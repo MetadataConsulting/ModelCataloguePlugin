@@ -5,6 +5,7 @@ import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.DataClass
+import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.crf.model.CaseReportForm
@@ -240,7 +241,7 @@ class ModelToFormExporterService {
             last.with {
                 // TODO: is there any way to configure simple conditional display
                 // TODO: validation
-                String regexpDef = fromCandidates(rel, candidates, EXT_ITEM_REGEXP, valueDomain?.regexDef)
+                String regexpDef = fromCandidates(rel, candidates, EXT_ITEM_REGEXP, valueDomain?.regexDef ?: dataType?.regexDef)
                 if (regexpDef) {
                     regexp regexpDef, fromCandidates(rel, candidates, EXT_ITEM_REGEXP_ERROR_MESSAGE, "Value must match /$regexpDef/")
                 }
@@ -255,7 +256,9 @@ class ModelToFormExporterService {
                 columnNumber = safeInteger(fromCandidates(rel, candidates, EXT_ITEM_COLUMN_NUMBER), EXT_ITEM_COLUMN_NUMBER, rel)
                 units fromCandidates(rel, candidates, EXT_ITEM_UNITS, candidates.find {
                     it.instanceOf(ValueDomain) && it.unitOfMeasure
-                }?.unitOfMeasure?.symbol)
+                }?.unitOfMeasure?.symbol ?: candidates.find {
+                    it.instanceOf(PrimitiveType) && it.measurementUnit
+                }?.measurementUnit?.symbol)
 
                 if (first) {
                     if (!last.group) {
