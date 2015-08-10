@@ -187,7 +187,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         waitFor {
             subviewTitle.text() == 'MET-523 DRAFT'
         }
-        totalOf('declares') == 28
+        totalOf('declares') == 39
     }
 
     def "upload excel file"() {
@@ -245,7 +245,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         waitFor(60) {
             subviewTitle.text() == 'MET-522 DRAFT'
         }
-        totalOf('declares') == 27
+        totalOf('declares') == 28
 
         when:
         goToDetailUsingSearch('MET-522.M1', 'MET-522')
