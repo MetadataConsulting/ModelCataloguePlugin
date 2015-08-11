@@ -29,11 +29,11 @@ classification name: 'Two', {
 
     model name: 'Model', {
         dataElement name: 'ABC', {
-            valueDomain name: 'Same', classification: 'Domains'
+            dataType name: 'Same', classification: 'Domains'
         }
         dataElement name: 'DEF'
         dataElement name: 'GHJ', {
-            valueDomain name: 'Same', classification: 'Domains'
+            dataType name: 'Same', classification: 'Domains'
         }
         dataElement name: 'IJK'
 

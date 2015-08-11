@@ -288,7 +288,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         }
 
         when: "value domain is selected"
-        valueDomain = 'xs:boolean'
+        dataType = 'xs:boolean'
         selectCepItemIfExists()
 
         and: "new mapping rule is created"

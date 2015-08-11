@@ -1,5 +1,5 @@
 import org.modelcatalogue.core.Mapping
 
 fixture {
-    Mapping_C_to_F(Mapping, source: VD_degree_C, destination: VD_degree_F, mapping: "(x as Double) * 9 / 5 + 32")
+    Mapping_C_to_F(Mapping, source: DT_test1, destination: DT_test2, mapping: "(x as Double) * 9 / 5 + 32")
 }

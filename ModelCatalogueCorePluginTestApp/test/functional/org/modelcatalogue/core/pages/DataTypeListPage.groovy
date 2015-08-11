@@ -20,7 +20,7 @@ class DataTypeListPage extends ModelCataloguePage {
         name                { basicEditDialog.find('#name') }
         modelCatalogueId    { basicEditDialog.find('#modelCatalogueId') }
         description         { basicEditDialog.find('#description') }
-        dataType            { basicEditDialog.find('#dataType') }
+        dataType            { $('#dataType') }
         unitOfMeasure       { basicEditDialog.find('#unitOfMeasure') }
         rule                { basicEditDialog.find('#rule') }
 
