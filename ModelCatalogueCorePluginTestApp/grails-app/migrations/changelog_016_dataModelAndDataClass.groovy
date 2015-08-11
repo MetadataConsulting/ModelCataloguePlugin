@@ -195,7 +195,28 @@ databaseChangeLog = {
                     """
                 }
 
-                // TODO: migrate extensions
+                // migrate extensions
+
+                sql.eachRow """
+                    select vd.data_type_id, ex.id
+                    from value_domain vd
+                    join extension_value ex on vd.id = ex.element_id
+                    where vd.data_type_id is not null
+                """, { row ->
+
+                    def dtid = row[0]
+                    def exid = row[1]
+
+                    try {
+                        sql.executeUpdate """
+                            update extension_value
+                            set element_id = $dtid
+                            where id = $exid
+                        """
+                    } catch (ignored) {
+                        // duplicate entry - ignored
+                    }
+                }
 
                 // migrate data elements
 
