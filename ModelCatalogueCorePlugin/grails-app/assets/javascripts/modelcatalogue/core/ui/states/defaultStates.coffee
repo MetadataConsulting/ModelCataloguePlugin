@@ -329,19 +329,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       templateUrl: 'modelcatalogue/core/ui/state/parent.html'
     })
 
-    $stateProvider.state 'mc.dataArchitect.uninstantiatedDataElements', {
-      url: "/uninstantiatedDataElements",
-      templateUrl: 'modelcatalogue/core/ui/state/list.html'
-      resolve:
-        list: ['$stateParams', 'modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
-          $stateParams.resource = "dataElement"
-          # it's safe to call top level for each controller, only model controller will respond on it
-          modelCatalogueDataArchitect.uninstantiatedDataElements()
-        ]
-
-      controller: 'mc.core.ui.states.ListCtrl'
-    }
-
 
     $stateProvider.state 'mc.dataArchitect.metadataKey', {
       url: "/metadataKeyCheck",
@@ -781,7 +768,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                         <div class="col-xs-9 text-right">
                             <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'dataElement'})" ui-sref-opts="{inherit: false}">Finalized Data Elements</a> {{finalizedDataElementCount}} </div>
                             <div show-for-role="VIEWER"><a id="modelsLink" ui-sref="mc.resource.list({resource: 'dataElement', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Data Elements</a> {{draftDataElementCount}}</div>
-                            <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'dataElement', status:'uninstantiated'})" ui-sref-opts="{inherit: false}">Uninstantiated Data Elements</a>  {{uninstantiatedDataElementCount}}</div>
                         </div>
                     </div>
                 </div>

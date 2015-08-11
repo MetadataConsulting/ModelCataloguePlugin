@@ -47,8 +47,6 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setDeprecationWarning 'dataElement', (dataElement) ->
     if dataElement.dataType
       return 'Data Type Deprecated' if dataElement.dataType.status == 'DEPRECATED'
-      dataTypeDeprecation = catalogueProvider.getDeprecationWarning('dataType')(dataElement.dataType)
-      return "Data Type uses deprecated #{dataTypeDeprecation}" if dataTypeDeprecation
 
     return undefined
 

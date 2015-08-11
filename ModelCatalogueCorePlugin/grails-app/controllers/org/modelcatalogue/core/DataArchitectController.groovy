@@ -23,11 +23,6 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
 
     def index(){}
 
-    def uninstantiatedDataElements(Integer max){
-        handleParams(max)
-        respond Lists.wrap(params, DataElement, "/dataArchitect/uninstantiatedDataElements", dataArchitectService.uninstantiatedDataElements(params))
-    }
-
 
     def metadataKeyCheck(Integer max){
         handleParams(max)

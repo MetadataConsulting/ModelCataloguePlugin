@@ -56,35 +56,6 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec {
     }
 
     @Unroll
-    def "json -  get uninstantiated data elements from the catalogue"() {
-        def controller = new DataArchitectController()
-        ResultRecorder recorder = DefaultResultRecorder.create(
-                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
-                "dataArchitect"
-        )
-
-        when:
-        controller.response.format = "json"
-        controller.uninstantiatedDataElements(10)
-        JSONElement json = controller.response.json
-        String list = "metadata_uninstantiated"
-        recorder.recordResult list, json
-
-        then:
-
-        json.success
-        json.total == 8
-        json.offset == 0
-        json.page == 10
-        json.list
-        json.list.size() == 8
-        json.next == ""
-        json.previous == ""
-
-
-    }
-
-    @Unroll
     def "json -  get data elements without metadata key from the catalogue"() {
 
         def controller = new DataArchitectController()

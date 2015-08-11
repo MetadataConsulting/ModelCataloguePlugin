@@ -53,7 +53,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def "create new version"() {
         DataElement author = DataElement.findByName('auth5')
-        DataType domain = DataType.findByName('test data type 1')
+        DataType domain = DataType.findByName('test1')
 
 
         author.ext.something = 'anything'
@@ -110,9 +110,14 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def "archive"() {
         DataElement author = DataElement.findByName('auth5')
-        DataType dataType = DataType.findByName('test data type 1')
+        DataType dataType = DataType.findByName('test1')
+
+        expect:
+        author
+        dataType
 
 
+        when:
         author.ext.something = 'anything'
         author.dataType = dataType
         author.save(failOnError: true)
@@ -122,7 +127,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         int archivedVersion     = archived.versionNumber
         author.refresh()
 
-        expect:
+        then:
         author == archived
         author.id == archived.id
         originalVersion == archivedVersion
@@ -131,7 +136,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         archived.ext.something == 'anything'
 
-        !(archived in dataType.dataElements)
+        !(archived in dataType.relatedDataElements)
     }
 
     def "merge"() {

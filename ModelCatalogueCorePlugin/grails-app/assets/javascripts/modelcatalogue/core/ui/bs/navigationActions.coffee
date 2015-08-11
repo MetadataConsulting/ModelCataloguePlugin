@@ -88,23 +88,6 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     }
   ]
 
-  uninstantiatedElements = ['$scope', '$state', ($scope, $state) ->
-    action = {
-      position:    200
-      label:      'Uninstantiated Data Elements'
-      icon:       'fa fa-fw fa-cube'
-      action: ->
-        $state.go 'mc.resource.list', {resource: 'dataElement', status: 'uninstantiated'}
-    }
-
-    $scope.$on '$stateChangeSuccess', (ignored, state) ->
-      action.active = state.name == 'mc.dataArchitect.uninstantiatedDataElements'
-
-    action
-  ]
-  actionsProvider.registerChildAction 'navbar-data-architect', 'navbar-uninstantiated-elements', uninstantiatedElements
-  actionsProvider.registerActionInRole 'global-uninstantiated-elements', actionsProvider.ROLE_GLOBAL_ACTION, uninstantiatedElements
-
   actionsProvider.registerChildAction 'navbar-data-architect', 'navbar-relations-by-metadata-key', ['$scope', '$state', ($scope, $state) ->
     action = {
       position:    300

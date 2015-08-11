@@ -34,14 +34,6 @@ class DataArchitectService {
         suggestions.keySet().sort()
     }
 
-    ListWithTotal<DataElement> uninstantiatedDataElements(Map params){
-        dataModelService.classified Lists.fromCriteria(params, DataElement) {
-            'in'('status', org.modelcatalogue.core.api.ElementStatus.DRAFT, org.modelcatalogue.core.api.ElementStatus.PENDING, org.modelcatalogue.core.api.ElementStatus.UPDATED, org.modelcatalogue.core.api.ElementStatus.FINALIZED)
-            isNull 'valueDomain'
-
-        }
-    }
-
     ListWithTotal<ValueDomain> incompleteValueDomains(Map params){
         dataModelService.classified Lists.fromCriteria(params, ValueDomain) {
             isNull 'dataType'

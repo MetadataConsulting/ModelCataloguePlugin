@@ -427,7 +427,6 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
     def "complex model"() {
         build {
-            automatic valueDomain
             automatic dataType
 
             dataModel name: 'Complex', {

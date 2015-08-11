@@ -31,7 +31,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      *
      * @see #automatic(BuilderKeyword)
      */
-    private static Set<Class> SUPPORTED_FOR_AUTO = [DataType, EnumeratedType, ReferenceType, PrimitiveType, ValueDomain]
+    private static Set<Class> SUPPORTED_FOR_AUTO = [DataType, EnumeratedType, ReferenceType, PrimitiveType]
 
     /**
      * Repository handles fetching the right elements from the database based on id, value or classification.

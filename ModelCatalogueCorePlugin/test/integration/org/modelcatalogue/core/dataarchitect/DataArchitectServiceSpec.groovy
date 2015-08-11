@@ -6,10 +6,11 @@ import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.util.ListWithTotal
+import spock.lang.Ignore
 
 class DataArchitectServiceSpec extends AbstractIntegrationSpec {
 
-    def dataArchitectService, relationshipService, de1, de2, de3, de4, de5, vd, md
+    def dataArchitectService, relationshipService, de1, de2, de3, de4, de5, md
 
 
     def setup() {
@@ -19,10 +20,8 @@ class DataArchitectServiceSpec extends AbstractIntegrationSpec {
         de3 = DataElement.findByName("AUTHOR")
         de4 = DataElement.findByName("auth4")
         de5 = DataElement.findByName("auth5")
-        vd = ValueDomain.findByName("value domain Celsius")
         md = new DataClass(name: "tsdfafsd").save()
         md.addToContains(de1)
-        de2.valueDomain = vd
         de2.save()
         de1.ext.put("localIdentifier", "test")
         de4.ext.put("test2", "test2")
@@ -65,19 +64,6 @@ class DataArchitectServiceSpec extends AbstractIntegrationSpec {
         !dataElements.items.contains(de4)
         dataElements.items.contains(de1)
         dataElements.items.contains(de5)
-
-    }
-
-    def "find uninstantiatedDataElements"() {
-        when:
-        Map params = [:]
-        params.put("max", 12)
-        ListWithTotal dataElements = dataArchitectService.uninstantiatedDataElements(params)
-
-        then:
-        !dataElements.items.contains(DataElement.findByName('speed of Vauxhall'))
-        dataElements.items.contains(DataElement.get(de1.id))
-        dataElements.items.contains(DataElement.get(de3.id))
 
     }
 

@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.util.DataTypeRuleScript
 import org.modelcatalogue.core.util.FriendlyErrors
@@ -128,20 +129,38 @@ class DataType extends CatalogueElement {
         if (!readyForQueries) {
             return []
         }
-        return DataElement.findAllByDataType(this)
+        if (archived) {
+            return DataElement.findAllByDataType(this)
+        }
+        return DataElement.findAllByDataTypeAndStatusInList(this, [ElementStatus.FINALIZED, ElementStatus.DRAFT])
     }
 
     Long countRelatedDataElements() {
         if (!readyForQueries) {
             return 0
         }
-        return DataElement.countByDataType(this)
+        if (archived) {
+            return DataElement.countByDataType(this)
+        }
+        return DataElement.countByDataTypeAndStatusInList(this, [ElementStatus.FINALIZED, ElementStatus.DRAFT])
     }
 
     DataType removeFromRelatedDataElements(DataElement element) {
         element.dataType = null
         FriendlyErrors.failFriendlySave(element)
         this
+    }
+
+    @Override
+    void afterMerge(CatalogueElement destination) {
+        if (!(destination.instanceOf(DataType))) {
+            return
+        }
+        List<DataElement> dataElements = new ArrayList<DataElement>(relatedDataElements)
+        for (DataElement element in dataElements) {
+            element.dataType = destination as DataType
+            FriendlyErrors.failFriendlySave(element)
+        }
     }
 
 

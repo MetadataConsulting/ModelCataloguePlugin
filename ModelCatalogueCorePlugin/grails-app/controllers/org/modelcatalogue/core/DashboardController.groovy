@@ -14,7 +14,6 @@ class DashboardController {
 
     def index() {
         response.addHeader('Expires', '-1')
-        def uninstantiatedDataElements = dataArchitectService.uninstantiatedDataElements(params)
 
         def model = [:]
 
@@ -46,7 +45,6 @@ class DashboardController {
         model.putAll([
             activeBatchCount:Batch.countByArchived(false),
             archivedBatchCount:Batch.countByArchived(true),
-            uninstantiatedDataElementCount: uninstantiatedDataElements.total,
             relationshipTypeCount:RelationshipType.count(),
             transformationsCount:CsvTransformation.count()
         ])
