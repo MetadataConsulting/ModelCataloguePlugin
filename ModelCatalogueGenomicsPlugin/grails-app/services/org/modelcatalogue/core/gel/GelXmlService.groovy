@@ -318,7 +318,7 @@ class GelXmlService {
     }
 
 
-    protected static printComplexType(MarkupBuilder xml, DataClass model, Set<DataType> valueDomains, DataModel xmlSchema) {
+    protected static printComplexType(MarkupBuilder xml, DataClass model, Set<DataType> dataTypes, DataModel xmlSchema) {
         def sectionType = 'xs:sequence'
         if (model.ext.get(XSD_SCHEMA_SECTION_TYPE)?.compareToIgnoreCase("choice") == 0) {
             sectionType = 'xs:choice'
@@ -340,7 +340,7 @@ class GelXmlService {
 
 
                 model.getOutgoingRelationshipsByType(RelationshipType.containmentType).each { Relationship relationship ->
-                    printDataElements(xml, relationship.destination, relationship.ext.get(METADATA_MIN_OCCURS), relationship.ext.get(METADATA_MAX_OCCURS), valueDomains, xmlSchema, relationship.ext)
+                    printDataElements(xml, relationship.destination, relationship.ext.get(METADATA_MIN_OCCURS), relationship.ext.get(METADATA_MAX_OCCURS), dataTypes, xmlSchema, relationship.ext)
                 }
 
                 model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType).each { Relationship relationship ->
@@ -365,7 +365,7 @@ class GelXmlService {
      * Check specific GEL  elements for metadata section  for xml model or xsd
      * @param xml
      * @param model
-     * @param valueDomains
+     * @param dataTypes
      * @param xmlSchema
      * @return void
      * @throw Exception with a text message for missing fields

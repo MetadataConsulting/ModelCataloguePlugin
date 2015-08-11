@@ -11,7 +11,6 @@ import org.modelcatalogue.core.util.SecuredRuleExecutor
 * A Data Type is like a primitive type
 * i.e. integer, string, byte, boolean, time........
 * additional types can be specified (as well as enumerated types (see EnumeratedType))
-* Data Types are used by Value Domains (please see ValueDomain and Usance)
 */
 
 
@@ -81,7 +80,7 @@ class DataType extends CatalogueElement {
         tablePerHierarchy false
     }
 
-    static transients = ['relatedValueDomains', 'relatedDataElements', 'regexDef']
+    static transients = ['relatedDataElements', 'regexDef']
 
     static String suggestName(Set<String> suggestions) {
         if (!suggestions) {
@@ -100,29 +99,6 @@ class DataType extends CatalogueElement {
         }
 
         result.join(" ")
-    }
-
-    @Deprecated
-    List<ValueDomain> getRelatedValueDomains() {
-        if (!readyForQueries) {
-            return []
-        }
-        return ValueDomain.findAllByDataType(this)
-    }
-
-    @Deprecated
-    Long countRelatedValueDomains() {
-        if (!readyForQueries) {
-            return 0
-        }
-        return ValueDomain.countByDataType(this)
-    }
-
-    @Deprecated
-    DataType removeFromRelatedValueDomains(ValueDomain domain) {
-        domain.dataType = null
-        FriendlyErrors.failFriendlySave(domain)
-        this
     }
 
     List<DataElement> getRelatedDataElements() {
@@ -166,6 +142,6 @@ class DataType extends CatalogueElement {
 
     @Override
     protected PublishingChain prepareDraftChain(PublishingChain chain) {
-        chain.add(this.relatedValueDomains).add(this.dataModels)
+        chain.add(this.dataModels)
     }
 }

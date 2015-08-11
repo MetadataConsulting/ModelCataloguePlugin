@@ -31,11 +31,6 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         RelationshipType.readByName("relationship")
     }
 
-    ValueDomain getVd1() {
-        ValueDomain.findByName("school subject")
-    }
-
-
     def "Fail to Create Relationship if the catalogue elements have not been persisted"()
     {
 

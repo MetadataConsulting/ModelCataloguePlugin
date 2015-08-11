@@ -3,7 +3,6 @@ package org.modelcatalogue.core.util.marshalling
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.PrimitiveType
-import org.modelcatalogue.core.ValueDomain
 
 /**
  * Marshallers for MeasurementUnit.

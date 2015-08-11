@@ -2,17 +2,14 @@ package org.modelcatalogue.core.util.marshalling.xlsx
 
 import grails.rest.render.RenderContext
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.Relationships
 import spock.lang.Specification
 
-/**
- * Created by ladin on 09.04.14.
- */
 class XLSXRendererSpec extends Specification {
 
     def "register and find row writers"() {
@@ -53,9 +50,9 @@ class XLSXRendererSpec extends Specification {
         }
 
         when:
-        def w1 = renderer.findRowWriter(null, new Elements(itemType: ValueDomain), showContext)
-        def w2 = renderer.findRowWriter(null, new Elements(itemType: ValueDomain), indexContext)
-        def w3 = renderer.findRowWriter('reversed', new Elements(itemType: ValueDomain), indexContext)
+        def w1 = renderer.findRowWriter(null, new Elements(itemType: DataType), showContext)
+        def w2 = renderer.findRowWriter(null, new Elements(itemType: DataType), indexContext)
+        def w3 = renderer.findRowWriter('reversed', new Elements(itemType: DataType), indexContext)
         def w4 = renderer.findRowWriter(null, new Relationships(), indexContext)
 
         then:

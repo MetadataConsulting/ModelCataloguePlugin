@@ -183,11 +183,6 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
         [name: element.name, id: element.id, elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", versionNumber: element.versionNumber, latestVersionId: element.latestVersionId ?: element.id]
     }
 
-    static Map<String, Object> minimumValueDomain(ValueDomain element) {
-        if (!element) return null
-        [name: element.name, id: element.id, dataType: minimumDataType(element.dataType), elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", latestVersionId: element.latestVersionId ?: element.id]
-    }
-
     static Map<String, Object> minimumDataType(DataType element) {
         if (!element) return null
         if (element instanceof EnumeratedType) {

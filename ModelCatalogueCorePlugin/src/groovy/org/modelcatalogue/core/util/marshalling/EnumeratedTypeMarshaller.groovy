@@ -1,8 +1,6 @@
 package org.modelcatalogue.core.util.marshalling
 
-import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.EnumeratedType
-import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.util.OrderedMap
 
 class EnumeratedTypeMarshaller extends DataTypeMarshaller {

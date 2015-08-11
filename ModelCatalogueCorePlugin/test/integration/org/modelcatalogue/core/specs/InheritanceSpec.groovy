@@ -10,7 +10,6 @@ import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.InitCatalogueService
 import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.util.Inheritance
 import spock.lang.Ignore
 
@@ -52,8 +51,8 @@ class InheritanceSpec extends IntegrationSpec  {
     DataElement dataElement2
     DataElement dataElement3
     DataElement dataElement4
-    DataElement parentValueDomain
-    DataElement childValueDomain
+    DataElement parentDataElement
+    DataElement childDataElement
     DataType dataType1
     DataType dataType2
     DataModel dataModel1
@@ -95,8 +94,8 @@ class InheritanceSpec extends IntegrationSpec  {
         dataElement2 = DataElement.findByName(TEST_DATA_ELEMENT_2_NAME)
         dataElement3 = DataElement.findByName(TEST_DATA_ELEMENT_3_NAME)
         dataElement4 = DataElement.findByName(TEST_DATA_ELEMENT_4_NAME)
-        parentValueDomain = DataElement.findByName(TEST_PARENT_VALUE_DOMAIN_NAME)
-        childValueDomain = DataElement.findByName(TEST_CHILD_VALUE_DOMAIN_NAME)
+        parentDataElement = DataElement.findByName(TEST_PARENT_VALUE_DOMAIN_NAME)
+        childDataElement = DataElement.findByName(TEST_CHILD_VALUE_DOMAIN_NAME)
         dataType1 = DataType.findByName(TEST_DATA_TYPE_1_NAME)
         dataType2 = DataType.findByName(TEST_DATA_TYPE_2_NAME)
         dataModel1 = DataModel.findByName(TEST_DATA_MODEL_1_NAME)
@@ -284,59 +283,59 @@ class InheritanceSpec extends IntegrationSpec  {
     def "inherit associations"() {
         addBasedOn()
         expect: "associations are inherited"
-        parentValueDomain.dataType == dataType1
-        parentValueDomain.save(failOnError: true, flush: true)
-        childValueDomain.dataType == dataType1
-        childValueDomain.save(failOnError: true, flush: true)
+        parentDataElement.dataType == dataType1
+        parentDataElement.save(failOnError: true, flush: true)
+        childDataElement.dataType == dataType1
+        childDataElement.save(failOnError: true, flush: true)
 
         when: "we remove associations from parent"
-        parentValueDomain.dataType = null
-        parentValueDomain.save(failOnError: true, flush: true)
+        parentDataElement.dataType = null
+        parentDataElement.save(failOnError: true, flush: true)
 
         then: "it is removed from the child as well"
-        childValueDomain.dataType == null
+        childDataElement.dataType == null
 
         when: "we add association to the parent"
-        parentValueDomain.dataType = dataType2
-        parentValueDomain.save(failOnError: true, flush: true)
+        parentDataElement.dataType = dataType2
+        parentDataElement.save(failOnError: true, flush: true)
 
         then: "it is added to child as well"
-        childValueDomain.dataType == dataType2
+        childDataElement.dataType == dataType2
 
         when: "association in the child is overridden"
-        childValueDomain.dataType = dataType1
-        childValueDomain.save(failOnError: true, flush: true)
+        childDataElement.dataType = dataType1
+        childDataElement.save(failOnError: true, flush: true)
 
         then: "it doesn't affect the parent"
-        parentValueDomain.dataType == dataType2
+        parentDataElement.dataType == dataType2
 
         when: "the association is removed from the parent"
-        parentValueDomain.dataType = null
-        parentValueDomain.save(failOnError: true, flush: true)
+        parentDataElement.dataType = null
+        parentDataElement.save(failOnError: true, flush: true)
 
         then: "the association is persisted in the child as it was already customized"
-        childValueDomain.dataType == dataType1
+        childDataElement.dataType == dataType1
 
         when: "the association is assigned in the parent but also exist in child"
-        parentValueDomain.dataType = dataType2
-        parentValueDomain.save(failOnError: true, flush: true)
+        parentDataElement.dataType = dataType2
+        parentDataElement.save(failOnError: true, flush: true)
 
         then: "only parent is assigned"
-        parentValueDomain.dataType == dataType2
-        childValueDomain.dataType == dataType1
+        parentDataElement.dataType == dataType2
+        childDataElement.dataType == dataType1
 
         when: "the association is removed from the child"
-        childValueDomain.dataType = null
-        childValueDomain.save(failOnError: true, flush: true)
+        childDataElement.dataType = null
+        childDataElement.save(failOnError: true, flush: true)
 
         then: "the association is reset to the one from parent"
-        childValueDomain.dataType == dataType2
+        childDataElement.dataType == dataType2
 
         when: "the element no longer inherits form the parent"
         removeBasedOn()
 
         then: "the association is set to null"
-        childValueDomain.dataType == null
+        childDataElement.dataType == null
 
     }
 
@@ -361,12 +360,12 @@ class InheritanceSpec extends IntegrationSpec  {
 
     private void addBasedOn() {
         childClass.addToIsBasedOn parentClass
-        childValueDomain.addToIsBasedOn parentValueDomain
+        childDataElement.addToIsBasedOn parentDataElement
     }
 
     private void removeBasedOn() {
         childClass.removeFromIsBasedOn parentClass
-        childValueDomain.removeFromIsBasedOn parentValueDomain
+        childDataElement.removeFromIsBasedOn parentDataElement
     }
 
     private void assertNothingInherited() {
@@ -386,15 +385,15 @@ class InheritanceSpec extends IntegrationSpec  {
         assert dataElement3
         assert dataElement4
 
-        assert parentValueDomain
-        assert childValueDomain
+        assert parentDataElement
+        assert childDataElement
         assert dataType1
         assert dataType2
 
         assert dataModel1
         assert dataModel2
 
-        assert parentValueDomain.dataType == dataType1
-        assert childValueDomain.dataType == null
+        assert parentDataElement.dataType == dataType1
+        assert childDataElement.dataType == null
     }
 }

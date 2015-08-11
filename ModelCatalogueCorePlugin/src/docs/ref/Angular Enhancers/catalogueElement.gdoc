@@ -20,9 +20,9 @@ or [modelCatalogueSearch|Angular Services].
 angular
 .module('foo', ['mc.core.catalogueElementResource', 'mc.core.catalogueElementEnhancer'])
 .factory('bar', function(catalogueElementResource) {
-    var valueDomains = catalogueElementResource('valueDomain')
-    valueDomains.get(1).then(function(domain){
-        domain.show(); // triggers the showCatalogueElement event
+    var dataTypes = catalogueElementResource('dataType')
+    dataTypes.get(1).then(function(type){
+        type.show(); // triggers the showCatalogueElement event
     });
 });
 {code}

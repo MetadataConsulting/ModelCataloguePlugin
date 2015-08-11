@@ -21,16 +21,16 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
 	def gereport() {
 		def results = getModelsForClassification(params.id as Long)
 
-		def valueDomains = new TreeSet<ValueDomain>([compare: { ValueDomain a, ValueDomain b ->
+		def dataTypes = new TreeSet<DataType>([compare: { DataType a, DataType b ->
 				a?.name <=> b?.name
-			}] as Comparator<ValueDomain>)
+			}] as Comparator<DataType>)
 
 		if (!results) {
 			notFound()
 			return
 		}
 
-		render view: 'gereport', model: ['models': results, 'valueDomains': valueDomains]
+		render view: 'gereport', model: ['models': results, 'dataTypes': dataTypes]
 	}
 
 

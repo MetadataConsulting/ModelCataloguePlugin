@@ -36,11 +36,6 @@ class DataElement extends CatalogueElement {
 
     @Override
     void afterDraftPersisted(CatalogueElement draft) {
-        super.afterDraftPersisted(draft)
-        if (valueDomain) {
-            (draft as DataElement).valueDomain = valueDomain
-            FriendlyErrors.failFriendlySave(draft)
-        }
         if (dataType) {
             (draft as DataElement).dataType = dataType
             FriendlyErrors.failFriendlySave(draft)
@@ -54,6 +49,6 @@ class DataElement extends CatalogueElement {
 
     @Override
     List<String> getInheritedAssociationsNames() {
-        ['valueDomain', 'dataType']
+        ['dataType']
     }
 }

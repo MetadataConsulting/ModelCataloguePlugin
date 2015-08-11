@@ -6,9 +6,6 @@ import org.modelcatalogue.core.ValueDomain
 import spock.lang.Specification
 import org.modelcatalogue.core.dataarchitect.xsd.*
 
-/**
- * Created by sus_avi on 11/07/2014.
- */
 
 @Mock(ValueDomain)
 class XsdlLoaderSpec extends Specification {

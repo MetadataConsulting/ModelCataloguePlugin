@@ -1,17 +1,11 @@
 dataModel name: 'Java', {
 
-    // if not set explicitly, the data type with the same name and description is created for value domains
-    automatic dataType
-
-    // data types are missing the link to the XMLSchema, but the all have xs prefix so no name clash should happen
-    globalSearchFor dataType
-
-    valueDomain name: "String", description: "java.lang.String"
-    valueDomain name: "Integer", description: "java.lang.Integer"
-    valueDomain name: "Double", description: "java.lang.Double"
-    valueDomain name: "Boolean", description: "java.lang.Boolean"
-    valueDomain name: "Date", description: "java.util.Date"
-    valueDomain name: "Time", description: "java.sql.Time"
-    valueDomain name: "Currency", description: "java.util.Currency"
-    valueDomain name: "Text", description: "a text field"
+    dataType name: "String", description: "java.lang.String"
+    dataType name: "Integer", description: "java.lang.Integer"
+    dataType name: "Double", description: "java.lang.Double"
+    dataType name: "Boolean", description: "java.lang.Boolean"
+    dataType name: "Date", description: "java.util.Date"
+    dataType name: "Time", description: "java.sql.Time"
+    dataType name: "Currency", description: "java.util.Currency"
+    dataType name: "Text", description: "a text field"
 }

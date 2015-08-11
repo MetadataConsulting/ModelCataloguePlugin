@@ -24,7 +24,7 @@ author.addToContainedIn(book)
 @.addToInstantiatedBy@
 {code}
 EnumeratedType schoolSubjects = EnumeratedType.findByName("schoolSubjects")
-ValueDomain subjects = new ValueDomain(name: "school subjects", dataType: v)
+DataType subjects = new DataType(name: "school subjects", dataType: v)
 author.addToInstantiatedBy(subjects)
 {code}
 

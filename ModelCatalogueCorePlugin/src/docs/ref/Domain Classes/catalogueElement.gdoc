@@ -4,7 +4,7 @@ Abstract Class extended to allow creation of [relationship|Domain Classes]s betw
 Relationships can be created and removed using the [relationshipService|Services].
 Shortcuts methods for catalogue element relationships can be configured using the [relationships|Domain Classes] declaration.
 
-Extended By: [dataElement|Domain Classes], [model|Domain Classes], [valueDomain|Domain Classes], [conceptualDomain|Domain Classes]
+Extended By: [dataElement|Domain Classes], [model|Domain Classes]
 
 h2. Usage
 

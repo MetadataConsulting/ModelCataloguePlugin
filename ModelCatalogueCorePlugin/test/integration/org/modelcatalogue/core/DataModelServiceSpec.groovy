@@ -64,12 +64,12 @@ class DataModelServiceSpec extends IntegrationSpec {
     }
 
     def "does not fail when there are no results"() {
-        ValueDomain domain = new ValueDomain(name: "Test Domain").save(failOnError: true)
+        DataType domain = new DataType(name: "Test Domain").save(failOnError: true)
         domain.addToDeclaredWithin classification1
-        DetachedCriteria<ValueDomain> criteria = dataModelService.classified(ValueDomain, DataModelFilter.create(true))
+        DetachedCriteria<DataType> criteria = dataModelService.classified(DataType, DataModelFilter.create(true))
 
         expect:
-        criteria.count() == ValueDomain.list().count { !it.classifications }
+        criteria.count() == DataType.list().count { !it.dataModels }
 
         Lists.fromCriteria([:], criteria).items.size() == criteria.count()
     }

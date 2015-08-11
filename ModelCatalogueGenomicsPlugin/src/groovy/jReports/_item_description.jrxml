@@ -7,7 +7,7 @@
 	<property name="net.sf.jasperreports.print.create.bookmarks" value="false"/>
 	<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
 	<parameter name="REPORTS_PATH" class="java.lang.String"/>
-	<parameter name="VALUE_DOMAINS" class="java.util.TreeSet"/>
+	<parameter name="DATA_TYPES" class="java.util.TreeSet"/>
 	<parameter name="SHOW_DOMAIN_ID" class="java.lang.Boolean"/>
 	<queryString>
 		<![CDATA[]]>
@@ -183,7 +183,7 @@
 					<property name="local_mesure_unitwidth" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<printWhenExpression><![CDATA[$P{VALUE_DOMAINS}.add($F{currentObject}.destination.valueDomain)|| Boolean.TRUE]]></printWhenExpression>
+					<printWhenExpression><![CDATA[$P{DATA_TYPES}.add($F{currentObject}.destination.dataType)|| Boolean.TRUE]]></printWhenExpression>
 				</reportElement>
 				<box padding="3" topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3">
 					<topPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
@@ -194,10 +194,10 @@
 				<textElement>
 					<font fontName="Calibri"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{currentObject}.destination.valueDomain?.name]]></textFieldExpression>
-				<hyperlinkReferenceExpression><![CDATA["#"+String.valueOf($F{currentObject}.destination.valueDomain.id)]]></hyperlinkReferenceExpression>
+				<textFieldExpression><![CDATA[$F{currentObject}.destination.dataType?.name]]></textFieldExpression>
+				<hyperlinkReferenceExpression><![CDATA["#"+String.valueOf($F{currentObject}.destination.dataType.id)]]></hyperlinkReferenceExpression>
 				<hyperlinkWhenExpression><![CDATA[true]]></hyperlinkWhenExpression>
-				<hyperlinkAnchorExpression><![CDATA["#ANC_"+$F{currentObject}.destination.valueDomain?.name]]></hyperlinkAnchorExpression>
+				<hyperlinkAnchorExpression><![CDATA["#ANC_"+$F{currentObject}.destination.dataType?.name]]></hyperlinkAnchorExpression>
 			</textField>
 			<frame>
 				<reportElement stretchType="RelativeToTallestObject" isPrintRepeatedValues="false" x="400" y="0" width="155" height="20" uuid="f5446fdd-4dd7-4a87-b47d-b5c430e94d00">
@@ -224,8 +224,8 @@
 					<subreportParameter name="REPORTS_PATH">
 						<subreportParameterExpression><![CDATA[$P{REPORTS_PATH}]]></subreportParameterExpression>
 					</subreportParameter>
-					<subreportParameter name="VALUE_DOMAINS">
-						<subreportParameterExpression><![CDATA[$P{VALUE_DOMAINS}]]></subreportParameterExpression>
+					<subreportParameter name="DATA_TYPES">
+						<subreportParameterExpression><![CDATA[$P{DATA_TYPES}]]></subreportParameterExpression>
 					</subreportParameter>
 					<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{currentObject}.destination.isSynonymFor)]]></dataSourceExpression>
 					<subreportExpression><![CDATA[new File($P{REPORTS_PATH}+"/_cIGe_synonym.jasper")]]></subreportExpression>

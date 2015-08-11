@@ -64,12 +64,12 @@ Considering you have following code in you controller with injected [catalogueEl
 [columns|Angular Services] and [enhance|Angular Services] services:
 
 {code}
-var itemType = 'com.modelcatalogue.core.ValueDomain'
+var itemType = 'com.modelcatalogue.core.DataType'
 // first declare an empty list before the values are loaded
 $scope.list     = enhance.getEnhancer('list').createEmptyList(type)
 // also get the appropriate columns definitions
 $scope.columns  = columns(type)
-catalogueElementResource('valueDomain').list().then(function(list) {
+catalogueElementResource('dataType').list().then(function(list) {
     $scope.list = list;
 });
 {code}

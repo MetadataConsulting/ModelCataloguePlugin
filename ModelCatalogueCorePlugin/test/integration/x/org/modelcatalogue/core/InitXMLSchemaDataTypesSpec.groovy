@@ -3,7 +3,6 @@ package x.org.modelcatalogue.core
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
-import org.modelcatalogue.core.ValueDomain
 import spock.lang.Stepwise
 import spock.lang.Unroll
 
@@ -60,8 +59,8 @@ class InitXMLSchemaDataTypesSpec extends IntegrationSpec {
         'xs:hexBinary'              | 'game'                                                                | false
         'xs:anyURI'                 | 'game'                                                                | true
         'xs:anyURI'                 | 'game#over'                                                           | true
-        'xs:anyURI'                 | 'https://metadata.cfapps.io/#/catalogue/dataType/58/valueDomains'     | true
-        'xs:anyURI'                 | 'https://metadata[cfa!ps]i0/#/catalogue/dataType/58/valueDomains'     | false
+        'xs:anyURI'                 | 'https://metadata.cfapps.io/#/catalogue/dataType/58/dataTypes'        | true
+        'xs:anyURI'                 | 'https://metadata[cfa!ps]i0/#/catalogue/dataType/58/dataTypes'        | false
         'xs:string'                 | 'just a regular string'                                               | true
         'xs:decimal'                | '+100'                                                                | true
         'xs:decimal'                | '-100'                                                                | true

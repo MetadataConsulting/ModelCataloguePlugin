@@ -7,7 +7,6 @@ import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.crf.model.CaseReportForm
 import org.modelcatalogue.crf.model.GenericItem
 import org.modelcatalogue.crf.model.GridGroup

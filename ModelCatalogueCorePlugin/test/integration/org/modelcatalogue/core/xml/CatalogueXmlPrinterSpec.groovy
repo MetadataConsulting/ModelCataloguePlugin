@@ -156,7 +156,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
         build {
             dataClass(name: "Locomotive", id: "http://www.example.com/models/Locomotive") {
                 dataElement(name: "Factor of Adhesion", id: "http://www.example.com/elements/Adhesion") {
-                    valueDomain(name: 'Force', id: "http://www.example.com/domains/Force") {
+                    dataType(name: 'Force', id: "http://www.example.com/domains/Force") {
                         description "A force is a push or pull upon an object resulting from the object's interaction with another object."
                         regex "\\d+"
                         dataType(name: "Decimal", id: "http://www.example.com/types/Decimal") {

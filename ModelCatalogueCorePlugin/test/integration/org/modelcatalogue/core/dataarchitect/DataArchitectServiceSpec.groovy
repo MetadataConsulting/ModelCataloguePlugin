@@ -4,7 +4,6 @@ import au.com.bytecode.opencsv.CSVReader
 import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataClass
-import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.util.ListWithTotal
 import spock.lang.Ignore
 

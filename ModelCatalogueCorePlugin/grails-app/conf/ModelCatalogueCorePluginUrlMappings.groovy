@@ -13,7 +13,7 @@ class ModelCatalogueCorePluginUrlMappings {
 
         def legacyElements    = [model: 'dataClass', classification: 'dataModel']
         def resources         = ['batch', 'relationshipType', 'csvTransformation' ]
-        def catalogueElements = ['asset', 'dataElement', 'dataClass', 'catalogueElement', 'dataType', 'enumeratedType', 'referenceType', 'primitiveType', 'measurementUnit', 'valueDomain', 'user', 'dataModel', 'classification', 'model']
+        def catalogueElements = ['asset', 'dataElement', 'dataClass', 'catalogueElement', 'dataType', 'enumeratedType', 'referenceType', 'primitiveType', 'measurementUnit', 'user', 'dataModel', 'classification', 'model']
         def allElements       = catalogueElements + resources
 
         for (String elementName in allElements) {

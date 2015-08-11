@@ -29,14 +29,14 @@
                 <g:each  in="${model.containsRelationships}" var="relationship" >
                   <g:if test="${relationship.destination instanceof DataElement }">
                     <%
-                        if (relationship.destination.valueDomain) {
-                            valueDomains << relationship.destination.valueDomain
+                        if (relationship.destination.dataType) {
+                            dataTypes << relationship.destination.dataType
                         }
                     %>
                     <tr>
                         <td width="100"><%=relationship.destination.name %> </br> (GE<%=relationship.destination.id %>)</td>
                         <td width="200"><%=relationship.destination.description %></td>
-                        <td width="100"><a href="#${relationship.destination.valueDomain?.id}">${relationship.destination.valueDomain?.name}</a></td>
+                        <td width="100"><a href="#${relationship.destination.dataType?.id}">${relationship.destination.dataType?.name}</a></td>
                         <td width="100">
                             <%=relationship.ext.get("Min Occurs")%>..<%=relationship.ext.get("Max Occurs") %>
                         </td>
@@ -49,15 +49,15 @@
                                 </g:if>
                             </g:each>
                         </td>
-                        %{--<g:if test="${relationship.destination.valueDomain?.dataType}">--}%
-                        %{--<td width="200"><%= relationship.destination.valueDomain.dataType.name %></td>--}%
+                        %{--<g:if test="${relationship.destination.dataType}">--}%
+                        %{--<td width="200"><%= relationship.destination.dataType.name %></td>--}%
                         %{--</g:if>--}%
                         %{--<g:else>--}%
                         %{--<td width="200">No Datatype defined</td>--}%
                         %{--</g:else>--}%
 
                         %{--<g:else>--}%
-                        %{--<td width="400"><%=relationship.destination.valueDomain.dataType.description%></td>--}%
+                        %{--<td width="400"><%=relationship.destination.dataType.description%></td>--}%
                         %{--</g:else>--}%
                         %{--<td width="30">${relationship.ext['Min Occurs']}</td>--}%
                         %{--<td width="30">${relationship.ext['Max Occurs']}</td>--}%
@@ -68,6 +68,6 @@
             </table>
          </g:if>
         <p>&nbsp;</p>
-        <g:if test="${model?.parentOf}"> <g:render template="recModel" model="${[models: model.parentOf, index: index+1,valueDomains:valueDomains]}"/></g:if>
+        <g:if test="${model?.parentOf}"> <g:render template="recModel" model="${[models: model.parentOf, index: index+1,dataTypes:dataTypes]}"/></g:if>
    </g:each>
 </g:if>

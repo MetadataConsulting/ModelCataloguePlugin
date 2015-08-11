@@ -12,14 +12,14 @@ class LoincImportService {
 
         loinc.toCsvReader([charset: 'UTF-8', skipLines: 1]).eachLine { tokens ->
             catalogueBuilder.build {
-                classification(name: "LOINC") {
+                dataModel(name: "LOINC") {
                     globalSearchFor dataType
                     description("LOINC conceptual domain")
-                    model(name: "LOINC Datasets") {
-                        model(name: tokens[4]) {
-                            model(name: tokens[7]) {
+                    dataClass(name: "LOINC Datasets") {
+                        dataClass(name: tokens[4]) {
+                            dataClass(name: tokens[7]) {
                                 dataElement(name: tokens[1], description: tokens[4]) {
-                                    valueDomain(name: tokens[28].replaceAll("\\s", "_")) {
+                                    dataType(name: tokens[28].replaceAll("\\s", "_")) {
                                         //DataImportService.importDataTypes(catalogueBuilder, tokens[3], [tokens[5]])
                                     }
                                     ext "Loinc Ref:", tokens[0]

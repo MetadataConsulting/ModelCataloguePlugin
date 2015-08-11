@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.util
 
 import org.modelcatalogue.core.DataType
-import org.modelcatalogue.core.ValueDomain
 
 import java.text.DateFormat
 import java.text.ParseException
@@ -180,17 +179,6 @@ abstract class DataTypeRuleScript extends Script {
 
     void setException(Exception e) {
         binding.setVariable('exception', e)
-    }
-
-    ValueDomain getDomain() {
-        if (!binding.hasVariable('domain')) {
-            return null
-        }
-        (ValueDomain)binding.getVariable('domain')
-    }
-
-    void setDomain(ValueDomain domain) {
-        binding.setVariable('domain', domain)
     }
 
 

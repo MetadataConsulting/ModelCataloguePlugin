@@ -5,8 +5,6 @@ import org.modelcatalogue.core.util.OrderedMap
 /*
 * Enumerated Types are data types that contain a list of enumerated values
 * i.e. ['politics', 'history', 'science']
-* Enumerated Types are used by Value Domains (please see ValueDomain)
-* i.e. ValueDomain subjects uses EnumeratedType enumerations ['politics', 'history', 'science']
 * */
 
 //TODO marshalling and unmarshalling for enumerated type as string at the moment it returns the enum as string

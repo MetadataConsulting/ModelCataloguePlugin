@@ -171,15 +171,15 @@ class BootStrap {
             catalogueBuilder.build {
                 automatic dataType
 
-                classification(name: 'Test 1') {
+                dataModel(name: 'Test 1') {
                     dataElement(name: 'Test Element 1') {
-                        valueDomain(name: 'Same Name')
+                        dataType(name: 'Same Name')
                     }
                 }
 
-                classification(name: 'Test 2') {
+                dataModel(name: 'Test 2') {
                     dataElement(name: 'Test Element 2') {
-                        valueDomain(name: 'Same Name')
+                        dataType(name: 'Same Name')
                     }
                 }
 

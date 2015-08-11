@@ -19,7 +19,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
 
 /**
 * Catalogue Element - there are a number of catalogue elements that make up the model
- * catalogue (please see DataType, MeasurementUnit, Model, ValueDomain,
+ * catalogue (please see DataType, MeasurementUnit, Model,
 * DataElement) they extend catalogue element which allows creation of incoming and outgoing
 * relationships between them. They also  share a number of characteristics.
 * */

@@ -24,13 +24,13 @@ angular
 .module('foo', ['mc.util.messages'])
 .factory('bar', function(messages, catalogueElementResource) {
     var deleteDomain = function(domainId) {
-        messages.confirm('Element Deletion', 'Do you really want to delete this value domain?').then(function(response) {
+        messages.confirm('Element Deletion', 'Do you really want to delete this data type?').then(function(response) {
             if (response) {
-                var domains = catalogueElementResource('valueDomain');
-                domains.delete({id: domainId}).then(function(status) {
-                    messages.success('Element deleted successfully', 'Value domain with id ' + domainId + ' was successfully deleted');
+                var types = catalogueElementResource('dataType');
+                types.delete({id: domainId}).then(function(status) {
+                    messages.success('Element deleted successfully', 'Data Type with id ' + domainId + ' was successfully deleted');
                 }, function(errors) {
-                    messages.success('Element deletion failed', 'Value domain with id ' + domainId + ' cannot be deleted');
+                    messages.success('Element deletion failed', 'Data Type with id ' + domainId + ' cannot be deleted');
                 });
             }
         });

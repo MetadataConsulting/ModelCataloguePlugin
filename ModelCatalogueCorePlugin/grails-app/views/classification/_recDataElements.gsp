@@ -1,4 +1,4 @@
-*<%@ page import="org.modelcatalogue.core.EnumeratedType" %>
+*<%@ page import="org.modelcatalogue.core.PrimitiveType; org.modelcatalogue.core.EnumeratedType" %>
 
     <h4>Data Elements</h4>
     <table class="table table-striped">
@@ -32,18 +32,18 @@
             </div>
             <div class="panel-body">
                 <p>${relationship.destination.description}</p>
-                <g:if test="${relationship?.destination?.valueDomain}">
+                <g:if test="${relationship?.destination?.dataType}">
                     <div class="panel panel-default">
-                        <g:each in="${relationship.destination?.valueDomain?.classifications}" var="cls">
+                        <g:each in="${relationship.destination?.dataType?.classifications}" var="cls">
                             <span class="pull-right badge">${cls.name}</span>
                         </g:each>
-                        <p><strong>${relationship?.destination?.valueDomain?.name}</strong>
-                            <g:if test="${relationship?.destination?.valueDomain?.description!=relationship?.destination?.description}">
-                                - ${relationship?.destination?.valueDomain?.description}
+                        <p><strong>${relationship?.destination?.dataType?.name}</strong>
+                            <g:if test="${relationship?.destination?.dataType?.description!=relationship?.destination?.description}">
+                                - ${relationship?.destination?.dataType?.description}
                             </g:if>
                         </p>
-                        <g:if test="${relationship.destination?.valueDomain?.dataType instanceof EnumeratedType}">
-                        %{--<p>${relationship.destination.valueDomain.dataType.prettyPrint()}</p>--}%
+                        <g:if test="${relationship.destination?.dataType instanceof EnumeratedType}">
+                        %{--<p>${relationship.destination.dataType.prettyPrint()}</p>--}%
                             <table class="table table-striped">
                                 <thead>
                                 <tr>
@@ -51,7 +51,7 @@
                                     <th width="200">Description</th>
                                 </tr>
                                 </thead>
-                                <g:each in="${relationship?.destination?.valueDomain?.dataType?.enumerations}" var="key, value">
+                                <g:each in="${relationship?.destination?.dataType?.enumerations}" var="key, value">
 
                                     <tr><td>${key}</td><td>${value}</td></tr>
 
@@ -61,15 +61,15 @@
                         </g:if>
                         <g:else>
 
-                            <g:if test="${relationship.destination?.valueDomain?.dataType?.name}">(${relationship.destination?.valueDomain?.dataType?.name})</g:if>
-                            <g:if test="${relationship.destination?.valueDomain?.dataType?.description}">(${relationship.destination?.valueDomain?.dataType?.description})</g:if>
-                            <g:if test="${relationship.destination?.valueDomain?.rule}"><p> Format: <code>${relationship.destination?.valueDomain?.rule}</code></p></g:if>
-                            <g:if test="${relationship.destination?.valueDomain?.unitOfMeasure?.name}">(${relationship.destination?.valueDomain?.unitOfMeasure?.name})</g:if>
-                            <g:if test="${relationship.destination?.valueDomain?.unitOfMeasure?.symbol}">(${relationship.destination?.valueDomain?.unitOfMeasure?.symbol})</g:if>
+                            <g:if test="${relationship.destination?.dataType?.name}">(${relationship.destination?.dataType?.name})</g:if>
+                            <g:if test="${relationship.destination?.dataType?.description}">(${relationship.destination?.dataType?.description})</g:if>
+                            <g:if test="${relationship.destination?.dataType?.rule}"><p> Format: <code>${relationship.destination?.rule}</code></p></g:if>
+                            <g:if test="${relationship.destination?.dataType instanceof org.modelcatalogue.core.PrimitiveType && relationship.destination?.dataType?.measurementUnit?.name}">(${relationship.destination?.measurementUnit?.name})</g:if>
+                            <g:if test="${relationship.destination?.dataType instanceof org.modelcatalogue.core.PrimitiveType && relationship.destination?.dataType?.measurementUnit?.symbol}">(${relationship.destination?.measurementUnit?.symbol})</g:if>
                         </g:else>
 
-                    %{--<g:if test="${relationship.destination?.valueDomain?.dataType?.enumerations}">--}%
-                    %{--<g:each in="${relationship.destination.valueDomain.dataType?.enumerations}" var="en">--}%
+                    %{--<g:if test="${relationship.destination?.dataType?.enumerations}">--}%
+                    %{--<g:each in="${relationship.destination?.dataType?.enumerations}" var="en">--}%
                     %{--<p>${en}</p>--}%
                     %{--</g:each>--}%
                     %{--</g:if>--}%

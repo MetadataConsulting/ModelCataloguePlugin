@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.util
 
-import org.modelcatalogue.core.ValueDomain
+import org.modelcatalogue.core.DataType
 import spock.lang.Specification
 import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
@@ -8,19 +8,19 @@ import spock.util.mop.ConfineMetaClassChanges
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
-class ValueDomainRuleScriptSpec extends Specification {
+class DataTypeRuleScriptSpec extends Specification {
 
-    @Unroll @ConfineMetaClassChanges(ValueDomain)
+    @Unroll @ConfineMetaClassChanges(DataType)
     def "for x='#value' the expression '#expression' is #expected"() {
         when:
-        ValueDomain base = new ValueDomain(name: "Test Base Domain", rule: "x != 'abrakadabra'")
-        ValueDomain domain = new ValueDomain(name: "Test Domain")
+        DataType base = new DataType(name: "Test Base Domain", rule: "x != 'abrakadabra'")
+        DataType dataType = new DataType(name: "Test Domain")
 
-        domain.metaClass.getBasedOn = {->
+        dataType.metaClass.getBasedOn = {->
             [base]
         }
 
-        def binding = new Binding(x: value, domain: domain)
+        def binding = new Binding(x: value, dataType: dataType)
         def executor = new SecuredRuleExecutor<DataTypeRuleScript>(DataTypeRuleScript, binding)
         executor.execute(expression)
         then:

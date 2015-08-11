@@ -7,7 +7,7 @@ import org.modelcatalogue.core.util.OrderedMap
 
 /*
 * Users can create relationships between all catalogue elements. They include
-* DataType, ConceptualDomain, MeasurementUnit, Model, ValueDomain, DataElement
+* DataType, ConceptualDomain, MeasurementUnit, Model, DataElement
 * Relationships have a source element, a destination element and a relationship type.
 * There are a number of different predefined relationship types that describe the ways catalogue
 * elements are related in the model catalogue
@@ -16,7 +16,6 @@ import org.modelcatalogue.core.util.OrderedMap
         | Source           | Relationship     | Destination | Source->Destination    |  Destination<-Source |
         | ---------------- | -----------------| ----------- | ---------------------- | -------------------- |
         | Model            | [containment]    | DataElement |  "contains"            |  "contained in"      |
-        | DataElement      | [instantiation]  | ValueDomain | "instantiated by"      | "instantiates"       |
         | Model            | [heirachical]    | Model       | "parentOf"             | "ChildOf"            |
         | DataElement      | [supersession]   | DataElement | "supercedes"           | "supercededBy"       |
 

@@ -4,7 +4,6 @@ import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.Mapping
-import org.modelcatalogue.core.ValueDomain
 
 class DataTypeMarshaller extends CatalogueElementMarshaller {
 

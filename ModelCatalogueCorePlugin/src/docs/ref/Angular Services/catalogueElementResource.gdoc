@@ -1,12 +1,12 @@
 h1. catalogueElementResource
 
-Function which creates an interface to communicate with the model catalogue REST API resource such as @valueDomain@.
+Function which creates an interface to communicate with the model catalogue REST API resource such as @dataType@.
 Declared in @mc.core.catalogueElementResource@ module inside [mc.core|Angular Packages] package.
 
 h2. Usage
 
 You can inject the function in any construct in the run phase (service, factory, controller, etc.). The value is function
-taking one string parameter which is URL name of the resource such as @'valueDomain'@ and returning interface
+taking one string parameter which is URL name of the resource such as @'dataType'@ and returning interface
 to communicate with the REST API backend.
 
 First of all, get the interface for the given resource. Than retrieve catalogue elements.
@@ -15,15 +15,15 @@ First of all, get the interface for the given resource. Than retrieve catalogue 
 angular
 .module('foo', ['mc.core.catalogueElementResource'])
 .factory('bar', function(catalogueElementResource) {
-    var valueDomains = catalogueElementResource('valueDomain')
-    valueDomains.get(1).then(function(domain){
-        // do something with domain
+    var dataTypes = catalogueElementResource('dataType')
+    dataTypes.get(1).then(function(type){
+        // do something with type
     });
-    valueDomains.list().then(function(list){
+    dataTypes.list().then(function(list){
         // do something with list
     });
     var domainData = {...};
-    valueDomains.save(domainData).then(function(domain) {
+    dataTypes.save(domainData).then(function(domain) {
         // do something with saved domain, e.g. save id somewhere
     }, function(errors) {
         // handle wrong data

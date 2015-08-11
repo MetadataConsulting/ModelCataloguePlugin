@@ -1,4 +1,4 @@
-        <%@ page import="org.modelcatalogue.core.DataClass; org.modelcatalogue.core.util.CDN; grails.util.BuildScope; org.modelcatalogue.core.EnumeratedType; org.modelcatalogue.core.DataType; org.modelcatalogue.core.MeasurementUnit; org.modelcatalogue.core.ValueDomain; org.modelcatalogue.core.DataElement; org.modelcatalogue.core.DataClass; grails.util.Environment;grails.util.GrailsNameUtils" contentType="text/html;charset=UTF-8" defaultCodec="none" %>
+        <%@ page import="org.modelcatalogue.core.DataClass; org.modelcatalogue.core.util.CDN; grails.util.BuildScope; org.modelcatalogue.core.EnumeratedType; org.modelcatalogue.core.DataType; org.modelcatalogue.core.MeasurementUnit; org.modelcatalogue.core.DataElement; org.modelcatalogue.core.DataClass; grails.util.Environment;grails.util.GrailsNameUtils" contentType="text/html;charset=UTF-8" defaultCodec="none" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -75,14 +75,14 @@
                                         <tr class="element-description-row">
                                             <td colspan="3">${relationship.destination.description}</td>
                                         </tr>
-                                        <g:if test="${relationship.destination.valueDomain?.dataType}">
+                                        <g:if test="${relationship.destination?.dataType}">
                                             <tr class="element-value-domain-row">
-                                                <td>${relationship.destination.valueDomain.dataType.name}</td>
-                                                <g:if test="${relationship.destination.valueDomain.dataType instanceof EnumeratedType}">
-                                                    <td colspan="2">${relationship.destination.valueDomain.dataType.prettyPrint()}</td>
+                                                <td>${relationship.destination.dataType.name}</td>
+                                                <g:if test="${relationship.destination.dataType instanceof EnumeratedType}">
+                                                    <td colspan="2">${relationship.destination.dataType.prettyPrint()}</td>
                                                 </g:if>
                                                 <g:else>
-                                                    <td colspan="2">${relationship.destination.valueDomain.dataType.description}</td>
+                                                    <td colspan="2">${relationship.destination.dataType.description}</td>
                                                 </g:else>
                                             </tr>
                                         </g:if>

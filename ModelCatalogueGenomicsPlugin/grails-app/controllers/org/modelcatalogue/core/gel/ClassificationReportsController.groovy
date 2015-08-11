@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.gel
 
 import org.modelcatalogue.core.DataClass
+import org.modelcatalogue.core.DataType
 
 import java.util.concurrent.ExecutorService
 import net.sf.jasperreports.engine.JasperFillManager
@@ -19,7 +20,6 @@ import org.modelcatalogue.core.AssetService
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.SecurityService;
-import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.api.ElementStatus;
 import org.modelcatalogue.core.audit.AuditService
 import org.springframework.core.io.Resource
@@ -137,9 +137,9 @@ class ClassificationReportsController {
         
         def reportFileName="${classification.name}-${classification.status}-${classification.version}${fileExtension}"
 
-        def valueDomains = new TreeSet<ValueDomain>([compare: { ValueDomain a, ValueDomain b ->
+        def dataTypes = new TreeSet<DataType>([compare: { DataType a, DataType b ->
                 a?.name <=> b?.name
-            }] as Comparator<ValueDomain>)
+            }] as Comparator<DataType>)
 
         
 
@@ -149,7 +149,7 @@ class ClassificationReportsController {
         parameters.put("DOCUMENT_FILENAME",reportFileName )
         parameters.put("DOCUMENT_STATUS", classification.status)
         parameters.put("SUBREPORT_DATA_SOURCE", new JRBeanCollectionDataSource(models))
-        parameters.put("VALUE_DOMAINS", valueDomains)
+        parameters.put("DATA_TYPES", dataTypes)
         parameters.put("REPORTS_PATH", resource.getFile().parent)
 
 

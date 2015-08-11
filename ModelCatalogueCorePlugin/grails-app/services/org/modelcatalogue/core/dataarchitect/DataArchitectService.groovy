@@ -34,12 +34,6 @@ class DataArchitectService {
         suggestions.keySet().sort()
     }
 
-    ListWithTotal<ValueDomain> incompleteValueDomains(Map params){
-        dataModelService.classified Lists.fromCriteria(params, ValueDomain) {
-            isNull 'dataType'
-        }
-    }
-
     ListWithTotal<DataElement> metadataKeyCheck(Map params){
         def searchParams = getParams(params)
 
@@ -246,27 +240,6 @@ class DataArchitectService {
 
     }
 
-    ListWithTotal<ValueDomain> unusedValueDomains(Map params) {
-        // TODO: create test
-        // TODO: count with classificaitons in use
-        Lists.fromQuery params, ValueDomain, """
-            from ValueDomain v
-            where
-                v.id in (select vd.id from ValueDomain vd left join vd.dataElements de group by vd.id having count(de.id) = sum(case when de.status = :archived then 1 else 0 end))
-        """, [archived: org.modelcatalogue.core.api.ElementStatus.DEPRECATED]
-    }
-
-    ListWithTotal<ValueDomain> duplicateValueDomains(Map params) {
-        // TODO: create test
-        // TODO: count with classificaitons in use
-        Lists.fromQuery params, ValueDomain, """
-            from ValueDomain v
-            where
-                v.id in (select vd.id from ValueDomain vd left join vd.dataElements de group by vd.id having count(de.id) = sum(case when de.status = :archived then 1 else 0 end))
-            and
-                v.name in (select vd.name from ValueDomain vd group by vd.name having count(vd.name) > 1)
-        """, [archived: org.modelcatalogue.core.api.ElementStatus.DEPRECATED]
-    }
 
     /**
      * Finds mapping between selected data elements or Mapping#DIRECT_MAPPING.
@@ -351,33 +324,11 @@ class DataArchitectService {
             statuses: statuses
         ]))
 
-
-        log.info "Generating deep decalaration suggestions for data elements => value domains"
-        //language=HQL
-        generateDeepClassification(Relationship.executeQuery(unclassifyIfNeeded(unclassifiedOnly,  '''
-            select rel.source, destination
-            from DataElement source
-            join source.incomingRelationships rel
-            join source.dataType destination
-            where rel.relationshipType = :classificationType
-            and source.status in :statuses
-            and destination.status in :statuses
-            and destination not in (
-                select rel2.destination
-                from Relationship rel2
-                where rel2.relationshipType = :classificationType
-                and (rel2.source.id = rel.source.id or rel2.source.latestVersionId = rel.source.latestVersionId)
-            )
-        '''), [
-                classificationType: RelationshipType.declarationType,
-                statuses: statuses
-        ]))
-
-        log.info "Generating deep declaration suggestions for value domains => data types"
+        log.info "Generating deep declaration suggestions for data element => data types"
         //language=HQL
         generateDeepClassification(Relationship.executeQuery(unclassifyIfNeeded(unclassifiedOnly, '''
             select rel.source, destination
-            from ValueDomain source
+            from DataElement source
             join source.incomingRelationships rel
             join source.dataType destination
             where rel.relationshipType = :classificationType

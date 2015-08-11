@@ -18,7 +18,7 @@
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
-	<variable name="valueDomains" class="java.util.TreeSet"/>
+	<variable name="dataTypes" class="java.util.TreeSet"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>

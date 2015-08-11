@@ -4,10 +4,6 @@ class DataViewPage extends ModelCataloguePage {
 
     static url = "#/catalogue/dataElement/all"
 
-    static vdUrl = "#/catalogue/valueDomain/all"
-
-
-
     static at = {
         url == "#/catalogue/dataElement/all"
     }

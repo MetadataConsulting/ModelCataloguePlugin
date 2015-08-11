@@ -4,15 +4,13 @@ package org.modelcatalogue.core
  */
 class RelationshipTypeISpec extends AbstractIntegrationSpec {
 
-    def md1, de1, md2, vd
+    def md1, de1, md2
 
     def setup(){
         loadFixtures()
         md1 = new DataClass(name: "book").save(failOnError: true)
         md2 = new DataClass(name: "chapter1").save(failOnError: true)
         de1 = new DataElement(name: "DE_author1").save(failOnError: true)
-        vd = new ValueDomain(name: "value domain uni subjects 2").save(failOnError: true)
-
     }
 
     def "data elements can be contained in models, models can contain data elements"(){

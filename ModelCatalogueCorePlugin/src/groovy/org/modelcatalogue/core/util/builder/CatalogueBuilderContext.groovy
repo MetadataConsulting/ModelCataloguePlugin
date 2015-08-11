@@ -8,13 +8,12 @@ import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.DataClass
-import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.api.RelationshipConfiguration
 
 class CatalogueBuilderContext {
 
-    private static Set<Class> SUPPORTED_AS_CONTEXT  = [CatalogueElement, DataModel, ValueDomain, DataType, DataClass, MeasurementUnit, DataElement]
+    private static Set<Class> SUPPORTED_AS_CONTEXT  = [CatalogueElement, DataModel, DataType, DataClass, MeasurementUnit, DataElement]
 
     private List<Map<Class, ContextItem>> contexts = []
 

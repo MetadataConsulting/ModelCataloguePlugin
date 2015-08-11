@@ -5,7 +5,7 @@
   Time: 13:13
 --%>
 
-<%@ page import="org.modelcatalogue.core.util.CDN; grails.util.BuildScope; org.modelcatalogue.core.EnumeratedType; org.modelcatalogue.core.DataType; org.modelcatalogue.core.MeasurementUnit; org.modelcatalogue.core.ValueDomain; org.modelcatalogue.core.DataElement; org.modelcatalogue.core.DataClass; grails.util.Environment;grails.util.GrailsNameUtils" contentType="text/html;charset=UTF-8" defaultCodec="none" %>
+<%@ page import="org.modelcatalogue.core.PrimitiveType; org.modelcatalogue.core.util.CDN; grails.util.BuildScope; org.modelcatalogue.core.EnumeratedType; org.modelcatalogue.core.DataType; org.modelcatalogue.core.MeasurementUnit; org.modelcatalogue.core.DataElement; org.modelcatalogue.core.DataClass; grails.util.Environment;grails.util.GrailsNameUtils" contentType="text/html;charset=UTF-8" defaultCodec="none" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,7 +31,7 @@
             <br/>
                 <g:each status="i" in="${models}" var="model">
                     <g:if test="!${model.childOf}">
-                        <g:render template="recModel" model="${[models: model, index:0, valueDomains: valueDomains]}" />
+                        <g:render template="recModel" model="${[models: model, index:0, dataTypes: dataTypes]}" />
                     </g:if>
                 </g:each>
             </div>
@@ -44,12 +44,12 @@
             <br/>
             <br/>
             <br/>
-                <g:each status="i" in="${valueDomains}" var="valueDomain">
+                <g:each status="i" in="${dataTypes}" var="dataType">
                     <div>
-                        <g:if test="${valueDomain.classifications[0]}"> <span class="pull-right">${valueDomain.classifications[0].name}</span></g:if>
-                        <h7 id="${valueDomain.id}"><strong>${valueDomain.name}</strong></h7>
-                        <p>${valueDomain.description}</p>
-                        <g:if test="${valueDomain.dataType instanceof EnumeratedType}">
+                        <g:if test="${dataType.classifications[0]}"> <span class="pull-right">${dataType.classifications[0].name}</span></g:if>
+                        <h7 id="${dataType.id}"><strong>${dataType.name}</strong></h7>
+                        <p>${dataType.description}</p>
+                        <g:if test="${dataType instanceof EnumeratedType}">
                             <table class="table table-striped">
                                 <thead>
                                 <tr>
@@ -57,18 +57,18 @@
                                     <th width="200">Description</th>
                                 </tr>
                                 </thead>
-                                <g:each in="${valueDomain.dataType?.enumerations}" var="key, value">
+                                <g:each in="${dataType.enumerations}" var="key, value">
                                     <tr><td>${key}</td><td>${value}</td></tr>
                                 </g:each>
                             </table>
                         </g:if>
                         <g:else>
 
-                            <g:if test="${valueDomain.dataType?.name}">(${valueDomain.dataType?.name})</g:if>
-                            <g:if test="${valueDomain.dataType?.description}">(${valueDomain.dataType?.description})</g:if>
-                            <g:if test="${valueDomain.rule}"><p> Format: <code>${valueDomain.rule}</code></p></g:if>
-                            <g:if test="${valueDomain.unitOfMeasure?.name}">(${valueDomain.unitOfMeasure?.name})</g:if>
-                            <g:if test="${valueDomain.unitOfMeasure?.symbol}">(${valueDomain.unitOfMeasure?.symbol})</g:if>
+                            <g:if test="${dataType.name}">(${dataType.name})</g:if>
+                            <g:if test="${dataType.description}">(${dataType.description})</g:if>
+                            <g:if test="${dataType.rule}"><p> Format: <code>${dataType.rule}</code></p></g:if>
+                            <g:if test="${dataType instanceof org.modelcatalogue.core.PrimitiveType && dataType.measurementUnit?.name}">(${dataType.measurementUnit?.name})</g:if>
+                            <g:if test="${dataType instanceof org.modelcatalogue.core.PrimitiveType && dataType.measurementUnit?.symbol}">(${dataType.measurementUnit?.symbol})</g:if>
                         </g:else>
                     </div>
                 </g:each>

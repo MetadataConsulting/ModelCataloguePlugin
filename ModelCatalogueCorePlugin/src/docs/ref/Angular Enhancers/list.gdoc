@@ -22,8 +22,8 @@ or [modelCatalogueSearch|Angular Services].
 angular
 .module('foo', ['mc.core.catalogueElementResource', 'mc.core.listEnhancer'])
 .factory('bar', function(catalogueElementResource, enhance) {
-    var valueDomains = catalogueElementResource('valueDomain')
-    valueDomains.list().then(function(list){
+    var dataTypes = catalogueElementResource('dataType')
+    dataTypes.list().then(function(list){
         list.next().then(function(nextList) {
             // do something with the next list
         });
@@ -33,6 +33,6 @@ angular
     });
 
     var listEnhancer = enhance.getEnhancer('list');
-    var emptyDomainList = listEnhancer.createEmptyList('org.modelcatalogue.core.ValueDomain');
+    var emptyDomainList = listEnhancer.createEmptyList('org.modelcatalogue.core.dataType');
 });
 {code}

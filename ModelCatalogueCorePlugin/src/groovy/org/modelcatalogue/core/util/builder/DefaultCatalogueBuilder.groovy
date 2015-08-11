@@ -142,9 +142,9 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
 
         context.withNewContext element, c
 
-        if (element.getParameter('valueDomain') == null && ValueDomain in createAutomatically) {
+        if (element.getParameter('dataType') == null && DataType in createAutomatically) {
             context.withNewContext element, {
-                valueDomain()
+                dataType()
             }
         }
 
@@ -218,10 +218,6 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
             }
         }
 
-        context.withContextElement(ValueDomain) {
-            it.setParameter('dataType', dataType)
-        }
-
         context.withContextElement(DataElement) {
             it.setParameter('dataType', dataType)
         }
@@ -247,10 +243,6 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         CatalogueElementProxy<MeasurementUnit> unit = createProxy(MeasurementUnit, parameters, null, isUnderControlIfSameClassification(parameters))
 
         context.withNewContext unit, c
-
-        context.withContextElement(ValueDomain) {
-            it.setParameter('unitOfMeasure', unit)
-        }
 
         context.withContextElement(DataType) {
             it.setParameter('measurementUnit', unit)
@@ -543,14 +535,14 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * Trigger the automatic creation of nested elements of given types. Currently data types and value domains are
      * supported for automatic creation.
      *
-     * If for example automatic creation of value domains is set and there is no nested <code>valueDomain</code> call
+     * If for example automatic creation of value domains is set and there is no nested <code>dataType</code> call
      * inside <code>dataElement</code> DSL definition closure value domain is created or matched with the name
      * of the data element and its description. Use this feature in imports when imported data don't have a concept
      * of value domains or data types to create value domains and data types placeholders automatically.
      *
      * You can set both supported classes calling this method twice.
      *
-     * @param type either dataType or valueDomain
+     * @param currently only dataType is supported
      */
     void automatic(BuilderKeyword type){
         if (type instanceof ModelCatalogueTypes) {
@@ -635,7 +627,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * Creates the proxy for given configuration.
      *
      * If a type is supported for automatic creation (data type and value domain at the moment) it also handles
-     * inheriting the name and description for every nested dataType or valueDomain call.
+     * inheriting the name and description for every nested dataType call.
      *
      * @param domain the class of the resolved element
      * @param parameters initial parameters mapp
