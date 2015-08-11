@@ -185,15 +185,13 @@ class ModelToFormExporterService {
         boolean first = true
         for (Relationship rel in model.containsRelationships) {
             DataElement dataElement = rel.destination as DataElement
-            ValueDomain valueDomain = dataElement.valueDomain
-            DataType dataType = valueDomain?.dataType ?: dataElement.dataType
+            DataType dataType = dataElement.dataType
 
             log.info "Generating items from data element $dataElement"
 
-            List<CatalogueElement> candidates = [dataElement, valueDomain, dataType].grep()
+            List<CatalogueElement> candidates = [dataElement, dataType].grep()
 
             collectBases(candidates, dataElement)
-            collectBases(candidates, valueDomain)
             collectBases(candidates, dataType)
 
 
@@ -205,7 +203,7 @@ class ModelToFormExporterService {
             } else if (dataType && dataType.instanceOf(EnumeratedType)) {
                 // either value domain is marked as multiple or
                 Map<String, Object> enumOptions = (dataType as EnumeratedType).enumerations.collectEntries { key, value -> [value ?: key, key == ENUM_DEFAULT ? '' : key]}
-                if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) in [RESPONSE_TYPE_CHECKBOX, RESPONSE_TYPE_MULTI_SELECT] || valueDomain?.multiple || rel.ext[EXT_MAX_OCCURS] && rel.ext[EXT_MAX_OCCURS] != '1') {
+                if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) in [RESPONSE_TYPE_CHECKBOX, RESPONSE_TYPE_MULTI_SELECT] ||  rel.ext[EXT_MAX_OCCURS] && rel.ext[EXT_MAX_OCCURS] != '1') {
                     // multi select or checkbox (default)
                     if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) == RESPONSE_TYPE_MULTI_SELECT) {
                         container.multiSelect(itemName) {
@@ -241,7 +239,7 @@ class ModelToFormExporterService {
             last.with {
                 // TODO: is there any way to configure simple conditional display
                 // TODO: validation
-                String regexpDef = fromCandidates(rel, candidates, EXT_ITEM_REGEXP, valueDomain?.regexDef ?: dataType?.regexDef)
+                String regexpDef = fromCandidates(rel, candidates, EXT_ITEM_REGEXP,  dataType?.regexDef)
                 if (regexpDef) {
                     regexp regexpDef, fromCandidates(rel, candidates, EXT_ITEM_REGEXP_ERROR_MESSAGE, "Value must match /$regexpDef/")
                 }
@@ -254,9 +252,7 @@ class ModelToFormExporterService {
                 phi(fromCandidates(rel, candidates, EXT_ITEM_PHI) == 'true')
                 required(fromCandidates(rel, candidates, EXT_ITEM_REQUIRED) == 'true' || rel.ext[EXT_MIN_OCCURS] == '1')
                 columnNumber = safeInteger(fromCandidates(rel, candidates, EXT_ITEM_COLUMN_NUMBER), EXT_ITEM_COLUMN_NUMBER, rel)
-                units fromCandidates(rel, candidates, EXT_ITEM_UNITS, candidates.find {
-                    it.instanceOf(ValueDomain) && it.unitOfMeasure
-                }?.unitOfMeasure?.symbol ?: candidates.find {
+                units fromCandidates(rel, candidates, EXT_ITEM_UNITS,  candidates.find {
                     it.instanceOf(PrimitiveType) && it.measurementUnit
                 }?.measurementUnit?.symbol)
 
@@ -294,7 +290,7 @@ class ModelToFormExporterService {
                     }
                 }
                 if (last instanceof Item) {
-                    CatalogueElement labelSource = dataType ?: valueDomain ?: dataElement
+                    CatalogueElement labelSource = dataType ?: dataElement
                     last.setResponseLabel(alphaNumNoSpaces(labelSource.name + "_" + labelSource.versionNumber))
                 }
             }

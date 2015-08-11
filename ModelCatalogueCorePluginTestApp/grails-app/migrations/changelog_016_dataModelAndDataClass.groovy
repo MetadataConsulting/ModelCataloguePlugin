@@ -195,6 +195,8 @@ databaseChangeLog = {
                     """
                 }
 
+                // TODO: migrate extensions
+
                 // migrate data elements
 
                 sql.eachRow """
