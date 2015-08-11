@@ -52,9 +52,8 @@ angular.module('mc.core.ui.metadataEditors', ['mc.core.catalogue']).provider 'me
   metadataEditorsProvider = {}
 
   ###
-
     Type is either element type or relationship pattern definition "sourceType=[relationshipType]=>destinationType"
-    where every part is optional e.g. "model=>", "=[base]=>valueDomain", "=>"
+    where every part is optional e.g. "model=>", "=[base]=>dataType", "=>"
   ###
   metadataEditorsProvider.register = (configuration) ->
     throw new Error('Please provide supported types configuration ("types" configuration property)') unless configuration.types?

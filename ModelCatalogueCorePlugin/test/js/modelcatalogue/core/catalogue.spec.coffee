@@ -6,11 +6,11 @@ describe "mc.core.catalogue", ->
 
 
   it "test instance of", inject (catalogue) ->
-    expect(catalogue.isInstanceOf('org.modelcatalogue.core.ValueDomain', 'org.modelcatalogue.core.ValueDomain')).toBeTruthy()
-    expect(catalogue.isInstanceOf('org.modelcatalogue.core.ValueDomain', 'org.modelcatalogue.core.CatalogueElement')).toBeTruthy()
-    expect(catalogue.isInstanceOf('org.modelcatalogue.core.ValueDomain', 'org.modelcatalogue.core.Model')).toBeFalsy()
+    expect(catalogue.isInstanceOf('org.modelcatalogue.core.DataType', 'org.modelcatalogue.core.DataType')).toBeTruthy()
+    expect(catalogue.isInstanceOf('org.modelcatalogue.core.DataType', 'org.modelcatalogue.core.CatalogueElement')).toBeTruthy()
+    expect(catalogue.isInstanceOf('org.modelcatalogue.core.DataType', 'org.modelcatalogue.core.Model')).toBeFalsy()
 
-    expect(catalogue.isInstanceOf('org.modelcatalogue.core.Model', 'org.modelcatalogue.core.ValueDomain')).toBeFalsy()
+    expect(catalogue.isInstanceOf('org.modelcatalogue.core.Model', 'org.modelcatalogue.core.DataType')).toBeFalsy()
     expect(catalogue.isInstanceOf('org.modelcatalogue.core.Model', 'org.modelcatalogue.core.MeasurementUnit')).toBeFalsy()
     expect(catalogue.isInstanceOf('org.modelcatalogue.core.Model', 'org.modelcatalogue.core.CatalogueElement')).toBeTruthy()
     expect(catalogue.isInstanceOf('org.modelcatalogue.core.Model', 'org.modelcatalogue.core.Model')).toBeTruthy()

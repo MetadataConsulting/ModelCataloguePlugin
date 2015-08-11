@@ -20,8 +20,8 @@ angular.module('mc.core.ui.bs.modalPromptNewMapping', ['mc.util.messages']).conf
             <messages-panel messages="messages"></messages-panel>
             <form role="form" ng-submit="createMapping()">
               <div class="form-group">
-                <label for="valueDomain" class="">Destination Data Type</label>
-                <input type="text" id="valueDomain" placeholder="Destination Data Type" ng-model="copy.destination" catalogue-element-picker="''' + elementType + '''" label="el.name">
+                <label for="dataType" class="">Destination Data Type</label>
+                <input type="text" id="dataType" placeholder="Destination Data Type" ng-model="copy.destination" catalogue-element-picker="''' + elementType + '''" label="el.name">
               </div>
               <div class="form-group">
                 <label for="mapping">Mapping</label>

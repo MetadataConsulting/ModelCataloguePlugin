@@ -50,7 +50,6 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptLogin'
   'mc.core.ui.bs.modalPromptBasicEdit'
   'mc.core.ui.bs.modalPromptMeasurementUnitEdit'
-  'mc.core.ui.bs.modalPromptValueDomainEdit'
   'mc.core.ui.bs.modalPromptEnumeratedTypeEdit'
   'mc.core.ui.bs.modalPromptActionParametersEdit'
   'mc.core.ui.bs.modalPromptModel'

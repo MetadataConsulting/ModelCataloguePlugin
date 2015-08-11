@@ -102,13 +102,6 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
     {header: 'Destination Class', value: 'destinationClass', classes: 'col-md-3', sort: {property: 'destinationClass', type: 'alpha'}}
   ]
 
-  columnsProvider.registerColumns 'org.modelcatalogue.core.ValueDomain', [
-    {header: 'Classifications', value: getClassificationsForDataElement, classes: 'col-md-3'}
-    {header: 'Name',                value: 'name',                                classes: 'col-md-3', href: 'href()',                show: true, href: 'href()', sort: {property: 'name', type: 'alpha'}}
-    {header: 'Unit',                value: 'unitOfMeasure.name',                  classes: 'col-md-3', href: 'unitOfMeasure.href()',  show: 'unitOfMeasure.show()'}
-    {header: 'Data Type',           value: 'dataType.name',                       classes: 'col-md-3', href: 'dataType.href()',       show: 'dataType.show()'}
-  ]
-
   dataTypeColumns = [
     {header: "Name",                        value: 'name',          classes: 'col-md-6', show: true, href: 'href()', sort: {property: 'name', type: 'alpha'}}
     {header: "Enumerations or Description", value: getEnumerations, classes: 'col-md-6'}

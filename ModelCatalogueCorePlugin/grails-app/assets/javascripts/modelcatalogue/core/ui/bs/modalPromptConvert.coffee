@@ -14,7 +14,7 @@ angular.module('mc.core.ui.bs.modalPromptConvert', ['mc.util.messages']).config 
             <form role="form" ng-submit="convert()">
               <div class="form-group" ng-hide="args.source">
                 <label for="source">From</label>
-                <input type="text" id="source" placeholder="Source Value Domain" ng-model="definition.source" catalogue-element-picker="valueDomain" label="el.name" typeahead-on-select="convert()">
+                <input type="text" id="source" placeholder="Source Data Type" ng-model="definition.source" catalogue-element-picker="dataType" label="el.name" typeahead-on-select="convert()">
               </div>
               <div class="form-group" ng-hide="args.destination">
                 <label for="destination">To</label>

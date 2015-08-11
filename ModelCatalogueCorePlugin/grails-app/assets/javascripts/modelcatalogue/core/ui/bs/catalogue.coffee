@@ -4,7 +4,6 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setIcon 'dataClass',          "fa fa-fw fa-cubes"
   catalogueProvider.setIcon 'model',              "fa fa-fw fa-cubes"
   catalogueProvider.setIcon 'dataElement',        "fa fa-fw fa-cube"
-  catalogueProvider.setIcon 'valueDomain',        "fa fa-fw fa-cog"
   catalogueProvider.setIcon 'primitiveType',      "fa fa-fw fa-cog"
   catalogueProvider.setIcon 'enumeratedType',     "fa fa-fw fa-list-alt"
   catalogueProvider.setIcon 'referenceType',      "fa fa-fw fa-external-link-square"
@@ -29,7 +28,6 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setInstanceOf 'dataClass',          'catalogueElement'
   catalogueProvider.setInstanceOf 'publishedElement',   'catalogueElement'
   catalogueProvider.setInstanceOf 'user',               'catalogueElement'
-  catalogueProvider.setInstanceOf 'valueDomain',        'catalogueElement'
   catalogueProvider.setInstanceOf 'dataType',           'catalogueElement'
   catalogueProvider.setInstanceOf 'classification',     'catalogueElement'
   catalogueProvider.setInstanceOf 'asset',              'catalogueElement'
@@ -45,19 +43,12 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setDefaultSort 'asset',             sort: 'lastUpdated',  order: 'desc'
 
 
-  catalogueProvider.setDeprecationWarning 'valueDomain', (domain) ->
-    ret = []
-    ret.push 'Data Type'        if domain.dataType?.status == 'DEPRECATED'
-    ret.push 'Measurement Unit' if domain.unitOfMeasure?.status == 'DEPRECATED'
-
-    return undefined if ret.length == 0
-    return ret.join(' and ') + " Deprecated"
-
+  # TODO: deprecation warning for primitive and reference data type
   catalogueProvider.setDeprecationWarning 'dataElement', (dataElement) ->
-    if dataElement.valueDomain
-      return 'Value Domain Deprecated' if dataElement.valueDomain.status == 'DEPRECATED'
-      valueDomainDeprecation = catalogueProvider.getDeprecationWarning('valueDomain')(dataElement.valueDomain)
-      return "Value Domain uses deprecated #{valueDomainDeprecation}" if valueDomainDeprecation
+    if dataElement.dataType
+      return 'Data Type Deprecated' if dataElement.dataType.status == 'DEPRECATED'
+      dataTypeDeprecation = catalogueProvider.getDeprecationWarning('dataType')(dataElement.dataType)
+      return "Data Type uses deprecated #{dataTypeDeprecation}" if dataTypeDeprecation
 
     return undefined
 

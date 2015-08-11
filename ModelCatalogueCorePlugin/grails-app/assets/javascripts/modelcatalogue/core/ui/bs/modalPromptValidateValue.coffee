@@ -13,8 +13,8 @@ angular.module('mc.core.ui.bs.modalPromptValidateValue', ['mc.util.messages']).c
             <messages-panel messages="messages"></messages-panel>
             <form role="form" ng-submit="validate()">
               <div class="form-group" ng-hide="args.domain">
-                <label for="domain">Value Domain</label>
-                <input type="text" id="domain" placeholder="Value Domain" ng-model="definition.domain" catalogue-element-picker="valueDomain" label="el.name" typeahead-on-select="validate()">
+                <label for="type">Data Type</label>
+                <input type="text" id="type" placeholder="Data Type" ng-model="definition.domain" catalogue-element-picker="dataType" label="el.name" typeahead-on-select="validate()">
               </div>
               <div class="form-group">
                 <label for="value">Value</label>

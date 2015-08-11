@@ -23,7 +23,7 @@ xsd.config ['metadataEditorsProvider', (metadataEditorsProvider)->
     title: 'XSD( Datatype Restrictions)'
     types: [
       'dataElement'   
-      'valueDomain'
+      'dataType'
       '=[containment]=>'
     ]
 
@@ -39,13 +39,13 @@ xsd.config ['metadataEditorsProvider', (metadataEditorsProvider)->
            "http://xsd.modelcatalogue.org/restrictions#fractionDigits"
            "http://xsd.modelcatalogue.org/restrictions#pattern"
     ]
-    template: 'modelcatalogue/core/ui/metadataEditors/xsdItemValueDomainRestriction.html'
+    template: 'modelcatalogue/core/ui/metadataEditors/xsdItemDataTypeRestriction.html'
   }
   metadataEditorsProvider.register {
     title: 'Occurences(Metadata)'
     types: [
           'dataElement'   
-          'valueDomain'
+          'dataType'
           '=[containment]=>'
           'model'
           '=[hierarchy]=>'
@@ -93,7 +93,7 @@ xsd.run ['$templateCache', ($templateCache) ->
       </div> 
       </form> 
     '''
- $templateCache.put 'modelcatalogue/core/ui/metadataEditors/xsdItemValueDomainRestriction.html', '''
+ $templateCache.put 'modelcatalogue/core/ui/metadataEditors/xsdItemDataTypeRestriction.html', '''
       <form class="form">
         <div class="form-group">
           <label for="xsd-restriction-pattern" class="control-label">Pattern (Valid XML Regex)</label>

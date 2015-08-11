@@ -63,7 +63,7 @@ forms.config ['metadataEditorsProvider', (metadataEditorsProvider)->
   metadataEditorsProvider.register {
     title: 'Form (Item)'
     types: [
-      'valueDomain'
+      'dataType'
     ]
 
     keys: [
@@ -74,7 +74,7 @@ forms.config ['metadataEditorsProvider', (metadataEditorsProvider)->
       "http://forms.modelcatalogue.org/item#regexp"
       "http://forms.modelcatalogue.org/item#regexpErrorMessage"
     ]
-    template: 'modelcatalogue/core/ui/metadataEditors/formItemValueDomain.html'
+    template: 'modelcatalogue/core/ui/metadataEditors/formItemDataType.html'
   }
 
   metadataEditorsProvider.register {
@@ -303,7 +303,7 @@ forms.run ['$templateCache', ($templateCache) ->
   '''
 
   #language=HTML
-  $templateCache.put 'modelcatalogue/core/ui/metadataEditors/formItemValueDomain.html', '''
+  $templateCache.put 'modelcatalogue/core/ui/metadataEditors/formItemDataType.html', '''
     <form class="form">
       <div class="form-group">
         <label for="item-response-type" class="control-label">Response Type</label>

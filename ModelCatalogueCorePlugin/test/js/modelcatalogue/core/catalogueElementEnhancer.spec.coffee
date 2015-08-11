@@ -54,16 +54,16 @@ describe "mc.core.catalogueElementEnhancer", ->
     expect(dataType.isInstanceOf).toBeFunction()
     expect(dataClass.isInstanceOf).toBeFunction()
 
-    describe "test value domain and model", ->
-      it "test value domain is ValueDomain", ->
+    describe "test data type and model", ->
+      it "test data type is DataType", ->
         expect(dataType.isInstanceOf('org.modelcatalogue.core.DataType')).toBeTruthy()
-      it "test value domain is CatalogueElement", ->
+      it "test data type is CatalogueElement", ->
         expect(dataType.isInstanceOf('org.modelcatalogue.core.CatalogueElement')).toBeTruthy()
-      it "test value domain isn't Model", ->
+      it "test data type isn't Model", ->
         expect(dataType.isInstanceOf('org.modelcatalogue.core.Model')).toBeFalsy()
 
-      it "test model isn't ValueDomain", ->
-        expect(dataClass.isInstanceOf('org.modelcatalogue.core.ValueDomain')).toBeFalsy()
+      it "test model isn't DataType", ->
+        expect(dataClass.isInstanceOf('org.modelcatalogue.core.DataType')).toBeFalsy()
       it "test model isn't MeasurementUnit", ->
         expect(dataClass.isInstanceOf('org.modelcatalogue.core.MeasurementUnit')).toBeFalsy()
       it "test model is CatalogueElement", ->
