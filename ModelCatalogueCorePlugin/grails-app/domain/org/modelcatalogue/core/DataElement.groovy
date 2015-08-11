@@ -36,6 +36,7 @@ class DataElement extends CatalogueElement {
 
     @Override
     void afterDraftPersisted(CatalogueElement draft) {
+        super.afterDraftPersisted(draft)
         if (dataType) {
             (draft as DataElement).dataType = dataType
             FriendlyErrors.failFriendlySave(draft)
