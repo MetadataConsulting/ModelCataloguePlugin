@@ -6,12 +6,9 @@ import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.ResultRecorder
 import spock.lang.Unroll
 
-/**
- * Created by adammilward on 27/02/2014.
- */
 class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec {
 
-    def relationshipService, de1, de2, de3, de4, de5, vd, md, md2
+    def relationshipService, de1, de2, de3, de4, de5, md, md2
 
 
     def setup() {
@@ -22,7 +19,6 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec {
         de3 = DataElement.findByName("AUTHOR")
         de4 = DataElement.findByName("auth4")
         de5 = DataElement.findByName("auth5")
-        vd = ValueDomain.findByName("value domain Celsius")
         md = new DataClass(name: "testModel").save()
         md2 = new DataClass(name: "testModel2").save()
         md.addToContains(de1)

@@ -32,7 +32,6 @@ class DataTypeListPage extends ModelCataloguePage {
 
         dataTypeHeader      { $("td[data-value-for='Data Type']") }
 
-        valueDomain         { modalDialog.find('#valueDomain') }
         mapping             { modalDialog.find('#mapping') }
         value               { modalDialog.find('#value') }
 

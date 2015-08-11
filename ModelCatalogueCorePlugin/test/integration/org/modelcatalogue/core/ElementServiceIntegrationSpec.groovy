@@ -20,11 +20,11 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         elementService.list().size()                == CatalogueElement.countByStatus(ElementStatus.FINALIZED)
         elementService.list(max: 10).size()         == 10
         elementService.list(DataElement).size()     == DataElement.countByStatus(ElementStatus.FINALIZED)
-        elementService.list(DataClass).size()           == DataClass.countByStatus(ElementStatus.FINALIZED)
+        elementService.list(DataClass).size()       == DataClass.countByStatus(ElementStatus.FINALIZED)
         elementService.list(Asset).size()           == Asset.countByStatus(ElementStatus.FINALIZED)
         elementService.count()                      == CatalogueElement.countByStatus(ElementStatus.FINALIZED)
         elementService.count(DataElement)           == DataElement.countByStatus(ElementStatus.FINALIZED)
-        elementService.count(DataClass)                 == DataClass.countByStatus(ElementStatus.FINALIZED)
+        elementService.count(DataClass)             == DataClass.countByStatus(ElementStatus.FINALIZED)
         elementService.count(Asset)                 == Asset.countByStatus(ElementStatus.FINALIZED)
     }
 
@@ -34,16 +34,16 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         elementService.list(status: 'DRAFT', max: 10).size()                    == 10
         elementService.list(status: ElementStatus.DRAFT).size()                 == 17
         elementService.list(status: ElementStatus.DRAFT, max: 10).size()        == 10
-        elementService.list(DataClass, status: 'DRAFT').size()                      == 7
-        elementService.list(DataClass, status: ElementStatus.DRAFT).size()          == 7
+        elementService.list(DataClass, status: 'DRAFT').size()                  == 7
+        elementService.list(DataClass, status: ElementStatus.DRAFT).size()      == 7
         elementService.list(DataElement, status: 'DRAFT').size()                == 5
         elementService.list(DataElement, status: ElementStatus.DRAFT).size()    == 5
         elementService.list(Asset, status: 'DRAFT').size()                      == 5
         elementService.list(Asset, status: ElementStatus.DRAFT).size()          == 5
         elementService.count(status: 'DRAFT')                                   == 17
         elementService.count(status: ElementStatus.DRAFT)                       == 17
-        elementService.count(DataClass, status: 'DRAFT')                            == 7
-        elementService.count(DataClass, status: ElementStatus.DRAFT)                == 7
+        elementService.count(DataClass, status: 'DRAFT')                        == 7
+        elementService.count(DataClass, status: ElementStatus.DRAFT)            == 7
         elementService.count(DataElement, status: 'DRAFT')                      == 5
         elementService.count(DataElement, status: ElementStatus.DRAFT)          == 5
         elementService.count(Asset, status: 'DRAFT')                            == 5
@@ -52,12 +52,12 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
 
     def "create new version"() {
-        DataElement author      = DataElement.findByName('auth5')
-        ValueDomain domain      = ValueDomain.findByName('value domain test1')
+        DataElement author = DataElement.findByName('auth5')
+        DataType domain = DataType.findByName('test data type 1')
 
 
         author.ext.something = 'anything'
-        author.valueDomain = domain
+        author.dataType = domain
 
         int originalVersion     = author.versionNumber
         DataElement draft       = elementService.createDraftVersion(author, DraftContext.forceNew()) as DataElement
@@ -76,8 +76,8 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         draft.supersedes.contains(author)
 
-        author.valueDomain
-        draft.valueDomain
+        author.dataType
+        draft.dataType
 
         author.status == ElementStatus.FINALIZED
         draft.status == ElementStatus.DRAFT
@@ -109,12 +109,12 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
     }
 
     def "archive"() {
-        DataElement author      = DataElement.findByName('auth5')
-        ValueDomain domain      = ValueDomain.findByName('value domain test1')
+        DataElement author = DataElement.findByName('auth5')
+        DataType dataType = DataType.findByName('test data type 1')
 
 
         author.ext.something = 'anything'
-        author.valueDomain = domain
+        author.dataType = dataType
         author.save(failOnError: true)
 
         int originalVersion     = author.versionNumber
@@ -131,16 +131,16 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         archived.ext.something == 'anything'
 
-        !(archived in domain.dataElements)
+        !(archived in dataType.dataElements)
     }
 
     def "merge"() {
         DataModel sact = new DataModel(name: "SACT").save(failOnError: true)
         DataModel cosd = new DataModel(name: "COSD").save(failOnError: true)
 
-        ValueDomain domain = new ValueDomain(name: "merger test domain").save(failOnError: true)
+        DataType dataType = new DataType(name: "merger test type").save(failOnError: true)
 
-        DataElement source = new DataElement(name: "merge tester", valueDomain: domain).save(failOnError: true)
+        DataElement source = new DataElement(name: "merge tester", dataType: dataType).save(failOnError: true)
         source.addToDeclaredWithin(sact)
 
         DataElement destination = new DataElement(name: "merge tester").save(failOnError: true)
@@ -172,7 +172,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         expect:
         merged.errors.errorCount == 0
         merged == destination
-        merged.valueDomain == domain
+        merged.dataType == dataType
         destination.ext.size() == 3
         destination.ext.two == 'two'
         source.countContainedIn() == 2
@@ -191,7 +191,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         source?.delete()
         destination?.beforeDelete()
         destination?.delete()
-        domain?.delete()
+        dataType?.delete()
         m1?.delete()
         m2?.delete()
         m3cosd?.delete()
@@ -349,25 +349,25 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
     }
 
     def "change value domains in data elements while merging value domains"() {
-        ValueDomain vd1 = new ValueDomain(name: "vd1").save(failOnError: true)
-        ValueDomain vd2 = new ValueDomain(name: "vd2").save(failOnError: true)
+        DataType vd1 = new DataType(name: "vd1").save(failOnError: true)
+        DataType vd2 = new DataType(name: "vd2").save(failOnError: true)
 
-        DataElement de = new DataElement(name: "de", valueDomain: vd1).save(failOnError: true)
+        DataElement de = new DataElement(name: "de", dataType: vd1).save(failOnError: true)
 
         expect:
-        de.valueDomain == vd1
+        de.dataType == vd1
 
         when:
         elementService.merge(vd1, vd2)
 
         then:
-        de.valueDomain == vd2
+        de.dataType == vd2
     }
 
 
     def "mappings are transferred to the new draft"() {
-        ValueDomain d1 = new ValueDomain(name: "VD4MT1", status: ElementStatus.FINALIZED).save(failOnError: true, flush: true)
-        ValueDomain d2 = new ValueDomain(name: "VD4MT2", status: ElementStatus.FINALIZED).save(failOnError: true, flush: true)
+        DataType d1 = new DataType(name: "VD4MT1", status: ElementStatus.FINALIZED).save(failOnError: true, flush: true)
+        DataType d2 = new DataType(name: "VD4MT2", status: ElementStatus.FINALIZED).save(failOnError: true, flush: true)
 
         Mapping mapping = mappingService.map(d1, d2, "x")
 
@@ -375,7 +375,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         mapping.errors.errorCount == 0
 
         when:
-        ValueDomain d1draft = elementService.createDraftVersion(d1, DraftContext.userFriendly())
+        DataType d1draft = elementService.createDraftVersion(d1, DraftContext.userFriendly())
 
         then:
         d1draft
@@ -387,9 +387,9 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     @Issue("https://metadata.atlassian.net/browse/MET-732")
     def "can un-deprecate element if conditions are met"() {
-        ValueDomain vd = new ValueDomain(name: 'VD4MET-732').save(failOnError: true, flush: true)
+        DataType vd = new DataType(name: 'VD4MET-732').save(failOnError: true, flush: true)
 
-        vd = elementService.createDraftVersion(vd, DraftContext.importFriendly([] as Set)) as ValueDomain
+        vd = elementService.createDraftVersion(vd, DraftContext.importFriendly([] as Set)) as DataType
         vd = elementService.finalizeElement(vd)
         vd = elementService.archive(vd, false)
 

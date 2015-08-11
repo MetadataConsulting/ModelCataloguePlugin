@@ -61,7 +61,6 @@ Model catalogue core plugin (metadata registry)
         ModelCatalogueTypes.DATA_MODEL.implementation = DataModel
         ModelCatalogueTypes.DATA_CLASS.implementation = DataClass
         ModelCatalogueTypes.DATA_ELEMENT.implementation = DataElement
-        ModelCatalogueTypes.VALUE_DOMAIN.implementation = DataType
         ModelCatalogueTypes.DATA_TYPE.implementation = DataType
         ModelCatalogueTypes.MEASUREMENT_UNIT.implementation = MeasurementUnit
         ModelCatalogueTypes.ENUMERATED_TYPE.implementation = EnumeratedType
@@ -95,7 +94,6 @@ Model catalogue core plugin (metadata registry)
                     new RelationshipTypeMarshaller(),
                     new RelationshipMarshallers(),
                     new RelationshipsMarshaller(),
-                    new ValueDomainMarshaller(),
                     new MappingMarshaller(),
                     new MappingsMarshaller(),
                     new ListWithTotalAndTypeWrapperMarshaller(),
@@ -148,22 +146,11 @@ Model catalogue core plugin (metadata registry)
 
         xlsxListRenderer.registerRowWriter ('DataTypes') {
             title "Data Types to Excel"
-            headers 'Model Catalogue ID', 'Name', 'Enumerations', 'Value Domains'
+            headers 'Model Catalogue ID', 'Name', 'Enumerations'
             when { ListWrapper container, RenderContext context ->
                 context.actionName in [null, 'index', 'search', 'incoming', 'outgoing', 'properties'] && (!container.itemType || DataType.isAssignableFrom(container.itemType))
             } then { DataType dataType ->
-                [[dataType.id, dataType.name, getEnumerationString(dataType), getValueDomainString(dataType)]]
-            }
-        }
-
-
-        xlsxListRenderer.registerRowWriter ('ValueDomains') {
-            title "Value Domains to Excel"
-            headers 'Model Catalogue ID', 'Name', 'Data Models', 'Unit of Measurement', 'Rules', 'Data Type Model Catalogue ID', 'DataType Name', 'Data Type Enumeration'
-            when { ListWrapper container, RenderContext context ->
-                context.actionName in [null, 'index', 'search', 'incoming', 'outgoing', 'valueDomains'] && (!container.itemType || ValueDomain.isAssignableFrom(container.itemType))
-            } then { ValueDomain valueDomain ->
-                [[valueDomain.modelCatalogueId, valueDomain.name, getDataModelsString(valueDomain), valueDomain.unitOfMeasure, getValueDomainRuleString(valueDomain), valueDomain.dataTypeId, valueDomain.dataType.name, getEnumerationString(valueDomain.dataType)]]
+                [[dataType.id, dataType.name, getEnumerationString(dataType)]]
             }
         }
 
@@ -214,7 +201,6 @@ Model catalogue core plugin (metadata registry)
                 (!container.itemType || Relationship.isAssignableFrom(container.itemType) && (context.actionName in [null,  'outgoing' ] ) && (context.getWebRequest().getParams().get("type") in ['context', 'hierarchy']) )
             } then { Relationship relationship ->
                 [[ relationship.source.modelCatalogueId, relationship.source.name, relationship.relationshipType.sourceToDestination, relationship.destination.modelCatalogueId, relationship.destination.name]]
-                //relationship.source.modelCatalogueId, relationship.source.name, relationship.relationshipType.sourceToDestination, relationship.destination.modelCatalogueId, relationship.destination.name
             }
         }
 
@@ -323,7 +309,7 @@ Model catalogue core plugin (metadata registry)
 
         reportsRegistry.register {
             creates link
-            type DataModel, DataClass, DataElement, ValueDomain, DataType, MeasurementUnit
+            type DataModel, DataClass, DataElement, DataType, MeasurementUnit
             title { "Export to Catalogue XML" }
             link { CatalogueElement element ->
                 [url: element.getDefaultModelCatalogueId(false) + '?format=xml']
@@ -374,42 +360,30 @@ Model catalogue core plugin (metadata registry)
         return null
     }
 
-
-    def static getValueDomain(DataElement dataElement){
-        return dataElement.valueDomain
-    }
-
     def static getUnitOfMeasure(DataElement dataElement){
-        ValueDomain valueDomain = getValueDomain(dataElement)
-        if(valueDomain) {
-            MeasurementUnit unitOfMeasure = valueDomain?.unitOfMeasure
-            return unitOfMeasure?.name
+        if (dataElement.dataType && dataElement.dataType instanceof PrimitiveType) {
+            return dataElement.dataType.measurementUnit?.name
         }
         return null
     }
 
     def static getUnitOfMeasureSymbol(DataElement dataElement){
-        ValueDomain valueDomain = getValueDomain(dataElement)
-        if(valueDomain) {
-            MeasurementUnit unitOfMeasure = valueDomain?.unitOfMeasure
-            return unitOfMeasure?.symbol
+        if (dataElement.dataType && dataElement.dataType instanceof PrimitiveType) {
+            return dataElement.dataType.measurementUnit?.symbol
         }
         return null
     }
 
     def static getDataType(DataElement dataElement){
-        ValueDomain valueDomain = getValueDomain(dataElement)
-        if(valueDomain) {
-            DataType dataType = valueDomain.dataType
-            if (!dataType) {
-                return ''
-            }
-            if (dataType instanceof EnumeratedType) {
-                return dataType.enumerations.collect { key, value -> "$key:$value"}.join('\n')
-            }
-            return dataType.name
+        DataType dataType = dataElement.dataType
+        if (!dataType) {
+            return ''
         }
-        return null
+        if (dataType instanceof EnumeratedType) {
+            return dataType.enumerations.collect { key, value -> "$key:$value"}.join('\n')
+        }
+        return dataType.name
+
     }
 
     def static getDataModelsString(CatalogueElement dataElement) {
@@ -419,30 +393,10 @@ Model catalogue core plugin (metadata registry)
         dataElement.dataModels.first().name
     }
 
-    def static getValueDomainString(DataType dataType){
-        String valueDomains = ""
-
-        dataType.relatedValueDomains.eachWithIndex{ ValueDomain valueDomain, Integer i ->
-            String vdText = valueDomain.id + " \t " + valueDomain.name + " \t "
-            if (valueDomains!="") valueDomains += (stringSeparator + vdText )
-            else valueDomains = vdText
-        }
-        return valueDomains
-    }
-
     def static getEnumerationString(DataType dataType){
         if (dataType instanceof EnumeratedType) {
             return dataType.enumAsString
         }
         return null
-    }
-
-    def static getValueDomainRuleString(ValueDomain valueDomain){
-        String rules = ""
-        valueDomain.rule.eachWithIndex{ String rule, int i ->
-            if (rules!="") rules += (stringSeparator + rule )
-            else rules = rule
-        }
-        return rules
     }
 }

@@ -15,7 +15,6 @@ beans = {
                             new RelationshipTypeMarshaller(),
                             new RelationshipMarshallers(),
                             new RelationshipsMarshaller(),
-                            new ValueDomainMarshaller(),
                             new MappingMarshaller(),
                             new MappingsMarshaller()
                 ]

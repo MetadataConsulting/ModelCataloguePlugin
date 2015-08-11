@@ -48,7 +48,6 @@ class DashboardController {
             archivedBatchCount:Batch.countByArchived(true),
             uninstantiatedDataElementCount: uninstantiatedDataElements.total,
             relationshipTypeCount:RelationshipType.count(),
-            incompleteValueDomainsCount: dataArchitectService.incompleteValueDomains(params).total,
             transformationsCount:CsvTransformation.count()
         ])
         respond model

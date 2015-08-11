@@ -417,45 +417,6 @@ class ElementService implements Publisher<CatalogueElement> {
     }
 
 
-
-    /**
-     * Returns data elements which are very likely to be duplicates.
-     *
-     * Data elements are considered duplicates if they share the exactly same value domain and they are having the same
-     * name.
-     *
-     * @return map with the data element id as key and set of ids of duplicate data elements as value
-     */
-    Map<Long, Set<Long>> findDuplicateDataElementsSuggestions() {
-        // TODO: create test
-        Object[][] results = DataElement.executeQuery """
-            select count(de.id), de.name, vd.id, vd.name
-                from DataElement de join de.valueDomain vd
-                where
-                    de.status in :states
-                group by de.name, vd.id
-                having count(de.id) > 1
-        """, [states: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.FINALIZED]]
-
-        Map<Long, Set<Long>> elements = new LinkedHashMap<Long, Set<Long>>()
-
-        results.each { row ->
-            Long[] duplicates = DataElement.executeQuery """
-                    select de.id from DataElement de
-                    where de.name = :name
-                    and de.valueDomain.id = :vd
-                    and de.status in :states
-
-                    order by de.dateCreated
-            """, [name: row[1], vd: row[2], states: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.FINALIZED]]
-
-            elements[duplicates.head()] = new HashSet<Long>(duplicates.tail().toList())
-
-        }
-
-        elements
-    }
-
     public <E extends CatalogueElement> E restore(E element) {
         if (!element) {
             return element
