@@ -105,15 +105,6 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   actionsProvider.registerChildAction 'new-import', 'import-obo', oboImport
   actionsProvider.registerActionInRole 'global-import-obo', actionsProvider.ROLE_GLOBAL_ACTION, oboImport
 
-
-  xsdImport = ['$scope', 'messages', ($scope, messages) -> {
-    label: "Import XSD"
-    action: ->
-      messages.prompt('Import XSD File', '', type: 'new-xsd-import')
-  }]
-  actionsProvider.registerChildAction 'new-import', 'import-xsd', xsdImport
-  actionsProvider.registerActionInRole 'global-import-xsd', actionsProvider.ROLE_GLOBAL_ACTION, xsdImport
-
   umlImport = ['$scope', 'messages', ($scope, messages) -> {
     label: "Import Star Uml"
     action: ->
