@@ -12,13 +12,9 @@ import org.modelcatalogue.core.util.FriendlyErrors
 
 class DataElement extends CatalogueElement {
 
-    @Deprecated
-    ValueDomain valueDomain
-
     DataType dataType
 
     static constraints = {
-        valueDomain nullable: true, fetch: 'join'
         dataType nullable: true, fetch: 'join'
     }
 
@@ -29,7 +25,6 @@ class DataElement extends CatalogueElement {
     @Override
     CatalogueElement publish(Publisher<CatalogueElement> publisher) {
         PublishingChain.finalize(this)
-        .add(this.valueDomain)
         .add(this.dataType)
         .run(publisher)
     }
