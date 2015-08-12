@@ -99,7 +99,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         repository.clear()
         createAutomatically.clear()
 
-        created
+        repository.unclassifiedQueriesFor = [MeasurementUnit]
     }
 
     /**
@@ -118,8 +118,6 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         CatalogueElementProxy<Classification> classification = createProxy(Classification, parameters, null, true)
 
         context.withNewContext classification, c
-
-        repository.unclassifiedQueriesFor = [MeasurementUnit]
 
         classification
     }
