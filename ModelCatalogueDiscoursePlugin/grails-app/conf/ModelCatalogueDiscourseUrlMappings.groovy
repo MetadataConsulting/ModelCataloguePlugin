@@ -6,7 +6,7 @@ class ModelCatalogueDiscourseUrlMappings {
     static mappings = {
         "/sso/discourse" (controller: 'comments', action: 'sso', method: HttpMethod.GET)
 
-        def catalogueElements = ['asset', 'dataElement', 'model', 'catalogueElement', 'dataType', 'enumeratedType','primitiveType','referenceType', 'measurementUnit', 'user', 'classification']
+        def catalogueElements = ['asset', 'dataElement', 'dataClass', 'catalogueElement', 'dataType', 'enumeratedType','primitiveType','referenceType', 'measurementUnit', 'user', 'dataModel']
 
         for (String controllerName in catalogueElements) {
             "/api/modelCatalogue/core/$controllerName/$id/comments"(controller: 'comments', action: 'comments', method: HttpMethod.GET)

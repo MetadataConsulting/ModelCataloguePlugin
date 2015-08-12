@@ -10,16 +10,16 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
 	}
 
 	def report() {
-		DataModel classification = DataModel.get(params.id)
-		if (!classification) {
+		DataModel dataModel = DataModel.get(params.id)
+		if (!dataModel) {
 			notFound()
 			return
 		}
-		render view: 'report', model: [classification: classification]
+		render view: 'report', model: [dataModel: dataModel]
 	}
 
 	def gereport() {
-		def results = getModelsForClassification(params.id as Long)
+		def results = getDataClassesForDataModel(params.id as Long)
 
 		def dataTypes = new TreeSet<DataType>([compare: { DataType a, DataType b ->
 				a?.name <=> b?.name
@@ -34,8 +34,8 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
 	}
 
 
-	private Collection getModelsForClassification(Long classificationId) {
-		def classificationType = RelationshipType.findByName('classification')
+	private Collection getDataClassesForDataModel(Long dataModelId) {
+		def classificationType = RelationshipType.declarationType
 		def results = DataClass.createCriteria().list {
 			fetchMode "extensions", FetchMode.JOIN
 			fetchMode "outgoingRelationships.extensions", FetchMode.JOIN
@@ -43,7 +43,7 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
 			incomingRelationships {
 				and {
 					eq("relationshipType", classificationType)
-					source { eq('id', classificationId) }
+					source { eq('id', dataModelId) }
 				}
 			}
 		}

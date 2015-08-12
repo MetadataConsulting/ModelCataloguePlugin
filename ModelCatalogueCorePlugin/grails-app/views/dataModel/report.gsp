@@ -37,9 +37,9 @@
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-                <h1>${classification.name}</h1>
+                <h1>${dataModel.name}</h1>
                     <h2>Models</h2>
-                    <g:each in="${classification.classifies.findAll{ it in org.modelcatalogue.core.DataClass}.sort { it.name }}">
+                    <g:each in="${dataModel.declares.findAll{ it in org.modelcatalogue.core.DataClass}.sort { it.name }}">
                         <h3>${GrailsNameUtils.getNaturalName(it.getClass().simpleName)} ${it.name}</h3>
                         <table class="table">
                             <thead>
