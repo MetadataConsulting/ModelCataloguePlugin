@@ -302,7 +302,7 @@ class CatalogueElementProxyRepository {
             T result = getLatestFromCriteria(dataModelService.classified(criteria, DataModelFilter.includes(classifications)))
 
             if (result) {
-                if (!id || !result.modelCatalogueId) {
+                if (!id || !result.hasModelCatalogueId()) {
                     return result
                 }
                 return null
@@ -314,7 +314,9 @@ class CatalogueElementProxyRepository {
             }
         }
 
-        T result = getLatestFromCriteria(criteria, true)
+        T result = getLatestFromCriteria(new DetachedCriteria<T>(type).build {
+            eq 'name', name.toString()
+        }, true)
 
         // nothing found
         if (!result) {
@@ -327,7 +329,7 @@ class CatalogueElementProxyRepository {
         }
 
         // return only if there is no id or the modelCatalogueId is null
-        if (!id || !result.modelCatalogueId) {
+        if (!id || !result.hasModelCatalogueId()) {
             return result
         }
 
