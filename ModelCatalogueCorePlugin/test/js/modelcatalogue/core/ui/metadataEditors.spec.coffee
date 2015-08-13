@@ -33,14 +33,14 @@ describe "mc.core.ui.metadataEditors", ->
     }
 
     metadataEditorsProvider.register {
-      title: 'value domain based on other value domain'
+      title: 'model based on other model'
       types: ['model=[hierarchy]=>model']
       keys: ['foo']
       template: '<p>...template...</p>'
     }
 
     metadataEditorsProvider.register {
-      title: 'value domain based on other value domain'
+      title: 'model based on other model'
       types: ['model']
       keys: ['foo']
       template: '<p>...template...</p>'

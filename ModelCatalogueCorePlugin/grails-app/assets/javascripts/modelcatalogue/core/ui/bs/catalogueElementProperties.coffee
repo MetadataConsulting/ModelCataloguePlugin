@@ -20,7 +20,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   containsDataElements= -> [
     {header: 'Name', value: "relation.name", classes: 'col-md-3', show: "relation.show()", href: 'relation.href()'}
     {header: "Description", value: "relation.description" , classes: "col-md-5"}
-    {header: "Value Domain", value: printDataType, classes: "col-md-3", show: true, href: 'href()'}
+    {header: "Data Type", value: printDataType, classes: "col-md-3", show: true, href: 'href()'}
     {header: 'Metadata',  value: printMetadata, classes: 'col-md-2'}
   ]
 
@@ -69,8 +69,6 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'parentOf', label: 'Children', columns: localNameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'childOf', label: 'Parents', columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'isContextFor', label: 'Data Classes', columns: nameAndIdent()
-  catalogueElementPropertiesProvider.configureProperty 'includes', label: 'Value Domains', columns: nameAndIdent()
-  catalogueElementPropertiesProvider.configureProperty 'instantiatedBy', label: 'Value Domains', columns: nameAndIdAndMetadata()
   catalogueElementPropertiesProvider.configureProperty 'contains', label: 'Data Elements', columns: containsDataElements()
   catalogueElementPropertiesProvider.configureProperty 'containedIn', label: 'Data Classes', columns: nameAndIdAndMetadata()
   catalogueElementPropertiesProvider.configureProperty 'hasAttachmentOf', label: 'Attachments', columns: attachmentColumns()

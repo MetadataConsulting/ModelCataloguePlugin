@@ -66,7 +66,7 @@ angular.module('mc.core.ui.bs.modalPromptNewMapping', ['mc.util.messages']).conf
           $scope.createMapping = ->
             $scope.messages.clearAllMessages()
             if not $scope.copy.destination or not $scope.copy.destination.id
-              $scope.messages.error 'Missing Destination Value Domain', 'Please select the destination value domain.'
+              $scope.messages.error 'Missing Destination Data Type', 'Please select the destination data type.'
               return
 
             if not $scope.copy.mapping

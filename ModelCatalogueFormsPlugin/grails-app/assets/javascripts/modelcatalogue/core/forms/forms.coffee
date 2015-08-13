@@ -295,7 +295,7 @@ forms.run ['$templateCache', ($templateCache) ->
         <label for="item-data-type" class="control-label">Data Type</label>
         <select id="item-data-type" class="form-control" ng-options="key for (key, value) in {'String':'string', 'Integer': 'int', 'Real':'real', 'Date':'date', 'Partial Date': 'pdate'}" ng-model="object.access('http://forms.modelcatalogue.org/item#dataType')" ng-model-options="{ getterSetter: true }"></select>
         <p class="help-block">
-          Data type of the item. If you want to use data type <code>file</code> select the <code>File</code> response type on the value domain.<br/>
+          Data type of the item. If you want to use data type <code>file</code> select the <code>File</code> response type on the data type.<br/>
           XMLSchema and Java data types are mapped to their proper data types automatically. This includes if the current data type is based on one of the data types from XMLSchema or Java classification. For a partial date, use <code>xs:gMonthYear</code> data type.
         </p>
       </div>
@@ -309,11 +309,10 @@ forms.run ['$templateCache', ($templateCache) ->
         <label for="item-response-type" class="control-label">Response Type</label>
         <select id="item-response-type" class="form-control" ng-options="key for (key, value) in {'Text':'text', 'Textarea': 'textarea', 'Single Select':'singleselect', 'Radio':'radio', 'Multi Select': 'multiselect', 'Checkbox': 'checkbox', 'File': 'file'}" ng-model="object.access('http://forms.modelcatalogue.org/item#responseType')" ng-model-options="{ getterSetter: true }"></select>
         <p class="help-block">
-          Response type of the item. If any metadata related to the item doesn't make sense for given context (e.g. default value for file) they are ignored. Reponse type is inherited from value domain's base domains.<br/>
+          Response type of the item. If any metadata related to the item doesn't make sense for given context (e.g. default value for file) they are ignored. Reponse type is inherited from data type's base domains.<br/>
 
           If data type name is <code>File</code> the default response type is <code>File</code>. If data type is enumeration the default value is <code>Single Select</code>
-          if the value domain is not multiple or data element's <code>Max Occurs</code> is <code>1</code>. This can be changed to <code>Radio</code>.
-          In case of enumerated data type and value domain which is marked as multiple the default value is <code>Checkobox</code> but can be customized to <code>Multi Select</code>.
+          if data element's <code>Max Occurs</code> is <code>1</code>. This can be changed to <code>Radio</code>.
           For other data types the default value is <code>Text</code> but can be customized to <code>Textarea</code>.
         </p>
       </div>
@@ -321,7 +320,7 @@ forms.run ['$templateCache', ($templateCache) ->
         <label for="item-units" class="control-label">Units</label>
         <input maxlength="64" type="text" class="form-control" id="item-units" ng-model="object.access('http://forms.modelcatalogue.org/item#units')" ng-model-options="{ getterSetter: true }">
         <p class="help-block">
-            Used to define the type of values being collected.  It appears to the right of the input field on the CRF. Defaults to the symbol of value domain's unit of measure.<br/>
+            Used to define the type of values being collected.  It appears to the right of the input field on the CRF. Defaults to the symbol of primitive type's unit of measure.<br/>
 
             If you are collecting data in Inches, this field can specify your units as Inches, IN, or in.
             This field should not be changed in any subsequent versions of the CRF. If you do change it and you are the owner
@@ -354,7 +353,7 @@ forms.run ['$templateCache', ($templateCache) ->
         <label for="item-regexp" class="control-label">Regular Expression</label>
         <input maxlength="1000" type="text" class="form-control" id="item-regexp" ng-model="object.access('http://forms.modelcatalogue.org/item#regexp')" ng-model-options="{ getterSetter: true }">
         <p class="help-block">
-          Regular expresion the value has match. Defaults to regular expression set for the value domain if it is in the format <code>x ==~ /\\d+(\\.\\d+)?/</code>
+          Regular expresion the value has match. Defaults to regular expression set for the data type if it is in the format <code>x ==~ /\\d+(\\.\\d+)?/</code>
         </p>
       </div>
       <div class="form-group">
@@ -516,11 +515,10 @@ forms.run ['$templateCache', ($templateCache) ->
 	    <label for="item-response-type" class="control-label">Response Type</label>
 	    <select id="item-response-type" class="form-control" ng-options="key for (key, value) in {'Text':'text', 'Textarea': 'textarea', 'Single Select':'singleselect', 'Radio':'radio', 'Multi Select': 'multiselect', 'Checkbox': 'checkbox', 'File': 'file'}" ng-model="object.access('http://forms.modelcatalogue.org/item#responseType')" ng-model-options="{ getterSetter: true }"></select>
 	    <p class="help-block">
-	      Response type of the item. If any metadata related to the item doesn't make sense for given context (e.g. default value for file) they are ignored. Reponse type is inherited from value domain's base domains.<br/>
+	      Response type of the item. If any metadata related to the item doesn't make sense for given context (e.g. default value for file) they are ignored. Reponse type is inherited from data type's base types.<br/>
 	
 	      If data type name is <code>File</code> the default response type is <code>File</code>. If data type is enumeration the default value is <code>Single Select</code>
-	      if the value domain is not multiple or data element's <code>Max Occurs</code> is <code>1</code>. This can be changed to <code>Radio</code>.
-	      In case of enumerated data type and value domain which is marked as multiple the default value is <code>Checkobox</code> but can be customized to <code>Multi Select</code>.
+	      if data element's <code>Max Occurs</code> is <code>1</code>. This can be changed to <code>Radio</code>.
 	      For other data types the default value is <code>Text</code> but can be customized to <code>Textarea</code>.
 	    </p>
 	  </div>
@@ -528,7 +526,7 @@ forms.run ['$templateCache', ($templateCache) ->
 	    <label for="item-units" class="control-label">Units</label>
 	    <input maxlength="64" type="text" class="form-control" id="item-units" ng-model="object.access('http://forms.modelcatalogue.org/item#units')" ng-model-options="{ getterSetter: true }">
 	    <p class="help-block">
-	        Used to define the type of values being collected.  It appears to the right of the input field on the CRF. Defaults to the symbol of value domain's unit of measure.<br/>
+	        Used to define the type of values being collected.  It appears to the right of the input field on the CRF. Defaults to the symbol of primitive type's unit of measure.<br/>
 	
 	        If you are collecting data in Inches, this field can specify your units as Inches, IN, or in.
 	        This field should not be changed in any subsequent versions of the CRF. If you do change it and you are the owner
@@ -561,7 +559,7 @@ forms.run ['$templateCache', ($templateCache) ->
 	    <label for="item-regexp" class="control-label">Regular Expression</label>
 	    <input maxlength="1000" type="text" class="form-control" id="item-regexp" ng-model="object.access('http://forms.modelcatalogue.org/item#regexp')" ng-model-options="{ getterSetter: true }">
 	    <p class="help-block">
-	      Regular expresion the value has match. Defaults to regular expression set for the value domain if it is in the format <code>x ==~ /\\d+(\\.\\d+)?/</code>
+	      Regular expresion the value has match. Defaults to regular expression set for the data type if it is in the format <code>x ==~ /\\d+(\\.\\d+)?/</code>
 	    </p>
 	  </div>
 	  <div class="form-group">

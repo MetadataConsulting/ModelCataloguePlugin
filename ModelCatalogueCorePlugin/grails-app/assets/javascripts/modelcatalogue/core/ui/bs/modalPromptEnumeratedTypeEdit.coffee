@@ -36,7 +36,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
                 <label for="rule" ng-click="ruleCollapsed = !ruleCollapsed">Rule <span class="glyphicon" ng-class="{'glyphicon-collapse-down': ruleCollapsed, 'glyphicon-collapse-up': !ruleCollapsed}"></span></label>
                 <div collapse="ruleCollapsed" >
                   <textarea rows="10" ng-model="copy.rule" placeholder="Rule" class="form-control" id="rule"></textarea>
-                  <p class="help-block">Enter valid <a href="http://www.groovy-lang.org/" target="_blank">Groovy</a> code. Variable <code>x</code> refers to the value validated value and  <code>domain</code> to current value domain. Last row is the result which should be <code>boolean</code> value. For example you can <a ng-click="showRegexExample()"><span class="fa fa-magic"></span> validate using regular expression</a> or <a ng-click="showSetExample()"><span class="fa fa-magic"></span> values in set</a></p>
+                  <p class="help-block">Enter valid <a href="http://www.groovy-lang.org/" target="_blank">Groovy</a> code. Variable <code>x</code> refers to the value validated value and  <code>dataType</code> to current data type. Last row is the result which should be <code>boolean</code> value. For example you can <a ng-click="showRegexExample()"><span class="fa fa-magic"></span> validate using regular expression</a> or <a ng-click="showSetExample()"><span class="fa fa-magic"></span> values in set</a></p>
                 </div>
               </div>
             <label class="radio-inline">
