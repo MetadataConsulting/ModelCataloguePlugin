@@ -4,6 +4,7 @@ import grails.util.Holders
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
+import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -67,10 +68,12 @@ class CopyAssociationsAndRelationships {
         copyRelationshipsInternal(RelationshipDirection.INCOMING, createdRelationshipHashes)
         copyRelationshipsInternal(RelationshipDirection.OUTGOING, createdRelationshipHashes)
 
-        GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(draft.class.name) as GrailsDomainClass
+        Class type = context.newType ?: HibernateProxyHelper.getClassWithoutInitializingProxy(draft)
+
+        GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(type.name) as GrailsDomainClass
 
         for (prop in domainClass.persistentProperties) {
-            if (prop.association && (prop.manyToOne || prop.oneToOne)) {
+            if (prop.association && (prop.manyToOne || prop.oneToOne) && element.hasProperty(prop.name)) {
                 def value = element.getProperty(prop.name)
                 if (value instanceof CatalogueElement) {
                     draft.setProperty(prop.name, DraftContext.preferDraft(value))

@@ -366,5 +366,34 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     }
   ]
 
+  actionsProvider.registerChildActionInRole 'catalogue-element', 'change-type', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', ($rootScope, $scope, messages, names, security, catalogueElementResource) ->
+    return undefined if not $scope.element
+    return undefined if not angular.isFunction $scope.element.isInstanceOf
+    return undefined if not $scope.element.isInstanceOf('dataType')
+    return undefined if not security.hasRole('CURATOR')
+
+    {
+      position:   1000
+      label:      'Change Type'
+      icon:       'fa fa-fw fa-edit'
+      type:       'primary'
+      watches:    ['element.status', 'element.archived']
+      disabled:   $scope.element.archived
+      action:     ->
+        options =
+          dataType: 'Data Type'
+          enumeratedType: 'Enumerated Type'
+          primitiveType: 'Primitive Type'
+          referenceType: 'Reference Type'
+
+        messages.prompt('Change Type', "To which type should be #{$scope.element.name} converted? WARNING: any extra information such as enumerated values, data classes and measurement units will be lost!", {type: 'with-options', selected: names.getPropertyNameFromType($scope.element.elementType), options: options}).then (type)->
+          catalogueElementResource($scope.element.elementType).update($scope.element, {newVersion: true, newType: type}).then (updated) ->
+            updateFrom $scope.element, updated
+            messages.success("#{$scope.element.name} is now #{options[type]}")
+            $rootScope.$broadcast 'newVersionCreated', updated
+            $rootScope.$broadcast 'catalogueElementUpdated', updated
+          , showErrorsUsingMessages(messages)
+    }
+  ]
 
 ]

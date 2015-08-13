@@ -11,25 +11,39 @@ class DraftContext {
 
     private Set<Long> elementsUnderControl
 
+    private Class<? extends CatalogueElement> newType
+
     private Set<CopyAssociationsAndRelationships> pendingRelationshipsTasks = new LinkedHashSet<CopyAssociationsAndRelationships>()
     private Set<String> createdRelationshipHashes = []
 
-    private DraftContext(boolean copyRelationships, Set<Long> elementsUnderControl) {
+    private DraftContext(boolean copyRelationships, Set<Long> elementsUnderControl, Class newType) {
         this.copyRelationships = copyRelationships
         this.elementsUnderControl = Collections.unmodifiableSet(elementsUnderControl)
+        this.newType = newType
     }
+
+    static DraftContext typeChanging(Class<? extends CatalogueElement> newType) {
+        DraftContext context = new DraftContext(true, [] as Set, newType)
+        context.forceNew = true
+        context
+    }
+
     static DraftContext userFriendly() {
-        new DraftContext(true, [] as Set)
+        new DraftContext(true, [] as Set, null)
     }
 
     static DraftContext importFriendly(Set<Long> elementsUnderControl) {
-        new DraftContext(false, elementsUnderControl)
+        new DraftContext(false, elementsUnderControl, null)
     }
 
     static DraftContext forceNew() {
-        DraftContext context = new DraftContext(true, [] as Set)
+        DraftContext context = new DraftContext(true, [] as Set, null)
         context.forceNew = true
         context
+    }
+
+    Class<? extends CatalogueElement> getNewType() {
+        newType
     }
 
     boolean isForceNew() {

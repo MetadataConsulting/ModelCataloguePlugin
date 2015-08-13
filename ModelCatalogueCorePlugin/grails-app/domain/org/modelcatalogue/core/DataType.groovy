@@ -139,9 +139,31 @@ class DataType extends CatalogueElement {
         }
     }
 
+    void afterDraftPersisted(CatalogueElement draft) {
+        if (draft.instanceOf(DataType)) {
+            for (DataElement de in getRelatedDataElements()) {
+                if (de.status == ElementStatus.DRAFT) {
+                    de.dataType = draft
+                    FriendlyErrors.failFriendlySave(de)
+                }
+            }
+        }
+    }
 
     @Override
     protected PublishingChain prepareDraftChain(PublishingChain chain) {
-        chain.add(this.dataModels)
+        super.prepareDraftChain(chain).add(relatedDataElements)
+    }
+
+    @Override
+    protected String getModelCatalogueResourceName() {
+        'dataType'
+    }
+
+    Integer countVersions() {
+        if (!latestVersionId) {
+            return 1
+        }
+        DataType.countByLatestVersionId(latestVersionId)
     }
 }

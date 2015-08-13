@@ -4,6 +4,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.RelationshipDirection
 import spock.lang.Issue
+import spock.lang.Unroll
 
 class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
@@ -388,6 +389,28 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         d1draft.outgoingMappings.size() == 1
         d1draft.outgoingMappings[0].destination == d2
 
+    }
+
+    @Unroll
+    def "can change data type type when creating new draft to #type"() {
+        DataType d1 = new DataType(name: "DT4CDT").save(failOnError: true, flush: true)
+        DataElement element = new DataElement(name: 'DE4MET-732', dataType: d1).save(failOnError: true, flush: true)
+
+        expect:
+        element in d1.relatedDataElements
+
+        when:
+        DataType d1draft = elementService.createDraftVersion(d1, DraftContext.typeChanging(type))
+
+        then:
+        d1draft
+        d1draft.errors.errorCount == 0
+        d1draft.instanceOf(type)
+        d1draft.name == "DT4CDT"
+        element in d1draft.relatedDataElements
+
+        where:
+        type << [PrimitiveType, EnumeratedType, ReferenceType]
     }
 
     @Issue("https://metadata.atlassian.net/browse/MET-732")

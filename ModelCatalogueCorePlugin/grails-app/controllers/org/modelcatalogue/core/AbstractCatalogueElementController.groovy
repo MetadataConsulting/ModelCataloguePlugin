@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.transaction.Transactional
+import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.*
@@ -483,9 +484,15 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
 
         if (newVersion) {
+            ModelCatalogueTypes newType = null
+            if (params.newType) {
+                newType = ModelCatalogueTypes.getType(params.newType)
+            } else if(request.JSON?.newType) {
+                newType = ModelCatalogueTypes.getType(request.JSON?.newType)
+            }
 
             // when draft version is created from the UI still just create plain draft ignoring dependencies
-            instance = elementService.createDraftVersion(instance, DraftContext.userFriendly()) as T
+            instance = elementService.createDraftVersion(instance, newType?.implementation ? DraftContext.typeChanging(newType.implementation) : DraftContext.userFriendly()) as T
             if (instance.hasErrors()) {
                 respond instance.errors, view: 'edit' // STATUS CODE 422
                 return
@@ -654,6 +661,14 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     }
 
     def history(Integer max) {
+        String name = getResourceName()
+        Class type = resource
+
+        if (name in ['primitiveType', 'enumeratedType', 'referenceType']) {
+            name = 'dataType'
+            type = DataType
+        }
+
         params.max = Math.min(max ?: 10, 100)
         CatalogueElement element = queryForResource(params.id)
         if (!element) {
@@ -664,8 +679,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         Long id = element.id
 
         if (!element.latestVersionId) {
-            respond Lists.wrap(params, "/${resourceName}/${params.id}/history", Lists.lazy(params, resource, {
-                [resource.get(id)]
+            respond Lists.wrap(params, "/${name}/${params.id}/history", Lists.lazy(params, type, {
+                [type.get(id)]
             }, { 1 }))
             return
         }
@@ -678,7 +693,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         customParams.sort = 'versionNumber'
         customParams.order = 'desc'
 
-        respond Lists.fromCriteria(customParams, resource, "/${resourceName}/${params.id}/history") {
+        respond Lists.fromCriteria(customParams, type, "/${name}/${params.id}/history") {
             eq 'latestVersionId', latestVersionId
         }
     }

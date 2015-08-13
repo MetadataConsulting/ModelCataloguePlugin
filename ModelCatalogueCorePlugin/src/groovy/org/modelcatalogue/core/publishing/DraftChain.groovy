@@ -4,6 +4,7 @@ import grails.util.Holders
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
+import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
@@ -11,11 +12,11 @@ import org.modelcatalogue.core.util.FriendlyErrors
 @Log4j
 class DraftChain extends PublishingChain {
 
-    private final DraftContext strategy
+    private final DraftContext context
 
-    private DraftChain(CatalogueElement published, DraftContext strategy) {
+    private DraftChain(CatalogueElement published, DraftContext context) {
         super(published)
-        this.strategy = strategy
+        this.context = context
     }
 
     static DraftChain create(CatalogueElement published, DraftContext strategy) {
@@ -23,7 +24,7 @@ class DraftChain extends PublishingChain {
     }
 
     protected CatalogueElement doRun(Publisher<CatalogueElement> publisher) {
-        if (!strategy.forceNew) {
+        if (!context.forceNew) {
             if (isDraft(published) || isUpdatingInProgress(published)) {
                 return published
             }
@@ -39,7 +40,7 @@ class DraftChain extends PublishingChain {
         }
 
         // only the first element in the chain can be forced
-        strategy.stopForcingNew()
+        context.stopForcingNew()
 
         startUpdating()
 
@@ -55,7 +56,7 @@ class DraftChain extends PublishingChain {
                     continue
                 }
                 processed << element.id
-                CatalogueElement draft = element.createDraftVersion(publisher, strategy)
+                CatalogueElement draft = element.createDraftVersion(publisher, context)
                 if (draft.hasErrors()) {
                     String message = FriendlyErrors.printErrors("Draft version $draft has errors", draft.errors)
                     log.warn(message)
@@ -79,17 +80,19 @@ class DraftChain extends PublishingChain {
             return published
         }
 
-        GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(published.class.name) as GrailsDomainClass
+        Class<? extends CatalogueElement> type = context.newType ?: HibernateProxyHelper.getClassWithoutInitializingProxy(published)
 
-        CatalogueElement draft = published.class.newInstance()
+        GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(type.name) as GrailsDomainClass
+
+        CatalogueElement draft = type.newInstance()
 
         for (prop in domainClass.persistentProperties) {
-            if (!prop.association) {
+            if (!prop.association && published.hasProperty(prop.name)) {
                 draft.setProperty(prop.name, published.getProperty(prop.name))
             }
         }
 
-        draft.versionNumber = (published.class.findByLatestVersionId(published.latestVersionId, [sort: 'versionNumber', order: 'desc'])?.versionNumber ?: 1) + 1
+        draft.versionNumber = (CatalogueElement.findByLatestVersionId(published.latestVersionId, [sort: 'versionNumber', order: 'desc'])?.versionNumber ?: 1) + 1
         draft.versionCreated = new Date()
 
         draft.latestVersionId = published.latestVersionId ?: published.id
@@ -107,7 +110,7 @@ class DraftChain extends PublishingChain {
 
         draft.addToSupersedes(published, skipUniqueChecking: true)
 
-        strategy.delayRelationshipCopying(draft, published)
+        context.delayRelationshipCopying(draft, published)
 
         published.afterDraftPersisted(draft)
 

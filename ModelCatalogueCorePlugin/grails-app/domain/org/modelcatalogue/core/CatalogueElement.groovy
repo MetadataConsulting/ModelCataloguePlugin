@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import com.google.common.base.Function
 import com.google.common.collect.Lists
 import grails.util.GrailsNameUtils
+import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Published
@@ -58,7 +59,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     Set<Mapping> outgoingMappings = []
     Set<Mapping> incomingMappings = []
 
-    static transients = ['relations', 'info', 'archived', 'relations', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext', 'classifications', 'inheritedAssociationsNames']
+    static transients = ['relations', 'info', 'archived', 'relations', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext', 'classifications', 'inheritedAssociationsNames', 'modelCatalogueResourceName']
 
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping, extensions: ExtensionValue]
 
@@ -267,11 +268,15 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
 
+    protected String getModelCatalogueResourceName() {
+        fixResourceName GrailsNameUtils.getPropertyName(HibernateProxyHelper.getClassWithoutInitializingProxy(this))
+    }
+
     String getDefaultModelCatalogueId(boolean withoutVersion = false) {
         if (!grailsLinkGenerator) {
             return null
         }
-        String resourceName = fixResourceName GrailsNameUtils.getPropertyName(getClass())
+        String resourceName = getModelCatalogueResourceName()
         if (withoutVersion) {
             return grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${getLatestVersionId() ?: getId()}")
         }

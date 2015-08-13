@@ -25,7 +25,7 @@ class EnumeratedType extends DataType {
 
     static constraints = {
         name unique:false
-        enumAsString nullable: false, /*unique:true,*/ maxSize: 10000, validator: { encodedVal, obj ->
+        enumAsString nullable: false, maxSize: 10000, validator: { encodedVal, obj ->
             Map<String, String> val = stringToMap(encodedVal)
             if (!val) return true
             if (val.size() < 1) return false
@@ -156,4 +156,10 @@ class EnumeratedType extends DataType {
         enumerations.collect { key, value -> "$key: $value" }.join('\n')
     }
 
+    @Override
+    void beforeDraftPersisted() {
+        if (!enumerations) {
+            enumerations = ['default' : '']
+        }
+    }
 }
