@@ -156,6 +156,9 @@ You can customize the text of the home page by setting HTML content into the `mc
 configuration properties. The `mc.welcome.jumbo` replaces content in the big grey box, the `mc.welcome.info` the
 text under the big gray box.
 
+== Relationship Types Synchronization
+Relationship types are crutial part of the model catalogue. If you want to stay always synchronized with their
+expected values, set `mc.sync.relationshipTypes` config property to `true`.
 
 ////
 == Known Issues

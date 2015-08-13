@@ -304,6 +304,35 @@ databaseChangeLog = {
                         // duplicate entry - it's fine
                     }
                 }
+
+                sql.executeUpdate """
+                    update data_element set value_domain_id = null where value_domain_id is not null
+                """
+
+                def ids = []
+
+                sql.eachRow "select id from value_domain", { row ->
+                    ids << row[0]
+                }
+
+                for (id in ids) {
+                    def vdResult = sql.executeUpdate """
+                        delete from value_domain where id = $id
+                    """
+
+                    def exResult = sql.executeUpdate """
+                        delete from extension_value where element_id = $id
+                    """
+
+                    def relResult = sql.executeUpdate """
+                        delete from relationship where source_id = $id or destination_id = $id
+                    """
+
+                    def ceResult = sql.executeUpdate """
+                        delete from catalogue_element where id = $id
+                    """
+                }
+
             }
         }
     }

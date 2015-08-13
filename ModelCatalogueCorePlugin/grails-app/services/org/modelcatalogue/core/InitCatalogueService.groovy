@@ -90,6 +90,9 @@ class InitCatalogueService {
                 if (type.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Cannot create relationship type $definition.name", type.errors))
                 }
+            } else if (grailsApplication.config.mc.sync.relationshipTypes) {
+                existing.properties = definition
+                FriendlyErrors.failFriendlySave(existing)
             } else {
                 if (definition.rule && definition.rule.replaceAll(/\s+/, ' ').trim() != existing.rule?.replaceAll(/\s+/, ' ')?.trim()) {
                     log.warn("""
