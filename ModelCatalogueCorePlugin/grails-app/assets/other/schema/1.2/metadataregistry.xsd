@@ -145,7 +145,7 @@
             <xs:enumeration value="relatedTo"/>
             <xs:enumeration value="synonym"/>
             <xs:enumeration value="favourite"/>
-            <xs:enumeration value="dataModel"/>
+            <xs:enumeration value="declaration"/>
         </xs:restriction>
     </xs:simpleType>
 
@@ -275,7 +275,6 @@
         <xs:complexContent>
             <xs:extension base="mdr:CatalogueElement">
                 <xs:sequence>
-                    <xs:element name="globalSearchFor" type="mdr:CatalogueElementType" minOccurs="0" maxOccurs="unbounded" />
                     <xs:choice minOccurs="0" maxOccurs="unbounded">
                         <xs:element name="dataModel"        type="mdr:DataModel"       />
                         <xs:element name="dataClass"        type="mdr:DataClass"       />
@@ -294,9 +293,10 @@
             <xs:element name="skipDraft" type="xs:boolean" minOccurs="0" />
             <xs:element name="copyRelationships" type="xs:boolean" minOccurs="0" />
             <xs:element name="createAutomatically" type="mdr:CatalogueElementType" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="globalSearchFor" type="mdr:CatalogueElementType" minOccurs="0" maxOccurs="unbounded" />
             <xs:choice maxOccurs="unbounded">
                 <xs:element name="dataModel"         type="mdr:DataModel"       />
-                <xs:element name="dataClass"         type="mdr:DataModel"       />
+                <xs:element name="dataClass"         type="mdr:DataClass"       />
                 <xs:element name="dataElement"       type="mdr:DataElement"     />
                 <xs:element name="dataType"          type="mdr:DataType"        />
                 <xs:element name="measurementUnit"   type="mdr:MeasurementUnit" />
