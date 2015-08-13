@@ -93,6 +93,9 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         waitFor {
             infTableCell(1, 1, text: 'New Reference Type').displayed
         }
+        waitFor {
+            infTableCell(1, 2, text: 'DEMOGRAPHICS').displayed
+        }
     }
 
     def "create primitive"() {
@@ -129,6 +132,9 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         then:
         waitFor {
             infTableCell(1, 1, text: 'New Primitive Type').displayed
+        }
+        waitFor {
+            infTableCell(1, 2, text: 'celsius').displayed
         }
     }
 

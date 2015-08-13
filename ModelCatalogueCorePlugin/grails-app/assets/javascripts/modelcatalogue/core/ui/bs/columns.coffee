@@ -10,6 +10,7 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
   getEnumerations = (enumeratedType) ->
     return '' if not enumeratedType
     return """<a href="#/catalogue/dataClass/#{enumeratedType.dataClass.id}"><span class="fa fa-fw fa-cubes"></span> #{enumeratedType.dataClass.name}</a>""" if enumeratedType.dataClass
+    return """<a href="#/catalogue/measurementUnit/#{enumeratedType.measurementUnit.id}"><span class="fa fa-fw fa-dashboard"></span> #{enumeratedType.measurementUnit.name}</a>""" if enumeratedType.measurementUnit
     return enumeratedType.description if not enumeratedType.enumerations
     return enumeratedType.description if not enumeratedType.enumerations.values
     enumerations = []

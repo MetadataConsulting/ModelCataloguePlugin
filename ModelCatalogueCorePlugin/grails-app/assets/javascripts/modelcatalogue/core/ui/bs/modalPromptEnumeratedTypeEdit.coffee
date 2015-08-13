@@ -132,8 +132,8 @@ x in ['apple', 'banana', 'cherry']
               if $scope.copy.dataClass and angular.isString($scope.copy.dataClass)
                  promise = promise.then -> catalogueElementResource('dataClass').save({name: $scope.copy.dataClass, dataModels: $scope.copy.dataModels}).then (newClass) ->
                    $scope.copy.dataClass = newClass
-              else
-                $scope.copy.dataClass = undefined
+            else
+              $scope.copy.dataClass = undefined
 
             if $scope.subtype is 'primitiveType'
               if $scope.copy.measurementUnit and angular.isString($scope.copy.measurementUnit)
