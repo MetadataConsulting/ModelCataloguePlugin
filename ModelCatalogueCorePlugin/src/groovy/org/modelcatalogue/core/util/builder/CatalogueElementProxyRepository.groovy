@@ -279,12 +279,18 @@ class CatalogueElementProxyRepository {
             if (proxy.domain == HibernateProxyHelper.getClassWithoutInitializingProxy(element)) {
                 return DraftContext.userFriendly()
             }
-            return DraftContext.typeChangingUserFriendly(proxy.domain)
+            if ((element.getLatestVersionId() ?: element.getId()) in elementsUnderControl) {
+                return DraftContext.typeChangingUserFriendly(proxy.domain)
+            }
+            return DraftContext.userFriendly()
         }
         if (proxy.domain == HibernateProxyHelper.getClassWithoutInitializingProxy(element)) {
             return DraftContext.importFriendly(elementsUnderControl)
         }
-        return DraftContext.typeChangingImportFriendly(proxy.domain, elementsUnderControl)
+        if ((element.getLatestVersionId() ?: element.getId()) in elementsUnderControl) {
+            return DraftContext.typeChangingImportFriendly(proxy.domain, elementsUnderControl)
+        }
+        return DraftContext.importFriendly(elementsUnderControl)
     }
 
     protected  <T extends CatalogueElement> T tryFind(Class<T> type, Object classificationName, Object name, Object id) {
