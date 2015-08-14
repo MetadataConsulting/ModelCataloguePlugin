@@ -400,7 +400,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         element in d1.relatedDataElements
 
         when:
-        DataType d1draft = elementService.createDraftVersion(d1, DraftContext.typeChanging(type))
+        DataType d1draft = elementService.createDraftVersion(d1, DraftContext.typeChangingUserFriendly(type))
 
         then:
         d1draft

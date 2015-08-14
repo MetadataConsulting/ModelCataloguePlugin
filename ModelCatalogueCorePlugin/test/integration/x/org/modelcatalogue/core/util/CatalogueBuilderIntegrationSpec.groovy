@@ -1,7 +1,9 @@
 package x.org.modelcatalogue.core.util
 
 import grails.util.Holders
+import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
@@ -34,7 +36,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
     }
 
     def "reuse existing classification by name"() {
-        DataModel c = new DataModel(name: 'ExistingSchema', status: org.modelcatalogue.core.api.ElementStatus.DEPRECATED).save(failOnError: true)
+        DataModel c = new DataModel(name: 'ExistingSchema', status: ElementStatus.DEPRECATED).save(failOnError: true)
 
         build {
             dataModel(name: 'ExistingSchema', namespace: 'http://www.w3.org/2001/ExistingSchema') {
@@ -90,7 +92,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
     }
 
     def "reuse existing measurement unit by name"() {
-        MeasurementUnit unit = new MeasurementUnit(name: 'ExistingUnit', status: org.modelcatalogue.core.api.ElementStatus.DEPRECATED).save(failOnError: true)
+        MeasurementUnit unit = new MeasurementUnit(name: 'ExistingUnit', status: ElementStatus.DEPRECATED).save(failOnError: true)
 
         build {
             measurementUnit(name: 'ExistingUnit', symbol: 'EU') {
@@ -105,7 +107,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
     }
 
     def "creates only one measurement unit as measurement unit name is unique"() {
-        new MeasurementUnit(name: 'ExistingUnit2', status: org.modelcatalogue.core.api.ElementStatus.DEPRECATED).save(failOnError: true, flush: true)
+        new MeasurementUnit(name: 'ExistingUnit2', status: ElementStatus.DEPRECATED).save(failOnError: true, flush: true)
 
         when:
         build {
@@ -157,7 +159,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
     }
 
     def "reuse existing data element unit by name"() {
-        DataElement unit = new DataElement(name: 'ExistingElement', status: org.modelcatalogue.core.api.ElementStatus.DEPRECATED).save(failOnError: true)
+        DataElement unit = new DataElement(name: 'ExistingElement', status: ElementStatus.DEPRECATED).save(failOnError: true)
 
         build {
             dataElement(name: 'ExistingElement') {
@@ -197,7 +199,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
     }
 
     def "reuse existing model by name"() {
-        DataClass unit = new DataClass(name: 'ExistingModel', status: org.modelcatalogue.core.api.ElementStatus.DEPRECATED).save(failOnError: true)
+        DataClass unit = new DataClass(name: 'ExistingModel', status: ElementStatus.DEPRECATED).save(failOnError: true)
 
         build {
             dataClass(name: 'ExistingModel') {
@@ -332,7 +334,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
     def "complain if data type name is missing"() {
         when:
         build {
-            dataType status: org.modelcatalogue.core.api.ElementStatus.FINALIZED
+            dataType status: ElementStatus.FINALIZED
         }
 
         then:
@@ -503,7 +505,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         }
 
         expect:
-        DataClass.findByName("ModelNV1")?.status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
+        DataClass.findByName("ModelNV1")?.status == ElementStatus.FINALIZED
 
         when:
         build {
@@ -517,16 +519,16 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         then: "new model is draft"
         DataClass.findByName("ModelNV2")?.modelCatalogueId  == "http://www.example.com/models/ModelNV1"
         DataClass.findByName("ModelNV2")?.latestVersionId   == DataClass.findByName("ModelNV1")?.id
-        DataClass.findByName("ModelNV2")?.status            == org.modelcatalogue.core.api.ElementStatus.DRAFT
+        DataClass.findByName("ModelNV2")?.status            == ElementStatus.DRAFT
 
         and: "the old model is still finalized"
-        DataClass.findByName("ModelNV1")?.status            == org.modelcatalogue.core.api.ElementStatus.FINALIZED
+        DataClass.findByName("ModelNV1")?.status            == ElementStatus.FINALIZED
         DataClass.findByName("ModelNV1")?.modelCatalogueId  == "http://www.example.com/models/ModelNV1"
 
         and: "there are two NewVersion1 classifications at the moment"
         DataModel.countByName('NewVersion1')                                   == 2
-        DataModel.countByNameAndStatus('NewVersion1', org.modelcatalogue.core.api.ElementStatus.DRAFT)     == 1
-        DataModel.countByNameAndStatus('NewVersion1', org.modelcatalogue.core.api.ElementStatus.FINALIZED) == 1
+        DataModel.countByNameAndStatus('NewVersion1', ElementStatus.DRAFT)     == 1
+        DataModel.countByNameAndStatus('NewVersion1', ElementStatus.FINALIZED) == 1
 
 
     }
@@ -557,7 +559,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
 
         then:
-        DataClass.findByName('Parent 007').status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
+        DataClass.findByName('Parent 007').status == ElementStatus.FINALIZED
 
         when:
         build {
@@ -571,7 +573,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         }
 
         then:
-        DataClass.findByName('Parent 007', [sort: 'versionNumber', order: 'desc']).status == org.modelcatalogue.core.api.ElementStatus.DRAFT
+        DataClass.findByName('Parent 007', [sort: 'versionNumber', order: 'desc']).status == ElementStatus.DRAFT
     }
 
 
@@ -594,7 +596,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
         expect:
         l1Finalized
-        l1Finalized.status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
+        l1Finalized.status == ElementStatus.FINALIZED
         l1Finalized.parentOf.size() == 1
 
         when:
@@ -602,7 +604,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
         then:
         l1Draft
-        l1Draft.status == org.modelcatalogue.core.api.ElementStatus.DRAFT
+        l1Draft.status == ElementStatus.DRAFT
         l1Draft.parentOf.size() == 1
 
         when:
@@ -617,7 +619,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
         then:
         l3Draft
-        l3Draft.status == org.modelcatalogue.core.api.ElementStatus.DRAFT
+        l3Draft.status == ElementStatus.DRAFT
         l3Draft.childOf.size()  == 1
         l1Draft.parentOf.size() == 1
     }
@@ -714,7 +716,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
         when: "model is removed from finalized element"
         elementService.finalizeElement(c4rmc)
-        c4rmc.status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
+        c4rmc.status == ElementStatus.FINALIZED
 
         build {
             dataModel(name: "C4RMC") {
@@ -725,7 +727,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
             }
         }
 
-        DataClass draft = DataClass.findByNameAndStatus('C4RMC Parent', org.modelcatalogue.core.api.ElementStatus.DRAFT)
+        DataClass draft = DataClass.findByNameAndStatus('C4RMC Parent', ElementStatus.DRAFT)
 
         then: "creation of draft should be triggered for finalized element"
         draft
@@ -733,7 +735,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
         when: "model is removed from draft element"
         elementService.finalizeElement(c4rmc)
-        c4rmc.status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
+        c4rmc.status == ElementStatus.FINALIZED
 
         build {
             dataModel(name: "C4RMC") {
@@ -743,7 +745,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
             }
         }
 
-        draft = DataClass.findByNameAndStatus('C4RMC Parent', org.modelcatalogue.core.api.ElementStatus.DRAFT)
+        draft = DataClass.findByNameAndStatus('C4RMC Parent', ElementStatus.DRAFT)
 
         then: "the relationship should be removed from the element"
         draft
@@ -761,8 +763,8 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         }
         then:
         noExceptionThrown()
-        DataClass.findByName('Parent Model 4 Finalization').status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
-        DataClass.findByName('Child Model 4 Finalization').status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
+        DataClass.findByName('Parent Model 4 Finalization').status == ElementStatus.FINALIZED
+        DataClass.findByName('Child Model 4 Finalization').status == ElementStatus.FINALIZED
     }
 
     def "can call relationship closure more than once"() {
@@ -851,7 +853,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
         then:
         noExceptionThrown()
-        CatalogueElement.findByNameAndStatus('C4CR GP', org.modelcatalogue.core.api.ElementStatus.DRAFT).classifications.any { it.name == 'C4CR'}
+        CatalogueElement.findByNameAndStatus('C4CR GP', ElementStatus.DRAFT).classifications.any { it.name == 'C4CR'}
     }
 
 
@@ -879,6 +881,43 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         noExceptionThrown()
         CatalogueElement.findByName('C4CR2 P').parentOf.size() == 3
         CatalogueElement.findByName('C4CR2 P').childOf.any { it.name == 'C4CR2 GP'}
-        CatalogueElement.findByNameAndStatus('C4CR2 GP', org.modelcatalogue.core.api.ElementStatus.DRAFT).parentOf.any { it.name == 'C4CR2 P'}
+        CatalogueElement.findByNameAndStatus('C4CR2 GP', ElementStatus.DRAFT).parentOf.any { it.name == 'C4CR2 P'}
+    }
+
+
+    def "can change data type's type"() {
+        when:
+        build {
+            dataModel name: 'DM4CCDTT', {
+                dataType name: 'DT4CCDTT'
+            }
+        }
+
+        DataType type = DataType.findByName 'DT4CCDTT'
+
+        then:
+        type
+        type.instanceOf(DataType)
+        !type.instanceOf(PrimitiveType)
+        HibernateProxyHelper.getClassWithoutInitializingProxy(type) == DataType
+
+
+        when:
+        build {
+            dataModel name: 'DM4CCDTT', {
+                dataType name: 'DT4CCDTT', {
+                    measurementUnit name: 'MU4CCDTT'
+                }
+            }
+        }
+
+        type = DataType.findByName('DT4CCDTT', [order: 'desc', sort: 'versionNumber'])
+
+        then:
+        type
+        type.instanceOf(DataType)
+        type.instanceOf(PrimitiveType)
+        HibernateProxyHelper.getClassWithoutInitializingProxy(type) == PrimitiveType
+
     }
 }

@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.util.builder
 
 import groovy.util.logging.Log4j
+import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.Legacy
@@ -129,9 +130,9 @@ import org.modelcatalogue.core.util.Legacy
             return null
         }
 
-        if (existing.status in [org.modelcatalogue.core.api.ElementStatus.FINALIZED, org.modelcatalogue.core.api.ElementStatus.DEPRECATED]) {
+        if (existing.status in [org.modelcatalogue.core.api.ElementStatus.FINALIZED, org.modelcatalogue.core.api.ElementStatus.DEPRECATED] || HibernateProxyHelper.getClassWithoutInitializingProxy(existing) != domain) {
             log.info("New draft version created for $this. Reason: $draftRequest")
-            return repository.createDraftVersion(existing)
+            return repository.createDraftVersion(existing, this)
         }
         return existing
     }
@@ -139,6 +140,9 @@ import org.modelcatalogue.core.util.Legacy
     private boolean isParametersChanged(T element) {
         parameters.any { String key, Object value ->
             if (key in [CatalogueElementProxyRepository.AUTOMATIC_NAME_FLAG, CatalogueElementProxyRepository.AUTOMATIC_DESCRIPTION_FLAG]) {
+                return false
+            }
+            if (!element.hasProperty(key)) {
                 return false
             }
             def currentValue = element.getProperty(key)
@@ -188,6 +192,10 @@ import org.modelcatalogue.core.util.Legacy
             T existing = findExisting()
             if (!existing) {
                 return changed = "Does Not Exist Yet"
+            }
+
+            if (domain != HibernateProxyHelper.getClassWithoutInitializingProxy(existing)) {
+                return changed = "Type Changed"
             }
 
             if (isParametersChanged(existing)) {

@@ -22,8 +22,14 @@ class DraftContext {
         this.newType = newType
     }
 
-    static DraftContext typeChanging(Class<? extends CatalogueElement> newType) {
+    static DraftContext typeChangingUserFriendly(Class<? extends CatalogueElement> newType) {
         DraftContext context = new DraftContext(true, [] as Set, newType)
+        context.forceNew = true
+        context
+    }
+
+    static DraftContext typeChangingImportFriendly(Class<? extends CatalogueElement> newType, Set<Long> elementsUnderControl) {
+        DraftContext context = new DraftContext(false, elementsUnderControl, newType)
         context.forceNew = true
         context
     }

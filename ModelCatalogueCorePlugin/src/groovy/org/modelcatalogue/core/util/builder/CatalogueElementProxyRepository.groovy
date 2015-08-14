@@ -2,6 +2,7 @@ package org.modelcatalogue.core.util.builder
 
 import grails.gorm.DetachedCriteria
 import groovy.util.logging.Log4j
+import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
@@ -14,6 +15,7 @@ import org.modelcatalogue.core.util.Legacy
 class CatalogueElementProxyRepository {
 
     static Set<Class> HAS_UNIQUE_NAMES = [MeasurementUnit, DataModel]
+    static final Set<Class> DATA_TYPE_CLASSES = [EnumeratedType, ReferenceType, DataType, PrimitiveType]
     static final String AUTOMATIC_NAME_FLAG = '__automatic_name__'
     static final String AUTOMATIC_DESCRIPTION_FLAG = '__automatic_description__'
     private static final Map LATEST = [sort: 'versionNumber', order: 'desc', max: 1]
@@ -268,8 +270,21 @@ class CatalogueElementProxyRepository {
         }
     }
 
-    public <T extends CatalogueElement> T createDraftVersion(T element) {
-        elementService.createDraftVersion(element, copyRelationships ? DraftContext.userFriendly() : DraftContext.importFriendly(elementsUnderControl))
+    public <T extends CatalogueElement> T createDraftVersion(T element, CatalogueElementProxy proxy) {
+        elementService.createDraftVersion(element, createDraftContext(proxy, element))
+    }
+
+    private <T extends CatalogueElement> DraftContext createDraftContext(CatalogueElementProxy proxy, T element) {
+        if (copyRelationships) {
+            if (proxy.domain == HibernateProxyHelper.getClassWithoutInitializingProxy(element)) {
+                return DraftContext.userFriendly()
+            }
+            return DraftContext.typeChangingUserFriendly(proxy.domain)
+        }
+        if (proxy.domain == HibernateProxyHelper.getClassWithoutInitializingProxy(element)) {
+            return DraftContext.importFriendly(elementsUnderControl)
+        }
+        return DraftContext.typeChangingImportFriendly(proxy.domain, elementsUnderControl)
     }
 
     protected  <T extends CatalogueElement> T tryFind(Class<T> type, Object classificationName, Object name, Object id) {
@@ -284,6 +299,9 @@ class CatalogueElementProxyRepository {
     }
 
     protected <T extends CatalogueElement> T tryFindWithClassification(Class<T> type, List<DataModel> classifications, Object name, Object id) {
+        if (type in DATA_TYPE_CLASSES) {
+            type = DataType
+        }
         if (id) {
             T result = findById(type, id)
             if (result) {
@@ -338,6 +356,9 @@ class CatalogueElementProxyRepository {
     }
 
     protected <T extends CatalogueElement> T findById(Class<T> type, Object id) {
+        if (type in DATA_TYPE_CLASSES) {
+            type = DataType
+        }
         DetachedCriteria<T> criteria = new DetachedCriteria<T>(type).build {
             eq 'modelCatalogueId', id.toString()
         }
