@@ -140,6 +140,7 @@ class DataType extends CatalogueElement {
     }
 
     void afterDraftPersisted(CatalogueElement draft) {
+        super.afterDraftPersisted(draft)
         if (draft.instanceOf(DataType)) {
             for (DataElement de in getRelatedDataElements()) {
                 if (de.status == ElementStatus.DRAFT) {
