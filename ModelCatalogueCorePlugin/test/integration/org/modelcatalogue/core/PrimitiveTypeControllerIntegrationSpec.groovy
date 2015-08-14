@@ -36,6 +36,15 @@ class PrimitiveTypeControllerIntegrationSpec extends AbstractCatalogueElementCon
     }
 
     @Override
+    protected String getResourceNameForHistory() {
+        'dataType'
+    }
+
+    protected String getItemTypeForHistory() {
+        DataType.name
+    }
+
+    @Override
     PrimitiveType getLoadItem() {
         PrimitiveType.findByName("Primitive Test 1")
     }

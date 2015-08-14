@@ -76,12 +76,20 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
         then:
         checkJsonCorrectListValues(json, total, size, offset, max, next, previous)
-        json.itemType == resource.name
+        json.itemType == itemTypeForHistory
 
         // TODO: add more verification
 
         where:
-        [no, size, max, offset, total, next, previous] << optimize(getHistoryPaginationParameters("/${resourceName}/${loadItem.id}/history"))
+        [no, size, max, offset, total, next, previous] << optimize(getHistoryPaginationParameters("/${getResourceNameForHistory()}/${loadItem.id}/history"))
+    }
+
+    protected String getResourceNameForHistory() {
+        resourceName
+    }
+
+    protected String getItemTypeForHistory() {
+        resource.name
     }
 
     def getHistoryPaginationParameters(String baseLink) {

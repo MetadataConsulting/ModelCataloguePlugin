@@ -39,6 +39,16 @@ class EnumeratedTypeControllerIntegrationSpec extends AbstractCatalogueElementCo
     }
 
     @Override
+    protected String getResourceNameForHistory() {
+        'dataType'
+    }
+
+
+    protected String getItemTypeForHistory() {
+        DataType.name
+    }
+
+    @Override
     EnumeratedType getLoadItem() {
         EnumeratedType.findByName("gender")
     }

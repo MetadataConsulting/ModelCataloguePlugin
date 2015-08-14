@@ -61,4 +61,12 @@ class ReferenceTypeControllerIntegrationSpec extends AbstractCatalogueElementCon
 
     }
 
+    @Override
+    protected String getResourceNameForHistory() {
+        'dataType'
+    }
+
+    protected String getItemTypeForHistory() {
+        DataType.name
+    }
 }
