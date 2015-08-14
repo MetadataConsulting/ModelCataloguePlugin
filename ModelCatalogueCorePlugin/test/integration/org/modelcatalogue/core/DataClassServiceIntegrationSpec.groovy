@@ -1,8 +1,13 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.ListWithTotal
+import org.modelcatalogue.core.util.ListWithTotalAndType
 
 class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
+
+    CatalogueBuilder catalogueBuilder
 
     DataClass parent1
     DataClass parent2
@@ -33,7 +38,7 @@ class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
         ListWithTotal topLevel = dataClassService.getTopLevelDataClasses([:])
 
         expect:
-        DataClass.count()           >= 5
+        DataClass.count()       >= 5
         topLevel.total          >= 2
         topLevel.items.size()   == topLevel.total
         topLevel.items.each {
@@ -77,4 +82,92 @@ class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
         subModels.count ==3
     }
 
+
+    def "data model filter where data classes has parents from other data models"() {
+        catalogueBuilder.build {
+            dataModel name: 'DM1', {
+                dataClass name: 'DC1', {
+                    child 'DM2', 'DC2'
+                }
+            }
+
+            dataModel name: 'DM2', {
+                dataClass name: 'DC2'
+            }
+
+            dataClass name: 'DC3', {
+                rel 'hierarchy' from 'DM1', 'DC1'
+            }
+
+            dataModel name: 'DM4', {
+                dataClass name: 'DC4'
+            }
+        }
+
+        DataModel DM1 = DataModel.findByName('DM1')
+        DataModel DM2 = DataModel.findByName('DM2')
+        DataModel DM4 = DataModel.findByName('DM4')
+
+        DataClass DC1 = DataClass.findByName('DC1')
+        DataClass DC2 = DataClass.findByName('DC2')
+        DataClass DC3 = DataClass.findByName('DC3')
+        DataClass DC4 = DataClass.findByName('DC4')
+
+        expect:
+        DM1
+        DM2
+        DM4
+        DC1
+        DC2
+        DC3
+        DC4
+        DC2 in DC1.parentOf
+        DC3 in DC1.parentOf
+        DM1 in DC1.dataModels
+        DM2 in DC2.dataModels
+        DM4 in DC4.dataModels
+        DC3.dataModels.empty
+
+        when:
+        ListWithTotalAndType<DataClass> includedClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.includes(DM2), [status: 'DRAFT'])
+
+        then:
+        !(DC1 in includedClasses.items)
+        DC2 in includedClasses.items
+        !(DC3 in includedClasses.items)
+        !(DC4 in includedClasses.items)
+        includedClasses.total == 1L
+
+        when:
+        ListWithTotalAndType<DataClass> excludedClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.excludes(DM1), [status: 'DRAFT'])
+
+        then:
+        !(DC1 in excludedClasses.items)
+        DC2 in excludedClasses.items
+        DC3 in excludedClasses.items
+        DC4 in excludedClasses.items
+        excludedClasses.total == 12L
+
+        when:
+        ListWithTotalAndType<DataClass> incExlClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.create([DM1],[DM2]), [status: 'DRAFT'])
+
+        then:
+        !(DC1 in includedClasses.items)
+        DC2 in includedClasses.items
+        !(DC3 in includedClasses.items)
+        !(DC4 in includedClasses.items)
+        includedClasses.total == 1L
+
+
+
+        when:
+        ListWithTotalAndType<DataClass> unclassifiedClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.create(true), [status: 'DRAFT'])
+
+        then:
+        DC3 in unclassifiedClasses.items
+        !(DC1 in unclassifiedClasses.items)
+        !(DC2 in unclassifiedClasses.items)
+        unclassifiedClasses.total == 10L
+
+    }
 }

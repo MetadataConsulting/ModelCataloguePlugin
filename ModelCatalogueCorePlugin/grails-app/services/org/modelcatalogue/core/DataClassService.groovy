@@ -18,6 +18,10 @@ class DataClassService {
     }
 
     ListWithTotalAndType<DataClass> getTopLevelDataClasses(DataModelFilter dataModelFilter, Map params) {
+        if (dataModelFilter.unclassifiedOnly) {
+            return getTopLevelDataClasses(DataModelFilter.excludes(DataModel.list()), params)
+        }
+
         RelationshipType hierarchy      = RelationshipType.hierarchyType
         ElementStatus status            = ElementService.getStatusFromParams(params)
         RelationshipType declaration = RelationshipType.declarationType
@@ -27,37 +31,58 @@ class DataClassService {
             // language=HQL
             return Lists.fromQuery(params, DataClass, """
                 select distinct m
-                from DataClass as m left join m.incomingRelationships as rel
+                from DataClass as m
                 where m.status = :status
-                    and (
-                        (
-                            m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
-                            and rel.relationshipType != :declarationType
+                    and m.id not in (
+                        select distinct r.destination.id
+                        from Relationship r
+                        where r.relationshipType = :type
+                        and r.source.id not in (
+                            select distinct r.destination.id
+                            from Relationship r
+                            where r.relationshipType = :declarationType
+                            and r.source.id in (select m.id from DataModel)
                         )
-                        or m.incomingRelationships is empty
-                     )
+                    )
+                    and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :declarationType and r.source.id in (select m.id from DataModel))
                 group by m.name, m.id
                 order by m.name
             ""","""
                 select count(m.id)
-                from DataClass as m left join m.incomingRelationships as rel
+                from DataClass as m
                 where m.status = :status
-                    and (
-                        (
-                            m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
-                            and rel.relationshipType != :declarationType
+                    and m.id not in (
+                        select distinct r.destination.id
+                        from Relationship r
+                        where r.relationshipType = :type
+                        and r.source.id not in (
+                            select distinct r.destination.id
+                            from Relationship r
+                            where r.relationshipType = :declarationType
+                            and r.source.id in (select m.id from DataModel)
                         )
-                        or m.incomingRelationships is empty
-                     )
+                    )
+                    and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :declarationType and r.source.id in (select m.id from DataModel))
             """, [type: hierarchy, status: status, declarationType: declaration ])
         }
+
         if (dataModelFilter.excludes && !dataModelFilter.includes) {
             // language=HQL
             return Lists.fromQuery(params, DataClass, """
                 select distinct m
                 from DataClass as m
                 where m.status = :status
-                    and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
+                    and m.id not in (
+                        select distinct r.destination.id
+                        from Relationship r
+                        where r.relationshipType = :type
+                        and r.source.id not in (
+                            select distinct r.destination.id
+                            from Relationship r
+                            where r.relationshipType = :declarationType
+                            and r.source.id in (:dataModels)
+                        )
+                    )
                     and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :declarationType and r.source.id in (:dataModels))
                 group by m.name, m.id
                 order by m.name
@@ -65,7 +90,17 @@ class DataClassService {
                 select count(m.id)
                 from DataClass as m
                 where m.status = :status
-                    and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
+                    and m.id not in (
+                        select distinct r.destination.id
+                        from Relationship r
+                        where r.relationshipType = :type
+                        and r.source.id not in (
+                            select distinct r.destination.id
+                            from Relationship r
+                            where r.relationshipType = :declarationType
+                            and r.source.id in (:dataModels)
+                        )
+                    )
                     and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :declarationType and r.source.id in (:dataModels))
             """, [type: hierarchy, status: status, dataModels: dataModelFilter.excludes, declarationType: declaration ])
         }
@@ -75,7 +110,23 @@ class DataClassService {
                 select distinct m
                 from DataClass as m
                 where m.status = :status
-                    and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
+                    and m.id not in (
+                        select distinct r.destination.id
+                        from Relationship r
+                        where r.relationshipType = :type
+                        and r.source.id in (
+                            select distinct d.destination.id
+                            from Relationship d
+                            where d.relationshipType = :declarationType
+                            and d.source.id in (:includes)
+                        )
+                        and r.source.id not in (
+                            select distinct r.destination.id
+                            from Relationship r
+                            where r.relationshipType = :declarationType
+                            and r.source.id in (:excludes)
+                        )
+                    )
                     and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :declarationType and r.source.id in (:excludes))
                     and m.id in (select distinct r.destination.id from Relationship r where r.relationshipType = :declarationType and r.source.id in (:includes))
                 group by m.name, m.id
@@ -84,7 +135,23 @@ class DataClassService {
                 select count(m.id)
                 from DataClass as m
                 where m.status = :status
-                    and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
+                    and m.id not in (
+                        select distinct r.destination.id
+                        from Relationship r
+                        where r.relationshipType = :type
+                        and r.source.id in (
+                            select distinct d.destination.id
+                            from Relationship d
+                            where d.relationshipType = :declarationType
+                            and d.source.id in (:includes)
+                        )
+                        and r.source.id not in (
+                            select distinct r.destination.id
+                            from Relationship r
+                            where r.relationshipType = :declarationType
+                            and r.source.id in (:excludes)
+                        )
+                    )
                     and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :declarationType and r.source.id in (:excludes))
                     and m.id in (select distinct r.destination.id from Relationship r where r.relationshipType = :declarationType and r.source.id in (:includes))
             """, [type: hierarchy, status: status, includes: dataModelFilter.includes, excludes: dataModelFilter.excludes, declarationType: declaration ])
@@ -95,7 +162,17 @@ class DataClassService {
                 select distinct m
                 from DataClass as m join m.incomingRelationships as rel
                 where m.status = :status
-                    and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
+                    and m.id not in (
+                        select distinct r.destination.id
+                        from Relationship r
+                        where r.relationshipType = :type
+                        and r.source.id in (
+                            select distinct d.destination.id
+                            from Relationship d
+                            where d.relationshipType = :declarationType
+                            and d.source.id in (:dataModels)
+                        )
+                    )
                     and rel.source.id in (:dataModels)
                     and rel.relationshipType = :declarationType
                 group by m.name, m.id
@@ -104,7 +181,17 @@ class DataClassService {
                 select count(m.id)
                 from DataClass as m join m.incomingRelationships as rel
                 where m.status = :status
-                    and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
+                    and m.id not in (
+                        select distinct r.destination.id
+                        from Relationship r
+                        where r.relationshipType = :type
+                        and r.source.id in (
+                            select distinct d.destination.id
+                            from Relationship d
+                            where d.relationshipType = :declarationType
+                            and d.source.id in (:dataModels)
+                        )
+                    )
                     and rel.source.id in (:dataModels)
                     and rel.relationshipType = :declarationType
             """, [type: hierarchy, status: status, dataModels: dataModelFilter.includes, declarationType: declaration ])
