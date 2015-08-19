@@ -56,6 +56,7 @@ class ModelToFormExporterService {
     static final String EXT_ITEM_REGEXP_ERROR_MESSAGE = "http://forms.modelcatalogue.org/item#regexpErrorMessage"
 
     static final String RESPONSE_TYPE_FILE = "file"
+    static final String RESPONSE_LABEL_FILE = "file"
     static final String RESPONSE_TYPE_TEXTAREA = "textarea"
     static final String RESPONSE_TYPE_MULTI_SELECT = "multiselect"
     static final String RESPONSE_TYPE_RADIO = "radio"
@@ -293,8 +294,12 @@ class ModelToFormExporterService {
                     }
                 }
                 if (last instanceof Item) {
-                    CatalogueElement labelSource = dataType ?: valueDomain ?: dataElement
-                    last.setResponseLabel(alphaNumNoSpaces(labelSource.name + "_" + labelSource.versionNumber))
+                    if (last.responseType == ResponseType.FILE) {
+                        last.setResponseLabel(RESPONSE_LABEL_FILE)
+                    } else {
+                        CatalogueElement labelSource = dataType ?: valueDomain ?: dataElement
+                        last.setResponseLabel(alphaNumNoSpaces(labelSource.name + "_" + labelSource.versionNumber))
+                    }
                 }
             }
         }

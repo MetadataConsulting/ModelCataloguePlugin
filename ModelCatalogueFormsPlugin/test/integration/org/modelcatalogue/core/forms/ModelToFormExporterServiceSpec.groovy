@@ -39,6 +39,7 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
     public static final String ITEM_FILE_NAME_OVERRIDEN = "File Name Overriden"
     public static final String ITEM_FILE_QUESTION = "Attachment"
     public static final String ITEM_FILE_QUTESTION_NUMBER = "10"
+    public static final String ITEM_FILE_RESPONSE_LABEL = "file"
     public static final String ITEM_RADIO_NAME = "Radio Item"
     public static final String ITEM_RADIO_NAME_NORMALIZED = "Form_1_Section_1_Radio_Item"
     public static final String ITEM_SINGLE_SELECT_NAME = "Single Select Name"
@@ -238,6 +239,7 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
         fileItem.dataType == DataType.FILE
         fileItem.questionNumber == ITEM_FILE_QUTESTION_NUMBER
         fileItem.leftItemText == ITEM_FILE_QUESTION
+        fileItem.responseLabel == ITEM_FILE_RESPONSE_LABEL
 
         when:
         Item radioItem = section1.items[ITEM_RADIO_NAME_NORMALIZED]
