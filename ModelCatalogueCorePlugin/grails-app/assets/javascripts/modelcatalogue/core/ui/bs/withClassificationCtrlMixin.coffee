@@ -37,9 +37,8 @@ angular.module('mc.core.ui.bs.withClassificationCtrlMixin', ['mc.util.security']
 
   $scope.$watchCollection 'copy.dataModels', dataModelsChanged
 
-
-  if security.getCurrentUser()?.dataModels?.length and not $scope.copy.dataModels.length
-    for dataModel in security.getCurrentUser().dataModels
+  if security.getCurrentUser()?.dataModels?.includes?.length and not $scope.copy.dataModels.length
+    for dataModel in security.getCurrentUser().dataModels.includes
       $scope.addToDataModels dataModel
 
 ]
