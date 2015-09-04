@@ -14,7 +14,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
         <div class="modal-body">
             <messages-panel messages="messages"></messages-panel>
             <form role="form" ng-submit="saveElement()">
-              <div class="form-group">
+              <div class="form-group" ng-if="!hideDataModels()">
                 <label for="dataModel"> Data Models</label>
                 <elements-as-tags elements="copy.dataModels"></elements-as-tags>
                 <input id="dataModel" placeholder="Data Model" ng-model="pending.dataModel" catalogue-element-picker="dataModel" label="el.name" typeahead-on-select="addToDataModels()">
@@ -75,6 +75,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
           orderedMapEnhancer = enhance.getEnhancer('orderedMap')
 
           $scope.newEntity = -> {enumerations: orderedMapEnhancer.emptyOrderedMap(), dataModels: []}
+          $scope.pending  = {dataModel: null}
           $scope.copy     = angular.copy(args.element ? $scope.newEntity())
           $scope.copy.enumerations = $scope.copy.enumerations ? orderedMapEnhancer.emptyOrderedMap()
           $scope.original = args.element ? $scope.newEntity()

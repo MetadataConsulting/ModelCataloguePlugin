@@ -14,7 +14,7 @@ angular.module('mc.core.ui.bs.modalPromptMeasurementUnitEdit', ['mc.util.message
         <div class="modal-body">
             <messages-panel messages="messages"></messages-panel>
             <form role="form" ng-submit="saveElement()">
-              <div class="form-group">
+              <div class="form-group" ng-if="!hideDataModels()">
                 <label for="dataModel"> Data Models</label>
                 <elements-as-tags elements="copy.dataModels"></elements-as-tags>
                 <input id="dataModel" placeholder="Data Model" ng-model="pending.dataModel" catalogue-element-picker="dataModel" label="el.name" typeahead-on-select="addToDataModels()">
@@ -42,7 +42,9 @@ angular.module('mc.core.ui.bs.modalPromptMeasurementUnitEdit', ['mc.util.message
         </div>
         '''
         controller: ['$scope', 'messages', '$controller', '$modalInstance', ($scope, messages, $controller, $modalInstance) ->
-          $scope.copy     = angular.copy(args.element ? {dataModels: []})
+          $scope.pending    = {dataModel: null}
+          $scope.newEntity  = -> {dataModels: $scope.copy?.dataModels ? []}
+          $scope.copy     = angular.copy(args.element ? $scope.newEntity())
           $scope.original = args.element ? {}
           $scope.messages = messages.createNewMessages()
           $scope.create   = args.create

@@ -17,7 +17,7 @@ angular.module('mc.core.ui.bs.modalPromptDataElementEdit', ['mc.util.messages'])
         <div class="modal-body">
             <messages-panel messages="messages"></messages-panel>
             <form role="form" ng-submit="saveElement()">
-              <div class="form-group">
+              <div class="form-group" ng-if="!hideDataModels()">
                 <label for="dataModel"> Data Models</label>
                 <elements-as-tags elements="copy.dataModels"></elements-as-tags>
                 <input id="dataModel-{{$index}}" placeholder="Data Model" ng-model="pending.dataModel" catalogue-element-picker="dataModel" label="el.name" typeahead-on-select="addToDataModels()">
