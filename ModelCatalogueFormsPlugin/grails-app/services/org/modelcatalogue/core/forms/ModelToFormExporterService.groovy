@@ -1,5 +1,9 @@
 package org.modelcatalogue.core.forms
 
+import java.awt.Container;
+
+import groovy.xml.XmlUtil;
+
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
@@ -249,9 +253,10 @@ class ModelToFormExporterService {
                 }
                 description fromCandidates(rel, candidates, EXT_ITEM_DESCRIPTION, dataElement.description)
                 question fromCandidates(rel, candidates, EXT_ITEM_QUESTION, localName)
-                questionNumber fromCandidates(rel, candidates, EXT_ITEM_QUESTION_NUMBER)
+                def qNumber =fromCandidates(rel, candidates, EXT_ITEM_QUESTION_NUMBER)
+                questionNumber =(qNumber==null?container.getItems().size():qNumber)
                 if (!last.group) {
-                    instructions fromCandidates(rel, candidates, EXT_ITEM_INSTRUCTIONS)
+                    instructions generateItemElementId(dataElement,fromCandidates(rel, candidates, EXT_ITEM_INSTRUCTIONS),fromCandidates(rel, candidates, "id"),prefix+questionNumber) +generateItemInstructions(dataElement,fromCandidates(rel, candidates, EXT_ITEM_INSTRUCTIONS))
                 }
                 phi(fromCandidates(rel, candidates, EXT_ITEM_PHI) == 'true')
                 required(fromCandidates(rel, candidates, EXT_ITEM_REQUIRED) == 'true' || rel.ext[EXT_MIN_OCCURS] == '1')
@@ -304,7 +309,99 @@ class ModelToFormExporterService {
             }
         }
     }
+    
+    /**
+     * Generate an <span> element based on his datatype 
+     * @param element
+     * @param overridenInstructions
+     * @return
+     */
+    private static String  generateItemElementId(DataElement element,String overridenInstructions,String spanID,String defaultSpanID ){
+        if (overridenInstructions &&overridenInstructions.contains("</span>") &&overridenInstructions.contains("<span data-id")){
+            return overridenInstructions.subSequence(overridenInstructions.indexOf("<span data-id"), overridenInstructions.indexOf("</span>")+7)
+        }else{
+            //add a logic here to colect span ID and his associated datatype 
+        }
+        
+        ValueDomain valueDomain=element.valueDomain
+        DataType dataType=valueDomain.dataType 
+        def regex=valueDomain.regexDef==null?'':valueDomain.regexDef
+        def dataTypeName=transformDataType(dataType)
+        def defaultID=(spanID==null?defaultSpanID:spanID)
+        
+        String hidden = "";
+        String typeStr = " data-type=\"";
+        if("hidden"=="key")//TODO add additional metadata 
+        {
+            hidden = " data-hidden=\"true\"";
+        }
+        
+        if(valueDomain.regexDef != null && !"".equals(valueDomain.regexDef))
+        {
+            regex = " data-regex=\"" +  XmlUtil.escapeXml(valueDomain.regexDef) + "\"";
+        }
+        
+        
+        typeStr +=dataTypeName+ "\""
+        return "<span data-id=\"" + defaultID+ "\"" +  typeStr + hidden + regex + "> </span>"
+    }
+    
+    /**
+     * Generate text description if was not already overriden. 
+     * @param element
+     * @param overridenInstructions
+     * @return text description with or without previous saved instructions. Keep compatibility between old and new format. 
+     */
+    private static String  generateItemInstructions(DataElement element,String overridenInstructions){
+       if (!overridenInstructions){
+           return element.description
+       }
+       if (!overridenInstructions && !overridenInstructions.contains("<span data-id")){
+           return element.description
+       }else{
+            return overridenInstructions.substring(overridenInstructions.indexOf("</span>")+7)
+       }
 
+       
+       return '';
+    }
+    
+    
+    protected static transformDataType( DataType dataType) {
+        if (dataType!=null){
+            if (dataType instanceof EnumeratedType){
+                return dataType.name
+            }
+
+            def dataType2 = dataType.name.replace('xs:', '')
+
+            def basicOnes = [
+                "string", "boolean",
+                "integer", "decimal",
+                "float", "date",
+                "pdate", "an10 date",
+                "time", "datetime",
+                "textarea", "file",
+                "email", "phone",
+                "NHSNumber"];
+
+            if (dataType2.toLowerCase() == "nonnegativeinteger" || dataType2.toLowerCase() == "positiveinteger") {
+                dataType2 = "integer"
+            } else if (dataType2.toLowerCase() == "double") {
+                dataType2 = "decimal"
+            } else if (dataType2.toLowerCase() == "dateTime") {
+                dataType2 = "datetime"
+            } else if (dataType2.toLowerCase() == "base64binary") {
+                dataType2 = "file"
+            } else if (!basicOnes.contains(dataType2.toLowerCase())) {
+                dataType2 = "string"
+            }
+
+            if (dataType2==null) return "null"
+            return dataType2.replaceAll(" ", "-").replaceAll("\\(", "").replaceAll("\\)", "").replaceAll("/", "-").toLowerCase()
+        }
+    }
+    
     private static FormDataType guessDataType(List<CatalogueElement> candidates, String extDataType) {
         if (extDataType) {
             switch (normalizeResponseType(extDataType)) {
