@@ -74,7 +74,7 @@ angular.module('mc.core.ui.bs', [
   if jQuery
     jQuery(document).on 'keypress', (e) ->
       # ctrl + space
-      if e.which is 0 and e.ctrlKey
+      if e.which in [0, 10] and e.ctrlKey
         messages.prompt null, null, type: 'search-action'
         e.preventDefault()
         return

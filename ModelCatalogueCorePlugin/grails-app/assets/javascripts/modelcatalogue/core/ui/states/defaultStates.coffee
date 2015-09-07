@@ -7,10 +7,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
     updateDashboard = (user) ->
       $scope.user  = user
-      catalogue.getStatistics().then ((result)->
-        angular.extend $scope,  result
-      )
       if user?.id
+        catalogue.getStatistics().then (result)->
+          angular.extend $scope, result
+
         catalogueElementResource('dataModel').list(status: 'active').then (models) ->
           $scope.models = models
 
@@ -174,7 +174,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
           if security.getCurrentUser() then return security.getCurrentUser() else return {displayName: ''}
         ]
         statistics: ['catalogue', 'security', (catalogue, security) ->
-          if security.getCurrentUser() then return catalogue.getStatistics() else return ''
+          if security.getCurrentUser()?.id then return catalogue.getStatistics() else return ''
         ]
     }
 
