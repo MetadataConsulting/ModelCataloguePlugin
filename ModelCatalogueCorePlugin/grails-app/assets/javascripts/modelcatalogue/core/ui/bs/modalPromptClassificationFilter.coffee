@@ -34,7 +34,7 @@ angular.module('mc.core.ui.bs.modalPromptClassificationFilter', ['mc.util.messag
 
         controller: ['$scope', ($scope) ->
           emptyFilter = -> {includes: [], excludes: [], unclassifiedOnly: false}
-          $scope.filter = if args.filter then angular.extend(emptyFilter(), args.filter) else emptyFilter()
+          $scope.filter = angular.copy(if args.filter then angular.extend(emptyFilter(), args.filter) else emptyFilter())
           $scope.push = (item, container, otherContainer) ->
             otherItemExistingIndex = -1
             for otherItem, i in otherContainer

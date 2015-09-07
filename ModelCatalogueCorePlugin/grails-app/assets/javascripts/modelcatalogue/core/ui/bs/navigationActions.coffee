@@ -136,7 +136,8 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     action
   ]
 
-  toggleClassification = (global) -> ['security', 'messages', '$scope', 'rest', 'enhance', 'modelCatalogueApiRoot', '$state', '$stateParams', (security, messages, $scope, rest, enhance, modelCatalogueApiRoot, $state, $stateParams) ->
+
+  actionsProvider.registerActionInRole 'currentDataModel', actionsProvider.ROLE_NAVIGATION, ['security', '$scope', '$state', (security, $scope, $state) ->
     return undefined if not security.isUserLoggedIn()
 
     getLabel = (user) ->
@@ -156,22 +157,95 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
       return label
 
     action = {
-      position:   2100
-      label:      if global then 'Filter by Data Model' else  getLabel(security.getCurrentUser())
-      icon:       'fa fa-tags'
-      action: -> messages.prompt('Select Data Model', 'Select which data models should be visible to you', type: 'classification-filter', filter: security.getCurrentUser().dataModels).then (filter) ->
-        security.requireUser().then ->
-          enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}/user/classifications", data: filter)).then (user)->
-            action.label = getLabel(user)
-            security.getCurrentUser().dataModels = user.dataModels
-            $state.go '.', $stateParams, reload: true
+      position:   - 100000
+      label: getLabel(security.getCurrentUser())
+      icon: 'fa fa-book'
+      action: ->
+        $state.go 'dashboard'
     }
 
     action
   ]
 
-  actionsProvider.registerActionInRole 'dataModels', actionsProvider.ROLE_NAVIGATION_BOTTOM_LEFT, toggleClassification(false)
+  toggleClassification = (global) -> ['security', 'messages', '$scope', 'rest', 'enhance', 'modelCatalogueApiRoot', '$state', '$stateParams', (security, messages, $scope, rest, enhance, modelCatalogueApiRoot, $state, $stateParams) ->
+    return undefined if not security.isUserLoggedIn()
+
+    action = {
+      position:   10000
+      label:      if global then 'Filter by Data Model' else  'Advanced Data Model Filter'
+      icon:       'fa fa-fw fa-filter'
+      action: -> messages.prompt('Select Data Model', 'Select which data models should be visible to you', type: 'classification-filter', filter: security.getCurrentUser().dataModels).then (filter) ->
+        security.requireUser().then ->
+          enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}/user/classifications", data: filter)).then (user)->
+            security.getCurrentUser().dataModels = user.dataModels
+            $state.go '.', $stateParams, reload: true
+            $scope.$broadcast 'redrawContextualActions'
+    }
+
+    action
+  ]
+
+  actionsProvider.registerChildAction 'currentDataModel', 'data-models', toggleClassification(false)
   actionsProvider.registerActionInRole 'global-dataModels', actionsProvider.ROLE_GLOBAL_ACTION, toggleClassification(true)
+
+  actionsProvider.registerChildAction 'currentDataModel', 'show-dashboard', ['$state', '$rootScope', ($state, $rootScope) ->
+    action = {
+      position:   1000
+      label: 'Show Dashboard'
+      icon: 'fa fa-fw fa-dashboard'
+      active: $state.current.name == 'dashboard'
+      action: ->
+        $state.go 'dashboard'
+    }
+
+    $rootScope.$on '$stateChangeSuccess', (ignored, state) ->
+      action.active = state.name == 'dashboard'
+
+    action
+  ]
+
+  actionsProvider.registerChildAction 'currentDataModel', 'show-data-model', ['security', '$scope', '$state', '$rootScope', (security, $scope, $state, $rootScope) ->
+    user = security.getCurrentUser()
+
+    return undefined if not user.dataModels.includes?.length > 0
+
+    model = user.dataModels.includes[0]
+
+
+    action = {
+
+      position:   2000
+      label: 'Show Detail'
+      icon: 'fa fa-tag fa-fw'
+      action: ->
+        $state.go 'mc.resource.show', {resource: 'dataModel', id: model.id}
+    }
+
+    $rootScope.$on '$stateChangeSuccess', (ignored, state, params) ->
+      action.active = state.name == 'mc.resource.show' and params.id == ('' + model.id)
+
+
+    action
+  ]
+
+  actionsProvider.registerChildAction 'currentDataModel', 'all-data-models', ['security', '$scope', '$state', 'enhance', 'rest', 'modelCatalogueApiRoot', '$rootScope', (security, $scope, $state, enhance, rest, modelCatalogueApiRoot, $rootScope) ->
+    return undefined if not security.isUserLoggedIn()
+
+    user = security.getCurrentUser()
+
+    return undefined if not user.dataModels.includes?.length > 0
+
+    {
+      position:   3000
+      label: 'All Data Models'
+      icon:  'fa fa-tags fa-fw'
+      action: ->
+        enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}/user/classifications", data: {unclassifiedOnly: false, includes: [], excludes: []})).then (user)->
+          security.getCurrentUser().dataModels = user.dataModels
+          $rootScope.$broadcast 'redrawContextualActions'
+          $state.go 'dashboard'
+    }
+  ]
 
   actionsProvider.registerActionInRole 'global-draft', actionsProvider.ROLE_GLOBAL_ACTION, ['$state', '$stateParams', 'catalogue', ($state, $stateParams, catalogue) ->
     return undefined unless $state.current.name == 'mc.resource.list'

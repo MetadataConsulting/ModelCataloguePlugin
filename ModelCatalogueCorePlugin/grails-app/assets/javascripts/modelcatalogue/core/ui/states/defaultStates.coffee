@@ -1,21 +1,25 @@
 angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
-.controller('mc.core.ui.states.DashboardCtrl', ['$rootScope', '$scope', '$stateParams', '$state', 'security', 'catalogue', 'modelCatalogueApiRoot', 'user', 'messages', 'applicationTitle', 'names', 'statistics', ($rootScope, $scope, $stateParams, $state, security, catalogue, modelCatalogueApiRoot, user, messages, applicationTitle, names, statistics) ->
+.controller('mc.core.ui.states.DashboardCtrl', ['$rootScope', '$scope', '$stateParams', '$state', 'security', 'catalogue', 'modelCatalogueApiRoot', 'user', 'messages', 'applicationTitle', 'names', 'statistics', 'catalogueElementResource', 'enhance', 'rest', ($rootScope, $scope, $stateParams, $state, security, catalogue, modelCatalogueApiRoot, user, messages, applicationTitle, names, statistics, catalogueElementResource, enhance, rest) ->
     applicationTitle "Model Catalogue"
 
     angular.extend $scope, statistics
 
-    updateDashboard = (userName) ->
-      $scope.user  = userName
+    updateDashboard = (user) ->
+      $scope.user  = user
       catalogue.getStatistics().then ((result)->
         angular.extend $scope,  result
       )
+      if user?.id
+        catalogueElementResource('dataModel').list(status: 'active').then (models) ->
+          $scope.models = models
+
 
     $scope.$on('userLoggedIn', (ignored, user) ->
-      if user?.data?.error
+      if user?.error
         updateDashboard undefined
       else
-        updateDashboard user?.data?.displayName
+        updateDashboard user
     )
 
     $scope.convert = ->
@@ -34,7 +38,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       messages.prompt("New #{names.getNaturalName(what)}", '', {type: dialogType, create: what}).then (element)->
         element.show()
 
-    if user!=''
+    if user != ''
       updateDashboard(user)
     else
       $scope.user = user
@@ -61,6 +65,12 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $scope.welcome = modelcatalogue.welcome
 
     $scope.image = (relativePath) -> "#{security.contextPath}/assets#{relativePath}"
+    $scope.selectDataModel = (dataModel) ->
+      security.requireUser().then ->
+        enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}/user/classifications", data: {includes: [dataModel]})).then (user)->
+          security.getCurrentUser().dataModels = user.dataModels
+          $state.go 'dashboard', {}, reload: true
+          $rootScope.$broadcast 'redrawContextualActions'
 
   ])
 
@@ -161,7 +171,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       controller: 'mc.core.ui.states.DashboardCtrl'
       resolve:
         user: ['security', (security) ->
-          if security.getCurrentUser() then return security.getCurrentUser().displayName else return ''
+          if security.getCurrentUser() then return security.getCurrentUser() else return {displayName: ''}
         ]
         statistics: ['catalogue', 'security', (catalogue, security) ->
           if security.getCurrentUser() then return catalogue.getStatistics() else return ''
@@ -709,6 +719,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 </div>
 
 <div show-if-logged-in>
+    <div ng-if="user.dataModels.includes.length || user.dataModels.excludes.length || user.dataModels.unclassifiedOnly">
       <div class="row">
         <div class="col-lg-4 col-sm-6 col-md-4">
             <div class="panel panel-default">
@@ -914,6 +925,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         </div>
       </div>
     </div>
+    <div ng-if="!(user.dataModels.includes.length || user.dataModels.excludes.length || user.dataModels.unclassifiedOnly)">
+      <infinite-list list="models" no-actions="true" on-item-selected="selectDataModel($element)"></infinite-list>
+    </div>
+</div>
     <div class="row">
         <div class="col-lg-12 col-sm-12 col-md-12">
             <div class="panel panel-default">

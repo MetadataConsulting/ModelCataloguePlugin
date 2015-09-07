@@ -406,6 +406,19 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
+        if (params.status?.toLowerCase() == 'active') {
+            if (modelCatalogueSecurityService.hasRole('CURATOR')){
+                respond dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+                    'in' 'status', [ElementStatus.FINALIZED, ElementStatus.DRAFT]
+                })
+                return
+            }
+            respond dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+                eq 'status', ElementStatus.FINALIZED
+            })
+            return
+        }
+
         respond dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
             eq 'status', ElementService.getStatusFromParams(params)
         })

@@ -134,10 +134,20 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
     }
     def "filter by classification"() {
         expect:
-        menuItem('dataModels', 'navigation-bottom-left').displayed
+        waitFor {
+            menuItem('currentDataModel').displayed
+        }
 
         when:
-        menuItem('dataModels', 'navigation-bottom-left').click()
+        menuItem('currentDataModel').click()
+
+        then:
+        waitFor {
+            menuItem('data-models', '').displayed
+        }
+
+        when:
+        menuItem('data-models', '').click()
 
         then:
         waitFor {
@@ -152,11 +162,25 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         waitFor {
-            !$('span.catalogue-element-treeview-name', text: "New 1").displayed && menuItem('dataModels', 'navigation-bottom-left').text().contains('XMLSchema')
+            !$('span.catalogue-element-treeview-name', text: "New 1").displayed
+        }
+        waitFor {
+            menuItem('currentDataModel').text().contains('XMLSchema')
         }
 
         when:
-        menuItem('dataModels', 'navigation-bottom-left').click()
+        waitFor {
+            menuItem('currentDataModel').displayed
+        }
+        menuItem('currentDataModel').click()
+
+        then:
+        waitFor {
+            menuItem('data-models', '').displayed
+        }
+
+        when:
+        menuItem('data-models', '').click()
 
         then:
         waitFor {
@@ -175,7 +199,10 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
             !modalDialog.find("#remove-tag-0").displayed
         }
         waitFor {
-            $('span.catalogue-element-treeview-name', text: "New 1").displayed && menuItem('dataModels', 'navigation-bottom-left').text().contains('All Data Models')
+            $('span.catalogue-element-treeview-name', text: "New 1").displayed
+        }
+        waitFor {
+            menuItem('currentDataModel').text().contains('All Data Models')
         }
 
     }
