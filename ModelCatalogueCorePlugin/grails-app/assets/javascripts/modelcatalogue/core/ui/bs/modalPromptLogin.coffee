@@ -9,7 +9,7 @@ angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies
         </div>
         <div class="modal-body">
             <messages-panel messages="messages"></messages-panel>
-            <div ng-if="providers &amp;&amp; contextPath">
+            <div ng-if="providers.length &amp;&amp; contextPath">
               <a ng-repeat="provider in providers" ng-click="loginExternal(provider)" class="btn btn-primary btn-block"><span class="fa fa-fw" ng-class="'fa-' + provider"></span> Login with {{names.getNaturalName(provider)}}</a>
               <hr/>
             </div>
@@ -45,16 +45,26 @@ angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies
             $scope.contextPath = security.contextPath
             $scope.forgotPasswordLink = "#{security.contextPath}/register/forgotPassword"
             $scope.canResetPassword = security.canResetPassword
+
+            onSuccess = (success) ->
+              if success.data.error
+                $scope.messages.error success.data.error
+              else if success.data.errors
+                for error in success.data.errors
+                  $scope.messages.error error
+              else
+                $cookies.mc_remember_me = $scope.user.rememberMe
+                $modalInstance.close success
+
+            onFailure = (failure) ->
+              if failure.data.error
+                $scope.messages.error failure.data.error
+              else if failure.data.errors
+                for error in failure.data.errors
+                  $scope.messages.error error
+
             $scope.login = ->
-              security.login($scope.user.username, $scope.user.password, $scope.user.rememberMe).then (success)->
-                if success.data.error
-                  $scope.messages.error success.data.error
-                else if success.data.errors
-                  for error in success.data.errors
-                    $scope.messages.error error
-                else
-                  $cookies.mc_remember_me = $scope.user.rememberMe
-                  $modalInstance.close success
+              security.login($scope.user.username, $scope.user.password, $scope.user.rememberMe).then(onSuccess, onFailure)
 
             $scope.loginExternal = (provider) ->
               url = security.contextPath  + '/oauth/' + provider + '/authenticate'

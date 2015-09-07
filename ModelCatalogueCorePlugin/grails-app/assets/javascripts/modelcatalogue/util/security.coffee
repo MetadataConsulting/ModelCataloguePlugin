@@ -160,7 +160,7 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages',
     loginFn         = security.login
     security.login  = (username, password, rememberMe) ->
       $q.when(loginFn(username, password, rememberMe)).then (user) ->
-        if not user.errors
+        unless user.errors or user.error or user.data?.errors or user.data?.error
           if user.username
             $rootScope.$broadcast 'userLoggedIn', user
             return user
@@ -170,7 +170,7 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages',
             $log.warn "got wrong user object and don't know how to handle it", user
             return $q.reject user
         else
-          $log.warn "login finished with errors", user.errors
+          $log.warn "login finished with errors", user
           return $q.reject user
 
     logoutFn        = security.logout

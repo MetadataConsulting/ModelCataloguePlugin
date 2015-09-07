@@ -136,7 +136,9 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
+
                 </button>
+                <a class="navbar-brand" href="#" hide-if-logged-in><span class="fa fa-fw fa-book"></span><span class="hidden-sm">&nbsp; Model Catalogue</span></a>
             </div>
 
             <div class="navbar-collapse collapse">
@@ -144,7 +146,6 @@
                 <ul class="nav navbar-nav">
                     <li class="hidden-sm hidden-md hidden-lg" ng-controller="defaultStates.userCtrl">
                         <a show-if-logged-in ng-click="logout()" type="submit">Log out</a>
-                        <a hide-if-logged-in ng-click="login()"  type="submit">Log in</a>
                     </li>
 
                 </ul>
@@ -159,7 +160,6 @@
             </div><!--/.nav-collapse -->
         </div>
     </div>
-
     <div class="container-fluid container-main">
         <div class="row">
             <div class="col-md-12">
