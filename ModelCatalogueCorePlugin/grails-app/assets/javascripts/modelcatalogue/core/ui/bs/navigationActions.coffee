@@ -149,10 +149,10 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
       label = 'All Data Models'
 
       if user.dataModels.includes?.length > 0
-        label = (dataModel.name for dataModel in user.dataModels.includes).join(', ')
+        label = ((if dataModel.status == 'DRAFT' then "#{dataModel.name} (draft)" else dataModel.name) for dataModel in user.dataModels.includes).join(', ')
 
       if user.dataModels.excludes?.length > 0
-        label += " except " + (dataModel.name for dataModel in user.dataModels.excludes).join(', ')
+        label += " except " + ((if dataModel.status == 'DRAFT' then "#{dataModel.name} (draft)" else dataModel.name) for dataModel in user.dataModels.excludes).join(', ')
 
       return label
 
