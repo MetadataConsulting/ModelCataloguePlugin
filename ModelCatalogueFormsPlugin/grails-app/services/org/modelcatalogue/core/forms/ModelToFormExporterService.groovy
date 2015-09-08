@@ -4,6 +4,7 @@ import java.awt.Container;
 
 import groovy.xml.XmlUtil;
 
+import org.apache.commons.lang.mutable.MutableInt;
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
@@ -75,11 +76,14 @@ class ModelToFormExporterService {
     static final Set<String> DATA_TYPE_INTEGER_NAMES = ['int', 'integer', 'long', 'short', 'byte', 'xs:int', 'xs:integer', 'xs:long', 'xs:short', 'xs:byte','xs:nonNegativeInteger', 'xs:nonPositiveInteger', 'xs:negativeInteger', 'xs:positiveInteger', 'xs:unsignedLong', 'xs:unsignedInt', 'xs:unsignedShort', 'xs:unsignedByte']
     public static final ArrayList<String> DATA_TYPE_DATA_NAMES = ['date', 'xs:date']
     public static final ArrayList<String> DATA_TYPE_PDATE_NAMES = ['pdate', 'partialdate', 'xs:gYear', 'xs:gYearMonth']
+    
+    private static class ItemIndex{private  int index=0}
 
 
     CaseReportForm convert(Model formModel) {
         Set<Long> processed = []
         String formName = formModel.ext[EXT_FORM_NAME] ?:formModel.name
+        MutableInt itemNumber=new MutableInt(1)
         CaseReportForm.build(formName) {
             version formModel.ext[EXT_FORM_VERSION] ?: formModel.versionNumber.toString()
             versionDescription formModel.ext[EXT_FORM_VERSION_DESCRIPTION] ?: formModel.description ?: "Generated from ${alphaNumNoSpaces(formModel.name)}"
@@ -88,16 +92,16 @@ class ModelToFormExporterService {
             if (formModel.countParentOf()) {
                 processed << formModel.getId()
                 for (Relationship sectionRel in formModel.parentOfRelationships) {
-                    handleSectionModel(processed, formName, delegate as CaseReportForm, sectionRel)
+                    handleSectionModel(itemNumber,processed, formName, delegate as CaseReportForm, sectionRel)
                 }
             } else {
-                handleSectionModel(processed, '', delegate as CaseReportForm, new Relationship(destination: formModel), true)
+                handleSectionModel(itemNumber,processed, '', delegate as CaseReportForm, new Relationship(destination: formModel), true)
             }
         }
 
     }
 
-    private void handleSectionModel(Set<Long> processed, String prefix, CaseReportForm form, Relationship sectionRel, boolean dataElementsOnly = false) {
+    private void handleSectionModel(MutableInt itemNumber,Set<Long> processed, String prefix, CaseReportForm form, Relationship sectionRel, boolean dataElementsOnly = false) {
         Model sectionModel = sectionRel.destination as Model
 
         if (sectionModel.getId() in processed) {
@@ -117,18 +121,18 @@ class ModelToFormExporterService {
                 instructions fromDestination(sectionRel, EXT_SECTION_INSTRUCTIONS, sectionModel.description)
                 pageNumber fromDestination(sectionRel, EXT_SECTION_PAGE_NUMBER)
 
-                generateItems(prefix, delegate as ItemContainer, sectionModel, null, null)
+                generateItems(itemNumber,prefix, delegate as ItemContainer, sectionModel, null, null)
 
                 if (dataElementsOnly) {
                     return
                 }
 
-                handleGroupOrVirtualSection(processed, prefix, delegate, sectionModel.parentOfRelationships, true)
+                handleGroupOrVirtualSection(itemNumber,processed, prefix, delegate, sectionModel.parentOfRelationships, true)
             }
         }
     }
 
-    private void handleGroupOrVirtualSection(Set<Long> processed, String prefix, Section section, List<Relationship> relationships, boolean nameAsHeader) {
+    private void handleGroupOrVirtualSection(MutableInt itemNumber,Set<Long> processed, String prefix, Section section, List<Relationship> relationships, boolean nameAsHeader) {
 
 
         for (Relationship itemsWithHeaderOrGridRel in relationships) {
@@ -149,7 +153,7 @@ class ModelToFormExporterService {
                 section.grid(alphaNumNoSpaces(itemsWithHeaderOrGridName)) { GridGroup grid ->
                     header fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_HEADER, itemsWithHeaderOrGridName)
 
-                    generateItems(prefix, grid, itemsWithHeaderOrGrid)
+                    generateItems(itemNumber,prefix, grid, itemsWithHeaderOrGrid)
 
                     Integer repeatNum = safeInteger(fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_REPEAT_NUM), EXT_GROUP_REPEAT_NUM, itemsWithHeaderOrGridRel.destination)
                     if (repeatNum) {
@@ -163,12 +167,12 @@ class ModelToFormExporterService {
                 }
             } else {
                 if (nameAsHeader) {
-                    generateItems(prefix, section, itemsWithHeaderOrGrid, itemsWithHeaderOrGridName)
+                    generateItems(itemNumber,prefix, section, itemsWithHeaderOrGrid, itemsWithHeaderOrGridName)
                 } else {
-                    generateItems(prefix, section, itemsWithHeaderOrGrid, null, itemsWithHeaderOrGridName)
+                    generateItems(itemNumber,prefix, section, itemsWithHeaderOrGrid, null, itemsWithHeaderOrGridName)
                 }
             }
-            handleGroupOrVirtualSection(processed, prefix, section, itemsWithHeaderOrGrid.parentOfRelationships, false)
+            handleGroupOrVirtualSection(itemNumber,processed, prefix, section, itemsWithHeaderOrGrid.parentOfRelationships, false)
         }
     }
 
@@ -186,9 +190,9 @@ class ModelToFormExporterService {
         label?.replaceAll(/[^\pL\pN_]/, '_')
     }
 
-    private void generateItems(String prefix, ItemContainer container, Model model, String aHeader = null, String aSubheader = null) {
+    private void generateItems(MutableInt itemNumber,String prefix, ItemContainer container, Model model, String aHeader = null, String aSubheader = null) {
         boolean first = true
-
+       
         for (Relationship rel in model.containsRelationships) {
             DataElement dataElement = rel.destination as DataElement
             ValueDomain valueDomain = dataElement.valueDomain
@@ -206,7 +210,8 @@ class ModelToFormExporterService {
             // bit of heuristic
             String localName = fromDestination(rel, EXT_NAME_CAP, fromDestination(rel, EXT_NAME_LC, dataElement.name))
             String itemName = alphaNumNoSpaces("${prefix ? (prefix + '_') : ''}${model.name}_${localName}")
-            if (candidates.any { it.name.toLowerCase() == 'file' } || normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) == RESPONSE_TYPE_FILE  ) {
+            String normalizedResponseType=normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE))
+            if (candidates.any { it.name.toLowerCase() == 'file' } ||  normalizedResponseType== RESPONSE_TYPE_FILE  ) {
                 container.file(itemName)
             } else if (dataType && dataType.instanceOf(EnumeratedType)) {
                 // either value domain is marked as multiple or
@@ -230,7 +235,9 @@ class ModelToFormExporterService {
                         }
                     } else {
                         container.singleSelect(itemName) {
-                            options enumOptions
+                            def selectOptions= ["Please select...":'']
+                            selectOptions.putAll(enumOptions)
+                            options selectOptions
                         }
                     }
                 }
@@ -254,7 +261,8 @@ class ModelToFormExporterService {
                 description fromCandidates(rel, candidates, EXT_ITEM_DESCRIPTION, dataElement.description)
                 question fromCandidates(rel, candidates, EXT_ITEM_QUESTION, localName)
                 def qNumber =fromCandidates(rel, candidates, EXT_ITEM_QUESTION_NUMBER)
-                questionNumber =(qNumber==null?container.getItems().size():qNumber)
+               
+                questionNumber =(qNumber==null?itemNumber.value++:qNumber)
                 if (!last.group) {
                     instructions generateItemElementId(dataElement,fromCandidates(rel, candidates, EXT_ITEM_INSTRUCTIONS),fromCandidates(rel, candidates, "id"),prefix+questionNumber) +generateItemInstructions(dataElement,fromCandidates(rel, candidates, EXT_ITEM_INSTRUCTIONS))
                 }
