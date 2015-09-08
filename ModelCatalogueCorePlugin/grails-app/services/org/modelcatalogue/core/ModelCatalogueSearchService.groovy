@@ -19,7 +19,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     def search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
         String query = "%$params.search%"
 
-        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, dataModelService.dataModelFilter.withImports())
+        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, getOverridableDataModelFilter(params))
 
         switch (direction) {
             case RelationshipDirection.OUTGOING:
@@ -88,7 +88,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
             searchResults.searchResults = criteria.list(params)
             searchResults.total = criteria.count()
         } else if (CatalogueElement.isAssignableFrom(resource)) {
-            DataModelFilter classifications = dataModelService.dataModelFilter.withImports()
+            DataModelFilter classifications = getOverridableDataModelFilter(params).withImports()
 
             String alias = resource.simpleName[0].toLowerCase()
             String listQuery = """
@@ -166,7 +166,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
             searchResults.total = resource.countByNameIlikeOrSourceToDestinationIlikeOrDestinationToSourceIlike(query, query, query)
         } else {
             searchResults.searchResults = resource.findAllByNameIlike(query, params)
-            searchResults.total         = resource.countByNameIlike(query)
+            searchResults.total = resource.countByNameIlike(query)
         }
 
         searchResults
@@ -181,5 +181,15 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     def unindex(Object object){}
     def unindex(Collection<Object> object){}
     def refresh(){}
+
+    protected DataModelFilter getOverridableDataModelFilter(Map params) {
+        if (params.dataModel) {
+            DataModel dataModel = DataModel.get(params.long('dataModel'))
+            if (dataModel) {
+                return DataModelFilter.includes(dataModel)
+            }
+        }
+        dataModelService.dataModelFilter
+    }
 
 }
