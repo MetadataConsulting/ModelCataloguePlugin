@@ -24,9 +24,10 @@ class DataModelFilter {
     private static final String UNCLASSIFIED_ONLY_KEY = '$unclassifiedOnly'
     private static final String EXCLUDE_KEY = '$exclude'
 
-    private DataModelFilter(ImmutableSet<Long> includes, ImmutableSet<Long> excludes) {
+    private DataModelFilter(ImmutableSet<Long> includes, ImmutableSet<Long> excludes, boolean includesImports) {
         this.includes = includes
         this.excludes = excludes
+        this.includesImports = includesImports
         this.unclassifiedOnly = false
     }
 
@@ -34,14 +35,15 @@ class DataModelFilter {
         this.unclassifiedOnly = unclassifiedOnly
         this.includes = ImmutableSet.of()
         this.excludes = ImmutableSet.of()
+        this.includesImports = true
     }
 
     static DataModelFilter includes(Iterable<DataModel> dataModels) {
-        new DataModelFilter(ImmutableSet.copyOf(dataModels.collect { it.id }), ImmutableSet.of())
+        new DataModelFilter(ImmutableSet.copyOf(dataModels.collect { it.id }), ImmutableSet.of(), false)
     }
 
     static DataModelFilter excludes(Iterable<DataModel> dataModels) {
-        new DataModelFilter(ImmutableSet.of(), ImmutableSet.copyOf(dataModels.collect { it.id }))
+        new DataModelFilter(ImmutableSet.of(), ImmutableSet.copyOf(dataModels.collect { it.id }), true)
     }
 
     static DataModelFilter create(boolean orphanedOnly) {
@@ -49,15 +51,15 @@ class DataModelFilter {
     }
 
     static DataModelFilter create(Iterable<DataModel> includes, Iterable<DataModel> excludes) {
-        new DataModelFilter(ImmutableSet.copyOf(includes.collect { it.id }), ImmutableSet.copyOf(excludes.collect { it.id }))
+        new DataModelFilter(ImmutableSet.copyOf(includes.collect { it.id }), ImmutableSet.copyOf(excludes.collect { it.id }), false)
     }
 
     static DataModelFilter includes(DataModel... includes) {
-        new DataModelFilter(ImmutableSet.copyOf(includes.collect { it.id }), ImmutableSet.of())
+        new DataModelFilter(ImmutableSet.copyOf(includes.collect { it.id }), ImmutableSet.of(), false)
     }
 
     static DataModelFilter excludes(DataModel... excludes) {
-        new DataModelFilter(ImmutableSet.of(), ImmutableSet.copyOf(excludes.collect { it.id }))
+        new DataModelFilter(ImmutableSet.of(), ImmutableSet.copyOf(excludes.collect { it.id }), true)
     }
 
     static DataModelFilter from(Map<String, Object> json) {
@@ -95,7 +97,7 @@ class DataModelFilter {
                     includes.add(rel.source.id)
                 }
             }
-            return new DataModelFilter(includes.build(), excludes.build())
+            return new DataModelFilter(includes.build(), excludes.build(), false)
         }
     }
 
@@ -103,6 +105,7 @@ class DataModelFilter {
     final ImmutableSet<Long> excludes
 
     final boolean unclassifiedOnly
+    final boolean includesImports
 
     /**
      * The value of the filter is truthy if the unclassifiedOnly flag is set of includes or excludes set is not empty.
@@ -142,5 +145,19 @@ class DataModelFilter {
         ]
     }
 
+    DataModelFilter withImports() {
+        if (includesImports || unclassifiedOnly) {
+            return this
+        }
+        ImmutableSet.Builder<Long> includes = ImmutableSet.builder().addAll(includes)
 
+        for (DataModel model in this.includes.collect { Long id -> DataModel.get(id) }) {
+            includes.add(model.getId())
+            for (Relationship imported in model.importsRelationships) {
+                includes.add(imported.getDestination().getId())
+            }
+        }
+
+        return new DataModelFilter(includes.build(), excludes, true)
+    }
 }

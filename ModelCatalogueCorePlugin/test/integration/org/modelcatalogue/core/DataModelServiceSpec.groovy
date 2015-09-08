@@ -13,22 +13,28 @@ class DataModelServiceSpec extends IntegrationSpec {
     def initCatalogueService
     def dataClassService
 
-    DataModel classification1
-    DataModel classification2
+    DataModel model1
+    DataModel model2
+    DataModel model3
 
-    DataClass model0
-    DataClass model1
-    DataClass model2
+    DataClass class0
+    DataClass class1
+    DataClass class2
+    DataClass class3
 
     def setup() {
         initCatalogueService.initDefaultRelationshipTypes()
-        classification1 = new DataModel(name: "Test Classification 1 ${System.currentTimeMillis()}").save(failOnError: true)
-        classification2 = new DataModel(name: "Test Classification 2 ${System.currentTimeMillis()}").save(failOnError: true)
-        model0 = new DataClass(name: "Not Classified", status: ElementStatus.FINALIZED).save(failOnError: true)
-        model1 = new DataClass(name: "Classified 1", status: ElementStatus.FINALIZED).save(failOnError: true)
-        model1.addToDeclaredWithin(classification1)
-        model2 = new DataClass(name: "Classified 2 ", status: ElementStatus.FINALIZED).save(failOnError: true)
-        model2.addToDeclaredWithin(classification2)
+        model1 = new DataModel(name: "Test Classification 1 ${System.currentTimeMillis()}").save(failOnError: true)
+        model2 = new DataModel(name: "Test Classification 2 ${System.currentTimeMillis()}").save(failOnError: true)
+        model3 = new DataModel(name: "Test Classification 3 ${System.currentTimeMillis()}").save(failOnError: true)
+        class0 = new DataClass(name: "Not Classified", status: ElementStatus.FINALIZED).save(failOnError: true)
+        class1 = new DataClass(name: "Classified 1", status: ElementStatus.FINALIZED).save(failOnError: true)
+        class1.addToDeclaredWithin(model1)
+        class2 = new DataClass(name: "Classified 2 ", status: ElementStatus.FINALIZED).save(failOnError: true)
+        class2.addToDeclaredWithin(model2)
+        class3 = new DataClass(name: "Classified 3 ", status: ElementStatus.FINALIZED).save(failOnError: true)
+        class3.addToDeclaredWithin(model3)
+        model2.addToImports(model3)
 
     }
 
@@ -65,7 +71,7 @@ class DataModelServiceSpec extends IntegrationSpec {
 
     def "does not fail when there are no results"() {
         DataType domain = new DataType(name: "Test Domain").save(failOnError: true)
-        domain.addToDeclaredWithin classification1
+        domain.addToDeclaredWithin model1
         DetachedCriteria<DataType> criteria = dataModelService.classified(DataType, DataModelFilter.create(true))
 
         expect:
@@ -76,21 +82,22 @@ class DataModelServiceSpec extends IntegrationSpec {
 
 
     def "is able to return only models classified by"() {
-        DetachedCriteria<DataClass> criteria = dataModelService.classified(DataClass, DataModelFilter.create([classification1], []))
+        DetachedCriteria<DataClass> criteria = dataModelService.classified(DataClass, DataModelFilter.create([model1], []))
 
         expect:
         criteria.count() == 1
-        model1 in criteria.list()
-        !(model2 in criteria.list())
+        class1 in criteria.list()
+        !(class2 in criteria.list())
     }
 
     def "is able to return only models not classified by"() {
-        DetachedCriteria<DataClass> criteria = dataModelService.classified(DataClass, DataModelFilter.create([], [classification2]))
+        DetachedCriteria<DataClass> criteria = dataModelService.classified(DataClass, DataModelFilter.create([], [model2]))
 
         expect:
-        criteria.count() == 1
-        model1 in criteria.list()
-        !(model2 in criteria.list())
+        criteria.count() == 2
+        class1 in criteria.list()
+        !(class2 in criteria.list())
+        class3 in criteria.list()
     }
 
     def "get unclassified top level models"() {
@@ -98,39 +105,49 @@ class DataModelServiceSpec extends IntegrationSpec {
 
         expect:
         models.total >= 1
-        model0 in models.items
-        !(model1 in models.items)
+        class0 in models.items
+        !(class1 in models.items)
     }
 
     def "get top level models with include classification filter"() {
-        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelDataClasses(DataModelFilter.create([classification1], []), [:])
+        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelDataClasses(DataModelFilter.create([model1], []), [:])
 
         expect:
         models.total >= 1
-        !(model0 in models.items)
-        model1 in models.items
-        !(model2 in models.items)
+        !(class0 in models.items)
+        class1 in models.items
+        !(class2 in models.items)
     }
 
 
     def "get top level models with exclude classification filter"() {
-        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelDataClasses(DataModelFilter.create([], [classification2]), [:])
+        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelDataClasses(DataModelFilter.create([], [model2]), [:])
 
         expect:
         models.total >= 2
-        model0 in models.items
-        model1 in models.items
-        !(model2 in models.items)
+        class0 in models.items
+        class1 in models.items
+        !(class2 in models.items)
     }
 
     def "get top level models with include and exclude classification filter"() {
-        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelDataClasses(DataModelFilter.create([classification1], [classification2]), [:])
+        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelDataClasses(DataModelFilter.create([model1], [model2]), [:])
 
         expect:
         models.total >= 1
-        !(model0 in models.items)
-        model1 in models.items
-        !(model2 in models.items)
+        !(class0 in models.items)
+        class1 in models.items
+        !(class2 in models.items)
+    }
+
+    def "is able to return models classified by or are imported"() {
+        DetachedCriteria<DataClass> criteria = dataModelService.classified(DataClass, DataModelFilter.create([model2], []).withImports())
+
+        expect:
+        criteria.count() == 2
+        !(class1 in criteria.list())
+        class2 in criteria.list()
+        class3 in criteria.list()
     }
 
 
