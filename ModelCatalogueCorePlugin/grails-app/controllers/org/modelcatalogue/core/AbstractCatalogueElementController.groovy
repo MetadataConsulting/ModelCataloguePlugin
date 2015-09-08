@@ -410,18 +410,18 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             if (modelCatalogueSecurityService.hasRole('CURATOR')){
                 respond dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
                     'in' 'status', [ElementStatus.FINALIZED, ElementStatus.DRAFT]
-                })
+                }, overridableDataModelFilter)
                 return
             }
             respond dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
                 eq 'status', ElementStatus.FINALIZED
-            })
+            }, overridableDataModelFilter)
             return
         }
 
         respond dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
             eq 'status', ElementService.getStatusFromParams(params)
-        })
+        }, overridableDataModelFilter)
     }
 
     /**
@@ -749,5 +749,15 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     protected clearAssociationsBeforeDelete(T instance) {
         // it is safe to remove all classifications
         instance.clearAssociationsBeforeDelete()
+    }
+
+    protected DataModelFilter getOverridableDataModelFilter() {
+        if (params.dataModel) {
+            DataModel dataModel = DataModel.get(params.long('dataModel'))
+            if (dataModel) {
+                return DataModelFilter.includes(dataModel)
+            }
+        }
+        dataModelService.dataModelFilter
     }
 }

@@ -22,7 +22,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
         }
         handleParams(max)
 
-        respond Lists.wrap(params, "/${resourceName}/", dataClassService.getTopLevelDataClasses(params))
+        respond Lists.wrap(params, "/${resourceName}/", dataClassService.getTopLevelDataClasses(overridableDataModelFilter, params))
     }
 
     def referenceTypes(Integer max){
