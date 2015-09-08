@@ -189,6 +189,10 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
   actionsProvider.registerActionInRole 'global-dataModels', actionsProvider.ROLE_GLOBAL_ACTION, toggleClassification(true)
 
   actionsProvider.registerChildAction 'currentDataModel', 'show-dashboard', ['$state', '$rootScope', ($state, $rootScope) ->
+    user = security.getCurrentUser()
+
+    return undefined if not user.dataModels.includes?.length > 0
+
     action = {
       position:   1000
       label: 'Show Dashboard'

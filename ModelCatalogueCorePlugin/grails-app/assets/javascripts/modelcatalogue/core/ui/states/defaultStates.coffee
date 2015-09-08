@@ -1,6 +1,6 @@
 angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
-.controller('mc.core.ui.states.DashboardCtrl', ['$rootScope', '$scope', '$stateParams', '$state', 'security', 'catalogue', 'modelCatalogueApiRoot', 'user', 'messages', 'applicationTitle', 'names', 'statistics', 'catalogueElementResource', 'enhance', 'rest', ($rootScope, $scope, $stateParams, $state, security, catalogue, modelCatalogueApiRoot, user, messages, applicationTitle, names, statistics, catalogueElementResource, enhance, rest) ->
+.controller('mc.core.ui.states.DashboardCtrl', ['$rootScope', '$scope', '$stateParams', '$state', 'security', 'catalogue', 'modelCatalogueApiRoot', 'user', 'messages', 'applicationTitle', 'names', 'statistics', 'catalogueElementResource', ($rootScope, $scope, $stateParams, $state, security, catalogue, modelCatalogueApiRoot, user, messages, applicationTitle, names, statistics, catalogueElementResource) ->
     applicationTitle "Model Catalogue"
 
     angular.extend $scope, statistics
@@ -67,8 +67,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $scope.image = (relativePath) -> "#{security.contextPath}/assets#{relativePath}"
     $scope.selectDataModel = (dataModel) ->
       security.requireUser().then ->
-        enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}/user/classifications", data: {includes: [dataModel]})).then (user)->
-          security.getCurrentUser().dataModels = user.dataModels
+        catalogue.select(dataModel).then ->
           $state.go 'dashboard', {}, reload: true
           $rootScope.$broadcast 'redrawContextualActions'
 

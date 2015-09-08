@@ -37,7 +37,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     }
   ]
 
-  actionsProvider.registerActionInRole 'select-data-model', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'security', 'modelCatalogueApiRoot', 'enhance', 'rest', '$state', '$rootScope', ($scope, security, modelCatalogueApiRoot, enhance, rest, $state, $rootScope) ->
+  actionsProvider.registerActionInRole 'select-data-model', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'security', 'catalogue', '$state', '$rootScope', ($scope, security, catalogue, $state, $rootScope) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
     return undefined if not $scope.element.isInstanceOf 'dataModel'
@@ -50,8 +50,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       type:       'primary'
       action: ->
         security.requireUser().then ->
-          enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}/user/classifications", data: {includes: [$scope.element]})).then (user)->
-            security.getCurrentUser().dataModels = user.dataModels
+          catalogue.select($scope.element).then ->
             $state.go 'dashboard', {}, reload: true
             $rootScope.$broadcast 'redrawContextualActions'
     }

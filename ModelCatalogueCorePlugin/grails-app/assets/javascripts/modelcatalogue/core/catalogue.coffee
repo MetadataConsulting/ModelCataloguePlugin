@@ -66,7 +66,7 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
 
 
   # factory function
-  catalogueProvider.$get = ['rest', 'modelCatalogueApiRoot', (rest, modelCatalogueApiRoot)->
+  catalogueProvider.$get = ['rest', 'modelCatalogueApiRoot', 'security', '$q', (rest, modelCatalogueApiRoot, security, $q)->
     catalogue = {}
 
     catalogue.getIcon = (type) ->
@@ -79,6 +79,16 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
 
     catalogue.getStatistics = ->
       rest method: 'GET', url: "#{modelCatalogueApiRoot}/dashboard"
+
+    catalogue.select = (dataModel) ->
+      deferred = $q.defer()
+      rest(method: 'POST', url: "#{modelCatalogueApiRoot}/user/classifications", data: {includes: [dataModel]}).then (user)->
+        security.getCurrentUser().dataModels = user.dataModels
+        deferred.resolve(security.getCurrentUser())
+      , (error) ->
+        deferred.reject(error)
+
+      deferred.promise
 
     catalogue
   ]
