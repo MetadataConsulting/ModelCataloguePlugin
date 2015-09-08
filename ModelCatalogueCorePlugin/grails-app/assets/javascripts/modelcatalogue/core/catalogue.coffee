@@ -1,4 +1,4 @@
-catalogueModule = angular.module('mc.core.catalogue', ['mc.util.names', 'mc.util.rest', 'mc.core.modelCatalogueApiRoot'])
+catalogueModule = angular.module('mc.core.catalogue', ['mc.util.security', 'mc.util.names', 'mc.util.rest', 'mc.core.modelCatalogueApiRoot'])
 
 # facade service for easier access to many other services
 catalogueModule.provider 'catalogue', ['names', (names) ->
@@ -80,6 +80,13 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
     catalogue.getStatistics = ->
       rest method: 'GET', url: "#{modelCatalogueApiRoot}/dashboard"
 
+    catalogue.isFilteredByDataModel = ->
+      user = security.getCurrentUser()
+      return false if user.dataModels.includes?.length != 1
+      return false if user.dataModels.excludes?.length != 0
+      return false if user.dataModels.unclassifiedOnly
+      return true
+
     catalogue.select = (dataModel) ->
       deferred = $q.defer()
       rest(method: 'POST', url: "#{modelCatalogueApiRoot}/user/classifications", data: {includes: [dataModel]}).then (user)->
@@ -97,6 +104,13 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
 ]
 
 # make catalogue property of the root scope (i.e. global property)
-catalogueModule.run ['$rootScope', 'catalogue', ($rootScope, catalogue) ->
+catalogueModule.run ['$rootScope', 'catalogue', '$state', 'security', ($rootScope, catalogue, $state, security) ->
   $rootScope.catalogue = catalogue
+
+  $rootScope.$on 'newVersionCreated', (ignored, element) ->
+    if angular.isFunction(element.isInstanceOf) and element.isInstanceOf('dataModel') and catalogue.isFilteredByDataModel()
+      catalogue.select(element).then ->
+        $state.go '.', {}, {reload: true}
+        security.requireUser().then ->
+          $rootScope.$broadcast 'redrawContextualActions'
 ]
