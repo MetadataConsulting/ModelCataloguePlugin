@@ -166,7 +166,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
           <button ng-disabled="!finished" class="btn btn-default"  ng-click="$close(dataClass)" id="exit-wizard"><span class="glyphicon glyphicon-remove"></span> Close</button>
         </div>
         '''
-        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', 'args', 'delayedQueueExecutor', '$q', '$log', 'enhance', 'metadataEditors', 'security', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout, args, delayedQueueExecutor, $q, $log, enhance, metadataEditors, security) ->
+        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', 'args', 'delayedQueueExecutor', '$q', '$log', 'enhance', 'metadataEditors', 'catalogue', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout, args, delayedQueueExecutor, $q, $log, enhance, metadataEditors, catalogue) ->
           execAfter50 = delayedQueueExecutor(500)
 
           orderedMapEnhancer = enhance.getEnhancer('orderedMap')
@@ -198,9 +198,8 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             if args.parent
               $scope.parents.push {element: args.parent, name: args.parent.name, metadata: orderedMapEnhancer.emptyOrderedMap()}
 
-            if security.getCurrentUser()?.dataModels?.includes?.length
-              for dataModel in security.getCurrentUser().dataModels.includes
-                $scope.dataModels.push  {element: dataModel, name: dataModel.name}
+            if catalogue.isFilteredByDataModel()
+              $scope.dataModels.push  {element: catalogue.getCurrentDataModel(), name: catalogue.getCurrentDataModel().name}
 
           $scope.reset()
 

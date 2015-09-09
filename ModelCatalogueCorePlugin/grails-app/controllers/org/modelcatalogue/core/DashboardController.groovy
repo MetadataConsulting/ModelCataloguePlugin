@@ -4,12 +4,13 @@ import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.actions.Batch
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
+import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.Lists
 
 class DashboardController {
 
     static responseFormats = ['json', 'xlsx']
-    def dataArchitectService
+
     def dataModelService
 
     def index() {
@@ -20,7 +21,7 @@ class DashboardController {
         List<Class> displayed = [DataModel, DataClass, DataElement, DataType, MeasurementUnit, Asset]
 
         for (Class type in displayed) {
-            DetachedCriteria criteria = dataModelService.classified(type)
+            DetachedCriteria criteria = dataModelService.classified(type, overridableDataModelFilter)
             criteria.projections {
                 property 'status'
                 property 'id'
@@ -49,6 +50,16 @@ class DashboardController {
             transformationsCount:CsvTransformation.count()
         ])
         respond model
+    }
+
+    protected DataModelFilter getOverridableDataModelFilter() {
+        if (params.dataModel) {
+            DataModel dataModel = DataModel.get(params.long('dataModel'))
+            if (dataModel) {
+                return DataModelFilter.includes(dataModel)
+            }
+        }
+        dataModelService.dataModelFilter
     }
 
 }

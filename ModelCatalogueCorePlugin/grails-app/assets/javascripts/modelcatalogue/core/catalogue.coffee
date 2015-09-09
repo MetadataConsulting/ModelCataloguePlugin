@@ -66,7 +66,7 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
 
 
   # factory function
-  catalogueProvider.$get = ['rest', 'modelCatalogueApiRoot', 'security', '$q', (rest, modelCatalogueApiRoot, security, $q)->
+  catalogueProvider.$get = ['rest', 'modelCatalogueApiRoot', 'security', '$q', '$rootScope', (rest, modelCatalogueApiRoot, security, $q, $rootScope)->
     catalogue = {}
 
     catalogue.getIcon = (type) ->
@@ -77,24 +77,21 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
 
     catalogue.isInstanceOf = (type, supertype) -> catalogueProvider.isInstanceOf(type, supertype)
 
-    catalogue.getStatistics = ->
-      rest method: 'GET', url: "#{modelCatalogueApiRoot}/dashboard"
+    catalogue.getStatistics = (dataModelId) ->
+      params = {}
+      params.dataModel = dataModelId if dataModelId and dataModelId isnt 'catalogue'
+      rest method: 'GET', url: "#{modelCatalogueApiRoot}/dashboard", params: params
+
+    catalogue.getCurrentDataModel = ->
+      $rootScope.currentDataModel
 
     catalogue.isFilteredByDataModel = ->
-      user = security.getCurrentUser()
-      return false if user.dataModels.includes?.length != 1
-      return false if user.dataModels.excludes?.length != 0
-      return false if user.dataModels.unclassifiedOnly
-      return true
+      $rootScope.currentDataModel?
 
     catalogue.select = (dataModel) ->
       deferred = $q.defer()
-      rest(method: 'POST', url: "#{modelCatalogueApiRoot}/user/classifications", data: {includes: [dataModel]}).then (user)->
-        security.getCurrentUser().dataModels = user.dataModels
-        deferred.resolve(security.getCurrentUser())
-      , (error) ->
-        deferred.reject(error)
-
+      $rootScope.currentDataModel = angular.copy dataModel
+      deferred.resolve($rootScope.currentDataModel)
       deferred.promise
 
     catalogue
@@ -110,7 +107,7 @@ catalogueModule.run ['$rootScope', 'catalogue', '$state', 'security', ($rootScop
   $rootScope.$on 'newVersionCreated', (ignored, element) ->
     if angular.isFunction(element.isInstanceOf) and element.isInstanceOf('dataModel') and catalogue.isFilteredByDataModel()
       catalogue.select(element).then ->
-        $state.go '.', {}, {reload: true}
+        $state.go '.', {dataModelId: element.id}, {reload: true}
         security.requireUser().then ->
           $rootScope.$broadcast 'redrawContextualActions'
 ]

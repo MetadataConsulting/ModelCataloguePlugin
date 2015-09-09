@@ -58,7 +58,7 @@ class ChangeController extends RestfulController<Change> {
             params.max = params.long('max')
         }
 
-        respond Lists.wrap(params, "/change/", auditService.getGlobalChanges(params, dataModelService.dataModelFilter))
+        respond Lists.wrap(params, "/change/", auditService.getGlobalChanges(params, overridableDataModelFilter))
     }
 
     def dataModelActivity(Integer max) {
@@ -83,6 +83,14 @@ class ChangeController extends RestfulController<Change> {
         respond Lists.wrap(params, "/user/${params.id}/activity", auditService.getChangesForUser(params, element))
     }
 
-
+    protected DataModelFilter getOverridableDataModelFilter() {
+        if (params.dataModel) {
+            DataModel dataModel = DataModel.get(params.long('dataModel'))
+            if (dataModel) {
+                return DataModelFilter.includes(dataModel)
+            }
+        }
+        dataModelService.dataModelFilter
+    }
 
 }

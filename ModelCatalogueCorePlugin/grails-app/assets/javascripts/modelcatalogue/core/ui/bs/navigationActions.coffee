@@ -42,7 +42,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
         currentStatus: undefined
         action: ->
 
-          $state.go 'mc.resource.list', {resource: resource, status: @currentStatus}, {inherit: false}
+          $state.go 'mc.resource.list', {resource: resource, status: @currentStatus, dataModelId: $stateParams.dataModelId}, {inherit: false}
       }
 
       $scope.$on '$stateChangeSuccess', (ignored, ignoredToState, toParams) ->
@@ -137,117 +137,73 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
   ]
 
 
-  actionsProvider.registerActionInRole 'currentDataModel', actionsProvider.ROLE_NAVIGATION, ['security', '$scope', '$state', (security, $scope, $state) ->
+  actionsProvider.registerActionInRole 'currentDataModel', actionsProvider.ROLE_NAVIGATION, ['security', '$scope', '$state', '$rootScope', (security, $scope, $state, $rootScope) ->
     return undefined if not security.isUserLoggedIn()
 
-    getLabel = (user) ->
-      if not user or not user.dataModels
-        return 'All Data Models'
-      if user.dataModels.unclassifiedOnly
-        return 'Orphaned Only'
-
-      label = 'All Data Models'
-
-      if user.dataModels.includes?.length > 0
-        label = ((if dataModel.status == 'DRAFT' then "#{dataModel.name} (draft)" else dataModel.name) for dataModel in user.dataModels.includes).join(', ')
-
-      if user.dataModels.excludes?.length > 0
-        label += " except " + ((if dataModel.status == 'DRAFT' then "#{dataModel.name} (draft)" else dataModel.name) for dataModel in user.dataModels.excludes).join(', ')
-
-      return label
+    getLabel = ->
+      return 'All Data Models' unless $rootScope.currentDataModel
+      return "#{ $rootScope.currentDataModel.name} (draft)" if $rootScope.currentDataModel.status == 'DRAFT'
+      return $rootScope.currentDataModel.name
 
     action = {
       position:   - 100000
-      label: getLabel(security.getCurrentUser())
+      label: getLabel()
       icon: 'fa fa-book'
-      action: ->
-        $state.go 'dashboard'
+      watches: ['currentDataModel']
     }
 
     action
   ]
 
-  toggleClassification = (global) -> ['security', 'messages', '$scope', 'rest', 'enhance', 'modelCatalogueApiRoot', '$state', '$stateParams', (security, messages, $scope, rest, enhance, modelCatalogueApiRoot, $state, $stateParams) ->
-    return undefined if not security.isUserLoggedIn()
-
-    action = {
-      position:   10000
-      label:      if global then 'Filter by Data Model' else  'Advanced Data Model Filter'
-      icon:       'fa fa-fw fa-filter'
-      action: -> messages.prompt('Select Data Model', 'Select which data models should be visible to you', type: 'classification-filter', filter: security.getCurrentUser().dataModels).then (filter) ->
-        security.requireUser().then ->
-          enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}/user/classifications", data: filter)).then (user)->
-            security.getCurrentUser().dataModels = user.dataModels
-            $state.go '.', $stateParams, reload: true
-            $scope.$broadcast 'redrawContextualActions'
-    }
-
-    action
-  ]
-
-  actionsProvider.registerChildAction 'currentDataModel', 'data-models', toggleClassification(false)
-  actionsProvider.registerActionInRole 'global-dataModels', actionsProvider.ROLE_GLOBAL_ACTION, toggleClassification(true)
-
-  actionsProvider.registerChildAction 'currentDataModel', 'show-dashboard', ['$state', '$rootScope', 'security', ($state, $rootScope, security) ->
-    user = security.getCurrentUser()
-
-    return undefined if not user.dataModels.includes?.length > 0
+  actionsProvider.registerChildAction 'currentDataModel', 'show-dashboard', ['$state', '$rootScope', 'catalogue', ($state, $rootScope, catalogue) ->
+    return undefined unless catalogue.isFilteredByDataModel()
 
     action = {
       position:   1000
       label: 'Show Dashboard'
       icon: 'fa fa-fw fa-dashboard'
-      active: $state.current.name == 'dashboard'
+      active: $state.current.name == 'mc.dashboard'
       action: ->
-        $state.go 'dashboard'
+        $state.go 'mc.dashboard', {dataModelId: $state.params.dataModelId}
     }
 
     $rootScope.$on '$stateChangeSuccess', (ignored, state) ->
-      action.active = state.name == 'dashboard'
+      action.active = state.name == 'mc.dashboard'
 
     action
   ]
 
-  actionsProvider.registerChildAction 'currentDataModel', 'show-data-model', ['security', '$scope', '$state', '$rootScope', (security, $scope, $state, $rootScope) ->
-    user = security.getCurrentUser()
-
-    return undefined if not user.dataModels.includes?.length > 0
-
-    model = user.dataModels.includes[0]
-
+  actionsProvider.registerChildAction 'currentDataModel', 'show-data-model', ['catalogue', '$scope', '$state', '$rootScope', (catalogue, $scope, $state, $rootScope) ->
+    return undefined if not catalogue.isFilteredByDataModel()
 
     action = {
 
       position:   2000
       label: 'Show Detail'
       icon: 'fa fa-tag fa-fw'
+      active: $state.name == 'mc.resource.show' and $state.params.id == ('' + catalogue.getCurrentDataModel().id)
       action: ->
-        $state.go 'mc.resource.show', {resource: 'dataModel', id: model.id}
+        $state.go 'mc.resource.show', {resource: 'dataModel', id: catalogue.getCurrentDataModel().id, dataModelId: catalogue.getCurrentDataModel().id}
     }
 
     $rootScope.$on '$stateChangeSuccess', (ignored, state, params) ->
-      action.active = state.name == 'mc.resource.show' and params.id == ('' + model.id)
+      action.active = state.name == 'mc.resource.show' and params.id == ('' + catalogue.getCurrentDataModel().id)
 
 
     action
   ]
 
-  actionsProvider.registerChildAction 'currentDataModel', 'all-data-models', ['security', '$scope', '$state', 'enhance', 'rest', 'modelCatalogueApiRoot', '$rootScope', (security, $scope, $state, enhance, rest, modelCatalogueApiRoot, $rootScope) ->
+  actionsProvider.registerChildAction 'currentDataModel', 'all-data-models', ['security', '$scope', '$state', 'enhance', 'rest', 'modelCatalogueApiRoot', '$rootScope', 'catalogue', (security, $scope, $state, enhance, rest, modelCatalogueApiRoot, $rootScope, catalogue) ->
     return undefined if not security.isUserLoggedIn()
 
-    user = security.getCurrentUser()
-
-    return undefined if not user.dataModels.includes?.length > 0
+    return undefined if not catalogue.isFilteredByDataModel()
 
     {
       position:   3000
       label: 'All Data Models'
       icon:  'fa fa-tags fa-fw'
       action: ->
-        enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}/user/classifications", data: {unclassifiedOnly: false, includes: [], excludes: []})).then (user)->
-          security.getCurrentUser().dataModels = user.dataModels
-          $rootScope.$broadcast 'redrawContextualActions'
-          $state.go 'dashboard'
+        $state.go 'mc.resource.list', {resource: 'dataModel', dataModelId: 'catalogue'}
     }
   ]
 

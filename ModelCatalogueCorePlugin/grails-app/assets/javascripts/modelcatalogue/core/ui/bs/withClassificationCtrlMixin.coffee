@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.withClassificationCtrlMixin', ['mc.util.security']).controller 'withClassificationCtrlMixin', ['$scope', 'security',  ($scope, security) ->
+angular.module('mc.core.ui.bs.withClassificationCtrlMixin', ['mc.util.security']).controller 'withClassificationCtrlMixin', ['$scope', 'security', 'catalogue',  ($scope, security, catalogue) ->
   createdMessages = []
   dataModelsChanged = (newDataModels) ->
     newDataModels = newDataModels ? []
@@ -38,10 +38,10 @@ angular.module('mc.core.ui.bs.withClassificationCtrlMixin', ['mc.util.security']
   $scope.$watchCollection 'copy.dataModels', dataModelsChanged
 
   $scope.hideDataModels = ->
-    security.getCurrentUser()?.dataModels?.includes?.length == 1
+    catalogue.isFilteredByDataModel()
 
-  if security.getCurrentUser()?.dataModels?.includes?.length and not $scope.copy.dataModels.length
-    for dataModel in security.getCurrentUser().dataModels.includes
-      $scope.addToDataModels dataModel
+  if catalogue.isFilteredByDataModel() and not $scope.copy.dataModels.length
+    if catalogue.isFilteredByDataModel()
+      $scope.addToDataModels catalogue.getCurrentDataModel()
 
 ]

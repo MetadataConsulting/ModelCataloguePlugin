@@ -117,7 +117,7 @@ changes.config ['actionsProvider', (actionsProvider)->
       label: 'Activity'
       icon: 'fa fa-fw fa-rss'
       action: ->
-        $state.go 'mc.resource.list', resource: 'change'
+        $state.go 'mc.resource.list', resource: 'change', dataModelId: if $rootScope.currentDataModel then $rootScope.currentDataModel.id else 'catalogue'
     }
 
     $rootScope.$on '$stateChangeSuccess', (ignored, state, params) ->

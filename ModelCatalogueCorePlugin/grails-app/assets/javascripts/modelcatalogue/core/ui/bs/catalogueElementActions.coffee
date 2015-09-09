@@ -49,10 +49,9 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       icon:       'fa fa-tags'
       type:       'primary'
       action: ->
-        security.requireUser().then ->
-          catalogue.select($scope.element).then ->
-            $state.go 'dashboard', {}, reload: true
-            $rootScope.$broadcast 'redrawContextualActions'
+        catalogue.select($scope.element).then ->
+          $state.go 'mc.dashboard', { dataModelId: $scope.element.id}, reload: true
+          $rootScope.$broadcast 'redrawContextualActions'
     }
 
   ]

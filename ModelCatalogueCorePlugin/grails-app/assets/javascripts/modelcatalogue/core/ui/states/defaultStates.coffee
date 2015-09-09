@@ -8,7 +8,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     updateDashboard = (user) ->
       $scope.user  = user
       if user?.id
-        catalogue.getStatistics().then (result)->
+        catalogue.getStatistics($stateParams.dataModelId).then (result)->
           angular.extend $scope, result
 
         catalogueElementResource('dataModel').list(status: 'active').then (models) ->
@@ -65,11 +65,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $scope.welcome = modelcatalogue.welcome
 
     $scope.image = (relativePath) -> "#{security.contextPath}/assets#{relativePath}"
-    $scope.selectDataModel = (dataModel) ->
-      security.requireUser().then ->
-        catalogue.select(dataModel).then ->
-          $state.go 'dashboard', {}, reload: true
-          $rootScope.$broadcast 'redrawContextualActions'
 
   ])
 
@@ -109,7 +104,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     applicationTitle "Comparison of #{((element.getLabel?.apply(element) ? element.name) for element in elements).join(' and ')}"
   ])
 
-.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', 'list', 'names', 'enhance', 'applicationTitle', '$rootScope', 'catalogueElementResource', ($scope, $stateParams, $state, list, names, enhance, applicationTitle, $rootScope) ->
+.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', 'list', 'names', 'enhance', 'applicationTitle', '$rootScope', 'catalogueElementResource', 'catalogue', ($scope, $stateParams, $state, list, names, enhance, applicationTitle, $rootScope, catalogueElementResource, catalogue) ->
     if $stateParams.resource
       applicationTitle  "#{names.getNaturalName($stateParams.resource)}s"
 
@@ -117,6 +112,11 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $scope.title                    = names.getNaturalName($stateParams.resource) + ' List'
     $scope.natural                  = (name) -> if name then names.getNaturalName(name) else "General"
     $scope.resource                 = $stateParams.resource
+
+    $scope.selectDataModel = (dataModel) ->
+      catalogue.select(dataModel).then ->
+        $state.go 'mc.dashboard', {dataModelId: dataModel.id}, reload: true
+        $rootScope.$broadcast 'redrawContextualActions'
 
     getLastModelsKey = (status = $stateParams.status)->
       "#{status ? 'finalized'}"
@@ -172,28 +172,44 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         user: ['security', (security) ->
           if security.getCurrentUser() then return security.getCurrentUser() else return {displayName: ''}
         ]
-        statistics: ['catalogue', 'security', (catalogue, security) ->
-          if security.getCurrentUser()?.id then return catalogue.getStatistics() else return ''
+        statistics: ['catalogue', 'security', '$stateParams', (catalogue, security, $stateParams) ->
+          if security.getCurrentUser()?.id then return catalogue.getStatistics($stateParams.dataModelId) else return ''
         ]
     }
 
-    $stateProvider.state 'dashboard2', {
-      url: '/'
+    $stateProvider.state 'mc.dashboard', {
+      url: '/dashboard'
       templateUrl: 'modelcatalogue/core/ui/state/dashboard.html',
       controller: 'mc.core.ui.states.DashboardCtrl'
       resolve:
         user: ['security', (security) ->
           if security.getCurrentUser() then return security.getCurrentUser() else return {displayName: ''}
         ]
-        statistics: ['catalogue', 'security', (catalogue, security) ->
-          if security.getCurrentUser()?.id then return catalogue.getStatistics() else return ''
+        statistics: ['catalogue', 'security', '$stateParams', (catalogue, security, $stateParams) ->
+          if security.getCurrentUser()?.id then return catalogue.getStatistics($stateParams.dataModelId) else return ''
         ]
     }
 
     $stateProvider.state 'mc', {
       abstract: true
-      url: '/catalogue'
+      url: '/{dataModelId:[0-9]+|catalogue}'
       templateUrl: 'modelcatalogue/core/ui/state/parent.html'
+      resolve:
+        currentDataModel: ['catalogue', '$rootScope', '$stateParams', '$q', 'catalogueElementResource', (catalogue, $rootScope, $stateParams, $q, catalogueElementResource) ->
+          if !$stateParams.dataModelId or $stateParams.dataModelId == 'catalogue'
+            $rootScope.currentDataModel = undefined
+            return undefined
+          if $rootScope.currentDataModel and $stateParams.dataModelId == $rootScope.currentDataModel.id.toString
+            return $rootScope.currentDataModel
+
+          deferred = $q.defer()
+
+          catalogueElementResource('dataModel').get($stateParams.dataModelId).then (dataModel) ->
+            deferred.resolve(dataModel)
+            $rootScope.currentDataModel = dataModel
+
+          deferred.promise
+        ]
     }
 
     $stateProvider.state 'mc.favorites', {
@@ -273,7 +289,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       templateUrl: 'modelcatalogue/core/ui/state/list.html'
 
       resolve:
-        list: ['$stateParams','catalogueElementResource', ($stateParams,catalogueElementResource) ->
+        list: ['$stateParams','catalogueElementResource', ($stateParams, catalogueElementResource) ->
           page = parseInt($stateParams.page ? 1, 10)
           page = 1 if isNaN(page)
           # it's safe to call top level for each controller, only data class controller will respond on it
@@ -283,9 +299,12 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
           params                = offset: (page - 1) * DEFAULT_ITEMS_PER_PAGE, toplevel: true, system: true
           params.order          = $stateParams.order ? defaultSorts.order
           params.sort           = $stateParams.sort ? defaultSorts.sort
-          params.status         = $stateParams.status ? 'finalized'
+          params.status         = $stateParams.status ? (if $stateParams.resource is 'dataModel' then 'active' else 'finalized')
           params.max            = $stateParams.max ? 10
           params.classification = $stateParams.classification ? undefined
+
+          if $stateParams.dataModelId and $stateParams.dataModelId != 'catalogue'
+               params.dataModel = $stateParams.dataModelId
 
           if $stateParams.q
             return catalogueElementResource($stateParams.resource).search($stateParams.q, params)
@@ -336,7 +355,11 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       resolve: {
         list: ['$stateParams','modelCatalogueSearch', ($stateParams, modelCatalogueSearch) ->
           $stateParams.resource = "searchResult"
-          return modelCatalogueSearch($stateParams.q)
+          params = {}
+          if $stateParams.dataModelId and $stateParams.dataModelId isnt 'catalogue'
+            params.dataModel = $stateParams.dataModelId
+
+          return modelCatalogueSearch($stateParams.q, params)
         ]
       },
       controller: 'mc.core.ui.states.ListCtrl'
@@ -532,7 +555,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         deferred.notify results
 
         if term
-          p1 = modelCatalogueSearch(term).then (searchResults)->
+          params = {}
+          params.dataModel = $state.params.dataModelId if $state.params.dataModelId and $state.params.dataModelId != 'catalogue'
+          p1 = modelCatalogueSearch(term, params).then (searchResults)->
             for searchResult in searchResults.list
               results.push {
                 label:      if searchResult.getLabel then searchResult.getLabel() else searchResult.name
@@ -645,7 +670,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
     #language=HTML
     $templateCache.put 'modelcatalogue/core/ui/state/list.html', '''
-    <div ng-if="(resource != 'model' &amp;&amp;  resource != 'dataClass')|| $stateParams.display != undefined">
+    <div ng-if="(resource != 'model' &amp;&amp;  resource != 'dataClass' &amp;&amp; resource != 'dataModel')|| $stateParams.display != undefined">
       <span class="contextual-actions-right">
         <contextual-actions size="sm" no-colors="true" role="list"></contextual-actions>
       </span>
@@ -654,9 +679,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       <infinite-table ng-if="$stateParams.display != 'grid'"  list="list" columns="columns" ></infinite-table>
     </div>
     <div ng-if="(resource == 'dataClass' || resource == 'model')&amp;&amp; $stateParams.display == undefined">
-
       <div class="row">
-
         <div class="col-md-4">
           <span class="contextual-actions-right">
              <contextual-actions size="sm" icon-only="true" no-colors="true" role="list"></contextual-actions>
@@ -671,6 +694,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         </div>
         <hr/>
       </div>
+    </div>
+    <div class="row" ng-if="resource == 'dataModel'">
+      <infinite-list list="list" no-actions="true" on-item-selected="selectDataModel($element)"></infinite-list>
     </div>
   '''
 
@@ -731,18 +757,18 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 </div>
 
 <div show-if-logged-in>
-    <div ng-if="user.dataModels.includes.length || user.dataModels.excludes.length || user.dataModels.unclassifiedOnly">
+    <div>
       <div class="row">
         <div class="col-lg-4 col-sm-6 col-md-4">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-3">
-                            <a ui-sref="mc.resource.list({resource: 'dataModel'})" ui-sref-opts="{inherit: false}"><i class="fa fa-tags fa-5x fa-fw"></i></a>
+                            <a ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataModel'})" ui-sref-opts="{inherit: false}"><i class="fa fa-tags fa-5x fa-fw"></i></a>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'dataModel'})" ui-sref-opts="{inherit: false}">Finalized Data Models</a> {{finalizedDataModelCount}} </div>
-                            <div show-for-role="VIEWER"><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'dataModel', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Data Models</a> {{draftDataModelCount}} </div>
+                            <div><a id="dataSetsLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataModel'})" ui-sref-opts="{inherit: false}">Finalized Data Models</a> {{finalizedDataModelCount}} </div>
+                            <div show-for-role="VIEWER"><a id="dataSetsLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataModel', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Data Models</a> {{draftDataModelCount}} </div>
                         </div>
                     </div>
                 </div>
@@ -761,11 +787,11 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-3">
-                            <a ui-sref="mc.resource.list({resource: 'dataClass'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cubes fa-5x fa-fw"></i></a>
+                            <a ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataClass'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cubes fa-5x fa-fw"></i></a>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div><a id="dataClasssLink" ui-sref="mc.resource.list({resource: 'dataClass'})" ui-sref-opts="{inherit: false}">Finalized Data Classes</a> {{finalizedDataClassCount}} </div>
-                            <div show-for-role="VIEWER"><a id="dataClassLink" ui-sref="mc.resource.list({resource: 'dataClass', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Data Classes</a> {{draftDataClassCount}}</div>
+                            <div><a id="dataClasssLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataClass'})" ui-sref-opts="{inherit: false}">Finalized Data Classes</a> {{finalizedDataClassCount}} </div>
+                            <div show-for-role="VIEWER"><a id="dataClassLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataClass', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Data Classes</a> {{draftDataClassCount}}</div>
 
                         </div>
                     </div>
@@ -784,11 +810,11 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-3">
-                            <a ui-sref="mc.resource.list({resource: 'dataElement'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cube fa-5x fa-fw"></i></a>
+                            <a ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataElement'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cube fa-5x fa-fw"></i></a>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'dataElement'})" ui-sref-opts="{inherit: false}">Finalized Data Elements</a> {{finalizedDataElementCount}} </div>
-                            <div show-for-role="VIEWER"><a id="modelsLink" ui-sref="mc.resource.list({resource: 'dataElement', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Data Elements</a> {{draftDataElementCount}}</div>
+                            <div><a id="modelsLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataElement'})" ui-sref-opts="{inherit: false}">Finalized Data Elements</a> {{finalizedDataElementCount}} </div>
+                            <div show-for-role="VIEWER"><a id="modelsLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataElement', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Data Elements</a> {{draftDataElementCount}}</div>
                         </div>
                     </div>
                 </div>
@@ -807,11 +833,11 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-3">
-                            <a ui-sref="mc.resource.list({resource: 'dataType'})" ui-sref-opts="{inherit: false}"><i class="fa fa-th-large fa-5x fa-fw"></i></a>
+                            <a ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataType'})" ui-sref-opts="{inherit: false}"><i class="fa fa-th-large fa-5x fa-fw"></i></a>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div><a id="dataTypesLink" ui-sref="mc.resource.list({resource: 'dataType'})" ui-sref-opts="{inherit: false}">Finalized Data Types</a> {{finalizedDataTypeCount}} </div>
-                            <div show-for-role="VIEWER"><a id="draftDataTypesLink" ui-sref="mc.resource.list({resource: 'dataType', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Data Types</a> {{draftDataTypeCount}} </div>
+                            <div><a id="dataTypesLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataType'})" ui-sref-opts="{inherit: false}">Finalized Data Types</a> {{finalizedDataTypeCount}} </div>
+                            <div show-for-role="VIEWER"><a id="draftDataTypesLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataType', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Data Types</a> {{draftDataTypeCount}} </div>
                         </div>
                     </div>
                 </div>
@@ -829,11 +855,11 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-3">
-                            <a ui-sref="mc.resource.list({resource: 'measurementUnit'})" ui-sref-opts="{inherit: false}"><i class="fa fa-tachometer fa-5x fa-fw"></i></a>
+                            <a ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'measurementUnit'})" ui-sref-opts="{inherit: false}"><i class="fa fa-tachometer fa-5x fa-fw"></i></a>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'measurementUnit'})" ui-sref-opts="{inherit: false}">Finalized Measurement Units</a> {{finalizedMeasurementUnitCount}} </div>
-                            <div show-for-role="VIEWER"><a id="modelsLink" ui-sref="mc.resource.list({resource: 'measurementUnit', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Measurement Units</a> {{draftMeasurementUnitCount}} </div>
+                            <div><a id="modelsLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'measurementUnit'})" ui-sref-opts="{inherit: false}">Finalized Measurement Units</a> {{finalizedMeasurementUnitCount}} </div>
+                            <div show-for-role="VIEWER"><a id="modelsLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'measurementUnit', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Measurement Units</a> {{draftMeasurementUnitCount}} </div>
                         </div>
                     </div>
                 </div>
@@ -851,11 +877,11 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-3">
-                            <a ui-sref="mc.resource.list({resource: 'asset'})" ui-sref-opts="{inherit: false}"><i class="fa fa-file-code-o fa-5x fa-fw"></i></a>
+                            <a ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'asset'})" ui-sref-opts="{inherit: false}"><i class="fa fa-file-code-o fa-5x fa-fw"></i></a>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'asset'})" ui-sref-opts="{inherit: false}">Finalized Assets</a> {{finalizedAssetCount}} </div>
-                            <div show-for-role="VIEWER"><a id="modelsLink" ui-sref="mc.resource.list({resource: 'asset', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Assets</a> {{draftAssetCount}}</div>
+                            <div><a id="modelsLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'asset'})" ui-sref-opts="{inherit: false}">Finalized Assets</a> {{finalizedAssetCount}} </div>
+                            <div show-for-role="VIEWER"><a id="modelsLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'asset', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Assets</a> {{draftAssetCount}}</div>
 
                         </div>
                     </div>
@@ -874,10 +900,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                   <div class="panel-heading">
                       <div class="row">
                           <div class="col-xs-3">
-                              <a ui-sref="mc.resource.list({resource: 'relationshipType'})" ui-sref-opts="{inherit: false}"><i class="fa fa-link fa-5x fa-fw"></i></a>
+                              <a ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'relationshipType'})" ui-sref-opts="{inherit: false}"><i class="fa fa-link fa-5x fa-fw"></i></a>
                           </div>
                           <div class="col-xs-9 text-right">
-                              <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'relationshipType'})" ui-sref-opts="{inherit: false}"> Relationship Types </a> {{relationshipTypeCount}}</div>
+                              <div><a id="modelsLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'relationshipType'})" ui-sref-opts="{inherit: false}"> Relationship Types </a> {{relationshipTypeCount}}</div>
                           </div>
                       </div>
                   </div>
@@ -895,10 +921,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-3">
-                            <a ui-sref="mc.resource.list({resource: 'csvTransformation'})" ui-sref-opts="{inherit: false}"><i class="fa fa-long-arrow-right fa-5x fa-fw"></i></a>
+                            <a ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'csvTransformation'})" ui-sref-opts="{inherit: false}"><i class="fa fa-long-arrow-right fa-5x fa-fw"></i></a>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div><a id="batchesLink" ui-sref="mc.resource.list({resource: 'csvTransformation'})" ui-sref-opts="{inherit: false}">CSV Transformations</a> {{transformationsCount}}</div>
+                            <div><a id="batchesLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'csvTransformation'})" ui-sref-opts="{inherit: false}">CSV Transformations</a> {{transformationsCount}}</div>
                         </div>
                     </div>
                 </div>
@@ -917,11 +943,11 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-3">
-                            <a ui-sref="mc.resource.list({resource: 'batch'})" ui-sref-opts="{inherit: false}"><i class="fa fa-flash fa-5x fa-fw"></i></a>
+                            <a ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'batch'})" ui-sref-opts="{inherit: false}"><i class="fa fa-flash fa-5x fa-fw"></i></a>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div><a id="batchesLink" ui-sref="mc.resource.list({resource: 'batch'})" ui-sref-opts="{inherit: false}">Active Batches</a> {{activeBatchCount}}</div>
-                            <div><a id="archivedbatchesLink" ui-sref="mc.resource.list({resource: 'batch', status: 'archived'})" ui-sref-opts="{inherit: false}">Archived Batches</a> {{archivedBatchCount}}</div>
+                            <div><a id="batchesLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'batch'})" ui-sref-opts="{inherit: false}">Active Batches</a> {{activeBatchCount}}</div>
+                            <div><a id="archivedbatchesLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'batch', status: 'archived'})" ui-sref-opts="{inherit: false}">Archived Batches</a> {{archivedBatchCount}}</div>
                         </div>
                     </div>
                 </div>
@@ -936,9 +962,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
             </div>
         </div>
       </div>
-    </div>
-    <div ng-if="!(user.dataModels.includes.length || user.dataModels.excludes.length || user.dataModels.unclassifiedOnly)">
-      <infinite-list list="models" no-actions="true" on-item-selected="selectDataModel($element)"></infinite-list>
     </div>
 </div>
     <div class="row">
@@ -974,6 +997,49 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     </div>
   '''
 
+])
+.config(['$provide', ($provide) ->
+  fixStateParams = (state, params) ->
+    stateName = if angular.isString(state) then state else state.name
+
+    if stateName.startsWith 'mc'
+      return {dataModelId: 'catalogue' } if not params
+
+      if not params.dataModelId
+        params.dataModelId = 'catalogue'
+
+    return params
+
+
+  $provide.decorator('$state', ['$delegate', ($delegate) ->
+    originalHref = $delegate.href
+
+    $delegate.href = (stateOrName, params, options) ->
+      return originalHref(stateOrName, fixStateParams(stateOrName, params), options)
+
+
+    originalTransitionTo = $delegate.transitionTo
+
+    $delegate.transitionTo = (to, toParams, options) ->
+      return originalTransitionTo(to, fixStateParams(to, toParams), options)
+
+    $delegate
+
+  ])
+
+])
+# keep track of the data model used
+.run(['$rootScope', 'catalogueElementResource', ($rootScope, catalogueElementResource) ->
+  $rootScope.$on '$stateChangeStart', (event, toState, toParams, fromState, fromParams) ->
+    if toParams.dataModelId isnt fromParams.dataModelId or (toParams.dataModelId and not $rootScope.currentDataModel)
+      if not toParams.dataModelId or toParams.dataModelId is 'catalogue'
+        $rootScope.currentDataModel = undefined
+        $rootScope.$broadcast 'redrawContextualActions'
+        return
+      if toParams.dataModelId isnt $rootScope.currentDataModel?.id?.toString
+        catalogueElementResource('dataModel').get(toParams.dataModelId).then (dataModel) ->
+          $rootScope.currentDataModel = dataModel
+          $rootScope.$broadcast 'redrawContextualActions'
 ])
 # debug states
 #.run(['$rootScope', '$log', ($rootScope, $log) ->

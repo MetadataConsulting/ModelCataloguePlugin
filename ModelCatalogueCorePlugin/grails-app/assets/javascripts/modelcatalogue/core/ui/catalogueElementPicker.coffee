@@ -16,7 +16,7 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
   priority: 10000
 
 
-  controller: ['$scope', '$q', '$parse',  ($scope, $q, $parse) ->
+  controller: ['$scope', '$q', '$parse', '$state',  ($scope, $q, $parse, $state) ->
     $scope.searchForElement = (query, pickerValue, resourceAttr, statusAttr) ->
       searchFun     = null
       resource      = if resourceAttr then $scope.$eval(resourceAttr) ? $scope.$parent.$eval(resourceAttr) else undefined
@@ -25,6 +25,9 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
 
       if statusAttr
         params.status = statusAttr
+
+      if $state.params.dataModelId and $state.params.dataModelId != 'catalogue'
+        params.dataModel = $state.params.dataModelId
 
       if (value)
         searchFun = (query) -> catalogueElementResource(value).search(query, params)
