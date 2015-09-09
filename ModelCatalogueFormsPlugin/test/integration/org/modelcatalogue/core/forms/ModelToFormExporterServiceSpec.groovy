@@ -260,7 +260,7 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
 
         then:
         singleSelectItem
-        singleSelectItem.rightItemText == '<span class="MT"></span> Multi Type'
+        singleSelectItem.rightItemText == "<span data-id=\"Form 12\" data-type=\"Multi Type\"> </span> Multi Type"
         singleSelectItem.defaultValue == ITEM_SINGLE_SELECT_DEFAULT_VALUE
 
         when:
