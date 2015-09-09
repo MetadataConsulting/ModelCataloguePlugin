@@ -4,6 +4,7 @@ import java.awt.Container;
 
 import groovy.xml.XmlUtil;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataElement
@@ -332,8 +333,8 @@ class ModelToFormExporterService {
         }
         
         ValueDomain valueDomain=element.valueDomain
-        DataType dataType=valueDomain.dataType 
-        def regex=valueDomain.regexDef==null?'':valueDomain.regexDef
+        DataType dataType=valueDomain?.dataType 
+        def regex=valueDomain?.regexDef?:''
         def dataTypeName=transformDataType(dataType)
         def defaultID=(spanID==null?defaultSpanID:spanID)
         
@@ -344,7 +345,7 @@ class ModelToFormExporterService {
             hidden = " data-hidden=\"true\"";
         }
         
-        if(valueDomain.regexDef != null && !"".equals(valueDomain.regexDef))
+        if(StringUtils.isNotEmpty(regex))
         {
             regex = " data-regex=\"" +  XmlUtil.escapeXml(valueDomain.regexDef) + "\"";
         }
