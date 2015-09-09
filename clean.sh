@@ -9,6 +9,8 @@ for file in */ .*/ ; do
         cd "$file"
         ./grailsw clean-all
         rm -rf target
+        rm -rf target-eclipse
+        ./grailsw refresh-dependencies --non-interactive
 	cd ..
     fi
 done
