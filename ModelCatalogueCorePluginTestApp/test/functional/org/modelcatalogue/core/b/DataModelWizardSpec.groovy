@@ -16,20 +16,18 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         at DataModelListPage
+
         waitFor(120) {
-            viewTitle.displayed
-        }
-        waitFor(120) {
-            viewTitle.text().trim() == 'Data Model List'
-        }
-        waitFor {
-            actionButton('create-catalogue-element', 'list').displayed
+           browser.title == 'Data Models'
         }
     }
 
     def "add new data model"() {
+        waitFor {
+            $('a.infinite-list-create-action').displayed
+        }
         when:
-        actionButton('create-catalogue-element', 'list').click()
+        $('a.infinite-list-create-action').click()
 
 
         then: 'the model dialog opens'
@@ -80,7 +78,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         waitFor {
-            infTableCell(1, 2, text: 'New Data Model').displayed
+            menuItem('currentDataModel').text().contains('New Data Model (draft)')
         }
 
     }

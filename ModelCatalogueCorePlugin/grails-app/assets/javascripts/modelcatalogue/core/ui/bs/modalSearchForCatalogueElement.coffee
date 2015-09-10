@@ -35,7 +35,7 @@ module.config ['messagesProvider', (messagesProvider)->
         </div>
         """
 
-        controller: ['$scope', 'catalogueElementResource', '$modalInstance', '$window', '$state', ($scope, catalogueElementResource, $modalInstance, $state) ->
+        controller: ['$scope', 'catalogueElementResource', '$modalInstance', '$window', '$state', ($scope, catalogueElementResource, $modalInstance, $window, $state) ->
           $scope.title = title
 
           appendToElements = (list) ->

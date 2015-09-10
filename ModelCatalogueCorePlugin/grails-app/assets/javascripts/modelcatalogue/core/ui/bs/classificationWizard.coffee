@@ -79,7 +79,7 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
           <button ng-disabled="!finished" class="btn btn-default"  ng-click="$dismiss()"><span class="glyphicon glyphicon-remove"></span> Close</button>
         </div>
         '''
-        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$q', '$modalInstance', ($scope, $state, $window, messages, names, catalogueElementResource, $q, $modalInstance) ->
+        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$q', '$modalInstance', 'catalogue', '$rootScope', ($scope, $state, $window, messages, names, catalogueElementResource, $q, $modalInstance, catalogue, $rootScope) ->
           $scope.reset = ->
             $scope.classification = {classifies:{}}
             $scope.dataElement = {}
@@ -165,7 +165,12 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
 
               promise = promise.then (classification) ->
                   messages.success "Data Model #{classification.name} created"
+                  catalogue.select(classification).then ->
+                    $state.go 'mc.dashboard', {dataModelId: classification.id}
+                    $rootScope.$broadcast 'redrawContextualActions'
+
                   $scope.finished = true
+
 
           $scope.$watch 'classification.name', (name) ->
             $scope.nameUnique = false

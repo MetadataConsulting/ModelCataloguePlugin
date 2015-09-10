@@ -187,7 +187,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     }
 
     $rootScope.$on '$stateChangeSuccess', (ignored, state, params) ->
-      action.active = state.name == 'mc.resource.show' and params.id == ('' + catalogue.getCurrentDataModel().id)
+      action.active = state.name == 'mc.resource.show' and params.id == ('' + catalogue.getCurrentDataModel().id) if angular.isFunction(catalogue.getCurrentDataModel)
 
 
     action
@@ -203,7 +203,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
       label: 'All Data Models'
       icon:  'fa fa-tags fa-fw'
       action: ->
-        $state.go 'mc.resource.list', {resource: 'dataModel', dataModelId: 'catalogue'}
+        $state.go 'mc.resource.list', {resource: 'dataModel', dataModelId: 'catalogue', status: undefined }
     }
   ]
 

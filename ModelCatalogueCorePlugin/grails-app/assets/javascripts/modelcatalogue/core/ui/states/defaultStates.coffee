@@ -104,7 +104,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     applicationTitle "Comparison of #{((element.getLabel?.apply(element) ? element.name) for element in elements).join(' and ')}"
   ])
 
-.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', 'list', 'names', 'enhance', 'applicationTitle', '$rootScope', 'catalogueElementResource', 'catalogue', ($scope, $stateParams, $state, list, names, enhance, applicationTitle, $rootScope, catalogueElementResource, catalogue) ->
+.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', 'list', 'names', 'enhance', 'applicationTitle', '$rootScope', 'catalogueElementResource', 'catalogue', 'messages', ($scope, $stateParams, $state, list, names, enhance, applicationTitle, $rootScope, catalogueElementResource, catalogue, messages) ->
     if $stateParams.resource
       applicationTitle  "#{names.getNaturalName($stateParams.resource)}s"
 
@@ -117,6 +117,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       catalogue.select(dataModel).then ->
         $state.go 'mc.dashboard', {dataModelId: dataModel.id}, reload: true
         $rootScope.$broadcast 'redrawContextualActions'
+
+    $scope.createDataModel = ->
+        messages.prompt("New Data Model", '', {type: 'create-dataModel', create: 'dataModel'}).then (element)->
+          catalogue.select(element)
 
     getLastModelsKey = (status = $stateParams.status)->
       "#{status ? 'finalized'}"
@@ -138,7 +142,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         $scope.elementSelectedInTree  = false
         $scope.element                = if list.size > 0 then list.list[0]
         $scope.property               =  'contains'
-
 
       $scope.$on 'treeviewElementSelected', (event, element, id) ->
         return unless id is 'model-treeview'
@@ -709,7 +712,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       </div>
     </div>
     <div class="row" ng-if="resource == 'dataModel'">
-      <infinite-list list="list" no-actions="true" on-item-selected="selectDataModel($element)"></infinite-list>
+      <infinite-list heading="'Data Models'" on-create-requested="createDataModel()" list="list" no-actions="true" on-item-selected="selectDataModel($element)"></infinite-list>
     </div>
   '''
 
@@ -804,7 +807,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                         </div>
                         <div class="col-xs-9 text-right">
                             <div><a id="dataClasssLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataClass'})" ui-sref-opts="{inherit: false}">Finalized Data Classes</a> {{finalizedDataClassCount}} </div>
-                            <div show-for-role="VIEWER"><a id="dataClassLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataClass', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Data Classes</a> {{draftDataClassCount}}</div>
+                            <div show-for-role="VIEWER"><a id="draftDataClassLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataClass', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Data Classes</a> {{draftDataClassCount}}</div>
 
                         </div>
                     </div>

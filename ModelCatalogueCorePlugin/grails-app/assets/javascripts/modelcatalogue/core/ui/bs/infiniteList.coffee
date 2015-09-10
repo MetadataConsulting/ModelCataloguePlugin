@@ -14,6 +14,16 @@ angular.module('mc.core.ui.bs.infiniteList', ['mc.core.ui.infiniteList', 'ngSani
         </div>
       </div>
       <div class="row" infinite-scroll="loadMore()" infinite-scroll-disabled="loading || !isVisible()" infinite-scroll-distance="2" infinite-scroll-immediate-check="isVisible()" infinite-scroll-listen-for-event="infiniteList:filtered">
+        <div ng-if="onCreateRequested" class="col-lg-3 col-sm-4 col-md-3 infinite-scroll-item">
+          <div class="panel panel-fixed-height-300 panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">{{heading}}</h3>
+            </div>
+            <div class="panel-body">
+                <a class="btn btn-block btn-lg infinite-list-create-action btn-default" ng-click="requestCreate()"><span class="fa fa-fw fa-plus"></span> Create</a>
+            </div>
+          </div>
+        </div>
         <div ng-repeat="element in elements" class="col-lg-3 col-sm-4 col-md-3 infinite-scroll-item" ng-if="isNotFiltered(element)">
           <div class="panel panel-fixed-height-300" ng-class="{'panel-warning': element.status == 'DRAFT', 'panel-info': element.status == 'PENDING', 'panel-default': element.status == 'FINALIZED' || !element.status, 'panel-danger': element.status == 'DEPRECATED'}">
             <div class="panel-heading">

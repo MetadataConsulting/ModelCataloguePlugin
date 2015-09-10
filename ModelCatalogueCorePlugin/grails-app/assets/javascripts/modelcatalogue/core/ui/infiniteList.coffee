@@ -5,6 +5,8 @@ angular.module('mc.core.ui.infiniteList', ['mc.core.ui.infiniteListCtrl', 'ngAni
       list: '='
       noActions: '=?'
       onItemSelected: '&?'
+      onCreateRequested: '&?'
+      heading: '=?'
 
     templateUrl: 'modelcatalogue/core/ui/infinitePanels.html'
 
@@ -13,8 +15,14 @@ angular.module('mc.core.ui.infiniteList', ['mc.core.ui.infiniteListCtrl', 'ngAni
         $scope.transform = (args) -> args.$element
       angular.extend(this, $controller('infiniteListCtrl', {$scope: $scope, $element: $element}))
 
+      unless $attrs.onCreateRequested
+        $scope.onCreateRequested = undefined
+
       unless $attrs.onItemSelected
         $scope.onItemSelected = (obj) -> obj.$element.show()
+
+      $scope.requestCreate = ->
+        $scope.onCreateRequested($list: $scope.list)
 
       $scope.nameFilter = ''
       $scope.select = (element) ->

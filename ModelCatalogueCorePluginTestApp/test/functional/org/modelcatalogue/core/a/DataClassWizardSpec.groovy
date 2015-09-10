@@ -133,40 +133,32 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         waitUntilModalClosed(30)
     }
     def "filter by classification"() {
-        expect:
-        waitFor {
-            menuItem('currentDataModel').displayed
-        }
-
         when:
-        menuItem('currentDataModel').click()
+        go "#/catalogue/dataModel/all"
 
         then:
         waitFor {
-            menuItem('data-models', '').displayed
+            $('h3', title: 'XMLSchema').displayed
         }
 
         when:
-        menuItem('data-models', '').click()
+        $('h3', title: 'XMLSchema').click()
 
         then:
         waitFor {
-            modalDialog.displayed
+            menuItem('currentDataModel').text().contains('XMLSchema')
+        }
+        waitFor {
+            $('#draftDataClassLink').displayed
         }
 
-
         when:
-        $('#includes').value('xmlschema')
-        selectCepItemIfExists()
-        modalPrimaryButton.click()
+        $('#draftDataClassLink').click()
 
         then:
         waitFor {
             !$('span.catalogue-element-treeview-name', text: "New 1").displayed
         }
-        waitFor {
-            menuItem('currentDataModel').text().contains('XMLSchema')
-        }
 
         when:
         waitFor {
@@ -176,33 +168,26 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         waitFor {
-            menuItem('data-models', '').displayed
+            menuItem('all-data-models', '').displayed
         }
 
         when:
-        menuItem('data-models', '').click()
+        menuItem('all-data-models', '').click()
 
         then:
         waitFor {
-            modalDialog.displayed
-        }
-        waitFor {
-            modalDialog.find("#remove-tag-0").displayed
-        }
-
-        when:
-        modalDialog.find("#remove-tag-0").click()
-        modalPrimaryButton.click()
-
-        then:
-        waitFor {
-            !modalDialog.find("#remove-tag-0").displayed
-        }
-        waitFor {
-            $('span.catalogue-element-treeview-name', text: "New 1").displayed
+            $('h3', title: 'XMLSchema').displayed
         }
         waitFor {
             menuItem('currentDataModel').text().contains('All Data Models')
+        }
+
+        when:
+        go "#/catalogue/dataClass/all?status=draft"
+
+        then:
+        waitFor {
+            $('span.catalogue-element-treeview-name', text: "New 1").displayed
         }
 
     }
