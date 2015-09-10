@@ -177,18 +177,18 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         ]
     }
 
-      $stateProvider.state 'dashboard2', {
-        url: '/'
-        templateUrl: 'modelcatalogue/core/ui/state/dashboard.html',
-        controller: 'mc.core.ui.states.DashboardCtrl'
-        resolve:
-          user: ['security', (security) ->
-            if security.getCurrentUser() then return security.getCurrentUser() else return {displayName: ''}
-          ]
-          statistics: ['catalogue', 'security', '$stateParams', (catalogue, security, $stateParams) ->
-            if security.getCurrentUser()?.id then return catalogue.getStatistics($stateParams.dataModelId) else return ''
-          ]
-      }
+    $stateProvider.state 'dashboard2', {
+      url: '/'
+      templateUrl: 'modelcatalogue/core/ui/state/dashboard.html',
+      controller: 'mc.core.ui.states.DashboardCtrl'
+      resolve:
+        user: ['security', (security) ->
+          if security.getCurrentUser() then return security.getCurrentUser() else return {displayName: ''}
+        ]
+        statistics: ['catalogue', 'security', '$stateParams', (catalogue, security, $stateParams) ->
+          if security.getCurrentUser()?.id then return catalogue.getStatistics($stateParams.dataModelId) else return ''
+        ]
+    }
 
     $stateProvider.state 'mc.dashboard', {
       url: '/dashboard'
