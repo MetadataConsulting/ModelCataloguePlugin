@@ -789,29 +789,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-3">
-                            <a ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataModel'})" ui-sref-opts="{inherit: false}"><i class="fa fa-tags fa-5x fa-fw"></i></a>
-                        </div>
-                        <div class="col-xs-9 text-right">
-                            <div><a id="dataSetsLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataModel'})" ui-sref-opts="{inherit: false}">Finalized Data Models</a> {{finalizedDataModelCount}} </div>
-                            <div show-for-role="VIEWER"><a id="dataSetsLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataModel', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Data Models</a> {{draftDataModelCount}} </div>
-                        </div>
-                    </div>
-                </div>
-
-                <a show-for-role="CURATOR" ng-click="create('dataModel')">
-                    <div class="panel-footer">
-                        <span class="pull-left">Create Data Model</span>
-                        <span class="pull-right"><i class="fa fa-magic"></i></span>
-                        <div class="clearfix"></div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div class="col-lg-4 col-sm-6 col-md-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-xs-3">
                             <a ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataClass'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cubes fa-5x fa-fw"></i></a>
                         </div>
                         <div class="col-xs-9 text-right">

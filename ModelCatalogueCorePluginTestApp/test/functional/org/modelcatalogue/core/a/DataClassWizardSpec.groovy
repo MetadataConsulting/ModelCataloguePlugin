@@ -142,7 +142,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         }
 
         when:
-        $('h3', title: 'XMLSchema').click()
+        $('h3', title: 'XMLSchema').find('a').click()
 
         then:
         waitFor {

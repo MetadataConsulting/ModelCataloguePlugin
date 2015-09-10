@@ -20,7 +20,7 @@ angular.module('mc.core.ui.bs.infiniteList', ['mc.core.ui.infiniteList', 'ngSani
               <h3 class="panel-title">{{heading}}</h3>
             </div>
             <div class="panel-body">
-                <a class="btn btn-block btn-lg infinite-list-create-action btn-default" ng-click="requestCreate()"><span class="fa fa-fw fa-plus"></span> Create</a>
+                <a class="btn btn-block infinite-list-create-action btn-default" ng-click="requestCreate()"><span class="fa fa-fw fa-plus"></span> Create</a>
             </div>
           </div>
         </div>

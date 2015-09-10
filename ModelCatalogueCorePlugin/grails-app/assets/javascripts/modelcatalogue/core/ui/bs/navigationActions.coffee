@@ -187,23 +187,35 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     }
 
     $rootScope.$on '$stateChangeSuccess', (ignored, state, params) ->
-      action.active = state.name == 'mc.resource.show' and params.id == ('' + catalogue.getCurrentDataModel().id) if angular.isFunction(catalogue.getCurrentDataModel)
+      action.active = state.name == 'mc.resource.show' and params.id == ('' + catalogue.getCurrentDataModel().id) if angular.isFunction(catalogue.getCurrentDataModel) and catalogue.getCurrentDataModel()
 
 
-    action
+        action
   ]
 
-  actionsProvider.registerChildAction 'currentDataModel', 'all-data-models', ['security', '$scope', '$state', 'enhance', 'rest', 'modelCatalogueApiRoot', '$rootScope', 'catalogue', (security, $scope, $state, enhance, rest, modelCatalogueApiRoot, $rootScope, catalogue) ->
+  actionsProvider.registerChildAction 'currentDataModel', 'all-data-models', ['security', '$scope', '$state', 'catalogue', (security, $scope, $state, catalogue) ->
     return undefined if not security.isUserLoggedIn()
-
-    return undefined if not catalogue.isFilteredByDataModel()
 
     {
       position:   3000
-      label: 'All Data Models'
+      label: 'Show All Data Models'
       icon:  'fa fa-tags fa-fw'
       action: ->
         $state.go 'mc.resource.list', {resource: 'dataModel', dataModelId: 'catalogue', status: undefined }
+    }
+  ]
+
+  actionsProvider.registerChildAction 'currentDataModel', 'add-import', ['$scope', 'messages', 'names', 'security', 'catalogue', ($scope, messages, names, security, catalogue) ->
+    return undefined if not security.isUserLoggedIn()
+    return undefined if not catalogue.isFilteredByDataModel()
+
+    {
+      position:   2000
+      label:      'Add Data Model Import'
+      icon:       'fa fa-fw fa-puzzle-piece'
+      type:       'success'
+      action:     ->
+        messages.prompt('Add Data ModelImport', '', {type: 'create-new-relationship', element: catalogue.getCurrentDataModel(), direction: 'sourceToDestination', relationshipTypeName: 'import'})
     }
   ]
 
