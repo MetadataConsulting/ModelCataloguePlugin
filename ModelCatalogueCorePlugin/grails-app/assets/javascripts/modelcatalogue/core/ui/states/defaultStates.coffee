@@ -719,7 +719,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       </div>
     </div>
     <div class="row" ng-if="resource == 'dataModel'">
-      <infinite-list heading="'Data Models'" on-create-requested="createDataModel()" list="list" no-actions="true" item-href="dataModelHref($element)"></infinite-list>
+      <div class="col-md-12">
+        <infinite-list heading="'Data Models'" on-create-requested="createDataModel()" list="list" no-actions="true" item-href="dataModelHref($element)"></infinite-list>
+      </div>
     </div>
   '''
 
@@ -988,7 +990,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     </div>
     <div ng-if="!currentDataModel">
     <div class="row" ng-if="resource == 'dataModel'">
-      <infinite-list heading="'Data Models'" on-create-requested="createDataModel()" list="list" no-actions="true" item-href="dataModelHref($element)"></infinite-list>
+      <div class="col-md-12">
+        <infinite-list heading="'Data Models'" on-create-requested="createDataModel()" list="list" no-actions="true" item-href="dataModelHref($element)"></infinite-list>
+      </div>
     </div>
     </div>
 </div>
