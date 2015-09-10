@@ -12,7 +12,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
           angular.extend $scope, result
 
         catalogueElementResource('dataModel').list(status: 'active').then (models) ->
-          $scope.models = models
+          $scope.list = models
+          $scope.resource = 'dataModel'
 
 
     $scope.$on('userLoggedIn', (ignored, user) ->
@@ -66,6 +67,14 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
     $scope.image = (relativePath) -> "#{security.contextPath}/assets#{relativePath}"
 
+
+    $scope.dataModelHref = (dataModel) ->
+      $state.href 'mc.dashboard', {dataModelId: dataModel.id}
+
+    $scope.createDataModel = ->
+      messages.prompt("New Data Model", '', {type: 'create-dataModel', create: 'dataModel'}).then (element)->
+        catalogue.select(element)
+
   ])
 
 .controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', 'element', '$rootScope', 'names' , ($scope, $stateParams, $state, element, $rootScope) ->
@@ -113,10 +122,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $scope.natural                  = (name) -> if name then names.getNaturalName(name) else "General"
     $scope.resource                 = $stateParams.resource
 
-    $scope.selectDataModel = (dataModel) ->
-      catalogue.select(dataModel).then ->
-        $state.go 'mc.dashboard', {dataModelId: dataModel.id}, reload: true
-        $rootScope.$broadcast 'redrawContextualActions'
+    $scope.dataModelHref = (dataModel) ->
+        $state.href 'mc.dashboard', {dataModelId: dataModel.id}
 
     $scope.createDataModel = ->
         messages.prompt("New Data Model", '', {type: 'create-dataModel', create: 'dataModel'}).then (element)->
@@ -712,7 +719,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       </div>
     </div>
     <div class="row" ng-if="resource == 'dataModel'">
-      <infinite-list heading="'Data Models'" on-create-requested="createDataModel()" list="list" no-actions="true" on-item-selected="selectDataModel($element)"></infinite-list>
+      <infinite-list heading="'Data Models'" on-create-requested="createDataModel()" list="list" no-actions="true" item-href="dataModelHref($element)"></infinite-list>
     </div>
   '''
 
@@ -773,7 +780,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 </div>
 
 <div show-if-logged-in>
-    <div>
+    <div ng-if="currentDataModel">
       <div class="row">
         <div class="col-lg-4 col-sm-6 col-md-4">
             <div class="panel panel-default">
@@ -978,6 +985,11 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
             </div>
         </div>
       </div>
+    </div>
+    <div ng-if="!currentDataModel">
+    <div class="row" ng-if="resource == 'dataModel'">
+      <infinite-list heading="'Data Models'" on-create-requested="createDataModel()" list="list" no-actions="true" item-href="dataModelHref($element)"></infinite-list>
+    </div>
     </div>
 </div>
     <div class="row">

@@ -4,7 +4,7 @@ angular.module('mc.core.ui.infiniteList', ['mc.core.ui.infiniteListCtrl', 'ngAni
     scope:
       list: '='
       noActions: '=?'
-      onItemSelected: '&?'
+      itemHref: '&?'
       onCreateRequested: '&?'
       heading: '=?'
 
@@ -18,15 +18,15 @@ angular.module('mc.core.ui.infiniteList', ['mc.core.ui.infiniteListCtrl', 'ngAni
       unless $attrs.onCreateRequested
         $scope.onCreateRequested = undefined
 
-      unless $attrs.onItemSelected
-        $scope.onItemSelected = (obj) -> obj.$element.show()
+      unless $attrs.itemHref
+        $scope.itemHref = (obj) -> obj.$element.href()
 
       $scope.requestCreate = ->
         $scope.onCreateRequested($list: $scope.list)
 
       $scope.nameFilter = ''
-      $scope.select = (element) ->
-        $scope.onItemSelected($element: element)
+      $scope.href = (element) ->
+        $scope.itemHref($element: element)
       $scope.isNotFiltered = (element) ->
         return true unless $scope.nameFilter
         return false if element.name?.toLowerCase().indexOf($scope.nameFilter?.toLowerCase()) == -1
