@@ -1,6 +1,6 @@
 angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalogueProvider', (catalogueProvider)->
-  catalogueProvider.setIcon 'dataModel',          "fa fa-fw fa-tags"
-  catalogueProvider.setIcon 'classification',     "fa fa-fw fa-tags"
+  catalogueProvider.setIcon 'dataModel',          "fa fa-fw fa-book"
+  catalogueProvider.setIcon 'classification',     "fa fa-fw fa-book"
   catalogueProvider.setIcon 'dataClass',          "fa fa-fw fa-cubes"
   catalogueProvider.setIcon 'model',              "fa fa-fw fa-cubes"
   catalogueProvider.setIcon 'dataElement',        "fa fa-fw fa-cube"

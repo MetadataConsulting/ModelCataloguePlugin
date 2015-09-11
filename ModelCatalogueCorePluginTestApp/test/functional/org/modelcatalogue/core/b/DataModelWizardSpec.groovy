@@ -42,27 +42,27 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         waitFor {
-            !stepElements.disabled
+            !stepImports.disabled
         }
 
         when:
-        stepElements.click()
+        stepImports.click()
 
         then:
         waitFor {
-            stepElements.hasClass('btn-primary')
+            stepImports.hasClass('btn-primary')
         }
 
         and:
-        stepElements.click()
+        stepImports.click()
 
         then:
         waitFor {
-            stepElements.hasClass('btn-primary')
+            stepImports.hasClass('btn-primary')
         }
 
         when:
-        name = 'nhs'
+        name = 'NHIC'
         selectCepItemIfExists()
 
 
@@ -79,6 +79,22 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         then:
         waitFor {
             menuItem('currentDataModel').text().contains('New Data Model (draft)')
+        }
+
+        when:
+        menuItem('currentDataModel').click()
+
+        then:
+        waitFor {
+            menuItem('show-data-model', '').displayed
+        }
+
+        when:
+        menuItem('show-data-model', '').click()
+
+        then:
+        waitFor {
+            totalOf('imports') == 1
         }
 
     }

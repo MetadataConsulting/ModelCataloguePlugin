@@ -19,7 +19,7 @@ class DataModelListPage extends ModelCataloguePage {
         modelCatalogueId    { classificationWizzard.find('#modelCatalogueId') }
 
         stepPrevious        { $("#step-previous") }
-        stepElements        { $("#step-elements") }
+        stepImports         { $("#step-imports") }
         stepNext            { $("#step-next") }
         stepFinish          { $("#step-finish") }
         exitButton          { $("#exit-wizard") }

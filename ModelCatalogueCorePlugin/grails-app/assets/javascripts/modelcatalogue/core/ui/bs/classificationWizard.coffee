@@ -1,8 +1,8 @@
-angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.util.ui.focusMe']).config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.dataModelWIzard', ['mc.util.messages', 'mc.util.ui.focusMe']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', '$q', 'messages', '$rootScope', ($modal, $q, messages,$rootScope) ->
     (title, body, args) ->
 
-      $rootScope.createClassificationWizard ?= $modal.open {
+      $rootScope.createDataModelWizard ?= $modal.open {
         windowClass: 'create-classification-wizard'
         backdrop: 'static'
         keyboard: false
@@ -22,10 +22,10 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
                 <button id="step-classification" ng-click="select('classification')" class="btn btn-default" ng-class="{'btn-primary': step == 'classification'}">1. Data Model</button>
               </li>
               <li>
-                <button id="step-elements" ng-disabled="!nameUnique" ng-click="select('elements')" class="btn btn-default" ng-class="{'btn-primary': step == 'elements'}">2. Elements</button>
+                <button id="step-imports" ng-disabled="!nameUnique" ng-click="select('imports')" class="btn btn-default" ng-class="{'btn-primary': step == 'imports'}">2. Imports</button>
               </li>
               <li>
-                <button id="step-next" ng-disabled="!nameUnique || step == 'elements'" ng-click="next()" class="btn btn-default" ><span class="glyphicon glyphicon-chevron-right"></span></button>
+                <button id="step-next" ng-disabled="!nameUnique || step == 'imports'" ng-click="next()" class="btn btn-default" ><span class="glyphicon glyphicon-chevron-right"></span></button>
               </li>
               <li>
                 <button id="step-finish" ng-disabled="!nameUnique" ng-click="finish()" class="btn btn-default btn-success"><span class="glyphicon glyphicon-ok"></span></button>
@@ -35,7 +35,7 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
         <div class="modal-body" ng-switch="step">
           <messages-panel messages="messages"></messages-panel>
           <div ng-switch-when="classification" id="classification">
-              <form role="form" ng-submit="select('elements')">
+              <form role="form" ng-submit="select('imports')">
                 <div class="form-group">
                   <label for="name" class="">Name</label>
                   <input type="text" class="form-control" id="name" placeholder="Name (Required)" ng-model="classification.name" focus-me="step=='classification'" required ng-model-options="{debounce: 500}">
@@ -46,29 +46,25 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
                 </div>
                 <div class="form-group">
                   <label for="description" class="">Description</label>
-                  <textarea rows="10" ng-model="classification.description" placeholder="Description (Optional)" class="form-control" id="description" ng-keydown="navigateOnKey($event, 9, 'elements')"></textarea>
+                  <textarea rows="10" ng-model="classification.description" placeholder="Description (Optional)" class="form-control" id="description" ng-keydown="navigateOnKey($event, 9, 'imports')"></textarea>
                 </div>
               </form>
           </div>
-          <div ng-switch-when="elements" id="elements">
+          <div ng-switch-when="imports" id="imports">
               <br/>
               <form role="form">
                 <div class="form-group">
-                  <label for="name" class="">Data Element</label>
-                  <elements-as-tags elements="dataElements"></elements-as-tags>
+                  <label for="name" class="">Imported Data Models</label>
+                  <elements-as-tags elements="imports"></elements-as-tags>
                   <div class="input-group">
-                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="dataElement.element" focus-me="step=='elements'" catalogue-element-picker="dataElement"  typeahead-on-select="push('dataElements', 'dataElement')">
+                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="import.element" focus-me="step=='imports'" catalogue-element-picker="dataModel" status="finalized" typeahead-on-select="push('imports', 'import')">
+                    <p class="help-block">To reuse data classes, data types and measurement units from you need to import them first. You can import only finalized data models.</p>
                     <span class="input-group-btn">
-                      <button class="btn btn-success" ng-click="push('dataElements', 'dataElement')" ng-disabled="isEmpty(dataElement.element)"><span class="glyphicon glyphicon-plus"></span></button>
+                      <button class="btn btn-success" ng-click="push('imports', 'import')" ng-disabled="isEmpty(import.element)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
                   </div>
                 </div>
               </form>
-              <div  ng-click="importFromCSV()">
-                <alert type="info">
-                  <strong>Hint:</strong> If you have CSV file with sample data  <a class="alert-link"><span class="fa fa-magic"></span> import data elements from CSV file headers</a>.
-                </alert>
-              </div>
           </div>
           <div ng-switch-when="summary" id="summary">
               <h4 ng-show="classification.name &amp;&amp;  finished">Data Model <strong>{{classification.name}} created</strong></h4>
@@ -79,13 +75,15 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
           <button ng-disabled="!finished" class="btn btn-default"  ng-click="$dismiss()"><span class="glyphicon glyphicon-remove"></span> Close</button>
         </div>
         '''
-        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$q', '$modalInstance', 'catalogue', '$rootScope', ($scope, $state, $window, messages, names, catalogueElementResource, $q, $modalInstance, catalogue, $rootScope) ->
+        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$q', '$modalInstance', 'catalogue', '$rootScope', 'delayedQueueExecutor', ($scope, $state, $window, messages, names, catalogueElementResource, $q, $modalInstance, catalogue, $rootScope, delayedQueueExecutor) ->
+          execAfter50 = delayedQueueExecutor(500)
+
           $scope.reset = ->
             $scope.classification = {classifies:{}}
-            $scope.dataElement = {}
-            $scope.dataElements = []
+            $scope.import = {}
+            $scope.imports = []
             $scope.messages = messages.createNewMessages()
-            $scope.steps = ['classification', 'elements']
+            $scope.steps = ['classification', 'imports']
             $scope.step = 'classification'
             $scope.finishInProgress = false
             $scope.finished = false
@@ -151,17 +149,16 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
 
               promise = $q.when {}
 
-              angular.forEach $scope.dataElements, (element, i)->
-                unless element.element and element.name
-                  promise = promise.then ->
-                    catalogueElementResource('dataElement').save({name: element.name}).then (newElement) ->
-                      $scope.dataElements[i] = newElement
-                else
-                  $scope.dataElements[i] = element.element
-
               promise = promise.then ->
-                $scope.classification.classifies = $scope.dataElements
                 catalogueElementResource('dataModel').save($scope.classification)
+
+              angular.forEach $scope.imports, (element, i) ->
+                promise = promise.then (classification) ->
+                  console.log classification
+                  execAfter50.submit ->
+                    classification.imports.add element.element
+                    classification
+
 
               promise = promise.then (classification) ->
                   messages.success "Data Model #{classification.name} created"
@@ -209,30 +206,17 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
 
           $scope.dismiss = (reason) ->
             return $modalInstance.dismiss(reason) if $scope.finished
-            if $scope.classification.name or $scope.dataElements.length > 0
+            if $scope.classification.name or $scope.imports.length > 0
               messages.confirm("Close Data Model Wizard", "Do you want to discard all changes?").then ->
                 $modalInstance.dismiss(reason)
             else
               $modalInstance.dismiss(reason)
-
-          $scope.importFromCSV = ->
-            messages.prompt("Import Data Elements", null, {type: 'data-element-suggestions-from-csv'}).then (result) ->
-              angular.forEach result, (element) ->
-                value = {element : element}
-                if angular.isString(value.element)
-                  value = {name: value.element, create: true}
-                else
-                  value.name = value.element.name
-                  value.elementType = value.element.elementType
-                  value.id = value.element.id
-                $scope.dataElements.push value
-
         ]
 
       }
 
-      $rootScope.createClassificationWizard.result.finally ->
-        $rootScope.createClassificationWizard = undefined
+      $rootScope.createDataModelWizard.result.finally ->
+        $rootScope.createDataModelWizard = undefined
   ]
 
   messagesProvider.setPromptFactory 'create-classification', factory

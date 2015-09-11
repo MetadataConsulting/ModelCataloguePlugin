@@ -46,7 +46,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     {
       position:   -10000
       label:      "Select #{$scope.element.name}"
-      icon:       'fa fa-tags'
+      icon:       'fa fa-book'
       type:       'primary'
       action: ->
         catalogue.select($scope.element).then ->

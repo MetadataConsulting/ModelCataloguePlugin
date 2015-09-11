@@ -180,7 +180,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
 
       position:   2000
       label: 'Show Detail'
-      icon: 'fa fa-tag fa-fw'
+      icon: 'fa fa-book fa-fw'
       active: $state.name == 'mc.resource.show' and $state.params.id == ('' + catalogue.getCurrentDataModel().id)
       action: ->
         $state.go 'mc.resource.show', {resource: 'dataModel', id: catalogue.getCurrentDataModel().id, dataModelId: catalogue.getCurrentDataModel().id}
@@ -198,7 +198,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     {
       position:   3000
       label: 'Show All Data Models'
-      icon:  'fa fa-tags fa-fw'
+      icon:  'fa fa-book fa-fw'
       action: ->
         $state.go 'mc.resource.list', {resource: 'dataModel', dataModelId: 'catalogue', status: undefined }
     }
@@ -214,7 +214,10 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
       icon:       'fa fa-fw fa-puzzle-piece'
       type:       'success'
       action:     ->
-        messages.prompt('Add Data ModelImport', '', {type: 'create-new-relationship', element: catalogue.getCurrentDataModel(), direction: 'sourceToDestination', relationshipTypeName: 'import'})
+        messages.prompt('Add Data Model Import', 'If you want to reuse data classes, data types or measurement units form different data models you need to import the containing data model first.', {type: 'catalogue-elements', resource: 'dataModel', status: 'finalized' }).then (elements) ->
+          angular.forEach elements, (element) ->
+            unless angular.isString(element)
+              catalogue.getCurrentDataModel().imports.add element
     }
   ]
 
