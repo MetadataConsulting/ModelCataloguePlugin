@@ -142,17 +142,38 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "classifications have activity feed"() {
-        go "#/catalogue/classification/all"
+        when:
+        go "#/catalogue/dataModel/all"
 
-        expect:
+        then:
         waitFor {
-            viewTitle.text().trim() == 'Classification List'
+            $('h3', title: 'XMLSchema').displayed
         }
 
         when:
-        noStale({ infTableCell(1, 2).find('a') }) {
-            it.click()
+        $('h3', title: 'XMLSchema').find('a').click()
+
+        then:
+        waitFor {
+            menuItem('currentDataModel').text().contains('XMLSchema')
         }
+
+        when:
+        waitFor {
+            menuItem('currentDataModel').displayed
+        }
+        menuItem('currentDataModel').click()
+
+        then:
+        waitFor {
+            menuItem('feed', '').displayed
+        }
+        waitFor {
+            menuItem('show-data-model', '').displayed
+        }
+
+        when:
+        menuItem('show-data-model', '').click()
 
         then:
         waitFor {

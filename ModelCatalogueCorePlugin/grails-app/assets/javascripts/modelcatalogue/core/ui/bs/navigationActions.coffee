@@ -189,8 +189,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     $rootScope.$on '$stateChangeSuccess', (ignored, state, params) ->
       action.active = state.name == 'mc.resource.show' and params.id == ('' + catalogue.getCurrentDataModel().id) if angular.isFunction(catalogue.getCurrentDataModel) and catalogue.getCurrentDataModel()
 
-
-        action
+    action
   ]
 
   actionsProvider.registerChildAction 'currentDataModel', 'all-data-models', ['security', '$scope', '$state', 'catalogue', (security, $scope, $state, catalogue) ->
