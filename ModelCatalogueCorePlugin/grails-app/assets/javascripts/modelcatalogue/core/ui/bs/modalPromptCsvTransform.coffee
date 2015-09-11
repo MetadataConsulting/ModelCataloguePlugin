@@ -23,7 +23,7 @@ angular.module('mc.core.ui.bs.modalPromptCsvTransform', ['mc.util.messages']).co
               </div>
               <div class="form-group">
                 <label for="csv" class="">CSV File</label>
-                <input type="file" name="csv" class="form-control" id="csv" placeholder="CSV File" ng-model="csv" ng-file-select="onFileSelect($files)">
+                <input type="file" name="csv" class="form-control" id="csv" placeholder="CSV File" ng-model="csv" ngf-select="onFileSelect($files)">
               </div>
             </form>
         </div>

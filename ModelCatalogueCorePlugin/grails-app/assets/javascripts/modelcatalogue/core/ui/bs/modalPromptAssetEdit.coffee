@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angularFileUpload', 'mc.core.ui.bs.withClassificationCtrlMixin']).config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'ngFileUpload', 'mc.core.ui.bs.withClassificationCtrlMixin']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
     (title, body, args) ->
       if not args?.element? and not args?.create?
@@ -30,7 +30,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
 
               <div class="form-group">
                 <label for="asset" class="">File</label>
-                <input ng-hide="uploading &amp;&amp; progress" type="file" class="form-control" id="asset" placeholder="File" ng-model="copy.asset" ng-file-select="onFileSelect($files)">
+                <input ng-hide="uploading &amp;&amp; progress" type="file" class="form-control" id="asset" placeholder="File" ngf-model="copy.asset" ngf-select="onFileSelect($files)">
                 <progressbar value="progress" ng-show="uploading &amp;&amp; progress">{{progress}} %</progressbar>
               </div>
               <div class="form-group">
@@ -43,7 +43,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
           <contextual-actions role="modal"></contextual-actions>
         </div>
         '''
-        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$upload', 'modelCatalogueApiRoot', 'enhance', '$rootScope', '$controller', ($scope, messages, names, catalogueElementResource, $modalInstance, $upload, modelCatalogueApiRoot, enhance, $rootScope, $controller) ->
+        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', '$rootScope', '$controller', ($scope, messages, names, catalogueElementResource, $modalInstance, Upload, modelCatalogueApiRoot, enhance, $rootScope, $controller) ->
           $scope.pending        = {dataModel: null}
           $scope.newEntity      = -> {dataModels: $scope.copy?.dataModels ? []}
           $scope.copy     = angular.copy(args.element ? $scope.newEntity())
@@ -87,7 +87,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
 
             if $scope.copy.file
               $scope.uploading = true
-              $scope.upload = $upload.upload({
+              $scope.upload = Upload.upload({
                 params: {id: $scope.copy.id, name: $scope.copy.name, description: $scope.copy.description}
                 url:                "#{modelCatalogueApiRoot}/asset/upload"
                 file:               $scope.copy.file

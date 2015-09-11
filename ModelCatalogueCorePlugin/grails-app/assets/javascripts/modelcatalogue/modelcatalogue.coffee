@@ -1,4 +1,4 @@
-#= require ng-file-upload/angular-file-upload
+#= require ng-file-upload/ng-file-upload
 #= require angular-i18n/angular-locale_en-gb
 #= require angular-http-auth/src/http-auth-interceptor
 #= require angular-loading-bar/build/loading-bar
