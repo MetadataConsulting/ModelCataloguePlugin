@@ -83,8 +83,12 @@
         def "finalize element"() {
             waitUntilModalClosed()
             when: "finalize is clicked"
-            actionButton('change-element-state').click()
-            actionButton('finalize').click()
+            noStale({ actionButton('change-element-state') }) {
+                it.click()
+            }
+            noStale({ actionButton('finalize') }) {
+                it.click()
+            }
 
             then: "modal prompt is displayed"
             waitFor {

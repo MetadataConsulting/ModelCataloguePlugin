@@ -149,11 +149,11 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
             menuItem('currentDataModel').text().contains('XMLSchema')
         }
         waitFor {
-            $('#draftDataClassLink').displayed
+            menuItem('sidenav-dataClass', 'sidenav').displayed
         }
 
         when:
-        $('#draftDataClassLink').click()
+        menuItem('sidenav-dataClass', 'sidenav').click()
 
         then:
         waitFor {
