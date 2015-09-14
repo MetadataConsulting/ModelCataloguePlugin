@@ -58,11 +58,11 @@ angular.module('mc.core.ui.bs.dataModelWIzard', ['mc.util.messages', 'mc.util.ui
                   <elements-as-tags elements="imports"></elements-as-tags>
                   <div class="input-group">
                     <input type="text" class="form-control" id="name" placeholder="Name" ng-model="import.element" focus-me="step=='imports'" catalogue-element-picker="dataModel" status="finalized" typeahead-on-select="push('imports', 'import')">
-                    <p class="help-block">To reuse data classes, data types and measurement units from you need to import them first. You can import only finalized data models.</p>
                     <span class="input-group-btn">
                       <button class="btn btn-success" ng-click="push('imports', 'import')" ng-disabled="isEmpty(import.element)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
                   </div>
+                  <p class="help-block">To reuse data classes, data types and measurement units from you need to import them first. You can import only finalized data models.</p>
                 </div>
               </form>
           </div>
@@ -163,7 +163,7 @@ angular.module('mc.core.ui.bs.dataModelWIzard', ['mc.util.messages', 'mc.util.ui
               promise = promise.then (classification) ->
                   messages.success "Data Model #{classification.name} created"
                   catalogue.select(classification).then ->
-                    $state.go 'mc.dashboard', {dataModelId: classification.id}
+                    $state.go 'mc.resource.list', {dataModelId: classification.id, resource: 'dataClass'}
                     $rootScope.$broadcast 'redrawContextualActions'
 
                   $scope.finished = true

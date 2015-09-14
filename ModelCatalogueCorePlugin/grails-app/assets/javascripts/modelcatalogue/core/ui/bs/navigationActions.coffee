@@ -24,6 +24,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
 
   angular.forEach RESOURCES, (resource, index) ->
     goToResource = ['$scope', '$state', '$stateParams', 'names', 'security', 'messages', 'catalogue', ($scope, $state, $stateParams, names, security, messages, catalogue) ->
+      return undefined if not security.hasRole('VIEWER')
       return undefined if (resource == 'batch' or resource == 'relationshipType' or resource == 'csvTransformation') and not security.hasRole('CURATOR')
 
       label = names.getNaturalName(resource) + 's'
@@ -36,6 +37,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
         label = 'Data Classes'
 
       action = {
+        active:     $stateParams.resource == resource
         icon:       catalogue.getIcon(resource)
         position:   index * 100
         label:      label
@@ -51,7 +53,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
 
       action
     ]
-    actionsProvider.registerChildAction 'navbar-catalogue-elements', 'navbar-' + resource , goToResource
+    actionsProvider.registerActionInRole  'sidenav-' + resource, actionsProvider.ROLE_SIDENAV , goToResource
     actionsProvider.registerActionInRole 'global-list-' + resource, actionsProvider.ROLE_GLOBAL_ACTION, goToResource
     unless resource == 'batch'
       actionsProvider.registerActionInRole 'global-create-' + resource, actionsProvider.ROLE_GLOBAL_ACTION, ['$scope', 'names', 'security', 'messages', '$state', '$log', ($scope, names, security, messages, $state, $log) ->
@@ -155,24 +157,6 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     action
   ]
 
-  actionsProvider.registerChildAction 'currentDataModel', 'show-dashboard', ['$state', '$rootScope', 'catalogue', ($state, $rootScope, catalogue) ->
-    return undefined unless catalogue.isFilteredByDataModel()
-
-    action = {
-      position:   1000
-      label: 'Show Dashboard'
-      icon: 'fa fa-fw fa-dashboard'
-      active: $state.current.name == 'mc.dashboard'
-      action: ->
-        $state.go 'mc.dashboard', {dataModelId: $state.params.dataModelId}
-    }
-
-    $rootScope.$on '$stateChangeSuccess', (ignored, state) ->
-      action.active = state.name == 'mc.dashboard'
-
-    action
-  ]
-
   actionsProvider.registerChildAction 'currentDataModel', 'show-data-model', ['catalogue', '$scope', '$state', '$rootScope', (catalogue, $scope, $state, $rootScope) ->
     return undefined if not catalogue.isFilteredByDataModel()
 
@@ -254,14 +238,13 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     }
   ]
 
-  actionsProvider.registerActionInRole 'dashboard', actionsProvider.ROLE_GLOBAL_ACTION, ['$state', ($state) ->
+  actionsProvider.registerActionInRole 'about-dialog', actionsProvider.ROLE_GLOBAL_ACTION, ['messages', (messages) ->
+
     {
-      label:      'Dashboard'
-      icon:       'fa fa-tachometer'
-      action: -> $state.go 'dashboard'
+      icon: 'fa fa-question'
+      label: 'Model Catalogue Version'
+      action: ->  messages.prompt('','', type: 'about-dialog')
     }
   ]
-
-
 
 ]

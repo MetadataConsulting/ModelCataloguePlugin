@@ -8,5 +8,6 @@ angular.module 'mc.util.ui.bs', [
   'mc.util.ui.bs.actionButtonSingle'
   'mc.util.ui.bs.actionButtonDropdown'
   'mc.util.ui.bs.menuItemSingle'
+  'mc.util.ui.bs.sidenav'
   'mc.util.ui.bs.menuItemDropdown'
 ]

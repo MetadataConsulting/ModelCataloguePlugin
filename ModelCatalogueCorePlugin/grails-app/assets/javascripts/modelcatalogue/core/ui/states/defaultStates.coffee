@@ -69,7 +69,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
 
     $scope.dataModelHref = (dataModel) ->
-      $state.href 'mc.dashboard', {dataModelId: dataModel.id}
+      $state.href 'mc.resource.list', {dataModelId: dataModel.id, resource: 'dataClass'}
 
     $scope.createDataModel = ->
       messages.prompt("New Data Model", '', {type: 'create-dataModel', create: 'dataModel'}).then (element)->
@@ -123,7 +123,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $scope.resource                 = $stateParams.resource
 
     $scope.dataModelHref = (dataModel) ->
-        $state.href 'mc.dashboard', {dataModelId: dataModel.id}
+        $state.href 'mc.resource.list', {dataModelId: dataModel.id, resource: 'dataClass'}
 
     $scope.createDataModel = ->
         messages.prompt("New Data Model", '', {type: 'create-dataModel', create: 'dataModel'}).then (element)->
@@ -174,7 +174,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
     DEFAULT_ITEMS_PER_PAGE = 10
 
-    $stateProvider.state 'dashboard', {
+    $stateProvider.state 'mc.landing', {
       url: ''
       templateUrl: 'modelcatalogue/core/ui/state/dashboard.html',
       controller: 'mc.core.ui.states.DashboardCtrl'
@@ -187,21 +187,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         ]
     }
 
-    $stateProvider.state 'dashboard2', {
+    $stateProvider.state 'mc.landing2', {
       url: '/'
-      templateUrl: 'modelcatalogue/core/ui/state/dashboard.html',
-      controller: 'mc.core.ui.states.DashboardCtrl'
-      resolve:
-        user: ['security', (security) ->
-          if security.getCurrentUser() then return security.getCurrentUser() else return {displayName: ''}
-        ]
-        statistics: ['catalogue', 'security', '$stateParams', (catalogue, security, $stateParams) ->
-          if security.getCurrentUser()?.id then return catalogue.getStatistics($stateParams.dataModelId) else return ''
-        ]
-    }
-
-    $stateProvider.state 'mc.dashboard', {
-      url: '/dashboard'
       templateUrl: 'modelcatalogue/core/ui/state/dashboard.html',
       controller: 'mc.core.ui.states.DashboardCtrl'
       resolve:
@@ -216,7 +203,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $stateProvider.state 'mc', {
       abstract: true
       url: '/{dataModelId:[0-9]+|catalogue}'
-      templateUrl: 'modelcatalogue/core/ui/state/parent.html'
+      templateUrl: 'modelcatalogue/core/ui/layout.html'
       resolve:
         currentDataModel: ['catalogue', '$rootScope', '$stateParams', '$q', 'catalogueElementResource', (catalogue, $rootScope, $stateParams, $q, catalogueElementResource) ->
           if !$stateParams.dataModelId or $stateParams.dataModelId == 'catalogue'
@@ -644,10 +631,55 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       if $stateParams.resource
         $state.go 'mc.resource.list', resource: $stateParams.resource
       else
-        $state.go 'dashboard'
+        $state.go 'mc.landing'
   ])
 
 .run(['$templateCache', ($templateCache) ->
+
+    $templateCache.put 'modelcatalogue/core/ui/layout.html', '''
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+
+                </button>
+                <a class="navbar-brand" href="#" hide-if-logged-in><span class="fa fa-fw fa-book"></span><span class="hidden-sm">&nbsp; Model Catalogue</span></a>
+            </div>
+
+            <div class="navbar-collapse collapse">
+                <contextual-menu></contextual-menu>
+                <ul class="nav navbar-nav">
+                    <li class="hidden-sm hidden-md hidden-lg" ng-controller="defaultStates.userCtrl">
+                        <a show-if-logged-in ng-click="logout()" type="submit">Log out</a>
+                    </li>
+
+                </ul>
+
+                <form class="navbar-form navbar-right hidden-xs" ng-controller="defaultStates.userCtrl">
+                    <button show-if-logged-in ng-click="logout()" class="btn btn-danger"  type="submit"><i class="glyphicon glyphicon-log-out"></i></button>
+                    <button hide-if-logged-in ng-click="login()"  class="btn btn-primary" type="submit"><i class="glyphicon glyphicon-log-in"></i></button>
+                </form>
+
+                <ng-include src="'modelcatalogue/core/ui/omnisearch.html'"></ng-include>
+
+            </div><!--/.nav-collapse -->
+        </div>
+    </div>
+
+    <div class="container-fluid container-main">
+        <sidenav></sidenav>
+        <div class="row content-row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div id="jserrors"></div>
+                <ui-view></ui-view>
+            </div>
+        </div>
+    </div>
+    '''
 
     $templateCache.put 'modelcatalogue/core/ui/omnisearch.html', '''
     <form show-if-logged-in class="navbar-form navbar-right navbar-input-group search-form hidden-xs" role="search" autocomplete="off" ng-submit="search()" ng-controller="defaultStates.searchCtrl">

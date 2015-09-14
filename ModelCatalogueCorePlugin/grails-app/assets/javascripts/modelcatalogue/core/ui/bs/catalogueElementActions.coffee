@@ -50,7 +50,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       type:       'primary'
       action: ->
         catalogue.select($scope.element).then ->
-          $state.go 'mc.dashboard', { dataModelId: $scope.element.id}, reload: true
+          $state.go 'mc.resource.list', { dataModelId: $scope.element.id, resource: 'dataClass'}, reload: true
           $rootScope.$broadcast 'redrawContextualActions'
     }
 
