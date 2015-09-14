@@ -23,7 +23,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
 
 
   angular.forEach RESOURCES, (resource, index) ->
-    goToResource = ['$scope', '$state', '$stateParams', 'names', 'security', 'messages', 'catalogue', ($scope, $state, $stateParams, names, security, messages, catalogue) ->
+    goToResource = ['$rootScope', '$scope', '$state', '$stateParams', 'names', 'security', 'messages', 'catalogue', ($rootScope, $scope, $state, $stateParams, names, security, messages, catalogue) ->
       return undefined if not security.hasRole('VIEWER')
       return undefined if (resource == 'batch' or resource == 'relationshipType' or resource == 'csvTransformation') and not security.hasRole('CURATOR')
 
@@ -41,7 +41,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
         icon:       catalogue.getIcon(resource)
         position:   index * 100
         label:      label
-        currentStatus: undefined
+        currentStatus: $rootScope.currentDataModel?.status?.toLowerCase()
         action: ->
 
           $state.go 'mc.resource.list', {resource: resource, status: @currentStatus, dataModelId: $stateParams.dataModelId}, {inherit: false}
@@ -121,19 +121,20 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
   ]
 
 
-  actionsProvider.registerActionInRoles 'cart', [actionsProvider.ROLE_NAVIGATION, actionsProvider.ROLE_GLOBAL_ACTION], ['security', '$state', (security, $state) ->
+  actionsProvider.registerActionInRoles 'cart', [actionsProvider.ROLE_SIDENAV, actionsProvider.ROLE_GLOBAL_ACTION], ['security', '$state', '$rootScope',  (security, $state, $rootScope) ->
     return undefined if not security.isUserLoggedIn()
 
     action = {
-      position:   2000
+      position:   10000
       label:      'Favorites'
       icon:       'fa fa-star'
+      active:     $state.current.name == 'mc.favorites'
       action: ->
-        $state.go 'mc.favorites'
+        $state.go 'mc.favorites', {dataModelId: $rootScope.currentDataModel?.id}
 
     }
-#    $scope.$on '$stateChangeSuccess', (ignored, state) ->
-#      action.active = state.name == 'mc.favorites'
+    $rootScope.$on '$stateChangeSuccess', (ignored, state) ->
+      action.active = state.name == 'mc.favorites'
 
     action
   ]
