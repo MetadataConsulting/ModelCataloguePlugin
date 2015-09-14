@@ -1,6 +1,6 @@
 angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
-.controller('mc.core.ui.states.DashboardCtrl', ['$rootScope', '$scope', '$stateParams', '$state', 'security', 'catalogue', 'modelCatalogueApiRoot', 'user', 'messages', 'applicationTitle', 'names', 'statistics', 'catalogueElementResource', ($rootScope, $scope, $stateParams, $state, security, catalogue, modelCatalogueApiRoot, user, messages, applicationTitle, names, statistics, catalogueElementResource) ->
+.controller('mc.core.ui.states.DashboardCtrl', ['$rootScope', '$scope', '$stateParams', '$state', 'security', 'catalogue', 'modelCatalogueApiRoot', 'user', 'messages', 'applicationTitle', 'names', 'statistics', 'catalogueElementResource', ($rootScope, $scope, $stateParams, $state, security, catalogue, modelCatalogueApiRoot, user, messages, applicationTitle, names, statistics) ->
     applicationTitle "Model Catalogue"
 
     angular.extend $scope, statistics
@@ -8,13 +8,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     updateDashboard = (user) ->
       $scope.user  = user
       if user?.id
-        catalogue.getStatistics($stateParams.dataModelId).then (result)->
-          angular.extend $scope, result
-
-        catalogueElementResource('dataModel').list(status: 'active').then (models) ->
-          $scope.list = models
-          $scope.resource = 'dataModel'
-
+        $state.go 'mc.resource.list', resource: 'dataModel', status: undefined
 
     $scope.$on('userLoggedIn', (ignored, user) ->
       if user?.error
@@ -43,25 +37,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       updateDashboard(user)
     else
       $scope.user = user
-      $scope.totalDataElementCount = ''
-      $scope.draftDataElementCount = ''
-      $scope.finalizedDataElementCount = ''
-      $scope.totalDataSetCount = ''
-      $scope.draftDataSetCount = ''
-      $scope.finalizedDataSetCount = ''
-      $scope.totalModelCount = ''
-      $scope.draftModelCount = ''
-      $scope.finalizedModelCount = ''
-      $scope.pendingActionCount = ''
-      $scope.failedActionCount = ''
-      $scope.activeBatchCount = ''
-      $scope.archivedBatchCount = ''
-      $scope.relationshipTypeCount = ''
-      $scope.measurementUnitCount = ''
-      $scope.dataTypeCount = ''
-      $scope.totalAssetCount = ''
-      $scope.draftAssetCount = ''
-      $scope.finalizedAssetCount = ''
 
     $scope.welcome = modelcatalogue.welcome
 
@@ -174,9 +149,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
     DEFAULT_ITEMS_PER_PAGE = 10
 
-    $stateProvider.state 'mc.landing', {
+    $stateProvider.state 'landing', {
       url: ''
-      templateUrl: 'modelcatalogue/core/ui/state/dashboard.html',
+      templateUrl: 'modelcatalogue/core/ui/state/dashboardWithNav.html',
       controller: 'mc.core.ui.states.DashboardCtrl'
       resolve:
         user: ['security', (security) ->
@@ -187,9 +162,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         ]
     }
 
-    $stateProvider.state 'mc.landing2', {
+    $stateProvider.state 'landing2', {
       url: '/'
-      templateUrl: 'modelcatalogue/core/ui/state/dashboard.html',
+      templateUrl: 'modelcatalogue/core/ui/state/dashboardWithNav.html',
       controller: 'mc.core.ui.states.DashboardCtrl'
       resolve:
         user: ['security', (security) ->
@@ -631,12 +606,12 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       if $stateParams.resource
         $state.go 'mc.resource.list', resource: $stateParams.resource
       else
-        $state.go 'mc.landing'
+        $state.go 'landing'
   ])
 
 .run(['$templateCache', ($templateCache) ->
 
-    $templateCache.put 'modelcatalogue/core/ui/layout.html', '''
+    $templateCache.put 'modelcatalogue/core/ui/layout.html', layout = '''
     <div class="navbar navbar-default navbar-fixed-top" role="navigation">
         <div class="container-fluid">
             <div class="navbar-header">
@@ -796,7 +771,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
   '''
 
     #language=HTML
-    $templateCache.put 'modelcatalogue/core/ui/state/dashboard.html', '''
+    $templateCache.put 'modelcatalogue/core/ui/state/dashboard.html', dashboard = '''
     		<!-- Jumbotron -->
   <div hide-if-logged-in>
 		<div class="jumbotron">
@@ -813,198 +788,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 		<div id="info" class="row" ng-bind-html="welcome.info"></div>
 </div>
 
-<div show-if-logged-in>
-    <div ng-if="currentDataModel">
-      <div class="row">
-        <div class="col-lg-4 col-sm-6 col-md-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <a ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataClass'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cubes fa-5x fa-fw"></i></a>
-                        </div>
-                        <div class="col-xs-9 text-right">
-                            <div><a id="dataClasssLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataClass'})" ui-sref-opts="{inherit: false}">Finalized Data Classes</a> {{finalizedDataClassCount}} </div>
-                            <div show-for-role="VIEWER"><a id="draftDataClassLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataClass', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Data Classes</a> {{draftDataClassCount}}</div>
-
-                        </div>
-                    </div>
-                </div>
-                <a show-for-role="CURATOR" ng-click="create('dataClass')">
-                    <div class="panel-footer">
-                        <span class="pull-left">Create Data Class</span>
-                        <span class="pull-right"><i class="fa fa-magic"></i></span>
-                        <div class="clearfix"></div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div class="col-lg-4 col-sm-6 col-md-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <a ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataElement'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cube fa-5x fa-fw"></i></a>
-                        </div>
-                        <div class="col-xs-9 text-right">
-                            <div><a id="modelsLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataElement'})" ui-sref-opts="{inherit: false}">Finalized Data Elements</a> {{finalizedDataElementCount}} </div>
-                            <div show-for-role="VIEWER"><a id="modelsLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataElement', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Data Elements</a> {{draftDataElementCount}}</div>
-                        </div>
-                    </div>
-                </div>
-                <a show-for-role="CURATOR" ng-click="create('dataElement')">
-                    <div class="panel-footer">
-                        <span class="pull-left">Create Data Element</span>
-                        <span class="pull-right"><i class="fa fa-magic"></i></span>
-                        <div class="clearfix"></div>
-                    </div>
-                </a>
-            </div>
-        </div>
-
-        <div class="col-lg-4 col-sm-6 col-md-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <a ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataType'})" ui-sref-opts="{inherit: false}"><i class="fa fa-th-large fa-5x fa-fw"></i></a>
-                        </div>
-                        <div class="col-xs-9 text-right">
-                            <div><a id="dataTypesLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataType'})" ui-sref-opts="{inherit: false}">Finalized Data Types</a> {{finalizedDataTypeCount}} </div>
-                            <div show-for-role="VIEWER"><a id="draftDataTypesLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'dataType', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Data Types</a> {{draftDataTypeCount}} </div>
-                        </div>
-                    </div>
-                </div>
-                <a show-for-role="CURATOR" ng-click="create('dataType')">
-                    <div class="panel-footer">
-                        <span class="pull-left" >Create Data Type</span>
-                        <span class="pull-right"><i class="fa fa-magic"></i></span>
-                        <div class="clearfix"></div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div class="col-lg-4 col-sm-6 col-md-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <a ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'measurementUnit'})" ui-sref-opts="{inherit: false}"><i class="fa fa-tachometer fa-5x fa-fw"></i></a>
-                        </div>
-                        <div class="col-xs-9 text-right">
-                            <div><a id="modelsLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'measurementUnit'})" ui-sref-opts="{inherit: false}">Finalized Measurement Units</a> {{finalizedMeasurementUnitCount}} </div>
-                            <div show-for-role="VIEWER"><a id="modelsLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'measurementUnit', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Measurement Units</a> {{draftMeasurementUnitCount}} </div>
-                        </div>
-                    </div>
-                </div>
-                <a show-for-role="CURATOR" ng-click="create('measurementUnit')">
-                    <div class="panel-footer">
-                        <span class="pull-left">Create Measurement Unit</span>
-                        <span class="pull-right"><i class="fa fa-magic"></i></span>
-                        <div class="clearfix"></div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div class="col-lg-4 col-sm-6 col-md-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <a ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'asset'})" ui-sref-opts="{inherit: false}"><i class="fa fa-file-code-o fa-5x fa-fw"></i></a>
-                        </div>
-                        <div class="col-xs-9 text-right">
-                            <div><a id="modelsLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'asset'})" ui-sref-opts="{inherit: false}">Finalized Assets</a> {{finalizedAssetCount}} </div>
-                            <div show-for-role="VIEWER"><a id="modelsLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'asset', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Assets</a> {{draftAssetCount}}</div>
-
-                        </div>
-                    </div>
-                </div>
-                <a show-for-role="CURATOR" ng-click="create('asset')">
-                    <div class="panel-footer">
-                        <span class="pull-left">Create Asset</span>
-                        <span class="pull-right"><i class="fa fa-magic"></i></span>
-                        <div class="clearfix"></div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div show-for-role="ADMIN" class="col-lg-4 col-sm-6 col-md-4">
-              <div class="panel panel-default">
-                  <div class="panel-heading">
-                      <div class="row">
-                          <div class="col-xs-3">
-                              <a ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'relationshipType'})" ui-sref-opts="{inherit: false}"><i class="fa fa-link fa-5x fa-fw"></i></a>
-                          </div>
-                          <div class="col-xs-9 text-right">
-                              <div><a id="modelsLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'relationshipType'})" ui-sref-opts="{inherit: false}"> Relationship Types </a> {{relationshipTypeCount}}</div>
-                          </div>
-                      </div>
-                  </div>
-                  <a ng-click="create('relationshipType')">
-                      <div class="panel-footer">
-                          <span class="pull-left">Create Relationship Type</span>
-                          <span class="pull-right"><i class="fa fa-magic"></i></span>
-                          <div class="clearfix"></div>
-                      </div>
-                  </a>
-              </div>
-          </div>
-        <div show-for-role="CURATOR" class="col-lg-4 col-sm-6 col-md-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <a ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'csvTransformation'})" ui-sref-opts="{inherit: false}"><i class="fa fa-long-arrow-right fa-5x fa-fw"></i></a>
-                        </div>
-                        <div class="col-xs-9 text-right">
-                            <div><a id="batchesLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'csvTransformation'})" ui-sref-opts="{inherit: false}">CSV Transformations</a> {{transformationsCount}}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <a ng-click="create('csvTransformation')">
-                    <div class="panel-footer">
-                        <span class="pull-left">Create CSV Transformation</span>
-                        <span class="pull-right"><i class="fa fa-magic"></i></span>
-                        <div class="clearfix"></div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div show-for-role="CURATOR" class="col-lg-4 col-sm-6 col-md-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <a ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'batch'})" ui-sref-opts="{inherit: false}"><i class="fa fa-flash fa-5x fa-fw"></i></a>
-                        </div>
-                        <div class="col-xs-9 text-right">
-                            <div><a id="batchesLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'batch'})" ui-sref-opts="{inherit: false}">Active Batches</a> {{activeBatchCount}}</div>
-                            <div><a id="archivedbatchesLink" ui-sref="mc.resource.list({dataModelId: currentDataModel.id, resource: 'batch', status: 'archived'})" ui-sref-opts="{inherit: false}">Archived Batches</a> {{archivedBatchCount}}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <a ng-click="create('batch')">
-                    <div class="panel-footer">
-                        <span class="pull-left">Create Batch</span>
-                        <span class="pull-right"><i class="fa fa-magic"></i></span>
-                        <div class="clearfix"></div>
-                    </div>
-                </a>
-            </div>
-        </div>
-      </div>
-    </div>
-    <div ng-if="!currentDataModel">
-    <div class="row" ng-if="resource == 'dataModel'">
-      <div class="col-md-12">
-        <infinite-list heading="'Data Models'" on-create-requested="createDataModel()" list="list" no-actions="true" item-href="dataModelHref($element)"></infinite-list>
-      </div>
-    </div>
-    </div>
-</div>
     <div class="row">
         <div class="col-lg-12 col-sm-12 col-md-12">
             <div class="panel panel-default">
@@ -1037,6 +820,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         </div>
     </div>
   '''
+
+    $templateCache.put 'modelcatalogue/core/ui/state/dashboardWithNav.html', layout.replace('<ui-view></ui-view>', dashboard)
 
 ])
 .config(['$provide', ($provide) ->

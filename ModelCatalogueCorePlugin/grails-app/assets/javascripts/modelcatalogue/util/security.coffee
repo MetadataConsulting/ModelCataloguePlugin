@@ -106,7 +106,7 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages',
         logout: ->
           $http(method: httpMethod, url: logoutUrl).then ->
             currentUser = null
-            $state.go 'mc.landing'
+            $state.go 'landing'
 
         requireUser: ->
           $http(method: 'GET', url: userUrl).then(handleUserResponse).then (result)->
@@ -202,7 +202,7 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages',
       , ->
         loginShown = false
         messages.warning('You are trying to access protected resource', if security.isUserLoggedIn() then 'Please, sign in as different user' else 'Please, sign in').noTimeout()
-        $state.go 'mc.landing'
+        $state.go 'landing'
 
 
   $rootScope.$security = security

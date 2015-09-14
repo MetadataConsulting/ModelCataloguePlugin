@@ -37,19 +37,19 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
         label = 'Data Classes'
 
       action = {
-        active:     $stateParams.resource == resource
+        active:     $stateParams.resource == resource || $stateParams.resource == 'dataModel' and $state.current?.name?.startsWith('landing')
         icon:       catalogue.getIcon(resource)
         position:   index * 100
         label:      label
-        currentStatus: $rootScope.currentDataModel?.status?.toLowerCase()
+        currentStatus: if resource isnt 'dataModel' then $rootScope.currentDataModel?.status?.toLowerCase() else undefined
         action: ->
 
           $state.go 'mc.resource.list', {resource: resource, status: @currentStatus, dataModelId: $stateParams.dataModelId}, {inherit: false}
       }
 
-      $scope.$on '$stateChangeSuccess', (ignored, ignoredToState, toParams) ->
-        action.active = toParams.resource == resource
-        action.currentStatus = toParams.status if toParams.hasOwnProperty('status')
+      $scope.$on '$stateChangeSuccess', (ignored, state, toParams) ->
+        action.active = toParams.resource == resource || toParams.resource == 'dataModel' and state.current?.name?.startsWith('landing')
+        action.currentStatus = toParams.status if toParams.hasOwnProperty('status') and resource isnt 'dataModel'
 
       action
     ]
