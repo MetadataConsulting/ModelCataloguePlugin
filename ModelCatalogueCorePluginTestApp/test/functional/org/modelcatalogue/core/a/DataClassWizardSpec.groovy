@@ -148,12 +148,9 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         waitFor {
             menuItem('currentDataModel').text().contains('XMLSchema')
         }
-        waitFor {
-            menuItem('sidenav-dataClass', 'sidenav').displayed
-        }
 
         when:
-        menuItem('sidenav-dataClass', 'sidenav').click()
+        go "#/catalogue/dataClass/all?status=draft"
 
         then:
         waitFor {
