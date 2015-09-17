@@ -27,7 +27,7 @@ class ClassificationReportsController {
     def gereportDoc() {
         Classification classification = Classification.get(params.id)
 
-        def assetName="$classification.name report as ${params.jasperFormat} "
+        def assetName="$classification.name report as MS Word Document"
         def assetFileName="${classification.name}-${classification.status}-${classification.version}.${params.jasperFormat}"
 
 

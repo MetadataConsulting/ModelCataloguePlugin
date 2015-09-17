@@ -8,7 +8,6 @@ import org.modelcatalogue.core.ClassificationService
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.InitCatalogueService
 import org.modelcatalogue.core.ValueDomain
-import org.modelcatalogue.core.gel.ClassificationToDocxExporter
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 
 class ClassificationToDocxExporterSpec extends IntegrationSpec {
