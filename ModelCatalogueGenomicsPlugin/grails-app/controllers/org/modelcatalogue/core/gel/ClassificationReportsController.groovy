@@ -27,29 +27,20 @@ class ClassificationReportsController {
     def gereportDoc() {
         Classification classification = Classification.get(params.id)
 
-        def assetName="$classification.name report as MS Word Document"
-        def assetFileName="${classification.name}-${classification.status}-${classification.version}.${params.jasperFormat}"
-
-
-        def assetPendingDesc="Your classification report  will be available in this asset soon. Use Refresh action to reload"
-        def assetFinalizedDesc="Your classification is ready. Use Download button to download it."
-        def assetErrorDesc="Error generating classification report"
-        def assetMimeType="application/${params.jasperFormat}"
-
-        def assetId=storeAssetAsDocx(classification,assetName,assetMimeType,assetPendingDesc,assetFinalizedDesc,assetErrorDesc,assetFileName)
+        def assetId=storeAssetAsDocx(classification)
 
         response.setHeader("X-Asset-ID",assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
     }
 
 
-    private def storeAssetAsDocx(Classification classification,String assetName=null,String mimeType="application/octet-stream",String assetPendingDesc="",String assetFinalizedDesc="",String assetErrorDesc="",String originalFileName="unknown"){
+    private def storeAssetAsDocx(Classification classification){
         Asset asset = new Asset(
-                name:assetName ,
-                originalFileName: originalFileName,
-                description: assetPendingDesc,
+                name: "$classification.name report as MS Word Document",
+                originalFileName: "${classification.name}-${classification.status}-${classification.version}.docx",
+                description: "Your classification report  will be available in this asset soon. Use Refresh action to reload",
                 status: ElementStatus.PENDING,
-                contentType: mimeType,
+                contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                 size: 0
                 )
 
@@ -71,7 +62,7 @@ class ClassificationReportsController {
                    
 
                     updated.status = ElementStatus.FINALIZED
-                    updated.description = assetFinalizedDesc
+                    updated.description = "Your classification is ready. Use Download button to download it."
                     updated.save(flush: true, failOnError: true)
                 } catch (e) {
                     log.error "Exception of type ${e.class} with id=${id}", e
@@ -79,7 +70,7 @@ class ClassificationReportsController {
                     updated.refresh()
                     updated.status = ElementStatus.FINALIZED
                     updated.name = updated.name + " - Error during generation"
-                    updated.description = assetErrorDesc+":$e"
+                    updated.description = "Error generating classification report" +":$e"
                     updated.save(flush: true, failOnError: true)
                 }
             }
