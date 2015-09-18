@@ -55,7 +55,7 @@ class ClassificationReportsController {
                 Asset updated = Asset.get(id)
                 try {
                     //do the hard work
-                    assetService.storeAssetWithSteam(updated, mimeType) { OutputStream out ->
+                    assetService.storeAssetWithSteam(updated, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",) { OutputStream out ->
                         new ClassificationToDocxExporter(Classification.get(classificationId)).export(out)
                     }
 

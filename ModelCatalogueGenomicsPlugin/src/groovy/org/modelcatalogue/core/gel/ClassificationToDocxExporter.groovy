@@ -99,15 +99,17 @@ class ClassificationToDocxExporter {
 
                         log.debug "Exporting value domain $domain to Word Document"
 
-                        paragraph {
-                            Map<String, Object> attrs = [ref: "${domain.id}"]
-                            attrs.putAll(DOMAIN_NAME)
-                            text attrs, domain.name
-                            if (domain.classifications) {
-                                text ' '
+                        Map<String, Object> attrs = [ref: "${domain.id}"]
+                        attrs.putAll(DOMAIN_NAME)
+
+                        heading2 attrs, domain.name
+
+                        if (domain.classifications) {
+                            paragraph {
                                 text DOMAIN_CLASSIFICATION_NAME, "(${domain.classifications.first().name})"
                             }
                         }
+
                         if (domain.description) {
                             paragraph {
                                 text domain.description
@@ -194,18 +196,11 @@ class ClassificationToDocxExporter {
         log.debug "Exporting model $model to Word Document"
 
         builder.with {
-            paragraph(style: "heading${Math.min(level + 1, 6)}"){
-                text model.name, ref: "${model.getId()}"
-            }
-
             if (model.getId() in processedModels) {
-                paragraph {
-                    text "See ${model.name}", url: "#${model.getId()}"
-                }
-                return
+                "heading${Math.min(level + 1, 6)}" model.name, ref: "${model.getId()}"
+            } else {
+                "heading${Math.min(level + 1, 6)}" model.name
             }
-
-            processedModels << model.getId()
 
             paragraph {
                 if (model.description) {
@@ -257,9 +252,23 @@ class ClassificationToDocxExporter {
                             }
                             cell {
                                 if (dataElement.valueDomain) {
-                                    Map<String, Object> attrs = [url: "#${dataElement.valueDomain.id}"]
+                                    Map<String, Object> attrs = [url: "#${dataElement.valueDomain.id}", font: [bold: true]]
                                     attrs.putAll(CELL_TEXT)
                                     text attrs, dataElement.valueDomain.name
+                                    if (dataElement.valueDomain.dataType?.instanceOf(EnumeratedType)) {
+                                        text '\n\n'
+                                        text 'Enumerations', font: [italic: true]
+                                        text '\n'
+                                        if (dataElement.valueDomain.dataType.enumerations.size() <= 10) {
+                                            for (entry in dataElement.valueDomain.dataType.enumerations) {
+                                                text "${entry.key ?: ''}", font: [bold: true]
+                                                text ":"
+                                                text "${entry.value ?: ''}"
+                                                text "\n"
+                                            }
+                                        }
+
+                                    }
                                 }
                             }
                             cell {
@@ -276,14 +285,21 @@ class ClassificationToDocxExporter {
 
             if (!(classificationId in model.classifications*.getId())) {
                 // do not continue down the tree if the model does not belong to the classification
+                processedModels << model.getId()
                 return
             }
 
-            if (model.countParentOf()) {
-                for (Model child in model.parentOf) {
-                    printModel(builder, child, level + 1)
+
+
+            if (!(model.getId() in processedModels)) {
+                if (model.countParentOf()) {
+                    for (Model child in model.parentOf) {
+                        printModel(builder, child, level + 1)
+                    }
                 }
             }
+
+            processedModels << model.getId()
         }
     }
 
