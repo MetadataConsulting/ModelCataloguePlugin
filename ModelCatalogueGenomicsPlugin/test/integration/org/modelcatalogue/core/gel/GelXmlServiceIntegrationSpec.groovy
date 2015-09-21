@@ -2,16 +2,16 @@ package org.modelcatalogue.core.gel
 
 
 import grails.test.spock.IntegrationSpec
-import org.modelcatalogue.core.AbstractIntegrationSpec
 
-//import org.modelcatalogue.core.AbstractIntegrationSpec;
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.RelationshipService;
 import org.modelcatalogue.core.RelationshipType;
 import org.modelcatalogue.core.RelationshipDefinition
+import org.modelcatalogue.core.util.test.TestDataHelper
+import spock.lang.Shared
 
-class GelXmlServiceIntegrationSpec extends AbstractIntegrationSpec {
+class GelXmlServiceIntegrationSpec extends IntegrationSpec {
     
     Model parent1
     Model parent2
@@ -86,5 +86,18 @@ class GelXmlServiceIntegrationSpec extends AbstractIntegrationSpec {
         def result=gelXmlService.printXmlModelShredder(parent1)
         then :
         assert result!=null
+    }
+
+
+    // from AbstractIntegrationSpec
+
+    @Shared
+    def fixtureLoader, fixtures, initCatalogueService, sessionFactory
+
+    def loadFixtures(){
+        TestDataHelper.initFreshDb(sessionFactory, 'testdata.sql') {
+            initCatalogueService.initDefaultRelationshipTypes()
+            fixtures = fixtureLoader.load("assets/*", "batches/*", "dataTypes/*", "enumeratedTypes/*", "measurementUnits/*", "models/*", "relationshipTypes/*", "classifications/*").load("actions/*", "valueDomains/*", "users/*").load("dataElements/*").load("extensions/*", "mappings/*").load("csvTransformations/*")
+        }
     }
 }
