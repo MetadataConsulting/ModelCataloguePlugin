@@ -17,7 +17,7 @@ class ClassificationToDocxExporterSpec extends IntegrationSpec {
     InitCatalogueService initCatalogueService
 
     def setup() {
-        initCatalogueService.initCatalogue(true)
+        initCatalogueService.initDefaultRelationshipTypes()
     }
 
     @Rule TemporaryFolder temporaryFolder

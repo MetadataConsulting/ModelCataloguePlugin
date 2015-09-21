@@ -70,16 +70,12 @@ class GelXmlServiceIntegrationSpec extends IntegrationSpec {
         assert result.contains("<xs:element name='${grandChild.name.toLowerCase()}'")
         
         when :
-        result=null
-        try{
-            parent1.ext=[:]
-            result=gelXmlService.printXSDModel(parent1)
-        } catch(e){
-           e.printStackTrace()
-           e.printStackTrace()
-        }
+        parent1.ext=[:]
+        gelXmlService.printXSDModel(parent1)
         then :
-        assert result==null
+        Exception e = thrown(Exception)
+        e.message
+        e.message.contains 'missing required field for xsd form'
     }
 
 
