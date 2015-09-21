@@ -50,6 +50,7 @@ class ClassificationToDocxExporterSpec extends IntegrationSpec {
             for (int i in 1.10) {
                 new ValueDomain(name: "Test Value Domain #${i}").save(failOnError: true)
             }
+            domains = ValueDomain.list()
         }
 
         builder.build {
