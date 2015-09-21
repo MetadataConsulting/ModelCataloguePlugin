@@ -47,7 +47,7 @@ class ClassificationToDocxExporter {
 
         log.info "Exporting classification $classification to Word Document"
 
-        DocumentBuilder builder = new WordDocumentBuilder(outputStream)
+        DocumentBuilder builder = new GelWordDocumentBuilder(outputStream)
 
         def customTemplate = {
             'document' font: [family: 'Calibri'], margin: [left: 20, right: 10]

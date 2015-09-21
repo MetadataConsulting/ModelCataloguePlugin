@@ -2,6 +2,7 @@ package org.modelcatalogue.core.gel
 
 
 import grails.test.spock.IntegrationSpec
+import org.modelcatalogue.core.AbstractIntegrationSpec
 
 //import org.modelcatalogue.core.AbstractIntegrationSpec;
 import org.modelcatalogue.core.DataElement
@@ -10,7 +11,7 @@ import org.modelcatalogue.core.RelationshipService;
 import org.modelcatalogue.core.RelationshipType;
 import org.modelcatalogue.core.RelationshipDefinition
 
-class GelXmlServiceIntegrationSpec extends IntegrationSpec {
+class GelXmlServiceIntegrationSpec extends AbstractIntegrationSpec {
     
     Model parent1
     Model parent2
@@ -24,7 +25,7 @@ class GelXmlServiceIntegrationSpec extends IntegrationSpec {
     DataElement de3
 
     def setup(){
-        //loadFixtures()
+        loadFixtures()
         parent1 = new Model(name: 'book').save(failOnError: true)
         parent2 = new Model(name: 'chapter1').save(failOnError: true)
         child1 = new Model(name: 'chapter2').save(failOnError: true)

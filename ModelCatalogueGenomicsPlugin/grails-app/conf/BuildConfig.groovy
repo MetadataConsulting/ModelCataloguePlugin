@@ -39,7 +39,7 @@ grails.project.dependency.resolution = {
         // runtime 'mysql:mysql-connector-java:5.1.27'
         //----- Jasper Reports specific dependencies
         //from the bintray
-        compile 'com.craigburke.document:word:0.4.10-fix27'
+        compile 'com.craigburke.document:word:0.4.10-fix31'
     }
 
     plugins {
