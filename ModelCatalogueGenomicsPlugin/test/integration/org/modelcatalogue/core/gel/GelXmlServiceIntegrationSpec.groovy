@@ -4,6 +4,7 @@ package org.modelcatalogue.core.gel
 import grails.test.spock.IntegrationSpec
 
 import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.InitCatalogueService
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.RelationshipService;
 import org.modelcatalogue.core.RelationshipType;
@@ -20,12 +21,13 @@ class GelXmlServiceIntegrationSpec extends IntegrationSpec {
     Model grandChild
     GelXmlService gelXmlService
     RelationshipService relationshipService
+    InitCatalogueService initCatalogueService
     DataElement de1
     DataElement de2
     DataElement de3
 
     def setup(){
-        loadFixtures()
+        initCatalogueService.initDefaultRelationshipTypes()
         parent1 = new Model(name: 'book').save(failOnError: true)
         parent2 = new Model(name: 'chapter1').save(failOnError: true)
         child1 = new Model(name: 'chapter2').save(failOnError: true)
@@ -86,18 +88,5 @@ class GelXmlServiceIntegrationSpec extends IntegrationSpec {
         def result=gelXmlService.printXmlModelShredder(parent1)
         then :
         assert result!=null
-    }
-
-
-    // from AbstractIntegrationSpec
-
-    @Shared
-    def fixtureLoader, fixtures, initCatalogueService, sessionFactory
-
-    def loadFixtures(){
-        TestDataHelper.initFreshDb(sessionFactory, 'testdata.sql') {
-            initCatalogueService.initDefaultRelationshipTypes()
-            fixtures = fixtureLoader.load("assets/*", "batches/*", "dataTypes/*", "enumeratedTypes/*", "measurementUnits/*", "models/*", "relationshipTypes/*", "classifications/*").load("actions/*", "valueDomains/*", "users/*").load("dataElements/*").load("extensions/*", "mappings/*").load("csvTransformations/*")
-        }
     }
 }
