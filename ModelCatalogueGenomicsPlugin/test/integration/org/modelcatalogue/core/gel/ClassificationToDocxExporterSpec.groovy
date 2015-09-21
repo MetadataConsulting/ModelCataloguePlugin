@@ -46,6 +46,12 @@ class ClassificationToDocxExporterSpec extends IntegrationSpec {
         Random random = new Random()
         List<ValueDomain> domains = ValueDomain.list()
 
+        if (!domains) {
+            for (int i in 1.10) {
+                new ValueDomain(name: "Test Value Domain #${i}").save(failOnError: true)
+            }
+        }
+
         builder.build {
             classification(name: 'C4CTDE') {
                 description "This is a classification for testing ClassificationToDocxExporter"
