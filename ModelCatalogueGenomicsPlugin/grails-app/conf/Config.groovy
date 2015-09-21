@@ -8,7 +8,16 @@ log4j = {
     //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
     //}
 
-    debug 'org.modelcatalogue.core.gel'
+       debug 'grails.app.services.org.modelcatalogue'
+       debug 'grails.app.controllers.org.modelcatalogue'
+
+       debug 'org.modelcatalogue.core.dataarchitect.xsd.XSDImporter'
+
+       debug 'org.modelcatalogue.core.util.builder'
+       debug 'org.modelcatalogue.core.publishing'
+       debug 'org.modelcatalogue.core.util.test'
+       debug 'org.modelcatalogue.core.gel'
+       debug 'org.modelcatalogue.discourse'
 
     error  'org.codehaus.groovy.grails.web.servlet',  //  controllers
            'org.codehaus.groovy.grails.web.pages', //  GSP
