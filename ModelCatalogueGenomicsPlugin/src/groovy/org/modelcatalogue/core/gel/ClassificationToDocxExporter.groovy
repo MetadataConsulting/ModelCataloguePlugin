@@ -189,7 +189,7 @@ class ClassificationToDocxExporter {
 
 
     private void printModel(DocumentBuilder builder, Model model, int level) {
-        if (level == 1 && model.countChildOf()) {
+        if (level == 1 && model.childOf.any { CatalogueElement it -> it.classifications.any { it.id == classificationId } }) {
             return
         }
 
