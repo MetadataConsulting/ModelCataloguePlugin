@@ -399,7 +399,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     def index(Integer max) {
         handleParams(max)
 
-        if(params.status && params.status.toLowerCase() != 'finalized' && !modelCatalogueSecurityService.hasRole('VIEWER')) {
+        if(params.status && !(params.status.toLowerCase() in ['finalized', 'deprecated']) && !modelCatalogueSecurityService.hasRole('VIEWER')) {
             notAuthorized()
             return
         }
@@ -422,7 +422,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        if (!modelCatalogueSecurityService.hasRole('VIEWER') && element.status != ElementStatus.FINALIZED) {
+        if (!modelCatalogueSecurityService.hasRole('VIEWER') && !(element.status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED])) {
             notAuthorized()
             return
         }
