@@ -45,7 +45,7 @@ class GelWordDocumentBuilder extends WordDocumentBuilder {
 //        }
 //
 
-        wordDocument.generateDocumentPart(BasicDocumentPartTypes.STYLES) {
+        def styles = {
             w.styles {
                 def normal = ['w:val': 'Normal']
                 w.style 'w:type': 'paragraph', 'w:styleId': 'Normal', 'w:default': '1', {
@@ -94,6 +94,10 @@ class GelWordDocumentBuilder extends WordDocumentBuilder {
                 }
             }
         }
+
+        wordDocument.generateDocumentPart(BasicDocumentPartTypes.STYLES, styles)
+        // commnent out if stylesWithEffects.xml is breaking the document
+        wordDocument.generateDocumentPart(BasicDocumentPartTypes.STYLES_WITH_EFFECTS, styles)
 
     }
 }
