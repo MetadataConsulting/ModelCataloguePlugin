@@ -653,20 +653,26 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     <div ng-if="resource == 'model' &amp;&amp; $stateParams.display == undefined">
 
       <div class="row">
-
-        <div class="col-md-4">
-          <span class="contextual-actions-right">
-             <contextual-actions size="sm" icon-only="true" no-colors="true" role="list"></contextual-actions>
-          </span>
-          <h2>
-            <small ng-class="catalogue.getIcon('model')"></small>&nbsp;<span ng-show="$stateParams.status">{{natural($stateParams.status)}}</span> Models
-          </h2>
-          <catalogue-element-treeview list="list" descend="'parentOf'" id="model-treeview"></catalogue-element-treeview>
+        <div class="col-md-3 split-view-left" resizable="{'handles': 'e', 'mirror': '.split-view-right', 'maxWidth': 1000, 'minWidth': 200, 'windowWidthCorrection': 31}">
+          <div class="split-view-content">
+            <div class="row">
+              <span class="contextual-actions-right">
+                   <contextual-actions size="sm" icon-only="true" no-colors="true" role="list"></contextual-actions>
+              </span>
+              <div class="col-md-12">
+                <h3>
+                    <small ng-class="catalogue.getIcon('model')"></small>&nbsp;<span ng-show="$stateParams.status">{{natural($stateParams.status)}}</span> Models
+                </h3>
+                <catalogue-element-treeview list="list" descend="'parentOf'" id="model-treeview"></catalogue-element-treeview>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="col-md-8" ng-if="element">
-          <catalogue-element-view element="element" property="property"></catalogue-element-view>
+        <div class="col-md-9 split-view-right" ng-if="element">
+          <div class="split-view-content">
+            <catalogue-element-view element="element" property="property"></catalogue-element-view>
+          </div>
         </div>
-        <hr/>
       </div>
     </div>
   '''
