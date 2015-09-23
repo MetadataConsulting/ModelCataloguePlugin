@@ -1,22 +1,23 @@
 package org.modelcatalogue.core.gel
 
-import com.craigburke.document.builder.WordDocumentBuilder
 import com.craigburke.document.core.builder.DocumentBuilder
 import groovy.util.logging.Log4j
 import org.hibernate.FetchMode
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
-import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.PrimitiveType
+import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
-import org.modelcatalogue.core.ValueDomain
 
 import java.text.SimpleDateFormat
 
 @Log4j
-class ClassificationToDocxExporter {
+class DataModelToDocxExporter {
 
     private static final Map<String, Object> HEADER_CELL =  [background: '#F2F2F2']
     private static final Map<String, Object> HEADER_CELL_TEXT =  [font: [color: '#29BDCA', size: 12, bold: true, family: 'Times New Roman']]
@@ -27,25 +28,25 @@ class ClassificationToDocxExporter {
     private static final Map<String, Object> DOMAIN_CLASSIFICATION_NAME =  [font: [color: '#999999', size: 12, bold: true]]
 
 
-    final Long classificationId
-    final Set<ValueDomain> usedValueDomains = new TreeSet<ValueDomain>([compare: { ValueDomain a, ValueDomain b ->
+    final Long dataModelId
+    final Set<DataType> usedDataTypes = new TreeSet<DataType>([compare: { DataType a, DataType b ->
         a?.name <=> b?.name
-    }] as Comparator<ValueDomain>)
+    }] as Comparator<DataType>)
     final Set<Long> processedModels = new HashSet<Long>()
 
 
-    ClassificationToDocxExporter(Classification classification) {
-        classificationId = classification.getId()
+    DataModelToDocxExporter(DataModel dataModel) {
+        dataModelId = dataModel.getId()
     }
 
     void export(OutputStream outputStream) {
 
-        usedValueDomains.clear()
+        usedDataTypes.clear()
         processedModels.clear()
 
-        Classification classification = Classification.get(classificationId)
+        DataModel dataModel = DataModel.get(dataModelId)
 
-        log.info "Exporting classification $classification to Word Document"
+        log.info "Exporting dataModel $dataModel to Word Document"
 
         DocumentBuilder builder = new GelWordDocumentBuilder(outputStream)
 
@@ -74,92 +75,92 @@ class ClassificationToDocxExporter {
 
         builder.create {
             document(template: customTemplate) {
-                paragraph classification.name, style: 'title',  align: 'center'
+                paragraph dataModel.name, style: 'title',  align: 'center'
                 paragraph(style: 'subtitle', align: 'center') {
-                    text "${classification.status}"
+                    text "${dataModel.status}"
                     lineBreak()
                     text SimpleDateFormat.dateInstance.format(new Date())
                 }
-                if (classification.description) {
-                    paragraph(style: 'classification.description', margin: [left: 50, right: 50]) {
-                        text classification.description
+                if (dataModel.description) {
+                    paragraph(style: 'dataModel.description', margin: [left: 50, right: 50]) {
+                        text dataModel.description
                     }
                 }
                 pageBreak()
 
-                for (Model model in getModelsForClassification(classification.id)) {
+                for (DataClass model in getModelsForClassification(dataModel.id)) {
                     printModel(builder, model, 1)
                 }
 
-                if (usedValueDomains) {
+                if (usedDataTypes) {
                     pageBreak()
-                    heading1 'Value Domains'
+                    heading1 'Data Types'
 
-                    for (ValueDomain domain in usedValueDomains) {
+                    for (DataType dataType in usedDataTypes) {
 
-                        log.debug "Exporting value domain $domain to Word Document"
+                        log.debug "Exporting data type $dataType to Word Document"
 
-                        Map<String, Object> attrs = [ref: "${domain.id}"]
+                        Map<String, Object> attrs = [ref: "${dataType.id}"]
                         attrs.putAll(DOMAIN_NAME)
 
-                        heading2 attrs, domain.name
+                        heading2 attrs, dataType.name
 
-                        if (domain.classifications) {
+                        if (dataType.dataModels) {
                             paragraph {
-                                text DOMAIN_CLASSIFICATION_NAME, "(${domain.classifications.first().name})"
+                                text DOMAIN_CLASSIFICATION_NAME, "(${dataType.dataModels.first().name})"
                             }
                         }
 
-                        if (domain.description) {
+                        if (dataType.description) {
                             paragraph {
-                                text domain.description
+                                text dataType.description
                             }
                         }
-                        if (domain.unitOfMeasure || domain.dataType || domain.rule) {
+                        if (hasExtraInformation(dataType)) {
                             table(columns: [1,4], border: [size: 0], font: [color: '#5C5C5C']) {
-                                if (domain.dataType) {
-                                    row {
-                                        cell 'Data Type'
-                                        cell {
-                                            text domain.dataType.name
-                                            if (domain.dataType.description) {
-                                                text ' ('
-                                                text domain.dataType.description
-                                                ')'
-                                            }
-                                        }
-                                    }
-                                }
-
-                                if (domain.unitOfMeasure) {
+                                if (dataType.instanceOf(PrimitiveType) && dataType.measurementUnit) {
                                     row {
                                         cell 'Unit of Measure'
                                         cell {
-                                            text domain.unitOfMeasure.name
-                                            if (domain.unitOfMeasure.description) {
+                                            text dataType.measurementUnit.name
+                                            if (dataType.measurementUnit.description) {
                                                 text ' ('
-                                                text domain.unitOfMeasure.description
+                                                text dataType.measurementUnit.description
                                                 ')'
                                             }
                                         }
                                     }
                                 }
 
-                                if (domain.regexDef) {
+                                if (dataType.instanceOf(ReferenceType) && dataType.dataClass) {
+                                    row {
+                                        cell 'Data Class'
+                                        cell {
+                                            text dataType.dataClass.name
+                                            if (dataType.dataClass.description) {
+                                                text ' ('
+                                                text dataType.dataClass.description
+                                                ')'
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (dataType.regexDef) {
                                     row {
                                         cell 'Regular Expression'
-                                        cell domain.regexDef
+                                        cell dataType.regexDef
                                     }
-                                } else if (domain.rule) {
+                                } else if (dataType.rule) {
                                     row {
                                         cell 'Rule'
-                                        cell domain.rule
+                                        cell dataType.rule
                                     }
                                 }
 
                             }
 
-                            if (domain.dataType?.instanceOf(EnumeratedType)) {
+                            if (dataType?.instanceOf(EnumeratedType)) {
                                 paragraph(font:  [color: '#999999', bold: true]){
                                     text 'Enumerations'
                                 }
@@ -169,7 +170,7 @@ class ClassificationToDocxExporter {
                                         cell ENUM_HEADER_CELL_TEXT, 'Code'
                                         cell ENUM_HEADER_CELL_TEXT, 'Description'
                                     }
-                                    for (Map.Entry<String, String> entry in domain.dataType.enumerations) {
+                                    for (Map.Entry<String, String> entry in dataType.enumerations) {
                                         row {
                                             cell entry.key
                                             cell entry.value
@@ -184,12 +185,16 @@ class ClassificationToDocxExporter {
             }
         }
 
-        log.debug "Classification $classification exported to Word Document"
+        log.debug "Data Model $dataModel exported to Word Document"
+    }
+
+    private boolean hasExtraInformation(DataType dataType) {
+        (dataType.instanceOf(PrimitiveType) && dataType.measurementUnit) || (dataType.instanceOf(ReferenceType) && dataType.dataClass) || dataType.rule
     }
 
 
-    private void printModel(DocumentBuilder builder, Model model, int level) {
-        if (level == 1 && model.childOf.any { CatalogueElement it -> it.classifications.any { it.id == classificationId } }) {
+    private void printModel(DocumentBuilder builder, DataClass model, int level) {
+        if (level == 1 && model.childOf.any { CatalogueElement it -> it.dataModels.any { it.id == dataModelId } }) {
             return
         }
 
@@ -237,8 +242,8 @@ class ClassificationToDocxExporter {
                     }
                     for (Relationship dataElementRelationship in model.containsRelationships) {
                         DataElement dataElement = dataElementRelationship.destination
-                        if (dataElement.valueDomain) {
-                            usedValueDomains << dataElement.valueDomain
+                        if (dataElement.dataType) {
+                            usedDataTypes << dataElement.dataType
                         }
                         row {
                             cell {
@@ -251,16 +256,16 @@ class ClassificationToDocxExporter {
                                 text CELL_TEXT, getMultiplicity(dataElementRelationship)
                             }
                             cell {
-                                if (dataElement.valueDomain) {
-                                    Map<String, Object> attrs = [url: "#${dataElement.valueDomain.id}", font: [bold: true]]
+                                if (dataElement.dataType) {
+                                    Map<String, Object> attrs = [url: "#${dataElement.dataType.id}", font: [bold: true]]
                                     attrs.putAll(CELL_TEXT)
-                                    text attrs, dataElement.valueDomain.name
-                                    if (dataElement.valueDomain.dataType?.instanceOf(EnumeratedType)) {
+                                    text attrs, dataElement.dataType.name
+                                    if (dataElement.dataType.instanceOf(EnumeratedType)) {
                                         text '\n\n'
                                         text 'Enumerations', font: [italic: true]
                                         text '\n'
-                                        if (dataElement.valueDomain.dataType.enumerations.size() <= 10) {
-                                            for (entry in dataElement.valueDomain.dataType.enumerations) {
+                                        if (dataElement.dataType.enumerations.size() <= 10) {
+                                            for (entry in dataElement.dataType.enumerations) {
                                                 text "${entry.key ?: ''}", font: [bold: true]
                                                 text ":"
                                                 text "${entry.value ?: ''}"
@@ -283,8 +288,8 @@ class ClassificationToDocxExporter {
                 }
             }
 
-            if (!(classificationId in model.classifications*.getId())) {
-                // do not continue down the tree if the model does not belong to the classification
+            if (!(dataModelId in model.dataModels*.getId())) {
+                // do not continue down the tree if the model does not belong to the dataModel
                 processedModels << model.getId()
                 return
             }
@@ -293,7 +298,7 @@ class ClassificationToDocxExporter {
 
             if (!(model.getId() in processedModels)) {
                 if (model.countParentOf()) {
-                    for (Model child in model.parentOf) {
+                    for (DataClass child in model.parentOf) {
                         printModel(builder, child, level + 1)
                     }
                 }
@@ -304,18 +309,18 @@ class ClassificationToDocxExporter {
     }
 
     private static String getSameAs(CatalogueElement element) {
-        if (!element.classifications) {
+        if (!element.dataModels) {
             return "${element.name}"
         }
-        "${element.name} (${element.ext['Data Item No'] ? "${element.ext['Data Item No']} from " : ''}${element.classifications.first().name})"
+        "${element.name} (${element.ext['Data Item No'] ? "${element.ext['Data Item No']} from " : ''}${element.dataModels.first().name})"
     }
 
     private static String getMultiplicity(Relationship relationship) {
         "${relationship.ext['Min Occurs'] ?: 0}..${relationship.ext['Max Occurs'] ?: 'unbounded'}"
     }
 
-    private static Collection<Model>  getModelsForClassification(Long classificationId) {
-        def results = Model.createCriteria().list {
+    private static Collection<DataClass>  getModelsForClassification(Long classificationId) {
+        def results = DataClass.createCriteria().list {
             fetchMode "extensions", FetchMode.JOIN
             fetchMode "outgoingRelationships.extensions", FetchMode.JOIN
             fetchMode "outgoingRelationships.destination.classifications", FetchMode.JOIN

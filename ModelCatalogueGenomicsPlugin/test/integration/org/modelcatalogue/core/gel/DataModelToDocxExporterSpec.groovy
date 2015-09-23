@@ -4,16 +4,18 @@ import grails.test.spock.IntegrationSpec
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.core.Classification
-import org.modelcatalogue.core.ClassificationService
+import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.DataModelService
+import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.InitCatalogueService
 import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 
-class ClassificationToDocxExporterSpec extends IntegrationSpec {
+class DataModelToDocxExporterSpec extends IntegrationSpec {
 
     ElementService elementService
-    ClassificationService classificationService
+    DataModelService dataModelService
     InitCatalogueService initCatalogueService
 
     def setup() {
@@ -25,10 +27,10 @@ class ClassificationToDocxExporterSpec extends IntegrationSpec {
     def "export model to docx"() {
         when:
         File file = temporaryFolder.newFile("${System.currentTimeMillis()}.docx")
-        Classification classification = buildTestClassification()
+        DataModel dataModel = buildTestDataModel()
 
 
-        new ClassificationToDocxExporter(classification).export(file.newOutputStream())
+        new DataModelToDocxExporter(dataModel).export(file.newOutputStream())
 
 
         println file.absolutePath
@@ -40,19 +42,19 @@ class ClassificationToDocxExporterSpec extends IntegrationSpec {
 
 
 
-    private Classification buildTestClassification() {
-        DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
+    private DataModel buildTestDataModel() {
+        DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
 
         Random random = new Random()
-        List<ValueDomain> domains = ValueDomain.list()
+        List<DataType> dataTypes = DataType.list()
 
-        if (!domains) {
+        if (!dataTypes) {
             for (int i in 1..10) {
-                ValueDomain domain = new ValueDomain(name: "Test Value Domain #${i}").save(failOnError: true)
-                Classification classification = new Classification(name: "Classification ${System.currentTimeMillis()}").save(failOnError: true)
-                classification.addToClassifies domain
+                DataType domain = new DataType(name: "Test Data Type #${i}").save(failOnError: true)
+                DataModel classification = new DataModel(name: "Data Model ${System.currentTimeMillis()}").save(failOnError: true)
+                classification.addToDeclares domain
             }
-            domains = ValueDomain.list()
+            dataTypes = ValueDomain.list()
         }
 
         builder.build {
@@ -66,11 +68,11 @@ class ClassificationToDocxExporterSpec extends IntegrationSpec {
                         for (int j in 1..10) {
                             dataElement name: "Model $i Data Element $j", {
                                 description "This is a description for Model $i Data Element $j"
-                                ValueDomain domain = domains[random.nextInt(domains.size())]
-                                while (!domain.classifications) {
-                                    domain = domains[random.nextInt(domains.size())]
+                                DataType domain = dataTypes[random.nextInt(dataTypes.size())]
+                                while (!domain.dataModels) {
+                                    domain = dataTypes[random.nextInt(dataTypes.size())]
                                 }
-                                valueDomain name: domain.name, classification: domain.classifications.first().name
+                                dataType name: domain.name, classification: domain.dataModels.first().name
                             }
                         }
                         for (int j in 1..3) {
@@ -80,11 +82,11 @@ class ClassificationToDocxExporterSpec extends IntegrationSpec {
                                 for (int k in 1..3) {
                                     dataElement name: "Model $i Child Model $j Data Element $k", {
                                         description "This is a description for Model $i Child Model $j Data Element $k"
-                                        ValueDomain domain = domains[random.nextInt(domains.size())]
-                                        while (!domain.classifications) {
-                                            domain = domains[random.nextInt(domains.size())]
+                                        DataType domain = dataTypes[random.nextInt(dataTypes.size())]
+                                        while (!domain.dataModels) {
+                                            domain = dataTypes[random.nextInt(dataTypes.size())]
                                         }
-                                        valueDomain name: domain.name, classification: domain.classifications.first().name
+                                        dataType name: domain.name, classification: domain.dataModels.first().name
                                     }
                                 }
                             }
@@ -96,7 +98,7 @@ class ClassificationToDocxExporterSpec extends IntegrationSpec {
             }
         }
 
-        return Classification.findByName('C4CTDE')
+        return DataModel.findByName('C4CTDE')
 
     }
 

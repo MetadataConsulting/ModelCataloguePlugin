@@ -1,17 +1,11 @@
 package org.modelcatalogue.core.gel
 
-import org.modelcatalogue.core.DataClass
-import org.modelcatalogue.core.DataType
-
 import java.util.concurrent.ExecutorService
 
-import org.hibernate.FetchMode
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.AssetService
 import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.RelationshipType
-import org.modelcatalogue.core.SecurityService;
-import org.modelcatalogue.core.ValueDomain
+import org.modelcatalogue.core.SecurityService
 import org.modelcatalogue.core.api.ElementStatus;
 import org.modelcatalogue.core.audit.AuditService
 /**
@@ -62,7 +56,7 @@ class ClassificationReportsController {
                 try {
                     //do the hard work
                     assetService.storeAssetWithSteam(updated, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",) { OutputStream out ->
-                        new ClassificationToDocxExporter(DataModel.get(classificationId)).export(out)
+                        new DataModelToDocxExporter(DataModel.get(classificationId)).export(out)
                     }
 
                    
