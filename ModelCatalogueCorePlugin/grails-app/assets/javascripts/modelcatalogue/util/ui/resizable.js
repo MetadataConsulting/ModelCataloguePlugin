@@ -35,17 +35,36 @@ angular.module('mc.util.ui.resizable', [])
                   jQuery(opts.mirror).data('resizestartwidth', jQuery(opts.mirror).outerWidth())
               });
               element.on('resize', function(event, ui){
-                  var delta;
+                  var delta, newWidth;
                   delta = ui.originalSize.width - ui.size.width;
                   if (!delta) {
-                      return;
+                      event.preventDefault();
+                      event.stopPropagation();
+                      return false;
                   }
-                  jQuery(opts.mirror).width(jQuery(opts.mirror).data('resizestartwidth') + delta - 1);
+                  newWidth = jQuery(opts.mirror).data('resizestartwidth') + delta - 1;
+
+                  if (newWidth < (opts.mirrorMinWidth ? opts.mirrorMinWidth : 200)) {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      return false;
+                  }
+
+                  jQuery(opts.mirror).width(newWidth);
                   event.stopPropagation();
               });
               jQuery($window).on('resize', function(){
-                  var windowWidth = jQuery($window).innerWidth(), elementWidth = element.outerWidth();
-                  jQuery(opts.mirror).width(windowWidth - elementWidth - (opts.windowWidthCorrection ? opts.windowWidthCorrection : 1));
+                  var windowWidth = jQuery($window).innerWidth(), elementWidth = element.outerWidth(),
+                      newWidth = windowWidth - elementWidth - (opts.windowWidthCorrection ? opts.windowWidthCorrection : 1);
+
+                  if (newWidth < (opts.mirrorMinWidth ? opts.mirrorMinWidth : 200)) {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      $window.resizeTo((opts.mirrorMinWidth ? opts.mirrorMinWidth : 200), $window.height());
+                      return false;
+                  }
+
+                  jQuery(opts.mirror).width(newWidth);
               })
           }
         }

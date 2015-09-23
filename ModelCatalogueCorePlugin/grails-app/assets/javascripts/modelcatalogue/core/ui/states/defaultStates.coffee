@@ -653,7 +653,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     <div ng-if="resource == 'model' &amp;&amp; $stateParams.display == undefined">
 
       <div class="row">
-        <div class="col-md-3 split-view-left" resizable="{'handles': 'e', 'mirror': '.split-view-right', 'maxWidth': 1000, 'minWidth': 200, 'windowWidthCorrection': 31}">
+        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 split-view-left" resizable="{'handles': 'e', 'mirror': '.split-view-right', 'maxWidth': 1000, 'minWidth': 200, 'windowWidthCorrection': 31}">
           <div class="split-view-content">
             <div class="row">
               <span class="contextual-actions-right">
@@ -668,7 +668,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
             </div>
           </div>
         </div>
-        <div class="col-md-9 split-view-right" ng-if="element">
+        <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 split-view-right" ng-if="element">
           <div class="split-view-content">
             <catalogue-element-view element="element" property="property"></catalogue-element-view>
           </div>
