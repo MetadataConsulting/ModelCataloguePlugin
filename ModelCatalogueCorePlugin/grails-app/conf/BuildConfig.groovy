@@ -37,10 +37,8 @@ grails.project.dependency.resolution = {
         //mavenRepo "http://download.java.net/maven/2/"
         //mavenRepo "http://repository.jboss.com/maven2/"
         mavenRepo 'http://jcenter.bintray.com'
-		mavenRepo'http://dl.bintray.com/csfercoci/maven'
 		mavenRepo "http://dl.bintray.com/metadata/model-catalogue"
         //mavenRepo "http://dl.dropbox.com/u/326301/repository"
-		mavenRepo 'http://jasperreports.sourceforge.net/maven2'		
 		//mavenRepo "http://www.biojava.org/download/maven/"
 
 

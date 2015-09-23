@@ -12,14 +12,14 @@ cetiModule.run [ '$templateCache', ($templateCache) ->
             ng-dblclick="element.show()"
 
           >
-          <span ng-if="!element.elementType"><a class="btn btn-link"><span class="glyphicon glyphicon-ban-circle"></span></a> No Data</span>
-          <a ng-if="currentDescend &amp;&amp; element.elementType" class="btn btn-link" ng-click="collapseOrExpand(element)">
-            <span class="glyphicon glyphicon-folder-close"  ng-if="element.$$collapsed &amp;&amp; element.$$numberOfChildren &amp;&amp; !element.$$loadingChildren"></span>
-            <span class="glyphicon glyphicon-folder-open"   ng-if="!element.$$collapsed &amp;&amp; element.$$numberOfChildren &amp;&amp; !element.$$loadingChildren"></span>
+          <span ng-if="!element.elementType"><a class="catalogue-element-treeview-icon btn btn-link"><span class="fa fa-fw fa-ban"></span></a> No Data</span>
+          <a ng-if="currentDescend &amp;&amp; element.elementType" class="catalogue-element-treeview-icon  btn btn-link" ng-click="collapseOrExpand(element)">
+            <span class="fa fa-fw fa-folder"  ng-if="element.$$collapsed &amp;&amp; element.$$numberOfChildren &amp;&amp; !element.$$loadingChildren"></span>
+            <span class="fa fa-fw fa-folder-open"   ng-if="!element.$$collapsed &amp;&amp; element.$$numberOfChildren &amp;&amp; !element.$$loadingChildren"></span>
             <span ng-class="element.getIcon()"              ng-if="!element.$$numberOfChildren"></span>
-            <span class="glyphicon glyphicon-refresh"       ng-if="element.$$loadingChildren" ></span>
+            <span class="fa fa-fw fa-refresh"       ng-if="element.$$loadingChildren" ></span>
           </a>
-          <a ng-if="!currentDescend &amp;&amp; element.elementType" class="btn btn-link" ng-click="select(element)">
+          <a ng-if="!currentDescend &amp;&amp; element.elementType" class="catalogue-element-treeview-icon btn btn-link" ng-click="select(element)">
             <span ng-class="element.getIcon()"></span>
           </a>
           <span class="catalogue-element-treeview-name" ng-class="{'text-warning': element.status == 'DRAFT', 'text-info': element.status == 'PENDING', 'text-danger': (element.status == 'DEPRECATED' || element.undone)}" ng-click="select(element)">{{element.$$localName || element.name}}<small class="text-muted" ng-if="element.$$localName"> {{element.name}}</small><small class="text-muted"> {{element.versionNumber}}</small></span>
@@ -30,7 +30,7 @@ cetiModule.run [ '$templateCache', ($templateCache) ->
         <catalogue-element-treeview-item element="child" descend="nextDescend" repeat="repeat" ng-repeat="child in element.$$children track by $index" root-id="rootId"></catalogue-element-treeview-item>
         <li ng-if="element.$$numberOfChildren > element.$$children.length" class="catalogue-element-treeview-item">
           <span class="catalogue-element-treeview-labels" ng-click="element.$$showMore()">
-            <a class="btn btn-link catalogue-element-treeview-show-more"><span class="glyphicon glyphicon-chevron-down"></span></a> <a class="text-muted">Show more</a>
+            <a class="catalogue-element-treeview-icon btn btn-link catalogue-element-treeview-show-more"><span class="fa fa-fw fa-chevron-down"></span></a> <a class="text-muted">Show more</a>
           </span>
         </li>
       </ul>

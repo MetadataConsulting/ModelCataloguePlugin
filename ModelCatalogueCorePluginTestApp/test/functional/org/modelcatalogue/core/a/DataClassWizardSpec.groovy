@@ -18,13 +18,10 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         then:
         at ModalTreeViewPage
         waitFor(120) {
-            !$('#jserrors').displayed && viewTitle.displayed
+            !$('#jserrors').displayed && $('h3').displayed
         }
         waitFor {
-            viewTitle.text()?.trim() == 'Data Classes'
-        }
-        waitFor {
-            subviewTitle.text()?.trim()  == 'NHIC Datasets FINALIZED'
+            $('h3').text()?.trim().contains('Data Classes')
         }
 
         waitFor {
@@ -219,7 +216,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         then:
         at ModalTreeViewPage
         waitFor(120) {
-            viewTitle.displayed
+            $('h3').displayed
         }
 
         when: 'I click the add data class button'

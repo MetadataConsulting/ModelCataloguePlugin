@@ -3,12 +3,14 @@ package org.modelcatalogue.core.gel
 
 import grails.test.spock.IntegrationSpec
 
-//import org.modelcatalogue.core.AbstractIntegrationSpec;
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataClass
+import org.modelcatalogue.core.InitCatalogueService
 import org.modelcatalogue.core.RelationshipService;
 import org.modelcatalogue.core.RelationshipType;
 import org.modelcatalogue.core.RelationshipDefinition
+import org.modelcatalogue.core.util.test.TestDataHelper
+import spock.lang.Shared
 
 class GelXmlServiceIntegrationSpec extends IntegrationSpec {
     
@@ -19,12 +21,13 @@ class GelXmlServiceIntegrationSpec extends IntegrationSpec {
     DataClass grandChild
     GelXmlService gelXmlService
     RelationshipService relationshipService
+    InitCatalogueService initCatalogueService
     DataElement de1
     DataElement de2
     DataElement de3
 
     def setup(){
-        //loadFixtures()
+        initCatalogueService.initDefaultRelationshipTypes()
         parent1 = new DataClass(name: 'book').save(failOnError: true)
         parent2 = new DataClass(name: 'chapter1').save(failOnError: true)
         child1 = new DataClass(name: 'chapter2').save(failOnError: true)
@@ -67,16 +70,12 @@ class GelXmlServiceIntegrationSpec extends IntegrationSpec {
         assert result.contains("<xs:element name='${grandChild.name.toLowerCase()}'")
         
         when :
-        result=null
-        try{
-            parent1.ext=[:]
-            result=gelXmlService.printXSDModel(parent1)
-        } catch(e){
-           e.printStackTrace()
-           e.printStackTrace()
-        }
+        parent1.ext=[:]
+        gelXmlService.printXSDModel(parent1)
         then :
-        assert result==null
+        Exception e = thrown(Exception)
+        e.message
+        e.message.contains 'missing required field for xsd form'
     }
 
 

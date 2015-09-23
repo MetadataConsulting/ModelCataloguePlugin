@@ -131,6 +131,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         $scope.elementSelectedInTree    = true
         $rootScope.$$lastModels ?= {}
         $rootScope.$$lastModels[getLastModelsKey()] = element: element, elementSelectedInTree: true, property: 'contains'
+        $rootScope.$broadcast 'redrawContextualActions'
 
       $scope.$on 'newVersionCreated', (ignored, element) ->
         if element
@@ -700,7 +701,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
     #language=HTML
     $templateCache.put 'modelcatalogue/core/ui/state/list.html', '''
-    <div ng-if="(resource != 'model' &amp;&amp;  resource != 'dataClass' &amp;&amp; resource != 'dataModel')|| $stateParams.display != undefined">
+    <div ng-if="(resource != 'dataClass' &amp;&amp;  resource != 'dataClass' &amp;&amp; resource != 'dataModel')|| $stateParams.display != undefined">
       <span class="contextual-actions-right">
         <contextual-actions size="sm" no-colors="true" role="list"></contextual-actions>
       </span>
@@ -708,21 +709,28 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       <infinite-list  ng-if="$stateParams.display == 'grid'"  list="list"></infinite-list>
       <infinite-table ng-if="$stateParams.display != 'grid'"  list="list" columns="columns" ></infinite-table>
     </div>
-    <div ng-if="(resource == 'dataClass' || resource == 'model')&amp;&amp; $stateParams.display == undefined">
+    <div ng-if="(resource == 'dataClass' || resource == 'dataClass')&amp;&amp; $stateParams.display == undefined">
       <div class="row">
-        <div class="col-md-4">
-          <span class="contextual-actions-right">
-             <contextual-actions size="sm" icon-only="true" no-colors="true" role="list"></contextual-actions>
-          </span>
-          <h2>
-            <small ng-class="catalogue.getIcon('dataClass')"></small>&nbsp;<span ng-show="$stateParams.status">{{natural($stateParams.status)}}</span> Data Classes
-          </h2>
-          <catalogue-element-treeview list="list" descend="'parentOf'" id="model-treeview"></catalogue-element-treeview>
+        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 split-view-left" resizable="{'handles': 'e', 'mirror': '.split-view-right', 'maxWidth': 1000, 'minWidth': 200, 'windowWidthCorrection': 31}">
+          <div class="split-view-content">
+            <div class="row">
+              <span class="contextual-actions-right">
+                   <contextual-actions size="sm" icon-only="true" no-colors="true" role="list"></contextual-actions>
+              </span>
+              <div class="col-md-12">
+                <h3>
+                    <small ng-class="catalogue.getIcon('dataClass')"></small>&nbsp;<span ng-show="$stateParams.status">{{natural($stateParams.status)}}</span> Data Classes
+                </h3>
+                <catalogue-element-treeview list="list" descend="'parentOf'" id="model-treeview"></catalogue-element-treeview>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="col-md-8" ng-if="element">
-          <catalogue-element-view element="element" property="property"></catalogue-element-view>
+        <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 split-view-right" ng-if="element">
+          <div class="split-view-content">
+            <catalogue-element-view element="element" property="property"></catalogue-element-view>
+          </div>
         </div>
-        <hr/>
       </div>
     </div>
     <div class="row" ng-if="resource == 'dataModel'">

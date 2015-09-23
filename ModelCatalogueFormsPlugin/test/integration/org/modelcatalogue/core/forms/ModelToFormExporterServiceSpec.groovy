@@ -39,6 +39,7 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
     public static final String ITEM_FILE_NAME_OVERRIDEN = "File Name Overriden"
     public static final String ITEM_FILE_QUESTION = "Attachment"
     public static final String ITEM_FILE_QUTESTION_NUMBER = "10"
+    public static final String ITEM_FILE_RESPONSE_LABEL = "file"
     public static final String ITEM_RADIO_NAME = "Radio Item"
     public static final String ITEM_RADIO_NAME_NORMALIZED = "Form_1_Section_1_Radio_Item"
     public static final String ITEM_SINGLE_SELECT_NAME = "Single Select Name"
@@ -193,7 +194,7 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
                     dataElement(name: ITEM_SINGLE_SELECT_NAME) {
                         dataType(name: 'Multi Type', enumerations: [A: 'Alpha', B: 'Beta', O: 'Omega']) {
                             ext EXT_ITEM_INSTRUCTIONS, '''
-                                <span class="MT"></span> Multi Type
+                                <span data-id="Form 12" data-type="Multi Type"> </span> Multi Type
                             '''
                         }
 
@@ -234,6 +235,7 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
         fileItem.dataType == DataType.FILE
         fileItem.questionNumber == ITEM_FILE_QUTESTION_NUMBER
         fileItem.leftItemText == ITEM_FILE_QUESTION
+        fileItem.responseLabel == ITEM_FILE_RESPONSE_LABEL
 
         when:
         Item radioItem = section1.items[ITEM_RADIO_NAME_NORMALIZED]
@@ -254,7 +256,8 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
 
         then:
         singleSelectItem
-        singleSelectItem.rightItemText == '<span class="MT"></span> Multi Type'
+
+        singleSelectItem.rightItemText == '<span data-id="Form 12" data-type="Multi Type"> </span> Multi Type'
         singleSelectItem.defaultValue == ITEM_SINGLE_SELECT_DEFAULT_VALUE
 
         when:
