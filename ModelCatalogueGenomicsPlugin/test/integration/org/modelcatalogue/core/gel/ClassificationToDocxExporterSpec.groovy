@@ -47,8 +47,10 @@ class ClassificationToDocxExporterSpec extends IntegrationSpec {
         List<ValueDomain> domains = ValueDomain.list()
 
         if (!domains) {
-            for (int i in 1.10) {
-                new ValueDomain(name: "Test Value Domain #${i}").save(failOnError: true)
+            for (int i in 1..10) {
+                ValueDomain domain = new ValueDomain(name: "Test Value Domain #${i}").save(failOnError: true)
+                Classification classification = new Classification(name: "Classification ${System.currentTimeMillis()}").save(failOnError: true)
+                classification.addToClassifies domain
             }
             domains = ValueDomain.list()
         }

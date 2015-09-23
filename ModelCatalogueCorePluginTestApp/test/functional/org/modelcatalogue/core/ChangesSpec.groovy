@@ -122,11 +122,11 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
             $('span.catalogue-element-treeview-name', text: "admin 1").displayed
         }
         waitFor {
-            $('.glyphicon-folder-close').parent('a').displayed
+            $('.fa-folder').parent('a').displayed
         }
 
         when:
-        noStale({$('.glyphicon-folder-close').parent('a')}) {
+        noStale({$('.fa-folder').parent('a')}) {
             it.click()
         }
 

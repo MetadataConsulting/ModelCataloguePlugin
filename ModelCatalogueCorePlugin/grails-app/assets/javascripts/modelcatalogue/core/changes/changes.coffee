@@ -4,7 +4,9 @@ changes = angular.module('mc.core.changes', ['mc.core.ui.columns', 'mc.util.ui.a
 
 changes.run ['$templateCache', ($templateCache) ->
   $templateCache.put 'modelcatalogue/core/ui/catalogueElementView/history-tab.html', '''
-     <catalogue-element-treeview  no-resize id="{{tab.name}}-table" list="tab.value" descend="'changes'"></catalogue-element-treeview>
+      <div class="history-tab">
+        <catalogue-element-treeview  no-resize id="{{tab.name}}-table" list="tab.value" descend="'changes'"></catalogue-element-treeview>
+      </div>
     '''
 ]
 
