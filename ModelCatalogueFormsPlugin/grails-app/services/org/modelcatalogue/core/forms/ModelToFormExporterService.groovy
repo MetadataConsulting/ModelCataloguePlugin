@@ -308,7 +308,7 @@ class ModelToFormExporterService {
                     if (last.responseType == ResponseType.FILE) {
                         last.setResponseLabel(RESPONSE_LABEL_FILE)
                     } else {
-                        CatalogueElement labelSource = dataType ?: valueDomain ?: dataElement
+                        CatalogueElement labelSource = dataType ?: dataElement
                         last.setResponseLabel(alphaNumNoSpaces(labelSource.name + "_" + labelSource.versionNumber))
                     }
                 }
@@ -329,9 +329,9 @@ class ModelToFormExporterService {
             //add a logic here to colect span ID and his associated datatype 
         }
         
-        ValueDomain valueDomain=element.valueDomain
-        DataType dataType=valueDomain?.dataType 
-        def regex=valueDomain?.regexDef?:''
+
+        DataType dataType=element?.dataType
+        def regex=dataType?.regexDef?:''
         def dataTypeName=transformDataType(dataType)
         def defaultID=(spanID==null?defaultSpanID:spanID)
         
@@ -344,7 +344,7 @@ class ModelToFormExporterService {
         
         if(StringUtils.isNotEmpty(regex))
         {
-            regex = " data-regex=\"" +  XmlUtil.escapeXml(valueDomain.regexDef) + "\"";
+            regex = " data-regex=\"" +  XmlUtil.escapeXml(dataType.regexDef) + "\"";
         }
         
         
