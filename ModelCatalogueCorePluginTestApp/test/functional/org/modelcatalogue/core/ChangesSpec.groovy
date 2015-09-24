@@ -119,7 +119,7 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
             $('#history-tab .catalogue-element-treeview-list-container.no-resize')
         }
         waitFor {
-            $('span.catalogue-element-treeview-name', text: "admin 1").displayed
+            $('span.catalogue-element-treeview-name', text: startsWith("admin")).displayed
         }
         waitFor {
             $('.fa-folder').parent('a').displayed

@@ -158,7 +158,9 @@ environments {
                 genOptions: [indent_start:0, indent_level:4, quote_keys: false, space_colon: false, beautify: false, ascii_only: false, inline_script:false]
         ]
 
-        grails.assets.minifyJs = true
+        // uncomment for debugging failing functional tests on Travis CI
+        grails.assets.bundle=false
+        grails.assets.minifyJs = false
 
         if (System.properties["mc.config.location"]) {
             // for running
