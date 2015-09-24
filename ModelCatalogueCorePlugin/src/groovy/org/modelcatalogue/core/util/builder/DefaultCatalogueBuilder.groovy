@@ -580,6 +580,11 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         if (DataModel.isAssignableFrom(element.domain)) {
             return
         }
+
+        if (element.classification) {
+            return
+        }
+
         context.withContextElement(DataModel) {
             RelationshipProxy relationshipProxy = new RelationshipProxy(RelationshipType.declarationType.name, it, element, [:])
             element.addToPendingRelationships(relationshipProxy)

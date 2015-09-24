@@ -3,13 +3,11 @@ package org.modelcatalogue.core.gel
 import grails.test.spock.IntegrationSpec
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
-import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.InitCatalogueService
-import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 
 class DataModelToDocxExporterSpec extends IntegrationSpec {
@@ -54,7 +52,7 @@ class DataModelToDocxExporterSpec extends IntegrationSpec {
                 DataModel classification = new DataModel(name: "Data Model ${System.currentTimeMillis()}").save(failOnError: true)
                 classification.addToDeclares domain
             }
-            dataTypes = ValueDomain.list()
+            dataTypes = DataType.list()
         }
 
         builder.build {
@@ -72,7 +70,7 @@ class DataModelToDocxExporterSpec extends IntegrationSpec {
                                 while (!domain.dataModels) {
                                     domain = dataTypes[random.nextInt(dataTypes.size())]
                                 }
-                                dataType name: domain.name, classification: domain.dataModels.first().name
+                                dataType name: domain.name, dataModel: domain.dataModels.first().name
                             }
                         }
                         for (int j in 1..3) {
@@ -86,7 +84,7 @@ class DataModelToDocxExporterSpec extends IntegrationSpec {
                                         while (!domain.dataModels) {
                                             domain = dataTypes[random.nextInt(dataTypes.size())]
                                         }
-                                        dataType name: domain.name, classification: domain.dataModels.first().name
+                                        dataType name: domain.name, dataModel: domain.dataModels.first().name
                                     }
                                 }
                             }

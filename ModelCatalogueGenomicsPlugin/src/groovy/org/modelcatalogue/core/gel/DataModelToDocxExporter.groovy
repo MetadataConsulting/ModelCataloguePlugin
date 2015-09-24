@@ -326,7 +326,7 @@ class DataModelToDocxExporter {
             fetchMode "outgoingRelationships.destination.classifications", FetchMode.JOIN
             incomingRelationships {
                 and {
-                    eq("relationshipType", RelationshipType.classificationType)
+                    eq("relationshipType", RelationshipType.declarationType)
                     source { eq('id', classificationId) }
                 }
             }
