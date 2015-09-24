@@ -105,7 +105,7 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
     '''
 
     $templateCache.put 'modelcatalogue/core/ui/catalogueElementView.html', '''
-    <div class="row">
+    <div class="row catalogue-element-view">
       <span class="contextual-actions-right">
         <contextual-actions size="sm" no-colors="true" role="item"></contextual-actions>
       </span>
