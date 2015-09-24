@@ -61,8 +61,22 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
         addItemsFromList(list)
         nextFun = list.next
         setLastListToRootScope(list)
+        $scope.$evalAsync ->
+          loadMoreIfNeeded()
+
+
+      loadMoreIfNeeded = ->
+        return if not $scope.list.total > $scope.list.$$children.length
+        return if $scope.$$showingMore
+        showMore = $element.find('.catalogue-element-treeview-root-show-more')
+        return if showMore.hasClass '.hide'
+        root = $element.find('.catalogue-element-treeview-root-list-root')
+        if showMore.offset()?.top < root.offset()?.top + 3 * root.height()
+          $scope.showMore()
 
       $scope.showMore = () ->
+        return if $scope.$$showingMore
+        $scope.$$showingMore = true
         return unless $scope.list.total > $scope.list.$$children.length
         params = {}
         params.classification = $stateParams.classification if $stateParams.classification
@@ -70,6 +84,9 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
         nextFun(null, params).then (list) ->
           addItemsFromList(list)
           nextFun = list.next
+          $scope.$$showingMore = false
+          loadMoreIfNeeded()
+
 
       if $scope.mode == 'list'
         onListChange $scope.list, getLastListFromRootScope($scope.list?.base)
@@ -83,6 +100,8 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
         $scope.$on 'catalogueElementDeleted', refreshList
         $scope.$on 'newVersionCreated', refreshList
         $scope.$on 'catalogueElementUpdated', refreshList
+
+        $element.find('.catalogue-element-treeview-root-list-root').on 'scroll', loadMoreIfNeeded
     ]
   }
 ]

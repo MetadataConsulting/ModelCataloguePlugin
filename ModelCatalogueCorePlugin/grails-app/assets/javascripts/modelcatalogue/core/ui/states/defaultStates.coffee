@@ -701,7 +701,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
     #language=HTML
     $templateCache.put 'modelcatalogue/core/ui/state/list.html', '''
-    <div ng-if="(resource != 'dataClass' &amp;&amp;  resource != 'dataClass' &amp;&amp; resource != 'dataModel')|| $stateParams.display != undefined">
+    <div class="row" ng-if="(resource != 'dataClass' &amp;&amp;  resource != 'dataClass' &amp;&amp; resource != 'dataModel')|| $stateParams.display != undefined">
       <span class="contextual-actions-right">
         <contextual-actions size="sm" no-colors="true" role="list"></contextual-actions>
       </span>
@@ -711,7 +711,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     </div>
     <div ng-if="(resource == 'dataClass' || resource == 'dataClass')&amp;&amp; $stateParams.display == undefined">
       <div class="row">
-        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 split-view-left" resizable="{'handles': 'e', 'mirror': '.split-view-right', 'maxWidth': 1000, 'minWidth': 200, 'windowWidthCorrection': 31}">
+        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 split-view-left" resizable="{'handles': 'e', 'mirror': '.split-view-right', 'maxWidth': 1000, 'minWidth': 200, 'windowWidthCorrection': 91}">
           <div class="split-view-content">
             <div class="row">
               <span class="contextual-actions-right">
@@ -743,7 +743,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
     #language=HTML
     $templateCache.put 'modelcatalogue/core/ui/state/favorites.html', '''
-    <div>
+    <div class="row">
       <span class="contextual-actions-right">
         <contextual-actions size="sm" no-colors="true" role="list"></contextual-actions>
       </span>

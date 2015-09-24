@@ -60,7 +60,7 @@ angular.module('mc.util.ui.resizable', [])
                   if (newWidth < (opts.mirrorMinWidth ? opts.mirrorMinWidth : 200)) {
                       event.preventDefault();
                       event.stopPropagation();
-                      $window.resizeTo((opts.mirrorMinWidth ? opts.mirrorMinWidth : 200), $window.height());
+                      $window.resizeTo((opts.mirrorMinWidth ? opts.mirrorMinWidth : 200), jQuery($window).height());
                       return false;
                   }
 
