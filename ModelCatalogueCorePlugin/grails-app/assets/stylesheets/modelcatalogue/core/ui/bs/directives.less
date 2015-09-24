@@ -64,10 +64,20 @@ blockquote, .dl-table-item-cell, .pp-table-property-value {
   border-radius: 4px;
 }
 
+.catalogue-element-treeview-link, .catalogue-element-treeview-version-number {
+  display: none;
+}
+
 .catalogue-element-treeview-labels {
   white-space: nowrap;
   overflow-x: hidden;
   text-overflow: ellipsis;
+
+  &:hover {
+    .catalogue-element-treeview-link, .catalogue-element-treeview-version-number {
+      display: inline-block;
+    }
+  }
 }
 
 .catalogue-element-treeview-name {
