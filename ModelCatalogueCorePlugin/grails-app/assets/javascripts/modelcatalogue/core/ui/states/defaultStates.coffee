@@ -834,9 +834,13 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 ])
 .config(['$provide', ($provide) ->
   fixStateParams = (state, params) ->
+    return params if not state
+
     stateName = if angular.isString(state) then state else state.name
 
-    if stateName.startsWith 'mc'
+    return params if not state
+
+    if stateName?.startsWith 'mc'
       return {dataModelId: 'catalogue' } if not params
 
       if not params.dataModelId

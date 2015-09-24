@@ -11,6 +11,11 @@
 #= require_self
 #= require_full_tree .
 
+if !String.prototype.startsWith
+  String.prototype.startsWith = (searchString, position) ->
+    position = position || 0;
+    return this.indexOf(searchString, position) == position
+
 modules = [
   'ui.bootstrap'
   'angular-loading-bar'
