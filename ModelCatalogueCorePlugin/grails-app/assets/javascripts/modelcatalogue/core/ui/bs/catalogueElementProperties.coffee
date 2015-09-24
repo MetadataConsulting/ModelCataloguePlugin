@@ -238,7 +238,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
         isDirty:    ->
           if @value and enhance.isEnhancedBy(@value, 'orderedMap') and @original and enhance.isEnhancedBy(@original, 'orderedMap')
             return false if angular.equals(@value.values, @original.values)
-            return false if @original.values.length == 0 and @value.values.length == 1 and not @value.values[0].value and not @value.values[0].key
+            return false if (@original.values ? []).length == 0 and @value.values.length == 1 and not @value.values[0].value and not @value.values[0].key
           !angular.equals(@original, @value)
         reset:      -> @value = angular.copy @original
         update:     ->
@@ -267,7 +267,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
 
 
       if $value?.type == 'orderedMap'
-        for value in $value.values when not angular.isObject(value.value)
+        for value in ($value.values ? []) when not angular.isObject(value.value)
           tabDefinition.properties.push {
             label: value.key
             value: getSortedMapPropertyVal(value.key)
