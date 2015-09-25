@@ -2,11 +2,15 @@ angular.module('mc.core.orderedMapEnhancer', ['mc.util.enhance']).config ['enhan
   condition = (orderedMap) -> orderedMap.hasOwnProperty('type') and orderedMap.type == 'orderedMap'
   factory   = [ 'enhance', (enhance)->
     orderedMapEnhancer = (orderedMap) ->
+      ensureValuesAreArray = (map) ->
+        return if map.values and angular.isArray(map.values)
+        map.values = []
 
       orderedMap.get = (key) -> @access(key).get()
       orderedMap.access = (key) ->
         self = @
         set = (newValue) ->
+          ensureValuesAreArray(self)
           for value in self.values
             if value.key == key
               value.value = newValue
@@ -15,6 +19,7 @@ angular.module('mc.core.orderedMapEnhancer', ['mc.util.enhance']).config ['enhan
           self.values.push(key: key, value: newValue) if newValue or not key
           return newValue
         get =  ->
+          ensureValuesAreArray(self)
           for value in self.values
             if value.key == key
               return value.value
@@ -29,6 +34,7 @@ angular.module('mc.core.orderedMapEnhancer', ['mc.util.enhance']).config ['enhan
         getterSetter.get = -> get()
         getterSetter.set = (newValue) -> set(newValue)
         getterSetter.remove = ->
+          ensureValuesAreArray(self)
           result = undefined
           for value, i in self.values[..].reverse()
             if value.key == key
@@ -46,10 +52,12 @@ angular.module('mc.core.orderedMapEnhancer', ['mc.util.enhance']).config ['enhan
 
 
       orderedMap.clearIfOnlyContainsPlaceholder = ->
+        ensureValuesAreArray(@)
         if @values.length == 1 and not @values[0].value
           @values = []
 
       orderedMap.addPlaceholderIfEmpty = ->
+        ensureValuesAreArray(@)
         if @values.length == 0
           @values = [{key: ''}]
       orderedMap

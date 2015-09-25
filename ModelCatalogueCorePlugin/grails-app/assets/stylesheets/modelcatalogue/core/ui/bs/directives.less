@@ -64,10 +64,20 @@ blockquote, .dl-table-item-cell, .pp-table-property-value {
   border-radius: 4px;
 }
 
+.catalogue-element-treeview-link, .catalogue-element-treeview-version-number {
+  display: none;
+}
+
 .catalogue-element-treeview-labels {
   white-space: nowrap;
   overflow-x: hidden;
   text-overflow: ellipsis;
+
+  &:hover {
+    .catalogue-element-treeview-link, .catalogue-element-treeview-version-number {
+      display: inline-block;
+    }
+  }
 }
 
 .catalogue-element-treeview-name {
@@ -415,8 +425,11 @@ a div.panel-footer, .with-pointer {
 }
 
 .pp-table {
-  background-color: transparent!important;
+  background-color: transparent !important;
+  font-size: smaller;
 }
+
+
 
 .ins, ins {
   color: green;
@@ -577,4 +590,16 @@ tr.inherited, .catalogue-element-treeview-text-content.inherited {
   border-right: 1px solid lightgrey;
   border-bottom: 1px solid lightgrey;
   border-bottom-right-radius: 7px;
+}
+
+.catalogue-element-view {
+  blockquote {
+    font-size: small;
+  }
+}
+
+.actions-cell {
+  blockquote {
+    font-size: smaller;
+  }
 }

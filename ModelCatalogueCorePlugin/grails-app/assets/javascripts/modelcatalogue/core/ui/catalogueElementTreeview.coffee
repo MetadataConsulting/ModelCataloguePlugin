@@ -37,6 +37,7 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
 
       addItemsFromList = (list) ->
         return if list.$$children
+        return if not list.list
         list.$$children = []
         for item in list.list
           cachedChild  = if list.$$cachedChildren then list.$$cachedChildren[item.link]
@@ -76,6 +77,7 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
 
       $scope.showMore = () ->
         return if $scope.$$showingMore
+        return if not nextFun
         $scope.$$showingMore = true
         return unless $scope.list.total > $scope.list.$$children.length
         params = {}
