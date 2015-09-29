@@ -1,20 +1,15 @@
 package org.modelcatalogue.core
 
 import org.codehaus.groovy.grails.web.json.JSONElement
-import org.modelcatalogue.core.dataarchitect.HeadersMap
+import org.modelcatalogue.integration.excel.HeadersMap
 import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.ResultRecorder
-import spock.lang.Shared
-
-/**
- * Created by sus_avi on 01/05/2014.
- */
 
 class DataImportControllerSpec extends AbstractIntegrationSpec implements ResultRecorder {
-    @Shared
+
     def fileName, recorder, filenameXsd, filenameXsd2, fileNameStarUML
 
-    def setupSpec() {
+    def setup() {
         fileName = "test/integration/resources/example.xls"
         filenameXsd = "test/unit/resources/SACT/XMLDataTypes.xsd"//"test/unit/resources/SACT/XSD_Example.xsd"
         filenameXsd2 = "test/unit/resources/SACT/Breast_XMLSchema.xsd"//"test/unit/resources/SACT/XSD_Example.xsd"
@@ -28,12 +23,17 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
     }
 
     def testHeaderSetup(){
-        HeadersMap headersMap = DataImportController.populateHeaders([])
+        HeadersMap headersMap = HeadersMap.create()
         expect:
         headersMap.dataElementCode == "Data Item Unique Code"
         headersMap.dataElementName == "Data Item Name"
         headersMap.dataElementDescription == "Data Item Description"
-        headersMap.dataType == "Data type"
+        headersMap.dataTypeClassification == "Data Type Classification"
+        headersMap.dataTypeCode == "Data Type Unique Code"
+        headersMap.dataTypeName == "Data Type"
+        headersMap.valueDomainClassification == "Value Domain Classification"
+        headersMap.valueDomainCode == "Value Domain Unique Code"
+        headersMap.valueDomainName == "Value Domain"
         headersMap.parentModelName == "Parent Model"
         headersMap.parentModelCode == "Parent Model Unique Code"
         headersMap.containingModelName == "Model"
@@ -52,7 +52,12 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
         params.dataElementCode = "Data Item UC"
         params.dataElementName = "DataI Name"
         params.dataElementDescription = "Description"
-        params.dataType = "DataType"
+        params.dataTypeClassification = "DataTypeClassification"
+        params.dataTypeCode = "DataTypeUniqueCode"
+        params.dataTypeName = "DataType"
+        params.valueDomainClassification = "ValueDomainClassification"
+        params.valueDomainCode = "ValueDomainUniqueCode"
+        params.valueDomainName = "ValueDomain"
         params.parentModelName = "parentModel"
         params.parentModelCode = "Parent Model UC"
         params.containingModelName = "ModelName"
@@ -62,12 +67,17 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
         params.classification = "Classification"
         params.metadata = "metadata"
 
-        HeadersMap headersMap = DataImportController.populateHeaders(params)
+        HeadersMap headersMap = HeadersMap.create(params)
         expect:
         headersMap.dataElementCode == "Data Item UC"
         headersMap.dataElementName == "DataI Name"
         headersMap.dataElementDescription == "Description"
-        headersMap.dataType == "DataType"
+        headersMap.dataTypeClassification == "DataTypeClassification"
+        headersMap.dataTypeCode == "DataTypeUniqueCode"
+        headersMap.dataTypeName == "DataType"
+        headersMap.valueDomainClassification == "ValueDomainClassification"
+        headersMap.valueDomainCode == "ValueDomainUniqueCode"
+        headersMap.valueDomainName == "ValueDomain"
         headersMap.parentModelName == "parentModel"
         headersMap.parentModelCode == "Parent Model UC"
         headersMap.containingModelName == "ModelName"

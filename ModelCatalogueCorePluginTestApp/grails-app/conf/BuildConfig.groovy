@@ -23,7 +23,10 @@ grails.project.fork = [
 
 
 grails.plugin.location.'model-catalogue-core' = "../ModelCatalogueCorePlugin"
+grails.plugin.location.'model-catalogue-discourse' = "../ModelCatalogueDiscoursePlugin"
 grails.plugin.location.'model-catalogue-security-ss2' = "../ModelCatalogueSpringSecurity2xPlugin"
+grails.plugin.location.'model-catalogue-forms' = '../ModelCatalogueFormsPlugin'
+grails.plugin.location.'model-catalogue-genomics' = '../ModelCatalogueGenomicsPlugin'
 
 grails.project.dependency.resolver = "maven" // or ivy
 grails.project.dependency.resolution = {
@@ -42,7 +45,6 @@ grails.project.dependency.resolution = {
 
         grailsPlugins()
         grailsHome()
-        mavenLocal()
         grailsCentral()
         mavenCentral()
         // uncomment these (or add new ones) to enable remote dependency resolution from public Maven repositories
@@ -61,8 +63,10 @@ grails.project.dependency.resolution = {
         runtime "org.modelcatalogue:spring-security-ajax-aware:0.1.1"
         runtime 'mysql:mysql-connector-java:5.1.24'
 
+        runtime "org.apache.httpcomponents:httpclient:4.3.1"
+
         // Selenium WebDriver, for use in Geb
-        def webDriverVersion = "2.44.0"
+        def webDriverVersion =  System.getenv('WEB_DRIVER_VERSION') ?: "2.45.0"
 
         // Testing modules
         test "org.gebish:geb-spock:0.9.3"
@@ -72,12 +76,11 @@ grails.project.dependency.resolution = {
         test "org.seleniumhq.selenium:selenium-remote-driver:${webDriverVersion}"
 
         // Required because of bug in 2.37.0 of WebDriver:
-        test "org.apache.httpcomponents:httpclient:4.3.1"
         test("org.seleniumhq.selenium:selenium-htmlunit-driver:${webDriverVersion}") {
             exclude 'xml-apis'
         }
 
-        test "org.grails:grails-datastore-test-support:1.0-grails-2.4"
+        test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
     }
 
     plugins {
@@ -98,6 +101,8 @@ grails.project.dependency.resolution = {
         runtime ":database-migration:1.4.0"
         runtime ":jquery:1.11.1"
         compile ":spring-security-ui:1.0-RC2"
+
+        compile ":grails-melody:1.55.0"
 
         test ":geb:0.9.3"
 

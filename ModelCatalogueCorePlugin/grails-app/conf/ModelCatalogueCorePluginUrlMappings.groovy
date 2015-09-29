@@ -6,6 +6,8 @@ class ModelCatalogueCorePluginUrlMappings {
 	static mappings = {
 
         "/catalogue/upload" (controller: "dataImport", action: 'upload', method: HttpMethod.POST)
+        "/catalogue/ext/$key/$value" (controller: 'catalogue', action: 'ext', method: HttpMethod.GET)
+        "/catalogue/ext/$key/$value/export" (controller: 'catalogue', action: 'ext', method: HttpMethod.GET)
         "/catalogue/$resource/$id(.${version})?" (controller: 'catalogue', action: 'xref', method: HttpMethod.GET)
         "/catalogue/$resource/$id(.${version})?/export" (controller: 'catalogue', action: 'xref', method: HttpMethod.GET)
 
@@ -70,6 +72,7 @@ class ModelCatalogueCorePluginUrlMappings {
 
                 "/api/modelCatalogue/core/$controllerName/$id/history"(controller: controllerName, action: 'history', method: HttpMethod.GET)
                 "/api/modelCatalogue/core/$controllerName/$id/archive"(controller: controllerName, action: 'archive', method: HttpMethod.POST)
+                "/api/modelCatalogue/core/$controllerName/$id/restore"(controller: controllerName, action: 'restore', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$controllerName/$id/finalize"(controller: controllerName, action: 'finalizeElement', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$controllerName/$source/merge/$destination"(controller: controllerName, action: 'merge', method: HttpMethod.POST)
 
@@ -82,6 +85,7 @@ class ModelCatalogueCorePluginUrlMappings {
                     // /ModelCatalogueCorePluginTestApp/api/modelCatalogue/core/classification/24/report
                     "/api/modelCatalogue/core/$controllerName/$id/report"(controller: controllerName, action: 'report', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$controllerName/$id/gereport"(controller: controllerName, action: 'gereport', method: HttpMethod.GET)
+
                 }
 
                 if (controllerName == 'measurementUnit') {
@@ -97,7 +101,8 @@ class ModelCatalogueCorePluginUrlMappings {
                 if (controllerName == 'user') {
                     "/$controllerName/current"(controller: controllerName, action: 'current', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$controllerName/current"(controller: controllerName, action: 'current', method: HttpMethod.GET)
-                    "/api/modelCatalogue/core/$controllerName/classifications/$ids?"(controller: controllerName, action: 'classifications', method: HttpMethod.POST)
+                    "/api/modelCatalogue/core/$controllerName/classifications"(controller: controllerName, action: 'classifications', method: HttpMethod.POST)
+                    "/api/modelCatalogue/core/$controllerName/lastSeen"(controller: controllerName, action: 'lastSeen', method: HttpMethod.GET)
                 }
 
                 if (controllerName == 'asset') {
@@ -126,11 +131,14 @@ class ModelCatalogueCorePluginUrlMappings {
             "/elementsFromCSV" (controller: "dataArchitect", action: "elementsFromCSV", method: HttpMethod.POST)
             "/modelsFromCSV" (controller: "dataArchitect", action: "modelsFromCSV", method: HttpMethod.POST)
             "/generateSuggestions" (controller: "dataArchitect", action: "generateSuggestions", method: HttpMethod.POST)
+            "/suggestionsNames" (controller: "dataArchitect", action: "suggestionsNames", method: HttpMethod.GET)
             "/imports/upload" (controller: "dataImport", action: 'upload', method: HttpMethod.POST)
         }
 
         "/"(view:"index")
         "/api/modelCatalogue/core/dashboard" (controller:"dashboard", action : 'index', method: HttpMethod.GET)
         "/api/modelCatalogue/core/search/$search?" (controller:"search", action : 'index', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/relationship/$id/restore" (controller:"relationship", action : 'restore', method: HttpMethod.POST)
+
 	}
 }

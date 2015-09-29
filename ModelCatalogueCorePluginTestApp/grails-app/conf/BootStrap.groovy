@@ -7,10 +7,10 @@ import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserRole
 import org.modelcatalogue.core.testapp.Requestmap
-import org.modelcatalogue.core.util.builder.CatalogueBuilder
-import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
+import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.core.util.ExtensionModulesLoader
+import org.modelcatalogue.core.util.test.TestDataHelper
 import org.springframework.http.HttpMethod
-import org.springframework.util.StopWatch
 
 class BootStrap {
 
@@ -20,27 +20,35 @@ class BootStrap {
     def actionService
     def mappingService
     CatalogueBuilder catalogueBuilder
-
-    XLSXListRenderer xlsxListRenderer
+    def sessionFactory
 
     def init = { servletContext ->
+        ExtensionModulesLoader.addExtensionModules()
 
-        StopWatch watch = new StopWatch('bootstrap')
+        if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST]) {
+            TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
+                initCatalogueService.initCatalogue(true)
+                initSecurity()
+                setupStuff()
+            }
+        } else {
+            initCatalogueService.initDefaultRelationshipTypes()
+            initSecurity()
+        }
+    }
 
-        watch.start('init catalogue')
-        initCatalogueService.initCatalogue(Environment.current in [Environment.DEVELOPMENT, Environment.TEST])
-        watch.stop()
-
-        watch.start('init security')
+    private static void initSecurity() {
         def roleUser = Role.findByAuthority('ROLE_USER') ?: new Role(authority: 'ROLE_USER').save(failOnError: true)
         def roleAdmin = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
         def metadataCurator = Role.findByAuthority('ROLE_METADATA_CURATOR') ?: new Role(authority: 'ROLE_METADATA_CURATOR').save(failOnError: true)
 
+        Role.findByAuthority('ROLE_REGISTERED') ?: new Role(authority: 'ROLE_REGISTERED').save(failOnError: true)
+
         // keep the passwords lame, they are only for dev/test or very first setup
         // sauce labs connector for some reason fails with the six in the input
-        def admin   = User.findByName('admin') ?: new User(name: 'admin', username: 'admin', enabled: true, password: 'admin').save(failOnError: true)
-        def viewer  = User.findByName('viewer') ?: new User(name: 'viewer', username: 'viewer', enabled: true, password: 'viewer').save(failOnError: true)
-        def curator = User.findByName('curator') ?: new User(name: 'curator', username: 'curator', enabled: true, password: 'creator').save(failOnError: true)
+        def admin = User.findByName('admin') ?: new User(name: 'admin', username: 'admin', enabled: true, password: 'admin').save(failOnError: true)
+        def viewer = User.findByName('viewer') ?: new User(name: 'viewer', username: 'viewer', enabled: true, password: 'viewer').save(failOnError: true)
+        def curator = User.findByName('curator') ?: new User(name: 'curator', username: 'curator', enabled: true, password: 'curator').save(failOnError: true)
 
 
         if (!admin.authorities.contains(roleAdmin)) {
@@ -79,69 +87,56 @@ class BootStrap {
             createRequestmapIfMissing(url, 'permitAll', null)
         }
 
-        createRequestmapIfMissing('/asset/download/*',             'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
-        createRequestmapIfMissing('/user/current',                 'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
-        createRequestmapIfMissing('/catalogue/upload',             'ROLE_METADATA_CURATOR',        org.springframework.http.HttpMethod.POST)
-        createRequestmapIfMissing('/catalogue/*/**',               'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR',        org.springframework.http.HttpMethod.POST)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR',        org.springframework.http.HttpMethod.PUT)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR',        org.springframework.http.HttpMethod.DELETE)
+        createRequestmapIfMissing('/asset/download/*',                      'IS_AUTHENTICATED_FULLY',        org.springframework.http.HttpMethod.GET)
+        createRequestmapIfMissing('/oauth/*/**',                            'IS_AUTHENTICATED_ANONYMOUSLY')
+        createRequestmapIfMissing('/user/current',                          'IS_AUTHENTICATED_ANONYMOUSLY',  org.springframework.http.HttpMethod.GET)
+        createRequestmapIfMissing('/catalogue/upload',                      'ROLE_METADATA_CURATOR',         org.springframework.http.HttpMethod.POST)
+        createRequestmapIfMissing('/catalogue/*/**',                        'IS_AUTHENTICATED_FULLY',        org.springframework.http.HttpMethod.GET)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'IS_AUTHENTICATED_FULLY',        org.springframework.http.HttpMethod.GET)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/*/comments',  'IS_AUTHENTICATED_FULLY',        org.springframework.http.HttpMethod.POST)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'ROLE_METADATA_CURATOR',         org.springframework.http.HttpMethod.POST)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'ROLE_METADATA_CURATOR',         org.springframework.http.HttpMethod.PUT)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'ROLE_METADATA_CURATOR',         org.springframework.http.HttpMethod.DELETE)
 
-        createRequestmapIfMissing('/role/**',                      'ROLE_ADMIN')
-        createRequestmapIfMissing('/userAdmin/**',                 'ROLE_ADMIN')
-        createRequestmapIfMissing('/requestMap/**',                'ROLE_ADMIN')
-        createRequestmapIfMissing('/registrationCode/**',          'ROLE_ADMIN')
-        createRequestmapIfMissing('/securityInfo/**',              'ROLE_ADMIN')
-        createRequestmapIfMissing('/console/**',                   'ROLE_ADMIN')
-        createRequestmapIfMissing('/dbconsole/**',                 'ROLE_ADMIN')
-        createRequestmapIfMissing('/plugins/console-1.5.0/**',     'ROLE_ADMIN')
+        createRequestmapIfMissing('/sso/*/**',                              'IS_AUTHENTICATED_REMEMBERED',   org.springframework.http.HttpMethod.GET)
+
+        createRequestmapIfMissing('/role/**',                               'ROLE_ADMIN')
+        createRequestmapIfMissing('/userAdmin/**',                          'ROLE_ADMIN')
+        createRequestmapIfMissing('/requestMap/**',                         'ROLE_ADMIN')
+        createRequestmapIfMissing('/registrationCode/**',                   'ROLE_ADMIN')
+        createRequestmapIfMissing('/securityInfo/**',                       'ROLE_ADMIN')
+        createRequestmapIfMissing('/console/**',                            'ROLE_ADMIN')
+        createRequestmapIfMissing('/dbconsole/**',                          'ROLE_ADMIN')
+        createRequestmapIfMissing('/monitoring/**',                         'ROLE_ADMIN')
+        createRequestmapIfMissing('/plugins/console-1.5.0/**',              'ROLE_ADMIN')
 
 //        createRequestmapIfMissing('/api/modelCatalogue/core/model/**', 'IS_AUTHENTICATED_ANONYMOUSLY')
 //        createRequestmapIfMissing('/api/modelCatalogue/core/dataElement/**', 'ROLE_METADATA_CURATOR')
 //        createRequestmapIfMissing('/api/modelCatalogue/core/dataType/**', 'ROLE_USER')
 //        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR')
 //        createRequestmapIfMissing('/api/modelCatalogue/core/relationshipTypes/**', 'ROLE_ADMIN')
-
-
-        watch.stop()
-
-        environments {
-            development {
-                setupStuff(watch)
-
-            }
-            test {
-                setupStuff(watch)
-            }
-
-        }
     }
 
-    def setupStuff(StopWatch watch){
+    def setupStuff(){
         actionService.resetAllRunningActions()
         try {
+
             println 'Running post init job'
             println 'Importing data'
-            watch.start('import data')
             importService.importData()
-            watch.stop()
 
             println 'Finalizing all published elements'
-            watch.start('finalizing all elements')
-            CatalogueElement.findAllByStatus(ElementStatus.DRAFT).each {
+            CatalogueElement.findAllByStatus(org.modelcatalogue.core.api.ElementStatus.DRAFT).each {
                 if (it instanceof Model) {
                     elementService.finalizeElement(it)
                 } else {
-                    it.status = ElementStatus.FINALIZED
+                    it.status = org.modelcatalogue.core.api.ElementStatus.FINALIZED
                     it.save failOnError: true
                 }
             }
-            watch.stop()
 
 
             println "Creating some actions"
-            watch.start('test actions')
             Batch batch = new Batch(name: 'Test Batch').save(failOnError: true)
 
             15.times {
@@ -164,40 +159,32 @@ class BootStrap {
             assert !actionService.create(batch, TestAction, test: actionService.create(batch, TestAction, fail: true, timeout: 3000)).hasErrors()
 
 
-            Action createRelationshipAction = actionService.create(batch, CreateRelationship, source: MeasurementUnit.findByName("celsius"), destination: MeasurementUnit.findByName("fahrenheit"), type: RelationshipType.findByName('relatedTo'))
+            Action createRelationshipAction = actionService.create(batch, CreateRelationship, source: MeasurementUnit.findByName("celsius"), destination: MeasurementUnit.findByName("fahrenheit"), type: RelationshipType.readByName('relatedTo'))
             if (createRelationshipAction.hasErrors()) {
                 println(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Failed to create relationship actions", createRelationshipAction.errors))
                 throw new AssertionError("Failed to create relationship actions!")
             }
 
-            watch.stop()
-
-            watch.start('setting up csv transformation')
             setupSimpleCsvTransformation()
-            watch.stop()
 
             // for generate suggestion test
-            watch.start('generating suggestions test data')
             catalogueBuilder.build {
                 automatic dataType
 
                 classification(name: 'Test 1') {
-                    dataElement (name: 'Test Element 1') {
+                    dataElement(name: 'Test Element 1') {
                         valueDomain(name: 'Same Name')
                     }
                 }
 
                 classification(name: 'Test 2') {
-                    dataElement (name: 'Test Element 2') {
+                    dataElement(name: 'Test Element 2') {
                         valueDomain(name: 'Same Name')
                     }
                 }
 
             }
-            watch.stop()
-
             println "Init finished in ${new Date()}"
-            println watch.prettyPrint()
         } catch (e) {
             e.printStackTrace()
         }
@@ -235,6 +222,13 @@ class BootStrap {
 
 
     private static Requestmap createRequestmapIfMissing(String url, String configAttribute, HttpMethod method = null) {
+        List<Requestmap> maps = Requestmap.findAllByUrlAndHttpMethod(url, method)
+        for(Requestmap map in maps) {
+            if (map.configAttribute == configAttribute) {
+                return map
+            }
+            println "Requestmap method: $method, url: $url has different config attribute - expected: $configAttribute, actual: $map.configAttribute"
+        }
         Requestmap.findOrSaveByUrlAndConfigAttributeAndHttpMethod(url, configAttribute, method, [failOnError: true])
     }
 

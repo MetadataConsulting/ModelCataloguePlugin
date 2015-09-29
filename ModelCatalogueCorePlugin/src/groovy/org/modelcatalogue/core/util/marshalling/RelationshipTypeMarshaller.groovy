@@ -3,7 +3,7 @@ package org.modelcatalogue.core.util.marshalling
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.RelationshipType
 
-class RelationshipTypeMarshaller extends AbstractMarshallers {
+class RelationshipTypeMarshaller extends AbstractMarshaller {
 
     RelationshipTypeMarshaller() {
         super(RelationshipType)
@@ -22,10 +22,11 @@ class RelationshipTypeMarshaller extends AbstractMarshallers {
                 destinationClass: el.destinationClass,
                 system: el.system,
                 versionSpecific: el.versionSpecific,
+                sourceToDestinationDescription: el.sourceToDestinationDescription,
+                destinationToSourceDescription: el.destinationToSourceDescription,
                 rule: el.rule,
                 bidirectional: el.bidirectional,
-                link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id",
-                metadataHints: el.metadataHints?.split(/\s*,\s*/)?.grep() ?: []
+                link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id"
         ]
     }
 }

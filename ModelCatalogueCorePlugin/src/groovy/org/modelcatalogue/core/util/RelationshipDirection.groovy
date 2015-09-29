@@ -11,19 +11,27 @@ enum RelationshipDirection {
     INCOMING {
 
         @Override
-        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<Classification> classifications) {
+        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, ClassificationFilter filter) {
             DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
+            criteria.join 'source'
             criteria.eq('destination', element)
-            if (!element.archived && (!type || !type.versionSpecific)) {
-                criteria.eq('archived', false)
-            }
             if (type) {
                 criteria.eq('relationshipType', type)
             }
-            if (classifications) {
+
+            if (filter) {
                 criteria.or {
-                    'in'('classification', classifications)
-                    isNull('classification')
+                    isNull 'classification'
+                    and {
+                        if (filter.excludes) {
+                            criteria.not {
+                                criteria.'in' 'classification.id', filter.excludes
+                            }
+                        }
+                        if (filter.includes) {
+                            criteria.'in'  'classification.id', filter.includes
+                        }
+                    }
                 }
             }
 
@@ -78,19 +86,27 @@ enum RelationshipDirection {
     OUTGOING {
 
         @Override
-        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<Classification> classifications) {
+        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, ClassificationFilter filter) {
             DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
+            criteria.join 'destination'
             criteria.eq('source', element)
-            if (!element.archived && (!type || !type.versionSpecific)) {
-                criteria.eq('archived', false)
-            }
             if (type) {
                 criteria.eq('relationshipType', type)
             }
-            if (classifications) {
+
+            if (filter) {
                 criteria.or {
-                    'in'('classification', classifications)
-                    isNull('classification')
+                    isNull 'classification'
+                    and {
+                        if (filter.excludes) {
+                            criteria.not {
+                                criteria.'in' 'classification.id', filter.excludes
+                            }
+                        }
+                        if (filter.includes) {
+                            criteria.'in'  'classification.id', filter.includes
+                        }
+                    }
                 }
             }
 
@@ -146,22 +162,30 @@ enum RelationshipDirection {
     },
     BOTH {
         @Override
-        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<Classification> classifications) {
+        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, ClassificationFilter filter) {
             DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
+            criteria.join 'source'
+            criteria.join 'destination'
             criteria.or {
                 eq('source', element)
                 eq('destination', element)
             }
-            if (!element.archived && (!type || !type.versionSpecific)) {
-                criteria.eq('archived', false)
-            }
             if (type) {
                 criteria.eq('relationshipType', type)
             }
-            if (classifications) {
+            if (filter) {
                 criteria.or {
-                    'in'('classification', classifications)
-                    isNull('classification')
+                    isNull 'classification'
+                    and {
+                        if (filter.excludes) {
+                            criteria.not {
+                                criteria.'in' 'classification.id', filter.excludes
+                            }
+                        }
+                        if (filter.includes) {
+                            criteria.'in'  'classification.id', filter.includes
+                        }
+                    }
                 }
             }
 
@@ -180,7 +204,7 @@ enum RelationshipDirection {
 
         @Override
         CatalogueElement getElement(CatalogueElement owner, Relationship relationship) {
-            owner == relationship.destination ? relationship.source : relationship.destination
+            owner
         }
 
         @Override
@@ -215,7 +239,7 @@ enum RelationshipDirection {
         }
     }
 
-    abstract DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<Classification> classifications)
+    abstract DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, ClassificationFilter filter)
     abstract String getDirection(CatalogueElement owner, Relationship relationship)
     abstract CatalogueElement getRelation(CatalogueElement owner, Relationship relationship)
     abstract CatalogueElement getElement(CatalogueElement owner, Relationship relationship)

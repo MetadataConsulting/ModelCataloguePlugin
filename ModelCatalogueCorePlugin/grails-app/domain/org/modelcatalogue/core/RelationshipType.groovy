@@ -1,9 +1,17 @@
 package org.modelcatalogue.core
 
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
+import com.google.common.util.concurrent.UncheckedExecutionException
 import grails.util.GrailsNameUtils
+import org.apache.log4j.Logger
 import org.modelcatalogue.core.util.SecuredRuleExecutor
 
-class RelationshipType {
+import java.util.concurrent.Callable
+
+class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
+
+    private static final Cache<String, Long> typesCache = CacheBuilder.newBuilder().initialCapacity(20).build()
 
     def relationshipTypeService
 
@@ -16,8 +24,14 @@ class RelationshipType {
     //the both sides of the relationship ie. for parentChild this would be parent (for synonym this is synonym, so the same on both sides)
     String sourceToDestination
 
+    // detailed explanation of the source to destination relationship
+    String sourceToDestinationDescription
+
     //the both sides of the relationship i.e. for parentChild this would be child (for synonym this is synonym, so the same on both sides)
     String destinationToSource
+
+    // detailed explanation of the reversed relationship
+    String destinationToSourceDescription
 
     //you can constrain the relationship type
     Class sourceClass
@@ -26,13 +40,18 @@ class RelationshipType {
     Class destinationClass
 
     // comma separated list of metadata hints
-    String metadataHints
+    /**
+     * @deprecated use angular metadataEditors instead
+     */
+    @Deprecated String metadataHints
 
     // if the direction of the relationship doesn't matter
     Boolean bidirectional = Boolean.FALSE
 
     /** if relationships of this type shall not be carried over when new draft version is created */
     Boolean versionSpecific = Boolean.FALSE
+
+    SecuredRuleExecutor.ReusableScript ruleScript
 
     /**
      * This is a script which will be evaluated with following binding:
@@ -60,16 +79,26 @@ class RelationshipType {
         destinationClass validator: classValidator
         metadataHints nullable: true, maxSize: 10000
         rule nullable: true, maxSize: 10000
+        sourceToDestinationDescription nullable: true, maxSize: 2000
+        destinationToSourceDescription nullable: true, maxSize: 2000
     }
+
+    static transients = ['ruleScript']
 
 
     static mapping = {
-        // this makes entities immutable
-        // cache usage: 'read-only'
+        cache 'nonstrict-read-write'
         sort "name"
+		name index: 'RelationType_name_idx'
+		destinationClass index: 'RelationType_destinationClass_idx'
     }
 
-    String validateSourceDestination(CatalogueElement source, CatalogueElement destination, Map<String, String> ext) {
+    void setRule(String rule) {
+        this.rule = rule
+        this.ruleScript = null
+    }
+
+    def validateSourceDestination(CatalogueElement source, CatalogueElement destination, Map<String, String> ext) {
 
         if (!sourceClass.isInstance(source)) {
             return 'source.not.instance.of'
@@ -98,7 +127,7 @@ class RelationshipType {
 
             if (result instanceof Throwable) {
                 log.warn("Rule of $name thrown an exception for $source and $destination: $result", result)
-                return ['rule.did.not.pass.with.exception', result.message]
+                return ['rule.did.not.pass.with.exception', [result.toString()] as Object[], "Rule thrown an exception: $result.message"]
             }
 
             if (result) {
@@ -114,12 +143,21 @@ class RelationshipType {
             return true
         }
 
-        new SecuredRuleExecutor(
+        if (!ruleScript) {
+            ruleScript = new SecuredRuleExecutor(
                 source: source,
                 destination: destination,
                 type: this,
                 ext: ext
-        ).execute(rule)
+            ).reuse(rule)
+        }
+
+        ruleScript.execute(
+            source: source,
+            destination: destination,
+            type: this,
+            ext: ext
+        )
     }
 
 
@@ -151,8 +189,28 @@ class RelationshipType {
         readByName("supersession")
     }
 
+    static getBaseType() {
+        readByName("base")
+    }
+
     static readByName(String name) {
-        findByName(name, [readOnly: true])
+        try {
+            Long id = typesCache.get(name, { ->
+                RelationshipType type = RelationshipType.findByName(name, [cache: true, readOnly: true])
+                if (!type) {
+                    throw new IllegalArgumentException("Type '$name' does not exist!")
+                }
+                return type.id
+            } as Callable<Long>)
+            RelationshipType.get(id)
+
+        } catch (UncheckedExecutionException e) {
+            if (e.cause instanceof IllegalArgumentException) {
+                Logger.getLogger(RelationshipType).warn "Type '$name' requested but not found!"
+            } else {
+                throw e
+            }
+        }
     }
 
     String toString() {
@@ -171,12 +229,22 @@ class RelationshipType {
         relationshipTypeService.clearCache()
     }
 
+    def afterInsert() {
+        typesCache.put name, getId()
+    }
+
     def beforeUpdate() {
         relationshipTypeService.clearCache()
+        typesCache.invalidate(name)
+    }
+
+    def afterUpdate() {
+        typesCache.put name, getId()
     }
 
     def beforeDelete() {
         relationshipTypeService.clearCache()
+        typesCache.invalidate(name)
     }
 
 

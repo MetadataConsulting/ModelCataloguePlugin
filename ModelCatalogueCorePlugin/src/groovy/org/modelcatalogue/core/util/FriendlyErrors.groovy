@@ -4,11 +4,9 @@ import grails.util.Holders
 import grails.validation.ValidationException
 import org.springframework.context.MessageSource
 import org.springframework.validation.Errors
+import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
 
-/**
- * Created by ladin on 05.02.15.
- */
 class FriendlyErrors {
 
     static String printErrors(String message, Errors errors) {
@@ -18,7 +16,11 @@ class FriendlyErrors {
         builder << ':\n'
         Set<String> messages = []
         for (ObjectError error in errors.allErrors) {
-            messages << messageSource.getMessage(error, locale)
+            if (error instanceof FieldError) {
+                messages << "${messageSource.getMessage(error, locale)} (${error.field})"
+            } else {
+                messages << "${messageSource.getMessage(error, locale)}"
+            }
         }
         for (String msg in messages) {
             builder << '    ' << msg << '\n'
@@ -26,9 +28,9 @@ class FriendlyErrors {
         builder.toString()
     }
 
-    static withFriendlyFailure(String message = "Exception while saving element", Class<? extends RuntimeException> exceptionType = IllegalStateException, Closure closure) {
+    static <T> T withFriendlyFailure(String message = "Exception while saving element", Class<? extends RuntimeException> exceptionType = IllegalStateException, Closure<T> closure) {
         try {
-            closure()
+            return closure()
         } catch(ValidationException ve) {
             throw exceptionType.newInstance(printErrors(message, ve.errors))
         }
@@ -36,7 +38,15 @@ class FriendlyErrors {
 
     static <T> T failFriendlySave(T object, String message = "Exception while saving element", Class<? extends RuntimeException> exceptionType = IllegalStateException) {
         try {
-            object.save(failOnError: true)
+            object.save(failOnError: true, flush: true, deepValidate: false)
+        } catch(ValidationException ve) {
+            throw exceptionType.newInstance(printErrors(message, ve.errors))
+        }
+    }
+
+    static <T> T failFriendlySaveWithoutFlush(T object, String message = "Exception while saving element", Class<? extends RuntimeException> exceptionType = IllegalStateException) {
+        try {
+            object.save(failOnError: true, deepValidate: false)
         } catch(ValidationException ve) {
             throw exceptionType.newInstance(printErrors(message, ve.errors))
         }

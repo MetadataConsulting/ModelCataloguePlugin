@@ -10,7 +10,7 @@ describe "mc.util.rest", ->
         input.enhanced = true
         input
     enhanceProvider.registerEnhancerFactory('greeter', condition, factory)
-    return
+    return undefined
   )
 
   rest          = null
@@ -68,7 +68,7 @@ describe "mc.util.rest", ->
     error   = null
     $httpBackend.when("GET", "/foobar").respond(404, {success: false})
 
-    promise = rest({ method: "GET", url: "/foobar"})
+    promise = rest({ method: "GET", url: "/foobar", noRetry404: true})
 
     expect(promise).toBeDefined()
     expect(promise.then).toBeDefined()

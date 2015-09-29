@@ -1,6 +1,6 @@
-angular.module('mc.util.rest', ['mc.util.messages']).factory 'rest',  [ '$q', '$http', '$rootScope', ($q, $http, $rootScope) ->
+angular.module('mc.util.rest', ['mc.util.messages']).factory 'rest',  [ '$q', '$http', '$rootScope', '$timeout', ($q, $http, $rootScope, $timeout) ->
 
-  (config) ->
+  rest = (config) ->
     deferred = $q.defer()
 
     $http(config).then(
@@ -16,11 +16,32 @@ angular.module('mc.util.rest', ['mc.util.messages']).factory 'rest',  [ '$q', '$
       config.statusListener(response.status) if config.statusListener?
       if response.status is 0
         $rootScope.$broadcast 'applicationOffline', response
+        deferred.reject response
+        return
       if response.status is 404
-        $rootScope.$broadcast 'resourceNotFound', response
+        if config.noRetry404
+          $rootScope.$broadcast 'resourceNotFound', response
+          deferred.reject response
+          return
+
+        retryNotFound = ->
+          newConfig = angular.copy(config)
+          newConfig.noRetry404 = true
+
+          rest(newConfig).then (newResult) ->
+            deferred.resolve newResult
+          , (newResponse) ->
+            deferred.reject newResponse
+
+        $timeout retryNotFound, (if config.retryAfter then config.retryAfter else 300)
+
+        return
+
       deferred.reject response
     , (update) ->
       deferred.update update
     )
     deferred.promise
+
+  rest
 ]

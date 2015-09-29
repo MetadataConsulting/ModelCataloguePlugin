@@ -1,14 +1,15 @@
 package org.modelcatalogue.core
 
-import geb.spock.GebReportingSpec
 import org.modelcatalogue.core.pages.DataTypeListPage
-import org.modelcatalogue.core.pages.MeasurementUnitListPage
 import spock.lang.Stepwise
 
 @Stepwise
-class DataTypeWizardSpec extends GebReportingSpec {
+class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {
+        go "#/"
+        loginAdmin()
+
         when:
         go "#/catalogue/dataType/all"
 
@@ -20,11 +21,6 @@ class DataTypeWizardSpec extends GebReportingSpec {
         waitFor {
             viewTitle.text().trim() == 'Data Type List'
         }
-
-        when:
-        loginAdmin()
-
-        then:
         waitFor {
             actionButton('create-catalogue-element', 'list').displayed
         }
@@ -32,7 +28,6 @@ class DataTypeWizardSpec extends GebReportingSpec {
     }
 
     def "create enum"() {
-        int initialSize = $('.inf-table tbody .inf-table-item-row').size()
 
         when:
         actionButton('create-catalogue-element', 'list').click()
@@ -57,12 +52,11 @@ class DataTypeWizardSpec extends GebReportingSpec {
 
         then:
         waitFor {
-            $('.inf-table tbody .inf-table-item-row').size() == initialSize + 1
+            infTableCell(1, 1, text: 'New Enum Type').displayed
         }
     }
 
     def "create standard"() {
-        int initialSize = $('.inf-table tbody .inf-table-item-row').size()
 
         when:
         actionButton('create-catalogue-element', 'list').click()
@@ -79,7 +73,7 @@ class DataTypeWizardSpec extends GebReportingSpec {
 
         then:
         waitFor {
-            $('.inf-table tbody .inf-table-item-row').size() == initialSize + 1
+            infTableCell(1, 1, text: 'New Data Type').displayed
         }
     }
 

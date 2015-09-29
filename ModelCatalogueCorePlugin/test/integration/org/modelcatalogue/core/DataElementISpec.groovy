@@ -1,21 +1,11 @@
 package org.modelcatalogue.core
 
-import spock.lang.Shared
-
-/**
- * Created by adammilward on 05/02/2014.
- */
-
 class DataElementISpec extends AbstractIntegrationSpec{
 
-    @Shared
     def auth1, auth3, auth2
 
-    def setupSpec(){
+    def setup(){
         loadFixtures()
-    }
-
-    def cleanupSpec(){
     }
 
     def "create writer data elements with the same code dataElement"(){
@@ -53,7 +43,7 @@ class DataElementISpec extends AbstractIntegrationSpec{
 
         auth2     in auth1.relations
         auth1     in auth2.relations
-        auth3      in auth2.relations
+        auth3     in auth2.relations
         auth2     in auth3.relations
 
         when:

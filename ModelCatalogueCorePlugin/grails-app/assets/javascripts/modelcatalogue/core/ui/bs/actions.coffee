@@ -66,97 +66,81 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       }
   ]
 
-  actionsProvider.registerChildAction 'new-import', 'import-loinc', ['$scope', 'messages', ($scope, messages) -> {
-  label:  "Import Loinc"
-  action: ->
-    messages.prompt('Import Loinc File', '', type: 'new-loinc-import')
-  }]
+  actionsProvider.registerActionInRoles 'user-last-seen', [actionsProvider.ROLE_GLOBAL_ACTION], [
+    '$scope', 'names','security', '$state', 'messages',
+    ($scope ,  names , security ,  $state ,  messages) ->
+      return undefined if not security.hasRole('ADMIN')
 
-  actionsProvider.registerChildAction 'new-import', 'import-excel', ['$scope', 'messages', ($scope, messages) -> {
+      {
+      position: 1000
+      label: "Activity"
+      icon: 'fa fa-users'
+      type: 'success'
+      action: ->
+        messages.prompt('Recent Activity', '', type: 'current-activity')
+      }
+  ]
+
+  loincImport = ['$scope', 'messages', ($scope, messages) -> {
+    label: "Import Loinc"
+    action: ->
+      messages.prompt('Import Loinc File', '', type: 'new-loinc-import')
+  }]
+  actionsProvider.registerChildAction 'new-import', 'import-loinc', loincImport
+  actionsProvider.registerActionInRole 'global-import-loinc', actionsProvider.ROLE_GLOBAL_ACTION, loincImport
+
+  excelImport = ['$scope', 'messages', ($scope, messages) -> {
     label:  "Import Excel"
     action: ->
       messages.prompt('Import Excel File', '', type: 'new-excel-import')
   }]
+  actionsProvider.registerChildAction 'new-import', 'import-excel', excelImport
+  actionsProvider.registerActionInRole 'global-import-excel', actionsProvider.ROLE_GLOBAL_ACTION, excelImport
 
-  actionsProvider.registerChildAction 'new-import', 'import-obo', ['$scope', 'messages', ($scope, messages) -> {
-    label:  "Import OBO"
+  oboImport = ['$scope', 'messages', ($scope, messages) -> {
+    label: "Import OBO"
     action: ->
       messages.prompt('Import OBO File', '', type: 'new-obo-import')
   }]
+  actionsProvider.registerChildAction 'new-import', 'import-obo', oboImport
+  actionsProvider.registerActionInRole 'global-import-obo', actionsProvider.ROLE_GLOBAL_ACTION, oboImport
 
-  actionsProvider.registerChildAction 'new-import', 'import-xsd', ['$scope', 'messages', ($scope, messages) -> {
-    label:  "Import XSD"
+
+  xsdImport = ['$scope', 'messages', ($scope, messages) -> {
+    label: "Import XSD"
     action: ->
       messages.prompt('Import XSD File', '', type: 'new-xsd-import')
   }]
+  actionsProvider.registerChildAction 'new-import', 'import-xsd', xsdImport
+  actionsProvider.registerActionInRole 'global-import-xsd', actionsProvider.ROLE_GLOBAL_ACTION, xsdImport
 
-  actionsProvider.registerChildAction 'new-import', 'import-umlj', ['$scope', 'messages', ($scope, messages) -> {
-  label:  "Import Star Uml"
-  action: ->
-    messages.prompt('Import Star Uml File', '', type: 'new-umlj-import')
+  umlImport = ['$scope', 'messages', ($scope, messages) -> {
+    label: "Import Star Uml"
+    action: ->
+      messages.prompt('Import Star Uml File', '', type: 'new-umlj-import')
   }]
-  actionsProvider.registerChildAction 'new-import', 'import-mc', ['$scope', 'messages', ($scope, messages) -> {
-    label:  "Import MC"
+  actionsProvider.registerChildAction 'new-import', 'import-umlj', umlImport
+  actionsProvider.registerActionInRole 'global-import-uml', actionsProvider.ROLE_GLOBAL_ACTION, umlImport
+
+  mcImport = ['$scope', 'messages', ($scope, messages) -> {
+    label: "Import MC"
     action: ->
       messages.prompt('Import Model Catalogue DSL File', '', type: 'new-mc-import')
   }]
-  actionsProvider.registerChildAction 'new-import', 'import-catalogue-xml', ['$scope', 'messages', ($scope, messages) -> {
-    label:  "Import Catalogue XML"
+  actionsProvider.registerChildAction 'new-import', 'import-mc', mcImport
+  actionsProvider.registerActionInRole 'global-import-mc', actionsProvider.ROLE_GLOBAL_ACTION, mcImport
+
+
+  xmlImport = ['$scope', 'messages', ($scope, messages) -> {
+    label: "Import Catalogue XML"
     action: ->
       messages.prompt('Import Model Catalogue XML File', '', type: 'new-catalogue-xml-import')
   }]
+  actionsProvider.registerChildAction 'new-import', 'import-catalogue-xml', xmlImport
+  actionsProvider.registerActionInRole 'global-import-xml', actionsProvider.ROLE_GLOBAL_ACTION, xmlImport
 
 
 
-  actionsProvider.registerActionInRole 'edit-catalogue-element', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', ($rootScope, $scope, messages, names, security) ->
-    return undefined if not $scope.element
-    return undefined if not angular.isFunction $scope.element.isInstanceOf
-    return undefined if not angular.isFunction $scope.element.getResourceName
-    return undefined if $scope.element.isInstanceOf 'dataImport'
-    return undefined if not messages.hasPromptFactory('create-' + $scope.element.getResourceName()) and not messages.hasPromptFactory('edit-' + $scope.element.getResourceName())
-    return undefined if not security.hasRole('CURATOR')
-
-    action =
-      position:   100
-      label:      'Edit'
-      icon:       'glyphicon glyphicon-edit'
-      type:       'primary'
-      disabled:   $scope.element.archived or $scope.element?.status == 'FINALIZED'
-      action:     ->
-        messages.prompt('Edit ' + $scope.element.getElementTypeName(), '', {type: 'edit-' + names.getPropertyNameFromType($scope.element.elementType), element: $scope.element}).then (updated)->
-          updateFrom $scope.element, updated
-
-    updateAction = ->
-      action.disabled = $scope.element.archived or $scope.element?.status == 'FINALIZED'
-
-    $scope.$watch 'element.status', updateAction
-    $scope.$watch 'element.archived', updateAction
-    $scope.$on 'newVersionCreated', updateAction
-
-    return action
-
-  ]
-
-  actionsProvider.registerActionInRole 'compare-catalogue-element', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'messages', '$state', ($scope, messages, $state) ->
-    elementPresent = $scope.element and angular.isFunction($scope.element.getResourceName) and angular.isFunction($scope.element.getElementTypeName) and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('catalogueElement')
-    diffView = $state.current.name == 'mc.resource.diff'
-
-    return undefined if not elementPresent and not diffView
-
-    element = if elementPresent then $scope.element else $scope.elements[0]
-    ids = if elementPresent then [element.id] else (e.id for e in $scope.elements)
-
-    {
-      position: 500
-      label: if elementPresent then 'Compare' else 'Compare Another'
-      icon: 'fa fa-arrows-h'
-      type: 'primary'
-      action: ->
-        messages.prompt('Compare ' + element.getElementTypeName(), "Select the #{element.getElementTypeName()} for the comparison",
-          {type: 'catalogue-element', resource: element.getResourceName()}).then (toBeCompared)->
-            $state.go 'mc.resource.diff', ids: ids.concat([toBeCompared.id]).join('~')
-    }
-  ]
 
   actionsProvider.registerActionInRole 'favorite-element', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'messages', '$state', 'security', 'catalogueElementResource', 'modelCatalogueApiRoot', 'enhance', 'rest', ($scope, messages, $state, security, catalogueElementResource, modelCatalogueApiRoot, enhance, rest) ->
     elementPresent = $scope.element and angular.isFunction($scope.element.getResourceName) and angular.isFunction($scope.element.getElementTypeName) and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('catalogueElement')
@@ -169,6 +153,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       label: ''
       icon: 'fa fa-star'
       type: 'primary'
+      watches: 'element.favourite'
       action: ->
         catalogueElementResource('user').get(security.getCurrentUser()?.id).then (user) ->
           favourite = $scope.element.favourite
@@ -183,13 +168,12 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
             relation
 
-    $scope.$watch 'element.favourite', (favourite) ->
-      if favourite
-        action.active = true
-        action.icon   = 'fa fa-star-o'
-      else
-        action.active = false
-        action.icon   = 'fa fa-star'
+    if $scope.element.favourite
+      action.active = true
+      action.icon   = 'fa fa-star-o'
+    else
+      action.active = false
+      action.icon   = 'fa fa-star'
 
     action
   ]
@@ -218,130 +202,17 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerActionInRole 'create-new-version', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', ($rootScope, $scope, messages, names, security, catalogueElementResource) ->
-    return undefined if not $scope.element
-    return undefined if not $scope.element.status
-    return undefined if not security.hasRole('CURATOR')
-
-    action = {
-    position:   150
-    label:      'New Version'
-    icon:       'glyphicon glyphicon-circle-arrow-up'
-    type:       'primary'
-    action:     ->
-      messages.confirm('Do you want to create new version?', "New version will be created for #{$scope.element.getElementTypeName()} #{$scope.element.name}").then ->
-        catalogueElementResource($scope.element.elementType).update($scope.element, {newVersion: true}).then (updated) ->
-          updateFrom $scope.element, updated
-          messages.success("New version created for #{$scope.element.name}")
-          $rootScope.$broadcast 'newVersionCreated', updated
-        , showErrorsUsingMessages(messages)
-    }
-
-    updateAction = ->
-      action.disabled = $scope.element.archived || $scope.element.status == 'DRAFT'
-
-    $scope.$watch 'element.status', updateAction
-    $scope.$watch 'element.archived', updateAction
-    $scope.$on 'newVersionCreated', updateAction
-
-    action
-  ]
-
-  actionsProvider.registerActionInRole 'finalize', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, catalogueElementResource, enhance, rest, modelCatalogueApiRoot) ->
-    return undefined if not $scope.element
-    return undefined if not $scope.element.status
-    return undefined if not security.hasRole('CURATOR')
-
-    action = {
-      position:   150
-      label:      'Finalize'
-      icon:       'glyphicon glyphicon-check'
-      type:       'primary'
-      action:     ->
-        messages.confirm("Do you want to finalize #{$scope.element.getElementTypeName()} #{$scope.element.name} ?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} and all it's dependencies will be finalized recursively. This means all elements classfied by classifications, all child models and data elements of models, all value domains of data elements and all data types of value domains. If any value domain is using measurement unit which is not finalized yet the whole finalization process will fail.").then ->
-          enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/finalize", method: 'POST')).then (finalized) ->
-            updateFrom $scope.element, finalized
-            $rootScope.$broadcast 'catalogueElementUpdated', finalized
-            $rootScope.$broadcast 'catalogueElementFinalized', finalized
-          , showErrorsUsingMessages(messages)
-    }
-
-    updateAction = ->
-      action.disabled = $scope.element?.status != 'DRAFT'
-
-    $scope.$watch 'element.status', updateAction
-    $scope.$watch 'element.archived', updateAction
-    $scope.$on 'newVersionCreated', updateAction
-
-    action
-  ]
-
-  actionsProvider.registerActionInRole 'archive', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
-    return undefined if not $scope.element
-    return undefined if not $scope.element.status
-    return undefined if not security.hasRole('CURATOR')
-
-    action = {
-      position:   150
-      label:      'Mark as Deprecated'
-      icon:       'glyphicon glyphicon-ban-circle'
-      type:       'danger'
-      action:     ->
-        messages.confirm("Do you want to mark #{$scope.element.getElementTypeName()} #{$scope.element.name} as deprecated?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be marked as deprecated").then ->
-          enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/archive", method: 'POST')).then (archived) ->
-            updateFrom $scope.element, archived
-            $rootScope.$broadcast 'catalogueElementUpdated', archived
-          , showErrorsUsingMessages(messages)
-    }
-
-    updateAction = ->
-      action.disabled = $scope.element.archived
-
-    $scope.$watch 'element.status', updateAction
-    $scope.$watch 'element.archived', updateAction
-    $scope.$on 'newVersionCreated', updateAction
-
-    action
-  ]
-
-  actionsProvider.registerActionInRole 'merge', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
-    return undefined if not $scope.element
-    return undefined if not $scope.element.status
-    return undefined if not security.hasRole('CURATOR')
-
-    action = {
-      position:   125
-      label:      'Merge'
-      icon:       'fa fa-code-fork fa-rotate-180 fa-flip-vertical'
-      type:       'danger'
-      action:     ->
-        messages.prompt("Merge #{$scope.element.getElementTypeName()} #{$scope.element.name} to another #{$scope.element.getElementTypeName()}", "All non-system relationships of the #{$scope.element.getElementTypeName()} #{$scope.element.name} will be moved to the following destination and than the #{$scope.element.getElementTypeName()} #{$scope.element.name} will be archived", {type: 'catalogue-element', resource: $scope.element.elementType, status: 'draft'}).then (destination)->
-          enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/merge/#{destination.id}", method: 'POST')).then (merged) ->
-            oldName = $scope.element.classifiedName
-            messages.success "Element #{oldName} merged successfully into  #{$scope.element.classifiedName}"
-            merged.show()
-          , showErrorsUsingMessages(messages)
-    }
-
-    updateAction = ->
-      action.disabled = $scope.element.status != 'DRAFT'
-
-    $scope.$watch 'element.status', updateAction
-    $scope.$watch 'element.archived', updateAction
-    $scope.$on 'newVersionCreated', updateAction
-
-    action
-  ]
-
   actionsProvider.registerActionInRole 'archive-batch', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
     return undefined unless $scope.element and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('batch') or $scope.batch
     return undefined if not security.hasRole('CURATOR')
 
-    action = {
+    {
       position:   150
       label:      'Archive'
       icon:       'glyphicon glyphicon-compressed'
       type:       'danger'
+      watches:    ['batch.archived', 'element.archived']
+      disabled:   ($scope.batch ? $scope.element).archived
       action:     ->
         batch = $scope.batch ? $scope.element
         messages.confirm("Do you want to archive batch #{batch.name} ?", "The batch #{batch.name} will be archived").then ->
@@ -349,156 +220,6 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
             updateFroms batch, archived
           , showErrorsUsingMessages(messages)
     }
-
-    updateAction = ->
-      action.disabled = ($scope.batch ? $scope.element).archived
-
-    $scope.$watch 'batch.archived', updateAction
-    $scope.$watch 'element.archived', updateAction
-
-    action
-  ]
-
-
-  actionsProvider.registerActionInRole 'delete', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', '$state', 'messages', 'names', 'security', ($rootScope, $scope, $state, messages, names, security) ->
-    return undefined if not $scope.element
-    return undefined if not angular.isFunction($scope.element.delete)
-    return undefined if not security.hasRole('ADMIN')
-
-    action = {
-      position:   150
-      label:      'Delete'
-      icon:       'glyphicon glyphicon-remove'
-      type:       'danger'
-      action:     ->
-        messages.confirm("Do you really want to delete #{$scope.element.getElementTypeName()} #{$scope.element.name} ?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be deleted permanently. This action cannot be undone.").then ->
-          $scope.element.delete()
-          .then ->
-            messages.success "#{$scope.element.getElementTypeName()} #{$scope.element.name} deleted."
-            if $state.current.name.indexOf('mc.resource.show') >= 0
-              $state.go('mc.resource.list', {resource: names.getPropertyNameFromType($scope.element.elementType)}, {reload: true})
-          .catch showErrorsUsingMessages(messages)
-    }
-
-    action
-  ]
-
-
-  actionsProvider.registerActionInRole 'remove-mapping', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', '$state', 'messages', 'names', 'security', '$q', ($rootScope, $scope, $state, messages, names, security, $q) ->
-    return undefined if not $scope.element
-    return undefined if not angular.isFunction($scope.element.isInstanceOf)
-    return undefined if not $scope.element.isInstanceOf('mapping')
-    return undefined if not security.hasRole('CURATOR')
-
-    {
-      position:   150
-      label:      'Remove'
-      icon:       'glyphicon glyphicon-remove'
-      type:       'danger'
-      action:     ->
-        mapping   = $scope.element
-        deferred = $q.defer()
-        messages.confirm('Remove Mapping', "Do you really want to remove mapping from #{mapping.source.name} to #{mapping.destination.name}?").then ->
-          mapping.remove().then ->
-            messages.success('Mapping removed!', "#{mapping.destination.name} is no longer related to #{mapping.source.name}")
-            # reloads the table
-            deferred.resolve(true)
-          , (response) ->
-            if response.data?.errors
-              if angular.isString response.data.errors
-                messages.error response.data.errors
-              else
-                for err in response.data.errors
-                  messages.error err.message
-            else if response.status == 404
-              messages.error('Error removing mapping', 'Mapping cannot be removed, it probably does not exist anymore. The table was refreshed to get the most up to date results.')
-              deferred.resolve(true)
-            else
-              messages.error('Error removing mapping', 'Mapping cannot be removed, see application logs for details')
-
-        deferred.promise
-    }
-  ]
-
-  actionsProvider.registerActionInRole 'remove-relationship', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', '$state', 'messages', 'names', 'security', '$q', ($rootScope, $scope, $state, messages, names, security, $q) ->
-    return undefined if not $scope.element
-    return undefined if not angular.isFunction($scope.element.isInstanceOf)
-    return undefined if not $scope.element.isInstanceOf('relationship')
-    return undefined if not security.hasRole('CURATOR')
-
-
-    {
-      position:   150
-      label:      'Remove'
-      icon:       'glyphicon glyphicon-remove'
-      type:       'danger'
-      action:     ->
-        rel   = $scope.element
-        deferred = $q.defer()
-        messages.confirm('Remove Relationship', "Do you really want to remove relation '#{rel.element.name} #{rel.type[rel.direction]} #{rel.relation.name}'?").then () ->
-          rel.remove().then ->
-            messages.success('Relationship removed!', "#{rel.relation.name} is no longer related to #{rel.element.name}")
-            # reloads the table
-            deferred.resolve(true)
-          , (response) ->
-            if response.data?.errors
-              if angular.isString response.data.errors
-                messages.error response.data.errors
-              else
-                for err in response.data.errors
-                  messages.error err.message
-            else if response.status == 404
-              messages.error('Error removing relationship', 'Relationship cannot be removed, it probably does not exist anymore. The table was refreshed to get the most up to date results.')
-              deferred.resolve(true)
-            else
-              messages.error('Error removing relationship', 'Relationship cannot be removed, see application logs for details')
-
-        deferred.promise
-    }
-  ]
-  actionsProvider.registerActionInRole 'edit-relationship', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', '$state', 'messages', 'names', 'security', ($rootScope, $scope, $state, messages, names, security) ->
-    return undefined if not $scope.element
-    return undefined if not angular.isFunction($scope.element.isInstanceOf)
-    return undefined if not $scope.element.isInstanceOf('relationship')
-    return undefined if not security.hasRole('CURATOR')
-
-    {
-      position:   100
-      label:      'Edit'
-      icon:       'glyphicon glyphicon-edit'
-      type:       'primary'
-      action:     ->
-        rel   = $scope.element
-        rel.element.refresh().then (element) ->
-          args = {relationshipType: rel.type, direction: rel.direction, type: 'update-relationship', update: true, element: element, relation: rel.relation, classification: rel.classification, metadata: angular.copy(rel.ext)}
-          messages.prompt('Update Relationship', '', args).then (updated)->
-            rel.ext = updated.ext
-    }
-  ]
-
-  actionsProvider.registerActionInRoles 'create-new-relationship', [actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
-    return undefined if not $scope.element
-    return undefined if not angular.isFunction($scope.element.isInstanceOf)
-    return undefined if not $scope.element.isInstanceOf('catalogueElement')
-    return undefined if $scope.element.isInstanceOf 'dataImport'
-    return undefined if not security.hasRole('CURATOR')
-
-    action = {
-      position:   200
-      label:      'Create Relationship'
-      icon:       'glyphicon glyphicon-link'
-      type:       'success'
-      action:     ->
-        messages.prompt('Create Relationship', '', {type: 'create-new-relationship', element: $scope.element}).catch showErrorsUsingMessages(messages)
-    }
-
-    updateAction = ->
-      action.disabled = $scope.element.archived
-
-    $scope.$watch 'element.status', updateAction
-    $scope.$watch 'element.archived', updateAction
-
-    action
   ]
 
 
@@ -513,39 +234,20 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     direction = if $scope.list.base?.indexOf('/incoming/') > -1 then 'destinationToSource' else 'sourceToDestination'
     relationshipType = $scope.list.base.substring($scope.list.base.lastIndexOf('/') + 1)
 
-    action = {
+    {
       position:   200
       label:      'Add'
       icon:       'fa fa-plus-circle'
       type:       'success'
+      disabled:   $scope.$parent.element.archived
+      watches:    [
+        (scope) -> scope.$parent.element.status
+        (scope) -> scope.$parent.element.archived
+      ]
       action:     ->
         messages.prompt('Create Relationship', '', {type: 'create-new-relationship', element: $scope.$parent.element, direction: direction, relationshipTypeName: relationshipType}).catch showErrorsUsingMessages(messages)
     }
-
-    updateAction = ->
-      action.disabled = $scope.$parent.element.archived
-
-    $scope.$parent.$watch 'element.status', updateAction
-    $scope.$parent.$watch 'element.archived', updateAction
-
-    action
   ]
-
-  actionsProvider.registerActionInRole 'create-new-mapping', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
-    return undefined if not $scope.element
-    return undefined if not $scope.element.hasOwnProperty('mappings')
-    return undefined if not security.hasRole('CURATOR')
-
-    {
-      position:   300
-      label:      'Create Mapping'
-      icon:       'fa fa-superscript'
-      type:       'success'
-      action:     ->
-        messages.prompt('Create new mapping for ' + $scope.element.name, '', {type: 'new-mapping', element: $scope.element}).catch showErrorsUsingMessages(messages)
-    }
-  ]
-
 
   actionsProvider.registerActionInRoles 'create-new-mapping-in-header',  [actionsProvider.ROLE_LIST_HEADER_ACTION, actionsProvider.ROLE_LIST_FOOTER_ACTION], ['$scope', 'messages', 'names', 'security', 'catalogue', ($scope, messages, names, security, catalogue) ->
     return undefined if not $scope.$parent.element
@@ -555,40 +257,12 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     return undefined if not catalogue.isInstanceOf($scope.list.itemType, 'mapping')
 
     {
-    position:   300
-    label:      'Add'
-    icon:       'fa fa-plus-circle'
-    type:       'success'
-    action:     ->
-      messages.prompt('Create new mapping for ' + $scope.$parent.element.name, '', {type: 'new-mapping', element: $scope.$parent.element}).catch showErrorsUsingMessages(messages)
-    }
-  ]
-
-  actionsProvider.registerActionInRole 'validate-xsd-schema', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'catalogue', ($scope, messages, catalogue) ->
-    return undefined if not catalogue.isInstanceOf($scope.element?.elementType, 'asset')
-
-    {
-      position:   0
-      label:      'Validate XML'
-      icon:       'fa fa-check-circle-o'
-      type:       'default'
+      position:   300
+      label:      'Add'
+      icon:       'fa fa-plus-circle'
+      type:       'success'
       action:     ->
-        messages.prompt('', '', {type: 'validate-xml-by-schema', asset: $scope.element})
-
-    }
-  ]
-
-  actionsProvider.registerActionInRole 'download-asset', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', '$window', ($scope, $window) ->
-    return undefined if not $scope.element?.downloadUrl?
-
-    {
-      position:   0
-      label:      'Download'
-      icon:       'glyphicon glyphicon-download'
-      type:       'primary'
-      action:     ->
-        $window.open $scope.element.downloadUrl, '_blank'; return true
-
+        messages.prompt('Create new mapping for ' + $scope.$parent.element.name, '', {type: 'new-mapping', element: $scope.$parent.element}).catch showErrorsUsingMessages(messages)
     }
   ]
 
@@ -609,83 +283,13 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerActionInRole 'convert', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'security', ($scope, messages) ->
-    return undefined if not $scope.element
-    return undefined if not angular.isFunction $scope.element.isInstanceOf
-    return undefined if not $scope.element.isInstanceOf('valueDomain') and not $scope.element.isInstanceOf('mapping')
-
-    {
-      position:   -100
-      label:      'Convert'
-      icon:       'fa fa-long-arrow-right'
-      type:       'primary'
-      action:     ->
-        if $scope.element.isInstanceOf('valueDomain')
-          messages.prompt('', '', {type: 'convert-with-value-domain', source: $scope.element})
-        else if $scope.element.isInstanceOf('mapping')
-          messages.prompt('', '', {type: 'convert-with-value-domain', source: $scope.element.source, destination: $scope.element.destination})
-
-    }
-  ]
-
-  actionsProvider.registerActionInRole 'edit-mapping', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'security', ($scope, messages) ->
-    return undefined if not $scope.element
-    return undefined if not angular.isFunction $scope.element.isInstanceOf
-    return undefined if not $scope.element.isInstanceOf('mapping')
-
-    action =  {
-      position:   100
-      label:      'Edit'
-      icon:       'glyphicon glyphicon-edit'
-      type:       'primary'
-      action:     ->
-        $scope.element.source.refresh().then (element)->
-          args = {type: 'new-mapping', update: true, element: element, mapping: $scope.element}
-          messages.prompt('Update Mapping', '', args).then (updated)->
-            updateFrom $scope.element, updated
-
-    }
-
-    $scope.$watch 'element.mappings.total', (total) ->
-      action.disabled = $scope.element.isInstanceOf('valueDomain') and not total
-
-    action
-
-  ]
-
-  actionsProvider.registerActionInRole 'validate-value', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'security', ($scope, messages) ->
-    return undefined if not $scope.element
-    return undefined if not angular.isFunction $scope.element.isInstanceOf
-    return undefined if not $scope.element.isInstanceOf('valueDomain')
-
-    action = {
-      position:   -200
-      label:      'Validate Value'
-      icon:       'fa fa-check-circle-o'
-      type:       'primary'
-      action:     ->
-        messages.prompt('', '', {type: 'validate-value-by-domain', domain: $scope.element})
-    }
-
-    updateDisabled =  ->
-      action.disabled = not $scope.element.rule and not ($scope.element.dataType and $scope.element.dataType.isInstanceOf('enumeratedType')) and $scope.element.basedOn?.length == 0
-
-
-    $scope.$watch 'element.rule',     updateDisabled
-    $scope.$watch 'element.dataType', updateDisabled
-
-    updateDisabled()
-
-    action
-  ]
-
   actionsProvider.registerActionInRole 'refresh-asset', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', '$rootScope', 'catalogueElementResource', ($scope, $rootScope, catalogueElementResource) ->
     return undefined if $scope.element?.elementType != 'org.modelcatalogue.core.Asset'
     return undefined if $scope.element.status != 'PENDING'
 
     {
-      position:   0
-      label:      'Refresh'
+      position:   -100
+      label:      ''
       icon:       'glyphicon glyphicon-refresh'
       type:       'primary'
       action:     ->
@@ -697,7 +301,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerActionInRole 'generate-merge-models', actionsProvider.ROLE_LIST_ACTION, ['$scope', 'security', 'catalogue', 'modelCatalogueApiRoot', 'enhance', 'rest', 'messages', '$state', '$rootScope', ($scope, security, catalogue, modelCatalogueApiRoot, enhance, rest, messages, $state, $rootScope)->
+  actionsProvider.registerActionInRole 'generate-merge-models', actionsProvider.ROLE_LIST_ACTION, ['$scope', 'security', 'catalogue', 'modelCatalogueApiRoot', 'enhance', 'rest', 'messages', '$state', ($scope, security, catalogue, modelCatalogueApiRoot, enhance, rest, messages, $state)->
     return undefined unless security.isUserLoggedIn()
     return undefined unless $scope.list
     return undefined unless catalogue.isInstanceOf($scope.list.itemType, 'batch')
@@ -707,18 +311,28 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       icon:       'fa fa-flash'
       type:       'primary'
       action: ->
-        messages.confirm("Generate Suggestions", "Suggestions to optimalize catalogue will be generated. This may take a long time depending on complexity of the catalogue. You can rerun the action later to clean all resolved batches generated by this action.").then ->
-          enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}/dataArchitect/generateSuggestions")).then (refreshed)->
-            messages.success "Suggestions created"
-            $rootScope.$broadcast 'catalogueElementUpdated', refreshed
-            $state.go('.', {page: undefined}, {reload: true})
-          , ->
-            messages.error "Cannot create actions to merge models."
+        messages.prompt('Generate Suggestions', "Suggestions to optimalize catalogue will be generated. This may take a long time depending on complexity of the catalogue. You can rerun the action later to clean all resolved batches generated by this action.", {type: 'generate-suggestions'}).then ->
+          $state.go('.', {page: undefined}, {reload: true})
+
+    }
+  ]
+
+  actionsProvider.registerActionInRole 'refresh-batches', actionsProvider.ROLE_LIST_ACTION, ['$state', '$scope', 'security', 'catalogue', ($state, $scope, security, catalogue)->
+    return undefined unless security.isUserLoggedIn()
+    return undefined unless $scope.list
+    return undefined unless catalogue.isInstanceOf($scope.list.itemType, 'batch')
+    {
+      position:   0
+      label:      'Refresh'
+      icon:       'fa fa-refresh'
+      type:       'primary'
+      action: ->
+        $state.go('.', {page: undefined}, {reload: true})
     }
   ]
 
   actionsProvider.registerActionInRoles 'export', [actionsProvider.ROLE_LIST_ACTION, actionsProvider.ROLE_ITEM_ACTION, actionsProvider.ROLE_LIST_HEADER_ACTION], ['$scope', 'security', ($scope, security)->
-    return undefined unless security.isUserLoggedIn()
+    return undefined unless security.hasRole('VIEWER')
     return undefined unless $scope.list or $scope.element
     if $scope.list
       return undefined if $scope.resource == 'import'
@@ -740,8 +354,9 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
         {
           label:  report.title
           url:    report.url
+          type:   report.type
           action: ->
-            if report.type == 'LINK'
+            if @type == 'LINK'
               $window.open(@url, '_blank')
             else enhance(rest(method: 'GET', url: @url)).then (result) ->
               result.show()
@@ -782,7 +397,8 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerActionInRole 'switch-status', actionsProvider.ROLE_LIST_ACTION, ['$state', '$scope', '$stateParams', 'catalogue', ($state, $scope, $stateParams, catalogue) ->
+  actionsProvider.registerActionInRole 'switch-status', actionsProvider.ROLE_LIST_ACTION, ['$state', '$scope', '$stateParams', 'catalogue', 'security', ($state, $scope, $stateParams, catalogue, security) ->
+    return undefined unless security.hasRole('VIEWER')
     return undefined unless $state.current.name == 'mc.resource.list'
     return undefined unless catalogue.isInstanceOf($stateParams.resource, 'catalogueElement')
 
@@ -981,6 +597,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       type:     'primary'
       icon:     'glyphicon glyphicon-open'
       label:    'Add or Remove Dependency'
+      watches:   -> $rootScope.selectedAction
       action:   ->
         if $rootScope.selectedAction == $scope.action
           $rootScope.selectedAction = undefined
@@ -1002,29 +619,28 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
     }
 
-    $rootScope.$watch 'selectedAction', (selectedAction) ->
-      if selectedAction
-        if selectedAction == $scope.action
-          action.active = true
-          action.icon = 'glyphicon glyphicon-open'
-          action.label = 'Add or Remove Dependency'
-          action.mode = 'select'
-        else
-          action.active = false
-          if selectedAction.dependsOn.hasOwnProperty('' + $scope.action.id)
-            action.icon = 'glyphicon glyphicon-remove-circle'
-            action.label = 'Remove Dependency'
-            action.mode = 'remove'
-          else
-            action.icon = 'glyphicon glyphicon-save'
-            action.label = 'Select as Dependency'
-            action.mode = 'add'
-
-      else
+    if $rootScope.selectedAction
+      if $rootScope.selectedAction == $scope.action
+        action.active = true
         action.icon = 'glyphicon glyphicon-open'
-        action.active = false
         action.label = 'Add or Remove Dependency'
         action.mode = 'select'
+      else
+        action.active = false
+        if $rootScope.selectedAction.dependsOn.hasOwnProperty('' + $scope.action.id)
+          action.icon = 'glyphicon glyphicon-remove-circle'
+          action.label = 'Remove Dependency'
+          action.mode = 'remove'
+        else
+          action.icon = 'glyphicon glyphicon-save'
+          action.label = 'Select as Dependency'
+          action.mode = 'add'
+
+    else
+      action.icon = 'glyphicon glyphicon-open'
+      action.active = false
+      action.label = 'Add or Remove Dependency'
+      action.mode = 'select'
 
     action
   ]
@@ -1039,6 +655,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       type:     'success'
       icon:     'glyphicon glyphicon-flash'
       label:    'Run All Pending'
+      watches:  ['batch', 'element']
       action:   ->
         batch = $scope.batch ? $scope.element
         messages.confirm('Run All Actions', "Do you really wan to run all actions from '#{batch.name}' batch").then ->
@@ -1053,9 +670,6 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
     updateDisabled($scope.batch ? $scope.element)
 
-    $scope.$watch 'batch', updateDisabled
-    $scope.$watch 'element', updateDisabled
-
     action
 
   ]
@@ -1067,23 +681,18 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     return undefined if $scope.action.state in ['PERFORMING', 'PERFORMED']
     return undefined if not security.hasRole('CURATOR')
 
-    action =
-      position:   100
-      label:      'Update Action Parameters'
-      icon:       'glyphicon glyphicon-edit'
-      type:       'primary'
-      action:     ->
-        messages.prompt('Update Action Parameters', '', {type: 'update-action-parameters', action: $scope.action}).then (updated)->
-          $scope.action = updated
-
-    updateAction = ->
-      action.disabled = $scope.action.state in ['PERFORMING', 'PERFORMED']
-
-    $scope.$watch 'action.state', updateAction
-
-    updateAction()
-
-    return action
+    {
+      position: 100
+      label: 'Update Action Parameters'
+      icon: 'glyphicon glyphicon-edit'
+      type: 'primary'
+      watches: 'action.state'
+      disabled: $scope.action.state in ['PERFORMING', 'PERFORMED']
+      action: ->
+        messages.prompt('Update Action Parameters', '',
+          {type: 'update-action-parameters', action: $scope.action}).then (updated)->
+            $scope.action = updated
+    }
 
   ]
 
@@ -1102,56 +711,47 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   actionsProvider.registerActionInRole 'modal-save-element', actionsProvider.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
     return undefined unless $scope.hasChanged and $scope.saveElement
 
-    action = {
+    {
       position:   1000
       label:      'Save'
       icon:       'glyphicon glyphicon-ok'
       type:       'success'
+      watches:    'hasChanged()'
+      disabled:   not $scope.hasChanged()
       action: ->
        $scope.saveElement() if $scope.hasChanged()
     }
-
-    $scope.$watch 'hasChanged()', (changed)->
-      action.disabled = not changed
-
-    action
   ]
 
   actionsProvider.registerActionInRole 'modal-save-and-add-another', actionsProvider.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
     return undefined unless $scope.hasChanged and $scope.saveAndCreateAnother
 
-    action = {
+    {
       position:   2000
       label:      'Save and Create Another'
       icon:       'glyphicon glyphicon-ok'
       type:       'success'
+      watches:    'hasChanged()'
+      disabled:   not $scope.hasChanged()
       action: ->
         $scope.saveAndCreateAnother() if $scope.hasChanged()
     }
-
-    $scope.$watch 'hasChanged()', (changed)->
-      action.disabled = not changed
-
-    action
   ]
 
 
   actionsProvider.registerChildAction 'modal-save-element', 'modal-save-element-as-new-version', ['$scope', ($scope) ->
     return undefined unless $scope.hasChanged and $scope.saveElement and not $scope.create and $scope.original and $scope.original.isInstanceOf and $scope.original.isInstanceOf 'catalogueElement'
 
-    action = {
+    {
       position:   1000
       label:      'Save as New Version'
       icon:       'glyphicon glyphicon-circle-arrow-up'
       type:       'success'
+      watches:    'hasChanged()'
+      disabled:   not $scope.hasChanged()
       action: ->
         $scope.saveElement(true) if $scope.hasChanged()
     }
-
-    $scope.$watch 'hasChanged()', (changed)->
-      action.disabled = not changed
-
-    action
   ]
 
   actionsProvider.registerActionInRole 'expand-all-rows', actionsProvider.ROLE_LIST_HEADER_ACTION, ['$scope', ($scope) ->

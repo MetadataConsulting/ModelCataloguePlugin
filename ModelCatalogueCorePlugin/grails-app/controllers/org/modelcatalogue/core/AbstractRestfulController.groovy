@@ -5,6 +5,7 @@ import grails.transaction.Transactional
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.hibernate.StaleStateException
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.Lists
@@ -14,7 +15,6 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.validation.Errors
 
 import javax.servlet.http.HttpServletResponse
-import java.util.concurrent.ExecutorService
 
 import static org.springframework.http.HttpStatus.*
 
@@ -25,7 +25,6 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     AssetService assetService
     SearchCatalogue modelCatalogueSearchService
     SecurityService modelCatalogueSecurityService
-    ExecutorService executorService
     ElementService elementService
 
     XLSXListRenderer xlsxListRenderer

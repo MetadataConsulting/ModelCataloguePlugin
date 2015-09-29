@@ -3,12 +3,17 @@ package org.modelcatalogue.core
 
 class MappingService {
 
+    def auditService
+
     static transactional = true
 
     Mapping map(CatalogueElement source, CatalogueElement destination, String mapping) {
         if (!source || !source.id || !destination || !destination.id || !mapping) return null
         Mapping existing = Mapping.findBySourceAndDestination(source, destination)
         if (existing) {
+            if (existing.mapping == mapping) {
+                return existing
+            }
             existing.mapping = mapping
             existing.validate()
 
@@ -16,7 +21,9 @@ class MappingService {
                 return existing
             }
 
-            return existing.save()
+            auditService.logMappingUpdated(existing)
+            existing.save(deepValidate: false)
+            return existing
         }
         Mapping newOne = new Mapping(source: source, destination: destination, mapping: mapping)
         newOne.validate()
@@ -25,9 +32,12 @@ class MappingService {
             return newOne
         }
 
-        newOne.save()
-        source.addToOutgoingMappings(newOne)
-        destination.addToIncomingMappings(newOne)
+        newOne.save(validate: false)
+        source.addToOutgoingMappings(newOne).save(validate: false)
+        destination.addToIncomingMappings(newOne).save(validate: false)
+
+        auditService.logMappingCreated(newOne)
+
         newOne
     }
 
@@ -39,8 +49,11 @@ class MappingService {
     Mapping unmap(CatalogueElement source, CatalogueElement destination) {
         Mapping old = Mapping.findBySourceAndDestination(source, destination)
         if (!old) return null
-        source.removeFromOutgoingMappings(old)
-        destination.removeFromIncomingMappings(old)
+
+        auditService.logMappingDeleted(old)
+
+        source.removeFromOutgoingMappings(old).save(validate: false)
+        destination.removeFromIncomingMappings(old).save(validate: false)
         old.delete(flush: true)
         old
     }

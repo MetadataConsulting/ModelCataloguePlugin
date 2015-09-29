@@ -1,7 +1,7 @@
 #!/bin/sh
 
-#if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
-  echo -e "Starting to update gh-pages\n"
+if [ "$TEST_SUITE" = "app_functional" ] ; then
+  echo "Starting to update gh-pages\n"
 
   #copy data we're interested in to other place
   mkdir -p $HOME/reports/last-tests-reports
@@ -17,7 +17,7 @@
   git config --global user.name "Travis"
 
   #using token clone gh-pages branch
-  git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/MetadataRegistry/ModelCataloguePlugin.git  gh-pages > /dev/null
+  git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/MetadataRegistry/ModelCataloguePluginReports.git gh-pages > /dev/null
 
   #go into diractory and copy data we're interested in to that directory
   cd gh-pages
@@ -26,9 +26,9 @@
   cp -Rf $HOME/reports/* ./reports/latest/
 
   #add, commit and push files
-  git add -u -f .
+  git add -A .
   git commit -m "Travis build $TRAVIS_BUILD_NUMBER pushed to gh-pages"
   git push -fq origin gh-pages > /dev/null
 
-  echo -e "Done magic with reports\n"
-#fi
+  echo "Done magic with reports\n"
+fi

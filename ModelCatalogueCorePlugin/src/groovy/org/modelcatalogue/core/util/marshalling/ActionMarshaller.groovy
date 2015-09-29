@@ -5,7 +5,7 @@ import org.modelcatalogue.core.actions.ActionRunner
 import org.modelcatalogue.core.actions.ActionService
 import org.springframework.beans.factory.annotation.Autowired
 
-class ActionMarshaller extends AbstractMarshallers {
+class ActionMarshaller extends AbstractMarshaller {
 
     @Autowired ActionService actionService
 

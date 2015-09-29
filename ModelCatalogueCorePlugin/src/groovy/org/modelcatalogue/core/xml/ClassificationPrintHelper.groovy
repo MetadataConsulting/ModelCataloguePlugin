@@ -2,6 +2,7 @@ package org.modelcatalogue.core.xml
 
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.util.ClassificationFilter
 
 class ClassificationPrintHelper extends CatalogueElementPrintHelper<Classification> {
 
@@ -14,7 +15,7 @@ class ClassificationPrintHelper extends CatalogueElementPrintHelper<Classificati
     void processElements(Object theMkp, Classification element, PrintContext context, Relationship rel) {
         super.processElements(theMkp, element, context, rel)
 
-        for (CatalogueElement other in context.modelService.getTopLevelModels([element], [:]).items) {
+        for (CatalogueElement other in context.modelService.getTopLevelModels(ClassificationFilter.includes(element), [:]).items) {
                 printElement(theMkp, other, context, null)
         }
 
@@ -30,11 +31,11 @@ class ClassificationPrintHelper extends CatalogueElementPrintHelper<Classificati
 
     private static <E extends CatalogueElement> List<E> allClassified(Class<E> type, Classification classification, PrintContext context) {
         DetachedCriteria<E> criteria = new DetachedCriteria<E>(type).build {
-            'in'('status', [ElementStatus.DEPRECATED, ElementStatus.FINALIZED, ElementStatus.DRAFT])
+            'in'('status', [org.modelcatalogue.core.api.ElementStatus.DEPRECATED, org.modelcatalogue.core.api.ElementStatus.FINALIZED, org.modelcatalogue.core.api.ElementStatus.DRAFT])
             not {
                 'in'('id', context.idsOfPrinted)
             }
         }
-        context.classificationService.classified(criteria, [classification]).list()
+        context.classificationService.classified(criteria, ClassificationFilter.includes([classification])).list()
     }
 }

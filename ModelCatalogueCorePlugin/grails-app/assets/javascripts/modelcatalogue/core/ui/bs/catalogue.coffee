@@ -13,6 +13,8 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setIcon 'batch',              "fa fa-fw fa-flash"
   catalogueProvider.setIcon 'user',               "fa fa-fw fa-user"
   catalogueProvider.setIcon 'csvTransformation',  "fa fa-fw fa-long-arrow-right"
+  catalogueProvider.setIcon 'relationship',       "fa fa-fw fa-link"
+  catalogueProvider.setIcon 'mapping',            "fa fa-fw fa-superscript"
 
   # this should be generated automatically in the future
 
@@ -31,6 +33,25 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
 
   catalogueProvider.setDefaultSort 'catalogueElement',  sort: 'name',         order: 'asc'
   catalogueProvider.setDefaultSort 'asset',             sort: 'lastUpdated',  order: 'desc'
+
+
+  catalogueProvider.setDeprecationWarning 'valueDomain', (domain) ->
+    ret = []
+    ret.push 'Data Type'        if domain.dataType?.status == 'DEPRECATED'
+    ret.push 'Measurement Unit' if domain.unitOfMeasure?.status == 'DEPRECATED'
+
+    return undefined if ret.length == 0
+    return ret.join(' and ') + " Deprecated"
+
+  catalogueProvider.setDeprecationWarning 'dataElement', (dataElement) ->
+    if dataElement.valueDomain
+      return 'Value Domain Deprecated' if dataElement.valueDomain.status == 'DEPRECATED'
+      valueDomainDeprecation = catalogueProvider.getDeprecationWarning('valueDomain')(dataElement.valueDomain)
+      return "Value Domain uses deprecated #{valueDomainDeprecation}" if valueDomainDeprecation
+
+    return undefined
+
+
 
 
 ]

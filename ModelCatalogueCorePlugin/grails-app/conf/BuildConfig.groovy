@@ -29,25 +29,39 @@ grails.project.dependency.resolution = {
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     repositories {
         grailsCentral()
-        mavenLocal()
         mavenCentral()
+        mavenLocal()
         // uncomment the below to enable remote dependency resolution
         // from public Maven repositories
         //mavenRepo "http://repository.codehaus.org"
         //mavenRepo "http://download.java.net/maven/2/"
         //mavenRepo "http://repository.jboss.com/maven2/"
         mavenRepo 'http://jcenter.bintray.com'
-        mavenRepo "http://dl.bintray.com/metadata/model-catalogue"
-        mavenRepo "http://dl.dropbox.com/u/326301/repository"
-//        mavenRepo "http://www.biojava.org/download/maven/"
+		mavenRepo "http://dl.bintray.com/metadata/model-catalogue"
+        //mavenRepo "http://dl.dropbox.com/u/326301/repository"
+		//mavenRepo "http://www.biojava.org/download/maven/"
 
 
     }
     dependencies {
+
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // runtime 'mysql:mysql-connector-java:5.1.27'
-        compile 'net.sourceforge.owlapi:owlapi-oboformat:3.5.1'
+        compile 'com.google.guava:guava:18.0'
+
+        String mcToolkitVersion = '1.0.0-alpha-11'
+        compile "org.modelcatalogue:mc-core-api:$mcToolkitVersion"
+        compile "org.modelcatalogue:mc-builder-api:$mcToolkitVersion"
+        compile "org.modelcatalogue:mc-integration-excel:$mcToolkitVersion"
+        compile "org.modelcatalogue:mc-integration-obo:$mcToolkitVersion"
+        compile "org.modelcatalogue:mc-integration-xml:$mcToolkitVersion"
+        test "org.modelcatalogue:mc-builder-xml:$mcToolkitVersion"
+
+		
+
         test 'xmlunit:xmlunit:1.6'
+        test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
+		 
     }
 
     plugins {
@@ -62,7 +76,7 @@ grails.project.dependency.resolution = {
         compile ":coffee-asset-pipeline:1.9.0"
         compile ":less-asset-pipeline:1.10.0"
 //        runtime ":hibernate4:4.3.5.5"
-        runtime  ":hibernate:3.6.10.17"
+        runtime  ":hibernate:3.6.10.18"
 
         compile ":excel-export:0.2.1"
         compile ":executor:0.3"
@@ -73,12 +87,13 @@ grails.project.dependency.resolution = {
         test ':fixtures:1.3'
 
         // codenarc static analysis
-        build ":codenarc:0.20"
+        build ":codenarc:0.21"
 
         // test coverage
         test ":code-coverage:1.2.7"
 
         build ":tomcat:7.0.55"
+		//jasper report generator see in dependencies
 
     }
 }

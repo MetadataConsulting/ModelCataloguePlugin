@@ -1,4 +1,7 @@
 package org.modelcatalogue.core
+
+import org.modelcatalogue.core.util.OrderedMap
+
 /*
 * Enumerated Types are data types that contain a list of enumerated values
 * i.e. ['politics', 'history', 'science']
@@ -11,7 +14,7 @@ package org.modelcatalogue.core
 
 class EnumeratedType extends DataType {
 
-    private static final QUOTED_CHARS = [
+    static final QUOTED_CHARS = [
             "\\": "&#92;",
             ":": "&#58;",
             "|": "&#124;",
@@ -41,19 +44,7 @@ class EnumeratedType extends DataType {
      * @param map the map containing the enum values
      */
     void setEnumerations(Map<String, String> map) {
-        if (map.type == 'orderedMap') {
-            if (map.values instanceof List) {
-                Map<String, String> newVal = [:]
-                for (item in map.values) {
-                    newVal[item.key as String] = item.value as String
-                }
-                enumAsString = mapToString(newVal)
-            } else {
-                enumAsString = mapToString([:])
-            }
-        } else {
-            enumAsString = mapToString(map)
-        }
+        enumAsString = mapToString(OrderedMap.fromJsonMap(map))
     }
 
     /**
@@ -66,6 +57,25 @@ class EnumeratedType extends DataType {
     Map<String, String> getEnumerations() {
         stringToMap(enumAsString)
     }
+	
+	 class EnumBean{
+		String name
+		String code 
+	}
+	/**
+	 * This method could be optimized 
+	 * 
+	 * @return  a list with beans (name,code)
+	 */
+	List getEnumerationsAsBeans(){
+		def results=new ArrayList()
+		def map =stringToMap(enumAsString)
+		for (String key in map.keySet()) {
+			results << new EnumBean(name:map.get(key),code:key)
+		}
+		return results
+		
+	}
 
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}, status: ${status}, modelCatalogueId: ${modelCatalogueId}, enumerations: ${enumerations}]"

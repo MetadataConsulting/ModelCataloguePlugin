@@ -1,7 +1,3 @@
-#= require_self
-#= require defaultStates
-
-
 angular.module('mc.core.ui.states', [
   # depends on
   'mc.util'
@@ -9,3 +5,5 @@ angular.module('mc.core.ui.states', [
   # list of modules
   'mc.core.ui.states.defaultStates'
 ])
+
+window.modelcatalogue.registerModule 'mc.core.ui.states'

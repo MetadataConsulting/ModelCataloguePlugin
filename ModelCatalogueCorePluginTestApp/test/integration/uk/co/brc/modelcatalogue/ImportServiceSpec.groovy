@@ -13,21 +13,22 @@ class ImportServiceSpec extends IntegrationSpec {
     "import nhic spreadsheet"() {
 
         when:
-        expect:
         def models = Model.list()
-        !models.isEmpty()
         def dataTypes = DataType.list()
-        !dataTypes.isEmpty()
         def dataElements = DataElement.list()
-        !dataElements.isEmpty()
         def valueDomains = ValueDomain.list()
+
+        then:
+        !models.isEmpty()
+        !dataTypes.isEmpty()
+        !dataElements.isEmpty()
         !valueDomains.isEmpty()
 
         when:
         def core = models.find { it.name == "MAIN" }
         def patientIdentity = models.find { it.name == "PATIENT IDENTITY DETAILS" }
         def NHICConceptualDomain = Classification.findByName("NHIC")
-        def indicatorCode = dataTypes.find { it.name == "NHS_NUMBER_STATUS_INDICATOR_CODE" }
+        def indicatorCode = dataTypes.find { it.name == "NHS NUMBER STATUS INDICATOR CODE" }
         def valueDomain = valueDomains.find { it.name == "NHS_NUMBER_STATUS_INDICATOR_CODE" }
         def dataElement = dataElements.find { it.name == "NHS NUMBER STATUS INDICATOR CODE" }
 

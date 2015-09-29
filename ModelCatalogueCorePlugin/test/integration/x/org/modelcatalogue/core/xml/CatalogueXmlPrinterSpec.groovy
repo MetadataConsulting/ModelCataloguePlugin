@@ -1,31 +1,33 @@
 package x.org.modelcatalogue.core.xml
 
-import grails.test.spock.IntegrationSpec
 import groovy.xml.XmlUtil
 import org.custommonkey.xmlunit.DetailedDiff
 import org.custommonkey.xmlunit.Diff
 import org.custommonkey.xmlunit.XMLUnit
 import org.modelcatalogue.core.*
-import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 import spock.lang.Ignore
-import spock.lang.Shared
-import spock.lang.Stepwise
 
-@Stepwise
-class CatalogueXmlPrinterSpec extends IntegrationSpec {
+class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
 
     CatalogueXmlPrinter printer
 
-    @Shared def classificationService
-    @Shared def elementService
-    @Shared def modelService
-    @Shared def initCatalogueService
+    def classificationService
+    def elementService
+    def modelService
 
-    def setupSpec() {
+
+    def setup() {
         XMLUnit.ignoreWhitespace = true
 
-        initCatalogueService.initCatalogue(true)
+        initCatalogue()
+
+        RelationshipType.containmentType.with {
+            rule = "/* A RULE */"
+            save(failOnError: true)
+        }
 
         if (!RelationshipType.findByName('derivedFrom')) {
             new RelationshipType(
@@ -34,13 +36,27 @@ class CatalogueXmlPrinterSpec extends IntegrationSpec {
                     sourceToDestination: 'is derived from',
                     destinationClass: MeasurementUnit,
                     destinationToSource: 'derives'
-            ).save(failOnError: true)
+            ).save(failOnError: true, flush: true)
         }
-    }
 
-    def setup() {
         printer = new CatalogueXmlPrinter(classificationService, modelService)
     }
+
+
+    def "replace special chars"() {
+        Writable writable = printer.bind(new ValueDomain(name: 'Test', description: "diagnosis.ƒ‚ƒ‚ƒ‚'‚“ e", modelCatalogueId: 'http://example.com/specialchars').save()) {
+            noHref = true
+        }
+        StringWriter writer = new StringWriter()
+        writable.writeTo(writer)
+        expect:
+        writer.toString() == '''<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.1.2/metadataregistry.xsd">
+  <valueDomain name="Test" id="http://example.com/specialchars" status="DRAFT">
+    <description>diagnosis.&#402;&#8218;&#402;&#8218;&#402;&#8218;'&#8218;&#8220; e</description>
+  </valueDomain>
+</catalogue>'''
+    }
+
 
     def "write simple measurement unit"() {
         expect:
@@ -98,12 +114,15 @@ class CatalogueXmlPrinterSpec extends IntegrationSpec {
         Diff diff = new Diff(xml, getClass().classLoader.getResourceAsStream("resources/xml/$sampleFile").text)
         DetailedDiff detailedDiff = new DetailedDiff(diff)
 
+
         assert detailedDiff.similar(), detailedDiff.toString()
         return true
     }
 
     private <E extends CatalogueElement> E build(@DelegatesTo(CatalogueBuilder) Closure cl) {
-        new CatalogueBuilder(classificationService, elementService).build(cl).first() as E
+        DefaultCatalogueBuilder defaultCatalogueBuilder = new DefaultCatalogueBuilder(classificationService, elementService)
+        defaultCatalogueBuilder.build cl
+        defaultCatalogueBuilder.created.first() as E
     }
 
     private ValueDomain getPressure() {

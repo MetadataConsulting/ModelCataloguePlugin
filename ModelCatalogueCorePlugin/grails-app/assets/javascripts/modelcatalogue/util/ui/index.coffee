@@ -1,20 +1,3 @@
-#= require_self
-#= require hideForRole
-#= require showForRole
-#= require hideIfLoggedIn
-#= require showIfLoggedIn
-#= require contextualActions
-#= require actions
-#= require actionButtonSingle
-#= require actionButtonDropdown
-#= require applicationTitle
-#= require contextualActions
-#= require contextualMenu
-#= require focusMe
-#= require menuItemDropdown
-#= require menuItemSingle
-#= require sortable
-
 angular.module 'mc.util.ui', [
   # dependencies
   'mc.util'
@@ -27,12 +10,11 @@ angular.module 'mc.util.ui', [
   'mc.util.ui.contextualActions'
   'mc.util.ui.actions'
   'mc.util.ui.focusMe'
-  'mc.util.ui.actionButtonSingle'
-  'mc.util.ui.actionButtonDropdown'
   'mc.util.ui.applicationTitle'
   'mc.util.ui.contextualActions'
   'mc.util.ui.contextualMenu'
   'mc.util.ui.menuItemDropdown'
   'mc.util.ui.menuItemSingle'
   'mc.util.ui.sortable'
+  'mc.util.ui.resizable'
 ]

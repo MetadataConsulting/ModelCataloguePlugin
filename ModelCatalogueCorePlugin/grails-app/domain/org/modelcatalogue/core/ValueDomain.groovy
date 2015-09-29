@@ -1,6 +1,6 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.publishing.DraftContext
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.util.FriendlyErrors
@@ -48,6 +48,11 @@ class ValueDomain extends CatalogueElement {
     Boolean multiple = Boolean.FALSE
 
     static transients = ['regexDef', 'dataElements']
+
+    static mapping = {
+        dataType fetch: 'join'
+        unitOfMeasure fetch: 'join'
+    }
 
     static constraints = {
         description nullable: true, maxSize: 2000
@@ -150,11 +155,8 @@ class ValueDomain extends CatalogueElement {
     }
 
     @Override
-    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftContext strategy) {
-        PublishingChain.createDraft(this, strategy)
-        .add(this.dataElements)
-        .add(this.classifications)
-        .run(publisher)
+    protected PublishingChain prepareDraftChain(PublishingChain chain) {
+        chain.add(this.dataElements).add(this.classifications)
     }
 
     @Override

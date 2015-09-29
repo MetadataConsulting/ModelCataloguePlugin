@@ -3,9 +3,6 @@ package org.modelcatalogue.core.xml
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.*
 
-/**
- * Created by ladin on 15.01.15.
- */
 abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
 
     private static <E extends CatalogueElement> CatalogueElementPrintHelper<E> get(Class<E> type) {
@@ -40,16 +37,17 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         if (element instanceof Classification) {
             if (context.currentClassification) {
                 theMkp."${elementName}"(ref(element, context)) {
-                    processRelationshipMetadata(theMkp, rel)
+                    processRelationshipMetadata(theMkp, context, rel)
                 }
                 return
             }
             context.currentClassification = element
+            context.typesUsed << 'classification'
         }
 
         if (context.wasPrinted(element)) {
             theMkp."${elementName}"(ref(element, context)) {
-                processRelationshipMetadata(theMkp, rel)
+                processRelationshipMetadata(theMkp, context, rel)
             }
             return
         }
@@ -82,8 +80,8 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             attrs.id = element.getDefaultModelCatalogueId(!context.idIncludeVersion)
         }
 
-        if (element.status != ElementStatus.FINALIZED) {
-            if (element.status in [ElementStatus.DRAFT, ElementStatus.DEPRECATED]) {
+        if (element.status != org.modelcatalogue.core.api.ElementStatus.FINALIZED) {
+            if (element.status in [org.modelcatalogue.core.api.ElementStatus.DRAFT, org.modelcatalogue.core.api.ElementStatus.DEPRECATED]) {
                 attrs.status = element.status
             } else {
                 throw new IllegalArgumentException("Cannot print ${element.getClass().simpleName} with status $element.status")
@@ -94,26 +92,26 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
     }
 
     void processElements(theMkp, E element, PrintContext context, Relationship relationship) {
-        processRelationshipMetadata(theMkp, relationship)
+        processRelationshipMetadata(theMkp, context, relationship)
 
         if (element.description) {
             theMkp.description element.description
         }
         for (Relationship rel in element.isBasedOnRelationships) {
             theMkp.basedOn(ref(rel.source, context)) {
-                processRelationshipMetadata(theMkp, rel)
+                processRelationshipMetadata(theMkp, context, rel)
             }
         }
         for (Relationship rel in element.relatedToRelationships) {
             CatalogueElement other = rel.source == element ? rel.destination : rel.source
             theMkp.relatedTo(ref(other, context)) {
-                processRelationshipMetadata(theMkp, rel)
+                processRelationshipMetadata(theMkp, context, rel)
             }
         }
         for (Relationship rel in element.isSynonymForRelationships) {
             CatalogueElement other = rel.source == element ? rel.destination : rel.source
             theMkp.synonym(ref(other, context)){
-                processRelationshipMetadata(theMkp, rel)
+                processRelationshipMetadata(theMkp, context, rel)
             }
         }
         if (element.ext) {
@@ -131,26 +129,33 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             theMkp.relationships {
                 for (Relationship rel in outgoing){
                     to(relationshipAttrs(rel, true, context)) {
-                        processRelationshipMetadata(theMkp, rel)
+                        processRelationshipMetadata(theMkp, context, rel)
                     }
                 }
 
                 for (Relationship rel in incoming){
                     from(relationshipAttrs(rel, false, context)) {
-                        processRelationshipMetadata(theMkp, rel)
+                        processRelationshipMetadata(theMkp, context, rel)
                     }
                 }
             }
         }
     }
 
-    static void processRelationshipMetadata(theMkp, Relationship rel) {
-        if (rel?.ext) {
+    static void processRelationshipMetadata(theMkp, PrintContext context, Relationship rel) {
+        if (!rel) {
+            return
+        }
+        context.typesUsed << rel.relationshipType.name
+        if (rel.ext) {
             theMkp.metadata {
                 for (Map.Entry<String, String> entry in rel.ext.entrySet()) {
                     extension(key: entry.key, entry.value)
                 }
             }
+        }
+        if (rel.archived) {
+            theMkp.archived true
         }
     }
 

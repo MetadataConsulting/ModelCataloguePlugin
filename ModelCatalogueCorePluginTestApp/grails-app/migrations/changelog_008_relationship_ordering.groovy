@@ -33,7 +33,7 @@ databaseChangeLog = {
         }
     }
 
-    changeSet(author: "Vladimir Orany", id: "1412847974090-04") {
+    changeSet(author: "Vladimir Orany", id: "1412847974090-14") {
         preConditions (onFail: 'MARK_RAN') {
             not {
                 // language=SQL
@@ -51,7 +51,7 @@ databaseChangeLog = {
     }
 
 
-    changeSet(author: "Vladimir Orany", id: "1412847974090-05") {
+    changeSet(author: "Vladimir Orany", id: "1412847974090-15") {
         preConditions (onFail: 'MARK_RAN') {
             not {
                 // language=SQL
@@ -70,7 +70,7 @@ databaseChangeLog = {
     }
 
 
-    changeSet(author: "Vladimir Orany", id: "1412847974090-06") {
+    changeSet(author: "Vladimir Orany", id: "1412847974090-16") {
         preConditions (onFail: 'MARK_RAN') {
             not {
                 // language=SQL

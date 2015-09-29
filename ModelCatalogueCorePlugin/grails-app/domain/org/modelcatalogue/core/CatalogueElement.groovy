@@ -1,12 +1,20 @@
 package org.modelcatalogue.core
 
+import com.google.common.base.Function
+import com.google.common.collect.Lists
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Published
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
+import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.ExtensionsWrapper
+import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.RelationshipDirection
+
+import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
 
 /**
 * Catalogue Element - there are a number of catalogue elements that make up the model
@@ -14,10 +22,11 @@ import org.modelcatalogue.core.util.RelationshipDirection
 * DataElement) they extend catalogue element which allows creation of incoming and outgoing
 * relationships between them. They also  share a number of characteristics.
 * */
-abstract class CatalogueElement implements Extendible, Published<CatalogueElement> {
+abstract class CatalogueElement implements Extendible<ExtensionValue>, Published<CatalogueElement>, ApiCatalogueElement {
 
     def grailsLinkGenerator
     def relationshipService
+    def auditService
     def mappingService
 
     String name
@@ -48,7 +57,7 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
     Set<Mapping> outgoingMappings = []
     Set<Mapping> incomingMappings = []
 
-    static transients = ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext', 'classifications']
+    static transients = ['relations', 'info', 'archived', 'relations', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext', 'classifications']
 
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping, extensions: ExtensionValue]
 
@@ -72,8 +81,9 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
     static mapping = {
         tablePerHierarchy false
         sort "name"
+		name index :'CtlgElement_name_idx'
         description type: "text"
-        extensions lazy: false
+        extensions lazy: false, sort: 'orderIndex'
     }
 
     static mappedBy = [outgoingRelationships: 'source', incomingRelationships: 'destination', outgoingMappings: 'source', incomingMappings: 'destination']
@@ -85,18 +95,23 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
      */
 
     List getRelations() {
-        return [
-                outgoingRelations,
-                incomingRelations
-        ].flatten()
+        CatalogueElement self = this
+        Lists.transform(relationshipService.getRelationships([:], RelationshipDirection.BOTH, this).items, {
+            if (it.source == self) return it.destination
+            it.source
+        } as Function<Relationship, CatalogueElement>)
     }
 
     List getIncomingRelations() {
-        relationshipService.getRelationships([:], RelationshipDirection.INCOMING, this).items.collect { it.source }
+        Lists.transform(relationshipService.getRelationships([:], RelationshipDirection.INCOMING, this).items, {
+            it.source
+        } as Function<Relationship, CatalogueElement>)
     }
 
     List getOutgoingRelations() {
-        relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, this).items.collect { it.destination }
+        Lists.transform(relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, this).items, {
+            it.destination
+        } as Function<Relationship, CatalogueElement>)
     }
 
     Long countIncomingRelations() {
@@ -146,7 +161,7 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
         [getOutgoingRelationshipsByType(type), getIncomingRelationshipsByType(type)].flatten()
     }
 
-    int countIncomingRelationsByType(RelationshipType type) {
+    int countIncomingRelationshipsByType(RelationshipType type) {
         CatalogueElement self = this.isAttached() ? this : get(this.id)
         if (archived) {
             return Relationship.countByDestinationAndRelationshipType(self, type)
@@ -155,7 +170,7 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
 
     }
 
-    int countOutgoingRelationsByType(RelationshipType type) {
+    int countOutgoingRelationshipsByType(RelationshipType type) {
         CatalogueElement self = this.isAttached() ? this : get(this.id)
         if (archived) {
             return Relationship.countBySourceAndRelationshipType(self, type)
@@ -163,17 +178,24 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
         Relationship.countBySourceAndRelationshipTypeAndArchived(self, type, false)
     }
 
-    int countRelationsByType(RelationshipType type) {
-        countOutgoingRelationsByType(type) + countIncomingRelationsByType(type)
+    int countRelationshipsByType(RelationshipType type) {
+        countOutgoingRelationshipsByType(type) + countIncomingRelationshipsByType(type)
     }
 
-
-    Relationship createLinkTo(CatalogueElement destination, RelationshipType type, Boolean resetIndexes = false) {
-        relationshipService.link(this, destination, type, null,  false, false, resetIndexes)
+    Relationship createLinkTo(Map<String, Object> params, CatalogueElement destination, RelationshipType type) {
+        relationshipService.link RelationshipDefinition.create(this, destination, type).withParams(params).definition
     }
 
-    Relationship createLinkFrom(CatalogueElement source, RelationshipType type, Boolean resetIndexes = false) {
-        relationshipService.link(source, this, type, null, false, false, resetIndexes)
+    Relationship createLinkTo(CatalogueElement destination, RelationshipType type) {
+        createLinkTo([:], destination, type)
+    }
+
+    Relationship createLinkFrom(Map<String, Object> params, CatalogueElement source, RelationshipType type) {
+        relationshipService.link RelationshipDefinition.create(source, this, type).withParams(params).definition
+    }
+
+    Relationship createLinkFrom(CatalogueElement source, RelationshipType type) {
+        createLinkFrom([:], source, type)
     }
 
     Relationship removeLinkTo(CatalogueElement destination, RelationshipType type) {
@@ -223,6 +245,7 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
             mapping.beforeDelete()
             mapping.delete(flush:true)
         }
+        auditService.logElementDeleted(this)
     }
 
     void setModelCatalogueId(String mcID) {
@@ -279,7 +302,10 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
     final Map<String, String> ext = new ExtensionsWrapper(this)
 
     void setExt(Map<String, String> ext) {
-        this.ext.clear()
+        ext = OrderedMap.fromJsonMap(ext)
+        for (String key in this.ext.keySet() - ext.keySet()) {
+            this.ext.remove key
+        }
         this.ext.putAll(ext)
     }
 
@@ -288,27 +314,33 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
     }
 
     @Override
-    Set<Extension> listExtensions() {
+    Set<ExtensionValue> listExtensions() {
         extensions
     }
 
     @Override
-    Extension addExtension(String name, String value) {
-        ExtensionValue newOne = new ExtensionValue(name: name, extensionValue: value, element: this)
-        newOne.save()
-        assert !newOne.errors.hasErrors()
-        addToExtensions(newOne)
-        newOne
+    ExtensionValue addExtension(String name, String value) {
+        if (getId() && isAttached()) {
+            ExtensionValue newOne = new ExtensionValue(name: name, extensionValue: value, element: this)
+            FriendlyErrors.failFriendlySaveWithoutFlush(newOne)
+            addToExtensions(newOne).save(validate: false)
+            auditService.logNewMetadata(newOne)
+            return newOne
+        }
+
+        throw new IllegalStateException("Cannot add extension before saving the element (id: ${getId()}, attached: ${isAttached()})")
     }
 
     @Override
-    void removeExtension(Extension extension) {
-        if (extension instanceof ExtensionValue) {
-            removeFromExtensions(extension)
-            extension.delete(flush: true)
-        } else {
-            throw new IllegalArgumentException("Only instances of ExtensionValue are supported")
-        }
+    void removeExtension(ExtensionValue extension) {
+        auditService.logMetadataDeleted(extension)
+        removeFromExtensions(extension).save(validate: false)
+        extension.delete(flush: true)
+    }
+
+    @Override
+    ExtensionValue findExtensionByName(String name) {
+        listExtensions()?.find { it.name == name }
     }
 
     List<Classification> getClassifications() {
@@ -326,7 +358,11 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
 
     @Override
     CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftContext strategy) {
-        PublishingChain.createDraft(this, strategy).add(classifications).run(publisher)
+        prepareDraftChain(PublishingChain.createDraft(this, strategy)).run(publisher)
+    }
+
+    protected PublishingChain prepareDraftChain(PublishingChain chain) {
+        chain.add(classifications)
     }
 
     @Override
@@ -342,4 +378,99 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
      */
     void afterMerge(CatalogueElement destination) {}
 
+    void afterInsert() {
+        auditService.logElementCreated(this)
+    }
+
+    void beforeUpdate() {
+        auditService.logElementUpdated(this)
+    }
+    
+    void clearAssociationsBeforeDelete() {
+        for (Classification c in this.classifications) {
+            this.removeFromClassifications(c)
+        }
+
+        // it is safe to remove all versioning informations
+        for (CatalogueElement e in this.supersededBy) {
+            this.removeFromSupersededBy(e)
+        }
+        for (CatalogueElement e in this.supersedes) {
+            this.removeFromSupersedes(e)
+        }
+        for (User u in this.isFavouriteOf) {
+            this.removeFromIsFavouriteOf(u)
+        }
+    }
+
+    @Override
+    int countExtensions() {
+        listExtensions()?.size() ?: 0
+    }
+
+    ExtensionValue updateExtension(ExtensionValue old, String value) {
+        old.orderIndex = System.currentTimeMillis()
+        if (old.extensionValue == value) {
+            FriendlyErrors.failFriendlySaveWithoutFlush(old)
+            return old
+        }
+        old.extensionValue = value
+        if (old.validate()) {
+            auditService.logMetadataUpdated(old)
+        }
+        FriendlyErrors.failFriendlySaveWithoutFlush(old)
+    }
+
+
+    // -- API
+
+    @Override
+    List<org.modelcatalogue.core.api.Relationship> getIncomingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        getIncomingRelationshipsByType(type as RelationshipType)
+    }
+
+    @Override
+    List<org.modelcatalogue.core.api.Relationship> getOutgoingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        getOutgoingRelationshipsByType(type as RelationshipType)
+    }
+
+    @Override
+    List<org.modelcatalogue.core.api.Relationship> getRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        getRelationshipsByType(type as RelationshipType)
+    }
+
+    @Override
+    int countIncomingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        countIncomingRelationshipsByType(type as RelationshipType)
+    }
+
+    @Override
+    int countOutgoingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        countOutgoingRelationshipsByType(type as RelationshipType)
+    }
+
+    @Override
+    int countRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        countRelationshipsByType(type as RelationshipType)
+    }
+
+    @Override
+    org.modelcatalogue.core.api.Relationship createLinkTo(Map<String, Object> parameters, org.modelcatalogue.core.api.CatalogueElement destination, org.modelcatalogue.core.api.RelationshipType type) {
+        createLinkTo(parameters, destination as CatalogueElement, type as RelationshipType)
+    }
+
+    @Override
+    org.modelcatalogue.core.api.Relationship createLinkFrom(Map<String, Object> parameters, org.modelcatalogue.core.api.CatalogueElement source, org.modelcatalogue.core.api.RelationshipType type) {
+        createLinkFrom(parameters, source as CatalogueElement, type as RelationshipType)
+    }
+
+    @Override
+    org.modelcatalogue.core.api.Relationship removeLinkTo(org.modelcatalogue.core.api.CatalogueElement destination, org.modelcatalogue.core.api.RelationshipType type) {
+        removeLinkTo(destination as CatalogueElement, type as RelationshipType)
+    }
+
+    @Override
+    org.modelcatalogue.core.api.Relationship removeLinkFrom(org.modelcatalogue.core.api.CatalogueElement source, org.modelcatalogue.core.api.RelationshipType type) {
+        removeLinkFrom(source as CatalogueElement, type as RelationshipType)
+    }
 }

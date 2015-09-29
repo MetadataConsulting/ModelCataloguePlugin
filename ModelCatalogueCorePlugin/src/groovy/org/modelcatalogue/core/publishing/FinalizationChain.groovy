@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.publishing
 
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.ElementStatus
+import org.modelcatalogue.core.api.ElementStatus
 
 class FinalizationChain extends PublishingChain {
 
@@ -49,17 +49,17 @@ class FinalizationChain extends PublishingChain {
 
     private CatalogueElement doPublish(Publisher<CatalogueElement> archiver) {
         published.status = ElementStatus.FINALIZED
+        published.save(flush: true, deepValidate: false)
 
         if (published.latestVersionId) {
-            List<CatalogueElement> previousFinalized = published.getClass().findAllByLatestVersionId(published.latestVersionId)
+            List<CatalogueElement> previousFinalized = published.getClass().findAllByLatestVersionIdAndStatus(published.latestVersionId, ElementStatus.FINALIZED)
             for (CatalogueElement e in previousFinalized) {
                 if (e != published) {
-                    archiver.archive(e)
+                    archiver.archive(e, true)
                 }
             }
         }
 
-        published.save()
         published
     }
 

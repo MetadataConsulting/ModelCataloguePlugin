@@ -1,11 +1,3 @@
-#= require_self
-#= require contextualActions
-#= require contextualMenu
-#= require actionButtonSingle
-#= require actionButtonDropdown
-#= require menuItemSingle
-#= require menuItemDropdown
-
 angular.module 'mc.util.ui.bs', [
   # dependencies
   'mc.util.ui'

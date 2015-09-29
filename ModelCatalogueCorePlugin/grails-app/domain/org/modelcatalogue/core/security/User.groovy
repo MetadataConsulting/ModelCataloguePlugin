@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.security
 
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.util.FriendlyErrors
 
 class User extends CatalogueElement {
 
@@ -29,18 +30,31 @@ class User extends CatalogueElement {
         password column: '`password`'
     }
 
+    static hasMany = [oAuthIDs: OAuthID]
+
+    void setUsername(String username) {
+        if (!getName()) {
+            setName(username)
+        }
+        this.username = username
+    }
+
     Set<Role> getAuthorities() {
         UserRole.findAllByUser(this).collect { it.role } as Set
     }
 
     def beforeInsert() {
         encodePassword()
+        if (!getName()) {
+            setName(getUsername())
+        }
     }
 
-    def beforeUpdate() {
+    void beforeUpdate() {
         if (isDirty('password') && !hasErrors()) {
             encodePassword()
         }
+        super.beforeUpdate()
     }
 
     protected void encodePassword() {

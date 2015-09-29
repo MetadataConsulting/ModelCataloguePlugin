@@ -1,33 +1,28 @@
 package org.modelcatalogue.core
 
-import geb.spock.GebReportingSpec
 import org.modelcatalogue.core.pages.ModalTreeViewPage
 import org.openqa.selenium.Keys
 import spock.lang.Stepwise
 
 @Stepwise
-class ModelWizardSpec extends GebReportingSpec {
+class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {
+        go "#/"
+        loginAdmin()
+
         when:
         go "#/catalogue/model/all"
 
         then:
         at ModalTreeViewPage
         waitFor(120) {
-            viewTitle.displayed
+            !$('#jserrors').displayed && $('h3').displayed
         }
         waitFor {
-            viewTitle.text()?.trim() == 'Models'
-        }
-        waitFor {
-            subviewTitle.text()?.trim()  == 'NHIC Datasets FINALIZED'
+            $('h3').text()?.trim().contains('Models')
         }
 
-        when:
-        loginAdmin()
-
-        then:
         waitFor {
             addModelButton.displayed
         }
@@ -80,10 +75,10 @@ class ModelWizardSpec extends GebReportingSpec {
         and: 'the child is selected'
         $('.search-for-more-icon').click()
         $('.modal-body .input-group-lg input').value('patient')
-        waitFor {
-            $('.list-group-item.item-found').displayed
+
+        noStale({ $('.list-group-item.item-found') }) {
+            it.click()
         }
-        $('.list-group-item.item-found').click()
 
         and: 'create child from scratch and leave it filled in'
         name = 'This should create new child model'
@@ -128,7 +123,7 @@ class ModelWizardSpec extends GebReportingSpec {
 
         then:
         waitFor {
-            $('span.catalogue-element-treeview-name', text: "New").displayed
+            $('span.catalogue-element-treeview-name', text: startsWith("New")).displayed
         }
 
         waitUntilModalClosed(30)
@@ -147,13 +142,13 @@ class ModelWizardSpec extends GebReportingSpec {
 
 
         when:
-        $('#elements').value('xmlschema')
+        $('#includes').value('xmlschema')
         selectCepItemIfExists()
         modalPrimaryButton.click()
 
         then:
         waitFor {
-            !$('span.catalogue-element-treeview-name', text: "New").displayed && menuItem('classifications', 'navigation-bottom-left').text().contains('XMLSchema')
+            !$('span.catalogue-element-treeview-name', text: startsWith("New")).displayed && menuItem('classifications', 'navigation-bottom-left').text().contains('XMLSchema')
         }
 
         when:
@@ -176,27 +171,8 @@ class ModelWizardSpec extends GebReportingSpec {
             !modalDialog.find("#remove-tag-0").displayed
         }
         waitFor {
-            $('span.catalogue-element-treeview-name', text: "New").displayed && menuItem('classifications', 'navigation-bottom-left').text().contains('All Classifications')
+            $('span.catalogue-element-treeview-name', text: startsWith("New")).displayed && menuItem('classifications', 'navigation-bottom-left').text().contains('All Classifications')
         }
-
-    }
-
-    def "open the detail view"() {
-        waitFor(30) {
-            $('a.catalogue-element-treeview-link', title: "New").displayed
-        }
-
-        when: 'the item is clicked'
-        $('a.catalogue-element-treeview-link', title: "New").click()
-
-        then:
-        waitFor {
-            subviewTitle.text().trim() == 'New DRAFT'
-        }
-
-        totalOf('parentOf') == 2
-        totalOf('contains') == 1
-
 
     }
 
@@ -208,7 +184,7 @@ class ModelWizardSpec extends GebReportingSpec {
         then:
         at ModalTreeViewPage
         waitFor(120) {
-            viewTitle.displayed
+            $('h3').displayed
         }
 
         when: 'I click the add model button'
@@ -235,11 +211,11 @@ class ModelWizardSpec extends GebReportingSpec {
 
         then:
         waitFor {
-            $('span.catalogue-element-treeview-name', text: "Another New").displayed
+            $('span.catalogue-element-treeview-name', text: startsWith("Another New")).displayed
         }
 
         when: "click the footer action"
-        $('span.catalogue-element-treeview-name', text: "Another New").click()
+        $('span.catalogue-element-treeview-name', text: startsWith("Another New")).click()
         tableFooterAction.click()
 
         then: "modal is shown"
@@ -256,7 +232,7 @@ class ModelWizardSpec extends GebReportingSpec {
 
         then: 'the number of children of Another New must be 1'
         waitFor {
-            $('span.catalogue-element-treeview-name', text: "Another New").parent().parent().find('.badge').text() == '1'
+            $('span.catalogue-element-treeview-name', text: startsWith("Another New")).parent().parent().find('.badge').text() == '1'
         }
 
     }
@@ -279,7 +255,7 @@ class ModelWizardSpec extends GebReportingSpec {
 
         then: "same number of children are still shown"
         waitFor {
-            $('span.catalogue-element-treeview-name', text: "Changed Name").parent().parent().find('.badge').text() == '1'
+            $('span.catalogue-element-treeview-name', text: startsWith("Changed Name")).parent().parent().find('.badge').text() == '1'
         }
     }
 

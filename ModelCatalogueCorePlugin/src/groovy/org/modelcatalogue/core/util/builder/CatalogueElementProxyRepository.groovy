@@ -3,7 +3,9 @@ package org.modelcatalogue.core.util.builder
 import grails.gorm.DetachedCriteria
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
+import org.modelcatalogue.core.util.ClassificationFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.springframework.util.StopWatch
 
@@ -11,6 +13,8 @@ import org.springframework.util.StopWatch
 class CatalogueElementProxyRepository {
 
     static Set<Class> HAS_UNIQUE_NAMES = [MeasurementUnit, Classification]
+    static final String AUTOMATIC_NAME_FLAG = '__automatic_name__'
+    static final String AUTOMATIC_DESCRIPTION_FLAG = '__automatic_description__'
     private static final Map LATEST = [sort: 'versionNumber', order: 'desc', max: 1]
 
     private final ClassificationService classificationService
@@ -20,6 +24,12 @@ class CatalogueElementProxyRepository {
 
     private Set<CatalogueElementProxy> pendingProxies = []
 
+    private Set<Long> elementsUnderControl = []
+
+    private boolean copyRelationships = false
+
+    private final Map<String, Relationship> createdRelationships = [:]
+
     CatalogueElementProxyRepository(ClassificationService classificationService, ElementService elementService) {
         this.classificationService = classificationService
         this.elementService = elementService
@@ -27,17 +37,28 @@ class CatalogueElementProxyRepository {
 
     public void clear() {
         unclassifiedQueriesFor.clear()
+        createdRelationships.clear()
         pendingProxies.clear()
+        elementsUnderControl.clear()
+        copyRelationships = false
     }
 
-    public boolean equals(CatalogueElementProxy a, CatalogueElementProxy b) {
+    public copyRelationships() {
+        this.copyRelationships = true
+    }
+
+    public isCopyRelationship() {
+        this.copyRelationships
+    }
+
+    public static boolean equals(CatalogueElementProxy a, CatalogueElementProxy b) {
         if (a == b) {
             return true
         }
         if (a && !b || b && !a) {
             return false
         }
-        if (a.id && a.id == b.id) {
+        if (a.modelCatalogueId && a.modelCatalogueId == b.modelCatalogueId) {
             return true
         }
         if (a.domain != b.domain) {
@@ -58,29 +79,40 @@ class CatalogueElementProxyRepository {
         StopWatch watch =  new StopWatch('catalogue proxy repository')
         Set<CatalogueElement> created = []
 
-        Set<CatalogueElementProxy> toBeResolved     = []
+        Set<CatalogueElementProxy> elementProxiesToBeResolved     = []
         Map<String, CatalogueElementProxy> byID     = [:]
         Map<String, CatalogueElementProxy> byName   = [:]
 
         watch.start('merging proxies')
+        log.info "(1/6) merging proxies"
         for (CatalogueElementProxy proxy in pendingProxies) {
-            if (proxy.id) {
-                CatalogueElementProxy existing = byID[proxy.id]
+            if (proxy.modelCatalogueId) {
+                CatalogueElementProxy existing = byID[proxy.modelCatalogueId]
 
                 if (!existing) {
-                    byID[proxy.id] = proxy
-                    toBeResolved << proxy
+                    byID[proxy.modelCatalogueId] = proxy
+                    elementProxiesToBeResolved << proxy
                 } else {
                     existing.merge(proxy)
                 }
             } else if (proxy.name) {
-                String fullName = "${proxy.domain}:${proxy.domain in HAS_UNIQUE_NAMES ? '*' : proxy.classification}:${proxy.name}"
+                String fullName = "${proxy.domain.simpleName}:${proxy.domain in HAS_UNIQUE_NAMES ? '*' : proxy.classification}:${proxy.name}"
+                String genericName = "${CatalogueElement.simpleName}:${proxy.domain in HAS_UNIQUE_NAMES ? '*' : proxy.classification}:${proxy.name}"
+
                 CatalogueElementProxy existing = byName[fullName]
+
+                if (!existing && fullName != genericName) {
+                    existing = byName[genericName]
+                    if (existing && !existing.domain.isAssignableFrom(proxy.domain)) {
+                        existing = null
+                    }
+                }
 
                 if (!existing) {
                     byName[fullName] = proxy
+                    byName[genericName] = proxy
                     // it is a set, so if we add it twice it does not matter
-                    toBeResolved << proxy
+                    elementProxiesToBeResolved << proxy
                 } else {
                     // must survive double addition
                     existing.merge(proxy)
@@ -94,7 +126,8 @@ class CatalogueElementProxyRepository {
         if (!skipDirtyChecking) {
             // Step 1:check something changed this must run before any other resolution happens
             watch.start('dirty checking')
-            for (CatalogueElementProxy element in toBeResolved) {
+            log.info "(2/6) dirty checking"
+            for (CatalogueElementProxy element in elementProxiesToBeResolved) {
                 if (element.changed) {
                     element.requestDraft()
                 }
@@ -103,24 +136,92 @@ class CatalogueElementProxyRepository {
 
             // Step 2: if something changed, create new versions. if run in one step, it generates false changes
             watch.start('requesting drafts')
-            for (CatalogueElementProxy element in toBeResolved) {
+            log.info "(3/6) requesting drafts"
+
+            elementProxiesToBeResolved.each {
+                if (!it.underControl) {
+                    return
+                }
+                CatalogueElement e = it.findExisting()
+
+                if (e) {
+                    if (e.getLatestVersionId()) {
+                        elementsUnderControl << e.getLatestVersionId()
+                    } else {
+                        elementsUnderControl << e.getId()
+                    }
+                }
+            }
+
+            for (CatalogueElementProxy element in elementProxiesToBeResolved) {
                 element.createDraftIfRequested()
             }
             watch.stop()
         }
 
+        Set<RelationshipProxy> relationshipProxiesToBeResolved = []
 
         // Step 3: resolve elements (set properties, update metadata)
         watch.start('resolving elements')
-        for (CatalogueElementProxy element in toBeResolved) {
+        log.info "(4/6) resolving elements"
+        int elNumberOfPositions = Math.floor(Math.log10(elementProxiesToBeResolved.size())) + 2
+        elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
+            log.debug "[${(i + 1).toString().padLeft(elNumberOfPositions, '0')}/${elementProxiesToBeResolved.size().toString().padLeft(elNumberOfPositions, '0')}] Resolving $element"
             created << element.resolve()
+            relationshipProxiesToBeResolved.addAll element.pendingRelationships
         }
         watch.stop()
 
         // Step 4: resolve pending relationships
         watch.start('resolving relationships')
-        for (CatalogueElementProxy element in toBeResolved) {
-            element.resolveRelationships()
+        Set<Long> resolvedRelationships = []
+        log.info "(5/6) resolving relationships"
+        int relNumberOfPositions = Math.floor(Math.log10(relationshipProxiesToBeResolved.size())) + 2
+        relationshipProxiesToBeResolved.eachWithIndex { RelationshipProxy relationshipProxy, i ->
+            log.debug "[${(i + 1).toString().padLeft(relNumberOfPositions, '0')}/${relationshipProxiesToBeResolved.size().toString().padLeft(relNumberOfPositions, '0')}] Resolving $relationshipProxy"
+            resolvedRelationships << relationshipProxy.resolve(this)?.getId()
+        }
+
+        // TODO: collect the ids of relationships resolved and than do the same comparison like in the is relationship
+        // changed
+        if (!copyRelationships) {
+            elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
+                if (!element.underControl) {
+                    return
+                }
+                CatalogueElement catalogueElement = element.resolve()
+                Set<Long> relations = []
+                relations.addAll catalogueElement.incomingRelationships*.getId()
+                relations.addAll catalogueElement.outgoingRelationships*.getId()
+
+                relations.removeAll resolvedRelationships
+
+                relations.collect { Relationship.get(it) } each {
+                    elementService.relationshipService.unlink(it.source, it.destination, it.relationshipType, it.classification, it.archived)
+                }
+            }
+        }
+
+        watch.stop()
+
+        // Step 4: resolve state changes
+        watch.start('resolving state changes')
+        log.info "(6/6) resolving state changes"
+        elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
+            log.debug "[${(i + 1).toString().padLeft(elNumberOfPositions, '0')}/${elementProxiesToBeResolved.size().toString().padLeft(elNumberOfPositions, '0')}] Resolving status changes for $element"
+
+            ElementStatus status = element.getParameter('status') as ElementStatus
+            CatalogueElement catalogueElement = element.resolve()
+
+            if (status && catalogueElement.status != status) {
+                if (status == ElementStatus.FINALIZED) {
+                    elementService.finalizeElement(catalogueElement)
+                } else if (status == ElementStatus.DRAFT) {
+                    elementService.createDraftVersion(catalogueElement, DraftContext.userFriendly())
+                } else if (status == ElementStatus.DEPRECATED) {
+                    elementService.archive(catalogueElement, true)
+                }
+            }
         }
         watch.stop()
 
@@ -129,34 +230,34 @@ class CatalogueElementProxyRepository {
         created
     }
 
-    public <T extends CatalogueElement> CatalogueElementProxy<T> createProxy(Class<T> domain, Map<String, Object> parameters) {
-        CatalogueElementProxy<T> proxy = createAbstractionInternal(domain, parameters)
+    public <T extends CatalogueElement> CatalogueElementProxy<T> createProxy(Class<T> domain, Map<String, Object> parameters, boolean underControl = false) {
+        CatalogueElementProxy<T> proxy = createAbstractionInternal(domain, parameters, underControl)
         pendingProxies << proxy
         proxy
     }
 
-    private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionInternal(Class<T> domain, Map<String, Object> parameters) {
+    private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionInternal(Class<T> domain, Map<String, Object> parameters, boolean underControl = false) {
         if (parameters.id) {
-            return createAbstractionById(domain, parameters.name?.toString(), parameters.id?.toString())
+            return createAbstractionById(domain, parameters.name?.toString(), parameters.id?.toString(), underControl)
         } else if (parameters.classification) {
-            return createAbstractionByClassificationAndName(domain, parameters.classification?.toString(), parameters.name?.toString())
+            return createAbstractionByClassificationAndName(domain, parameters.classification?.toString(), parameters.name?.toString(), underControl)
         } else if (parameters.name) {
-            return createAbstractionByName(domain, parameters.name?.toString())
+            return createAbstractionByName(domain, parameters.name?.toString(), underControl)
         }
         throw new IllegalArgumentException("Cannot create element abstraction from $parameters")
     }
 
 
-    public <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionById(Class<T> domain, String name, String id) {
-        return new DefaultCatalogueElementProxy<T>(this, domain, id, null, name)
+    public <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionById(Class<T> domain, String name, String id, boolean underControl) {
+        return new DefaultCatalogueElementProxy<T>(this, domain, id, null, name, underControl)
     }
 
-    public <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionByClassificationAndName(Class<T> domain, String classificationName, String name) {
-        return new DefaultCatalogueElementProxy<T>(this, domain, null, classificationName, name)
+    private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionByClassificationAndName(Class<T> domain, String classificationName, String name, boolean underControl) {
+        return new DefaultCatalogueElementProxy<T>(this, domain, null, classificationName, name, underControl)
     }
 
-    public <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionByName(Class<T> domain, String name) {
-        return new DefaultCatalogueElementProxy<T>(this, domain, null, null, name)
+    private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionByName(Class<T> domain, String name, boolean underControl) {
+        return new DefaultCatalogueElementProxy<T>(this, domain, null, null, name, underControl)
     }
 
 
@@ -167,13 +268,7 @@ class CatalogueElementProxyRepository {
     }
 
     public <T extends CatalogueElement> T createDraftVersion(T element) {
-        DraftContext context = DraftContext.importFriendly()
-        T draft = element.createDraftVersion(elementService, context) as T
-        if (draft.hasErrors()) {
-            throw new IllegalStateException(FriendlyErrors.printErrors("Failed to create draft version of $element", draft.errors))
-        }
-        context.classifyDrafts()
-        draft
+        elementService.createDraftVersion(element, copyRelationships ? DraftContext.userFriendly() : DraftContext.importFriendly(elementsUnderControl))
     }
 
     protected  <T extends CatalogueElement> T tryFind(Class<T> type, Object classificationName, Object name, Object id) {
@@ -203,10 +298,10 @@ class CatalogueElementProxyRepository {
         }
 
         if (classifications) {
-            T result = getLatestFromCriteria(classificationService.classified(criteria, classifications))
+            T result = getLatestFromCriteria(classificationService.classified(criteria, ClassificationFilter.includes(classifications)))
 
             if (result) {
-                if (!id || !result.modelCatalogueId) {
+                if (!id || !result.hasModelCatalogueId()) {
                     return result
                 }
                 return null
@@ -218,7 +313,9 @@ class CatalogueElementProxyRepository {
             }
         }
 
-        T result = getLatestFromCriteria(criteria, true)
+        T result = getLatestFromCriteria(new DetachedCriteria<T>(type).build {
+            eq 'name', name.toString()
+        }, true)
 
         // nothing found
         if (!result) {
@@ -231,7 +328,7 @@ class CatalogueElementProxyRepository {
         }
 
         // return only if there is no id or the modelCatalogueId is null
-        if (!id || !result.modelCatalogueId) {
+        if (!id || !result.hasModelCatalogueId()) {
             return result
         }
 
@@ -279,7 +376,7 @@ class CatalogueElementProxyRepository {
         return null
     }
 
-    private <T extends CatalogueElement> T getLatestFromCriteria(DetachedCriteria<T> criteria, boolean unclassifiedOnly = false) {
+    private static <T extends CatalogueElement> T getLatestFromCriteria(DetachedCriteria<T> criteria, boolean unclassifiedOnly = false) {
         Map<String, Object> params = unclassifiedOnly ? LATEST - [max: 1] : LATEST
         List<T> elements = criteria.list(params)
         if (elements) {
@@ -293,6 +390,44 @@ class CatalogueElementProxyRepository {
             }
         }
         return null
+    }
+
+
+    public <T extends CatalogueElement,U extends CatalogueElement> Relationship resolveRelationship(RelationshipProxy<T,U> proxy) {
+        RelationshipType type = RelationshipType.readByName(proxy.relationshipTypeName)
+
+        T sourceElement = proxy.source.resolve()
+        U destinationElement = proxy.destination.resolve()
+
+        if (sourceElement.hasErrors()) {
+            throw new IllegalStateException(FriendlyErrors.printErrors("Source element $sourceElement contains errors and is not ready to be part of the relationship ${proxy.toString()}", sourceElement.errors))
+        }
+
+        if (!sourceElement.readyForQueries) {
+            throw new IllegalStateException("Source element $sourceElement is not ready to be part of the relationship ${proxy.toString()}")
+        }
+        if (destinationElement.hasErrors()) {
+            throw new IllegalStateException(FriendlyErrors.printErrors("Destination element $destinationElement contains errors and is not ready to be part of the relationship ${proxy.toString()}", destinationElement.errors))
+        }
+
+        if (!destinationElement.readyForQueries) {
+            throw new IllegalStateException("Destination element $destinationElement is not ready to be part of the relationship ${proxy.toString()}")
+        }
+
+        String hash = DraftContext.hashForRelationship(sourceElement, destinationElement, type)
+
+
+        Relationship existing = createdRelationships[hash]
+
+        if (existing) {
+            return existing
+        }
+
+        Relationship relationship = sourceElement.createLinkTo(destinationElement, type, archived: proxy.archived, resetIndices: true, skipUniqueChecking: proxy.source.new || proxy.destination.new)
+
+        createdRelationships[hash] = relationship
+
+        return relationship
     }
 
 }

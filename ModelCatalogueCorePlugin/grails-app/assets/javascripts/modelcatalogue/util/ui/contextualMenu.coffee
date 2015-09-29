@@ -25,6 +25,5 @@ angular.module('mc.util.ui.contextualMenu', ['mc.util.ui.bs.menuItemDropdown','m
 
     $scope.$on 'userLoggedIn', updateActions
     $scope.$on 'userLoggedOut', updateActions
-
     $scope.$on 'redrawContextualActions', updateActions
 }]

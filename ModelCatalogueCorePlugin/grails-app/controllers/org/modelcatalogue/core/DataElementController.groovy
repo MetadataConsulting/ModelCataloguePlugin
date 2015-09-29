@@ -18,6 +18,10 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
             respond Lists.wrap(params, resource, basePath, dataArchitectService.uninstantiatedDataElements(params))
             return
         }
+        if(params.status && params.status.toLowerCase() != 'finalized' && !modelCatalogueSecurityService.hasRole('VIEWER')) {
+            notAuthorized()
+            return
+        }
         super.index(max)
     }
 

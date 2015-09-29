@@ -14,6 +14,13 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
     controller: ['$scope', '$rootScope', '$element', '$timeout', '$stateParams', ($scope, $rootScope, $element) ->
       endsWith = (text, suffix) -> text.indexOf(suffix, text.length - suffix.length) != -1
 
+      getLocalName = (item) ->
+        return undefined if not item
+        return undefined if not item.ext
+        return undefined if not angular.isFunction(item.ext.get)
+
+        return item.ext.get('name') ? item.ext.get('Name')
+
       handleDescendPaths = ->
         if angular.isArray($scope.descend)
           if $scope.descend.length == 0
@@ -39,18 +46,16 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
         return if showMore.hasClass '.hide'
         root = $element.closest('.catalogue-element-treeview-list-root')
         if showMore.offset()?.top < root.offset()?.top + 3 * root.height() and angular.isFunction($scope.element.$$showMore)
-          $scope.element.$$showMore().then ->
-            root.hide()
-            root.get(0).offsetHeight
-            root.show()
+          $scope.element.$$showMore()
 
       createShowMore  = (list) ->
         # function to load more items to existing $$children helper property
         ->
           $scope.element.$$showingMore = true
           list.next().then (nextList) ->
-            for item in nextList.list when item.relation
-              $scope.element.$$children.push(angular.extend(item.relation, {$$metadata: item.ext}))
+            for item in nextList.list
+              it = if item.relation then item.relation else item
+              $scope.element.$$children.push(angular.extend(it, {$$relationship: (if item.relation then item else undefined), $$metadata: item.ext, $$archived: item.archived, $$localName: getLocalName(item) }))
             $scope.element.$$showMore = createShowMore(nextList)
             loadMoreIfNeeded()
             $scope.element.$$showingMore = false
@@ -62,21 +67,29 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
           $scope.element.$$cachedChildren[child.latestVersionId] = child
 
         newChildren = []
-        for item in firstList.list when item.relation
-          cachedChild = $scope.element.$$cachedChildren[item.relation.latestVersionId] ? {}
-
-          if cachedChild.$$collapsed
-            cachedChild.$$resetHelperProperties() if angular.isFunction(cachedChild.$$resetHelperProperties)
-          else
-            cachedChild.$$loadChildren() if angular.isFunction(cachedChild.$$loadChildren)
+        for item in firstList.list
+          it = if item.relation then item.relation else item
+          id = if it.latestVersionId then it.latestVersionId else it.id
           objectToExtend = {}
-          if cachedChild.id == item.relation.id
-            objectToExtend = cachedChild
-          else
-            for key, prop of cachedChild
-              if key.indexOf('$') == 0
-                objectToExtend[key] = prop
-          newChildren.push(angular.extend(objectToExtend, item.relation, {$$metadata: item.ext}))
+
+
+
+          if id
+            cachedChild = $scope.element.$$cachedChildren[id] ? {}
+
+            if cachedChild.$$collapsed
+              cachedChild.$$resetHelperProperties() if angular.isFunction(cachedChild.$$resetHelperProperties)
+            else
+              cachedChild.$$loadChildren() if angular.isFunction(cachedChild.$$loadChildren)
+
+            if cachedChild.id == it.id
+              objectToExtend = cachedChild
+            else
+              for key, prop of cachedChild
+                if key.indexOf('$') == 0
+                  objectToExtend[key] = prop
+
+          newChildren.push(angular.extend(objectToExtend, it, {$$relationship: (if item.relation then item else undefined), $$metadata: item.ext, $$archived: item.archived, $$localName: getLocalName(item) }))
 
         $scope.element.$$children = newChildren
         $scope.element.$$collapsed  = false
@@ -133,7 +146,6 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
         unless $scope.element.$$children.length == 0 and $scope.element.$$numberOfChildren > 0
           $scope.element.$$collapsed = false
-          $scope.select($scope.element)
           return
 
         $scope.element.$$loadChildren()
@@ -147,6 +159,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
       # event broadcasters and listeners
       $scope.select = (element) ->
+        $scope.collapseOrExpand()
         $rootScope.$broadcast 'treeviewElementSelected', element, $scope.rootId
 
       $scope.$on 'treeviewElementSelected', (event, element, id) ->
@@ -165,6 +178,8 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
       $scope.$on 'catalogueElementDeleted', (event, element) ->
         indexesToRemove = []
+        if $scope.element.$$relationship == element
+          delete $scope.element.$$relationship
         for item, i in $scope.element.$$children
           if element.relation and item.link == element.relation.link
             indexesToRemove.push i
@@ -176,6 +191,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
         reloadChildrenOnChange event, element
 
       $scope.$on 'catalogueElementCreated', reloadChildrenOnChange
+      $scope.$on 'catalogueElementUpdated', reloadChildrenOnChange
       $scope.$on 'listReferenceReordered', (ignored, listReference) ->
         $scope.element.$$loadChildren() if $scope.descendFun.link == listReference.link
     ]

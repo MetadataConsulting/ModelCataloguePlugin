@@ -1,29 +1,28 @@
 package org.modelcatalogue.core
 
-
-import org.modelcatalogue.core.dataarchitect.ExcelLoader
-import org.modelcatalogue.core.dataarchitect.HeadersMap
-
+import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.integration.excel.ExcelLoader
+import org.modelcatalogue.integration.excel.HeadersMap
 import org.modelcatalogue.core.dataarchitect.xsd.XsdLoader
-import org.modelcatalogue.core.util.builder.CatalogueBuilder
-import org.modelcatalogue.core.xml.CatalogueXmlLoader
+import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
+import org.modelcatalogue.integration.obo.OboLoader
+import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 import org.springframework.http.HttpStatus
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
 class DataImportController  {
 
-    def dataImportService
     def initCatalogueService
     def XSDImportService
-    def OBOService
     def umljService
-    def LoincImportService
+    def loincImportService
     def modelCatalogueSecurityService
     def executorService
     def elementService
     def classificationService
     def assetService
+    def auditService
 
 
     private static final CONTENT_TYPES = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream', 'application/xml', 'text/xml']
@@ -47,7 +46,7 @@ class DataImportController  {
 
 
 
-    def upload(Integer max) {
+    def upload() {
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
             render status: HttpStatus.UNAUTHORIZED
             return
@@ -59,31 +58,31 @@ class DataImportController  {
             return
         }
 
-        def errors = [], response
+        def errors = []
 
         String conceptualDomainName
         MultipartFile file = request.getFile("file")
         errors.addAll(getErrors(params, file))
 
         if (errors) {
-            response = ["errors": errors]
-            respond response
+            respond("errors": errors)
             return
         }
         conceptualDomainName = trimString(params.conceptualDomain)
         def confType = file.getContentType()
+        boolean isAdmin = modelCatalogueSecurityService.hasRole('ADMIN')
 
         if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xls")) {
             def asset = storeAsset(params, file, 'application/vnd.ms-excel')
             def id = asset.id
             InputStream inputStream = file.inputStream
-            HeadersMap headersMap = populateHeaders(request.JSON.headersMap ?: [:])
-            executorService.submit {
+            HeadersMap headersMap = HeadersMap.create(request.JSON.headersMap ?: [:])
+            executeInBackground(id, "Imported from Excel") {
                 try {
-                    ExcelLoader parser = new ExcelLoader(inputStream)
-                    def (headers, rows) = parser.parse()
-                    Collection<CatalogueElement> catElements =  dataImportService.importData(headers, rows, headersMap)
-                    makeRelationships(catElements, finalizeAsset(id))
+                    DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService, isAdmin)
+                    ExcelLoader parser = new ExcelLoader(builder)
+                    parser.importData(headersMap, inputStream)
+                    finalizeAsset(id)
                 } catch (Exception e) {
                     logError(id, e)
                 }
@@ -96,12 +95,11 @@ class DataImportController  {
             def asset = storeAsset(params, file, 'application/xml')
             def id = asset.id
             InputStream inputStream = file.inputStream
-            HeadersMap headersMap = populateHeaders(request.JSON.headersMap ?: [:])
-            executorService.submit {
+            executeInBackground(id, "Imported from XML") {
                 try {
-                    CatalogueXmlLoader loader = new CatalogueXmlLoader(new CatalogueBuilder(classificationService, elementService))
-                    Collection<CatalogueElement> catElements = loader.load(inputStream)
-                    makeRelationships(catElements, finalizeAsset(id))
+                    CatalogueXmlLoader loader = new CatalogueXmlLoader(new DefaultCatalogueBuilder(classificationService, elementService, isAdmin))
+                    loader.load(inputStream)
+                    finalizeAsset(id)
                 } catch (Exception e) {
                     logError(id, e)
                 }
@@ -116,9 +114,13 @@ class DataImportController  {
             InputStream inputStream = file.inputStream
             String name = params?.name
             String idpattern = params.idpattern
-            executorService.submit {
+            executeInBackground(id, "Imported from OBO") {
                 try {
-                    Classification classification = OBOService.importOntology(inputStream, name, idpattern)
+                    DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService, isAdmin)
+                    OboLoader loader = new OboLoader(builder)
+                    idpattern = idpattern ?: "${grailsApplication.config.grails.serverURL}/catalogue/ext/${OboLoader.OBO_ID}/:id".toString().replace(':id', '$id')
+                    loader.load(inputStream, name, idpattern)
+                    Classification classification = builder.created.find { it.instanceOf(Classification) } as Classification
                     Asset updated = finalizeAsset(id)
                     classifyAsset(updated, classification)
                 } catch (Exception e) {
@@ -135,12 +137,9 @@ class DataImportController  {
             def id = asset.id
             InputStream inputStream = file.inputStream
 
-            executorService.submit {
+            executeInBackground(id, "Imported from LOINC")  {
                 try {
-                    Set<CatalogueElement> created = LoincImportService.serviceMethod(inputStream)
-                    for (CatalogueElement element in created) {
-                        asset.addToRelatedTo(element)
-                    }
+                    Set<CatalogueElement> created = loincImportService.serviceMethod(inputStream)
                     Asset updated = finalizeAsset(id)
                     Classification classification = created.find { it instanceof Classification } as Classification
                     classifyAsset(updated, classification)
@@ -158,12 +157,9 @@ class DataImportController  {
             def id = asset.id
             InputStream inputStream = file.inputStream
 
-            executorService.submit {
+            executeInBackground(id, "Imported from Model Catalogue DSL")  {
                 try {
                     Set<CatalogueElement> created = initCatalogueService.importMCFile(inputStream)
-                    for (CatalogueElement element in created) {
-                        asset.addToRelatedTo(element)
-                    }
                     Asset updated = finalizeAsset(id)
                     Classification classification = created.find { it instanceof Classification } as Classification
                     classifyAsset(updated, classification)
@@ -182,7 +178,7 @@ class DataImportController  {
             InputStream inputStream = file.inputStream
             String name = params?.name
 
-            executorService.submit {
+            executeInBackground(id, "Imported from Style UML")  {
                 try {
                     Classification classification = Classification.findByName(name)
                     if(!classification) classification =  new Classification(name: name).save(flush:true, failOnError:true)
@@ -191,11 +187,8 @@ class DataImportController  {
                     updated.status = ElementStatus.FINALIZED
                     updated.description = "Your import has finished."
                     updated.save(flush: true, failOnError: true)
-                    updated.addToClassifications(classification)
-                    classification.addToClassifies(updated)
-                    if (classification) {
-                        updated.addToRelatedTo(classification)
-                    }
+                    updated.addToClassifications(classification, skipUniqueChecking: true)
+                    classification.addToClassifies(updated, skipUniqueChecking: true)
                 } catch (Exception e) {
                     Asset updated = Asset.get(id)
                     updated.refresh()
@@ -206,16 +199,8 @@ class DataImportController  {
                 }
             }
 
-            webRequest.currentResponse.with {
-                //TODO: remove the base link
-                def location = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/api/modelCatalogue/core/asset/" + asset.id
-                status = 302
-                setHeader("Location", location.toString())
-                setHeader("X-Asset-ID", asset.id.toString())
-                outputStream.flush()
-            }
+            redirectToAsset(id)
             return
-
         }
 
 
@@ -227,21 +212,12 @@ class DataImportController  {
 
         if (!CONTENT_TYPES.contains(confType)) errors.add("input should be an Excel file but uploaded content is ${confType}")
         if (file.size <= 0) errors.add("The uploaded file is empty")
-        response = ["errors": errors]
-        respond response
-    }
-
-    protected static makeRelationships(Collection<CatalogueElement> catElements, Asset asset){
-        catElements.each{
-            asset.addToRelatedTo(it)
-        }
+        respond "errors": errors
     }
 
     protected static classifyAsset(Asset asset, Classification classification){
         if (classification) {
-            asset.addToClassifications(classification)
-            classification.addToClassifies(asset)
-            asset.addToRelatedTo(classification)
+            asset.addToClassifications(classification, skipUniqueChecking: true)
         }
     }
 
@@ -253,13 +229,8 @@ class DataImportController  {
         updated
     }
     protected redirectToAsset(Long id){
-        webRequest.currentResponse.with {
-            def location = grailsApplication.config.grails.serverURL +  "/api/modelCatalogue/core/asset/" + id
-            status = 302
-            setHeader("Location", location.toString())
-            setHeader("X-Asset-ID",  id.toString())
-            outputStream.flush()
-        }
+        response.setHeader("X-Asset-ID",  id.toString())
+        redirect url: grailsApplication.config.grails.serverURL +  "/api/modelCatalogue/core/asset/" + id
     }
 
     protected logError(Long id,Exception e){
@@ -296,18 +267,16 @@ class DataImportController  {
         Long id = asset.id
         Boolean createModelsForElements = params.boolean('createModelsForElements')
 
-        executorService.submit {
+        executeInBackground(id, "Rendered Import as Asset") {
             Asset updated = Asset.get(id)
             try {
                 XsdLoader parserXSD = new XsdLoader(inputStream)
                 def (topLevelElements, simpleDataTypes, complexDataTypes, schema, namespaces) = parserXSD.parse()
-                def (classification, conceptualDomain) = XSDImportService.createAll(simpleDataTypes, complexDataTypes, topLevelElements, conceptualDomainName, conceptualDomainName, schema, namespaces, createModelsForElements)
+                XSDImportService.createAll(simpleDataTypes, complexDataTypes, topLevelElements, conceptualDomainName, conceptualDomainName, schema, namespaces, createModelsForElements)
                 updated.status = ElementStatus.FINALIZED
                 updated.description = "Your export is ready. Use Download button to view it."
                 updated.ext['Original URL'] = uri
                 updated.save(flush: true, failOnError: true)
-                updated.addToRelatedTo(classification)
-                updated.addToRelatedTo(conceptualDomain)
             } catch (e) {
                 log.error("Error importing schema", e)
                 updated.refresh()
@@ -320,21 +289,10 @@ class DataImportController  {
         asset
     }
 
-    protected static HeadersMap populateHeaders(params){
-
-        HeadersMap headersMap = new HeadersMap()
-        headersMap.dataElementCode = params.dataElementCode ?: "Data Item Unique Code"
-        headersMap.dataElementName = params.dataElementName ?: "Data Item Name"
-        headersMap.dataElementDescription = params.dataElementDescription ?: "Data Item Description"
-        headersMap.dataType = params.dataType ?: "Data type"
-        headersMap.parentModelName = params.parentModelName ?: "Parent Model"
-        headersMap.parentModelCode = params.parentModelCode ?: "Parent Model Unique Code"
-        headersMap.containingModelName = params.containingModelName ?: "Model"
-        headersMap.containingModelCode = params.containingModelCode ?: "Model Unique Code"
-        headersMap.measurementUnitName = params.measurementUnitName ?: "Measurement Unit"
-        headersMap.measurementSymbol = params.measurementSymbol ?: "Measurement Unit Symbol"
-        headersMap.classification = params.classification ?: "Classification"
-        headersMap.metadata = params.metadata ?: "Metadata"
-        return headersMap
+    protected executeInBackground(Long assetId, String message, Closure code) {
+        Long userId = modelCatalogueSecurityService.currentUser?.id
+        executorService.submit {
+            auditService.logExternalChange(Asset.get(assetId), userId, message, code)
+        }
     }
 }

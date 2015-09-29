@@ -5,9 +5,13 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.ListWrapper
-import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.marshalling.*
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
+import org.modelcatalogue.core.audit.AuditJsonMarshallingCustomizer
+import org.modelcatalogue.core.util.js.FrontendConfigurationProviderRegistry
+import org.modelcatalogue.core.util.js.ApiRootFrontendConfigurationProvider
+import org.modelcatalogue.builder.api.ModelCatalogueTypes
 
 class ModelCatalogueCoreGrailsPlugin {
     // the plugin version
@@ -54,10 +58,25 @@ Model catalogue core plugin (metadata registry)
 
 
     def doWithSpring = {
+        ModelCatalogueTypes.CLASSIFICATION.implementation = Classification
+        ModelCatalogueTypes.MODEL.implementation = Model
+        ModelCatalogueTypes.DATA_ELEMENT.implementation = DataElement
+        ModelCatalogueTypes.VALUE_DOMAIN.implementation = ValueDomain
+        ModelCatalogueTypes.DATA_TYPE.implementation = DataType
+        ModelCatalogueTypes.MEASUREMENT_UNIT.implementation = MeasurementUnit
+        ModelCatalogueTypes.ENUMERATED_TYPE.implementation = EnumeratedType
+
+
         mergeConfig(application)
 
         xlsxListRenderer(XLSXListRenderer)
         reportsRegistry(ReportsRegistry)
+        jsonMarshallingCustomizerRegistry(JsonMarshallingCustomizerRegistry)
+        frontendConfigurationProviderRegistry(FrontendConfigurationProviderRegistry)
+
+        apiRootFrontendConfigurationProvider(ApiRootFrontendConfigurationProvider)
+        
+        auditJsonMarshallingCustomizer(AuditJsonMarshallingCustomizer)
 
         modelCatalogueCorePluginCustomObjectMarshallers(ModelCatalogueCorePluginCustomObjectMarshallers) {
             marshallers = [
@@ -67,19 +86,21 @@ Model catalogue core plugin (metadata registry)
                     new DataTypeMarshaller(),
                     new ElementsMarshaller(),
                     new EnumeratedTypeMarshaller(),
-                    new MeasurementUnitMarshallers(),
+                    new MeasurementUnitMarshaller(),
                     new ModelMarshaller(),
                     new RelationshipTypeMarshaller(),
                     new RelationshipMarshallers(),
                     new RelationshipsMarshaller(),
                     new ValueDomainMarshaller(),
-                    new MappingMarshallers(),
+                    new MappingMarshaller(),
                     new MappingsMarshaller(),
                     new ListWithTotalAndTypeWrapperMarshaller(),
                     new BatchMarshaller(),
                     new ActionMarshaller(),
                     new CsvTransformationMarshaller(),
-                    new UserMarshaller()
+                    new UserMarshaller(),
+                    new ChangeMarshaller(),
+
             ]
         }
 
@@ -87,7 +108,7 @@ Model catalogue core plugin (metadata registry)
             springConfig.addAlias('modelCatalogueStorageService','localFilesStorageService')
         }
 
-        catalogueBuilder(CatalogueBuilder, ref('classificationService'), ref('elementService')) { bean ->
+        catalogueBuilder(DefaultCatalogueBuilder, ref('classificationService'), ref('elementService')) { bean ->
             bean.scope = 'prototype'
         }
 
@@ -225,18 +246,50 @@ Model catalogue core plugin (metadata registry)
         xlsxListRenderer.registerRowWriter('NHIC') {
             title "Data Elements to Excel"
             append metadata
-            headers "Classification", "Parent Model Unique Code",
-            "Parent Model", "Model Unique Code", "Model",
-            "Data Item Unique Code", "Data Item Name", "Data Item Description",
-            "Measurement Unit","Measurement Unit Symbol", "Data type", "Metadata"
+            headers "Classification",
+                    "Parent Model Unique Code",
+                    "Parent Model",
+                    "Model Unique Code",
+                    "Model",
+                    "Data Item Unique Code",
+                    "Data Item Name",
+                    "Data Item Description",
+                    "Value Domain Classification",
+                    "Value Domain Unique Code",
+                    "Value Domain",
+                    "Measurement Unit",
+                    "Measurement Unit Symbol",
+                    "Data Type Classification",
+                    "Data Type Unique Code",
+                    "Data Type",
+                    "Metadata"
 
             when { ListWrapper container, RenderContext context ->
                 container.itemType && DataElement.isAssignableFrom(container.itemType)
             } then { DataElement element ->
-                [[getClassificationString(element), getParentModel(element)?.modelCatalogueId,
-                  getParentModel(element)?.name, getContainingModel(element)?.modelCatalogueId, getContainingModel(element)?.name,
-                  element.modelCatalogueId, element.name, element.description,
-                  getUnitOfMeasure(element), getUnitOfMeasureSymbol(element) , getDataType(element), "-"]]
+                Model parent = getParentModel(element)
+                Model model = getContainingModel(element)
+                ValueDomain valueDomain = element.valueDomain
+                DataType dataType = valueDomain?.dataType
+                [[
+                         getClassificationString(element),
+                         parent?.modelCatalogueId ?: parent?.getDefaultModelCatalogueId(true),
+                         parent?.name,
+                         model?.modelCatalogueId  ?: model?.getDefaultModelCatalogueId(true),
+                         model?.name,
+                         element.modelCatalogueId ?: element.getDefaultModelCatalogueId(true),
+                         element.name,
+                         element.description,
+                         getClassificationString(valueDomain),
+                         valueDomain?.modelCatalogueId ?: valueDomain?.getDefaultModelCatalogueId(true),
+                         valueDomain?.name,
+                         getUnitOfMeasure(element),
+                         getUnitOfMeasureSymbol(element) ,
+                         getClassificationString(dataType),
+                         dataType?.modelCatalogueId ?: dataType?.getDefaultModelCatalogueId(true),
+                         getDataType(element),
+                         "-"
+                 ]]
             }
         }
 
@@ -263,6 +316,13 @@ Model catalogue core plugin (metadata registry)
             type Classification
             link controller: 'classification', action: 'gereport', id: true
         }
+		
+		reportsRegistry.register {
+			creates link
+			title { "GE Inventory Report Docx" }
+			type Classification
+			link controller: 'classificationReports', action: 'gereportDoc', id: true
+		}
 
         reportsRegistry.register {
             creates link
@@ -348,7 +408,7 @@ Model catalogue core plugin (metadata registry)
                 return ''
             }
             if (dataType instanceof EnumeratedType) {
-                return dataType.enumAsString
+                return dataType.enumerations.collect { key, value -> "$key:$value"}.join('\n')
             }
             return dataType.name
         }
@@ -356,12 +416,10 @@ Model catalogue core plugin (metadata registry)
     }
 
     def static getClassificationString(CatalogueElement dataElement) {
-        String classifications = ""
-        dataElement.classifications.eachWithIndex{ def classification, Integer i ->
-            if (classifications != "") classifications += (stringSeparator + classification.name)
-            else classifications = classification.name
+        if (!dataElement?.classifications) {
+            return ""
         }
-        return classifications
+        dataElement.classifications.first().name
     }
 
     def static getValueDomainString(DataType dataType){

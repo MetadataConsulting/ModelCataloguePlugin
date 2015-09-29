@@ -1,11 +1,13 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.RelationshipDirection
+import spock.lang.Issue
 
 class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
-    def setupSpec() {
+    def setup() {
         loadFixtures()
     }
 
@@ -116,7 +118,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         author.save(failOnError: true)
 
         int originalVersion     = author.versionNumber
-        DataElement archived    = elementService.archive(author) as DataElement
+        DataElement archived    = elementService.archive(author, true) as DataElement
         int archivedVersion     = archived.versionNumber
         author.refresh()
 
@@ -129,7 +131,6 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         archived.ext.something == 'anything'
 
-        !archived.valueDomain
         !(archived in domain.dataElements)
     }
 
@@ -382,6 +383,21 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         d1draft.outgoingMappings.size() == 1
         d1draft.outgoingMappings[0].destination == d2
 
+    }
+
+    @Issue("https://metadata.atlassian.net/browse/MET-732")
+    def "can un-deprecate element if conditions are met"() {
+        ValueDomain vd = new ValueDomain(name: 'VD4MET-732').save(failOnError: true, flush: true)
+
+        vd = elementService.createDraftVersion(vd, DraftContext.importFriendly([] as Set)) as ValueDomain
+        vd = elementService.finalizeElement(vd)
+        vd = elementService.archive(vd, false)
+
+        when:
+        elementService.restore(vd)
+
+        then:
+        vd.status == ElementStatus.FINALIZED
     }
 
 }

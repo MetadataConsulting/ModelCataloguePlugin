@@ -1,6 +1,6 @@
 Model Catalogue Grails Plugin
 ====================
-[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/MetadataRegistry/ModelCataloguePlugin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/MetadataRegistry/ModelCataloguePlugin.svg?branch=develop)](https://travis-ci.org/MetadataRegistry/ModelCataloguePlugin) [![Gitter](https://badges.gitter.im/Join Chat.svg)] (https://gitter.im/MetadataRegistry/ModelCataloguePlugin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 To use the model catalogue core plugin in your grails app, include the following in your BuildConfig.groovy:
 
@@ -26,6 +26,7 @@ plugins{
 You can run the model catalogue application standalone either for development purposes or to setup your own metadata
 registry.
 
+
 ### Requirements
 
 To run application locally you need following installed on your machine 
@@ -45,6 +46,7 @@ git --version
 
 All tools should return their versions.
   
+
 ### Launching the application
 
 Model Catalogue provides rich web client which requires some other tools to be installed before launching the application.

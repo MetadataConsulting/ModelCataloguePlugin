@@ -1,5 +1,5 @@
 angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
-  messagesProvider.setPromptFactory 'create-new-relationship', [ '$modal', '$q', 'messages', 'catalogueElementResource', ($modal, $q, messages, catalogueElementResource) ->
+  messagesProvider.setPromptFactory 'create-new-relationship', [ '$modal', '$q', 'messages', 'catalogueElementResource', 'enhance', ($modal, $q, messages, catalogueElementResource, enhance) ->
     (title, body, args) ->
       if not args?.element?
         messages.error('Cannot create relationship dialog.', 'The element to be connected to is missing.')
@@ -17,6 +17,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
                 <select id="type" ng-model="relationshipTypeInfo" class="form-control" ng-options="rt as rt.value for rt in relationshipTypes" ng-change="updateInfo(relationshipTypeInfo)">
                   <option value="">-- choose relation --</option>
                 </select>
+                <p class="help-block" ng-if="relationshipTypeInfo.description">{{relationshipTypeInfo.description}}</p>
               </div>
               <div class="panel panel-default" ng-repeat="destination in destinations">
                 <div class="panel-heading">
@@ -29,14 +30,18 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
                     <input id="element" type="text" class="form-control" ng-model="destination.relation" catalogue-element-picker resource="relationType" typeahead-on-select="destination.updateRelation(destination.relation)" ng-disabled="!relationshipTypeInfo.type">
                   </div>
                   <div class="form-group">
-                    <label>Metadata</label>
-                    <simple-object-editor object="destination.metadata" hints="relationshipTypeInfo.type.metadataHints"></simple-object-editor>
-                    <p class="help-block">Metadata specific to this relationship. For example <code>contains</code> and <code>parent of</code> relationship types supports <code>Name</code> metadata as an alias of nested model or data element.</p>
+                    <label for="classification" ng-click="destination.classificationExpanded = ! destination.classificationExpanded">Classification <span class="fa fa-fw" ng-class="{'fa-toggle-up': destination.classificationExpanded, 'fa-toggle-down': !destination.classificationExpanded}"></span></label>
+                    <div collapse="!destination.classificationExpanded">
+                      <input id="classification" ng-model="destination.classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="destination.updateClassification(destination.classification)">
+                      <p class="help-block">Select a classification only if the relationship applies for given classification only. This usually happens when you are reusing catalogue elements form some standard dataset</p>
+                    </div>
                   </div>
                   <div class="form-group">
-                    <label for="classification" >Classification</label>
-                    <input id="classification" ng-model="destination.classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="destination.updateClassification(destination.classification)">
-                    <p class="help-block">Select a classification only if the relationship applies for given classification only. This usually happens when you are reusing catalogue elements form some standard dataset</p>
+                    <label ng-click="destination.metadataExpanded = ! destination.metadataExpanded" class="expand-metadata"">Metadata <span class="fa fa-fw" ng-class="{'fa-toggle-up': destination.metadataExpanded, 'fa-toggle-down': !destination.metadataExpanded}"></label>
+                    <div collapse="!destination.metadataExpanded">
+                      <p class="help-block metadata-help-block">Metadata specific to this relationship. For example <code>contains</code> and <code>parent of</code> relationship types supports <code>Name</code> metadata as an alias of nested model or data element.</p>
+                      <metadata-editor owner="destination.metadataOwner" object="destination.metadata"></metadata-editor>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -49,6 +54,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
         </div>
         '''
         controller: ['$scope', 'messages', '$modalInstance', ($scope, messages, $modalInstance) ->
+
           $scope.relationshipTypes = []
           $scope.relationshipTypeInfo = null
           $scope.relationType = 'catalogueElement'
@@ -62,16 +68,35 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
               $scope.relationshipType = info.type
               $scope.relationType = $scope.relationshipType["#{info.relation}Class"]
               $scope.direction = info.direction
+
             else
               $scope.relationshipTypeInfo = null
               $scope.relationshipType = null
               $scope.relationType = null
               $scope.direction = null
+              $scope.metadataOwner = null
+
+            for destination in $scope.destinations
+              destination.updateRelation(destination.relation)
 
           $scope.addDestination = ->
-            destination = messages: messages.createNewMessages(), metadata: {}
-            destination.updateRelation = (relation) -> @relation = relation
+            destination = messages: messages.createNewMessages(), metadata: enhance.getEnhancer('orderedMap').emptyOrderedMap()
+            destination.updateRelation = (relation) ->
+              @metadataOwner =
+                type: $scope.relationshipTypeInfo?.type
+                element: $scope.element
+                relation: if relation then relation else {elementType: $scope.relationType}
+                direction: if $scope.direction == 'outgoing' then 'sourceToDestination' else 'destinationToSource'
+                ext:
+                  type: 'orderedMap'
+                elementType: 'relationship'
+
+              @relation = relation
+
             destination.updateClassification = (classification) -> @classification = classification
+
+            # init metadata editors
+            destination.updateRelation(null)
 
             $scope.destinations.push destination
 
@@ -117,8 +142,8 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
 
           appendToRelationshipTypes = (result) ->
             for type in result.list
-              outgoing = if args.element.isInstanceOf(type.sourceClass) then {type: type, value: type.sourceToDestination, relation: 'destination',  direction: 'outgoing'}
-              incoming = if args.element.isInstanceOf(type.destinationClass) and type.sourceToDestination != type.destinationToSource then {type: type, value: type.destinationToSource, relation: 'source',       direction: 'incoming'}
+              outgoing = if args.element.isInstanceOf(type.sourceClass) then {type: type, value: type.sourceToDestination, relation: 'destination',  direction: 'outgoing', description: type.sourceToDestinationDescription}
+              incoming = if args.element.isInstanceOf(type.destinationClass) and type.sourceToDestination != type.destinationToSource then {type: type, value: type.destinationToSource, relation: 'source', direction: 'incoming', description: type.destinationToSourceDescription}
               $scope.relationshipTypes.push outgoing if outgoing
               $scope.relationshipTypes.push incoming if incoming
 

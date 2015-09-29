@@ -82,7 +82,7 @@ class UpdateCatalogueElement extends AbstractActionRunner {
         CatalogueElement element = queryForCatalogueElement()
 
         element.properties = properties
-        if (element.save()) {
+        if (element.save(flush: true)) {
             if (element instanceof Extendible) {
                 properties.findAll {key, value -> key.startsWith('ext:')}.each { key, value ->
                     if (value) {

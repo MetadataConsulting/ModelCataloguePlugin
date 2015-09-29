@@ -1,6 +1,4 @@
-# FormsPlugin
-/ModelCatalogueFormsPlugin
-*.iml
+**.iml
 **/web-app/*
 **/.idea/*
 **/atlassian-ide-plugin.xml
@@ -16,3 +14,5 @@ out/**/*
 **/target/**/*
 **/target-eclipse/**/*
 **/*.class
+**/*.gen.fixture.js
+**/build/**/*

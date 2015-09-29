@@ -34,6 +34,7 @@ module.exports = function(config) {
             'grails-app/assets/jslibs/google-diff-match-patch/javascript/diff_match_patch.js',
 
             // App under test
+            'grails-app/assets/javascripts/modelcatalogue/modelcatalogue.coffee',
             'grails-app/assets/javascripts/**/*.coffee',
             'grails-app/assets/javascripts/**/*.js',
 

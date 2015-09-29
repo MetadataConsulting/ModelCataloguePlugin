@@ -1,13 +1,18 @@
 package org.modelcatalogue.core
 
-import geb.spock.GebReportingSpec
 import org.modelcatalogue.core.pages.MeasurementUnitListPage
 import spock.lang.Stepwise
 
 @Stepwise
-class MeasurementUnitWizardSpec extends GebReportingSpec {
+class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {
+        go "#/"
+        loginAdmin()
+
+        // poor man's fix
+        browser.driver.navigate().refresh()
+
         when:
         go "#/catalogue/measurementUnit/all"
 
@@ -20,10 +25,6 @@ class MeasurementUnitWizardSpec extends GebReportingSpec {
             viewTitle.text().trim() == 'Measurement Unit List'
         }
 
-        when:
-        loginAdmin()
-
-        then:
         waitFor {
             actionButton('create-catalogue-element', 'list').displayed
         }
@@ -31,7 +32,6 @@ class MeasurementUnitWizardSpec extends GebReportingSpec {
     }
 
     def "create new unit"() {
-        int initialSize = $('.inf-table tbody .inf-table-item-row').size()
 
         when:
         actionButton('create-catalogue-element', 'list').click()
@@ -49,7 +49,7 @@ class MeasurementUnitWizardSpec extends GebReportingSpec {
 
         then:
         waitFor {
-            $('.inf-table tbody .inf-table-item-row').size() == initialSize + 1
+            infTableCell(1, 2, text: 'Foos').displayed
         }
     }
 
@@ -82,6 +82,69 @@ class MeasurementUnitWizardSpec extends GebReportingSpec {
         waitFor {
             currentUrl.toString().endsWith('/ext')
         }
+    }
+
+    def "finalize element"() {
+        waitUntilModalClosed()
+        when: "finalize is clicked"
+        actionButton('change-element-state').click()
+        actionButton('finalize').click()
+
+        then: "modal prompt is displayed"
+        waitFor {
+            confirmDialog.displayed
+        }
+
+        when: "ok is clicked"
+        confirmOk.click()
+
+        then: "the element is finalized"
+        waitFor(120) {
+            subviewStatus.text() == 'FINALIZED'
+        }
+
+    }
+
+    def "deprecate the element"() {
+        waitUntilModalClosed()
+        when: "depracete action is clicked"
+        actionButton('change-element-state').click()
+        actionButton('archive').click()
+
+        then: "modal prompt is displayed"
+        waitFor {
+            confirmDialog.displayed
+        }
+
+        when: "ok is clicked"
+        confirmOk.click()
+
+        then: "the element is now deprecated"
+        waitFor {
+            subviewStatus.text() == 'DEPRECATED'
+        }
+
+    }
+
+    def "restore the element"() {
+        waitUntilModalClosed()
+        when: "restore action is clicked"
+        actionButton('change-element-state').click()
+        actionButton('archive').click()
+
+        then: "modal prompt is displayed"
+        waitFor {
+            confirmDialog.displayed
+        }
+
+        when: "ok is clicked"
+        confirmOk.click()
+
+        then: "the element is now finalized"
+        waitFor {
+            subviewStatus.text() == 'FINALIZED'
+        }
+
     }
 
 }

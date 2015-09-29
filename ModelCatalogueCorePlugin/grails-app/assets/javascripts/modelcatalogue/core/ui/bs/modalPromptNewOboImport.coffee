@@ -21,7 +21,7 @@ angular.module('mc.core.ui.bs.modalPromptNewOboImport', ['mc.util.messages', 'an
               <div class="form-group">
                 <label for="idpattern" class="">ID Template (use <code>${id}</code> to insert id)</label>
                 <input type="text" class="form-control" id="idpattern" placeholder="ID Template (e.g. http://purl.obolibrary.org/obo/${id.replace(':', '_')})" ng-model="copy.idpattern">
-                <p class="help-block">Must be valid URL when evaluated</p>
+                <p class="help-block">Must be valid URL when evaluated. <a ng-click="copy.idpattern = purlPattern">Use PURL</a></p>
               </div>
               <div class="form-group">
                 <label for="asset" class="">File</label>

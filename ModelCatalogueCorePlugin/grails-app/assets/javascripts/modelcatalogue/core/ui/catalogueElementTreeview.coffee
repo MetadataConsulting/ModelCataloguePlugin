@@ -10,7 +10,10 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementTreeview.html'
 
-    controller: ['$scope', 'enhance', '$stateParams', '$rootScope', ($scope, enhance, $stateParams, $rootScope) ->
+    controller: ['$scope', 'enhance', '$stateParams', '$rootScope', '$element', '$attrs', ($scope, enhance, $stateParams, $rootScope, $element, $attrs) ->
+      if $attrs.hasOwnProperty('noResize')
+        $element.addClass('no-resize')
+
       setLastListToRootScope = (newList) ->
         return unless newList
         $rootScope.$$lastTreeLists ?= {}
@@ -34,10 +37,12 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
 
       addItemsFromList = (list) ->
         return if list.$$children
+        return if not list.list
         list.$$children = []
         for item in list.list
           cachedChild  = if list.$$cachedChildren then list.$$cachedChildren[item.link]
           cachedChild ?= {}
+          delete cachedChild.$$relationship
           if cachedChild.$$collapsed
             cachedChild.$$resetHelperProperties() if angular.isFunction(cachedChild.$$resetHelperProperties)
           else
@@ -51,13 +56,29 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
           list.$$cachedChildren = oldList.$$cachedChildren ? {}
 
           for child in oldList.$$children
+            delete child.$$relationship
             list.$$cachedChildren[child.link] = child
 
         addItemsFromList(list)
         nextFun = list.next
         setLastListToRootScope(list)
+        $scope.$evalAsync ->
+          loadMoreIfNeeded()
+
+
+      loadMoreIfNeeded = ->
+        return if not $scope.list.total > $scope.list.$$children.length
+        return if $scope.$$showingMore
+        showMore = $element.find('.catalogue-element-treeview-root-show-more')
+        return if showMore.hasClass '.hide'
+        root = $element.find('.catalogue-element-treeview-root-list-root')
+        if showMore.offset()?.top < root.offset()?.top + 3 * root.height()
+          $scope.showMore()
 
       $scope.showMore = () ->
+        return if $scope.$$showingMore
+        return if not nextFun
+        $scope.$$showingMore = true
         return unless $scope.list.total > $scope.list.$$children.length
         params = {}
         params.classification = $stateParams.classification if $stateParams.classification
@@ -65,6 +86,9 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
         nextFun(null, params).then (list) ->
           addItemsFromList(list)
           nextFun = list.next
+          $scope.$$showingMore = false
+          loadMoreIfNeeded()
+
 
       if $scope.mode == 'list'
         onListChange $scope.list, getLastListFromRootScope($scope.list?.base)
@@ -78,6 +102,8 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
         $scope.$on 'catalogueElementDeleted', refreshList
         $scope.$on 'newVersionCreated', refreshList
         $scope.$on 'catalogueElementUpdated', refreshList
+
+        $element.find('.catalogue-element-treeview-root-list-root').on 'scroll', loadMoreIfNeeded
     ]
   }
 ]

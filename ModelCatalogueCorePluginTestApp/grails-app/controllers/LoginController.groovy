@@ -1,5 +1,5 @@
 import grails.converters.JSON
-import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
+import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 
 import javax.servlet.http.HttpServletResponse
 
@@ -66,11 +66,7 @@ class LoginController {
      * Show denied page.
      */
     def denied = {
-        if (springSecurityService.isLoggedIn() &&
-                authenticationTrustResolver.isRememberMe(SCH.context?.authentication)) {
-            // have cookie but the page is guarded with IS_AUTHENTICATED_FULLY
-            redirect action: 'full', params: params
-        }
+        response.sendError HttpServletResponse.SC_UNAUTHORIZED
     }
 
     /**
@@ -130,7 +126,7 @@ class LoginController {
             username: springSecurityService.authentication.name,
             roles: springSecurityService.authentication.authorities*.authority,
             id: springSecurityService.authentication.hasProperty('id') ? springSecurityService.authentication.id : null,
-            classifications: springSecurityService.authentication.hasProperty('id') ? springSecurityService.authentication.classifications?.collect{ CatalogueElementMarshallers.minimalCatalogueElementJSON(it) } : []
+            classifications: springSecurityService.authentication.hasProperty('id') ? springSecurityService.authentication.classifications?.collect{ CatalogueElementMarshaller.minimalCatalogueElementJSON(it) } : []
         ] as JSON)
     }
 
@@ -138,6 +134,7 @@ class LoginController {
      * The Ajax denied redirect url.
      */
     def ajaxDenied = {
+        response.sendError HttpServletResponse.SC_UNAUTHORIZED
         render([error: 'access denied'] as JSON)
     }
 }

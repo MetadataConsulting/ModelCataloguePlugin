@@ -1,4 +1,4 @@
-<%@ page import="grails.util.Environment" contentType="text/html;charset=UTF-8" defaultCodec="none" %>
+<%@ page import="org.modelcatalogue.core.util.CDN; grails.plugin.springsecurity.SpringSecurityUtils; org.modelcatalogue.core.security.User; grails.util.BuildScope; org.modelcatalogue.core.util.ClassificationFilter; grails.util.Environment" contentType="text/html;charset=UTF-8" defaultCodec="none" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,7 +17,7 @@
     <g:if test="${Environment.current in [Environment.DEVELOPMENT, Environment.TEST, Environment.CUSTOM]}">
         <script type="text/javascript">
             window.pendingErrorsPres = [];
-            window.onerror = function(errorMsg, url, lineNumber) {
+            window.printErrorInPre = function(errorMsg, url, lineNumber) {
                 var message = document.createElement('div');
                 message.innerHTML = errorMsg + ' at ' + url + ' at ' + lineNumber;
                 message.className = 'pre-js-error well';
@@ -31,32 +31,34 @@
                         }
                     }
                 }
+            };
+            window.onerror = function(errorMsg, url, lineNumber) {
+                window.printErrorInPre(errorMsg, url, lineNumber)
             }
         </script>
     </g:if>
-    <g:if test="${Environment.current in [Environment.PRODUCTION, Environment.TEST, Environment.CUSTOM]}">
+    <g:if test="${CDN.preferred}">
+        <g:set var="minSuffix" value="${Environment.current == Environment.TEST ? '' : '.min'}"/>
         <!-- CDNs -->
-        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap${minSuffix}.css">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome${minSuffix}.css">
 
-        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-        %{--<script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>--}%
-        %{--this is minimized jquery ui needed for ui-sortable plugin, if there is a need to add more functionality from jquery ui--}%
-        <script type="application/javascript" src="//cdn.jsdelivr.net/g/jquery.ui@1.10%28jquery.ui.core.min.js+jquery.ui.widget.min.js+jquery.ui.mouse.min.js+jquery.ui.sortable.min.js%29"></script>
-        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/js/bootstrap.min.js"></script>
-        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.0/angular.min.js"></script>
-        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.11.2/ui-bootstrap-tpls.min.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery${minSuffix}.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui${minSuffix}.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/js/bootstrap${minSuffix}.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/angular${minSuffix}.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.11.2/ui-bootstrap-tpls${minSuffix}.js"></script>
 
-        <!-- i18n 1.3.0 not present but hopefuly it's the same -->
+        <!-- i18n 1.3.15 not present but hopefuly it's the same -->
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-i18n/1.2.15/angular-locale_en-gb.js"></script>
 
-        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.0/angular-animate.min.js"></script>
-        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.0/angular-sanitize.min.js"></script>
-        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.0/angular-cookies.min.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/angular-animate${minSuffix}.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/angular-sanitize${minSuffix}.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/angular-cookies${minSuffix}.js"></script>
 
         <!-- code -->
         <asset:stylesheet href="modelcatalogue.css"/>
-        <asset:javascript src="modelcatalogue.js"/>
+        <asset:javascript src="modelcatalogue/modelcatalogue.js"/>
     </g:if>
     <g:else>
         <asset:stylesheet href="bootstrap/dist/css/bootstrap.css"/>
@@ -72,13 +74,19 @@
         <asset:javascript src="angular-cookies/angular-cookies.js"/>
         <asset:javascript src="angular-sanitize/angular-sanitize.js"/>
         <asset:javascript src="angular-animate/angular-animate.js"/>
-        <asset:javascript src="modelcatalogue.js"/>
+        <asset:javascript src="modelcatalogue/modelcatalogue.js"/>
     </g:else>
+    <g:set var="configurationProvider" bean="frontendConfigurationProviderRegistry"/>
+    <g:set var="oauthService" bean="oauthService"/>
     <script type="text/javascript">
+        ${configurationProvider.frontendConfiguration}
         var demoConfig = angular.module('demo.config', ['mc.core.modelCatalogueApiRoot', 'mc.util.security']);
         demoConfig.config(['securityProvider', function (securityProvider) {
             securityProvider.springSecurity({
-                contextPath: '${request.contextPath ?: ''}',
+                oauthProviders: ${oauthService.services.keySet().collect{"'$it'"}},
+                contextPath:      '${grailsApplication.config.grails.app.context ?: request.contextPath ?: ''}',
+                allowRegistration: ${grailsApplication.config.grails.mc.allow.signup.asBoolean()},
+                canResetPassword:  ${grailsApplication.config.grails.mail.host.asBoolean() || grailsApplication.config.grails.mc.can.reset.password.asBoolean()},
                 roles: {
                     VIEWER:     ['ROLE_USER', 'ROLE_METADATA_CURATOR', 'ROLE_ADMIN'],
                     CURATOR:    ['ROLE_METADATA_CURATOR', 'ROLE_ADMIN'],
@@ -86,16 +94,35 @@
                 },
                 <sec:ifLoggedIn>
                 currentUser: {
-                    roles: ${grails.plugin.springsecurity.SpringSecurityUtils.getPrincipalAuthorities()*.authority.encodeAsJSON()},
+                    roles: ${SpringSecurityUtils.getPrincipalAuthorities()*.authority.encodeAsJSON()},
                     username: '${sec.username()}',
                     id: ${sec.loggedInUserInfo(field:"id")},
-                    classifications: ${(org.modelcatalogue.core.security.User.get(sec.loggedInUserInfo(field:"id"))?.filteredBy?.collect({ org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers.minimalCatalogueElementJSON(it) }) ?: []).encodeAsJSON() }
+                    classifications: ${(ClassificationFilter.from(User.get(sec.loggedInUserInfo(field:"id"))).toMap()).encodeAsJSON() }
                 }
                 </sec:ifLoggedIn>
             })
         }]);
-        demoConfig.value('modelCatalogueApiRoot', '${request.contextPath ?: ''}/api/modelCatalogue/core')
+        modelcatalogue.registerModule('demo.config');
+
+        modelcatalogue.welcome = {};
+        modelcatalogue.welcome.jumbo = "${grailsApplication.config.mc.welcome.jumbo.encodeAsJSON()}";
+        modelcatalogue.welcome.info = "${grailsApplication.config.mc.welcome.info.encodeAsJSON()}";
+
+        // create an app module based on registered modules
+        angular.module('metadataCurator', window.modelcatalogue.getModules())
     </script>
+    <g:if test="${Environment.current in [Environment.DEVELOPMENT, Environment.TEST, Environment.CUSTOM]}">
+        <script type="text/javascript">
+            angular.module('demo.config').factory('$exceptionHandler', function($log, $window) {
+                return function(exception, cause) {
+                    $log.error(exception, cause);
+                    window.printErrorInPre($window.location.href);
+                    window.printErrorInPre(exception.stack);
+                };
+            });
+
+        </script>
+    </g:if>
 
 </head>
 
@@ -110,7 +137,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#"><span class="fa fa-fw fa-book"></span><span class="visible-md-inline">&nbsp; Model Catalogue</span></a>
+                <a class="navbar-brand" href="#"><span class="fa fa-fw fa-book"></span><span class="hidden-sm">&nbsp; Model Catalogue</span></a>
             </div>
 
             <div class="navbar-collapse collapse">
@@ -145,10 +172,13 @@
         </div>
     </div>
 
-    <nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
+    <nav class="navbar navbar-default navbar-fixed-bottom" role="navigation" show-if-logged-in>
         <div class="container-fluid">
             <contextual-menu role="navigation-bottom-left"></contextual-menu>
             <contextual-menu role="navigation-bottom-right" right="true"></contextual-menu>
+            <div class="mc-version small">
+                <g:render template="/version"/>
+            </div>
             <g:if env="test">
                 <h4 style="float: right; color: red;">TEST ENVIRONMENT - WON'T PERSIST NEXT UPDATE</h4>
             </g:if>

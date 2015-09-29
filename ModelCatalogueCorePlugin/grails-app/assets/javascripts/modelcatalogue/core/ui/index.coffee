@@ -1,25 +1,3 @@
-#= require_self
-#= require modelcatalogue/core/index
-#= require infiniteList
-#= require infiniteTable
-#= require infiniteListCtrl
-#= require columnsSupportCtrl
-#= require catalogueElementView
-#= require csvTransformationView
-#= require batchView
-#= require catalogueElementTreeviewItem
-#= require catalogueElementTreeview
-#= require catalogueElementPicker
-#= require catalogueElementIcon
-#= require catalogueElementProperties
-#= require propertiesPane
-#= require messagesPanel
-#= require columns
-#= require columnsConfiguration
-#= require simpleObjectEditor
-#= require elementsAsTags
-#= require diffTable
-
 angular.module('mc.core.ui', [
   # depends on
   'ui.router',
@@ -36,6 +14,7 @@ angular.module('mc.core.ui', [
   'mc.core.ui.catalogueElementTreeview'
   'mc.core.ui.catalogueElementIcon'
   'mc.core.ui.catalogueElementPicker'
+  'mc.core.ui.expectCatalogueElement'
   'mc.core.ui.catalogueElementProperties'
   'mc.core.ui.propertiesPane'
   'mc.core.ui.messagesPanel'
@@ -44,4 +23,7 @@ angular.module('mc.core.ui', [
   'mc.core.ui.simpleObjectEditor'
   'mc.core.ui.elementsAsTags'
   'mc.core.ui.diffTable'
+  'mc.core.ui.orderedMapEditor'
+  'mc.core.ui.metadataEditors'
+  'mc.core.ui.metadataEditor'
 ])

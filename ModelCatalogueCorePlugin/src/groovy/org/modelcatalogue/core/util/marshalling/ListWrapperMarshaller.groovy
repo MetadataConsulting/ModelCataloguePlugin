@@ -3,7 +3,7 @@ package org.modelcatalogue.core.util.marshalling
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.springframework.beans.factory.annotation.Autowired
 
-abstract class ListWrapperMarshaller extends AbstractMarshallers {
+abstract class ListWrapperMarshaller extends AbstractMarshaller {
 
     @Autowired ReportsRegistry reportsRegistry
 

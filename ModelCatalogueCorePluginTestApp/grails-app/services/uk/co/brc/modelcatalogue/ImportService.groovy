@@ -1,22 +1,14 @@
 package uk.co.brc.modelcatalogue
 
-import org.modelcatalogue.core.dataarchitect.DataImportService
-import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.integration.excel.ExcelLoader
 
 class ImportService {
 
     static transactional = false
 
     def grailsApplication
-    def initCatalogueService
     CatalogueBuilder catalogueBuilder
-
-    private static final QUOTED_CHARS = [
-            "\\": "&#92;",
-            ":": "&#58;",
-            "|": "&#124;",
-            "%": "&#37;",
-    ]
 
     def importData() {
         String basePath = grailsApplication.mainContext.getResource("/").getFile().toString()
@@ -36,7 +28,8 @@ class ImportService {
                                         model(name:tokens[2]){
                                             dataElement(name:tokens[3], description:tokens[4]){
                                                 valueDomain(name:tokens[3].replaceAll("\\s", "_")){
-                                                    DataImportService.importDataTypes(catalogueBuilder, tokens[3], [tokens[5]])
+                                                    def enumerations = tokens[5] ? ExcelLoader.parseEnumeration(tokens[5].split("\\r?\\n")) : [:]
+                                                    ExcelLoader.importDataTypes(catalogueBuilder, tokens[3], enumerations ? tokens[5] : null, null, null)
                                                 }
                                                 ext "NHIC_Identifier:", tokens[0].take(2000)
                                                 ext "Link_to_existing definition:", tokens[6].take(2000)
@@ -65,14 +58,5 @@ class ImportService {
             }
 
         }
-    }
-
-    private static String quote(String s) {
-        if (s == null) return null
-        String ret = s
-        QUOTED_CHARS.each { original, replacement ->
-            ret = ret.replace(original, replacement)
-        }
-        ret
     }
 }

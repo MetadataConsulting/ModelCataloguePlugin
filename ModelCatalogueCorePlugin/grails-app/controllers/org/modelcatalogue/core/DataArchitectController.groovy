@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.dataarchitect.CSVService
-import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
@@ -14,6 +13,7 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
     static responseFormats = ['json', 'xlsx']
 
     def dataArchitectService
+    def executorService
     def modelService
     @Autowired CSVService csvService
 
@@ -109,14 +109,17 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
         respond elements
     }
 
+    def suggestionsNames() {
+        respond dataArchitectService.suggestionsNames
+    }
+
     def generateSuggestions() {
-        try {
-            dataArchitectService.generateMergeModelActions()
-            respond status: HttpStatus.OK
-        } catch (e) {
-            log.error("Error generating suggestions", e)
-            respond status: HttpStatus.BAD_REQUEST
+        String suggestion = params.suggestion
+        executorService.execute {
+            dataArchitectService.generateSuggestions(suggestion)
         }
+        respond status: HttpStatus.OK
+
     }
 
 

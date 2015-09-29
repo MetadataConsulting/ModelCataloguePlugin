@@ -17,7 +17,7 @@ class ExtensionsWrapper implements Map<String, String> {
 
     @Override
     int size() {
-        element.listExtensions()?.size() ?: 0
+        element.countExtensions()
     }
 
     @Override
@@ -37,13 +37,18 @@ class ExtensionsWrapper implements Map<String, String> {
 
     @Override
     String get(Object key) {
-        if (isEmpty()) return null
-        findExtensionValueByName(key)?.extensionValue
+        if (!key) return null
+        findExtensionValueByName(key?.toString())?.extensionValue
     }
 
     @Override
     String put(String key, String value) {
-        if (!key || key.length() < 1) throw new IllegalArgumentException("Invalid key: $key. The key must be contain at least one character")
+        if (!key || key.length() < 1) {
+            if (value) {
+                throw new IllegalArgumentException("Invalid key: $key. The key must be contain at least one character! (value = $value)")
+            }
+            return value
+        }
         createOrUpdate(key, value)
     }
 
@@ -86,9 +91,9 @@ class ExtensionsWrapper implements Map<String, String> {
         DefaultGroovyMethods.toMapString(this)
     }
 
-    private Extension findExtensionValueByName(key) {
+    private Extension findExtensionValueByName(String key) {
         if (!key) return null
-        element.listExtensions()?.find { it.name == key }
+        element.findExtensionByName(key)
     }
 
     private Map<String, String> asReadOnlyMap() {
@@ -101,13 +106,10 @@ class ExtensionsWrapper implements Map<String, String> {
     private String createOrUpdate(String name, String value) {
         Extension existing = findExtensionValueByName(name)
         if (existing) {
-            String old = existing.extensionValue
-            existing.extensionValue = value?.toString()
-            if (existing.save()) {
-                return old
-            }
+            String oldVal = existing.extensionValue
+            element.updateExtension(existing, value)
+            return oldVal
         }
-
         element.addExtension(name?.toString(), value?.toString())
         return null
 

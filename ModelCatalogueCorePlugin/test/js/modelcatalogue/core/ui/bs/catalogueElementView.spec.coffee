@@ -2,6 +2,9 @@ describe "mc.core.ui.catalogueElementView", ->
 
   beforeEach module 'mc.core.ui.states'
   beforeEach module 'mc.core.ui.bs.catalogueElementView'
+  beforeEach module 'mc.core.ui.bs.catalogueElementTreeview'
+  beforeEach module 'mc.core.ui.bs.catalogueElementProperties'
+  beforeEach module 'mc.core.ui.bs.catalogueElementTreeviewItem'
   beforeEach module 'mc.core.ui.bs.infiniteTable'
   beforeEach module 'mc.core.ui.bs.propertiesPane'
   beforeEach module 'mc.core.ui.bs.simpleObjectEditor'
@@ -29,6 +32,9 @@ describe "mc.core.ui.catalogueElementView", ->
     expect(element.prop('tagName').toLowerCase()).toBe('div')
     expect(element.find('h3.ce-name').text().trim()).toBe("#{catEl.name} FINALIZED".trim())
     expect(element.find('blockquote.ce-description').text()).toBe(catEl.description)
+
+    element.find('ul.nav.nav-tabs li').each (index, element) ->
+      console.log $(element).data('tab-name')
 
     expect(element.find('ul.nav.nav-tabs li').length).toBe(numberOfTabs - 1)
     expect(element.find('div.tab-pane').length).toBe(numberOfTabs - 1)

@@ -2,14 +2,8 @@
 // config files can be ConfigSlurper scripts, Java properties files, or classes
 // in the classpath in ConfigSlurper format
 
-// grails.config.locations = [ "classpath:${appName}-config.properties",
-//                             "classpath:${appName}-config.groovy",
-//                             "file:${userHome}/.grails/${appName}-config.properties",
-//                             "file:${userHome}/.grails/${appName}-config.groovy"]
-
-// if (System.properties["${appName}.config.location"]) {
-//    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
-// }
+// will be overriden by specific configuration but needs to exist at least as empty map
+oauth.providers = [:]
 
 grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
 
@@ -79,7 +73,7 @@ grails.spring.bean.packages = []
 grails.web.disable.multipart = false
 
 // request parameters to mask when logging exceptions
-grails.exceptionresolver.params.exclude = ['password']
+grails.exceptionresolver.params.exclude = ['password', 'password1', 'password2', 'client_secret']
 
 // configure auto-caching of queries by default (if false you can cache individual queries with 'cache: true')
 grails.hibernate.cache.queries = false
@@ -88,18 +82,101 @@ environments {
     development {
         grails.logging.jul.usebridge = true
         grails.serverURL = "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
+//        discourse {
+//            url = "http://192.168.1.123/"
+//            api {
+//                key = "af9402ba45b8f4aff5a84bcdf6da85fc7548db746026c5095ed652d0f83fcd8b"
+//                user = "discourse"
+//            }
+//            users {
+//                fallbackEmail = 'vladimir.orany+:username@gmail.com'
+//            }
+//            sso {
+//                key = System.getenv('METADATA_DISCOURSE_SSO_KEY') ?: "notasecret"
+//            }
+//        }
+        oauth {
+            providers {
+                google {
+                    // this key is limited to localhost only so no need to hide it
+                    api = org.modelcatalogue.repack.org.scribe.builder.api.GoogleApi20
+                    key = '225917730237-0hg6u55rgnld9cbtm949ab9h9fk5onr3.apps.googleusercontent.com'
+                    secret = 'OG0JVVoy4bnGm48bneIS0haB'
+                    successUri = '/oauth/google/success'
+                    failureUri = '/oauth/google/error'
+                    callback = "${grails.serverURL}/oauth/google/callback"
+                    scope = 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
+                }
+            }
+        }
+        grails.mc.allow.signup = true
+
+        grails {
+            mail {
+                host = "smtp.gmail.com"
+                port = 465
+                username = "youracount@gmail.com"
+                password = "yourpassword"
+                props = ["mail.smtp.auth":"true",
+                         "mail.smtp.socketFactory.port":"465",
+                         "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
+                         "mail.smtp.socketFactory.fallback":"false"]
+            }
+        }
     }
     local {
         grails.logging.jul.usebridge = true
         grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
     }
     test {
+        // uncomment for debugging failing functional tests on Travis CI
+        grails.assets.bundle=false
+        grails.assets.minifyJs = false
+        oauth {
+            providers {
+                google {
+                    // this key is limited to localhost only so no need to hide it
+                    api = org.modelcatalogue.repack.org.scribe.builder.api.GoogleApi20
+                    key = '225917730237-0hg6u55rgnld9cbtm949ab9h9fk5onr3.apps.googleusercontent.com'
+                    secret = 'OG0JVVoy4bnGm48bneIS0haB'
+                    successUri = '/oauth/google/success'
+                    failureUri = '/oauth/google/error'
+                    callback = "${grails.serverURL}/oauth/google/callback"
+                    scope = 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
+                }
+            }
+        }
+        grails.mc.allow.signup = true
+
         grails.plugin.console.enabled = true
         grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
     }
     production {
-        grails.logging.jul.usebridge = false
-        grails.serverURL = System.getenv('METADATA_SERVER_URL') ?: "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
+        grails.assets.minifyOptions = [
+                strictSemicolons: false,
+                mangleOptions: [mangle: false, toplevel: false, defines: null, except: null, no_functions:false],
+                genOptions: [indent_start:0, indent_level:4, quote_keys: false, space_colon: false, beautify: false, ascii_only: false, inline_script:false]
+        ]
+
+        grails.assets.minifyJs = true
+
+        if (System.properties["mc.config.location"]) {
+            // for running
+            // grails prod run-war -Dmc.config.location=my-conf.groovy
+            grails.config.locations = ["file:" + System.properties["mc.config.location"]]
+        } else {
+            grails.config.locations = [ "classpath:mc-config.properties",
+                                        "classpath:mc-config.groovy",
+                                        "file:${userHome}/.grails/mc-config.properties",
+                                        "file:${userHome}/.grails/mc-config.groovy"]
+        }
+        if (System.properties['catalina.base']) {
+            def tomcatConfDir = new File("${System.properties['catalina.base']}/conf")
+            if (tomcatConfDir.isDirectory()) {
+                grails.config.locations = ["file:${tomcatConfDir.canonicalPath}/mc-config.groovy"]
+            }
+        }
+
     }
 }
 
@@ -117,13 +194,16 @@ log4j = {
     //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
     //}
 
-    debug 'grails.app.services.org.modelcatalogue.core.ElementService'
-    debug 'grails.app.services.org.modelcatalogue.core.dataarchitect.OBOService'
-    debug 'grails.app.services.org.modelcatalogue.core.InitCatalogueService'
+    debug 'grails.app.services.org.modelcatalogue'
+    debug 'grails.app.controllers.org.modelcatalogue'
+
     debug 'org.modelcatalogue.core.dataarchitect.xsd.XSDImporter'
 
     debug 'org.modelcatalogue.core.util.builder'
     debug 'org.modelcatalogue.core.publishing'
+    debug 'org.modelcatalogue.core.util.test'
+    debug 'org.modelcatalogue.core.gel'
+    debug 'org.modelcatalogue.discourse'
 
 //    debug 'org.codehaus.groovy.grails.web.mapping'
 //    debug 'org.springframework.security'
@@ -135,8 +215,7 @@ log4j = {
 //        debug 'org.hibernate.SQL'
 //    }
 
-    warn 'org.modelcatalogue.core.xml'
-    warn 'org.modelcatalogue.core.reports.ReportDescriptor'
+    warn 'org.modelcatalogue'
 
     error 'org.codehaus.groovy.grails.web.servlet',           // controllers
             'org.codehaus.groovy.grails.web.pages',          // GSP
@@ -152,45 +231,6 @@ log4j = {
 }
 grails.views.gsp.encoding = "UTF-8"
 
-elasticSearch.client.mode = 'local'
-elasticSearch.index.store.type = 'memory' // store local node in memory and not on disk
-elasticSearch.datastoreImpl = 'hibernateDatastore'
-
-modelcatalogue.defaults.relationshiptypes =  [
-        [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement, metadataHints: "Min Occurs, Max Occurs", rule: '''
-            String minOccursString = ext['Min Occurs']
-            String maxOccursString = ext['Max Occurs']
-
-            Integer minOccurs = minOccursString in ['unbounded', 'null'] ? 0 : (minOccursString as Integer)
-            Integer maxOccurs = maxOccursString in ['unbounded', 'null'] ? Integer.MAX_VALUE : (maxOccursString as Integer)
-
-            if (minOccurs != null) {
-                if (minOccurs < 0) {
-                    return false
-                }
-                if (maxOccurs != null && maxOccurs < minOccurs) {
-                    return false
-                }
-            } else {
-                if (maxOccurs != null && maxOccurs < 1) {
-                    return false
-                }
-            }
-
-            return true
-        ''', versionSpecific: true],
-        [name: 'base', sourceToDestination: 'is base for', destinationToSource: 'is based on', sourceClass: CatalogueElement, destinationClass: CatalogueElement, rule: "source.class == destination.class"],
-        [name: "attachment", sourceToDestination: "has attachment of", destinationToSource: "is attached to", sourceClass: CatalogueElement, destinationClass: Asset],
-        [name: "hierarchy", sourceToDestination: "parent of", destinationToSource: "child of", sourceClass: Model, destinationClass: Model, versionSpecific: true],
-        [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: CatalogueElement, destinationClass: CatalogueElement, rule: "source.class == destination.class", system: true, versionSpecific: true],
-        [name: "relatedTo", sourceToDestination: "related to", destinationToSource: "related to", sourceClass: CatalogueElement, destinationClass: CatalogueElement, bidirectional: true],
-        [name: "synonym", sourceToDestination: "is synonym for", destinationToSource: "is synonym for", sourceClass: CatalogueElement, destinationClass: CatalogueElement, bidirectional: true, rule: "source.class == destination.class"],
-        [name: "favourite", sourceToDestination: "favourites", destinationToSource: "is favourite of", sourceClass: User, destinationClass: CatalogueElement, system: true],
-        [name: "classification", sourceToDestination: "classifies", destinationToSource: "classifications", sourceClass: Classification, destinationClass: CatalogueElement, versionSpecific: true],
-        [name: "classificationFilter", sourceToDestination: "used as filter by", destinationToSource: "filtered by", sourceClass: Classification, destinationClass: User, system: true],
-
-]
-
 // configure the default storage
 modelcatalogue.storage.directory = "/tmp/modelcatalogue/storage"
 modelcatalogue.storage.maxSize = 50 * 1024 * 1024
@@ -204,7 +244,7 @@ grails.plugin.springsecurity.securityConfigType = 'Requestmap'
 
 grails.assets.excludes =  [
         "bootstrap/**/*.*",
-        "bootstrap/**/*.*",
+        "jquery-ui/**/*.*",
         "font-awesome/**/*.*",
         "jquery/**/*.*",
         "angular/**/*.*",
@@ -236,10 +276,12 @@ grails.assets.excludes =  [
         "**/python2/*.*",
         "**/python3/*.*",
 ]
+
+grails.assets.plugin.famfamfam.excludes = ['**/*.*']
 
 grails.assets.plugin."model-catalogue-core-plugin".excludes = [
         "bootstrap/**/*.*",
-        "bootstrap/**/*.*",
+        "jquery-ui/**/*.*",
         "font-awesome/**/*.*",
         "jquery/**/*.*",
         "angular/**/*.*",
@@ -271,21 +313,61 @@ grails.assets.plugin."model-catalogue-core-plugin".excludes = [
         "**/python2/*.*",
         "**/python3/*.*",
 ]
-
-grails.assets.minifyOptions = [
-        strictSemicolons: false,
-        mangleOptions: [mangle: false, toplevel: false, defines: null, except: null, no_functions:false],
-        genOptions: [indent_start:0, indent_level:4, quote_keys: false, space_colon: false, beautify: false, ascii_only: false, inline_script:false]
-]
-
-//grails.assets.bundle=false
-
-grails.assets.minifyJs = true
 
 
 grails.plugin.springsecurity.useBasicAuth = true
 grails.plugin.springsecurity.basic.realmName = "Model Catalogue"
 grails.plugin.springsecurity.filterChain.chainMap = [
-        '/catalogue/upload': 'JOINED_FILTERS,-exceptionTranslationFilter',
-        '/**': 'JOINED_FILTERS,-basicAuthenticationFilter,-basicExceptionTranslationFilter'
+        '/catalogue/upload':        'JOINED_FILTERS,-exceptionTranslationFilter',
+        '/catalogue/*/*/export':    'JOINED_FILTERS,-exceptionTranslationFilter',
+        '/**':                      'JOINED_FILTERS,-basicAuthenticationFilter,-basicExceptionTranslationFilter'
 ]
+grails.plugin.springsecurity.logout.handlerNames = [
+        'rememberMeServices',
+        'securityContextLogoutHandler',
+        'modelCatalogueSecurityService' // both spring security services implements it
+]
+
+// Added by the Spring Security OAuth plugin:
+grails.plugin.springsecurity.oauth.domainClass = 'org.modelcatalogue.core.security.OAuthID'
+
+if (!grails.mc.allow.signup) {
+    // for safety reasons, override the default class
+    grails.plugin.springsecurity.oauth.registration.roleNames = ['ROLE_REGISTERED']
+}
+
+grails.plugin.springsecurity.ajaxCheckClosure = { request ->
+    request.getHeader('accept')?.startsWith('application/json')
+}
+
+//language=HTML
+mc.welcome.jumbo = """
+<h1>Model Catalogue</h1>
+<p class="lead">
+    <b><em>Model</em></b> existing business processes and context. <b><em>Design</em></b> and version new datasets <b><em>Generate</em></b> better software components
+</p>
+"""
+
+mc.welcome.info = """
+<div class="col-sm-4">
+<h2>Data Quality</h2>
+<p>Build up datasets using existing data elements from existing datasets and add them to new data elements to compose new data models.</p>
+<p>
+
+</p>
+</div>
+<div class="col-sm-4">
+<h2>Dataset Curation</h2>
+<p>Link and compose data-sets to create uniquely identified and versioned "metadata-sets", thus ensuring preservation of data semantics between applications</p>
+<p>
+
+</p>
+</div>
+      <div class="col-sm-4">
+<h2>Dataset Comparison</h2>
+<p>Discover synonyms, hyponyms and duplicate data elements within datasets, and compare data elements from differing datasets.</p>
+<p></p>
+</div>
+"""
+
+grails.plugin.springsecurity.ui.register.defaultRoleNames = [] // no roles

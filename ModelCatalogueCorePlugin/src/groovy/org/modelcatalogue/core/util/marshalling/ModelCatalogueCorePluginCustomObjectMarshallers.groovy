@@ -7,7 +7,7 @@ class ModelCatalogueCorePluginCustomObjectMarshallers {
 
     @Autowired AutowireCapableBeanFactory autowireCapableBeanFactory
 
-    List<AbstractMarshallers> marshallers = []
+    List<AbstractMarshaller> marshallers = []
 
     void register() {
         marshallers.each {

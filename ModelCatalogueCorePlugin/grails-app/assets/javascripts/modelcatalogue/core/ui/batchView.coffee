@@ -8,7 +8,7 @@ angular.module('mc.core.ui.batchView', ['mc.core.catalogueElementEnhancer', 'mc.
 
     templateUrl: 'modelcatalogue/core/ui/batchView.html'
 
-    controller: ['$scope','$q', '$window', 'names', ($scope, $q, $window, names) ->
+    controller: ['$scope','$q', '$window', 'names', '$timeout', ($scope, $q, $window, names, $timeout) ->
       $scope.getType = (action) ->
         return 'info'    if not action
         return 'warning' if action.highlighted
@@ -36,8 +36,9 @@ angular.module('mc.core.ui.batchView', ['mc.core.catalogueElementEnhancer', 'mc.
               performedActions.unshift action
           if list.total > list.offset + list.size
             deferred.notify pendingActions: pendingActions, performedActions: performedActions
-            loadActions(list.next, pendingActions, performedActions).then ->
-              deferred.resolve pendingActions: pendingActions, performedActions: performedActions
+            $timeout (->
+              loadActions(list.next, pendingActions, performedActions).then ->
+                deferred.resolve pendingActions: pendingActions, performedActions: performedActions), 300
           else
             deferred.resolve pendingActions: pendingActions, performedActions: performedActions
         deferred.promise

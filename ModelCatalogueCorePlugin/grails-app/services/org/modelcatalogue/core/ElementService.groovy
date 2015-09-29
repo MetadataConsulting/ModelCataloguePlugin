@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import grails.util.Environment
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.util.FriendlyErrors
@@ -16,6 +17,7 @@ class ElementService implements Publisher<CatalogueElement> {
     def relationshipService
     def modelCatalogueSearchService
     def messageSource
+    def auditService
 
     List<CatalogueElement> list(Map params = [:]) {
         CatalogueElement.findAllByStatus(getStatusFromParams(params), params)
@@ -35,56 +37,73 @@ class ElementService implements Publisher<CatalogueElement> {
 
 
     public <E extends CatalogueElement> E createDraftVersion(E element, DraftContext context) {
-        CatalogueElement.withTransaction { TransactionStatus status ->
-            E draft = element.createDraftVersion(this, context) as E
-            if (draft.hasErrors()) {
-                status.setRollbackOnly()
-                return element
+        Closure<E> code = { TransactionStatus status = null ->
+            auditService.logNewVersionCreated(element) {
+                E draft = element.createDraftVersion(this, context) as E
+                if (draft.hasErrors()) {
+                    status?.setRollbackOnly()
+                    return element
+                }
+                context.classifyDrafts()
+                context.resolvePendingRelationships()
+                return draft
             }
-            context.classifyDrafts()
-            context.resolvePendingRelationships()
-            draft
+        }
+        if (context.importFriendly) {
+            return code()
+        } else {
+            return CatalogueElement.withTransaction(code)
         }
     }
 
 
 
-    CatalogueElement archive(CatalogueElement archived) {
+    CatalogueElement archive(CatalogueElement archived, boolean archiveRelationships) {
         if (archived.archived) {
             return archived
         }
 
-        archived.incomingRelationships.each {
-            if (it.relationshipType == RelationshipType.supersessionType) {
-                return
+        CatalogueElement.withTransaction { TransactionStatus status ->
+            auditService.logElementDeprecated(archived) {
+                if (archiveRelationships) {
+                    archived.incomingRelationships.each {
+                        if (it.relationshipType == RelationshipType.supersessionType) {
+                            return
+                        }
+                        it.archived = true
+                        FriendlyErrors.failFriendlySave(it)
+                        auditService.logRelationArchived(it)
+                    }
+
+                    archived.outgoingRelationships.each {
+                        if (it.relationshipType == RelationshipType.supersessionType) {
+                            return
+                        }
+                        it.archived = true
+                        FriendlyErrors.failFriendlySave(it)
+                        auditService.logRelationArchived(it)
+                    }
+                }
+
+                modelCatalogueSearchService.unindex(archived)
+
+                archived.status = ElementStatus.DEPRECATED
+                archived.save(flush: true, validate: false)
+                return archived
             }
-            it.archived = true
-            FriendlyErrors.failFriendlySave(it)
         }
-
-        archived.outgoingRelationships.each {
-            if (it.relationshipType == RelationshipType.supersessionType) {
-                return
-            }
-            it.archived = true
-            FriendlyErrors.failFriendlySave(it)
-        }
-
-        modelCatalogueSearchService.unindex(archived)
-
-        archived.status = ElementStatus.DEPRECATED
-        archived.save()
-        return archived
     }
 
 
     public <E extends CatalogueElement> E finalizeElement(E draft) {
         CatalogueElement.withTransaction { TransactionStatus status ->
-            E finalized = draft.publish(this) as E
-            if (finalized.hasErrors()) {
-                status.setRollbackOnly()
+            auditService.logElementFinalized(draft) {
+                E finalized = draft.publish(this) as E
+                if (finalized.hasErrors()) {
+                    status.setRollbackOnly()
+                }
+                finalized
             }
-            finalized
         }
     }
 
@@ -156,7 +175,7 @@ class ElementService implements Publisher<CatalogueElement> {
         }
 
         destination.status = ElementStatus.UPDATED
-        destination.save()
+        destination.save(flush: true, validate: false)
 
 
         for (Classification classification in new HashSet<Classification>(source.classifications)) {
@@ -247,10 +266,10 @@ class ElementService implements Publisher<CatalogueElement> {
         }
 
         if (!source.archived) {
-            archive source
+            archive source, true
         }
 
-        destination.addToSupersededBy(source)
+        destination.addToSupersededBy(source, skipUniqueChecking: true)
 
         destination.status = originalStatus
 
@@ -276,7 +295,7 @@ class ElementService implements Publisher<CatalogueElement> {
             group by m.name
             having sum(case when inc.relationshipType = :base then 1 else 0 end) = 1
             and sum(case when inc.relationshipType = :hierarchy then 1 else 0 end) = 2
-        """, [hierarchy: RelationshipType.hierarchyType, base: RelationshipType.findByName("base")])
+        """, [hierarchy: RelationshipType.hierarchyType, base: RelationshipType.readByName("base")])
 
         Map<Long, Long> ret = [:]
 
@@ -314,7 +333,7 @@ class ElementService implements Publisher<CatalogueElement> {
             and
                 (rel.relationshipType = :containment or rel.relationshipType = :hierarchy)
             order by m.name asc, m.dateCreated asc, rel.destination.name asc
-        """, [states: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.FINALIZED], containment: RelationshipType.findByName('containment'), hierarchy: RelationshipType.findByName('hierarchy')]
+        """, [states: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.FINALIZED], containment: RelationshipType.readByName('containment'), hierarchy: RelationshipType.readByName('hierarchy')]
 
 
         Map<Long, Map<String, Object>> models = new LinkedHashMap<Long, Map<String, Object>>().withDefault { [id: it, elementNames: new TreeSet<String>(), childrenNames: new TreeSet<String>()] }
@@ -425,6 +444,29 @@ class ElementService implements Publisher<CatalogueElement> {
         }
 
         elements
+    }
+
+    public <E extends CatalogueElement> E restore(E element) {
+        if (!element) {
+            return element
+        }
+
+        if (!element) {
+            element.errors.rejectValue('status', 'element.restore.not.deprecated', 'Unable to restore element. Element is not deprecated.')
+            return element
+        }
+
+        if (element.latestVersionId) {
+            CatalogueElement finalized = CatalogueElement.findByLatestVersionIdAndStatus(element.latestVersionId, ElementStatus.FINALIZED)
+            if (finalized) {
+                element.errors.rejectValue('status', 'element.restore.finalized.exists', 'Unable to restore element. There is already a finalized version of this element.')
+                return element
+            }
+        }
+
+        element.status = ElementStatus.FINALIZED
+        element.save(flush: true)
+        return element
     }
 
 }

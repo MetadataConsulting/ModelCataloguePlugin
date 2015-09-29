@@ -7,19 +7,15 @@ import org.modelcatalogue.core.RelationshipType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 import spock.lang.Shared
-
 import static org.modelcatalogue.core.actions.AbstractActionRunner.encodeEntity
 import static org.modelcatalogue.core.actions.AbstractActionRunner.normalizeDescription
 
+
 class CreateRelationshipISpec extends AbstractIntegrationSpec {
 
-    def relationshipTypeService
     def modelCatalogueSecurityService
-    def modelCatalogueSearchService
     def relationshipService
-    def elementService
-    def actionService
-    def classificationService
+
     @Autowired AutowireCapableBeanFactory autowireCapableBeanFactory
     @Shared
     Model one, two

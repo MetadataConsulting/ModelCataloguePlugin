@@ -3,6 +3,7 @@ package org.modelcatalogue.core.dataarchitect.xsd
 import groovy.util.logging.Log4j
 import groovy.xml.QName
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.util.ClassificationFilter
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.RelationshipDirection
 
@@ -69,23 +70,23 @@ class XSDImporter {
 
             log.info("Publishing elements as DRAFT")
             for (DataElement element in elementsCreated) {
-                element.status = ElementStatus.DRAFT
+                element.status = org.modelcatalogue.core.api.ElementStatus.DRAFT
                 element.save(failOnError: true)
             }
 
             log.info("Publishing models as DRAFT")
             for (Model model in modelsCreated) {
-                model.status = ElementStatus.DRAFT
+                model.status = org.modelcatalogue.core.api.ElementStatus.DRAFT
                 model.save(failOnError: true)
             }
 
             if (publicTypesContainer) {
-                publicTypesContainer.status = ElementStatus.DRAFT
+                publicTypesContainer.status = org.modelcatalogue.core.api.ElementStatus.DRAFT
                 publicTypesContainer.save(failOnError: true)
             }
 
             if (rootElementsContainer) {
-                rootElementsContainer.status = ElementStatus.DRAFT
+                rootElementsContainer.status = org.modelcatalogue.core.api.ElementStatus.DRAFT
                 rootElementsContainer.save(failOnError: true)
             }
 
@@ -110,12 +111,12 @@ class XSDImporter {
         classifications.add(typeClassification)
 
         publicTypesContainer = findModel(containerModelName)
-        if (!publicTypesContainer) publicTypesContainer = new Model(name: containerModelName, description: "Container model for complex types. This is automatically generated. You can remove this container model and curate the data as you wish", status: ElementStatus.PENDING).save(failOnError: true)
+        if (!publicTypesContainer) publicTypesContainer = new Model(name: containerModelName, description: "Container model for complex types. This is automatically generated. You can remove this container model and curate the data as you wish", status: org.modelcatalogue.core.api.ElementStatus.PENDING).save(failOnError: true)
 
         if (!createModelsForElements) {
             if (!rootElementsModelName) rootElementsModelName = classifications.first()?.name + " Root Elements"
             rootElementsContainer = findModel(rootElementsModelName)
-            if (!rootElementsContainer) rootElementsContainer = new Model(name: rootElementsModelName, description: "Container model for root elements. This is automatically generated. You can remove this container model and curate the data as you wish", status: ElementStatus.PENDING).save(failOnError: true)
+            if (!rootElementsContainer) rootElementsContainer = new Model(name: rootElementsModelName, description: "Container model for root elements. This is automatically generated. You can remove this container model and curate the data as you wish", status: org.modelcatalogue.core.api.ElementStatus.PENDING).save(failOnError: true)
         }
 
 
@@ -181,7 +182,7 @@ class XSDImporter {
         def model = findModel(modelName)
         if (!model) {
 
-            model = new Model(name: modelName, description: complexType?.description, status: ElementStatus.UPDATED).save(flush: true, failOnError: true)
+            model = new Model(name: modelName, description: complexType?.description, status: org.modelcatalogue.core.api.ElementStatus.UPDATED).save(flush: true, failOnError: true)
             model = addClassifications(model)
             modelsCreated.add(model)
 
@@ -217,7 +218,7 @@ class XSDImporter {
                 }
             }
 
-            model.status = ElementStatus.PENDING
+            model.status = org.modelcatalogue.core.api.ElementStatus.PENDING
 
         }
         return model
@@ -253,7 +254,7 @@ class XSDImporter {
 
 
     List<Model> findModels(String modelName) {
-        classificationService.classified(Model.where { name == modelName }, classifications).list()
+        classificationService.classified(Model.where { name == modelName }, ClassificationFilter.includes(classifications)).list()
     }
 
     Model findModel(String name) {
@@ -565,7 +566,7 @@ class XSDImporter {
         DataElement dataElement = findDataElement(name, domain)
 
         if (!dataElement) {
-            dataElement = new DataElement(name: name, description: description, valueDomain: domain, status: ElementStatus.PENDING)
+            dataElement = new DataElement(name: name, description: description, valueDomain: domain, status: org.modelcatalogue.core.api.ElementStatus.PENDING)
             dataElement = addClassifications(dataElement)
             elementsCreated << dataElement.save(failOnError: true)
         }
@@ -583,11 +584,11 @@ class XSDImporter {
         if (domain) {
             elements = classificationService.classified(DataElement.where {
                 name == theName && valueDomain == domain
-            }, classifications).list()
+            }, ClassificationFilter.includes(classifications)).list()
         } else {
             elements = classificationService.classified(DataElement.where {
                 name == theName && valueDomain == null
-            }, classifications).list()
+            }, ClassificationFilter.includes(classifications)).list()
         }
 
         if (elements) {

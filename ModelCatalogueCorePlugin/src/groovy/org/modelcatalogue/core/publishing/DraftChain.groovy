@@ -1,12 +1,14 @@
 package org.modelcatalogue.core.publishing
 
 import grails.util.Holders
+import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.ElementStatus
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 
+@Log4j
 class DraftChain extends PublishingChain {
 
     private final DraftContext strategy
@@ -55,7 +57,9 @@ class DraftChain extends PublishingChain {
                 processed << element.id
                 CatalogueElement draft = element.createDraftVersion(publisher, strategy)
                 if (draft.hasErrors()) {
-                    return rejectDraftDependency(draft)
+                    String message = FriendlyErrors.printErrors("Draft version $draft has errors", draft.errors)
+                    log.warn(message)
+                    return rejectDraftDependency(draft, message)
                 }
             }
         }
@@ -94,31 +98,31 @@ class DraftChain extends PublishingChain {
 
         draft.beforeDraftPersisted()
 
-        if (!draft.save()) {
+        if (!draft.save(flush: true, deepValidate: false)) {
             return draft
         }
 
         restoreStatus()
 
 
-        draft.addToSupersedes(published)
+        draft.addToSupersedes(published, skipUniqueChecking: true)
 
         strategy.delayRelationshipCopying(draft, published)
 
         published.afterDraftPersisted(draft)
 
         if (published.status == ElementStatus.DRAFT) {
-            archiver.archive(published)
+            archiver.archive(published, true)
         }
 
         draft.status = ElementStatus.DRAFT
-        draft.save()
+        draft.save(flush: true, deepValidate: false)
     }
 
 
-    private CatalogueElement rejectDraftDependency(CatalogueElement element) {
+    private CatalogueElement rejectDraftDependency(CatalogueElement element, String message) {
         restoreStatus()
-        published.errors.reject('org.modelcatalogue.core.CatalogueElement.cannot.create.draft.dependency', "Cannot create draft of dependency ${element}, please, resolve the issue first. You'll see more details when you try to create draft manualy")
+        published.errors.reject('org.modelcatalogue.core.CatalogueElement.cannot.create.draft.dependency', "Cannot create draft of dependency ${element}, please, resolve the issue first. You'll see more details when you try to create draft manualy\n\n$message")
         published
     }
 

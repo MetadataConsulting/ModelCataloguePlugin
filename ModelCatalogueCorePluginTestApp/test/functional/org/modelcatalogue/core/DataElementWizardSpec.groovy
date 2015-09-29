@@ -1,6 +1,5 @@
     package org.modelcatalogue.core
 
-    import geb.spock.GebReportingSpec
     import org.modelcatalogue.core.pages.DataViewPage
     import spock.lang.Stepwise
 
@@ -8,9 +7,12 @@
      * Created by david on 02/11/14.
      */
     @Stepwise
-    class DataElementWizardSpec extends GebReportingSpec  {
+    class DataElementWizardSpec extends AbstractModelCatalogueGebSpec  {
 
         def "login and select Data Element"() {
+            go "#/"
+            loginAdmin()
+
             when:
             go "#/catalogue/dataElement/all"
 
@@ -23,10 +25,6 @@
                 viewTitle.text().trim() == 'Data Element List'
             }
 
-            when:
-            loginAdmin()
-
-            then:
             waitFor {
                 addNewDataElementButton.displayed
             }
@@ -135,6 +133,7 @@
         def "finalize element"() {
             waitUntilModalClosed()
             when: "finalize is clicked"
+            actionButton('change-element-state').click()
             actionButton('finalize').click()
 
             then: "modal prompt is displayed"
@@ -155,6 +154,7 @@
         def "create new version of the element"() {
             waitUntilModalClosed()
             when: "new version is clicked"
+            actionButton('change-element-state').click()
             actionButton('create-new-version').click()
 
             then: "modal prompt is displayed"
@@ -175,6 +175,7 @@
         def "deprecate the element"() {
             waitUntilModalClosed()
             when: "depracete action is clicked"
+            actionButton('change-element-state').click()
             actionButton('archive').click()
 
             then: "modal prompt is displayed"
@@ -195,6 +196,7 @@
         def "hard delete the element"() {
             waitUntilModalClosed()
             when: "delete action is clicked"
+            actionButton('change-element-state').click()
             actionButton('delete').click()
 
             then: "modal prompt is displayed"

@@ -2,6 +2,8 @@ package org.modelcatalogue.core.pages
 
 import geb.Page
 import geb.navigator.Navigator
+import geb.waiting.WaitTimeoutException
+import org.openqa.selenium.StaleElementReferenceException
 
 abstract class ModelCataloguePage extends Page {
 
@@ -21,6 +23,7 @@ abstract class ModelCataloguePage extends Page {
         modalDialog(OPT)        { $("div.modal") }
         modalHeader(OPT)        { $("div.modal-header h4") }
         modalPrimaryButton(OPT) { $("div.modal").find('button.btn-primary') }
+        modalSuccessButton(OPT) { $("div.modal").find('button.btn-success') }
         modalCloseButton(OPT)   { $("div.modal").find('button.close') }
 
         username                { $("div.modal").find("#username") }
@@ -36,123 +39,4 @@ abstract class ModelCataloguePage extends Page {
 
 
     }
-
-
-    // keep the passwords simply stupid, they are only for dev/test or very first setup
-    // sauce labs connector for some reason fails with the six in the input
-    def loginAdmin() { loginUser("admin", "admin") }
-    def loginViewer() { loginUser("viewer", "viewer") }
-    def loginCurator() { loginUser("curator", "creator") }
-
-    def loginUser(String user, String pwd) {
-        if (!$('.login-modal-prompt').displayed) {
-            if (!showLoginButton.displayed) {
-                showLogoutButton.click()
-            }
-
-            waitFor {
-                showLoginButton.displayed
-            }
-
-            showLoginButton.click()
-        }
-
-        waitFor {
-            loginDialog.displayed
-        }
-
-        username = user
-        password = pwd
-        loginButton.click()
-    }
-
-    boolean waitUntilModalClosed(int timeout = 10) {
-        waitFor(timeout){
-            !$('.modal-backdrop').displayed
-        }
-        return true
-    }
-
-    /**
-     * Selects the first item from catalogue element picker if any element is found.
-     * returns true if the element was selected, false otherwise
-     */
-    boolean selectCepItemIfExists(long waitTime = 3) {
-        try {
-            waitFor(waitTime) {
-                $('.cep-item').displayed
-            }
-            $('.cep-item').click()
-            return true
-        } catch (ignored) {
-            return false
-        }
-
-    }
-
-    Navigator actionButton(String id, String role = "item") {
-        $('#role_' + role + '_' + id + 'Btn')
-    }
-
-    Navigator menuItem(String id, String role = "navigation") {
-        $('#role_' + role + '_' + id + '-menu-item-link')
-    }
-
-    /**
-     * @param row number of row starting 1
-     * @param column number of column starting 1
-     * @return given cell
-     */
-    Navigator infTableCell(Map attrs = [:], int row, int column) {
-        $(attrs, 'div.inf-table-body tbody tr:nth-child(' + row +') td:nth-child(' + column + ')')
-    }
-
-
-    void toggleInfTableRow(int row) {
-        waitFor {
-            $('div.inf-table-body tbody tr:nth-child(' + row +') a.inf-cell-expand')
-        }
-        $('div.inf-table-body tbody tr:nth-child(' + row +') a.inf-cell-expand').click()
-    }
-
-    int totalOf(String name) {
-        Navigator totalSpan = tab(name).find('span.badge.tab-value-total')
-        if (!totalSpan.displayed) {
-            return 0
-        }
-        return totalSpan.text() as Integer
-    }
-
-    Navigator tab(String name) {
-        $('li', 'data-tab-name': name)
-    }
-
-    void selectTab(String name) {
-        $("li[data-tab-name='$name'] a").click()
-    }
-
-    boolean tabActive(String name) {
-        $("li[data-tab-name='$name'].active").displayed
-    }
-
-    /**
-     * Fills the metadata with the new values
-     * @param newMetadata
-     */
-    void fillMetadata(Map newMetadata, Navigator parent = null) {
-        if (!parent) {
-            parent = simpleObjectEditor
-        }
-
-        while (parent.find('.soe-table-property-row').size() > 1) {
-            parent.find('.soe-table-property-row:first-child .soe-table-property-actions .soe-remove-row').click()
-        }
-
-        newMetadata.each { key, value ->
-            parent.find('.soe-table-property-row:last-child .soe-table-property-key input').value(key?.toString() ?: '')
-            parent.find('.soe-table-property-row:last-child .soe-table-property-value input').value(value?.toString() ?: '')
-            parent.find('.soe-table-property-row:last-child .soe-table-property-actions .soe-add-row').click()
-        }
-    }
-
 }

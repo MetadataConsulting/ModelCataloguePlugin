@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.Lists
 
 class ValueDomainController extends AbstractCatalogueElementController<ValueDomain> {
@@ -25,6 +26,10 @@ class ValueDomainController extends AbstractCatalogueElementController<ValueDoma
         if (params.status == 'unused') {
             handleParams(max)
             respond Lists.wrap(params, resource, basePath, dataArchitectService.unusedValueDomains(params))
+            return
+        }
+        if(params.status && params.status.toLowerCase() != 'finalized' && !modelCatalogueSecurityService.hasRole('VIEWER')) {
+            notAuthorized()
             return
         }
         super.index(max)

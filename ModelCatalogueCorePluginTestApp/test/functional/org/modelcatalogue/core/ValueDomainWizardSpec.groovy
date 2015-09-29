@@ -1,13 +1,15 @@
     package org.modelcatalogue.core
 
-    import geb.spock.GebReportingSpec
     import org.modelcatalogue.core.pages.ValueDomainPage
     import spock.lang.Stepwise
 
     @Stepwise
-    class ValueDomainWizardSpec extends GebReportingSpec  {
+    class ValueDomainWizardSpec extends AbstractModelCatalogueGebSpec  {
 
         def "login and select Value Domain"() {
+            go "#/"
+            loginAdmin()
+
             when:
             go "#/catalogue/valueDomain/all"
 
@@ -19,11 +21,6 @@
             waitFor {
                 viewTitle.text().trim() == 'Value Domain List'
             }
-
-            when:
-            loginAdmin()
-
-            then:
             waitFor {
                 actionButton('create-catalogue-element', 'list').displayed
             }
@@ -145,9 +142,39 @@
             waitFor {
                 $('button.btn-primary.update-object').disabled
             }
+            waitFor {
+                $('.btn.add-metadata').displayed
+            }
 
             when:
+            noStale({$('.btn.add-metadata')}) {
+                it.click()
+            }
+
             fillMetadata(foo: 'bar', one: 'two', free: 'for')
+
+            then:
+            waitFor {
+                !$('button.btn-primary.update-object').disabled
+            }
+
+            when:
+            $('button.btn-primary.update-object').click()
+
+            then:
+            waitFor {
+                $('button.btn-primary.update-object').displayed
+            }
+            waitFor(30) {
+                $('button.btn-primary.update-object').disabled
+            }
+
+            when:
+            3.times {
+                noStale({$('a.soe-remove-row')}) {
+                    it.click()
+                }
+            }
 
             then:
             waitFor {
@@ -162,11 +189,20 @@
                 $('button.btn-primary.update-object').displayed && $('button.btn-primary.update-object').disabled
             }
 
+            when:
+            browser.driver.navigate().refresh()
+
+            then:
+            waitFor {
+                $('.btn.add-metadata').displayed
+            }
+
         }
 
         def "validate value"() {
             waitUntilModalClosed()
             when: "validate action is clicked"
+            actionButton('catalogue-element').click()
             actionButton('validate-value').click()
 
 
@@ -207,6 +243,7 @@
         def "create new mapping"() {
             waitUntilModalClosed()
             when: "create new mapping action is clicked"
+            actionButton('catalogue-element').click()
             actionButton('create-new-mapping').click()
 
 
@@ -235,6 +272,7 @@
         def "convert value"() {
             waitUntilModalClosed()
             when: "convert action is clicked"
+            actionButton('catalogue-element').click()
             actionButton('convert').click()
 
             then: "modal is shown"
@@ -310,6 +348,7 @@
         def "create relationship"() {
             waitUntilModalClosed()
             when: "create relationship action is clicked"
+            actionButton('catalogue-element').click()
             actionButton('create-new-relationship').click()
 
             then: "modal is shown"
@@ -322,6 +361,17 @@
             element = 'xs:boolean'
             selectCepItemIfExists()
 
+
+            noStale({ $('.expand-metadata') })  {
+                it.click()
+            }
+
+            then:
+            waitFor {
+                $('.metadata-help-block').displayed
+            }
+
+            when:
             fillMetadata(modalDialog, foo: 'bar', one: 'two')
 
             modalPrimaryButton.click()
@@ -342,6 +392,9 @@
             then: "related to tab is active"
             waitFor {
                 tabActive('relatedTo')
+            }
+            waitFor {
+                tableFooterAction.displayed
             }
 
             when: "click the footer action"
@@ -436,6 +489,7 @@
         def "finalize domain"() {
             waitUntilModalClosed()
             when: "finalize is clicked"
+            actionButton('change-element-state').click()
             actionButton('finalize').click()
 
             then: "modal prompt is displayed"
@@ -456,6 +510,7 @@
         def "create new version of the domain"() {
             waitUntilModalClosed()
             when: "new version is clicked"
+            actionButton('change-element-state').click()
             actionButton('create-new-version').click()
 
             then: "modal prompt is displayed"
@@ -479,6 +534,7 @@
         def "merge domain"() {
             waitUntilModalClosed()
             when:
+            actionButton('change-element-state').click()
             actionButton('merge').click()
 
             then:

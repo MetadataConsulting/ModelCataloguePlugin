@@ -73,7 +73,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
               <form ng-submit="select('parents')">
                 <div>
                   <h4>Metadata</h4>
-                  <simple-object-editor title="Key" value-title="Value" object="metadata"></simple-object-editor>
+                  <metadata-editor title="Key" value-title="Value" object="metadata" owner="owners.model"></metadata-editor>
                 </div>
               </form>
           </div>
@@ -91,7 +91,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   </div>
                   <p class="help-block">Parent model is source for the hierarchy relationship</p>
                 </div>
-                <simple-object-editor object="parent.ext" title="Relationship Metadata" hints="['Min Occurs', 'Max Occurs']"></simple-object-editor>
+                <metadata-editor object="parent.ext" title="Relationship Metadata" owner="owners.parents"></metadata-editor>
               </form>
           </div>
           <div ng-switch-when="children" id="children">
@@ -113,7 +113,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                     <strong>Hint:</strong> If you have CSV file with sample data you can <a class="alert-link"><span class="fa fa-magic"></span> import child models from CSV file headers</a>.
                   </alert>
                 </div>
-                <simple-object-editor object="child.ext" title="Relationship Metadata" hints="['Min Occurs', 'Max Occurs']"></simple-object-editor>
+                <metadata-editor object="child.ext" title="Relationship Metadata" owner="owners.children"></metadata-editor>
               </form>
           </div>
           <div ng-switch-when="elements" id="elements">
@@ -135,7 +135,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                     <strong>Hint:</strong> If you have CSV file with sample data you can <a class="alert-link"><span class="fa fa-magic"></span> import data elements from CSV file headers</a>.
                   </alert>
                 </div>
-                <simple-object-editor object="dataElement.ext" title="Relationship Metadata" hints="['Min Occurs', 'Max Occurs']"></simple-object-editor>
+                <metadata-editor object="dataElement.ext" title="Relationship Metadata" owner="owners.contains"></metadata-editor>
               </form>
             </tab>
           </div>
@@ -166,18 +166,20 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
           <button ng-disabled="!finished" class="btn btn-default"  ng-click="$close(model)" id="exit-wizard"><span class="glyphicon glyphicon-remove"></span> Close</button>
         </div>
         '''
-        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', 'args', 'delayedQueueExecutor', '$q', '$log', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout, args, delayedQueueExecutor, $q, $log) ->
+        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', 'args', 'delayedQueueExecutor', '$q', '$log', 'enhance', 'metadataEditors', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout, args, delayedQueueExecutor, $q, $log, enhance, metadataEditors) ->
           execAfter50 = delayedQueueExecutor(500)
+
+          orderedMapEnhancer = enhance.getEnhancer('orderedMap')
 
           $scope.reset = ->
             $scope.args = args
             $scope.model = {classifications: []}
-            $scope.metadata = {}
-            $scope.parent = {ext: {}}
+            $scope.metadata = orderedMapEnhancer.emptyOrderedMap()
+            $scope.parent = {ext: orderedMapEnhancer.emptyOrderedMap()}
             $scope.parents = []
-            $scope.child = {ext: {}}
+            $scope.child = {ext: orderedMapEnhancer.emptyOrderedMap()}
             $scope.children = []
-            $scope.dataElement = args.dataElement ? {ext: {}}
+            $scope.dataElement = args.dataElement ? {ext: orderedMapEnhancer.emptyOrderedMap()}
             $scope.dataElements = []
             $scope.classification = {}
             $scope.classifications = []
@@ -194,7 +196,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             $scope.classificationsVisited = false
 
             if args.parent
-              $scope.parents.push {element: args.parent, name: args.parent.name, metadata: {}}
+              $scope.parents.push {element: args.parent, name: args.parent.name, metadata: orderedMapEnhancer.emptyOrderedMap()}
 
           $scope.reset()
 
@@ -217,12 +219,11 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             else
               value.name = value.element.name
             $scope[arrayName].push value
-            $scope[propertyName] = {ext: {}}
+            $scope[propertyName] = {ext: orderedMapEnhancer.emptyOrderedMap()}
 
           $scope.openElementInNewWindow = (element) ->
             url = $state.href('mc.resource.show', {resource: names.getPropertyNameFromType(element.elementType), id: element.id})
             $window.open(url,'_blank')
-            return
 
           $scope.finish = () ->
             return if $scope.finishInProgress
@@ -297,16 +298,16 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             for action in $scope.pendingActions
              promise = promise.then(action).then decreasePendingActionsCount, (errorResponse) ->
 
-               if errorResponse.errors
-                for error in errorResponse.errors
+               if errorResponse.data.errors
+                for error in errorResponse.data.errors
                   messages.error(error.message)
-               else if errorResponse.error
-                 messages.error(errorResponse.error)
+               else if errorResponse.data.error
+                 messages.error(errorResponse.data.error)
                else
                  messages.error('Unknown expection happened while creating new model. See application logs for details.')
 
                $scope.finishInProgress = false
-               $q.reject errorResponse
+               $q.reject errorResponse.data
 
             promise.then (model) ->
               messages.success "Model #{model.name} created"
@@ -318,10 +319,9 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             $scope.classificationsVisited |= step == 'classifications'
             return if step != 'model' and not $scope.model.name
             $scope.step = step
-            return
 
           $scope.next = ->
-            return if not $scope.model.name
+            return undefined if not $scope.model.name
             for step, i in $scope.steps
               if step == $scope.step and i < $scope.steps.length - 1
                 nextStep = $scope.steps[i + 1]
@@ -332,7 +332,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   break
 
           $scope.previous = ->
-            return if not $scope.model.name
+            return undefined if not $scope.model.name
             for step, i in $scope.steps
               if step == $scope.step and i != 0
                 $scope.step = $scope.steps[i - 1]
@@ -385,30 +385,33 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
               $scope.metadata           = angular.copy model.ext
 
               angular.forEach model.classifications, (classification) ->
-                $scope.classifications.push classification
+                $scope.classifications.push {element: classification, name: classification.name}
 
               push = (container, property) ->
                 (result) ->
                   angular.forEach result.list, (relation) ->
                     $scope[property] = element: relation.relation, ext: relation.ext
                     $scope.push container, property
-                  $scope[property] {ext: {}}
+                  $scope[property] = {ext: orderedMapEnhancer.emptyOrderedMap()}
 
-              promises.push model.childOf(null, max: 100).then push('parents', 'parent')
               promises.push model.parentOf(null, max: 100).then push('children', 'child')
               promises.push model.contains(null, max: 100).then push('dataElements', 'dataElement')
 
               $q.all promises
 
           $scope.hasMetadata = ->
-            for ignored of $scope.metadata
-              return true
-            return false
+            return $scope.metadata.values.length > 0 and $scope.metadata.values[0].key
 
 
           $scope.isModelCatalogueIdValid = ->
             return true if not $scope.model.modelCatalogueId
             return new RegExp(/(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?/).test($scope.model.modelCatalogueId)
+
+          $scope.owners =
+            model: metadataEditors.createFakeOwner('model')
+            parents: metadataEditors.createFakeOwner('=[hierarchy]=>model')
+            children: metadataEditors.createFakeOwner('model=[hierarchy]=>')
+            contains: metadataEditors.createFakeOwner('model=[containment]=>')
         ]
 
       }

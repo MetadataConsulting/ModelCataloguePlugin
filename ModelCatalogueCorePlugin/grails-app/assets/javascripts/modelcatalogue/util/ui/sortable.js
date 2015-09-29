@@ -1,7 +1,7 @@
-(function(window, angular, undefined) {
+(function(window, angular) {
 'use strict';
 /**
- * Exremly simplified https://github.com/angular-ui/ui-sortable
+ * Extremly simplified https://github.com/angular-ui/ui-sortable
  */
 angular.module('mc.util.ui.sortable', [])
   .value('sortableConfig',{})
@@ -13,8 +13,6 @@ angular.module('mc.util.ui.sortable', [])
           sortable: '='
         },
         link: function(scope, element) {
-          var savedNodes;
-
           var opts = {};
 
           angular.extend(opts, sortableConfig, scope.sortable);

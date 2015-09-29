@@ -1,6 +1,8 @@
 package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
+import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.util.ClassificationFilter
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
 
@@ -11,6 +13,7 @@ import org.modelcatalogue.core.util.RelationshipDirection
 class ModelCatalogueSearchService implements SearchCatalogue {
 
     def classificationService
+    def modelCatalogueSecurityService
 
     @Override
     def search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
@@ -62,6 +65,12 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         if (!params.search) {
             return [errors: "No query string to search on"]
         }
+
+        // if the user doesn't have at least VIEWER role, don't return other elements than finalized
+        if (!params.status && !modelCatalogueSecurityService.hasRole('VIEWER')) {
+            params.status = 'FINALIZED'
+        }
+
         def searchResults = [:]
 
         String query = "%$params.search%"
@@ -79,7 +88,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
             searchResults.searchResults = criteria.list(params)
             searchResults.total = criteria.count()
         } else if (CatalogueElement.isAssignableFrom(resource)) {
-            List<Classification> classifications = classificationService.classificationsInUse
+            ClassificationFilter classifications = classificationService.classificationsInUse
 
             String alias = resource.simpleName[0].toLowerCase()
             String listQuery = """
@@ -106,24 +115,46 @@ class ModelCatalogueSearchService implements SearchCatalogue {
             ]
 
             if (classifications) {
-                listQuery = """
-                from ${resource.simpleName} ${alias} join ${alias}.incomingRelationships as rel
-                where
-                    ${alias}.status in :statuses
-                    and (
-                        lower(${alias}.name) like lower(:query)
-                        or lower(${alias}.description) like lower(:query)
-                        or lower(${alias}.modelCatalogueId) like lower(:query)
-                        or ${alias} in (select ev.element from ExtensionValue ev where lower(ev.extensionValue) like lower(:query))
-                    )
-                    and rel.source in (:classifications)
-                    and rel.relationshipType = :classificationType
-                """
-                arguments.classifications = classifications
-                arguments.classificationType = RelationshipType.classificationType
+                if (classifications.unclassifiedOnly) {
+                    listQuery = """
+                    from ${resource.simpleName} ${alias}
+                    where
+                        ${alias}.status in :statuses
+                        and (
+                            lower(${alias}.name) like lower(:query)
+                            or lower(${alias}.description) like lower(:query)
+                            or lower(${alias}.modelCatalogueId) like lower(:query)
+                            or ${alias} in (select ev.element from ExtensionValue ev where lower(ev.extensionValue) like lower(:query))
+                        )
+                        and ${alias} not in (select rel.destination from Relationship rel where rel.relationshipType = :classificationType)
+                    """
+                    arguments.classificationType = RelationshipType.classificationType
+                } else {
+                    listQuery = """
+                    from ${resource.simpleName} ${alias} left join ${alias}.incomingRelationships as rel
+                    where
+                        ${alias}.status in :statuses
+                        and (
+                            lower(${alias}.name) like lower(:query)
+                            or lower(${alias}.description) like lower(:query)
+                            or lower(${alias}.modelCatalogueId) like lower(:query)
+                            or ${alias} in (select ev.element from ExtensionValue ev where lower(ev.extensionValue) like lower(:query))
+                        )
+                        and rel.relationshipType = :classificationType
+                    """
+
+                    if (classifications.includes) {
+                        listQuery += " and rel.source.id in :includes "
+                        arguments.includes = classifications.includes
+                    }
+
+                    if (classifications.excludes) {
+                        listQuery += " and rel.source.id not in :excludes "
+                        arguments.excludes = classifications.excludes
+                    }
+                    arguments.classificationType = RelationshipType.classificationType
+                }
             }
-
-
 
             def results = Lists.fromQuery(params, resource, listQuery, arguments)
 

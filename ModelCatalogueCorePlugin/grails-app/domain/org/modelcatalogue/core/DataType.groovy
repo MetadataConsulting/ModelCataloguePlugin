@@ -1,8 +1,6 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
-import org.modelcatalogue.core.publishing.DraftContext
-import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.util.FriendlyErrors
 
@@ -25,26 +23,6 @@ class DataType extends CatalogueElement {
     }
 
     static transients = ['relatedValueDomains']
-
-    private final static defaultRelationshipTypesDefinitions = [
-            [name: "String", description: "java.lang.String"],
-            [name: "Integer", description: "java.lang.Integer"],
-            [name: "Double", description: "java.lang.Double"],
-            [name: "Boolean", description: "java.lang.Boolean"],
-            [name: "Date", description: "java.util.Date"],
-            [name: "Time", description: "java.sql.Time"],
-            [name: "Currency", description: "java.util.Currency"]
-    ]
-
-    static initDefaultDataTypes() {
-        for (definition in defaultRelationshipTypesDefinitions) {
-            DataType existing = findByName(definition.name)
-            if (!existing) {
-                new DataType(definition).save()
-            }
-        }
-    }
-
 
     static String suggestName(Set<String> suggestions) {
         if (!suggestions) {
@@ -86,10 +64,7 @@ class DataType extends CatalogueElement {
     }
 
     @Override
-    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftContext strategy) {
-        PublishingChain.createDraft(this, strategy)
-        .add(this.relatedValueDomains)
-        .add(this.classifications)
-        .run(publisher)
+    protected PublishingChain prepareDraftChain(PublishingChain chain) {
+        chain.add(this.relatedValueDomains).add(this.classifications)
     }
 }

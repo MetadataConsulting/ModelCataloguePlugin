@@ -1,21 +1,27 @@
 package org.modelcatalogue.core
 
-import geb.spock.GebReportingSpec
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
+import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
+import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
+import org.modelcatalogue.integration.excel.ExcelLoader
 import org.modelcatalogue.core.pages.AssetListPage
+import org.modelcatalogue.integration.excel.HeadersMap
 import spock.lang.Stepwise
 
 @Stepwise
-class AssetWizardSpec extends GebReportingSpec {
-
-    private final String SAMPLE_XSD_URL = "https://gist.githubusercontent.com/musketyr/fdafc05a3383758b6475/raw/b4e21b12613f70fd7733428e7bbb8434faec4925/example.xsd"
-    private final String SAMPLE_VALID_XML_URL = "https://gist.githubusercontent.com/musketyr/fdafc05a3383758b6475/raw/d8369d85bb6b09e06706a96973697acc1010c439/example.xml"
-    private final String SAMPLE_INVALID_XML_URL = "https://gist.githubusercontent.com/musketyr/fdafc05a3383758b6475/raw/b8d405978d8c42ed6c2f80a080bbf56f03aaf7ae/example-invalid.xml"
+class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
     @Rule TemporaryFolder tmp = new TemporaryFolder()
 
+    ClassificationService classificationService
+    ElementService elementService
+
     def "go to login"() {
+        go "#/"
+        loginAdmin()
+
         when:
         go "#/catalogue/asset/all"
 
@@ -27,15 +33,9 @@ class AssetWizardSpec extends GebReportingSpec {
         waitFor {
             viewTitle.text().trim() == 'Asset List'
         }
-
-        when:
-        loginAdmin()
-
-        then:
         waitFor {
             actionButton('create-catalogue-element', 'list').displayed
         }
-
     }
 
     def "upload new asset"() {
@@ -49,7 +49,7 @@ class AssetWizardSpec extends GebReportingSpec {
 
         when:
         $('#name').value('Sample XSD')
-        $('#asset').value(download('sample.xsd', SAMPLE_XSD_URL).absolutePath)
+        $('#asset').value(file('example.xsd'))
 
         modalDialog.find("button.btn-success").click()
 
@@ -79,6 +79,14 @@ class AssetWizardSpec extends GebReportingSpec {
 
     def "validate xml schema"() {
         when:
+        actionButton('catalogue-element').click()
+
+        then:
+        waitFor {
+            actionButton('validate-xsd-schema')
+        }
+
+        when:
         actionButton('validate-xsd-schema').click()
 
         then:
@@ -87,7 +95,7 @@ class AssetWizardSpec extends GebReportingSpec {
         }
 
         when:
-        $('#xml').value(download('valid.xml', SAMPLE_VALID_XML_URL).absolutePath)
+        $('#xml').value(file('example.xml'))
 
         then:
         waitFor(60) {
@@ -95,7 +103,7 @@ class AssetWizardSpec extends GebReportingSpec {
         }
 
         when:
-        $('#xml').value(download('invalid.xml', SAMPLE_INVALID_XML_URL).absolutePath)
+        $('#xml').value(file('example-invalid.xml'))
 
         then:
         waitFor(60) {
@@ -112,12 +120,192 @@ class AssetWizardSpec extends GebReportingSpec {
     }
 
 
-    private File download(String name, String url) {
-        File sampleXsd = tmp.newFile(name)
-        def out = new BufferedOutputStream(new FileOutputStream(sampleXsd))
-        out << new URL(url).openStream()
-        out.close()
-        sampleXsd
+    def "upload mc file"() {
+        when:
+        go "#/catalogue/asset/all"
+
+        then:
+        at AssetListPage
+
+        waitFor {
+            actionButton('new-import', 'list').displayed
+        }
+
+        when:
+        actionButton('new-import', 'list').click()
+
+        then:
+        waitFor {
+            actionButton('import-mc').displayed
+        }
+
+        when:
+        actionButton('import-mc').click()
+
+        then:
+        waitFor {
+            modalDialog.displayed
+        }
+
+        when:
+        $('#asset').value(file('MET-523.mc'))
+
+        then:
+        waitFor {
+            !modalSuccessButton.disabled
+        }
+
+        when:
+        modalSuccessButton.click()
+
+        then:
+        waitFor(60) {
+            subviewTitle.displayed
+        }
+        waitFor(60) {
+            subviewTitle.text().startsWith('Import for MET-523.mc')
+        }
+
+        when:
+        10.times {
+            actionButton('refresh-asset').click()
+            try {
+                waitFor {
+                    subviewTitle.text() == 'Import for MET-523.mc FINALIZED'
+                }
+            } catch (ignored) {}
+        }
+
+        then:
+        waitFor {
+            $('td', 'data-value-for': 'Classifications').text() == 'MET-523'
+        }
+
+        when:
+        noStale({$('td', 'data-value-for': 'Classifications').find('a')}) {
+            it.click()
+        }
+
+        then:
+        waitFor {
+            subviewTitle.text() == 'MET-523 DRAFT'
+        }
+        totalOf('classifies') == 44
+    }
+
+    def "upload excel file"() {
+        when:
+        go "#/catalogue/asset/all"
+
+        then:
+        at AssetListPage
+
+        waitFor {
+            actionButton('new-import', 'list').displayed
+        }
+
+        when:
+        actionButton('new-import', 'list').click()
+
+        then:
+        waitFor {
+            actionButton('import-excel').displayed
+        }
+
+        when:
+        actionButton('import-excel').click()
+
+        then:
+        waitFor {
+            modalDialog.displayed
+        }
+
+        when:
+        $('#asset').value(file('MET-522.xlsx'))
+
+        then:
+        waitFor {
+            !modalSuccessButton.disabled
+        }
+
+        when:
+        modalSuccessButton.click()
+
+        then:
+        waitFor(60) {
+            subviewTitle.displayed
+        }
+        waitFor(60) {
+            subviewTitle.text().startsWith('Import for MET-522.xlsx')
+        }
+
+        when:
+        waitUntilFinalized('Import for MET-522.xlsx')
+
+        goToDetailUsingSearch('MET-522')
+
+        then:
+        waitFor(60) {
+            subviewTitle.text() == 'MET-522 DRAFT'
+        }
+        totalOf('classifies') == 43
+
+        when:
+        goToDetailUsingSearch('MET-522.M1', 'MET-522')
+
+        then:
+        waitFor(60) {
+            subviewTitle.text() == 'MET-522.M1 DRAFT'
+        }
+
+        when:
+        actionButton('export').click()
+
+        noStale({ $('span', text: 'Export All Elements of MET-522.M1 to Excel XSLX').parent('a') }) { exportAll ->
+            if (exportAll.displayed) {
+                exportAll.click()
+            }
+        }
+
+        withWindow({
+            title != 'MET-522.M1 (MET-522)'
+        }) {
+            waitFor {
+                subviewTitle.text().startsWith 'Data Elements to Excel.xlsx'
+            }
+            waitUntilFinalized('Data Elements to Excel.xlsx')
+
+            StringWriter sw = new StringWriter()
+            CatalogueBuilder builder = new XmlCatalogueBuilder(sw)
+            ExcelLoader parser = new ExcelLoader(builder)
+            parser.importData(HeadersMap.create(), new ByteArrayInputStream(downloadBytes("api/modelCatalogue/core/asset/${currentId}/download")))
+
+            sw.toString().count('<dataElement') == 15
+        }
+
+        then:
+
+        true
+    }
+
+    void waitUntilFinalized(String expectedName) {
+        10.times {
+            if (subviewTitle.text() == "${expectedName} PENDING") {
+                actionButton('refresh-asset').click()
+                try {
+                    waitFor(10) {
+                        subviewTitle.text() == "${expectedName} FINALIZED"
+                    }
+                } catch (e) {
+                    if (it == 9) throw new RuntimeException("Waiting for element finalization. Expected '${expectedName} FINALIZED' got '${subviewTitle.text()}", e)
+                }
+            }
+        }
+    }
+
+
+    String file(String name) {
+        new File(AssetWizardSpec.getResource(name).toURI()).absolutePath
     }
 
 }

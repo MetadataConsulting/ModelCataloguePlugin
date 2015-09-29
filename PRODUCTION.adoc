@@ -1,0 +1,158 @@
+= Running Model Catalogue in Production
+You can create a production WAR by running `war.sh` script located at the root of the project directory. You can also
+run the catalogue in production environment for testing purposes on embedded Tomcat by running `run-war.sh` script.
+Configuration of data source, Discourse integration and OAuth 2.0 security providers such as Google, Facebook or Twitter
+for production environment is externalized into file called `mc-config.groovy`.
+
+IMPORTANT: You always have to provide the `mc-config.groovy` file with at least <<Database Configuration>> present
+otherwise the catalogue will not start.
+
+== Configuration File Location
+For local testing place your `mc-config.groovy` file into your `$USER_HOME/.grails/` directory.
+For running on Tomcat place your `mc-config.groovy` file into your Tomcat's `conf` directory (`$CATALINA_BASE/conf/`).
+
+== Database Configuration
+For detailed information about setting the data source, please, follow the instruction in
+http://grails.github.io/grails-doc/2.4.3/guide/conf.html#dataSource[the DataSource] section of the Grails Reference
+Documentation.
+
+NOTE: Model Catalogue has been so far tested only using MySQL Database. Default configuration provides you the MySQL
+driver out of the box.
+
+.Sample MySQL Data Source Configuration
+----
+dataSource {
+    pooled = true
+    dbCreate = "update"
+    url = "jdbc:mysql://localhost:3306/my_database?autoReconnect=true&useUnicode=yes"
+    driverClassName = "com.mysql.jdbc.Driver"
+    dialect = org.hibernate.dialect.MySQLDialect
+    username = "username"
+    password = "password"
+    properties {
+       jmxEnabled = true
+       initialSize = 5
+       maxActive = 50
+       minIdle = 5
+       maxIdle = 25
+       maxWait = 10000
+       maxAge = 10 * 60000
+       timeBetweenEvictionRunsMillis = 5000
+       minEvictableIdleTimeMillis = 60000
+       validationQuery = "SELECT 1"
+       validationQueryTimeout = 3
+       validationInterval = 15000
+       testOnBorrow = true
+       testWhileIdle = true
+       testOnReturn = false
+       jdbcInterceptors = "ConnectionState;StatementCache(max=200)"
+       defaultTransactionIsolation = java.sql.Connection.TRANSACTION_READ_COMMITTED
+    }
+}
+----
+
+== Mail Configuration
+Mail plugin must be configured properly to allow user registration (enabled by `grails.mc.allow.signup` configuration
+property set to true).
+
+For detailed information about setting the data source, please, follow the instruction in
+http://grails.org/plugins/mail[Grails Mail Plugin Documentation] where you can see the configuration for
+most common mail providers. By default the application expects unsecured mail server running on the localhost.
+
+
+== OAuth 2.0 Configuration
+Following three providers are included out of the box:
+ * Facebook - https://grails.org/plugin/spring-security-oauth-facebook
+ * Google - https://grails.org/plugin/spring-security-oauth-google
+ * Twitter - https://grails.org/plugin/spring-security-oauth-twitter
+
+You must configure the provides to enable them. See the documentation for particular plugin for details.
+
+Due issues in class loading following APIs implementation must be used:
+ * `org.modelcatalogue.repack.org.scribe.builder.api.FacebookApi`
+ * `org.modelcatalogue.repack.org.scribe.builder.api.GoogleApi20`
+ * `org.modelcatalogue.repack.org.scribe.builder.api.TwitterApi`
+
+
+=== Google OAuth 2.0 Configuration
+
+ . Create new project in https://console.developers.google.com/project[Google Developers Console]
+ . Open new project and navigate to menu:APIs & auth [Credentials]
+ . Press the btn:Create new Client ID, select _Web Application_ and fill your website URL
+   into _Authorized JavaScript origins_ input and your website URL followed by `/oauth/google/callback` into
+   _Authorized redirect URIs_
+ . Use generated _Client ID_ and _Client secret_ in the following configuration
+
+
+.Sample Google OAuth 2.0 Provider Configuration
+----
+oauth {
+    providers {
+        google {
+            // this key is limited to localhost only so no need to hide it
+            api = org.modelcatalogue.repack.org.scribe.builder.api.GoogleApi20
+            key = 'change-to-key-from-console'
+            secret = 'change-to-secret-from-console'
+            successUri = '/oauth/google/success'
+            failureUri = '/oauth/google/error'
+            callback = "${grails.serverURL}/oauth/google/callback"
+            scope = 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
+        }
+    }
+}
+----
+
+
+== Discourse Integration
+It is possible to enable catalogue to integrate with http://www.discourse.org/[Discourse] discussion forum. Purchase
+a hosted solution from their website or follow https://github.com/discourse/discourse/blob/master/docs/INSTALL-cloud.md[the
+instruction how to install Discourse on your own cloud server (or any other Ubuntu server)].
+
+Visit `/admin/api` admin page of your Discourse server when you have set it up successfully and generate new _API Key_.
+Also enable Single Sign-In on `/admin/site_settings/category/login`. You have to
+
+ . Check _enable sso_ option
+ . Check _enable sso provider_ option
+ . Set _sso url_ input to `<your model catalogue website>/sso/discourse`
+ . Set _sso secret_
+
+
+IMPORTANT: All catalogue users should have their emails set when the catalogue is integrated with Discourse.
+
+.Discourse configuration
+----
+discourse {
+    // URL where the discourse server is running
+    url = "http://discourse.example.com/"
+    api {
+        // API Key generated at /admin/api
+        key = "af9402ba45b8f4aff5a84bcdf6da85fc7548db746026c5095ed652d0f83fcd8b"
+        // user to be used as an author for automatically generated posts
+        user = "discourse"
+    }
+    users {
+        // set the fallback email in case the email is not set in the catalogue
+        // :username literal is replaced with the actual username
+        // if you're using GMail or Google Apps Email you can use following pattern
+        // as anything after plus sign is ignored
+        fallbackEmail = 'your.name+:username@gmail.com'
+    }
+    sso {
+        // sso key set at /admin/site_settings/category/login
+        key = "notasecret"
+    }
+}
+----
+
+== Home Page Customisation
+
+You can customize the text of the home page by setting HTML content into the `mc.welcome.jumbo` and `mc.welcome.info`
+configuration properties. The `mc.welcome.jumbo` replaces content in the big grey box, the `mc.welcome.info` the
+text under the big gray box.
+
+
+////
+== Known Issues
+=== Using Reverse Proxy to Map to Different Context Path
+////
+

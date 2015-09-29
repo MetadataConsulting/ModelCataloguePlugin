@@ -21,42 +21,31 @@ blockquote, .dl-table-item-cell, .pp-table-property-value {
 
 .catalogue-element-treeview-list {
   list-style-type: none;
-  padding-left: 15px;
+  padding-left: 10px;
 }
 
 .catalogue-element-treeview-list-container {
-  border: solid #d3d3d3 1px;
-  border-radius: 8px;
-  height: 440px;
-  padding-top: 15px;
-  padding-right: 15px;
-  z-index: 1001;
-  background-color: rgba(255, 255, 255, 0.7);
-
-  @media (min-width:768px) {
-    &:hover {
-      position: absolute;
-      min-width: 120%;
-
-      .catalogue-element-treeview-labels {
-        overflow-x: visible;
-        text-overflow:clip;
-        padding-right: 35px;
-      }
-    }
-  }
-  
+  font-size: small;
 }
 
 .catalogue-element-treeview-list-root {
   height: 400px;
   overflow-y: auto;
+  padding-left: 0!important;
+  margin-left: -10px;
+  margin-right: -10px;
 }
 
 .catalogue-element-treeview-item {
   .badge {
-    margin: 7px;
+    font-size: smaller;
+    margin-right: 2px;
+    margin-top: 2px;
   }
+}
+
+.catalogue-element-treeview-icon {
+  padding: 0;
 }
 
 .catalogue-element-treeview-text-content {
@@ -75,10 +64,20 @@ blockquote, .dl-table-item-cell, .pp-table-property-value {
   border-radius: 4px;
 }
 
+.catalogue-element-treeview-link, .catalogue-element-treeview-version-number {
+  display: none;
+}
+
 .catalogue-element-treeview-labels {
   white-space: nowrap;
   overflow-x: hidden;
   text-overflow: ellipsis;
+
+  &:hover {
+    .catalogue-element-treeview-link, .catalogue-element-treeview-version-number {
+      display: inline-block;
+    }
+  }
 }
 
 .catalogue-element-treeview-name {
@@ -426,8 +425,11 @@ a div.panel-footer, .with-pointer {
 }
 
 .pp-table {
-  background-color: transparent!important;
+  background-color: transparent !important;
+  font-size: smaller;
 }
+
+
 
 .ins, ins {
   color: green;
@@ -490,6 +492,7 @@ li.active .omnisearch-text.text-info {
   background-color: salmon;
   border-color: red;
   color: white;
+  white-space: pre-line;
 }
 
 .search-for-more-icon {
@@ -523,6 +526,70 @@ td.handle {
   margin-top: 20px;
 }
 
+.mc-version {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  color: rgba(119, 119, 119, 0.68)
+}
+
 .front-footer {
   margin-top: 3cm;
+}
+
+tr.archived, .catalogue-element-treeview-text-content.archived {
+  font-style: italic;
+}
+
+.ordered-map-container {
+  margin-top: 15px;
+  margin-left: 15px;
+  margin-right: 15px;
+
+  .editor {
+    padding-top: 15px;
+    border-left-color: whitesmoke;
+    border-left-style: solid;
+  }
+}
+
+.sponsor-logo-small {
+  max-width: 100px;
+  max-height: 50px;
+}
+
+.jumbotron {
+  @media screen and (min-width: 768px) {
+    h2,
+    .h2 {
+      font-size: 45px;
+    }
+    h3,
+    .h3 {
+      font-size: 35px;
+    }
+  }
+}
+
+.split-view-left, .split-view-right {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.split-view-left {
+  border-right: 1px solid lightgrey;
+  border-bottom: 1px solid lightgrey;
+  border-bottom-right-radius: 7px;
+}
+
+.catalogue-element-view {
+  blockquote {
+    font-size: small;
+  }
+}
+
+.actions-cell {
+  blockquote {
+    font-size: smaller;
+  }
 }

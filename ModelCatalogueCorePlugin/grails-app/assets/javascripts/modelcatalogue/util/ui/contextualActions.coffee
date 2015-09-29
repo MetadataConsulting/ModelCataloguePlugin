@@ -17,15 +17,39 @@ angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingl
     getTemplate = (action) ->
       $templateCache.get(if action.children?.length or action.abstract then 'modelcatalogue/util/ui/actionButtonDropdown.html' else 'modelcatalogue/util/ui/actionButtonSingle.html')
 
+    scopes = []
 
     updateActions = ->
       hasActions = false
+      scope.$destroy() for scope in scopes
+      scopes = []
+
       $element.empty()
-      for action in actions.getActions($scope.scope ? $scope.$parent, $scope.role)
+
+      actionsScope = $scope.scope ? $scope.$parent
+
+      for action in actions.getActions(actionsScope, $scope.role)
+        watches = []
         hasActions = hasActions || true
         newScope = $scope.$new()
         newScope.action = action
+
+        scopes.push newScope
+
+        if angular.isArray(action.watches)
+          watches =  action.watches
+        else if action.watches
+          watches.push action.watches
+
         $element.append($compile(getTemplate(action))(newScope))
+
+        if watches.length > 0
+          removeWatchers = actionsScope.$watchGroup watches, (newValue, oldValue) ->
+            if angular.equals(newValue, oldValue)
+              return
+            updateActions()
+          newScope.$on '$destroy', ->
+            removeWatchers()
 
       if not hasActions and $scope.noActions
         $element.append("""<em>No Actions</em>""")
@@ -35,6 +59,5 @@ angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingl
 
     $scope.$on 'userLoggedIn', updateActions
     $scope.$on 'userLoggedOut', updateActions
-
     $scope.$on 'redrawContextualActions', updateActions
 }]

@@ -2,29 +2,33 @@ package org.modelcatalogue.core.util.builder
 
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.api.ElementStatus
 
-@Log4j class DefaultCatalogueElementProxy<T extends CatalogueElement> implements CatalogueElementProxy<T> {
+@Log4j class DefaultCatalogueElementProxy<T extends CatalogueElement> implements CatalogueElementProxy<T>, org.modelcatalogue.core.api.CatalogueElement {
 
     static final List<Class> KNOWN_DOMAIN_CLASSES = [Asset, CatalogueElement, Classification, DataElement, DataType, EnumeratedType, MeasurementUnit, Model, ValueDomain]
 
     Class<T> domain
 
-    String id
+    String modelCatalogueId
     String name
     String classification
+
+    boolean newlyCreated
+    boolean underControl
 
     protected CatalogueElementProxyRepository repository
 
     private final Map<String, Object> parameters = [:]
     private final Map<String, String> extensions = [:]
-    private final Set<RelationshipProxy> relationships = []
+    final Set<RelationshipProxy> relationships = []
 
     private CatalogueElementProxy<T> replacedBy
     private T resolved
     private String draftRequest
     private String changed
 
-    DefaultCatalogueElementProxy(CatalogueElementProxyRepository repository, Class<T> domain, String id, String classification, String name) {
+    DefaultCatalogueElementProxy(CatalogueElementProxyRepository repository, Class<T> domain, String id, String classification, String name, boolean underControl) {
         if (!(domain in KNOWN_DOMAIN_CLASSES)) {
             throw new IllegalArgumentException("Only domain classes of $KNOWN_DOMAIN_CLASSES are supported as proxies")
         }
@@ -32,9 +36,22 @@ import org.modelcatalogue.core.*
         this.repository = repository
         this.domain = domain
 
-        this.id = id
+        this.modelCatalogueId = id
         this.name = name
         this.classification = classification
+
+        this.underControl = underControl
+    }
+
+    Set<RelationshipProxy> getPendingRelationships() {
+        relationships
+    }
+
+    boolean isNew() {
+        if (replacedBy) {
+            return replacedBy.isNew()
+        }
+        return newlyCreated
     }
 
     @Override
@@ -56,6 +73,7 @@ import org.modelcatalogue.core.*
 
             log.debug "$this not found, creating new one"
 
+            newlyCreated = true
             resolved = fill(domain.newInstance())
 
             return resolved
@@ -77,7 +95,7 @@ import org.modelcatalogue.core.*
         }
 
         if (key == 'modelCatalogueId') {
-            id = value?.toString()
+            modelCatalogueId = value?.toString()
         }
 
         if (key == 'name') {
@@ -110,7 +128,7 @@ import org.modelcatalogue.core.*
             return null
         }
 
-        if (existing.status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED]) {
+        if (existing.status in [org.modelcatalogue.core.api.ElementStatus.FINALIZED, org.modelcatalogue.core.api.ElementStatus.DEPRECATED]) {
             log.info("New draft version created for $this. Reason: $draftRequest")
             return repository.createDraftVersion(existing)
         }
@@ -119,15 +137,18 @@ import org.modelcatalogue.core.*
 
     private boolean isParametersChanged(T element) {
         parameters.any { String key, Object value ->
+            if (key in [CatalogueElementProxyRepository.AUTOMATIC_NAME_FLAG, CatalogueElementProxyRepository.AUTOMATIC_DESCRIPTION_FLAG]) {
+                return false
+            }
             def currentValue = element.getProperty(key)
             if (value instanceof CatalogueElementProxy) {
                 def realValue = value.findExisting()
                 if (realValue?.latestVersionId && realValue?.latestVersionId != currentValue?.latestVersionId) {
-                    log.debug "$this has changed at least one property - property $key\n\n===NEW===\n$realValue\n===OLD===\n${currentValue}\n========="
+                    log.debug "$this has changed at least one property - property $key (different latest version id)\n\n===NEW===\n$realValue\n===OLD===\n${currentValue}\n========="
                     return true
                 }
-                if (realValue?.id != currentValue?.id) {
-                    log.debug "$this has changed at least one property - property $key\n\n===NEW===\n$realValue\n===OLD===\n${currentValue}\n========="
+                if (realValue?.modelCatalogueId != currentValue?.modelCatalogueId) {
+                    log.debug "$this has changed at least one property - property $key (different id)\n\n===NEW===\n$realValue\n===OLD===\n${currentValue}\n========="
                     return true
                 }
                 return false
@@ -136,7 +157,15 @@ import org.modelcatalogue.core.*
                 if (key == 'modelCatalogueId' && value?.toString()?.startsWith(element.getDefaultModelCatalogueId(true))) {
                     return false
                 }
-                log.debug "$this has changed at least one property - property $key\n\n===NEW===\n${normalizeWhitespace(value)}\n===OLD===\n${normalizeWhitespace(currentValue)}\n========="
+                if (key == 'name' && parameters[CatalogueElementProxyRepository.AUTOMATIC_NAME_FLAG] && element.name) {
+                    // automatic name can't replace one already set
+                    return false
+                }
+                if (key == 'description' && parameters[CatalogueElementProxyRepository.AUTOMATIC_DESCRIPTION_FLAG] && element.description) {
+                    // automatic description can't replace one already set
+                    return false
+                }
+                log.debug "$this has changed at least one property - property $key (different value)\n\n===NEW===\n${normalizeWhitespace(value)}\n===OLD===\n${normalizeWhitespace(currentValue)}\n========="
                 return true
             }
             return false
@@ -154,28 +183,34 @@ import org.modelcatalogue.core.*
     }
 
     String getChanged() {
-        T existing = findExisting()
-        if (!existing) {
-            return changed = "Does Not Exist Yet"
-        }
+        try {
+            T existing = findExisting()
+            if (!existing) {
+                return changed = "Does Not Exist Yet"
+            }
 
-        if (isParametersChanged(existing)) {
-            return changed = "Parameters Changed"
-        }
+            if (isParametersChanged(existing)) {
+                return changed = "Parameters Changed"
+            }
 
-        if (isExtensionsChanged(existing)) {
-            return changed = "Extensions Changed"
-        }
+            if (isExtensionsChanged(existing)) {
+                return changed = "Extensions Changed"
+            }
 
-        if (isRelationshipsChanged()) {
-            return changed = "Relationship Changed"
-        }
+            if (isRelationshipsChanged()) {
+                return changed = "Relationship Changed"
+            }
 
-        return ""
+            return ""
+        } catch (e) {
+            throw new IllegalStateException("Error while determining whether $this changed!", e)
+        }
     }
 
     boolean isRelationshipsChanged() {
-        relationships.any {
+        Set<Long> foundRelationships = []
+
+        boolean relationshipsChanged = relationships.any {
             CatalogueElement source = it.source.findExisting()
 
             if (!source) return true
@@ -190,11 +225,13 @@ import org.modelcatalogue.core.*
 
             Relationship found = Relationship.findBySourceAndDestinationAndRelationshipType(source, destination, type)
 
+
             if (!found) {
                 log.debug "$this has changed at least one relationship $it"
                 return true
             }
 
+            foundRelationships << found.getId()
 
             if (it.extensions != found.ext) {
                 log.debug "$this has changed at least one relationship $it. it has changed metadata. old: ${found.ext}, new: ${it.extensions}"
@@ -203,11 +240,28 @@ import org.modelcatalogue.core.*
 
             return false
         }
+
+        if (relationshipsChanged) {
+            return true
+        }
+
+        if (underControl && !repository.isCopyRelationship()) {
+            CatalogueElement existing = findExisting()
+            if (!existing) {
+                return true
+            }
+            Set<Long> allRelationships = []
+            allRelationships.addAll existing.incomingRelationships*.getId()
+            allRelationships.addAll existing.outgoingRelationships*.getId()
+            return !(allRelationships - foundRelationships).isEmpty()
+        }
+
+        return false
     }
 
     T findExisting() {
-        if (id) {
-            T result = repository.findById(domain, id)
+        if (modelCatalogueId) {
+            T result = repository.findById(domain, modelCatalogueId)
             if (result) {
                 return result
             }
@@ -217,9 +271,9 @@ import org.modelcatalogue.core.*
         }
         if (name) {
             if (classification) {
-                return repository.tryFind(domain, classification, name, id)
+                return repository.tryFind(domain, classification, name, modelCatalogueId)
             }
-            return repository.tryFindUnclassified(domain, name, id)
+            return repository.tryFindUnclassified(domain, name, modelCatalogueId)
         }
         throw new IllegalStateException("Missing id, classification and name so there is no way how to find existing element")
     }
@@ -249,13 +303,21 @@ import org.modelcatalogue.core.*
 
     private Map<String, Object> updateProperties(T element) {
         element.name = name
-        if (id && !id.startsWith(element.getDefaultModelCatalogueId(true))) {
-            element.modelCatalogueId = id
+        if (modelCatalogueId && !modelCatalogueId.startsWith(element.getDefaultModelCatalogueId(true))) {
+            element.modelCatalogueId = modelCatalogueId
         }
         parameters.each { String key, Object value ->
+            if (key == 'status') return
+            if (key == CatalogueElementProxyRepository.AUTOMATIC_NAME_FLAG) return
+            if (key == CatalogueElementProxyRepository.AUTOMATIC_DESCRIPTION_FLAG) return
+            if (key == 'name' && parameters[CatalogueElementProxyRepository.AUTOMATIC_NAME_FLAG] && element.name) return
+            if (key == 'description' && parameters[CatalogueElementProxyRepository.AUTOMATIC_DESCRIPTION_FLAG] && element.description) return
             if (value instanceof CatalogueElementProxy) {
                 element.setProperty(key, value.resolve())
                 return
+            }
+            if (value instanceof String) {
+                element.setProperty(key, value.trim())
             }
             element.setProperty(key, value)
         }
@@ -277,15 +339,8 @@ import org.modelcatalogue.core.*
         relationships << relationshipProxy
     }
 
-    @Override
-    Set<Relationship> resolveRelationships() {
-        relationships.collect { RelationshipProxy it ->
-            it.resolve()
-        }
-    }
-
     String toString() {
-        "Proxy of $domain[id: $id, classification: $classification, name: $name]"
+        "Proxy of $domain.simpleName[id: $modelCatalogueId, classification: $classification, name: $name]"
     }
 
     @Override
@@ -308,15 +363,27 @@ import org.modelcatalogue.core.*
 
         other.relationships.each { RelationshipProxy relationship ->
             if (repository.equals(this, relationship.source)) {
-                addToPendingRelationships(new RelationshipProxy(relationship.relationshipTypeName, this, relationship.destination, relationship.extensions))
+                RelationshipProxy relationshipProxy = new RelationshipProxy(relationship.relationshipTypeName, this, relationship.destination, relationship.extensions)
+                addToPendingRelationships(relationshipProxy)
+                relationship.destination.addToPendingRelationships(relationshipProxy)
             }
 
             if (repository.equals(this, relationship.destination)) {
-                addToPendingRelationships(new RelationshipProxy(relationship.relationshipTypeName, relationship.source, this, relationship.extensions))
+                RelationshipProxy relationshipProxy = new RelationshipProxy(relationship.relationshipTypeName, relationship.source, this, relationship.extensions)
+                addToPendingRelationships(relationshipProxy)
+                relationship.source.addToPendingRelationships(relationshipProxy)
             }
         }
 
         other.replacedBy = this
+
+        if (domain != other.domain) {
+            if (domain == CatalogueElement) {
+                domain = other.domain
+            }
+        }
+
+        this.underControl = this.underControl || other.underControl
 
         this
     }
@@ -325,9 +392,87 @@ import org.modelcatalogue.core.*
         if (o instanceof CharSequence) {
             return o.toString().replaceAll(/(?m)\s+/, ' ').trim()
         }
+        if (o instanceof Enum) {
+            return o.toString()
+        }
         if (!o) {
             return ''
         }
         return o
+    }
+
+    @Override
+    String getDescription() {
+        return parameters.description?.toString()
+    }
+
+    @Override
+    void setDescription(String description) {
+        parameters.description = description
+    }
+
+    @Override
+    List<org.modelcatalogue.core.api.Relationship> getIncomingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        throw new UnsupportedOperationException("Not Implemented")
+    }
+
+    @Override
+    List<org.modelcatalogue.core.api.Relationship> getOutgoingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        throw new UnsupportedOperationException("Not Implemented")
+    }
+
+    @Override
+    List<org.modelcatalogue.core.api.Relationship> getRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        throw new UnsupportedOperationException("Not Implemented")
+    }
+
+    @Override
+    int countIncomingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        throw new UnsupportedOperationException("Not Implemented")
+    }
+
+    @Override
+    int countOutgoingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        throw new UnsupportedOperationException("Not Implemented")
+    }
+
+    @Override
+    int countRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        throw new UnsupportedOperationException("Not Implemented")
+    }
+
+    @Override
+    org.modelcatalogue.core.api.Relationship createLinkTo(Map<String, Object> parameters, org.modelcatalogue.core.api.CatalogueElement destination, org.modelcatalogue.core.api.RelationshipType type) {
+        throw new UnsupportedOperationException("Not Implemented")
+    }
+
+    @Override
+    org.modelcatalogue.core.api.Relationship createLinkFrom(Map<String, Object> parameters, org.modelcatalogue.core.api.CatalogueElement source, org.modelcatalogue.core.api.RelationshipType type) {
+        throw new UnsupportedOperationException("Not Implemented")
+    }
+
+    @Override
+    org.modelcatalogue.core.api.Relationship removeLinkTo(org.modelcatalogue.core.api.CatalogueElement destination, org.modelcatalogue.core.api.RelationshipType type) {
+        throw new UnsupportedOperationException("Not Implemented")
+    }
+
+    @Override
+    org.modelcatalogue.core.api.Relationship removeLinkFrom(org.modelcatalogue.core.api.CatalogueElement source, org.modelcatalogue.core.api.RelationshipType type) {
+        throw new UnsupportedOperationException("Not Implemented")
+    }
+
+    @Override
+    Map<String, String> getExt() {
+        throw new UnsupportedOperationException("Not Implemented")
+    }
+
+    @Override
+    ElementStatus getStatus() {
+        return parameters.status as ElementStatus
+    }
+
+    @Override
+    void setStatus(ElementStatus status) {
+        parameters.status = status
     }
 }

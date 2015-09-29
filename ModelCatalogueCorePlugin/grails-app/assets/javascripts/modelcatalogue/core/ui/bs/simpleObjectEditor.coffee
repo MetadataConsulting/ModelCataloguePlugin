@@ -10,9 +10,8 @@ angular.module('mc.core.ui.bs.simpleObjectEditor', ['mc.core.ui.simpleObjectEdit
             <input type="submit" class="hide">
           </th>
         </thead>
-        <tbody sortable="sortableOptions">
+        <tbody>
           <tr class="soe-table-property-row" ng-repeat="property in editableProperties" ng-class="{'has-error': !isKeyUnique(property.key)}">
-            <td ng-if="canReorder" ><span class="handle fa fa-ellipsis-v fa-fw text-muted with-move"></span></td>
             <th class="soe-table-property-key col-md-5 col-sm-5">
               <input type="text" ng-model="property.key" class="form-control" ng-change="keyChanged(property)" placeholder="{{valuePlaceholder ? keyPlaceholder : 'Key'}}" autofocus="autofocus" focus-me="lastAddedRow == $index &amp;&amp; $index != 0">
             </th>

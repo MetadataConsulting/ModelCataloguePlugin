@@ -1,124 +1,116 @@
-<html>
+<%@ page import="org.modelcatalogue.core.util.CDN; grails.util.BuildScope; org.modelcatalogue.core.util.ClassificationFilter; grails.util.Environment" contentType="text/html;charset=UTF-8" defaultCodec="none" %>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta name='layout' content='main'/>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <asset:javascript src="ng-file-upload-shim/angular-file-upload-shim.min.js"/>
+
     <title><g:message code="springSecurity.login.title"/></title>
-    <style type='text/css' media='screen'>
-    #login {
-        margin: 15px 0px;
-        padding: 0px;
-        text-align: center;
-    }
+    <g:if test="${CDN.preferred}">
+        <!-- CDNs -->
+        <link rel="stylesheet" type="text/css"
+              href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap${minSuffix}.css">
+        <link rel="stylesheet" type="text/css"
+              href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome${minSuffix}.css">
 
-    #login .inner {
-        width: 340px;
-        padding-bottom: 6px;
-        margin: 60px auto;
-        text-align: left;
-        border: 1px solid #aab;
-        background-color: #f0f0fa;
-        -moz-box-shadow: 2px 2px 2px #eee;
-        -webkit-box-shadow: 2px 2px 2px #eee;
-        -khtml-box-shadow: 2px 2px 2px #eee;
-        box-shadow: 2px 2px 2px #eee;
-    }
-
-    #login .inner .fheader {
-        padding: 18px 26px 14px 26px;
-        background-color: #f7f7ff;
-        margin: 0px 0 14px 0;
-        color: #2e3741;
-        font-size: 18px;
-        font-weight: bold;
-    }
-
-    #login .inner .cssform p {
-        clear: left;
-        margin: 0;
-        padding: 4px 0 3px 0;
-        padding-left: 105px;
-        margin-bottom: 20px;
-        height: 1%;
-    }
-
-    #login .inner .cssform input[type='text'] {
-        width: 120px;
-    }
-
-    #login .inner .cssform label {
-        font-weight: bold;
-        float: left;
-        text-align: right;
-        margin-left: -105px;
-        width: 110px;
-        padding-top: 3px;
-        padding-right: 10px;
-    }
-
-    #login #remember_me_holder {
-        padding-left: 120px;
-    }
-
-    #login #submit {
-        margin-left: 15px;
-    }
-
-    #login #remember_me_holder label {
-        float: none;
-        margin-left: 0;
-        text-align: left;
-        width: 200px
-    }
-
-    #login .inner .login_message {
-        padding: 6px 25px 20px 25px;
-        color: #c33;
-    }
-
-    #login .inner .text_ {
-        width: 120px;
-    }
-
-    #login .inner .chk {
-        height: 12px;
-    }
-    </style>
+        <!-- code -->
+        <asset:stylesheet href="modelcatalogue.css"/>
+    </g:if>
+    <g:else>
+        <asset:stylesheet href="bootstrap/dist/css/bootstrap.css"/>
+        <asset:stylesheet href="font-awesome/css/font-awesome"/>
+        <asset:stylesheet href="modelcatalogue.css"/>
+    </g:else>
 </head>
 
 <body>
-<div id='login'>
-    <div class='inner'>
-        <div class='fheader'><g:message code="springSecurity.login.header"/></div>
+<g:set var="oauth" bean="oauthService"/>
+<div id="metadataCurator" ng-app="metadataCurator">
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#"><span class="fa fa-fw fa-book"></span><span
+                        class="visible-md-inline">&nbsp; Model Catalogue</span></a>
+            </div>
+        </div>
+    </div>
 
-        <g:if test='${flash.message}'>
-            <div class='login_message'>${flash.message}</div>
-        </g:if>
+    <div class="container-fluid container-main">
+        <div class="row">
+            <g:if test="${oauth.services}">
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Login with Service Provider</h3>
+                        </div>
+                        <div class="panel-body">
+                            <g:each in="${oauth.services}" var="entry">
+                                <a class="btn btn-block btn-primary btn-lg" href="${createLink(controller: 'oauth', action: 'authenticate', params: [provider: entry.key])}"><span class="fa fa-fw fa-${entry.key}"></span> Login with ${entry.key.capitalize()} Account</a>
 
-        <form action='${postUrl}' method='POST' id='loginForm' class='cssform' autocomplete='off'>
-            <p>
-                <label for='username'><g:message code="springSecurity.login.username.label"/>:</label>
-                <input type='text' class='text_' name='j_username' id='username'/>
-            </p>
+                            </g:each>
+                        </div>
+                    </div>
 
-            <p>
-                <label for='password'><g:message code="springSecurity.login.password.label"/>:</label>
-                <input type='password' class='text_' name='j_password' id='password'/>
-            </p>
+                </div>
+            </g:if>
+            <div class="${oauth.services ? '' : 'col-md-offset-3'} col-md-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Login with Username and Password</h3>
+                    </div>
+                    <div class="panel-body">
+                        <g:if test='${flash.message}'>
+                            <div class='alert alert-danger'>${flash.message}</div>
+                        </g:if>
+                        <form action='${postUrl}' method='POST' id='loginForm' class="form-horizontal" autocomplete='off'>
+                            <div class="form-group">
+                                <label for='username' class="control-label col-sm-3"><g:message code="springSecurity.login.username.label"/>:</label>
+                                <div class="col-sm-9">
+                                    <input type='text' class='form-control' name='j_username' id='username'/>
+                                </div>
+                            </div>
 
-            <p id="remember_me_holder">
-                <input type='checkbox' class='chk' name='${rememberMeParameter}' id='remember_me'
-                       <g:if test='${hasCookie}'>checked='checked'</g:if>/>
-                <label for='remember_me'><g:message code="springSecurity.login.remember.me.label"/></label>
-            </p>
+                            <div class="form-group">
+                                <label for='password' class="control-label col-sm-3"><g:message code="springSecurity.login.password.label"/>:</label>
+                                <div class="col-sm-9">
+                                    <input type='password' class='form-control' name='j_password' id='password'/>
+                                </div>
+                            </div>
 
-            <p>
-                <input type='submit' id="submit" value='${message(code: "springSecurity.login.button")}'/>
-            </p>
-        </form>
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-9">
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" class='chk' name='${rememberMeParameter}' id='remember_me' <g:if test='${hasCookie}'>checked='checked'</g:if>> <g:message code="springSecurity.login.remember.me.label"/>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-9">
+                                    <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-log-in"></i> Login</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
 </div>
 <script type='text/javascript'>
     <!--
-    (function () {
+    (function() {
         document.forms['loginForm'].elements['j_username'].focus();
     })();
     // -->

@@ -103,6 +103,10 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
         loadMoreIfNeeded() unless loading
       $scope.$watch 'filters', (-> loadMoreIfNeeded()), true
 
+      windowEl.on 'resize', ->
+        updateHeader(windowEl.scrollTop())
+
+
       $scope.$on 'infiniteTableRedraw', ->
         updateHeader()
         $timeout updateHeader, 100

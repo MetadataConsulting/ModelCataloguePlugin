@@ -4,8 +4,10 @@ import grails.converters.JSON
 import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.ResultRecorder
 import spock.lang.Unroll
 
@@ -184,7 +186,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     @Unroll
     def "Link existing elements using add to #direction endpoint with failing constraint as JSON result"(){
         controller.request.method       = 'POST'
-        RelationshipType relationshipType = RelationshipType.findByName("falseRuleReturn")
+        RelationshipType relationshipType = RelationshipType.readByName("falseRuleReturn")
         controller.response.format = 'json'
         controller.request.json = anotherLoadItem as JSON
         controller."add${direction.capitalize()}"(loadItem.id, relationshipType.name)
@@ -479,9 +481,9 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
 
     protected linkRelationshipsToDummyEntities(String incomingOrOutgoing) {
-        def first = loadItem
-        first."${incomingOrOutgoing}Relationships" = first."${incomingOrOutgoing}Relationships" ?: []
+        def first = loadItem.save(flush: true)
         for (unit in resource.list()) {
+            unit.save(flush: true)
             if (unit != first) {
                 if (incomingOrOutgoing == "incoming") {
                     assert !controller.relationshipService.link(unit, first, relationshipType).hasErrors()
@@ -551,15 +553,6 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         checkProperty(json.name , item.name, "name")
         checkProperty(json.description , item.description, "description")
         checkProperty(json.elementType , item.class.name, "elementType")
-        checkProperty(json.relationships.count, (item?.incomingRelationships ? item.incomingRelationships.size(): 0) + (item?.outgoingRelationships ? item.outgoingRelationships.size(): 0), "relationshipsCount")
-        checkProperty(json.relationships.link, "/${GrailsNameUtils.getPropertyName(item.class.simpleName)}/${item.id}/relationships", "relationshipsLink")
-        checkProperty(json.relationships.itemType, Relationship.name, "relationshipsItemType")
-        checkProperty(json.outgoingRelationships.count, (item?.outgoingRelationships)?item.outgoingRelationships.size(): 0, "outgoingCount")
-        checkProperty(json.outgoingRelationships.link, "/${GrailsNameUtils.getPropertyName(item.class.simpleName)}/${item.id}/outgoing", "outgoingLink")
-        checkProperty(json.outgoingRelationships.itemType, Relationship.name, "outgoingItemType")
-        checkProperty(json.incomingRelationships.count, (item?.incomingRelationships)?item.incomingRelationships.size(): 0, "incomingCount")
-        checkProperty(json.incomingRelationships.link, "/${GrailsNameUtils.getPropertyName(item.class.simpleName)}/${item.id}/incoming", "incomingLink")
-        checkProperty(json.incomingRelationships.itemType, Relationship.name, "incomingItemType")
 
         assert json.dateCreated
         assert json.lastUpdated
@@ -573,15 +566,6 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         checkProperty(json.name , inputItem.name, "name")
         checkProperty(json.description , inputItem.description, "description")
         checkProperty(json.elementType , outputItem.class.name, "elementType")
-        checkProperty(json.relationships.count, (outputItem?.incomingRelationships ? outputItem.incomingRelationships.size(): 0) + (outputItem?.outgoingRelationships ? outputItem.outgoingRelationships.size(): 0), "relationshipsCount")
-        checkProperty(json.relationships.link, "/${GrailsNameUtils.getPropertyName(outputItem.class.simpleName)}/${outputItem.id}/relationships", "relationshipsLink")
-        checkProperty(json.relationships.itemType, Relationship.name, "relationshipsItemType")
-        checkProperty(json.outgoingRelationships.count, (outputItem?.outgoingRelationships)?outputItem.outgoingRelationships.size(): 0, "outgoingCount")
-        checkProperty(json.outgoingRelationships.link, "/${GrailsNameUtils.getPropertyName(outputItem.class.simpleName)}/${outputItem.id}/outgoing", "outgoingLink")
-        checkProperty(json.outgoingRelationships.itemType, Relationship.name, "outgoingItemType")
-        checkProperty(json.incomingRelationships.count, (outputItem?.incomingRelationships)?outputItem.incomingRelationships.size(): 0, "incomingCount")
-        checkProperty(json.incomingRelationships.link, "/${GrailsNameUtils.getPropertyName(outputItem.class.simpleName)}/${outputItem.id}/incoming", "incomingLink")
-        checkProperty(json.incomingRelationships.itemType, Relationship.name, "incomingItemType")
 
         assert json.dateCreated
         assert json.lastUpdated
@@ -755,7 +739,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         controller.request.method       = 'PUT'
         controller.params.id            = another.id
         controller.params.newVersion    = true
-        controller.request.json         = [name: newName, ext: keyValue]
+        controller.request.json         = [name: newName, ext: OrderedMap.toJsonMap(keyValue)]
         controller.response.format      = "json"
 
         controller.update()
@@ -763,12 +747,14 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
         then:
         json.name                   == newName
-        json.ext == keyValue
+        OrderedMap.fromJsonMap(json.ext) == keyValue
 
     }
 
     protected mapToDummyEntities(CatalogueElement toBeLinked) {
+        toBeLinked.save(flush: true)
         for (domain in toBeLinked.class.list()) {
+            domain.save(flush: true)
             if (domain != toBeLinked) {
                 controller.mappingService.map(toBeLinked, domain, "x")
                 if (toBeLinked.outgoingMappings.size() == 3) {
@@ -776,7 +762,6 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
                 }
             }
         }
-
         assert toBeLinked.outgoingMappings
         assert toBeLinked.outgoingMappings.size() == 3
         toBeLinked

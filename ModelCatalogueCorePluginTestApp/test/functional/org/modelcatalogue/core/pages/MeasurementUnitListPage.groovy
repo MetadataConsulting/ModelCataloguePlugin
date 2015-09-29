@@ -11,7 +11,7 @@ class MeasurementUnitListPage extends ModelCataloguePage {
         url == "#/catalogue/measurementUnit/all"
     }
 
-    static content={
-
+    static content = {
+        viewTitle(required: false)          { $("h2") }
     }
 }

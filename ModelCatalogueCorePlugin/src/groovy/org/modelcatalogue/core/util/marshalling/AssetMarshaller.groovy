@@ -4,7 +4,7 @@ import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.modelcatalogue.core.Asset
 import org.springframework.beans.factory.annotation.Autowired
 
-class AssetMarshaller extends CatalogueElementMarshallers {
+class AssetMarshaller extends CatalogueElementMarshaller {
 
     @Autowired LinkGenerator linkGenerator
 

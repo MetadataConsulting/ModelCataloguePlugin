@@ -5,7 +5,7 @@ import org.modelcatalogue.core.security.User
 /**
  * Default implementation meaning no security. The user is always logged in and has all the roles.
  */
-class ModelCatalogueSecurityService implements SecurityService {
+class ModelCatalogueSecurityService implements SecurityService, LogoutListeners {
 
     static transactional = false
 
@@ -27,5 +27,10 @@ class ModelCatalogueSecurityService implements SecurityService {
     @Override
     User getCurrentUser() {
         return null
+    }
+
+    @Override
+    Map<String, Long> getUsersLastSeen() {
+        return [:]
     }
 }
