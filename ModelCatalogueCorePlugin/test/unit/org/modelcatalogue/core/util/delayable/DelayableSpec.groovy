@@ -46,42 +46,4 @@ class DelayableSpec extends Specification {
 
     }
 
-    def "complex nesting"() {
-        List<String> collector = []
-        Delayable<List<String>> delayable = new Delayable<List<String>>(collector)
-
-        delayable.whilePaused {
-            whilePaused {
-                add 'a'
-            }
-
-            reset()
-
-            add 'b'
-
-            whilePaused(true) {
-                add 'c'
-                reset()
-                add 'd'
-            }
-
-            whilePaused(true) {
-                add 'e'
-                requestRun()
-                add 'f'
-            }
-
-            add 'g'
-
-            whilePaused {
-                add 'h'
-                reset()
-                add 'i'
-            }
-        }
-
-        expect:
-        collector.join('') == 'befgi'
-
-    }
 }

@@ -37,10 +37,10 @@ class ChangelogGenerator {
             'paragraph.description' font: [color: '#13D4CA', size: 16.pt, italic: true], margin: [left: 30, right: 30]
             'heading1' font: [size: 20, bold: true]
             'heading2' font: [size: 18, bold: true]
-            'heading3' font: [size: 16, bold: true]
-            'heading4' font: [size: 16]
-            'heading5' font: [size: 15]
-            'heading6' font: [size: 14]
+            'heading3' font: [size: 16, bold: true, italic: true]
+            'heading4' font: [size: 14, italic: true]
+            'heading5' font: [size: 13]
+            'heading6' font: [size: 12, bold: true]
             'paragraph.heading1' font: [size: 20, bold: true]
             'paragraph.heading2' font: [size: 18, bold: true]
             'paragraph.heading3' font: [size: 16, bold: true]
@@ -69,16 +69,25 @@ class ChangelogGenerator {
                 }
                 pageBreak()
 
-                heading1 "Classification Changes"
+                delayable.pauseAndRecord()
 
+                heading1 "Classification Changes"
                 printPropertiesChanges(delayable, classification, classification)
+
+                delayable.runIfRequested()
+
+                delayable.pauseAndRecord()
 
                 heading1 'Models'
 
                 for (Model model in getModelsForClassification(classification)) {
+                    delayable.pauseAndRecord()
                     printPropertiesChanges(delayable, model, classification)
                     printModelStructuralChanges(delayable, model, classification)
+                    delayable.runIfRequested()
                 }
+
+                delayable.runIfRequested()
 
 
             }
@@ -94,14 +103,17 @@ class ChangelogGenerator {
             heading2 "$element.name ($element.combinedVersion, $element.status)", ref: "${element.getId()}"
 
             if (getChanges(element, classification, ChangeType.NEW_VERSION_CREATED)) {
+                requestRun()
                 paragraph {
                     text "New version "
                     text element.versionNumber, font: [bold: true]
                     text " created"
                 }
             } else if (getChanges(element, classification, ChangeType.NEW_ELEMENT_CREATED)) {
+                requestRun()
                 paragraph "New ${GrailsNameUtils.getNaturalName(element.class.name)} created"
             } else if (getChanges(element, classification, ChangeType.ELEMENT_DEPRECATED)) {
+                requestRun()
                 paragraph {
                     text "${GrailsNameUtils.getNaturalName(element.class.name)} has been "
                     text "deprecated", font: [bold: true]
@@ -111,6 +123,7 @@ class ChangelogGenerator {
             List<Change> changedProperties = getChanges(element, classification, ChangeType.PROPERTY_CHANGED, ChangeType.METADATA_CREATED, ChangeType.METADATA_DELETED, ChangeType.METADATA_UPDATED)
 
             if (changedProperties) {
+                requestRun()
                 Map<String, List<String>> rows = new TreeMap<String, List<String>>().withDefault {['', '']}
 
                 for(Change change in changedProperties) {
@@ -165,12 +178,15 @@ class ChangelogGenerator {
     }
 
     private void handleRelationshipChanges(Delayable<DocumentBuilder> builder, CatalogueElement owner, Multimap<String, Change> byDestination, RelationshipType type, String changesSummaryHeading, String newRelationshipNote, String removedRelationshipNote) {
-        if (byDestination.keySet().any { it.startsWith(type.name) }) {
-            builder.heading3 changesSummaryHeading
-        }
+        builder.pauseAndRecord()
+
+        builder.heading3 changesSummaryHeading
+
         for (CatalogueElement destination in owner.getOutgoingRelationsByType(type)) {
             Set<Change> changes = byDestination.removeAll("${type.name}:${destination.getLatestVersionId() ?: destination.getId()}".toString())
             if (changes) {
+                builder.requestRun()
+
                 builder.heading4 "${destination.name} ($destination.combinedVersion, $destination.status)"
                 if (changes.any { it.type == ChangeType.RELATIONSHIP_CREATED}) {
                     builder.paragraph newRelationshipNote
@@ -205,11 +221,15 @@ class ChangelogGenerator {
                 continue
             }
 
+            builder.requestRun()
+
             def value = DefaultAuditor.readValue(deleteChange.oldValue)
 
             builder.heading4 "${value.destination.name} (${value.destination.latestVersionId}.${value.destination.versionNumber}, $value.destination.status)"
             builder.paragraph removedRelationshipNote
         }
+
+        builder.runIfRequested()
     }
 
     private static String getRelationshipMetadataName(Change ch) {

@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.util.delayable
 
-import groovy.transform.stc.ClosureParams
-import groovy.transform.stc.FromString
+import groovy.util.logging.Log4j
 
 /**
  * Object wrapper with ability to delay and rollback method calls.
@@ -10,11 +9,13 @@ import groovy.transform.stc.FromString
  *
  * @param < T > the type of the delegate
  */
+@Log4j
 class Delayable<T> implements Runnable {
 
     private final T delegate
     private final List<List<DelayableQueueItem>> queues = [].withDefault { [] }
     private final List<Boolean> runRequests = [].withDefault { Boolean.FALSE }
+    private final List<Boolean> runInProgress = [].withDefault { Boolean.FALSE }
 
     private int pauseLevel = -1
 
@@ -82,12 +83,14 @@ class Delayable<T> implements Runnable {
      */
     void run() {
         List<DelayableQueueItem> queue = queues[pauseLevel]
-        if (pauseLevel > 0) {
+        if (pauseLevel > 0 && !runInProgress[pauseLevel - 1]) {
             queues[pauseLevel - 1].addAll(queue)
         } else {
+            runInProgress[pauseLevel] = Boolean.TRUE
             for (DelayableQueueItem item in queue) {
                 delegate.invokeMethod(item.methodName, item.args)
             }
+            runInProgress[pauseLevel] = Boolean.FALSE
         }
         queue.clear()
         runRequests[pauseLevel] = Boolean.FALSE
@@ -95,7 +98,9 @@ class Delayable<T> implements Runnable {
     }
 
     void requestRun() {
-        runRequests[pauseLevel] = Boolean.TRUE
+        for (int i in 0..pauseLevel) {
+            runRequests[i] = Boolean.TRUE
+        }
     }
 
     /**
@@ -110,7 +115,8 @@ class Delayable<T> implements Runnable {
     }
 
     /**
-     * Invokes the method on the delegate if not paused or queues the method for later execution with the #run() method.
+     * Invokes the method on the delegate if not paused or if the name does not match any factory or queues the method
+     * for later execution with the #run() method.
      *
      * While paused, you can remove all the queued methods later using #resetAndUnpause().
      *
@@ -120,28 +126,10 @@ class Delayable<T> implements Runnable {
      */
     @Override
     Object invokeMethod(String name, Object args) {
-        if (paused) {
+        if (paused && !runInProgress[pauseLevel]) {
             queues[pauseLevel] << new DelayableQueueItem(name, args)
             return null
         }
         delegate.invokeMethod(name, args)
-    }
-
-    /**
-     * Runs code inside the closure in the paused mode and runs all the pending methods when the closure execution is
-     * finished.
-     *
-     * @param onlyRunWhenRequested only runs the pending methods if requested
-     * @param closure closure which will be executed in context of this object with single parameters which is this object
-     */
-    void whilePaused(boolean onlyRunWhenRequested = false, @ClosureParams(value = FromString, options = 'org.modelcatalogue.core.util.delayable.Delayable') Closure closure) {
-        pauseAndRecord()
-        with closure
-        if (onlyRunWhenRequested) {
-            runIfRequested()
-        } else {
-            run()
-        }
-
     }
 }
