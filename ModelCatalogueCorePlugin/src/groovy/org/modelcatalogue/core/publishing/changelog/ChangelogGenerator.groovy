@@ -4,7 +4,10 @@ import com.craigburke.document.core.builder.DocumentBuilder
 import com.google.common.collect.LinkedHashMultimap
 import com.google.common.collect.Multimap
 import grails.util.GrailsNameUtils
+import grails.util.Holders
 import groovy.util.logging.Log4j
+import org.codehaus.groovy.grails.commons.GrailsDomainClass
+import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.audit.Change
@@ -81,6 +84,7 @@ class ChangelogGenerator {
                 heading1 'Models'
 
                 for (Model model in getModelsForClassification(classification)) {
+                    log.info "Handling changes from Model $model.name"
                     delayable.pauseAndRecord()
                     printPropertiesChanges(delayable, model, classification)
                     printModelStructuralChanges(delayable, model, classification)
@@ -93,14 +97,14 @@ class ChangelogGenerator {
             }
         }
 
-        log.debug "Classification $classification.name changelog exported to Word Document"
+        log.info "Classification $classification.name changelog exported to Word Document"
 
 
     }
 
-    private void printPropertiesChanges(Delayable<DocumentBuilder> builder, CatalogueElement element, Classification classification) {
+    private void printPropertiesChanges(Delayable<DocumentBuilder> builder, CatalogueElement element, Classification classification, int headingLevel = 2) {
         builder.with {
-            heading2 "$element.name ($element.combinedVersion, $element.status)", ref: "${element.getId()}"
+            "heading${Math.min(headingLevel, 5)}" "$element.name ($element.combinedVersion, $element.status)", ref: "${element.getId()}"
 
             if (getChanges(element, classification, ChangeType.NEW_VERSION_CREATED)) {
                 requestRun()
@@ -127,16 +131,34 @@ class ChangelogGenerator {
                 Map<String, List<String>> rows = new TreeMap<String, List<String>>().withDefault {['', '']}
 
                 for(Change change in changedProperties) {
-                    String propLabel = change.type == ChangeType.PROPERTY_CHANGED ? GrailsNameUtils.getPropertyName(change.property) : change.property
+                    String propLabel = change.property
+                    if (change.type == ChangeType.PROPERTY_CHANGED) {
+                        if (change.property == 'enumAsString') {
+                            propLabel = 'Enumerations'
+                        } else {
+                            propLabel = GrailsNameUtils.getNaturalName(change.property)
+                        }
+                    }
                     List<String> vals = rows[propLabel]
-                    vals[0] = vals[0] ?: valueForPrint(change.oldValue)
-                    vals[1] = valueForPrint(change.newValue)
+                    vals[0] = vals[0] ?: valueForPrint(change.property, change.oldValue)
+                    vals[1] = valueForPrint(change.property, change.newValue)
                     rows[propLabel] = vals
                 }
 
                 paragraph font: [bold: true], "Changed Properties"
 
                 printChangesTable builder, rows
+            }
+
+            GrailsDomainClass grailsDomainClass = Holders.grailsApplication.getDomainClass(HibernateProxyHelper.getClassWithoutInitializingProxy(element).name)
+
+            grailsDomainClass.persistentProperties.findAll { it.oneToOne || it.manyToOne }.sort{ it.name }.each {
+                def value = element.getProperty(it.name)
+                if (value.respondsTo('instanceOf') && value.instanceOf(CatalogueElement)) {
+                    builder.pauseAndRecord()
+                    printPropertiesChanges(builder, value as CatalogueElement, classification, headingLevel + 1 )
+                    builder.runIfRequested()
+                }
             }
 
 
@@ -162,34 +184,37 @@ class ChangelogGenerator {
 
     private void printModelStructuralChanges(Delayable<DocumentBuilder> builder, Model model, Classification classification) {
         List<Change> relationshipChanges = getChanges(model, classification, ChangeType.RELATIONSHIP_CREATED, ChangeType.RELATIONSHIP_DELETED, ChangeType.RELATIONSHIP_ARCHIVED, ChangeType.RELATIONSHIP_METADATA_CREATED, ChangeType.RELATIONSHIP_METADATA_DELETED, ChangeType.RELATIONSHIP_METADATA_UPDATED)
-        log.info "Found ${relationshipChanges.size()} relationship changes: $relationshipChanges"
 
-        Multimap<String, Change> byDestination = LinkedHashMultimap.create()
+        Multimap<String, Change> byDestinationsAndSources = LinkedHashMultimap.create()
 
         for (Change ch in relationshipChanges) {
-            byDestination.put "${getRelationshipType(ch)}:${getDestinationId(ch)}".toString(), ch
+            byDestinationsAndSources.put "out:${getRelationshipType(ch)}:${getDestinationId(ch)}".toString(), ch
+            byDestinationsAndSources.put "in:${getRelationshipType(ch)}:${getSourceId(ch)}".toString(), ch
         }
 
-        handleRelationshipChanges(builder, model, byDestination, RelationshipType.hierarchyType, "Changed Child Models", "New child model", "Child model removed")
-        handleRelationshipChanges(builder, model, byDestination, RelationshipType.containmentType, "Changed Data Elements", "New data element", "Data element removed")
-        handleRelationshipChanges(builder, model, byDestination, RelationshipType.synonymType, "Changed Synonyms", "New synonym", "Synonym removed")
-        handleRelationshipChanges(builder, model, byDestination, RelationshipType.relatedToType, "Changed Relations", "Newly related", "No longer related")
-        handleRelationshipChanges(builder, model, byDestination, RelationshipType.baseType, "Changed Bases", "Newly based on", "No longer based on")
+        handleRelationshipChanges(builder, byDestinationsAndSources, classification, RelationshipChangesCheckConfiguration.create(model, RelationshipType.hierarchyType).withChangesSummaryHeading("Changed Child Models").withNewRelationshipNote("New child model").withRemovedRelationshipNote("Child model removed"))
+        handleRelationshipChanges(builder, byDestinationsAndSources, classification, RelationshipChangesCheckConfiguration.create(model, RelationshipType.containmentType).withChangesSummaryHeading("Changed Data Elements").withNewRelationshipNote("New data element").withRemovedRelationshipNote("Data element removed").withDeep(true))
+        handleRelationshipChanges(builder, byDestinationsAndSources, classification, RelationshipChangesCheckConfiguration.create(model, RelationshipType.synonymType).withChangesSummaryHeading("Changed Synonyms").withNewRelationshipNote("New synonym").withRemovedRelationshipNote("Synonym removed"))
+        handleRelationshipChanges(builder, byDestinationsAndSources, classification, RelationshipChangesCheckConfiguration.create(model, RelationshipType.relatedToType).withChangesSummaryHeading("Changed Relations").withNewRelationshipNote("Newly related").withRemovedRelationshipNote("No longer related"))
+        handleRelationshipChanges(builder, byDestinationsAndSources, classification, RelationshipChangesCheckConfiguration.create(model, RelationshipType.baseType).withChangesSummaryHeading("Changed Bases").withNewRelationshipNote("Newly based on").withRemovedRelationshipNote("No longer based on").withIncoming(true))
     }
 
-    private void handleRelationshipChanges(Delayable<DocumentBuilder> builder, CatalogueElement owner, Multimap<String, Change> byDestination, RelationshipType type, String changesSummaryHeading, String newRelationshipNote, String removedRelationshipNote) {
+    private void handleRelationshipChanges(Delayable<DocumentBuilder> builder, Multimap<String, Change> byDestinationsAndSources, Classification classification, RelationshipChangesCheckConfiguration configuration) {
         builder.pauseAndRecord()
 
-        builder.heading3 changesSummaryHeading
+        builder.heading3 configuration.changesSummaryHeading
 
-        for (CatalogueElement destination in owner.getOutgoingRelationsByType(type)) {
-            Set<Change> changes = byDestination.removeAll("${type.name}:${destination.getLatestVersionId() ?: destination.getId()}".toString())
+        for (CatalogueElement element in (configuration.incoming ? configuration.element.getIncomingRelationsByType(configuration.type) : configuration.element.getOutgoingRelationsByType(configuration.type))) {
+            builder.pauseAndRecord()
+            if (configuration.deep) {
+                printPropertiesChanges(builder, element, classification, 4)
+            }
+            Set<Change> changes = byDestinationsAndSources.removeAll("${configuration.incoming ? 'in' : 'out'}:${configuration.type.name}:${element.getLatestVersionId() ?: element.getId()}".toString())
             if (changes) {
                 builder.requestRun()
 
-                builder.heading4 "${destination.name} ($destination.combinedVersion, $destination.status)"
                 if (changes.any { it.type == ChangeType.RELATIONSHIP_CREATED}) {
-                    builder.paragraph newRelationshipNote
+                    builder.paragraph configuration.newRelationshipNote
                 }
                 Set<Change> metadataChanges = changes.findAll { it.type in [ChangeType.RELATIONSHIP_METADATA_CREATED, ChangeType.RELATIONSHIP_METADATA_DELETED, ChangeType.RELATIONSHIP_METADATA_UPDATED]}
                 if (metadataChanges) {
@@ -209,12 +234,13 @@ class ChangelogGenerator {
 
                 }
             }
+            builder.runIfRequested()
         }
 
-        Set<String> otherHierarchyChanges = byDestination.keySet().findAll { it.startsWith("${type.name}:") }
+        Set<String> otherHierarchyChanges = byDestinationsAndSources.keySet().findAll { it.startsWith("${configuration.type.name}:") }
 
         for (String key in otherHierarchyChanges) {
-            Set<Change> rest = byDestination.removeAll(key)
+            Set<Change> rest = byDestinationsAndSources.removeAll(key)
             Change deleteChange = new ArrayList<Change>(rest).reverse().find { it.type == ChangeType.RELATIONSHIP_DELETED}
 
             if (!deleteChange) {
@@ -225,8 +251,12 @@ class ChangelogGenerator {
 
             def value = DefaultAuditor.readValue(deleteChange.oldValue)
 
-            builder.heading4 "${value.destination.name} (${value.destination.latestVersionId}.${value.destination.versionNumber}, $value.destination.status)"
-            builder.paragraph removedRelationshipNote
+            if (configuration.incoming) {
+                builder.heading4 "${value.destination.name} (${value.destination.latestVersionId}.${value.destination.versionNumber}, $value.destination.status)"
+            } else {
+                builder.heading4 "${value.source.name} (${value.source.latestVersionId}.${value.source.versionNumber}, $value.source.status)"
+            }
+            builder.paragraph configuration.removedRelationshipNote
         }
 
         builder.runIfRequested()
@@ -235,9 +265,11 @@ class ChangelogGenerator {
     private static String getRelationshipMetadataName(Change ch) {
         switch (ch.type) {
             case [ChangeType.RELATIONSHIP_METADATA_DELETED, ChangeType.RELATIONSHIP_METADATA_UPDATED]:
-                return DefaultAuditor.readValue(ch.oldValue).name
+                def value = DefaultAuditor.readValue(ch.oldValue)
+                return value instanceof CatalogueElement ? value.name : value
             case ChangeType.RELATIONSHIP_METADATA_CREATED:
-                return DefaultAuditor.readValue(ch.newValue).name
+                def value = DefaultAuditor.readValue(ch.newValue)
+                return value instanceof CatalogueElement ? value.name : value
 
             default:
                 throw new IllegalArgumentException("Cannot get old relationship metadata value from $ch")
@@ -247,7 +279,8 @@ class ChangelogGenerator {
     private static String getOldRelationshipMetadataValue(Change ch) {
         switch (ch.type) {
             case [ChangeType.RELATIONSHIP_METADATA_DELETED, ChangeType.RELATIONSHIP_METADATA_UPDATED]:
-                return DefaultAuditor.readValue(ch.oldValue).extensionValue
+                def value = org.modelcatalogue.core.audit.DefaultAuditor.readValue(ch.oldValue)
+                return value instanceof String ? value : value.extensionValue
             case ChangeType.RELATIONSHIP_METADATA_CREATED:
                 return ''
 
@@ -259,7 +292,8 @@ class ChangelogGenerator {
     private static String getNewRelationshipMetadataValue(Change ch) {
         switch (ch.type) {
             case [ChangeType.RELATIONSHIP_METADATA_CREATED, ChangeType.RELATIONSHIP_METADATA_UPDATED]:
-                return DefaultAuditor.readValue(ch.newValue).extensionValue
+                def value = org.modelcatalogue.core.audit.DefaultAuditor.readValue(ch.newValue)
+                return value instanceof String ? value : value.extensionValue
             case ChangeType.RELATIONSHIP_METADATA_DELETED:
                 return ''
 
@@ -295,6 +329,13 @@ class ChangelogGenerator {
         }
         return rel.destination.id
     }
+    private static Long getSourceId(Change ch) {
+        def rel = getRelationship(ch)
+        if (rel.source.latestVersionId) {
+            return rel.source.latestVersionId
+        }
+        return rel.source.id
+    }
 
     private List<Change> getChanges(CatalogueElement element, Classification classification, ChangeType... types) {
         auditService.getChanges(element, sort: 'dateCreated', order: 'asc'){
@@ -311,7 +352,7 @@ class ChangelogGenerator {
         classificationService.classified(Model, ClassificationFilter.includes(classification)).list(sort: 'name')
     }
 
-    private static String valueForPrint(String storedValue) {
+    private static String valueForPrint(String propertyName, String storedValue) {
         if (!storedValue) {
             return ''
         }
@@ -320,7 +361,9 @@ class ChangelogGenerator {
             return ''
         }
         if (value instanceof CharSequence) {
-            return value
+            if (propertyName == 'enumAsString') {
+                return EnumeratedType.stringToMap(value?.toString()).collect { "$it.key: $it.value" }.join('\n')
+            }
         }
         if (value instanceof CatalogueElement) {
             return value.name

@@ -7,6 +7,7 @@ class ModelCatalogueGenomicsUrlMappings {
         "/api/modelCatalogue/core/gel/generateXmlShredderModel/$id"(controller: "gelXml", action: "generateXmlShredderModel", method: HttpMethod.GET)
         "/api/modelCatalogue/core/gel/generateXSD/$id"(controller: "gelXml", action: "generateXSD", method: HttpMethod.GET)
         "/api/modelCatalogue/core/gel/reports/classificationJasper"(controller: 'classificationReports', action: 'gereportDoc', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/gel/reports/classificationChangelog"(controller: 'classificationReports', action: 'changelogDoc', method: HttpMethod.GET)
     }
 
 }

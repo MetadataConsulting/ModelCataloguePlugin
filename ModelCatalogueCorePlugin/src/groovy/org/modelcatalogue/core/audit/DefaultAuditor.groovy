@@ -454,7 +454,7 @@ class DefaultAuditor implements Auditor {
             if (object.elementType == Relationship.name) {
                 return object
             }
-            return Class.forName(object.elementType).get(object.id)
+            return Class.forName(CatalogueElement.fixResourceName(object.elementType)).get(object.id)
         }
         throw new IllegalArgumentException("Unsupported stored value: $string")
     }

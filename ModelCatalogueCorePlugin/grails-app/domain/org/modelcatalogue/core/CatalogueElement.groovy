@@ -132,6 +132,14 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
         relationshipService.getRelationships([:], RelationshipDirection.BOTH, refreshed).total
     }
 
+    List getOutgoingRelationsByTypeAndDirection(RelationshipType type, RelationshipDirection direction) {
+        switch (direction) {
+            case RelationshipDirection.INCOMING: return getIncomingRelationsByType(type)
+            case RelationshipDirection.OUTGOING: return getOutgoingRelationsByType(type)
+            case RelationshipDirection.BOTH: return getRelationsByType(type)
+            default: throw new IllegalArgumentException("Unknown relationship direction $direction")
+        }
+    }
 
     List getIncomingRelationsByType(RelationshipType type) {
         getIncomingRelationshipsByType(type).collect {

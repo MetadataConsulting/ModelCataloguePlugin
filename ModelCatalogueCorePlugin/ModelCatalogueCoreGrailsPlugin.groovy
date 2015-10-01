@@ -324,6 +324,13 @@ Model catalogue core plugin (metadata registry)
 			link controller: 'classificationReports', action: 'gereportDoc', id: true
 		}
 
+		reportsRegistry.register {
+			creates link
+			title { "GE Changelog Docx" }
+			type Classification
+			link controller: 'classificationReports', action: 'changelogDoc', id: true
+		}
+
         reportsRegistry.register {
             creates link
             type Classification, Model, DataElement, ValueDomain, DataType, MeasurementUnit

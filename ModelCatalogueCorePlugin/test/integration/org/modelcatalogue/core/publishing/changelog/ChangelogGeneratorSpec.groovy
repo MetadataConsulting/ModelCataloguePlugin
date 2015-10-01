@@ -82,7 +82,7 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
                                     domain = domains[random.nextInt(domains.size())]
                                 }
                                 valueDomain name: domain.name, classification: domain.classifications.first().name, {
-                                    dataType name: domain.name, classification: domain.classifications.first().name, enumerations: (1..(i * j)).collectEntries { ["$it", "value of $it"] }
+                                    dataType name: "$domain.name Data Type", classification: domain.classifications.first().name, enumerations: (1..(i * j)).collectEntries { ["$it", "value of $it"] }
                                 }
                                 relationship {
                                     ext 'Min Occurs': '0', 'Max Occurs': "$j"
@@ -133,6 +133,7 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
 
             create draft of 'Model 1 Child Model 2'
             update 'hierarchy' of 'Model 1 Child Model 2' add 'Model XYZ'
+            update 'base' of  'Model 1 Child Model 1' add 'Model 1 Child Model 2' // 'Model 1 Child Model 1' is base for 'Model 1 Child Model 2'
 
             create draft of 'Model 1'
             update 'hierarchy' of 'Model 1' remove 'Model 1 Child Model 1'
@@ -144,6 +145,8 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
 
             create draft of 'Model 1 Child Model 2 Data Element 1'
             update 'valueDomain' of 'Model 1 Child Model 2 Data Element 1' to 'New Value Domain'
+            update 'dataType' of 'Test Value Domain 1' to 'Test Value Domain 2 Data Type'
+            update 'enumerations' of 'Test Value Domain 3 Data Type' to one: 'jedna', eight: 'osm'
 
             finalize 'C4C'
 
