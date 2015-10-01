@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.gel
 
-import com.craigburke.document.builder.WordDocumentBuilder
 import com.craigburke.document.core.builder.DocumentBuilder
 import groovy.util.logging.Log4j
 import org.hibernate.FetchMode
@@ -12,6 +11,7 @@ import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.ValueDomain
+import org.modelcatalogue.core.util.docx.ModelCatalogueWordDocumentBuilder
 
 import java.text.SimpleDateFormat
 
@@ -47,7 +47,7 @@ class ClassificationToDocxExporter {
 
         log.info "Exporting classification $classification to Word Document"
 
-        DocumentBuilder builder = new GelWordDocumentBuilder(outputStream)
+        DocumentBuilder builder = new ModelCatalogueWordDocumentBuilder(outputStream)
 
         def customTemplate = {
             'document' font: [family: 'Calibri'], margin: [left: 20, right: 10]

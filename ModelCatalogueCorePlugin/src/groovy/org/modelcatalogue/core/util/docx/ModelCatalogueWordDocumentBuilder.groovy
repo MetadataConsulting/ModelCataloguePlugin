@@ -1,11 +1,11 @@
-package org.modelcatalogue.core.gel
+package org.modelcatalogue.core.util.docx
 
 import com.craigburke.document.builder.BasicDocumentPartTypes
 import com.craigburke.document.builder.WordDocumentBuilder
 
-class GelWordDocumentBuilder extends WordDocumentBuilder {
+class ModelCatalogueWordDocumentBuilder extends WordDocumentBuilder {
 
-    GelWordDocumentBuilder(OutputStream outputStream) {
+    ModelCatalogueWordDocumentBuilder(OutputStream outputStream) {
         super(outputStream)
     }
 

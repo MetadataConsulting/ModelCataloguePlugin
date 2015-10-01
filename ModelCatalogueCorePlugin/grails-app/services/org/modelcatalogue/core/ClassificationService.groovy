@@ -37,7 +37,11 @@ class ClassificationService {
         return list
     }
 
-    public <T> DetachedCriteria<T> classified(DetachedCriteria<T> criteria, ClassificationFilter classificationsFilter = classificationsInUse) {
+    public <T> DetachedCriteria<T> classified(DetachedCriteria<T> criteria) {
+        classified(criteria, classificationsInUse)
+    }
+
+    public static <T> DetachedCriteria<T> classified(DetachedCriteria<T> criteria, ClassificationFilter classificationsFilter) {
         if (criteria.persistentEntity.javaClass == Classification) {
             return criteria
         }
