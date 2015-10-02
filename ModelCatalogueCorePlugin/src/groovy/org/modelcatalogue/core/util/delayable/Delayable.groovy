@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.util.delayable
 
+import groovy.transform.stc.ClosureParams
+import groovy.transform.stc.FromString
 import groovy.util.logging.Log4j
 
 /**
@@ -10,7 +12,7 @@ import groovy.util.logging.Log4j
  * @param < T > the type of the delegate
  */
 @Log4j
-class Delayable<T> implements Runnable {
+class Delayable<T>  {
 
     private final T delegate
     private final List<List<DelayableQueueItem>> queues = [].withDefault { [] }
@@ -26,21 +28,21 @@ class Delayable<T> implements Runnable {
     /**
      * All method call will from this call return null and will be queued for later execution using the #run() method.
      */
-    void pauseAndRecord() {
+    protected void pauseAndRecord() {
         pauseLevel++
     }
 
     /**
      * @return <code>true</code> if the execution is currently paused
      */
-    boolean isPaused() {
+    protected boolean isPaused() {
         pauseLevel >= 0
     }
 
     /**
      * @return <code>true</code> if the run is requested
      */
-    boolean isRunRequested() {
+    protected boolean isRunRequested() {
         runRequests[pauseLevel]
     }
 
@@ -51,7 +53,7 @@ class Delayable<T> implements Runnable {
      *
      * @return number of methods queued
      */
-    int resetAndUnpause(boolean ignoreNotPaused = false) {
+    protected int resetAndUnpause(boolean ignoreNotPaused = false) {
         if (!paused && !ignoreNotPaused) {
             throw new IllegalStateException("Execution is not paused. Run pauseAndRecord() before to start queuing method calls.")
         }
@@ -68,7 +70,7 @@ class Delayable<T> implements Runnable {
      * but does not unpause the execution.
      * @return number of methods queued
      */
-    int reset(boolean ignoreNotPaused = false) {
+    protected int reset(boolean ignoreNotPaused = false) {
         if (!paused && !ignoreNotPaused) {
             throw new IllegalStateException("Execution is not paused. Run pauseAndRecord() before to start queuing method calls.")
         }
@@ -81,7 +83,7 @@ class Delayable<T> implements Runnable {
     /**
      * Invokes all the queued methods on the delegate regardless the run requested state.
      */
-    void run() {
+    protected void run() {
         List<DelayableQueueItem> queue = queues[pauseLevel]
         if (pauseLevel > 0 && !runInProgress[pauseLevel - 1]) {
             queues[pauseLevel - 1].addAll(queue)
@@ -106,7 +108,7 @@ class Delayable<T> implements Runnable {
     /**
      * Runs only if the run was requested from the last call to the #pauseAndRecord().
      */
-    void runIfRequested() {
+    protected void runIfRequested() {
         if (runRequested) {
             run()
         } else {
@@ -132,4 +134,15 @@ class Delayable<T> implements Runnable {
         }
         delegate.invokeMethod(name, args)
     }
+
+
+    void whilePaused(@ClosureParams(value = FromString, options = 'Delayable<T>') Closure closure) {
+        pauseAndRecord()
+        closure this
+        runIfRequested()
+    }
+
+    // TODO: publish more API
+
+
 }
