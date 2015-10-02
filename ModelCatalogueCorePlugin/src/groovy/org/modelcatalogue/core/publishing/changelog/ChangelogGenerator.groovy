@@ -13,7 +13,6 @@ import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.audit.Change
 import org.modelcatalogue.core.audit.ChangeType
 import org.modelcatalogue.core.audit.DefaultAuditor
-import org.modelcatalogue.core.util.ClassificationFilter
 import org.modelcatalogue.core.util.delayable.Delayable
 import org.modelcatalogue.core.util.docx.ModelCatalogueWordDocumentBuilder
 
@@ -23,18 +22,18 @@ import java.text.SimpleDateFormat
 class ChangelogGenerator {
 
     final AuditService auditService
-    final ClassificationService classificationService
+    final ModelService modelService
 
-    ChangelogGenerator(AuditService auditService, ClassificationService classificationService) {
+    ChangelogGenerator(AuditService auditService, ModelService modelService) {
         this.auditService = auditService
-        this.classificationService = classificationService
+        this.modelService = modelService
     }
 
-    void generateChangelog(Classification classification, OutputStream outputStream) {
+    void generateChangelog(Model model, OutputStream outputStream) {
         DocumentBuilder builder = new ModelCatalogueWordDocumentBuilder(outputStream)
 
         def customTemplate = {
-            'document' font: [family: 'Calibri'], margin: [left: 20, right: 10]
+            'document' font: [family: 'Calibri'], margin: [left: 30, right: 30]
             'paragraph.title' font: [color: '#13D4CA', size: 26.pt], margin: [top: 200.pt]
             'paragraph.subtitle' font: [color: '#13D4CA', size: 18.pt]
             'paragraph.description' font: [color: '#13D4CA', size: 16.pt, italic: true], margin: [left: 30, right: 30]
@@ -59,57 +58,59 @@ class ChangelogGenerator {
 
         builder.create {
             document(template: customTemplate) {
-                paragraph "Changelog for ${classification.name}", style: 'title',  align: 'center'
+                paragraph "Changelog for ${model.name}", style: 'title',  align: 'center'
                 paragraph(style: 'subtitle', align: 'center') {
-                    text "${classification.status}"
+                    text "${model.combinedVersion}"
+                    lineBreak()
+                    text "${model.status}"
                     lineBreak()
                     text SimpleDateFormat.dateInstance.format(new Date())
                 }
-                if (classification.description) {
-                    paragraph(style: 'classification.description', margin: [left: 50, right: 50]) {
-                        text classification.description
+                if (model.description) {
+                    paragraph(style: 'description', margin: [left: 50, right: 50]) {
+                        text model.description
                     }
                 }
                 pageBreak()
 
                 delayable.whilePaused {
-                    delayable.heading1 "Classification Changes"
-                    printPropertiesChanges(delayable, classification, classification)
+                    delayable.heading1 "Root Model Changes"
+                    printPropertiesChanges(delayable, model)
                 }
 
                 heading1 'Models'
 
-                for (Model model in getModelsForClassification(classification)) {
-                    log.info "Handling changes from Model $model.name"
+                for (Model child in getModelsForRootModel(model)) {
+                    log.info "Handling changes from Model $child.name"
                     delayable.whilePaused {
-                        printPropertiesChanges(delayable, model, classification)
-                        printModelStructuralChanges(delayable, model, classification)
+                        printPropertiesChanges(delayable, child)
+                        printModelStructuralChanges(delayable, child)
                     }
 
                 }
             }
         }
 
-        log.info "Classification $classification.name changelog exported to Word Document"
+        log.info "Model $model.name changelog exported to Word Document"
 
 
     }
 
-    private void printPropertiesChanges(Delayable<DocumentBuilder> builder, CatalogueElement element, Classification classification, int headingLevel = 2) {
+    private void printPropertiesChanges(Delayable<DocumentBuilder> builder, CatalogueElement element, int headingLevel = 2) {
         builder.with {
             "heading${Math.min(headingLevel, 5)}" "$element.name ($element.combinedVersion, $element.status)", ref: "${element.getId()}"
 
-            if (getChanges(element, classification, ChangeType.NEW_VERSION_CREATED)) {
+            if (getChanges(element, ChangeType.NEW_VERSION_CREATED)) {
                 requestRun()
                 paragraph {
                     text "New version "
                     text element.versionNumber, font: [bold: true]
                     text " created"
                 }
-            } else if (getChanges(element, classification, ChangeType.NEW_ELEMENT_CREATED)) {
+            } else if (getChanges(element, ChangeType.NEW_ELEMENT_CREATED)) {
                 requestRun()
                 paragraph "New ${GrailsNameUtils.getNaturalName(element.class.name)} created"
-            } else if (getChanges(element, classification, ChangeType.ELEMENT_DEPRECATED)) {
+            } else if (getChanges(element, ChangeType.ELEMENT_DEPRECATED)) {
                 requestRun()
                 paragraph {
                     text "${GrailsNameUtils.getNaturalName(element.class.name)} has been "
@@ -117,7 +118,7 @@ class ChangelogGenerator {
                 }
             }
 
-            List<Change> changedProperties = getChanges(element, classification, ChangeType.PROPERTY_CHANGED, ChangeType.METADATA_CREATED, ChangeType.METADATA_DELETED, ChangeType.METADATA_UPDATED)
+            List<Change> changedProperties = getChanges(element, ChangeType.PROPERTY_CHANGED, ChangeType.METADATA_CREATED, ChangeType.METADATA_DELETED, ChangeType.METADATA_UPDATED)
 
             if (changedProperties) {
                 requestRun()
@@ -150,7 +151,7 @@ class ChangelogGenerator {
                 def value = element.getProperty(it.name)
                 if (value.respondsTo('instanceOf') && value.instanceOf(CatalogueElement)) {
                     builder.whilePaused {
-                        printPropertiesChanges(builder, value as CatalogueElement, classification, headingLevel + 1)
+                        printPropertiesChanges(builder, value as CatalogueElement, headingLevel + 1)
                     }
                 }
             }
@@ -160,15 +161,23 @@ class ChangelogGenerator {
     }
 
     private void printChangesTable(Delayable<DocumentBuilder> builder, Map<String, List<String>> rows) {
-        builder.table {
-            row {
-                cell "Property"
-                cell "Old Value"
-                cell "New Value"
+        builder.table(border: [size: 1, color: '#D2D2D2'], columns: [1,2,2], font: [size: 10]) {
+            row(background: '#F2F2F2') {
+                cell "Property", style: 'headerCell'
+                cell "Old Value", style: 'headerCell'
+                cell "New Value", style: 'headerCell'
             }
+
             for (Map.Entry<String, List<String>> change in rows) {
-                row {
-                    cell change.key
+                String background = "#FFFFFF"
+
+                if (change.value[0] && !change.value[1]) {
+                    background = "#F2DEDE"
+                } else if (!change.value[0] && change.value[1]) {
+                    background = '#DFF0D8'
+                }
+                row (background: background){
+                    cell change.key, font: [bold: true]
                     cell change.value[0]
                     cell change.value[1]
                 }
@@ -176,8 +185,8 @@ class ChangelogGenerator {
         }
     }
 
-    private void printModelStructuralChanges(Delayable<DocumentBuilder> builder, Model model, Classification classification) {
-        List<Change> relationshipChanges = getChanges(model, classification, ChangeType.RELATIONSHIP_CREATED, ChangeType.RELATIONSHIP_DELETED, ChangeType.RELATIONSHIP_ARCHIVED, ChangeType.RELATIONSHIP_METADATA_CREATED, ChangeType.RELATIONSHIP_METADATA_DELETED, ChangeType.RELATIONSHIP_METADATA_UPDATED)
+    private void printModelStructuralChanges(Delayable<DocumentBuilder> builder, Model model) {
+        List<Change> relationshipChanges = getChanges(model, ChangeType.RELATIONSHIP_CREATED, ChangeType.RELATIONSHIP_DELETED, ChangeType.RELATIONSHIP_ARCHIVED, ChangeType.RELATIONSHIP_METADATA_CREATED, ChangeType.RELATIONSHIP_METADATA_DELETED, ChangeType.RELATIONSHIP_METADATA_UPDATED)
 
         Multimap<String, Change> byDestinationsAndSources = LinkedHashMultimap.create()
 
@@ -186,21 +195,21 @@ class ChangelogGenerator {
             byDestinationsAndSources.put "in:${getRelationshipType(ch)}:${getSourceId(ch)}".toString(), ch
         }
 
-        handleRelationshipChanges(builder, byDestinationsAndSources, classification, RelationshipChangesCheckConfiguration.create(model, RelationshipType.hierarchyType).withChangesSummaryHeading("Changed Child Models").withNewRelationshipNote("New child model").withRemovedRelationshipNote("Child model removed"))
-        handleRelationshipChanges(builder, byDestinationsAndSources, classification, RelationshipChangesCheckConfiguration.create(model, RelationshipType.containmentType).withChangesSummaryHeading("Changed Data Elements").withNewRelationshipNote("New data element").withRemovedRelationshipNote("Data element removed").withDeep(true))
-        handleRelationshipChanges(builder, byDestinationsAndSources, classification, RelationshipChangesCheckConfiguration.create(model, RelationshipType.synonymType).withChangesSummaryHeading("Changed Synonyms").withNewRelationshipNote("New synonym").withRemovedRelationshipNote("Synonym removed"))
-        handleRelationshipChanges(builder, byDestinationsAndSources, classification, RelationshipChangesCheckConfiguration.create(model, RelationshipType.relatedToType).withChangesSummaryHeading("Changed Relations").withNewRelationshipNote("Newly related").withRemovedRelationshipNote("No longer related"))
-        handleRelationshipChanges(builder, byDestinationsAndSources, classification, RelationshipChangesCheckConfiguration.create(model, RelationshipType.baseType).withChangesSummaryHeading("Changed Bases").withNewRelationshipNote("Newly based on").withRemovedRelationshipNote("No longer based on").withIncoming(true))
+        handleRelationshipChanges(builder, byDestinationsAndSources, RelationshipChangesCheckConfiguration.create(model, RelationshipType.hierarchyType).withChangesSummaryHeading("Changed Child Models").withNewRelationshipNote("New child model").withRemovedRelationshipNote("Child model removed"))
+        handleRelationshipChanges(builder, byDestinationsAndSources, RelationshipChangesCheckConfiguration.create(model, RelationshipType.containmentType).withChangesSummaryHeading("Changed Data Elements").withNewRelationshipNote("New data element").withRemovedRelationshipNote("Data element removed").withDeep(true))
+        handleRelationshipChanges(builder, byDestinationsAndSources, RelationshipChangesCheckConfiguration.create(model, RelationshipType.synonymType).withChangesSummaryHeading("Changed Synonyms").withNewRelationshipNote("New synonym").withRemovedRelationshipNote("Synonym removed"))
+        handleRelationshipChanges(builder, byDestinationsAndSources, RelationshipChangesCheckConfiguration.create(model, RelationshipType.relatedToType).withChangesSummaryHeading("Changed Relations").withNewRelationshipNote("Newly related").withRemovedRelationshipNote("No longer related"))
+        handleRelationshipChanges(builder, byDestinationsAndSources, RelationshipChangesCheckConfiguration.create(model, RelationshipType.baseType).withChangesSummaryHeading("Changed Bases").withNewRelationshipNote("Newly based on").withRemovedRelationshipNote("No longer based on").withIncoming(true))
     }
 
-    private void handleRelationshipChanges(Delayable<DocumentBuilder> builder, Multimap<String, Change> byDestinationsAndSources, Classification classification, RelationshipChangesCheckConfiguration configuration) {
+    private void handleRelationshipChanges(Delayable<DocumentBuilder> builder, Multimap<String, Change> byDestinationsAndSources, RelationshipChangesCheckConfiguration configuration) {
         builder.whilePaused {
             builder.heading3 configuration.changesSummaryHeading
 
             for (CatalogueElement element in (configuration.incoming ? configuration.element.getIncomingRelationsByType(configuration.type) : configuration.element.getOutgoingRelationsByType(configuration.type))) {
                 builder.whilePaused {
                     if (configuration.deep) {
-                        printPropertiesChanges(builder, element, classification, 4)
+                        printPropertiesChanges(builder, element, 4)
                     } else {
                         builder.heading4 "$element.name ($element.combinedVersion, $element.status)", ref: "${element.getId()}"
                     }
@@ -334,19 +343,18 @@ class ChangelogGenerator {
         return rel.source.id
     }
 
-    private List<Change> getChanges(CatalogueElement element, Classification classification, ChangeType... types) {
+    private List<Change> getChanges(CatalogueElement element, ChangeType... types) {
         auditService.getChanges(element, sort: 'dateCreated', order: 'asc'){
             ne 'undone', true
             isNull 'parentId'
-            gte 'dateCreated', classification.dateCreated
             if (types) {
                 inList 'type', types.toList()
             }
         }.items
     }
 
-    private Collection<Model> getModelsForClassification(Classification classification) {
-        classificationService.classified(Model, ClassificationFilter.includes(classification)).list(sort: 'name')
+    private Collection<Model> getModelsForRootModel(Model model) {
+        modelService.getSubModels(model).items.sort { it.name }
     }
 
     private static String valueForPrint(String propertyName, String storedValue) {

@@ -7,6 +7,7 @@ import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.ClassificationService
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.ModelService
 import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.ddl.DataDefinitionLanguage
@@ -19,6 +20,7 @@ import java.awt.Desktop
 class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
 
     AuditService auditService
+    ModelService modelService
     ClassificationService classificationService
     ElementService elementService
 
@@ -29,12 +31,12 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
     }
 
     def "test changelog export"() {
-        Classification draft = buildTestClassification()
+        Model draft = buildTestModel()
 
         when:
         File file = tmp.newFile('changelog.docx')
 
-        ChangelogGenerator generator = new ChangelogGenerator(auditService, classificationService)
+        ChangelogGenerator generator = new ChangelogGenerator(auditService, modelService)
 
         generator.generateChangelog(draft, file.newOutputStream())
 
@@ -44,7 +46,7 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
         noExceptionThrown()
     }
 
-    private Classification buildTestClassification() {
+    private Model buildTestModel() {
         DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
 
         Random random = new Random()
@@ -67,57 +69,56 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
                 ext 'foo', 'bar'
                 ext 'one', '1'
 
+                model name: 'Root Model', {
+                    for (int i in 1..3) {
+                        model name: "Model $i", {
+                            description "This is a description for Model $i"
+                            ext 'foo', 'bar'
+                            ext 'boo', 'cow'
 
-                for (int i in 1..3) {
-                    model name: "Model $i", {
-                        description "This is a description for Model $i"
-                        ext 'foo', 'bar'
-                        ext 'boo', 'cow'
-
-                        for (int j in 1..3) {
-                            dataElement name: "Model $i Data Element $j", {
-                                description "This is a description for Model $i Data Element $j"
-                                ValueDomain domain = domains[random.nextInt(domains.size())]
-                                while (!domain.classifications) {
-                                    domain = domains[random.nextInt(domains.size())]
-                                }
-                                valueDomain name: domain.name, classification: domain.classifications.first().name, {
-                                    dataType name: "$domain.name Data Type", classification: domain.classifications.first().name, enumerations: (1..(i * j)).collectEntries { ["$it", "value of $it"] }
-                                }
-                                relationship {
-                                    ext 'Min Occurs': '0', 'Max Occurs': "$j"
+                            for (int j in 1..3) {
+                                dataElement name: "Model $i Data Element $j", {
+                                    description "This is a description for Model $i Data Element $j"
+                                    ValueDomain domain = domains[random.nextInt(domains.size())]
+                                    while (!domain.classifications) {
+                                        domain = domains[random.nextInt(domains.size())]
+                                    }
+                                    valueDomain name: domain.name, classification: domain.classifications.first().name, {
+                                        dataType name: "$domain.name Data Type", classification: domain.classifications.first().name, enumerations: (1..(i * j)).collectEntries { ["$it", "value of $it"] }
+                                    }
+                                    relationship {
+                                        ext 'Min Occurs': '0', 'Max Occurs': "$j"
+                                    }
                                 }
                             }
-                        }
-                        for (int j in 1..3) {
-                            model name: "Model $i Child Model $j", {
-                                description "This is a description for Model $i Child Model $j"
+                            for (int j in 1..3) {
+                                model name: "Model $i Child Model $j", {
+                                    description "This is a description for Model $i Child Model $j"
 
-                                for (int k in 1..3) {
-                                    dataElement name: "Model $i Child Model $j Data Element $k", {
-                                        description "This is a description for Model $i Child Model $j Data Element $k"
-                                        ValueDomain domain = domains[random.nextInt(domains.size())]
-                                        while (!domain.classifications) {
-                                            domain = domains[random.nextInt(domains.size())]
+                                    for (int k in 1..3) {
+                                        dataElement name: "Model $i Child Model $j Data Element $k", {
+                                            description "This is a description for Model $i Child Model $j Data Element $k"
+                                            ValueDomain domain = domains[random.nextInt(domains.size())]
+                                            while (!domain.classifications) {
+                                                domain = domains[random.nextInt(domains.size())]
+                                            }
+                                            valueDomain name: domain.name, classification: domain.classifications.first().name
                                         }
-                                        valueDomain name: domain.name, classification: domain.classifications.first().name
                                     }
                                 }
                             }
                         }
                     }
                 }
-
-
             }
         }
 
-        return makeChanges(elementService.finalizeElement(Classification.findByName('C4C')))
+        return makeChanges(elementService.finalizeElement(Model.findByName('Root Model')))
 
     }
 
-    private Classification makeChanges(Classification finalized) {
-        Classification classification = elementService.createDraftVersion(finalized, DraftContext.userFriendly())
+    private Model makeChanges(Model finalized) {
+        Model model = elementService.createDraftVersion(finalized, DraftContext.userFriendly())
 
         // update description of C4C to
         DataDefinitionLanguage.with('C4C') {
@@ -152,7 +153,7 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
 
         }
 
-        return classification
+        return model
 
     }
 

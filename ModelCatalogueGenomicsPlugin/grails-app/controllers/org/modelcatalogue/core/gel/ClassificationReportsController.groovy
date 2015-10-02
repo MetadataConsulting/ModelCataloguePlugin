@@ -1,6 +1,8 @@
 package org.modelcatalogue.core.gel
 
 import org.modelcatalogue.core.ClassificationService
+import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.ModelService
 import org.modelcatalogue.core.publishing.changelog.ChangelogGenerator
 
 import java.util.concurrent.ExecutorService
@@ -24,7 +26,7 @@ class ClassificationReportsController {
     AuditService auditService
     AssetService assetService
     SecurityService modelCatalogueSecurityService
-    ClassificationService classificationService
+    ModelService modelService
     
     def index() { }
     
@@ -83,19 +85,19 @@ class ClassificationReportsController {
     }
 
     def changelogDoc() {
-        Classification classification = Classification.get(params.id)
+        Model model = Model.get(params.id)
 
-        def assetId = storeChangelogAsset(classification)
+        def assetId = storeChangelogAsset(model)
 
         response.setHeader("X-Asset-ID",assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
     }
 
 
-    private def storeChangelogAsset(Classification classification){
+    private def long storeChangelogAsset(Model model){
         Asset asset = new Asset(
-                name: "$classification.name changelog as MS Word Document",
-                originalFileName: "${classification.name}-${classification.status}-${classification.version}-changelog.docx",
+                name: "$model.name changelog as MS Word Document",
+                originalFileName: "${model.name}-${model.status}-${model.version}-changelog.docx",
                 description: "Your classification report will be available in this asset soon. Use Refresh action to reload",
                 status: ElementStatus.PENDING,
                 contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -106,7 +108,7 @@ class ClassificationReportsController {
 
         Long id = asset.id
         Long authorId = modelCatalogueSecurityService.currentUser?.id
-        Long classificationId = classification.id
+        Long modelId = model.id
 
         executorService.submit {
             auditService.withDefaultAuthorId(authorId) {
@@ -114,11 +116,11 @@ class ClassificationReportsController {
                 try {
                     //do the hard work
                     assetService.storeAssetWithSteam(updated, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",) { OutputStream out ->
-                        new ChangelogGenerator(auditService, classificationService).generateChangelog(Classification.get(classificationId), out)
+                        new ChangelogGenerator(auditService, modelService).generateChangelog(Model.get(modelId), out)
                     }
 
                     updated.status = ElementStatus.FINALIZED
-                    updated.description = "Your classification is ready. Use Download button to download it."
+                    updated.description = "Your model changelog is ready. Use Download button to download it."
                     updated.save(flush: true, failOnError: true)
                 } catch (e) {
                     log.error "Exception of type ${e.class} with id=${id}", e
@@ -126,7 +128,7 @@ class ClassificationReportsController {
                     updated.refresh()
                     updated.status = ElementStatus.FINALIZED
                     updated.name = updated.name + " - Error during generation"
-                    updated.description = "Error generating classification report" +":$e"
+                    updated.description = "Error generating model changelog report" +":$e"
                     updated.save(flush: true, failOnError: true)
                 }
             }
