@@ -80,8 +80,11 @@ class ChangelogGenerator {
 
                 heading1 'Models'
 
-                for (Model child in getModelsForRootModel(model)) {
-                    log.info "Handling changes from Model $child.name"
+                Collection<Model> models = getModelsForRootModel(model)
+                int counter = 1
+                int size = models.size()
+                for (Model child in models) {
+                    log.info "[${counter++}/${size}] Processing changes from Model $child.name"
                     delayable.whilePaused {
                         printPropertiesChanges(delayable, child)
                         printModelStructuralChanges(delayable, child)
@@ -96,6 +99,53 @@ class ChangelogGenerator {
 
     }
 
+    private String getUpdateText(CatalogueElement element) {
+        if (getChanges(element, ChangeType.NEW_VERSION_CREATED)) {
+            return "New version ${element.versionNumber} of the ${GrailsNameUtils.getNaturalName(element.class.name)}"
+        }
+
+        if (getChanges(element, ChangeType.NEW_ELEMENT_CREATED)) {
+            return "New ${GrailsNameUtils.getNaturalName(element.class.name)}"
+        }
+
+        if (getChanges(element, ChangeType.ELEMENT_DEPRECATED)) {
+            return "${GrailsNameUtils.getNaturalName(element.class.name)} has been deprecated "
+        }
+
+        List<Change> changedProperties = getChanges(element, ChangeType.PROPERTY_CHANGED, ChangeType.METADATA_CREATED, ChangeType.METADATA_DELETED, ChangeType.METADATA_UPDATED)
+
+        if (changedProperties) {
+            Set<String> changedPropertiesLabels = new TreeSet<String>()
+
+            for (Change change in changedProperties) {
+                String propLabel = change.property
+                if (change.type == ChangeType.PROPERTY_CHANGED) {
+                    if (change.property == 'enumAsString') {
+                        propLabel = 'Enumerations'
+                    } else {
+                        propLabel = GrailsNameUtils.getNaturalName(change.property)
+                    }
+                }
+                changedPropertiesLabels << propLabel
+            }
+
+            return "${changedProperties.join(', ')} ${changedProperties.size() > 1 ? 'have' : 'has'} been changed"
+        }
+
+        GrailsDomainClass grailsDomainClass = Holders.grailsApplication.getDomainClass(HibernateProxyHelper.getClassWithoutInitializingProxy(element).name)
+
+        grailsDomainClass.persistentProperties.findAll { it.oneToOne || it.manyToOne }.sort { it.name }.each {
+            def value = element.getProperty(it.name)
+            if (value.respondsTo('instanceOf') && value.instanceOf(CatalogueElement)) {
+                String change = getUpdateText(value as CatalogueElement)
+                if (change) {
+                    return "${GrailsNameUtils.getNaturalName(it.name)} > ${change}"
+                }
+            }
+        }
+        return null
+    }
+
     private void printPropertiesChanges(Delayable<DocumentBuilder> builder, CatalogueElement element, int headingLevel = 2) {
         builder.with {
             "heading${Math.min(headingLevel, 5)}" "$element.name ($element.combinedVersion, $element.status)", ref: "${element.getId()}"
@@ -103,18 +153,18 @@ class ChangelogGenerator {
             if (getChanges(element, ChangeType.NEW_VERSION_CREATED)) {
                 requestRun()
                 paragraph {
-                    text "New version "
+                    text "This is a new version "
                     text element.versionNumber, font: [bold: true]
-                    text " created"
+                    text " of the ${GrailsNameUtils.getNaturalName(element.class.name)}."
                 }
             } else if (getChanges(element, ChangeType.NEW_ELEMENT_CREATED)) {
                 requestRun()
-                paragraph "New ${GrailsNameUtils.getNaturalName(element.class.name)} created"
+                paragraph "This is a new ${GrailsNameUtils.getNaturalName(element.class.name)}"
             } else if (getChanges(element, ChangeType.ELEMENT_DEPRECATED)) {
                 requestRun()
                 paragraph {
-                    text "${GrailsNameUtils.getNaturalName(element.class.name)} has been "
-                    text "deprecated", font: [bold: true]
+                    text "This ${GrailsNameUtils.getNaturalName(element.class.name)} has been "
+                    text " deprecated", font: [bold: true]
                 }
             }
 
@@ -206,27 +256,28 @@ class ChangelogGenerator {
         builder.whilePaused {
             builder.heading3 configuration.changesSummaryHeading
 
-            for (CatalogueElement element in (configuration.incoming ? configuration.element.getIncomingRelationsByType(configuration.type) : configuration.element.getOutgoingRelationsByType(configuration.type))) {
-                builder.whilePaused {
-                    if (configuration.deep) {
-                        printPropertiesChanges(builder, element, 4)
-                    } else {
-                        builder.heading4 "$element.name ($element.combinedVersion, $element.status)", ref: "${element.getId()}"
-                    }
+            Map<String, String> titleRows = new TreeMap<String, String>()
+            Map<String, Map<String, List<String>>> metadataRows = new TreeMap<String, Map<String, List<String>>>()
+
+            builder.whilePaused {
+                for (CatalogueElement element in (configuration.incoming ? configuration.element.getIncomingRelationsByType(configuration.type) : configuration.element.getOutgoingRelationsByType(configuration.type))) {
+                    String heading = "$element.name ($element.combinedVersion, $element.status)"
+
                     Set<Change> changes = byDestinationsAndSources.removeAll("${configuration.incoming ? 'in' : 'out'}:${configuration.type.name}:${element.getLatestVersionId() ?: element.getId()}".toString())
                     if (changes) {
                         builder.requestRun()
 
                         if (changes.any { it.type == ChangeType.RELATIONSHIP_CREATED }) {
-                            builder.paragraph configuration.newRelationshipNote
+                            titleRows[heading] = configuration.newRelationshipNote
                         }
                         Set<Change> metadataChanges = changes.findAll {
                             it.type in [ChangeType.RELATIONSHIP_METADATA_CREATED, ChangeType.RELATIONSHIP_METADATA_DELETED, ChangeType.RELATIONSHIP_METADATA_UPDATED]
                         }
                         if (metadataChanges) {
-                            builder.paragraph "Updated Relationship Metadata", font: [bold: true]
 
-                            Map<String, List<String>> rows = new TreeMap<String, List<String>>().withDefault { ['', ''] }
+                            Map<String, List<String>> rows = new TreeMap<String, List<String>>().withDefault {
+                                ['', '']
+                            }
 
                             for (Change change in metadataChanges) {
                                 String propName = getRelationshipMetadataName(change) ?: ''
@@ -236,34 +287,89 @@ class ChangelogGenerator {
                                 rows[propName] = vals
                             }
 
-                            printChangesTable builder, rows
+                            metadataRows[heading] = rows
 
+                        }
+                    } else if (configuration.deep) {
+                        String update = getUpdateText(element)
+                        if (update) {
+                            titleRows[heading] = "$update\n (See following)"
+                        }
+                    }
+                }
+
+
+                Set<String> otherHierarchyChanges = byDestinationsAndSources.keySet().findAll { it.startsWith("${configuration.incoming ? 'in' : 'out'}:${configuration.type.name}:") }
+
+                for (String key in otherHierarchyChanges) {
+                    Set<Change> rest = byDestinationsAndSources.removeAll(key)
+                    Change deleteChange = new ArrayList<Change>(rest).reverse().find { it.type == ChangeType.RELATIONSHIP_DELETED}
+
+                    if (!deleteChange) {
+                        continue
+                    }
+
+                    builder.requestRun()
+
+                    def value = DefaultAuditor.readValue(deleteChange.oldValue)
+
+                    String heading = "${value.destination.name} (${value.destination.latestVersionId}.${value.destination.versionNumber}, $value.destination.status)"
+
+                    if (configuration.incoming) {
+                        heading = "${value.source.name} (${value.source.latestVersionId}.${value.source.versionNumber}, $value.source.status)"
+                    }
+
+                    titleRows[heading] = configuration.removedRelationshipNote
+                }
+
+                builder.table(border: [size: 1, color: '#D2D2D2'], columns: [1] * 10, font: [size: 10]) {
+                    for (Map.Entry<String, String> entry in titleRows) {
+                        Map<String, List<String>> metadataChanges = metadataRows[entry.key]
+                        if (entry.value || metadataChanges) {
+                            String background = "#FFFFFF"
+
+                            if (entry.value == configuration.newRelationshipNote) {
+                                background = "#DFF0D8"
+                            } else if (entry.value == configuration.removedRelationshipNote) {
+                                background = '#F2DEDE'
+                            }
+                            row(background: background) {
+                                cell entry.key, colspan: 5, font: [bold: true, size: 12]
+                                cell(entry.value ?: 'Metadata Updated', colspan: 5)
+                            }
+                        }
+                        if (metadataChanges) {
+                            row(background: '#F2F2F2') {
+                                cell 'Updated Metadata', colspan: 2,style: 'headerCell', font: [size: 10]
+                                cell 'Old Value', colspan: 4, style: 'headerCell'
+                                cell 'New Value', colspan: 4, style: 'headerCell'
+                            }
+                            for (Map.Entry<String, List<String>> metadataEntry in metadataChanges) {
+                                String background = "#FFFFFF"
+
+                                if (metadataEntry.value[0] && !metadataEntry.value[1]) {
+                                    background = "#F2DEDE"
+                                } else if (!metadataEntry.value[0] && metadataEntry.value[1]) {
+                                    background = '#DFF0D8'
+                                }
+                                row(background: background) {
+                                    cell metadataEntry.key, colspan: 2
+                                    cell metadataEntry.value[0], colspan: 4
+                                    cell metadataEntry.value[1], colspan: 4
+                                }
+                            }
                         }
                     }
                 }
             }
-        }
-        builder.whilePaused {
-            Set<String> otherHierarchyChanges = byDestinationsAndSources.keySet().findAll { it.startsWith("${configuration.incoming ? 'in' : 'out'}:${configuration.type.name}:") }
 
-            for (String key in otherHierarchyChanges) {
-                Set<Change> rest = byDestinationsAndSources.removeAll(key)
-                Change deleteChange = new ArrayList<Change>(rest).reverse().find { it.type == ChangeType.RELATIONSHIP_DELETED}
 
-                if (!deleteChange) {
-                    continue
+            if (configuration.deep) {
+                for (CatalogueElement element in (configuration.incoming ? configuration.element.getIncomingRelationsByType(configuration.type) : configuration.element.getOutgoingRelationsByType(configuration.type))) {
+                    builder.whilePaused {
+                        printPropertiesChanges(builder, element, 4)
+                    }
                 }
-
-                builder.requestRun()
-
-                def value = DefaultAuditor.readValue(deleteChange.oldValue)
-
-                if (configuration.incoming) {
-                    builder.heading4 "${value.destination.name} (${value.destination.latestVersionId}.${value.destination.versionNumber}, $value.destination.status)"
-                } else {
-                    builder.heading4 "${value.source.name} (${value.source.latestVersionId}.${value.source.versionNumber}, $value.source.status)"
-                }
-                builder.paragraph configuration.removedRelationshipNote
             }
         }
     }
