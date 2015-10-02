@@ -138,7 +138,12 @@ class Delayable<T>  {
 
     void whilePaused(@ClosureParams(value = FromString, options = 'Delayable<T>') Closure closure) {
         pauseAndRecord()
-        closure this
+        try {
+            closure this
+        } catch(Exception e) {
+            reset(true)
+            return
+        }
         runIfRequested()
     }
 

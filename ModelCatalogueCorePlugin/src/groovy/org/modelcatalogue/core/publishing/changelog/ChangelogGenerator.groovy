@@ -13,6 +13,8 @@ import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.audit.Change
 import org.modelcatalogue.core.audit.ChangeType
 import org.modelcatalogue.core.audit.DefaultAuditor
+import org.modelcatalogue.core.comments.Comment
+import org.modelcatalogue.core.comments.CommentsService
 import org.modelcatalogue.core.util.delayable.Delayable
 import org.modelcatalogue.core.util.docx.ModelCatalogueWordDocumentBuilder
 
@@ -21,15 +23,25 @@ import java.text.SimpleDateFormat
 @Log4j
 class ChangelogGenerator {
 
-    final AuditService auditService
-    final ModelService modelService
+    private final AuditService auditService
+    private final ModelService modelService
+    private final CommentsService commentsService
+
+    private final Map<Long, List<Comment>> commentsCache = [:]
 
     ChangelogGenerator(AuditService auditService, ModelService modelService) {
         this.auditService = auditService
         this.modelService = modelService
+        try {
+            commentsService = Holders.applicationContext.getBean(CommentsService)
+        } catch (Exception ignored) {
+            commentsService = null
+            log.info "Comments are not enabled for this catalogue."
+        }
     }
 
     void generateChangelog(Model model, OutputStream outputStream) {
+        log.info "Generating changelog for model $model.name ($model.combinedVersion)"
         DocumentBuilder builder = new ModelCatalogueWordDocumentBuilder(outputStream)
 
         def customTemplate = {
@@ -167,6 +179,32 @@ class ChangelogGenerator {
                     text " deprecated", font: [bold: true]
                 }
             }
+
+
+            if (commentsService?.forumEnabled) {
+                builder.whilePaused {
+                    builder.heading3 'Comments'
+
+                    List<Comment> comments = commentsCache[element.getId()]
+
+                    if (comments == null) {
+                        comments = commentsService.getComments(element)
+                        commentsCache[element.getId()] = comments
+                    }
+
+                    if (comments) {
+                        // first comment is always a description and link
+                        for (Comment comment in comments.tail()) {
+                            builder.requestRun()
+                            builder.with {
+                                paragraph "${comment.username} (${SimpleDateFormat.dateTimeInstance.format(comment.created)})" , font: [bold: true]
+                                paragraph comment.text
+                            }
+                        }
+                    }
+                }
+            }
+
 
             List<Change> changedProperties = getChanges(element, ChangeType.PROPERTY_CHANGED, ChangeType.METADATA_CREATED, ChangeType.METADATA_DELETED, ChangeType.METADATA_UPDATED)
 
@@ -460,7 +498,7 @@ class ChangelogGenerator {
     }
 
     private Collection<Model> getModelsForRootModel(Model model) {
-        modelService.getSubModels(model).items.sort { it.name }
+        modelService.getSubModels(model).items
     }
 
     private static String valueForPrint(String propertyName, String storedValue) {

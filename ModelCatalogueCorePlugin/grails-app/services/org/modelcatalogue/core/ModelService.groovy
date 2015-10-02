@@ -129,8 +129,8 @@ class ModelService {
     }
 
     ListWithTotalAndType<Model> getSubModels(Model model) {
-        List<Model> models = listChildren(model)
-        new ListCountAndType<Model>(count: models.size(), list: models, itemType: Model)
+        Map<String, Model> models = collectChildren(3, model, new TreeMap<String, Model>())
+        new ListCountAndType<Model>(count: models.size(), list: models.values().toList(), itemType: Model)
 
     }
 
@@ -143,14 +143,24 @@ class ModelService {
     }
 
 
-    protected List<Model> listChildren(Model model, results = []){
-            if (model && !results.contains(model)) {
-                    results += model
-                    model.parentOf?.each { child ->
-                        results += listChildren(child, results)
-                    }
+    protected Map<String, Model> collectChildren(int maxLevel, Model model, Map<String, Model> results) {
+        log.info "Collecting children for $model.name ($model.combinedVersion)"
+        String key = "$model.name $model.combinedVersion".toString()
+        if (model && !results.containsKey(key)) {
+            results[key] = model
+            if (maxLevel > 0) {
+                model.parentOf?.each { Model child ->
+                    collectChildren(maxLevel - 1, child, results)
+                }
+            } else {
+                int count = model.countParentOf()
+                if (count > 0) {
+                    log.info "Reached max level for travelsal at $model.name ($model.combinedVersion) with $count child models left"
+                }
             }
-            results.unique()
+
+        }
+        results
     }
 
 

@@ -60,6 +60,8 @@ grails.project.dependency.resolution = {
 
         compile 'com.craigburke.document:word:0.4.10-fix31'
 
+        compile 'org.jsoup:jsoup:1.8.3'
+
         test 'xmlunit:xmlunit:1.6'
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
 		 

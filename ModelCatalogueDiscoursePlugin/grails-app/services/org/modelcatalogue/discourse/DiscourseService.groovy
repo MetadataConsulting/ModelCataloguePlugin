@@ -1,15 +1,21 @@
 package org.modelcatalogue.discourse
 
 import grails.util.GrailsNameUtils
+import org.jsoup.Jsoup
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.LogoutListener
+import org.modelcatalogue.core.comments.Comment
+import org.modelcatalogue.core.comments.CommentsService
 import org.modelcatalogue.core.security.User
 
+import java.text.SimpleDateFormat
 
-class DiscourseService implements LogoutListener {
+class DiscourseService implements LogoutListener, CommentsService {
 
     static transactional = false
+
+    private static final SimpleDateFormat JSON_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX")
 
     def grailsApplication
     def modelCatalogueSecurityService
@@ -66,6 +72,23 @@ class DiscourseService implements LogoutListener {
         }
 
         new CategoriesForClassifications(discourseCategoryName: name, classificationId: classificationId).save(flush: true).discourseCategoryName
+    }
+
+    @Override
+    List<Comment> getComments(CatalogueElement element) {
+        return discourse.topics.getTopic(findOrCreateDiscourseTopic(element.getId()))?.data?.post_stream?.posts?.collect {
+            new Comment(
+                    username: it.display_username,
+                    text: Jsoup.parse(it.cooked).text(),
+                    created: JSON_FORMAT.parse(it.created_at),
+                    original: it
+            )
+        } ?: []
+    }
+
+    @Override
+    boolean isForumEnabled() {
+        return discourseEnabled
     }
 
     Long findOrCreateDiscourseTopic(Long catalogueElementId) {
