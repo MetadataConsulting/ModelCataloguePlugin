@@ -159,7 +159,7 @@
                     <div id="jserrors"></div>
                     <div class="jumbotron">
                         <div>
-                            <div class="text-center"><span class="fa fa-fw fa-5x fa-spinner fa-pulse"></span></div>
+                            <div class="text-center"><span class="fa fa-fw fa-5x fa-spin fa-spinner"></span></div>
                         </div>
                     </div>
                     <div class="row">

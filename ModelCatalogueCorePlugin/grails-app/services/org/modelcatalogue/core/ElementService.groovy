@@ -20,19 +20,19 @@ class ElementService implements Publisher<CatalogueElement> {
     def auditService
 
     List<CatalogueElement> list(Map params = [:]) {
-        CatalogueElement.findAllByStatus(getStatusFromParams(params), params)
+        CatalogueElement.findAllByStatusInList(getStatusFromParams(params), params)
     }
 
     public <E extends CatalogueElement> List<E> list(params = [:], Class<E> resource) {
-        resource.findAllByStatus(getStatusFromParams(params), params)
+        resource.findAllByStatusInList(getStatusFromParams(params), params)
     }
 
     Long count(params = [:]) {
-        CatalogueElement.countByStatus(getStatusFromParams(params))
+        CatalogueElement.countByStatusInList(getStatusFromParams(params))
     }
 
     public <E extends CatalogueElement> Long count(params = [:], Class<E> resource) {
-        resource.countByStatus(getStatusFromParams(params))
+        resource.countByStatusInList(getStatusFromParams(params))
     }
 
 
@@ -107,14 +107,14 @@ class ElementService implements Publisher<CatalogueElement> {
         }
     }
 
-    static ElementStatus getStatusFromParams(params) {
-        if (!params.status) {
-            return ElementStatus.FINALIZED
+    static List<ElementStatus> getStatusFromParams(params) {
+        if (!params.status || params.status == 'active') {
+            return [ElementStatus.FINALIZED, ElementStatus.DRAFT]
         }
         if (params.status instanceof ElementStatus) {
-            return params.status
+            return [params.status]
         }
-        return ElementStatus.valueOf(params.status.toString().toUpperCase())
+        return [ElementStatus.valueOf(params.status.toString().toUpperCase())]
     }
 
 

@@ -112,7 +112,6 @@ angular.module('mc.core.ui.bs.dataModelWIzard', ['mc.util.messages', 'mc.util.ui
           $scope.openElementInNewWindow = (element) ->
             url = $state.href('mc.resource.show', {resource: names.getPropertyNameFromType(element.elementType), id: element.id})
             $window.open(url,'_blank')
-            return
 
 
           isNameUnique = (name) ->
@@ -152,9 +151,8 @@ angular.module('mc.core.ui.bs.dataModelWIzard', ['mc.util.messages', 'mc.util.ui
               promise = promise.then ->
                 catalogueElementResource('dataModel').save($scope.classification)
 
-              angular.forEach $scope.imports, (element, i) ->
+              angular.forEach $scope.imports, (element) ->
                 promise = promise.then (classification) ->
-                  console.log classification
                   execAfter50.submit ->
                     classification.imports.add element.element
                     classification
@@ -179,10 +177,9 @@ angular.module('mc.core.ui.bs.dataModelWIzard', ['mc.util.messages', 'mc.util.ui
           $scope.select = (step) ->
             return if step != 'classification' and not $scope.classification.name
             $scope.step = step
-            return
 
           $scope.next = ->
-            return if not $scope.classification.name
+            return undefined if not $scope.classification.name
             for step, i in $scope.steps
               if step == $scope.step and i < $scope.steps.length - 1
                 nextStep = $scope.steps[i + 1]
@@ -193,7 +190,7 @@ angular.module('mc.core.ui.bs.dataModelWIzard', ['mc.util.messages', 'mc.util.ui
                   break
 
           $scope.previous = ->
-            return if not $scope.classification.name
+            return undefined if not $scope.classification.name
             for step, i in $scope.steps
               if step == $scope.step and i != 0
                 $scope.step = $scope.steps[i - 1]

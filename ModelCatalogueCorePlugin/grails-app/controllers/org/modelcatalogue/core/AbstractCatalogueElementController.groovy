@@ -420,7 +420,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
 
         respond dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
-            eq 'status', ElementService.getStatusFromParams(params)
+            'in' 'status', ElementService.getStatusFromParams(params)
         }, overridableDataModelFilter)
     }
 

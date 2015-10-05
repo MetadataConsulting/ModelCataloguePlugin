@@ -5,7 +5,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
       element:  '='
       descend:  '='
       repeat:   '='
-      rootId:   '='
+      treeview: '='
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementTreeviewItem.html'
 
@@ -160,11 +160,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
       # event broadcasters and listeners
       $scope.select = (element) ->
-        $rootScope.$broadcast 'treeviewElementSelected', element, $scope.rootId
-
-      $scope.$on 'treeviewElementSelected', (event, element, id) ->
-        return if id and $scope.rootId and id != $scope.rootId
-        $scope.element.$$active = $scope.element.link == element.link
+        $scope.treeview.select(element)
 
       reloadChildrenOnChange = (_, result) ->
         if result and result.relation and result.element and result.type and result.direction

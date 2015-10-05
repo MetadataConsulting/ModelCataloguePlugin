@@ -107,7 +107,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     getLastModelsKey = (status = $stateParams.status)->
       "#{status ? 'finalized'}"
 
-    if $scope.resource == 'dataClass' || $scope.resource == 'model'
+    if $scope.resource == 'dataClass' || $scope.resource == 'model' || $scope.resource == 'dataModel'
       if $rootScope.$$lastModels and $rootScope.$$lastModels[getLastModelsKey()]
         if $rootScope.$$lastModels[getLastModelsKey()].element
           $rootScope.$$lastModels[getLastModelsKey()].element.refresh().then (element) ->
@@ -125,8 +125,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         $scope.element                = if list.size > 0 then list.list[0]
         $scope.property               =  'contains'
 
-      $scope.$on 'treeviewElementSelected', (event, element, id) ->
-        return unless id is 'model-treeview'
+      $scope.onTreeviewSelected = (element) ->
         $scope.element                  = element
         $scope.elementSelectedInTree    = true
         $rootScope.$$lastModels ?= {}
@@ -709,7 +708,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       <infinite-list  ng-if="$stateParams.display == 'grid'"  list="list"></infinite-list>
       <infinite-table ng-if="$stateParams.display != 'grid'"  list="list" columns="columns" ></infinite-table>
     </div>
-    <div ng-if="(resource == 'dataClass' || resource == 'dataClass')&amp;&amp; $stateParams.display == undefined">
+    <div ng-if="(resource == 'dataClass' || resource == 'model' || resource == 'xdataModel')&amp;&amp; $stateParams.display == undefined">
       <div class="row">
         <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 split-view-left" resizable="{'handles': 'e', 'mirror': '.split-view-right', 'maxWidth': 1000, 'minWidth': 200, 'windowWidthCorrection': 91}">
           <div class="split-view-content">
@@ -719,9 +718,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
               </span>
               <div class="col-md-12">
                 <h3>
-                    <small ng-class="catalogue.getIcon('dataClass')"></small>&nbsp;<span ng-show="$stateParams.status">{{natural($stateParams.status)}}</span> Data Classes
+                    <small ng-class="catalogue.getIcon('dataClass')"></small>&nbsp;<span ng-show="$stateParams.status">{{natural($stateParams.status)}}</span> {{ resource == 'dataClass' ? 'Data Classes' : 'Data Models' }}
                 </h3>
-                <catalogue-element-treeview list="list" descend="'parentOf'" id="model-treeview"></catalogue-element-treeview>
+                <catalogue-element-treeview list="list" descend="resource == 'xdataModel' ? 'content' : 'parentOf'" id="model-treeview" on-select="onTreeviewSelected($element)"></catalogue-element-treeview>
               </div>
             </div>
           </div>

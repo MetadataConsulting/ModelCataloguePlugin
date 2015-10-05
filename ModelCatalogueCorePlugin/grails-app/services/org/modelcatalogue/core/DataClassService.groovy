@@ -22,8 +22,8 @@ class DataClassService {
             return getTopLevelDataClasses(DataModelFilter.excludes(DataModel.list()), params)
         }
 
-        RelationshipType hierarchy      = RelationshipType.hierarchyType
-        ElementStatus status            = ElementService.getStatusFromParams(params)
+        RelationshipType hierarchy = RelationshipType.hierarchyType
+        List<ElementStatus> status = ElementService.getStatusFromParams(params)
         RelationshipType declaration = RelationshipType.declarationType
 
 
@@ -32,7 +32,7 @@ class DataClassService {
             return Lists.fromQuery(params, DataClass, """
                 select distinct m
                 from DataClass as m
-                where m.status = :status
+                where m.status in :status
                     and m.id not in (
                         select distinct r.destination.id
                         from Relationship r
@@ -50,7 +50,7 @@ class DataClassService {
             ""","""
                 select count(m.id)
                 from DataClass as m
-                where m.status = :status
+                where m.status in :status
                     and m.id not in (
                         select distinct r.destination.id
                         from Relationship r
@@ -71,7 +71,7 @@ class DataClassService {
             return Lists.fromQuery(params, DataClass, """
                 select distinct m
                 from DataClass as m
-                where m.status = :status
+                where m.status in :status
                     and m.id not in (
                         select distinct r.destination.id
                         from Relationship r
@@ -89,7 +89,7 @@ class DataClassService {
             ""","""
                 select count(m.id)
                 from DataClass as m
-                where m.status = :status
+                where m.status in :status
                     and m.id not in (
                         select distinct r.destination.id
                         from Relationship r
@@ -109,7 +109,7 @@ class DataClassService {
             return Lists.fromQuery(params, DataClass, """
                 select distinct m
                 from DataClass as m
-                where m.status = :status
+                where m.status in :status
                     and m.id not in (
                         select distinct r.destination.id
                         from Relationship r
@@ -134,7 +134,7 @@ class DataClassService {
             ""","""
                 select count(m.id)
                 from DataClass as m
-                where m.status = :status
+                where m.status in :status
                     and m.id not in (
                         select distinct r.destination.id
                         from Relationship r
@@ -161,7 +161,7 @@ class DataClassService {
             return Lists.fromQuery(params, DataClass, """
                 select distinct m
                 from DataClass as m join m.incomingRelationships as rel
-                where m.status = :status
+                where m.status in :status
                     and m.id not in (
                         select distinct r.destination.id
                         from Relationship r
@@ -180,7 +180,7 @@ class DataClassService {
             ""","""
                 select count(m.id)
                 from DataClass as m join m.incomingRelationships as rel
-                where m.status = :status
+                where m.status in :status
                     and m.id not in (
                         select distinct r.destination.id
                         from Relationship r
@@ -200,13 +200,13 @@ class DataClassService {
         Lists.fromQuery params, DataClass, """
             select distinct m
             from DataClass m
-            where m.status = :status and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
+            where m.status in :status and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
             group by m.name, m.id
             order by m.name
         ""","""
             select count(m.id)
             from DataClass m
-            where m.status = :status and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
+            where m.status in :status and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
         """, [type: hierarchy, status: status]
     }
 
