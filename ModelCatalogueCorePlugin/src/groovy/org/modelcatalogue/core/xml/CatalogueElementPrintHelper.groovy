@@ -39,7 +39,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
                 return
             }
             context.currentClassification = element
-            context.typesUsed << 'classification'
+            context.typesUsed << 'declaration'
         }
 
         if (context.wasPrinted(element)) {

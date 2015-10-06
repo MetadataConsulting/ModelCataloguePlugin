@@ -6,12 +6,12 @@ import org.modelcatalogue.core.api.ElementStatus
 class CatalogueElementControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     def setupSpec(){
-        totalCount = resource.countByStatus(ElementStatus.FINALIZED)
+        totalCount = resource.countByStatusInList([ElementStatus.FINALIZED, ElementStatus.DRAFT])
     }
 
     @Override
     protected Long getResourceCount() {
-        resource.countByStatus(ElementStatus.FINALIZED)
+        resource.countByStatusInList([ElementStatus.FINALIZED, ElementStatus.DRAFT])
     }
 
     @Override

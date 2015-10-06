@@ -16,17 +16,17 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
     def relationshipService
     def mappingService
 
-    def "return only finalized elements by default"() {
+    def "return finalized and draft elements by default"() {
         expect:
-        elementService.list().size()                == CatalogueElement.countByStatus(ElementStatus.FINALIZED)
+        elementService.list().size()                == CatalogueElement.countByStatusInList([ElementStatus.FINALIZED, ElementStatus.DRAFT])
         elementService.list(max: 10).size()         == 10
-        elementService.list(DataElement).size()     == DataElement.countByStatus(ElementStatus.FINALIZED)
-        elementService.list(DataClass).size()       == DataClass.countByStatus(ElementStatus.FINALIZED)
-        elementService.list(Asset).size()           == Asset.countByStatus(ElementStatus.FINALIZED)
-        elementService.count()                      == CatalogueElement.countByStatus(ElementStatus.FINALIZED)
-        elementService.count(DataElement)           == DataElement.countByStatus(ElementStatus.FINALIZED)
-        elementService.count(DataClass)             == DataClass.countByStatus(ElementStatus.FINALIZED)
-        elementService.count(Asset)                 == Asset.countByStatus(ElementStatus.FINALIZED)
+        elementService.list(DataElement).size()     == DataElement.countByStatusInList([ElementStatus.FINALIZED, ElementStatus.DRAFT])
+        elementService.list(DataClass).size()       == DataClass.countByStatusInList([ElementStatus.FINALIZED, ElementStatus.DRAFT])
+        elementService.list(Asset).size()           == Asset.countByStatusInList([ElementStatus.FINALIZED, ElementStatus.DRAFT])
+        elementService.count()                      == CatalogueElement.countByStatusInList([ElementStatus.FINALIZED, ElementStatus.DRAFT])
+        elementService.count(DataElement)           == DataElement.countByStatusInList([ElementStatus.FINALIZED, ElementStatus.DRAFT])
+        elementService.count(DataClass)             == DataClass.countByStatusInList([ElementStatus.FINALIZED, ElementStatus.DRAFT])
+        elementService.count(Asset)                 == Asset.countByStatusInList([ElementStatus.FINALIZED, ElementStatus.DRAFT])
     }
 
     def "can supply status as parameter"() {
