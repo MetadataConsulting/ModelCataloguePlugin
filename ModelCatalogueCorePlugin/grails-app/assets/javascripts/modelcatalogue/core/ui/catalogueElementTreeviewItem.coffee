@@ -146,7 +146,6 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
         unless $scope.element.$$children.length == 0 and $scope.element.$$numberOfChildren > 0
           $scope.element.$$collapsed = false
-          $scope.select($scope.element)
           return
 
         $scope.element.$$loadChildren()
@@ -160,6 +159,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
       # event broadcasters and listeners
       $scope.select = (element) ->
+        $scope.collapseOrExpand()
         $scope.treeview.select(element)
 
       reloadChildrenOnChange = (_, result) ->

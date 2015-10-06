@@ -9,7 +9,7 @@ cetiModule.run [ '$templateCache', ($templateCache) ->
         <span class="badge pull-right" ng-if="currentDescend &amp;&amp; element.$$numberOfChildren">{{element.$$numberOfChildren}}</span>
         <span class="catalogue-element-treeview-labels">
           <span ng-if="!element.elementType"><a class="catalogue-element-treeview-icon btn btn-link"><span class="fa fa-fw fa-ban"></span></a> No Data</span>
-          <a ng-if="currentDescend &amp;&amp; element.elementType" class="catalogue-element-treeview-icon  btn btn-link" ng-click="collapseOrExpand(element)">
+          <a ng-if="currentDescend &amp;&amp; element.elementType" class="catalogue-element-treeview-icon  btn btn-link" ng-click="select(element)">
             <span class="fa fa-fw fa-folder"  ng-if="element.$$collapsed &amp;&amp; element.$$numberOfChildren &amp;&amp; !element.$$loadingChildren"></span>
             <span class="fa fa-fw fa-folder-open"   ng-if="!element.$$collapsed &amp;&amp; element.$$numberOfChildren &amp;&amp; !element.$$loadingChildren"></span>
             <span ng-class="element.getIcon()"              ng-if="!element.$$numberOfChildren"></span>
