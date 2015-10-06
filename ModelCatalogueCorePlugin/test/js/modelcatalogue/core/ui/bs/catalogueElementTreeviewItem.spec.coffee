@@ -13,7 +13,7 @@ describe "mc.core.ui.catalogueElementTreeviewItem", ->
 
     $rootScope.element = catEl
     $rootScope.descend = ['outgoingRelationships']
-    $rootScope.treevew =
+    $rootScope.treeview =
       select: (element) -> console.log element
 
     element = $compile('''
