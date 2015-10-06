@@ -210,9 +210,9 @@ class DataClassService {
         """, [type: hierarchy, status: status]
     }
 
-    ListWithTotalAndType<DataClass> getInnerClasses(DataClass model) {
-        List<DataClass> models = listChildren(model)
-        new ListCountAndType<DataClass>(count: models.size(), list: models, itemType: DataClass)
+    ListWithTotalAndType<DataClass> getInnerClasses(DataClass dataClass) {
+        Map<String, DataClass> dataClasses = collectChildren(3, dataClass, new TreeMap<String, DataClass>())
+        new ListCountAndType<DataClass>(count: dataClasses.size(), list: dataClasses.values().toList(), itemType: DataClass)
 
     }
 
@@ -225,15 +225,25 @@ class DataClassService {
     }
 
 
-    protected List<DataClass> listChildren(DataClass model, results = []){
-            if (model && !results.contains(model)) {
-                    results += model
-                    model.parentOf?.each { child ->
-                        results += listChildren(child, results)
-                    }
-            }
-            results.unique()
-    }
 
+    protected Map<String, DataClass> collectChildren(int maxLevel, DataClass dataClass, Map<String, DataClass> results) {
+        log.info "Collecting inner classes for $dataClass.name ($dataClass.combinedVersion)"
+        String key = "$dataClass.name $dataClass.combinedVersion".toString()
+        if (dataClass && !results.containsKey(key)) {
+            results[key] = dataClass
+            if (maxLevel > 0) {
+                dataClass.parentOf?.each { DataClass child ->
+                    collectChildren(maxLevel - 1, child, results)
+                }
+            } else {
+                int count = dataClass.countParentOf()
+                if (count > 0) {
+                    log.info "Reached max level for travelsal at $dataClass.name ($dataClass.combinedVersion) with $count inner data classes left"
+                }
+            }
+
+        }
+        results
+    }
 
 }

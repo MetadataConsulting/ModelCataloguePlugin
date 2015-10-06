@@ -27,7 +27,6 @@ grails.project.dependency.resolution = {
         grailsCentral()
         mavenCentral()
         // mavenLocal()
-        mavenRepo "http://dl.bintray.com/musketyr/document-builder"
         // uncomment the below to enable remote dependency resolution
         // from public Maven repositories
         //mavenRepo "http://repository.codehaus.org"
@@ -37,9 +36,6 @@ grails.project.dependency.resolution = {
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // runtime 'mysql:mysql-connector-java:5.1.27'
-        //----- Jasper Reports specific dependencies
-        //from the bintray
-        compile 'com.craigburke.document:word:0.4.10-fix31'
     }
 
     plugins {

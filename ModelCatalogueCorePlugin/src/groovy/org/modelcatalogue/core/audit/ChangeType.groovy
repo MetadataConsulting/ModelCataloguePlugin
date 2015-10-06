@@ -5,9 +5,6 @@ import org.apache.log4j.Logger
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.FriendlyErrors
 
-/**
- * Created by ladin on 17.02.15.
- */
 enum ChangeType {
 
     NEW_ELEMENT_CREATED  {

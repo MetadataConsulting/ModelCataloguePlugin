@@ -53,7 +53,7 @@ class Change {
 
     @Override
     String toString() {
-        "Change[id: $id, change: $changedId, parent: $parentId, latest: $latestVersionId, author: $authorId, type: $type, property: $property, newValue: $newValue, oldValue: $oldValue, undone: $undone, otherSide: $otherSide]"
+        "Change[id: $id, changed element: $changedId ($latestVersionId), parent change: $parentId, author: $authorId, type: $type, property: $property, newValue: $newValue, oldValue: $oldValue, undone: $undone, otherSide: $otherSide]"
     }
 
     boolean undo() {

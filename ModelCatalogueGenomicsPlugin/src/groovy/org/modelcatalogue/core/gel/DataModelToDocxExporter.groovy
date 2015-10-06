@@ -13,6 +13,7 @@ import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.util.docx.ModelCatalogueWordDocumentBuilder
 
 import java.text.SimpleDateFormat
 
@@ -48,7 +49,7 @@ class DataModelToDocxExporter {
 
         log.info "Exporting dataModel $dataModel to Word Document"
 
-        DocumentBuilder builder = new GelWordDocumentBuilder(outputStream)
+        DocumentBuilder builder = new ModelCatalogueWordDocumentBuilder(outputStream)
 
         def customTemplate = {
             'document' font: [family: 'Calibri'], margin: [left: 20, right: 10]
