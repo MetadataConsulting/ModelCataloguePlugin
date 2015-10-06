@@ -72,7 +72,7 @@ class DataDefinitionLanguage {
             }
             elements = criteria.list(sort: 'versionNumber', order: 'desc')
             element = elements ? elements[0] : null
-            if (!element.instanceOf(Classification)) {
+            if (!element?.instanceOf(Classification)) {
                 element = null
             }
         }

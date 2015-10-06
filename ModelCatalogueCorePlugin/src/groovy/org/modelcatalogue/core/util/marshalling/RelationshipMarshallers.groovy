@@ -24,6 +24,7 @@ class RelationshipMarshallers extends AbstractMarshaller {
                 destination: CatalogueElementMarshaller.minimalCatalogueElementJSON(rel.destination),
                 type: rel.relationshipType.info,
                 archived: rel.archived,
+                inherited: rel.inherited,
                 ext: OrderedMap.toJsonMap(rel.ext),
                 elementType: Relationship.name,
                 classification: CatalogueElementMarshaller.minimalCatalogueElementJSON(rel.classification)
