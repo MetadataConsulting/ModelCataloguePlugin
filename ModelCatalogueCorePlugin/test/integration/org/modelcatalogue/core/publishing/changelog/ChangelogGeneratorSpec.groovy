@@ -52,16 +52,6 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
         Random random = new Random()
 
 
-        Classification vdClassificaiton = new Classification(name: "Classification ${System.currentTimeMillis()}").save(failOnError: true)
-        for (int i in 1..3) {
-            ValueDomain domain = new ValueDomain(name: "Test Value Domain ${i}").save(failOnError: true)
-            vdClassificaiton.addToClassifies domain
-        }
-
-        List<ValueDomain> domains = classificationService.classified(ValueDomain, ClassificationFilter.includes(vdClassificaiton)).list()
-
-
-
         builder.build {
             classification(name: 'C4C') {
                 description "This is a classification for testing ClassificationToDocxExporter"
@@ -78,13 +68,9 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
 
                             for (int j in 1..3) {
                                 dataElement name: "Model $i Data Element $j", {
-                                    description "This is a description for Model $i Data Element $j"
-                                    ValueDomain domain = domains[random.nextInt(domains.size())]
-                                    while (!domain.classifications) {
-                                        domain = domains[random.nextInt(domains.size())]
-                                    }
-                                    valueDomain name: domain.name, classification: domain.classifications.first().name, {
-                                        dataType name: "$domain.name Data Type", classification: domain.classifications.first().name, enumerations: (1..(i * j)).collectEntries { ["$it", "value of $it"] }
+
+                                    valueDomain name: "Test Value Domain ${j}", {
+                                        dataType name: "Test Value Domain ${i} Data Type", enumerations: (1..(i * j)).collectEntries { ["$it", "value of $it"] }
                                     }
                                     relationship {
                                         ext 'Min Occurs': '0', 'Max Occurs': "$j"
@@ -98,11 +84,7 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
                                     for (int k in 1..3) {
                                         dataElement name: "Model $i Child Model $j Data Element $k", {
                                             description "This is a description for Model $i Child Model $j Data Element $k"
-                                            ValueDomain domain = domains[random.nextInt(domains.size())]
-                                            while (!domain.classifications) {
-                                                domain = domains[random.nextInt(domains.size())]
-                                            }
-                                            valueDomain name: domain.name, classification: domain.classifications.first().name
+                                            valueDomain name: "Test Value Domain ${k}"
                                         }
                                     }
                                 }
