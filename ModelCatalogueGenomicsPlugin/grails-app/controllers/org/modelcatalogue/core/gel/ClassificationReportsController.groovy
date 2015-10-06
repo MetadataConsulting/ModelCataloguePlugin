@@ -10,7 +10,7 @@ import org.modelcatalogue.core.AssetService
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.SecurityService
-import org.modelcatalogue.core.api.ElementStatus;
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.audit.AuditService
 /**
  * Various reports generations as an asset. 
@@ -28,22 +28,20 @@ class ClassificationReportsController {
     def index() { }
     
     def gereportDoc() {
-        DataModel classification = DataModel.get(params.id)
-        def models = getDataClassesForDataModels(params.id as Long)
-        
+        DataModel dataModel = DataModel.get(params.id)
 
-        def assetId=storeAssetAsDocx(classification)
+        def assetId=storeAssetAsDocx(dataModel)
 
         response.setHeader("X-Asset-ID",assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
     }
 
 
-    private def storeAssetAsDocx(DataModel classification){
+    private def storeAssetAsDocx(DataModel dataModel){
         Asset asset = new Asset(
-                name: "$classification.name report as MS Word Document",
-                originalFileName: "${classification.name}-${classification.status}-${classification.version}.docx",
-                description: "Your classification report  will be available in this asset soon. Use Refresh action to reload",
+                name: "$dataModel.name report as MS Word Document",
+                originalFileName: "${dataModel.name}-${dataModel.status}-${dataModel.version}.docx",
+                description: "Your data model report  will be available in this asset soon. Use Refresh action to reload",
                 status: ElementStatus.PENDING,
                 contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                 size: 0
@@ -53,7 +51,7 @@ class ClassificationReportsController {
 
         Long id = asset.id
         Long authorId = modelCatalogueSecurityService.currentUser?.id
-        Long classificationId = classification.id
+        Long dataModelId = dataModel.id
 
         executorService.submit {
             auditService.withDefaultAuthorId(authorId) {
@@ -61,7 +59,7 @@ class ClassificationReportsController {
                 try {
                     //do the hard work
                     assetService.storeAssetWithSteam(updated, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",) { OutputStream out ->
-                        new DataModelToDocxExporter(DataModel.get(classificationId)).export(out)
+                        new DataModelToDocxExporter(DataModel.get(dataModelId)).export(out)
                     }
 
                    
@@ -97,7 +95,7 @@ class ClassificationReportsController {
         Asset asset = new Asset(
                 name: "$model.name changelog as MS Word Document",
                 originalFileName: "${model.name}-${model.status}-${model.version}-changelog.docx",
-                description: "Your classification report will be available in this asset soon. Use Refresh action to reload",
+                description: "Your data model report will be available in this asset soon. Use Refresh action to reload",
                 status: ElementStatus.PENDING,
                 contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                 size: 0
@@ -115,7 +113,7 @@ class ClassificationReportsController {
                 try {
                     //do the hard work
                     assetService.storeAssetWithSteam(updated, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",) { OutputStream out ->
-                        new ChangelogGenerator(auditService, dataClassService).generateChangelog(Model.get(modelId), out)
+                        new ChangelogGenerator(auditService, dataClassService).generateChangelog(DataClass.get(modelId), out)
                     }
 
                     updated.status = ElementStatus.FINALIZED

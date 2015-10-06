@@ -134,6 +134,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         relationshipService.getRelationships([:], RelationshipDirection.BOTH, refreshed).total
     }
 
+
     List getIncomingRelationsByType(RelationshipType type) {
         getIncomingRelationshipsByType(type).collect {
             it.source

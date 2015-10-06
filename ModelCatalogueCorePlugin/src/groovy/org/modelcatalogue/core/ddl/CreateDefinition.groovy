@@ -38,8 +38,8 @@ class CreateDefinition<T extends CatalogueElement> {
 
         FriendlyErrors.failFriendlySave(element)
 
-        if (ddl.classification) {
-            ddl.classification.addToClassifies element
+        if (ddl.dataModel) {
+            ddl.dataModel.addToDeclares element
         }
     }
 

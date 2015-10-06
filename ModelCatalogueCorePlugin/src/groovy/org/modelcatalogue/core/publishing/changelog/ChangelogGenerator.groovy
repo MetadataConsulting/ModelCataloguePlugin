@@ -429,7 +429,7 @@ class ChangelogGenerator {
     private static String getOldRelationshipMetadataValue(Change ch) {
         switch (ch.type) {
             case [ChangeType.RELATIONSHIP_METADATA_DELETED, ChangeType.RELATIONSHIP_METADATA_UPDATED]:
-                def value = org.modelcatalogue.core.audit.DefaultAuditor.readValue(ch.oldValue)
+                def value = DefaultAuditor.readValue(ch.oldValue)
                 return value instanceof CharSequence ? value : value?.extensionValue
             case ChangeType.RELATIONSHIP_METADATA_CREATED:
                 return ''
@@ -442,7 +442,7 @@ class ChangelogGenerator {
     private static String getNewRelationshipMetadataValue(Change ch) {
         switch (ch.type) {
             case [ChangeType.RELATIONSHIP_METADATA_CREATED, ChangeType.RELATIONSHIP_METADATA_UPDATED]:
-                def value = org.modelcatalogue.core.audit.DefaultAuditor.readValue(ch.newValue)
+                def value = DefaultAuditor.readValue(ch.newValue)
                 return value instanceof CharSequence ? value : value?.extensionValue
             case ChangeType.RELATIONSHIP_METADATA_DELETED:
                 return ''

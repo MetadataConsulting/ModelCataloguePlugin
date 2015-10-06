@@ -310,7 +310,7 @@ Model catalogue core plugin (metadata registry)
 		reportsRegistry.register {
 			creates link
 			title { "GE Changelog Docx" }
-			type Model
+			type DataClass
 			link controller: 'classificationReports', action: 'changelogDoc', id: true
 		}
 
