@@ -38,6 +38,7 @@ grails.project.dependency.resolution = {
         //mavenRepo "http://repository.jboss.com/maven2/"
         mavenRepo 'http://jcenter.bintray.com'
 		mavenRepo "http://dl.bintray.com/metadata/model-catalogue"
+        mavenRepo "http://dl.bintray.com/musketyr/document-builder"
         //mavenRepo "http://dl.dropbox.com/u/326301/repository"
 		//mavenRepo "http://www.biojava.org/download/maven/"
 
@@ -57,7 +58,9 @@ grails.project.dependency.resolution = {
         compile "org.modelcatalogue:mc-integration-xml:$mcToolkitVersion"
         test "org.modelcatalogue:mc-builder-xml:$mcToolkitVersion"
 
-		
+        compile 'com.craigburke.document:word:0.4.10-fix31'
+
+        compile 'org.jsoup:jsoup:1.8.3'
 
         test 'xmlunit:xmlunit:1.6'
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"

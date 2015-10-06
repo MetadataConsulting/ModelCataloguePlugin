@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.audit
 
+import grails.gorm.DetachedCriteria
 import grails.util.Holders
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.*
@@ -179,18 +180,23 @@ class AuditService {
                 where ce.id in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:includes)) or ce.id in (:includes)
             """
         }
-        throw new IllegalArgumentException("Classification fitler must be set")
+        throw new IllegalArgumentException("Data model filter must be set")
     }
 
-    ListWithTotalAndType<Change> getChanges(Map params, CatalogueElement element) {
+    ListWithTotalAndType<Change> getChanges(Map params, CatalogueElement element, @DelegatesTo(DetachedCriteria) Closure additionalCriteria = {}) {
         if (!params.sort) {
             params.sort  = 'dateCreated'
             params.order = 'desc'
         }
-        Lists.fromCriteria(params, Change) {
+
+        DetachedCriteria<Change> criteria = new DetachedCriteria<Change>(Change).build {
             eq 'changedId', element.id
             ne 'system', Boolean.TRUE
-        }
+        }.build additionalCriteria
+
+
+
+        Lists.fromCriteria(params, criteria)
     }
 
     ListWithTotalAndType<Change> getSubChanges(Map params, Change change) {

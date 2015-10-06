@@ -77,7 +77,11 @@ class DataModelService {
         return list
     }
 
-    public <T> DetachedCriteria<T> classified(DetachedCriteria<T> criteria, DataModelFilter modelFilter = dataModelFilter) {
+    public <T> DetachedCriteria<T> classified(DetachedCriteria<T> criteria) {
+        classified(criteria, dataModelFilter)
+    }
+
+    public static <T> DetachedCriteria<T> classified(DetachedCriteria<T> criteria, DataModelFilter modelFilter) {
         if (criteria.persistentEntity.javaClass == DataModel) {
             return criteria
         }

@@ -59,7 +59,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     Set<Mapping> outgoingMappings = []
     Set<Mapping> incomingMappings = []
 
-    static transients = ['relations', 'info', 'archived', 'relations', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext', 'classifications', 'inheritedAssociationsNames', 'modelCatalogueResourceName']
+    static transients = ['relations', 'info', 'archived', 'relations', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext', 'classifications', 'combinedVersion', 'inheritedAssociationsNames', 'modelCatalogueResourceName']
 
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping, extensions: ExtensionValue]
 
@@ -530,6 +530,10 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     @Override
     org.modelcatalogue.core.api.Relationship removeLinkFrom(org.modelcatalogue.core.api.CatalogueElement source, org.modelcatalogue.core.api.RelationshipType type) {
         removeLinkFrom(source as CatalogueElement, type as RelationshipType)
+    }
+
+    String getCombinedVersion() {
+        "${getLatestVersionId() ?: getId() ?: '<id not assigned yet>'}.${getVersionNumber()}"
     }
 
     final void addInheritedAssociations(CatalogueElement child) {
