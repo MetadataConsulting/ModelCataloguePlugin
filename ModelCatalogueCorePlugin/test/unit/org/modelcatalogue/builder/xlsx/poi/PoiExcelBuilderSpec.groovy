@@ -98,6 +98,31 @@ class PoiExcelBuilderSpec extends Specification {
                         }
                     }
                 }
+                sheet ('Groups'){
+                    row {
+                        cell "Headline 1"
+                        cell "Headline 2"
+                        cell "Headline 3"
+                        cell "Headline 4"
+                        cell "Headline 5"
+                    }
+                    group {
+                        row {
+                            cell "Some stuff"
+                        }
+                        collapse {
+                            row {
+                                cell "Something"
+                            }
+                            row {
+                                cell "Something other"
+                            }
+                        }
+                        row {
+                            cell "Other stuff"
+                        }
+                    }
+                }
             }
         }
 

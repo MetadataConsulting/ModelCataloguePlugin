@@ -10,6 +10,7 @@ class PoiSheet implements Sheet {
     private final XSSFSheet xssfSheet
     private final PoiWorkbook workbook
 
+    private final List<Integer> startPositions = []
     private int nextRowNumber = 0
 
     PoiSheet(PoiWorkbook workbook, XSSFSheet xssfSheet) {
@@ -47,5 +48,31 @@ class PoiSheet implements Sheet {
     @Override
     void freeze(int column, int row) {
         xssfSheet.createFreezePane(column, row)
+    }
+
+    @Override
+    void collapse(@DelegatesTo(Sheet.class) Closure<Object> insideGroupDefinition) {
+        createGroup(true, insideGroupDefinition)
+    }
+
+    @Override
+    void group(@DelegatesTo(Sheet.class) Closure<Object> insideGroupDefinition) {
+        createGroup(false, insideGroupDefinition)
+    }
+
+    private void createGroup(boolean collapsed, @DelegatesTo(Sheet.class) Closure<Object> insideGroupDefinition) {
+        startPositions.push nextRowNumber
+        with insideGroupDefinition
+
+        int startPosition = startPositions.pop()
+
+        if (nextRowNumber - startPosition > 1) {
+            int endPosition = nextRowNumber - 1
+            xssfSheet.groupRow(startPosition, endPosition)
+            if (collapsed) {
+                xssfSheet.setRowGroupCollapsed(endPosition, true)
+            }
+        }
+
     }
 }

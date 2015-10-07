@@ -31,4 +31,7 @@ public interface Sheet {
      */
     void freeze(int column, int row);
 
+    void group(@DelegatesTo(Sheet.class) Closure<Object> insideGroupDefinition);
+    void collapse(@DelegatesTo(Sheet.class) Closure<Object> insideGroupDefinition);
+
 }
