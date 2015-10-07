@@ -148,7 +148,7 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
         try {
             if (Desktop.desktopSupported && Desktop.desktop.isSupported(Desktop.Action.OPEN)) {
                 Desktop.desktop.open(file)
-                Thread.sleep(60000)
+                Thread.sleep(10000)
             }
         } catch(ignored) {
             // CI
