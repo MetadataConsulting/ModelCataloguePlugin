@@ -48,7 +48,10 @@ class PoiExcelBuilderSpec extends Specification {
                                 color '#00ff00'
                             }
                         }
-                        cell 'Hello'
+                        cell {
+                            value 'Hello'
+                            name 'Salutation'
+                        }
                         cell {
                             style 'zebra'
                             value 'World'
@@ -66,6 +69,30 @@ class PoiExcelBuilderSpec extends Specification {
                             comment 'This is a date!'
                             colspan 5
                             rowspan 2
+                        }
+                    }
+                }
+                sheet('Links') {
+                    row {
+                        cell {
+                            value 'Document'
+                            link to name 'Salutation'
+                        }
+                        cell {
+                            value 'File'
+                            link to file 'text.txt'
+                        }
+                        cell {
+                            value 'URL'
+                            link to url 'https://www.google.com'
+                        }
+                        cell {
+                            value 'Mail (plain)'
+                            link to email 'vladimir@orany.cz'
+                        }
+                        cell {
+                            value 'Mail (with subject)'
+                            link to email 'vladimir@orany.cz', subject: 'Testing Excel Builder', body: 'It is really great tools'
                         }
                     }
                 }

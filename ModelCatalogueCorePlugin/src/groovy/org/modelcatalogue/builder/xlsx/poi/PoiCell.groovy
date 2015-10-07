@@ -1,9 +1,12 @@
 package org.modelcatalogue.builder.xlsx.poi
 
 import org.apache.poi.xssf.usermodel.XSSFCell
+import org.apache.poi.xssf.usermodel.XSSFName
 import org.modelcatalogue.builder.xlsx.Cell
 import org.modelcatalogue.builder.xlsx.CellStyle
 import org.modelcatalogue.builder.xlsx.Comment
+import org.modelcatalogue.builder.xlsx.LinkDefinition
+import org.modelcatalogue.builder.xlsx.ToKeyword
 
 class PoiCell implements Cell  {
 
@@ -92,6 +95,23 @@ class PoiCell implements Cell  {
     @Override
     void style(String name) {
         xssfCell.cellStyle = row.sheet.workbook.getStyle(name)
+    }
+
+    @Override
+    void name(String name) {
+        XSSFName theName = xssfCell.row.sheet.workbook.createName()
+        theName.setNameName(name)
+        theName.setRefersToFormula("${xssfCell.sheet.sheetName}!${xssfCell.reference}")
+    }
+
+    @Override
+    ToKeyword getTo() {
+        return ToKeyword.TO
+    }
+
+    @Override
+    LinkDefinition link(ToKeyword to) {
+        return new PoiLinkDefintion(xssfCell)
     }
 
     protected int getColspan() {
