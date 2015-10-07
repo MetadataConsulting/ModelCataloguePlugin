@@ -3,6 +3,7 @@ package org.modelcatalogue.builder.xlsx.poi
 import org.apache.poi.xssf.usermodel.XSSFCell
 import org.modelcatalogue.builder.xlsx.Cell
 import org.modelcatalogue.builder.xlsx.CellStyle
+import org.modelcatalogue.builder.xlsx.Comment
 
 class PoiCell implements Cell  {
 
@@ -57,5 +58,19 @@ class PoiCell implements Cell  {
     void style(@DelegatesTo(CellStyle.class) Closure<Object> styleDefinition) {
         PoiCellStyle poiCellStyle = new PoiCellStyle(xssfCell)
         poiCellStyle.with styleDefinition
+    }
+
+    @Override
+    void comment(String commentText) {
+        comment {
+            text commentText
+        }
+    }
+
+    @Override
+    void comment(@DelegatesTo(Comment.class) Closure<Object> commentDefinition) {
+        PoiComment poiComment = new PoiComment()
+        poiComment.with commentDefinition
+        poiComment.applyTo xssfCell
     }
 }

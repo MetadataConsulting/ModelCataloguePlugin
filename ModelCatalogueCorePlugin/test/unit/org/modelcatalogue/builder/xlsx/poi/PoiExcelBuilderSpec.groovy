@@ -51,12 +51,17 @@ class PoiExcelBuilderSpec extends Specification {
                                 fill thinBackwardDiagonal
                             }
                             value 'World'
+                            comment {
+                                text 'This cell has some fancy fg/bg'
+                                author 'musketyr'
+                            }
                         }
                         cell {
                             style {
                                 format 'd.m.y'
                             }
                             value new Date()
+                            comment 'This is a date!'
                         }
                     }
                 }
