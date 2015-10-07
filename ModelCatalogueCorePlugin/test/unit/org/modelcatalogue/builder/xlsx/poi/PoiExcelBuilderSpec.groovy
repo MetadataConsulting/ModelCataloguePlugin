@@ -20,6 +20,16 @@ class PoiExcelBuilderSpec extends Specification {
 
         tmpFile.withOutputStream { OutputStream out ->
             builder.build(out) {
+                style('zebra') {
+                    font {
+                        bold
+                        size 12
+                        color '#dddddd'
+                    }
+                    background '#123456'
+                    foreground '#654321'
+                    fill thinBackwardDiagonal
+                }
                 sheet('One') {
                     row {
                         cell 'First Row'
@@ -40,16 +50,7 @@ class PoiExcelBuilderSpec extends Specification {
                         }
                         cell 'Hello'
                         cell {
-                            style {
-                                font {
-                                    bold
-                                    size 12
-                                    color '#dddddd'
-                                }
-                                background '#123456'
-                                foreground '#654321'
-                                fill thinBackwardDiagonal
-                            }
+                            style 'zebra'
                             value 'World'
                             comment {
                                 text 'This cell has some fancy fg/bg'
@@ -59,9 +60,12 @@ class PoiExcelBuilderSpec extends Specification {
                         cell {
                             style {
                                 format 'd.m.y'
+                                align center center
                             }
                             value new Date()
                             comment 'This is a date!'
+                            colspan 5
+                            rowspan 2
                         }
                     }
                 }

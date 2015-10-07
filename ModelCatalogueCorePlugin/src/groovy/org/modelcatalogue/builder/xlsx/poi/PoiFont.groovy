@@ -1,19 +1,18 @@
 package org.modelcatalogue.builder.xlsx.poi
 
 import org.apache.poi.ss.usermodel.FontUnderline
-import org.apache.poi.xssf.usermodel.XSSFCell
 import org.apache.poi.xssf.usermodel.XSSFCellStyle
 import org.apache.poi.xssf.usermodel.XSSFFont
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.modelcatalogue.builder.xlsx.Font
 
 class PoiFont implements Font {
 
     private final XSSFFont font
 
-    PoiFont(XSSFCell xssfCell, XSSFCellStyle style) {
-        font = xssfCell.row.sheet.workbook.createFont()
+    PoiFont(XSSFWorkbook workbook, XSSFCellStyle style) {
+        font = workbook.createFont()
         style.font = font
-
     }
 
     @Override

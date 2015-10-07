@@ -6,6 +6,7 @@ import org.apache.poi.xssf.usermodel.XSSFCell
 import org.apache.poi.xssf.usermodel.XSSFCellStyle
 import org.apache.poi.xssf.usermodel.XSSFColor
 import org.apache.poi.xssf.usermodel.XSSFDataFormat
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.modelcatalogue.builder.xlsx.AbstractCellStyle
 import org.modelcatalogue.builder.xlsx.Border
 import org.modelcatalogue.builder.xlsx.BorderSide
@@ -19,13 +20,18 @@ import org.modelcatalogue.builder.xlsx.VerticalAlignmentConfigurer
 
 class PoiCellStyle extends AbstractCellStyle {
 
-    private final XSSFCell xssfCell
     private final XSSFCellStyle style
+    private final XSSFWorkbook workbook
 
     PoiCellStyle(XSSFCell xssfCell) {
-        this.xssfCell = xssfCell
         style = xssfCell.row.sheet.workbook.createCellStyle()
         xssfCell.cellStyle = style
+        workbook = xssfCell.row.sheet.workbook
+    }
+
+    PoiCellStyle(XSSFWorkbook workbook, XSSFCellStyle style) {
+        this.style = style
+        this.workbook = workbook
     }
 
     @Override
@@ -97,7 +103,7 @@ class PoiCellStyle extends AbstractCellStyle {
 
     @Override
     void font(@DelegatesTo(Font.class) Closure<Object> fontConfiguration) {
-        PoiFont poiFont = new PoiFont(xssfCell, style)
+        PoiFont poiFont = new PoiFont(workbook, style)
         poiFont.with fontConfiguration
     }
 
@@ -128,7 +134,7 @@ class PoiCellStyle extends AbstractCellStyle {
 
     @Override
     void format(String format) {
-        XSSFDataFormat dataFormat = xssfCell.row.sheet.workbook.createDataFormat()
+        XSSFDataFormat dataFormat = workbook.createDataFormat()
         style.dataFormat = dataFormat.getFormat(format)
     }
 

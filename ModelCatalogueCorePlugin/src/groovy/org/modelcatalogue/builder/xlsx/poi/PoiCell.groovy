@@ -7,10 +7,15 @@ import org.modelcatalogue.builder.xlsx.Comment
 
 class PoiCell implements Cell  {
 
+    private final PoiRow row
     private final XSSFCell xssfCell
 
-    PoiCell(XSSFCell xssfCell) {
+    private int colspan = 1
+    private int rowspan = 1
+
+    PoiCell(PoiRow row, XSSFCell xssfCell) {
         this.xssfCell = xssfCell
+        this.row = row
     }
 
     @Override
@@ -72,5 +77,28 @@ class PoiCell implements Cell  {
         PoiComment poiComment = new PoiComment()
         poiComment.with commentDefinition
         poiComment.applyTo xssfCell
+    }
+
+    @Override
+    void colspan(int span) {
+        this.colspan = span
+    }
+
+    @Override
+    void rowspan(int span) {
+        this.rowspan = span
+    }
+
+    @Override
+    void style(String name) {
+        xssfCell.cellStyle = row.sheet.workbook.getStyle(name)
+    }
+
+    protected int getColspan() {
+        return colspan
+    }
+
+    protected int getRowspan() {
+        return rowspan
     }
 }

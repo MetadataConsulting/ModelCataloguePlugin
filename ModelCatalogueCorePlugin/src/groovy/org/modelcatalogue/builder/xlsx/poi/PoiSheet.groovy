@@ -8,10 +8,12 @@ import org.modelcatalogue.builder.xlsx.Sheet
 class PoiSheet implements Sheet {
 
     private final XSSFSheet xssfSheet
+    private final PoiWorkbook workbook
 
     private int nextRowNumber = 0
 
-    PoiSheet(XSSFSheet xssfSheet) {
+    PoiSheet(PoiWorkbook workbook, XSSFSheet xssfSheet) {
+        this.workbook = workbook
         this.xssfSheet = xssfSheet
     }
 
@@ -24,7 +26,7 @@ class PoiSheet implements Sheet {
     void row(@DelegatesTo(Row.class) Closure<Object> rowDefinition) {
         XSSFRow xssfRow = xssfSheet.createRow(nextRowNumber++)
 
-        PoiRow row = new PoiRow(xssfRow)
+        PoiRow row = new PoiRow(this, xssfRow)
         row.with rowDefinition
     }
 
@@ -34,8 +36,11 @@ class PoiSheet implements Sheet {
 
         nextRowNumber = row + 1
 
-        PoiRow poiRow = new PoiRow(xssfRow)
+        PoiRow poiRow = new PoiRow(this, xssfRow)
         poiRow.with rowDefinition
     }
 
+    protected PoiWorkbook getWorkbook() {
+        return workbook
+    }
 }
