@@ -31,6 +31,7 @@ class PoiExcelBuilderSpec extends Specification {
                     fill thinBackwardDiagonal
                 }
                 sheet('One') {
+                    freeze 1,1
                     row {
                         cell 'First Row'
                     }
@@ -73,6 +74,7 @@ class PoiExcelBuilderSpec extends Specification {
                     }
                 }
                 sheet('Links') {
+                    freeze 1,0
                     row {
                         cell {
                             value 'Document'

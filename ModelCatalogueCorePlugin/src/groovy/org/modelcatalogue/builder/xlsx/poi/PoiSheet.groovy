@@ -43,4 +43,9 @@ class PoiSheet implements Sheet {
     protected PoiWorkbook getWorkbook() {
         return workbook
     }
+
+    @Override
+    void freeze(int column, int row) {
+        xssfSheet.createFreezePane(column, row)
+    }
 }

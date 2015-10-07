@@ -24,4 +24,11 @@ public interface Sheet {
      */
     void row (int row, @DelegatesTo(Row.class) Closure<Object> rowDefinition);
 
+    /**
+     * Freeze some column or row or both.
+     * @param column last freeze column
+     * @param row last freeze row
+     */
+    void freeze(int column, int row);
+
 }
