@@ -27,7 +27,7 @@ class PoiExcelBuilderSpec extends Specification {
                         size 12
                         color '#dddddd'
                     }
-                    background ye
+                    background yellow
                     foreground '#654321'
                     fill thinBackwardDiagonal
                 }
