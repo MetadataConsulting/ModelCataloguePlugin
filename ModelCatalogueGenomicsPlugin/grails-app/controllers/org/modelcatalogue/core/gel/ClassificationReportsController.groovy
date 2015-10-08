@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.gel
 
-import org.modelcatalogue.core.ClassificationService
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.ModelService
 import org.modelcatalogue.core.publishing.changelog.ChangelogGenerator
@@ -31,7 +30,7 @@ class ClassificationReportsController {
     def index() { }
     
     def gereportDoc() {
-        Classification classification = Classification.get(params.id)
+        Model classification = Model.get(params.id)
 
         def assetId=storeAssetAsDocx(classification)
 
@@ -40,11 +39,11 @@ class ClassificationReportsController {
     }
 
 
-    private def storeAssetAsDocx(Classification classification){
+    private def storeAssetAsDocx(Model model){
         Asset asset = new Asset(
-                name: "$classification.name report as MS Word Document",
-                originalFileName: "${classification.name}-${classification.status}-${classification.version}.docx",
-                description: "Your classification report  will be available in this asset soon. Use Refresh action to reload",
+                name: "$model.name report as MS Word Document",
+                originalFileName: "${model.name}-${model.status}-${model.version}.docx",
+                description: "Your model report  will be available in this asset soon. Use Refresh action to reload",
                 status: ElementStatus.PENDING,
                 contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                 size: 0
@@ -54,7 +53,7 @@ class ClassificationReportsController {
 
         Long id = asset.id
         Long authorId = modelCatalogueSecurityService.currentUser?.id
-        Long classificationId = classification.id
+        Long modelId = model.id
 
         executorService.submit {
             auditService.withDefaultAuthorId(authorId) {
@@ -62,13 +61,13 @@ class ClassificationReportsController {
                 try {
                     //do the hard work
                     assetService.storeAssetWithSteam(updated, "application/vnd.openxmlformats-officedocument.wordprocessingml.document",) { OutputStream out ->
-                        new ClassificationToDocxExporter(Classification.get(classificationId)).export(out)
+                        new ModelToDocxExporter(Model.get(modelId), modelService).export(out)
                     }
 
                    
 
                     updated.status = ElementStatus.FINALIZED
-                    updated.description = "Your classification is ready. Use Download button to download it."
+                    updated.description = "Your model is ready. Use Download button to download it."
                     updated.save(flush: true, failOnError: true)
                 } catch (e) {
                     log.error "Exception of type ${e.class} with id=${id}", e
@@ -76,7 +75,7 @@ class ClassificationReportsController {
                     updated.refresh()
                     updated.status = ElementStatus.FINALIZED
                     updated.name = updated.name + " - Error during generation"
-                    updated.description = "Error generating classification report" +":$e"
+                    updated.description = "Error generating model report" +":$e"
                     updated.save(flush: true, failOnError: true)
                 }
             }
@@ -98,7 +97,7 @@ class ClassificationReportsController {
         Asset asset = new Asset(
                 name: "$model.name changelog as MS Word Document",
                 originalFileName: "${model.name}-${model.status}-${model.version}-changelog.docx",
-                description: "Your classification report will be available in this asset soon. Use Refresh action to reload",
+                description: "Your model report will be available in this asset soon. Use Refresh action to reload",
                 status: ElementStatus.PENDING,
                 contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                 size: 0

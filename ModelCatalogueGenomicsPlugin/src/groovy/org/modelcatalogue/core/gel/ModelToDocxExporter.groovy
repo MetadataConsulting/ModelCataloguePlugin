@@ -4,10 +4,10 @@ import com.craigburke.document.core.builder.DocumentBuilder
 import groovy.util.logging.Log4j
 import org.hibernate.FetchMode
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.ModelService
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.ValueDomain
@@ -16,7 +16,7 @@ import org.modelcatalogue.core.util.docx.ModelCatalogueWordDocumentBuilder
 import java.text.SimpleDateFormat
 
 @Log4j
-class ClassificationToDocxExporter {
+class ModelToDocxExporter {
 
     private static final Map<String, Object> HEADER_CELL =  [background: '#F2F2F2']
     private static final Map<String, Object> HEADER_CELL_TEXT =  [font: [color: '#29BDCA', size: 12, bold: true, family: 'Times New Roman']]
@@ -27,15 +27,17 @@ class ClassificationToDocxExporter {
     private static final Map<String, Object> DOMAIN_CLASSIFICATION_NAME =  [font: [color: '#999999', size: 12, bold: true]]
 
 
-    final Long classificationId
+    final ModelService modelService
+    final Long modelId
     final Set<ValueDomain> usedValueDomains = new TreeSet<ValueDomain>([compare: { ValueDomain a, ValueDomain b ->
         a?.name <=> b?.name
     }] as Comparator<ValueDomain>)
     final Set<Long> processedModels = new HashSet<Long>()
 
 
-    ClassificationToDocxExporter(Classification classification) {
-        classificationId = classification.getId()
+    ModelToDocxExporter(Model model, ModelService modelService) {
+        this.modelId = model.getId()
+        this.modelService = modelService
     }
 
     void export(OutputStream outputStream) {
@@ -43,9 +45,9 @@ class ClassificationToDocxExporter {
         usedValueDomains.clear()
         processedModels.clear()
 
-        Classification classification = Classification.get(classificationId)
+        Model rootModel = Model.get(modelId)
 
-        log.info "Exporting classification $classification to Word Document"
+        log.info "Exporting model $rootModel to Word Document"
 
         DocumentBuilder builder = new ModelCatalogueWordDocumentBuilder(outputStream)
 
@@ -74,20 +76,20 @@ class ClassificationToDocxExporter {
 
         builder.create {
             document(template: customTemplate) {
-                paragraph classification.name, style: 'title',  align: 'center'
+                paragraph rootModel.name, style: 'title',  align: 'center'
                 paragraph(style: 'subtitle', align: 'center') {
-                    text "${classification.status}"
+                    text "${rootModel.status}"
                     lineBreak()
                     text SimpleDateFormat.dateInstance.format(new Date())
                 }
-                if (classification.description) {
+                if (rootModel.description) {
                     paragraph(style: 'classification.description', margin: [left: 50, right: 50]) {
-                        text classification.description
+                        text rootModel.description
                     }
                 }
                 pageBreak()
 
-                for (Model model in getModelsForClassification(classification.id)) {
+                for (Model model in rootModel.parentOf) {
                     printModel(builder, model, 1)
                 }
 
@@ -184,12 +186,13 @@ class ClassificationToDocxExporter {
             }
         }
 
-        log.debug "Classification $classification exported to Word Document"
+        log.debug "Model $rootModel exported to Word Document"
     }
 
 
     private void printModel(DocumentBuilder builder, Model model, int level) {
-        if (level == 1 && model.childOf.any { CatalogueElement it -> it.classifications.any { it.id == classificationId } }) {
+        if (level > 3) {
+            // only go 3 levels deep
             return
         }
 
@@ -283,14 +286,6 @@ class ClassificationToDocxExporter {
                 }
             }
 
-            if (!(classificationId in model.classifications*.getId())) {
-                // do not continue down the tree if the model does not belong to the classification
-                processedModels << model.getId()
-                return
-            }
-
-
-
             if (!(model.getId() in processedModels)) {
                 if (model.countParentOf()) {
                     for (Model child in model.parentOf) {
@@ -312,21 +307,6 @@ class ClassificationToDocxExporter {
 
     private static String getMultiplicity(Relationship relationship) {
         "${relationship.ext['Min Occurs'] ?: 0}..${relationship.ext['Max Occurs'] ?: 'unbounded'}"
-    }
-
-    private static Collection<Model>  getModelsForClassification(Long classificationId) {
-        def results = Model.createCriteria().list {
-            fetchMode "extensions", FetchMode.JOIN
-            fetchMode "outgoingRelationships.extensions", FetchMode.JOIN
-            fetchMode "outgoingRelationships.destination.classifications", FetchMode.JOIN
-            incomingRelationships {
-                and {
-                    eq("relationshipType", RelationshipType.classificationType)
-                    source { eq('id', classificationId) }
-                }
-            }
-        }
-        return results
     }
 
 }

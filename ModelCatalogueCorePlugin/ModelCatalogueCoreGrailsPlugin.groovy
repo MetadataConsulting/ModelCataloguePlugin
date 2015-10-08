@@ -320,7 +320,7 @@ Model catalogue core plugin (metadata registry)
 		reportsRegistry.register {
 			creates link
 			title { "GE Inventory Report Docx" }
-			type Classification
+			type Model
 			link controller: 'classificationReports', action: 'gereportDoc', id: true
 		}
 
