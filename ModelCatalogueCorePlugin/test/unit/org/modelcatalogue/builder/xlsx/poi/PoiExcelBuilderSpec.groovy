@@ -2,8 +2,8 @@ package org.modelcatalogue.builder.xlsx.poi
 
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
-import org.modelcatalogue.builder.xlsx.ExcelBuilder
-import org.modelcatalogue.builder.xlsx.ForegroundFill
+import org.modelcatalogue.builder.xlsx.api.ExcelBuilder
+import org.modelcatalogue.builder.xlsx.api.ForegroundFill
 import spock.lang.Specification
 
 import java.awt.Desktop

@@ -2,8 +2,8 @@ package org.modelcatalogue.builder.xlsx.poi
 
 import org.apache.poi.xssf.usermodel.XSSFRow
 import org.apache.poi.xssf.usermodel.XSSFSheet
-import org.modelcatalogue.builder.xlsx.Row
-import org.modelcatalogue.builder.xlsx.Sheet
+import org.modelcatalogue.builder.xlsx.api.Row
+import org.modelcatalogue.builder.xlsx.api.Sheet
 
 class PoiSheet implements Sheet {
 

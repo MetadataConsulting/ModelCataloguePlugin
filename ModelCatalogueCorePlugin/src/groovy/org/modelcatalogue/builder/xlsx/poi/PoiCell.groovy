@@ -2,13 +2,12 @@ package org.modelcatalogue.builder.xlsx.poi
 
 import org.apache.poi.xssf.usermodel.XSSFCell
 import org.apache.poi.xssf.usermodel.XSSFName
-import org.modelcatalogue.builder.xlsx.AbstractCell
-import org.modelcatalogue.builder.xlsx.AutoKeyword
-import org.modelcatalogue.builder.xlsx.Cell
-import org.modelcatalogue.builder.xlsx.CellStyle
-import org.modelcatalogue.builder.xlsx.Comment
-import org.modelcatalogue.builder.xlsx.LinkDefinition
-import org.modelcatalogue.builder.xlsx.ToKeyword
+import org.modelcatalogue.builder.xlsx.api.AbstractCell
+import org.modelcatalogue.builder.xlsx.api.AutoKeyword
+import org.modelcatalogue.builder.xlsx.api.CellStyle
+import org.modelcatalogue.builder.xlsx.api.Comment
+import org.modelcatalogue.builder.xlsx.api.LinkDefinition
+import org.modelcatalogue.builder.xlsx.api.ToKeyword
 
 class PoiCell extends AbstractCell {
 

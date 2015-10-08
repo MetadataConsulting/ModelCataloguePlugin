@@ -3,9 +3,9 @@ package org.modelcatalogue.builder.xlsx.poi
 import org.apache.poi.ss.util.CellRangeAddress
 import org.apache.poi.xssf.usermodel.XSSFCell
 import org.apache.poi.xssf.usermodel.XSSFRow
-import org.modelcatalogue.builder.xlsx.Cell
-import org.modelcatalogue.builder.xlsx.CellStyle
-import org.modelcatalogue.builder.xlsx.Row
+import org.modelcatalogue.builder.xlsx.api.Cell
+import org.modelcatalogue.builder.xlsx.api.CellStyle
+import org.modelcatalogue.builder.xlsx.api.Row
 
 class PoiRow implements Row {
 

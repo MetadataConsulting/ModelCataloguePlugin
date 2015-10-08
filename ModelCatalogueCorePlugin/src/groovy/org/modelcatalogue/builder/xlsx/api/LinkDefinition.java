@@ -1,4 +1,4 @@
-package org.modelcatalogue.builder.xlsx;
+package org.modelcatalogue.builder.xlsx.api;
 
 import java.util.Map;
 

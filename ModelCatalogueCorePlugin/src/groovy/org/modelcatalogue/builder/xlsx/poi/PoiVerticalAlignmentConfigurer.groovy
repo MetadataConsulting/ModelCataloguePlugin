@@ -1,7 +1,7 @@
 package org.modelcatalogue.builder.xlsx.poi
 
 import org.apache.poi.ss.usermodel.VerticalAlignment
-import org.modelcatalogue.builder.xlsx.VerticalAlignmentConfigurer
+import org.modelcatalogue.builder.xlsx.api.VerticalAlignmentConfigurer
 
 class PoiVerticalAlignmentConfigurer implements VerticalAlignmentConfigurer {
 

@@ -3,9 +3,9 @@ package org.modelcatalogue.builder.xlsx.poi
 import org.apache.poi.xssf.usermodel.XSSFCellStyle
 import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.modelcatalogue.builder.xlsx.CellStyle
-import org.modelcatalogue.builder.xlsx.Sheet
-import org.modelcatalogue.builder.xlsx.Workbook
+import org.modelcatalogue.builder.xlsx.api.CellStyle
+import org.modelcatalogue.builder.xlsx.api.Sheet
+import org.modelcatalogue.builder.xlsx.api.Workbook
 
 
 class PoiWorkbook implements Workbook {

@@ -4,8 +4,8 @@ import org.apache.poi.ss.usermodel.FontUnderline
 import org.apache.poi.xssf.usermodel.XSSFCellStyle
 import org.apache.poi.xssf.usermodel.XSSFFont
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.modelcatalogue.builder.xlsx.Color
-import org.modelcatalogue.builder.xlsx.Font
+import org.modelcatalogue.builder.xlsx.api.Color
+import org.modelcatalogue.builder.xlsx.api.Font
 
 class PoiFont implements Font {
 

@@ -5,7 +5,7 @@ import org.apache.poi.xssf.usermodel.XSSFCell
 import org.apache.poi.xssf.usermodel.XSSFHyperlink
 import org.apache.poi.xssf.usermodel.XSSFName
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.modelcatalogue.builder.xlsx.LinkDefinition
+import org.modelcatalogue.builder.xlsx.api.LinkDefinition
 
 class PoiLinkDefintion implements LinkDefinition {
 

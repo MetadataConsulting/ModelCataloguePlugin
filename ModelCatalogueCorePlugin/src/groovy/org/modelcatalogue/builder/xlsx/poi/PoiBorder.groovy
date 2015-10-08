@@ -2,12 +2,12 @@ package org.modelcatalogue.builder.xlsx.poi
 
 import org.apache.poi.xssf.usermodel.XSSFCellStyle
 import org.apache.poi.xssf.usermodel.XSSFColor
-import org.modelcatalogue.builder.xlsx.AbstractBorder
-import org.modelcatalogue.builder.xlsx.BorderSide
-import org.modelcatalogue.builder.xlsx.BorderSideAndHorizontalAlignment
-import org.modelcatalogue.builder.xlsx.BorderStyle
-import org.modelcatalogue.builder.xlsx.Color
-import org.modelcatalogue.builder.xlsx.PureBorderSide
+import org.modelcatalogue.builder.xlsx.api.AbstractBorder
+import org.modelcatalogue.builder.xlsx.api.BorderSide
+import org.modelcatalogue.builder.xlsx.api.BorderSideAndHorizontalAlignment
+import org.modelcatalogue.builder.xlsx.api.BorderStyle
+import org.modelcatalogue.builder.xlsx.api.Color
+import org.modelcatalogue.builder.xlsx.api.PureBorderSide
 
 class PoiBorder extends AbstractBorder {
 

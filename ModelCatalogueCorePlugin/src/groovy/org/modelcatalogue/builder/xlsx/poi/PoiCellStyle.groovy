@@ -1,24 +1,23 @@
 package org.modelcatalogue.builder.xlsx.poi
 
 import org.apache.poi.ss.usermodel.CellStyle
-import org.apache.poi.ss.usermodel.FillPatternType
 import org.apache.poi.ss.usermodel.VerticalAlignment
 import org.apache.poi.xssf.usermodel.XSSFCell
 import org.apache.poi.xssf.usermodel.XSSFCellStyle
 import org.apache.poi.xssf.usermodel.XSSFColor
 import org.apache.poi.xssf.usermodel.XSSFDataFormat
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.modelcatalogue.builder.xlsx.AbstractCellStyle
-import org.modelcatalogue.builder.xlsx.Border
-import org.modelcatalogue.builder.xlsx.BorderSide
-import org.modelcatalogue.builder.xlsx.BorderSideAndHorizontalAlignment
-import org.modelcatalogue.builder.xlsx.Color
-import org.modelcatalogue.builder.xlsx.Font
-import org.modelcatalogue.builder.xlsx.ForegroundFill
-import org.modelcatalogue.builder.xlsx.HorizontalAlignment
-import org.modelcatalogue.builder.xlsx.PureBorderSide
-import org.modelcatalogue.builder.xlsx.PureHorizontalAlignment
-import org.modelcatalogue.builder.xlsx.VerticalAlignmentConfigurer
+import org.modelcatalogue.builder.xlsx.api.AbstractCellStyle
+import org.modelcatalogue.builder.xlsx.api.Border
+import org.modelcatalogue.builder.xlsx.api.BorderSide
+import org.modelcatalogue.builder.xlsx.api.BorderSideAndHorizontalAlignment
+import org.modelcatalogue.builder.xlsx.api.Color
+import org.modelcatalogue.builder.xlsx.api.Font
+import org.modelcatalogue.builder.xlsx.api.ForegroundFill
+import org.modelcatalogue.builder.xlsx.api.HorizontalAlignment
+import org.modelcatalogue.builder.xlsx.api.PureBorderSide
+import org.modelcatalogue.builder.xlsx.api.PureHorizontalAlignment
+import org.modelcatalogue.builder.xlsx.api.VerticalAlignmentConfigurer
 
 class PoiCellStyle extends AbstractCellStyle {
 

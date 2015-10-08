@@ -6,7 +6,7 @@ import org.apache.poi.xssf.usermodel.XSSFComment
 import org.apache.poi.xssf.usermodel.XSSFCreationHelper
 import org.apache.poi.xssf.usermodel.XSSFDrawing
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.modelcatalogue.builder.xlsx.Comment
+import org.modelcatalogue.builder.xlsx.api.Comment
 
 class PoiComment implements Comment {
 
