@@ -3,6 +3,7 @@ package org.modelcatalogue.builder.xlsx.poi
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.builder.xlsx.ExcelBuilder
+import org.modelcatalogue.builder.xlsx.ForegroundFill
 import spock.lang.Specification
 
 import java.awt.Desktop
@@ -26,7 +27,7 @@ class PoiExcelBuilderSpec extends Specification {
                         size 12
                         color '#dddddd'
                     }
-                    background '#123456'
+                    background yellow
                     foreground '#654321'
                     fill thinBackwardDiagonal
                 }
@@ -52,6 +53,7 @@ class PoiExcelBuilderSpec extends Specification {
                         cell {
                             value 'Hello'
                             name 'Salutation'
+                            width auto
                         }
                         cell {
                             style 'zebra'
@@ -60,6 +62,7 @@ class PoiExcelBuilderSpec extends Specification {
                                 text 'This cell has some fancy fg/bg'
                                 author 'musketyr'
                             }
+                            width 50
                         }
                         cell {
                             style {
@@ -77,8 +80,9 @@ class PoiExcelBuilderSpec extends Specification {
                     freeze 1,0
                     row {
                         cell {
-                            value 'Document'
+                            value 'Document (and a very long text)'
                             link to name 'Salutation'
+                            width auto
                         }
                         cell {
                             value 'File'
@@ -101,10 +105,21 @@ class PoiExcelBuilderSpec extends Specification {
                 sheet ('Groups'){
                     row {
                         cell "Headline 1"
-                        cell "Headline 2"
-                        cell "Headline 3"
-                        cell "Headline 4"
-                        cell "Headline 5"
+                        group {
+                            cell {
+                                value "Headline 2"
+                                style {
+                                    foreground magenta
+                                    fill solidForeground
+                                }
+                            }
+                            cell "Headline 3"
+                            collapse {
+                                cell "Headline 4"
+                                cell "Headline 5"
+                            }
+                            cell "Headline 6"
+                        }
                     }
                     group {
                         row {
@@ -123,6 +138,21 @@ class PoiExcelBuilderSpec extends Specification {
                         }
                     }
                 }
+                sheet('Fills') {
+                    for(ForegroundFill foregroundFill in ForegroundFill.values()) {
+                        row {
+                            cell {
+                                width auto
+                                value foregroundFill.name()
+                                style {
+                                    background magenta
+                                    foreground cyan
+                                    fill foregroundFill
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -138,13 +168,9 @@ class PoiExcelBuilderSpec extends Specification {
      * @param file file to be opened
      */
     private static void open(File file) {
-        try {
-            if (Desktop.desktopSupported && Desktop.desktop.isSupported(Desktop.Action.OPEN)) {
-                Desktop.desktop.open(file)
-                Thread.sleep(10000)
-            }
-        } catch(ignored) {
-            // CI
+        if (Desktop.desktopSupported && Desktop.desktop.isSupported(Desktop.Action.OPEN)) {
+            Desktop.desktop.open(file)
+            Thread.sleep(10000)
         }
     }
 

@@ -7,7 +7,7 @@ import java.io.OutputStream;
 
 public interface ExcelBuilder {
 
-    void build(OutputStream outputStream, @DelegatesTo(Workbook.class) Closure<Object> workbookDefinition);
+    void build(OutputStream outputStream, @DelegatesTo(Workbook.class) Closure workbookDefinition);
 
 
 }

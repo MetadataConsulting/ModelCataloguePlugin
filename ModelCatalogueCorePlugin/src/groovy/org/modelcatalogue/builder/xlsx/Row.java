@@ -8,7 +8,10 @@ public interface Row extends HasStyle {
 
     void cell();
     void cell(Object value);
-    void cell(@DelegatesTo(Cell.class) Closure<Object> cellDefinition);
-    void cell(int column, @DelegatesTo(Cell.class) Closure<Object> cellDefinition);
+    void cell(@DelegatesTo(Cell.class) Closure cellDefinition);
+    void cell(int column, @DelegatesTo(Cell.class) Closure cellDefinition);
+
+    void group(@DelegatesTo(Row.class) Closure insideGroupDefinition);
+    void collapse(@DelegatesTo(Row.class) Closure insideGroupDefinition);
 
 }

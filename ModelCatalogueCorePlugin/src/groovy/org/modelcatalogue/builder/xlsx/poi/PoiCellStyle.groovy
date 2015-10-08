@@ -1,6 +1,7 @@
 package org.modelcatalogue.builder.xlsx.poi
 
 import org.apache.poi.ss.usermodel.CellStyle
+import org.apache.poi.ss.usermodel.FillPatternType
 import org.apache.poi.ss.usermodel.VerticalAlignment
 import org.apache.poi.xssf.usermodel.XSSFCell
 import org.apache.poi.xssf.usermodel.XSSFCellStyle
@@ -11,6 +12,7 @@ import org.modelcatalogue.builder.xlsx.AbstractCellStyle
 import org.modelcatalogue.builder.xlsx.Border
 import org.modelcatalogue.builder.xlsx.BorderSide
 import org.modelcatalogue.builder.xlsx.BorderSideAndHorizontalAlignment
+import org.modelcatalogue.builder.xlsx.Color
 import org.modelcatalogue.builder.xlsx.Font
 import org.modelcatalogue.builder.xlsx.ForegroundFill
 import org.modelcatalogue.builder.xlsx.HorizontalAlignment
@@ -40,8 +42,18 @@ class PoiCellStyle extends AbstractCellStyle {
     }
 
     @Override
+    void background(Color colorPreset) {
+        background colorPreset.hex
+    }
+
+    @Override
     void foreground(String hexColor) {
         style.setFillForegroundColor(parseColor(hexColor))
+    }
+
+    @Override
+    void foreground(Color colorPreset) {
+        foreground colorPreset.hex
     }
 
     @Override
@@ -102,7 +114,7 @@ class PoiCellStyle extends AbstractCellStyle {
     }
 
     @Override
-    void font(@DelegatesTo(Font.class) Closure<Object> fontConfiguration) {
+    void font(@DelegatesTo(Font.class) Closure fontConfiguration) {
         PoiFont poiFont = new PoiFont(workbook, style)
         poiFont.with fontConfiguration
     }
@@ -169,7 +181,7 @@ class PoiCellStyle extends AbstractCellStyle {
     }
 
     @Override
-    void border(@DelegatesTo(Border.class) Closure<Object> borderConfiguration) {
+    void border(@DelegatesTo(Border.class) Closure borderConfiguration) {
         PoiBorder poiBorder = new PoiBorder(style)
         poiBorder.with borderConfiguration
 
@@ -179,7 +191,7 @@ class PoiCellStyle extends AbstractCellStyle {
     }
 
     @Override
-    void border(BorderSide location, @DelegatesTo(Border.class) Closure<Object> borderConfiguration) {
+    void border(BorderSide location, @DelegatesTo(Border.class) Closure borderConfiguration) {
         PoiBorder poiBorder = new PoiBorder(style)
         poiBorder.with borderConfiguration
         poiBorder.applyTo(location)
@@ -187,7 +199,7 @@ class PoiCellStyle extends AbstractCellStyle {
 
     @Override
     void border(BorderSide first, BorderSide second,
-                @DelegatesTo(Border.class) Closure<Object> borderConfiguration) {
+                @DelegatesTo(Border.class) Closure borderConfiguration) {
 
         PoiBorder poiBorder = new PoiBorder(style)
         poiBorder.with borderConfiguration
@@ -198,7 +210,7 @@ class PoiCellStyle extends AbstractCellStyle {
 
     @Override
     void border(BorderSide first, BorderSide second, BorderSide third,
-                @DelegatesTo(Border.class) Closure<Object> borderConfiguration) {
+                @DelegatesTo(Border.class) Closure borderConfiguration) {
 
         PoiBorder poiBorder = new PoiBorder(style)
         poiBorder.with borderConfiguration

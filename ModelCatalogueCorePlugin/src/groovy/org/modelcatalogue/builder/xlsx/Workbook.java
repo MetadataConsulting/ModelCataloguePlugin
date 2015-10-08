@@ -10,8 +10,8 @@ public interface Workbook {
      * @param name name of the style
      * @param styleDefinition definition of the style
      */
-    void style(String name, @DelegatesTo(CellStyle.class) Closure<Object> styleDefinition);
-    void sheet(String name, @DelegatesTo(Sheet.class) Closure<Object> sheetDefinition);
+    void style(String name, @DelegatesTo(CellStyle.class) Closure styleDefinition);
+    void sheet(String name, @DelegatesTo(Sheet.class) Closure sheetDefinition);
     
 
 }

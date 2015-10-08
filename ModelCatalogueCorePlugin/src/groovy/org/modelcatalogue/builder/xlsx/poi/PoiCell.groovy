@@ -2,13 +2,15 @@ package org.modelcatalogue.builder.xlsx.poi
 
 import org.apache.poi.xssf.usermodel.XSSFCell
 import org.apache.poi.xssf.usermodel.XSSFName
+import org.modelcatalogue.builder.xlsx.AbstractCell
+import org.modelcatalogue.builder.xlsx.AutoKeyword
 import org.modelcatalogue.builder.xlsx.Cell
 import org.modelcatalogue.builder.xlsx.CellStyle
 import org.modelcatalogue.builder.xlsx.Comment
 import org.modelcatalogue.builder.xlsx.LinkDefinition
 import org.modelcatalogue.builder.xlsx.ToKeyword
 
-class PoiCell implements Cell  {
+class PoiCell extends AbstractCell {
 
     private final PoiRow row
     private final XSSFCell xssfCell
@@ -63,7 +65,7 @@ class PoiCell implements Cell  {
     }
 
     @Override
-    void style(@DelegatesTo(CellStyle.class) Closure<Object> styleDefinition) {
+    void style(@DelegatesTo(CellStyle.class) Closure styleDefinition) {
         PoiCellStyle poiCellStyle = new PoiCellStyle(xssfCell)
         poiCellStyle.with styleDefinition
     }
@@ -76,7 +78,7 @@ class PoiCell implements Cell  {
     }
 
     @Override
-    void comment(@DelegatesTo(Comment.class) Closure<Object> commentDefinition) {
+    void comment(@DelegatesTo(Comment.class) Closure commentDefinition) {
         PoiComment poiComment = new PoiComment()
         poiComment.with commentDefinition
         poiComment.applyTo xssfCell
@@ -105,13 +107,18 @@ class PoiCell implements Cell  {
     }
 
     @Override
-    ToKeyword getTo() {
-        return ToKeyword.TO
+    LinkDefinition link(ToKeyword to) {
+        return new PoiLinkDefintion(xssfCell)
     }
 
     @Override
-    LinkDefinition link(ToKeyword to) {
-        return new PoiLinkDefintion(xssfCell)
+    void width(double width) {
+        row.sheet.sheet.setColumnWidth(xssfCell.columnIndex, (int)Math.round(width * 255D))
+    }
+
+    @Override
+    void width(AutoKeyword auto) {
+        row.sheet.addAutoColumn(xssfCell.columnIndex)
     }
 
     protected int getColspan() {

@@ -13,7 +13,10 @@ class PoiRow implements Row {
     private final PoiSheet sheet
 
     private String styleName
-    private Closure<Object> styleDefinition = { return null }
+    private Closure styleDefinition = { return null }
+
+    private final List<Integer> startPositions = []
+    private int nextColNumber = 0
 
     PoiRow(PoiSheet sheet, XSSFRow xssfRow) {
         this.sheet = sheet
@@ -22,12 +25,12 @@ class PoiRow implements Row {
 
     @Override
     void cell() {
-        xssfRow.createCell(xssfRow.lastCellNum, org.apache.poi.ss.usermodel.Cell.CELL_TYPE_BLANK)
+        xssfRow.createCell(nextColNumber++, org.apache.poi.ss.usermodel.Cell.CELL_TYPE_BLANK)
     }
 
     @Override
     void cell(Object value) {
-        XSSFCell xssfCell = xssfRow.createCell(nextCellNum)
+        XSSFCell xssfCell = xssfRow.createCell(nextColNumber++)
 
         PoiCell poiCell = new PoiCell(this, xssfCell)
         poiCell.style styleDefinition
@@ -35,8 +38,8 @@ class PoiRow implements Row {
     }
 
     @Override
-    void cell(@DelegatesTo(Cell.class) Closure<Object> cellDefinition) {
-        XSSFCell xssfCell = xssfRow.createCell(nextCellNum)
+    void cell(@DelegatesTo(Cell.class) Closure cellDefinition) {
+        XSSFCell xssfCell = xssfRow.createCell(nextColNumber++)
 
         PoiCell poiCell = new PoiCell(this, xssfCell)
         poiCell.style styleDefinition
@@ -57,7 +60,7 @@ class PoiRow implements Row {
     }
 
     @Override
-    void cell(int column, @DelegatesTo(Cell.class) Closure<Object> cellDefinition) {
+    void cell(int column, @DelegatesTo(Cell.class) Closure cellDefinition) {
         XSSFCell xssfCell = xssfRow.createCell(column)
 
         PoiCell poiCell = new PoiCell(this, xssfCell)
@@ -69,7 +72,7 @@ class PoiRow implements Row {
     }
 
     @Override
-    void style(@DelegatesTo(CellStyle.class) Closure<Object> styleDefinition) {
+    void style(@DelegatesTo(CellStyle.class) Closure styleDefinition) {
         this.styleDefinition = styleDefinition
     }
 
@@ -78,11 +81,33 @@ class PoiRow implements Row {
         this.styleName = name
     }
 
-    private short getNextCellNum() {
-        Math.max(xssfRow.lastCellNum, 0)
-    }
-
     protected PoiSheet getSheet() {
         return sheet
+    }
+
+    @Override
+    void group(@DelegatesTo(Row.class) Closure insideGroupDefinition) {
+        createGroup(false, insideGroupDefinition)
+    }
+
+    @Override
+    void collapse(@DelegatesTo(Row.class) Closure insideGroupDefinition) {
+        createGroup(true, insideGroupDefinition)
+    }
+
+    private void createGroup(boolean collapsed, @DelegatesTo(Row.class) Closure insideGroupDefinition) {
+        startPositions.push nextColNumber
+        with insideGroupDefinition
+
+        int startPosition = startPositions.pop()
+
+        if (nextColNumber - startPosition > 1) {
+            int endPosition = nextColNumber - 1
+            sheet.sheet.groupColumn(startPosition, endPosition)
+            if (collapsed) {
+                sheet.sheet.setColumnGroupCollapsed(endPosition, true)
+            }
+        }
+
     }
 }

@@ -8,7 +8,7 @@ import org.modelcatalogue.builder.xlsx.Sheet
 class PoiExcelBuilder implements ExcelBuilder {
 
     @Override
-    void build(OutputStream outputStream, @DelegatesTo(Sheet.class) Closure<Object> workbookDefinition) {
+    void build(OutputStream outputStream, @DelegatesTo(Sheet.class) Closure workbookDefinition) {
         XSSFWorkbook workbook = new XSSFWorkbook()
 
         PoiWorkbook poiWorkbook = new PoiWorkbook(workbook)

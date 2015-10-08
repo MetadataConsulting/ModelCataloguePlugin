@@ -3,15 +3,17 @@ package org.modelcatalogue.builder.xlsx;
 import groovy.lang.Closure;
 import groovy.lang.DelegatesTo;
 
-public interface CellStyle {
+public interface CellStyle extends ProvidesHTMLColors {
 
     void background(String hexColor);
+    void background(Color color);
 
     void foreground(String hexColor);
+    void foreground(Color color);
 
     void fill(ForegroundFill fill);
 
-    void font(@DelegatesTo(Font.class) Closure<Object> fontConfiguration);
+    void font(@DelegatesTo(Font.class) Closure fontConfiguration);
 
     /**
      * Sets the indent of the cell in spaces.
@@ -51,14 +53,14 @@ public interface CellStyle {
      * Configures all the borders of the cell.
      * @param borderConfiguration border configuration closure
      */
-    void border(@DelegatesTo(Border.class) Closure<Object> borderConfiguration);
+    void border(@DelegatesTo(Border.class) Closure borderConfiguration);
 
     /**
      * Configures one border of the cell.
      * @param location border to be configured
      * @param borderConfiguration border configuration closure
      */
-    void border(BorderSide location, @DelegatesTo(Border.class) Closure<Object> borderConfiguration);
+    void border(BorderSide location, @DelegatesTo(Border.class) Closure borderConfiguration);
 
     /**
      * Configures two borders of the cell.
@@ -66,7 +68,7 @@ public interface CellStyle {
      * @param second second border to be configured
      * @param borderConfiguration border configuration closure
      */
-    void border(BorderSide first, BorderSide second, @DelegatesTo(Border.class) Closure<Object> borderConfiguration);
+    void border(BorderSide first, BorderSide second, @DelegatesTo(Border.class) Closure borderConfiguration);
 
     /**
      * Configures three borders of the cell.
@@ -75,7 +77,7 @@ public interface CellStyle {
      * @param third third border to be configured
      * @param borderConfiguration border configuration closure
      */
-    void border(BorderSide first, BorderSide second, BorderSide third, @DelegatesTo(Border.class) Closure<Object> borderConfiguration);
+    void border(BorderSide first, BorderSide second, BorderSide third, @DelegatesTo(Border.class) Closure borderConfiguration);
 
 
 
@@ -110,6 +112,10 @@ public interface CellStyle {
     ForegroundFill getThinForwardDiagonal();
     ForegroundFill getSquares();
     ForegroundFill getDiamonds();
+
+
+
+
 
 
 }

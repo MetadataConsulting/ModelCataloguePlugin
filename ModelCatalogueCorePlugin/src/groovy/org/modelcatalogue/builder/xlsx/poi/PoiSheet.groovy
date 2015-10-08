@@ -12,6 +12,7 @@ class PoiSheet implements Sheet {
 
     private final List<Integer> startPositions = []
     private int nextRowNumber = 0
+    private final Set<Integer> autoColumns = new HashSet<Integer>()
 
     PoiSheet(PoiWorkbook workbook, XSSFSheet xssfSheet) {
         this.workbook = workbook
@@ -24,7 +25,7 @@ class PoiSheet implements Sheet {
     }
 
     @Override
-    void row(@DelegatesTo(Row.class) Closure<Object> rowDefinition) {
+    void row(@DelegatesTo(Row.class) Closure rowDefinition) {
         XSSFRow xssfRow = xssfSheet.createRow(nextRowNumber++)
 
         PoiRow row = new PoiRow(this, xssfRow)
@@ -32,7 +33,7 @@ class PoiSheet implements Sheet {
     }
 
     @Override
-    void row(int row, @DelegatesTo(Row.class) Closure<Object> rowDefinition) {
+    void row(int row, @DelegatesTo(Row.class) Closure rowDefinition) {
         XSSFRow xssfRow = xssfSheet.createRow(row)
 
         nextRowNumber = row + 1
@@ -51,16 +52,16 @@ class PoiSheet implements Sheet {
     }
 
     @Override
-    void collapse(@DelegatesTo(Sheet.class) Closure<Object> insideGroupDefinition) {
+    void collapse(@DelegatesTo(Sheet.class) Closure insideGroupDefinition) {
         createGroup(true, insideGroupDefinition)
     }
 
     @Override
-    void group(@DelegatesTo(Sheet.class) Closure<Object> insideGroupDefinition) {
+    void group(@DelegatesTo(Sheet.class) Closure insideGroupDefinition) {
         createGroup(false, insideGroupDefinition)
     }
 
-    private void createGroup(boolean collapsed, @DelegatesTo(Sheet.class) Closure<Object> insideGroupDefinition) {
+    private void createGroup(boolean collapsed, @DelegatesTo(Sheet.class) Closure insideGroupDefinition) {
         startPositions.push nextRowNumber
         with insideGroupDefinition
 
@@ -74,5 +75,19 @@ class PoiSheet implements Sheet {
             }
         }
 
+    }
+
+    protected XSSFSheet getSheet() {
+        return xssfSheet
+    }
+
+    protected void addAutoColumn(int i) {
+        autoColumns << i
+    }
+
+    protected void processAutoColumns() {
+        for (int index in autoColumns) {
+            xssfSheet.autoSizeColumn(index)
+        }
     }
 }

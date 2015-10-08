@@ -6,6 +6,7 @@ import org.modelcatalogue.builder.xlsx.AbstractBorder
 import org.modelcatalogue.builder.xlsx.BorderSide
 import org.modelcatalogue.builder.xlsx.BorderSideAndHorizontalAlignment
 import org.modelcatalogue.builder.xlsx.BorderStyle
+import org.modelcatalogue.builder.xlsx.Color
 import org.modelcatalogue.builder.xlsx.PureBorderSide
 
 class PoiBorder extends AbstractBorder {
@@ -27,6 +28,11 @@ class PoiBorder extends AbstractBorder {
     @Override
     void color(String hexColor) {
         color = PoiCellStyle.parseColor(hexColor)
+    }
+
+    @Override
+    void color(Color colorPreset) {
+        color colorPreset.hex
     }
 
     protected void applyTo(BorderSide location) {

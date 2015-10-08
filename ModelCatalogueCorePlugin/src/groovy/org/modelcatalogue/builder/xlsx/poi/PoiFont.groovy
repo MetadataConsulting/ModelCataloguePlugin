@@ -4,6 +4,7 @@ import org.apache.poi.ss.usermodel.FontUnderline
 import org.apache.poi.xssf.usermodel.XSSFCellStyle
 import org.apache.poi.xssf.usermodel.XSSFFont
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.modelcatalogue.builder.xlsx.Color
 import org.modelcatalogue.builder.xlsx.Font
 
 class PoiFont implements Font {
@@ -18,6 +19,11 @@ class PoiFont implements Font {
     @Override
     void color(String hexColor) {
         font.setColor(PoiCellStyle.parseColor(hexColor))
+    }
+
+    @Override
+    void color(Color colorPreset) {
+        color colorPreset.hex
     }
 
     @Override

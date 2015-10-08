@@ -4,6 +4,7 @@ public interface Border {
 
     void style(BorderStyle style);
     void color(String hexColor);
+    void color(Color color);
 
 
     // keywords

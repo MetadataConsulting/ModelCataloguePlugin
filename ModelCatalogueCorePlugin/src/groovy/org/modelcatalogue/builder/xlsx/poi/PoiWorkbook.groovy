@@ -18,15 +18,17 @@ class PoiWorkbook implements Workbook {
     }
 
     @Override
-    void sheet(String name, @DelegatesTo(Sheet.class) Closure<Object> sheetDefinition) {
+    void sheet(String name, @DelegatesTo(Sheet.class) Closure sheetDefinition) {
         XSSFSheet xssfSheet = workbook.getSheet(name) ?: workbook.createSheet(name)
 
         PoiSheet sheet = new PoiSheet(this, xssfSheet)
         sheet.with sheetDefinition
+
+        sheet.processAutoColumns()
     }
 
     @Override
-    void style(String name, @DelegatesTo(CellStyle.class) Closure<Object> styleDefinition) {
+    void style(String name, @DelegatesTo(CellStyle.class) Closure styleDefinition) {
         XSSFCellStyle style = workbook.createCellStyle()
         PoiCellStyle poiCellStyle = new PoiCellStyle(workbook, style)
         poiCellStyle.with styleDefinition

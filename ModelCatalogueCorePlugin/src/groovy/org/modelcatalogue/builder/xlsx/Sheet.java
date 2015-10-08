@@ -15,14 +15,14 @@ public interface Sheet {
      * Creates new row in the spreadsheet.
      * @param rowDefinition closure defining the content of the row
      */
-    void row (@DelegatesTo(Row.class) Closure<Object> rowDefinition);
+    void row (@DelegatesTo(Row.class) Closure rowDefinition);
 
     /**
      * Creates new row in the spreadsheet.
      * @param row row number
      * @param rowDefinition closure defining the content of the row
      */
-    void row (int row, @DelegatesTo(Row.class) Closure<Object> rowDefinition);
+    void row (int row, @DelegatesTo(Row.class) Closure rowDefinition);
 
     /**
      * Freeze some column or row or both.
@@ -31,7 +31,7 @@ public interface Sheet {
      */
     void freeze(int column, int row);
 
-    void group(@DelegatesTo(Sheet.class) Closure<Object> insideGroupDefinition);
-    void collapse(@DelegatesTo(Sheet.class) Closure<Object> insideGroupDefinition);
+    void group(@DelegatesTo(Sheet.class) Closure insideGroupDefinition);
+    void collapse(@DelegatesTo(Sheet.class) Closure insideGroupDefinition);
 
 }
