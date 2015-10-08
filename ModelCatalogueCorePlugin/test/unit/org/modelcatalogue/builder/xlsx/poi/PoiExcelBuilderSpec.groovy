@@ -27,7 +27,7 @@ class PoiExcelBuilderSpec extends Specification {
                         size 12
                         color '#dddddd'
                     }
-                    background yellow
+                    background ye
                     foreground '#654321'
                     fill thinBackwardDiagonal
                 }
@@ -168,9 +168,13 @@ class PoiExcelBuilderSpec extends Specification {
      * @param file file to be opened
      */
     private static void open(File file) {
-        if (Desktop.desktopSupported && Desktop.desktop.isSupported(Desktop.Action.OPEN)) {
-            Desktop.desktop.open(file)
-            Thread.sleep(10000)
+        try {
+            if (Desktop.desktopSupported && Desktop.desktop.isSupported(Desktop.Action.OPEN)) {
+                Desktop.desktop.open(file)
+                Thread.sleep(10000)
+            }
+        } catch(ignored) {
+            // CI
         }
     }
 
