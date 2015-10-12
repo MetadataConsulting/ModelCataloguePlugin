@@ -107,6 +107,9 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
         $scope.descendFun = $scope.element[$scope.currentDescend]
 
+        if angular.isFunction(element.href)
+          element.$$href = element.href()
+
         element.$$resetHelperProperties = ->
           if @[$scope.currentDescend]
             @$$numberOfChildren = $scope.element[$scope.currentDescend].total
