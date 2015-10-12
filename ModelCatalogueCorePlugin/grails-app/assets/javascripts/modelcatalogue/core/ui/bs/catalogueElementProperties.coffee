@@ -332,6 +332,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'type:date', tabDefinition: hideTab
   catalogueElementPropertiesProvider.configureProperty 'type:string', tabDefinition: hideTab
 
+  catalogueElementPropertiesProvider.configureProperty '$$href', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'version', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'name', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'classifiedName', hidden: true
