@@ -12,8 +12,8 @@
     "karma-ng-html2js-preprocessor": "~0.1.0",
     "karma-osx-reporter": "0.0.4",
     "karma-jasmine": "~0.1.0",
-    "karma-chrome-lanucher": "~0.2.1",
-    "karma-firefox-lanucher": "~0.1"
+    "karma-chrome-launcher": "~0.2.1",
+    "karma-firefox-launcher": "~0.1"
   },
   "keywords": [
     "metadata"
