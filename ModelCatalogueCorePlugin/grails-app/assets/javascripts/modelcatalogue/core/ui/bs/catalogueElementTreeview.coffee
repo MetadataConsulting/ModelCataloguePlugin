@@ -9,7 +9,7 @@ angular.module('mc.core.ui.bs.catalogueElementTreeview', ['mc.core.ui.catalogueE
               <a class="catalogue-element-treeview-icon btn btn-link catalogue-element-treeview-root-show-more catalogue-element-treeview-show-more"><span class="fa fa-fw fa-chevron-down"></span></a> <a class="text-muted">Show more</a>
             </span>
           </li>
-          <catalogue-element-treeview-item element="element" descend="descend" root-id="id" treeview="treeview" repeat="repeat" ng-switch-when="element"></catalogue-element-treeview-item>
+          <catalogue-element-treeview-item element="element" descend="descend" treeview="treeview" repeat="repeat" ng-switch-when="element"></catalogue-element-treeview-item>
       </ul>
     </div>
     '''

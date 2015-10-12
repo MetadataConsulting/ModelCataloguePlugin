@@ -6,7 +6,7 @@ class CatalogueElementTreeview
 
     @select = (element) ->
       if selected and selected isnt element
-        element.$$active = false
+        selected.$$active = false
       selected = element
       element.$$active = true
       $scope.onSelect({$element: element})
