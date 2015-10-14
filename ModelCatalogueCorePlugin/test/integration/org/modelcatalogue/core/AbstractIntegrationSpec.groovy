@@ -11,23 +11,23 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
     @Shared
     def fixtureLoader, fixtures, initCatalogueService, sessionFactory
 
-    def loadMarshallers() {
+    void loadMarshallers() {
         def springContext = WebApplicationContextUtils.getWebApplicationContext( ServletContextHolder.servletContext )
         springContext.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
     }
 
 
-    def initRelationshipTypes(){
+    void initRelationshipTypes(){
         TestDataHelper.initFreshDb(sessionFactory, 'reltypes.sql') {
             initCatalogueService.initDefaultRelationshipTypes()
         }
     }
 
-    def initCatalogue(){
+    void initCatalogue(){
         initCatalogueService.initCatalogue(true)
     }
 
-    def loadFixtures(){
+    void loadFixtures(){
         TestDataHelper.initFreshDb(sessionFactory, 'testdata.sql') {
             initCatalogueService.initDefaultRelationshipTypes()
             fixtures = fixtureLoader.load("assets/*", "batches/*", "dataTypes/*", "enumeratedTypes/*", "measurementUnits/*", "models/*", "relationshipTypes/*", "classifications/*").load("actions/*", "users/*", "referenceTypes/*", "primitiveTypes/*").load("dataElements/*").load("extensions/*", "mappings/*").load("csvTransformations/*")

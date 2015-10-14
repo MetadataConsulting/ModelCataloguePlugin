@@ -302,16 +302,23 @@ Model catalogue core plugin (metadata registry)
 		
 		reportsRegistry.register {
 			creates link
-			title { "GE Inventory Report Docx" }
-			type DataModel
-			link controller: 'classificationReports', action: 'gereportDoc', id: true
+			title { "Inventory Report Document" }
+			type DataClass
+			link controller: 'dataClass', action: 'inventoryDoc', id: true
 		}
 
 		reportsRegistry.register {
 			creates link
-			title { "GE Changelog Docx" }
+			title { "Inventory Report Spreadsheet" }
+			type DataClas
+			link controller: 'dataClass', action: 'inventorySpreadsheet', id: true
+		}
+
+		reportsRegistry.register {
+			creates link
+			title { "Changelog Document" }
 			type DataClass
-			link controller: 'classificationReports', action: 'changelogDoc', id: true
+			link controller: 'dataClass', action: 'changelogDoc', id: true
 		}
 
         reportsRegistry.register {

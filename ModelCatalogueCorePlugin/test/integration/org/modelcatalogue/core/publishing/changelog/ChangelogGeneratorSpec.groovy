@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.publishing.changelog
 
+import static org.modelcatalogue.core.util.test.FileOpener.open
+
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.core.AbstractIntegrationSpec
@@ -40,7 +42,7 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
 
         generator.generateChangelog(draft, file.newOutputStream())
 
-        openInWord(file)
+        open(file)
 
         then:
         noExceptionThrown()
@@ -152,22 +154,6 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
 
         return model
 
-    }
-
-    /**
-     * Tries to open the file in Word. Only works locally on Mac at the moment. Ignored otherwise.
-     * Main purpose of this method is to quickly open the generated file for manual review.
-     * @param file file to be opened
-     */
-    private static void openInWord(File file) {
-        try {
-            if (Desktop.desktopSupported && Desktop.desktop.isSupported(Desktop.Action.OPEN)) {
-                Desktop.desktop.open(file)
-                Thread.sleep(60000)
-            }
-        } catch(ignored) {
-            // CI
-        }
     }
 
 }

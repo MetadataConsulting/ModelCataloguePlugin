@@ -37,7 +37,7 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec {
         )
 
         when:
-        controller.params.put("modelId", md.id)
+        controller.params.put("dataClassId", md.id)
         controller.response.format = "json"
         controller.getSubModelElements()
         JSONElement json = controller.response.json

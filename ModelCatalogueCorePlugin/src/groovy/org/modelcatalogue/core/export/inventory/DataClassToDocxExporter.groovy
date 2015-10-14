@@ -1,12 +1,11 @@
-package org.modelcatalogue.core.gel
+package org.modelcatalogue.core.export.inventory
 
 import com.craigburke.document.core.builder.DocumentBuilder
 import groovy.util.logging.Log4j
-import org.hibernate.FetchMode
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
+import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.PrimitiveType
@@ -18,7 +17,7 @@ import org.modelcatalogue.core.util.docx.ModelCatalogueWordDocumentBuilder
 import java.text.SimpleDateFormat
 
 @Log4j
-class DataModelToDocxExporter {
+class DataClassToDocxExporter {
 
     private static final Map<String, Object> HEADER_CELL =  [background: '#F2F2F2']
     private static final Map<String, Object> HEADER_CELL_TEXT =  [font: [color: '#29BDCA', size: 12, bold: true, family: 'Times New Roman']]
@@ -29,15 +28,17 @@ class DataModelToDocxExporter {
     private static final Map<String, Object> DOMAIN_CLASSIFICATION_NAME =  [font: [color: '#999999', size: 12, bold: true]]
 
 
-    final Long dataModelId
+    final DataClassService dataClassService
+    final Long dataClassId
     final Set<DataType> usedDataTypes = new TreeSet<DataType>([compare: { DataType a, DataType b ->
         a?.name <=> b?.name
     }] as Comparator<DataType>)
     final Set<Long> processedModels = new HashSet<Long>()
 
 
-    DataModelToDocxExporter(DataModel dataModel) {
-        dataModelId = dataModel.getId()
+    DataClassToDocxExporter(DataClass model, DataClassService dataClassService) {
+        this.dataClassId = model.getId()
+        this.dataClassService = dataClassService
     }
 
     void export(OutputStream outputStream) {
@@ -45,9 +46,9 @@ class DataModelToDocxExporter {
         usedDataTypes.clear()
         processedModels.clear()
 
-        DataModel dataModel = DataModel.get(dataModelId)
+        DataClass rootModel = DataClass.get(dataClassId)
 
-        log.info "Exporting dataModel $dataModel to Word Document"
+        log.info "Exporting data class $rootModel to Word Document"
 
         DocumentBuilder builder = new ModelCatalogueWordDocumentBuilder(outputStream)
 
@@ -76,20 +77,20 @@ class DataModelToDocxExporter {
 
         builder.create {
             document(template: customTemplate) {
-                paragraph dataModel.name, style: 'title',  align: 'center'
+                paragraph rootModel.name, style: 'title',  align: 'center'
                 paragraph(style: 'subtitle', align: 'center') {
-                    text "${dataModel.status}"
+                    text "${rootModel.status}"
                     lineBreak()
                     text SimpleDateFormat.dateInstance.format(new Date())
                 }
-                if (dataModel.description) {
-                    paragraph(style: 'dataModel.description', margin: [left: 50, right: 50]) {
-                        text dataModel.description
+                if (rootModel.description) {
+                    paragraph(style: 'classification.description', margin: [left: 50, right: 50]) {
+                        text rootModel.description
                     }
                 }
                 pageBreak()
 
-                for (DataClass model in getModelsForClassification(dataModel.id)) {
+                for (DataClass model in rootModel.parentOf) {
                     printModel(builder, model, 1)
                 }
 
@@ -195,11 +196,12 @@ class DataModelToDocxExporter {
 
 
     private void printModel(DocumentBuilder builder, DataClass model, int level) {
-        if (level == 1 && model.childOf.any { CatalogueElement it -> it.dataModels.any { it.id == dataModelId } }) {
+        if (level > 3) {
+            // only go 3 levels deep
             return
         }
 
-        log.debug "Exporting model $model to Word Document"
+        log.debug "Exporting data class $model to Word Document"
 
         builder.with {
             if (model.getId() in processedModels) {
@@ -212,13 +214,13 @@ class DataModelToDocxExporter {
                 if (model.description) {
                     text model.description
                 } else {
-                    text "${model.name} model does not have any description yet.", font: [italic: true]
+                    text "${model.name} data class does not have any description yet.", font: [italic: true]
                 }
             }
 
             if (!model.countContains() && !model.countParentOf()) {
                 paragraph {
-                    text "${model.name} model does not have any child models or data elements yet.", font: [italic: true]
+                    text "${model.name} data class does not have any inner data classes or data elements yet.", font: [italic: true]
                 }
             }
 
@@ -261,7 +263,7 @@ class DataModelToDocxExporter {
                                     Map<String, Object> attrs = [url: "#${dataElement.dataType.id}", font: [bold: true]]
                                     attrs.putAll(CELL_TEXT)
                                     text attrs, dataElement.dataType.name
-                                    if (dataElement.dataType.instanceOf(EnumeratedType)) {
+                                    if (dataElement.dataType?.instanceOf(EnumeratedType)) {
                                         text '\n\n'
                                         text 'Enumerations', font: [italic: true]
                                         text '\n'
@@ -289,14 +291,6 @@ class DataModelToDocxExporter {
                 }
             }
 
-            if (!(dataModelId in model.dataModels*.getId())) {
-                // do not continue down the tree if the model does not belong to the dataModel
-                processedModels << model.getId()
-                return
-            }
-
-
-
             if (!(model.getId() in processedModels)) {
                 if (model.countParentOf()) {
                     for (DataClass child in model.parentOf) {
@@ -318,21 +312,6 @@ class DataModelToDocxExporter {
 
     private static String getMultiplicity(Relationship relationship) {
         "${relationship.ext['Min Occurs'] ?: 0}..${relationship.ext['Max Occurs'] ?: 'unbounded'}"
-    }
-
-    private static Collection<DataClass>  getModelsForClassification(Long classificationId) {
-        def results = DataClass.createCriteria().list {
-            fetchMode "extensions", FetchMode.JOIN
-            fetchMode "outgoingRelationships.extensions", FetchMode.JOIN
-            fetchMode "outgoingRelationships.destination.classifications", FetchMode.JOIN
-            incomingRelationships {
-                and {
-                    eq("relationshipType", RelationshipType.declarationType)
-                    source { eq('id', classificationId) }
-                }
-            }
-        }
-        return results
     }
 
 }
