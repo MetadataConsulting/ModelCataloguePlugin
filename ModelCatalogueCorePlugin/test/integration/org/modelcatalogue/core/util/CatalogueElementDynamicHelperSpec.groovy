@@ -2,7 +2,7 @@ package org.modelcatalogue.core.util
 
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.DataClass
 import spock.lang.Unroll
 
 class CatalogueElementDynamicHelperSpec extends IntegrationSpec {
@@ -30,7 +30,7 @@ class CatalogueElementDynamicHelperSpec extends IntegrationSpec {
 
         where:
         clazz                   | prop
-        Model                   | 'parentOf'
+        DataClass                   | 'parentOf'
     }
 
 }

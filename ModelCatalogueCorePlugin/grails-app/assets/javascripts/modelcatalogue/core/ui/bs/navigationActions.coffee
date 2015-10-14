@@ -1,10 +1,9 @@
 angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.util.security']).config ['actionsProvider', 'names', (actionsProvider, names)->
 
   RESOURCES = [
-    'classification'
-    'model'
+    'dataModel'
+    'dataClass'
     'dataElement'
-    'valueDomain'
     'dataType'
     'measurementUnit'
     'asset'
@@ -24,7 +23,8 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
 
 
   angular.forEach RESOURCES, (resource, index) ->
-    goToResource = ['$scope', '$state', '$stateParams', 'names', 'security', 'messages', 'catalogue', ($scope, $state, $stateParams, names, security, messages, catalogue) ->
+    goToResource = ['$rootScope', '$scope', '$state', '$stateParams', 'names', 'security', 'messages', 'catalogue', ($rootScope, $scope, $state, $stateParams, names, security, messages, catalogue) ->
+      return undefined if not security.hasRole('VIEWER')
       return undefined if (resource == 'batch' or resource == 'relationshipType' or resource == 'csvTransformation') and not security.hasRole('CURATOR')
 
       label = names.getNaturalName(resource) + 's'
@@ -33,24 +33,27 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
         label = 'Actions'
       else if resource == 'csvTransformation'
         label = 'CSV Transformations'
+      else if resource == 'dataClass'
+        label = 'Data Classes'
 
       action = {
+        active:     $stateParams.resource == resource || $stateParams.resource == 'dataModel' and $state.current?.name?.startsWith('landing')
         icon:       catalogue.getIcon(resource)
         position:   index * 100
         label:      label
-        currentStatus: undefined
+        currentStatus: if resource isnt 'dataModel' then $rootScope.currentDataModel?.status?.toLowerCase() else undefined
         action: ->
 
-          $state.go 'mc.resource.list', {resource: resource, status: @currentStatus}, {inherit: false}
+          $state.go 'mc.resource.list', {resource: resource, status: @currentStatus, dataModelId: $stateParams.dataModelId}, {inherit: false}
       }
 
-      $scope.$on '$stateChangeSuccess', (ignored, ignoredToState, toParams) ->
-        action.active = toParams.resource == resource
-        action.currentStatus = toParams.status if toParams.hasOwnProperty('status')
+      $scope.$on '$stateChangeSuccess', (ignored, state, toParams) ->
+        action.active = toParams.resource == resource || toParams.resource == 'dataModel' and state.current?.name?.startsWith('landing')
+        action.currentStatus = toParams.status if toParams.hasOwnProperty('status') and resource isnt 'dataModel'
 
       action
     ]
-    actionsProvider.registerChildAction 'navbar-catalogue-elements', 'navbar-' + resource , goToResource
+    actionsProvider.registerActionInRole  'sidenav-' + resource, actionsProvider.ROLE_SIDENAV , goToResource
     actionsProvider.registerActionInRole 'global-list-' + resource, actionsProvider.ROLE_GLOBAL_ACTION, goToResource
     unless resource == 'batch'
       actionsProvider.registerActionInRole 'global-create-' + resource, actionsProvider.ROLE_GLOBAL_ACTION, ['$scope', 'names', 'security', 'messages', '$state', '$log', ($scope, names, security, messages, $state, $log) ->
@@ -87,23 +90,6 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     }
   ]
 
-  uninstantiatedElements = ['$scope', '$state', ($scope, $state) ->
-    action = {
-      position:    200
-      label:      'Uninstantiated Data Elements'
-      icon:       'fa fa-fw fa-cube'
-      action: ->
-        $state.go 'mc.resource.list', {resource: 'dataElement', status: 'uninstantiated'}
-    }
-
-    $scope.$on '$stateChangeSuccess', (ignored, state) ->
-      action.active = state.name == 'mc.dataArchitect.uninstantiatedDataElements'
-
-    action
-  ]
-  actionsProvider.registerChildAction 'navbar-data-architect', 'navbar-uninstantiated-elements', uninstantiatedElements
-  actionsProvider.registerActionInRole 'global-uninstantiated-elements', actionsProvider.ROLE_GLOBAL_ACTION, uninstantiatedElements
-
   actionsProvider.registerChildAction 'navbar-data-architect', 'navbar-relations-by-metadata-key', ['$scope', '$state', ($scope, $state) ->
     action = {
       position:    300
@@ -135,60 +121,90 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
   ]
 
 
-  actionsProvider.registerActionInRoles 'cart', [actionsProvider.ROLE_NAVIGATION, actionsProvider.ROLE_GLOBAL_ACTION], ['security', '$state', (security, $state) ->
+  actionsProvider.registerActionInRoles 'cart', [actionsProvider.ROLE_SIDENAV, actionsProvider.ROLE_GLOBAL_ACTION], ['security', '$state', '$rootScope',  (security, $state, $rootScope) ->
     return undefined if not security.isUserLoggedIn()
 
     action = {
-      position:   2000
+      position:   10000
       label:      'Favorites'
       icon:       'fa fa-star'
+      active:     $state.current.name == 'mc.favorites'
       action: ->
-        $state.go 'mc.favorites'
+        $state.go 'mc.favorites', {dataModelId: $rootScope.currentDataModel?.id}
 
     }
-#    $scope.$on '$stateChangeSuccess', (ignored, state) ->
-#      action.active = state.name == 'mc.favorites'
+    $rootScope.$on '$stateChangeSuccess', (ignored, state) ->
+      action.active = state.name == 'mc.favorites'
 
     action
   ]
 
-  toggleClassification = (global) -> ['security', 'messages', '$scope', 'rest', 'enhance', 'modelCatalogueApiRoot', '$state', '$stateParams', (security, messages, $scope, rest, enhance, modelCatalogueApiRoot, $state, $stateParams) ->
+
+  actionsProvider.registerActionInRole 'currentDataModel', actionsProvider.ROLE_NAVIGATION, ['security', '$scope', '$state', '$rootScope', (security, $scope, $state, $rootScope) ->
     return undefined if not security.isUserLoggedIn()
 
-    getLabel = (user) ->
-      if not user or not user.classifications
-        return 'All Classifications'
-      if user.classifications.unclassifiedOnly
-        return 'Unclassified Only'
-
-      label = 'All Classifications'
-
-      if user.classifications.includes?.length > 0
-        label = (classification.name for classification in user.classifications.includes).join(', ')
-
-      if user.classifications.excludes?.length > 0
-        label += " except " + (classification.name for classification in user.classifications.excludes).join(', ')
-
-      return label
+    getLabel = ->
+      return 'All Data Models' unless $rootScope.currentDataModel
+      return "#{ $rootScope.currentDataModel.name} (draft)" if $rootScope.currentDataModel.status == 'DRAFT'
+      return $rootScope.currentDataModel.name
 
     action = {
-      position:   2100
-      label:      if global then 'Filter by Classification' else  getLabel(security.getCurrentUser())
-      icon:       'fa fa-tags'
-      action: -> messages.prompt('Select Classifications', 'Select which classifications should be visible to you', type: 'classification-filter', filter: security.getCurrentUser().classifications).then (filter) ->
-        security.requireUser().then ->
-          enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}/user/classifications", data: filter)).then (user)->
-            action.label = getLabel(user)
-            security.getCurrentUser().classifications = user.classifications
-            $state.go '.', $stateParams, reload: true
-            $scope.$broadcast 'redrawContextualActions'
+      position:   - 100000
+      label: getLabel()
+      icon: 'fa fa-book'
+      watches: ['currentDataModel']
     }
 
     action
   ]
 
-  actionsProvider.registerActionInRole 'classifications', actionsProvider.ROLE_NAVIGATION_BOTTOM_LEFT, toggleClassification(false)
-  actionsProvider.registerActionInRole 'global-classifications', actionsProvider.ROLE_GLOBAL_ACTION, toggleClassification(true)
+  actionsProvider.registerChildAction 'currentDataModel', 'show-data-model', ['catalogue', '$scope', '$state', '$rootScope', (catalogue, $scope, $state, $rootScope) ->
+    return undefined if not catalogue.isFilteredByDataModel()
+
+    action = {
+
+      position:   2000
+      label: 'Show Detail'
+      icon: 'fa fa-book fa-fw'
+      active: $state.name == 'mc.resource.show' and $state.params.id == ('' + catalogue.getCurrentDataModel().id)
+      action: ->
+        $state.go 'mc.resource.show', {resource: 'dataModel', id: catalogue.getCurrentDataModel().id, dataModelId: catalogue.getCurrentDataModel().id}
+    }
+
+    $rootScope.$on '$stateChangeSuccess', (ignored, state, params) ->
+      action.active = state.name == 'mc.resource.show' and params.id == ('' + catalogue.getCurrentDataModel().id) if angular.isFunction(catalogue.getCurrentDataModel) and catalogue.getCurrentDataModel()
+
+    action
+  ]
+
+  actionsProvider.registerChildAction 'currentDataModel', 'all-data-models', ['security', '$scope', '$state', 'catalogue', (security, $scope, $state, catalogue) ->
+    return undefined if not security.isUserLoggedIn()
+
+    {
+      position:   3000
+      label: 'Show All Data Models'
+      icon:  'fa fa-book fa-fw'
+      action: ->
+        $state.go 'mc.resource.list', {resource: 'dataModel', dataModelId: 'catalogue', status: undefined }
+    }
+  ]
+
+  actionsProvider.registerChildAction 'currentDataModel', 'add-import', ['$scope', 'messages', 'names', 'security', 'catalogue', ($scope, messages, names, security, catalogue) ->
+    return undefined if not security.isUserLoggedIn()
+    return undefined if not catalogue.isFilteredByDataModel()
+
+    {
+      position:   2000
+      label:      'Add Data Model Import'
+      icon:       'fa fa-fw fa-puzzle-piece'
+      type:       'success'
+      action:     ->
+        messages.prompt('Add Data Model Import', 'If you want to reuse data classes, data types or measurement units form different data models you need to import the containing data model first.', {type: 'catalogue-elements', resource: 'dataModel', status: 'finalized' }).then (elements) ->
+          angular.forEach elements, (element) ->
+            unless angular.isString(element)
+              catalogue.getCurrentDataModel().imports.add element
+    }
+  ]
 
   actionsProvider.registerActionInRole 'global-draft', actionsProvider.ROLE_GLOBAL_ACTION, ['$state', '$stateParams', 'catalogue', ($state, $stateParams, catalogue) ->
     return undefined unless $state.current.name == 'mc.resource.list'
@@ -223,14 +239,13 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     }
   ]
 
-  actionsProvider.registerActionInRole 'dashboard', actionsProvider.ROLE_GLOBAL_ACTION, ['$state', ($state) ->
+  actionsProvider.registerActionInRole 'about-dialog', actionsProvider.ROLE_GLOBAL_ACTION, ['messages', (messages) ->
+
     {
-      label:      'Dashboard'
-      icon:       'fa fa-tachometer'
-      action: -> $state.go 'dashboard'
+      icon: 'fa fa-question'
+      label: 'Model Catalogue Version'
+      action: ->  messages.prompt('','', type: 'about-dialog')
     }
   ]
-
-
 
 ]

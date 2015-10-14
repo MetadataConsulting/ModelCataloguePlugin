@@ -4,20 +4,18 @@ package org.modelcatalogue.core
  */
 class RelationshipTypeISpec extends AbstractIntegrationSpec {
 
-    def md1, de1, md2, vd
+    def md1, de1, md2
 
     def setup(){
         loadFixtures()
-        md1 = new Model(name: "book").save(failOnError: true)
-        md2 = new Model(name: "chapter1").save(failOnError: true)
+        md1 = new DataClass(name: "book").save(failOnError: true)
+        md2 = new DataClass(name: "chapter1").save(failOnError: true)
         de1 = new DataElement(name: "DE_author1").save(failOnError: true)
-        vd = new ValueDomain(name: "value domain uni subjects 2").save(failOnError: true)
-
     }
 
     def "data elements can be contained in models, models can contain data elements"(){
 
-        def model = new Model(name: "tester12343124").save()
+        def model = new DataClass(name: "tester12343124").save()
         def element =  DataElement.get(de1.id)
 
         when:
@@ -60,8 +58,8 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
 
     def "model can be a parent of another model, model can be child of another model)"(){
 
-        def book = Model.get(md1.id)
-        def chapter = Model.get(md2.id)
+        def book = DataClass.get(md1.id)
+        def chapter = DataClass.get(md2.id)
 
         when:
         book.addToParentOf(chapter)

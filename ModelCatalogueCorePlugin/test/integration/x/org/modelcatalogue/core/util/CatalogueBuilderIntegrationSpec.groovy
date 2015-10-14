@@ -1,28 +1,28 @@
 package x.org.modelcatalogue.core.util
 
-import grails.test.spock.IntegrationSpec
+import grails.util.Holders
+import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import spock.lang.Issue
 
+class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
-class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
-
-    def initCatalogueService
-    def classificationService
+    def dataModelService
     def elementService
 
     Set<CatalogueElement> created = []
 
     def setup() {
-        initCatalogueService.initDefaultRelationshipTypes()
+        initRelationshipTypes()
     }
     
     def "creates new classification with given name, namespace and description"() {
         build {
-            classification(name: 'TestSchema', namespace: 'http://www.w3.org/2001/TestSchema') {
+            dataModel(name: 'TestSchema', namespace: 'http://www.w3.org/2001/TestSchema') {
                 description '''
                     This is a test schema which is just for test purposes!
                 '''
@@ -30,16 +30,16 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         expect:
-        Classification.findByName('TestSchema')
-        Classification.findByName('TestSchema').description == 'This is a test schema which is just for test purposes!'
-        Classification.findByModelCatalogueId('http://www.w3.org/2001/TestSchema')
+        DataModel.findByName('TestSchema')
+        DataModel.findByName('TestSchema').description == 'This is a test schema which is just for test purposes!'
+        DataModel.findByModelCatalogueId('http://www.w3.org/2001/TestSchema')
     }
 
     def "reuse existing classification by name"() {
-        Classification c = new Classification(name: 'ExistingSchema', status: org.modelcatalogue.core.api.ElementStatus.DEPRECATED).save(failOnError: true)
+        DataModel c = new DataModel(name: 'ExistingSchema', status: ElementStatus.DEPRECATED).save(failOnError: true)
 
         build {
-            classification(name: 'ExistingSchema', namespace: 'http://www.w3.org/2001/ExistingSchema') {
+            dataModel(name: 'ExistingSchema', namespace: 'http://www.w3.org/2001/ExistingSchema') {
                 description '''
                     This is a test schema which is just for test purposes!
                 '''
@@ -51,10 +51,10 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     }
 
     def "reuse existing classification by id"() {
-        Classification c = new Classification(name: 'SchemaWithId', modelCatalogueId: 'http://www.example.com/SWI').save(failOnError: true)
+        DataModel c = new DataModel(name: 'SchemaWithId', modelCatalogueId: 'http://www.example.com/SWI').save(failOnError: true)
 
         build {
-            classification(name: 'NotUniqueName', id: 'http://www.example.com/SWI') {
+            dataModel(name: 'NotUniqueName', id: 'http://www.example.com/SWI') {
                 description '''
                     This is a test schema which is just for test purposes!
                 '''
@@ -69,7 +69,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     def "complain if classification name is missing"() {
         when:
         build {
-            classification namespace: 'http://www.w3.org/2001/TestSchema'
+            dataModel namespace: 'http://www.w3.org/2001/TestSchema'
         }
 
         then:
@@ -92,7 +92,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     }
 
     def "reuse existing measurement unit by name"() {
-        MeasurementUnit unit = new MeasurementUnit(name: 'ExistingUnit', status: org.modelcatalogue.core.api.ElementStatus.DEPRECATED).save(failOnError: true)
+        MeasurementUnit unit = new MeasurementUnit(name: 'ExistingUnit', status: ElementStatus.DEPRECATED).save(failOnError: true)
 
         build {
             measurementUnit(name: 'ExistingUnit', symbol: 'EU') {
@@ -107,17 +107,18 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     }
 
     def "creates only one measurement unit as measurement unit name is unique"() {
-        MeasurementUnit unit = new MeasurementUnit(name: 'ExistingUnit2', status: org.modelcatalogue.core.api.ElementStatus.DEPRECATED).save(failOnError: true, flush: true)
+        new MeasurementUnit(name: 'ExistingUnit2', status: ElementStatus.DEPRECATED).save(failOnError: true, flush: true)
 
+        when:
         build {
-            classification(name: "TestClassificationA") {
+            dataModel(name: "TestClassificationA") {
                 measurementUnit(name: 'ExistingUnit2', symbol: 'EU2') {
                     description '''
                         This is a test unit which is just for test purposes!
                     '''
                 }
             }
-            classification(name: "TestClassificationB") {
+            dataModel(name: "TestClassificationB") {
                 measurementUnit(name: 'ExistingUnit2', symbol: 'EU2') {
                     description '''
                         This is a test unit which is just for test purposes!
@@ -126,12 +127,10 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
             }
         }
 
-        expect:
-        created.find { it instanceof  MeasurementUnit}.latestVersionId == unit.refresh().latestVersionId
-        created.size() == 3
-        created.any { it.name == 'TestClassificationA'}
-        created.any { it.name == 'TestClassificationB'}
-        created.any { it.name == 'ExistingUnit2'}
+        then:
+        RuntimeException ex = thrown(RuntimeException)
+        ex.cause instanceof IllegalStateException
+        ex.cause.message.startsWith('Cannot create relationship of type declaration between')
     }
 
     def "complain if measurement unit name is missing"() {
@@ -160,7 +159,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     }
 
     def "reuse existing data element unit by name"() {
-        DataElement unit = new DataElement(name: 'ExistingElement', status: org.modelcatalogue.core.api.ElementStatus.DEPRECATED).save(failOnError: true)
+        DataElement unit = new DataElement(name: 'ExistingElement', status: ElementStatus.DEPRECATED).save(failOnError: true)
 
         build {
             dataElement(name: 'ExistingElement') {
@@ -187,7 +186,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
     def "creates new model with given name"() {
         build {
-            model(name: 'TestModel') {
+            dataClass(name: 'TestModel') {
                 description '''
                     This is a test model which is just for test purposes!
                 '''
@@ -195,15 +194,15 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         expect:
-        Model.findByName('TestModel')
-        Model.findByName('TestModel').description == 'This is a test model which is just for test purposes!'
+        DataClass.findByName('TestModel')
+        DataClass.findByName('TestModel').description == 'This is a test model which is just for test purposes!'
     }
 
     def "reuse existing model by name"() {
-        Model unit = new Model(name: 'ExistingModel', status: org.modelcatalogue.core.api.ElementStatus.DEPRECATED).save(failOnError: true)
+        DataClass unit = new DataClass(name: 'ExistingModel', status: ElementStatus.DEPRECATED).save(failOnError: true)
 
         build {
-            model(name: 'ExistingModel') {
+            dataClass(name: 'ExistingModel') {
                 description '''
                     This is a test model which is just for test purposes!
                 '''
@@ -217,7 +216,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     def "complain if model name is missing"() {
         when:
         build {
-            model([:])
+            dataClass([:])
         }
 
         then:
@@ -225,63 +224,58 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         e.message.startsWith "Cannot create element abstraction from"
     }
 
-    def "creates new value domain with given name"() {
+    def "value domain calls are delegated to the data type"() {
         build {
             valueDomain name: 'Domain'
         }
 
         expect:
-        ValueDomain.findByName('Domain')
+        DataType.findByName('Domain')
     }
 
-    def "reuses existing value domain with given name in classification"() {
-        Classification cls  = new Classification(name: 'Some').save(failOnError: true)
-        ValueDomain domain1 = new ValueDomain(name: 'SomeDomain').save(failOnError: true)
-        ValueDomain domain2 = new ValueDomain(name: 'SomeDomain').save(failOnError: true)
-
-        cls.addToClassifies(domain1)
-
+    def "if there is a nested data type with name missing - it is merged into single data type"() {
         build {
-            valueDomain name: 'SomeDomain'
-            classification(name: 'Some') {
-                valueDomain name: 'SomeDomain'
+            valueDomain name: 'Merged Type', {
+                dataType(description: 'MT DESC')
             }
         }
 
         expect:
-        ValueDomain.countByName('SomeDomain') == 2
-
-        cleanup:
-        [domain2].each {
-            it.beforeDelete()
-            it.delete()
-        }
+        DataType.findByName('Merged Type')
+        DataType.findByName('Merged Type').description == 'MT DESC'
     }
 
-    def "complain if value domain name is missing"() {
-        when:
+
+    def "if there is a nested data type with different name - it's set as base"() {
         build {
-            valueDomain rule: 'is number'
+            valueDomain name: 'Inherited Type', {
+                dataType(name: 'Base Type', description: 'MT DESC')
+            }
         }
 
-        then:
-        IllegalArgumentException e = thrown(IllegalArgumentException)
-        e.message.startsWith "Cannot create element abstraction from"
+        expect:
+        DataType.findByName('Inherited Type')
+        DataType.findByName('Base Type')
+
+        DataType.findByName('Inherited Type').isBasedOn
+        DataType.findByName('Inherited Type').isBasedOn.contains DataType.findByName('Base Type')
     }
+
+
 
     def "specify rule as regex"() {
         when:
         build {
-            valueDomain name: 'with regex', {
+            dataType name: 'with regex', {
                 regex(/\w+/)
             }
         }
 
-        ValueDomain domain = ValueDomain.findByName('with regex')
+        DataType dataType = DataType.findByName('with regex')
 
         then:
-        domain
-        domain.rule == """x ==~ /\\w+/"""
+        dataType
+        dataType.rule == """x ==~ /\\w+/"""
     }
 
     def "add extensions"() {
@@ -314,15 +308,15 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     }
 
     def "reuses existing data type with given name"() {
-        Classification cls  = new Classification(name: 'Some').save(failOnError: true)
+        DataModel cls  = new DataModel(name: 'Some').save(failOnError: true)
         DataType dt1 = new DataType(name: 'SomeType').save(failOnError: true)
         DataType dt2 = new DataType(name: 'SomeType').save(failOnError: true)
 
-        cls.addToClassifies(dt1)
+        cls.addToDeclares(dt1)
 
         build {
             dataType name: 'SomeType'
-            classification(name: 'Some') {
+            dataModel(name: 'Some') {
                 dataType name: 'SomeType'
             }
         }
@@ -340,7 +334,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     def "complain if data type name is missing"() {
         when:
         build {
-            dataType status: org.modelcatalogue.core.api.ElementStatus.FINALIZED
+            dataType status: ElementStatus.FINALIZED
         }
 
         then:
@@ -348,79 +342,109 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         e.message.startsWith "Cannot create element abstraction from"
     }
 
-    def "do not complain if data type name is missing but inside value domain"() {
+    def "if enumerations present, create enumerated type"() {
         build {
-            valueDomain(name: 'test:number') {
+            dataType name: 'ETTest', enumerations: [foo: 'bar']
+        }
+
+        expect:
+        EnumeratedType.findByName('ETTest')
+    }
+
+
+    def "if data class present, create reference type"() {
+        build {
+            dataType name: 'RTTest', {
+                dataClass name: 'RTTest DC'
+            }
+        }
+
+        ReferenceType referenceType = ReferenceType.findByName('RTTest')
+
+        expect:
+        referenceType
+        referenceType.dataClass
+        referenceType.dataClass.name == "RTTest DC"
+    }
+
+
+    def "if unit of measure present, create primitive type"() {
+        build {
+            dataType name: 'PTTest', {
+                measurementUnit name: 'PTUnit'
+            }
+        }
+
+        PrimitiveType primitiveType = PrimitiveType.findByName('PTTest')
+
+        expect:
+        primitiveType
+        primitiveType.measurementUnit
+        primitiveType.measurementUnit.name == "PTUnit"
+    }
+
+    def "do not complain if data type name is missing but inside data element"() {
+        build {
+            dataElement(name: 'test:number') {
                 dataType()
             }
         }
 
         expect:
         DataType.findByName('test:number')
-        ValueDomain.findByName('test:number')
-        ValueDomain.findByName('test:number').dataType
-        ValueDomain.findByName('test:number').dataType == DataType.findByName('test:number')
+        DataElement.findByName('test:number')
+        DataElement.findByName('test:number').dataType
+        DataElement.findByName('test:number').dataType == DataType.findByName('test:number')
     }
 
 
 
     def "elements are added to classification"() {
         build {
-            classification(name: 'TestSchema') {
-                valueDomain(name: 'test:string domain') {
-                    dataType(name: 'test:string')
-                }
-                valueDomain(name: 'test:token domain') {
-                    basedOn 'test:string domain'
+            dataModel(name: 'TestSchema') {
+                dataType(name: 'test:string')
+                dataType(name: 'test:token') {
+                    basedOn 'test:string'
                 }
             }
         }
 
-        Classification schema       = Classification.findByName('TestSchema')
-        ValueDomain stringDomain    = ValueDomain.findByName('test:string domain')
-        ValueDomain tokenDomain     = ValueDomain.findByName('test:token domain')
-        DataType stringType         = DataType.findByName('test:string')
+        DataModel schema       = DataModel.findByName('TestSchema')
+        DataType tokenType     = DataType.findByName('test:token')
+        DataType stringType    = DataType.findByName('test:string')
 
         expect:
         schema
-        stringDomain
-        tokenDomain
+        tokenType
         stringType
 
-        schema.classifies
-        stringDomain    in schema.classifies
-        tokenDomain     in schema.classifies
-        stringType      in schema.classifies
+        schema.declares
+        tokenType in schema.declares
+        stringType in schema.declares
 
-        stringDomain.dataType == stringType
-
-        tokenDomain.isBasedOn
-        tokenDomain.isBasedOn.contains stringDomain
+        tokenType.isBasedOn
+        tokenType.isBasedOn.contains stringType
 
     }
 
     def "complex model"() {
         build {
-            automatic valueDomain
             automatic dataType
 
-            classification name: 'Complex', {
+            dataModel name: 'Complex', {
                 id 'http://www.example.com/complex-model'
 
-                model name: "Complex Grand Parent", {
-                    model name: "Complex Parent", {
-                        model name: "Complex Child", {
+                dataClass name: "Complex Grand Parent", {
+                    dataClass name: "Complex Parent", {
+                        dataClass name: "Complex Child", {
                             dataElement name: "Complex Element 1"
                             dataElement name: "Complex Element 2", {
-                                valueDomain name: "Complex Domain 2", {
-                                    dataType enumerations: [yes: 'Yes', no: 'No']
-                                    measurementUnit name: 'Unit'
-                                }
+                                dataType enumerations: [yes: 'Yes', no: 'No']
                             }
                         }
                     }
 
-                    model name: "Complex Sibling", {
+                    dataClass name: "Complex Sibling", {
                         dataElement name: "Sibling Element"
                     }
                 }
@@ -428,28 +452,26 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         expect:
-        Model.findByName('Complex Grand Parent')
-        Model.findByName('Complex Grand Parent').parentOf
-        Model.findByName('Complex Grand Parent').parentOf.size() == 2
+        DataClass.findByName('Complex Grand Parent')
+        DataClass.findByName('Complex Grand Parent').parentOf
+        DataClass.findByName('Complex Grand Parent').parentOf.size() == 2
 
-        Model.findByName('Complex Child')
-        Model.findByName('Complex Child').contains
-        Model.findByName('Complex Child').contains.size() == 2
-
-        ValueDomain.findByName('Complex Element 1')
+        DataClass.findByName('Complex Child')
+        DataClass.findByName('Complex Child').contains
+        DataClass.findByName('Complex Child').contains.size() == 2
     }
 
     def "create generic relationship"() {
         build {
-            classification name: "Other123", {
-                valueDomain name: 'WD40'
+            dataModel name: "Other123", {
+                dataType name: 'WD40'
             }
-            classification name: "Other234", {
-                valueDomain name: 'VDRel1'
-                valueDomain name: 'VDRel2'
-                valueDomain name: 'VDRel3'
-                valueDomain name: 'VDRel4', {
-                    rel 'synonym'   to      valueDomain called 'VDRel2'
+            dataModel name: "Other234", {
+                dataType name: 'VDRel1'
+                dataType name: 'VDRel2'
+                dataType name: 'VDRel3'
+                dataType name: 'VDRel4', {
+                    rel 'synonym'   to      dataType called 'VDRel2'
                     rel 'synonym'   from    'VDRel1'
                     rel 'relatedTo' to      'Other123', 'WD40'
                     rel 'base'      to      'Other123', 'WD40'
@@ -458,17 +480,17 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         expect:
-        ValueDomain.findByName('VDRel4')
-        ValueDomain.findByName('VDRel4').countRelationshipsByType(RelationshipType.readByName('synonym'))   == 2
-        ValueDomain.findByName('VDRel4').countRelationshipsByType(RelationshipType.readByName('base'))      == 1
-        ValueDomain.findByName('VDRel4').countRelationshipsByType(RelationshipType.readByName('relatedTo')) == 1
+        DataType.findByName('VDRel4')
+        DataType.findByName('VDRel4').countRelationshipsByType(RelationshipType.readByName('synonym'))   == 2
+        DataType.findByName('VDRel4').countRelationshipsByType(RelationshipType.readByName('base'))      == 1
+        DataType.findByName('VDRel4').countRelationshipsByType(RelationshipType.readByName('relatedTo')) == 1
     }
 
     def "creates new version of the element"() {
         build {
-            classification(name: "NewVersion1") {
+            dataModel(name: "NewVersion1") {
                 // creates finalized model
-                model name: "ModelNV1", id: "http://www.example.com/models/ModelNV1"
+                dataClass name: "ModelNV1", id: "http://www.example.com/models/ModelNV1"
             }
         }
 
@@ -477,44 +499,44 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         build {
-            classification(name: "NewVersion2") {
-                model name: "ModelNVX1", id: "http://www.example.com/models/ModelNVX1"
+            dataModel(name: "NewVersion2") {
+                dataClass name: "ModelNVX1", id: "http://www.example.com/models/ModelNVX1"
             }
         }
 
         expect:
-        Model.findByName("ModelNV1")?.status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
+        DataClass.findByName("ModelNV1")?.status == ElementStatus.FINALIZED
 
         when:
         build {
-            classification(name: "NewVersion1") {
+            dataModel(name: "NewVersion1") {
                 // this should create new version with different name
-                model name: "ModelNV2", id: "http://www.example.com/models/ModelNV1"
+                dataClass name: "ModelNV2", id: "http://www.example.com/models/ModelNV1"
             }
         }
 
 
         then: "new model is draft"
-        Model.findByName("ModelNV2")?.modelCatalogueId  == "http://www.example.com/models/ModelNV1"
-        Model.findByName("ModelNV2")?.latestVersionId   == Model.findByName("ModelNV1")?.id
-        Model.findByName("ModelNV2")?.status            == org.modelcatalogue.core.api.ElementStatus.DRAFT
+        DataClass.findByName("ModelNV2")?.modelCatalogueId  == "http://www.example.com/models/ModelNV1"
+        DataClass.findByName("ModelNV2")?.latestVersionId   == DataClass.findByName("ModelNV1")?.id
+        DataClass.findByName("ModelNV2")?.status            == ElementStatus.DRAFT
 
         and: "the old model is still finalized"
-        Model.findByName("ModelNV1")?.status            == org.modelcatalogue.core.api.ElementStatus.FINALIZED
-        Model.findByName("ModelNV1")?.modelCatalogueId  == "http://www.example.com/models/ModelNV1"
+        DataClass.findByName("ModelNV1")?.status            == ElementStatus.FINALIZED
+        DataClass.findByName("ModelNV1")?.modelCatalogueId  == "http://www.example.com/models/ModelNV1"
 
         and: "there are two NewVersion1 classifications at the moment"
-        Classification.countByName('NewVersion1')                                   == 2
-        Classification.countByNameAndStatus('NewVersion1', org.modelcatalogue.core.api.ElementStatus.DRAFT)     == 1
-        Classification.countByNameAndStatus('NewVersion1', org.modelcatalogue.core.api.ElementStatus.FINALIZED) == 1
+        DataModel.countByName('NewVersion1')                                   == 2
+        DataModel.countByNameAndStatus('NewVersion1', ElementStatus.DRAFT)     == 1
+        DataModel.countByNameAndStatus('NewVersion1', ElementStatus.FINALIZED) == 1
 
 
     }
 
     def "adds metadata to nested relationship like child model"() {
         build {
-            model(name: "Parent 007") {
-                model(name: "Child 008") {
+            dataClass(name: "Parent 007") {
+                dataClass(name: "Child 008") {
                     relationship {
                         ext "Min. Occurs", "1"
                     }
@@ -523,7 +545,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         when:
-        Relationship rel = Relationship.findBySourceAndDestination(Model.findByName('Parent 007'), Model.findByName('Child 008'))
+        Relationship rel = Relationship.findBySourceAndDestination(DataClass.findByName('Parent 007'), DataClass.findByName('Child 008'))
 
         then:
         rel
@@ -533,16 +555,16 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
 
         when:
-        elementService.finalizeElement(Model.findByName('Parent 007'))
+        elementService.finalizeElement(DataClass.findByName('Parent 007'))
 
 
         then:
-        Model.findByName('Parent 007').status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
+        DataClass.findByName('Parent 007').status == ElementStatus.FINALIZED
 
         when:
         build {
-            model(name: "Parent 007") {
-                model(name: "Child 008") {
+            dataClass(name: "Parent 007") {
+                dataClass(name: "Child 008") {
                     relationship {
                         ext "Min. Occurs", "0"
                     }
@@ -551,57 +573,59 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         then:
-        Model.findByName('Parent 007', [sort: 'versionNumber', order: 'desc']).status == org.modelcatalogue.core.api.ElementStatus.DRAFT
+        DataClass.findByName('Parent 007', [sort: 'versionNumber', order: 'desc']).status == ElementStatus.DRAFT
     }
 
 
     def "migrates hierarchy relationship to new draft version"() {
         build {
-            model(name: 'MHR ROOT') {
-                model(name: 'MHR L1') {
-                    model(name: 'MHR L2') {
-                        model(name: 'MHR L3')
+            dataModel(name: 'MHR MODEL') {
+                dataClass(name: 'MHR ROOT') {
+                    dataClass(name: 'MHR L1') {
+                        dataClass(name: 'MHR L2') {
+                            dataClass(name: 'MHR L3')
+                        }
                     }
                 }
             }
         }
 
-        elementService.finalizeElement(Model.findByName('MHR ROOT'))
+        elementService.finalizeElement(DataClass.findByName('MHR ROOT'))
 
-        Model l1Finalized = Model.findByName('MHR L1')
+        DataClass l1Finalized = DataClass.findByName('MHR L1')
 
         expect:
         l1Finalized
-        l1Finalized.status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
-        l1Finalized.countParentOf() == 1
+        l1Finalized.status == ElementStatus.FINALIZED
+        l1Finalized.parentOf.size() == 1
 
         when:
-        Model l1Draft = elementService.createDraftVersion(l1Finalized, DraftContext.userFriendly())
+        DataClass l1Draft = elementService.createDraftVersion(l1Finalized, DraftContext.userFriendly())
 
         then:
         l1Draft
-        l1Draft.status == org.modelcatalogue.core.api.ElementStatus.DRAFT
-        l1Draft.countParentOf() == 1
+        l1Draft.status == ElementStatus.DRAFT
+        l1Draft.parentOf.size() == 1
 
         when:
-        Model l3Finalized = Model.findByName('MHR L3')
+        DataClass l3Finalized = DataClass.findByName('MHR L3')
 
         then:
         l3Finalized
-        l3Finalized.countChildOf() == 1
+        l3Finalized.childOf.size() == 1
 
         when:
-        Model l3Draft = elementService.createDraftVersion(l3Finalized, DraftContext.userFriendly())
+        DataClass l3Draft = elementService.createDraftVersion(l3Finalized, DraftContext.userFriendly())
 
         then:
         l3Draft
-        l3Draft.status == org.modelcatalogue.core.api.ElementStatus.DRAFT
-        l3Draft.countChildOf()  == 1
-        l1Draft.countParentOf() == 1
+        l3Draft.status == ElementStatus.DRAFT
+        l3Draft.childOf.size()  == 1
+        l1Draft.parentOf.size() == 1
     }
 
     private void build(@DelegatesTo(CatalogueBuilder) Closure cl) {
-        DefaultCatalogueBuilder defaultCatalogueBuilder = new DefaultCatalogueBuilder(classificationService, elementService)
+        DefaultCatalogueBuilder defaultCatalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
         defaultCatalogueBuilder.build cl
         created = defaultCatalogueBuilder.created
     }
@@ -610,8 +634,8 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     def "order from builder is persisted"() {
         when:
         build {
-            classification (name: 'Order Test') {
-                model (name: 'OT Parent') {
+            dataModel (name: 'Order Test') {
+                dataClass (name: 'OT Parent') {
                     dataElement (name: 'OT Child 002')
                     dataElement (name: 'OT Child 001')
                     dataElement (name: 'OT Child 004')
@@ -621,7 +645,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         then:
-        Model.findByName('OT Parent').contains*.name == [
+        DataClass.findByName('OT Parent').contains*.name == [
                 'OT Child 002',
                 'OT Child 001',
                 'OT Child 004',
@@ -630,8 +654,8 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         when:
         build {
-            classification (name: 'Order Test') {
-                model (name: 'OT Parent') {
+            dataModel (name: 'Order Test') {
+                dataClass (name: 'OT Parent') {
                     dataElement (name: 'OT Child 001')
                     dataElement (name: 'OT Child 002')
                     dataElement (name: 'OT Child 003')
@@ -641,7 +665,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         then:
-        Model.findByName('OT Parent').contains*.name == [
+        DataClass.findByName('OT Parent').contains*.name == [
                 'OT Child 001',
                 'OT Child 002',
                 'OT Child 003',
@@ -650,37 +674,41 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     }
 
     def "define id as closure"() {
+        Object old = Holders.grailsApplication.config.grails.serverURL
+        Holders.grailsApplication.config.grails.serverURL = "http://localhost:8080/ModelCatalogueCorePluginTestApp"
         build {
-            classification(name: 'CS4ID') {
+            dataModel(name: 'CS4ID') {
                 id { String name, Class type ->
                     "http://www.example.com/classification/${type.simpleName[0].toLowerCase()}/$name"
                 }
-                model(name: "Model_ID")
+                dataClass(name: "Model_ID")
             }
         }
 
-        Model model = Model.findByName('Model_ID')
+        DataClass model = DataClass.findByName('Model_ID')
 
         expect:
-        model.modelCatalogueId == "http://www.example.com/classification/m/Model_ID"
+        model.modelCatalogueId == "http://www.example.com/classification/d/Model_ID"
+
+        cleanup:
+        Holders.grailsApplication.config.grails.serverURL = old
     }
 
-    // @Ignore
     @Issue("MET-587")
     def "remove child model when missing"() {
         when:
         build {
-            classification(name: "C4RMC") {
-                model (name: 'C4RMC Parent') {
-                    model (name: 'C4RMC Child 1')
-                    model (name: 'C4RMC Child 2')
-                    model (name: 'C4RMC Child 3')
+            dataModel(name: "C4RMC") {
+                dataClass (name: 'C4RMC Parent') {
+                    dataClass (name: 'C4RMC Child 1')
+                    dataClass (name: 'C4RMC Child 2')
+                    dataClass (name: 'C4RMC Child 3')
                 }
             }
         }
 
-        Classification c4rmc = Classification.findByName('C4RMC')
-        Model c4rmcParent = Model.findByName('C4RMC Parent')
+        DataModel c4rmc = DataModel.findByName('C4RMC')
+        DataClass c4rmcParent = DataClass.findByName('C4RMC Parent')
         then:
         c4rmc
         c4rmcParent
@@ -688,18 +716,18 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         when: "model is removed from finalized element"
         elementService.finalizeElement(c4rmc)
-        c4rmc.status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
+        c4rmc.status == ElementStatus.FINALIZED
 
         build {
-            classification(name: "C4RMC") {
-                model (name: 'C4RMC Parent') {
-                    model (name: 'C4RMC Child 2')
-                    model (name: 'C4RMC Child 3')
+            dataModel(name: "C4RMC") {
+                dataClass (name: 'C4RMC Parent') {
+                    dataClass (name: 'C4RMC Child 2')
+                    dataClass (name: 'C4RMC Child 3')
                 }
             }
         }
 
-        Model draft = Model.findByNameAndStatus('C4RMC Parent', org.modelcatalogue.core.api.ElementStatus.DRAFT)
+        DataClass draft = DataClass.findByNameAndStatus('C4RMC Parent', ElementStatus.DRAFT)
 
         then: "creation of draft should be triggered for finalized element"
         draft
@@ -707,17 +735,17 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         when: "model is removed from draft element"
         elementService.finalizeElement(c4rmc)
-        c4rmc.status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
+        c4rmc.status == ElementStatus.FINALIZED
 
         build {
-            classification(name: "C4RMC") {
-                model (name: 'C4RMC Parent') {
-                    model (name: 'C4RMC Child 3')
+            dataModel(name: "C4RMC") {
+                dataClass (name: 'C4RMC Parent') {
+                    dataClass (name: 'C4RMC Child 3')
                 }
             }
         }
 
-        draft = Model.findByNameAndStatus('C4RMC Parent', org.modelcatalogue.core.api.ElementStatus.DRAFT)
+        draft = DataClass.findByNameAndStatus('C4RMC Parent', ElementStatus.DRAFT)
 
         then: "the relationship should be removed from the element"
         draft
@@ -728,23 +756,23 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     def "finalizes model after creation"() {
         when:
         build {
-            model(name: 'Parent Model 4 Finalization') {
+            dataClass(name: 'Parent Model 4 Finalization') {
                 status finalized
-                model(name: 'Child Model 4 Finalization')
+                dataClass(name: 'Child Model 4 Finalization')
             }
         }
         then:
         noExceptionThrown()
-        Model.findByName('Parent Model 4 Finalization').status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
-        Model.findByName('Child Model 4 Finalization').status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
+        DataClass.findByName('Parent Model 4 Finalization').status == ElementStatus.FINALIZED
+        DataClass.findByName('Child Model 4 Finalization').status == ElementStatus.FINALIZED
     }
 
     def "can call relationship closure more than once"() {
         String name = 'Model for Double Relationship Call'
         when:
         build {
-            model(name: name) {
-                model(name: "$name Child") {
+            dataClass(name: name) {
+                dataClass(name: "$name Child") {
                     relationship {
                         ext 'one', '1'
                     }
@@ -755,7 +783,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
             }
         }
 
-        Model parent = created.find { it.name == name }
+        DataClass parent = created.find { it.name == name }
 
         then:
         parent
@@ -771,15 +799,15 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         String ch2Name = "$name Child 2"
         when:
         build {
-            model(name: name) {
-                model(name: ch1Name) {
+            dataClass(name: name) {
+                dataClass(name: ch1Name) {
                     relationship {
                         ext 'one', '1'
                         ext 'two', '2'
                     }
                 }
 
-                model(name: ch2Name) {
+                dataClass(name: ch2Name) {
                     relationship {
                         ext 'two', 'II'
                         ext 'three', 'III'
@@ -787,7 +815,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
                 }
             }
         }
-        Model parent = created.find { it.name == name } as Model
+        DataClass parent = created.find { it.name == name } as DataClass
 
         then:
         parent
@@ -825,7 +853,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         then:
         noExceptionThrown()
-        CatalogueElement.findByNameAndStatus('C4CR GP', org.modelcatalogue.core.api.ElementStatus.DRAFT).classifications.any { it.name == 'C4CR'}
+        CatalogueElement.findByNameAndStatus('C4CR GP', ElementStatus.DRAFT).classifications.any { it.name == 'C4CR'}
     }
 
 
@@ -853,6 +881,43 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         noExceptionThrown()
         CatalogueElement.findByName('C4CR2 P').parentOf.size() == 3
         CatalogueElement.findByName('C4CR2 P').childOf.any { it.name == 'C4CR2 GP'}
-        CatalogueElement.findByNameAndStatus('C4CR2 GP', org.modelcatalogue.core.api.ElementStatus.DRAFT).parentOf.any { it.name == 'C4CR2 P'}
+        CatalogueElement.findByNameAndStatus('C4CR2 GP', ElementStatus.DRAFT).parentOf.any { it.name == 'C4CR2 P'}
+    }
+
+
+    def "can change data type's type"() {
+        when:
+        build {
+            dataModel name: 'DM4CCDTT', {
+                dataType name: 'DT4CCDTT'
+            }
+        }
+
+        DataType type = DataType.findByName 'DT4CCDTT'
+
+        then:
+        type
+        type.instanceOf(DataType)
+        !type.instanceOf(PrimitiveType)
+        HibernateProxyHelper.getClassWithoutInitializingProxy(type) == DataType
+
+
+        when:
+        build {
+            dataModel name: 'DM4CCDTT', {
+                dataType name: 'DT4CCDTT', {
+                    measurementUnit name: 'MU4CCDTT'
+                }
+            }
+        }
+
+        type = DataType.findByName('DT4CCDTT', [order: 'desc', sort: 'versionNumber'])
+
+        then:
+        type
+        type.instanceOf(DataType)
+        type.instanceOf(PrimitiveType)
+        HibernateProxyHelper.getClassWithoutInitializingProxy(type) == PrimitiveType
+
     }
 }

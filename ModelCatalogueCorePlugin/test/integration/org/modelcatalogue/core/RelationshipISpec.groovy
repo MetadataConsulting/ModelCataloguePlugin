@@ -31,11 +31,6 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         RelationshipType.readByName("relationship")
     }
 
-    ValueDomain getVd1() {
-        ValueDomain.findByName("school subject")
-    }
-
-
     def "Fail to Create Relationship if the catalogue elements have not been persisted"()
     {
 
@@ -105,20 +100,20 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
     }
 
-    Model getMd1() {
-        Model.findByName("book")
+    DataClass getMd1() {
+        DataClass.findByName("book")
     }
 
 
     def "get classified name"() {
         expect:
         relationshipService.getClassifiedName(null)                     ==  null
-        relationshipService.getClassifiedName(new Model(name: 'BLAH'))  == 'BLAH'
+        relationshipService.getClassifiedName(new DataClass(name: 'BLAH'))  == 'BLAH'
 
         when:
-        Classification classification = new Classification(name: "classy").save(failOnError: true)
-        Model model = new Model(name: "Supermodel").save(failOnError: true)
-        model.addToClassifications(classification)
+        DataModel classification = new DataModel(name: "classy").save(failOnError: true)
+        DataClass model = new DataClass(name: "Supermodel").save(failOnError: true)
+        model.addToDeclaredWithin(classification)
 
         then:
         relationshipService.getClassifiedName(model) == 'Supermodel (classy)'
@@ -130,19 +125,19 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
     def "get classification info"() {
         expect:
-        relationshipService.getClassificationsInfo(null)                     == []
-        relationshipService.getClassificationsInfo(new Model(name: 'BLAH'))  == []
+        relationshipService.getDataModelsInfo(null)                     == []
+        relationshipService.getDataModelsInfo(new DataClass(name: 'BLAH'))  == []
 
         when:
-        Classification classification = new Classification(name: "classy").save(failOnError: true)
-        Model model = new Model(name: "Supermodel").save(failOnError: true)
-        model.addToClassifications(classification)
+        DataModel classification = new DataModel(name: "classy").save(failOnError: true)
+        DataClass model = new DataClass(name: "Supermodel").save(failOnError: true)
+        model.addToDeclaredWithin(classification)
 
-        def info = relationshipService.getClassificationsInfo(model)
+        def info = relationshipService.getDataModelsInfo(model)
 
         then:
         info == [
-                [name: classification.name, id: classification.id, elementType: Classification.name, link: "/classification/${classification.id}", status: 'DRAFT']
+                [name: classification.name, id: classification.id, elementType: DataModel.name, link: "/dataModel/${classification.id}", status: 'DRAFT']
         ]
 
         cleanup:
@@ -155,7 +150,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
     def "init default indexes assigned when linking sortable relationship type so we are able to reorder (#direction)"() {
         given:
         RelationshipType type = RelationshipType.relatedToType
-        Model m1 = new Model(name: 'M1').save(failOnError: true)
+        DataClass m1 = new DataClass(name: 'M1').save(failOnError: true)
 
         DataElement de1 = new DataElement(name: "DE1").save(failOnError: true)
         DataElement de2 = new DataElement(name: "DE2").save(failOnError: true)
@@ -274,7 +269,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         return relationshipService.link(source, destination, type)
     }
 
-    private List<Long> getIds(RelationshipDirection direction, RelationshipType type, Model m1) {
+    private List<Long> getIds(RelationshipDirection direction, RelationshipType type, DataClass m1) {
         relationshipService.getRelationships([sort: direction.sortProperty], direction, m1, type).items*.id
     }
 

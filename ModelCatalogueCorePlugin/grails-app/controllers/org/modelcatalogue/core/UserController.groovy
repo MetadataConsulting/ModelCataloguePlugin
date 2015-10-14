@@ -2,7 +2,7 @@ package org.modelcatalogue.core
 
 import grails.converters.JSON
 import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.util.ClassificationFilter
+import org.modelcatalogue.core.util.DataModelFilter
 
 class UserController extends AbstractCatalogueElementController<User> {
 
@@ -19,7 +19,7 @@ class UserController extends AbstractCatalogueElementController<User> {
             return
         }
 
-        ClassificationFilter.from(request.JSON).to(modelCatalogueSecurityService.currentUser)
+        DataModelFilter.from(request.JSON).to(modelCatalogueSecurityService.currentUser)
 
         redirect controller: 'user', action: 'current'
     }
@@ -30,14 +30,14 @@ class UserController extends AbstractCatalogueElementController<User> {
             return
         }
 
-        ClassificationFilter filter = ClassificationFilter.from(modelCatalogueSecurityService.currentUser)
+        DataModelFilter filter = DataModelFilter.from(modelCatalogueSecurityService.currentUser)
 
         render([
                 success: true,
                 username: modelCatalogueSecurityService.currentUser.username,
                 roles: modelCatalogueSecurityService.currentUser.authorities*.authority,
                 id: modelCatalogueSecurityService.currentUser.hasProperty('id') ? modelCatalogueSecurityService.currentUser.id : null,
-                classifications: filter.toMap()
+                dataModels: filter.toMap()
         ] as JSON)
     }
 

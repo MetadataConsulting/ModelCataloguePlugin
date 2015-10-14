@@ -6,9 +6,6 @@ import org.modelcatalogue.core.util.ResultRecorder
 import spock.lang.Shared
 import spock.lang.Unroll
 
-/**
- * Created by adammilward on 05/02/2014.
- */
 class SearchISpec extends AbstractIntegrationSpec{
 
  //runs ok in integration test (test-app :integration), fails as part of test-app (Grails Bug) - uncomment to run
@@ -63,11 +60,10 @@ class SearchISpec extends AbstractIntegrationSpec{
         5 | "DataElement"       | new DataElementController()         | "de_author1"                    | "json"    | "DE_author1"              | 1         | null
         9 | "EnumeratedType"    | new EnumeratedTypeController()      | "sub1"                          | "json"    | "sub1"                    | 1         | null
        11 | "MeasurementUnit"   | new MeasurementUnitController()     | "°C"                            | "json"    | "Degrees Celsius"         | 1         | null
-       13 | "Model"             | new ModelController()               | "Jabberwocky"                   | "json"    | "chapter1"                | 1         | null
-       14 | "Model"             | new ModelController()               | "Jabberwocky"                   | "json"    | "chapter1"                | 0         | 'deprecated'
-       15 | "ValueDomain"       | new ValueDomainController()         | "domain Celsius"                | "json"    | "value domain Celsius"    | 1         | null
-       17 | "RelationshipType"  | new RelationshipTypeController()    | "classification"                | "json"    | "classification"          | 2         | null
-       18 | "RelationshipType"  | new RelationshipTypeController()    | "classification"                | "json"    | "classification"          | 2         | null
+       13 | "DataClass"         | new DataClassController()           | "Jabberwocky"                   | "json"    | "chapter1"                | 1         | null
+       14 | "DataClass"         | new DataClassController()           | "Jabberwocky"                   | "json"    | "chapter1"                | 0         | 'deprecated'
+       17 | "RelationshipType"  | new RelationshipTypeController()    | "declaration"                   | "json"    | "declaration"              | 1         | null
+       18 | "RelationshipType"  | new RelationshipTypeController()    | "declaration"                   | "json"    | "declaration"              | 1         | null
     }
 
     @Unroll
@@ -112,13 +108,13 @@ class SearchISpec extends AbstractIntegrationSpec{
     protected static getPaginationParameters() {
         [
                 // no, size, max, offset, total, next, previous, searchString, sort, order
-                [1, 10, 10, 0, 75, "/search/?search=a&max=10&offset=10", "", "a"],
-                [2, 5, 5, 0, 75, "/search/?search=a&max=5&sort=name&order=ASC&offset=5", "", "a", "name", "ASC"],
-                [3, 2, 2, 6, 75, "/search/?search=a&max=2&sort=name&order=ASC&offset=8", "/search/?search=a&max=2&sort=name&order=ASC&offset=4", "a", "name", "ASC"],
-                [4, 4, 4, 1, 75, "/search/?search=a&max=4&sort=name&order=ASC&offset=5", "", "a", "name", "ASC"],
-                [5, 2, 2, 2, 75, "/search/?search=a&max=2&sort=name&order=ASC&offset=4", "/search/?search=a&max=2&sort=name&order=ASC&offset=0", "a", "name", "ASC"],
-                [6, 2, 2, 4, 75, "/search/?search=a&max=2&sort=name&offset=6", "/search/?search=a&max=2&sort=name&offset=2", "a", "name", ""],
-                [7, 2, 2, 4, 75, "/search/?search=a&max=2&offset=6", "/search/?search=a&max=2&offset=2", "a", null, null]
+                [1, 10, 10, 0, 65, "/search/?search=a&max=10&offset=10", "", "a"],
+                [2, 5, 5, 0, 65, "/search/?search=a&max=5&sort=name&order=ASC&offset=5", "", "a", "name", "ASC"],
+                [3, 2, 2, 6, 65, "/search/?search=a&max=2&sort=name&order=ASC&offset=8", "/search/?search=a&max=2&sort=name&order=ASC&offset=4", "a", "name", "ASC"],
+                [4, 4, 4, 1, 65, "/search/?search=a&max=4&sort=name&order=ASC&offset=5", "", "a", "name", "ASC"],
+                [5, 2, 2, 2, 65, "/search/?search=a&max=2&sort=name&order=ASC&offset=4", "/search/?search=a&max=2&sort=name&order=ASC&offset=0", "a", "name", "ASC"],
+                [6, 2, 2, 4, 65, "/search/?search=a&max=2&sort=name&offset=6", "/search/?search=a&max=2&sort=name&offset=2", "a", "name", ""],
+                [7, 2, 2, 4, 65, "/search/?search=a&max=2&offset=6", "/search/?search=a&max=2&offset=2", "a", null, null]
         ]
     }
 

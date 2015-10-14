@@ -38,6 +38,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptCsvHeaders'
   'mc.core.ui.bs.modalPromptCsvTransform'
   'mc.core.ui.bs.modalPromptEditRelationship'
+  'mc.core.ui.bs.modalPromptWithOptions'
   'mc.core.ui.bs.modalPromptNewRelationship'
   'mc.core.ui.bs.modalPromptNewMapping'
   'mc.core.ui.bs.modalPromptXmlValidate'
@@ -50,20 +51,20 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptLogin'
   'mc.core.ui.bs.modalPromptBasicEdit'
   'mc.core.ui.bs.modalPromptMeasurementUnitEdit'
-  'mc.core.ui.bs.modalPromptValueDomainEdit'
   'mc.core.ui.bs.modalPromptEnumeratedTypeEdit'
   'mc.core.ui.bs.modalPromptActionParametersEdit'
   'mc.core.ui.bs.modalPromptModel'
   'mc.core.ui.bs.modalPromptRelationshipTypeEdit'
   'mc.core.ui.bs.modalPromptGenerateSuggestions'
   'mc.core.ui.bs.modalPromptDataElementEdit'
+  'mc.core.ui.bs.modalAbout'
   'mc.core.ui.bs.saveOrUpdatePublishedElementCtrl'
   'mc.core.ui.bs.saveAndCreateAnotherCtrlMixin'
   'mc.core.ui.bs.modalPromptConvert'
   'mc.core.ui.bs.modalPromptCurrentActivity'
   'mc.core.ui.bs.modalPromptValidateValue'
   'mc.core.ui.bs.modelWizard'
-  'mc.core.ui.bs.classificationWizard'
+  'mc.core.ui.bs.dataModelWIzard'
   'mc.core.ui.bs.elementsAsTags'
   'mc.core.ui.bs.diffTable'
   'mc.core.ui.bs.withClassificationCtrlMixin'
@@ -74,7 +75,7 @@ angular.module('mc.core.ui.bs', [
   if jQuery
     jQuery(document).on 'keypress', (e) ->
       # ctrl + space
-      if e.which is 0 and e.ctrlKey
+      if e.which in [0, 10] and e.ctrlKey
         messages.prompt null, null, type: 'search-action'
         e.preventDefault()
         return

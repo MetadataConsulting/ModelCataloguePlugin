@@ -24,14 +24,14 @@ import java.text.SimpleDateFormat
 class ChangelogGenerator {
 
     private final AuditService auditService
-    private final ModelService modelService
+    private final DataClassService dataClassService
     private final CommentsService commentsService
 
     private final Map<Long, List<Comment>> commentsCache = [:]
 
-    ChangelogGenerator(AuditService auditService, ModelService modelService) {
+    ChangelogGenerator(AuditService auditService, DataClassService dataClassService) {
         this.auditService = auditService
-        this.modelService = modelService
+        this.dataClassService = dataClassService
         try {
             commentsService = Holders.applicationContext.getBean(CommentsService)
         } catch (Exception ignored) {
@@ -40,8 +40,8 @@ class ChangelogGenerator {
         }
     }
 
-    void generateChangelog(Model model, OutputStream outputStream) {
-        log.info "Generating changelog for model $model.name ($model.combinedVersion)"
+    void generateChangelog(DataClass dataClass, OutputStream outputStream) {
+        log.info "Generating changelog for data class $dataClass.name ($dataClass.combinedVersion)"
         DocumentBuilder builder = new ModelCatalogueWordDocumentBuilder(outputStream)
 
         def customTemplate = {
@@ -70,43 +70,43 @@ class ChangelogGenerator {
 
         builder.create {
             document(template: customTemplate) {
-                paragraph "Changelog for ${model.name}", style: 'title',  align: 'center'
+                paragraph "Changelog for ${dataClass.name}", style: 'title',  align: 'center'
                 paragraph(style: 'subtitle', align: 'center') {
-                    text "${model.combinedVersion}"
+                    text "${dataClass.combinedVersion}"
                     lineBreak()
-                    text "${model.status}"
+                    text "${dataClass.status}"
                     lineBreak()
                     text SimpleDateFormat.dateInstance.format(new Date())
                 }
-                if (model.description) {
+                if (dataClass.description) {
                     paragraph(style: 'description', margin: [left: 50, right: 50]) {
-                        text model.description
+                        text dataClass.description
                     }
                 }
                 pageBreak()
 
                 delayable.whilePaused {
-                    delayable.heading1 "Root Model Changes"
-                    printPropertiesChanges(delayable, model)
+                    delayable.heading1 "Root Data Class Changes"
+                    printPropertiesChanges(delayable, dataClass)
                 }
 
-                heading1 'Models'
+                heading1 'Data Classes'
 
-                Collection<Model> models = getModelsForRootModel(model)
+                Collection<DataClass> classes = getInnerClasses(dataClass)
                 int counter = 1
-                int size = models.size()
-                for (Model child in models) {
-                    log.info "[${counter++}/${size}] Processing changes from Model $child.name"
+                int size = classes.size()
+                for (DataClass child in classes) {
+                    log.info "[${counter++}/${size}] Processing changes from Data Class $child.name"
                     delayable.whilePaused {
                         printPropertiesChanges(delayable, child)
-                        printModelStructuralChanges(delayable, child)
+                        printClassStructuralChanges(delayable, child)
                     }
 
                 }
             }
         }
 
-        log.info "Model $model.name changelog exported to Word Document"
+        log.info "Data Class $dataClass.name changelog exported to Word Document"
 
 
     }
@@ -273,8 +273,8 @@ class ChangelogGenerator {
         }
     }
 
-    private void printModelStructuralChanges(Delayable<DocumentBuilder> builder, Model model) {
-        List<Change> relationshipChanges = getChanges(model, ChangeType.RELATIONSHIP_CREATED, ChangeType.RELATIONSHIP_DELETED, ChangeType.RELATIONSHIP_ARCHIVED, ChangeType.RELATIONSHIP_METADATA_CREATED, ChangeType.RELATIONSHIP_METADATA_DELETED, ChangeType.RELATIONSHIP_METADATA_UPDATED)
+    private void printClassStructuralChanges(Delayable<DocumentBuilder> builder, DataClass dataClass) {
+        List<Change> relationshipChanges = getChanges(dataClass, ChangeType.RELATIONSHIP_CREATED, ChangeType.RELATIONSHIP_DELETED, ChangeType.RELATIONSHIP_ARCHIVED, ChangeType.RELATIONSHIP_METADATA_CREATED, ChangeType.RELATIONSHIP_METADATA_DELETED, ChangeType.RELATIONSHIP_METADATA_UPDATED)
 
         Multimap<String, Change> byDestinationsAndSources = LinkedHashMultimap.create()
 
@@ -283,11 +283,11 @@ class ChangelogGenerator {
             byDestinationsAndSources.put "in:${getRelationshipType(ch)}:${getSourceId(ch)}".toString(), ch
         }
 
-        handleRelationshipChanges(builder, byDestinationsAndSources, RelationshipChangesCheckConfiguration.create(model, RelationshipType.hierarchyType).withChangesSummaryHeading("Changed Child Models").withNewRelationshipNote("New child model").withRemovedRelationshipNote("Child model removed"))
-        handleRelationshipChanges(builder, byDestinationsAndSources, RelationshipChangesCheckConfiguration.create(model, RelationshipType.containmentType).withChangesSummaryHeading("Changed Data Elements").withNewRelationshipNote("New data element").withRemovedRelationshipNote("Data element removed").withDeep(true))
-        handleRelationshipChanges(builder, byDestinationsAndSources, RelationshipChangesCheckConfiguration.create(model, RelationshipType.synonymType).withChangesSummaryHeading("Changed Synonyms").withNewRelationshipNote("New synonym").withRemovedRelationshipNote("Synonym removed"))
-        handleRelationshipChanges(builder, byDestinationsAndSources, RelationshipChangesCheckConfiguration.create(model, RelationshipType.relatedToType).withChangesSummaryHeading("Changed Relations").withNewRelationshipNote("Newly related").withRemovedRelationshipNote("No longer related"))
-        handleRelationshipChanges(builder, byDestinationsAndSources, RelationshipChangesCheckConfiguration.create(model, RelationshipType.baseType).withChangesSummaryHeading("Changed Bases").withNewRelationshipNote("Newly based on").withRemovedRelationshipNote("No longer based on").withIncoming(true))
+        handleRelationshipChanges(builder, byDestinationsAndSources, RelationshipChangesCheckConfiguration.create(dataClass, RelationshipType.hierarchyType).withChangesSummaryHeading("Changed Inner Data Classes").withNewRelationshipNote("New inner data class").withRemovedRelationshipNote("Inner data class removed"))
+        handleRelationshipChanges(builder, byDestinationsAndSources, RelationshipChangesCheckConfiguration.create(dataClass, RelationshipType.containmentType).withChangesSummaryHeading("Changed Data Elements").withNewRelationshipNote("New data element").withRemovedRelationshipNote("Data element removed").withDeep(true))
+        handleRelationshipChanges(builder, byDestinationsAndSources, RelationshipChangesCheckConfiguration.create(dataClass, RelationshipType.synonymType).withChangesSummaryHeading("Changed Synonyms").withNewRelationshipNote("New synonym").withRemovedRelationshipNote("Synonym removed"))
+        handleRelationshipChanges(builder, byDestinationsAndSources, RelationshipChangesCheckConfiguration.create(dataClass, RelationshipType.relatedToType).withChangesSummaryHeading("Changed Relations").withNewRelationshipNote("Newly related").withRemovedRelationshipNote("No longer related"))
+        handleRelationshipChanges(builder, byDestinationsAndSources, RelationshipChangesCheckConfiguration.create(dataClass, RelationshipType.baseType).withChangesSummaryHeading("Changed Bases").withNewRelationshipNote("Newly based on").withRemovedRelationshipNote("No longer based on").withIncoming(true))
     }
 
     private void handleRelationshipChanges(Delayable<DocumentBuilder> builder, Multimap<String, Change> byDestinationsAndSources, RelationshipChangesCheckConfiguration configuration) {
@@ -429,7 +429,7 @@ class ChangelogGenerator {
     private static String getOldRelationshipMetadataValue(Change ch) {
         switch (ch.type) {
             case [ChangeType.RELATIONSHIP_METADATA_DELETED, ChangeType.RELATIONSHIP_METADATA_UPDATED]:
-                def value = org.modelcatalogue.core.audit.DefaultAuditor.readValue(ch.oldValue)
+                def value = DefaultAuditor.readValue(ch.oldValue)
                 return value instanceof CharSequence ? value : value?.extensionValue
             case ChangeType.RELATIONSHIP_METADATA_CREATED:
                 return ''
@@ -442,7 +442,7 @@ class ChangelogGenerator {
     private static String getNewRelationshipMetadataValue(Change ch) {
         switch (ch.type) {
             case [ChangeType.RELATIONSHIP_METADATA_CREATED, ChangeType.RELATIONSHIP_METADATA_UPDATED]:
-                def value = org.modelcatalogue.core.audit.DefaultAuditor.readValue(ch.newValue)
+                def value = DefaultAuditor.readValue(ch.newValue)
                 return value instanceof CharSequence ? value : value?.extensionValue
             case ChangeType.RELATIONSHIP_METADATA_DELETED:
                 return ''
@@ -497,8 +497,8 @@ class ChangelogGenerator {
         }.items
     }
 
-    private Collection<Model> getModelsForRootModel(Model model) {
-        modelService.getSubModels(model).items
+    private Collection<DataClass> getInnerClasses(DataClass dataClass) {
+        dataClassService.getInnerClasses(dataClass).items
     }
 
     private static String valueForPrint(String propertyName, String storedValue) {

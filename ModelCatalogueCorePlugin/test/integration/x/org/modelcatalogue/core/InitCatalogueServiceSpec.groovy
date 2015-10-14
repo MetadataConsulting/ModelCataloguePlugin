@@ -30,10 +30,10 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
     def "init default relationship types"() {
 
         when:
-        RelationshipType dt1 = RelationshipType.readByName("containment")
-        RelationshipType dt2 = RelationshipType.readByName("classification")
-        RelationshipType dt3 = RelationshipType.readByName("supersession")
-        RelationshipType dt4 = RelationshipType.readByName("hierarchy")
+        RelationshipType dt1 = RelationshipType.containmentType
+        RelationshipType dt2 = RelationshipType.declarationType
+        RelationshipType dt3 = RelationshipType.supersessionType
+        RelationshipType dt4 = RelationshipType.hierarchyType
 
         then:
         dt1
@@ -48,7 +48,7 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
 
         then:
         loaded
-        loaded.sourceClass == Model
+        loaded.sourceClass == DataClass
         loaded.destinationClass == DataElement
         loaded.sourceToDestination == "contains"
         loaded.destinationToSource == "contained in"
@@ -62,8 +62,8 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
 
         then:
         loaded
-        loaded.sourceClass == Model
-        loaded.destinationClass == Model
+        loaded.sourceClass == DataClass
+        loaded.destinationClass == DataClass
         loaded.sourceToDestination == "parent of"
         loaded.destinationToSource == "child of"
         loaded.name == "hierarchy"
@@ -82,7 +82,7 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
         loaded.destinationToSource == "supersedes"
         loaded.name == "supersession"
 
-        !loaded.validateRule(new Model(), new DataElement(), [:])
+        !loaded.validateRule(new DataClass(), new DataElement(), [:])
         loaded.validateRule(new DataElement(), new DataElement(), [:])
 
     }

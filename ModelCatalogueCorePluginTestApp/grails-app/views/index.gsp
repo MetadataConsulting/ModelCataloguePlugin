@@ -1,4 +1,4 @@
-<%@ page import="org.modelcatalogue.core.util.CDN; grails.plugin.springsecurity.SpringSecurityUtils; org.modelcatalogue.core.security.User; grails.util.BuildScope; org.modelcatalogue.core.util.ClassificationFilter; grails.util.Environment" contentType="text/html;charset=UTF-8" defaultCodec="none" %>
+<%@ page import="org.modelcatalogue.core.util.DataModelFilter; org.modelcatalogue.core.util.CDN; grails.plugin.springsecurity.SpringSecurityUtils; org.modelcatalogue.core.security.User; grails.util.BuildScope; org.modelcatalogue.core.util.DataModelFilter; grails.util.Environment" contentType="text/html;charset=UTF-8" defaultCodec="none" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -97,11 +97,18 @@
                     roles: ${SpringSecurityUtils.getPrincipalAuthorities()*.authority.encodeAsJSON()},
                     username: '${sec.username()}',
                     id: ${sec.loggedInUserInfo(field:"id")},
-                    classifications: ${(ClassificationFilter.from(User.get(sec.loggedInUserInfo(field:"id"))).toMap()).encodeAsJSON() }
+                    dataModels: ${(org.modelcatalogue.core.util.DataModelFilter.from(User.get(sec.loggedInUserInfo(field:"id"))).toMap()).encodeAsJSON() }
                 }
                 </sec:ifLoggedIn>
             })
         }]);
+
+        demoConfig.run(['$templateCache', function ($templateCache) {
+            $templateCache.put("/info/version.html", '${render(template:"/version")}')
+
+        }]);
+
+
         modelcatalogue.registerModule('demo.config');
 
         modelcatalogue.welcome = {};
@@ -128,63 +135,69 @@
 
 <body>
 <div id="metadataCurator" ng-app="metadataCurator" >
-    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="#"><span class="fa fa-fw fa-book"></span><span class="hidden-sm">&nbsp; Model Catalogue</span></a>
+    <ui-view>
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+
+                    </button>
+                    <a class="navbar-brand" href="#"><span class="fa fa-fw fa-book"></span>&nbsp; Model Catalogue</a>
+                </div>
+
+                <div class="navbar-collapse collapse"></div><!--/.nav-collapse -->
             </div>
-
-            <div class="navbar-collapse collapse">
-                <contextual-menu></contextual-menu>
-                <ul class="nav navbar-nav">
-                    <li class="hidden-sm hidden-md hidden-lg" ng-controller="defaultStates.userCtrl">
-                        <a show-if-logged-in ng-click="logout()" type="submit">Log out</a>
-                        <a hide-if-logged-in ng-click="login()"  type="submit">Log in</a>
-                    </li>
-
-                </ul>
-
-                <form class="navbar-form navbar-right hidden-xs" ng-controller="defaultStates.userCtrl">
-                    <button show-if-logged-in ng-click="logout()" class="btn btn-danger"  type="submit"><i class="glyphicon glyphicon-log-out"></i></button>
-                    <button hide-if-logged-in ng-click="login()"  class="btn btn-primary" type="submit"><i class="glyphicon glyphicon-log-in"></i></button>
-                </form>
-
-                <ng-include src="'modelcatalogue/core/ui/omnisearch.html'"></ng-include>
-
-            </div><!--/.nav-collapse -->
         </div>
-    </div>
 
-    <div class="container-fluid container-main">
-        <div class="row">
-            <div class="col-md-12">
-                <g:if test="${Environment.current in [Environment.DEVELOPMENT, Environment.TEST, Environment.CUSTOM]}">
+        <div class="container-fluid container-main">
+            <div class="row content-row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                     <div id="jserrors"></div>
-                </g:if>
-                <ui-view></ui-view>
+                    <div class="jumbotron">
+                        <div>
+                            <div class="text-center"><span class="fa fa-fw fa-5x fa-spin fa-spinner"></span></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12 col-sm-12 col-md-12">
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class=" col-xs-12 col-sm-12 col-md-4 col-lg-4"><p>Model catalogue development supported by</p></div>
+                                        <div class=" col-xs-3 col-sm-3 col-md-2 col-lg-2">
+                                            <p>
+                                                <a href="http://www.genomicsengland.co.uk/">
+                                                    <asset:image src="/modelcatalogue/GEL.jpg" class="img-thumbnail sponsor-logo-small" alt="Genomics England" />
+                                                </a>
+                                            </p>
+                                            <p class="hidden-xs"><a href="http://www.genomicsengland.co.uk/" class="text-muted">Genomics England</a></p>
+                                        </div>
+                                        <div class=" col-xs-3 col-sm-3 col-md-2 col-lg-2">
+                                            <p><a href="http://www.mrc.ac.uk"><asset:image src="/modelcatalogue/MRC.png" class="img-thumbnail sponsor-logo-small" alt="Medical Research Council"/></a></p>
+                                            <p class="hidden-xs"><a href="http://www.mrc.ac.uk" class="text-muted">Medical Research Council</a></p>
+                                        </div>
+                                        <div class=" col-xs-3 col-sm-3 col-md-2 col-lg-2">
+                                            <p><a href="http://www.nihr.ac.uk/"><asset:image src="/modelcatalogue/NIHR.png" class="img-thumbnail sponsor-logo-small" alt="NIHR"/></a></p>
+                                            <p class="hidden-xs"><a href="http://www.nihr.ac.uk/" class="text-muted">National Institute for Health Research</a></p>
+                                        </div>
+                                        <div class=" col-xs-3 col-sm-3 col-md-2 col-lg-2">
+                                            <p><a href="http://www.metadataconsusting.co.uk"><asset:image src="/modelcatalogue/MDC.png" class="img-thumbnail sponsor-logo-small" alt="Metadata Consulting Ltd" /></a></p>
+                                            <p class="hidden-xs"><a href="http://www.metadataconsusting.co.uk" class="text-muted">Metadata Consulting</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <nav class="navbar navbar-default navbar-fixed-bottom" role="navigation" show-if-logged-in>
-        <div class="container-fluid">
-            <contextual-menu role="navigation-bottom-left"></contextual-menu>
-            <contextual-menu role="navigation-bottom-right" right="true"></contextual-menu>
-            <div class="mc-version small">
-                <g:render template="/version"/>
-            </div>
-            <g:if env="test">
-                <h4 style="float: right; color: red;">TEST ENVIRONMENT - WON'T PERSIST NEXT UPDATE</h4>
-            </g:if>
-        </div>
-    </nav>
-
+    </ui-view>
     <messages-panel max="3" growl="true"></messages-panel>
 </div>
 </body>

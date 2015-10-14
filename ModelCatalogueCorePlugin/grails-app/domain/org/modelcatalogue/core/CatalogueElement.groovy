@@ -20,11 +20,11 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
 
 /**
 * Catalogue Element - there are a number of catalogue elements that make up the model
- * catalogue (please see DataType, MeasurementUnit, Model, ValueDomain,
+ * catalogue (please see DataType, MeasurementUnit, Model,
 * DataElement) they extend catalogue element which allows creation of incoming and outgoing
 * relationships between them. They also  share a number of characteristics.
 * */
-abstract class CatalogueElement implements Extendible<ExtensionValue>, Published<CatalogueElement>, ApiCatalogueElement {
+abstract class  CatalogueElement implements Extendible<ExtensionValue>, Published<CatalogueElement>, ApiCatalogueElement {
 
     def grailsLinkGenerator
     def relationshipService
@@ -64,7 +64,7 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping, extensions: ExtensionValue]
 
     static relationships = [
-            incoming: [base: 'isBasedOn', classification: 'classifications', supersession: 'supersedes', favourite: 'isFavouriteOf'],
+            incoming: [base: 'isBasedOn', declaration: 'declaredWithin', supersession: 'supersedes', favourite: 'isFavouriteOf'],
             outgoing: [base: 'isBaseFor', attachment: 'hasAttachmentOf', supersession: 'supersededBy'],
             bidirectional: [relatedTo: 'relatedTo', synonym: 'isSynonymFor']
     ]
@@ -360,8 +360,13 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
         listExtensions()?.find { it.name == name }
     }
 
-    List<Classification> getClassifications() {
-        relationshipService.getClassifications(this)
+    List<DataModel> getDataModels() {
+        relationshipService.getDataModels(this)
+    }
+
+    @Deprecated
+    List<DataModel> getClassifications() {
+        relationshipService.getDataModels(this)
     }
 
     boolean isReadyForQueries() {
@@ -379,7 +384,7 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
     }
 
     protected PublishingChain prepareDraftChain(PublishingChain chain) {
-        chain.add(classifications)
+        chain.add(dataModels)
     }
 
     @Override
@@ -434,8 +439,8 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
     }
 
     void clearAssociationsBeforeDelete() {
-        for (Classification c in this.classifications) {
-            this.removeFromClassifications(c)
+        for (DataModel c in this.dataModels) {
+            this.removeFromDeclaredWithin(c)
         }
 
         // it is safe to remove all versioning informations
@@ -527,6 +532,10 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
         removeLinkFrom(source as CatalogueElement, type as RelationshipType)
     }
 
+    String getCombinedVersion() {
+        "${getLatestVersionId() ?: getId() ?: '<id not assigned yet>'}.${getVersionNumber()}"
+    }
+
     final void addInheritedAssociations(CatalogueElement child) {
         for (String propertyName in inheritedAssociationsNames) {
             if (child.getProperty(propertyName) == null) {
@@ -546,8 +555,4 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
     }
 
     List<String> getInheritedAssociationsNames() { Collections.emptyList() }
-
-    String getCombinedVersion() {
-        "${getLatestVersionId() ?: getId() ?: '<id not assigned yet>'}.${getVersionNumber()}"
-    }
 }

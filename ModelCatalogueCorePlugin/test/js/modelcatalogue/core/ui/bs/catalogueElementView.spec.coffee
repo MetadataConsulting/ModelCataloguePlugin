@@ -12,7 +12,7 @@ describe "mc.core.ui.catalogueElementView", ->
   it "element get compiled",  inject ($compile, $rootScope, enhance, $httpBackend) ->
     $httpBackend.when('GET', '/api/modelCatalogue/core/dashboard').respond(fixtures.dashboard.index)
 
-    catEl = enhance angular.copy(fixtures.valueDomain.showOne)
+    catEl = enhance angular.copy(fixtures.dataType.showOne)
     catEl.description = "Hello World!"
 
     numberOfTabs = 0
@@ -36,8 +36,8 @@ describe "mc.core.ui.catalogueElementView", ->
     element.find('ul.nav.nav-tabs li').each (index, element) ->
       console.log $(element).data('tab-name')
 
-    expect(element.find('ul.nav.nav-tabs li').length).toBe(numberOfTabs - 1)
-    expect(element.find('div.tab-pane').length).toBe(numberOfTabs - 1)
+    expect(element.find('ul.nav.nav-tabs li').length).toBe(numberOfTabs - 2)
+    expect(element.find('div.tab-pane').length).toBe(numberOfTabs - 2)
 
     expect(element.find('.dl-table-item-row').length).toBe(0)
 

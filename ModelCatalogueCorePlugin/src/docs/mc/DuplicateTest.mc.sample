@@ -1,19 +1,19 @@
 
 classification name: 'Domains', {
-    valueDomain name: 'Same'
+    dataType name: 'Same'
 }
 
 classification name: 'One', {
 
-    globalSearchFor valueDomain
+    globalSearchFor dataType
 
     model name: 'Model', {
         dataElement name: 'ABC', {
-            valueDomain name: 'Same', classification: 'Domains'
+            dataType name: 'Same', classification: 'Domains'
         }
         dataElement name: 'DEF'
         dataElement name: 'GHJ', {
-            valueDomain name: 'Same', classification: 'Domains'
+            dataType name: 'Same', classification: 'Domains'
         }
         dataElement name: 'IJK'
 
@@ -25,15 +25,15 @@ classification name: 'One', {
 
 classification name: 'Two', {
 
-    globalSearchFor valueDomain
+    globalSearchFor dataType
 
     model name: 'Model', {
         dataElement name: 'ABC', {
-            valueDomain name: 'Same', classification: 'Domains'
+            dataType name: 'Same', classification: 'Domains'
         }
         dataElement name: 'DEF'
         dataElement name: 'GHJ', {
-            valueDomain name: 'Same', classification: 'Domains'
+            dataType name: 'Same', classification: 'Domains'
         }
         dataElement name: 'IJK'
 

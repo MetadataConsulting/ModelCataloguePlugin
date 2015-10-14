@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptNewExcelImport', ['mc.util.messages', 'angularFileUpload']).config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.modalPromptNewExcelImport', ['mc.util.messages', 'mc.core.ui.bs.importCtrl']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', ($modal) ->
     (title, body, args) ->
       dialog = $modal.open {
@@ -21,7 +21,7 @@ angular.module('mc.core.ui.bs.modalPromptNewExcelImport', ['mc.util.messages', '
               </div>
               <div class="form-group">
                 <label for="asset" class="">File</label>
-                <input ng-hide="uploading &amp;&amp; progress" type="file" accept=".xls,.xlsx" class="form-control" id="asset" placeholder="File" ng-model="copy.asset" ng-file-select="onFileSelect($files)">
+                <input ng-hide="uploading &amp;&amp; progress" type="file" accept=".xls,.xlsx" class="form-control" id="asset" placeholder="File" ngf-model="copy.asset" ngf-select="onFileSelect($files)">
                 <progressbar value="progress" ng-show="uploading &amp;&amp; progress">{{progress}} %</progressbar>
               </div>
               <div class="form-group">
@@ -41,8 +41,8 @@ angular.module('mc.core.ui.bs.modalPromptNewExcelImport', ['mc.util.messages', '
                       <input type="text" class="form-control" id="dataElementDescription" placeholder="Data Item Description" ng-model="headersMap.dataElementDescription">
                     </div>
                     <div class="form-group">
-                      <label for="dataTypeClassification">Data Type Classification</label>
-                      <input type="text" class="form-control" id="dataTypeClassification" placeholder="Data Type Classification" ng-model="headersMap.dataTypeClassification">
+                      <label for="dataTypeClassification">Data Type Data Model</label>
+                      <input type="text" class="form-control" id="dataTypeClassification" placeholder="Data Type Data Model" ng-model="headersMap.dataTypeDataModel">
                     </div>
                     <div class="form-group">
                       <label for="dataTypeName">Data Type</label>
@@ -53,32 +53,20 @@ angular.module('mc.core.ui.bs.modalPromptNewExcelImport', ['mc.util.messages', '
                       <input type="text" class="form-control" id="dataTypeCode" placeholder="Data Type Unique Code" ng-model="headersMap.dataTypeCode">
                     </div>
                     <div class="form-group">
-                      <label for="valueDomainClassification">Value Domain Classification</label>
-                      <input type="text" class="form-control" id="valueDomainClassification" placeholder="Value Domain Classification" ng-model="headersMap.valueDomainClassification">
+                      <label for="parentModelName">Parent Data Class</label>
+                      <input type="text" class="form-control" id="parentModelName" placeholder="Parent Data Class" ng-model="headersMap.parentDataClassName">
                     </div>
                     <div class="form-group">
-                      <label for="valueDomainName">Value Domain</label>
-                      <input type="text" class="form-control" id="valueDomainName" placeholder="Value Domain" ng-model="headersMap.valueDomainName">
+                      <label for="parentModelCode">Parent Data Class Unique Code</label>
+                      <input type="text" class="form-control" id="parentModelCode" placeholder="Parent Data Class Unique Code" ng-model="headersMap.parentDataClassCode">
                     </div>
                     <div class="form-group">
-                      <label for="valueDomainCode">Value Domain Unique Code</label>
-                      <input type="text" class="form-control" id="valueDomainCode" placeholder="Value Domain Unique Code" ng-model="headersMap.valueDomainCode">
+                      <label for="containingModelName">Data Class</label>
+                      <input type="text" class="form-control" id="containingModelName" placeholder="Data Class" ng-model="headersMap.containingDataClassName">
                     </div>
                     <div class="form-group">
-                      <label for="parentModelName">Parent Model</label>
-                      <input type="text" class="form-control" id="parentModelName" placeholder="Parent Model" ng-model="headersMap.parentModelName">
-                    </div>
-                    <div class="form-group">
-                      <label for="parentModelCode">Parent Model Unique Code</label>
-                      <input type="text" class="form-control" id="parentModelCode" placeholder="Parent Model Unique Code" ng-model="headersMap.parentModelCode">
-                    </div>
-                    <div class="form-group">
-                      <label for="containingModelName">Model</label>
-                      <input type="text" class="form-control" id="containingModelName" placeholder="Model" ng-model="headersMap.containingModelName">
-                    </div>
-                    <div class="form-group">
-                      <label for="containingModelCode">Model Unique Code</label>
-                      <input type="text" class="form-control" id="containingModelCode" placeholder="Model Unique Code" ng-model="headersMap.containingModelCode">
+                      <label for="containingModelCode">Data Class Unique Code</label>
+                      <input type="text" class="form-control" id="containingModelCode" placeholder="Data Class Unique Code" ng-model="headersMap.containingDataClassCode">
                     </div>
                     <div class="form-group">
                       <label for="measurementUnitName">Measurement Unit</label>
@@ -89,8 +77,8 @@ angular.module('mc.core.ui.bs.modalPromptNewExcelImport', ['mc.util.messages', '
                       <input type="text" class="form-control" id="measurementSymbol" placeholder="Measurement Unit Symbol" ng-model="headersMap.measurementSymbol">
                     </div>
                     <div class="form-group">
-                      <label for="classification">Classification</label>
-                      <input type="text" class="form-control" id="classificatio  n" placeholder="Classification" ng-model="headersMap.classification">
+                      <label for="classification">Data Model</label>
+                      <input type="text" class="form-control" id="classification" placeholder="Data Model" ng-model="headersMap.dataModel">
                     </div>
                     <div class="form-group">
                       <label for="metadata">Metadata</label>

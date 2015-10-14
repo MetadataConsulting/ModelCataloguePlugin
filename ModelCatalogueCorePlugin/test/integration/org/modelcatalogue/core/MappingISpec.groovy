@@ -1,32 +1,24 @@
 package org.modelcatalogue.core
 
-import spock.lang.Shared
 import spock.lang.Unroll
 
 class MappingISpec extends AbstractIntegrationSpec {
 
-    @Shared
-    def vd1, vd2
 
-    @Shared MappingService mappingService = new MappingService()
+    DataType dt1
+    DataType dt2
 
-    def setupSpec(){
+    MappingService mappingService
+
+    def setup(){
         loadFixtures()
-        vd1 = ValueDomain.findByName("value domain test3")
-        vd2 = ValueDomain.findByName("value domain test4")
+        dt1 = notNull DataType.findByName("test5")
+        dt2 = notNull DataType.findByName("test6")
     }
-
-    /*
-    def cleanupSpec(){
-
-        vd1.delete()
-        vd2.delete()
-
-    }*/
 
 
     @Unroll
-    def "create a mew data type from #args validates to #validates" (){
+    def "create a new data type from #args validates to #validates" (){
         int initialCount = Mapping.count()
 
         when:
@@ -37,8 +29,8 @@ class MappingISpec extends AbstractIntegrationSpec {
 
         then:
 
-        !type.hasErrors() == validates
-        Mapping.count()   == size + initialCount
+        (type.errors.errorCount == 0) == validates
+        Mapping.count() == size + initialCount
 
         when:
 
@@ -52,8 +44,8 @@ class MappingISpec extends AbstractIntegrationSpec {
         validates | size | args
         false     | 0    | [:]
         false     | 0    | [name: "x" * 256]
-        false     | 0    | [ name: "String", source: vd1, destination: vd2, mapping: "foo" ]
-        true      | 1    | [ name: "String1", source: vd1, destination: vd2, mapping: "x * 2" ]
+        false     | 0    | [ name: "String", source: notNull(DataType.findByName("test5")), destination: notNull(DataType.findByName("test6")), mapping: "foo" ]
+        true      | 1    | [ name: "String1", source: notNull(DataType.findByName("test5")), destination: notNull(DataType.findByName("test6")), mapping: "x * 2" ]
 
 
 
@@ -63,7 +55,7 @@ class MappingISpec extends AbstractIntegrationSpec {
 
         when:
 
-        def dC = ValueDomain.get(vd1.id)
+        def dC = DataType.get(dt1.id)
 
         Mapping self = mappingService.map(dC, dC, "x")
 
@@ -78,10 +70,10 @@ class MappingISpec extends AbstractIntegrationSpec {
 
         when:
 
-        def dC = ValueDomain.get(vd1.id)
-        def dF = ValueDomain.get(vd2.id)
+        def dC = DataType.get(dt1.id)
+        def dF = DataType.get(dt2.id)
 
-        Mapping zero = mappingService.map(dC, new ValueDomain(name: "none"), "x")
+        Mapping zero = mappingService.map(dC, new DataType(name: "none"), "x")
 
         then:
         !zero

@@ -5,7 +5,7 @@ import grails.util.Holders
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.util.ClassificationFilter
+import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
@@ -15,7 +15,7 @@ class AuditService {
     static transactional = false
 
     def modelCatalogueSecurityService
-    def classificationService
+    def dataModelService
 
     private static ThreadLocal<Auditor> auditor = new ThreadLocal<Auditor>() {
         protected Auditor initialValue() { return new DefaultAuditor(); }
@@ -116,7 +116,7 @@ class AuditService {
         }
     }
 
-    ListWithTotalAndType<Change> getGlobalChanges(Map params, ClassificationFilter classifications) {
+    ListWithTotalAndType<Change> getGlobalChanges(Map params, DataModelFilter classifications) {
         if (!params.sort) {
             params.sort  = 'dateCreated'
             params.order = 'desc'
@@ -141,8 +141,8 @@ class AuditService {
             where c.system != true and c.otherSide != true and c.parentId is null and c.changedId  in (""" + subquery + """)""", args
     }
 
-    private static String getClassifiedElementsSubQuery(ClassificationFilter classifications, Map<String, Object> args) {
-        args.classificationType = RelationshipType.classificationType
+    private static String getClassifiedElementsSubQuery(DataModelFilter classifications, Map<String, Object> args) {
+        args.classificationType = RelationshipType.declarationType
         if (classifications.unclassifiedOnly) {
             // language=HQL
             return """
@@ -180,7 +180,7 @@ class AuditService {
                 where ce.id in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:includes)) or ce.id in (:includes)
             """
         }
-        throw new IllegalArgumentException("Classification filter must be set")
+        throw new IllegalArgumentException("Data model filter must be set")
     }
 
     ListWithTotalAndType<Change> getChanges(Map params, CatalogueElement element, @DelegatesTo(DetachedCriteria) Closure additionalCriteria = {}) {

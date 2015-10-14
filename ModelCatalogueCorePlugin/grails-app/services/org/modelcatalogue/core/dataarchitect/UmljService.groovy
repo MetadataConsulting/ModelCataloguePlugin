@@ -6,18 +6,18 @@ import groovy.json.JsonSlurper
  * James Welch, A.Milward
  */
 import groovy.json.internal.LazyMap
-import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 
 class UmljService {
 
-    def classificationService, elementService
+    def dataModelService, elementService
 
     static transactional = false
 
-    protected void importUmlDiagram(InputStream is, String name, Classification classification) {
+    protected void importUmlDiagram(InputStream is, String name, DataModel classification) {
         log.info "Parsing Umlj file for ${name}"
         def slurper = new JsonSlurper()
         def result  = slurper.parse(new BufferedReader(new InputStreamReader(is)))
@@ -26,9 +26,9 @@ class UmljService {
     }
 
 
-    protected void generateCatalogueElements(StarUMLDiagram umlFile, Classification clsf) {
+    protected void generateCatalogueElements(StarUMLDiagram umlFile, DataModel clsf) {
 
-        CatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
+        CatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
         builder.build {
             classification(name: clsf.name) {
                 globalSearchFor dataType
@@ -43,7 +43,7 @@ class UmljService {
     }
 
 
-    static createValueDomain(CatalogueBuilder builder, LazyMap att, StarUMLDiagram umlFile) {
+    static createDataType(CatalogueBuilder builder, LazyMap att, StarUMLDiagram umlFile) {
 
             if (!(att.type instanceof String) && att.type?.$ref && umlFile.allDataTypes.get(att?.type?.$ref)) {
                 // Find highest supertype
@@ -52,9 +52,7 @@ class UmljService {
                     currType = umlFile.allDataTypes.get(currType.ownedElements.findAll({ oe -> oe._type.equals("UMLGeneralization") }).get(0).target?.$ref)
                 }
 
-                return builder.valueDomain(name: currType.name.toString()) {
-                        dataType(name: currType.name.toString())
-                    }
+                return builder.dataType(name: currType.name.toString())
 
             }
 
@@ -65,16 +63,12 @@ class UmljService {
                     enumMap.put(ev.name, ev.documentation)
                 }
 
-                return builder.valueDomain(name: enumeration.name) {
-                    dataType(name: enumeration.name, enumerations: enumMap)
-                }
+                return builder.dataType(name: enumeration.name, enumerations: enumMap)
 
             } else if (att.type instanceof String) {
                 if (att.type == "") att.type = "xs:string"
 
-                return builder.valueDomain(name: att.type) {
-                        dataType(name: att.type)
-                    }
+                return builder.dataType(name: att.type)
         }
     }
 
@@ -103,7 +97,7 @@ class UmljService {
                                 }
                             }
 
-                            createValueDomain(builder, att, umlFile)
+                            createDataType(builder, att, umlFile)
 
                         }
 

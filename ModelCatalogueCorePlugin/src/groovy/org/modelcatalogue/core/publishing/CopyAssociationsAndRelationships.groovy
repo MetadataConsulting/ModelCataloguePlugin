@@ -4,6 +4,7 @@ import grails.util.Holders
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
+import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -29,20 +30,20 @@ class CopyAssociationsAndRelationships {
 
 
     void copyClassifications(Set<String> createdRelationshipHashes) {
-        relationshipService.eachRelationshipPartitioned(RelationshipDirection.INCOMING, element, RelationshipType.classificationType) { Relationship r ->
+        relationshipService.eachRelationshipPartitioned(RelationshipDirection.INCOMING, element, RelationshipType.declarationType) { Relationship r ->
             CatalogueElement source = DraftContext.preferDraft(r.source)
 
-            String hash = DraftContext.hashForRelationship(source, draft, RelationshipType.classificationType)
+            String hash = DraftContext.hashForRelationship(source, draft, RelationshipType.declarationType)
 
             if (hash in createdRelationshipHashes) {
                 return
             }
 
-            RelationshipDefinitionBuilder definitionBuilder = RelationshipDefinition.create(source, draft, RelationshipType.classificationType)
+            RelationshipDefinitionBuilder definitionBuilder = RelationshipDefinition.create(source, draft, RelationshipType.declarationType)
 
             definitionBuilder
                     .withArchived(r.archived)
-                    .withClassification(r.classification)
+                    .withDataModel(r.dataModel)
                     .withIncomingIndex(r.incomingIndex)
                     .withOutgoingIndex(r.outgoingIndex)
                     .withCombinedIndex(r.combinedIndex)
@@ -67,10 +68,12 @@ class CopyAssociationsAndRelationships {
         copyRelationshipsInternal(RelationshipDirection.INCOMING, createdRelationshipHashes)
         copyRelationshipsInternal(RelationshipDirection.OUTGOING, createdRelationshipHashes)
 
-        GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(draft.class.name) as GrailsDomainClass
+        Class type = context.newType ?: HibernateProxyHelper.getClassWithoutInitializingProxy(draft)
+
+        GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(type.name) as GrailsDomainClass
 
         for (prop in domainClass.persistentProperties) {
-            if (prop.association && (prop.manyToOne || prop.oneToOne)) {
+            if (prop.association && (prop.manyToOne || prop.oneToOne) && element.hasProperty(prop.name)) {
                 def value = element.getProperty(prop.name)
                 if (value instanceof CatalogueElement) {
                     draft.setProperty(prop.name, DraftContext.preferDraft(value))
@@ -113,7 +116,7 @@ class CopyAssociationsAndRelationships {
 
             definitionBuilder
                     .withArchived(r.archived)
-                    .withClassification(r.classification)
+                    .withDataModel(r.dataModel)
                     .withIncomingIndex(r.incomingIndex)
                     .withOutgoingIndex(r.outgoingIndex)
                     .withCombinedIndex(r.combinedIndex)

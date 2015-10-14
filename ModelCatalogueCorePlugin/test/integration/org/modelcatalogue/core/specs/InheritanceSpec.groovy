@@ -3,10 +3,10 @@ package org.modelcatalogue.core.specs
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.Classification
-import org.modelcatalogue.core.ValueDomain
+import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.InitCatalogueService
 import org.modelcatalogue.core.Relationship
@@ -44,62 +44,62 @@ class InheritanceSpec extends IntegrationSpec  {
     ElementService elementService
     CatalogueBuilder catalogueBuilder
 
-    Model parentClass
-    Model childClass
-    Model dummyClass
+    DataClass parentClass
+    DataClass childClass
+    DataClass dummyClass
     DataElement dataElement1
     DataElement dataElement2
     DataElement dataElement3
     DataElement dataElement4
     DataElement parentDataElement
     DataElement childDataElement
-    ValueDomain valueDomain1
-    ValueDomain valueDomain2
-    Classification dataModel1
-    Classification dataModel2
+    DataType dataType1
+    DataType dataType2
+    DataModel dataModel1
+    DataModel dataModel2
 
     def setup() {
         initCatalogueService.initDefaultRelationshipTypes()
         catalogueBuilder.build {
-            classification name: TEST_DATA_MODEL_1_NAME, {
-                model name: DUMMY_DATA_CLASS_NAME
-                model name: TEST_PARENT_DATA_CLASS_NAME, {
+            dataModel name: TEST_DATA_MODEL_1_NAME, {
+                dataClass name: DUMMY_DATA_CLASS_NAME
+                dataClass name: TEST_PARENT_DATA_CLASS_NAME, {
                     dataElement name: TEST_DATA_ELEMENT_1_NAME
                     dataElement name: TEST_DATA_ELEMENT_2_NAME
                     dataElement name: TEST_DATA_ELEMENT_3_NAME
                     ext METADATA_KEY_1, METADATA_VALUE_1
                     ext METADATA_KEY_2, METADATA_VALUE_2
                     ext METADATA_KEY_3, METADATA_VALUE_3
-                    rel 'synonym' to model called DUMMY_DATA_CLASS_NAME
+                    rel 'synonym' to dataClass called DUMMY_DATA_CLASS_NAME
                 }
                 dataElement name: TEST_PARENT_VALUE_DOMAIN_NAME, {
-                    valueDomain name: TEST_DATA_TYPE_1_NAME
+                    dataType name: TEST_DATA_TYPE_1_NAME
                 }
                 dataElement name: TEST_CHILD_VALUE_DOMAIN_NAME
-                valueDomain name: TEST_DATA_TYPE_2_NAME
+                dataType name: TEST_DATA_TYPE_2_NAME
             }
 
-            classification name: TEST_DATA_MODEL_2_NAME, {
-                model name: TEST_CHILD_DATA_CLASS_NAME, {
+            dataModel name: TEST_DATA_MODEL_2_NAME, {
+                dataClass name: TEST_CHILD_DATA_CLASS_NAME, {
                     dataElement name: TEST_DATA_ELEMENT_4_NAME
                     ext METADATA_KEY_4, METADATA_VALUE_4
                 }
             }
         }
 
-        parentClass = Model.findByName(TEST_PARENT_DATA_CLASS_NAME)
-        childClass = Model.findByName(TEST_CHILD_DATA_CLASS_NAME)
-        dummyClass = Model.findByName(DUMMY_DATA_CLASS_NAME)
+        parentClass = DataClass.findByName(TEST_PARENT_DATA_CLASS_NAME)
+        childClass = DataClass.findByName(TEST_CHILD_DATA_CLASS_NAME)
+        dummyClass = DataClass.findByName(DUMMY_DATA_CLASS_NAME)
         dataElement1 = DataElement.findByName(TEST_DATA_ELEMENT_1_NAME)
         dataElement2 = DataElement.findByName(TEST_DATA_ELEMENT_2_NAME)
         dataElement3 = DataElement.findByName(TEST_DATA_ELEMENT_3_NAME)
         dataElement4 = DataElement.findByName(TEST_DATA_ELEMENT_4_NAME)
         parentDataElement = DataElement.findByName(TEST_PARENT_VALUE_DOMAIN_NAME)
         childDataElement = DataElement.findByName(TEST_CHILD_VALUE_DOMAIN_NAME)
-        valueDomain1 = ValueDomain.findByName(TEST_DATA_TYPE_1_NAME)
-        valueDomain2 = ValueDomain.findByName(TEST_DATA_TYPE_2_NAME)
-        dataModel1 = Classification.findByName(TEST_DATA_MODEL_1_NAME)
-        dataModel2 = Classification.findByName(TEST_DATA_MODEL_2_NAME)
+        dataType1 = DataType.findByName(TEST_DATA_TYPE_1_NAME)
+        dataType2 = DataType.findByName(TEST_DATA_TYPE_2_NAME)
+        dataModel1 = DataModel.findByName(TEST_DATA_MODEL_1_NAME)
+        dataModel2 = DataModel.findByName(TEST_DATA_MODEL_2_NAME)
 
         assertNothingInherited()
     }
@@ -283,72 +283,72 @@ class InheritanceSpec extends IntegrationSpec  {
     def "inherit associations"() {
         addBasedOn()
         expect: "associations are inherited"
-        parentDataElement.valueDomain == valueDomain1
+        parentDataElement.dataType == dataType1
         parentDataElement.save(failOnError: true, flush: true)
-        childDataElement.valueDomain == valueDomain1
+        childDataElement.dataType == dataType1
         childDataElement.save(failOnError: true, flush: true)
 
         when: "we remove associations from parent"
-        parentDataElement.valueDomain = null
+        parentDataElement.dataType = null
         parentDataElement.save(failOnError: true, flush: true)
 
         then: "it is removed from the child as well"
-        childDataElement.valueDomain == null
+        childDataElement.dataType == null
 
         when: "we add association to the parent"
-        parentDataElement.valueDomain = valueDomain2
+        parentDataElement.dataType = dataType2
         parentDataElement.save(failOnError: true, flush: true)
 
         then: "it is added to child as well"
-        childDataElement.valueDomain == valueDomain2
+        childDataElement.dataType == dataType2
 
         when: "association in the child is overridden"
-        childDataElement.valueDomain = valueDomain1
+        childDataElement.dataType = dataType1
         childDataElement.save(failOnError: true, flush: true)
 
         then: "it doesn't affect the parent"
-        parentDataElement.valueDomain == valueDomain2
+        parentDataElement.dataType == dataType2
 
         when: "the association is removed from the parent"
-        parentDataElement.valueDomain = null
+        parentDataElement.dataType = null
         parentDataElement.save(failOnError: true, flush: true)
 
         then: "the association is persisted in the child as it was already customized"
-        childDataElement.valueDomain == valueDomain1
+        childDataElement.dataType == dataType1
 
         when: "the association is assigned in the parent but also exist in child"
-        parentDataElement.valueDomain = valueDomain2
+        parentDataElement.dataType = dataType2
         parentDataElement.save(failOnError: true, flush: true)
 
         then: "only parent is assigned"
-        parentDataElement.valueDomain == valueDomain2
-        childDataElement.valueDomain == valueDomain1
+        parentDataElement.dataType == dataType2
+        childDataElement.dataType == dataType1
 
         when: "the association is removed from the child"
-        childDataElement.valueDomain = null
+        childDataElement.dataType = null
         childDataElement.save(failOnError: true, flush: true)
 
         then: "the association is reset to the one from parent"
-        childDataElement.valueDomain == valueDomain2
+        childDataElement.dataType == dataType2
 
         when: "the element no longer inherits form the parent"
         removeBasedOn()
 
         then: "the association is set to null"
-        childDataElement.valueDomain == null
+        childDataElement.dataType == null
 
     }
 
     def "handle data models"() {
         expect: "both data classes belongs to right models"
-        dataModel1 in parentClass.classifications
-        dataModel2 in childClass.classifications
+        dataModel1 in parentClass.dataModels
+        dataModel2 in childClass.dataModels
 
         when:
         addBasedOn()
 
         then:
-        !(dataModel1 in childClass.classifications)
+        !(dataModel1 in childClass.dataModels)
     }
 
 
@@ -387,13 +387,13 @@ class InheritanceSpec extends IntegrationSpec  {
 
         assert parentDataElement
         assert childDataElement
-        assert valueDomain1
-        assert valueDomain2
+        assert dataType1
+        assert dataType2
 
         assert dataModel1
         assert dataModel2
 
-        assert parentDataElement.valueDomain == valueDomain1
-        assert childDataElement.valueDomain == null
+        assert parentDataElement.dataType == dataType1
+        assert childDataElement.dataType == null
     }
 }

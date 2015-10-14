@@ -16,5 +16,6 @@ angular.module 'mc.util.ui', [
   'mc.util.ui.menuItemDropdown'
   'mc.util.ui.menuItemSingle'
   'mc.util.ui.sortable'
+  'mc.util.ui.sidenav'
   'mc.util.ui.resizable'
 ]

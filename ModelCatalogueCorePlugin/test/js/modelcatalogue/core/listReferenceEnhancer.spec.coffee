@@ -16,7 +16,7 @@ describe "mc.core.listReferenceEnhancer", ->
     enhance               = _enhance_
 
   it "can deep enhance", ->
-    enhanced = enhance angular.copy(fixtures.valueDomain.showOne)
+    enhanced = enhance angular.copy(fixtures.dataType.showOne)
 
     expect(angular.isFunction(enhanced.mappings)).toBeTruthy()
 

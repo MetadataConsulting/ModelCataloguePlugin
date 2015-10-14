@@ -1,27 +1,26 @@
 package org.modelcatalogue.core.xml
 
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Classification
-import org.modelcatalogue.core.ClassificationService
-import org.modelcatalogue.core.ModelService
-import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.DataModelService
+import org.modelcatalogue.core.DataClassService
 
 class PrintContext {
 
-    ClassificationService classificationService
-    ModelService modelService
+    DataModelService dataModelService
+    DataClassService modelService
 
 
     boolean idIncludeVersion
     boolean noHref
 
-    Classification currentClassification
+    DataModel currentClassification
     Set<Long> idsOfPrinted = []
 
     Set<String> typesUsed = new TreeSet<String>()
 
-    PrintContext(ClassificationService classificationService, ModelService modelService) {
-        this.classificationService = classificationService
+    PrintContext(DataModelService dataModelService, DataClassService modelService) {
+        this.dataModelService = dataModelService
         this.modelService = modelService
     }
 

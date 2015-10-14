@@ -1,9 +1,18 @@
 import org.codehaus.groovy.grails.commons.GrailsClass
 import org.modelcatalogue.core.AbstractRestfulController
+import org.modelcatalogue.core.util.Legacy
 
 class ApiFilters {
 
+
     def filters = {
+        legacy(controller:'*', action:'*') {
+            before = {
+                if (Legacy.hasLegacyName(controllerName) && !request.forwardURI.contains(controllerName)) {
+                    redirect url: Legacy.getRedirectUrl(controllerName, request), permanent: true
+                }
+            }
+        }
         expires(controller:'*', action:'*') {
             before = {
                 if (!controllerName) {

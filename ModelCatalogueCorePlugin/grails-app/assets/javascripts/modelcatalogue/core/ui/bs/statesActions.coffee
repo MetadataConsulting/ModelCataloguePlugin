@@ -87,7 +87,7 @@ angular.module('mc.core.ui.bs.statesActions', ['mc.util.ui.actions']).config ['a
       disabled:   $scope.element?.status != 'DRAFT'
       watches:    ['element.status', 'element.archived']
       action:     ->
-        messages.confirm("Do you want to finalize #{$scope.element.getElementTypeName()} #{$scope.element.name} ?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} and all it's dependencies will be finalized recursively. This means all elements classfied by classifications, all child models and data elements of models, all value domains of data elements and all data types of value domains. If any value domain is using measurement unit which is not finalized yet the whole finalization process will fail.").then ->
+        messages.confirm("Do you want to finalize #{$scope.element.getElementTypeName()} #{$scope.element.name} ?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} and all it's dependencies will be finalized recursively. This means all elements declared by data model, all inner data classes and data elements of data classes and all data types of data elements. If any data type is using measurement unit which is not finalized yet the whole finalization process will fail.").then ->
           enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/finalize", method: 'POST')).then (finalized) ->
             updateFrom $scope.element, finalized
             $rootScope.$broadcast 'catalogueElementUpdated', finalized

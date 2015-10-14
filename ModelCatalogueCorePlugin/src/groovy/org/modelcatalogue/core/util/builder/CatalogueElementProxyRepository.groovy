@@ -2,22 +2,25 @@ package org.modelcatalogue.core.util.builder
 
 import grails.gorm.DetachedCriteria
 import groovy.util.logging.Log4j
+import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
-import org.modelcatalogue.core.util.ClassificationFilter
+import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.springframework.util.StopWatch
+import org.modelcatalogue.core.util.Legacy
 
 @Log4j
 class CatalogueElementProxyRepository {
 
-    static Set<Class> HAS_UNIQUE_NAMES = [MeasurementUnit, Classification]
+    static Set<Class> HAS_UNIQUE_NAMES = [MeasurementUnit, DataModel]
+    static final Set<Class> DATA_TYPE_CLASSES = [EnumeratedType, ReferenceType, DataType, PrimitiveType]
     static final String AUTOMATIC_NAME_FLAG = '__automatic_name__'
     static final String AUTOMATIC_DESCRIPTION_FLAG = '__automatic_description__'
     private static final Map LATEST = [sort: 'versionNumber', order: 'desc', max: 1]
 
-    private final ClassificationService classificationService
+    private final DataModelService dataModelService
     private final ElementService elementService
 
     Set<Class> unclassifiedQueriesFor = []
@@ -30,8 +33,8 @@ class CatalogueElementProxyRepository {
 
     private final Map<String, Relationship> createdRelationships = [:]
 
-    CatalogueElementProxyRepository(ClassificationService classificationService, ElementService elementService) {
-        this.classificationService = classificationService
+    CatalogueElementProxyRepository(DataModelService dataModelService, ElementService elementService) {
+        this.dataModelService = dataModelService
         this.elementService = elementService
     }
 
@@ -197,7 +200,7 @@ class CatalogueElementProxyRepository {
                 relations.removeAll resolvedRelationships
 
                 relations.collect { Relationship.get(it) } each {
-                    elementService.relationshipService.unlink(it.source, it.destination, it.relationshipType, it.classification, it.archived)
+                    elementService.relationshipService.unlink(it.source, it.destination, it.relationshipType, it.dataModel, it.archived)
                 }
             }
         }
@@ -239,8 +242,8 @@ class CatalogueElementProxyRepository {
     private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionInternal(Class<T> domain, Map<String, Object> parameters, boolean underControl = false) {
         if (parameters.id) {
             return createAbstractionById(domain, parameters.name?.toString(), parameters.id?.toString(), underControl)
-        } else if (parameters.classification) {
-            return createAbstractionByClassificationAndName(domain, parameters.classification?.toString(), parameters.name?.toString(), underControl)
+        } else if (parameters.classification || parameters.dataModel) {
+            return createAbstractionByClassificationAndName(domain, (parameters.classification ?: parameters.dataModel)?.toString(), parameters.name?.toString(), underControl)
         } else if (parameters.name) {
             return createAbstractionByName(domain, parameters.name?.toString(), underControl)
         }
@@ -267,22 +270,44 @@ class CatalogueElementProxyRepository {
         }
     }
 
-    public <T extends CatalogueElement> T createDraftVersion(T element) {
-        elementService.createDraftVersion(element, copyRelationships ? DraftContext.userFriendly() : DraftContext.importFriendly(elementsUnderControl))
+    public <T extends CatalogueElement> T createDraftVersion(T element, CatalogueElementProxy proxy) {
+        elementService.createDraftVersion(element, createDraftContext(proxy, element))
+    }
+
+    private <T extends CatalogueElement> DraftContext createDraftContext(CatalogueElementProxy proxy, T element) {
+        if (copyRelationships) {
+            if (proxy.domain == HibernateProxyHelper.getClassWithoutInitializingProxy(element)) {
+                return DraftContext.userFriendly()
+            }
+            if ((element.getLatestVersionId() ?: element.getId()) in elementsUnderControl) {
+                return DraftContext.typeChangingUserFriendly(proxy.domain)
+            }
+            return DraftContext.userFriendly()
+        }
+        if (proxy.domain == HibernateProxyHelper.getClassWithoutInitializingProxy(element)) {
+            return DraftContext.importFriendly(elementsUnderControl)
+        }
+        if ((element.getLatestVersionId() ?: element.getId()) in elementsUnderControl) {
+            return DraftContext.typeChangingImportFriendly(proxy.domain, elementsUnderControl)
+        }
+        return DraftContext.importFriendly(elementsUnderControl)
     }
 
     protected  <T extends CatalogueElement> T tryFind(Class<T> type, Object classificationName, Object name, Object id) {
         if (type in HAS_UNIQUE_NAMES) {
             return tryFindWithClassification(type, null, name, id)
         }
-        tryFindWithClassification(type, Classification.findAllByName(classificationName?.toString()), name, id)
+        tryFindWithClassification(type, DataModel.findAllByName(classificationName?.toString()), name, id)
     }
 
     protected <T extends CatalogueElement> T tryFindUnclassified(Class<T> type, Object name, Object id) {
         tryFindWithClassification(type, null, name, id)
     }
 
-    protected <T extends CatalogueElement> T tryFindWithClassification(Class<T> type, List<Classification> classifications, Object name, Object id) {
+    protected <T extends CatalogueElement> T tryFindWithClassification(Class<T> type, List<DataModel> classifications, Object name, Object id) {
+        if (type in DATA_TYPE_CLASSES) {
+            type = DataType
+        }
         if (id) {
             T result = findById(type, id)
             if (result) {
@@ -298,7 +323,7 @@ class CatalogueElementProxyRepository {
         }
 
         if (classifications) {
-            T result = getLatestFromCriteria(classificationService.classified(criteria, ClassificationFilter.includes(classifications)))
+            T result = getLatestFromCriteria(dataModelService.classified(criteria, DataModelFilter.includes(classifications)))
 
             if (result) {
                 if (!id || !result.hasModelCatalogueId()) {
@@ -337,6 +362,9 @@ class CatalogueElementProxyRepository {
     }
 
     protected <T extends CatalogueElement> T findById(Class<T> type, Object id) {
+        if (type in DATA_TYPE_CLASSES) {
+            type = DataType
+        }
         DetachedCriteria<T> criteria = new DetachedCriteria<T>(type).build {
             eq 'modelCatalogueId', id.toString()
         }
@@ -356,7 +384,7 @@ class CatalogueElementProxyRepository {
 
             if (version) {
                 result = CatalogueElement.findByLatestVersionIdAndVersionNumber(theId, version) as T
-                if (result && result.getDefaultModelCatalogueId(false) == id.toString()) {
+                if (result && result.getDefaultModelCatalogueId(false) == org.modelcatalogue.core.util.Legacy.fixModelCatalogueId(id).toString()) {
                     return result
                 }
                 return null
@@ -364,12 +392,12 @@ class CatalogueElementProxyRepository {
 
             result = CatalogueElement.findByLatestVersionId(theId, [sort: 'versionNumber', order: 'desc']) as T
 
-            if (result && id.toString().startsWith(result.getDefaultModelCatalogueId(true))) {
+            if (result && org.modelcatalogue.core.util.Legacy.fixModelCatalogueId(id).toString().startsWith(result.getDefaultModelCatalogueId(true))) {
                 return result
             }
 
             result = CatalogueElement.get(theId) as T
-            if (result && result.getDefaultModelCatalogueId(true) == id.toString()) {
+            if (result && result.getDefaultModelCatalogueId(true) == Legacy.fixModelCatalogueId(id).toString()) {
                 return result
             }
         }
@@ -399,6 +427,10 @@ class CatalogueElementProxyRepository {
         T sourceElement = proxy.source.resolve()
         U destinationElement = proxy.destination.resolve()
 
+        if (sourceElement == destinationElement) {
+            throw new IllegalStateException("Source and the destinaiton is the same: $sourceElement")
+        }
+
         if (sourceElement.hasErrors()) {
             throw new IllegalStateException(FriendlyErrors.printErrors("Source element $sourceElement contains errors and is not ready to be part of the relationship ${proxy.toString()}", sourceElement.errors))
         }
@@ -422,6 +454,8 @@ class CatalogueElementProxyRepository {
         if (existing) {
             return existing
         }
+
+
 
         Relationship relationship = sourceElement.createLinkTo(destinationElement, type, archived: proxy.archived, resetIndices: true, skipUniqueChecking: proxy.source.new || proxy.destination.new)
 

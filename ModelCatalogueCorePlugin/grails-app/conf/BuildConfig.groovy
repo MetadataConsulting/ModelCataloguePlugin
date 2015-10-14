@@ -37,7 +37,6 @@ grails.project.dependency.resolution = {
         //mavenRepo "http://download.java.net/maven/2/"
         //mavenRepo "http://repository.jboss.com/maven2/"
         mavenRepo 'http://jcenter.bintray.com'
-
 		mavenRepo "http://dl.bintray.com/metadata/model-catalogue"
         mavenRepo "http://dl.bintray.com/musketyr/document-builder"
         //mavenRepo "http://dl.dropbox.com/u/326301/repository"
@@ -51,7 +50,7 @@ grails.project.dependency.resolution = {
         // runtime 'mysql:mysql-connector-java:5.1.27'
         compile 'com.google.guava:guava:18.0'
 
-        String mcToolkitVersion = '1.0.0-alpha-11'
+        String mcToolkitVersion = '1.0.0-rename-6'
         compile "org.modelcatalogue:mc-core-api:$mcToolkitVersion"
         compile "org.modelcatalogue:mc-builder-api:$mcToolkitVersion"
         compile "org.modelcatalogue:mc-integration-excel:$mcToolkitVersion"
@@ -83,9 +82,9 @@ grails.project.dependency.resolution = {
 
         runtime ':database-migration:1.3.6'
 
-        compile ":asset-pipeline:1.9.9"
-        compile ":coffee-asset-pipeline:1.9.0"
-        compile ":less-asset-pipeline:1.10.0"
+        compile ":asset-pipeline:2.4.3"
+        compile ":coffee-asset-pipeline:2.0.7"
+        compile ":less-asset-pipeline:2.3.0"
 //        runtime ":hibernate4:4.3.5.5"
         runtime  ":hibernate:3.6.10.18"
 

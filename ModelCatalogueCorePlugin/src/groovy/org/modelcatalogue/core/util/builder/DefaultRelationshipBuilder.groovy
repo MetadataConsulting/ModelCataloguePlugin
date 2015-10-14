@@ -4,7 +4,7 @@ import org.modelcatalogue.builder.api.BuilderKeyword
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.builder.api.RelationshipBuilder
 import org.modelcatalogue.builder.api.RelationshipConfiguration
-import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.api.CatalogueElement
@@ -74,7 +74,7 @@ class DefaultRelationshipBuilder implements RelationshipBuilder {
      * @param extensions closure defining the metadata
      */
     void to(String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
-        context.withContextElement(Classification) {
+        context.withContextElement(DataModel) {
             to repository.createProxy(getDestinationHintOrClass(), [classification: it.name, name: name]), extensions
         } or {
             to repository.createProxy(getDestinationHintOrClass(), [name: name]), extensions
@@ -157,7 +157,7 @@ class DefaultRelationshipBuilder implements RelationshipBuilder {
     }
 
     void from(String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
-        context.withContextElement(Classification) {
+        context.withContextElement(DataModel) {
             from repository.createProxy(getSourceHintOrClass(), [classification: it.name, name: name]), extensions
         } or {
             from repository.createProxy(getSourceHintOrClass(), [name: name]), extensions

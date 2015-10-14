@@ -14,8 +14,8 @@ Call the @columns@ function with item type to retrieve predefined columns.
 angular
 .module('foo', ['mc.core.ui.columns'])
 .factory('bar', function(columns) {
-    var valueDomainColumns = columns('org.modelcatalogue.core.ValueDomain');
-    var vdOrUserDefaults   = columns('org.modelcatalogue.core.ValueDomain', [...]);
+    var dataTypeColumns = columns('org.modelcatalogue.core.DataType');
+    var vdOrUserDefaults   = columns('org.modelcatalogue.core.DataType', [...]);
     var defaultColumns     = columns();
 });
 {code}

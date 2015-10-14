@@ -161,8 +161,10 @@ class SecuredRuleExecutor<S extends Script> {
     ReusableScript<S> reuse(String scriptText) {
         try {
             return new ReusableScript<S>((S) shell.parse(scriptText))
-        } catch (CompilationFailedException ignored) {
-            return null
+        } catch (CompilationFailedException e) {
+            throw new IllegalArgumentException("Invalid script:\n\n$scriptText\n", e)
+        } catch (e) {
+            throw e
         }
     }
 

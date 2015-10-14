@@ -20,34 +20,18 @@ class DataArchitectService {
     def relationshipService
     def elementService
     def actionService
-    def classificationService
+    def dataModelService
 
     private Map<String,Runnable> suggestions = [
             'Inline Models': this.&generateInlineModel,
-            'Merge Data Elements': this.&generateMergeDataElements,
             'Merge Models': this.&generateMergeModels,
             'Enum Duplicates and Synonyms': this.&generatePossibleEnumDuplicatesAndSynonyms,
-            'Rename Data Types and Value Domains': this.&generateRenameDataTypesAndValueDomain,
-            'Deep Classification': this.&generateDeepClassify.curry(false),
-            'Deep Classification (Unclassified Only)': this.&generateDeepClassify.curry(true)
+            'Deep Declaration': this.&generateDeepClassify.curry(false),
+            'Deep Declaration (Orpahned Only)': this.&generateDeepClassify.curry(true)
     ]
 
     Set<String> getSuggestionsNames() {
         suggestions.keySet().sort()
-    }
-
-    ListWithTotal<DataElement> uninstantiatedDataElements(Map params){
-        classificationService.classified Lists.fromCriteria(params, DataElement) {
-            'in'('status', org.modelcatalogue.core.api.ElementStatus.DRAFT, org.modelcatalogue.core.api.ElementStatus.PENDING, org.modelcatalogue.core.api.ElementStatus.UPDATED, org.modelcatalogue.core.api.ElementStatus.FINALIZED)
-            isNull 'valueDomain'
-
-        }
-    }
-
-    ListWithTotal<ValueDomain> incompleteValueDomains(Map params){
-        classificationService.classified Lists.fromCriteria(params, ValueDomain) {
-            isNull 'dataType'
-        }
     }
 
     ListWithTotal<DataElement> metadataKeyCheck(Map params){
@@ -161,31 +145,31 @@ class DataArchitectService {
         List<Object> elements = []
 
         for (String header in headers) {
-            def element = Model.findByNameIlikeAndStatus(header, org.modelcatalogue.core.api.ElementStatus.FINALIZED)
+            def element = DataClass.findByNameIlikeAndStatus(header, org.modelcatalogue.core.api.ElementStatus.FINALIZED)
             if (!element) {
-                element = Model.findByModelCatalogueId(header)
+                element = DataClass.findByModelCatalogueId(header)
             }
             if (!element) {
                 if (header.contains('_')) {
-                    element = Model.findByNameIlikeAndStatus(header.replace('_', ' '), org.modelcatalogue.core.api.ElementStatus.FINALIZED)
+                    element = DataClass.findByNameIlikeAndStatus(header.replace('_', ' '), org.modelcatalogue.core.api.ElementStatus.FINALIZED)
                 } else {
-                    element = Model.findByNameIlikeAndStatus(header.replace(' ', '_'), org.modelcatalogue.core.api.ElementStatus.FINALIZED)
+                    element = DataClass.findByNameIlikeAndStatus(header.replace(' ', '_'), org.modelcatalogue.core.api.ElementStatus.FINALIZED)
                 }
             }
             if (!element) {
-                element = Model.findByNameIlikeAndStatus(header, org.modelcatalogue.core.api.ElementStatus.DRAFT)
+                element = DataClass.findByNameIlikeAndStatus(header, org.modelcatalogue.core.api.ElementStatus.DRAFT)
             }
             if (!element) {
                 if (header.contains('_')) {
-                    element = Model.findByNameIlikeAndStatus(header.replace('_', ' '), org.modelcatalogue.core.api.ElementStatus.DRAFT)
+                    element = DataClass.findByNameIlikeAndStatus(header.replace('_', ' '), org.modelcatalogue.core.api.ElementStatus.DRAFT)
                 } else {
-                    element = Model.findByNameIlikeAndStatus(header.replace(' ', '_'), org.modelcatalogue.core.api.ElementStatus.DRAFT)
+                    element = DataClass.findByNameIlikeAndStatus(header.replace(' ', '_'), org.modelcatalogue.core.api.ElementStatus.DRAFT)
                 }
             }
             if (element) {
                 elements << element
             } else {
-                def searchResult = modelCatalogueSearchService.search(Model, [search: header])
+                def searchResult = modelCatalogueSearchService.search(DataClass, [search: header])
                 // only if we have single hit
                 if (searchResult.total == 1) {
                     elements << searchResult.searchResults[0]
@@ -256,95 +240,6 @@ class DataArchitectService {
 
     }
 
-    ListWithTotal<ValueDomain> unusedValueDomains(Map params) {
-        // TODO: create test
-        // TODO: count with classificaitons in use
-        Lists.fromQuery params, ValueDomain, """
-            from ValueDomain v
-            where
-                v.id in (select vd.id from ValueDomain vd left join vd.dataElements de group by vd.id having count(de.id) = sum(case when de.status = :archived then 1 else 0 end))
-        """, [archived: org.modelcatalogue.core.api.ElementStatus.DEPRECATED]
-    }
-
-    ListWithTotal<ValueDomain> duplicateValueDomains(Map params) {
-        // TODO: create test
-        // TODO: count with classificaitons in use
-        Lists.fromQuery params, ValueDomain, """
-            from ValueDomain v
-            where
-                v.id in (select vd.id from ValueDomain vd left join vd.dataElements de group by vd.id having count(de.id) = sum(case when de.status = :archived then 1 else 0 end))
-            and
-                v.name in (select vd.name from ValueDomain vd group by vd.name having count(vd.name) > 1)
-        """, [archived: org.modelcatalogue.core.api.ElementStatus.DEPRECATED]
-    }
-
-    Map<Long, String> dataTypesNamesSuggestions() {
-        // find all data types with duplicite name
-        List<DataType> dataTypes = DataType.executeQuery("""
-            from DataType d
-            where d.name in (
-                select d.name
-                from DataType d
-                where
-                    d.name not like '%(in %)'
-                and
-                    d.latestVersionId = d.id or d.latestVersionId is null
-                group by
-                    d.name
-                having
-                    count(d.name) > 1
-            )
-            order by d.name
-        """)
-
-        Map<Long, Set<String>> suggestions = new LinkedHashMap<Long, Set<String>>().withDefault { new TreeSet<String>() }
-
-        for (DataType dataType in dataTypes) {
-            List<ValueDomain> domains = ValueDomain.findAllByDataTypeAndName(dataType, dataType.name)
-            if (!domains) {
-                // value domains have different names
-                for (ValueDomain domain in ValueDomain.findAllByDataType(dataType)) {
-                    suggestions[dataType.id] << domain.name
-                }
-            } else {
-                // we have to try names of data element
-                for (ValueDomain valueDomain in domains) {
-                    List<DataElement> elements = DataElement.findAllByValueDomainAndName(valueDomain, dataType.name)
-                    if (!elements) {
-                        // elements have different names
-                        for (DataElement element in DataElement.findAllByValueDomain(valueDomain)) {
-                            suggestions[dataType.id] << element.name
-                        }
-                    } else {
-                        // we have to rely on names of the model
-                        def results = DataElement.executeQuery """
-                            select re.source.name
-                            from DataElement de
-                                left join de.incomingRelationships re
-                            where
-                                de.valueDomain = :valueDomain
-                            and
-                                re.relationshipType = :containment
-                            order by de.id
-                        """, [containment: RelationshipType.containmentType, valueDomain: valueDomain]
-
-                        for (row in results) {
-                            suggestions[dataType.id] << row[0]
-                        }
-                    }
-                }
-            }
-        }
-
-
-        Map<Long, String> ret = [:]
-
-        suggestions.each { Long id, Set<String> names ->
-            ret[id] = DataType.suggestName(names)
-        }
-
-        ret
-    }
 
     /**
      * Finds mapping between selected data elements or Mapping#DIRECT_MAPPING.
@@ -353,17 +248,17 @@ class DataArchitectService {
      * @return mapping if exists between data elements's value domains or direct mapping
      */
     SecuredRuleExecutor.ReusableScript findDomainMapper(DataElement source, DataElement destination) {
-        if (!source?.valueDomain || !destination?.valueDomain) {
+        if (!source?.dataType || !destination?.dataType) {
             return null
         }
-        Mapping mapping = Mapping.findBySourceAndDestination(source.valueDomain, destination.valueDomain)
+        Mapping mapping = Mapping.findBySourceAndDestination(source.dataType, destination.dataType)
         if (mapping) {
             return mapping.mapper()
         }
         return null
     }
 
-    private Closure getReset() {
+    private static Closure getReset() {
         return { Batch batch ->
             for (Action action in new HashSet<Action>(batch.actions)) {
                 if (action.state in [ActionState.FAILED, ActionState.PENDING]) {
@@ -402,11 +297,11 @@ class DataArchitectService {
 
 
     private void generateDeepClassify(boolean unclassifiedOnly = false) {
-        Batch.findAllByNameIlike("Deep Classify '%'").each reset
+        Batch.findAllByNameIlike("Deep Declaration '%'").each reset
 
         List<ElementStatus> statuses = [ElementStatus.FINALIZED, ElementStatus.DRAFT]
 
-        log.info "Generating deep classification suggestions for models => models/data elements"
+        log.info "Generating deep declaration suggestions for models => models/data elements"
         generateDeepClassification(Relationship.executeQuery(unclassifyIfNeeded(unclassifiedOnly,  '''
             select rel.source, destination
             from Relationship rel
@@ -424,38 +319,16 @@ class DataArchitectService {
                 and (rel2.source.id = rel.source.id or rel2.source.latestVersionId = rel.source.latestVersionId)
             )
         '''), [
-            classificationType: RelationshipType.classificationType,
+            classificationType: RelationshipType.declarationType,
             inheriting: [RelationshipType.hierarchyType, RelationshipType.containmentType],
             statuses: statuses
         ]))
 
-
-        log.info "Generating deep classification suggestions for data elements => value domains"
-        //language=HQL
-        generateDeepClassification(Relationship.executeQuery(unclassifyIfNeeded(unclassifiedOnly,  '''
-            select rel.source, destination
-            from DataElement source
-            join source.incomingRelationships rel
-            join source.valueDomain destination
-            where rel.relationshipType = :classificationType
-            and source.status in :statuses
-            and destination.status in :statuses
-            and destination not in (
-                select rel2.destination
-                from Relationship rel2
-                where rel2.relationshipType = :classificationType
-                and (rel2.source.id = rel.source.id or rel2.source.latestVersionId = rel.source.latestVersionId)
-            )
-        '''), [
-                classificationType: RelationshipType.classificationType,
-                statuses: statuses
-        ]))
-
-        log.info "Generating deep classification suggestions for value domains => data types"
+        log.info "Generating deep declaration suggestions for data element => data types"
         //language=HQL
         generateDeepClassification(Relationship.executeQuery(unclassifyIfNeeded(unclassifiedOnly, '''
             select rel.source, destination
-            from ValueDomain source
+            from DataElement source
             join source.incomingRelationships rel
             join source.dataType destination
             where rel.relationshipType = :classificationType
@@ -468,7 +341,7 @@ class DataArchitectService {
                 and (rel2.source.id = rel.source.id or rel2.source.latestVersionId = rel.source.latestVersionId)
             )
         '''), [
-                classificationType: RelationshipType.classificationType,
+                classificationType: RelationshipType.declarationType,
                 statuses: statuses
         ]))
     }
@@ -482,14 +355,14 @@ class DataArchitectService {
 
     private void generateDeepClassification(result) {
         for (Object[] row in result) {
-            Classification classification = row[0] as Classification
+            DataModel classification = row[0] as DataModel
             CatalogueElement element = row[1] as CatalogueElement
 
-            Batch batch = Batch.findOrSaveByName("Deep Classify '$classification.name'")
+            Batch batch = Batch.findOrSaveByName("Deep Declare '$classification.name'")
 
-            Action action = actionService.create batch, CreateRelationship, source: AbstractActionRunner.encodeEntity(DraftContext.preferDraft(classification)), destination: AbstractActionRunner.encodeEntity(DraftContext.preferDraft(element)), type: "gorm://org.modelcatalogue.core.RelationshipType:${RelationshipType.classificationType.id}"
+            Action action = actionService.create batch, CreateRelationship, source: AbstractActionRunner.encodeEntity(DraftContext.preferDraft(classification)), destination: AbstractActionRunner.encodeEntity(DraftContext.preferDraft(element)), type: "gorm://org.modelcatalogue.core.RelationshipType:${RelationshipType.declarationType.id}"
             if (action.hasErrors()) {
-                log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating deep classification action", action.errors))
+                log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating deep declaration action", action.errors))
             }
 
             batch.archived = false
@@ -498,14 +371,14 @@ class DataArchitectService {
     }
 
     private void generateInlineModel() {
-        Batch.findAllByNameIlike("Inline Model '%'").each reset
+        Batch.findAllByNameIlike("Inline Data Class '%'").each reset
         elementService.findModelsToBeInlined().each { sourceId, destId ->
-            Model model = Model.get(sourceId)
-            Batch batch = Batch.findOrSaveByName("Inline Model '$model.name'")
-            batch.description = """Model '$model.name' was created from XML Schema element but it is actually used only in one place an can be replaced by its type"""
-            Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.Model:$sourceId", destination: "gorm://org.modelcatalogue.core.Model:$destId"
+            DataClass model = DataClass.get(sourceId)
+            Batch batch = Batch.findOrSaveByName("Inline Data Class '$model.name'")
+            batch.description = """Data Class '$model.name' was created from XML Schema element but it is actually used only in one place an can be replaced by its type"""
+            Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.DataClass:$sourceId", destination: "gorm://org.modelcatalogue.core.DataClass:$destId"
             if (action.hasErrors()) {
-                log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating merge model action", action.errors))
+                log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating merge data class action", action.errors))
             }
             batch.archived = false
             batch.save(flush: true)
@@ -515,13 +388,13 @@ class DataArchitectService {
     private void generateMergeModels() {
         def duplicateModelsSuggestions = elementService.findDuplicateModelsSuggestions()
 
-        Batch.findAllByNameIlike("Create Synonyms for Model '%'").each reset
+        Batch.findAllByNameIlike("Create Synonyms for Data Class '%'").each reset
         duplicateModelsSuggestions.each { destId, sources ->
-            Model model = Model.get(destId)
-            Batch batch = Batch.findOrSaveByName("Create Synonyms for Model '$model.name'")
+            DataClass model = DataClass.get(destId)
+            Batch batch = Batch.findOrSaveByName("Create Synonyms for Data Class '$model.name'")
             RelationshipType type = RelationshipType.readByName("synonym")
             sources.each { srcId ->
-                Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.Model:$srcId", destination: "gorm://org.modelcatalogue.core.Model:$destId", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
+                Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.DataClass:$srcId", destination: "gorm://org.modelcatalogue.core.DataClass:$destId", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
                 if (action.hasErrors()) {
                     log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
@@ -530,70 +403,18 @@ class DataArchitectService {
             batch.save(flush: true)
         }
 
-        Batch.findAllByNameIlike("Merge Model '%'").each reset
+        Batch.findAllByNameIlike("Merge Data Class '%'").each reset
         duplicateModelsSuggestions.each { destId, sources ->
-            Model model = Model.get(destId)
-            Batch batch = Batch.findOrSaveByName("Merge Model '$model.name'")
+            DataClass model = DataClass.get(destId)
+            Batch batch = Batch.findOrSaveByName("Merge Data Class '$model.name'")
             sources.each { srcId ->
-                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.Model:$srcId", destination: "gorm://org.modelcatalogue.core.Model:$destId"
+                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.DataClass:$srcId", destination: "gorm://org.modelcatalogue.core.DataClass:$destId"
                 if (action.hasErrors()) {
                     log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
             }
             batch.archived = false
             batch.save(flush: true)
-        }
-    }
-
-    private void generateMergeDataElements() {
-        def duplicateDataElementsSuggestions = elementService.findDuplicateDataElementsSuggestions()
-
-        Batch.findAllByNameIlike("Create Synonyms for Data Element '%'").each reset
-        duplicateDataElementsSuggestions.each { destId, sources ->
-            DataElement dataElement = DataElement.get(destId)
-            Batch batch = Batch.findOrSaveByName("Create Synonyms for Data Element '$dataElement.name'")
-            RelationshipType type = RelationshipType.readByName("synonym")
-            sources.each { srcId ->
-                Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.DataElement:$srcId", destination: "gorm://org.modelcatalogue.core.DataElement:$destId", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
-                if (action.hasErrors()) {
-                    log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
-                }
-            }
-            batch.archived = false
-            batch.save(flush: true)
-        }
-
-        Batch.findAllByNameIlike("Merge Data Element '%'").each reset
-        duplicateDataElementsSuggestions.each { destId, sources ->
-            DataElement dataElement = DataElement.get(destId)
-            Batch batch = Batch.findOrSaveByName("Merge Data Element '$dataElement.name'")
-            sources.each { srcId ->
-                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.DataElement:$srcId", destination: "gorm://org.modelcatalogue.core.DataElement:$destId"
-                if (action.hasErrors()) {
-                    log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
-                }
-            }
-            batch.archived = false
-            batch.save(flush: true)
-        }
-    }
-
-    private void generateRenameDataTypesAndValueDomain() {
-        Batch.findAllByName("Rename Data Types and Value Domains").each reset
-        Map<Long, String> suggestions = dataTypesNamesSuggestions()
-        if (suggestions) {
-            Batch renameBatch = Batch.findOrSaveByName("Rename Data Types and Value Domains")
-            suggestions.findAll { id, name -> name }.each { id, name ->
-                DataType type = DataType.get(id)
-                String originalName = type.name
-                String newName = "$originalName (in $name)"
-                Action updateDataType = actionService.create renameBatch, UpdateCatalogueElement, id: id, type: DataType.name, name: newName
-                type.relatedValueDomains.each { ValueDomain it ->
-                    actionService.create renameBatch, UpdateCatalogueElement, id: it.id, type: ValueDomain.name, name: newName, relatedDataType: updateDataType
-                }
-            }
-            renameBatch.archived = false
-            renameBatch.save(flush: true)
         }
     }
 

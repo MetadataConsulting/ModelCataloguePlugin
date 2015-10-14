@@ -31,7 +31,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      *
      * @see #automatic(BuilderKeyword)
      */
-    private static Set<Class> SUPPORTED_FOR_AUTO = [DataType, EnumeratedType, ValueDomain]
+    private static Set<Class> SUPPORTED_FOR_AUTO = [DataType, EnumeratedType, ReferenceType, PrimitiveType]
 
     /**
      * Repository handles fetching the right elements from the database based on id, value or classification.
@@ -69,11 +69,11 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
 
     /**
      * Creates new catalogue builder with given classification and element services.
-     * @param classificationService classification service
+     * @param dataModelService classification service
      * @param elementService element service
      */
-    DefaultCatalogueBuilder(ClassificationService classificationService, ElementService elementService, boolean canCreateRelationshipTypes = false) {
-        this.repository = new CatalogueElementProxyRepository(classificationService, elementService)
+    DefaultCatalogueBuilder(DataModelService dataModelService, ElementService elementService, boolean canCreateRelationshipTypes = false) {
+        this.repository = new CatalogueElementProxyRepository(dataModelService, elementService)
         this.context = new CatalogueBuilderContext(this)
         this.canCreateRelationshipTypes = canCreateRelationshipTypes
     }
@@ -114,8 +114,8 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @param c DSL definition closure
      * @return proxy to classification specified by the parameters map and the DSL closure
      */
-    void classification(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        CatalogueElementProxy<Classification> classification = createProxy(Classification, parameters, null, true)
+    void dataModel(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
+        CatalogueElementProxy<DataModel> classification = createProxy(DataModel, parameters, null, true)
 
         context.withNewContext classification, c
 
@@ -136,17 +136,17 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @return proxy to data element specified by the parameters map and the DSL closure
      */
     void dataElement(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        CatalogueElementProxy<DataElement> element = createProxy(DataElement, parameters, Model, isUnderControlIfSameClassification(parameters))
+        CatalogueElementProxy<DataElement> element = createProxy(DataElement, parameters, DataClass, isUnderControlIfSameClassification(parameters))
 
         context.withNewContext element, c
 
-        if (element.getParameter('valueDomain') == null && ValueDomain in createAutomatically) {
+        if (element.getParameter('dataType') == null && DataType in createAutomatically) {
             context.withNewContext element, {
-                valueDomain()
+                dataType()
             }
         }
 
-        context.withContextElement(Model) { ignored, Closure relConf ->
+        context.withContextElement(DataClass) { ignored, Closure relConf ->
             contains element, relConf
         }
 
@@ -164,46 +164,18 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @param c DSL definition closure
      * @return proxy to model specified by the parameters map and the DSL closure
      */
-    void model(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        CatalogueElementProxy<Model> model = createProxy(Model, parameters, Classification, isUnderControlIfSameClassification(parameters))
+    void dataClass(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
+        CatalogueElementProxy<DataClass> dataClass = createProxy(DataClass, parameters, DataModel, isUnderControlIfSameClassification(parameters))
 
-        context.withNewContext model, c
-        context.withContextElement(Model) { ignored, Closure relConf ->
-            child model, relConf
+        context.withNewContext dataClass, c
+        context.withContextElement(DataType) {
+            it.setParameter('dataClass', dataClass)
+        }
+        context.withContextElement(DataClass) { ignored, Closure relConf ->
+            child dataClass, relConf
         }
 
-        model
-    }
-
-    /**
-     * Creates new value domain, reuses the latest draft or creates new draft unless the exactly same value domain
-     * already exists in the catalogue. Accepts any bindable parameters which ValueDomain instances does.
-     *
-     * Measurement unit nested inside the DSL definition closure will be set as unit of measure of this element.
-     * Data type nested inside the DSL definition closure will be set as data type of this element.
-     *
-     * If data types are created automatically a data type with the same name and description will be created
-     * if no nested data type is specified.
-     *
-     * @param parameters map of parameters such as name or id
-     * @param c DSL definition closure
-     * @return proxy to value domain specified by the parameters map and the DSL closure
-     */
-    void valueDomain(Map<String, Object> parameters = [:], @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        CatalogueElementProxy<ValueDomain> domain = createProxy(ValueDomain, parameters, DataElement, isUnderControlIfSameClassification(parameters))
-
-        context.withNewContext domain, c
-
-        context.withContextElement(DataElement) {
-            it.setParameter('valueDomain', domain)
-        }
-
-        if (domain.getParameter('dataType') == null && DataType in createAutomatically) {
-            context.withNewContext domain, {
-                dataType()
-            }
-        }
-        domain
+        dataClass
     }
 
     /**
@@ -219,12 +191,39 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         if (parameters.containsKey('enumerations') && !parameters.enumerations) {
             parameters.remove('enumerations')
         }
-        CatalogueElementProxy<? extends DataType> dataType = createProxy(type, parameters, ValueDomain, isUnderControlIfSameClassification(parameters))
+
+        context.withContextElement(DataType) {
+            if (!parameters.name) {
+                parameters.name = it.getParameter('name')
+            }
+        }
+
+
+        CatalogueElementProxy<? extends DataType> dataType = createProxy(type, parameters, DataElement, isUnderControlIfSameClassification(parameters))
 
         context.withNewContext dataType, c
 
-        context.withContextElement(ValueDomain) {
+        if (dataType.getParameter('dataClass')) {
+            if (dataType instanceof DefaultCatalogueElementProxy) {
+                DefaultCatalogueElementProxy proxy = (DefaultCatalogueElementProxy) dataType;
+                proxy.domain = ReferenceType
+            }
+        }
+        if (dataType.getParameter('measurementUnit')) {
+            if (dataType instanceof DefaultCatalogueElementProxy) {
+                DefaultCatalogueElementProxy proxy = (DefaultCatalogueElementProxy) dataType;
+                proxy.domain = PrimitiveType
+            }
+        }
+
+        context.withContextElement(DataElement) {
             it.setParameter('dataType', dataType)
+        }
+
+        context.withContextElement(DataType) { outerDataType, Closure relConf ->
+            if (outerDataType.name != dataType.name) {
+                basedOn dataType, relConf
+            }
         }
 
         dataType
@@ -243,8 +242,8 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
 
         context.withNewContext unit, c
 
-        context.withContextElement(ValueDomain) {
-            it.setParameter('unitOfMeasure', unit)
+        context.withContextElement(DataType) {
+            it.setParameter('measurementUnit', unit)
         }
 
         unit
@@ -448,7 +447,6 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * Sets the status of the current element. Currently it does not work as expected as it sets the status property
      * right after object is resolved instead e.g. finalizing the element after all the work is done.
      * @param status new status of the element
-     * @see https://metadata.atlassian.net/browse/MET-620
      */
     @Deprecated
     void status(ElementStatus status) {
@@ -535,14 +533,14 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * Trigger the automatic creation of nested elements of given types. Currently data types and value domains are
      * supported for automatic creation.
      *
-     * If for example automatic creation of value domains is set and there is no nested <code>valueDomain</code> call
+     * If for example automatic creation of value domains is set and there is no nested <code>dataType</code> call
      * inside <code>dataElement</code> DSL definition closure value domain is created or matched with the name
      * of the data element and its description. Use this feature in imports when imported data don't have a concept
      * of value domains or data types to create value domains and data types placeholders automatically.
      *
      * You can set both supported classes calling this method twice.
      *
-     * @param type either dataType or valueDomain
+     * @param currently only dataType is supported
      */
     void automatic(BuilderKeyword type){
         if (type instanceof ModelCatalogueTypes) {
@@ -579,11 +577,16 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @param element element to be classified
      */
     private <T extends CatalogueElement, A extends CatalogueElementProxy<T>> void classifyIfNeeded(A element) {
-        if (Classification.isAssignableFrom(element.domain)) {
+        if (DataModel.isAssignableFrom(element.domain)) {
             return
         }
-        context.withContextElement(Classification) {
-            RelationshipProxy relationshipProxy = new RelationshipProxy('classification', it, element, [:])
+
+        if (element.classification) {
+            return
+        }
+
+        context.withContextElement(DataModel) {
+            RelationshipProxy relationshipProxy = new RelationshipProxy(RelationshipType.declarationType.name, it, element, [:])
             element.addToPendingRelationships(relationshipProxy)
             it.addToPendingRelationships(relationshipProxy)
         }
@@ -627,7 +630,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * Creates the proxy for given configuration.
      *
      * If a type is supported for automatic creation (data type and value domain at the moment) it also handles
-     * inheriting the name and description for every nested dataType or valueDomain call.
+     * inheriting the name and description for every nested dataType call.
      *
      * @param domain the class of the resolved element
      * @param parameters initial parameters mapp
@@ -663,7 +666,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
 
         parameters.each { String key, Object value ->
             // these are specials handled directly
-            if (key in ['id', 'classification', 'name']) {
+            if (key in ['id', 'classification', 'dataModel',  'name']) {
                 return
             }
             element.setParameter(key, value)
@@ -675,12 +678,12 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
     }
 
     private boolean isUnderControlIfSameClassification(Map<String, Object> parameters) {
-        if (!parameters.classification) {
+        if (!parameters.dataModel && !parameters.classification) {
             return true
         }
         boolean ret = true
-        context.withContextElement(Classification) {
-            ret = it.name == parameters.classification?.toString()
+        context.withContextElement(DataModel) {
+            ret = it.name == (parameters.dataModel ?: parameters.classification)?.toString()
         }
         return ret
     }

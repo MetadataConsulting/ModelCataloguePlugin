@@ -9,13 +9,12 @@ import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.ResultRecorder
+import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import spock.lang.Unroll
 
 import javax.servlet.http.HttpServletResponse
+import javax.xml.crypto.Data
 
-/**
- * Created by adammilward on 27/02/2014.
- */
 abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends AbstractControllerIntegrationSpec implements ResultRecorder{
 
 
@@ -39,7 +38,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         controller.request.method = 'PUT'
         controller.params.id = another.id
         controller.params.newVersion = true
-        controller.request.json = [name: newName]
+        controller.request.json = [name: newName, dataModels: dataModelsForSpec]
         controller.response.format = "json"
 
         controller.update()
@@ -77,12 +76,20 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
         then:
         checkJsonCorrectListValues(json, total, size, offset, max, next, previous)
-        json.itemType == resource.name
+        json.itemType == itemTypeForHistory
 
         // TODO: add more verification
 
         where:
-        [no, size, max, offset, total, next, previous] << optimize(getHistoryPaginationParameters("/${resourceName}/${loadItem.id}/history"))
+        [no, size, max, offset, total, next, previous] << optimize(getHistoryPaginationParameters("/${getResourceNameForHistory()}/${loadItem.id}/history"))
+    }
+
+    protected String getResourceNameForHistory() {
+        resourceName
+    }
+
+    protected String getItemTypeForHistory() {
+        resource.name
     }
 
     def getHistoryPaginationParameters(String baseLink) {
@@ -739,7 +746,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         controller.request.method       = 'PUT'
         controller.params.id            = another.id
         controller.params.newVersion    = true
-        controller.request.json         = [name: newName, ext: OrderedMap.toJsonMap(keyValue)]
+        controller.request.json         = [name: newName, ext: OrderedMap.toJsonMap(keyValue), dataModels: dataModelsForSpec]
         controller.response.format      = "json"
 
         controller.update()
@@ -778,6 +785,15 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     }
 
+
+
+    def getDataModelsForSpec() {
+        [CatalogueElementMarshaller.minimalCatalogueElementJSON(DataModel.findOrCreateByName("data set 1").save(failOnError: true))]
+    }
+
+    protected  getBadNameJSON() {
+        [name: "g" * 256, dataModels: dataModelsForSpec]
+    }
 
 
 }

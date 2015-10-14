@@ -19,7 +19,7 @@ class BatchListPage extends ModelCataloguePage {
 
         batchList           { $('table.dl-table') }
         linkToTestBatch     { $('td.inf-table-item-cell a', text: 'Test Batch') }
-        linkToRename        { $('td.inf-table-item-cell a', text: 'Rename Data Types and Value Domains') }
+        linkToRename        { $('td.inf-table-item-cell a', text: 'Create Synonyms for Enumerated Type \'PERSON GENDER CODE (CURRENT)\'') }
 
     }
 }

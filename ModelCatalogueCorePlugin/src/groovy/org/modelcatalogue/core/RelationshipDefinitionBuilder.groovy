@@ -8,8 +8,8 @@ class RelationshipDefinitionBuilder {
         this.definition = definition
     }
 
-    RelationshipDefinitionBuilder withClassification(Classification classification) {
-        definition.classification = classification
+    RelationshipDefinitionBuilder withDataModel(DataModel dataModel) {
+        definition.dataModel = dataModel
         this
     }
 
@@ -20,6 +20,11 @@ class RelationshipDefinitionBuilder {
 
     RelationshipDefinitionBuilder withArchived(boolean archived) {
         definition.archived = archived
+        this
+    }
+
+    RelationshipDefinitionBuilder withInherited(boolean inherited) {
+        definition.inherited = inherited
         this
     }
 
@@ -68,6 +73,10 @@ class RelationshipDefinitionBuilder {
             } else if (definition.hasProperty(key)) {
                 definition.setProperty(key, value)
             } else {
+                if (key == 'classification') {
+                    definition.dataModel = value as DataModel
+                    return
+                }
                 throw new IllegalArgumentException("Parameter $key not supported")
             }
         }

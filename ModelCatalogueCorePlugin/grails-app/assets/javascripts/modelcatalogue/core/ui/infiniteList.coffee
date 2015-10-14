@@ -3,33 +3,38 @@ angular.module('mc.core.ui.infiniteList', ['mc.core.ui.infiniteListCtrl', 'ngAni
     replace: true
     scope:
       list: '='
+      noActions: '=?'
+      itemHref: '&?'
+      onCreateRequested: '&?'
+      heading: '=?'
 
     templateUrl: 'modelcatalogue/core/ui/infinitePanels.html'
 
-    controller: ['$scope', '$animate', '$window', '$controller', '$element', ($scope, $animate, $window, $controller, $element) ->
+    controller: ['$scope', '$animate', '$window', '$controller', '$element', '$attrs', ($scope, $animate, $window, $controller, $element, $attrs) ->
+      unless $attrs.transform
+        $scope.transform = (args) -> args.$element
       angular.extend(this, $controller('infiniteListCtrl', {$scope: $scope, $element: $element}))
 
-      $scope.extendOrCollapse = ($event)->
-        panelContainer = angular.element(angular.element($event.currentTarget).closest('.panel').parent())
-        if not panelContainer.hasClass('expanded')
-          $animate.removeClass(panelContainer, 'col-md-4')
-          $animate.removeClass(panelContainer, 'col-sm-6')
-          $animate.removeClass(panelContainer, 'col-lg-4')
-          $animate.addClass(panelContainer, 'col-md-12')
-          $animate.addClass(panelContainer, 'col-sm-12')
-          $animate.addClass(panelContainer, 'col-lg-12')
-          $animate.addClass(panelContainer, 'expanded')
-        else
-          $animate.removeClass(panelContainer, 'col-md-12')
-          $animate.removeClass(panelContainer, 'col-sm-12')
-          $animate.removeClass(panelContainer, 'col-lg-12')
-          $animate.removeClass(panelContainer, 'expanded')
-          $animate.addClass(panelContainer, 'col-md-4')
-          $animate.addClass(panelContainer, 'col-sm-6')
-          $animate.addClass(panelContainer, 'col-lg-4')
+      unless $attrs.onCreateRequested
+        $scope.onCreateRequested = undefined
 
-        $window.scrollTo 0, panelContainer.offset().top - 70
+      unless $attrs.itemHref
+        $scope.itemHref = (obj) -> obj.$element.href()
 
+      $scope.requestCreate = ->
+        $scope.onCreateRequested($list: $scope.list)
+
+      $scope.nameFilter = ''
+      $scope.href = (element) ->
+        $scope.itemHref($element: element)
+      $scope.isNotFiltered = (element) ->
+        return true unless $scope.nameFilter
+        return false if element.name?.toLowerCase().indexOf($scope.nameFilter?.toLowerCase()) == -1
+        return true
+
+
+      $scope.$watch 'nameFilter', (newFilter)->
+        $scope.$emit "infiniteList:filtered", newFilter
     ]
   }
 ]

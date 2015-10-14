@@ -7,7 +7,7 @@ import org.modelcatalogue.core.util.OrderedMap
 
 /*
 * Users can create relationships between all catalogue elements. They include
-* DataType, ConceptualDomain, MeasurementUnit, Model, ValueDomain, DataElement
+* DataType, ConceptualDomain, MeasurementUnit, Model, DataElement
 * Relationships have a source element, a destination element and a relationship type.
 * There are a number of different predefined relationship types that describe the ways catalogue
 * elements are related in the model catalogue
@@ -41,10 +41,10 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
 
     RelationshipType relationshipType
 
-    Classification classification
+    DataModel dataModel
 
-    Long outgoingIndex = System.currentTimeMillis()
-    Long incomingIndex = System.currentTimeMillis()
+    Long outgoingIndex
+    Long incomingIndex
 
     /*
      * Reordeing bidirectional relationships is not supported as the combined index is
@@ -77,7 +77,7 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
     static belongsTo = [source: CatalogueElement, destination: CatalogueElement]
 
     static constraints = {
-        classification nullable: true
+        dataModel nullable: true
     }
 
     static mapping = {

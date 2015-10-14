@@ -13,17 +13,14 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         if (DataType.isAssignableFrom(type)) {
             return new DataTypePrintHelper() as CatalogueElementPrintHelper<E>
         }
-        if (ValueDomain.isAssignableFrom(type)) {
-            return new ValueDomainPrintHelper() as CatalogueElementPrintHelper<E>
-        }
         if (DataElement.isAssignableFrom(type)) {
             return new DataElementPrintHelper() as CatalogueElementPrintHelper<E>
         }
-        if (Model.isAssignableFrom(type)) {
-            return new ModelPrintHelper() as CatalogueElementPrintHelper<E>
+        if (DataClass.isAssignableFrom(type)) {
+            return new DataClassPrintHelper() as CatalogueElementPrintHelper<E>
         }
-        if (Classification.isAssignableFrom(type)) {
-            return new ClassificationPrintHelper() as CatalogueElementPrintHelper<E>
+        if (DataModel.isAssignableFrom(type)) {
+            return new DataModelPrintHelper() as CatalogueElementPrintHelper<E>
         }
         throw new IllegalArgumentException("Not yet implemented for $type")
     }
@@ -34,7 +31,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             elementName = helper.topLevelName
         }
 
-        if (element instanceof Classification) {
+        if (element instanceof DataModel) {
             if (context.currentClassification) {
                 theMkp."${elementName}"(ref(element, context)) {
                     processRelationshipMetadata(theMkp, context, rel)
@@ -42,7 +39,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
                 return
             }
             context.currentClassification = element
-            context.typesUsed << 'classification'
+            context.typesUsed << 'declaration'
         }
 
         if (context.wasPrinted(element)) {
@@ -58,7 +55,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             helper.processElements(theMkp, element, context, rel)
         }
 
-        if (element instanceof Classification) {
+        if (element instanceof DataModel) {
             context.currentClassification = null
         }
     }
@@ -67,8 +64,8 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
     Map<String, Object> collectAttributes(E element, PrintContext context) {
         Map<String, Object> attrs = [name: element.name]
 
-        if (element.classifications && !(context.currentClassification in element.classifications)) {
-            attrs.classification = element.classifications.first().name
+        if (element.dataModels && !(context.currentClassification in element.dataModels)) {
+            attrs.dataModel = element.dataModels.first().name
         }
 
         if (element.hasModelCatalogueId()) {
@@ -157,11 +154,14 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         if (rel.archived) {
             theMkp.archived true
         }
+        if (rel.inherited) {
+            theMkp.inherited true
+        }
     }
 
     static DetachedCriteria<Relationship> restOfRelationships(DetachedCriteria<Relationship>  criteria) {
         criteria.not {
-            'in' 'relationshipType', ['classification', 'hierarchy', 'containment', 'supersession', 'base', 'relatedTo', 'synonym'].collect { RelationshipType.readByName(it) }
+            'in' 'relationshipType', ['declaration', 'hierarchy', 'containment', 'supersession', 'base', 'relatedTo', 'synonym'].collect { RelationshipType.readByName(it) }
         }
         criteria.'eq' 'archived', false
     }
@@ -174,11 +174,11 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             return [ref: element.modelCatalogueId, href: element.getDefaultModelCatalogueId(!context.idIncludeVersion)]
         }
 
-        if (element.classifications) {
-            if (context.currentClassification in element.classifications) {
+        if (element.dataModels) {
+            if (context.currentClassification in element.dataModels) {
                 return [name: element.name]
             } else {
-                return [name: element.name, classification: element.classifications.first().name]
+                return [name: element.name, classification: element.dataModels.first().name]
             }
         }
 
@@ -204,7 +204,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         if (type == EnumeratedType) {
             return 'dataType'
         }
-        if (type in [Classification, Model, DataElement, ValueDomain, DataType, MeasurementUnit]) {
+        if (type in [DataModel, DataClass, DataElement, DataType, MeasurementUnit]) {
             String simpleName = type.simpleName
             return simpleName[0].toLowerCase() + simpleName[1..-1]
         }

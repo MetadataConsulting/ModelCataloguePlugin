@@ -10,9 +10,9 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
-import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.DataClass
+import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.crf.model.CaseReportForm
 import org.modelcatalogue.crf.model.GenericItem
 import org.modelcatalogue.crf.model.GridGroup
@@ -81,7 +81,7 @@ class ModelToFormExporterService {
     private static class ItemIndex{private  int index=0}
 
 
-    CaseReportForm convert(Model formModel) {
+    CaseReportForm convert(DataClass formModel) {
         Set<Long> processed = []
         String formName = formModel.ext[EXT_FORM_NAME] ?:formModel.name
         MutableInt itemNumber=new MutableInt(1)
@@ -103,7 +103,7 @@ class ModelToFormExporterService {
     }
 
     private void handleSectionModel(MutableInt itemNumber,Set<Long> processed, String prefix, CaseReportForm form, Relationship sectionRel, boolean dataElementsOnly = false) {
-        Model sectionModel = sectionRel.destination as Model
+        DataClass sectionModel = sectionRel.destination as DataClass
 
         if (sectionModel.getId() in processed) {
             return
@@ -137,7 +137,7 @@ class ModelToFormExporterService {
 
 
         for (Relationship itemsWithHeaderOrGridRel in relationships) {
-            Model itemsWithHeaderOrGrid = itemsWithHeaderOrGridRel.destination as Model
+            DataClass itemsWithHeaderOrGrid = itemsWithHeaderOrGridRel.destination as DataClass
 
             if (itemsWithHeaderOrGridRel.getId() in processed) {
                 return
@@ -147,7 +147,6 @@ class ModelToFormExporterService {
 
 
             log.info "Creating group or section for model $itemsWithHeaderOrGrid"
-            log.info "Grid extension value is ${fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_GRID)}"
             String itemsWithHeaderOrGridName = fromDestination(itemsWithHeaderOrGridRel, EXT_NAME_CAP, fromDestination(itemsWithHeaderOrGridRel, EXT_NAME_LC, itemsWithHeaderOrGrid.name))
             if (fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_GRID) == 'true') {
 
@@ -191,20 +190,18 @@ class ModelToFormExporterService {
         label?.replaceAll(/[^\pL\pN_]/, '_')
     }
 
-    private void generateItems(MutableInt itemNumber,String prefix, ItemContainer container, Model model, String aHeader = null, String aSubheader = null) {
+    private void generateItems(MutableInt itemNumber,String prefix, ItemContainer container, DataClass model, String aHeader = null, String aSubheader = null) {
         boolean first = true
        
         for (Relationship rel in model.containsRelationships) {
             DataElement dataElement = rel.destination as DataElement
-            ValueDomain valueDomain = dataElement.valueDomain
-            DataType dataType = valueDomain?.dataType
+            DataType dataType = dataElement.dataType
 
             log.info "Generating items from data element $dataElement"
 
-            List<CatalogueElement> candidates = [dataElement, valueDomain, dataType].grep()
+            List<CatalogueElement> candidates = [dataElement, dataType].grep()
 
             collectBases(candidates, dataElement)
-            collectBases(candidates, valueDomain)
             collectBases(candidates, dataType)
 
 
@@ -217,7 +214,7 @@ class ModelToFormExporterService {
             } else if (dataType && dataType.instanceOf(EnumeratedType)) {
                 // either value domain is marked as multiple or
                 Map<String, Object> enumOptions = (dataType as EnumeratedType).enumerations.collectEntries { key, value -> [value ?: key, key == ENUM_DEFAULT ? '' : key]}
-                if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) in [RESPONSE_TYPE_CHECKBOX, RESPONSE_TYPE_MULTI_SELECT] || valueDomain?.multiple || rel.ext[EXT_MAX_OCCURS] && rel.ext[EXT_MAX_OCCURS] != '1') {
+                if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) in [RESPONSE_TYPE_CHECKBOX, RESPONSE_TYPE_MULTI_SELECT] ||  rel.ext[EXT_MAX_OCCURS] && rel.ext[EXT_MAX_OCCURS] != '1') {
                     // multi select or checkbox (default)
                     if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) == RESPONSE_TYPE_MULTI_SELECT) {
                         container.multiSelect(itemName) {
@@ -255,7 +252,7 @@ class ModelToFormExporterService {
             last.with {
                 // TODO: is there any way to configure simple conditional display
                 // TODO: validation
-                String regexpDef = fromCandidates(rel, candidates, EXT_ITEM_REGEXP, valueDomain?.regexDef)
+                String regexpDef = fromCandidates(rel, candidates, EXT_ITEM_REGEXP,  dataType?.regexDef)
                 if (regexpDef) {
                     regexp regexpDef, fromCandidates(rel, candidates, EXT_ITEM_REGEXP_ERROR_MESSAGE, "Value must match /$regexpDef/")
                 }
@@ -270,9 +267,9 @@ class ModelToFormExporterService {
                 phi(fromCandidates(rel, candidates, EXT_ITEM_PHI) == 'true')
                 required(fromCandidates(rel, candidates, EXT_ITEM_REQUIRED) == 'true' || rel.ext[EXT_MIN_OCCURS] == '1')
                 columnNumber = safeInteger(fromCandidates(rel, candidates, EXT_ITEM_COLUMN_NUMBER), EXT_ITEM_COLUMN_NUMBER, rel)
-                units fromCandidates(rel, candidates, EXT_ITEM_UNITS, candidates.find {
-                    it.instanceOf(ValueDomain) && it.unitOfMeasure
-                }?.unitOfMeasure?.symbol)
+                units fromCandidates(rel, candidates, EXT_ITEM_UNITS,  candidates.find {
+                    it.instanceOf(PrimitiveType) && it.measurementUnit
+                }?.measurementUnit?.symbol)
 
                 if (first) {
                     if (!last.group) {
@@ -311,7 +308,7 @@ class ModelToFormExporterService {
                     if (last.responseType == ResponseType.FILE) {
                         last.setResponseLabel(RESPONSE_LABEL_FILE)
                     } else {
-                        CatalogueElement labelSource = dataType ?: valueDomain ?: dataElement
+                        CatalogueElement labelSource = dataType ?: dataElement
                         last.setResponseLabel(alphaNumNoSpaces(labelSource.name + "_" + labelSource.versionNumber))
                     }
                 }
@@ -332,9 +329,9 @@ class ModelToFormExporterService {
             //add a logic here to colect span ID and his associated datatype 
         }
         
-        ValueDomain valueDomain=element.valueDomain
-        DataType dataType=valueDomain?.dataType 
-        def regex=valueDomain?.regexDef?:''
+
+        DataType dataType=element?.dataType
+        def regex=dataType?.regexDef?:''
         def dataTypeName=transformDataType(dataType)
         def defaultID=(spanID==null?defaultSpanID:spanID)
         
@@ -347,7 +344,7 @@ class ModelToFormExporterService {
         
         if(StringUtils.isNotEmpty(regex))
         {
-            regex = " data-regex=\"" +  XmlUtil.escapeXml(valueDomain.regexDef) + "\"";
+            regex = " data-regex=\"" +  XmlUtil.escapeXml(dataType.regexDef) + "\"";
         }
         
         

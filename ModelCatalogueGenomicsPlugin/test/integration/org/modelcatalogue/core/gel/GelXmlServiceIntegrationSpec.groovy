@@ -4,8 +4,8 @@ package org.modelcatalogue.core.gel
 import grails.test.spock.IntegrationSpec
 
 import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.InitCatalogueService
-import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.RelationshipService;
 import org.modelcatalogue.core.RelationshipType;
 import org.modelcatalogue.core.RelationshipDefinition
@@ -14,11 +14,11 @@ import spock.lang.Shared
 
 class GelXmlServiceIntegrationSpec extends IntegrationSpec {
     
-    Model parent1
-    Model parent2
-    Model child1
-    Model child2
-    Model grandChild
+    DataClass parent1
+    DataClass parent2
+    DataClass child1
+    DataClass child2
+    DataClass grandChild
     GelXmlService gelXmlService
     RelationshipService relationshipService
     InitCatalogueService initCatalogueService
@@ -28,11 +28,11 @@ class GelXmlServiceIntegrationSpec extends IntegrationSpec {
 
     def setup(){
         initCatalogueService.initDefaultRelationshipTypes()
-        parent1 = new Model(name: 'book').save(failOnError: true)
-        parent2 = new Model(name: 'chapter1').save(failOnError: true)
-        child1 = new Model(name: 'chapter2').save(failOnError: true)
-        child2 = new Model(name: 'mTest1').save(failOnError: true)
-        grandChild = new Model(name: 'mTest2').save(failOnError: true)
+        parent1 = new DataClass(name: 'book').save(failOnError: true)
+        parent2 = new DataClass(name: 'chapter1').save(failOnError: true)
+        child1 = new DataClass(name: 'chapter2').save(failOnError: true)
+        child2 = new DataClass(name: 'mTest1').save(failOnError: true)
+        grandChild = new DataClass(name: 'mTest2').save(failOnError: true)
         parent1.addToParentOf child1
         parent2.addToParentOf child2
         child1.addToParentOf grandChild

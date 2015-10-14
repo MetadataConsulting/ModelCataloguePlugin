@@ -1,12 +1,14 @@
 package org.modelcatalogue.core.util.builder
 
 import groovy.util.logging.Log4j
+import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.util.Legacy
 
 @Log4j class DefaultCatalogueElementProxy<T extends CatalogueElement> implements CatalogueElementProxy<T>, org.modelcatalogue.core.api.CatalogueElement {
 
-    static final List<Class> KNOWN_DOMAIN_CLASSES = [Asset, CatalogueElement, Classification, DataElement, DataType, EnumeratedType, MeasurementUnit, Model, ValueDomain]
+    static final List<Class> KNOWN_DOMAIN_CLASSES = [Asset, CatalogueElement, DataModel, DataElement, DataType, EnumeratedType, ReferenceType, MeasurementUnit, DataClass, PrimitiveType]
 
     Class<T> domain
 
@@ -128,9 +130,9 @@ import org.modelcatalogue.core.api.ElementStatus
             return null
         }
 
-        if (existing.status in [org.modelcatalogue.core.api.ElementStatus.FINALIZED, org.modelcatalogue.core.api.ElementStatus.DEPRECATED]) {
+        if (existing.status in [org.modelcatalogue.core.api.ElementStatus.FINALIZED, org.modelcatalogue.core.api.ElementStatus.DEPRECATED] || HibernateProxyHelper.getClassWithoutInitializingProxy(existing) != domain) {
             log.info("New draft version created for $this. Reason: $draftRequest")
-            return repository.createDraftVersion(existing)
+            return repository.createDraftVersion(existing, this)
         }
         return existing
     }
@@ -138,6 +140,9 @@ import org.modelcatalogue.core.api.ElementStatus
     private boolean isParametersChanged(T element) {
         parameters.any { String key, Object value ->
             if (key in [CatalogueElementProxyRepository.AUTOMATIC_NAME_FLAG, CatalogueElementProxyRepository.AUTOMATIC_DESCRIPTION_FLAG]) {
+                return false
+            }
+            if (!element.hasProperty(key)) {
                 return false
             }
             def currentValue = element.getProperty(key)
@@ -154,7 +159,7 @@ import org.modelcatalogue.core.api.ElementStatus
                 return false
             }
             if (normalizeWhitespace(currentValue) != normalizeWhitespace(value)) {
-                if (key == 'modelCatalogueId' && value?.toString()?.startsWith(element.getDefaultModelCatalogueId(true))) {
+                if (key == 'modelCatalogueId' && Legacy.fixModelCatalogueId(value)?.toString()?.startsWith(element.getDefaultModelCatalogueId(true))) {
                     return false
                 }
                 if (key == 'name' && parameters[CatalogueElementProxyRepository.AUTOMATIC_NAME_FLAG] && element.name) {
@@ -187,6 +192,10 @@ import org.modelcatalogue.core.api.ElementStatus
             T existing = findExisting()
             if (!existing) {
                 return changed = "Does Not Exist Yet"
+            }
+
+            if (domain != HibernateProxyHelper.getClassWithoutInitializingProxy(existing)) {
+                return changed = "Type Changed"
             }
 
             if (isParametersChanged(existing)) {
@@ -303,8 +312,8 @@ import org.modelcatalogue.core.api.ElementStatus
 
     private Map<String, Object> updateProperties(T element) {
         element.name = name
-        if (modelCatalogueId && !modelCatalogueId.startsWith(element.getDefaultModelCatalogueId(true))) {
-            element.modelCatalogueId = modelCatalogueId
+        if (modelCatalogueId && !Legacy.fixModelCatalogueId(modelCatalogueId).startsWith(element.getDefaultModelCatalogueId(true))) {
+            element.modelCatalogueId = Legacy.fixModelCatalogueId(modelCatalogueId)
         }
         parameters.each { String key, Object value ->
             if (key == 'status') return
@@ -333,14 +342,14 @@ import org.modelcatalogue.core.api.ElementStatus
 
     @Override
     void addToPendingRelationships(RelationshipProxy relationshipProxy) {
-        if (!classification && relationshipProxy.relationshipTypeName == 'classification' && repository.equals(this, relationshipProxy.destination)) {
+        if (!classification && relationshipProxy.relationshipTypeName == RelationshipType.declarationType.name && repository.equals(this, relationshipProxy.destination)) {
             classification = relationshipProxy.source.name
         }
         relationships << relationshipProxy
     }
 
     String toString() {
-        "Proxy of $domain.simpleName[id: $modelCatalogueId, classification: $classification, name: $name]"
+        "Proxy of $domain.simpleName[id: $modelCatalogueId, dataModel: $classification, name: $name]"
     }
 
     @Override

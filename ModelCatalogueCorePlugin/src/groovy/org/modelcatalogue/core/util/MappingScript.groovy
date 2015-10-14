@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.util
 
 /**
- * Created for future use not to use ValueDomainRuleScript directly.
+ * Created for future use not to use DataTypeRuleScript directly.
  */
-abstract class MappingScript extends ValueDomainRuleScript {}
+abstract class MappingScript extends DataTypeRuleScript {}

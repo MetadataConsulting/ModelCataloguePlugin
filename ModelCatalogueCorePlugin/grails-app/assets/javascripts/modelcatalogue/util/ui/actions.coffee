@@ -5,11 +5,10 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
   availableActionsById      = {}
   actionsProvider           =
     ROLE_NAVIGATION:              'navigation'
-    ROLE_NAVIGATION_BOTTOM_LEFT:  'navigation-bottom-left'
-    ROLE_NAVIGATION_BOTTOM_RIGHT: 'navigation-bottom-right'
     ROLE_LIST_ACTION:             'list'
     ROLE_ITEM_ACTION:             'item'
     ROLE_MODAL_ACTION:            'modal'
+    ROLE_SIDENAV:                 'sidenav'
     ROLE_LIST_HEADER_ACTION:      'header'
     ROLE_LIST_FOOTER_ACTION:      'footer'
     ROLE_GLOBAL_ACTION:           'global-action'
@@ -136,11 +135,10 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
 
     actions =
       ROLE_NAVIGATION:              actionsProvider.ROLE_NAVIGATION
-      ROLE_NAVIGATION_BOTTOM_LEFT:  actionsProvider.ROLE_NAVIGATION_BOTTOM_LEFT
-      ROLE_NAVIGATION_BOTTOM_RIGHT: actionsProvider.ROLE_NAVIGATION_BOTTOM_RIGHT
       ROLE_LIST_ACTION:             actionsProvider.ROLE_LIST_ACTION
       ROLE_ITEM_ACTION:             actionsProvider.ROLE_ITEM_ACTION
       ROLE_MODAL_ACTION:            actionsProvider.ROLE_MODAL_ACTION
+      ROLE_SIDENAV:                 actionsProvider.ROLE_SIDENAV
       ROLE_LIST_HEADER_ACTION:      actionsProvider.ROLE_LIST_HEADER_ACTION
       ROLE_LIST_FOOTER_ACTION:      actionsProvider.ROLE_LIST_FOOTER_ACTION
       ROLE_GLOBAL_ACTION:           actionsProvider.ROLE_GLOBAL_ACTION

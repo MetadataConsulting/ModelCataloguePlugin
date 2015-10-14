@@ -24,7 +24,7 @@ xsd.config ['metadataEditorsProvider', (metadataEditorsProvider)->
     title: 'XSD-XSL( Datatype Restrictions)'
     types: [
       'dataElement'   
-      'valueDomain'
+      'dataType'
       '=[containment]=>'
     ]
 
@@ -41,13 +41,13 @@ xsd.config ['metadataEditorsProvider', (metadataEditorsProvider)->
            "http://xsd.modelcatalogue.org/restrictions#pattern"
            "http://xsl.modelcatalogue.org/tableName"
     ]
-    template: 'modelcatalogue/core/ui/metadataEditors/xsdItemValueDomainRestriction.html'
+    template: 'modelcatalogue/core/ui/metadataEditors/xsdItemDataTypeRestriction.html'
   }
   metadataEditorsProvider.register {
     title: 'Occurences(Metadata)'
     types: [
           'dataElement'   
-          'valueDomain'
+          'dataType'
           '=[containment]=>'
           'model'
           '=[hierarchy]=>'
@@ -102,7 +102,7 @@ xsd.run ['$templateCache', ($templateCache) ->
       </div> 
       </form> 
     '''
- $templateCache.put 'modelcatalogue/core/ui/metadataEditors/xsdItemValueDomainRestriction.html', '''
+ $templateCache.put 'modelcatalogue/core/ui/metadataEditors/xsdItemDataTypeRestriction.html', '''
       <form class="form">
         <div class="form-group">
           <label for="xsl-table-name" class="control-label">XSL table Name</label>

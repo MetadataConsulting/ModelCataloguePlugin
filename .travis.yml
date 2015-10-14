@@ -1,4 +1,5 @@
 language: groovy
+sudo: false
 cache:
   directories:
     - node_modules
@@ -9,11 +10,13 @@ cache:
     - $HOME/.grails/wrapper
 
 env:
+  - TEST_SUITE=app_functional_a
+  - TEST_SUITE=app_functional_b
+  - TEST_SUITE=app_functional_c
   - TEST_SUITE=core_unit
   - TEST_SUITE=core_integration
   - TEST_SUITE=core_integration_slow
   - TEST_SUITE=app_integration
-  - TEST_SUITE=app_functional
   - TEST_SUITE=forms_integration
   - TEST_SUITE=gel_integration
 jdk:

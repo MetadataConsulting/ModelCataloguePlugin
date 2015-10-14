@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'angularFileUpload']).controller 'importCtrl', ['$scope', 'messages', 'names', 'modelCatalogueDataArchitect', '$modalInstance', '$upload', 'modelCatalogueApiRoot', 'enhance', 'catalogue', 'args', ($scope, messages, names, modelCatalogueDataArchitect, $modalInstance, $upload, modelCatalogueApiRoot, enhance, catalogue, args) ->
+angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'ngFileUpload']).controller 'importCtrl', ['$scope', 'messages', 'names', 'modelCatalogueDataArchitect', '$modalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', 'catalogue', 'args', ($scope, messages, names, modelCatalogueDataArchitect, $modalInstance, Upload, modelCatalogueApiRoot, enhance, catalogue, args) ->
     $scope.copy     = angular.copy(args.element ? {})
     $scope.original = args.element ? {}
     $scope.messages = messages.createNewMessages()
@@ -28,11 +28,11 @@ angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'angularFileUplo
 
       $scope.uploading = true
       # TODO: rename conceptualDomain to classification and let user pick from existing classification
-      $scope.upload = $upload.upload({
+      $scope.upload = Upload.upload({
         params: {id: $scope.copy.id, name: $scope.copy.name, conceptualDomain: $scope.copy.conceptualDomain, createModelsForElements: $scope.copy.createModelsForElements, idpattern: $scope.copy.idpattern}
         url:                "#{modelCatalogueApiRoot}/dataArchitect/imports/upload"
         file:               $scope.copy.file
-        data:
+        fields:
           headersMap: $scope.headersMap
         fileFormDataName:   'file'
       }).progress((evt) ->

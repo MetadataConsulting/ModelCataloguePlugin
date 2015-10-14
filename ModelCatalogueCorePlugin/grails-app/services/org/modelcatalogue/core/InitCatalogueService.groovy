@@ -17,7 +17,7 @@ class InitCatalogueService {
     static transactional = false
 
     def grailsApplication
-    def classificationService
+    def dataModelService
     def elementService
     def sessionFactory
 
@@ -78,7 +78,7 @@ class InitCatalogueService {
     }
 
     def initDefaultRelationshipTypes() {
-
+        RelationshipType.clearCache()
         def defaultDataTypes = grailsApplication.config.modelcatalogue.defaults.relationshiptypes
 
         for (Map definition in defaultDataTypes) {
@@ -90,14 +90,17 @@ class InitCatalogueService {
                 if (type.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Cannot create relationship type $definition.name", type.errors))
                 }
+            } else if (grailsApplication.config.mc.sync.relationshipTypes) {
+                existing.properties = definition
+                FriendlyErrors.failFriendlySave(existing)
             } else {
                 if (definition.rule && definition.rule.replaceAll(/\s+/, ' ').trim() != existing.rule?.replaceAll(/\s+/, ' ')?.trim()) {
                     log.warn("""
                     Your current rule for relationship type '${existing.name}' is different than the one from configuration. This may cause unexpected behaviour:
                     ===EXPECTED'${existing.name}'===
-                    ${definition.rule.trim()}
+                    ${definition.rule?.trim()}
                     ===ACTUAL '${existing.name}'===
-                    ${existing.rule.trim()}
+                    ${existing.rule?.trim()}
                 """.stripIndent())
 
                 }
@@ -114,7 +117,7 @@ class InitCatalogueService {
     }
 
     Set<CatalogueElement> importMCFile(InputStream inputStream, boolean skipDraft = false) {
-        DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
+        DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
         if (skipDraft) {
             builder.skip ElementStatus.DRAFT
         }

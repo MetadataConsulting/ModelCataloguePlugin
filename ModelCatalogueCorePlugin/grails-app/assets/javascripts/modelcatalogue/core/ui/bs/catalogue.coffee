@@ -1,9 +1,12 @@
 angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalogueProvider', (catalogueProvider)->
-  catalogueProvider.setIcon 'classification',     "fa fa-fw fa-tags"
+  catalogueProvider.setIcon 'dataModel',          "fa fa-fw fa-book"
+  catalogueProvider.setIcon 'classification',     "fa fa-fw fa-book"
+  catalogueProvider.setIcon 'dataClass',          "fa fa-fw fa-cubes"
   catalogueProvider.setIcon 'model',              "fa fa-fw fa-cubes"
   catalogueProvider.setIcon 'dataElement',        "fa fa-fw fa-cube"
-  catalogueProvider.setIcon 'valueDomain',        "fa fa-fw fa-cog"
+  catalogueProvider.setIcon 'primitiveType',      "fa fa-fw fa-cog"
   catalogueProvider.setIcon 'enumeratedType',     "fa fa-fw fa-list-alt"
+  catalogueProvider.setIcon 'referenceType',      "fa fa-fw fa-external-link-square"
   catalogueProvider.setIcon 'dataType',           "fa fa-fw fa-th-large"
   catalogueProvider.setIcon 'measurementUnit',    "fa fa-fw fa-tachometer"
   catalogueProvider.setIcon 'asset',              "fa fa-fw fa-file-code-o"
@@ -19,9 +22,12 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   # this should be generated automatically in the future
 
 
+  catalogueProvider.setInstanceOf 'dataModel',          'classification'
+  catalogueProvider.setInstanceOf 'dataModel',          'catalogueElement'
+  catalogueProvider.setInstanceOf 'dataClass',          'model'
+  catalogueProvider.setInstanceOf 'dataClass',          'catalogueElement'
   catalogueProvider.setInstanceOf 'publishedElement',   'catalogueElement'
   catalogueProvider.setInstanceOf 'user',               'catalogueElement'
-  catalogueProvider.setInstanceOf 'valueDomain',        'catalogueElement'
   catalogueProvider.setInstanceOf 'dataType',           'catalogueElement'
   catalogueProvider.setInstanceOf 'classification',     'catalogueElement'
   catalogueProvider.setInstanceOf 'asset',              'catalogueElement'
@@ -30,24 +36,17 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setInstanceOf 'dataElement',        'catalogueElement'
 
   catalogueProvider.setInstanceOf 'enumeratedType',     'dataType'
+  catalogueProvider.setInstanceOf 'referenceType',      'dataType'
+  catalogueProvider.setInstanceOf 'primitiveType',      'dataType'
 
   catalogueProvider.setDefaultSort 'catalogueElement',  sort: 'name',         order: 'asc'
   catalogueProvider.setDefaultSort 'asset',             sort: 'lastUpdated',  order: 'desc'
 
 
-  catalogueProvider.setDeprecationWarning 'valueDomain', (domain) ->
-    ret = []
-    ret.push 'Data Type'        if domain.dataType?.status == 'DEPRECATED'
-    ret.push 'Measurement Unit' if domain.unitOfMeasure?.status == 'DEPRECATED'
-
-    return undefined if ret.length == 0
-    return ret.join(' and ') + " Deprecated"
-
+  # TODO: deprecation warning for primitive and reference data type
   catalogueProvider.setDeprecationWarning 'dataElement', (dataElement) ->
-    if dataElement.valueDomain
-      return 'Value Domain Deprecated' if dataElement.valueDomain.status == 'DEPRECATED'
-      valueDomainDeprecation = catalogueProvider.getDeprecationWarning('valueDomain')(dataElement.valueDomain)
-      return "Value Domain uses deprecated #{valueDomainDeprecation}" if valueDomainDeprecation
+    if dataElement.dataType
+      return 'Data Type Deprecated' if dataElement.dataType.status == 'DEPRECATED'
 
     return undefined
 

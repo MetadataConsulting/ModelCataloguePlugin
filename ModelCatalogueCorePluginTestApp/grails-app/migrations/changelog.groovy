@@ -15,4 +15,5 @@ databaseChangeLog = {
 //    include file: 'changelog_013_relationship_description.groovy'
     include file: 'changelog_014_discourse.groovy'
     include file: 'changelog_015_oauth.groovy'
+    include file: 'changelog_016_dataModelAndDataClass.groovy'
 }

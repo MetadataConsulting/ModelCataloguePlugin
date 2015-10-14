@@ -34,11 +34,13 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
       if element.isInstanceOf('catalogueElement') and not element.isInstanceOf('classification')
         properties.push label: 'Classifications', value: -> element.classifications
       if element.isInstanceOf('dataElement')
-        properties.push label: 'Value Domain', value: -> element.valueDomain
-      if element.isInstanceOf('valueDomain')
         properties.push label: 'Data Type', value: -> element.dataType
-        properties.push label: 'Unit of Measure', value: -> element.unitOfMeasure
+      if element.isInstanceOf('dataType')
         properties.push label: 'Rule', value: -> element.rule
+      if element.isInstanceOf('primitiveType')
+        properties.push label: 'Measurement Unit', value: -> element.measurementUnit
+      if element.isInstanceOf('referenceType')
+        properties.push label: 'Data Class', value: -> element.dataClass
       if element.isInstanceOf('enumeratedType')
         properties.push label: 'Enumerations', value: getEnumerations
 
@@ -189,7 +191,9 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
       or "#{modelCatalogueApiRoot}#{$scope.list.base}".indexOf(url) >= 0 \
       or url.indexOf("#{modelCatalogueApiRoot}#{$scope.list.base.replace('/relationships/', '/outgoing/')}") >= 0 \
       or "#{modelCatalogueApiRoot}#{$scope.list.base.replace('/relationships/', '/outgoing/')}".indexOf(url) >= 0 \
-      or "#{modelCatalogueApiRoot}#{$scope.list.base.replace('/dataType/', '/enumeratedType/')}".indexOf(url) >= 0
+      or "#{modelCatalogueApiRoot}#{$scope.list.base.replace('/dataType/', '/enumeratedType/')}".indexOf(url) >= 0 \
+      or "#{modelCatalogueApiRoot}#{$scope.list.base.replace('/dataType/', '/primitiveType/')}".indexOf(url) >= 0 \
+      or "#{modelCatalogueApiRoot}#{$scope.list.base.replace('/dataType/', '/referenceType/')}".indexOf(url) >= 0
 
     $scope.total++
     $scope.elements.unshift newElement

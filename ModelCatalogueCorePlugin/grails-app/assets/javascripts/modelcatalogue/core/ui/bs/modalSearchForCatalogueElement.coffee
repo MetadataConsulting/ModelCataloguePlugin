@@ -35,7 +35,7 @@ module.config ['messagesProvider', (messagesProvider)->
         </div>
         """
 
-        controller: ['$scope', 'catalogueElementResource', '$modalInstance', '$window', ($scope, catalogueElementResource, $modalInstance) ->
+        controller: ['$scope', 'catalogueElementResource', '$modalInstance', '$window', '$state', ($scope, catalogueElementResource, $modalInstance, $window, $state) ->
           $scope.title = title
 
           appendToElements = (list) ->
@@ -56,6 +56,9 @@ module.config ['messagesProvider', (messagesProvider)->
           listOrSearch = (query, callback) ->
             params = {}
             params.status = args.status if args.status
+
+            if $state.params.dataModelId and $state.params.dataModelId != 'catalogue'
+                   params.dataModel = $state.params.dataModelId
 
             if query
               catalogueElementResource(args.resource ? 'catalogueElement').search(query, params).then(callback)

@@ -36,13 +36,13 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       args      = {create: ($scope.resource)}
       args.type = if messages.hasPromptFactory('create-' + $scope.resource) then "create-#{$scope.resource}" else "edit-#{$scope.resource}"
 
-      if $scope.resource == 'model' and $scope.element and $scope.elementSelectedInTree
+      if ($scope.resource == 'model' || $scope.resource == 'dataClass') and $scope.element and $scope.elementSelectedInTree
         args.parent = $scope.element
 
       security.requireRole('CURATOR')
       .then ->
         messages.prompt('Create ' + names.getNaturalName($scope.resource), '', args).then ->
-          if $scope.resource == 'model' and $state.current.name == 'mc.resource.list'
+          if ($scope.resource == 'model' || $scope.resource == 'dataClass')and $state.current.name == 'mc.resource.list'
             # reload in draft mode
             $state.go '.', {status: 'draft'}, {reload: true}
       , (errors)->
@@ -104,15 +104,6 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   }]
   actionsProvider.registerChildAction 'new-import', 'import-obo', oboImport
   actionsProvider.registerActionInRole 'global-import-obo', actionsProvider.ROLE_GLOBAL_ACTION, oboImport
-
-
-  xsdImport = ['$scope', 'messages', ($scope, messages) -> {
-    label: "Import XSD"
-    action: ->
-      messages.prompt('Import XSD File', '', type: 'new-xsd-import')
-  }]
-  actionsProvider.registerChildAction 'new-import', 'import-xsd', xsdImport
-  actionsProvider.registerActionInRole 'global-import-xsd', actionsProvider.ROLE_GLOBAL_ACTION, xsdImport
 
   umlImport = ['$scope', 'messages', ($scope, messages) -> {
     label: "Import Star Uml"
@@ -709,7 +700,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
   actionsProvider.registerActionInRole 'modal-save-element', actionsProvider.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
-    return undefined unless $scope.hasChanged and $scope.saveElement
+    return undefined unless $scope.hasChanged and $scope.saveElement and $scope.hasDataModels
 
     {
       position:   1000
@@ -724,7 +715,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
   actionsProvider.registerActionInRole 'modal-save-and-add-another', actionsProvider.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
-    return undefined unless $scope.hasChanged and $scope.saveAndCreateAnother
+    return undefined unless $scope.hasChanged and $scope.saveAndCreateAnother and $scope.hasDataModels
 
     {
       position:   2000

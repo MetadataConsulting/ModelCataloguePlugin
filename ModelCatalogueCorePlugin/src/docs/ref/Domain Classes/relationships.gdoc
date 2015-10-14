@@ -26,6 +26,6 @@ catalogue element to be added or removed.
 
 h2. Usage
 
-see [dataElement|DomainClasses], [valueDomain|DomainClasses], [model|DomainClasses], [conceptualDomain|DomainClasses]
+see [dataElement|DomainClasses], [model|DomainClasses], [conceptualDomain|DomainClasses]
 
 

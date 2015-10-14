@@ -55,11 +55,11 @@ and [catalogueElementResource|Angular Services].
 Considering you have injected these two services into your controller you can write code like following one:
 
 {code}
-var valueDomains = catalogueElementResource('valueDomain')
-valueDomains.list().then(function(list) {
+var dataTypes = catalogueElementResource('dataType')
+dataTypes.list().then(function(list) {
     $scope.list = list;
 });
-valueDomain.get(15).then(function(element) {
+dataType.get(15).then(function(element) {
     $scope.element = element
 });
 

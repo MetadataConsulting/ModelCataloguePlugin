@@ -11,8 +11,8 @@ import spock.lang.Specification
 import spock.util.mop.ConfineMetaClassChanges
 
 @TestFor(ModelCatalogueTagLib)
-@Mock([RelationshipType, Relationship, Model])
-@ConfineMetaClassChanges(Model)
+@Mock([RelationshipType, Relationship, DataClass])
+@ConfineMetaClassChanges(DataClass)
 class ModelCatalogueTagLibSpec extends Specification {
 
     RelationshipService relationshipService
@@ -20,7 +20,7 @@ class ModelCatalogueTagLibSpec extends Specification {
     RelationshipType type
 
     def setup(){
-        CatalogueElementDynamicHelper.addShortcuts(Model)
+        CatalogueElementDynamicHelper.addShortcuts(DataClass)
 
         type = [name: "hierarchy", sourceToDestination: "parent of", destinationToSource: "child of", sourceClass: CatalogueElement, destinationClass: CatalogueElement]
         type.relationshipTypeService = new RelationshipTypeService()
@@ -36,10 +36,10 @@ class ModelCatalogueTagLibSpec extends Specification {
 
 
     def "relationships tag is iterating over relationships of the element"() {
-        Model model = makeModel(name: 'Parent')
+        DataClass model = makeModel(name: 'Parent')
 
-        ListWithTotal<Model> children = Lists.lazy([:], Model, {
-            List<Model> ret = []
+        ListWithTotal<DataClass> children = Lists.lazy([:], DataClass, {
+            List<DataClass> ret = []
 
             3.times {
                 ret << new Relationship(source: model, destination: makeModel(name: "Child ${it + 1}"), relationshipType: type)
@@ -64,8 +64,8 @@ class ModelCatalogueTagLibSpec extends Specification {
     }
 
 
-    private Model makeModel(Map params) {
-        Model model = new Model(params)
+    private DataClass makeModel(Map params) {
+        DataClass model = new DataClass(params)
         model.relationshipService = relationshipService
         model.auditService = auditService
         model.save(failOnError: true)

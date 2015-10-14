@@ -108,10 +108,10 @@ class ExtendibleElementExtensionsWrapperSpec extends IntegrationSpec {
     }
 
     private Relationship createRelationship() {
-        Model source = new Model(name: "source")
+        DataClass source = new DataClass(name: "source")
         assert source.save()
 
-        Model target = new Model(name: "target")
+        DataClass target = new DataClass(name: "target")
         assert target.save()
 
         RelationshipType type = new RelationshipType(sourceToDestination: "src to dest", destinationToSource: "dest to src", sourceClass: CatalogueElement, destinationClass: CatalogueElement, name: "type")

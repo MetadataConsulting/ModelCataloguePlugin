@@ -2,7 +2,7 @@ package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.util.ClassificationFilter
+import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
 
@@ -12,14 +12,14 @@ import org.modelcatalogue.core.util.RelationshipDirection
  */
 class ModelCatalogueSearchService implements SearchCatalogue {
 
-    def classificationService
+    def dataModelService
     def modelCatalogueSecurityService
 
     @Override
     def search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
         String query = "%$params.search%"
 
-        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, classificationService.classificationsInUse)
+        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, getOverridableDataModelFilter(params))
 
         switch (direction) {
             case RelationshipDirection.OUTGOING:
@@ -75,7 +75,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
         String query = "%$params.search%"
 
-        if (Classification.isAssignableFrom(resource) || MeasurementUnit.isAssignableFrom(resource)) {
+        if (DataModel.isAssignableFrom(resource) || MeasurementUnit.isAssignableFrom(resource)) {
             DetachedCriteria criteria = new DetachedCriteria(resource)
             criteria.or {
                 ilike('name', query)
@@ -88,7 +88,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
             searchResults.searchResults = criteria.list(params)
             searchResults.total = criteria.count()
         } else if (CatalogueElement.isAssignableFrom(resource)) {
-            ClassificationFilter classifications = classificationService.classificationsInUse
+            DataModelFilter classifications = getOverridableDataModelFilter(params).withImports()
 
             String alias = resource.simpleName[0].toLowerCase()
             String listQuery = """
@@ -128,7 +128,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                         )
                         and ${alias} not in (select rel.destination from Relationship rel where rel.relationshipType = :classificationType)
                     """
-                    arguments.classificationType = RelationshipType.classificationType
+                    arguments.classificationType = RelationshipType.declarationType
                 } else {
                     listQuery = """
                     from ${resource.simpleName} ${alias} left join ${alias}.incomingRelationships as rel
@@ -152,7 +152,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                         listQuery += " and rel.source.id not in :excludes "
                         arguments.excludes = classifications.excludes
                     }
-                    arguments.classificationType = RelationshipType.classificationType
+                    arguments.classificationType = RelationshipType.declarationType
                 }
             }
 
@@ -166,7 +166,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
             searchResults.total = resource.countByNameIlikeOrSourceToDestinationIlikeOrDestinationToSourceIlike(query, query, query)
         } else {
             searchResults.searchResults = resource.findAllByNameIlike(query, params)
-            searchResults.total         = resource.countByNameIlike(query)
+            searchResults.total = resource.countByNameIlike(query)
         }
 
         searchResults
@@ -181,5 +181,15 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     def unindex(Object object){}
     def unindex(Collection<Object> object){}
     def refresh(){}
+
+    protected DataModelFilter getOverridableDataModelFilter(Map params) {
+        if (params.dataModel) {
+            DataModel dataModel = DataModel.get(params.long('dataModel'))
+            if (dataModel) {
+                return DataModelFilter.includes(dataModel)
+            }
+        }
+        dataModelService.dataModelFilter
+    }
 
 }

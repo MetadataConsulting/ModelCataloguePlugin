@@ -110,7 +110,7 @@ class BootStrap {
         createRequestmapIfMissing('/monitoring/**',                         'ROLE_ADMIN')
         createRequestmapIfMissing('/plugins/console-1.5.0/**',              'ROLE_ADMIN')
 
-//        createRequestmapIfMissing('/api/modelCatalogue/core/model/**', 'IS_AUTHENTICATED_ANONYMOUSLY')
+//        createRequestmapIfMissing('/api/modelCatalogue/core/dataClass/**', 'IS_AUTHENTICATED_ANONYMOUSLY')
 //        createRequestmapIfMissing('/api/modelCatalogue/core/dataElement/**', 'ROLE_METADATA_CURATOR')
 //        createRequestmapIfMissing('/api/modelCatalogue/core/dataType/**', 'ROLE_USER')
 //        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR')
@@ -127,7 +127,7 @@ class BootStrap {
 
             println 'Finalizing all published elements'
             CatalogueElement.findAllByStatus(org.modelcatalogue.core.api.ElementStatus.DRAFT).each {
-                if (it instanceof Model) {
+                if (it instanceof DataClass) {
                     elementService.finalizeElement(it)
                 } else {
                     it.status = org.modelcatalogue.core.api.ElementStatus.FINALIZED
@@ -142,11 +142,11 @@ class BootStrap {
             15.times {
                 Action action
                 if (it == 7) {
-                    action = actionService.create(batch, CreateCatalogueElement, two: Action.get(2), five: Action.get(5), six: Action.get(6), name: "Model #${it}", type: Model.name)
+                    action = actionService.create(batch, CreateCatalogueElement, two: Action.get(2), five: Action.get(5), six: Action.get(6), name: "Model #${it}", type: DataClass.name)
                 } else if (it == 4) {
-                    action = actionService.create(batch, CreateCatalogueElement, two: Action.get(2), name: "Model #${it}", type: Model.name)
+                    action = actionService.create(batch, CreateCatalogueElement, two: Action.get(2), name: "Model #${it}", type: DataClass.name)
                 } else {
-                    action = actionService.create(batch, CreateCatalogueElement, name: "Model #${it}", type: Model.name)
+                    action = actionService.create(batch, CreateCatalogueElement, name: "Model #${it}", type: DataClass.name)
                 }
                 if (it % 3 == 0) {
                     actionService.dismiss(action)
@@ -171,15 +171,15 @@ class BootStrap {
             catalogueBuilder.build {
                 automatic dataType
 
-                classification(name: 'Test 1') {
+                dataModel(name: 'Test 1') {
                     dataElement(name: 'Test Element 1') {
-                        valueDomain(name: 'Same Name')
+                        dataType(name: 'Same Name')
                     }
                 }
 
-                classification(name: 'Test 2') {
+                dataModel(name: 'Test 2') {
                     dataElement(name: 'Test Element 2') {
-                        valueDomain(name: 'Same Name')
+                        dataType(name: 'Same Name')
                     }
                 }
 
@@ -200,15 +200,15 @@ class BootStrap {
         assert f
         assert doubleType
 
-        ValueDomain temperatureUS = new ValueDomain(name: "temperature US", dataType: doubleType, unitOfMeasure: f, regexDef: /\d+(\.\d+)?/).save(failOnError: true)
-        ValueDomain temperature   = new ValueDomain(name: "temperature",    dataType: doubleType, unitOfMeasure: c, regexDef: /\d+(\.\d+)?/).save(failOnError: true)
+        PrimitiveType temperatureUS = new PrimitiveType(name: "temperature US", measurementUnit: f, regexDef: /\d+(\.\d+)?/).save(failOnError: true)
+        PrimitiveType temperature   = new PrimitiveType(name: "temperature",    measurementUnit: c, regexDef: /\d+(\.\d+)?/).save(failOnError: true)
 
 
         assert mappingService.map(temperature, temperatureUS, "(x as Double) * 9 / 5 + 32")
         assert mappingService.map(temperatureUS, temperature, "((x as Double) - 32) * 5 / 9")
 
-        DataElement patientTemperature   = new DataElement(name: "patient temperature",    valueDomain: temperature).save(failOnError: true)
-        DataElement patientTemperatureUS = new DataElement(name: "patient temperature US", valueDomain: temperatureUS).save(failOnError: true)
+        DataElement patientTemperature   = new DataElement(name: "patient temperature",    dataType: temperature).save(failOnError: true)
+        DataElement patientTemperatureUS = new DataElement(name: "patient temperature US", dataType: temperatureUS).save(failOnError: true)
 
 
         CsvTransformation transformation = new CsvTransformation(name: "UK to US records").save(failOnError: true)

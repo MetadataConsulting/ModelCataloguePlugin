@@ -20,19 +20,19 @@ class ElementService implements Publisher<CatalogueElement> {
     def auditService
 
     List<CatalogueElement> list(Map params = [:]) {
-        CatalogueElement.findAllByStatus(getStatusFromParams(params), params)
+        CatalogueElement.findAllByStatusInList(getStatusFromParams(params), params)
     }
 
     public <E extends CatalogueElement> List<E> list(params = [:], Class<E> resource) {
-        resource.findAllByStatus(getStatusFromParams(params), params)
+        resource.findAllByStatusInList(getStatusFromParams(params), params)
     }
 
     Long count(params = [:]) {
-        CatalogueElement.countByStatus(getStatusFromParams(params))
+        CatalogueElement.countByStatusInList(getStatusFromParams(params))
     }
 
     public <E extends CatalogueElement> Long count(params = [:], Class<E> resource) {
-        resource.countByStatus(getStatusFromParams(params))
+        resource.countByStatusInList(getStatusFromParams(params))
     }
 
 
@@ -107,18 +107,18 @@ class ElementService implements Publisher<CatalogueElement> {
         }
     }
 
-    static ElementStatus getStatusFromParams(params) {
-        if (!params.status) {
-            return ElementStatus.FINALIZED
+    static List<ElementStatus> getStatusFromParams(params) {
+        if (!params.status || params.status == 'active') {
+            return [ElementStatus.FINALIZED, ElementStatus.DRAFT]
         }
         if (params.status instanceof ElementStatus) {
-            return params.status
+            return [params.status]
         }
-        return ElementStatus.valueOf(params.status.toString().toUpperCase())
+        return [ElementStatus.valueOf(params.status.toString().toUpperCase())]
     }
 
 
-    public <E extends CatalogueElement> E merge(E source, E destination, Set<Classification> classifications = new HashSet(source.classifications)) {
+    public <E extends CatalogueElement> E merge(E source, E destination, Set<DataModel> classifications = new HashSet(source.dataModels)) {
         log.info "Merging $source into $destination"
         if (destination == null) return null
 
@@ -145,7 +145,7 @@ class ElementService implements Publisher<CatalogueElement> {
             return destination
         }
 
-        if (destination.class != source.class) {
+        if (destination.class != source.class && !(destination.instanceOf(DataType) && source.instanceOf(DataType))) {
             destination.errors.reject('merge.not.same.type', 'Both source and destination must be of the same type')
             return destination
         }
@@ -178,11 +178,13 @@ class ElementService implements Publisher<CatalogueElement> {
         destination.save(flush: true, validate: false)
 
 
-        for (Classification classification in new HashSet<Classification>(source.classifications)) {
-            classification.removeFromClassifies(source)
-            source.removeFromClassifications(classification)
-            classification.addToClassifies(destination)
-            destination.addToClassifications(classification)
+        if (!destination.dataModels) {
+            for (DataModel dataModel in new HashSet<DataModel>(source.dataModels)) {
+                dataModel.removeFromDeclares(source)
+                source.removeFromDeclaredWithin(dataModel)
+                dataModel.addToDeclares(destination)
+                destination.addToDeclaredWithin(dataModel)
+            }
         }
 
         for (Map.Entry<String, String> extension in new HashMap<String, String>(source.ext)) {
@@ -194,6 +196,10 @@ class ElementService implements Publisher<CatalogueElement> {
         for (Relationship rel in new HashSet<Relationship>(source.outgoingRelationships)) {
             if (rel.relationshipType.system) {
                 // skip system, currently only supersession
+                continue
+            }
+
+            if (rel.relationshipType == RelationshipType.declarationType) {
                 continue
             }
 
@@ -211,7 +217,7 @@ class ElementService implements Publisher<CatalogueElement> {
 
             if (existing) {
                 if (rel.destination instanceof CatalogueElement && existing.destination instanceof CatalogueElement && rel.destination.class == existing.destination.class && existing.destination != destination) {
-                    if (rel.destination.classifications.intersect(classifications)) {
+                    if (rel.destination.dataModels.intersect(classifications)) {
                         merge rel.destination, existing.destination, classifications
                     }
                 }
@@ -232,6 +238,10 @@ class ElementService implements Publisher<CatalogueElement> {
                 continue
             }
 
+            if (rel.relationshipType == RelationshipType.declarationType) {
+                continue
+            }
+
             if (rel.source == destination) {
                 // do not self-reference
                 continue
@@ -246,7 +256,7 @@ class ElementService implements Publisher<CatalogueElement> {
 
             if (existing) {
                 if (rel.source.class == existing.source.class && existing.source != destination) {
-                    if (rel.source.classifications.intersect(classifications)) {
+                    if (rel.source.dataModels.intersect(classifications)) {
                         merge rel.source, existing.source, classifications
                     }
                 }
@@ -289,9 +299,9 @@ class ElementService implements Publisher<CatalogueElement> {
             log.warn "Trying to find inlined models in development mode. This feature does not work with H2 database"
             return [:]
         }
-        List<Model> models = Model.executeQuery("""
+        List<DataClass> models = DataClass.executeQuery("""
             select m
-            from Model m left join m.incomingRelationships inc
+            from DataClass m left join m.incomingRelationships inc
             group by m.name
             having sum(case when inc.relationshipType = :base then 1 else 0 end) = 1
             and sum(case when inc.relationshipType = :hierarchy then 1 else 0 end) = 2
@@ -299,7 +309,7 @@ class ElementService implements Publisher<CatalogueElement> {
 
         Map<Long, Long> ret = [:]
 
-        for (Model model in models) {
+        for (DataClass model in models) {
             if (model.ext.from == 'xs:element') {
                 ret[model.id] = model.isBasedOn[0].id
             }
@@ -316,12 +326,12 @@ class ElementService implements Publisher<CatalogueElement> {
      */
     Map<Long, Set<Long>> findDuplicateModelsSuggestions() {
         // TODO: create test
-        Object[][] results = Model.executeQuery """
+        Object[][] results = DataClass.executeQuery """
             select m.id, m.name, rel.relationshipType.name,  rel.destination.name
-            from Model m join m.outgoingRelationships as rel
+            from DataClass m join m.outgoingRelationships as rel
             where
                 m.name in (
-                    select model.name from Model model
+                    select model.name from DataClass model
                     where model.status in :states
                     group by model.name
                     having count(model.id) > 1
@@ -406,45 +416,6 @@ class ElementService implements Publisher<CatalogueElement> {
         }.sort().join(':')
     }
 
-
-
-    /**
-     * Returns data elements which are very likely to be duplicates.
-     *
-     * Data elements are considered duplicates if they share the exactly same value domain and they are having the same
-     * name.
-     *
-     * @return map with the data element id as key and set of ids of duplicate data elements as value
-     */
-    Map<Long, Set<Long>> findDuplicateDataElementsSuggestions() {
-        // TODO: create test
-        Object[][] results = DataElement.executeQuery """
-            select count(de.id), de.name, vd.id, vd.name
-                from DataElement de join de.valueDomain vd
-                where
-                    de.status in :states
-                group by de.name, vd.id
-                having count(de.id) > 1
-        """, [states: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.FINALIZED]]
-
-        Map<Long, Set<Long>> elements = new LinkedHashMap<Long, Set<Long>>()
-
-        results.each { row ->
-            Long[] duplicates = DataElement.executeQuery """
-                    select de.id from DataElement de
-                    where de.name = :name
-                    and de.valueDomain.id = :vd
-                    and de.status in :states
-
-                    order by de.dateCreated
-            """, [name: row[1], vd: row[2], states: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.FINALIZED]]
-
-            elements[duplicates.head()] = new HashSet<Long>(duplicates.tail().toList())
-
-        }
-
-        elements
-    }
 
     public <E extends CatalogueElement> E restore(E element) {
         if (!element) {

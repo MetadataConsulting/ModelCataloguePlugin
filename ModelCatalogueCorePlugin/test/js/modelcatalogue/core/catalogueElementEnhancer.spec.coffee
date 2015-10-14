@@ -6,10 +6,10 @@ describe "mc.core.catalogueElementEnhancer", ->
 
   xit "changes the state on show() method", inject (enhance, $rootScope, $httpBackend, modelCatalogueApiRoot) ->
     $httpBackend
-    .when('GET', "#{modelCatalogueApiRoot}#{fixtures.valueDomain.showOne.link}")
-    .respond(angular.copy(fixtures.valueDomain.showOne))
+    .when('GET', "#{modelCatalogueApiRoot}#{fixtures.dataType.showOne.link}")
+    .respond(angular.copy(fixtures.dataType.showOne))
 
-    enhanced = enhance angular.copy(fixtures.valueDomain.showOne)
+    enhanced = enhance angular.copy(fixtures.dataType.showOne)
 
     event    = null
     toState  = null
@@ -37,40 +37,38 @@ describe "mc.core.catalogueElementEnhancer", ->
     expect(event).not.toBeNull()
     expect(toState).not.toBeNull()
     expect(toState.name).toEqual('mc.resource.show')
-    expect(angular.equals(toParams, {resource: 'valueDomain', id: "#{enhanced.id}"})).toBeTruthy()
+    expect(angular.equals(toParams, {resource: 'dataType', id: "#{enhanced.id}"})).toBeTruthy()
     expect(self).toEqual(enhanced)
 
   it "returns expected results for getLabel()", inject (enhance) ->
-    domain  = enhance angular.copy(fixtures.valueDomain.showOne)
-    model   = enhance angular.copy(fixtures.model.showOne)
+    dataClass   = enhance angular.copy(fixtures.dataClass.showOne)
     element = enhance angular.copy(fixtures.dataType.showOne)
 
-    expect(domain.getLabel()) .toBe("school subject")
-    expect(model.getLabel())  .toBe("mTest3")
+    expect(dataClass.getLabel()).toBe("mTest3")
     expect(element.getLabel()).toBe("boolean")
 
   it "returns expected results for instance of", inject (enhance) ->
-    domain  = enhance angular.copy(fixtures.valueDomain.showOne)
-    model   = enhance angular.copy(fixtures.model.showOne)
+    dataType  = enhance angular.copy(fixtures.dataType.showOne)
+    dataClass   = enhance angular.copy(fixtures.dataClass.showOne)
 
-    expect(domain.isInstanceOf).toBeFunction()
-    expect(model.isInstanceOf).toBeFunction()
+    expect(dataType.isInstanceOf).toBeFunction()
+    expect(dataClass.isInstanceOf).toBeFunction()
 
-    describe "test value domain and model", ->
-      it "test value domain is ValueDomain", ->
-        expect(domain.isInstanceOf('org.modelcatalogue.core.ValueDomain')).toBeTruthy()
-      it "test value domain is CatalogueElement", ->
-        expect(domain.isInstanceOf('org.modelcatalogue.core.CatalogueElement')).toBeTruthy()
-      it "test value domain isn't Model", ->
-        expect(domain.isInstanceOf('org.modelcatalogue.core.Model')).toBeFalsy()
+    describe "test data type and model", ->
+      it "test data type is DataType", ->
+        expect(dataType.isInstanceOf('org.modelcatalogue.core.DataType')).toBeTruthy()
+      it "test data type is CatalogueElement", ->
+        expect(dataType.isInstanceOf('org.modelcatalogue.core.CatalogueElement')).toBeTruthy()
+      it "test data type isn't Model", ->
+        expect(dataType.isInstanceOf('org.modelcatalogue.core.Model')).toBeFalsy()
 
-      it "test model isn't ValueDomain", ->
-        expect(model.isInstanceOf('org.modelcatalogue.core.ValueDomain')).toBeFalsy()
+      it "test model isn't DataType", ->
+        expect(dataClass.isInstanceOf('org.modelcatalogue.core.DataType')).toBeFalsy()
       it "test model isn't MeasurementUnit", ->
-        expect(model.isInstanceOf('org.modelcatalogue.core.MeasurementUnit')).toBeFalsy()
+        expect(dataClass.isInstanceOf('org.modelcatalogue.core.MeasurementUnit')).toBeFalsy()
       it "test model is CatalogueElement", ->
-        expect(model.isInstanceOf('org.modelcatalogue.core.CatalogueElement')).toBeTruthy()
+        expect(dataClass.isInstanceOf('org.modelcatalogue.core.CatalogueElement')).toBeTruthy()
       it "test model is Model", ->
-        expect(model.isInstanceOf('org.modelcatalogue.core.Model')).toBeTruthy()
+        expect(dataClass.isInstanceOf('org.modelcatalogue.core.DataClass')).toBeTruthy()
 
 

@@ -247,7 +247,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         controller.request.method = 'PUT'
         controller.response.format = "json"
         controller.params.id = instance.id
-        controller.request.json = [name: "g" * 256]
+        controller.request.json = badNameJSON
         controller.update()
         JSONObject updated = controller.response.json
         recordResult 'updateErrors', updated
@@ -260,6 +260,10 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         resourceCount == totalCount
 
 
+    }
+
+    protected getBadNameJSON() {
+        [name: "g" * 256]
     }
 
     def "Return 404 for non-existing item as JSON"() {
@@ -457,6 +461,13 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         recorder.recordInputJSON(fixtureName, json)
     }
 
-    boolean removeAllRelations(Object instance) { true }
+    boolean removeAllRelations(Object instance) {
+        if (instance.hasProperty('dataModels'))
+        for (DataModel dataModel in instance.dataModels) {
+            instance.removeFromDeclaredWithin(dataModel)
+        }
+
+        return true
+    }
 
 }

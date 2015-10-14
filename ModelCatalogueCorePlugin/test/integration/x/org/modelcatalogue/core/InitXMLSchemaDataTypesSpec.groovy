@@ -1,9 +1,8 @@
 package x.org.modelcatalogue.core
 
 import grails.test.spock.IntegrationSpec
-import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
-import org.modelcatalogue.core.ValueDomain
 import spock.lang.Stepwise
 import spock.lang.Unroll
 
@@ -24,20 +23,18 @@ class InitXMLSchemaDataTypesSpec extends IntegrationSpec {
         initCatalogueService.initDefaultDataTypes(true)
         initCatalogueService.initDefaultDataTypes(true)
         expect:
-        Classification.countByName('XMLSchema') == 1
+        DataModel.countByName('XMLSchema') == 1
     }
 
     def "check #domain validates value #value as #valid"(){
         when:
-        ValueDomain valueDomain = ValueDomain.findByName(domain)
         DataType dataType       = DataType.findByName(domain)
 
         then:
         dataType
-        valueDomain
 
         when:
-        def result = valueDomain.validateRule(value)
+        def result = dataType.validateRule(value)
 
         then:
         if (valid) {
@@ -62,8 +59,8 @@ class InitXMLSchemaDataTypesSpec extends IntegrationSpec {
         'xs:hexBinary'              | 'game'                                                                | false
         'xs:anyURI'                 | 'game'                                                                | true
         'xs:anyURI'                 | 'game#over'                                                           | true
-        'xs:anyURI'                 | 'https://metadata.cfapps.io/#/catalogue/dataType/58/valueDomains'     | true
-        'xs:anyURI'                 | 'https://metadata[cfa!ps]i0/#/catalogue/dataType/58/valueDomains'     | false
+        'xs:anyURI'                 | 'https://metadata.cfapps.io/#/catalogue/dataType/58/dataTypes'        | true
+        'xs:anyURI'                 | 'https://metadata[cfa!ps]i0/#/catalogue/dataType/58/dataTypes'        | false
         'xs:string'                 | 'just a regular string'                                               | true
         'xs:decimal'                | '+100'                                                                | true
         'xs:decimal'                | '-100'                                                                | true

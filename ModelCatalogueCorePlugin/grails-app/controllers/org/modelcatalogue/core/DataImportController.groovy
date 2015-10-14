@@ -3,7 +3,6 @@ package org.modelcatalogue.core
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.integration.excel.ExcelLoader
 import org.modelcatalogue.integration.excel.HeadersMap
-import org.modelcatalogue.core.dataarchitect.xsd.XsdLoader
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.integration.obo.OboLoader
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
@@ -14,13 +13,12 @@ import org.springframework.web.multipart.MultipartHttpServletRequest
 class DataImportController  {
 
     def initCatalogueService
-    def XSDImportService
     def umljService
     def loincImportService
     def modelCatalogueSecurityService
     def executorService
     def elementService
-    def classificationService
+    def dataModelService
     def assetService
     def auditService
 
@@ -60,7 +58,6 @@ class DataImportController  {
 
         def errors = []
 
-        String conceptualDomainName
         MultipartFile file = request.getFile("file")
         errors.addAll(getErrors(params, file))
 
@@ -68,7 +65,6 @@ class DataImportController  {
             respond("errors": errors)
             return
         }
-        conceptualDomainName = trimString(params.conceptualDomain)
         def confType = file.getContentType()
         boolean isAdmin = modelCatalogueSecurityService.hasRole('ADMIN')
 
@@ -79,7 +75,7 @@ class DataImportController  {
             HeadersMap headersMap = HeadersMap.create(request.JSON.headersMap ?: [:])
             executeInBackground(id, "Imported from Excel") {
                 try {
-                    DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService, isAdmin)
+                    DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService, isAdmin)
                     ExcelLoader parser = new ExcelLoader(builder)
                     parser.importData(headersMap, inputStream)
                     finalizeAsset(id)
@@ -97,7 +93,7 @@ class DataImportController  {
             InputStream inputStream = file.inputStream
             executeInBackground(id, "Imported from XML") {
                 try {
-                    CatalogueXmlLoader loader = new CatalogueXmlLoader(new DefaultCatalogueBuilder(classificationService, elementService, isAdmin))
+                    CatalogueXmlLoader loader = new CatalogueXmlLoader(new DefaultCatalogueBuilder(dataModelService, elementService, isAdmin))
                     loader.load(inputStream)
                     finalizeAsset(id)
                 } catch (Exception e) {
@@ -116,13 +112,13 @@ class DataImportController  {
             String idpattern = params.idpattern
             executeInBackground(id, "Imported from OBO") {
                 try {
-                    DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService, isAdmin)
+                    DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService, isAdmin)
                     OboLoader loader = new OboLoader(builder)
                     idpattern = idpattern ?: "${grailsApplication.config.grails.serverURL}/catalogue/ext/${OboLoader.OBO_ID}/:id".toString().replace(':id', '$id')
                     loader.load(inputStream, name, idpattern)
-                    Classification classification = builder.created.find { it.instanceOf(Classification) } as Classification
+                    DataModel dataModel = builder.created.find { it.instanceOf(DataModel) } as DataModel
                     Asset updated = finalizeAsset(id)
-                    classifyAsset(updated, classification)
+                    assignAssetToModel(updated, dataModel)
                 } catch (Exception e) {
                     logError(id, e)
                 }
@@ -139,10 +135,8 @@ class DataImportController  {
 
             executeInBackground(id, "Imported from LOINC")  {
                 try {
-                    Set<CatalogueElement> created = loincImportService.serviceMethod(inputStream)
-                    Asset updated = finalizeAsset(id)
-                    Classification classification = created.find { it instanceof Classification } as Classification
-                    classifyAsset(updated, classification)
+                    loincImportService.serviceMethod(inputStream)
+                    finalizeAsset(id)
                 } catch (Exception e) {
                     logError(id, e)
                 }
@@ -161,8 +155,8 @@ class DataImportController  {
                 try {
                     Set<CatalogueElement> created = initCatalogueService.importMCFile(inputStream)
                     Asset updated = finalizeAsset(id)
-                    Classification classification = created.find { it instanceof Classification } as Classification
-                    classifyAsset(updated, classification)
+                    DataModel dataModel = created.find { it instanceof DataModel } as DataModel
+                    assignAssetToModel(updated, dataModel)
                 } catch (Exception e) {
                     logError(id, e)
                 }
@@ -180,15 +174,15 @@ class DataImportController  {
 
             executeInBackground(id, "Imported from Style UML")  {
                 try {
-                    Classification classification = Classification.findByName(name)
-                    if(!classification) classification =  new Classification(name: name).save(flush:true, failOnError:true)
-                    umljService.importUmlDiagram(inputStream, name, classification)
+                    DataModel dataModel = DataModel.findByName(name)
+                    if(!dataModel) dataModel =  new DataModel(name: name).save(flush:true, failOnError:true)
+                    umljService.importUmlDiagram(inputStream, name, dataModel)
                     Asset updated = Asset.get(id)
                     updated.status = ElementStatus.FINALIZED
                     updated.description = "Your import has finished."
                     updated.save(flush: true, failOnError: true)
-                    updated.addToClassifications(classification, skipUniqueChecking: true)
-                    classification.addToClassifies(updated, skipUniqueChecking: true)
+                    updated.addToDeclaredWithin(dataModel, skipUniqueChecking: true)
+                    dataModel.addToDeclares(updated, skipUniqueChecking: true)
                 } catch (Exception e) {
                     Asset updated = Asset.get(id)
                     updated.refresh()
@@ -203,21 +197,14 @@ class DataImportController  {
             return
         }
 
-
-        if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xsd")) {
-            Asset asset = renderImportAsAsset(params, file, conceptualDomainName)
-            redirectToAsset(asset.id)
-            return
-        }
-
         if (!CONTENT_TYPES.contains(confType)) errors.add("input should be an Excel file but uploaded content is ${confType}")
         if (file.size <= 0) errors.add("The uploaded file is empty")
         respond "errors": errors
     }
 
-    protected static classifyAsset(Asset asset, Classification classification){
-        if (classification) {
-            asset.addToClassifications(classification, skipUniqueChecking: true)
+    protected static assignAssetToModel(Asset asset, DataModel dataModel){
+        if (dataModel) {
+            asset.addToDeclaredWithin(dataModel, skipUniqueChecking: true)
         }
     }
 
@@ -257,36 +244,6 @@ class DataImportController  {
         asset.save(flush: true, failOnError: true)
         assetService.storeAssetFromFile(file, asset)
         return asset
-    }
-
-    protected renderImportAsAsset(param, file, conceptualDomainName){
-
-        String uri = request.forwardURI + '?' + request.queryString
-        InputStream inputStream = file.inputStream
-        def asset = storeAsset(param, file)
-        Long id = asset.id
-        Boolean createModelsForElements = params.boolean('createModelsForElements')
-
-        executeInBackground(id, "Rendered Import as Asset") {
-            Asset updated = Asset.get(id)
-            try {
-                XsdLoader parserXSD = new XsdLoader(inputStream)
-                def (topLevelElements, simpleDataTypes, complexDataTypes, schema, namespaces) = parserXSD.parse()
-                XSDImportService.createAll(simpleDataTypes, complexDataTypes, topLevelElements, conceptualDomainName, conceptualDomainName, schema, namespaces, createModelsForElements)
-                updated.status = ElementStatus.FINALIZED
-                updated.description = "Your export is ready. Use Download button to view it."
-                updated.ext['Original URL'] = uri
-                updated.save(flush: true, failOnError: true)
-            } catch (e) {
-                log.error("Error importing schema", e)
-                updated.refresh()
-                updated.status = ElementStatus.FINALIZED
-                updated.name = updated.name + " - Error during upload"
-                updated.description = "Error importing file: please validate that the schema is valid xml and that any dependencies already exist in the catalogue"
-                updated.save(flush: true, failOnError: true)
-            }
-        }
-        asset
     }
 
     protected executeInBackground(Long assetId, String message, Closure code) {

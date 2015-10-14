@@ -12,7 +12,7 @@ class RelationshipDefinition {
     static RelationshipDefinition from(Relationship relationship) {
         RelationshipDefinition definition = new RelationshipDefinition(relationship.source, relationship.destination, relationship.relationshipType)
         definition.with {
-            classification = relationship.classification
+            dataModel = relationship.dataModel
             metadata = new LinkedHashMap<String, String>(relationship.ext)
             archived = relationship.archived
             outgoingIndex = relationship.outgoingIndex
@@ -38,7 +38,7 @@ class RelationshipDefinition {
     }
 
     // optional
-    Classification classification = null
+    DataModel dataModel = null
     Map<String, String> metadata = [:]
     boolean archived
     boolean inherited
@@ -56,7 +56,7 @@ class RelationshipDefinition {
                 source: source?.id ? source : null,
                 destination: destination?.id ? destination : null,
                 relationshipType: relationshipType?.id ? relationshipType : null,
-                classification: classification?.id ? classification : null,
+                dataModel: dataModel?.id ? dataModel : null,
                 archived: archived,
                 inherited: inherited,
                 outgoingIndex: outgoingIndex ?: System.currentTimeMillis(),
@@ -66,7 +66,7 @@ class RelationshipDefinition {
     }
 
     @Override String toString() {
-        "$source.name =[$relationshipType.sourceToDestination${classification ? ('/' + classification.name) : ''}]=> $destination.name"
+        "$source.name =[$relationshipType.sourceToDestination${dataModel ? ('/' + dataModel.name) : ''}]=> $destination.name"
     }
 }
 

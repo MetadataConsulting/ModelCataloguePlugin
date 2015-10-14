@@ -37,6 +37,24 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     }
   ]
 
+  actionsProvider.registerActionInRole 'select-data-model', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'security', 'catalogue', '$state', '$rootScope', ($scope, security, catalogue, $state, $rootScope) ->
+    return undefined if not $scope.element
+    return undefined if not angular.isFunction $scope.element.isInstanceOf
+    return undefined if not $scope.element.isInstanceOf 'dataModel'
+    return undefined if not security.hasRole('VIEWER')
+
+    {
+      position:   -10000
+      label:      "Select #{$scope.element.name}"
+      icon:       'fa fa-book'
+      type:       'primary'
+      action: ->
+        catalogue.select($scope.element).then ->
+          $state.go 'mc.resource.list', { dataModelId: $scope.element.id, resource: 'dataClass'}, reload: true
+          $rootScope.$broadcast 'redrawContextualActions'
+    }
+
+  ]
   actionsProvider.registerActionInRole 'edit-catalogue-element', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
@@ -122,7 +140,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerChildActionInRole 'catalogue-element', 'validate-value', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'security', ($scope, messages) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
-    return undefined if not $scope.element.isInstanceOf('valueDomain')
+    return undefined if not $scope.element.isInstanceOf('dataType')
 
     {
       position:   1200
@@ -130,8 +148,10 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       icon:       'fa fa-fw fa-check-circle-o'
       type:       'primary'
       watches:    ['element.rule', 'element.dataType']
-      disabled:   not $scope.element.rule and not ($scope.element.dataType and $scope.element.dataType.isInstanceOf('enumeratedType')) and $scope.element.basedOn?.length == 0
-      action:     ->
+      disabled:   not $scope.element.rule \
+        and $scope.element.basedOn?.length == 0 \
+        and not (($scope.element.dataType and $scope.element.dataType.isInstanceOf('enumeratedType')) or $scope.element.isInstanceOf('enumeratedType'))
+    action:     ->
         messages.prompt('', '', {type: 'validate-value-by-domain', domain: $scope.element})
     }
   ]
@@ -140,7 +160,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerChildActionInRole 'catalogue-element', 'convert', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'security', ($scope, messages) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
-    return undefined if not $scope.element.isInstanceOf('valueDomain') and not $scope.element.isInstanceOf('mapping')
+    return undefined if not $scope.element.isInstanceOf('dataType') and not $scope.element.isInstanceOf('mapping')
 
     {
       position:   1100
@@ -148,7 +168,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       icon:       'fa fa-fw fa-long-arrow-right'
       type:       'primary'
       action:     ->
-        if $scope.element.isInstanceOf('valueDomain')
+        if $scope.element.isInstanceOf('dataType')
           messages.prompt('', '', {type: 'convert-with-value-domain', source: $scope.element})
         else if $scope.element.isInstanceOf('mapping')
           messages.prompt('', '', {type: 'convert-with-value-domain', source: $scope.element.source, destination: $scope.element.destination})
@@ -297,7 +317,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       icon:       'glyphicon glyphicon-edit'
       type:       'primary'
       watches:    'element.mappings.total'
-      disabled:    $scope.element.isInstanceOf('valueDomain') and not $scope.element.mappings.total
+      disabled:    $scope.element.isInstanceOf('dataType') and not $scope.element.mappings.total
       action:     ->
         $scope.element.source.refresh().then (element)->
           args = {type: 'new-mapping', update: true, element: element, mapping: $scope.element}
@@ -344,5 +364,34 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     }
   ]
 
+  actionsProvider.registerChildActionInRole 'catalogue-element', 'change-type', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', ($rootScope, $scope, messages, names, security, catalogueElementResource) ->
+    return undefined if not $scope.element
+    return undefined if not angular.isFunction $scope.element.isInstanceOf
+    return undefined if not $scope.element.isInstanceOf('dataType')
+    return undefined if not security.hasRole('CURATOR')
+
+    {
+      position:   1000
+      label:      'Change Type'
+      icon:       'fa fa-fw fa-edit'
+      type:       'primary'
+      watches:    ['element.status', 'element.archived']
+      disabled:   $scope.element.archived
+      action:     ->
+        options =
+          dataType: 'Data Type'
+          enumeratedType: 'Enumerated Type'
+          primitiveType: 'Primitive Type'
+          referenceType: 'Reference Type'
+
+        messages.prompt('Change Type', "To which type should be #{$scope.element.name} converted? WARNING: any extra information such as enumerated values, data classes and measurement units will be lost!", {type: 'with-options', selected: names.getPropertyNameFromType($scope.element.elementType), options: options}).then (type)->
+          catalogueElementResource($scope.element.elementType).update($scope.element, {newVersion: true, newType: type}).then (updated) ->
+            updateFrom $scope.element, updated
+            messages.success("#{$scope.element.name} is now #{options[type]}")
+            $rootScope.$broadcast 'newVersionCreated', updated
+            $rootScope.$broadcast 'catalogueElementUpdated', updated
+          , showErrorsUsingMessages(messages)
+    }
+  ]
 
 ]

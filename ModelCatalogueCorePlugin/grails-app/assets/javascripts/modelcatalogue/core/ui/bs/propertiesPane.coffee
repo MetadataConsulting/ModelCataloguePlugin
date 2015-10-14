@@ -13,9 +13,15 @@ angular.module('mc.core.ui.bs.propertiesPane', ['mc.core.ui.propertiesPane', 'ng
               <div ng-show="theValue.enumerations" class="preserve-new-lines"><strong>Enumerations</strong>
                 {{getEnumerations(theValue)}}
               </div>
+              <div ng-show="theValue.dataClass" class="preserve-new-lines"><strong>Data Class</strong>
+                <span ng-bind-html="getEnumerations(theValue)"></span>
+              </div>
               <div ng-if="theValue.dataType"><span class="text-muted"><catalogue-element-icon type="'dataType'"></catalogue-element-icon></span> <a ng-href="{{theValue.dataType.href()}}">{{theValue.dataType.name}}</a></div>
               <div ng-show="theValue.dataType.enumerations" class="preserve-new-lines"><strong>Enumerations</strong>
                 {{getEnumerations(theValue.dataType)}}
+              </div>
+              <div ng-show="theValue.dataType.dataClass" class="preserve-new-lines"><strong>Data Class</strong>
+                <span ng-bind-html="getEnumerations(theValue.dataType)"></span>
               </div>
             </div></td>
             <td class="pp-table-property-value col-md-8 pp-table-property-element-value" data-value-for="{{property.label}}" ng-switch-when="date">{{theValue | date:'short'}}</td>

@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.transaction.Transactional
+import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.*
@@ -158,9 +159,10 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 return
             }
 
-            Classification classification = otherSide.classification ? Classification.get(otherSide.classification.id) : null
+            def dataModelObject = otherSide.dataModel ?: otherSide.classification
+            DataModel dataModel = dataModelObject ? DataModel.get(dataModelObject.id) : null
 
-            Relationship old = outgoing ?  relationshipService.unlink(source, destination, relationshipType, classification) :  relationshipService.unlink(destination, source, relationshipType, classification)
+            Relationship old = outgoing ?  relationshipService.unlink(source, destination, relationshipType, dataModel) :  relationshipService.unlink(destination, source, relationshipType, dataModel)
             if (!old) {
                 notFound()
                 return
@@ -197,18 +199,18 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
             }
 
-            def newClassification = objectToBind['__classification']
-            Long classificationId = newClassification instanceof Map ? newClassification.id : null
+            def newDataModel = objectToBind['__dataModel'] ?: objectToBind['__classification']
+            Long dataModelId = newDataModel instanceof Map ? newDataModel.id : null
 
-            Classification classification = classificationId ? Classification.get(classificationId) : null
+            DataModel dataModel = dataModelId ? DataModel.get(dataModelId) : null
 
 
-            def oldClassification = objectToBind['__oldClassification']
-            Long oldClassificationId = oldClassification instanceof Map ? oldClassification.id : null
+            def oldDataModel = objectToBind['__oldDataModel'] ?: objectToBind['__oldClassification']
+            Long oldDataModelId = oldDataModel instanceof Map ? oldDataModel.id : null
 
-            Classification oldClassificationInstance = oldClassificationId ? Classification.get(oldClassificationId) : null
+            DataModel oldDataModelInstance = oldDataModelId ? DataModel.get(oldDataModelId) : null
 
-            if (classificationId && !classification) {
+            if (dataModelId && !dataModel) {
                 notFound()
                 return
             }
@@ -227,17 +229,17 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 return
             }
 
-            if (oldClassificationInstance != classification) {
+            if (oldDataModelInstance != dataModel) {
                 if (outgoing) {
-                    relationshipService.unlink(source, destination, relationshipType, oldClassificationInstance)
+                    relationshipService.unlink(source, destination, relationshipType, oldDataModelInstance)
                 } else {
-                    relationshipService.unlink(destination, source, relationshipType, oldClassificationInstance)
+                    relationshipService.unlink(destination, source, relationshipType, oldDataModelInstance)
                 }
             }
 
             RelationshipDefinitionBuilder definition = outgoing ? RelationshipDefinition.create(source, destination, relationshipType) : RelationshipDefinition.create(destination, source, relationshipType)
 
-            definition.withClassification(classification).withMetadata(OrderedMap.fromJsonMap(objectToBind.metadata ?: [:]))
+            definition.withDataModel(dataModel).withMetadata(OrderedMap.fromJsonMap(objectToBind.metadata ?: [:]))
 
             Relationship rel = relationshipService.link(definition.definition)
 
@@ -249,7 +251,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             response.status = HttpServletResponse.SC_CREATED
             RelationshipDirection direction = outgoing ? RelationshipDirection.OUTGOING : RelationshipDirection.INCOMING
 
-            respond(id: rel.id, type: rel.relationshipType, ext: OrderedMap.toJsonMap(rel.ext), element: CatalogueElementMarshaller.minimalCatalogueElementJSON(direction.getElement(source, rel)), relation: direction.getRelation(source, rel), direction: direction.getDirection(source, rel), removeLink: RelationshipsMarshaller.getDeleteLink(source, rel), archived: rel.archived, elementType: Relationship.name, classification: rel.classification)
+            respond(id: rel.id, type: rel.relationshipType, ext: OrderedMap.toJsonMap(rel.ext), element: CatalogueElementMarshaller.minimalCatalogueElementJSON(direction.getElement(source, rel)), relation: direction.getRelation(source, rel), direction: direction.getDirection(source, rel), removeLink: RelationshipsMarshaller.getDeleteLink(source, rel), archived: rel.archived, elementType: Relationship.name, classification: rel.dataModel, dataModel: rel.dataModel)
         }
     }
 
@@ -280,7 +282,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 type: type,
                 owner: element,
                 direction: direction,
-                list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), direction.composeWhere(element, type, ClassificationFilter.from(modelCatalogueSecurityService.currentUser)))
+                list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), direction.composeWhere(element, type, DataModelFilter.from(modelCatalogueSecurityService.currentUser)))
         )
     }
 
@@ -393,7 +395,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     protected getDefaultSort()  { actionName == 'index' ? 'name'  : null }
     protected getDefaultOrder() { actionName == 'index' ? 'asc'   : null }
 
-    def classificationService
+    def dataModelService
 
     @Override
     def index(Integer max) {
@@ -404,9 +406,22 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        respond classificationService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
-            eq 'status', ElementService.getStatusFromParams(params)
-        })
+        if (params.status?.toLowerCase() == 'active') {
+            if (modelCatalogueSecurityService.hasRole('CURATOR')){
+                respond dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+                    'in' 'status', [ElementStatus.FINALIZED, ElementStatus.DRAFT]
+                }, overridableDataModelFilter)
+                return
+            }
+            respond dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+                eq 'status', ElementStatus.FINALIZED
+            }, overridableDataModelFilter)
+            return
+        }
+
+        respond dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+            'in' 'status', ElementService.getStatusFromParams(params)
+        }, overridableDataModelFilter)
     }
 
     /**
@@ -482,9 +497,15 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
 
         if (newVersion) {
+            ModelCatalogueTypes newType = null
+            if (params.newType) {
+                newType = ModelCatalogueTypes.getType(params.newType)
+            } else if(request.JSON?.newType) {
+                newType = ModelCatalogueTypes.getType(request.JSON?.newType)
+            }
 
             // when draft version is created from the UI still just create plain draft ignoring dependencies
-            instance = elementService.createDraftVersion(instance, DraftContext.userFriendly()) as T
+            instance = elementService.createDraftVersion(instance, newType?.implementation ? DraftContext.typeChangingUserFriendly(newType.implementation) : DraftContext.userFriendly()) as T
             if (instance.hasErrors()) {
                 respond instance.errors, view: 'edit' // STATUS CODE 422
                 return
@@ -653,6 +674,14 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     }
 
     def history(Integer max) {
+        String name = getResourceName()
+        Class type = resource
+
+        if (name in ['primitiveType', 'enumeratedType', 'referenceType']) {
+            name = 'dataType'
+            type = DataType
+        }
+
         params.max = Math.min(max ?: 10, 100)
         CatalogueElement element = queryForResource(params.id)
         if (!element) {
@@ -663,8 +692,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         Long id = element.id
 
         if (!element.latestVersionId) {
-            respond Lists.wrap(params, "/${resourceName}/${params.id}/history", Lists.lazy(params, resource, {
-                [resource.get(id)]
+            respond Lists.wrap(params, "/${name}/${params.id}/history", Lists.lazy(params, type, {
+                [type.get(id)]
             }, { 1 }))
             return
         }
@@ -677,32 +706,42 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         customParams.sort = 'versionNumber'
         customParams.order = 'desc'
 
-        respond Lists.fromCriteria(customParams, resource, "/${resourceName}/${params.id}/history") {
+        respond Lists.fromCriteria(customParams, type, "/${name}/${params.id}/history") {
             eq 'latestVersionId', latestVersionId
         }
     }
 
     // classifications are marshalled with the published element so no need for special method to fetch them
     protected bindRelations(T instance, boolean newVersion, Object objectToBind) {
-        def classifications = objectToBind.classifications ?: []
-        for (classification in instance.classifications.findAll { !(it.id in classifications.collect { it.id as Long } || it.latestVersionId in classifications.collect { it.id as Long })  }) {
-            instance.removeFromClassifications classification
-            classification.removeFromClassifies instance
+        if (!instance.readyForQueries) {
+            return
         }
-        for (domain in classifications) {
-            Classification classification = DraftContext.preferDraft(Classification.get(domain.id as Long)) as Classification
-            if (!(classification.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
-                classification = elementService.createDraftVersion(classification, DraftContext.userFriendly())
+        def dataModels = objectToBind.classifications ?: objectToBind.dataModels ?: []
+        if (!dataModels && !instance.dataModels && !(instance.instanceOf(DataModel))) {
+            instance.errors.reject 'catalogue.element.at.least.one.data.model', "'$instance.name' has to be declared wihtin a data model"
+        }
+        if (instance.dataModels && !dataModels) {
+            // data models not present in the request
+            return
+        }
+        for (dataModel in instance.dataModels.findAll { !(it.id in dataModels.collect { it.id as Long } || it.latestVersionId in dataModels.collect { it.id as Long })  }) {
+            instance.removeFromDeclaredWithin dataModel
+            dataModel.removeFromDeclares instance
+        }
+        for (domain in dataModels) {
+            DataModel dataModel = DraftContext.preferDraft(DataModel.get(domain.id as Long)) as DataModel
+            if (!(dataModel.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
+                dataModel = elementService.createDraftVersion(dataModel, DraftContext.userFriendly())
             }
-            instance.addToClassifications classification
-            classification.addToClassifies instance
+            instance.addToDeclaredWithin dataModel
+            dataModel.addToDeclares instance
         }
     }
 
     @Override
     protected getIncludeFields(){
         def fields = super.includeFields
-        fields.removeAll(['extensions', 'versionCreated', 'versionNumber', 'classifications'])
+        fields.removeAll(['extensions', 'versionCreated', 'versionNumber', 'dataModels'])
         fields
     }
 
@@ -710,5 +749,15 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     protected clearAssociationsBeforeDelete(T instance) {
         // it is safe to remove all classifications
         instance.clearAssociationsBeforeDelete()
+    }
+
+    protected DataModelFilter getOverridableDataModelFilter() {
+        if (params.dataModel) {
+            DataModel dataModel = DataModel.get(params.long('dataModel'))
+            if (dataModel) {
+                return DataModelFilter.includes(dataModel)
+            }
+        }
+        dataModelService.dataModelFilter
     }
 }

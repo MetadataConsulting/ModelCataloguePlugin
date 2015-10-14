@@ -3,33 +3,30 @@ package org.modelcatalogue.core
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.api.ElementStatus
 
-/**
- * Created by adammilward on 27/02/2014.
- */
 class CatalogueElementControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     def setupSpec(){
-        totalCount = resource.countByStatus(ElementStatus.FINALIZED)
+        totalCount = resource.countByStatusInList([ElementStatus.FINALIZED, ElementStatus.DRAFT])
     }
 
     @Override
     protected Long getResourceCount() {
-        resource.countByStatus(ElementStatus.FINALIZED)
+        resource.countByStatusInList([ElementStatus.FINALIZED, ElementStatus.DRAFT])
     }
 
     @Override
     Map getPropertiesToEdit(){
-        [name: "changedName", description: "edited description "]
+        [name: "changedName", description: "edited description ", dataModels: dataModelsForSpec]
     }
 
     @Override
     Map getNewInstance(){
-       [name: "Something", description: "blah blah blah"]
+       [name: "Something", description: "blah blah blah", dataModels: dataModelsForSpec]
     }
 
     @Override
     Map getBadInstance(){
-        [name: "t"*300, description: "asdf"]
+        [name: "t"*300, description: "asdf", dataModels: dataModelsForSpec]
     }
 
 

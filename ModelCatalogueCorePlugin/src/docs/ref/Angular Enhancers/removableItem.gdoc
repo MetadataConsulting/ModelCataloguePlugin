@@ -16,8 +16,8 @@ or [modelCatalogueSearch|Angular Services].
 angular
 .module('foo', ['mc.core.catalogueElementResource', 'mc.core.listReferenceEnhancer'])
 .factory('bar', function(catalogueElementResource) {
-    var valueDomains = catalogueElementResource('valueDomain')
-    valueDomains.get(1).then(function(domain){
+    var dataTypes = catalogueElementResource('dataType')
+    dataTypes.get(1).then(function(domain){
         domain.incomingRelationships().then(function(relationshipsList) {
            relationshipsList.list[0].remove().then(function(result) {
                alert('First item deleted successfully')

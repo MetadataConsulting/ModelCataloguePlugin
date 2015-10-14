@@ -1,6 +1,6 @@
-angular.module('mc.core.ui.bs.modalPromptCsvHeaders', ['mc.util.messages', 'angularFileUpload']).config ['messagesProvider', (messagesProvider)->
-  factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
-    (title, body, args) ->
+angular.module('mc.core.ui.bs.modalPromptCsvHeaders', ['mc.util.messages', 'ngFileUpload']).config ['messagesProvider', (messagesProvider)->
+  factory = [ '$modal', 'messages', ($modal, messages) ->
+    (title) ->
       dialog = $modal.open {
         windowClass: 'basic-edit-modal-prompt'
         template: '''
@@ -16,13 +16,13 @@ angular.module('mc.core.ui.bs.modalPromptCsvHeaders', ['mc.util.messages', 'angu
               </div>
               <div class="form-group">
                 <label for="asset" class="">CSV File</label>
-                <input ng-hide="uploading &amp;&amp; progress" type="file" class="form-control" id="csvFile" placeholder="CSV File" ng-model="csvFile" ng-file-select="onFileSelect($files)">
+                <input ng-hide="uploading &amp;&amp; progress" type="file" class="form-control" id="csvFile" placeholder="CSV File" ngf-model="csvFile" ngf-select="onFileSelect($files)">
                 <progressbar value="progress" ng-show="uploading &amp;&amp; progress"><span ng-hide="progress == 100">{{progress}} %</span><span ng-show="progress == 100">Upload finished. Elements are being matched. This may take a while.</span></progressbar>
               </div>
             </form>
         </div>
         '''
-        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$upload', 'modelCatalogueApiRoot', 'enhance', ($scope, messages, names, catalogueElementResource, $modalInstance, $upload, modelCatalogueApiRoot, enhance) ->
+        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', ($scope, messages, names, catalogueElementResource, $modalInstance, Upload, modelCatalogueApiRoot, enhance) ->
           $scope.separator = ';'
           $scope.messages = messages.createNewMessages()
 
@@ -38,7 +38,7 @@ angular.module('mc.core.ui.bs.modalPromptCsvHeaders', ['mc.util.messages', 'angu
             if(title=="Import Child Models") then url ="dataArchitect/modelsFromCSV" else url = "dataArchitect/elementsFromCSV"
 
             $scope.uploading = true
-            $scope.upload = $upload.upload({
+            $scope.upload = Upload.upload({
               params: {separator: $scope.separator}
               url:                "#{modelCatalogueApiRoot}/#{url}"
               file:               $files[0]

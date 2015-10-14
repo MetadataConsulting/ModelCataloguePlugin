@@ -113,18 +113,20 @@ changes.config ['actionsProvider', (actionsProvider)->
     }
   ]
 
-  actionsProvider.registerActionInRoles 'feed', [actionsProvider.ROLE_NAVIGATION, actionsProvider.ROLE_GLOBAL_ACTION], ['security', '$state', (security, $state) ->
-    return undefined if not security.isUserLoggedIn()
-
-    {
-      position:   1500
-      label:      'Changes'
-      icon:       'fa fa-rss'
+  actionsProvider.registerChildAction 'currentDataModel', 'feed', ['$state', '$rootScope', ($state, $rootScope) ->
+    action = {
+      position:   500
+      label: 'Activity'
+      icon: 'fa fa-fw fa-rss'
       action: ->
-        $state.go 'mc.resource.list', resource: 'change'
-
+        $state.go 'mc.resource.list', resource: 'change', dataModelId: if $rootScope.currentDataModel then $rootScope.currentDataModel.id else 'catalogue'
     }
-  ]
+
+    $rootScope.$on '$stateChangeSuccess', (ignored, state, params) ->
+      action.active = state.name == 'mc.resource.list' and params.resource == 'change'
+
+    action
+  ], [actionsProvider.ROLE_NAVIGATION]
 ]
 
 changes.config ['catalogueProvider', (catalogueProvider)->

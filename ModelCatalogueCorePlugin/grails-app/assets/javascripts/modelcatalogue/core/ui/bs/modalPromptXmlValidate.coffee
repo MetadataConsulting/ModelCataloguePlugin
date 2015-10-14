@@ -16,7 +16,7 @@ angular.module('mc.core.ui.bs.modalPromptXmlValidate', ['mc.util.messages']).con
             <form role="form" ng-submit="validateResult()">
               <div class="form-group">
                 <label for="asset" class="">XML File</label>
-                <input ng-hide="uploading &amp;&amp; progress" type="file" class="form-control" id="xml" placeholder="XML File" ng-model="copy.xml" ng-file-select="onFileSelect($files)">
+                <input ng-hide="uploading &amp;&amp; progress" type="file" class="form-control" id="xml" placeholder="XML File" ngf-model="copy.xml" ngf-select="onFileSelect($files)">
                 <progressbar value="progress" ng-show="uploading &amp;&amp; progress">{{progress}} %</progressbar>
               </div>
             </form>
@@ -26,7 +26,7 @@ angular.module('mc.core.ui.bs.modalPromptXmlValidate', ['mc.util.messages']).con
           <alert type="danger"  ng-show="result !== true &amp;&amp; result">{{result}}</alert>
         </div>
         '''
-        controller: ['$scope', 'messages', '$modalInstance', '$upload', 'modelCatalogueApiRoot', 'enhance', ($scope, messages, $modalInstance, $upload, modelCatalogueApiRoot, enhance) ->
+        controller: ['$scope', 'messages', '$modalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', ($scope, messages, $modalInstance, Upload, modelCatalogueApiRoot, enhance) ->
           $scope.copy     = {}
           $scope.messages = messages.createNewMessages()
 
@@ -44,7 +44,7 @@ angular.module('mc.core.ui.bs.modalPromptXmlValidate', ['mc.util.messages']).con
           $scope.validateResult = ->
             $scope.messages.clearAllMessages()
             $scope.uploading = true
-            $scope.upload = $upload.upload({
+            $scope.upload = Upload.upload({
               url:                "#{modelCatalogueApiRoot}/asset/#{args.asset.id}/validateXml"
               file:               $scope.copy.file
               fileFormDataName:   'xml'

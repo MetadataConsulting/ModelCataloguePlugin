@@ -5,8 +5,6 @@ import org.modelcatalogue.core.util.OrderedMap
 /*
 * Enumerated Types are data types that contain a list of enumerated values
 * i.e. ['politics', 'history', 'science']
-* Enumerated Types are used by Value Domains (please see ValueDomain)
-* i.e. ValueDomain subjects uses EnumeratedType enumerations ['politics', 'history', 'science']
 * */
 
 //TODO marshalling and unmarshalling for enumerated type as string at the moment it returns the enum as string
@@ -27,7 +25,7 @@ class EnumeratedType extends DataType {
 
     static constraints = {
         name unique:false
-        enumAsString nullable: false, /*unique:true,*/ maxSize: 10000, validator: { encodedVal, obj ->
+        enumAsString nullable: false, maxSize: 10000, validator: { encodedVal, obj ->
             Map<String, String> val = stringToMap(encodedVal)
             if (!val) return true
             if (val.size() < 1) return false
@@ -76,6 +74,16 @@ class EnumeratedType extends DataType {
 		return results
 		
 	}
+
+    boolean isEnumKey(Object x) {
+        if (!x) {
+            return true
+        }
+        if (!enumerations.keySet().contains(x.toString())) {
+            return false
+        }
+        return true
+    }
 
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}, status: ${status}, modelCatalogueId: ${modelCatalogueId}, enumerations: ${enumerations}]"
@@ -148,4 +156,10 @@ class EnumeratedType extends DataType {
         enumerations.collect { key, value -> "$key: $value" }.join('\n')
     }
 
+    @Override
+    void beforeDraftPersisted() {
+        if (!enumerations) {
+            enumerations = ['default' : '']
+        }
+    }
 }

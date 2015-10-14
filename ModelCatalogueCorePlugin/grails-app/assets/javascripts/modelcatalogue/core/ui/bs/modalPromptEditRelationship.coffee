@@ -15,9 +15,9 @@ angular.module('mc.core.ui.bs.modalPromptEditRelationship', ['mc.util.messages']
                 <h4>{{element.name}} <code>{{relationshipTypeInfo.value}}</code> {{relation.name}} <span ng-show="classification"> in classification {{classification.name}}</h4>
                 <messages-panel messages="messages"></messages-panel>
                 <div class="form-group">
-                  <label for="classification">Classification</label>
-                  <input id="classification" ng-model="classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="updateClassification(classification)">
-                  <p class="help-block">Select a classification only if the relationship applies for given classification only. This usually happens when you are reusing catalogue elements form some standard dataset</p>
+                  <label for="classification">Data Model</label>
+                  <input id="classification" ng-model="classification" catalogue-element-picker="dataModel" label="el.name" typeahead-on-select="updateClassification(classification)">
+                  <p class="help-block">Select a data model only if the relationship applies for given classification only. This usually happens when you are reusing catalogue elements form some standard data model</p>
                 </div>
                 <div class="form-group">
                   <label>Metadata</label>

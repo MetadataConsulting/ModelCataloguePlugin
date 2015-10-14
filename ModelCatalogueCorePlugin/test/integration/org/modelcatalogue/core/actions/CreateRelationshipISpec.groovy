@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.actions
 
 import org.modelcatalogue.core.AbstractIntegrationSpec
-import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,12 +13,11 @@ import static org.modelcatalogue.core.actions.AbstractActionRunner.normalizeDesc
 
 class CreateRelationshipISpec extends AbstractIntegrationSpec {
 
-    def modelCatalogueSecurityService
     def relationshipService
 
     @Autowired AutowireCapableBeanFactory autowireCapableBeanFactory
     @Shared
-    Model one, two
+    DataClass one, two
     @Shared
     RelationshipType relation, contains
     @Shared
@@ -29,8 +28,8 @@ class CreateRelationshipISpec extends AbstractIntegrationSpec {
         createAction = new CreateRelationship()
         createAction.relationshipService = relationshipService
         createAction.autowireCapableBeanFactory = autowireCapableBeanFactory
-        one = Model.findByName("book")
-        two = Model.findByName("chapter1")
+        one = DataClass.findByName("book")
+        two = DataClass.findByName("chapter1")
         relation = RelationshipType.relatedToType
         contains = RelationshipType.containmentType
     }
@@ -46,7 +45,7 @@ class CreateRelationshipISpec extends AbstractIntegrationSpec {
 
         then:
         createAction.message == """
-            Create new relationship '   <a href='#/catalogue/model/${one.id}'> Model 'book'</a>  related to <a href='#/catalogue/model/${two.id}'> Model 'chapter1'</a> with following parameters:
+            Create new relationship '   <a href='#/catalogue/dataClass/${one.id}'> Data Class 'book'</a>  related to <a href='#/catalogue/dataClass/${two.id}'> Data Class 'chapter1'</a> with following parameters:
 
                         Source: book
             Destination: chapter1
@@ -64,7 +63,7 @@ class CreateRelationshipISpec extends AbstractIntegrationSpec {
         errorsForEmpty.containsKey 'type'
 
         when:
-        Map<String, String> errorsForNonExisting = createAction.validate(source: 'gorm://org.modelacatalogue.core.Model:1233456')
+        Map<String, String> errorsForNonExisting = createAction.validate(source: 'gorm://org.modelacatalogue.core.DataClass:1233456')
 
         then:
         errorsForNonExisting.containsKey 'source'
@@ -113,7 +112,7 @@ class CreateRelationshipISpec extends AbstractIntegrationSpec {
 
         then:
         !createAction.failed
-        sw.toString() == "<a href='#/catalogue/model/${one.id}'>Model 'book'</a> now <a href='#/catalogue/relationshipType/${relation.id}'>related to</a> <a href='#/catalogue/model/${two.id}'>Model 'chapter1'</a>"
+        sw.toString() == "<a href='#/catalogue/dataClass/${one.id}'>Data Class 'book'</a> now <a href='#/catalogue/relationshipType/${relation.id}'>related to</a> <a href='#/catalogue/dataClass/${two.id}'>Data Class 'chapter1'</a>"
         createAction.result == encodeEntity(Relationship.list(limit: 1)[0])
     }
 

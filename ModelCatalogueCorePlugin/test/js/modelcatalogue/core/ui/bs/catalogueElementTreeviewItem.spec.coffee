@@ -9,10 +9,10 @@ describe "mc.core.ui.catalogueElementTreeviewItem", ->
 
     catEl = enhance angular.copy(fixtures.dataType.showOne)
     catEl.description = "Hello World!"
-    catEl.valueDomains.total = 5
+    catEl.outgoingRelationships.total = 5
 
     $rootScope.element = catEl
-    $rootScope.descend = ['valueDomains']
+    $rootScope.descend = ['outgoingRelationships']
     $rootScope.treeview =
       select: (element) -> console.log element
 
@@ -24,12 +24,12 @@ describe "mc.core.ui.catalogueElementTreeviewItem", ->
 
     expect(element.prop('tagName').toLowerCase()).toBe('li')
     expect(element.find('span.catalogue-element-treeview-name').text()).toBe("#{catEl.name} #{catEl.latestVersionId}.#{catEl.versionNumber}")
-    expect(element.find('span.badge').text()).toBe("#{catEl.valueDomains.total}")
+    expect(element.find('span.badge').text()).toBe("#{catEl.outgoingRelationships.total}")
 
 
-    valueDomains = angular.copy(fixtures.dataType.valueDomains1)
+    relationships = angular.copy(fixtures.dataType.outgoing1)
 
-    $httpBackend.expect('GET', catEl.valueDomains.link).respond(valueDomains)
+    $httpBackend.expect('GET', catEl.outgoingRelationships.link).respond(relationships)
 
     element.find('a').click()
 

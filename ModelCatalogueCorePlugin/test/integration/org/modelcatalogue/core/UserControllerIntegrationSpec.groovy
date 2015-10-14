@@ -1,26 +1,24 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.User
 
-/**
- * Created by adammilward on 27/02/2014.
- */
 class UserControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     @Override
     Map getPropertiesToEdit(){
-        [name: "changedName", description: "edited description "]
+        [name: "changedName", description: "edited description ", dataModels: dataModelsForSpec]
     }
 
     @Override
     Map getNewInstance(){
-        [name: 'user', username: 'user', password: 'password']
+        [name: 'user', username: 'user', password: 'password', dataModels: dataModelsForSpec]
     }
 
     @Override
     Map getBadInstance() {
-        [name: "t" * 300, description: "asdf"]
+        [name: "t" * 300, description: "asdf", dataModels: dataModelsForSpec]
     }
 
     @Override

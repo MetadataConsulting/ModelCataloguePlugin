@@ -17,10 +17,10 @@ angular.module('mc.core.ui.bs.modalPromptDataElementEdit', ['mc.util.messages'])
         <div class="modal-body">
             <messages-panel messages="messages"></messages-panel>
             <form role="form" ng-submit="saveElement()">
-              <div class="form-group">
-                <label for="classification"> Classifications</label>
-                <elements-as-tags elements="copy.classifications"></elements-as-tags>
-                <input id="classification-{{$index}}" placeholder="Classification" ng-model="pending.classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="addToClassifications()">
+              <div class="form-group" ng-if="!hideDataModels()">
+                <label for="dataModel"> Data Models</label>
+                <elements-as-tags elements="copy.dataModels"></elements-as-tags>
+                <input id="dataModel-{{$index}}" placeholder="Data Model" ng-model="pending.dataModel" catalogue-element-picker="dataModel" label="el.name" typeahead-on-select="addToDataModels()">
               </div>
               <div class="form-group">
                 <label for="name" class="">Name</label>
@@ -35,8 +35,8 @@ angular.module('mc.core.ui.bs.modalPromptDataElementEdit', ['mc.util.messages'])
                 <textarea rows="10" ng-model="copy.description" placeholder="Description" class="form-control" id="description"></textarea>
               </div>
               <div class="form-group">
-                <label for="valueDomain" class="">Value Domain</label>
-                <input type="text" id="valueDomain" placeholder="Value Domain" ng-model="copy.valueDomain" catalogue-element-picker="valueDomain" label="el.name">
+                <label for="dataType" class="">Data Type</label>
+                <input type="text" id="dataType" placeholder="Data Type" ng-model="copy.dataType" catalogue-element-picker="dataType" label="el.name">
               </div>
             </form>
         </div>

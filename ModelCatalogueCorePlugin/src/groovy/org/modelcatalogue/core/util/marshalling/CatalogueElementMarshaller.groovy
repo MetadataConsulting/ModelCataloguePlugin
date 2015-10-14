@@ -13,7 +13,7 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
     @Autowired ReportsRegistry reportsRegistry
     @Autowired RelationshipTypeService relationshipTypeService
     @Autowired RelationshipService relationshipService
-    @Autowired ClassificationService classificationService
+    @Autowired DataModelService dataModelService
 
     CatalogueElementMarshaller(Class type) {
         super(type)
@@ -60,7 +60,7 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
                 eq 'destination', el
             }
 
-            incomingCounts.putAll classificationService.classified(incomingTypes).list().countBy { row ->
+            incomingCounts.putAll dataModelService.classified(incomingTypes).list().countBy { row ->
                 row[1]
             }
 
@@ -72,7 +72,7 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
                 eq 'source', el
             }
 
-            outgoingCounts.putAll classificationService.classified(outgoingTypes).list().countBy { row ->
+            outgoingCounts.putAll dataModelService.classified(outgoingTypes).list().countBy { row ->
                 row[1]
             }
         }
@@ -85,7 +85,7 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
         relationships.bidirectional?.each   addRelationsJson('relationships', el, ret, types, incomingCounts, outgoingCounts)
 
         ret.availableReports = getAvailableReports(el)
-        ret.classifications  = relationshipService.getClassificationsInfo(el)
+        ret.dataModels = relationshipService.getDataModelsInfo(el)
 
         if (modelCatalogueSecurityService.currentUser) {
             RelationshipType favorite = RelationshipType.readByName('favourite')
@@ -183,15 +183,16 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
         [name: element.name, id: element.id, elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", versionNumber: element.versionNumber, latestVersionId: element.latestVersionId ?: element.id]
     }
 
-    static Map<String, Object> minimumValueDomain(ValueDomain element) {
-        if (!element) return null
-        [name: element.name, id: element.id, dataType: minimumDataType(element.dataType), elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", latestVersionId: element.latestVersionId ?: element.id]
-    }
-
     static Map<String, Object> minimumDataType(DataType element) {
         if (!element) return null
         if (element instanceof EnumeratedType) {
             return [name: element.name, id: element.id, enumerations: OrderedMap.toJsonMap(element.enumerations),  elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", latestVersionId: element.latestVersionId ?: element.id]
+        }
+        if (element instanceof ReferenceType) {
+            return [name: element.name, id: element.id, dataClass: minimalCatalogueElementJSON(element.dataClass),  elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", latestVersionId: element.latestVersionId ?: element.id]
+        }
+        if (element instanceof PrimitiveType) {
+            return [name: element.name, id: element.id, measurementUnit: minimalCatalogueElementJSON(element.measurementUnit),  elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", latestVersionId: element.latestVersionId ?: element.id]
         }
         return [name: element.name, id: element.id,  elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", latestVersionId: element.latestVersionId ?: element.id]
     }

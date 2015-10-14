@@ -3,8 +3,12 @@ package org.modelcatalogue.core
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.google.common.util.concurrent.UncheckedExecutionException
+import grails.util.Environment
 import grails.util.GrailsNameUtils
 import org.apache.log4j.Logger
+import org.codehaus.groovy.grails.exceptions.DefaultStackTraceFilterer
+import org.codehaus.groovy.grails.exceptions.StackTraceFilterer
+import org.modelcatalogue.core.util.RelationshipTypeRuleScript
 import org.modelcatalogue.core.util.SecuredRuleExecutor
 
 import java.util.concurrent.Callable
@@ -12,6 +16,11 @@ import java.util.concurrent.Callable
 class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
 
     private static final Cache<String, Long> typesCache = CacheBuilder.newBuilder().initialCapacity(20).build()
+
+    static void clearCache() {
+        typesCache.invalidateAll()
+        typesCache.cleanUp()
+    }
 
     def relationshipTypeService
 
@@ -99,7 +108,6 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
     }
 
     def validateSourceDestination(CatalogueElement source, CatalogueElement destination, Map<String, String> ext) {
-
         if (!sourceClass.isInstance(source)) {
             return 'source.not.instance.of'
         }
@@ -109,7 +117,13 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
         }
 
         if (rule && rule.trim()) {
-            def result = validateRule(source, destination, ext)
+            def result = null
+            try {
+                result = validateRule(source, destination, ext)
+            } catch (e) {
+                log.warn("Exception validating rule of $this", e)
+                result = e
+            }
             if (result instanceof List && result.size() > 1 && result.first() instanceof String) {
                 return result
             }
@@ -144,7 +158,7 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
         }
 
         if (!ruleScript) {
-            ruleScript = new SecuredRuleExecutor(
+            ruleScript = new SecuredRuleExecutor(RelationshipTypeRuleScript,
                 source: source,
                 destination: destination,
                 type: this,
@@ -161,39 +175,44 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
     }
 
 
-    static getContainmentType() {
+    static RelationshipType getContainmentType() {
         readByName("containment")
     }
 
-    static getClassificationType() {
-        readByName("classification")
+    static RelationshipType getDeclarationType() {
+        readByName("declaration")
     }
 
-    static getFavouriteType() {
+    static RelationshipType getFavouriteType() {
         readByName("favourite")
     }
 
-    static getSynonymType() {
+    static RelationshipType getSynonymType() {
         readByName("synonym")
     }
 
-    static getRelatedToType() {
+    static RelationshipType getRelatedToType() {
         readByName("relatedTo")
     }
 
-    static getHierarchyType() {
+    static RelationshipType getHierarchyType() {
         readByName("hierarchy")
     }
 
-    static getSupersessionType() {
+    static RelationshipType getSupersessionType() {
         readByName("supersession")
     }
 
-    static getBaseType() {
+    static RelationshipType getBaseType() {
         readByName("base")
     }
 
     static readByName(String name) {
+        // TODO: temporary give warning if 'classification' type is requested
+        if (name == 'classification') {
+            Logger.getLogger(RelationshipType).warn extractFormattedException(new IllegalArgumentException("Relationship 'classification' was replaced by 'definition'. Update your code properly!"))
+            return declarationType
+        }
         try {
             Long id = typesCache.get(name, { ->
                 RelationshipType type = RelationshipType.findByName(name, [cache: true, readOnly: true])
@@ -202,8 +221,17 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
                 }
                 return type.id
             } as Callable<Long>)
-            RelationshipType.get(id)
 
+            RelationshipType type = RelationshipType.get(id)
+            if (type) {
+                return type
+            }
+            type = RelationshipType.findByName(name)
+            if (type) {
+                typesCache.asMap().put(name, type.id)
+                return type
+            }
+            return null
         } catch (UncheckedExecutionException e) {
             if (e.cause instanceof IllegalArgumentException) {
                 Logger.getLogger(RelationshipType).warn "Type '$name' requested but not found!"
@@ -259,6 +287,13 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
             }
         }
         newParts.join('')
+    }
+
+    static String extractFormattedException(Throwable exception) {
+        String exceptionMsg = exception.message + "\n"
+        StackTraceFilterer stackTraceFilterer = new DefaultStackTraceFilterer()
+        exceptionMsg += stackTraceFilterer.filter(exception).stackTrace.join('\n')
+        return exceptionMsg
     }
 }
 

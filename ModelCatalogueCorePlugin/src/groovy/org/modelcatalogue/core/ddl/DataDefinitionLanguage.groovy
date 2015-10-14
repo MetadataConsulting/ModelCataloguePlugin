@@ -4,24 +4,24 @@ import grails.gorm.DetachedCriteria
 import grails.util.GrailsNameUtils
 import grails.util.Holders
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Classification
-import org.modelcatalogue.core.ClassificationService
+import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
-import org.modelcatalogue.core.util.ClassificationFilter
+import org.modelcatalogue.core.util.DataModelFilter
 
 /**
  * Simple data definition language. Designed to be usually used in the tests.
  */
 class DataDefinitionLanguage {
 
-    static void with(Classification classification, @DelegatesTo(DataDefinitionLanguage) Closure closure) {
-        new DataDefinitionLanguage(classification: classification).with closure
+    static void with(DataModel dataModel, @DelegatesTo(DataDefinitionLanguage) Closure closure) {
+        new DataDefinitionLanguage(dataModel: dataModel).with closure
     }
-    static void with(String classification, @DelegatesTo(DataDefinitionLanguage) Closure closure) {
-        new DataDefinitionLanguage(classification: find(Classification, classification, null)).with closure
+    static void with(String dataModel, @DelegatesTo(DataDefinitionLanguage) Closure closure) {
+        new DataDefinitionLanguage(dataModel: find(DataModel, dataModel, null)).with closure
     }
 
-    private Classification classification
+    private DataModel dataModel
 
     UpdateDefinition update(String propertyOrExtName) {
         return new UpdateDefinition(this, propertyOrExtName)
@@ -47,21 +47,21 @@ class DataDefinitionLanguage {
         return DraftKeyword.INSTANCE
     }
 
-    protected Classification getClassification() {
-        return classification
+    protected DataModel getDataModel() {
+        return dataModel
     }
 
     protected <T extends CatalogueElement> T find(Class<T> domain, String name) {
-        find domain, name, classification
+        find domain, name, dataModel
     }
 
-    protected static <T extends CatalogueElement> T find(Class<T> domain, String name, Classification classification) {
+    protected static <T extends CatalogueElement> T find(Class<T> domain, String name, DataModel dataModel) {
         DetachedCriteria<T> criteria = new DetachedCriteria<T>(domain).build {
             eq 'name', name
         }
 
-        if (domain != classification && classification) {
-            criteria = ClassificationService.classified(criteria, ClassificationFilter.includes(classification))
+        if (domain != dataModel && dataModel) {
+            criteria = DataModelService.classified(criteria, DataModelFilter.includes(dataModel))
         }
 
         List<T> elements = criteria.list(sort: 'versionNumber', order: 'desc')
@@ -72,7 +72,7 @@ class DataDefinitionLanguage {
             }
             elements = criteria.list(sort: 'versionNumber', order: 'desc')
             element = elements ? elements[0] : null
-            if (!element?.instanceOf(Classification)) {
+            if (!element.instanceOf(DataModel)) {
                 element = null
             }
         }

@@ -11,13 +11,17 @@ otherwise the catalogue will not start.
 For local testing place your `mc-config.groovy` file into your `$USER_HOME/.grails/` directory.
 For running on Tomcat place your `mc-config.groovy` file into your Tomcat's `conf` directory (`$CATALINA_BASE/conf/`).
 
+NOTE: You can add the path to the config file as the first parameter to `run-prod.sh` to run against different
+production environment.
+
 == Database Configuration
 For detailed information about setting the data source, please, follow the instruction in
 http://grails.github.io/grails-doc/2.4.3/guide/conf.html#dataSource[the DataSource] section of the Grails Reference
 Documentation.
 
 NOTE: Model Catalogue has been so far tested only using MySQL Database. Default configuration provides you the MySQL
-driver out of the box.
+driver out of the box. To migrate your database when upgrading to newer version of the catalogue, you can use `migrate-db.sh`
+scripts which optionally takes the configuration file location as the first parameter.
 
 .Sample MySQL Data Source Configuration
 ----
@@ -62,6 +66,7 @@ most common mail providers. By default the application expects unsecured mail se
 
 == OAuth 2.0 Configuration
 Following three providers are included out of the box:
+
  * Facebook - https://grails.org/plugin/spring-security-oauth-facebook
  * Google - https://grails.org/plugin/spring-security-oauth-google
  * Twitter - https://grails.org/plugin/spring-security-oauth-twitter
@@ -69,6 +74,7 @@ Following three providers are included out of the box:
 You must configure the provides to enable them. See the documentation for particular plugin for details.
 
 Due issues in class loading following APIs implementation must be used:
+
  * `org.modelcatalogue.repack.org.scribe.builder.api.FacebookApi`
  * `org.modelcatalogue.repack.org.scribe.builder.api.GoogleApi20`
  * `org.modelcatalogue.repack.org.scribe.builder.api.TwitterApi`
@@ -150,6 +156,9 @@ You can customize the text of the home page by setting HTML content into the `mc
 configuration properties. The `mc.welcome.jumbo` replaces content in the big grey box, the `mc.welcome.info` the
 text under the big gray box.
 
+== Relationship Types Synchronization
+Relationship types are crutial part of the model catalogue. If you want to stay always synchronized with their
+expected values, set `mc.sync.relationshipTypes` config property to `true`.
 
 ////
 == Known Issues

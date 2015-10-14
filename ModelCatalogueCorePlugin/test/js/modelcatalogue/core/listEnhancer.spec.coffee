@@ -18,7 +18,7 @@ describe "mc.core.listEnhancer", ->
   it "can list resource", ->
     $httpBackend
     .when("GET", '/foo')
-    .respond(fixtures.valueDomain.list1)
+    .respond(fixtures.dataType.list1)
 
     result = null
     error  = null
@@ -33,15 +33,15 @@ describe "mc.core.listEnhancer", ->
     $httpBackend.flush()
 
     expect(result).toBeDefined()
-    expect(result.total).toBe(12)
-    expect(result.page).toBe(10)
-    expect(result.size).toBe(10)
+    expect(result.total).toBe(48)
+    expect(result.page).toBe(1)
+    expect(result.size).toBe(1)
     expect(result.offset).toBe(0)
     expect(result.currentPage).toBe(1)
     expect(result.list).toBeDefined()
-    expect(result.list.length).toBe(10)
+    expect(result.list.length).toBe(1)
     expect(angular.isFunction(result.next)).toBeTruthy()
-    expect(result.next.size).toBe(2)
+    expect(result.next.size).toBe(1)
     expect(angular.isFunction(result.previous)).toBeTruthy()
     expect(result.previous.size).toBe(0)
     expect(angular.isFunction(result.goto)).toBeTruthy()
@@ -55,8 +55,8 @@ describe "mc.core.listEnhancer", ->
     $rootScope.$apply();
 
     expect(emptyResult).toBeDefined()
-    expect(emptyResult.total).toBe(12)
-    expect(emptyResult.page).toBe(10)
+    expect(emptyResult.total).toBe(48)
+    expect(emptyResult.page).toBe(1)
     expect(emptyResult.size).toBe(0)
     expect(emptyResult.offset).toBe(0)
     expect(emptyResult.currentPage).toBe(1)
@@ -65,15 +65,15 @@ describe "mc.core.listEnhancer", ->
     expect(emptyResult.success).toBeFalsy()
 
 
-    nextList = angular.copy(fixtures.valueDomain.list1)
+    nextList = angular.copy(fixtures.dataType.list1)
     nextList.size = 2
     nextList.list = nextList.list.slice(0, 2)
     nextList.offset = 10
-    nextList.next = fixtures.valueDomain.list1.next.replace("offset=10", "offset=20")
-    nextList.previous = "/valueDomain/?max=10&offset=0"
+    nextList.next = fixtures.dataType.list1.next.replace("offset=10", "offset=20")
+    nextList.previous = "/dataType/?max=10&offset=0"
 
     $httpBackend
-    .when("GET", "#{modelCatalogueApiRoot}/valueDomain/?max=10&offset=10")
+    .when("GET", "#{modelCatalogueApiRoot}/dataType/?max=1&offset=1")
     .respond(nextList)
 
     nextResult = null
@@ -90,19 +90,19 @@ describe "mc.core.listEnhancer", ->
     $httpBackend.flush()
 
     expect(nextResult).toBeDefined()
-    expect(nextResult.total).toBe(12)
-    expect(nextResult.page).toBe(10)
+    expect(nextResult.total).toBe(48)
+    expect(nextResult.page).toBe(1)
     expect(nextResult.size).toBe(2)
     expect(nextResult.offset).toBe(10)
-    expect(nextResult.currentPage).toBe(2)
+    expect(nextResult.currentPage).toBe(11)
     expect(nextResult.list).toBeDefined()
-    expect(nextResult.list.length).toBe(2)
+    expect(nextResult.list.length).toBe(1)
     expect(angular.isFunction(nextResult.next)).toBeTruthy()
     expect(angular.isFunction(nextResult.previous)).toBeTruthy()
 
     $httpBackend
-    .when("GET", "#{modelCatalogueApiRoot}/valueDomain/?max=10&offset=0")
-    .respond(fixtures.valueDomain.list1)
+    .when("GET", "#{modelCatalogueApiRoot}/dataType/?max=10&offset=0")
+    .respond(fixtures.dataType.list1)
 
     result = null
     error  = null
@@ -117,13 +117,13 @@ describe "mc.core.listEnhancer", ->
     $httpBackend.flush()
 
     expect(result).toBeDefined()
-    expect(result.total).toBe(12)
-    expect(result.page).toBe(10)
-    expect(result.size).toBe(10)
+    expect(result.total).toBe(48)
+    expect(result.page).toBe(1)
+    expect(result.size).toBe(1)
     expect(result.offset).toBe(0)
     expect(result.currentPage).toBe(1)
     expect(result.list).toBeDefined()
-    expect(result.list.length).toBe(10)
+    expect(result.list.length).toBe(1)
 
     gotoResult = null
     error  = null
@@ -138,17 +138,17 @@ describe "mc.core.listEnhancer", ->
     $httpBackend.flush()
 
     expect(gotoResult).toBeDefined()
-    expect(gotoResult.total).toBe(12)
-    expect(gotoResult.page).toBe(10)
+    expect(gotoResult.total).toBe(48)
+    expect(gotoResult.page).toBe(1)
     expect(gotoResult.size).toBe(2)
     expect(gotoResult.offset).toBe(10)
-    expect(gotoResult.currentPage).toBe(2)
+    expect(gotoResult.currentPage).toBe(11)
     expect(gotoResult.list).toBeDefined()
-    expect(gotoResult.list.length).toBe(2)
+    expect(gotoResult.list.length).toBe(1)
 
 
     $httpBackend
-    .when("GET", "#{modelCatalogueApiRoot}/valueDomain/?max=10&offset=10&order=asc&sort=name")
+    .when("GET", "#{modelCatalogueApiRoot}/dataType/?max=1&offset=10&order=asc&sort=name")
     .respond(nextList)
 
     reloadResult = null
@@ -164,13 +164,13 @@ describe "mc.core.listEnhancer", ->
     $httpBackend.flush()
 
     expect(reloadResult).toBeDefined()
-    expect(reloadResult.total).toBe(12)
-    expect(reloadResult.page).toBe(10)
+    expect(reloadResult.total).toBe(48)
+    expect(reloadResult.page).toBe(1)
     expect(reloadResult.size).toBe(2)
     expect(reloadResult.offset).toBe(10)
-    expect(reloadResult.currentPage).toBe(2)
+    expect(reloadResult.currentPage).toBe(11)
     expect(reloadResult.list).toBeDefined()
-    expect(reloadResult.list.length).toBe(2)
+    expect(reloadResult.list.length).toBe(1)
 
 
 

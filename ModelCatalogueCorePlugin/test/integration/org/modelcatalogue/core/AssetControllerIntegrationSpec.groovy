@@ -2,12 +2,10 @@ package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.plugins.testing.GrailsMockMultipartFile
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.OrderedMap
 import spock.lang.Unroll
 
-/**
- * Created by adammilward on 27/02/2014.
- */
 class AssetControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     @Unroll
@@ -95,17 +93,17 @@ class AssetControllerIntegrationSpec extends AbstractCatalogueElementControllerI
 
     @Override
     Map getPropertiesToEdit(){
-        [name: "changedName", description: "edited description ", code: "AA123"]
+        [name: "changedName", description: "edited description ", code: "AA123", dataModels: dataModelsForSpec]
     }
 
     @Override
     Map getNewInstance(){
-       [name:"new data element", description: "the DE_author of the book", code: "12312312308"]
+       [name:"new data element", description: "the DE_author of the book", code: "12312312308", dataModels: dataModelsForSpec]
     }
 
     @Override
     Map getBadInstance(){
-        [name: "t"*300, description: "asdf"]
+        [name: "t"*300, description: "asdf", dataModels: dataModelsForSpec]
     }
 
     @Override
@@ -159,9 +157,9 @@ class AssetControllerIntegrationSpec extends AbstractCatalogueElementControllerI
     def getPaginationParameters(String baseLink) {
         [
                 // no,size, max , off. tot. next                           , previous
-                [1, 7, 10, 0, 7, "", ""],
-                [2, 5, 5, 0, 7, "${baseLink}?max=5&offset=5", ""],
-                [3, 2, 5, 5, 7, "", "${baseLink}?max=5&offset=0"],
+                [1, 10, 10, 0, 12, "${baseLink}?max=10&offset=10", ""],
+                [2, 5, 5, 0, 12, "${baseLink}?max=5&offset=5", "${baseLink}?max=5&offset=0"],
+                [3, 2, 5, 10,12, "", "${baseLink}?max=5&offset=5"],
         ]
     }
 

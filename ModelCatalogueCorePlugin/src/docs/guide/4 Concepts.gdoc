@@ -1,7 +1,3 @@
-h2. [conceptualDomain|Domain Classes]
-
-ConceptualDomains provide context for Models and include ValueDomains.
-As a context for a model, a conceptual domain allows a system to know which ValueDomain(s) to use to instantiate the DataElement(s) contained within it.
 
 h2. [model|Domain Classes]
 
@@ -35,27 +31,6 @@ It can be instantiated by a value domain when it is contained in a Model within 
 Data Elements are [publishedElement|Domain Classes]
 i.e. once a data element is finalized it cannot be further changed, instead a new version will be created that supersedes the original.*
 Data Elements are also [extendibleElement|Domain Classes] which allows the user add additional metadata to the element.
-
-h2. [valueDomain|Domain Classes]
-
-A ValueDomain captures information regarding the rules and constraints upon a piece of data i.e. a regular expression or an enumerated set of allowable values.
-i.e.
-{code}
-<xs:simpleType name="CANCERTREATMENT">
-       <xs:restriction base="xs:string">
-        <xs:enumeration value="Chemo" />
-        <xs:enumeration value="Surgery" />
-        <xs:enumeration value="Radiotherapy" />
-        <xs:enumeration value="Other" />
-       </xs:restriction>
-     </xs:simpleType>
-{code}
-
-ValueDomains can instantiate [dataElement|Domain Classes] with this information.
-i.e.
-{code}
-    <xs:element name="treatment" type="CANCERTREATMENT"/>
- {code}
 
 
 

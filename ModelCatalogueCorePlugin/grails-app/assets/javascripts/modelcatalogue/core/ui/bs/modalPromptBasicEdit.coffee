@@ -51,6 +51,7 @@ angular.module('mc.core.ui.bs.modalPromptBasicEdit', ['mc.util.messages', 'mc.co
   ]
 
   messagesProvider.setPromptFactory 'edit-classification', factory
+  messagesProvider.setPromptFactory 'edit-dataModel', factory
   messagesProvider.setPromptFactory 'edit-batch', factory
   messagesProvider.setPromptFactory 'edit-csvTransformation', factory
 ]

@@ -34,7 +34,7 @@ describe "mc.core.ui.expectCatalogueElement", ->
     expect(element.hasClass('has-warning')).toBeTruthy()
 
   it "shows success if the model is element", inject ($compile, $rootScope, enhance) ->
-    $rootScope.classification = enhance angular.copy(fixtures.valueDomain.showOne)
+    $rootScope.classification = enhance angular.copy(fixtures.dataType.showOne)
 
     element = $compile('''
         <div class="form-group">

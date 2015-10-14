@@ -13,7 +13,7 @@ Considering you have following code in you controller with injected [catalogueEl
 
 {code}
 $scope.element = null;
-catalogueElementResource('valueDomain').get(1).then(function(element) {
+catalogueElementResource('dataType').get(1).then(function(element) {
     $scope.element = element;
 });
 {code}

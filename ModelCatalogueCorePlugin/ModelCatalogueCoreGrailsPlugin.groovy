@@ -58,13 +58,14 @@ Model catalogue core plugin (metadata registry)
 
 
     def doWithSpring = {
-        ModelCatalogueTypes.CLASSIFICATION.implementation = Classification
-        ModelCatalogueTypes.MODEL.implementation = Model
+        ModelCatalogueTypes.DATA_MODEL.implementation = DataModel
+        ModelCatalogueTypes.DATA_CLASS.implementation = DataClass
         ModelCatalogueTypes.DATA_ELEMENT.implementation = DataElement
-        ModelCatalogueTypes.VALUE_DOMAIN.implementation = ValueDomain
         ModelCatalogueTypes.DATA_TYPE.implementation = DataType
         ModelCatalogueTypes.MEASUREMENT_UNIT.implementation = MeasurementUnit
         ModelCatalogueTypes.ENUMERATED_TYPE.implementation = EnumeratedType
+        ModelCatalogueTypes.PRIMITIVE_TYPE.implementation = PrimitiveType
+        ModelCatalogueTypes.REFERENCE_TYPE.implementation = ReferenceType
 
 
         mergeConfig(application)
@@ -81,17 +82,18 @@ Model catalogue core plugin (metadata registry)
         modelCatalogueCorePluginCustomObjectMarshallers(ModelCatalogueCorePluginCustomObjectMarshallers) {
             marshallers = [
                     new AssetMarshaller(),
-                    new ClassificationMarshaller(),
+                    new DataModelMarshaller(),
                     new DataElementMarshaller(),
                     new DataTypeMarshaller(),
                     new ElementsMarshaller(),
                     new EnumeratedTypeMarshaller(),
+                    new ReferenceTypeMarshaller(),
+                    new PrimitiveTypeMarshaller(),
                     new MeasurementUnitMarshaller(),
-                    new ModelMarshaller(),
+                    new DataClassMarshaller(),
                     new RelationshipTypeMarshaller(),
                     new RelationshipMarshallers(),
                     new RelationshipsMarshaller(),
-                    new ValueDomainMarshaller(),
                     new MappingMarshaller(),
                     new MappingsMarshaller(),
                     new ListWithTotalAndTypeWrapperMarshaller(),
@@ -108,7 +110,7 @@ Model catalogue core plugin (metadata registry)
             springConfig.addAlias('modelCatalogueStorageService','localFilesStorageService')
         }
 
-        catalogueBuilder(DefaultCatalogueBuilder, ref('classificationService'), ref('elementService')) { bean ->
+        catalogueBuilder(DefaultCatalogueBuilder, ref('dataModelService'), ref('elementService')) { bean ->
             bean.scope = 'prototype'
         }
 
@@ -133,33 +135,22 @@ Model catalogue core plugin (metadata registry)
         XLSXListRenderer xlsxListRenderer = ctx.getBean(XLSXListRenderer)
 
         xlsxListRenderer.registerRowWriter ('Classifications'){
-            title "Classifications to Excel"
+            title "Data Models to Excel"
             headers  'Model Catalogue ID',  'Name', 'Description'
             when { ListWrapper container, RenderContext context ->
-                    context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && (!container.itemType || Classification.isAssignableFrom(container.itemType))
-            } then { Classification classification ->
-                [[ classification.modelCatalogueId,  classification.name, classification.description]]
+                    context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && (!container.itemType || DataModel.isAssignableFrom(container.itemType))
+            } then { DataModel dataModel ->
+                [[ dataModel.modelCatalogueId,  dataModel.name, dataModel.description]]
             }
         }
 
         xlsxListRenderer.registerRowWriter ('DataTypes') {
-            title "DataTypes to Excel"
-            headers 'Model Catalogue ID', 'Name', 'Enumerations', 'Value Domains'
+            title "Data Types to Excel"
+            headers 'Model Catalogue ID', 'Name', 'Enumerations'
             when { ListWrapper container, RenderContext context ->
                 context.actionName in [null, 'index', 'search', 'incoming', 'outgoing', 'properties'] && (!container.itemType || DataType.isAssignableFrom(container.itemType))
             } then { DataType dataType ->
-                [[dataType.id, dataType.name, getEnumerationString(dataType), getValueDomainString(dataType)]]
-            }
-        }
-
-
-        xlsxListRenderer.registerRowWriter ('ValueDomains') {
-            title "ValueDomains to Excel"
-            headers 'Model Catalogue ID', 'Name', 'Classifications', 'Unit of Measurement', 'Rules', 'Data Type Model Catalogue ID', 'DataType Name', 'Data Type Enumeration'
-            when { ListWrapper container, RenderContext context ->
-                context.actionName in [null, 'index', 'search', 'incoming', 'outgoing', 'valueDomains'] && (!container.itemType || ValueDomain.isAssignableFrom(container.itemType))
-            } then { ValueDomain valueDomain ->
-                [[valueDomain.modelCatalogueId, valueDomain.name, getClassificationString(valueDomain), valueDomain.unitOfMeasure, getValueDomainRuleString(valueDomain), valueDomain.dataTypeId, valueDomain.dataType.name, getEnumerationString(valueDomain.dataType)]]
+                [[dataType.id, dataType.name, getEnumerationString(dataType)]]
             }
         }
 
@@ -198,8 +189,8 @@ Model catalogue core plugin (metadata registry)
             title "Models to Excel"
             headers  'Model Catalogue ID', 'Name', 'Description'
             when { ListWrapper container, RenderContext context ->
-                context.actionName in [null,'index'] && (!container.itemType || Model.isAssignableFrom(container.itemType))
-            } then { Model model ->
+                context.actionName in [null,'index'] && (!container.itemType || DataClass.isAssignableFrom(container.itemType))
+            } then { DataClass model ->
                 [[ model.modelCatalogueId, model.name, model.description]]
             }
         }
@@ -210,7 +201,6 @@ Model catalogue core plugin (metadata registry)
                 (!container.itemType || Relationship.isAssignableFrom(container.itemType) && (context.actionName in [null,  'outgoing' ] ) && (context.getWebRequest().getParams().get("type") in ['context', 'hierarchy']) )
             } then { Relationship relationship ->
                 [[ relationship.source.modelCatalogueId, relationship.source.name, relationship.relationshipType.sourceToDestination, relationship.destination.modelCatalogueId, relationship.destination.name]]
-                //relationship.source.modelCatalogueId, relationship.source.name, relationship.relationshipType.sourceToDestination, relationship.destination.modelCatalogueId, relationship.destination.name
             }
         }
 
@@ -246,20 +236,17 @@ Model catalogue core plugin (metadata registry)
         xlsxListRenderer.registerRowWriter('NHIC') {
             title "Data Elements to Excel"
             append metadata
-            headers "Classification",
-                    "Parent Model Unique Code",
-                    "Parent Model",
-                    "Model Unique Code",
-                    "Model",
+            headers "Data Model",
+                    "Parent Data Class Unique Code",
+                    "Parent Data Class",
+                    "Data Class Unique Code",
+                    "Data Class",
                     "Data Item Unique Code",
                     "Data Item Name",
                     "Data Item Description",
-                    "Value Domain Classification",
-                    "Value Domain Unique Code",
-                    "Value Domain",
                     "Measurement Unit",
                     "Measurement Unit Symbol",
-                    "Data Type Classification",
+                    "Data Type Data Model",
                     "Data Type Unique Code",
                     "Data Type",
                     "Metadata"
@@ -267,12 +254,11 @@ Model catalogue core plugin (metadata registry)
             when { ListWrapper container, RenderContext context ->
                 container.itemType && DataElement.isAssignableFrom(container.itemType)
             } then { DataElement element ->
-                Model parent = getParentModel(element)
-                Model model = getContainingModel(element)
-                ValueDomain valueDomain = element.valueDomain
-                DataType dataType = valueDomain?.dataType
+                DataClass parent = getParentModel(element)
+                DataClass model = getContainingModel(element)
+                DataType dataType = element.dataType
                 [[
-                         getClassificationString(element),
+                         getDataModelsString(element),
                          parent?.modelCatalogueId ?: parent?.getDefaultModelCatalogueId(true),
                          parent?.name,
                          model?.modelCatalogueId  ?: model?.getDefaultModelCatalogueId(true),
@@ -280,12 +266,9 @@ Model catalogue core plugin (metadata registry)
                          element.modelCatalogueId ?: element.getDefaultModelCatalogueId(true),
                          element.name,
                          element.description,
-                         getClassificationString(valueDomain),
-                         valueDomain?.modelCatalogueId ?: valueDomain?.getDefaultModelCatalogueId(true),
-                         valueDomain?.name,
                          getUnitOfMeasure(element),
                          getUnitOfMeasureSymbol(element) ,
-                         getClassificationString(dataType),
+                         getDataModelsString(dataType),
                          dataType?.modelCatalogueId ?: dataType?.getDefaultModelCatalogueId(true),
                          getDataType(element),
                          "-"
@@ -299,48 +282,48 @@ Model catalogue core plugin (metadata registry)
         reportsRegistry.register {
             creates asset
             title { "Export All Elements of ${it.name} to Excel XSLX" }
-            type Model
+            type DataClass
             link controller: 'dataArchitect', action: 'getSubModelElements', params: [format: 'xlsx', report:'NHIC'], id: true
         }
 
         reportsRegistry.register {
             creates link
             title { "Inventory Report" }
-            type Classification
-            link controller: 'classification', action: 'report', id: true
+            type DataModel
+            link controller: 'dataModel', action: 'report', id: true
         }
 
         reportsRegistry.register {
             creates link
             title { "GE Inventory Report" }
-            type Classification
-            link controller: 'classification', action: 'gereport', id: true
+            type DataModel
+            link controller: 'dataModel', action: 'gereport', id: true
         }
 		
 		reportsRegistry.register {
 			creates link
 			title { "Inventory Report Document" }
-			type Model
-			link controller: 'model', action: 'inventoryDoc', id: true
+			type DataClass
+			link controller: 'dataClass', action: 'inventoryDoc', id: true
 		}
 
 		reportsRegistry.register {
 			creates link
 			title { "Inventory Report Spreadsheet" }
-			type Model
-			link controller: 'model', action: 'inventorySpreadsheet', id: true
+			type DataClass
+			link controller: 'dataClass', action: 'inventorySpreadsheet', id: true
 		}
 
 		reportsRegistry.register {
 			creates link
 			title { "Changelog Document" }
-			type Model
-			link controller: 'model', action: 'changelogDoc', id: true
+			type DataClass
+			link controller: 'dataClass', action: 'changelogDoc', id: true
 		}
 
         reportsRegistry.register {
             creates link
-            type Classification, Model, DataElement, ValueDomain, DataType, MeasurementUnit
+            type DataModel, DataClass, DataElement, DataType, MeasurementUnit
             title { "Export to Catalogue XML" }
             link { CatalogueElement element ->
                 [url: element.getDefaultModelCatalogueId(false) + '?format=xml']
@@ -384,67 +367,44 @@ Model catalogue core plugin (metadata registry)
     }
 
     def static getParentModel(DataElement dataElement){
-        Model containingModel = getContainingModel(dataElement)
+        DataClass containingModel = getContainingModel(dataElement)
         if(containingModel.childOf) {
             return containingModel.childOf.first()
         }
         return null
     }
 
-
-    def static getValueDomain(DataElement dataElement){
-        return dataElement.valueDomain
-    }
-
     def static getUnitOfMeasure(DataElement dataElement){
-        ValueDomain valueDomain = getValueDomain(dataElement)
-        if(valueDomain) {
-            MeasurementUnit unitOfMeasure = valueDomain?.unitOfMeasure
-            return unitOfMeasure?.name
+        if (dataElement.dataType && dataElement.dataType instanceof PrimitiveType) {
+            return dataElement.dataType.measurementUnit?.name
         }
         return null
     }
 
     def static getUnitOfMeasureSymbol(DataElement dataElement){
-        ValueDomain valueDomain = getValueDomain(dataElement)
-        if(valueDomain) {
-            MeasurementUnit unitOfMeasure = valueDomain?.unitOfMeasure
-            return unitOfMeasure?.symbol
+        if (dataElement.dataType && dataElement.dataType instanceof PrimitiveType) {
+            return dataElement.dataType.measurementUnit?.symbol
         }
         return null
     }
 
     def static getDataType(DataElement dataElement){
-        ValueDomain valueDomain = getValueDomain(dataElement)
-        if(valueDomain) {
-            DataType dataType = valueDomain.dataType
-            if (!dataType) {
-                return ''
-            }
-            if (dataType instanceof EnumeratedType) {
-                return dataType.enumerations.collect { key, value -> "$key:$value"}.join('\n')
-            }
-            return dataType.name
+        DataType dataType = dataElement.dataType
+        if (!dataType) {
+            return ''
         }
-        return null
+        if (dataType instanceof EnumeratedType) {
+            return dataType.enumerations.collect { key, value -> "$key:$value"}.join('\n')
+        }
+        return dataType.name
+
     }
 
-    def static getClassificationString(CatalogueElement dataElement) {
-        if (!dataElement?.classifications) {
+    def static getDataModelsString(CatalogueElement dataElement) {
+        if (!dataElement?.dataModels) {
             return ""
         }
-        dataElement.classifications.first().name
-    }
-
-    def static getValueDomainString(DataType dataType){
-        String valueDomains = ""
-
-        dataType.relatedValueDomains.eachWithIndex{ ValueDomain valueDomain, Integer i ->
-            String vdText = valueDomain.id + " \t " + valueDomain.name + " \t "
-            if (valueDomains!="") valueDomains += (stringSeparator + vdText )
-            else valueDomains = vdText
-        }
-        return valueDomains
+        dataElement.dataModels.first().name
     }
 
     def static getEnumerationString(DataType dataType){
@@ -452,14 +412,5 @@ Model catalogue core plugin (metadata registry)
             return dataType.enumAsString
         }
         return null
-    }
-
-    def static getValueDomainRuleString(ValueDomain valueDomain){
-        String rules = ""
-        valueDomain.rule.eachWithIndex{ String rule, int i ->
-            if (rules!="") rules += (stringSeparator + rule )
-            else rules = rule
-        }
-        return rules
     }
 }

@@ -3,16 +3,23 @@ package org.modelcatalogue.core
 import grails.gorm.DetachedCriteria
 import grails.util.GrailsNameUtils
 import org.hibernate.proxy.HibernateProxyHelper
+import org.modelcatalogue.core.util.Legacy
 import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 import org.springframework.http.HttpStatus
 
 class CatalogueController {
 
-    def classificationService
-    def modelService
+    def dataModelService
+    def dataClassService
 
     def xref() {
         String resource = params.resource
+
+        if (Legacy.isLegacyResourceName(resource)) {
+            redirect permanent: true, url: Legacy.getRedirectUrl(Legacy.getNewResourceName(resource), request)
+            return
+        }
+
         Long id = params.long('id')
         Integer version = params.int('version')
 
@@ -34,7 +41,7 @@ class CatalogueController {
         if (params.format == 'xml') {
             response.contentType = 'application/xml'
             response.setHeader("Content-disposition", "attachment; filename=${element.name.replaceAll(/\s+/, '_')}.xml")
-            CatalogueXmlPrinter printer = new CatalogueXmlPrinter(classificationService, modelService)
+            CatalogueXmlPrinter printer = new CatalogueXmlPrinter(dataModelService, dataClassService)
             printer.bind(element).writeTo(response.writer)
             return
         }
@@ -69,7 +76,7 @@ class CatalogueController {
         if (params.format == 'xml') {
             response.contentType = 'application/xml'
             response.setHeader("Content-disposition", "attachment; filename=${element.name.replaceAll(/\s+/, '_')}.xml")
-            CatalogueXmlPrinter printer = new CatalogueXmlPrinter(classificationService, modelService)
+            CatalogueXmlPrinter printer = new CatalogueXmlPrinter(dataModelService, dataClassService)
             printer.bind(element).writeTo(response.writer)
             return
         }

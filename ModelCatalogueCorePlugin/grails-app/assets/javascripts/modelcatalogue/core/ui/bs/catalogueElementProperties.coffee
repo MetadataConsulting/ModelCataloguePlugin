@@ -20,17 +20,19 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   containsDataElements= -> [
     {header: 'Name', value: "relation.name", classes: 'col-md-3', show: "relation.show()", href: 'relation.href()'}
     {header: "Description", value: "relation.description" , classes: "col-md-5"}
-    {header: "Value Domain", value: printDataType, classes: "col-md-3", show: true, href: 'href()'}
+    {header: "Data Type", value: printDataType, classes: "col-md-3", show: true, href: 'href()'}
     {header: 'Metadata',  value: printMetadata, classes: 'col-md-2'}
   ]
 
   printDataType = (relationship) ->
     result  = ''
-    dataType = relationship?.relation?.valueDomain?.dataType
+    dataType = relationship?.relation?.dataType
     if dataType?.enumerations?.values
       ext     = dataType?.enumerations?.values ? []
       for e in ext
         result += "#{e.key} \n"
+    if dataType?.dataClass
+      result = """<a href="#{dataType.dataClass.modelCatalogueId}"><span class="fa fa-fw fa-cubes"></span>#{dataType.dataClass.name}</a>"""
     else if dataType
       result = dataType?.name
     result
@@ -66,14 +68,12 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'ext', label: 'Metadata'
   catalogueElementPropertiesProvider.configureProperty 'parentOf', label: 'Children', columns: localNameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'childOf', label: 'Parents', columns: nameAndIdent()
-  catalogueElementPropertiesProvider.configureProperty 'isContextFor', label: 'Models', columns: nameAndIdent()
-  catalogueElementPropertiesProvider.configureProperty 'includes', label: 'Value Domains', columns: nameAndIdent()
-  catalogueElementPropertiesProvider.configureProperty 'instantiatedBy', label: 'Value Domains', columns: nameAndIdAndMetadata()
+  catalogueElementPropertiesProvider.configureProperty 'isContextFor', label: 'Data Classes', columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'contains', label: 'Data Elements', columns: containsDataElements()
-  catalogueElementPropertiesProvider.configureProperty 'containedIn', label: 'Models', columns: nameAndIdAndMetadata()
+  catalogueElementPropertiesProvider.configureProperty 'containedIn', label: 'Data Classes', columns: nameAndIdAndMetadata()
   catalogueElementPropertiesProvider.configureProperty 'hasAttachmentOf', label: 'Attachments', columns: attachmentColumns()
   catalogueElementPropertiesProvider.configureProperty 'hasContextOf', label: 'Conceptual Domains', columns: nameAndIdent()
-  catalogueElementPropertiesProvider.configureProperty 'classifies', label: 'Classifies', columns: localNameAndIdent()
+  catalogueElementPropertiesProvider.configureProperty 'classifies', label: 'Defines', columns: localNameAndIdent()
 
   catalogueElementPropertiesProvider.configureProperty 'instantiates', label: 'Data Elements', columns: nameAndIdAndMetadata()
 
@@ -169,10 +169,12 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Asset.synonyms', hidden: true
 
   catalogueElementPropertiesProvider.configureProperty 'relationships', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'content', hidden: true
   catalogueElementPropertiesProvider.configureProperty '$$metadata', hidden: true
   catalogueElementPropertiesProvider.configureProperty '$$cachedChildren', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'supersededBy', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'supersedes', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'classifications', hidden: true
 
   catalogueElementPropertiesProvider.configureProperty '$$relationship', tabDefinition: [ '$element', '$name', ($element, $name) ->
 
@@ -348,6 +350,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'parent', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'oldValue', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'newValue', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'declaredWithin', hidden: true
 
 
   catalogueElementPropertiesProvider.configureProperty 'enumerations', tabDefinition: ['$element', '$name', '$value', '$scope', 'catalogueElementProperties', '$injector', 'security', ($element, $name, $value, $scope, catalogueElementProperties, $injector, security) ->

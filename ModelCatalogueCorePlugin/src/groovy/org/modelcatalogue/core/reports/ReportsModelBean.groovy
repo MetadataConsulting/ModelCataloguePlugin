@@ -1,11 +1,11 @@
 package org.modelcatalogue.core.reports
 
 import org.modelcatalogue.core.DataElement;
-import org.modelcatalogue.core.Model;
+import org.modelcatalogue.core.DataClass;
 
 class ReportsModelBean {
   //List<Model> modelParents
-  List<Model> modelChilds
+  List<DataClass> modelChilds
   List<DataElement> dataElements
   
 }

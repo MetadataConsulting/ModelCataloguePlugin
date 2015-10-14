@@ -4,7 +4,7 @@ import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.util.ClassificationFilter
+import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Inheritance
 import org.modelcatalogue.core.util.ListWithTotal
@@ -52,16 +52,16 @@ class RelationshipService {
         if (!params.sort) {
             params.sort = direction.sortProperty
         }
-        Lists.fromCriteria(params, direction.composeWhere(element, type, element.instanceOf(User) ? ClassificationFilter.NO_FILTER : ClassificationFilter.from(modelCatalogueSecurityService.currentUser)))
+        Lists.fromCriteria(params, direction.composeWhere(element, type, element.instanceOf(User) ? DataModelFilter.NO_FILTER : DataModelFilter.from(modelCatalogueSecurityService.currentUser)))
     }
 
     /**
      * @deprecated use #link(Closure)
      */
     @Deprecated
-    Relationship link(CatalogueElement theSource, CatalogueElement theDestination, RelationshipType type, Classification theClassification, boolean theArchived = false, boolean theIgnoreRules = false, boolean theResetIndices = false) {
+    Relationship link(CatalogueElement theSource, CatalogueElement theDestination, RelationshipType type, DataModel theDataModel, boolean theArchived = false, boolean theIgnoreRules = false, boolean theResetIndices = false) {
         link RelationshipDefinition.create(theSource, theDestination, type)
-                .withClassification(theClassification)
+                .withDataModel(theDataModel)
                 .withArchived(theArchived)
                 .withIgnoreRules(theIgnoreRules)
                 .withResetIndices(theResetIndices)
@@ -171,20 +171,20 @@ class RelationshipService {
             where rel.source = :source
             and rel.destination = :destination
             and rel.relationshipType = :relationshipType
-            and rel.classification = :classification
+            and rel.dataModel = :dataModel
         """
 
-        Map<String, Object> params = [source: definition.source, destination: definition.destination, relationshipType: definition.relationshipType, classification: definition.classification]
+        Map<String, Object> params = [source: definition.source, destination: definition.destination, relationshipType: definition.relationshipType, dataModel: definition.dataModel]
 
-        if (!definition.classification) {
+        if (!definition.dataModel) {
             query = """
                 select rel from Relationship rel left join fetch rel.extensions
                 where rel.source = :source
                 and rel.destination = :destination
                 and rel.relationshipType = :relationshipType
-                and rel.classification is null
+                and rel.dataModel is null
             """
-            params.remove 'classification'
+            params.remove 'dataModel'
         }
         List<Relationship> relationships = Relationship.executeQuery(query, params)
         if (relationships)  {
@@ -213,10 +213,10 @@ class RelationshipService {
         unlink source, destination, relationshipType, null, ignoreRules
     }
 
-    Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, Classification classification, boolean ignoreRules = false, Map<String, String> expectedMetadata = null) {
+    Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, DataModel dataModel, boolean ignoreRules = false, Map<String, String> expectedMetadata = null) {
 
         if (source?.id && destination?.id && relationshipType?.id) {
-            Relationship relationshipInstance = findExistingRelationship(RelationshipDefinition.create(source, destination, relationshipType).withClassification(classification).definition)
+            Relationship relationshipInstance = findExistingRelationship(RelationshipDefinition.create(source, destination, relationshipType).withDataModel(dataModel).definition)
 
             if (!relationshipInstance) {
                 return null
@@ -227,6 +227,11 @@ class RelationshipService {
                     relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedDataElement.remove', [source.status.toString()] as Object[], "Cannot changed finalized elements.")
                     return relationshipInstance
                 }
+                // TODO: enable as soon as all the test are fixed
+/*                if (relationshipType == RelationshipType.declarationType && (destination.dataModels - [source]).size() == 0) {
+                    relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.single.owning.dataModel.remove', [] as Object[], "Cannot remove single owning data model.")
+                    return relationshipInstance
+                }*/
 
                 if (relationshipInstance.inherited) {
                     relationshipInstance.errors.rejectValue('inherited', 'org.modelcatalogue.core.RelationshipType.cannot.change.inherited',  "Cannot changed inherited relationships.")
@@ -247,7 +252,7 @@ class RelationshipService {
             if (relationshipType == RelationshipType.baseType) {
                 for (Relationship relationship in new LinkedHashSet<Relationship>(source.outgoingRelationships)) {
                     if (relationship.relationshipType.versionSpecific) {
-                        unlink relationship.source, relationship.destination, relationship.relationshipType, relationship.classification, true, relationship.ext
+                        unlink relationship.source, relationship.destination, relationship.relationshipType, relationship.dataModel, true, relationship.ext
                     }
                 }
                 List<String> forRemoval = []
@@ -262,7 +267,7 @@ class RelationshipService {
                 }
             } else if (relationshipType.versionSpecific) {
                 Inheritance.withChildren(source) {
-                    unlink(it, destination, relationshipType, classification, true, relationshipInstance.ext)
+                    unlink(it, destination, relationshipType, dataModel, true, relationshipInstance.ext)
                 }
             }
 
@@ -270,7 +275,7 @@ class RelationshipService {
             source.removeFromOutgoingRelationships(relationshipInstance)
             relationshipInstance.source = null
             relationshipInstance.destination = null
-            relationshipInstance.classification = null
+            relationshipInstance.dataModel = null
             relationshipInstance.delete(flush: true)
             if (relationshipType == RelationshipType.baseType) {
                 source.removeInheritedAssociations(destination)
@@ -291,24 +296,24 @@ class RelationshipService {
             return element.name
         }
 
-        RelationshipType classification = RelationshipType.readByName('classification')
+        RelationshipType dataModel = RelationshipType.declarationType
 
-        String classifications = Relationship.executeQuery("""
+        String dataModels = Relationship.executeQuery("""
             select r.source.name
             from Relationship as r
-            where r.relationshipType.id = :classification
+            where r.relationshipType.id = :dataModel
             and r.destination.id = :elementId
             order by r.source.name
-        """, [classification: classification.id, elementId: element.id]).join(', ')
+        """, [dataModel: dataModel.id, elementId: element.id]).join(', ')
 
-        if (classifications) {
-            return "${element.name} (${classifications})"
+        if (dataModels) {
+            return "${element.name} (${dataModels})"
         }
 
         return element.name
     }
 
-    def getClassificationsInfo(CatalogueElement element) {
+    def getDataModelsInfo(CatalogueElement element) {
         if (!element) {
             return []
         }
@@ -317,20 +322,20 @@ class RelationshipService {
             return []
         }
 
-        RelationshipType classification = RelationshipType.readByName('classification')
+        RelationshipType dataModel = RelationshipType.declarationType
 
         Relationship.executeQuery("""
             select r.source.name, r.source.id, r.source.status
             from Relationship as r
-            where r.relationshipType.id = :classification
+            where r.relationshipType.id = :dataModel
             and r.destination.id = :elementId
             order by r.source.name
-        """, [classification: classification.id, elementId: element.id]).collect {
-            [name: it[0], id: it[1], status: "${it[2]}", elementType: Classification.name, link:  "/classification/${it[1]}"]
+        """, [dataModel: dataModel.id, elementId: element.id]).collect {
+            [name: it[0], id: it[1], status: "${it[2]}", elementType: DataModel.name, link:  "/dataModel/${it[1]}"]
         }
     }
 
-    def List<Classification> getClassifications(CatalogueElement element) {
+    def List<DataModel> getDataModels(CatalogueElement element) {
         if (!element) {
             return []
         }
@@ -339,16 +344,16 @@ class RelationshipService {
             return []
         }
 
-        RelationshipType classification = RelationshipType.readByName('classification')
+        RelationshipType dataModel = RelationshipType.declarationType
 
-        Classification.executeQuery """
+        DataModel.executeQuery """
             select c
-            from Classification as c
+            from DataModel as c
             join c.outgoingRelationships as rel
-            where rel.relationshipType.id = :classification
+            where rel.relationshipType.id = :dataModel
             and rel.destination.id = :elementId
             order by c.name
-        """, [classification: classification.id, elementId: element.id], [cache: true]
+        """, [dataModel: dataModel.id, elementId: element.id], [cache: true]
     }
 
     Relationship moveAfter(RelationshipDirection direction, CatalogueElement owner,  Relationship relationship, Relationship other) {
@@ -391,7 +396,7 @@ class RelationshipService {
     }
 
     private static Relationship moveAfterWithRearrange(RelationshipDirection direction, CatalogueElement owner, Relationship relationship, Relationship other) {
-        List<Relationship> relationships = direction.composeWhere(owner, relationship.relationshipType, ClassificationFilter.NO_FILTER).list([sort: direction.sortProperty])
+        List<Relationship> relationships = direction.composeWhere(owner, relationship.relationshipType, DataModelFilter.NO_FILTER).list([sort: direction.sortProperty])
         int correction = 0
         relationships.eachWithIndex { Relationship entry, i ->
             if (entry == relationship) {

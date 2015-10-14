@@ -78,7 +78,10 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     Navigator menuItem(String id, String role = "navigation") {
-        $('#role_' + role + '_' + id + '-menu-item-link').last()
+        if (role == '') {
+            return $('#' + id + '-menu-item-link').last()
+        }
+        return $('#role_' + role + '_' + id + '-menu-item-link').last()
     }
 
     /**

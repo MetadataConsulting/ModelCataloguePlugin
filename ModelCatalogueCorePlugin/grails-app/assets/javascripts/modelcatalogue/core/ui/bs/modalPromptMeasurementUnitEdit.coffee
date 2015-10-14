@@ -14,10 +14,10 @@ angular.module('mc.core.ui.bs.modalPromptMeasurementUnitEdit', ['mc.util.message
         <div class="modal-body">
             <messages-panel messages="messages"></messages-panel>
             <form role="form" ng-submit="saveElement()">
-              <div class="form-group">
-                <label for="classification"> Classifications</label>
-                <elements-as-tags elements="copy.classifications"></elements-as-tags>
-                <input id="classification" placeholder="Classification" ng-model="pending.classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="addToClassifications()">
+              <div class="form-group" ng-if="!hideDataModels()">
+                <label for="dataModel"> Data Models</label>
+                <elements-as-tags elements="copy.dataModels"></elements-as-tags>
+                <input id="dataModel" placeholder="Data Model" ng-model="pending.dataModel" catalogue-element-picker="dataModel" label="el.name" typeahead-on-select="addToDataModels()">
               </div>
               <div class="form-group">
                 <label for="name" class="">Name</label>
@@ -42,13 +42,15 @@ angular.module('mc.core.ui.bs.modalPromptMeasurementUnitEdit', ['mc.util.message
         </div>
         '''
         controller: ['$scope', 'messages', '$controller', '$modalInstance', ($scope, messages, $controller, $modalInstance) ->
-          $scope.copy     = angular.copy(args.element ? {classifications: []})
+          $scope.pending    = {dataModel: null}
+          $scope.newEntity  = -> {dataModels: $scope.copy?.dataModels ? []}
+          $scope.copy     = angular.copy(args.element ? $scope.newEntity())
           $scope.original = args.element ? {}
           $scope.messages = messages.createNewMessages()
           $scope.create   = args.create
 
           $scope.hasChanged   = ->
-            $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or $scope.copy.symbol != $scope.original.symbol or $scope.copy.modelCatalogueId != $scope.original.modelCatalogueId or not angular.equals($scope.original.classifications ? {}, $scope.copy.classifications ? {})
+            $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or $scope.copy.symbol != $scope.original.symbol or $scope.copy.modelCatalogueId != $scope.original.modelCatalogueId or not angular.equals($scope.original.dataModels ? {}, $scope.copy.dataModels ? {})
 
           angular.extend(this, $controller('withClassificationCtrlMixin', {$scope: $scope}))
           angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))

@@ -24,4 +24,3 @@ class DefaultRelationshipConfiguration implements RelationshipConfiguration {
         extensions.putAll(values)
     }
 }
-

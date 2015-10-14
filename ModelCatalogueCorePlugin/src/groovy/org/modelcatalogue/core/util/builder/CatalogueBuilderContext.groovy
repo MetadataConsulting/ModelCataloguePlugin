@@ -3,18 +3,17 @@ package org.modelcatalogue.core.util.builder
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.MeasurementUnit
-import org.modelcatalogue.core.Model
-import org.modelcatalogue.core.ValueDomain
+import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.api.RelationshipConfiguration
 
 class CatalogueBuilderContext {
 
-    private static Set<Class> SUPPORTED_AS_CONTEXT  = [CatalogueElement, Classification, ValueDomain, DataType, Model, MeasurementUnit, DataElement]
+    private static Set<Class> SUPPORTED_AS_CONTEXT  = [CatalogueElement, DataModel, DataType, DataClass, MeasurementUnit, DataElement]
 
     private List<Map<Class, ContextItem>> contexts = []
 

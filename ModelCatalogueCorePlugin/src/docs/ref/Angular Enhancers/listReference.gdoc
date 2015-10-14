@@ -18,11 +18,11 @@ or [modelCatalogueSearch|Angular Services].
 angular
 .module('foo', ['mc.core.catalogueElementResource', 'mc.core.listReferenceEnhancer'])
 .factory('bar', function(catalogueElementResource) {
-    var valueDomains = catalogueElementResource('valueDomain')
-    valueDomains.get(1).then(function(domain){
+    var dataTypes = catalogueElementResource('dataType')
+    dataTypes.get(1).then(function(domain){
         domain.incomingRelationships.total     // total number of items
         domain.incomingRelationships.itemType  // org.metadatacatalogue.core.Relationship
-        domain.incomingRelationships.link      // /valueDomain/1/incoming
+        domain.incomingRelationships.link      // /dataType/1/incoming
         domain.incomingRelationships().then(function(relationshipsList) {
             // do something with the relationship list
 

@@ -2,7 +2,6 @@ package org.modelcatalogue.core.util
 
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 
@@ -11,7 +10,7 @@ enum RelationshipDirection {
     INCOMING {
 
         @Override
-        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, ClassificationFilter filter) {
+        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, DataModelFilter filter) {
             DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
             criteria.join 'source'
             criteria.eq('destination', element)
@@ -21,15 +20,15 @@ enum RelationshipDirection {
 
             if (filter) {
                 criteria.or {
-                    isNull 'classification'
+                    isNull 'dataModel'
                     and {
                         if (filter.excludes) {
                             criteria.not {
-                                criteria.'in' 'classification.id', filter.excludes
+                                criteria.'in' 'dataModel.id', filter.excludes
                             }
                         }
                         if (filter.includes) {
-                            criteria.'in'  'classification.id', filter.includes
+                            criteria.'in'  'dataModel.id', filter.includes
                         }
                     }
                 }
@@ -86,7 +85,7 @@ enum RelationshipDirection {
     OUTGOING {
 
         @Override
-        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, ClassificationFilter filter) {
+        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, DataModelFilter filter) {
             DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
             criteria.join 'destination'
             criteria.eq('source', element)
@@ -96,15 +95,15 @@ enum RelationshipDirection {
 
             if (filter) {
                 criteria.or {
-                    isNull 'classification'
+                    isNull 'dataModel'
                     and {
                         if (filter.excludes) {
                             criteria.not {
-                                criteria.'in' 'classification.id', filter.excludes
+                                criteria.'in' 'dataModel.id', filter.excludes
                             }
                         }
                         if (filter.includes) {
-                            criteria.'in'  'classification.id', filter.includes
+                            criteria.'in'  'dataModel.id', filter.includes
                         }
                     }
                 }
@@ -162,7 +161,7 @@ enum RelationshipDirection {
     },
     BOTH {
         @Override
-        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, ClassificationFilter filter) {
+        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, DataModelFilter filter) {
             DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
             criteria.join 'source'
             criteria.join 'destination'
@@ -175,15 +174,15 @@ enum RelationshipDirection {
             }
             if (filter) {
                 criteria.or {
-                    isNull 'classification'
+                    isNull 'dataModel'
                     and {
                         if (filter.excludes) {
                             criteria.not {
-                                criteria.'in' 'classification.id', filter.excludes
+                                criteria.'in' 'dataModel.id', filter.excludes
                             }
                         }
                         if (filter.includes) {
-                            criteria.'in'  'classification.id', filter.includes
+                            criteria.'in'  'dataModel.id', filter.includes
                         }
                     }
                 }
@@ -239,7 +238,7 @@ enum RelationshipDirection {
         }
     }
 
-    abstract DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, ClassificationFilter filter)
+    abstract DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, DataModelFilter filter)
     abstract String getDirection(CatalogueElement owner, Relationship relationship)
     abstract CatalogueElement getRelation(CatalogueElement owner, Relationship relationship)
     abstract CatalogueElement getElement(CatalogueElement owner, Relationship relationship)

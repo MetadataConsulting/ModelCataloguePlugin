@@ -1,13 +1,13 @@
 package org.modelcatalogue.core.util
 
-import org.modelcatalogue.core.ValueDomain
+import org.modelcatalogue.core.DataType
 import spock.lang.Specification
 import spock.lang.Unroll
 
 @Unroll
 class SecuredRuleExecutorSpec extends Specification {
 
-    ValueDomain x = new ValueDomain()
+    DataType x = new DataType()
     SecuredRuleExecutor executor = [x: x]
 
     static List<String> VALID_EXPRESSIONS = [

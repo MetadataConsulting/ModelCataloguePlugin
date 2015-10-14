@@ -6,12 +6,9 @@ import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.ResultRecorder
 import spock.lang.Unroll
 
-/**
- * Created by adammilward on 27/02/2014.
- */
 class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec {
 
-    def relationshipService, de1, de2, de3, de4, de5, vd, md, md2
+    def relationshipService, de1, de2, de3, de4, de5, md, md2
 
 
     def setup() {
@@ -22,9 +19,8 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec {
         de3 = DataElement.findByName("AUTHOR")
         de4 = DataElement.findByName("auth4")
         de5 = DataElement.findByName("auth5")
-        vd = ValueDomain.findByName("value domain Celsius")
-        md = new Model(name: "testModel").save()
-        md2 = new Model(name: "testModel2").save()
+        md = new DataClass(name: "testModel").save()
+        md2 = new DataClass(name: "testModel2").save()
         md.addToContains(de1)
         md2.addToContains(de3)
         md.addToParentOf(md2)
@@ -41,7 +37,7 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec {
         )
 
         when:
-        controller.params.put("modelId", md.id)
+        controller.params.put("dataClassId", md.id)
         controller.response.format = "json"
         controller.getSubModelElements()
         JSONElement json = controller.response.json
@@ -57,35 +53,6 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec {
         json.list.size() == 2
         json.next == ""
         json.previous == ""
-    }
-
-    @Unroll
-    def "json -  get uninstantiated data elements from the catalogue"() {
-        def controller = new DataArchitectController()
-        ResultRecorder recorder = DefaultResultRecorder.create(
-                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
-                "dataArchitect"
-        )
-
-        when:
-        controller.response.format = "json"
-        controller.uninstantiatedDataElements(10)
-        JSONElement json = controller.response.json
-        String list = "metadata_uninstantiated"
-        recorder.recordResult list, json
-
-        then:
-
-        json.success
-        json.total == 8
-        json.offset == 0
-        json.page == 10
-        json.list
-        json.list.size() == 8
-        json.next == ""
-        json.previous == ""
-
-
     }
 
     @Unroll

@@ -3,7 +3,7 @@ package org.modelcatalogue.core
 import grails.rest.RestfulController
 import org.modelcatalogue.core.audit.Change
 import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.util.ClassificationFilter
+import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.Lists
 
 import static org.springframework.http.HttpStatus.*
@@ -17,7 +17,7 @@ class ChangeController extends RestfulController<Change> {
     static responseFormats = ['json']
 
     def auditService
-    def classificationService
+    def dataModelService
 
     def undo() {
         Change change = Change.get(params.id)
@@ -58,18 +58,18 @@ class ChangeController extends RestfulController<Change> {
             params.max = params.long('max')
         }
 
-        respond Lists.wrap(params, "/change/", auditService.getGlobalChanges(params, classificationService.classificationsInUse))
+        respond Lists.wrap(params, "/change/", auditService.getGlobalChanges(params, overridableDataModelFilter))
     }
 
-    def classificationActivity(Integer max) {
+    def dataModelActivity(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        Classification element = Classification.get(params.id)
+        DataModel element = DataModel.get(params.id)
         if (!element) {
             notFound()
             return
         }
 
-        respond Lists.wrap(params, "/classification/${params.id}/activity", auditService.getGlobalChanges(params, ClassificationFilter.includes(element)))
+        respond Lists.wrap(params, "/dataModel/${params.id}/activity", auditService.getGlobalChanges(params, DataModelFilter.includes(element)))
     }
 
     def userActivity(Integer max) {
@@ -83,6 +83,14 @@ class ChangeController extends RestfulController<Change> {
         respond Lists.wrap(params, "/user/${params.id}/activity", auditService.getChangesForUser(params, element))
     }
 
-
+    protected DataModelFilter getOverridableDataModelFilter() {
+        if (params.dataModel) {
+            DataModel dataModel = DataModel.get(params.long('dataModel'))
+            if (dataModel) {
+                return DataModelFilter.includes(dataModel)
+            }
+        }
+        dataModelService.dataModelFilter
+    }
 
 }

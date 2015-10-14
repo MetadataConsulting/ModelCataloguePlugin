@@ -3,7 +3,7 @@ package org.modelcatalogue.core.reports
 import grails.rest.render.RenderContext
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWrapper
@@ -19,14 +19,14 @@ import spock.lang.Stepwise
 class ReportsRegistryIntegrationSpec extends IntegrationSpec {
 
     def "returns reports for the given element"() {
-        Model model                 = new Model(name: "Test")
+        DataClass model                 = new DataClass(name: "Test")
         model.id                    = 1
 
         ReportsRegistry registry    = applicationContext.getBean(ReportsRegistry)
 
         registry.register {
             title 'Export All to COSD'
-            type Model
+            type DataClass
             link controller: 'dataArchitect', action: 'getSubModelElements', params: [format: 'xslt', report: 'COSD'], id: true
 
         }
@@ -41,7 +41,7 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
         registry.register {
             creates asset
             title 'WRAPPER'
-            item Model
+            item DataClass
             link controller: 'foo', action: 'bar', params: [format: 'xml']
         }
 
@@ -53,7 +53,7 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
         modelReports[0].getLink(model)      == "/api/modelCatalogue/core/dataArchitect/getSubModelElements?format=xlsx&report=NHIC&asset=true&name=Export+All+Elements+of+Test+to+Excel+XSLX&id=${model.id}"
 
         when:
-        def models = new Elements(itemType: Model)
+        def models = new Elements(itemType: DataClass)
         def wrapperReports = registry.getAvailableReports(models)
 
         then:

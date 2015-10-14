@@ -1,37 +1,71 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.1.2/metadataregistry.xsd">
-    <classification name="Transportation" id="http://www.example.com/datasets/Transportation" status="DRAFT">
-        <model name="Locomotive" id="http://www.example.com/models/Locomotive" status="DRAFT">
-            <dataElement name="Factor of Adhesion" id="http://www.example.com/elements/Adhesion" status="DRAFT">
-                <valueDomain name="Force" id="http://www.example.com/domains/Force" status="DRAFT">
-                    <description>A force is a push or pull upon an object resulting from the object's interaction with another object.</description>
-                    <regex>\d+</regex>
-                    <unitOfMeasure name="Newton" id="http://www.example.com/units/Newton" status="DRAFT" symbol="N">
-                        <description>The newton (symbol: N) is the International System of Units (SI) derived unit of force.</description>
-                        <extensions>
-                            <extension key="From">SI</extension>
-                        </extensions>
-                    </unitOfMeasure>
-                    <dataType name="Decimal" id="http://www.example.com/types/Decimal" status="DRAFT">
-                        <description>A number that uses a decimal point followed by digits that show a value smaller than one.</description>
-                    </dataType>
-                </valueDomain>
-            </dataElement>
-        </model>
-        <model name="Engine" id="http://www.example.com/models/Engine" status="DRAFT">
-            <dataElement ref="http://www.example.com/elements/Adhesion"/>
-        </model>
-    </classification>
-    <!-- Relationship types are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored! For non-admin users, the types are always imported as system ones and they need to be approved by the catalogue admin first. -->
-    <relationshipTypes>
-        <relationshipType name="classification" source="org.modelcatalogue.core.Classification" destination="org.modelcatalogue.core.CatalogueElement" versionSpecific="true">
-            <sourceToDestination label="classifies">Classification can classify multiple elements. Based on this relationship you can narrow the elements shown in the catalogue using the classifications filter in the bottom left corner. When classification is finalized all classified elements are finalized as well.</sourceToDestination>
-            <destinationToSource label="is classified by">Any element can be classified by multiple classifications. When new draft of the classified element is created then drafts for classifications are created as well.</destinationToSource>
-        </relationshipType>
-        <relationshipType name="containment" source="org.modelcatalogue.core.Model" destination="org.modelcatalogue.core.DataElement" versionSpecific="true">
-            <sourceToDestination label="contains">Model can contain multiple data elements. Contained data elements are finalized when the model is finalized.</sourceToDestination>
-            <destinationToSource label="contained in">Data element can be contained in multiple models. When new draft of the data element is created then drafts for all containing models are created as well.</destinationToSource>
-            <rule>/* A RULE */</rule>
-        </relationshipType>
-    </relationshipTypes>
+<?xml version="1.0" encoding="UTF-8"?><catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd">
+  <dataModel name="Transportation" id="http://www.example.com/datasets/Transportation" status="DRAFT">
+    <dataClass name="Engine" id="http://www.example.com/models/Engine" status="DRAFT">
+      <dataElement name="Factor of Adhesion" id="http://www.example.com/elements/Adhesion" status="DRAFT">
+        <dataType name="Force" id="http://www.example.com/domains/Force" status="DRAFT">
+          <description>A force is a push or pull upon an object resulting from the object's interaction with another object.</description>
+          <basedOn ref="http://www.example.com/types/Decimal"/>
+          <regex>\d+</regex>
+          <measurementUnit name="Newton" id="http://www.example.com/units/Newton" status="DRAFT" symbol="N">
+            <description>The newton (symbol: N) is the International System of Units (SI) derived unit of force.</description>
+            <extensions>
+              <extension key="From">SI</extension>
+            </extensions>
+          </measurementUnit>
+        </dataType>
+      </dataElement>
+    </dataClass>
+    <dataClass name="Locomotive" id="http://www.example.com/models/Locomotive" status="DRAFT">
+      <dataElement ref="http://www.example.com/elements/Adhesion"/>
+    </dataClass>
+    <dataType name="Decimal" id="http://www.example.com/types/Decimal" status="DRAFT">
+      <description>A number that uses a decimal point followed by digits that show a value smaller than one.</description>
+    </dataType>
+  </dataModel>
+  <!-- Relationship types are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored! For non-admin users, the types are always imported as system ones and they need to be approved by the catalogue admin first. -->
+  <relationshipTypes>
+    <relationshipType name="base" source="org.modelcatalogue.core.CatalogueElement" destination="org.modelcatalogue.core.CatalogueElement">
+      <sourceToDestination label="is base for">Any catalogue element can be base for multiple elements of the same type.</sourceToDestination>
+      <destinationToSource label="is based on">Any catalogue element can be based on multiple elements of the same type. Value domains will first use rules of the base value domains and than their owns when validating input values.</destinationToSource>
+      <rule>sameClass</rule>
+    </relationshipType>
+    <relationshipType name="containment" source="org.modelcatalogue.core.DataClass" destination="org.modelcatalogue.core.DataElement" versionSpecific="true">
+      <sourceToDestination label="contains">Model can contain multiple data elements. Contained data elements are finalized when the model is finalized.</sourceToDestination>
+      <destinationToSource label="contained in">Data element can be contained in multiple models. When new draft of the data element is created then drafts for all containing models are created as well.</destinationToSource>
+      <rule>String minOccursString = ext['Min Occurs']
+            String maxOccursString = ext['Max Occurs']
+
+            Integer minOccurs = minOccursString in ['unbounded', 'null', '*', null] ? 0 : (minOccursString as Integer)
+            Integer maxOccurs = maxOccursString in ['unbounded', 'null', '*', null] ? Integer.MAX_VALUE : (maxOccursString as Integer)
+
+            if (minOccurs &lt; 0) {
+                return ["relationshipType.containment.min.occurs.less.than.zero", "'Max Occurs' has to be greater than zero"]
+            }
+            if (maxOccurs &lt; minOccurs) {
+                return ["relationshipType.containment.min.occurs.greater.than.max.occurs", "The metadata 'Min Occurs' cannot be greater than 'Min Occurs'"]
+            }
+            if (maxOccurs &lt; 1) {
+                return ["relationshipType.containment.max.occurs.zero", "The metadata 'Max Occurs' must be greater than zero"]
+            }
+
+            return true</rule>
+    </relationshipType>
+    <relationshipType name="declaration" source="org.modelcatalogue.core.DataModel" destination="org.modelcatalogue.core.CatalogueElement" versionSpecific="true">
+      <sourceToDestination label="declares">Data models can declare multiple elements. Based on this relationship you can narrow the elements shown in the catalogue using the data model filter in the bottom left corner. When data model is finalized all defined elements are finalized as well.</sourceToDestination>
+      <destinationToSource label="declared within">Any element can be declared within multiple data models. When new draft of the element is created then drafts for data models are created as well.</destinationToSource>
+      <rule>if (!destination.dataModels) {
+                return true
+            }
+
+            long newModelLatestVersionId = source.latestVersionId ?: source.id
+
+            for (int i = 0; i &lt; destination.dataModels.size() ; i++) {
+               def dataModel = destination.dataModels[i]
+               long existingDataModelLatestVersionId = dataModel.latestVersionId ?: dataModel.id
+               if (newModelLatestVersionId != existingDataModelLatestVersionId) {
+                   return ["catalogue.element.can.have.only.one.data.model", "'$destination.name' is already owned by data model '$dataModel.name'"]
+               }
+            }</rule>
+    </relationshipType>
+  </relationshipTypes>
 </catalogue>

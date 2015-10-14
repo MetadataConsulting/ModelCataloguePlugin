@@ -14,7 +14,7 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
 
     def dataArchitectService
     def executorService
-    def modelService
+    def dataClassService
     @Autowired CSVService csvService
 
     DataArchitectController() {
@@ -23,11 +23,6 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
 
     def index(){}
 
-    def uninstantiatedDataElements(Integer max){
-        handleParams(max)
-        respond Lists.wrap(params, DataElement, "/dataArchitect/uninstantiatedDataElements", dataArchitectService.uninstantiatedDataElements(params))
-    }
-
 
     def metadataKeyCheck(Integer max){
         handleParams(max)
@@ -35,12 +30,12 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
     }
 
     def getSubModelElements(){
-        Long id = params.long('modelId') ?: params.long('id')
+        Long id = params.long('dataClassId') ?: params.long('id')
         respond Lists.lazy(params, DataElement, "/dataArchitect/getSubModelElements") {
             if (id){
-                Model model = Model.get(id)
-                ListWithTotalAndType<Model> subModels = modelService.getSubModels(model)
-                return modelService.getDataElementsFromModels(subModels.items).items
+                DataClass model = DataClass.get(id)
+                ListWithTotalAndType<DataClass> subModels = dataClassService.getInnerClasses(model)
+                return dataClassService.getDataElementsFromClasses(subModels.items).items
             }
             return []
         }

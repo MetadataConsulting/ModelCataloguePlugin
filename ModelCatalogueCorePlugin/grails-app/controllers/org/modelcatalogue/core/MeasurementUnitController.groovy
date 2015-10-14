@@ -9,7 +9,7 @@ class MeasurementUnitController extends AbstractCatalogueElementController<Measu
         super(MeasurementUnit, false)
     }
 
-    def valueDomains(Integer max){
+    def primitiveTypes(Integer max){
         handleParams(max)
 
         MeasurementUnit unit = queryForResource(params.id)
@@ -18,8 +18,8 @@ class MeasurementUnitController extends AbstractCatalogueElementController<Measu
             return
         }
 
-        respond classificationService.classified(Lists.fromCriteria(params, ValueDomain, "/${resourceName}/${params.id}/valueDomain") {
-            eq "unitOfMeasure", unit
+        respond dataModelService.classified(Lists.fromCriteria(params, PrimitiveType, "/${resourceName}/${params.id}/primitiveType") {
+            eq "measurementUnit", unit
             if (!unit.attach().archived) {
                 ne 'status', ElementStatus.DEPRECATED
                 ne 'status', ElementStatus.UPDATED
