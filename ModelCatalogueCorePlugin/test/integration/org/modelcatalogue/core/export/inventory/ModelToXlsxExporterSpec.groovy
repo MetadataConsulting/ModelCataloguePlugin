@@ -64,10 +64,7 @@ class ModelToXlsxExporterSpec extends AbstractIntegrationSpec {
                                     dataElement name: "Model $i Data Element $j", {
                                         description "This is a description for Model $i Data Element $j"
                                         ValueDomain domain = domains[random.nextInt(domains.size())]
-                                        while (!domain.classifications) {
-                                            domain = domains[random.nextInt(domains.size())]
-                                        }
-                                        valueDomain name: domain.name, classification: domain.classifications.first().name
+                                        valueDomain name: domain.name, classification: domain.classifications ? domains.classifications.first().name : null
                                     }
                                 }
                                 for (int j in 1..3) {
@@ -78,10 +75,7 @@ class ModelToXlsxExporterSpec extends AbstractIntegrationSpec {
                                             dataElement name: "Model $i Child Model $j Data Element $k", {
                                                 description "This is a description for Model $i Child Model $j Data Element $k"
                                                 ValueDomain domain = domains[random.nextInt(domains.size())]
-                                                while (!domain.classifications) {
-                                                    domain = domains[random.nextInt(domains.size())]
-                                                }
-                                                valueDomain name: domain.name, classification: domain.classifications.first().name
+                                                valueDomain name: domain.name, classification: domain.classifications ? domains.classifications.first().name : null
                                             }
                                         }
                                     }
