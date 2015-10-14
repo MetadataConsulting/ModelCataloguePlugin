@@ -310,7 +310,7 @@ Model catalogue core plugin (metadata registry)
 		reportsRegistry.register {
 			creates link
 			title { "Inventory Report Spreadsheet" }
-			type DataClas
+			type DataClass
 			link controller: 'dataClass', action: 'inventorySpreadsheet', id: true
 		}
 
