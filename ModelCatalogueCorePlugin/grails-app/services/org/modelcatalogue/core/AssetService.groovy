@@ -1,9 +1,13 @@
 package org.modelcatalogue.core
 
 import groovy.transform.CompileStatic
+import groovy.transform.stc.ClosureParams
+import groovy.transform.stc.FromString
 import org.apache.commons.io.input.CountingInputStream
 import org.apache.commons.io.output.CountingOutputStream
 import org.codehaus.groovy.runtime.InvokerInvocationException
+import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.publishing.DraftContext
 import org.springframework.util.DigestUtils
 import org.springframework.web.multipart.MultipartFile
@@ -11,15 +15,16 @@ import org.springframework.web.multipart.MultipartFile
 import java.security.DigestInputStream
 import java.security.DigestOutputStream
 import java.security.MessageDigest
+import java.util.concurrent.ExecutorService
 
-/**
- * Created by ladin on 10.07.14.
- */
 @CompileStatic
 class AssetService {
 
     StorageService modelCatalogueStorageService
     ElementService elementService
+    ExecutorService executorService
+    SecurityService modelCatalogueSecurityService
+    AuditService auditService
 
     private static final long GIGA = 1024 * 1024 * 1024
     private static final long MEGA = 1024 * 1024
@@ -151,6 +156,46 @@ class AssetService {
         }
         asset.md5 = DigestUtils.md5DigestAsHex(md5.digest())
         asset.save(flush: true)
+    }
+
+    Long storeReportAsAsset(Map<String, String> assetParams, @ClosureParams(value = FromString, options= "java.io.OutputStream") Closure worker){
+        assert assetParams.name
+        assert assetParams.contentType
+        assert assetParams.originalFileName
+
+        assetParams.size = 0
+        assetParams.status = ElementStatus.PENDING
+        assetParams.description = "Your report will be available in this asset soon. Use Refresh action to reload"
+
+        Asset asset = new Asset(assetParams)
+
+        asset.save(flush: true, failOnError: true)
+
+        Long id = asset.id
+        Long authorId = modelCatalogueSecurityService.currentUser?.id
+
+        executorService.submit {
+            auditService.withDefaultAuthorId(authorId) {
+                Asset updated = Asset.get(id)
+                try {
+                    //do the hard work
+                    storeAssetWithSteam(updated, assetParams.contentType, worker)
+
+                    updated.status = ElementStatus.FINALIZED
+                    updated.description = "Your report is ready. Use Download button to download it."
+                    updated.save(flush: true, failOnError: true)
+                } catch (e) {
+                    log.error "Exception of type ${e.class} with id=${id}", e
+
+                    updated.refresh()
+                    updated.status = ElementStatus.FINALIZED
+                    updated.name = updated.name + " - Error during generation"
+                    updated.description = "Error generating report" +":$e"
+                    updated.save(flush: true, failOnError: true)
+                }
+            }
+        }
+        return asset.id;
     }
 
 }

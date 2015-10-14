@@ -3,9 +3,6 @@ package org.modelcatalogue.core.util.test
 import groovy.sql.Sql
 import org.hibernate.SessionFactory
 
-/**
- * Created by ladin on 18.02.15.
- */
 class TestDataHelper {
 
     /**

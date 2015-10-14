@@ -1,9 +1,10 @@
 package org.modelcatalogue.core.publishing.changelog
 
+import static org.modelcatalogue.core.util.test.FileOpener.open
+
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.core.AbstractIntegrationSpec
-import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.ClassificationService
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.Model
@@ -12,10 +13,7 @@ import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.ddl.DataDefinitionLanguage
 import org.modelcatalogue.core.publishing.DraftContext
-import org.modelcatalogue.core.util.ClassificationFilter
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
-
-import java.awt.Desktop
 
 class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
 
@@ -40,7 +38,7 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
 
         generator.generateChangelog(draft, file.newOutputStream())
 
-        openInWord(file)
+        open(file)
 
         then:
         noExceptionThrown()
@@ -137,22 +135,6 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
 
         return model
 
-    }
-
-    /**
-     * Tries to open the file in Word. Only works locally on Mac at the moment. Ignored otherwise.
-     * Main purpose of this method is to quickly open the generated file for manual review.
-     * @param file file to be opened
-     */
-    private static void openInWord(File file) {
-        try {
-            if (Desktop.desktopSupported && Desktop.desktop.isSupported(Desktop.Action.OPEN)) {
-                Desktop.desktop.open(file)
-                Thread.sleep(10000)
-            }
-        } catch(ignored) {
-            // CI
-        }
     }
 
 }

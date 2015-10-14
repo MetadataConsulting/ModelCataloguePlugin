@@ -92,6 +92,12 @@ class ModelCatalogueCorePluginUrlMappings {
                     "/api/modelCatalogue/core/$controllerName/$id/valueDomain"(controller: controllerName, action: 'valueDomains', method: HttpMethod.GET)
                 }
 
+                if (controllerName == 'model') {
+                    "/api/modelCatalogue/core/gel/reports/classificationJasper"(controller: 'model', action: 'gereportDoc', method: HttpMethod.GET)
+                    "/api/modelCatalogue/core/gel/reports/classificationChangelog"(controller: 'model', action: 'changelogDoc', method: HttpMethod.GET)
+                    "/api/modelCatalogue/core/gel/reports/inventorySpreadsheet"(controller: 'model', action: 'inventorySpreadsheet', method: HttpMethod.GET)
+                }
+
                 if (controllerName == 'valueDomain') {
                     "/api/modelCatalogue/core/$controllerName/$id/dataElement"(controller: controllerName, action: 'dataElements', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$controllerName/$id/convert/$destination"(controller: controllerName, action: 'convert', method: HttpMethod.GET)

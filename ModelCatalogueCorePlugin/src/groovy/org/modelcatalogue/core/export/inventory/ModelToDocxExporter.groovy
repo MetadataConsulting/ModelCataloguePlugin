@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.gel
+package org.modelcatalogue.core.export.inventory
 
 import com.craigburke.document.core.builder.DocumentBuilder
 import groovy.util.logging.Log4j

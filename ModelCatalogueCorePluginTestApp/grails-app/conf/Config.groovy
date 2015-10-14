@@ -203,6 +203,7 @@ log4j = {
     debug 'org.modelcatalogue.core.publishing'
     debug 'org.modelcatalogue.core.util.test'
     debug 'org.modelcatalogue.core.gel'
+    debug 'org.modelcatalogue.core.export'
     debug 'org.modelcatalogue.discourse'
 
 //    debug 'org.codehaus.groovy.grails.web.mapping'

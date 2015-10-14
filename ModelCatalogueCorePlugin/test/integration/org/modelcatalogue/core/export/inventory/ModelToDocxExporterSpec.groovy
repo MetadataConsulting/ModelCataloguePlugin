@@ -1,4 +1,6 @@
-package org.modelcatalogue.core.gel
+package org.modelcatalogue.core.export.inventory
+
+import static org.modelcatalogue.core.util.test.FileOpener.open
 
 import grails.test.spock.IntegrationSpec
 import org.junit.Rule
@@ -11,8 +13,6 @@ import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.ModelService
 import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
-
-import java.awt.Desktop
 
 class ModelToDocxExporterSpec extends IntegrationSpec {
 
@@ -104,21 +104,4 @@ class ModelToDocxExporterSpec extends IntegrationSpec {
         return Model.findByName('C4CTDE Root')
 
     }
-
-    /**
-     * Tries to open the file in Word. Only works locally on Mac at the moment. Ignored otherwise.
-     * Main purpose of this method is to quickly open the generated file for manual review.
-     * @param file file to be opened
-     */
-    private static void open(File file) {
-        try {
-            if (Desktop.desktopSupported && Desktop.desktop.isSupported(Desktop.Action.OPEN)) {
-                Desktop.desktop.open(file)
-                Thread.sleep(10000)
-            }
-        } catch(ignored) {
-            // CI
-        }
-    }
-
 }

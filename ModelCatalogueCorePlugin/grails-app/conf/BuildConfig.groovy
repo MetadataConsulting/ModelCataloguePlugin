@@ -37,6 +37,7 @@ grails.project.dependency.resolution = {
         //mavenRepo "http://download.java.net/maven/2/"
         //mavenRepo "http://repository.jboss.com/maven2/"
         mavenRepo 'http://jcenter.bintray.com'
+
 		mavenRepo "http://dl.bintray.com/metadata/model-catalogue"
         mavenRepo "http://dl.bintray.com/musketyr/document-builder"
         //mavenRepo "http://dl.dropbox.com/u/326301/repository"
@@ -62,7 +63,12 @@ grails.project.dependency.resolution = {
 
         compile 'org.jsoup:jsoup:1.8.3'
 
-        compile 'org.modelcatalogue:spreadsheet-builder-poi:0.1.3'
+        compile 'org.modelcatalogue:spreadsheet-builder-poi:0.1.9'
+
+        compile 'org.apache.poi:poi:3.13'
+        compile 'org.apache.poi:poi-ooxml:3.13'
+        compile 'org.apache.poi:ooxml-schemas:1.1'
+
 
         test 'xmlunit:xmlunit:1.6'
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
