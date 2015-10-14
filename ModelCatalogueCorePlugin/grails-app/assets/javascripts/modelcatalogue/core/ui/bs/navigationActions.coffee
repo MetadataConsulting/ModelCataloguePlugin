@@ -181,6 +181,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
             action.label = getLabel(user)
             security.getCurrentUser().classifications = user.classifications
             $state.go '.', $stateParams, reload: true
+            $scope.$broadcast 'redrawContextualActions'
     }
 
     action
