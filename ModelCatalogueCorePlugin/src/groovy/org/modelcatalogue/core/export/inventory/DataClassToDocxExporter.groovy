@@ -101,10 +101,10 @@ class DataClassToDocxExporter {
 
                         log.debug "Exporting data type $dataType to Word Document"
 
-                        Map<String, Object> attrs = [ref: "${dataType.id}"]
+                        Map<String, Object> attrs = [ref: "${dataType.id}", style: 'heading2']
                         attrs.putAll(DOMAIN_NAME)
 
-                        heading2 attrs, dataType.name
+                        paragraph attrs, dataType.name
 
                         if (dataType.dataModels) {
                             paragraph {
