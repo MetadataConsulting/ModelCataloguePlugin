@@ -53,8 +53,8 @@ class ModelToDocxExporterSpec extends IntegrationSpec {
 
         if (!domains) {
             for (int i in 1..10) {
-                ValueDomain domain = new ValueDomain(name: "Test Value Domain #${i}").save(failOnError: true)
-                Classification classification = new Classification(name: "Classification ${System.currentTimeMillis()}").save(failOnError: true)
+                ValueDomain domain = new ValueDomain(name: "C4CTDE Test Value Domain #${i}").save(failOnError: true)
+                Classification classification = new Classification(name: "C4CTDE Classification ${System.currentTimeMillis()}").save(failOnError: true)
                 classification.addToClassifies domain
             }
             domains = ValueDomain.list()
@@ -66,22 +66,22 @@ class ModelToDocxExporterSpec extends IntegrationSpec {
 
                 model (name: 'C4CTDE Root') {
                     for (int i in 1..10) {
-                        model name: "Model $i", {
+                        model name: "C4CTDE Model $i", {
                             description "This is a description for Model $i"
 
                             for (int j in 1..10) {
-                                dataElement name: "Model $i Data Element $j", {
+                                dataElement name: "C4CTDE Model $i Data Element $j", {
                                     description "This is a description for Model $i Data Element $j"
                                     ValueDomain domain = domains[random.nextInt(domains.size())]
                                     valueDomain name: domain.name, classification: domain.classifications ? domains.classifications.first().name : null
                                 }
                             }
                             for (int j in 1..3) {
-                                model name: "Model $i Child Model $j", {
+                                model name: "C4CTDE Model $i Child Model $j", {
                                     description "This is a description for Model $i Child Model $j"
 
                                     for (int k in 1..3) {
-                                        dataElement name: "Model $i Child Model $j Data Element $k", {
+                                        dataElement name: "C4CTDE Model $i Child Model $j Data Element $k", {
                                             description "This is a description for Model $i Child Model $j Data Element $k"
                                             ValueDomain domain = domains[random.nextInt(domains.size())]
                                             valueDomain name: domain.name, classification: domain.classifications ? domains.classifications.first().name : null
