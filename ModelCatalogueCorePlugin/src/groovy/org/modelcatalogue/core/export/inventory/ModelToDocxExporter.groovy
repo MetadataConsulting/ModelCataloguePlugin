@@ -101,10 +101,10 @@ class ModelToDocxExporter {
 
                         log.debug "Exporting value domain $domain to Word Document"
 
-                        Map<String, Object> attrs = [ref: "${domain.id}"]
+                        Map<String, Object> attrs = [ref: "${domain.id}", style: 'heading2']
                         attrs.putAll(DOMAIN_NAME)
 
-                        heading2 attrs, domain.name
+                        paragraph attrs, domain.name
 
                         if (domain.classifications) {
                             paragraph {
