@@ -408,7 +408,7 @@ class DataClassToXlsxExporter {
                 cell {
                     value dataClass.dataModels.collect { it.name }.unique().sort().join(', ')
                     style 'property-value'
-                    style 'dataClass-catalogue-id'
+                    style 'model-catalogue-id'
                     colspan 2
                 }
             }
@@ -416,7 +416,7 @@ class DataClassToXlsxExporter {
             row {
                 cell {
                     value dataClass.combinedVersion
-                    style 'dataClass-catalogue-id'
+                    style 'model-catalogue-id'
                     colspan 2
                 }
             }

@@ -1,8 +1,8 @@
 package org.modelcatalogue.core.util.test
 
+import grails.util.Metadata
 import groovy.sql.Sql
 import org.hibernate.SessionFactory
-import org.modelcatalogue.core.RelationshipType
 
 class TestDataHelper {
 
@@ -24,11 +24,11 @@ class TestDataHelper {
     }
 
     private static initDb(SessionFactory sessionFactory, boolean drop, String tempSqlFileName, Closure initCode) {
-        if (!isH2(sessionFactory)) {
+        if (isH2(sessionFactory)) {
             return initCode()
         }
 
-        String scriptLocation = "${System.getProperty('java.io.tmpdir')}/mc/${tempSqlFileName}"
+        String scriptLocation = "${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/${tempSqlFileName}"
 
         if (new File(scriptLocation).exists()) {
             long start = System.currentTimeMillis()
@@ -41,7 +41,7 @@ class TestDataHelper {
         long start = System.currentTimeMillis()
 
         if (drop) {
-            String clearScriptLocation = "${System.getProperty('java.io.tmpdir')}/mc/dropfiles/$tempSqlFileName"
+            String clearScriptLocation = "${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/dropfiles/$tempSqlFileName"
             new Sql(sessionFactory.currentSession.connection()).execute("SCRIPT NODATA DROP TO ${clearScriptLocation}")
             println "Clear script created in $clearScriptLocation"
             new Sql(sessionFactory.currentSession.connection()).execute("RUNSCRIPT FROM ${clearScriptLocation}")
@@ -58,6 +58,6 @@ class TestDataHelper {
     }
 
     static boolean isH2(SessionFactory sessionFactory) {
-        sessionFactory.currentSession.connection().metaData.databaseProductName == 'H2'
+        sessionFactory.currentSession.connection().metaData.databaseProductName != 'H2'
     }
 }

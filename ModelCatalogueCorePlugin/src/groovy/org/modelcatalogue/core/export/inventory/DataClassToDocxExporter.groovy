@@ -11,7 +11,6 @@ import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.util.docx.ModelCatalogueWordDocumentBuilder
 
 import java.text.SimpleDateFormat

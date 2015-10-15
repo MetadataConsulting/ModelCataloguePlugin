@@ -45,15 +45,15 @@ class DataClassToDocxExporterSpec extends IntegrationSpec {
 
 
     private DataClass buildTestModel() {
-        DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
+        DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
 
         Random random = new Random()
         List<DataType> domains = DataType.list()
 
         if (!domains) {
             for (int i in 1..10) {
-                DataType domain = new DataType(name: "Test Value Domain #${i}").save(failOnError: true)
-                DataModel classification = new DataModel(name: "Classification ${System.currentTimeMillis()}").save(failOnError: true)
+                DataType domain = new DataType(name: "C4CTDE Test Value Domain #${i}").save(failOnError: true)
+                DataModel classification = new DataModel(name: "C4CTDE Classification ${System.currentTimeMillis()}").save(failOnError: true)
                 classification.addToDeclares domain
             }
             domains = DataType.list()
@@ -65,31 +65,25 @@ class DataClassToDocxExporterSpec extends IntegrationSpec {
 
                 dataClass (name: 'C4CTDE Root') {
                     for (int i in 1..10) {
-                        dataClass name: "Model $i", {
+                        dataClass name: "C4CTDE Model $i", {
                             description "This is a description for Model $i"
 
                             for (int j in 1..10) {
-                                dataElement name: "Model $i Data Element $j", {
+                                dataElement name: "C4CTDE Model $i Data Element $j", {
                                     description "This is a description for Model $i Data Element $j"
                                     DataType data = domains[random.nextInt(domains.size())]
-                                    while (!data.dataModels) {
-                                        data = domains[random.nextInt(domains.size())]
-                                    }
-                                    dataClass name: data.name, dataModel: data.dataModels.first().name
+                                    dataClass name: data.name, dataModel: data.dataModels ? data.dataModels.first().name : null
                                 }
                             }
                             for (int j in 1..3) {
-                                dataClass name: "Model $i Child Model $j", {
+                                dataClass name: "C4CTDE Model $i Child Model $j", {
                                     description "This is a description for Model $i Child Model $j"
 
                                     for (int k in 1..3) {
-                                        dataElement name: "Model $i Child Model $j Data Element $k", {
+                                        dataElement name: "C4CTDE Model $i Child Model $j Data Element $k", {
                                             description "This is a description for Model $i Child Model $j Data Element $k"
                                             DataType domain = domains[random.nextInt(domains.size())]
-                                            while (!domain.dataModels) {
-                                                domain = domains[random.nextInt(domains.size())]
-                                            }
-                                            dataType name: domain.name, dataModel: domain.dataModels.first().name
+                                            dataType name: domain.name, dataModel: domain.dataModels ? domain.dataModels.first().name : null
                                         }
                                     }
                                 }
