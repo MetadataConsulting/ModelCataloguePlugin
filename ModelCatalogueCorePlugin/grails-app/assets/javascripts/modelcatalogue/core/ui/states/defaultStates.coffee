@@ -24,8 +24,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $scope.validate = ->
       messages.prompt('', '', {type: 'validate-value-by-domain'})
 
-    console.log security
-
     if security.allowRegistration
       $scope.registrationUrl = "#{security.contextPath}/register/"
 
@@ -36,7 +34,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       messages.prompt("New #{names.getNaturalName(what)}", '', {type: dialogType, create: what}).then (element)->
         element.show()
 
-    if user!=''
+    if user != ''
       updateDashboard(user)
     else
       $scope.user = user
@@ -135,9 +133,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         $scope.element                = if list.size > 0 then list.list[0]
         $scope.property               =  'contains'
 
-
-      $scope.$on 'treeviewElementSelected', (event, element, id) ->
-        return unless id is 'model-treeview'
+      $scope.onTreeviewSelected = (element) ->
         $scope.element                  = element
         $scope.elementSelectedInTree    = true
         $rootScope.$$lastModels ?= {}
@@ -663,7 +659,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                 <h3>
                     <small ng-class="catalogue.getIcon('model')"></small>&nbsp;<span ng-show="$stateParams.status">{{natural($stateParams.status)}}</span> Models
                 </h3>
-                <catalogue-element-treeview list="list" descend="'parentOf'" id="model-treeview"></catalogue-element-treeview>
+                <catalogue-element-treeview list="list" descend="'parentOf'" id="model-treeview" on-select="onTreeviewSelected($element)"></catalogue-element-treeview>
               </div>
             </div>
           </div>
