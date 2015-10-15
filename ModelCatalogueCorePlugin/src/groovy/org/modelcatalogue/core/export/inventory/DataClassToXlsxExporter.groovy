@@ -307,7 +307,7 @@ class DataClassToXlsxExporter {
 
                     if (element.dataType) {
                         cell ('E') { Cell theCell ->
-                            createDescriptionAndOrEnums(cell, element.dataType)
+                            createDescriptionAndOrEnums(theCell, element.dataType)
                         }
 
                         if (element.dataType.instanceOf(PrimitiveType) && element.dataType.measurementUnit) {
