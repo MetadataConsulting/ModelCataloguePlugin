@@ -993,6 +993,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
   '''
 
 ])
+.config([ '$modalProvider', ($modalProvider) ->
+    $modalProvider.options.backdrop = 'static'
+])
 # debug states
 #.run(['$rootScope', '$log', ($rootScope, $log) ->
 #  $rootScope.$on '$stateChangeSuccess', (event, toState, toParams, fromState, fromParams) ->
