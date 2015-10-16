@@ -62,6 +62,8 @@ class CatalogueElementTreeview
           delete child.$$relationship
           list.$$cachedChildren[child.link] = child
 
+      $scope.$$showingMore = false
+
       addItemsFromList(list)
       nextFun = list.next
       setLastListToRootScope(list)
