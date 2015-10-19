@@ -70,11 +70,8 @@ angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingl
 
         if watches.length > 0
           $scope.$$actionWatcherToBeRemoved.push(actionsScope.$watchGroup(watches, (newValue, oldValue) ->
-            start = new Date().getTime()
             if angular.equals(newValue, oldValue)
-              console.log('equals', (new Date().getTime() - start), newValue, oldValue, actionsScope.$id, actionsScope.$$watchers.length, (w.exp for w in actionsScope.$$watchers))
               return
-            console.log('not equals - updating actions', (new Date().getTime() - start), newValue, oldValue, actionsScope.$id, actionsScope.$$watchers.length, (w.exp for w in actionsScope.$$watchers))
             updateActions()
           ))
           newScope.$on '$destroy', ->
