@@ -16,6 +16,13 @@ angular.module('mc.util.ui.contextualMenu', ['mc.util.ui.bs.menuItemDropdown','m
     updateActions = ->
       $element.empty()
       for action in actions.getActions($scope.scope ? $scope.$parent, $scope.role ? actions.ROLE_NAVIGATION)
+        if action.active and action.disabled
+          action.$$class = 'active disabled'
+        else if action.active
+          action.$$class = 'active'
+        else if action.disabled
+          action.$$class = 'disabled'
+
         newScope = $scope.$new()
         newScope.action = action
         $element.append($compile(getTemplate(action))(newScope))
