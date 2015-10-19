@@ -29,7 +29,10 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     dataType = relationship?.relation?.valueDomain?.dataType
     if dataType?.enumerations?.values
       ext     = dataType?.enumerations?.values ? []
-      for e in ext
+      for e, i in ext
+        if i == 10
+          result += "..."
+          break
         result += "#{e.key} \n"
     else if dataType
       result = dataType?.name

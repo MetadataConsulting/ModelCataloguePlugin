@@ -8,7 +8,11 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
     return enumeratedType.description if not enumeratedType.enumerations
     return enumeratedType.description if not enumeratedType.enumerations.values
     enumerations = []
-    enumerations.push "#{enumeration.key}: #{enumeration.value}" for enumeration in enumeratedType.enumerations.values
+    for enumeration, i in enumeratedType.enumerations.values
+      if i == 10
+        enumerations.push('...')
+        break
+      enumerations.push "#{enumeration.key}: #{enumeration.value}"
     enumerations.join('\n')
 
 
