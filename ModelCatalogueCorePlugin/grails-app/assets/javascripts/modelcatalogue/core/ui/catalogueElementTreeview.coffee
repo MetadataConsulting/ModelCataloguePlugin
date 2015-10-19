@@ -46,6 +46,7 @@ class CatalogueElementTreeview
         cachedChild  = if list.$$cachedChildren then list.$$cachedChildren[item.link]
         cachedChild ?= {}
         delete cachedChild.$$relationship
+        delete cachedChild.$$loadingChildren
         if cachedChild.$$collapsed
           cachedChild.$$resetHelperProperties() if angular.isFunction(cachedChild.$$resetHelperProperties)
         else
@@ -60,6 +61,7 @@ class CatalogueElementTreeview
 
         for child in oldList.$$children
           delete child.$$relationship
+          delete child.$$loadingChildren
           list.$$cachedChildren[child.link] = child
 
       $scope.$$showingMore = false

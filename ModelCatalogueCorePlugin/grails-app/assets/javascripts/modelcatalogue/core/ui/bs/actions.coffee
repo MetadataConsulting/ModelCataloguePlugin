@@ -371,6 +371,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     position:   1000
     label:      "#{$scope.element.name} Reports"
     disabled:   not $scope.element?.availableReports?.length
+    watches:    'element.availableReports'
     generator:  (action) ->
       action.createActionsFrom 'element.availableReports', generateReports($scope, $window, enhance, rest)
     }
@@ -381,6 +382,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     position:   2000
     label:      "Other Reports"
     disabled:   not $scope.reports?.length
+    watches:   'reports'
     generator: (action) ->
       action.createActionsFrom 'reports', generateReports($scope, $window, enhance, rest)
     }
@@ -393,6 +395,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     position:   5000
     label:      "Current Reports"
     disabled:   not $scope.list.availableReports?.length
+    watches:    'list.availableReports'
     generator:  (action) ->
       action.createActionsFrom 'list.availableReports', generateReports($scope, $window, enhance, rest)
     }
