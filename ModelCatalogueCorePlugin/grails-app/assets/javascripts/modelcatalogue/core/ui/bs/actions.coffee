@@ -355,6 +355,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
           label:  report.title
           url:    report.url
           type:   report.type
+          watches: 'element'
           action: ->
             if @type == 'LINK'
               $window.open(@url, '_blank')
