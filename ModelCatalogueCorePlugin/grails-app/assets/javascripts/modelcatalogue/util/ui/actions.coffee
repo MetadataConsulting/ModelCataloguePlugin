@@ -115,8 +115,7 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
               action.children = ret
 
               action.sortChildren()
-
-            $scope.$watch watchExpression, updateChildActions
+              action.watches = watchExpression
 
             updateChildActions($scope.$eval(watchExpression))
 

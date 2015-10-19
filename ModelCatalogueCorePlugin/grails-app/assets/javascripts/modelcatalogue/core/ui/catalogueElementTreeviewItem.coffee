@@ -113,9 +113,11 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
         element.$$resetHelperProperties = ->
           if @[$scope.currentDescend]
             @$$numberOfChildren = $scope.element[$scope.currentDescend].total
+            @$$loadingChildren = false
           else
             @$$numberOfChildren = 0
-    
+            @$$loadingChildren = false
+
           @$$children  ?= []
           @$$collapsed ?= true
           @$$showMore  ?= ->

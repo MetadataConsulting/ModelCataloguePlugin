@@ -29,7 +29,10 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     dataType = relationship?.relation?.dataType
     if dataType?.enumerations?.values
       ext     = dataType?.enumerations?.values ? []
-      for e in ext
+      for e, i in ext
+        if i == 10
+          result += "..."
+          break
         result += "#{e.key} \n"
     if dataType?.dataClass
       result = """<a href="#{dataType.dataClass.modelCatalogueId}"><span class="fa fa-fw fa-cubes"></span>#{dataType.dataClass.name}</a>"""

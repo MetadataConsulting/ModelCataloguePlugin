@@ -130,7 +130,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         $scope.elementSelectedInTree    = true
         $rootScope.$$lastModels ?= {}
         $rootScope.$$lastModels[getLastModelsKey()] = element: element, elementSelectedInTree: true, property: 'contains'
-        $rootScope.$broadcast 'redrawContextualActions'
 
       $scope.$on 'newVersionCreated', (ignored, element) ->
         if element
@@ -879,7 +878,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
           $rootScope.$broadcast 'redrawContextualActions'
 ])
 .config([ '$modalProvider', ($modalProvider) ->
-  $modalProvider.options.backdrop = 'static'
+    $modalProvider.options.backdrop = 'static'
 ])
 # debug states
 #.run(['$rootScope', '$log', ($rootScope, $log) ->

@@ -8,7 +8,11 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
     return enumeratedType.description if not enumeratedType.enumerations
     return enumeratedType.description if not enumeratedType.enumerations.values
     enumerations = []
-    enumerations.push "#{enumeration.key}: #{enumeration.value}" for enumeration in enumeratedType.enumerations.values
+    for enumeration, i in enumeratedType.enumerations.values
+      if i == 10
+        enumerations.push('...')
+        break
+      enumerations.push "#{enumeration.key}: #{enumeration.value}"
     enumerations.join('\n')
 
 
@@ -65,7 +69,7 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
     properties
 
   getRowForElement = (element) ->
-    row = {element: element, properties: getPropertiesForElement(if element.relation then element.relation else element), sortable: $scope.isSortable, classesForStatus: $scope.classesForStatus(element), tail: [], $$expanded: $scope.$$expandAll}
+    row = {element: element, properties: getPropertiesForElement(if element.relation then element.relation else element), sortable: $scope.isSortable, classesForStatus: $scope.classesForStatus(element), tail: [], $$expanded: $scope.$$expandAll ? false}
 
     if $scope.columns
       row.head = getCellForColumn(element, $scope.columns[0])
