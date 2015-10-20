@@ -38,7 +38,6 @@ angular.module('mc.util.ui.contextualMenu', ['mc.util.ui.bs.menuItemDropdown','m
 
     updateActions = ->
       removeWatchers($scope)
-      hasActions = false
       scope.$destroy() for scope in scopes
       scopes = []
 
@@ -66,7 +65,7 @@ angular.module('mc.util.ui.contextualMenu', ['mc.util.ui.bs.menuItemDropdown','m
         $element.append($compile(getTemplate(action))(newScope))
 
         if watches.length > 0
-          $scope.$$actionWatcherToBeRemoved.push(actionsScope.$watchGroup(watches, (newValue, oldValue) ->
+          $scope.$$actionWatcherToBeRemoved.push($scope.$watchGroup(watches, (newValue, oldValue) ->
             if angular.equals(newValue, oldValue)
               return
             updateActions()

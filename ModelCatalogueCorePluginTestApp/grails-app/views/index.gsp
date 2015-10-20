@@ -40,21 +40,21 @@
     <g:if test="${CDN.preferred}">
         <g:set var="minSuffix" value="${Environment.current == Environment.TEST ? '' : '.min'}"/>
         <!-- CDNs -->
-        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap${minSuffix}.css">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap${minSuffix}.css">
         <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome${minSuffix}.css">
 
-        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery${minSuffix}.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery${minSuffix}.js"></script>
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui${minSuffix}.js"></script>
-        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/js/bootstrap${minSuffix}.js"></script>
-        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/angular${minSuffix}.js"></script>
-        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.11.2/ui-bootstrap-tpls${minSuffix}.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap${minSuffix}.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular${minSuffix}.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.4/ui-bootstrap-tpls${minSuffix}.js"></script>
 
         <!-- i18n 1.3.15 not present but hopefuly it's the same -->
-        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-i18n/1.2.15/angular-locale_en-gb.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular-locale_en-gb.js"></script>
 
-        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/angular-animate${minSuffix}.js"></script>
-        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/angular-sanitize${minSuffix}.js"></script>
-        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/angular-cookies${minSuffix}.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular-animate${minSuffix}.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular-sanitize${minSuffix}.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular-cookies${minSuffix}.js"></script>
 
         <!-- code -->
         <asset:stylesheet href="modelcatalogue.css"/>
