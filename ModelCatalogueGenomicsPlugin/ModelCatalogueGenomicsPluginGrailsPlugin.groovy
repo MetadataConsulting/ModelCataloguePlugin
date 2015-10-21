@@ -68,6 +68,13 @@ Genomics England Custom Additions to Model Catalogue
             type Model
             link controller: 'gelXml', action: 'generateXmlShredderModel',id: true
         }
+        
+        reportsRegistry.register {
+            creates asset
+            title { "Disease Ontology JSON (Choose Rare Disease List)" }
+            type Model
+            link controller: 'gelJson', action: 'printDiseaseOntology',id: true
+        }
 
     }
 
