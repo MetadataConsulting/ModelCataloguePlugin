@@ -21,16 +21,98 @@ import org.modelcatalogue.core.ValueDomain
 
 @Transactional
 class GelJsonService {
-    
 
-    String printDiseaseOntology(Model model){
-        //TODO add the right code here to generate json 
-       return null;
+    def jsonString = new StringBuffer()
+
+    def printDiseaseOntology(Model model){
+
+        def jsonStringBuffer = new StringBuffer(10*1024);
+
+        jsonStringBuffer<<='{\"DiseaseGroups\": [\n"'
+        jsonStringBuffer<<="    {"
+        jsonStringBuffer<<=printChild(model, 0)
+        jsonStringBuffer<<="]}\n}"
+        return jsonStringBuffer.toString();
     }
-    
-    
-    
-    
-  
-   
+
+
+    def printChild(Model child, Integer level){
+        def jsonString=''
+        def id = child.latestVersionId ?: child.id
+
+
+
+        if(level==0){
+            child.parentOf?.each { Model cd ->
+                jsonString<<=printChild(cd, level + 1)
+            }
+        }
+
+        if (level == 1) {
+
+            jsonString<<='{ \n'
+            jsonString<<='   "id" : "' + id  + '",\n'
+            jsonString<<='   "name" : "' + child.name+ '",'
+            jsonString<<='   "subGroups" : ['
+
+            child.parentOf.each { Model cd ->
+                jsonString<<=printChild(cd, level + 1)
+            }
+
+            jsonString<<="]\n"
+            jsonString<<='        },'
+        }
+
+        if (level == 2) {
+
+            jsonString<<='{      \n'
+            jsonString<<='       "id" : "' + id +'",\n'
+
+            jsonString<<='       "name" : "' + child.name+ '",'
+            jsonString<<='       "specificDisorders" : ['
+
+            child.parentOf.each { Model cd ->
+                jsonString<<=printChild(cd, level + 1)
+            }
+
+            jsonString<<="       ]\n"
+            jsonString<<="       },"
+        }
+
+        if (level == 3) {
+
+            jsonString<<='           { \n'
+            jsonString<<='           "id" : "' + id  +'",\n'
+            jsonString<<='            "name" : "' + child.name+ '",'
+            jsonString<<='                "eligibilityQuestion": {\n'
+            jsonString<<='                        "date:"'+child.lastUpdated+',\n'
+            jsonString<<='                        "version": "' +child.versionNumber +'"\n'
+            jsonString<<='                   },'
+
+            jsonString<<='           "shallowPhenotypes" : ['
+
+            child.parentOf.each { Model cd ->
+                jsonString<<=printChild(cd, level + 1)
+            }
+
+            jsonString<<="           ]\n"
+            jsonString<<="           },"
+        }
+
+        if (level == 4 && child.name.matches("(?i:.*Phenotypes.*)")) {
+            child.parentOf.each { Model cd ->
+                jsonString<<=printChild(cd, level + 1)
+            }
+        }
+
+        if (level == 5) {
+
+            jsonString<<='{\n'
+            jsonString<<='                        "name" : "' + child.name  + '",\n'
+            jsonString<<='                        "id"   : "' + child.ext.get("OBO ID") + '"\n'
+            jsonString<<='                    },'
+        }
+
+        return jsonString.toString()
+    }
 }
