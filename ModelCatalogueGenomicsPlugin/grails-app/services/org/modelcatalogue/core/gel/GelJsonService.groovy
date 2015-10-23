@@ -29,9 +29,9 @@ class GelJsonService {
         def jsonStringBuffer = new StringBuffer(10*1024);
 
         jsonStringBuffer<<='{\"DiseaseGroups\": [\n"'
-        jsonStringBuffer<<="    {"
+        jsonStringBuffer<<="    {\n"
         jsonStringBuffer<<=printChild(model, 0)
-        jsonStringBuffer<<="]}\n}"
+        jsonStringBuffer<<="]\n}\n}"
         return jsonStringBuffer.toString();
     }
 
@@ -76,27 +76,27 @@ class GelJsonService {
             }
 
             jsonString<<="       ]\n"
-            jsonString<<="       },"
+            jsonString<<="       },\n"
         }
 
         if (level == 3) {
 
             jsonString<<='           { \n'
             jsonString<<='           "id" : "' + id  +'",\n'
-            jsonString<<='            "name" : "' + child.name+ '",'
+            jsonString<<='            "name" : "' + child.name+ '",\n'
             jsonString<<='                "eligibilityQuestion": {\n'
             jsonString<<='                        "date:"'+child.lastUpdated+',\n'
             jsonString<<='                        "version": "' +child.versionNumber +'"\n'
-            jsonString<<='                   },'
+            jsonString<<='                   },\n'
 
-            jsonString<<='           "shallowPhenotypes" : ['
+            jsonString<<='           "shallowPhenotypes" : [\n'
 
             child.parentOf.each { Model cd ->
                 jsonString<<=printChild(cd, level + 1)
             }
 
             jsonString<<="           ]\n"
-            jsonString<<="           },"
+            jsonString<<="           },\n"
         }
 
         if (level == 4 && child.name.matches("(?i:.*Phenotypes.*)")) {
@@ -107,10 +107,10 @@ class GelJsonService {
 
         if (level == 5) {
 
-            jsonString<<='{\n'
+            jsonString<<='                    {\n'
             jsonString<<='                        "name" : "' + child.name  + '",\n'
             jsonString<<='                        "id"   : "' + child.ext.get("OBO ID") + '"\n'
-            jsonString<<='                    },'
+            jsonString<<='                    },\n'
         }
 
         return jsonString.toString()

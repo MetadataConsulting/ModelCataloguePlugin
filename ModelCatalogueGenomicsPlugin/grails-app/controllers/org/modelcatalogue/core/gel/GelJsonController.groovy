@@ -51,7 +51,7 @@ class GelJsonController {
         def assetPendingDesc="Your Rare Disease Ontology list as JSON   will be available in this asset soon. Use Refresh action to reload"
         def assetFinalizedDesc="Your JSON is ready. Use Download button to download it."
         def assetErrorDesc="Error generating json"
-        def assetMimeType="application/octet-stream"
+        def assetMimeType="application/gel-json"
         Closure closure={return gelJsonService.printDiseaseOntology(model)}
 
         def assetId=storeAssetFromString(model,closure,assetName,assetMimeType,assetPendingDesc,assetFinalizedDesc,assetErrorDesc,assetFileName)
