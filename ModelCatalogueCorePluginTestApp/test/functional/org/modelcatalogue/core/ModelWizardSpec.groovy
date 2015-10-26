@@ -123,7 +123,7 @@ class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         waitFor {
-            $('span.catalogue-element-treeview-name', text: "New 1").displayed
+            $('span.catalogue-element-treeview-name', text: startsWith("New")).displayed
         }
 
         waitUntilModalClosed(30)
@@ -148,7 +148,7 @@ class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         waitFor {
-            !$('span.catalogue-element-treeview-name', text: "New 1").displayed && menuItem('classifications', 'navigation-bottom-left').text().contains('XMLSchema')
+            !$('span.catalogue-element-treeview-name', text: startsWith("New")).displayed && menuItem('classifications', 'navigation-bottom-left').text().contains('XMLSchema')
         }
 
         when:
@@ -171,27 +171,8 @@ class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
             !modalDialog.find("#remove-tag-0").displayed
         }
         waitFor {
-            $('span.catalogue-element-treeview-name', text: "New 1").displayed && menuItem('classifications', 'navigation-bottom-left').text().contains('All Classifications')
+            $('span.catalogue-element-treeview-name', text: startsWith("New")).displayed && menuItem('classifications', 'navigation-bottom-left').text().contains('All Classifications')
         }
-
-    }
-
-    def "open the detail view"() {
-        waitFor(30) {
-            $('a.catalogue-element-treeview-link', title: "New").displayed
-        }
-
-        when: 'the item is clicked'
-        $('a.catalogue-element-treeview-link', title: "New").click()
-
-        then:
-        waitFor {
-            subviewTitle.text().trim() == 'New DRAFT'
-        }
-
-        totalOf('parentOf') == 2
-        totalOf('contains') == 1
-
 
     }
 
@@ -230,11 +211,11 @@ class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         waitFor {
-            $('span.catalogue-element-treeview-name', text: "Another New 1").displayed
+            $('span.catalogue-element-treeview-name', text: startsWith("Another New")).displayed
         }
 
         when: "click the footer action"
-        $('span.catalogue-element-treeview-name', text: "Another New 1").click()
+        $('span.catalogue-element-treeview-name', text: startsWith("Another New")).click()
         tableFooterAction.click()
 
         then: "modal is shown"
@@ -251,7 +232,7 @@ class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then: 'the number of children of Another New must be 1'
         waitFor {
-            $('span.catalogue-element-treeview-name', text: "Another New 1").parent().parent().find('.badge').text() == '1'
+            $('span.catalogue-element-treeview-name', text: startsWith("Another New")).parent().parent().find('.badge').text() == '1'
         }
 
     }
@@ -274,7 +255,7 @@ class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then: "same number of children are still shown"
         waitFor {
-            $('span.catalogue-element-treeview-name', text: "Changed Name 1").parent().parent().find('.badge').text() == '1'
+            $('span.catalogue-element-treeview-name', text: startsWith("Changed Name")).parent().parent().find('.badge').text() == '1'
         }
     }
 
