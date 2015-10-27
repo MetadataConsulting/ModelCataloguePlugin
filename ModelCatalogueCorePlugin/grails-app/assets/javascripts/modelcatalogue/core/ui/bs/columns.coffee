@@ -39,7 +39,7 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
   columnsProvider.registerColumns 'org.modelcatalogue.core.Model',     idNameAndDescription()
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.DataElement', [
-    { header: 'Classifications',  value: getClassificationsForDataElement,  classes: 'col-md-2'}
+    { header: 'Data Models',  value: getClassificationsForDataElement,  classes: 'col-md-2'}
     { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-3", show: true, href: 'modelCatalogueId'}
     { header: "Name", value: "name", classes: "col-md-3", show: true, href: 'href()', sort: {property: 'name', type: 'alpha'} }
     { header: "Description", value: "description" , classes: "col-md-4"}
