@@ -165,7 +165,7 @@ class AssetService {
 
         assetParams.size = 0
         assetParams.status = ElementStatus.PENDING
-        assetParams.description = "Your report will be available in this asset soon. Use Refresh action to reload"
+        assetParams.description = assetParams.description ?: "Your report will be available in this asset soon. Use Refresh action to reload"
 
         Asset asset = new Asset(assetParams)
 
