@@ -48,7 +48,7 @@ class LetterAnnotatorService {
                 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
                 <script type="text/javascript">
                     \$(function () {
-                      \$('[data-toggle="popover"]').popover({trigger: 'hover'})
+                      \$('[data-toggle="popover"]').popover({trigger: 'hover', placement: 'bottom'})
                     })
                 </script>
             </head>
@@ -75,7 +75,6 @@ class LetterAnnotatorService {
                     extensions 'data-toggle', 'popover'
                     extensions 'id', m.getId()
                     extensions 'data-classification', classification.name
-                    extensions 'placement', 'bottom'
                     builder
                 });
             }
@@ -104,10 +103,10 @@ class LetterAnnotatorService {
             for (TermOccurrence occurrence in annotatedLetter.occurrences) {
                 assetStream << """<tr>"""
 
-                assetStream << """</td><td class="col-md-2 text-right">${occurrence.occurrence}</td>"""
+                assetStream << """</td><td class="col-md-1 text-right">${occurrence.occurrence}</td>"""
 
                 assetStream << """
-                    <td class="col-md-10"><a href="#${occurrence.term.extensions.id}">${occurrence.term.term}</a>
+                    <td class="col-md-11"><a href="#${occurrence.term.extensions.id}">${occurrence.term.term}</a>
                 """
 
                 if (occurrence.term.url) {
