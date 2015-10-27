@@ -130,7 +130,7 @@ import org.modelcatalogue.core.util.Legacy
             return null
         }
 
-        if (existing.status in [org.modelcatalogue.core.api.ElementStatus.FINALIZED, org.modelcatalogue.core.api.ElementStatus.DEPRECATED] || HibernateProxyHelper.getClassWithoutInitializingProxy(existing) != domain) {
+        if (existing.status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED] || HibernateProxyHelper.getClassWithoutInitializingProxy(existing) != domain) {
             log.info("New draft version created for $this. Reason: $draftRequest")
             return repository.createDraftVersion(existing, this)
         }
@@ -387,7 +387,7 @@ import org.modelcatalogue.core.util.Legacy
         other.replacedBy = this
 
         if (domain != other.domain) {
-            if (domain == CatalogueElement) {
+            if (domain.isAssignableFrom(other.domain)) {
                 domain = other.domain
             }
         }
