@@ -141,6 +141,7 @@ class ModelCatalogueCorePluginUrlMappings {
             "/generateSuggestions" (controller: "dataArchitect", action: "generateSuggestions", method: HttpMethod.POST)
             "/suggestionsNames" (controller: "dataArchitect", action: "suggestionsNames", method: HttpMethod.GET)
             "/imports/upload" (controller: "dataImport", action: 'upload', method: HttpMethod.POST)
+            "/imports/annotate"(controller: 'dataImport', action: 'annotate', method: HttpMethod.POST)
         }
 
         "/"(view:"index")
