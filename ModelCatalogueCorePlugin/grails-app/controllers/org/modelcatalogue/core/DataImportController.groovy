@@ -21,6 +21,7 @@ class DataImportController  {
     def dataModelService
     def assetService
     def auditService
+    def letterAnnotatorService
 
 
     private static final CONTENT_TYPES = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream', 'application/xml', 'text/xml']
@@ -33,7 +34,11 @@ class DataImportController  {
             params.name = file.originalFilename
         }
         if (!params?.name) errors.add("no import name")
-        if (!file) errors.add("no file")
+        if (!file) {
+            errors.add("no file")
+        } else if (file.size <= 0) {
+            errors.add("file is empty")
+        }
         return errors
     }
 
@@ -42,7 +47,48 @@ class DataImportController  {
         return string
     }
 
+    def annotate() {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            render status: HttpStatus.UNAUTHORIZED
+            return
+        }
 
+
+        if (!(request instanceof MultipartHttpServletRequest)) {
+            respond "errors": [message: 'No file selected']
+            return
+        }
+
+        def errors = []
+
+        MultipartFile file = request.getFile("file")
+        errors.addAll(getErrors(params, file))
+
+
+        Set<Long> dataModels = (params.dataModels ?: '').split(',').collect{ Long.valueOf(it,10) }.toSet()
+
+        if (!dataModels) {
+            errors << "no data models"
+        }
+
+        if (errors) {
+            respond("errors": errors)
+            return
+        }
+
+
+
+        String letter = file.inputStream.text
+        def id = assetService.storeReportAsAsset(
+                name: params.name,
+                originalFileName: params.name.endsWith('.html') ? params.name : "${params.name}.annotated.html",
+                contentType: "text/html",
+                description: "Your annotated letter will be available soon. Use Refresh action to reload the screen."
+        )  { OutputStream out ->
+            letterAnnotatorService.annotateLetter(dataModels.collect{ DataModel.get(it)}.toSet(), letter, out)
+        }
+        redirectToAsset(id)
+    }
 
     def upload() {
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
@@ -197,8 +243,14 @@ class DataImportController  {
             return
         }
 
+
+        if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xsd")) {
+            Asset asset = renderImportAsAsset(params, file, conceptualDomainName)
+            redirectToAsset(asset.id)
+            return
+        }
+
         if (!CONTENT_TYPES.contains(confType)) errors.add("input should be an Excel file but uploaded content is ${confType}")
-        if (file.size <= 0) errors.add("The uploaded file is empty")
         respond "errors": errors
     }
 
