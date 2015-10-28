@@ -82,9 +82,9 @@ class LetterAnnotatorService {
         }
 
         log.info "Finding candidate terms"
-        AnnotatedLetter annotatedLetter = annotator.annotate(letter, Highlighter.HTML)
+        AnnotatedLetter annotatedLetter = annotator.annotate(letter)
 
-        assetStream << annotatedLetter.highlighted
+        assetStream << annotatedLetter.text
         log.info "Annotated letter exported"
 
         assetStream << """</pre>
@@ -103,7 +103,7 @@ class LetterAnnotatorService {
             for (TermOccurrence occurrence in annotatedLetter.occurrences) {
                 assetStream << """<tr>"""
 
-                assetStream << """</td><td class="col-md-1 text-right">${occurrence.occurrence}</td>"""
+                assetStream << """</td><td class="col-md-1 text-right">${occurrence.positiveOccurrence}</td>"""
 
                 assetStream << """
                     <td class="col-md-11"><a href="#${occurrence.term.extensions.id}">${occurrence.term.term}</a>
