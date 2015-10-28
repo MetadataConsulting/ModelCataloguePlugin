@@ -3,7 +3,6 @@ package org.modelcatalogue.core
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.letter.annotator.AnnotatedLetter
 import org.modelcatalogue.letter.annotator.CandidateTerm
-import org.modelcatalogue.letter.annotator.Highlighter
 import org.modelcatalogue.letter.annotator.LetterAnnotator
 import org.modelcatalogue.letter.annotator.TermOccurrence
 import org.modelcatalogue.letter.annotator.lucene.LuceneLetterAnnotator
