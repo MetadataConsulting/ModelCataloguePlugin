@@ -2,6 +2,7 @@ package org.modelcatalogue.core.xml
 
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.api.ElementStatus
 
 abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
 
@@ -77,8 +78,8 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             attrs.id = element.getDefaultModelCatalogueId(!context.idIncludeVersion)
         }
 
-        if (element.status != org.modelcatalogue.core.api.ElementStatus.FINALIZED) {
-            if (element.status in [org.modelcatalogue.core.api.ElementStatus.DRAFT, org.modelcatalogue.core.api.ElementStatus.DEPRECATED]) {
+        if (element.status != ElementStatus.FINALIZED) {
+            if (element.status in [ElementStatus.DRAFT, ElementStatus.DEPRECATED]) {
                 attrs.status = element.status
             } else {
                 throw new IllegalArgumentException("Cannot print ${element.getClass().simpleName} with status $element.status")
@@ -178,7 +179,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             if (context.currentClassification in element.dataModels) {
                 return [name: element.name]
             } else {
-                return [name: element.name, classification: element.dataModels.first().name]
+                return [name: element.name, dataModel: element.dataModels.first().name]
             }
         }
 

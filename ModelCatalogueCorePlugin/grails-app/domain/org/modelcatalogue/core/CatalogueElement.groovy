@@ -222,6 +222,10 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     def beforeValidate() {
+        removeModelCatalogueIdIfDefault()
+    }
+
+    private void removeModelCatalogueIdIfDefault() {
         if (modelCatalogueId) {
             String defaultId = getDefaultModelCatalogueId(true)
             if (defaultId && modelCatalogueId.startsWith(defaultId)) {
@@ -405,6 +409,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     void beforeUpdate() {
+        removeModelCatalogueIdIfDefault()
         auditService.logElementUpdated(this)
 
         CatalogueElement self = this
