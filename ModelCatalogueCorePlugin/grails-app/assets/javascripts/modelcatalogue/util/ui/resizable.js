@@ -1,75 +1,125 @@
-(function(window, angular) {
-'use strict';
-/**
- * Extremly simplified https://github.com/angular-ui/ui-sortable
- */
-angular.module('mc.util.ui.resizable', [])
-  .value('resizableConfig',{})
-  .directive('resizable', [
-    'resizableConfig', '$timeout', '$log', '$window',
-    function(resizableConfig, $timeout, $log, $window) {
-      return {
-        scope: {
-          resizable: '='
-        },
-        link: function(scope, element) {
-          var opts = {};
+(function (window, angular) {
+    'use strict';
 
-          angular.extend(opts, resizableConfig, scope.resizable);
+    /**
+     * Extremly simplified https://github.com/angular-ui/ui-sortable
+     */
+    angular.module('mc.util.ui.resizable', [])
+        .value('resizableConfig', {})
+        .directive('resizable', [
+            'resizableConfig', '$timeout', '$log', '$window', '$rootScope',
+            function (resizableConfig, $timeout, $log, $window, $rootScope) {
+                return {
+                    scope: {
+                        resizable: '='
+                    },
+                    link: function (scope, element) {
+                        var opts = {}, setOption, recalculateWidths, getAbsoluteWidth, breakIfNeeded;
 
-          if (!angular.element.fn || !angular.element.fn.jquery) {
-            $log.error('resizable: jQuery should be included before AngularJS!');
-            return;
-          }
+                        getAbsoluteWidth = function (widthInPercents, parentElement) {
+                            return parentElement.innerWidth() * widthInPercents / 100
+                        };
 
-          // Create resizable
-          element.resizable(opts);
+                        setOption = function (opts, option, value) {
+                            // always set the value in opts for better accessibility
+                            opts[option] = value;
+                            // in case the resizable is already initialized, update the option directly
+                            if (element.resizable('instance')) {
+                                element.resizable('option', option, value);
+                            }
+                        };
+
+                        recalculateWidths = function (opts) {
+                            if (opts.minWidthPct) {
+                                setOption(opts, 'minWidth', getAbsoluteWidth(opts.minWidthPct, element.parent()));
+                            }
+
+                            if (opts.maxWidthPct) {
+                                setOption(opts, 'maxWidth', getAbsoluteWidth(opts.maxWidthPct, element.parent()));
+                            }
+                        };
+
+                        breakIfNeeded = function(opts) {
+                            var windowWidth = jQuery($window).width();
+
+                            if (!opts.breakWidth || !opts.mirror) {
+                                return false;
+                            }
+                            if (windowWidth > opts.breakWidth) {
+                                return false;
+                            }
+
+                            jQuery(opts.mirror).width(windowWidth - (opts.windowWidthCorrection ? opts.windowWidthCorrection : 0));
+                            element.width(windowWidth - (opts.windowWidthCorrection ? opts.windowWidthCorrection : 0));
+                            return true;
+                        };
+
+                        angular.extend(opts, resizableConfig, scope.resizable);
+
+                        if (!angular.element.fn || !angular.element.fn.jquery) {
+                            $log.error('resizable: jQuery should be included before AngularJS!');
+                            return;
+                        }
+
+                        recalculateWidths(opts);
+
+                        // Create resizable
+                        element.resizable(opts);
 
 
+                        if (opts.mirror) {
+                            breakIfNeeded(opts);
 
-          if (opts.mirror) {
-              element.on('resizestart', function(){
-                  // stores the width with padding as when setting back the padding is stripped out (setting with
-                  // outerWidth does not help at all)
-                  // this is probably bug in jQuery and there should be a mechanism to check if it isn't fix yet
-                  jQuery(opts.mirror).data('resizestartwidth', jQuery(opts.mirror).outerWidth())
-              });
-              element.on('resize', function(event, ui){
-                  var delta, newWidth;
-                  delta = ui.originalSize.width - ui.size.width;
-                  if (!delta) {
-                      event.preventDefault();
-                      event.stopPropagation();
-                      return false;
-                  }
-                  newWidth = jQuery(opts.mirror).data('resizestartwidth') + delta - 1;
+                            element.on('resizestart', function () {
+                                // stores the width with padding as when setting back the padding is stripped out (setting with
+                                // outerWidth does not help at all)
+                                // this is probably bug in jQuery and there should be a mechanism to check if it isn't fix yet
+                                jQuery(opts.mirror).data('resizestartwidth', jQuery(opts.mirror).outerWidth())
+                            });
+                            element.on('resize', function (event, ui) {
+                                var delta, newWidth;
+                                delta = ui.originalSize.width - ui.size.width;
+                                if (!delta) {
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                    return false;
+                                }
+                                newWidth = jQuery(opts.mirror).data('resizestartwidth') + delta - 1;
 
-                  if (newWidth < (opts.mirrorMinWidth ? opts.mirrorMinWidth : 200)) {
-                      event.preventDefault();
-                      event.stopPropagation();
-                      return false;
-                  }
+                                jQuery(opts.mirror).width(newWidth);
 
-                  jQuery(opts.mirror).width(newWidth);
-                  event.stopPropagation();
-              });
-              jQuery($window).on('resize', function(){
-                  var windowWidth = jQuery($window).innerWidth(), elementWidth = element.outerWidth(),
-                      newWidth = windowWidth - elementWidth - (opts.windowWidthCorrection ? opts.windowWidthCorrection : 1);
+                                $rootScope.$broadcast('infiniteTableRedraw');
 
-                  if (newWidth < (opts.mirrorMinWidth ? opts.mirrorMinWidth : 200)) {
-                      event.preventDefault();
-                      event.stopPropagation();
-                      $window.resizeTo((opts.mirrorMinWidth ? opts.mirrorMinWidth : 200), $window.height());
-                      return false;
-                  }
+                                event.stopPropagation();
+                            });
+                            jQuery($window).on('resize', function () {
+                                var parentWidth, elementWidth, newWidth;
 
-                  jQuery(opts.mirror).width(newWidth);
-              })
-          }
-        }
-      };
-    }
-  ]);
+                                if (breakIfNeeded(opts)) {
+                                    return;
+                                }
+
+                                recalculateWidths(opts);
+
+                                parentWidth = element.parent().innerWidth();
+                                elementWidth = element.outerWidth();
+
+                                if (opts.minWidth && elementWidth < opts.minWidth) {
+                                    element.width(opts.minWidth);
+                                    elementWidth = element.outerWidth();
+                                } else if (opts.maxWidth && elementWidth > opts.maxWidth) {
+                                    element.width(opts.maxWidth);
+                                    elementWidth = element.outerWidth();
+                                }
+
+                                newWidth = parentWidth - elementWidth - (opts.windowWidthCorrection ? opts.windowWidthCorrection : 1);
+
+                                jQuery(opts.mirror).width(newWidth);
+                            })
+                        }
+                    }
+                };
+            }
+        ]);
 
 })(window, window.angular);
