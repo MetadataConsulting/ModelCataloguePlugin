@@ -283,6 +283,9 @@ Model catalogue core plugin (metadata registry)
             creates asset
             title { "Export All Elements of ${it.name} to Excel XSLX" }
             type DataClass
+            when { DataClass dataClass ->
+                dataClass.countContains() > 0
+            }
             link controller: 'dataArchitect', action: 'getSubModelElements', params: [format: 'xlsx', report:'NHIC'], id: true
         }
 
