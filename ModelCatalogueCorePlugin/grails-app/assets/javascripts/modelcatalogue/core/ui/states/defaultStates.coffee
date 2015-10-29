@@ -709,7 +709,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     </div>
     <div ng-if="(resource == 'dataClass' || resource == 'model' || resource == 'xdataModel')&amp;&amp; $stateParams.display == undefined">
       <div class="row">
-        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 split-view-left" resizable="{'handles': 'e', 'mirror': '.split-view-right', 'maxWidth': 1000, 'minWidth': 200, 'windowWidthCorrection': 91}">
+        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 split-view-left" resizable="{'handles': 'e', 'mirror': '.split-view-right', 'maxWidthPct': 60, 'minWidthPct': 20, 'windowWidthCorrection': 91, 'parentWidthCorrection': 31, 'breakWidth': 768}">
           <div class="split-view-content">
             <div class="row">
               <span class="contextual-actions-right">
