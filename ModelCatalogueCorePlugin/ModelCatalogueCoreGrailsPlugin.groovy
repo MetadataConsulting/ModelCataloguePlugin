@@ -265,7 +265,7 @@ Model catalogue core plugin (metadata registry)
                     "Metadata"
 
             when { ListWrapper container, RenderContext context ->
-                container.itemType && DataElement.isAssignableFrom(container.itemType)
+                container.itemType && DataElement.isAssignableFrom(container.itemType) && container.total > 0
             } then { DataElement element ->
                 Model parent = getParentModel(element)
                 Model model = getContainingModel(element)
@@ -300,6 +300,9 @@ Model catalogue core plugin (metadata registry)
             creates asset
             title { "Export All Elements of ${it.name} to Excel XSLX" }
             type Model
+            when { Model model ->
+                model.countContains() > 0
+            }
             link controller: 'dataArchitect', action: 'getSubModelElements', params: [format: 'xlsx', report:'NHIC'], id: true
         }
 
