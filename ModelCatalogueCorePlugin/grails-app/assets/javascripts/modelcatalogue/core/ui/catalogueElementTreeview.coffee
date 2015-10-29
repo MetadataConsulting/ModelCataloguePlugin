@@ -9,7 +9,7 @@ class CatalogueElementTreeview
         selected.$$active = false
       selected = element
       element.$$active = true
-      $scope.onSelect({$element: element})
+      $scope.onSelect({$element: element}) if angular.isFunction($scope.onSelect)
 
 
 
