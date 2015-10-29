@@ -50,7 +50,7 @@ grails.project.dependency.resolution = {
         // runtime 'mysql:mysql-connector-java:5.1.27'
         compile 'com.google.guava:guava:18.0'
 
-        String mcToolkitVersion = '1.0.0-rename-7'
+        String mcToolkitVersion = '1.0.0-rename-8'
         compile "org.modelcatalogue:mc-core-api:$mcToolkitVersion"
         compile "org.modelcatalogue:mc-builder-api:$mcToolkitVersion"
         compile "org.modelcatalogue:mc-integration-excel:$mcToolkitVersion"
