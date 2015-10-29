@@ -429,8 +429,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     }
   ])
 
-.controller('defaultStates.searchCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$rootScope', '$q', '$state', 'names', 'messages', 'actions', 'modelCatalogueApiRoot', '$http', 'enhance'
-    (catalogueElementResource, modelCatalogueSearch, $scope, $rootScope, $q, $state, names, messages, actions, modelCatalogueApiRoot, $http, enhance)->
+.controller('defaultStates.searchCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$rootScope', '$q', '$state', 'names', 'messages', 'actions', 'modelCatalogueApiRoot', '$http', 'enhance', 'security',
+    (catalogueElementResource, modelCatalogueSearch, $scope, $rootScope, $q, $state, names, messages, actions, modelCatalogueApiRoot, $http, enhance, security)->
       actions = []
 
       $scope.search = (item, model, label) ->
@@ -537,8 +537,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
           p2 = $q.when true
 
-          if term.match(/^\d+$/)
-            p2 = $http.get("#{modelCatalogueApiRoot}/catalogueElement/#{term}").then (result) ->
+          if term.match(/^\d+(\.\d+)?$/)
+            p2 = $http.get("#{security.contextPath ? ''}/catalogue/catalogueElement/#{term}").then (result) ->
               return unless result.data?.elementType
               searchResult = enhance result.data
               results.push {
