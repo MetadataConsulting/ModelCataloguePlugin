@@ -9,14 +9,11 @@ for file in */ .*/ ; do
         echo "found grails wrapper in $file"
         cd "$file"
 
-        PROP_VALUE=`cat "application.properties" | grep "app.grails.version" | cut -d'=' -f2`
-
-        echo "$PROP_VALUE"
-
         ./grailsw clean-all --stacktrace
         rm -rf target
         rm -rf target-eclipse
 
+        PROP_VALUE=`cat "application.properties" | grep "app.grails.version" | cut -d'=' -f2`
         GRAILS_PROJECT_FOLDER="~/.grails/$PROP_VALUE/projects/${PWD##*/}"
 
         rm -rf "$GRAILS_PROJECT_FOLDER"
