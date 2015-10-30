@@ -3,6 +3,8 @@
 # fail if any line fails
 set -e
 
+date ; echo -e "\n"
+
 if [[ "$1" != "" ]]; then
     TEST_SUITE="$1"
 fi

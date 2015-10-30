@@ -3,6 +3,9 @@
 # fail if any line fails
 set -e
 
+date ; echo -e "\n"
+
+
 mkdir -p build
 
 ./setup-frontend.sh

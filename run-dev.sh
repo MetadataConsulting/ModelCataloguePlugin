@@ -3,6 +3,8 @@
 # fail if any line fails
 set -e
 
+date ; echo -e "\n"
+
 ./setup-frontend.sh
 
 cd ModelCatalogueCorePluginTestApp
