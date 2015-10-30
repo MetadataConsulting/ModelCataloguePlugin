@@ -16,3 +16,5 @@ ModelCatalogueCorePluginTestApp/test/integration/resources/rare_diseases_combine
 **/*.class
 **/*.gen.fixture.js
 **/build/**/*
+
+.default-mc-config-location
