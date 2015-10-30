@@ -12,6 +12,12 @@ elif [[ "$1" == "offline" ]]; then
     ./grailsw prod run-app -Dmc.offline=true
 elif [[ "$1" ]]; then
     ./grailsw prod run-app -Dmc.config.location="$1"
+elif test -f "../.default-mc-config-location" ; then
+    location=`cat "../.default-mc-config-location"`
+    echo -e "\n\nUsing $location configuration!\n\n"
+    ./grailsw prod run-app -Dmc.config.location="$location"
+elif ! test -f "~/.grails/mc-config.groovy" ; then
+    echo -e "\n\nLocal Model Catalogue production configuration is missing!\nPlease copy file ./ModelCatalogueCorePluginTestApp/grails-app/conf/mc-config.groovy.example into ~/.grails/mc-config.groovy and update it with your local production database settings.\n"
 else
     ./grailsw prod run-app
 fi

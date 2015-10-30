@@ -24,6 +24,29 @@ dataSource {
     }
 }
 
+// oauth {
+//     providers {
+//         google {
+//             // this key is limited to localhost only so no need to hide it
+//             api = org.modelcatalogue.repack.org.scribe.builder.api.GoogleApi20
+//             key = '225917730237-0hg6u55rgnld9cbtm949ab9h9fk5onr3.apps.googleusercontent.com'
+//             secret = 'OG0JVVoy4bnGm48bneIS0haB'
+//             successUri = '/oauth/google/success'
+//             failureUri = '/oauth/google/error'
+//             callback = "${grails.serverURL}/oauth/google/callback"
+//             scope = 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
+//         }
+//         twitter {
+//             api = org.modelcatalogue.repack.org.scribe.builder.api.TwitterApi.Authenticate
+//             key = '7TEsVb5FADZpVjjy5nFnMo4gd'
+//             secret = 'NcHe21gS4fHkorlNBS8mc2QbMez3bL51G3LT18nXy0KEP7SIn0'
+//             successUri = '/oauth/twitter/success'
+//             failureUri = '/oauth/twitter/error'
+//             callback = "${grails.serverURL}/oauth/twitter/callback"
+//         }
+//     }
+// }
+
 //discourse {
 //    // do not forget to setup a firewall rule to access this server
 //    url = "http://192.168.1.123/"

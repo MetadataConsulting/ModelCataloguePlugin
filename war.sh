@@ -12,5 +12,7 @@ cd ModelCatalogueCorePluginTestApp
 
 cp target/*.war ../build/
 
+echo "War created in ./build/ directory. You need to have put mc-config.groovy configuration file in your Tomcat's conf directory"
+
 
 
