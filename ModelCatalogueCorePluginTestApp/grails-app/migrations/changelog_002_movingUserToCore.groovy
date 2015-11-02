@@ -1,9 +1,16 @@
 databaseChangeLog = {
 
-	changeSet(author: "Vladimir Orany", id: "1512847974030-01") {
+	changeSet(author: "Vladimir Orany", id: "1512847974030-01-1") {
         preConditions (onFail: 'MARK_RAN') {
             not {
                 tableExists tableName: "security_user_old"
+                sqlCheck expectedResult: '0', """
+                    select count(ce.id)
+                    from catalogue_element ce
+                    join user u
+                    on u.id = ce.id and ce.name = u.username
+
+                """
             }
         }
 
