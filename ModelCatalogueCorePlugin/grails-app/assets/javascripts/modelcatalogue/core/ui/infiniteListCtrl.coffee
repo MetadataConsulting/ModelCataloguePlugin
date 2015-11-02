@@ -30,13 +30,12 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
     cell
 
   getPropertiesForElement = (element) ->
-    properties = [
-      {label: 'Model Catalogue ID', value: -> element.modelCatalogueId }
-      {label: 'Version', value: -> "#{element.latestVersionId}.#{element.versionNumber}" }
-    ]
+    properties = []
     if element and angular.isFunction(element.isInstanceOf)
-      if element.isInstanceOf('catalogueElement') and not element.isInstanceOf('classification')
-        properties.push label: 'Classifications', value: -> element.classifications
+      if element.isInstanceOf('catalogueElement')
+        properties.push label: 'Model Catalogue ID', value: -> element.modelCatalogueId
+        properties.push label: 'Version', value: -> "#{element.latestVersionId}.#{element.versionNumber}"
+        properties.push(label: 'Classifications', value: -> element.classifications) if not element.isInstanceOf('classification')
       if element.isInstanceOf('dataElement')
         properties.push label: 'Value Domain', value: -> element.valueDomain
       if element.isInstanceOf('valueDomain')
