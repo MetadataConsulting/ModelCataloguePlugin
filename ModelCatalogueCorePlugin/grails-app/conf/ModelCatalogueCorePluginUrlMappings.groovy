@@ -92,7 +92,7 @@ class ModelCatalogueCorePluginUrlMappings {
                 }
 
                 if (controllerName == 'model') {
-                    "/api/modelCatalogue/core/gel/reports/classificationJasper"(controller: 'model', action: 'gereportDoc', method: HttpMethod.GET)
+                    "/api/modelCatalogue/core/gel/reports/inventoryDoc"(controller: 'model', action: 'inventoryDoc', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/gel/reports/classificationChangelog"(controller: 'model', action: 'changelogDoc', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/gel/reports/inventorySpreadsheet"(controller: 'model', action: 'inventorySpreadsheet', method: HttpMethod.GET)
                 }
