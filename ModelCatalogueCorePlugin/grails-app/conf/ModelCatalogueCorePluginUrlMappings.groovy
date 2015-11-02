@@ -100,10 +100,10 @@ class ModelCatalogueCorePluginUrlMappings {
                 }
 
                 if (controllerName == 'dataClass') {
+                    "/api/modelCatalogue/core/$elementName/$id/inventoryDoc"(controller: 'dataClass', action: 'inventoryDoc', method: HttpMethod.GET)
+                    "/api/modelCatalogue/core/$elementName/$id/classificationChangelog"(controller: 'dataClass', action: 'changelogDoc', method: HttpMethod.GET)
+                    "/api/modelCatalogue/core/$elementName/$id/inventorySpreadsheet"(controller: 'dataClass', action: 'inventorySpreadsheet', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/$id/referenceType"(controller: controllerName, action: 'referenceTypes', method: HttpMethod.GET)
-                    "/api/modelCatalogue/core/gel/reports/inventoryDoc"(controller: 'dataClass', action: 'inventoryDoc', method: HttpMethod.GET)
-                    "/api/modelCatalogue/core/gel/reports/classificationChangelog"(controller: 'dataClass', action: 'changelogDoc', method: HttpMethod.GET)
-                    "/api/modelCatalogue/core/gel/reports/inventorySpreadsheet"(controller: 'dataClass', action: 'inventorySpreadsheet', method: HttpMethod.GET)
 
                 }
 
