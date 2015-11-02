@@ -101,9 +101,9 @@ class ModelCatalogueCorePluginUrlMappings {
 
                 if (controllerName == 'dataClass') {
                     "/api/modelCatalogue/core/$elementName/$id/referenceType"(controller: controllerName, action: 'referenceTypes', method: HttpMethod.GET)
-                    "/api/modelCatalogue/core/gel/reports/classificationJasper"(controller: controllerName, action: 'gereportDoc', method: HttpMethod.GET)
-                    "/api/modelCatalogue/core/gel/reports/classificationChangelog"(controller: controllerName, action: 'changelogDoc', method: HttpMethod.GET)
-                    "/api/modelCatalogue/core/gel/reports/inventorySpreadsheet"(controller: controllerName, action: 'inventorySpreadsheet', method: HttpMethod.GET)
+                    "/api/modelCatalogue/core/gel/reports/inventoryDoc"(controller: 'dataClass', action: 'inventoryDoc', method: HttpMethod.GET)
+                    "/api/modelCatalogue/core/gel/reports/classificationChangelog"(controller: 'dataClass', action: 'changelogDoc', method: HttpMethod.GET)
+                    "/api/modelCatalogue/core/gel/reports/inventorySpreadsheet"(controller: 'dataClass', action: 'inventorySpreadsheet', method: HttpMethod.GET)
 
                 }
 
