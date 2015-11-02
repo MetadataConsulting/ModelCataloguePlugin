@@ -8,7 +8,7 @@ forms.config ['metadataEditorsProvider', (metadataEditorsProvider)->
   metadataEditorsProvider.register {
     title: 'Form (Metadata)'
     types: [
-      'model'
+      'dataClass'
     ]
     keys: [
       "http://forms.modelcatalogue.org/form#name"
@@ -22,7 +22,7 @@ forms.config ['metadataEditorsProvider', (metadataEditorsProvider)->
   metadataEditorsProvider.register {
     title: 'Form (Section)'
     types: [
-      'model'
+      'dataClass'
       '=[hierarchy]=>'
     ]
     keys: [
@@ -37,7 +37,7 @@ forms.config ['metadataEditorsProvider', (metadataEditorsProvider)->
   metadataEditorsProvider.register {
     title: 'Form (Grid)'
     types: [
-      'model'
+      'dataClass'
       '=[hierarchy]=>'
     ]
     keys: [

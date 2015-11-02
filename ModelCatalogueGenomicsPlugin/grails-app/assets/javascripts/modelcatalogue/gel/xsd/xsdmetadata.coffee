@@ -7,7 +7,7 @@ xsd.config ['metadataEditorsProvider', (metadataEditorsProvider)->
   metadataEditorsProvider.register {
     title: 'XSD-XSL(Metadata)'
     types: [
-      'model'
+      'dataClass'
       '=[hierarchy]=>'
     ]
     keys: [
@@ -49,7 +49,7 @@ xsd.config ['metadataEditorsProvider', (metadataEditorsProvider)->
           'dataElement'   
           'dataType'
           '=[containment]=>'
-          'model'
+          'dataClass'
           '=[hierarchy]=>'
         ]
 
