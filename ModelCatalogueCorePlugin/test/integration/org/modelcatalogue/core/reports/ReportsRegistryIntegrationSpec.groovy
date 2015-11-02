@@ -50,7 +50,7 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
         expect:
         modelReports.size()                 >= 1
         modelReports[0].getTitle(model)     == 'Inventory Report Document'
-        modelReports[0].getLink(model)      == "/model/inventoryDoc/1"
+        modelReports[0].getLink(model)      == "/api/modelCatalogue/core/gel/reports/inventoryDoc?id=1"
 
         when:
         def models = new Elements(itemType: Model)
