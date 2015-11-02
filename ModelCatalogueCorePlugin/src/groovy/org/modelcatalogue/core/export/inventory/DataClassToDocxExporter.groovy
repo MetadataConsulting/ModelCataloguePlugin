@@ -186,7 +186,7 @@ class DataClassToDocxExporter {
             }
         }
 
-        log.debug "Data Model $dataModel exported to Word Document"
+        log.debug "Data Model $rootModel exported to Word Document"
     }
 
     private boolean hasExtraInformation(DataType dataType) {
