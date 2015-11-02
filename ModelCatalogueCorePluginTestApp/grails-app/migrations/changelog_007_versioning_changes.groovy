@@ -1,6 +1,6 @@
 databaseChangeLog = {
 
-	changeSet(author: "Vladimir Orany", id: "1412847974051-01") {
+	changeSet(author: "Vladimir Orany", id: "1412847974051-02") {
         preConditions (onFail: 'MARK_RAN') {
             not {
                 columnExists tableName: "relationship_type", columnName: "version_specific"

@@ -977,4 +977,65 @@ databaseChangeLog = {
         addForeignKeyConstraint(baseColumnNames: "classification_id", baseTableName: "classification_classifies", constraintName: "FK2499F01B24A7E205", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "classification", referencesUniqueColumn: "false")
         addForeignKeyConstraint(baseColumnNames: "published_element_id", baseTableName: "classification_classifies", constraintName: "FK2499F01BD3630CA8", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "published_element", referencesUniqueColumn: "false")
     }
+
+    // reasonable database defaults which corresponds the defaults in the entities, has to be in the first ddl changelog
+    // in case running dbCreate=update
+
+	changeSet(author: "Vladimir Orany", id: "1412847974300-100") {
+        preConditions (onFail: 'MARK_RAN') {
+            columnExists tableName: "catalogue_element", columnName: "status"
+        }
+        addDefaultValue(tableName: "catalogue_element", columnName: "status", defaultValue: "DRAFT")
+    }
+
+    changeSet(author: "Vladimir Orany", id: "1412847974300-101") {
+        preConditions (onFail: 'MARK_RAN') {
+            columnExists tableName: "relationship_type", columnName: "version_specific"
+        }
+
+        addDefaultValue(tableName: "relationship_type", columnName: "version_specific", defaultValueBoolean: true)
+    }
+
+    changeSet(author: "Vladimir Orany", id: "1412847974300-102") {
+        preConditions (onFail: 'MARK_RAN') {
+            columnExists tableName: "catalogue_element", columnName: "version_created"
+        }
+        dropNotNullConstraint(tableName: "catalogue_element", columnName: "version_created", columnDataType: "DATETIME")
+    }
+
+    changeSet(author: "Vladimir Orany", id: "1412847974300-103") {
+        preConditions (onFail: 'MARK_RAN') {
+            columnExists tableName: "catalogue_element", columnName: "version_number"
+        }
+        addDefaultValue(tableName: "catalogue_element", columnName: "version_number", defaultValueNumeric: 1)
+    }
+
+    changeSet(author: "Vladimir Orany", id: "1412847974300-104") {
+        preConditions (onFail: 'MARK_RAN') {
+            columnExists tableName: "relationship", columnName: "combined_index"
+        }
+        addDefaultValue(tableName: "relationship", columnName: "combined_index", defaultValueNumeric: 1)
+    }
+
+    changeSet(author: "Vladimir Orany", id: "1412847974300-105") {
+        preConditions (onFail: 'MARK_RAN') {
+            columnExists tableName: "relationship", columnName: "outgoing_index"
+        }
+        addDefaultValue(tableName: "relationship", columnName: "outgoing_index", defaultValueNumeric: 1)
+    }
+
+    changeSet(author: "Vladimir Orany", id: "1412847974300-106") {
+        preConditions (onFail: 'MARK_RAN') {
+            columnExists tableName: "relationship", columnName: "incoming_index"
+        }
+        addDefaultValue(tableName: "relationship", columnName: "incoming_index", defaultValueNumeric: 1)
+    }
+
+    changeSet(author: "Vladimir Orany", id: "1412847974300-107") {
+        preConditions (onFail: 'MARK_RAN') {
+            columnExists tableName: "relationship", columnName: "inherited"
+        }
+
+        addDefaultValue(tableName: "relationship", columnName: "inherited", defaultValueBoolean: false)
+    }
 }

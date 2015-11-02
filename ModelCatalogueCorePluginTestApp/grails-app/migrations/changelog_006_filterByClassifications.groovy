@@ -10,26 +10,84 @@ databaseChangeLog = {
         dropColumn tableName: 'user', columnName: 'default_classification_id'
     }
 
-    changeSet(author: "Vladimir Orany", id: "1412847974051-01") {
+    changeSet(author: "Vladimir Orany", id: "1412847974051-01-01") {
         preConditions(onFail: 'MARK_RAN') {
             tableExists tableName: "extendible_element"
+            tableExists tableName: "value_domain"
         }
-
-        dropAllForeignKeyConstraints baseTableName: 'user'
-        addForeignKeyConstraint(baseColumnNames: "id", baseTableName: "user", constraintName: "FKEA5792AFB738USER", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "catalogue_element", referencesUniqueColumn: "false")
-
-        dropAllForeignKeyConstraints baseTableName: 'extension_value'
-        addForeignKeyConstraint(baseColumnNames: "element_id", baseTableName: "extension_value", constraintName: "CAT_EL_EXTENSIONS", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "catalogue_element", referencesUniqueColumn: "false")
-
-        dropAllForeignKeyConstraints baseTableName: 'published_element'
-        addForeignKeyConstraint(baseColumnNames: "id", baseTableName: "published_element", constraintName: "FK4C2699AB33E59620", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "catalogue_element", referencesUniqueColumn: "false")
 
         dropAllForeignKeyConstraints baseTableName: 'value_domain'
         addForeignKeyConstraint(baseColumnNames: "data_type_id", baseTableName: "value_domain", constraintName: "FK1706EF52537B20FA", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "data_type", referencesUniqueColumn: "false")
         addForeignKeyConstraint(baseColumnNames: "id", baseTableName: "value_domain", constraintName: "FK1706EF5233E59620", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "catalogue_element", referencesUniqueColumn: "false")
         addForeignKeyConstraint(baseColumnNames: "unit_of_measure_id", baseTableName: "value_domain", constraintName: "FK1706EF524DE6923E", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "measurement_unit", referencesUniqueColumn: "false")
 
+    }
+
+    changeSet(author: "Vladimir Orany", id: "1412847974051-01-02") {
+        preConditions(onFail: 'MARK_RAN') {
+            tableExists tableName: "extendible_element"
+            tableExists tableName: "extension_value"
+        }
+
+        dropAllForeignKeyConstraints baseTableName: 'extension_value'
+        addForeignKeyConstraint(baseColumnNames: "element_id", baseTableName: "extension_value", constraintName: "CAT_EL_EXTENSIONS", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "catalogue_element", referencesUniqueColumn: "false")
+    }
+
+    changeSet(author: "Vladimir Orany", id: "1412847974051-01-03") {
+        preConditions(onFail: 'MARK_RAN') {
+//            not {
+//                foreignKeyConstraintExists foreignKeyName: 'FK4C2699AB33E59620'
+//            }
+            tableExists tableName: "extendible_element"
+            tableExists tableName: "published_element"
+        }
+
+        dropAllForeignKeyConstraints baseTableName: 'published_element'
+        addForeignKeyConstraint(baseColumnNames: "id", baseTableName: "published_element", constraintName: "FK4D2699AB33E59620", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "catalogue_element", referencesUniqueColumn: "false")
+    }
+
+    changeSet(author: "Vladimir Orany", id: "1412847974051-01-04") {
+        preConditions(onFail: 'MARK_RAN') {
+            foreignKeyConstraintExists foreignKeyName: 'FKEA5792AFB738USER'
+        }
+
+        dropForeignKeyConstraint baseTableName: 'user', constraintName: 'FKEA5792AFB738USER'
+    }
+
+
+    changeSet(author: "Vladimir Orany", id: "1412847974051-01-05") {
+        preConditions(onFail: 'MARK_RAN') {
+            tableExists tableName: "extendible_element"
+
+            changeSetExecuted changeLogFile: 'changelog_006_filterByClassifications.groovy', author: "Vladimir Orany", id: "1412847974051-01-01"
+            changeSetExecuted changeLogFile: 'changelog_006_filterByClassifications.groovy', author: "Vladimir Orany", id: "1412847974051-01-02"
+            changeSetExecuted changeLogFile: 'changelog_006_filterByClassifications.groovy', author: "Vladimir Orany", id: "1412847974051-01-03"
+            // changeSetExecuted changeLogFile: 'changelog_006_filterByClassifications.groovy', author: "Vladimir Orany", id: "1412847974051-01-04"
+        }
+
+        dropAllForeignKeyConstraints baseTableName: 'extendible_element'
+
+        grailsChange {
+            change {
+                if (database.databaseProductName.toLowerCase().contains('mysql')) {
+                    sql.execute  """
+                        SET foreign_key_checks = 0;
+                    """
+                }
+            }
+        }
+
         dropTable tableName: 'extendible_element'
+
+        grailsChange {
+            change {
+                if (database.databaseProductName.toLowerCase().contains('mysql')) {
+                    sql.execute  """
+                        SET foreign_key_checks = 1;
+                    """
+                }
+            }
+        }
     }
 
     changeSet(author: "Vladimir Orany", id: "1412847974051-02") {
@@ -69,7 +127,7 @@ databaseChangeLog = {
         dropTable tableName: 'classification_classifies'
     }
 
-    changeSet(author: "Vladimir Orany", id: "1412847974051-03") {
+    changeSet(author: "Vladimir Orany", id: "1412847974051-03-01") {
         preConditions(onFail: 'MARK_RAN') {
             tableExists tableName: "published_element"
             not {
@@ -132,6 +190,24 @@ databaseChangeLog = {
         """
 
         dropTable tableName: 'published_element'
+    }
+
+    changeSet(author: "Vladimir Orany", id: "1412847974051-03-02") {
+        preConditions(onFail: 'MARK_RAN') {
+            not {
+                sqlCheck expectedResult: '0', """
+                    select count(id)
+                    from relationship_type
+                    where source_class = 'org.modelcatalogue.core.PublishedElement'
+                    or destination_class = 'org.modelcatalogue.core.PublishedElement'
+                """
+            }
+        }
+
+        sql """
+            update relationship_type set source_class = 'org.modelcatalogue.core.CatalogueElement' where source_class = 'org.modelcatalogue.core.PublishedElement';
+            update relationship_type set destination_class = 'org.modelcatalogue.core.CatalogueElement' where destination_class = 'org.modelcatalogue.core.PublishedElement';
+        """
     }
 
     changeSet(author: "Vladimir Orany", id: "1412847974051-04") {
