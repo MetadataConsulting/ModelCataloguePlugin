@@ -265,7 +265,7 @@ Model catalogue core plugin (metadata registry)
                     "Metadata"
 
             when { ListWrapper container, RenderContext context ->
-                container.itemType && DataElement.isAssignableFrom(container.itemType) && container.total > 0
+                container.itemType && DataElement.isAssignableFrom(container.itemType)
             } then { DataElement element ->
                 Model parent = getParentModel(element)
                 Model model = getContainingModel(element)
