@@ -6,6 +6,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.ClassificationFilter
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.Inheritance
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -68,7 +69,7 @@ class RelationshipService {
     }
 
     Relationship link(RelationshipDefinition relationshipDefinition) {
-        if (relationshipDefinition.source?.id && relationshipDefinition.destination?.id && relationshipDefinition.relationshipType?.id) {
+        if (relationshipDefinition.source?.readyForQueries && relationshipDefinition.destination?.readyForQueries && relationshipDefinition.relationshipType?.getId()) {
             Relationship relationshipInstance = relationshipDefinition.skipUniqueChecking ? null : findExistingRelationship(relationshipDefinition)
 
             if (relationshipInstance) {
@@ -129,7 +130,37 @@ class RelationshipService {
         }
 
         log.debug "Created $relationshipDefinition"
-        
+
+
+        if (relationshipDefinition.relationshipType == RelationshipType.baseType) {
+            // copy relationships when new based on relationship is created
+            for (Relationship relationship in new LinkedHashSet<Relationship>(relationshipDefinition.source.outgoingRelationships)) {
+                if (relationship.relationshipType.versionSpecific) {
+                    RelationshipDefinition newDefinition = RelationshipDefinition.from(relationship)
+                    newDefinition.source = relationshipDefinition.destination
+                    newDefinition.inherited = true
+                    Relationship newRelationship = link newDefinition
+                    if (newRelationship.hasErrors()) {
+                        relationshipInstance.errors.reject('unable.to.copy.from.parent', FriendlyErrors.printErrors("Unable to copy relationship $newDefinition from ${relationshipDefinition.source} to child ${relationshipDefinition.destination}", newRelationship.errors))
+                    }
+                }
+            }
+            relationshipDefinition.destination.ext.putAll relationshipDefinition.source.ext.subMap(relationshipDefinition.source.ext.keySet() - relationshipDefinition.destination.ext.keySet())
+            relationshipDefinition.source.addInheritedAssociations(relationshipDefinition.destination)
+        } else if (relationshipDefinition.relationshipType.versionSpecific) {
+            // propagate relationship to the children
+            Inheritance.withChildren(relationshipInstance.source) {
+                RelationshipDefinition newDefinition = relationshipDefinition.clone()
+                newDefinition.source = it
+                newDefinition.inherited = true
+                Relationship newRelationship = link newDefinition
+                if (newRelationship.hasErrors()) {
+                    relationshipInstance.errors.reject('unable.to.copy.from.parent', FriendlyErrors.printErrors("Unable to propagate relationship $newDefinition from ${relationshipDefinition.source} to child ${newDefinition.source}", newRelationship.errors))
+                }
+            }
+        }
+
+
         relationshipInstance
     }
 
@@ -182,26 +213,70 @@ class RelationshipService {
         unlink source, destination, relationshipType, null, ignoreRules
     }
 
-    Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, Classification classification, boolean ignoreRules = false) {
+    Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, Classification classification, boolean ignoreRules = false, Map<String, String> expectedMetadata = null) {
 
         if (source?.id && destination?.id && relationshipType?.id) {
             Relationship relationshipInstance = findExistingRelationship(RelationshipDefinition.create(source, destination, relationshipType).withClassification(classification).definition)
+
+            if (!relationshipInstance) {
+                return null
+            }
 
             if(!ignoreRules) {
                 if (relationshipType.versionSpecific && !relationshipType.system && source.status != ElementStatus.DRAFT && source.status != ElementStatus.UPDATED && source.status != ElementStatus.DEPRECATED) {
                     relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedDataElement.remove', [source.status.toString()] as Object[], "Cannot changed finalized elements.")
                     return relationshipInstance
                 }
+
+                if (relationshipInstance.inherited) {
+                    relationshipInstance.errors.rejectValue('inherited', 'org.modelcatalogue.core.RelationshipType.cannot.change.inherited',  "Cannot changed inherited relationships.")
+                    return relationshipInstance
+                }
+
             }
 
-            if (relationshipInstance && source && destination) {
-                auditService.logRelationRemoved(relationshipInstance)
-                destination?.removeFromIncomingRelationships(relationshipInstance)
-                source?.removeFromOutgoingRelationships(relationshipInstance)
-                relationshipInstance.classification = null
-                relationshipInstance.delete(flush: true)
-                return relationshipInstance
+            if (expectedMetadata != null && expectedMetadata != relationshipInstance.ext) {
+                return null
             }
+
+            auditService.logRelationRemoved(relationshipInstance)
+
+            destination.refresh()
+            source.refresh()
+
+            if (relationshipType == RelationshipType.baseType) {
+                for (Relationship relationship in new LinkedHashSet<Relationship>(source.outgoingRelationships)) {
+                    if (relationship.relationshipType.versionSpecific) {
+                        unlink relationship.source, relationship.destination, relationship.relationshipType, relationship.classification, true, relationship.ext
+                    }
+                }
+                List<String> forRemoval = []
+                source.ext.each { String key, String value ->
+                    String valueInChild = destination.ext[key]
+                    if (valueInChild == value) {
+                        forRemoval << key
+                    }
+                }
+                forRemoval.each {
+                    source.ext.remove(it)
+                }
+            } else if (relationshipType.versionSpecific) {
+                Inheritance.withChildren(source) {
+                    unlink(it, destination, relationshipType, classification, true, relationshipInstance.ext)
+                }
+            }
+
+            destination.removeFromIncomingRelationships(relationshipInstance)
+            source.removeFromOutgoingRelationships(relationshipInstance)
+            relationshipInstance.source = null
+            relationshipInstance.destination = null
+            relationshipInstance.classification = null
+            relationshipInstance.delete(flush: true)
+            if (relationshipType == RelationshipType.baseType) {
+                source.removeInheritedAssociations(destination)
+            }
+
+            return relationshipInstance
         }
         return null
     }

@@ -57,6 +57,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptRelationshipTypeEdit'
   'mc.core.ui.bs.modalPromptGenerateSuggestions'
   'mc.core.ui.bs.modalPromptDataElementEdit'
+  'mc.core.ui.bs.modalPromptAnnotateLetter'
   'mc.core.ui.bs.saveOrUpdatePublishedElementCtrl'
   'mc.core.ui.bs.saveAndCreateAnotherCtrlMixin'
   'mc.core.ui.bs.modalPromptConvert'

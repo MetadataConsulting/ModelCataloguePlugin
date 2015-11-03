@@ -1,11 +1,9 @@
 package org.modelcatalogue.core.util.test
 
+import grails.util.Metadata
 import groovy.sql.Sql
 import org.hibernate.SessionFactory
 
-/**
- * Created by ladin on 18.02.15.
- */
 class TestDataHelper {
 
     /**
@@ -30,7 +28,7 @@ class TestDataHelper {
             return initCode()
         }
 
-        String scriptLocation = "${System.getProperty('java.io.tmpdir')}/mc/${tempSqlFileName}"
+        String scriptLocation = "${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/${tempSqlFileName}"
 
         if (new File(scriptLocation).exists()) {
             long start = System.currentTimeMillis()
@@ -43,7 +41,7 @@ class TestDataHelper {
         long start = System.currentTimeMillis()
 
         if (drop) {
-            String clearScriptLocation = "${System.getProperty('java.io.tmpdir')}/mc/dropfiles/$tempSqlFileName"
+            String clearScriptLocation = "${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/dropfiles/$tempSqlFileName"
             new Sql(sessionFactory.currentSession.connection()).execute("SCRIPT NODATA DROP TO ${clearScriptLocation}")
             println "Clear script created in $clearScriptLocation"
             new Sql(sessionFactory.currentSession.connection()).execute("RUNSCRIPT FROM ${clearScriptLocation}")

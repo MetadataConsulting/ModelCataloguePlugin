@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.ExtensionsWrapper
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.Inheritance
 import org.modelcatalogue.core.util.OrderedMap
 
 /*
@@ -15,7 +16,6 @@ import org.modelcatalogue.core.util.OrderedMap
         | Source           | Relationship     | Destination | Source->Destination    |  Destination<-Source |
         | ---------------- | -----------------| ----------- | ---------------------- | -------------------- |
         | Model            | [containment]    | DataElement |  "contains"            |  "contained in"      |
-        | DataElement      | [instantiation]  | ValueDomain | "instantiated by"      | "instantiates"       |
         | Model            | [heirachical]    | Model       | "parentOf"             | "ChildOf"            |
         | DataElement      | [supersession]   | DataElement | "supercedes"           | "supercededBy"       |
 
@@ -26,7 +26,15 @@ import org.modelcatalogue.core.util.OrderedMap
 
 class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalogue.core.api.Relationship {
 
+    // when the relationship class is first loaded set the next index to current time in milliseconds
+    static long nextIndex = System.currentTimeMillis()
+
+    static long getNextIndex() {
+        ++nextIndex;
+    }
+
     def auditService
+    def relationshipService
 
     CatalogueElement source
     CatalogueElement destination
@@ -44,12 +52,18 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
      * and change from the other side would change the view from the opposite side
      */
     @Deprecated
-    Long combinedIndex = System.currentTimeMillis()
+    Long combinedIndex
+
+    // init the indexes
+    {
+        resetIndexes()
+    }
 
     static hasMany = [extensions: RelationshipMetadata]
     static transients = ['ext']
 
     Boolean archived = false
+    Boolean inherited = false
 
     final Map<String, String> ext = new ExtensionsWrapper(this)
 
@@ -84,9 +98,10 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
     }
 
     void resetIndexes() {
-        outgoingIndex = System.currentTimeMillis()
-        incomingIndex = System.currentTimeMillis()
-        combinedIndex = System.currentTimeMillis()
+        long nextIndex = getNextIndex()
+        outgoingIndex = nextIndex
+        incomingIndex = nextIndex
+        combinedIndex = nextIndex
     }
 
     @Override
@@ -111,6 +126,14 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
             FriendlyErrors.failFriendlySaveWithoutFlush(newOne)
             addToExtensions(newOne).save(validate: false)
             auditService.logNewRelationshipMetadata(newOne)
+            Inheritance.withChildren(source) {
+                RelationshipDefinition definition = RelationshipDefinition.from(this)
+                definition.source = it
+                Relationship rel = relationshipService.findExistingRelationship(definition)
+                if (rel) {
+                    rel.addExtension(name, value)
+                }
+            }
             return newOne
         }
         throw new IllegalStateException("Cannot add extension before saving the element (id: ${getId()}, attached: ${isAttached()})")
@@ -118,6 +141,17 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
 
     @Override
     void removeExtension(RelationshipMetadata extension) {
+        Inheritance.withChildren(source) {
+            RelationshipDefinition definition = RelationshipDefinition.from(this)
+            definition.source = it
+            Relationship rel = relationshipService.findExistingRelationship(definition)
+            if (rel) {
+                RelationshipMetadata existing = rel.findExtensionByName(extension.name)
+                if (existing.extensionValue == extension.extensionValue) {
+                    rel.removeExtension(existing)
+                }
+            }
+        }
         auditService.logRelationshipMetadataDeleted(extension)
         removeFromExtensions(extension).save()
         extension.delete(flush: true)
@@ -125,6 +159,17 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
 
     @Override
     RelationshipMetadata updateExtension(RelationshipMetadata old, String value) {
+        Inheritance.withChildren(source) {
+            RelationshipDefinition definition = RelationshipDefinition.from(this)
+            definition.source = it
+            Relationship rel = relationshipService.findExistingRelationship(definition)
+            if (rel) {
+                RelationshipMetadata existing = rel.findExtensionByName(old.name)
+                if (existing.extensionValue == old.extensionValue) {
+                    rel.updateExtension(existing, value)
+                }
+            }
+        }
         if (old.extensionValue == value) {
             old.orderIndex = System.currentTimeMillis()
             FriendlyErrors.failFriendlySaveWithoutFlush(old)

@@ -29,7 +29,10 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     dataType = relationship?.relation?.valueDomain?.dataType
     if dataType?.enumerations?.values
       ext     = dataType?.enumerations?.values ? []
-      for e in ext
+      for e, i in ext
+        if i == 10
+          result += "..."
+          break
         result += "#{e.key} \n"
     else if dataType
       result = dataType?.name
@@ -332,6 +335,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'type:date', tabDefinition: hideTab
   catalogueElementPropertiesProvider.configureProperty 'type:string', tabDefinition: hideTab
 
+  catalogueElementPropertiesProvider.configureProperty '$$href', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'version', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'name', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'classifiedName', hidden: true

@@ -148,7 +148,11 @@ class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         waitFor {
-            !$('span.catalogue-element-treeview-name', text: startsWith("New")).displayed && menuItem('classifications', 'navigation-bottom-left').text().contains('XMLSchema')
+            !$('span.catalogue-element-treeview-name', text: startsWith("New")).displayed
+        }
+
+        waitFor {
+            menuItem('classifications', 'navigation-bottom-left').text().contains('XMLSchema')
         }
 
         when:

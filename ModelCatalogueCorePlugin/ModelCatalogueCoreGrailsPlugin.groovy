@@ -300,6 +300,9 @@ Model catalogue core plugin (metadata registry)
             creates asset
             title { "Export All Elements of ${it.name} to Excel XSLX" }
             type Model
+            when { Model model ->
+                model.countContains() > 0
+            }
             link controller: 'dataArchitect', action: 'getSubModelElements', params: [format: 'xlsx', report:'NHIC'], id: true
         }
 
@@ -319,9 +322,23 @@ Model catalogue core plugin (metadata registry)
 		
 		reportsRegistry.register {
 			creates link
-			title { "GE Inventory Report Docx" }
-			type Classification
-			link controller: 'classificationReports', action: 'gereportDoc', id: true
+			title { "Inventory Report Document" }
+			type Model
+			link controller: 'model', action: 'inventoryDoc', id: true
+		}
+
+		reportsRegistry.register {
+			creates link
+			title { "Inventory Report Spreadsheet" }
+			type Model
+			link controller: 'model', action: 'inventorySpreadsheet', id: true
+		}
+
+		reportsRegistry.register {
+			creates link
+			title { "Changelog Document" }
+			type Model
+			link controller: 'model', action: 'changelogDoc', id: true
 		}
 
         reportsRegistry.register {

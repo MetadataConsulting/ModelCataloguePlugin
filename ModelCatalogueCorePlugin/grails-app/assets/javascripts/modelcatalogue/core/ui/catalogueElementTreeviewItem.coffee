@@ -5,7 +5,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
       element:  '='
       descend:  '='
       repeat:   '='
-      rootId:   '='
+      treeview: '='
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementTreeviewItem.html'
 
@@ -107,11 +107,16 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
         $scope.descendFun = $scope.element[$scope.currentDescend]
 
+        if angular.isFunction(element.href)
+          element.$$href = element.href()
+
         element.$$resetHelperProperties = ->
           if @[$scope.currentDescend]
             @$$numberOfChildren = $scope.element[$scope.currentDescend].total
+            @$$loadingChildren = false
           else
             @$$numberOfChildren = 0
+            @$$loadingChildren = false
     
           @$$children  ?= []
           @$$collapsed ?= true
@@ -160,11 +165,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
       # event broadcasters and listeners
       $scope.select = (element) ->
         $scope.collapseOrExpand()
-        $rootScope.$broadcast 'treeviewElementSelected', element, $scope.rootId
-
-      $scope.$on 'treeviewElementSelected', (event, element, id) ->
-        return if id and $scope.rootId and id != $scope.rootId
-        $scope.element.$$active = $scope.element.link == element.link
+        $scope.treeview.select(element)
 
       reloadChildrenOnChange = (_, result) ->
         if result and result.relation and result.element and result.type and result.direction

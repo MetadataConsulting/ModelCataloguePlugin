@@ -170,4 +170,9 @@ class ValueDomain extends CatalogueElement {
             FriendlyErrors.failFriendlySave(element)
         }
     }
+
+    @Override
+    List<String> getInheritedAssociationsNames() {
+        ['dataType', 'unitOfMeasure']
+    }
 }

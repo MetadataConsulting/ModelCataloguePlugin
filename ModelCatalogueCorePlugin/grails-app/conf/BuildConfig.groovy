@@ -38,6 +38,7 @@ grails.project.dependency.resolution = {
         //mavenRepo "http://repository.jboss.com/maven2/"
         mavenRepo 'http://jcenter.bintray.com'
 		mavenRepo "http://dl.bintray.com/metadata/model-catalogue"
+        mavenRepo "http://dl.bintray.com/musketyr/document-builder"
         //mavenRepo "http://dl.dropbox.com/u/326301/repository"
 		//mavenRepo "http://www.biojava.org/download/maven/"
 
@@ -57,7 +58,17 @@ grails.project.dependency.resolution = {
         compile "org.modelcatalogue:mc-integration-xml:$mcToolkitVersion"
         test "org.modelcatalogue:mc-builder-xml:$mcToolkitVersion"
 
-		
+        compile 'com.craigburke.document:word:0.4.10-fix31'
+
+        compile 'org.jsoup:jsoup:1.8.3'
+
+        compile 'org.modelcatalogue:spreadsheet-builder-poi:0.1.9'
+        compile 'org.modelcatalogue:letter-annotator-lucene:0.2.0'
+
+        compile 'org.apache.poi:poi:3.13'
+        compile 'org.apache.poi:poi-ooxml:3.13'
+        compile 'org.apache.poi:ooxml-schemas:1.1'
+
 
         test 'xmlunit:xmlunit:1.6'
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
@@ -72,9 +83,9 @@ grails.project.dependency.resolution = {
 
         runtime ':database-migration:1.3.6'
 
-        compile ":asset-pipeline:1.9.9"
-        compile ":coffee-asset-pipeline:1.9.0"
-        compile ":less-asset-pipeline:1.10.0"
+        compile ":asset-pipeline:2.4.3"
+        compile ":coffee-asset-pipeline:2.0.7"
+        compile ":less-asset-pipeline:2.3.0"
 //        runtime ":hibernate4:4.3.5.5"
         runtime  ":hibernate:3.6.10.18"
 

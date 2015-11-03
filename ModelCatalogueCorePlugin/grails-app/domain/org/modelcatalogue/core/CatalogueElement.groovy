@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import com.google.common.base.Function
 import com.google.common.collect.Lists
 import grails.util.GrailsNameUtils
+import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Published
@@ -11,6 +12,7 @@ import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.ExtensionsWrapper
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.Inheritance
 import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.RelationshipDirection
 
@@ -57,7 +59,7 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
     Set<Mapping> outgoingMappings = []
     Set<Mapping> incomingMappings = []
 
-    static transients = ['relations', 'info', 'archived', 'relations', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext', 'classifications']
+    static transients = ['relations', 'info', 'archived', 'relations', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext', 'classifications', 'combinedVersion', 'inheritedAssociationsNames', 'modelCatalogueResourceName']
 
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping, extensions: ExtensionValue]
 
@@ -149,15 +151,15 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
         [getOutgoingRelationsByType(type), getIncomingRelationsByType(type)].flatten()
     }
 
-    List getIncomingRelationshipsByType(RelationshipType type) {
+    List<Relationship> getIncomingRelationshipsByType(RelationshipType type) {
         relationshipService.getRelationships([:], RelationshipDirection.INCOMING, this, type).items
     }
 
-    List getOutgoingRelationshipsByType(RelationshipType type) {
+    List<Relationship> getOutgoingRelationshipsByType(RelationshipType type) {
         relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, this, type).items
     }
 
-    List getRelationshipsByType(RelationshipType type) {
+    List<Relationship> getRelationshipsByType(RelationshipType type) {
         [getOutgoingRelationshipsByType(type), getIncomingRelationshipsByType(type)].flatten()
     }
 
@@ -266,11 +268,15 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
     }
 
 
+    protected String getModelCatalogueResourceName() {
+        fixResourceName GrailsNameUtils.getPropertyName(HibernateProxyHelper.getClassWithoutInitializingProxy(this))
+    }
+
     String getDefaultModelCatalogueId(boolean withoutVersion = false) {
         if (!grailsLinkGenerator) {
             return null
         }
-        String resourceName = fixResourceName GrailsNameUtils.getPropertyName(getClass())
+        String resourceName = getModelCatalogueResourceName()
         if (withoutVersion) {
             return grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${getLatestVersionId() ?: getId()}")
         }
@@ -325,6 +331,11 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
             FriendlyErrors.failFriendlySaveWithoutFlush(newOne)
             addToExtensions(newOne).save(validate: false)
             auditService.logNewMetadata(newOne)
+            Inheritance.withChildren(this) {
+                if (!it.ext.containsKey(name)) {
+                    it.addExtension(name, value)
+                }
+            }
             return newOne
         }
 
@@ -333,6 +344,12 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
 
     @Override
     void removeExtension(ExtensionValue extension) {
+        Inheritance.withChildren(this) {
+            ExtensionValue oldExt = it.findExtensionByName(extension.name)
+            if (oldExt && oldExt.extensionValue == extension.extensionValue) {
+                it.removeExtension(oldExt)
+            }
+        }
         auditService.logMetadataDeleted(extension)
         removeFromExtensions(extension).save(validate: false)
         extension.delete(flush: true)
@@ -384,8 +401,38 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
 
     void beforeUpdate() {
         auditService.logElementUpdated(this)
+
+        CatalogueElement self = this
+
+
+        if (inheritedAssociationsNames.any { self.isDirty(it) }) {
+            Inheritance.withChildren(this) {
+                boolean changed = false
+
+                for (String propertyName in inheritedAssociationsNames) {
+                    if (self.isDirty(propertyName) && it.getProperty(propertyName) == self.getPersistentValue(propertyName)) {
+                        it.setProperty(propertyName, self.getProperty(propertyName))
+                        changed = true
+                    }
+                }
+
+                if (changed) {
+                    FriendlyErrors.failFriendlySaveWithoutFlush(it)
+                }
+            }
+
+            for (String propertyName in inheritedAssociationsNames) {
+                if (self.isDirty(propertyName) && self.getProperty(propertyName) == null){
+                    Inheritance.withParents(this) {
+                        if (it.getProperty(propertyName) != null) {
+                            self.setProperty(propertyName, it.getProperty(propertyName))
+                        }
+                    }
+                }
+            }
+        }
     }
-    
+
     void clearAssociationsBeforeDelete() {
         for (Classification c in this.classifications) {
             this.removeFromClassifications(c)
@@ -409,6 +456,12 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
     }
 
     ExtensionValue updateExtension(ExtensionValue old, String value) {
+        Inheritance.withChildren(this) {
+            ExtensionValue oldExt = it.findExtensionByName(old.name)
+            if (oldExt && oldExt.extensionValue == old.extensionValue) {
+                it.updateExtension(oldExt, value)
+            }
+        }
         old.orderIndex = System.currentTimeMillis()
         if (old.extensionValue == value) {
             FriendlyErrors.failFriendlySaveWithoutFlush(old)
@@ -472,5 +525,29 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
     @Override
     org.modelcatalogue.core.api.Relationship removeLinkFrom(org.modelcatalogue.core.api.CatalogueElement source, org.modelcatalogue.core.api.RelationshipType type) {
         removeLinkFrom(source as CatalogueElement, type as RelationshipType)
+    }
+
+    final void addInheritedAssociations(CatalogueElement child) {
+        for (String propertyName in inheritedAssociationsNames) {
+            if (child.getProperty(propertyName) == null) {
+                child.setProperty(propertyName, getProperty(propertyName))
+            }
+        }
+        FriendlyErrors.failFriendlySave(child)
+    }
+
+    final void removeInheritedAssociations(CatalogueElement child) {
+        for (String propertyName in inheritedAssociationsNames) {
+            if (child.getProperty(propertyName) == getProperty(propertyName)) {
+                child.setProperty(propertyName, null)
+            }
+        }
+        FriendlyErrors.failFriendlySave(child)
+    }
+
+    List<String> getInheritedAssociationsNames() { Collections.emptyList() }
+
+    String getCombinedVersion() {
+        "${getLatestVersionId() ?: getId() ?: '<id not assigned yet>'}.${getVersionNumber()}"
     }
 }

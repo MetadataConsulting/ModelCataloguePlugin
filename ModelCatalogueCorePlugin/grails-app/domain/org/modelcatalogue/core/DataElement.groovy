@@ -42,4 +42,9 @@ class DataElement extends CatalogueElement {
     protected PublishingChain prepareDraftChain(PublishingChain chain) {
         chain.add(this.containedIn).add(this.classifications)
     }
+
+    @Override
+    List<String> getInheritedAssociationsNames() {
+        ['valueDomain']
+    }
 }

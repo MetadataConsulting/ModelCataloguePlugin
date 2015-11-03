@@ -24,8 +24,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $scope.validate = ->
       messages.prompt('', '', {type: 'validate-value-by-domain'})
 
-    console.log security
-
     if security.allowRegistration
       $scope.registrationUrl = "#{security.contextPath}/register/"
 
@@ -36,7 +34,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       messages.prompt("New #{names.getNaturalName(what)}", '', {type: dialogType, create: what}).then (element)->
         element.show()
 
-    if user!=''
+    if user != ''
       updateDashboard(user)
     else
       $scope.user = user
@@ -135,14 +133,11 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         $scope.element                = if list.size > 0 then list.list[0]
         $scope.property               =  'contains'
 
-
-      $scope.$on 'treeviewElementSelected', (event, element, id) ->
-        return unless id is 'model-treeview'
+      $scope.onTreeviewSelected = (element) ->
         $scope.element                  = element
         $scope.elementSelectedInTree    = true
         $rootScope.$$lastModels ?= {}
         $rootScope.$$lastModels[getLastModelsKey()] = element: element, elementSelectedInTree: true, property: 'contains'
-        $rootScope.$broadcast 'redrawContextualActions'
 
       $scope.$on 'newVersionCreated', (ignored, element) ->
         if element
@@ -434,8 +429,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     }
   ])
 
-.controller('defaultStates.searchCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$rootScope', '$q', '$state', 'names', 'messages', 'actions', 'modelCatalogueApiRoot', '$http', 'enhance'
-    (catalogueElementResource, modelCatalogueSearch, $scope, $rootScope, $q, $state, names, messages, actions, modelCatalogueApiRoot, $http, enhance)->
+.controller('defaultStates.searchCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$rootScope', '$q', '$state', 'names', 'messages', 'actions', 'modelCatalogueApiRoot', '$http', 'enhance', 'security',
+    (catalogueElementResource, modelCatalogueSearch, $scope, $rootScope, $q, $state, names, messages, actions, modelCatalogueApiRoot, $http, enhance, security)->
       actions = []
 
       $scope.search = (item, model, label) ->
@@ -542,8 +537,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
           p2 = $q.when true
 
-          if term.match(/^\d+$/)
-            p2 = $http.get("#{modelCatalogueApiRoot}/catalogueElement/#{term}").then (result) ->
+          if term.match(/^\d+(\.\d+)?$/)
+            p2 = $http.get("#{security.contextPath ? ''}/catalogue/catalogueElement/#{term}").then (result) ->
               return unless result.data?.elementType
               searchResult = enhance result.data
               results.push {
@@ -653,7 +648,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     <div ng-if="resource == 'model' &amp;&amp; $stateParams.display == undefined">
 
       <div class="row">
-        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 split-view-left" resizable="{'handles': 'e', 'mirror': '.split-view-right', 'maxWidth': 1000, 'minWidth': 200, 'windowWidthCorrection': 31}">
+        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 split-view-left" resizable="{'handles': 'e', 'mirror': '.split-view-right', 'maxWidthPct': 60, 'minWidthPct': 20, 'windowWidthCorrection': 31, 'breakWidth': 768}">
           <div class="split-view-content">
             <div class="row">
               <span class="contextual-actions-right">
@@ -663,7 +658,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                 <h3>
                     <small ng-class="catalogue.getIcon('model')"></small>&nbsp;<span ng-show="$stateParams.status">{{natural($stateParams.status)}}</span> Models
                 </h3>
-                <catalogue-element-treeview list="list" descend="'parentOf'" id="model-treeview"></catalogue-element-treeview>
+                <catalogue-element-treeview list="list" descend="'parentOf'" id="model-treeview" on-select="onTreeviewSelected($element)"></catalogue-element-treeview>
               </div>
             </div>
           </div>
@@ -996,6 +991,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     </div>
   '''
 
+])
+.config([ '$modalProvider', ($modalProvider) ->
+    $modalProvider.options.backdrop = 'static'
 ])
 # debug states
 #.run(['$rootScope', '$log', ($rootScope, $log) ->

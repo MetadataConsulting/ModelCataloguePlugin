@@ -346,9 +346,7 @@ a div.panel-footer, .with-pointer {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     @media (min-width: 1200px) {
-      &:hover, &:active, &:focus, &.expanded {
-        width: 400px;
-      }
+        width: 400px!important;
     }
   }
 
@@ -539,6 +537,11 @@ td.handle {
 
 tr.archived, .catalogue-element-treeview-text-content.archived {
   font-style: italic;
+}
+
+tr.inherited, .catalogue-element-treeview-text-content.inherited {
+  font-style: italic;
+  background-color: whitesmoke;
 }
 
 .ordered-map-container {

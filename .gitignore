@@ -1,6 +1,6 @@
 **.iml
 **/web-app/*
-**/.idea/*
+**/.idea/**/*
 **/atlassian-ide-plugin.xml
 ModelCatalogueCorePlugin/test/unit/resources/SACT/Breast_XMLSchema.xsd
 ModelCatalogueCorePlugin/test/unit/resources/SACT/XMLDataTypes.xsd
@@ -10,7 +10,7 @@ ModelCatalogueCorePluginTestApp/test/integration/resources/DataTemplateChangeDat
 ModelCatalogueCorePluginTestApp/test/integration/resources/DataTemplateChangeDataItems.xls
 ModelCatalogueCorePluginTestApp/test/integration/resources/example.xls
 ModelCatalogueCorePluginTestApp/test/integration/resources/rare_diseases_combined.umlj
-out/**/*
+**/out/**/*
 **/target/**/*
 **/target-eclipse/**/*
 **/*.class
