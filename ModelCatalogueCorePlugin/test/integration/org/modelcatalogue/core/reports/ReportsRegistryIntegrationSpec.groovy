@@ -12,9 +12,6 @@ import org.modelcatalogue.core.util.SimpleListWrapper
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import spock.lang.Stepwise
 
-/**
- * Created by ladin on 09.06.14.
- */
 @Stepwise
 class ReportsRegistryIntegrationSpec extends IntegrationSpec {
 
@@ -50,7 +47,7 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
         expect:
         modelReports.size()                 >= 1
         modelReports[0].getTitle(model)     == 'Inventory Report Document'
-        modelReports[0].getLink(model)      == "/api/modelCatalogue/core/gel/reports/inventoryDoc?id=1"
+        modelReports[0].getLink(model)      == "/api/modelCatalogue/core/dataClass/1/inventoryDoc"
 
         when:
         def models = new Elements(itemType: DataClass)
