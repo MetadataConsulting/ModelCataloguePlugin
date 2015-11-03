@@ -152,6 +152,8 @@ environments {
         grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
     }
     production {
+        grails.logging.jul.usebridge = false
+
         grails.assets.minifyOptions = [
                 strictSemicolons: false,
                 mangleOptions: [mangle: false, toplevel: false, defines: null, except: null, no_functions:false],
