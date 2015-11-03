@@ -92,6 +92,8 @@ grails.project.dependency.resolution = {
         compile ":excel-export:0.2.1"
         compile ":executor:0.3"
 
+        compile ":karman-aws:0.8.4"
+
         compile ":csv:0.3.1"
 
         test ':build-test-data:2.1.2'

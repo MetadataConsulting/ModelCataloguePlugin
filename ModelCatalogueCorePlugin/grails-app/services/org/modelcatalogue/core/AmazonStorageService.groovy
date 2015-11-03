@@ -1,19 +1,36 @@
 package org.modelcatalogue.core
 
+import com.bertramlabs.plugins.karman.CloudFile
+import com.bertramlabs.plugins.karman.CloudFileACL
+import com.bertramlabs.plugins.karman.StorageProvider
+import com.bertramlabs.plugins.karman.local.LocalStorageProvider
 import org.codehaus.groovy.grails.commons.GrailsApplication
 
 import javax.annotation.PostConstruct
 
-class LocalFilesStorageService implements StorageService {
+class AmazonStorageService implements StorageService {
 
     GrailsApplication grailsApplication
-    private File fileStoreBase
+    private String bucket
+    private StorageProvider provider
     private Long maxSize
 
     @PostConstruct
     private void init() {
-        fileStoreBase   = new File(grailsApplication.config.mc.storage.directory ?: 'storage')
-        maxSize         = grailsApplication.config.mc.storage.maxSize ?: (20 * 1024 * 1024)
+        maxSize = grailsApplication.config.mc.storage.maxSize ?: (20 * 1024 * 1024)
+        if (grailsApplication.config.mc.storage.s3.bucket) {
+            provider = StorageProvider.create(
+                provider: 's3',
+                accessKey: grailsApplication.config.mc.storage.s3.key,
+                secretKey: grailsApplication.config.mc.storage.s3.secret,
+                region: grailsApplication.config.mc.storage.s3.region ?: 'eu-west-1'
+            )
+            bucket = grailsApplication.config.mc.storage.s3.bucket
+        } else {
+            provider = new LocalStorageProvider(basePath: grailsApplication.config.mc.storage.directory ?: 'storage')
+            bucket = 'modelcatalogue'
+        }
+
     }
 
     /**
@@ -40,9 +57,11 @@ class LocalFilesStorageService implements StorageService {
      * @param withOutputStream the closure which gets files output stream as a parameter
      */
     void store(String directory, String filename, String contentType, Closure withOutputStream) {
-        File dir = new File(fileStoreBase, directory)
-        dir.mkdirs()
-        new File(dir, filename).withOutputStream withOutputStream
+        CloudFile file = provider[bucket]["$directory/$filename"]
+        ByteArrayOutputStream stream = new ByteArrayOutputStream()
+        stream.withStream withOutputStream
+        file.bytes = stream.toByteArray()
+        file.save()
     }
 
     /**
@@ -52,10 +71,7 @@ class LocalFilesStorageService implements StorageService {
      * @return <code>true</code> if the file exits in the store
      */
     boolean exists(String directory, String filename) {
-        File dir = new File(fileStoreBase, directory)
-        if (!dir.exists()) return false
-        File file = new File(dir, filename)
-        file.exists()
+        provider[bucket]["$directory/$filename"].exists()
     }
 
     /**
@@ -67,6 +83,6 @@ class LocalFilesStorageService implements StorageService {
      */
     InputStream fetch(String directory, String filename) {
         if (!exists(directory, filename)) throw new FileNotFoundException("No such file $filename in $directory")
-        new File(new File(fileStoreBase, directory), filename).newInputStream()
+        provider[bucket]["$directory/$filename"].inputStream
     }
 }

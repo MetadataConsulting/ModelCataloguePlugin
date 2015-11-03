@@ -4,10 +4,52 @@ Model Catalogue provides special published element of type [Asset|api:org.modelc
 storing files with additional metadata. By default the uploaded files are stored on the disc. You can customize the
 default storage in @Config.groovy@:
 
+h3. File Storage
+
+You can let Model Catalogue to store files to local disk by setting the `mc.storage.directory` property.
+
 {code}
-modelcatalogue.storage.directory = '/assets'        // defaults to 'storage'
-modelcatalogue.storage.maxSize   = 10 * 1024 * 1024 // defaults to 20 * 1024 * 1024
+mc.storage.directory = '/assets'        // defaults to 'storage'
+mc.storage.maxSize   = 10 * 1024 * 1024 // defaults to 20 * 1024 * 1024
 {code}
+
+
+h3 S3 Storage
+
+You can let Model Catalogue to store files in AWS S3 by setting the `mc.storage.s3.bucket` property with
+the valid credentials:
+
+{code}
+mc.storage.s3.bucket = 'test-mc-s3' // bucket name - required
+mc.storage.s3.key = 'key'           // api key - required
+mc.storage.s3.secret = 'secret'     // api secret - required
+mc.storage.s3.region = 'eu-west-1'  // defaults to 'eu-west-1'
+{code}
+
+The user, who the credentials belong to, must be able to `List` and `Upload/Delete`. Also following Bucket Policy
+must be set for the bucket:
+
+{code}
+{
+	"Id": "Policy1446540507991",
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "Stmt1446540504270",
+			"Action": [
+				"s3:GetObject"
+			],
+			"Effect": "Allow",
+			"Resource": "arn:aws:s3:::test-mc-s3/*",
+			"Principal": "*"
+		}
+	]
+}
+{code}
+
+Replace the `Resource` with your bucket name.
+
+h3. Custom Storage
 
 It's very common that your application doesn't want or simply can't store files on the disc. You can use your own
 implementation of [StorageService|api:org.modelcatalogue.core.StorageService] and override the definition of @modelCatalogueStorageService@

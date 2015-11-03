@@ -1,6 +1,8 @@
 import grails.rest.render.RenderContext
 import grails.util.Environment
 import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.grails.commons.GrailsDomainClass
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
@@ -106,7 +108,9 @@ Model catalogue core plugin (metadata registry)
             ]
         }
 
-        if (Environment.current == Environment.DEVELOPMENT) {
+        if (application.config.mc.storage.s3.bucket) {
+            springConfig.addAlias('modelCatalogueStorageService','amazonStorageService')
+        } else if (Environment.current == Environment.DEVELOPMENT || application.config.mc.storage.directory) {
             springConfig.addAlias('modelCatalogueStorageService','localFilesStorageService')
         }
 
@@ -117,12 +121,12 @@ Model catalogue core plugin (metadata registry)
     }
 
     def doWithDynamicMethods = { ctx ->
-        ctx.grailsApplication.domainClasses.each {
+        ctx.grailsApplication.domainClasses.each { GrailsDomainClass it ->
             if (CatalogueElement.isAssignableFrom(it.clazz)) {
                 CatalogueElementDynamicHelper.addShortcuts(it.clazz)
             }
         }
-        org.codehaus.groovy.grails.web.json.JSONObject.Null.metaClass.getId = {->
+        JSONObject.Null.metaClass.getId = {->
             null
         }
     }

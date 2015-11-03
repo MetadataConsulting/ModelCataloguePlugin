@@ -15,7 +15,7 @@ class ModelCatalogueStorageService implements StorageService {
 
     @PostConstruct
     private void init() {
-        maxSize = grailsApplication.config.modelcatalogue.storage.maxSize ?: (20 * 1024 * 1024)
+        maxSize = grailsApplication.config.mc.storage.maxSize ?: (20 * 1024 * 1024)
     }
 
     /**
