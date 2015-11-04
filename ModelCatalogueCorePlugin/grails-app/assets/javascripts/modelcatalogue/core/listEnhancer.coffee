@@ -83,7 +83,7 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
 
             enhance rest method: 'GET', url: theLink
 
-          @reload = (config = {}) ->
+          @reload ?= (config = {}) ->
             params = {
               offset: @offset
               max:    @page
@@ -101,34 +101,37 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
       # return new list decorator
       new ListDecorator(list)
 
-    listEnhancer.createEmptyList = (itemType = null, total = 0) -> listEnhancer {
-      list: []
-      size: 0
-      next: ''
-      previous: ''
-      total: total
-      empty: true
-      itemType: itemType
+    listEnhancer.createEmptyList = (itemType = null, total = 0) ->
+      enhanced = listEnhancer {
+        list: []
+        size: 0
+        next: ''
+        previous: ''
+        total: total
+        empty: true
+        itemType: itemType
+        sort: 'name'
+        order: 'asc'
 
-    }
+      }
+      enhanced.reload = -> $q.when(enhanced)
+      enhanced
 
-    listEnhancer.createSingletonList = (item) -> listEnhancer {
-      list: [item]
-      size: 1
-      next: ''
-      previous: ''
-      total: 1
-      itemType: item?.elementType
-    }
+    listEnhancer.createArrayList = (array, itemType = null) ->
+      enhanced = listEnhancer {
+        list: array
+        size: array.length
+        next: ''
+        previous: ''
+        total: array.length
+        itemType: itemType
+        sort: 'name'
+        order: 'asc'
+      }
+      enhanced.reload = -> $q.when(enhanced)
+      enhanced
 
-    listEnhancer.createArrayList = (array, itemType = null) -> listEnhancer {
-      list: array
-      size: array.length
-      next: ''
-      previous: ''
-      total: array.length
-      itemType: itemType
-    }
+    listEnhancer.createSingletonList = (item) -> listEnhancer.createArrayList([item])
 
     listEnhancer
 

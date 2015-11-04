@@ -66,7 +66,13 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
             if self.isInstanceOf "csvTransformation"
               return $state.href('mc.csvTransformations.show', {id: self.id})
 
-            $state.href('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id})
+            dataModelId = undefined
+            if self.isInstanceOf "dataModel"
+              dataModelId = self.id
+            else if self.dataModels?.length > 0
+              dataModelId = self.dataModels[0].id
+
+            $state.href('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id, dataModelId: dataModelId})
 
           self.getLabel = ->
               return @classifiedName if @classifiedName?

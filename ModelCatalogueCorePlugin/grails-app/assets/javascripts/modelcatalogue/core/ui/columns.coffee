@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.columns', []).provider 'columns', ->
+angular.module('mc.core.ui.columns', ['mc.util.names']).provider 'columns', ['names', (names)->
   columns  = {}
   defaultColumns = [
     {header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-4", show: true, href: 'modelCatalogueId'}
@@ -9,13 +9,14 @@ angular.module('mc.core.ui.columns', []).provider 'columns', ->
   columnsProvider = {}
 
   columnsProvider.registerColumns = (type, cols) ->
-    columns[type] = angular.copy(cols)
+    columns[names.getPropertyNameFromType(type)] = angular.copy(cols)
 
   columnsProvider.setDefaultColumns = (cols) ->
     defaultColumns = angular.copy cols
 
 
   columnsProvider.$get = ->
-    (name, userDefaults) -> angular.copy (columns[name] ? userDefaults ? defaultColumns)
+    (name, userDefaults) -> angular.copy (columns[names.getPropertyNameFromType(name)] ? userDefaults ? defaultColumns)
 
   columnsProvider
+]

@@ -4,7 +4,10 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.export.inventory.DataClassToDocxExporter
 import org.modelcatalogue.core.export.inventory.DataClassToXlsxExporter
 import org.modelcatalogue.core.publishing.changelog.ChangelogGenerator
+import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.Lists
+import org.modelcatalogue.core.util.RelationshipDirection
+import org.modelcatalogue.core.util.Relationships
 
 class DataClassController extends AbstractCatalogueElementController<DataClass> {
 
@@ -48,6 +51,47 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
             }
         })
 
+    }
+
+    def content(Integer max) {
+        handleParams(max)
+
+        DataClass element = queryForResource(params.id)
+
+        if (!element) {
+            notFound()
+            return
+        }
+
+        DataModelFilter filter = DataModelFilter.from(modelCatalogueSecurityService.currentUser)
+
+        respond new Relationships(
+                owner: element,
+                direction: RelationshipDirection.OUTGOING,
+                list: Lists.fromCriteria(params, Relationship, "/${resourceName}/${params.id}/content") {
+                    join 'destination'
+                    eq 'source', element
+                    inList 'relationshipType', [RelationshipType.containmentType, RelationshipType.hierarchyType]
+
+                    if (filter) {
+                        or {
+                            isNull 'dataModel'
+                            and {
+                                if (filter.excludes) {
+                                    not {
+                                        'in' 'dataModel.id', filter.excludes
+                                    }
+                                }
+                                if (filter.includes) {
+                                    'in'  'dataModel.id', filter.includes
+                                }
+                            }
+                        }
+                    }
+
+                    sort('outgoingIndex')
+                }
+        )
     }
 
     def inventoryDoc() {

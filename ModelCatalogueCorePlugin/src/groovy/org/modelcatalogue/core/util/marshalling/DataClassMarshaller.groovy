@@ -14,7 +14,7 @@ class DataClassMarshaller extends CatalogueElementMarshaller {
     protected Map<String, Object> prepareJsonMap(Object el) {
         Map<String, Object> ret = super.prepareJsonMap(el)
         ret.referenceTypes = [count: el.countReferringDataTypes(), itemType: ReferenceType.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/referenceType"]
-        ret.content = ret.parentOf
+        ret.content = [count: el.countContains() + el.countParentOf(), itemType: ReferenceType.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/content"]
         return ret
     }
 

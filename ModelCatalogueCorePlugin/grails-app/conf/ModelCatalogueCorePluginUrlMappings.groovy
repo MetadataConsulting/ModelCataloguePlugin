@@ -104,6 +104,7 @@ class ModelCatalogueCorePluginUrlMappings {
                     "/api/modelCatalogue/core/$elementName/$id/classificationChangelog"(controller: 'dataClass', action: 'changelogDoc', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/$id/inventorySpreadsheet"(controller: 'dataClass', action: 'inventorySpreadsheet', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/$id/referenceType"(controller: controllerName, action: 'referenceTypes', method: HttpMethod.GET)
+                    "/api/modelCatalogue/core/$elementName/$id/content"(controller: controllerName, action: 'content', method: HttpMethod.GET)
 
                 }
 
@@ -120,6 +121,10 @@ class ModelCatalogueCorePluginUrlMappings {
                     "/api/modelCatalogue/core/$elementName/$id/download"(controller: controllerName, action: 'download', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/$id/content"(controller: controllerName, action: 'content', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/$id/validateXml"(controller: controllerName, action: 'validateXml', method: HttpMethod.POST)
+                }
+
+                if (controllerName in ['dataElement', 'primitiveType', 'referenceType', 'enumeratedType']) {
+                    "/api/modelCatalogue/core/$elementName/$id/content"(controller: controllerName, action: 'content', method: HttpMethod.GET)
                 }
             }
 

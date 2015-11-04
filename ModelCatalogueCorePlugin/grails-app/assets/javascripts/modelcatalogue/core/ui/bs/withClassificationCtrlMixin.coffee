@@ -6,7 +6,7 @@ angular.module('mc.core.ui.bs.withClassificationCtrlMixin', ['mc.util.security']
     createdMessages = []
     noDrafts = (dataModel.name for dataModel in newDataModels when dataModel.status isnt 'DRAFT')
     if noDrafts.length > 0 and $scope.messages
-      createdMessages.push $scope.messages.warning "Draft versions of #{noDrafts.join(', ')} dataModel#{if noDrafts.length == 1 then '' else 's'} will be used"
+      createdMessages.push $scope.messages.warning "Draft versions of #{noDrafts.join(', ')} data model#{if noDrafts.length == 1 then '' else 's'} will be used"
 
   $scope.hasDataModels = ->
     $scope.pending.dataModel or (angular.isArray($scope.copy.dataModels) && $scope.copy.dataModels.length > 0)

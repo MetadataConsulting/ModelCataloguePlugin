@@ -6,6 +6,7 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setIcon 'dataElement',        "fa fa-fw fa-cube"
   catalogueProvider.setIcon 'primitiveType',      "fa fa-fw fa-cog"
   catalogueProvider.setIcon 'enumeratedType',     "fa fa-fw fa-list-alt"
+  catalogueProvider.setIcon 'enumeratedValue',    "fa fa-fw fa-th-list"
   catalogueProvider.setIcon 'referenceType',      "fa fa-fw fa-external-link-square"
   catalogueProvider.setIcon 'dataType',           "fa fa-fw fa-th-large"
   catalogueProvider.setIcon 'measurementUnit',    "fa fa-fw fa-tachometer"

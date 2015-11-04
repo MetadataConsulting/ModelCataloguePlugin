@@ -78,6 +78,7 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
         ret.content = [count: count, itemType: clazz.name, link: link]
         ret.link = link
         ret.resource = GrailsNameUtils.getPropertyName(clazz)
+		ret.status = dataModel.status.toString()
         ret
     }
 
