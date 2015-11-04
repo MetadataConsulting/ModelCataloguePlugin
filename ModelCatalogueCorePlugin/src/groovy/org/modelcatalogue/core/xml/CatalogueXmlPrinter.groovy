@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.xml
 
 import groovy.xml.MarkupBuilder
+import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.DataClassService
