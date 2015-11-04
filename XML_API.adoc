@@ -26,7 +26,7 @@ _Result_
 
 [source,xml]
 ----
-<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.1.2/metadataregistry.xsd">
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd">
   <measurementUnit name="celsius" id="http://localhost:8080/ModelCatalogueCorePluginTestApp/catalogue/measurementUnit/1" symbol="&#176;C">
     <description>degrees celsius</description>
   </measurementUnit>
@@ -75,7 +75,7 @@ If your import takes longer time use to process you may get information about th
 
 [source,xml]
 ----
-<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.1.2/metadataregistry_asset.xsd">
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry_asset.xsd">
   <asset name="Import for celsius.xml" id="http://localhost:8080/ModelCatalogueCorePluginTestApp/catalogue/asset/228" status="PENDING">
     <description>Your import will be available in this asset soon. Use Refresh action to reload.</description>
   </asset>
@@ -87,7 +87,7 @@ When the upload is fully processed you should get following result:
 
 [source,xml]
 ----
-<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.1.2/metadataregistry_asset.xsd">
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry_asset.xsd">
   <asset name="Import for celsius.xml" id="http://localhost:8080/ModelCatalogueCorePluginTestApp/catalogue/asset/228">
     <description>Your import has finished.</description>
   </asset>
