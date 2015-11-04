@@ -9,6 +9,7 @@ import org.modelcatalogue.core.RelationshipType
 class CatalogueXmlPrinter {
 
     static final String NAMESPACE_URL = 'http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd'
+    static final String ASSETS_NAMESPACE_URL = 'http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry_asset.xsd'
 
     DataModelService dataModelService
     DataClassService modelService
@@ -22,11 +23,17 @@ class CatalogueXmlPrinter {
         PrintContext context = new PrintContext(dataModelService, modelService)
         context.with contextConfigurer
 
+        Map<String, String> ns = [xmlns : NAMESPACE_URL]
+
+        if (element.instanceOf(Asset)) {
+            ns.xmlns = ASSETS_NAMESPACE_URL
+        }
+
         return { Writer writer ->
             EscapeSpecialWriter escapeSpecialWriter = new EscapeSpecialWriter(writer)
             MarkupBuilder builder = new MarkupBuilder(escapeSpecialWriter)
             builder.doubleQuotes = true
-            builder.catalogue ('xmlns' : NAMESPACE_URL) {
+            builder.catalogue (ns) {
                 CatalogueElementPrintHelper.printElement(builder, element, context, null)
                 printRelationshipTypes(builder, context)
             }

@@ -23,6 +23,9 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         if (DataModel.isAssignableFrom(type)) {
             return new DataModelPrintHelper() as CatalogueElementPrintHelper<E>
         }
+        if (Asset.isAssignableFrom(type)) {
+            return new AssetPrintHelper() as CatalogueElementPrintHelper<E>
+        }
         throw new IllegalArgumentException("Not yet implemented for $type")
     }
 
