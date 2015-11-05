@@ -13,8 +13,23 @@ class CatalogueController {
 
     def xref() {
         String resource = params.resource
-        Long id = params.long('id')
-        Integer version = params.int('version')
+        String idString = params.id
+
+        if (!idString) {
+            render status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        Long id
+        Integer version = 1
+        if (idString.contains('.')) {
+            String[] parts = idString.split(/\./)
+            id = Long.parseLong(parts[0], 10)
+            version = Long.parseLong(parts[1], 10)
+        } else {
+            id = Long.valueOf(idString)
+            version = params.int('version')
+        }
 
         CatalogueElement element
 
