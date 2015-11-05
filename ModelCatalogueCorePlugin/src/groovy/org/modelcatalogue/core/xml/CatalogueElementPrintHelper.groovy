@@ -25,6 +25,9 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         if (Classification.isAssignableFrom(type)) {
             return new ClassificationPrintHelper() as CatalogueElementPrintHelper<E>
         }
+        if (Asset.isAssignableFrom(type)) {
+            return new AssetPrintHelper() as CatalogueElementPrintHelper<E>
+        }
         throw new IllegalArgumentException("Not yet implemented for $type")
     }
 
