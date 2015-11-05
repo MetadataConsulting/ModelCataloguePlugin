@@ -92,7 +92,7 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
         }
 
         if (!serve) {
-            response.setHeader("Content-disposition", "attachement; filename=${asset.originalFileName}")
+            response.setHeader("Content-disposition", "attachement; filename=\"${asset.originalFileName}\"")
         }
 
         response.contentType    = asset.contentType
