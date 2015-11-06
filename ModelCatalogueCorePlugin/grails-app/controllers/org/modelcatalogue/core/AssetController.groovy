@@ -93,9 +93,9 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
 
         if (!serve) {
             if (params.force) {
-                response.setHeader("Content-disposition", "filename=\"${asset.originalFileName}\"")
-            } else {
                 response.setHeader("Content-disposition", "attachment; filename=\"${asset.originalFileName}\"")
+            } else {
+                response.setHeader("Content-disposition", "filename=\"${asset.originalFileName}\"")
             }
         }
 
