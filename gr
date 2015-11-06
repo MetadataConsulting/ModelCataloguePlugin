@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -e
+
+echo "executing in all subprojects: ./grailsw $@"
+echo
+
+for file in */ .*/ ; do
+    if [ -f $file/package.json ]; then
+        cd "$file"
+        echo "executing in $file: ./grailsw $@"
+        ./grailsw "$@"
+        echo
+	    cd ..
+    fi
+done
