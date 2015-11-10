@@ -43,6 +43,25 @@ class CatalogueXmlPrinter {
         } as Writable
     }
 
+    public <CE extends CatalogueElement> Writable bind(Iterable<CE> elements, @DelegatesTo(PrintContext) Closure contextConfigurer = {}) {
+        PrintContext context = new PrintContext(dataModelService, modelService)
+        context.with contextConfigurer
+
+        return { Writer writer ->
+            EscapeSpecialWriter escapeSpecialWriter = new EscapeSpecialWriter(writer)
+            MarkupBuilder builder = new MarkupBuilder(escapeSpecialWriter)
+            builder.doubleQuotes = true
+            builder.catalogue (xmlns : NAMESPACE_URL) {
+                for (CE element in elements) {
+                    CatalogueElementPrintHelper.printElement(builder, element, context, null)
+                }
+                printRelationshipTypes(builder, context)
+            }
+
+            writer
+        } as Writable
+    }
+
     private static void printRelationshipTypes(MarkupBuilder builder, PrintContext context) {
         if (!context.typesUsed) {
             return
