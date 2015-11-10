@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.Elements
+import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.Lists
 
 class SearchController extends AbstractRestfulController<CatalogueElement>{
@@ -14,20 +15,21 @@ class SearchController extends AbstractRestfulController<CatalogueElement>{
     def index(Integer max){
         setSafeMax(max)
 
-        def results =  modelCatalogueSearchService.search(params)
+        ListWithTotal<CatalogueElement> results =  modelCatalogueSearchService.search(params)
 
         if(results.errors){
             respond results
             return
         }
 
-        def total = (results.total)?results.total.intValue():0
         def baseLink = "/search/?search=${params.search.encodeAsURL()}"
+
+        int total = results.total
         def links = Lists.nextAndPreviousLinks(params, baseLink, total)
         Elements elements =  new Elements(
                 base: baseLink,
                 total: total,
-                items: results.searchResults,
+                items: results.items,
                 previous: links.previous,
                 next: links.next,
                 offset: params.int('offset') ?: 0,

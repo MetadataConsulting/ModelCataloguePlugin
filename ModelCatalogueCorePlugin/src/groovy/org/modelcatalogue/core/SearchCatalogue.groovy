@@ -1,19 +1,18 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
 
-/**
- * Created by adammilward on 20/05/2014.
- */
 public interface SearchCatalogue {
 
-    def search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params)
-    def search(Class resource, Map params)
-    def search(Map params)
-    def index(Class resource)
-    def index(Collection<Class> resource)
-    def unindex(Object object)
-    def unindex(Collection<Object> object)
-    def refresh()
+    ListWithTotalAndType<Relationship> search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params)
+    public <T> ListWithTotalAndType<T> search(Class<T> resource, Map params)
+    ListWithTotalAndType<CatalogueElement> search(Map params)
+
+    void index(Object element)
+    void index(Iterable<Object> resource)
+    void unindex(Object object)
+    void unindex(Collection<Object> object)
+    void refresh()
 
 }
