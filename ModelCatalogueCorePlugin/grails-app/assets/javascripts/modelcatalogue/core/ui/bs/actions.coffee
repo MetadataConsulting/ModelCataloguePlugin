@@ -726,7 +726,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
   actionsProvider.registerActionInRole 'modal-save-element', actionsProvider.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
-    return undefined unless $scope.hasChanged and $scope.saveElement and $scope.hasDataModels
+    return undefined unless $scope.hasChanged and $scope.saveElement and ($scope.hasDataModels or $scope.copy?.elementType == 'org.modelcatalogue.core.DataModel')
 
     {
       position:   1000
@@ -741,7 +741,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
   actionsProvider.registerActionInRole 'modal-save-and-add-another', actionsProvider.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
-    return undefined unless $scope.hasChanged and $scope.saveAndCreateAnother and $scope.hasDataModels
+    return undefined unless $scope.hasChanged and $scope.saveAndCreateAnother and ($scope.hasDataModels or $scope.copy?.elementType == 'org.modelcatalogue.core.DataModel')
 
     {
       position:   2000
