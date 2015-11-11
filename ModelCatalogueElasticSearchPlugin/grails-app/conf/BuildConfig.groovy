@@ -37,10 +37,14 @@ grails.project.dependency.resolution = {
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // runtime 'mysql:mysql-connector-java:5.1.27'
-        compile group: 'org.elasticsearch', name: 'elasticsearch-groovy', version: '2.0.0', classifier: 'grails', {
-            excludes 'groovy-all'
-        }
 
+        // no way how to beat the problem with loading extension modules in the integration tests
+//        compile group: 'org.elasticsearch', name: 'elasticsearch-groovy', version: '2.0.0', classifier: 'grails', {
+//            excludes 'groovy-all'
+//        }
+
+        compile group: 'org.elasticsearch', name: 'elasticsearch', version: '2.0.0'
+        compile 'com.vividsolutions:jts:1.13'
     }
 
     plugins {

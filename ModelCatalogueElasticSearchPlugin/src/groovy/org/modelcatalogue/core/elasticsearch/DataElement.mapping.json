@@ -1,0 +1,59 @@
+{
+  "data_element" : {
+
+    "properties" : {
+
+      "data_type" : {
+
+        "properties" : {
+            "name" : {
+              "type": "string"
+            },
+            "description" :{
+              "type": "string"
+            },
+            "data_class" : {
+              "properties" : {
+                "id": {
+                  "type": "long"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              }
+            },
+            "measurement_unit" :  {
+              "properties" : {
+                "id": {
+                  "type": "long"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              }
+            },
+            "enumerated_value" : {
+              "properties" : {
+                "key" : {
+                  "type" : "string",
+                  "index" : "not_analyzed"
+                },
+                "value" : {
+                  "type" : "string"
+                }
+              }
+            }
+        }
+
+      }
+
+    }
+
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "asset" : {
+
+    "properties" : {
+
+      "data_type" : {
+
+        "properties" : {
+          "size" : {
+            "type": "long"
+          },
+          "md5" :{
+            "type": "string",
+            "index" : "not_analyzed"
+          },
+          "content_type" :{
+            "type": "string",
+            "index" : "not_analyzed"
+          },
+          "original_file_name" :{
+            "type": "string",
+            "index" : "not_analyzed"
+          }
+        }
+
+      }
+
+    }
+
+  }
+}
