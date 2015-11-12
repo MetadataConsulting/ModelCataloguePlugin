@@ -13,6 +13,6 @@ public interface SearchCatalogue {
     void index(Iterable<Object> resource)
     void unindex(Object object)
     void unindex(Collection<Object> object)
-    void refresh()
+    void reindex()
 
 }

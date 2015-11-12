@@ -4,9 +4,15 @@ import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.Lists
 
+import java.util.concurrent.ExecutorService
+
+import static org.springframework.http.HttpStatus.*
+
 class SearchController extends AbstractRestfulController<CatalogueElement>{
 
     static responseFormats = ['json', 'xml', 'xlsx']
+
+    ExecutorService executorService
 
     SearchController() {
         super(CatalogueElement, true)
@@ -16,11 +22,6 @@ class SearchController extends AbstractRestfulController<CatalogueElement>{
         setSafeMax(max)
 
         ListWithTotal<CatalogueElement> results =  modelCatalogueSearchService.search(params)
-
-        if(results.errors){
-            respond results
-            return
-        }
 
         def baseLink = "/search/?search=${params.search.encodeAsURL()}"
 
@@ -41,6 +42,29 @@ class SearchController extends AbstractRestfulController<CatalogueElement>{
 
         respond elements
 
+    }
+
+    /**
+     * Toggle reindexing the catalogue. Use wisely, can take along time.
+     * @return
+     */
+    def reindex() {
+        if (!modelCatalogueSecurityService.hasRole("ADMIN")) {
+            notAuthorized()
+            return
+        }
+
+        executorService.submit {
+            try {
+                log.info "Reindexing search service ..."
+                modelCatalogueSearchService.reindex()
+                log.info "... search service reindexed"
+            } catch (Exception e) {
+                log.error("Reindexing failed", e)
+            }
+        }
+
+        respond(success: true, status: OK)
     }
 
     protected setSafeMax(Integer max) {

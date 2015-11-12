@@ -17,53 +17,15 @@ class CatalogueElementDocumentSerializer implements DocumentSerializer<Catalogue
                 full_version: element.combinedVersion,
                 latest_version: element.latestVersionId ?: element.getId(),
                 version_number: element.versionNumber,
-                model_catalogue_id: element.modelCatalogueId,
+                model_catalogue_id: element.modelCatalogueId ?: element.getDefaultModelCatalogueId(false),
                 id: element.getId(),
                 status: element.status.toString(),
                 date_create: element.dateCreated,
                 last_updated: element.lastUpdated,
-                relationships: collectRelationships(element),
                 ext: element.ext.collect { key, value -> [key: key, value: value] }
 
         ]
 
     }
-
-
-    private static List<Map> collectRelationships(CatalogueElement element) {
-        List<Map> ret = []
-        for (Relationship relationship in element.outgoingRelationships) {
-            ret << [
-                    id: relationship.getId(),
-                    incoming_index: relationship.incomingIndex,
-                    outgoing_index: relationship.outgoingIndex,
-                    relationship_type: relationship.relationshipType.name,
-                    relationship_type_id: relationship.relationshipType.getId(),
-                    name: relationship.ext['name'] ?: relationship.ext['Name'] ?: relationship.destination.name,
-                    relation_name: relationship.destination.name,
-                    relation_id: relationship.destination.getId(),
-                    archived: relationship.archived,
-                    inherited: relationship.inherited,
-                    ext: relationship.ext.collect { key, value -> [key: key, value: value] }
-            ]
-        }
-        for (Relationship relationship in element.incomingRelationships) {
-            ret << [
-                    id: relationship.getId(),
-                    incoming_index: relationship.incomingIndex,
-                    outgoing_index: relationship.outgoingIndex,
-                    relationship_type: relationship.relationshipType.name,
-                    relationship_type_id: relationship.relationshipType.getId(),
-                    name: relationship.ext['name'] ?: relationship.ext['Name'] ?: relationship.source.name,
-                    relation_name: relationship.source.name,
-                    relation_id: relationship.source.getId(),
-                    archived: relationship.archived,
-                    inherited: relationship.inherited,
-                    ext: relationship.ext.collect { key, value -> [key: key, value: value] }
-            ]
-        }
-        ret
-    }
-
 
 }

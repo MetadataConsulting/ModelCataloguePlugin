@@ -1,0 +1,30 @@
+{
+  "relationship" : {
+    "properties": {
+      "incoming_index": {
+        "type": "long"
+      },
+      "outgoing_index": {
+        "type": "long"
+      },
+      "archived": {
+        "type": "boolean"
+      },
+      "inherited": {
+        "type": "boolean"
+      },
+      "ext": {
+        "type": "nested",
+        "properties": {
+          "key": {
+            "type": "string",
+            "index": "not_analyzed"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,3 +1,10 @@
+import grails.util.Environment
+import org.elasticsearch.client.Client
+import org.elasticsearch.client.transport.TransportClient
+import org.elasticsearch.common.settings.Settings
+import org.elasticsearch.common.transport.InetSocketTransportAddress
+import org.elasticsearch.node.Node
+import org.elasticsearch.node.NodeBuilder
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.reports.ReportsRegistry
 
@@ -44,7 +51,9 @@ ElasticSearch support for Model Catalogue
     }
 
     def doWithSpring = {
-
+        if (application.config.mc.search.elasticsearch.local || application.config.mc.search.elasticsearch.host || System.getProperty('mc.search.elasticsearch.host')) {
+            springConfig.addAlias('modelCatalogueSearchService','elasticSearchService')
+        }
     }
 
     def doWithDynamicMethods = { ctx ->

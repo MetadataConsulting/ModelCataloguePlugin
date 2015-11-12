@@ -181,7 +181,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     void index(Iterable<Object> resource) {}
     void unindex(Object object) {}
     void unindex(Collection<Object> object) {}
-    void refresh() {}
+    void reindex() {}
 
     protected DataModelFilter getOverridableDataModelFilter(Map params) {
         if (params.dataModel) {

@@ -1,15 +1,11 @@
 package org.modelcatalogue.core.elasticsearch
 
 import grails.test.spock.IntegrationSpec
-import org.elasticsearch.action.search.SearchResponse
 import org.elasticsearch.client.Client
 import org.elasticsearch.client.transport.TransportClient
 import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.common.transport.InetSocketTransportAddress
-import org.elasticsearch.index.query.QueryBuilder
-import org.elasticsearch.index.query.QueryBuilders
 import org.elasticsearch.node.Node
-import org.elasticsearch.node.NodeBuilder
 import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.CatalogueElement
@@ -17,6 +13,7 @@ import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.InitCatalogueService
+import org.modelcatalogue.core.util.ListWithTotalAndType
 
 
 class ElasticSearchServiceSpec extends IntegrationSpec {
@@ -68,6 +65,9 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
 
         Class elementClass = HibernateProxyHelper.getClassWithoutInitializingProxy(element)
 
+        String index = elasticSearchService.getDataModelIndex(dataModel)
+        String type  = elasticSearchService.getTypeName(elementClass)
+
         expect:
         dataModel
         element
@@ -81,25 +81,19 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
         then:
         noExceptionThrown()
         elasticSearchService.client
-                .prepareGet(
-                    elasticSearchService.getIndexNameFor(dataModel),
-                    elasticSearchService.getTypeName(elementClass),
-                    element.getId().toString()
-                )
+                .prepareGet(index, type, element.getId().toString())
                 .execute()
                 .get().exists
 
         when:
-        QueryBuilder qb = QueryBuilders.queryStringQuery('foo')
-        SearchResponse searchResponse = elasticSearchService.client
-                .prepareSearch(elasticSearchService.getIndexNameFor(dataModel))
-                .setTypes(elasticSearchService.getTypeName(elementClass))
-                .setQuery(qb)
-                .execute()
-                .actionGet()
+        Thread.sleep(1000) // some time to index
+
+
+        ListWithTotalAndType<DataClass> found = elasticSearchService.search(DataClass, [search: 'foo'])
 
         then:
-        searchResponse.hits.totalHits == 1
+        found.total == 1L
+        element in found.items
     }
 
 
