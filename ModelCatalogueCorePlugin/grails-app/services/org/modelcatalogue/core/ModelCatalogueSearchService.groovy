@@ -59,7 +59,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                 }
         }
 
-        [searchResults: criteria.list(params), total: criteria.count()]
+        return Lists.fromCriteria(params, criteria)
     }
 
     public <T> ListWithTotalAndType<T> search(Class<T> resource, Map params) {

@@ -92,7 +92,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       icon: 'fa fa-search'
       type: 'success'
       action: ->
-        messages.confirm("Do you want to reindex catalogue?", "Whole catalogue will be reindexed. This may take a long time").then ->
+        messages.confirm("Do you want to reindex catalogue?", "Whole catalogue will be reindexed. This may take a long time and it can have negative impact on the performance.").then ->
           rest(url: "#{modelCatalogueApiRoot}/search/reindex", method: 'POST').then ->
             messages.success('Reindex Catalogue', 'Reindexing the catalogue scheduled.')
       }

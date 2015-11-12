@@ -78,6 +78,7 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
         when:
         // deletes index "data_model_<id>"
         elasticSearchService.unindex(dataModel)
+        elasticSearchService.unindex(element)
         elasticSearchService.index(element)
 
         then:

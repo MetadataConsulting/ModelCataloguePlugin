@@ -10,16 +10,24 @@ import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
 
+import java.util.concurrent.Callable
+
 class AuditService {
 
     static transactional = false
 
     def modelCatalogueSecurityService
     def dataModelService
+    def executorService
+
+    static Callable<Auditor> auditorFactory = { return new DefaultAuditor(); }
 
     private static ThreadLocal<Auditor> auditor = new ThreadLocal<Auditor>() {
-        protected Auditor initialValue() { return new DefaultAuditor(); }
+        protected Auditor initialValue() {
+            return auditorFactory()
+        }
     }
+
 
     /**
      * Allows to run block of code without logging any activity. This is supposed to be used when setting and resetting

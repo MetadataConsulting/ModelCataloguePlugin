@@ -5,18 +5,23 @@ import groovy.json.JsonSlurper
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder
-import org.elasticsearch.action.index.IndexResponse
+import org.elasticsearch.action.bulk.BulkItemResponse
+import org.elasticsearch.action.bulk.BulkRequestBuilder
 import org.elasticsearch.action.search.SearchRequestBuilder
 import org.elasticsearch.client.Client
 import org.elasticsearch.client.transport.TransportClient
 import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.common.transport.InetSocketTransportAddress
+import org.elasticsearch.index.query.BoolQueryBuilder
 import org.elasticsearch.index.query.QueryBuilder
 import org.elasticsearch.index.query.QueryBuilders
 import org.elasticsearch.node.Node
 import org.elasticsearch.node.NodeBuilder
 import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.audit.AuditService
+import org.modelcatalogue.core.audit.Auditor
+import org.modelcatalogue.core.audit.CompoundAuditor
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -28,12 +33,24 @@ import javax.annotation.PreDestroy
 import static rx.Observable.from
 import static rx.Observable.just
 
-// FIXME: do async/batch where possible
+// FIXME: do async/batch where possible - this is partially done - index is now running in batches but can be improved
+// FIXME: there should be global index as well to prevent duplicate entries returned from global search
+// TODO: JSON from the search service should only return partial response (id, name...) to skip database round trip
 class ElasticSearchService implements SearchCatalogue {
 
     private static String GLOBAL_PREFIX = "global_"
     private static String DATA_MODEL_INDEX = "${GLOBAL_PREFIX}data_model"
     private static String ORPHANED_INDEX = "{GLOBAL_PREFIX}catalogue_element"
+    private static Map<String, Integer> CATALOGUE_ELEMENT_BOOSTS = [
+
+            name: 100,
+            full_version: 90,
+            latest_id: 80,
+            // id : 70,
+            // latest_version: 70,
+            'ext.extension_value.value' : 10,
+            description: 1
+    ]
 
     private Set<Class> typesSupportedInDataModel = [
             Asset, DataClass, DataElement, DataType, EnumeratedType, MeasurementUnit, PrimitiveType, ReferenceType, Relationship
@@ -41,6 +58,7 @@ class ElasticSearchService implements SearchCatalogue {
 
     GrailsApplication grailsApplication
     DataModelService dataModelService
+    AuditService auditService
     Node node
     Client client
 
@@ -52,6 +70,9 @@ class ElasticSearchService implements SearchCatalogue {
                     .local(true).node()
 
             client = node.client()
+
+            Closure<Auditor> oldFactory = auditService.auditorFactory
+            auditService.auditorFactory = { CompoundAuditor.from(oldFactory(), new ElasticSearchServiceNotifier(this))}
 
             log.info "Using local ElasticSearch instance in directory ${grailsApplication.config.mc.search.elasticsearch.local}"
         } else if (grailsApplication.config.mc.search.elasticsearch.host || System.getProperty('mc.search.elasticsearch.host')) {
@@ -69,6 +90,9 @@ class ElasticSearchService implements SearchCatalogue {
                     .build()
                     .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), Integer.parseInt(port, 10)))
 
+            Closure<Auditor> oldFactory = auditService.auditorFactory
+            auditService.auditorFactory = { CompoundAuditor.from(oldFactory(), new ElasticSearchServiceNotifier(this))}
+
             log.info "Using ElasticSearch instance at $host:$port"
         }
 
@@ -82,6 +106,7 @@ class ElasticSearchService implements SearchCatalogue {
 
     @Override
     ListWithTotalAndType<Relationship> search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
+        // TODO: implement
         throw new UnsupportedOperationException("Not Yet Implemented")
     }
 
@@ -91,23 +116,44 @@ class ElasticSearchService implements SearchCatalogue {
         QueryBuilder qb
         List<String> indicies
 
-        // TODO: add pagination
-
         if (CatalogueElement.isAssignableFrom(resource)) {
             indicies = collectDataModelIndicies(params)
-            // TODO: advanced query with status etc.
-            qb = QueryBuilders.queryStringQuery(search)
-//                    .field("full_version", 30)
-//                    .field("latest_version", 30)
-//                    .field("id", 30)
-//                    .field("model_catalogue_id", 30)
-//                    .field("ext.value", 20)
-//                    .field("name", 10)
-//                    .field("description", 5)
+
+            BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
+
+            if (params.status) {
+                boolQuery.must(QueryBuilders.termQuery('status', params.status.toString().toUpperCase()))
+            }
+
+            CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
+                boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
+            }
+
+            boolQuery.should(QueryBuilders.prefixQuery('name', search).boost(200))
+
+            qb = boolQuery
+        } else if (RelationshipType.isAssignableFrom(resource)) {
+            indicies = [getGlobalIndexName(resource)]
+
+            BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
+
+            if (params.status) {
+                boolQuery.must(QueryBuilders.termQuery('status', params.status.toString().toUpperCase()))
+            }
+
+            CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
+                boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
+            }
+
+            boolQuery.should(QueryBuilders.prefixQuery('name', search).boost(200))
+
+            qb = boolQuery
         } else {
             indicies = [getGlobalIndexName(resource)]
             qb = QueryBuilders.queryStringQuery(search).defaultField("name")
         }
+
+        // log.debug "searching $qb"
 
         SearchRequestBuilder request = client
                 .prepareSearch(indicies as String[])
@@ -116,7 +162,7 @@ class ElasticSearchService implements SearchCatalogue {
                 .setQuery(qb)
 
 
-        return ElasticSearchQueryList.search(resource, request)
+        return ElasticSearchQueryList.search(params,resource, request)
     }
 
     private static String getGlobalIndexName(Class resource) {
@@ -169,7 +215,7 @@ class ElasticSearchService implements SearchCatalogue {
     void index(Object object) {
         log.debug "Indexing $object"
 
-        Observable<IndexResponse> indexing = indexAsync(object)
+        Observable<SimpleIndexResponse> indexing = indexAsync(object)
 
         indexing.doOnError { throwable ->
             log.error("Exception while indexing", throwable)
@@ -179,10 +225,11 @@ class ElasticSearchService implements SearchCatalogue {
             log.info("got index response: $indexResponse")
         }
 
+        // TODO: should be returning observable and not be blocking
         indexing.toBlocking().last()
     }
 
-    private Observable<IndexResponse> indexAsync(object) {
+    private Observable<SimpleIndexResponse> indexAsync(object) {
         Class clazz = HibernateProxyHelper.getClassWithoutInitializingProxy(object)
         if (DataModel.isAssignableFrom(clazz)) {
             return safeIndex(just(DATA_MODEL_INDEX).cache(), getElementWithRelationships(object as CatalogueElement) , [DataModel])
@@ -212,19 +259,28 @@ class ElasticSearchService implements SearchCatalogue {
                 .cache()
     }
 
-    private Observable<IndexResponse> safeIndex(Observable<String> indicies, Observable<Object> objects, Iterable<Class> supportedTypes) {
+    private Observable<SimpleIndexResponse> safeIndex(Observable<String> indicies, Observable<Object> objects, Iterable<Class> supportedTypes) {
         return indexInternal(ensureIndexExists(indicies, supportedTypes), objects)
     }
 
 
-    private Observable<IndexResponse> indexInternal(Observable<String> index, Observable<Object> objects) {
-        return objects.flatMap { object ->
-            index.flatMap { idx ->
-                return from(client
+    private Observable<SimpleIndexResponse> indexInternal(Observable<String> index, Observable<Object> objects) {
+        return index.flatMap { idx ->
+            BulkRequestBuilder bulkRequest = client.prepareBulk()
+
+            // TODO: use take(time) to split by time
+            // wait until finished
+            for (Object object in objects.toBlocking().toIterable()) {
+                bulkRequest.add(client
                         .prepareIndex(idx, getTypeName(HibernateProxyHelper.getClassWithoutInitializingProxy(object)), object.getId().toString())
                         .setSource(getDocument(object))
-                        .execute()
                 )
+            }
+
+            return from(bulkRequest.execute()).flatMap { bulkResponse ->
+                from(bulkResponse.items).map { bulkResponseItem ->
+                    SimpleIndexResponse.from(bulkResponseItem)
+                }
             }
         }
     }
@@ -289,9 +345,10 @@ class ElasticSearchService implements SearchCatalogue {
                 getDataModelIndex(it)
             } : [ORPHANED_INDEX])) {
                 try {
-                    if (client.prepareGet(index, getTypeName(clazz), "${element.getId()}").setFields(new String[0]).execute().actionGet().exists) {
-                        client.prepareDelete(index, getTypeName(clazz), "${element.getId()}").execute().actionGet()
-                    }
+                    // if (client.prepareGet(index, getTypeName(clazz), "${element.getId()}").setFields(new String[0]).execute().actionGet().exists) {
+                    // ignore if does not exist yet
+                    client.prepareDelete(index, getTypeName(clazz), "${element.getId()}").execute().actionGet()
+                    // }
                 } catch (Exception e) {
                     // index probably does not exist yet
                     log.debug "Exception unindexing $element", e
@@ -430,4 +487,27 @@ class ElasticSearchService implements SearchCatalogue {
 class SimpleIndicesExistsResponse {
     boolean exists
     String index
+}
+
+class SimpleIndexResponse {
+    final String index
+    final String type
+    final String id
+    final boolean ok
+
+    SimpleIndexResponse(String index, String type, String id, boolean ok) {
+        this.index = index
+        this.type = type
+        this.id = id
+        this.ok = ok
+    }
+
+    static SimpleIndexResponse from(BulkItemResponse bulkItemResponse) {
+        return new SimpleIndexResponse(
+                bulkItemResponse.index,
+                bulkItemResponse.type,
+                bulkItemResponse.id,
+                !bulkItemResponse.failed
+        )
+    }
 }
