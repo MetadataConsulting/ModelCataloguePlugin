@@ -6,9 +6,8 @@ import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.security.User
-
-import javax.management.relation.RelationType
 
 interface DocumentSerializer<T> {
 
@@ -22,7 +21,7 @@ interface DocumentSerializer<T> {
                 (DataType)        : new DataTypeDocumentSerializer(),
                 (MeasurementUnit) : new MeasurementUnitDocumentSerializer(),
                 (User)            : new UserDocumentSerializer(),
-                (RelationType)    : new RelationshipTypeDocumentSerializer(),
+                (RelationshipType): new RelationshipTypeDocumentSerializer(),
                 (Relationship)    : new RelationshipDocumentSerializer()
         ]
 

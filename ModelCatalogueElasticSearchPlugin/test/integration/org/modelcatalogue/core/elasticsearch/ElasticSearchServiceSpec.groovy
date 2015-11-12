@@ -13,6 +13,8 @@ import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.InitCatalogueService
+import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.util.ListWithTotalAndType
 
 
@@ -89,11 +91,11 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
         Thread.sleep(1000) // some time to index
 
 
-        ListWithTotalAndType<DataClass> found = elasticSearchService.search(DataClass, [search: 'foo'])
+        ListWithTotalAndType<DataClass> foundClasses = elasticSearchService.search(DataClass, [search: 'foo'])
 
         then:
-        found.total == 1L
-        element in found.items
+        foundClasses.total == 1L
+        element in foundClasses.items
     }
 
 

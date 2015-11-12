@@ -5,8 +5,6 @@ import groovy.json.JsonSlurper
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse
 import org.elasticsearch.action.index.IndexResponse
 import org.elasticsearch.action.search.SearchRequestBuilder
 import org.elasticsearch.client.Client
@@ -23,10 +21,12 @@ import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
 import rx.Observable
-import rx.schedulers.Schedulers
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
+
+import static rx.Observable.from
+import static rx.Observable.just
 
 // FIXME: do async/batch where possible
 class ElasticSearchService implements SearchCatalogue {
@@ -36,7 +36,7 @@ class ElasticSearchService implements SearchCatalogue {
     private static String ORPHANED_INDEX = "{GLOBAL_PREFIX}catalogue_element"
 
     private Set<Class> typesSupportedInDataModel = [
-            Asset, DataClass, DataElement, DataType, EnumeratedType, MeasurementUnit, PrimitiveType, ReferenceType
+            Asset, DataClass, DataElement, DataType, EnumeratedType, MeasurementUnit, PrimitiveType, ReferenceType, Relationship
     ]
 
     GrailsApplication grailsApplication
@@ -105,7 +105,7 @@ class ElasticSearchService implements SearchCatalogue {
 //                    .field("name", 10)
 //                    .field("description", 5)
         } else {
-            indicies = ["${GLOBAL_PREFIX}${getTypeName(resource)}"]
+            indicies = [getGlobalIndexName(resource)]
             qb = QueryBuilders.queryStringQuery(search).defaultField("name")
         }
 
@@ -117,6 +117,10 @@ class ElasticSearchService implements SearchCatalogue {
 
 
         return ElasticSearchQueryList.search(resource, request)
+    }
+
+    private static String getGlobalIndexName(Class resource) {
+        "${GLOBAL_PREFIX}${getTypeName(resource)}"
     }
 
     List<String> collectTypes(Class<?> resource) {
@@ -167,11 +171,11 @@ class ElasticSearchService implements SearchCatalogue {
 
         Observable<IndexResponse> indexing = indexAsync(object)
 
-        indexing.doOnError{ throwable ->
+        indexing.doOnError { throwable ->
             log.error("Exception while indexing", throwable)
         }
 
-        indexing.doOnNext{ indexResponse ->
+        indexing.doOnNext { indexResponse ->
             log.info("got index response: $indexResponse")
         }
 
@@ -181,49 +185,72 @@ class ElasticSearchService implements SearchCatalogue {
     private Observable<IndexResponse> indexAsync(object) {
         Class clazz = HibernateProxyHelper.getClassWithoutInitializingProxy(object)
         if (DataModel.isAssignableFrom(clazz)) {
-            return safeIndex(DATA_MODEL_INDEX, object, [DataModel])
+            return safeIndex(just(DATA_MODEL_INDEX).cache(), getElementWithRelationships(object as CatalogueElement) , [DataModel])
         }
+
         if (CatalogueElement.isAssignableFrom(clazz)) {
             CatalogueElement element = object as CatalogueElement
-            return getIndices(element).flatMap { idx ->
-                return safeIndex(idx, object, typesSupportedInDataModel)
-            }
+            return safeIndex(getIndices(element), getElementWithRelationships(element), typesSupportedInDataModel)
         }
+
+        if (RelationshipType.isAssignableFrom(clazz)) {
+            return safeIndex(just(getGlobalIndexName(clazz)).cache(), just(object).cache(), [clazz])
+        }
+
+        if (Relationship.isAssignableFrom(clazz)) {
+            Relationship rel = object as Relationship
+            return safeIndex(getIndices(rel.source).mergeWith(getIndices(rel.destination)).cache(), just(object).cache(), typesSupportedInDataModel)
+        }
+
         throw new UnsupportedOperationException("Not Yet Implemented for $object")
     }
 
-    private Observable<IndexResponse> safeIndex(String idx, Object object, Iterable<Class> supportedTypes) {
-        return indexInternal(ensureIndexExists(idx, supportedTypes), object)
+    private static Observable<Object> getElementWithRelationships(CatalogueElement element) {
+        return just(element as Object)
+                .mergeWith(from(element.incomingRelationships))
+                .mergeWith(from(element.outgoingRelationships))
+                .cache()
     }
 
-    private Observable<IndexResponse> indexInternal(Observable<String> index, Object object) {
-        return index.flatMap {
-            return Observable.from(client
-                    .prepareIndex(it, getTypeName(HibernateProxyHelper.getClassWithoutInitializingProxy(object)), object.getId().toString())
-                    .setSource(getDocument(object))
-                    .execute()
-            )
+    private Observable<IndexResponse> safeIndex(Observable<String> indicies, Observable<Object> objects, Iterable<Class> supportedTypes) {
+        return indexInternal(ensureIndexExists(indicies, supportedTypes), objects)
+    }
+
+
+    private Observable<IndexResponse> indexInternal(Observable<String> index, Observable<Object> objects) {
+        return objects.flatMap { object ->
+            index.flatMap { idx ->
+                return from(client
+                        .prepareIndex(idx, getTypeName(HibernateProxyHelper.getClassWithoutInitializingProxy(object)), object.getId().toString())
+                        .setSource(getDocument(object))
+                        .execute()
+                )
+            }
         }
     }
 
-    private Observable<IndicesExistsResponse> indexExists(String index) {
-        return Observable.from(client.admin().indices().prepareExists(index).execute())
+    private Observable<SimpleIndicesExistsResponse> indexExists(Observable<String> indices) {
+        return indices.flatMap { index ->
+            return from(client.admin().indices().prepareExists(index).execute()).map {
+                return new SimpleIndicesExistsResponse(exists: it, index: index)
+            }
+        }
     }
 
-    private Observable<String> ensureIndexExists(String index, Iterable<Class> supportedTypes) {
-        return indexExists(index).flatMap { exists ->
-            if (exists.exists) {
-                return Observable.just(index)
+    private Observable<String> ensureIndexExists(Observable<String> indices, Iterable<Class> supportedTypes) {
+        return indexExists(indices).flatMap { response ->
+            if (response.exists) {
+                return just(response.index)
             }
             CreateIndexRequestBuilder request = client.admin()
                     .indices()
-                    .prepareCreate(index)
+                    .prepareCreate(response.index)
 
             for (Class type in supportedTypes) {
                 request.addMapping(getTypeName(type), getMapping(type))
             }
-            return Observable.from(request.execute()).map { CreateIndexResponse response ->
-                return index
+            return from(request.execute()).map {
+                return response.index
             }
         }
     }
@@ -231,11 +258,11 @@ class ElasticSearchService implements SearchCatalogue {
 
     private static Observable<String> getIndices(CatalogueElement element) {
         if (element.dataModels) {
-            return Observable.from(element.dataModels).map {
+            return from(element.dataModels).map {
                 getDataModelIndex(it)
             }.cache()
         }
-        return Observable.just(ORPHANED_INDEX).cache()
+        return just(ORPHANED_INDEX).cache()
     }
 
     @Override
@@ -298,7 +325,7 @@ class ElasticSearchService implements SearchCatalogue {
     @Override
     void reindex() {
         int total = DataModel.count() + 2
-        DataModel.list().eachWithIndex { DataModel model, Integer i ->
+        DataModel.list().eachWithIndex { DataModel model, i ->
             log.info "[${i + 1}/$total] Reindexing data model ${model.name} (${model.combinedVersion}) - ${model.countOutgoingRelationshipsByType(RelationshipType.declarationType)} items"
             unindex(model)
             index(model)
@@ -398,4 +425,9 @@ class ElasticSearchService implements SearchCatalogue {
         }
         dataModelService.dataModelFilter
     }
+}
+
+class SimpleIndicesExistsResponse {
+    boolean exists
+    String index
 }
