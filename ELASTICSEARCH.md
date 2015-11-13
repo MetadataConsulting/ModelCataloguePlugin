@@ -71,7 +71,7 @@ your indices (it's phpMyAdmin of ElasticSearch :smile:).  [Sense](https://github
 Running `./elasticsearch.sh stop` will stop all required Docker containers and remove the Docker IP in `.docker-ip`  file so the `./run-prod.sh` command will no longer get it automatically and start with default settings.
 
 ### Removing the Local ElasticSearch Instances
-Run `./elasticsearch.sh stop` to reset all changes in the local ElasticSearch servers.
+Run `./elasticsearch.sh rm` to reset all changes in the local ElasticSearch servers.
 
 
 
