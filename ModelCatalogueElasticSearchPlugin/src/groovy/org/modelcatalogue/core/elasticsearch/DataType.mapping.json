@@ -11,7 +11,7 @@
       "data_class" : {
         "properties" : {
           "id": {
-            "type": "long"
+            "type": "string"
           },
           "name": {
             "type": "string"
@@ -24,7 +24,7 @@
       "measurement_unit" :  {
         "properties" : {
           "id": {
-            "type": "long"
+            "type": "string"
           },
           "name": {
             "type": "string"

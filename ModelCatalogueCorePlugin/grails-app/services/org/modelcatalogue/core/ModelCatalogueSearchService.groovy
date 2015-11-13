@@ -6,6 +6,7 @@ import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
+import rx.Observable
 
 /**
  * Poor man's search service searching in name and description
@@ -177,11 +178,11 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         search CatalogueElement, params
     }
 
-    void index(Object element) {}
-    void index(Iterable<Object> resource) {}
-    void unindex(Object object) {}
-    void unindex(Collection<Object> object) {}
-    void reindex() {}
+    Observable<Boolean> index(Object element) { Observable.just(true) }
+    Observable<Boolean> index(Iterable<Object> resource)  { Observable.just(true) }
+    Observable<Boolean> unindex(Object object)  { Observable.just(true) }
+    Observable<Boolean> unindex(Collection<Object> object)  { Observable.just(true) }
+    Observable<Boolean> reindex()  { Observable.just(true) }
 
     protected DataModelFilter getOverridableDataModelFilter(Map params) {
         if (params.dataModel) {

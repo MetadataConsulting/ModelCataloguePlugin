@@ -6,7 +6,10 @@ import org.elasticsearch.client.transport.TransportClient
 import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.common.transport.InetSocketTransportAddress
 import org.elasticsearch.node.Node
+import org.elasticsearch.node.NodeBuilder
 import org.hibernate.proxy.HibernateProxyHelper
+import org.junit.Rule
+import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
@@ -16,6 +19,8 @@ import org.modelcatalogue.core.InitCatalogueService
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.util.ListWithTotalAndType
+import org.modelcatalogue.core.util.RelationshipDirection
+import rx.Observable
 
 
 class ElasticSearchServiceSpec extends IntegrationSpec {
@@ -25,22 +30,26 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
     CatalogueBuilder catalogueBuilder
     Node node
 
+    @Rule TemporaryFolder data
+
     def setup() {
         initCatalogueService.initDefaultRelationshipTypes()
 
+        File dataFolder = data.newFolder('elasticsearch')
+
         // keep this for unit tests
-        // node = NodeBuilder.nodeBuilder().settings(Settings.builder().put('path.home', '/tmp').build()).local(true).node()
-        // Client client = node.client()
+         node = NodeBuilder.nodeBuilder().settings(Settings.builder().put('path.home', dataFolder.canonicalPath).build()).local(true).node()
+         Client client = node.client()
 
         // testing with docker instance
-        Settings settings = Settings.settingsBuilder()
-                .put("client.transport.sniff", false)
-                .put("client.transport.ignore_cluster_name", false).build();
-        Client client = TransportClient
-                .builder()
-                .settings(settings)
-                .build()
-                .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("192.168.99.100"), 9300))
+//        Settings settings = Settings.settingsBuilder()
+//                .put("client.transport.sniff", false)
+//                .put("client.transport.ignore_cluster_name", false).build();
+//        Client client = TransportClient
+//                .builder()
+//                .settings(settings)
+//                .build()
+//                .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("192.168.99.100"), 9300))
 
         elasticSearchService.client = client
 
@@ -78,8 +87,10 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
         when:
         // deletes index "data_model_<id>"
         elasticSearchService.unindex(dataModel)
-        elasticSearchService.unindex(element)
-        elasticSearchService.index(element)
+                .concatWith(elasticSearchService.unindex(element))
+                .concatWith(elasticSearchService.index(dataModel))
+                .concatWith(elasticSearchService.index(element))
+                .toBlocking().last()
 
         then:
         noExceptionThrown()
@@ -97,6 +108,14 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
         then:
         foundClasses.total == 1L
         element in foundClasses.items
+
+
+        when: "search with the content of item name in relationships"
+        ListWithTotalAndType<Relationship> foundRelationships = elasticSearchService.search(dataModel, RelationshipType.declarationType, RelationshipDirection.BOTH,[search: 'test'])
+
+        then: "there are no results if the related item does not contain the search term"
+        foundRelationships.total == 0L
+
     }
 
 

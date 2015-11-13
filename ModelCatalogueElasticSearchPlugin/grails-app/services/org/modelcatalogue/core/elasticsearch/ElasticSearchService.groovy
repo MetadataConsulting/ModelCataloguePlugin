@@ -19,9 +19,6 @@ import org.elasticsearch.node.Node
 import org.elasticsearch.node.NodeBuilder
 import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.*
-import org.modelcatalogue.core.audit.AuditService
-import org.modelcatalogue.core.audit.Auditor
-import org.modelcatalogue.core.audit.CompoundAuditor
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -33,21 +30,23 @@ import javax.annotation.PreDestroy
 import static rx.Observable.from
 import static rx.Observable.just
 
-// FIXME: do async/batch where possible - this is partially done - index is now running in batches but can be improved
-// FIXME: there should be global index as well to prevent duplicate entries returned from global search
 // TODO: JSON from the search service should only return partial response (id, name...) to skip database round trip
+// TODO: review mappings and try to tune the analyzers
 class ElasticSearchService implements SearchCatalogue {
 
-    private static String GLOBAL_PREFIX = "global_"
+    private static String MC_PREFIX = "mc_"
+    private static String GLOBAL_PREFIX = "${MC_PREFIX}global_"
+    private static String MC_ALL_INDEX = "${MC_PREFIX}all"
     private static String DATA_MODEL_INDEX = "${GLOBAL_PREFIX}data_model"
-    private static String ORPHANED_INDEX = "{GLOBAL_PREFIX}catalogue_element"
+    private static String DATA_MODEL_PREFIX = "${MC_PREFIX}data_model_"
+    private static String ORPHANED_INDEX = "${GLOBAL_PREFIX}orphaned"
+
     private static Map<String, Integer> CATALOGUE_ELEMENT_BOOSTS = [
 
             name: 100,
             full_version: 90,
             latest_id: 80,
-            // id : 70,
-            // latest_version: 70,
+            entity_id : 70,
             'ext.extension_value.value' : 10,
             description: 1
     ]
@@ -58,7 +57,6 @@ class ElasticSearchService implements SearchCatalogue {
 
     GrailsApplication grailsApplication
     DataModelService dataModelService
-    AuditService auditService
     Node node
     Client client
 
@@ -70,9 +68,6 @@ class ElasticSearchService implements SearchCatalogue {
                     .local(true).node()
 
             client = node.client()
-
-            Closure<Auditor> oldFactory = auditService.auditorFactory
-            auditService.auditorFactory = { CompoundAuditor.from(oldFactory(), new ElasticSearchServiceNotifier(this))}
 
             log.info "Using local ElasticSearch instance in directory ${grailsApplication.config.mc.search.elasticsearch.local}"
         } else if (grailsApplication.config.mc.search.elasticsearch.host || System.getProperty('mc.search.elasticsearch.host')) {
@@ -90,9 +85,6 @@ class ElasticSearchService implements SearchCatalogue {
                     .build()
                     .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), Integer.parseInt(port, 10)))
 
-            Closure<Auditor> oldFactory = auditService.auditorFactory
-            auditService.auditorFactory = { CompoundAuditor.from(oldFactory(), new ElasticSearchServiceNotifier(this))}
-
             log.info "Using ElasticSearch instance at $host:$port"
         }
 
@@ -106,8 +98,44 @@ class ElasticSearchService implements SearchCatalogue {
 
     @Override
     ListWithTotalAndType<Relationship> search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
-        // TODO: implement
-        throw new UnsupportedOperationException("Not Yet Implemented")
+        List<String> indicies = collectDataModelIndicies(params)
+        String search = params.search
+
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
+
+        switch (direction) {
+            case RelationshipDirection.OUTGOING:
+                boolQuery.should(QueryBuilders.prefixQuery('destination.name', search))
+                boolQuery.should(QueryBuilders.matchQuery('destination.name', search))
+                break;
+            case RelationshipDirection.INCOMING:
+                boolQuery.should(QueryBuilders.prefixQuery('source.name', search))
+                boolQuery.should(QueryBuilders.matchQuery('source.name', search))
+                break;
+            case RelationshipDirection.BOTH:
+                BoolQueryBuilder outgoing = QueryBuilders.boolQuery()
+                outgoing.should(QueryBuilders.prefixQuery('destination.name', search))
+                outgoing.should(QueryBuilders.matchQuery('destination.name', search))
+                outgoing.mustNot(QueryBuilders.termQuery('destination.entity_id', element.id.toString()))
+
+                BoolQueryBuilder incoming = QueryBuilders.boolQuery()
+                incoming.should(QueryBuilders.prefixQuery('source.name', search))
+                incoming.should(QueryBuilders.matchQuery('source.name', search))
+                incoming.mustNot(QueryBuilders.termQuery('source.entity_id', element.id.toString()))
+
+                boolQuery.should(outgoing)
+                boolQuery.should(incoming)
+                break;
+        }
+
+        SearchRequestBuilder request = client
+                .prepareSearch(indicies as String[])
+                .setTypes(getTypeName(Relationship))
+                .addField('_id')
+                .setQuery(boolQuery)
+
+
+        return ElasticSearchQueryList.search(params,Relationship, request)
     }
 
     @Override
@@ -153,8 +181,6 @@ class ElasticSearchService implements SearchCatalogue {
             qb = QueryBuilders.queryStringQuery(search).defaultField("name")
         }
 
-        // log.debug "searching $qb"
-
         SearchRequestBuilder request = client
                 .prepareSearch(indicies as String[])
                 .setTypes(collectTypes(resource) as String[])
@@ -187,7 +213,7 @@ class ElasticSearchService implements SearchCatalogue {
         DataModelFilter filter = getOverridableDataModelFilter(params)
 
         if (!filter) {
-            return [everyDataModelIndex] // search all by default
+            return [MC_ALL_INDEX] // search all by default
         }
 
         if (filter.unclassifiedOnly) {
@@ -200,7 +226,7 @@ class ElasticSearchService implements SearchCatalogue {
         }
 
         if (filter.excludes) {
-            return [everyDataModelIndex] + filter.excludes.collect { "-${getDataModelIndex(it)}" }
+            return ["${DATA_MODEL_PREFIX}*"] + filter.excludes.collect { "-${getDataModelIndex(it)}" }
         }
 
         throw new IllegalStateException("Unknown filter setup: $filter")
@@ -212,7 +238,7 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     @Override
-    void index(Object object) {
+    Observable<Boolean> index(Object object) {
         log.debug "Indexing $object"
 
         Observable<SimpleIndexResponse> indexing = indexAsync(object)
@@ -225,8 +251,132 @@ class ElasticSearchService implements SearchCatalogue {
             log.info("got index response: $indexResponse")
         }
 
-        // TODO: should be returning observable and not be blocking
-        indexing.toBlocking().last()
+        return indexing.all {
+            it.ok
+        }
+    }
+
+
+    @Override
+    Observable<Boolean> index(Iterable<Object> resource) {
+        from(resource).all {
+            index(it)
+        }
+    }
+
+    @Override
+    Observable<Boolean> unindex(Object object) {
+        log.debug "Unindexing $object"
+        Class clazz = HibernateProxyHelper.getClassWithoutInitializingProxy(object)
+        if (DataModel.isAssignableFrom(clazz)) {
+            String indexName = getDataModelIndex(object as DataModel)
+            return indexExists(just(indexName)).flatMap {
+                if (it.exists) {
+                    return from(client.admin().indices().prepareDelete(indexName).execute()).map {
+                        it.acknowledged
+                    }.onErrorReturn { error ->
+                        log.debug "Exception deleting index $indexName: $error"
+                        return false
+                    }
+                }
+                return just(true)
+            }
+        }
+        if (CatalogueElement.isAssignableFrom(clazz)) {
+            CatalogueElement element = object as CatalogueElement
+            return getIndices(element).flatMap { idx ->
+                from(client.prepareDelete(idx, getTypeName(clazz), "${element.getId()}").execute()).map {
+                    it.found
+                }.onErrorReturn { error ->
+                    log.debug "Exception unindexing $element: $error"
+                    return false
+                }
+            }
+        }
+        return just(false)
+    }
+
+    @Override
+    Observable<Boolean> unindex(Collection<Object> object) {
+        return from(object).all {
+            unindex(it)
+        }
+    }
+
+    @Override
+    Observable<Boolean> reindex() {
+        int total = DataModel.count() + 2
+        int dataModelCounter = 1
+
+        Observable<Boolean> result = from(DataModel.list())
+        .doOnNext {
+            log.info "[${dataModelCounter++}/$total] Reindexing data model ${it.name} (${it.combinedVersion}) - ${it.countOutgoingRelationshipsByType(RelationshipType.declarationType)} items"
+        }.flatMap {
+            return unindex(it)
+            .concatWith(index(it))
+            .concatWith(from(it.getOutgoingRelationshipsByType(RelationshipType.declarationType)).flatMap { element ->
+                return unindex(element).concatWith(index(element))
+            })
+        }
+
+        log.info "[${total - 1}/$total] Reindexing orphaned elements"
+        result.concatWith(from(dataModelService.classified(CatalogueElement, DataModelFilter.create(true))).flatMap { element ->
+            return unindex(element).concatWith(index(element))
+        })
+
+        log.info "[${total}/$total] Reindexing relationship types"
+        return result.concatWith(from(RelationshipType.list()).flatMap {
+            return unindex(it).concatWith(index(it))
+        })
+
+    }
+
+    public Map<String, Object> getDocument(Object object) {
+        if (!object) {
+            return [:]
+        }
+        DocumentSerializer.Registry.get(object.class).getDocument(object)
+    }
+
+    Map<String, Map> getMapping(Class clazz) {
+        if (!clazz) {
+            return [:]
+        }
+
+        Map<String, Map> mapping = [(getTypeName(clazz)): [:]]
+
+        if (clazz.superclass && clazz.superclass != Object) {
+            merge mapping[getTypeName(clazz)], getMapping(clazz.superclass)[getTypeName(clazz.superclass)]
+        }
+
+
+
+        URL url = ElasticSearchService.getResource("${clazz.simpleName}.mapping.json")
+
+
+        if (url) {
+            File mappingFile = new File(url.toURI())
+            Map parsed = new JsonSlurper().parse(mappingFile) as Map
+            Map parsedMapping = parsed[getTypeName(clazz)] as Map
+            if (!parsedMapping) {
+                log.warn "the mapping does not contain expected root entry ${getTypeName(clazz)}"
+            } else {
+                merge mapping[getTypeName(clazz)], parsedMapping
+            }
+        }
+
+        if (clazz == Relationship) {
+            // source and destination combines all available catalogue element mappings
+            // relationship copies relationship type mapping
+            mapping.relationship_type = getMapping(RelationshipType)
+
+            Map catalogueElementMappingComibied = combineMappingForAllCatalogueElements()
+
+            mapping.source = catalogueElementMappingComibied
+            mapping.destination = catalogueElementMappingComibied
+        }
+
+        return mapping
     }
 
     private Observable<SimpleIndexResponse> indexAsync(object) {
@@ -256,6 +406,7 @@ class ElasticSearchService implements SearchCatalogue {
         return just(element as Object)
                 .mergeWith(from(element.incomingRelationships))
                 .mergeWith(from(element.outgoingRelationships))
+                .distinct()
                 .cache()
     }
 
@@ -316,142 +467,17 @@ class ElasticSearchService implements SearchCatalogue {
         if (element.dataModels) {
             return from(element.dataModels).map {
                 getDataModelIndex(it)
-            }.cache()
+            }.concatWith(just(MC_ALL_INDEX)).cache()
         }
-        return just(ORPHANED_INDEX).cache()
+        return just(ORPHANED_INDEX, MC_ALL_INDEX).cache()
     }
 
-    @Override
-    void index(Iterable<Object> resource) {
-        for (o in resource) {
-            index(o)
-        }
+    private static String getDataModelIndex(Long id) {
+        "${DATA_MODEL_PREFIX}${id}"
     }
 
-    @Override
-    void unindex(Object object) {
-        log.debug "Unindexing $object"
-        Class clazz = HibernateProxyHelper.getClassWithoutInitializingProxy(object)
-        if (DataModel.isAssignableFrom(clazz)) {
-            String indexName = getDataModelIndex(object as DataModel)
-            if (client.admin().indices().prepareExists(indexName).execute().actionGet().exists) {
-                client.admin().indices().prepareDelete(indexName).execute().actionGet()
-            }
-            return
-        }
-        if (CatalogueElement.isAssignableFrom(clazz)) {
-            CatalogueElement element = object as CatalogueElement
-            for (String index in (element.dataModels ? element.dataModels.collect {
-                getDataModelIndex(it)
-            } : [ORPHANED_INDEX])) {
-                try {
-                    // if (client.prepareGet(index, getTypeName(clazz), "${element.getId()}").setFields(new String[0]).execute().actionGet().exists) {
-                    // ignore if does not exist yet
-                    client.prepareDelete(index, getTypeName(clazz), "${element.getId()}").execute().actionGet()
-                    // }
-                } catch (Exception e) {
-                    // index probably does not exist yet
-                    log.debug "Exception unindexing $element", e
-                }
-
-            }
-            return
-        }
-        throw new UnsupportedOperationException("Not Yet Implemented for $object")
-    }
-
-    static String getDataModelIndex(Long id) {
-        "data_model_${id}"
-    }
-
-    static String getDataModelIndex(DataModel dataModel) {
+    private static String getDataModelIndex(DataModel dataModel) {
         getDataModelIndex(dataModel.getId())
-    }
-
-    static String getEveryDataModelIndex() {
-        "data_model_*"
-    }
-
-    @Override
-    void unindex(Collection<Object> object) {
-        for (o in object) {
-            unindex(o)
-        }
-    }
-
-    @Override
-    void reindex() {
-        int total = DataModel.count() + 2
-        DataModel.list().eachWithIndex { DataModel model, i ->
-            log.info "[${i + 1}/$total] Reindexing data model ${model.name} (${model.combinedVersion}) - ${model.countOutgoingRelationshipsByType(RelationshipType.declarationType)} items"
-            unindex(model)
-            index(model)
-            for (CatalogueElement element in model.getOutgoingRelationsByType(RelationshipType.declarationType)) {
-                unindex(element)
-                index(element)
-            }
-        }
-
-        log.info "[${total - 1}/$total] Reindexing orphaned elements"
-        dataModelService.classified(CatalogueElement, DataModelFilter.create(true)).list().each { CatalogueElement element ->
-            unindex(element)
-            index(element)
-        }
-
-        log.info "[${total}/$total] Reindexing relationship types"
-        RelationshipType.list().each {
-            unindex(it)
-            index(it)
-        }
-
-    }
-
-    public Map<String, Object> getDocument(Object object) {
-        if (!object) {
-            return [:]
-        }
-        DocumentSerializer.Registry.get(object.class).getDocument(object)
-    }
-
-    Map<String, Map> getMapping(Class clazz) {
-        if (!clazz) {
-            return [:]
-        }
-
-        Map<String, Map> mapping = [(getTypeName(clazz)): [:]]
-
-        if (clazz.superclass && clazz.superclass != Object) {
-            merge mapping[getTypeName(clazz)], getMapping(clazz.superclass)[getTypeName(clazz.superclass)]
-        }
-
-
-
-        URL url = ElasticSearchService.getResource("${clazz.simpleName}.mapping.json")
-
-
-        if (url) {
-            File mappingFile = new File(url.toURI())
-            Map parsed = new JsonSlurper().parse(mappingFile) as Map
-            Map parsedMapping = parsed[getTypeName(clazz)] as Map
-            if (!parsedMapping) {
-                log.warn "the mapping does not contain expected root entry ${getTypeName(clazz)}"
-            } else {
-                merge mapping[getTypeName(clazz)], parsedMapping
-            }
-        }
-
-        if (clazz == Relationship) {
-            // source and destination combines all available catalogue element mappings
-            // relationship copies relationship type mapping
-            mapping.relationship_type = getMapping(RelationshipType)
-
-            Map catalogueElementMappingComibied = combineMappingForAllCatalogueElements()
-
-            mapping.source = catalogueElementMappingComibied
-            mapping.destination = catalogueElementMappingComibied
-        }
-
-        return mapping
     }
 
     private Map combineMappingForAllCatalogueElements() {

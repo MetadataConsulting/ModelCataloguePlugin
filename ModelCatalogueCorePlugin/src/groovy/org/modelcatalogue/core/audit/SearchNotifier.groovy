@@ -1,18 +1,18 @@
-package org.modelcatalogue.core.elasticsearch
+package org.modelcatalogue.core.audit
 
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.ExtensionValue
 import org.modelcatalogue.core.Mapping
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipMetadata
-import org.modelcatalogue.core.audit.Auditor
+import org.modelcatalogue.core.SearchCatalogue
 
-class ElasticSearchServiceNotifier implements Auditor {
+class SearchNotifier implements Auditor {
 
-    final ElasticSearchService elasticSearchService
+    final SearchCatalogue searchService
 
-    ElasticSearchServiceNotifier(ElasticSearchService elasticSearchService) {
-        this.elasticSearchService = elasticSearchService
+    SearchNotifier(SearchCatalogue searchService) {
+        this.searchService = searchService
     }
 
     @Override
@@ -47,118 +47,118 @@ class ElasticSearchServiceNotifier implements Auditor {
 
     @Override
     Long logExternalChange(CatalogueElement source, String message, Long authorId) {
-        elasticSearchService.index(source)
+        searchService.index(source)
         return null
     }
 
     @Override
     Long logNewVersionCreated(CatalogueElement element, Long authorId) {
-        elasticSearchService.index(element)
+        searchService.index(element)
         return null
     }
 
     @Override
     Long logElementFinalized(CatalogueElement element, Long authorId) {
-        elasticSearchService.index(element)
+        searchService.index(element)
         return null
     }
 
     @Override
     Long logElementDeprecated(CatalogueElement element, Long authorId) {
-        elasticSearchService.index(element)
+        searchService.index(element)
         return null
     }
 
     @Override
     Long logElementCreated(CatalogueElement element, Long authorId) {
-        elasticSearchService.index(element)
+        searchService.index(element)
         return null
     }
 
     @Override
     Long logElementDeleted(CatalogueElement element, Long authorId) {
-        elasticSearchService.unindex(element)
+        searchService.unindex(element)
         return null
     }
 
     @Override
     Long logElementUpdated(CatalogueElement element, Long authorId) {
-        elasticSearchService.index(element)
+        searchService.index(element)
         return null
     }
 
     @Override
     Long logMappingCreated(Mapping mapping, Long authorId) {
-        elasticSearchService.index(mapping.source)
-        elasticSearchService.index(mapping.destination)
+        searchService.index(mapping.source)
+        searchService.index(mapping.destination)
         return null
     }
 
     @Override
     Long logMappingDeleted(Mapping mapping, Long authorId) {
-        elasticSearchService.index(mapping.source)
-        elasticSearchService.index(mapping.destination)
+        searchService.index(mapping.source)
+        searchService.index(mapping.destination)
         return null
     }
 
     @Override
     Long logMappingUpdated(Mapping mapping, Long authorId) {
-        elasticSearchService.index(mapping.source)
-        elasticSearchService.index(mapping.destination)
+        searchService.index(mapping.source)
+        searchService.index(mapping.destination)
         return null
     }
 
     @Override
     Long logNewMetadata(ExtensionValue extension, Long authorId) {
-        elasticSearchService.index(extension.element)
+        searchService.index(extension.element)
         return null
     }
 
     @Override
     Long logMetadataUpdated(ExtensionValue extension, Long authorId) {
-        elasticSearchService.index(extension.element)
+        searchService.index(extension.element)
         return null
     }
 
     @Override
     Long logMetadataDeleted(ExtensionValue extension, Long authorId) {
-        elasticSearchService.index(extension.element)
+        searchService.index(extension.element)
         return null
     }
 
     @Override
     Long logNewRelation(Relationship relationship, Long authorId) {
-        elasticSearchService.index(relationship)
+        searchService.index(relationship)
         return null
     }
 
     @Override
     Long logRelationRemoved(Relationship relationship, Long authorId) {
-        elasticSearchService.unindex(relationship)
+        searchService.unindex(relationship)
         return null
     }
 
     @Override
     Long logRelationArchived(Relationship relationship, Long authorId) {
-        elasticSearchService.index(relationship)
+        searchService.index(relationship)
         return null
     }
 
     @Override
     Long logNewRelationshipMetadata(RelationshipMetadata extension, Long authorId) {
-        elasticSearchService.index(extension.relationship)
+        searchService.index(extension.relationship)
         return null
     }
 
     @Override
     Long logRelationshipMetadataUpdated(RelationshipMetadata extension, Long authorId) {
-        elasticSearchService.index(extension.relationship)
+        searchService.index(extension.relationship)
         return null
     }
 
     @Override
     Long logRelationshipMetadataDeleted(RelationshipMetadata extension, Long authorId) {
-        elasticSearchService.index(extension.relationship)
+        searchService.index(extension.relationship)
         return null
     }
 }
