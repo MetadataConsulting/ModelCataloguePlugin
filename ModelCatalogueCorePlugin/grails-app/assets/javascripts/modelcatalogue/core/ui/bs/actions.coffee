@@ -365,6 +365,19 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
+  actionsProvider.registerChildAction 'export', 'export-cart', ['security', '$state', '$window', 'modelCatalogueApiRoot', (security, $state, $window, modelCatalogueApiRoot) ->
+    return undefined if not security.isUserLoggedIn()
+    return undefined if not $state.current.name == 'mc.favorites'
+
+    {
+    position:   10000
+    label:      'Export Favorites'
+    action: ->
+      $window.open "#{modelCatalogueApiRoot}/user/#{security.getCurrentUser().id}/outgoing/favourite?format=xml"
+
+    }
+  ]
+
   generateReports = ($scope, $window, enhance, rest) ->
     (reports = []) ->
       for report in reports
@@ -730,7 +743,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
   actionsProvider.registerActionInRole 'modal-save-element', actionsProvider.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
-    return undefined unless $scope.hasChanged and $scope.saveElement and $scope.hasDataModels
+    return undefined unless $scope.hasChanged and $scope.saveElement and ($scope.hasDataModels or $scope.copy?.elementType == 'org.modelcatalogue.core.DataModel')
 
     {
       position:   1000
@@ -745,7 +758,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
   actionsProvider.registerActionInRole 'modal-save-and-add-another', actionsProvider.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
-    return undefined unless $scope.hasChanged and $scope.saveAndCreateAnother and $scope.hasDataModels
+    return undefined unless $scope.hasChanged and $scope.saveAndCreateAnother and ($scope.hasDataModels or $scope.copy?.elementType == 'org.modelcatalogue.core.DataModel')
 
     {
       position:   2000

@@ -589,6 +589,11 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       security.requireLogin()
   ])
 
+.controller('defaultStates.fastActionsCtrl', ['$scope', 'messages', ($scope, messages)->
+    $scope.showFastActions = ->
+      messages.prompt null, null, type: 'search-action'
+  ])
+
 .run(['$rootScope', '$state', '$stateParams', 'messages', ($rootScope, $state, $stateParams, messages) ->
     # It's very handy to add references to $state and $stateParams to the $rootScope
     # so that you can access them from any scope within your applications.For example,
@@ -641,6 +646,12 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                 <ng-include src="'modelcatalogue/core/ui/omnisearch.html'"></ng-include>
 
             </div><!--/.nav-collapse -->
+        </div>
+        <div class="fast-actions" ng-controller="defaultStates.fastActionsCtrl" ng-click="showFastActions()">
+            <span class="fa-stack fa-3x">
+              <i class="fa fa-fw fa-circle fa-stack-2x"></i>
+              <i class="fa fa-fw fa-flash fa-inverse fa-stack-1x"></i>
+            </span>
         </div>
     </div>
 
