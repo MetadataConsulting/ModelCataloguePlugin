@@ -92,6 +92,9 @@ import org.modelcatalogue.core.util.Legacy
 
     @Override
     void setParameter(String key, Object value) {
+        if (!value) {
+            value = null
+        }
         if (resolved) {
             throw new IllegalStateException("This catalogue element is already resolved!")
         }
