@@ -47,118 +47,118 @@ class SearchNotifier implements Auditor {
 
     @Override
     Long logExternalChange(CatalogueElement source, String message, Long authorId) {
-        searchService.index(source)
+        searchService.index(source).subscribe()
         return null
     }
 
     @Override
     Long logNewVersionCreated(CatalogueElement element, Long authorId) {
-        searchService.index(element)
+        searchService.index(element).subscribe()
         return null
     }
 
     @Override
     Long logElementFinalized(CatalogueElement element, Long authorId) {
-        searchService.index(element)
+        searchService.index(element).subscribe()
         return null
     }
 
     @Override
     Long logElementDeprecated(CatalogueElement element, Long authorId) {
-        searchService.index(element)
+        searchService.index(element).subscribe()
         return null
     }
 
     @Override
     Long logElementCreated(CatalogueElement element, Long authorId) {
-        searchService.index(element)
+        searchService.index(element).subscribe()
         return null
     }
 
     @Override
     Long logElementDeleted(CatalogueElement element, Long authorId) {
-        searchService.unindex(element)
+        searchService.unindex(element).subscribe()
         return null
     }
 
     @Override
     Long logElementUpdated(CatalogueElement element, Long authorId) {
-        searchService.index(element)
+        searchService.index(element).subscribe()
         return null
     }
 
     @Override
     Long logMappingCreated(Mapping mapping, Long authorId) {
-        searchService.index(mapping.source)
-        searchService.index(mapping.destination)
+        searchService.index(mapping.source).subscribe()
+        searchService.index(mapping.destination).subscribe()
         return null
     }
 
     @Override
     Long logMappingDeleted(Mapping mapping, Long authorId) {
-        searchService.index(mapping.source)
-        searchService.index(mapping.destination)
+        searchService.index(mapping.source).subscribe()
+        searchService.index(mapping.destination).subscribe()
         return null
     }
 
     @Override
     Long logMappingUpdated(Mapping mapping, Long authorId) {
-        searchService.index(mapping.source)
-        searchService.index(mapping.destination)
+        searchService.index(mapping.source).subscribe()
+        searchService.index(mapping.destination).subscribe()
         return null
     }
 
     @Override
     Long logNewMetadata(ExtensionValue extension, Long authorId) {
-        searchService.index(extension.element)
+        searchService.index(extension.element).subscribe()
         return null
     }
 
     @Override
     Long logMetadataUpdated(ExtensionValue extension, Long authorId) {
-        searchService.index(extension.element)
+        searchService.index(extension.element).subscribe()
         return null
     }
 
     @Override
     Long logMetadataDeleted(ExtensionValue extension, Long authorId) {
-        searchService.index(extension.element)
+        searchService.index(extension.element).subscribe()
         return null
     }
 
     @Override
     Long logNewRelation(Relationship relationship, Long authorId) {
-        searchService.index(relationship)
+        searchService.index(relationship).subscribe()
         return null
     }
 
     @Override
     Long logRelationRemoved(Relationship relationship, Long authorId) {
-        searchService.unindex(relationship)
+        searchService.unindex(relationship).subscribe()
         return null
     }
 
     @Override
     Long logRelationArchived(Relationship relationship, Long authorId) {
-        searchService.index(relationship)
+        searchService.index(relationship).subscribe()
         return null
     }
 
     @Override
     Long logNewRelationshipMetadata(RelationshipMetadata extension, Long authorId) {
-        searchService.index(extension.relationship)
+        searchService.index(extension.relationship).subscribe()
         return null
     }
 
     @Override
     Long logRelationshipMetadataUpdated(RelationshipMetadata extension, Long authorId) {
-        searchService.index(extension.relationship)
+        searchService.index(extension.relationship).subscribe()
         return null
     }
 
     @Override
     Long logRelationshipMetadataDeleted(RelationshipMetadata extension, Long authorId) {
-        searchService.index(extension.relationship)
+        searchService.index(extension.relationship).subscribe()
         return null
     }
 }

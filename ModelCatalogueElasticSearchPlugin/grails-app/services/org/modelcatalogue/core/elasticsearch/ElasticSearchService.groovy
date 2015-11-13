@@ -51,7 +51,7 @@ class ElasticSearchService implements SearchCatalogue {
             description: 1
     ]
 
-    private Set<Class> typesSupportedInDataModel = [
+    private Set<Class> mappedTypesInDataModel = [
             Asset, DataClass, DataElement, DataType, EnumeratedType, MeasurementUnit, PrimitiveType, ReferenceType, Relationship
     ]
 
@@ -139,7 +139,7 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     @Override
-    def <T> ListWithTotalAndType<T> search(Class<T> resource, Map params) {
+    public <T> ListWithTotalAndType<T> search(Class<T> resource, Map params) {
         String search = params.search
         QueryBuilder qb
         List<String> indicies
@@ -314,18 +314,18 @@ class ElasticSearchService implements SearchCatalogue {
         }.flatMap {
             return unindex(it)
             .concatWith(index(it))
-            .concatWith(from(it.getOutgoingRelationshipsByType(RelationshipType.declarationType)).flatMap { element ->
+            .concatWith(from(it.getOutgoingRelationsByType(RelationshipType.declarationType)).flatMap { element ->
                 return unindex(element).concatWith(index(element))
             })
         }
 
-        log.info "[${total - 1}/$total] Reindexing orphaned elements"
         result.concatWith(from(dataModelService.classified(CatalogueElement, DataModelFilter.create(true))).flatMap { element ->
+            log.info "[${total - 1}/$total] Reindexing orphaned elements"
             return unindex(element).concatWith(index(element))
         })
 
-        log.info "[${total}/$total] Reindexing relationship types"
         return result.concatWith(from(RelationshipType.list()).flatMap {
+            log.info "[${total}/$total] Reindexing relationship types"
             return unindex(it).concatWith(index(it))
         })
 
@@ -387,7 +387,7 @@ class ElasticSearchService implements SearchCatalogue {
 
         if (CatalogueElement.isAssignableFrom(clazz)) {
             CatalogueElement element = object as CatalogueElement
-            return safeIndex(getIndices(element), getElementWithRelationships(element), typesSupportedInDataModel)
+            return safeIndex(getIndices(element), getElementWithRelationships(element), mappedTypesInDataModel)
         }
 
         if (RelationshipType.isAssignableFrom(clazz)) {
@@ -396,7 +396,7 @@ class ElasticSearchService implements SearchCatalogue {
 
         if (Relationship.isAssignableFrom(clazz)) {
             Relationship rel = object as Relationship
-            return safeIndex(getIndices(rel.source).mergeWith(getIndices(rel.destination)).cache(), just(object).cache(), typesSupportedInDataModel)
+            return safeIndex(getIndices(rel.source).mergeWith(getIndices(rel.destination)).cache(), just(object).cache(), mappedTypesInDataModel)
         }
 
         throw new UnsupportedOperationException("Not Yet Implemented for $object")

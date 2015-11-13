@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.Lists
+import rx.schedulers.Schedulers
 
 import java.util.concurrent.ExecutorService
 
@@ -54,15 +55,17 @@ class SearchController extends AbstractRestfulController<CatalogueElement>{
             return
         }
 
+        log.info "Reindexing search service ..."
         executorService.submit {
-            try {
-                log.info "Reindexing search service ..."
-                modelCatalogueSearchService.reindex()
-                log.info "... search service reindexed"
-            } catch (Exception e) {
-                log.error("Reindexing failed", e)
+            modelCatalogueSearchService.reindex()
+                    .doOnError {
+                log.error("Reindexing failed", it)
             }
+            .doOnCompleted {
+                log.info "... search service reindexed"
+            }.subscribe()
         }
+
 
         respond(success: true, status: OK)
     }
