@@ -115,7 +115,7 @@ class DataImportController  {
         boolean isAdmin = modelCatalogueSecurityService.hasRole('ADMIN')
 
         if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xls")) {
-            def asset = storeAsset(params, file, 'application/vnd.ms-excel')
+            def asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
             def id = asset.id
             InputStream inputStream = file.inputStream
             HeadersMap headersMap = HeadersMap.create(request.JSON.headersMap ?: [:])
@@ -134,7 +134,7 @@ class DataImportController  {
         }
 
         if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xml")) {
-            def asset = storeAsset(params, file, 'application/xml')
+            def asset = assetService.storeAsset(params, file, 'application/xml')
             def id = asset.id
             InputStream inputStream = file.inputStream
             executeInBackground(id, "Imported from XML") {
@@ -151,7 +151,7 @@ class DataImportController  {
         }
 
         if (file.size > 0 && file.originalFilename.endsWith(".obo")) {
-            def asset = storeAsset(params, file, 'text/obo')
+            def asset = assetService.storeAsset(params, file, 'text/obo')
             def id = asset.id
             InputStream inputStream = file.inputStream
             String name = params?.name
@@ -175,7 +175,7 @@ class DataImportController  {
         }
 
         if (file.size > 0 && file.originalFilename.endsWith("c.csv")) {
-            def asset = storeAsset(params, file, 'application/model-catalogue')
+            def asset = assetService.storeAsset(params, file, 'application/model-catalogue')
             def id = asset.id
             InputStream inputStream = file.inputStream
 
@@ -193,7 +193,7 @@ class DataImportController  {
         }
 
         if (file.size > 0 && file.originalFilename.endsWith(".mc")) {
-            def asset = storeAsset(params, file, 'application/model-catalogue')
+            def asset = assetService.storeAsset(params, file, 'application/model-catalogue')
             def id = asset.id
             InputStream inputStream = file.inputStream
 
@@ -213,7 +213,7 @@ class DataImportController  {
         }
 
         if (file.size > 0 && file.originalFilename.endsWith(".umlj")) {
-            def asset = storeAsset(params, file, 'text/umlj')
+            def asset = assetService.storeAsset(params, file, 'text/umlj')
             def id = asset.id
             InputStream inputStream = file.inputStream
             String name = params?.name
@@ -281,22 +281,7 @@ class DataImportController  {
         updated.description = "Error importing file: ${e}"
         updated.save(flush: true, failOnError: true)
     }
-    protected storeAsset(param, file, contentType = 'application/xslt'){
 
-        String theName = (param.name ?: param.action)
-
-        Asset asset = new Asset(
-                name: "Import for " + theName,
-                originalFileName: file.originalFilename,
-                description: "Your import will be available in this asset soon. Use Refresh action to reload.",
-                status: ElementStatus.PENDING,
-                contentType: contentType,
-                size: 0
-        )
-        asset.save(flush: true, failOnError: true)
-        assetService.storeAssetFromFile(file, asset)
-        return asset
-    }
 
     protected executeInBackground(Long assetId, String message, Closure code) {
         Long userId = modelCatalogueSecurityService.currentUser?.id

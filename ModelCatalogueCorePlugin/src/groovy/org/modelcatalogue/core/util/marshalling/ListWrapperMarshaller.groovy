@@ -30,11 +30,11 @@ abstract class ListWrapperMarshaller extends AbstractMarshaller {
         ]
     }
 
-    protected static getList(Object elements) {
+    protected getList(Object elements) {
         elements.items
     }
 
-    protected static getSize(Object elements) {
+    protected getSize(Object elements) {
         elements.items.size()
     }
 }

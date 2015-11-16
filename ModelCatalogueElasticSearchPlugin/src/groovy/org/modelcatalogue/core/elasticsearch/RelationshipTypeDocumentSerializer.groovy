@@ -1,11 +1,14 @@
 package org.modelcatalogue.core.elasticsearch
 
+import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.RelationshipType
 
 class RelationshipTypeDocumentSerializer implements DocumentSerializer<RelationshipType> {
 
     Map getDocument(RelationshipType type) {
         [
+                _id: type.getId()?.toString(),
+                _type: ElasticSearchService.getTypeName(HibernateProxyHelper.getClassWithoutInitializingProxy(type)),
                 name: type.name,
                 system: type.system,
                 source_to_destination: type.sourceToDestination,
@@ -14,8 +17,8 @@ class RelationshipTypeDocumentSerializer implements DocumentSerializer<Relations
                 destination_to_source_description: type.destinationToSourceDescription,
                 source_class: type.sourceClass.toString(),
                 destination_class: type.destinationClass.toString(),
-                bidirectional: type.bidirectional,
-                version_specific: type.versionSpecific
+                                bidirectional: type.bidirectional,
+                                version_specific: type.versionSpecific
         ]
 
     }

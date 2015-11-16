@@ -10,6 +10,8 @@ class CatalogueElementDocumentSerializer implements DocumentSerializer<Catalogue
     Map getDocument(CatalogueElement element) {
         Class<? extends CatalogueElement> clazz = HibernateProxyHelper.getClassWithoutInitializingProxy(element)
         [
+                _id: element.getId()?.toString(),
+                _type: ElasticSearchService.getTypeName(HibernateProxyHelper.getClassWithoutInitializingProxy(element)),
                 name: element.name,
                 name_not_analyzed: element.name,
                 link: "/${GrailsNameUtils.getPropertyName(clazz)}/${element.getId()}",

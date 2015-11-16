@@ -17,7 +17,7 @@ class UmljService {
 
     static transactional = false
 
-    protected void importUmlDiagram(InputStream is, String name, DataModel classification) {
+    void importUmlDiagram(InputStream is, String name, DataModel classification) {
         log.info "Parsing Umlj file for ${name}"
         def slurper = new JsonSlurper()
         def result  = slurper.parse(new BufferedReader(new InputStreamReader(is)))

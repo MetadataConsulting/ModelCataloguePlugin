@@ -23,6 +23,7 @@ import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
 import rx.Observable
+import rx.subjects.PublishSubject
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
@@ -247,8 +248,8 @@ class ElasticSearchService implements SearchCatalogue {
             log.error("Exception while indexing", throwable)
         }
 
-        indexing.doOnNext { indexResponse ->
-            log.info("got index response: $indexResponse")
+        indexing.doOnCompleted {
+            log.debug "Indexing $object completed"
         }
 
         return indexing.all {
@@ -259,8 +260,10 @@ class ElasticSearchService implements SearchCatalogue {
 
     @Override
     Observable<Boolean> index(Iterable<Object> resource) {
-        from(resource).all {
-            index(it)
+        from(resource).flatMap { object ->
+            index(object)
+        }.all {
+            it
         }
     }
 
@@ -284,7 +287,7 @@ class ElasticSearchService implements SearchCatalogue {
         }
         if (CatalogueElement.isAssignableFrom(clazz)) {
             CatalogueElement element = object as CatalogueElement
-            return getIndices(element).flatMap { idx ->
+            return from(getIndices(element)).flatMap { idx ->
                 from(client.prepareDelete(idx, getTypeName(clazz), "${element.getId()}").execute()).map {
                     it.found
                 }.onErrorReturn { error ->
@@ -298,8 +301,10 @@ class ElasticSearchService implements SearchCatalogue {
 
     @Override
     Observable<Boolean> unindex(Collection<Object> object) {
-        return from(object).all {
+        return from(object).flatMap {
             unindex(it)
+        }.all {
+            it
         }
     }
 
@@ -308,7 +313,7 @@ class ElasticSearchService implements SearchCatalogue {
         int total = DataModel.count() + 2
         int dataModelCounter = 1
 
-        Observable<Boolean> result = from(DataModel.list())
+        Observable<Boolean> result = from(DataModel.list(sort: 'lastUpdated', order: 'desc'))
         .doOnNext {
             log.info "[${dataModelCounter++}/$total] Reindexing data model ${it.name} (${it.combinedVersion}) - ${it.countOutgoingRelationshipsByType(RelationshipType.declarationType)} items"
         }.flatMap {
@@ -335,7 +340,22 @@ class ElasticSearchService implements SearchCatalogue {
         if (!object) {
             return [:]
         }
-        DocumentSerializer.Registry.get(object.class).getDocument(object)
+
+        if (object instanceof Map) {
+            return object
+        }
+
+        Map result = DocumentSerializer.Registry.get(object.class).getDocument(object)
+
+        if (!result._id) {
+            throw new IllegalArgumentException("_id field for $object is missing")
+        }
+
+        if (!result._type) {
+            throw new IllegalArgumentException("_type dfield for $object is missing")
+        }
+
+        result
     }
 
     Map<String, Map> getMapping(Class clazz) {
@@ -382,7 +402,7 @@ class ElasticSearchService implements SearchCatalogue {
     private Observable<SimpleIndexResponse> indexAsync(object) {
         Class clazz = HibernateProxyHelper.getClassWithoutInitializingProxy(object)
         if (DataModel.isAssignableFrom(clazz)) {
-            return safeIndex(just(DATA_MODEL_INDEX).cache(), getElementWithRelationships(object as CatalogueElement) , [DataModel])
+            return safeIndex(getIndices(object), getElementWithRelationships(object as CatalogueElement), [DataModel])
         }
 
         if (CatalogueElement.isAssignableFrom(clazz)) {
@@ -391,50 +411,61 @@ class ElasticSearchService implements SearchCatalogue {
         }
 
         if (RelationshipType.isAssignableFrom(clazz)) {
-            return safeIndex(just(getGlobalIndexName(clazz)).cache(), just(object).cache(), [clazz])
+            return safeIndex(getIndices(object), [getDocument(object)], [clazz])
         }
 
         if (Relationship.isAssignableFrom(clazz)) {
             Relationship rel = object as Relationship
-            return safeIndex(getIndices(rel.source).mergeWith(getIndices(rel.destination)).cache(), just(object).cache(), mappedTypesInDataModel)
+            return safeIndex(getIndices(rel), getRelationshipWithSourceAndDestination(rel), mappedTypesInDataModel)
         }
 
         throw new UnsupportedOperationException("Not Yet Implemented for $object")
     }
 
-    private static Observable<Object> getElementWithRelationships(CatalogueElement element) {
-        return just(element as Object)
-                .mergeWith(from(element.incomingRelationships))
-                .mergeWith(from(element.outgoingRelationships))
-                .distinct()
-                .cache()
+    private List<Map> getElementWithRelationships(CatalogueElement element) {
+        List<Map> ret = []
+        ret.add(getDocument(element))
+        ret.addAll(element.incomingRelationships.collect { getDocument(it) })
+        ret.addAll(element.outgoingRelationships.collect { getDocument(it) })
+        return ret
     }
 
-    private Observable<SimpleIndexResponse> safeIndex(Observable<String> indicies, Observable<Object> objects, Iterable<Class> supportedTypes) {
-        return indexInternal(ensureIndexExists(indicies, supportedTypes), objects)
+    private List<Map> getRelationshipWithSourceAndDestination(Relationship rel) {
+        List<Map> ret = []
+        ret.add(getDocument(rel))
+        ret.add(getDocument(rel.source))
+        ret.add(getDocument(rel.destination))
+        return ret
     }
 
+    private Observable<SimpleIndexResponse> safeIndex(Iterable<String> indicies, Iterable<Map> documents, Iterable<Class> supportedTypes) {
+        return from(indicies).flatMap { idx ->
+            return ensureIndexExists(just(idx), supportedTypes).flatMap { existingIndex ->
+                BulkRequestBuilder bulkRequest = client.prepareBulk()
 
-    private Observable<SimpleIndexResponse> indexInternal(Observable<String> index, Observable<Object> objects) {
-        return index.flatMap { idx ->
-            BulkRequestBuilder bulkRequest = client.prepareBulk()
+                for (Map object in documents) {
+                    Map document = new LinkedHashMap(object)
 
-            // TODO: use take(time) to split by time
-            // wait until finished
-            for (Object object in objects.toBlocking().toIterable()) {
-                bulkRequest.add(client
-                        .prepareIndex(idx, getTypeName(HibernateProxyHelper.getClassWithoutInitializingProxy(object)), object.getId().toString())
-                        .setSource(getDocument(object))
-                )
-            }
+                    document.remove '_id'
+                    document.remove '_type'
 
-            return from(bulkRequest.execute()).flatMap { bulkResponse ->
-                from(bulkResponse.items).map { bulkResponseItem ->
-                    SimpleIndexResponse.from(bulkResponseItem)
+                    bulkRequest.add(client
+                            .prepareIndex(existingIndex, object._type, object._id)
+                            .setSource(document)
+                    )
                 }
+
+                return from(bulkRequest.execute()).flatMap { bulkResponse ->
+                    from(bulkResponse.items).map { bulkResponseItem ->
+                        SimpleIndexResponse.from(bulkResponseItem)
+                    }
+                }
+
             }
         }
     }
+
+
 
     private Observable<SimpleIndicesExistsResponse> indexExists(Observable<String> indices) {
         return indices.flatMap { index ->
@@ -463,20 +494,38 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
 
-    private static Observable<String> getIndices(CatalogueElement element) {
-        if (element.dataModels) {
-            return from(element.dataModels).map {
-                getDataModelIndex(it)
-            }.concatWith(just(MC_ALL_INDEX)).cache()
+
+    protected static List<String> getIndices(object) {
+        Class clazz = HibernateProxyHelper.getClassWithoutInitializingProxy(object)
+        if (DataModel.isAssignableFrom(clazz)) {
+            return [DATA_MODEL_INDEX]
         }
-        return just(ORPHANED_INDEX, MC_ALL_INDEX).cache()
+
+        if (CatalogueElement.isAssignableFrom(clazz)) {
+            CatalogueElement element = object as CatalogueElement
+            if (element.dataModels) {
+                return [MC_ALL_INDEX] + element.dataModels.collect { getDataModelIndex(it) }
+            }
+            return [ORPHANED_INDEX, MC_ALL_INDEX]
+        }
+
+        if (RelationshipType.isAssignableFrom(clazz)) {
+            return [getGlobalIndexName(clazz)]
+        }
+
+        if (Relationship.isAssignableFrom(clazz)) {
+            Relationship rel = object as Relationship
+            return (getIndices(rel.source) + getIndices(rel.destination)).unique()
+        }
+
+        throw new UnsupportedOperationException("Not Yet Implemented for $object")
     }
 
-    private static String getDataModelIndex(Long id) {
+    protected static String getDataModelIndex(Long id) {
         "${DATA_MODEL_PREFIX}${id}"
     }
 
-    private static String getDataModelIndex(DataModel dataModel) {
+    protected static String getDataModelIndex(DataModel dataModel) {
         getDataModelIndex(dataModel.getId())
     }
 

@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.elasticsearch
 
-import grails.util.GrailsNameUtils
 import groovy.util.logging.Log4j
 import org.elasticsearch.action.search.SearchRequestBuilder
 import org.elasticsearch.action.search.SearchResponse

@@ -92,6 +92,7 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
                 .concatWith(elasticSearchService.index(element))
                 .toBlocking().last()
 
+        Thread.sleep(1000) // some time to index
         then:
         noExceptionThrown()
         elasticSearchService.client
@@ -100,7 +101,6 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
                 .get().exists
 
         when:
-        Thread.sleep(1000) // some time to index
 
 
         ListWithTotalAndType<DataClass> foundClasses = elasticSearchService.search(DataClass, [search: 'foo'])

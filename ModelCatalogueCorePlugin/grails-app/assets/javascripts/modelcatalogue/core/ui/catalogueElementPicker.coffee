@@ -67,7 +67,7 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
 
     element.attr('typeahead', "el as label(el, #{label}) for el in searchForElement($viewValue, \"" + escape(attrs.catalogueElementPicker ? '') + "\", \"" + escape(attrs.resource ? '') + "\", \"" + escape(attrs.status ? '') + "\")" )
     element.attr('autocomplete', "off")
-    element.attr('typeahead-wait-ms', "500") unless element.attr('typeahead-wait-ms')
+    element.attr('typeahead-wait-ms', "50") unless element.attr('typeahead-wait-ms')
     element.attr('typeahead-template-url', 'modelcatalogue/core/ui/catalogueElementPickerTypeahead.html')
     element.attr('placeholder', if attrs.status then "Start typing or click icon on the left for advanced search for #{attrs.status} elements" else 'Start typing or click icon on the left for advanced search')
     element.removeAttr('catalogue-element-picker')
