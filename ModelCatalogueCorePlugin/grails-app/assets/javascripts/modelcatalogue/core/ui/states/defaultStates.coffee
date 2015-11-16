@@ -647,7 +647,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
             </div><!--/.nav-collapse -->
         </div>
-        <div class="fast-actions" ng-controller="defaultStates.fastActionsCtrl" ng-click="showFastActions()">
+        <div class="fast-actions" ng-controller="defaultStates.fastActionsCtrl" ng-click="showFastActions()" show-if-logged-in>
             <span class="fa-stack fa-3x">
               <i class="fa fa-fw fa-circle fa-stack-2x"></i>
               <i class="fa fa-fw fa-flash fa-inverse fa-stack-1x"></i>
