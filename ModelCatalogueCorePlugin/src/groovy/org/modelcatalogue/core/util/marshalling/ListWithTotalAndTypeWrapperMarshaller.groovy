@@ -17,11 +17,4 @@ class ListWithTotalAndTypeWrapperMarshaller extends ListWrapperMarshaller {
         return super.getList(elements)
     }
 
-    @Override
-    protected getSize(Object elements) {
-        if (elements.list instanceof JsonAwareListWithTotalAndType) {
-            return elements.list.size()
-        }
-        return super.getSize(elements)
-    }
 }

@@ -679,7 +679,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                    typeahead="result.term as result.label for result in getResults($viewValue)"
                    typeahead-on-select="search($item, $model, $label)"
                    typeahead-template-url="modelcatalogue/core/ui/omnisearchItem.html"
-                   typeahead-wait-ms="300"
+                   #{ ###typeahead-wait-ms="300" ### }
                    class="form-control"
                    ng-class="{'expanded': searchSelect}"
             >

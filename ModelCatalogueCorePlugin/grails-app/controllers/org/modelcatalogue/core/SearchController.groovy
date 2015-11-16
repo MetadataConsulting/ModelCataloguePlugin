@@ -1,9 +1,6 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.util.Elements
-import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.Lists
-import rx.schedulers.Schedulers
 
 import java.util.concurrent.ExecutorService
 
@@ -22,26 +19,7 @@ class SearchController extends AbstractRestfulController<CatalogueElement>{
     def index(Integer max){
         setSafeMax(max)
 
-        ListWithTotal<CatalogueElement> results =  modelCatalogueSearchService.search(params)
-
-        def baseLink = "/search/?search=${params.search.encodeAsURL()}"
-
-        int total = results.total
-        def links = Lists.nextAndPreviousLinks(params, baseLink, total)
-        Elements elements =  new Elements(
-                base: baseLink,
-                total: total,
-                items: results.items,
-                previous: links.previous,
-                next: links.next,
-                offset: params.int('offset') ?: 0,
-                page: params.int('max') ?: 10,
-                sort: params.sort,
-                order: params.order,
-                itemType: CatalogueElement
-        )
-
-        respond elements
+        respond Lists.wrap(params, "/search/?search=${params.search.encodeAsURL()}", modelCatalogueSearchService.search(params))
 
     }
 

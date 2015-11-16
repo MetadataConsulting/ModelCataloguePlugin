@@ -1,13 +1,16 @@
 package org.modelcatalogue.core.elasticsearch
 
+import grails.util.GrailsNameUtils
 import groovy.util.logging.Log4j
 import org.elasticsearch.action.search.SearchRequestBuilder
 import org.elasticsearch.action.search.SearchResponse
 import org.elasticsearch.search.SearchHit
+import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.util.JsonAwareListWithTotalAndType
 import org.modelcatalogue.core.util.ListWithTotalAndType
 
 @Log4j
-class ElasticSearchQueryList<T> implements ListWithTotalAndType<T> {
+class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
 
     final Map<String, Object> params
     final Class<T> type
@@ -23,6 +26,10 @@ class ElasticSearchQueryList<T> implements ListWithTotalAndType<T> {
         this.params = params
         this.type = type
         this.searchRequest = searchRequest
+
+        if (CatalogueElement.isAssignableFrom(type)) {
+            searchRequest.addFields('name', '_id', 'fully_qualified_type','link','status','version_number','latest_version', 'data_model')
+        }
     }
 
     @Override
@@ -61,5 +68,24 @@ class ElasticSearchQueryList<T> implements ListWithTotalAndType<T> {
         return response.hits.hits.collect { SearchHit hit ->
             type.get(hit.id().toLong())
         }
+    }
+
+    @Override
+    List<Object> getJsonItems() {
+        // don't forget to add field into the fetched field in the constructor if you want to use it
+        if (CatalogueElement.isAssignableFrom(type)) {
+            return response.hits.hits.collect { SearchHit hit ->
+                [
+                        name: hit.field('name')?.value(),
+                        id: hit.id(),
+                        elementType: hit.field('fully_qualified_type')?.value(),
+                        link:  hit.field('link'), status: hit.field('status')?.value(),
+                        versionNumber: hit.field('version_number')?.value(),
+                        latestVersionId: hit.field('latest_version')?.value(),
+                        classifiedName: hit.field('data_model')?.value() ? "${hit.field('name').value()} (${hit.field('data_model').value()})" : hit.field('name').value()
+                ]
+            }
+        }
+        return items
     }
 }
