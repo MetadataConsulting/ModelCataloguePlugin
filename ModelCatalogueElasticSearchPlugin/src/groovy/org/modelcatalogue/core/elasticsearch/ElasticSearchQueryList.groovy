@@ -27,7 +27,7 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
         this.searchRequest = searchRequest
 
         if (CatalogueElement.isAssignableFrom(type)) {
-            searchRequest.addFields('name', '_id', 'fully_qualified_type','link','status','version_number','latest_version', 'data_model')
+            searchRequest.addFields('name', '_id', 'fully_qualified_type','link','status','version_number','latest_id', 'data_model', 'model_catalogue_id')
         }
     }
 
@@ -46,7 +46,7 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
 
     private SearchResponse initializeResponse() {
         try {
-            if (params.offeset) {
+            if (params.offset) {
                 searchRequest.setFrom(Integer.parseInt(params.offset.toString(), 10))
             }
             if (params.max) {
@@ -80,8 +80,9 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
                         elementType: hit.field('fully_qualified_type')?.value(),
                         link:  hit.field('link'), status: hit.field('status')?.value(),
                         versionNumber: hit.field('version_number')?.value(),
-                        latestVersionId: hit.field('latest_version')?.value(),
-                        classifiedName: hit.field('data_model')?.value() ? "${hit.field('name').value()} (${hit.field('data_model').value()})" : hit.field('name').value()
+                        latestVersionId: hit.field('latest_id')?.value(),
+                        classifiedName: hit.field('data_model')?.value() ? "${hit.field('name').value()} (${hit.field('data_model').value()})" : hit.field('name').value(),
+                        modelCatalogueId: hit.field('model_catalogue_id')?.value()
                 ]
             }
         }

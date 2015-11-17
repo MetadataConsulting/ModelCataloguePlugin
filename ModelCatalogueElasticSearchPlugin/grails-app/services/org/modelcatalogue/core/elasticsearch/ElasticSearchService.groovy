@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.elasticsearch
 
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
 import grails.util.GrailsNameUtils
 import groovy.json.JsonSlurper
 import org.codehaus.groovy.grails.commons.GrailsApplication
@@ -23,17 +25,18 @@ import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
 import rx.Observable
-import rx.subjects.PublishSubject
+import rx.schedulers.Schedulers
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
+import java.util.concurrent.ExecutorService
 
 import static rx.Observable.from
 import static rx.Observable.just
 
-// TODO: JSON from the search service should only return partial response (id, name...) to skip database round trip
-// TODO: review mappings and try to tune the analyzers
 class ElasticSearchService implements SearchCatalogue {
+
+    private static Cache<Class, List<Class>> subclassesCache = CacheBuilder.newBuilder().initialCapacity(20).build()
 
     private static String MC_PREFIX = "mc_"
     private static String GLOBAL_PREFIX = "${MC_PREFIX}global_"
@@ -56,6 +59,7 @@ class ElasticSearchService implements SearchCatalogue {
             Asset, DataClass, DataElement, DataType, EnumeratedType, MeasurementUnit, PrimitiveType, ReferenceType, Relationship
     ]
 
+    ExecutorService executorService
     GrailsApplication grailsApplication
     DataModelService dataModelService
     Node node
@@ -201,13 +205,15 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     List<Class> collectSubclasses(Class<?> resource) {
-        // TODO: this should be cached
-        GrailsDomainClass domainClass = grailsApplication.getDomainClass(resource.name) as GrailsDomainClass
+        subclassesCache.get(resource) {
+            GrailsDomainClass domainClass = grailsApplication.getDomainClass(resource.name) as GrailsDomainClass
 
-        if (domainClass.hasSubClasses()) {
-            return [resource] + domainClass.subClasses.collect { it.clazz }
+            if (domainClass.hasSubClasses()) {
+                return [resource] + domainClass.subClasses.collect { it.clazz }
+            }
+
+            return [resource]
         }
-        return [resource]
     }
 
     private List<String> collectDataModelIndicies(Map params) {
@@ -240,28 +246,38 @@ class ElasticSearchService implements SearchCatalogue {
 
     @Override
     Observable<Boolean> index(Object object) {
-        log.debug "Indexing $object"
+        return index(IndexingSession.create(), object)
+    }
 
-        Observable<SimpleIndexResponse> indexing = indexAsync(object)
+    Observable<Boolean> index(IndexingSession session, Object object) {
+        session.indexOnlyOnce(object) {
+            log.debug "Indexing $object"
 
-        indexing.doOnError { throwable ->
-            log.error("Exception while indexing", throwable)
-        }
+            Observable<SimpleIndexResponse> indexing = indexAsync(session, object)
 
-        indexing.doOnCompleted {
-            log.debug "Indexing $object completed"
-        }
+            indexing.doOnError { throwable ->
+                log.error("Exception while indexing", throwable)
+            }
 
-        return indexing.all {
-            it.ok
+            indexing.doOnCompleted {
+                log.debug "Indexing $object completed"
+            }
+
+            return indexing.all {
+                it.ok
+            }
         }
     }
 
 
     @Override
     Observable<Boolean> index(Iterable<Object> resource) {
+        index IndexingSession.create(), resource
+    }
+
+    Observable<Boolean> index(IndexingSession session, Iterable<Object> resource) {
         from(resource).flatMap { object ->
-            index(object)
+            index(session, object)
         }.all {
             it
         }
@@ -313,49 +329,35 @@ class ElasticSearchService implements SearchCatalogue {
         int total = DataModel.count() + 2
         int dataModelCounter = 1
 
-        Observable<Boolean> result = from(DataModel.list(sort: 'lastUpdated', order: 'desc'))
+        IndexingSession session = IndexingSession.create()
+
+        // deleting all mc indices so we don't have to unindex each element separately
+        Observable<Boolean> result = from(client.admin().indices().prepareDelete("${MC_PREFIX}*").execute()).map {
+            it.acknowledged
+        }
+
+        result = result.concatWith(from(DataModel.list(sort: 'lastUpdated', order: 'desc'))
         .doOnNext {
             log.info "[${dataModelCounter++}/$total] Reindexing data model ${it.name} (${it.combinedVersion}) - ${it.countOutgoingRelationshipsByType(RelationshipType.declarationType)} items"
         }.flatMap {
-            return unindex(it)
-            .concatWith(index(it))
+            return index(session, it)
             .concatWith(from(it.getOutgoingRelationsByType(RelationshipType.declarationType)).flatMap { element ->
-                return unindex(element).concatWith(index(element))
+                return index(session, element)
             })
-        }
+        })
 
-        result.concatWith(from(dataModelService.classified(CatalogueElement, DataModelFilter.create(true))).flatMap { element ->
+        result = result.concatWith(from(dataModelService.classified(CatalogueElement, DataModelFilter.create(true))).flatMap { element ->
             log.info "[${total - 1}/$total] Reindexing orphaned elements"
-            return unindex(element).concatWith(index(element))
+            return index(session, element)
         })
 
         return result.concatWith(from(RelationshipType.list()).flatMap {
             log.info "[${total}/$total] Reindexing relationship types"
-            return unindex(it).concatWith(index(it))
-        })
-
-    }
-
-    public Map<String, Object> getDocument(Object object) {
-        if (!object) {
-            return [:]
+            return index(session, it)
+        }).doOnError {
+            log.error "Exception reindexing catalogue", it
         }
 
-        if (object instanceof Map) {
-            return object
-        }
-
-        Map result = DocumentSerializer.Registry.get(object.class).getDocument(object)
-
-        if (!result._id) {
-            throw new IllegalArgumentException("_id field for $object is missing")
-        }
-
-        if (!result._type) {
-            throw new IllegalArgumentException("_type dfield for $object is missing")
-        }
-
-        result
     }
 
     Map<String, Map> getMapping(Class clazz) {
@@ -385,7 +387,10 @@ class ElasticSearchService implements SearchCatalogue {
             }
         }
 
-        if (clazz == Relationship) {
+        if (clazz == DataElement) {
+            // data type is embedded into data element
+            mapping.data_type = getMapping(DataType)
+        } else if (clazz == Relationship) {
             // source and destination combines all available catalogue element mappings
             // relationship copies relationship type mapping
             mapping.relationship_type = getMapping(RelationshipType)
@@ -399,42 +404,42 @@ class ElasticSearchService implements SearchCatalogue {
         return mapping
     }
 
-    private Observable<SimpleIndexResponse> indexAsync(object) {
+    private Observable<SimpleIndexResponse> indexAsync(IndexingSession session, object) {
         Class clazz = HibernateProxyHelper.getClassWithoutInitializingProxy(object)
         if (DataModel.isAssignableFrom(clazz)) {
-            return safeIndex(getIndices(object), getElementWithRelationships(object as CatalogueElement), [DataModel])
+            return safeIndex(getIndices(object), getElementWithRelationships(session, object as CatalogueElement), [DataModel])
         }
 
         if (CatalogueElement.isAssignableFrom(clazz)) {
             CatalogueElement element = object as CatalogueElement
-            return safeIndex(getIndices(element), getElementWithRelationships(element), mappedTypesInDataModel)
+            return safeIndex(getIndices(element), getElementWithRelationships(session, element), mappedTypesInDataModel)
         }
 
         if (RelationshipType.isAssignableFrom(clazz)) {
-            return safeIndex(getIndices(object), [getDocument(object)], [clazz])
+            return safeIndex(getIndices(object), [session.getDocument(object)], [clazz])
         }
 
         if (Relationship.isAssignableFrom(clazz)) {
             Relationship rel = object as Relationship
-            return safeIndex(getIndices(rel), getRelationshipWithSourceAndDestination(rel), mappedTypesInDataModel)
+            return safeIndex(getIndices(rel), getRelationshipWithSourceAndDestination(session, rel), mappedTypesInDataModel)
         }
 
         throw new UnsupportedOperationException("Not Yet Implemented for $object")
     }
 
-    private List<Map> getElementWithRelationships(CatalogueElement element) {
+    private static List<Map> getElementWithRelationships(IndexingSession session, CatalogueElement element) {
         List<Map> ret = []
-        ret.add(getDocument(element))
-        ret.addAll(element.incomingRelationships.collect { getDocument(it) })
-        ret.addAll(element.outgoingRelationships.collect { getDocument(it) })
+        ret.add(session.getDocument(element))
+        ret.addAll(element.incomingRelationships.collect { session.getDocument(it) })
+        ret.addAll(element.outgoingRelationships.collect { session.getDocument(it) })
         return ret
     }
 
-    private List<Map> getRelationshipWithSourceAndDestination(Relationship rel) {
+    private static List<Map> getRelationshipWithSourceAndDestination(IndexingSession session, Relationship rel) {
         List<Map> ret = []
-        ret.add(getDocument(rel))
-        ret.add(getDocument(rel.source))
-        ret.add(getDocument(rel.destination))
+        ret.add(session.getDocument(rel))
+        ret.add(session.getDocument(rel.source))
+        ret.add(session.getDocument(rel.destination))
         return ret
     }
 

@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.elasticsearch
 
+import com.google.common.collect.ImmutableMap
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataElement
@@ -11,7 +12,7 @@ import org.modelcatalogue.core.security.User
 
 interface DocumentSerializer<T> {
 
-    Map getDocument(T object)
+    ImmutableMap.Builder<String, Object> buildDocument(IndexingSession session, T object, ImmutableMap.Builder<String, Object> builder)
 
     class Registry {
         private static Map<Class, DocumentSerializer> documentSerializers = [

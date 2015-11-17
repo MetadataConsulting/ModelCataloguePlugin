@@ -1,18 +1,19 @@
 package org.modelcatalogue.core.elasticsearch
 
+import com.google.common.collect.ImmutableMap
 import org.modelcatalogue.core.Asset
 
-class AssetDocumentSerializer extends CatalogueElementDocumentSerializer implements DocumentSerializer<Asset> {
+class AssetDocumentSerializer extends CatalogueElementDocumentSerializer<Asset> {
 
-    Map getDocument(Asset element) {
-        Map ret = super.getDocument(element)
+    ImmutableMap.Builder<String, Object> buildDocument(IndexingSession session, Asset element, ImmutableMap.Builder<String, Object> builder) {
+        super.buildDocument(session, element, builder)
 
-        ret.size = element.size
-        ret.content_type = element.contentType
-        ret.md5 = element.md5
-        ret.original_file_name = element.originalFileName
+        safePut(builder, 'size', element.size)
+        safePut(builder, 'content_type', element.contentType)
+        safePut(builder, 'md5', element.md5)
+        safePut(builder, 'original_file_name', element.originalFileName)
 
-        return ret
+        return builder
     }
 
 }

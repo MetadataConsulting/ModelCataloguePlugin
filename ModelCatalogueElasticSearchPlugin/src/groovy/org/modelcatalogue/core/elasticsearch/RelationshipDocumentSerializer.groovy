@@ -1,24 +1,27 @@
 package org.modelcatalogue.core.elasticsearch
 
+import static org.modelcatalogue.core.elasticsearch.CatalogueElementDocumentSerializer.safePut
+
+import com.google.common.collect.ImmutableList
+import com.google.common.collect.ImmutableMap
 import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipType
 
 class RelationshipDocumentSerializer implements DocumentSerializer<Relationship> {
 
-    Map getDocument(Relationship relationship) {
-        [
-                _id: relationship.getId()?.toString(),
-                _type: ElasticSearchService.getTypeName(HibernateProxyHelper.getClassWithoutInitializingProxy(relationship)),
-                incoming_index: relationship.incomingIndex,
-                outgoing_index: relationship.outgoingIndex,
-                relationship_type: DocumentSerializer.Registry.get(RelationshipType).getDocument(relationship.relationshipType),
-                source: DocumentSerializer.Registry.get(relationship.source.class).getDocument(relationship.source),
-                destination: DocumentSerializer.Registry.get(relationship.destination.class).getDocument(relationship.destination),
-                                archived: relationship.archived,
-                                inherited: relationship.inherited,
-                                ext: relationship.ext.collect { key, value -> [key: key, value: value] }
-        ]
+    @Override
+    ImmutableMap.Builder<String, Object> buildDocument(IndexingSession session, Relationship relationship, ImmutableMap.Builder<String, Object> builder) {
+        safePut(builder, '_id', relationship.getId()?.toString())
+        safePut(builder, '_type', ElasticSearchService.getTypeName(HibernateProxyHelper.getClassWithoutInitializingProxy(relationship)))
+        safePut(builder, 'incoming_index', relationship.incomingIndex)
+        safePut(builder, 'outgoing_index', relationship.outgoingIndex)
+        safePut(builder, 'relationship_type', session.getDocument(relationship.relationshipType))
+        safePut(builder, 'source', session.getDocument(relationship.source))
+        safePut(builder, 'destination', session.getDocument(relationship.destination))
+        safePut(builder, 'archived', relationship.archived)
+        safePut(builder, 'inherited', relationship.inherited)
+        safePut(builder, 'ext', CatalogueElementDocumentSerializer.getExtensions(relationship.ext))
+        return builder
     }
 
 }

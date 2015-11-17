@@ -27,7 +27,7 @@ grails.mime.types = [ // the first one is the default format
 ]
 
 // URL Mapping Cache Max Size, defaults to 5000
-//grails.urlmapping.cache.maxsize = 1000
+//grails.urlmapping.documentCache.maxsize = 1000
 
 // What URL patterns should be processed by the resources plugin
 grails.resources.adhoc.patterns = ['/images/*', '/css/*', '/js/*', '/plugins/*']
@@ -75,7 +75,7 @@ grails.web.disable.multipart = false
 // request parameters to mask when logging exceptions
 grails.exceptionresolver.params.exclude = ['password', 'password1', 'password2', 'client_secret']
 
-// configure auto-caching of queries by default (if false you can cache individual queries with 'cache: true')
+// configure auto-caching of queries by default (if false you can documentCache individual queries with 'documentCache: true')
 grails.hibernate.cache.queries = false
 
 environments {

@@ -1,25 +1,27 @@
 package org.modelcatalogue.core.elasticsearch
 
+import static org.modelcatalogue.core.elasticsearch.CatalogueElementDocumentSerializer.safePut
+
+import com.google.common.collect.ImmutableMap
 import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.RelationshipType
 
 class RelationshipTypeDocumentSerializer implements DocumentSerializer<RelationshipType> {
 
-    Map getDocument(RelationshipType type) {
-        [
-                _id: type.getId()?.toString(),
-                _type: ElasticSearchService.getTypeName(HibernateProxyHelper.getClassWithoutInitializingProxy(type)),
-                name: type.name,
-                system: type.system,
-                source_to_destination: type.sourceToDestination,
-                source_to_destination_description: type.sourceToDestinationDescription,
-                destination_to_source: type.destinationToSource,
-                destination_to_source_description: type.destinationToSourceDescription,
-                source_class: type.sourceClass.toString(),
-                destination_class: type.destinationClass.toString(),
-                                bidirectional: type.bidirectional,
-                                version_specific: type.versionSpecific
-        ]
-
+    @Override
+    ImmutableMap.Builder<String, Object> buildDocument(IndexingSession session, RelationshipType type, ImmutableMap.Builder<String, Object> builder) {
+        safePut(builder, '_id', type.getId()?.toString())
+        safePut(builder, '_type', ElasticSearchService.getTypeName(HibernateProxyHelper.getClassWithoutInitializingProxy(type)))
+        safePut(builder, 'name', type.name)
+        safePut(builder, 'system', type.system)
+        safePut(builder, 'source_to_destination', type.sourceToDestination)
+        safePut(builder, 'source_to_destination_description', type.sourceToDestinationDescription)
+        safePut(builder, 'destination_to_source', type.destinationToSource)
+        safePut(builder, 'destination_to_source_description', type.destinationToSourceDescription)
+        safePut(builder, 'source_class', type.sourceClass.toString())
+        safePut(builder, 'destination_class', type.destinationClass.toString())
+        safePut(builder, 'bidirectional', type.bidirectional)
+        safePut(builder, 'version_specific', type.versionSpecific)
+        return builder
     }
 }

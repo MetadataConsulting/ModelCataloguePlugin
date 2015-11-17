@@ -1,15 +1,17 @@
 package org.modelcatalogue.core.elasticsearch
 
+import com.google.common.collect.ImmutableMap
 import org.modelcatalogue.core.MeasurementUnit
 
-class MeasurementUnitDocumentSerializer extends CatalogueElementDocumentSerializer implements DocumentSerializer<MeasurementUnit> {
+class MeasurementUnitDocumentSerializer extends CatalogueElementDocumentSerializer<MeasurementUnit> {
 
-    Map getDocument(MeasurementUnit unit) {
-        Map ret = super.getDocument(unit)
+    @Override
+    ImmutableMap.Builder<String, Object> buildDocument(IndexingSession session, MeasurementUnit element, ImmutableMap.Builder<String, Object> builder) {
+        super.buildDocument(session, element, builder)
 
-        ret.symbol = unit.symbol
+        safePut(builder, 'symbol', element.symbol)
 
-        return ret
+        return builder
     }
 
 }

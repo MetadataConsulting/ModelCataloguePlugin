@@ -1,32 +1,31 @@
 package org.modelcatalogue.core.elasticsearch
 
+import com.google.common.collect.ImmutableList
+import com.google.common.collect.ImmutableMap
 import org.modelcatalogue.core.*
 
-class DataTypeDocumentSerializer extends CatalogueElementDocumentSerializer implements DocumentSerializer<DataType> {
+class DataTypeDocumentSerializer extends CatalogueElementDocumentSerializer<DataType> {
 
-    Map getDocument(DataType dataType) {
-        Map ret = super.getDocument(dataType)
+    @Override
+    ImmutableMap.Builder<String, Object> buildDocument(IndexingSession session, DataType dataType, ImmutableMap.Builder<String, Object> builder) {
+        super.buildDocument(session, dataType, builder)
 
+        addDataTypeNestedObjects(dataType, builder, session)
+
+        return builder
+    }
+
+    public static void addDataTypeNestedObjects(DataType dataType, ImmutableMap.Builder<String, Object> builder, IndexingSession session) {
         if (dataType.instanceOf(PrimitiveType) && dataType.measurementUnit) {
-            ret.measurement_unit = [
-                    id: dataType.measurementUnit.getId(),
-                    name: dataType.measurementUnit.name,
-                    description: dataType.measurementUnit.description
-            ]
+            safePut(builder, 'measurement_unit', session.getDocument(dataType.measurementUnit))
         }
 
         if (dataType.instanceOf(ReferenceType) && dataType.dataClass) {
-            ret.data_class = [
-                    id: dataType.dataClass.getId(),
-                    name: dataType.dataClass.name,
-                    description: dataType.dataClass.description
-            ]
+            safePut(builder, 'data_class', session.getDocument(dataType.dataClass))
         }
 
         if (dataType.instanceOf(EnumeratedType) && dataType.enumerations) {
-            ret.enumerated_value = dataType.enumerations.collect { key, value -> [key: key, value: value] }
+            safePut(builder, 'enumerated_value', getExtensions(dataType.enumerations))
         }
-
-        return ret
     }
 }
