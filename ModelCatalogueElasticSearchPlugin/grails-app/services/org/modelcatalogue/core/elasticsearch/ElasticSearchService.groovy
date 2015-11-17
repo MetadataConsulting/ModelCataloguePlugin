@@ -2,12 +2,12 @@ package org.modelcatalogue.core.elasticsearch
 
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import grails.gorm.DetachedCriteria
 import grails.util.GrailsNameUtils
 import groovy.json.JsonSlurper
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder
-import org.elasticsearch.action.bulk.BulkItemResponse
 import org.elasticsearch.action.bulk.BulkRequestBuilder
 import org.elasticsearch.action.search.SearchRequestBuilder
 import org.elasticsearch.client.Client
@@ -25,9 +25,11 @@ import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
 import rx.Observable
+import rx.subjects.ReplaySubject
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
+import java.util.concurrent.ExecutorService
 
 import static rx.Observable.from
 import static rx.Observable.just
@@ -45,6 +47,8 @@ class ElasticSearchService implements SearchCatalogue {
     private static String DATA_MODEL_PREFIX = "${MC_PREFIX}data_model_"
     private static String ORPHANED_INDEX = "${GLOBAL_PREFIX}orphaned"
 
+    private static int EMIT_RELATIONSHIPS_PAGE = 10
+
     private static Map<String, Integer> CATALOGUE_ELEMENT_BOOSTS = [
 
             name: 100,
@@ -59,6 +63,7 @@ class ElasticSearchService implements SearchCatalogue {
             Asset, DataClass, DataElement, DataType, EnumeratedType, MeasurementUnit, PrimitiveType, ReferenceType, Relationship
     ]
 
+    ExecutorService executorService
     GrailsApplication grailsApplication
     DataModelService dataModelService
     Node node
@@ -344,10 +349,9 @@ class ElasticSearchService implements SearchCatalogue {
         .doOnNext {
             log.info "[${dataModelCounter++}/$total] Reindexing data model ${it.name} (${it.combinedVersion}) - ${it.countOutgoingRelationshipsByType(RelationshipType.declarationType)} items"
         }.flatMap {
-            return index(session, it)
-            .concatWith(from(it.getOutgoingRelationsByType(RelationshipType.declarationType)).flatMap { element ->
+            return getDataModelWithDeclaredElements(it).flatMap { element ->
                 return index(session, element)
-            })
+            }
         })
 
         result = result.concatWith(from(dataModelService.classified(CatalogueElement, DataModelFilter.create(true))).flatMap { element ->
@@ -420,7 +424,7 @@ class ElasticSearchService implements SearchCatalogue {
         }
 
         if (RelationshipType.isAssignableFrom(clazz)) {
-            return safeIndex(getIndices(object), [session.getDocument(object)], [clazz])
+            return safeIndex(getIndices(object), just(session.getDocument(object)).cache(), [clazz])
         }
 
         if (Relationship.isAssignableFrom(clazz)) {
@@ -431,38 +435,78 @@ class ElasticSearchService implements SearchCatalogue {
         throw new UnsupportedOperationException("Not Yet Implemented for $object")
     }
 
-    private static List<Map> getElementWithRelationships(IndexingSession session, CatalogueElement element) {
-        List<Map> ret = []
-        ret.add(session.getDocument(element))
-        ret.addAll(element.incomingRelationships.collect { session.getDocument(it) })
-        ret.addAll(element.outgoingRelationships.collect { session.getDocument(it) })
-        return ret
+    private Observable<Document> getElementWithRelationships(IndexingSession session, CatalogueElement element) {
+        ReplaySubject<Document> subject = ReplaySubject.create()
+        executorService.submit {
+            subject.onNext(session.getDocument(element))
+            DetachedCriteria<Relationship> criteria = Relationship.where {
+                source == element || destination == element
+            }
+
+            Number total = criteria.count()
+
+
+            for (int page = 0 ; page * EMIT_RELATIONSHIPS_PAGE < total ; page++) {
+                criteria.list(max: EMIT_RELATIONSHIPS_PAGE, offset: page * EMIT_RELATIONSHIPS_PAGE).each {
+                    subject.onNext(session.getDocument(it))
+                }
+            }
+            subject.onCompleted()
+        }
+        return subject
     }
 
-    private static List<Map> getRelationshipWithSourceAndDestination(IndexingSession session, Relationship rel) {
-        List<Map> ret = []
-        ret.add(session.getDocument(rel))
-        ret.add(session.getDocument(rel.source))
-        ret.add(session.getDocument(rel.destination))
-        return ret
+    private Observable<CatalogueElement> getDataModelWithDeclaredElements(DataModel element) {
+        ReplaySubject<CatalogueElement> subject = ReplaySubject.create()
+
+        RelationshipType declaration = RelationshipType.declarationType
+
+        executorService.submit {
+            subject.onNext(element)
+            DetachedCriteria<Relationship> criteria = Relationship.where {
+                source == element && relationshipType == declaration
+            }
+
+            Number total = criteria.count()
+
+            for (int page = 0 ; page * EMIT_RELATIONSHIPS_PAGE < total ; page++) {
+                criteria.list(max: EMIT_RELATIONSHIPS_PAGE, offset: page * EMIT_RELATIONSHIPS_PAGE).each {
+                    subject.onNext(it.destination)
+                }
+            }
+
+            subject.onCompleted()
+        }
+        return subject
     }
 
-    private Observable<SimpleIndexResponse> safeIndex(Iterable<String> indicies, Iterable<Map> documents, Iterable<Class> supportedTypes) {
+    private Observable<Document> getRelationshipWithSourceAndDestination(IndexingSession session, Relationship rel) {
+        ReplaySubject<Document> subject = ReplaySubject.create()
+
+        executorService.submit {
+            subject.onNext(session.getDocument(rel))
+            subject.onNext(session.getDocument(rel.source))
+            subject.onNext(session.getDocument(rel.destination))
+            subject.onCompleted()
+        }
+
+        return subject
+    }
+
+    private Observable<SimpleIndexResponse> safeIndex(Iterable<String> indicies, Observable<Document> documents, Iterable<Class> supportedTypes) {
         return from(indicies).flatMap { idx ->
             return ensureIndexExists(just(idx), supportedTypes).flatMap { existingIndex ->
                 BulkRequestBuilder bulkRequest = client.prepareBulk()
 
-                for (Map object in documents) {
-                    Map document = new LinkedHashMap(object)
-
-                    document.remove '_id'
-                    document.remove '_type'
-
+                documents.subscribe { document ->
                     bulkRequest.add(client
-                            .prepareIndex(existingIndex, object._type, object._id)
-                            .setSource(document)
+                            .prepareIndex(existingIndex, document.type, document.id)
+                            .setSource(document.payload)
                     )
                 }
+
+                // await completion
+                documents.toBlocking().last()
 
                 return from(bulkRequest.execute()).flatMap { bulkResponse ->
                     from(bulkResponse.items).map { bulkResponseItem ->
@@ -568,30 +612,4 @@ class ElasticSearchService implements SearchCatalogue {
     }
 }
 
-class SimpleIndicesExistsResponse {
-    boolean exists
-    String index
-}
 
-class SimpleIndexResponse {
-    final String index
-    final String type
-    final String id
-    final boolean ok
-
-    SimpleIndexResponse(String index, String type, String id, boolean ok) {
-        this.index = index
-        this.type = type
-        this.id = id
-        this.ok = ok
-    }
-
-    static SimpleIndexResponse from(BulkItemResponse bulkItemResponse) {
-        return new SimpleIndexResponse(
-                bulkItemResponse.index,
-                bulkItemResponse.type,
-                bulkItemResponse.id,
-                !bulkItemResponse.failed
-        )
-    }
-}

@@ -3,7 +3,7 @@ package org.modelcatalogue.core.elasticsearch
 import com.google.common.collect.ImmutableMap
 import org.modelcatalogue.core.DataElement
 
-class DataElementDocumentSerializer extends CatalogueElementDocumentSerializer<DataElement> implements DocumentSerializer {
+class DataElementDocumentSerializer extends CatalogueElementDocumentSerializer<DataElement> {
 
     @Override
     ImmutableMap.Builder<String, Object> buildDocument(IndexingSession session, DataElement element, ImmutableMap.Builder<String, Object> builder) {

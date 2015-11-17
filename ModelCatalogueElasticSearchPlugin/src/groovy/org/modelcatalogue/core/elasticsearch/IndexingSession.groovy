@@ -8,7 +8,7 @@ import rx.Observable
 
 class IndexingSession {
 
-    final Cache<String, Map> documentCache = CacheBuilder.newBuilder().build()
+    final Cache<String, Document> documentCache = CacheBuilder.newBuilder().build()
     final Cache<String, Observable<Boolean>> indexingCache = CacheBuilder.newBuilder().build()
 
     static IndexingSession create() {
@@ -17,7 +17,7 @@ class IndexingSession {
 
     private IndexingSession() {}
 
-    Map getDocument(Object o) {
+    Document getDocument(Object o) {
         documentCache.get("${HibernateProxyHelper.getClassWithoutInitializingProxy(o)}:${o.getId()}") {
             createDocument(o)
         }
@@ -29,25 +29,25 @@ class IndexingSession {
         }
     }
 
-    private Map createDocument(Object object) {
+    private Document createDocument(Object object) {
         if (!object) {
-            return [:]
+            return new Document('','',ImmutableMap.of())
         }
 
-        if (object instanceof Map) {
+        if (object instanceof Document) {
             return object
         }
 
-        Map result = DocumentSerializer.Registry.get(object.class).buildDocument(this, object, ImmutableMap.builder()).build()
+        ImmutableMap<String, Object> result = DocumentSerializer.Registry.get(object.class).buildDocument(this, object, ImmutableMap.builder()).build()
 
-        if (!result._id) {
-            throw new IllegalArgumentException("_id field for $object is missing")
+        if (result._id) {
+            throw new IllegalArgumentException("Payload for $object cannot contain _id")
         }
 
-        if (!result._type) {
-            throw new IllegalArgumentException("_type dfield for $object is missing")
+        if (result._type) {
+            throw new IllegalArgumentException("Payload for $object cannot contain _type")
         }
 
-        result
+        new Document(ElasticSearchService.getTypeName(HibernateProxyHelper.getClassWithoutInitializingProxy(object)), object.getId()?.toString(), result)
     }
 }

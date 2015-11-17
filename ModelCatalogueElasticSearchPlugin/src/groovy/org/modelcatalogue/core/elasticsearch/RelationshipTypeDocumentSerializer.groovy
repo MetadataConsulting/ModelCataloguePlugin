@@ -3,15 +3,12 @@ package org.modelcatalogue.core.elasticsearch
 import static org.modelcatalogue.core.elasticsearch.CatalogueElementDocumentSerializer.safePut
 
 import com.google.common.collect.ImmutableMap
-import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.RelationshipType
 
 class RelationshipTypeDocumentSerializer implements DocumentSerializer<RelationshipType> {
 
     @Override
     ImmutableMap.Builder<String, Object> buildDocument(IndexingSession session, RelationshipType type, ImmutableMap.Builder<String, Object> builder) {
-        safePut(builder, '_id', type.getId()?.toString())
-        safePut(builder, '_type', ElasticSearchService.getTypeName(HibernateProxyHelper.getClassWithoutInitializingProxy(type)))
         safePut(builder, 'name', type.name)
         safePut(builder, 'system', type.system)
         safePut(builder, 'source_to_destination', type.sourceToDestination)

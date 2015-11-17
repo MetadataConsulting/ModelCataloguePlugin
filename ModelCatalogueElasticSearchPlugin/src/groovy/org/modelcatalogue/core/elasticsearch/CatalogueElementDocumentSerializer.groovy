@@ -13,9 +13,6 @@ class CatalogueElementDocumentSerializer<T extends CatalogueElement> implements 
     ImmutableMap.Builder<String, Object> buildDocument(IndexingSession session, T element, ImmutableMap.Builder<String, Object> builder) {
         Class<? extends CatalogueElement> clazz = HibernateProxyHelper.getClassWithoutInitializingProxy(element)
 
-
-        safePut(builder, '_id', element.getId()?.toString())
-        safePut(builder, '_type', ElasticSearchService.getTypeName(HibernateProxyHelper.getClassWithoutInitializingProxy(element)))
         safePut(builder, 'name', element.name)
         safePut(builder, 'name_not_analyzed', element.name)
         safePut(builder, 'link', "/${GrailsNameUtils.getPropertyName(clazz)}/${element.getId()}")
