@@ -691,8 +691,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $templateCache.put 'modelcatalogue/core/ui/omnisearchItem.html', '''
     <a>
         <span class="omnisearch-icon" ng-class="match.model.icon"></span>
-        <span class="omnisearch-text" ng-if="!match.model.highlight" bind-html-unsafe="match.label" ng-class="{'text-warning': match.model.element.status == 'DRAFT', 'text-info': match.model.element.status == 'PENDING'}"></span>
-        <span class="omnisearch-text" ng-if=" match.model.highlight" bind-html-unsafe="match.label | typeaheadHighlight:query" ng-class="{'text-warning': match.model.element.status == 'DRAFT', 'text-info': match.model.element.status == 'PENDING'}"></span>
+        <span class="omnisearch-text" ng-if="!match.model.highlight" bind-html-unsafe="match.label" ng-class="{'text-warning': match.model.element.status == 'DRAFT', 'text-danger': match.model.element.status == 'DEPRECATED', 'text-info': match.model.element.status == 'PENDING'}"></span>
+        <span class="omnisearch-text" ng-if=" match.model.highlight" bind-html-unsafe="match.label | typeaheadHighlight:query" ng-class="{'text-warning': match.model.element.status == 'DRAFT', 'text-danger': match.model.element.status == 'DEPRECATED', 'text-info': match.model.element.status == 'PENDING'}"></span>
     </a>
   '''
 
