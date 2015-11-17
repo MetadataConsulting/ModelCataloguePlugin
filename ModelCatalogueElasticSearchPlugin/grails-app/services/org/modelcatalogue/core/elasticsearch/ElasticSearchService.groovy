@@ -25,16 +25,16 @@ import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
 import rx.Observable
-import rx.schedulers.Schedulers
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
-import java.util.concurrent.ExecutorService
 
 import static rx.Observable.from
 import static rx.Observable.just
 
 class ElasticSearchService implements SearchCatalogue {
+
+    static transactional = false
 
     private static Cache<Class, List<Class>> subclassesCache = CacheBuilder.newBuilder().initialCapacity(20).build()
 
@@ -59,7 +59,6 @@ class ElasticSearchService implements SearchCatalogue {
             Asset, DataClass, DataElement, DataType, EnumeratedType, MeasurementUnit, PrimitiveType, ReferenceType, Relationship
     ]
 
-    ExecutorService executorService
     GrailsApplication grailsApplication
     DataModelService dataModelService
     Node node
@@ -267,6 +266,11 @@ class ElasticSearchService implements SearchCatalogue {
                 it.ok
             }
         }
+    }
+
+    @Override
+    boolean isIndexingManually() {
+        return true
     }
 
 

@@ -33,8 +33,10 @@ class AuditService {
 
    @PostConstruct
    void hookSearchService() {
-       Callable<Auditor> oldFactory = auditorFactory
-       auditorFactory = { CompoundAuditor.from(oldFactory(), new SearchNotifier(modelCatalogueSearchService))}
+       if (modelCatalogueSearchService.indexingManually) {
+        Callable<Auditor> oldFactory = auditorFactory
+        auditorFactory = { CompoundAuditor.from(oldFactory(), new SearchNotifier(modelCatalogueSearchService))}
+       }
    }
 
     /**

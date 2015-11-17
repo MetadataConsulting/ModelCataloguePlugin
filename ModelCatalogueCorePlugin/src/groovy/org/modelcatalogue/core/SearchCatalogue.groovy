@@ -16,4 +16,6 @@ public interface SearchCatalogue {
     Observable<Boolean> unindex(Collection<Object> object)
     Observable<Boolean> reindex()
 
+    boolean isIndexingManually()
+
 }

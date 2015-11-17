@@ -18,6 +18,11 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     def modelCatalogueSecurityService
 
     @Override
+    boolean isIndexingManually() {
+        return false
+    }
+
+    @Override
     ListWithTotalAndType<Relationship> search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
         String query = "%$params.search%"
 
@@ -178,11 +183,27 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         search CatalogueElement, params
     }
 
-    Observable<Boolean> index(Object element) { Observable.just(true) }
-    Observable<Boolean> index(Iterable<Object> resource)  { Observable.just(true) }
-    Observable<Boolean> unindex(Object object)  { Observable.just(true) }
-    Observable<Boolean> unindex(Collection<Object> object)  { Observable.just(true) }
-    Observable<Boolean> reindex()  { Observable.just(true) }
+    Observable<Boolean> index(Object element) {
+        Observable.just(true)
+    }
+
+
+    Observable<Boolean> index(Iterable<Object> resource)  {
+        Observable.just(true)
+    }
+
+    Observable<Boolean> unindex(Object object)  {
+        Observable.just(true)
+    }
+
+    Observable<Boolean> unindex(Collection<Object> object)  {
+        Observable.just(true)
+    }
+
+    Observable<Boolean> reindex()  {
+        log.info "Using database search, reindexing not needed!"
+        Observable.just(true)
+    }
 
     protected DataModelFilter getOverridableDataModelFilter(Map params) {
         if (params.dataModel) {

@@ -19,6 +19,11 @@ class SearchController extends AbstractRestfulController<CatalogueElement>{
     def index(Integer max){
         setSafeMax(max)
 
+        if (!params.search) {
+            respond errors: "No query string to search on"
+            return
+        }
+
         respond Lists.wrap(params, "/search/?search=${params.search.encodeAsURL()}", modelCatalogueSearchService.search(params))
 
     }
