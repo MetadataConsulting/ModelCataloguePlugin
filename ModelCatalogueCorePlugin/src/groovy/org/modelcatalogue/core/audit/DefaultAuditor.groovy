@@ -13,14 +13,9 @@ import org.modelcatalogue.core.util.marshalling.RelationshipMarshallers
  * Default auditor auditing the changes using the change table/entity.
  */
 @Log4j
-class DefaultAuditor implements Auditor {
+class DefaultAuditor extends AbstractAuditor {
 
     static List<String> IGNORED_PROPERTIES = ['password', 'version', 'versionNumber', 'outgoingRelationships', 'incomingRelationships', 'outgoingMappings', 'incomingMappings', 'latestVersionId', 'extensions']
-
-    Long defaultAuthorId
-    Long parentChangeId
-    Boolean system
-
 
     Long logExternalChange(CatalogueElement source, String message, Long authorId) {
         logChange(source,

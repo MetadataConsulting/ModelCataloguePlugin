@@ -3,8 +3,10 @@ package org.modelcatalogue.core
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.DataModelFilter
+import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
+import rx.Observable
 
 /**
  * Poor man's search service searching in name and description
@@ -16,7 +18,12 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     def modelCatalogueSecurityService
 
     @Override
-    def search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
+    boolean isIndexingManually() {
+        return false
+    }
+
+    @Override
+    ListWithTotalAndType<Relationship> search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
         String query = "%$params.search%"
 
         DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, getOverridableDataModelFilter(params))
@@ -58,25 +65,19 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                 }
         }
 
-        [searchResults: criteria.list(params), total: criteria.count()]
+        return Lists.fromCriteria(params, criteria)
     }
 
-    def search(Class resource, Map params) {
-        if (!params.search) {
-            return [errors: "No query string to search on"]
-        }
-
+    public <T> ListWithTotalAndType<T> search(Class<T> resource, Map params) {
         // if the user doesn't have at least VIEWER role, don't return other elements than finalized
         if (!params.status && !modelCatalogueSecurityService.hasRole('VIEWER')) {
             params.status = 'FINALIZED'
         }
 
-        def searchResults = [:]
-
         String query = "%$params.search%"
 
         if (DataModel.isAssignableFrom(resource) || MeasurementUnit.isAssignableFrom(resource)) {
-            DetachedCriteria criteria = new DetachedCriteria(resource)
+            DetachedCriteria<T> criteria = new DetachedCriteria(resource)
             criteria.or {
                 ilike('name', query)
                 ilike('description', query)
@@ -85,9 +86,10 @@ class ModelCatalogueSearchService implements SearchCatalogue {
             if (params.status) {
                 criteria.eq('status', ElementStatus.valueOf(params.status.toString().toUpperCase()))
             }
-            searchResults.searchResults = criteria.list(params)
-            searchResults.total = criteria.count()
-        } else if (CatalogueElement.isAssignableFrom(resource)) {
+            return Lists.fromCriteria(params, criteria)
+        }
+
+        if (CatalogueElement.isAssignableFrom(resource)) {
             DataModelFilter classifications = getOverridableDataModelFilter(params).withImports()
 
             String alias = resource.simpleName[0].toLowerCase()
@@ -156,31 +158,52 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                 }
             }
 
-            def results = Lists.fromQuery(params, resource, listQuery, arguments)
-
-
-            searchResults.searchResults = results.items
-            searchResults.total = results.total
-        } else if (RelationshipType.isAssignableFrom(resource)) {
-            searchResults.searchResults = resource.findAllByNameIlikeOrSourceToDestinationIlikeOrDestinationToSourceIlike(query, query, query, params)
-            searchResults.total = resource.countByNameIlikeOrSourceToDestinationIlikeOrDestinationToSourceIlike(query, query, query)
-        } else {
-            searchResults.searchResults = resource.findAllByNameIlike(query, params)
-            searchResults.total = resource.countByNameIlike(query)
+            return Lists.fromQuery(params, resource, listQuery, arguments)
         }
 
-        searchResults
+        if (RelationshipType.isAssignableFrom(resource)) {
+            return Lists.fromCriteria(params, resource) {
+                or {
+                    ilike 'name', query
+                    ilike 'sourceToDestination', query
+                    ilike 'destinationToSource', query
+                }
+            }
+
+        }
+
+        return Lists.fromCriteria(params, resource) {
+            or {
+                ilike 'name', query
+            }
+        }
     }
 
-    def search(Map params){
+    ListWithTotalAndType<CatalogueElement> search(Map params){
         search CatalogueElement, params
     }
 
-    def index(Class resource){}
-    def index(Collection<Class> resource){}
-    def unindex(Object object){}
-    def unindex(Collection<Object> object){}
-    def refresh(){}
+    Observable<Boolean> index(Object element) {
+        Observable.just(true)
+    }
+
+
+    Observable<Boolean> index(Iterable<Object> resource)  {
+        Observable.just(true)
+    }
+
+    Observable<Boolean> unindex(Object object)  {
+        Observable.just(true)
+    }
+
+    Observable<Boolean> unindex(Collection<Object> object)  {
+        Observable.just(true)
+    }
+
+    Observable<Boolean> reindex()  {
+        log.info "Using database search, reindexing not needed!"
+        Observable.just(true)
+    }
 
     protected DataModelFilter getOverridableDataModelFilter(Map params) {
         if (params.dataModel) {

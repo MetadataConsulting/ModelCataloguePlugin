@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export GRAILS_OPTS="-Xmx2G -Xms1G -XX:MaxPermSize=1G -server"
+
 # fail if any line fails
 set -e
 
@@ -7,21 +9,44 @@ date ; echo -e "\n"
 
 ./setup-frontend.sh
 
+if test -f ".docker-ip" ; then
+    DOCKER_IP=`cat ".docker-ip"`
+    echo
+    echo "Using ElasticSearch in docker at $DOCKER_IP for searching the catalogue."
+    echo
+else
+    DOCKER_IP=""
+    echo
+    echo "ElasticSearch in docker is not running. Default database search will be used or local ElasticSearch instance if configured in config file."
+    echo
+fi
+
+if test -f ".default-mc-config-location" ; then
+    MC_CONFIG_LOCATION=`cat ".default-mc-config-location"`
+    echo
+    echo -e "Using $MC_CONFIG_LOCATION configuration!\n\n"
+    echo
+else
+    MC_CONFIG_LOCATION="~/.grails/mc-config.groovy"
+    echo
+    echo -e "Using default configuration $MC_CONFIG_LOCATION!\n\n"
+    echo
+fi
+
+if ! test -f "$MC_CONFIG_LOCATION" ; then
+    echo -e "\Local Model Catalogue production configuration is missing!\nPlease copy file ./ModelCatalogueCorePluginTestApp/grails-app/conf/mc-config.groovy.example into ~/.grails/mc-config.groovy and update it with your local production database settings.\n"
+    exit 1
+fi
+
 cd ModelCatalogueCorePluginTestApp
 if [[ "$1" == "debug" ]]; then
-    ./grailsw prod run-app --debug-fork
+    ./grailsw prod run-app --debug-fork -Dmc.config.location="$MC_CONFIG_LOCATION" -Dmc.search.elasticsearch.host="$DOCKER_IP"
 elif [[ "$1" == "offline" ]]; then
-    ./grailsw prod run-app -Dmc.offline=true
+    ./grailsw prod run-app -Dmc.offline=true -Dmc.config.location="$MC_CONFIG_LOCATION" -Dmc.search.elasticsearch.host="$DOCKER_IP"
 elif [[ "$1" ]]; then
-    ./grailsw prod run-app -Dmc.config.location="$1"
-elif test -f "../.default-mc-config-location" ; then
-    location=`cat "../.default-mc-config-location"`
-    echo -e "Using $location configuration!\n\n"
-    ./grailsw prod run-app -Dmc.config.location="$location"
-elif ! test -f "~/.grails/mc-config.groovy" ; then
-    echo -e "\Local Model Catalogue production configuration is missing!\nPlease copy file ./ModelCatalogueCorePluginTestApp/grails-app/conf/mc-config.groovy.example into ~/.grails/mc-config.groovy and update it with your local production database settings.\n"
+    ./grailsw prod run-app -Dmc.config.location="$1" -Dmc.search.elasticsearch.host="$DOCKER_IP"
 else
-    ./grailsw prod run-app
+    ./grailsw prod run-app -Dmc.config.location="$MC_CONFIG_LOCATION" -Dmc.search.elasticsearch.host="$DOCKER_IP"
 fi
 
 

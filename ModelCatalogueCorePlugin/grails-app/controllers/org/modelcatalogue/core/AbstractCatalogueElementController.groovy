@@ -310,21 +310,15 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         RelationshipType relationshipType = RelationshipType.readByName(type)
 
         handleParams(max)
-        def results =  modelCatalogueSearchService.search(element, relationshipType, direction, params)
 
-        if(results.errors){
-            respond results
+        if (!params.search) {
+            respond errors: "No query string to search on"
             return
         }
 
-        def total = (results.total)?results.total.intValue():0
+        ListWithTotalAndType<Relationship> results =  modelCatalogueSearchService.search(element, relationshipType, direction, params)
 
-        SimpleListWrapper<Relationship> elements = new SimpleListWrapper<Relationship>(
-                base: "/${resourceName}/${params.id}/${direction.actionName}" + (type ? "/${type}" : "") + "/search?search=${params.search?.encodeAsURL() ?: ''}",
-                total: total,
-                items: results.searchResults,
-        )
-        respond new Relationships(owner: element, direction: direction, type: relationshipType, list: withLinks(elements))
+        respond new Relationships(owner: element, direction: direction, type: relationshipType, list: Lists.wrap(params, "/${resourceName}/${params.id}/${direction.actionName}" + (type ? "/${type}" : "") + "/search?search=${params.search?.encodeAsURL() ?: ''}", results))
     }
 
 

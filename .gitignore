@@ -19,3 +19,4 @@ ModelCatalogueCorePluginTestApp/test/integration/resources/rare_diseases_combine
 **/build/**/*
 
 .default-mc-config-location
+.docker-ip

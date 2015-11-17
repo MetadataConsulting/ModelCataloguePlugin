@@ -81,6 +81,23 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       }
   ]
 
+  actionsProvider.registerActionInRoles 'reindex-catalogue', [actionsProvider.ROLE_GLOBAL_ACTION], [
+    '$scope', 'names','security', '$state', 'messages', 'rest', 'modelCatalogueApiRoot'
+    ($scope ,  names , security ,  $state ,  messages ,  rest ,  modelCatalogueApiRoot ) ->
+      return undefined if not security.hasRole('ADMIN')
+
+      {
+      position: 1000
+      label: "Reindex Catalogue"
+      icon: 'fa fa-search'
+      type: 'success'
+      action: ->
+        messages.confirm("Do you want to reindex catalogue?", "Whole catalogue will be reindexed. This may take a long time and it can have negative impact on the performance.").then ->
+          rest(url: "#{modelCatalogueApiRoot}/search/reindex", method: 'POST').then ->
+            messages.success('Reindex Catalogue', 'Reindexing the catalogue scheduled.')
+      }
+  ]
+
   annotate = ['$scope', 'messages', ($scope, messages) -> {
     label: "Annotate Letter"
     action: ->
