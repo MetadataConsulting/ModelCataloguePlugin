@@ -20,7 +20,7 @@ module.config ['messagesProvider', (messagesProvider)->
             </div>
             <div>
               <div class class="list-group">
-                <a ng-repeat="element in elements" class="list-group-item with-pointer item-found" ng-class="{'list-group-item-warning': element.status == 'DRAFT', 'list-group-item-info': element.status == 'PENDING', 'active': $index == selected}" ng-click="$close(element)">
+                <a ng-repeat="element in elements" class="list-group-item with-pointer item-found" ng-class="{'list-group-item-warning': element.status == 'DRAFT', 'list-group-item-info': element.status == 'PENDING', 'list-group-item-danger': element.status == 'DEPRECATED', 'active': $index == selected}" ng-click="$close(element)">
                     <h4 class="list-group-item-heading"><catalogue-element-icon type="element.elementType"></catalogue-element-icon> {{element.classifiedName}}</h4>
                     <p ng-if="element.description" class="list-group-item-text preserve-new-lines">{{element.description}}</p>
                 </a>
