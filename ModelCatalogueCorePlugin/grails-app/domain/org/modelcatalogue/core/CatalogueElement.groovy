@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import com.google.common.base.Function
 import com.google.common.collect.Lists
 import grails.util.GrailsNameUtils
+import org.hibernate.StaleObjectStateException
 import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
@@ -365,7 +366,12 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     List<DataModel> getDataModels() {
-        relationshipService.getDataModels(this)
+        try {
+            return relationshipService.getDataModels(this)
+        } catch (StaleObjectStateException stale) {
+            log.error("Stale object exception getting data models for $this, errors=${ this.validate() ; this.errors }", stale)
+            return []
+        }
     }
 
     @Deprecated
