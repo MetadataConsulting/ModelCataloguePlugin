@@ -496,24 +496,20 @@ class ElasticSearchService implements SearchCatalogue {
     private Observable<SimpleIndexResponse> safeIndex(Iterable<String> indicies, Observable<Document> documents, Iterable<Class> supportedTypes) {
         return from(indicies).flatMap { idx ->
             return ensureIndexExists(just(idx), supportedTypes).flatMap { existingIndex ->
-                BulkRequestBuilder bulkRequest = client.prepareBulk()
-
-                documents.subscribe { document ->
-                    bulkRequest.add(client
-                            .prepareIndex(existingIndex, document.type, document.id)
-                            .setSource(document.payload)
-                    )
-                }
-
-                // await completion
-                documents.toBlocking().last()
-
-                return from(bulkRequest.execute()).flatMap { bulkResponse ->
-                    from(bulkResponse.items).map { bulkResponseItem ->
-                        SimpleIndexResponse.from(bulkResponseItem)
+                documents.buffer(100).flatMap {
+                    BulkRequestBuilder bulkRequest = client.prepareBulk()
+                    for (Document document in it) {
+                        bulkRequest.add(client
+                                .prepareIndex(existingIndex, document.type, document.id)
+                                .setSource(document.payload)
+                        )
+                    }
+                    return from(bulkRequest.execute()).flatMap { bulkResponse ->
+                        from(bulkResponse.items).map { bulkResponseItem ->
+                            SimpleIndexResponse.from(bulkResponseItem)
+                        }
                     }
                 }
-
             }
         }
     }
