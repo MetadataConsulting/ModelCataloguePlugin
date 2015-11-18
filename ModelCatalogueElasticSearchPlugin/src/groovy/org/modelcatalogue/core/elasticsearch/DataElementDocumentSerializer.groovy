@@ -10,7 +10,7 @@ class DataElementDocumentSerializer extends CatalogueElementDocumentSerializer<D
         super.buildDocument(session, element, builder)
 
         if (element.dataType) {
-            safePut(builder, 'data_type', session.getDocument(element.dataType))
+            safePut(builder, 'data_type', session.getDocument(element.dataType).payload)
         }
 
         return builder

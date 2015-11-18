@@ -27,7 +27,7 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
         this.searchRequest = searchRequest
 
         if (CatalogueElement.isAssignableFrom(type)) {
-            searchRequest.addFields('name', '_id', 'fully_qualified_type','link','status','version_number','latest_id', 'data_model', 'model_catalogue_id')
+            searchRequest.addFields('name', '_id', 'fully_qualified_type','link','status','version_number','latest_id', 'data_model', 'model_catalogue_id', 'description')
         }
     }
 
@@ -82,7 +82,8 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
                         versionNumber: hit.field('version_number')?.value(),
                         latestVersionId: hit.field('latest_id')?.value(),
                         classifiedName: hit.field('data_model')?.value() ? "${hit.field('name').value()} (${hit.field('data_model').value()})" : hit.field('name').value(),
-                        modelCatalogueId: hit.field('model_catalogue_id')?.value()
+                        modelCatalogueId: hit.field('model_catalogue_id')?.value(),
+                        description: hit.field('description')?.value()
                 ]
             }
         }

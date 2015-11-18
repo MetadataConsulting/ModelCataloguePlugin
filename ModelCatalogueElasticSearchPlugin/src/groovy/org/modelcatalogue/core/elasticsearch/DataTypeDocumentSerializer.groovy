@@ -17,11 +17,11 @@ class DataTypeDocumentSerializer extends CatalogueElementDocumentSerializer<Data
 
     public static void addDataTypeNestedObjects(DataType dataType, ImmutableMap.Builder<String, Object> builder, IndexingSession session) {
         if (dataType.instanceOf(PrimitiveType) && dataType.measurementUnit) {
-            safePut(builder, 'measurement_unit', session.getDocument(dataType.measurementUnit))
+            safePut(builder, 'measurement_unit', session.getDocument(dataType.measurementUnit).payload)
         }
 
         if (dataType.instanceOf(ReferenceType) && dataType.dataClass) {
-            safePut(builder, 'data_class', session.getDocument(dataType.dataClass))
+            safePut(builder, 'data_class', session.getDocument(dataType.dataClass).payload)
         }
 
         if (dataType.instanceOf(EnumeratedType) && dataType.enumerations) {
