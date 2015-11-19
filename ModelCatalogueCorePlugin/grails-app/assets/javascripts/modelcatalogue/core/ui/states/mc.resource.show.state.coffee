@@ -1,9 +1,18 @@
-angular.module('mc.core.ui.states.mc.resource.show', ['mc.core.ui.states.controllers.ShowCtrl']).config(['$stateProvider', ($stateProvider) ->
+angular.module('mc.core.ui.states.mc.resource.show', ['mc.core.ui.states.controllers']).config(['$stateProvider', ($stateProvider) ->
 
     $stateProvider.state 'mc.resource.show', {
       url: '/{id:\\d+}'
 
-      templateUrl: 'modelcatalogue/core/ui/state/show.html'
+      views:
+        "":
+          templateUrl: 'modelcatalogue/core/ui/state/show.html'
+          controller: 'mc.core.ui.states.controllers.ShowCtrl'
+
+#        'navbar-left@':
+#          template: '<contextual-menu></contextual-menu>'
+#        'navbar-right@':
+#          template: '<contextual-actions role="item"></contextual-actions>'
+#          controller: 'mc.core.ui.states.controllers.ElementCtrl'
 
       resolve:
         element: ['$stateParams','catalogueElementResource', ($stateParams, catalogueElementResource) ->
@@ -12,8 +21,6 @@ angular.module('mc.core.ui.states.mc.resource.show', ['mc.core.ui.states.control
       onExit: ['$rootScope', ($rootScope) ->
         $rootScope.elementToShow = null
       ]
-
-      controller: 'mc.core.ui.states.controllers.ShowCtrl'
     }
 
 ])

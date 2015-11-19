@@ -1,8 +1,6 @@
-angular.module('mc.core.ui.states.bs.batch.html', ['mc.core.ui.states.bs.layout.html']).run([
-  '$templateCache', 'mcLayoutTemplateHtml'
-  ($templateCache ,  mcLayoutTemplateHtml) ->
-
-    layout = mcLayoutTemplateHtml
+angular.module('mc.core.ui.states.bs.batch.html', []).run([
+  '$templateCache',
+  ($templateCache) ->
 
     #language=HTML
     $templateCache.put 'modelcatalogue/core/ui/state/dashboard.html', dashboard = '''
@@ -55,6 +53,6 @@ angular.module('mc.core.ui.states.bs.batch.html', ['mc.core.ui.states.bs.layout.
     </div>
     '''
 
-    $templateCache.put 'modelcatalogue/core/ui/state/dashboardWithNav.html', layout.replace('<ui-view></ui-view>', dashboard)
+    $templateCache.put 'modelcatalogue/core/ui/state/dashboardWithNav.html', dashboard
 
 ])

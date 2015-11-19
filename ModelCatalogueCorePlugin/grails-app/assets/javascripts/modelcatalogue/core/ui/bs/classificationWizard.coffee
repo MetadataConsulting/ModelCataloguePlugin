@@ -161,7 +161,7 @@ angular.module('mc.core.ui.bs.dataModelWIzard', ['mc.util.messages', 'mc.util.ui
               promise = promise.then (classification) ->
                   messages.success "Data Model #{classification.name} created"
                   catalogue.select(classification).then ->
-                    $state.go 'mc.resource.list', {dataModelId: classification.id, resource: 'dataClass'}
+                    $state.go 'mc.resource.show', {dataModelId: classification.id, resource: 'dataModel', id: classification.id}
                     $rootScope.$broadcast 'redrawContextualActions'
 
                   $scope.finished = true

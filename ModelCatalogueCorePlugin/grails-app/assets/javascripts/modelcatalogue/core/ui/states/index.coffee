@@ -5,6 +5,7 @@ angular.module('mc.core.ui.states', [
   'mc.core.ui.states.controllers'
   # list of modules
   'mc.core.ui.states.landing'
+  'mc.core.ui.states.dataModels'
   'mc.core.ui.states.mc.actions.show'
   'mc.core.ui.states.mc.actions'
   'mc.core.ui.states.mc.csvTransformations.show'

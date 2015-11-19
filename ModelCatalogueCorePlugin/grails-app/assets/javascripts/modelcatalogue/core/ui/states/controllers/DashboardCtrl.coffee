@@ -7,9 +7,9 @@ angular.module('mc.core.ui.states.controllers.DashboardCtrl', ['ui.router', 'mc.
     angular.extend $scope, statistics
 
     updateDashboard = (user) ->
-      $scope.user  = user
+      $scope.user = user
       if user?.id
-        $state.go 'mc.resource.list', resource: 'dataModel', status: undefined
+        $state.go 'dataModels'
 
     $scope.$on('userLoggedIn', (ignored, user) ->
       if user?.error

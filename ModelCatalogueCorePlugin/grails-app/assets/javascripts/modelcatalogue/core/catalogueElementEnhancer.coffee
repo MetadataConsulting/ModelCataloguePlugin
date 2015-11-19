@@ -48,15 +48,25 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
             enhance(rest(method: 'PUT', url: "#{modelCatalogueApiRoot}#{self.link}", data: self.getUpdatePayload())).then (result)->
               $rootScope.$broadcast 'catalogueElementUpdated', result
               result
+
+          self.getDataModelId = ->
+            return self.id if self.isInstanceOf "dataModel"
+            return self.dataModels[0].id if self.dataModels?.length > 0
+            return 'catalogue'
+
+
           self.show           = () ->
             if self.isInstanceOf "batch"
-              $state.go('mc.actions.show', {id: self.id}); self
-            else if self.isInstanceOf "dataImport"
-              $state.go('mc.dataArchitect.imports.show', {id: self.id}); self
-            else if self.isInstanceOf "csvTransformation"
-              $state.go('mc.csvTransformations.show', {id: self.id}); self
-            else
-              $state.go('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id}); self
+              return $state.go('mc.actions.show', {id: self.id}); self
+            if self.isInstanceOf "dataImport"
+              return $state.go('mc.dataArchitect.imports.show', {id: self.id}); self
+            if self.isInstanceOf "csvTransformation"
+              return $state.go('mc.csvTransformations.show', {id: self.id}); self
+
+            if self.isInstanceOf "enumeratedValue"
+              $state.go('mc.resource.show.property', {resource: 'enumeratedType', id: self.id, dataModelId: self.getDataModelId(), property: 'enumerations'}) ; self
+
+            $state.go('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id, dataModelId: self.getDataModelId()}) ; self
 
           self.href           = () ->
             if self.isInstanceOf "batch"
@@ -66,13 +76,7 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
             if self.isInstanceOf "csvTransformation"
               return $state.href('mc.csvTransformations.show', {id: self.id})
 
-            dataModelId = undefined
-            if self.isInstanceOf "dataModel"
-              dataModelId = self.id
-            else if self.dataModels?.length > 0
-              dataModelId = self.dataModels[0].id
-
-            $state.href('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id, dataModelId: dataModelId})
+            $state.href('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id, dataModelId: self.getDataModelId()})
 
           self.getLabel = ->
               return @classifiedName if @classifiedName?

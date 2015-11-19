@@ -37,7 +37,7 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
         respond Lists.wrap(params, "/${resourceName}/${params.id}/content", list)
     }
 
-    private static Map createDescriptor(EnumeratedType type, Map.Entry<String, String> enumeratedValue) {
+    private Map createDescriptor(EnumeratedType type, Map.Entry<String, String> enumeratedValue) {
         String link = "/${GrailsNameUtils.getPropertyName(EnumeratedType)}/$type.id"
         Map ret = [:]
         ret.id = type.getId()
@@ -45,6 +45,7 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
         ret.name = "${enumeratedValue.getKey() ?: ''}: ${enumeratedValue.getValue() ?: ''}"
         ret.link = link
         ret.status = type.status.toString()
+        ret.dataModels = relationshipService.getDataModelsInfo(type)
         ret
     }
 

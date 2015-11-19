@@ -13,6 +13,7 @@ angular.module('mc.core.ui.states.controllers', [
   'mc.core.ui.states.controllers.SearchCtrl'
   'mc.core.ui.states.controllers.UserCtrl'
   'mc.core.ui.states.controllers.FastActionsCtrl'
-
-
+  'mc.core.ui.states.controllers.ElementCtrl'
+  'mc.core.ui.states.controllers.DataModelTreeCtrl'
+  'mc.core.ui.states.controllers.PanelsCtrl'
 ])

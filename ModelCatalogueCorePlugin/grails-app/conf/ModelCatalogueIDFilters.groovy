@@ -1,10 +1,24 @@
+import org.modelcatalogue.core.CatalogueElement
+import org.springframework.http.HttpStatus
+
 class ModelCatalogueIDFilters {
 
     def filters = {
         all(controller: '*', action:'show') {
             before = {
                 if (!request.getHeader('Accept')?.contains('json')) {
-                    redirect(uri: "/#/catalogue/${controllerName}/${params.id}")
+                    CatalogueElement element = CatalogueElement.get(params.id)
+
+                    if (!element) {
+                        render status: HttpStatus.NOT_FOUND
+                        return
+                    }
+
+
+
+                    String dataModelId = element.dataModels ? element.dataModels.first().getId() : 'catalogue'
+
+                    redirect(uri: "/#/${dataModelId}/${controllerName}/${params.id}")
                 }
             }
         }

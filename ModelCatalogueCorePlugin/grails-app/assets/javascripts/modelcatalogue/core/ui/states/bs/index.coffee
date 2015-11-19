@@ -2,7 +2,6 @@ angular.module('mc.core.ui.states.bs', [
   # depends on
   'mc.core.ui.states'
   # list of modules
-  'mc.core.ui.states.bs.layout.html'
   'mc.core.ui.states.bs.omnisearch.html'
   'mc.core.ui.states.bs.parent.html'
   'mc.core.ui.states.bs.diff.html'
@@ -12,6 +11,8 @@ angular.module('mc.core.ui.states.bs', [
   'mc.core.ui.states.bs.dataImport.html'
   'mc.core.ui.states.bs.batch.html'
   'mc.core.ui.states.bs.csvTransformation.html'
+  'mc.core.ui.states.bs.mc.html'
+  'mc.core.ui.states.bs.panels.html'
 ])
 
 window.modelcatalogue.registerModule 'mc.core.ui.states.bs'
