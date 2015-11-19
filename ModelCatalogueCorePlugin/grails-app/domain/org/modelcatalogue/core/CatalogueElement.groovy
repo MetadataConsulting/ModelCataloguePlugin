@@ -384,9 +384,11 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     @Override
-    CatalogueElement publish(Publisher<CatalogueElement> publisher) {
-        PublishingChain.finalize(this).run(publisher)
+    final CatalogueElement publish(Publisher<CatalogueElement> publisher) {
+        preparePublishChain(PublishingChain.finalize(this)).run(publisher)
     }
+
+    protected PublishingChain preparePublishChain(PublishingChain chain) { chain }
 
     @Override
     CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftContext strategy) {
