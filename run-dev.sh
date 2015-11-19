@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export GRAILS_OPTS="-Xmx2G -Xms1G -XX:MaxPermSize=1G -server"
+export GRAILS_OPTS="-Xmx1G -Xms512m -XX:MaxPermSize=512m -server"
 
 # fail if any line fails
 set -e
