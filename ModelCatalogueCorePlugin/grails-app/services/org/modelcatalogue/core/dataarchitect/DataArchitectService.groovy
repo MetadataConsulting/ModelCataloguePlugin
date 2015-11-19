@@ -130,8 +130,8 @@ class DataArchitectService {
             } else {
                 def searchResult = modelCatalogueSearchService.search(DataElement, [search: header])
                 // only if we have single hit
-                if (searchResult.total == 1) {
-                    elements << searchResult.searchResults[0]
+                if (searchResult.total == 1L) {
+                    elements << searchResult.items[0]
                 } else {
                     elements << header
                 }
@@ -171,8 +171,8 @@ class DataArchitectService {
             } else {
                 def searchResult = modelCatalogueSearchService.search(DataClass, [search: header])
                 // only if we have single hit
-                if (searchResult.total == 1) {
-                    elements << searchResult.searchResults[0]
+                if (searchResult.total == 1L) {
+                    elements << searchResult.items[0]
                 } else {
                     elements << header
                 }

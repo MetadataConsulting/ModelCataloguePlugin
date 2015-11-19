@@ -15,7 +15,13 @@ class RelationshipService {
 
     static final long INDEX_STEP = 1000
 
-    static transactional = true
+    /**
+     * It's not desired if it triggers any transaction itself. It should just support the transactions already running.
+     *
+     * Especially method #getDataModels() can be called in various places where forcing transaction may cause an
+     * exception.
+     */
+    static transactional = false
 
     def modelCatalogueSecurityService
     def auditService
@@ -340,7 +346,11 @@ class RelationshipService {
             return []
         }
 
-        if (!element.id) {
+        if (!element.getId()) {
+            return []
+        }
+
+        if (!element.isReadyForQueries()) {
             return []
         }
 

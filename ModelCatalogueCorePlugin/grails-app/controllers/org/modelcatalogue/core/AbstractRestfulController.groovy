@@ -7,6 +7,7 @@ import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.hibernate.StaleStateException
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
+import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
@@ -40,14 +41,15 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
     def search(Integer max){
         handleParams(max)
-        def results = modelCatalogueSearchService.search(resource, params)
 
-        if(results.errors){
-            respond results
+        if (!params.search) {
+            respond errors: "No query string to search on"
             return
         }
 
-        respond Lists.lazy(params, resource, "/${resourceName}/search?search=${URLEncoder.encode(params.search, 'UTF-8')}", { results.searchResults }, { results.total })
+        ListWithTotalAndType<T> results = modelCatalogueSearchService.search(resource, params)
+
+        respond Lists.wrap(params, "/${resourceName}/search?search=${URLEncoder.encode(params.search, 'UTF-8')}", results)
     }
 
     protected handleParams(Integer max) {

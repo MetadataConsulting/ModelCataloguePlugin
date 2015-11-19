@@ -20,13 +20,21 @@ abstract class ListWrapperMarshaller extends AbstractMarshaller {
                 total: elements.total,
                 offset: elements.offset,
                 page: elements.page,
-                size: elements.items.size(),
-                list: elements.items,
+                size: getSize(elements),
+                list: getList(elements),
                 previous: elements.previous,
                 next: elements.next,
                 availableReports: getAvailableReports(elements),
                 sort: elements.sort,
                 order: elements.order
         ]
+    }
+
+    protected getList(Object elements) {
+        elements.items
+    }
+
+    protected getSize(Object elements) {
+        elements.items.size()
     }
 }

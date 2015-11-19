@@ -158,6 +158,22 @@ class AssetService {
         asset.save(flush: true)
     }
 
+    protected Asset storeAsset(Map param, MultipartFile file, String contentType = 'application/xslt'){
+        String theName = (param.name ?: param.action)
+
+        Asset asset = new Asset(
+                name: "Import for " + theName,
+                originalFileName: file.originalFilename,
+                description: "Your import will be available in this asset soon. Use Refresh action to reload.",
+                status: ElementStatus.PENDING,
+                contentType: contentType,
+                size: 0
+        )
+        asset.save(flush: true, failOnError: true)
+        storeAssetFromFile(file, asset)
+        return asset
+    }
+
     Long storeReportAsAsset(Map<String, String> assetParams, @ClosureParams(value = FromString, options= "java.io.OutputStream") Closure worker){
         assert assetParams.name
         assert assetParams.contentType

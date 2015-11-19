@@ -49,6 +49,11 @@ grails.project.dependency.resolution = {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // runtime 'mysql:mysql-connector-java:5.1.27'
         compile 'com.google.guava:guava:18.0'
+        compile 'io.reactivex:rxjava:1.0.15'
+
+        // does not work in tests
+        // compile 'io.reactivex:rxgroovy:1.0.3'
+
 
         String mcToolkitVersion = '1.0.0-rename-8'
         compile "org.modelcatalogue:mc-core-api:$mcToolkitVersion"

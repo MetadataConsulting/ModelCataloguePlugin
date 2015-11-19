@@ -1,19 +1,21 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
+import rx.Observable
 
-/**
- * Created by adammilward on 20/05/2014.
- */
 public interface SearchCatalogue {
 
-    def search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params)
-    def search(Class resource, Map params)
-    def search(Map params)
-    def index(Class resource)
-    def index(Collection<Class> resource)
-    def unindex(Object object)
-    def unindex(Collection<Object> object)
-    def refresh()
+    ListWithTotalAndType<Relationship> search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params)
+    public <T> ListWithTotalAndType<T> search(Class<T> resource, Map params)
+    ListWithTotalAndType<CatalogueElement> search(Map params)
+
+    Observable<Boolean> index(Object element)
+    Observable<Boolean> index(Iterable<Object> resource)
+    Observable<Boolean> unindex(Object object)
+    Observable<Boolean> unindex(Collection<Object> object)
+    Observable<Boolean> reindex()
+
+    boolean isIndexingManually()
 
 }

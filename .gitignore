@@ -10,6 +10,7 @@ ModelCatalogueCorePluginTestApp/test/integration/resources/DataTemplateChangeDat
 ModelCatalogueCorePluginTestApp/test/integration/resources/DataTemplateChangeDataItems.xls
 ModelCatalogueCorePluginTestApp/test/integration/resources/example.xls
 ModelCatalogueCorePluginTestApp/test/integration/resources/rare_diseases_combined.umlj
+**/storage/**/*
 **/out/**/*
 **/target/**/*
 **/target-eclipse/**/*
@@ -18,3 +19,4 @@ ModelCatalogueCorePluginTestApp/test/integration/resources/rare_diseases_combine
 **/build/**/*
 
 .default-mc-config-location
+.docker-ip

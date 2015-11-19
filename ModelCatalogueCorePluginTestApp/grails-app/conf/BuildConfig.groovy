@@ -27,6 +27,7 @@ grails.plugin.location.'model-catalogue-discourse' = "../ModelCatalogueDiscourse
 grails.plugin.location.'model-catalogue-security-ss2' = "../ModelCatalogueSpringSecurity2xPlugin"
 grails.plugin.location.'model-catalogue-forms' = '../ModelCatalogueFormsPlugin'
 grails.plugin.location.'model-catalogue-genomics' = '../ModelCatalogueGenomicsPlugin'
+grails.plugin.location.'model-catalogue-elasticsearch' = '../ModelCatalogueElasticSearchPlugin'
 
 grails.project.dependency.resolver = "maven" // or ivy
 grails.project.dependency.resolution = {

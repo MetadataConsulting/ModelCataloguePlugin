@@ -3,7 +3,6 @@ package org.modelcatalogue.core
 import grails.gorm.DetachedCriteria
 import grails.util.GrailsNameUtils
 import org.hibernate.proxy.HibernateProxyHelper
-import org.modelcatalogue.core.util.Legacy
 import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 import org.springframework.http.HttpStatus
 
@@ -14,14 +13,23 @@ class CatalogueController {
 
     def xref() {
         String resource = params.resource
+        String idString = params.id
 
-        if (Legacy.isLegacyResourceName(resource)) {
-            redirect permanent: true, url: Legacy.getRedirectUrl(Legacy.getNewResourceName(resource), request)
+        if (!idString) {
+            render status: HttpStatus.NOT_FOUND
             return
         }
 
-        Long id = params.long('id')
-        Integer version = params.int('version')
+        Long id
+        Integer version = 1
+        if (idString.contains('.')) {
+            String[] parts = idString.split(/\./)
+            id = Long.parseLong(parts[0], 10)
+            version = Long.parseLong(parts[1], 10)
+        } else {
+            id = Long.valueOf(idString)
+            version = params.int('version')
+        }
 
         CatalogueElement element
 
@@ -40,7 +48,7 @@ class CatalogueController {
 
         if (params.format == 'xml') {
             response.contentType = 'application/xml'
-            response.setHeader("Content-disposition", "attachment; filename=${element.name.replaceAll(/\s+/, '_')}.xml")
+            response.setHeader("Content-disposition", "attachment; filename=\"${element.name.replaceAll(/\s+/, '_')}.xml\"")
             CatalogueXmlPrinter printer = new CatalogueXmlPrinter(dataModelService, dataClassService)
             printer.bind(element).writeTo(response.writer)
             return
@@ -75,7 +83,7 @@ class CatalogueController {
 
         if (params.format == 'xml') {
             response.contentType = 'application/xml'
-            response.setHeader("Content-disposition", "attachment; filename=${element.name.replaceAll(/\s+/, '_')}.xml")
+            response.setHeader("Content-disposition", "attachment; filename=\"${element.name.replaceAll(/\s+/, '_')}.xml\"")
             CatalogueXmlPrinter printer = new CatalogueXmlPrinter(dataModelService, dataClassService)
             printer.bind(element).writeTo(response.writer)
             return

@@ -9,7 +9,9 @@ class ModelCatalogueCorePluginUrlMappings {
         "/catalogue/ext/$key/$value" (controller: 'catalogue', action: 'ext', method: HttpMethod.GET)
         "/catalogue/ext/$key/$value/export" (controller: 'catalogue', action: 'ext', method: HttpMethod.GET)
         "/catalogue/$resource/$id(.${version})?" (controller: 'catalogue', action: 'xref', method: HttpMethod.GET)
-        "/catalogue/$resource/$id(.${version})?/export" (controller: 'catalogue', action: 'xref', method: HttpMethod.GET)
+        "/catalogue/$resource/$id(.${version})?/export" (controller: 'catalogue', action: 'xref', method: HttpMethod.GET) {
+            format = 'xml'
+        }
 
         def legacyElements    = [model: 'dataClass', classification: 'dataModel']
         def resources         = ['batch', 'relationshipType', 'csvTransformation' ]
@@ -151,6 +153,7 @@ class ModelCatalogueCorePluginUrlMappings {
 
         "/"(view:"index")
         "/api/modelCatalogue/core/dashboard" (controller:"dashboard", action : 'index', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/search/reindex" (controller:"search", action : 'reindex', method: HttpMethod.POST)
         "/api/modelCatalogue/core/search/$search?" (controller:"search", action : 'index', method: HttpMethod.GET)
         "/api/modelCatalogue/core/relationship/$id/restore" (controller:"relationship", action : 'restore', method: HttpMethod.POST)
 

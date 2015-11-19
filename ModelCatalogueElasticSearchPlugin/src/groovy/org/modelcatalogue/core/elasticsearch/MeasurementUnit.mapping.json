@@ -1,0 +1,20 @@
+{
+  "measurement_unit" : {
+
+    "properties" : {
+
+      "data_type" : {
+
+        "properties" : {
+          "symbol" :{
+            "type": "string",
+            "index" : "not_analyzed"
+          }
+        }
+
+      }
+
+    }
+
+  }
+}

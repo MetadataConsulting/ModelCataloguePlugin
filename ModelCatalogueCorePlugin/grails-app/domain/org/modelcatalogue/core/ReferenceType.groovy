@@ -12,15 +12,14 @@ class ReferenceType extends DataType {
     }
 
 
+    @Override
     protected PublishingChain prepareDraftChain(PublishingChain chain) {
         super.prepareDraftChain(chain).add(dataClass)
     }
 
     @Override
-    CatalogueElement publish(Publisher<CatalogueElement> publisher) {
-        PublishingChain.finalize(this)
-                .add(this.dataClass)
-                .run(publisher)
+    protected PublishingChain preparePublishChain(PublishingChain chain) {
+        super.preparePublishChain(chain).add(this.dataClass)
     }
 
     List<String> getInheritedAssociationsNames() { ['dataClass'] }

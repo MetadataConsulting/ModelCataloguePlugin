@@ -81,6 +81,23 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       }
   ]
 
+  actionsProvider.registerActionInRoles 'reindex-catalogue', [actionsProvider.ROLE_GLOBAL_ACTION], [
+    '$scope', 'names','security', '$state', 'messages', 'rest', 'modelCatalogueApiRoot'
+    ($scope ,  names , security ,  $state ,  messages ,  rest ,  modelCatalogueApiRoot ) ->
+      return undefined if not security.hasRole('ADMIN')
+
+      {
+      position: 1000
+      label: "Reindex Catalogue"
+      icon: 'fa fa-search'
+      type: 'success'
+      action: ->
+        messages.confirm("Do you want to reindex catalogue?", "Whole catalogue will be reindexed. This may take a long time and it can have negative impact on the performance.").then ->
+          rest(url: "#{modelCatalogueApiRoot}/search/reindex", method: 'POST').then ->
+            messages.success('Reindex Catalogue', 'Reindexing the catalogue scheduled.')
+      }
+  ]
+
   annotate = ['$scope', 'messages', ($scope, messages) -> {
     label: "Annotate Letter"
     action: ->
@@ -345,6 +362,19 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       icon:       'glyphicon glyphicon-download-alt'
       type:       'primary'
       expandToLeft: true
+    }
+  ]
+
+  actionsProvider.registerChildAction 'export', 'export-cart', ['security', '$state', '$window', 'modelCatalogueApiRoot', (security, $state, $window, modelCatalogueApiRoot) ->
+    return undefined if not security.isUserLoggedIn()
+    return undefined if not $state.current.name == 'mc.favorites'
+
+    {
+    position:   10000
+    label:      'Export Favorites'
+    action: ->
+      $window.open "#{modelCatalogueApiRoot}/user/#{security.getCurrentUser().id}/outgoing/favourite?format=xml"
+
     }
   ]
 
@@ -713,7 +743,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
   actionsProvider.registerActionInRole 'modal-save-element', actionsProvider.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
-    return undefined unless $scope.hasChanged and $scope.saveElement and $scope.hasDataModels
+    return undefined unless $scope.hasChanged and $scope.saveElement and ($scope.hasDataModels or $scope.copy?.elementType == 'org.modelcatalogue.core.DataModel')
 
     {
       position:   1000
@@ -728,7 +758,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
   actionsProvider.registerActionInRole 'modal-save-and-add-another', actionsProvider.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
-    return undefined unless $scope.hasChanged and $scope.saveAndCreateAnother and $scope.hasDataModels
+    return undefined unless $scope.hasChanged and $scope.saveAndCreateAnother and ($scope.hasDataModels or $scope.copy?.elementType == 'org.modelcatalogue.core.DataModel')
 
     {
       position:   2000

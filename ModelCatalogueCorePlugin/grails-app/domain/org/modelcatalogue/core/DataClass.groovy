@@ -13,11 +13,10 @@ class DataClass extends CatalogueElement {
     ]
 
     @Override
-    CatalogueElement publish(Publisher<CatalogueElement> publisher) {
-        PublishingChain.finalize(this)
-        .add(this.contains)
-        .add(this.parentOf)
-        .run(publisher)
+    protected PublishingChain preparePublishChain(PublishingChain chain) {
+        super.preparePublishChain(chain)
+                .add(this.contains)
+                .add(this.parentOf)
     }
 
     @Override

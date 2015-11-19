@@ -14,6 +14,7 @@ import org.modelcatalogue.core.audit.AuditJsonMarshallingCustomizer
 import org.modelcatalogue.core.util.js.FrontendConfigurationProviderRegistry
 import org.modelcatalogue.core.util.js.ApiRootFrontendConfigurationProvider
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
+import org.modelcatalogue.core.xml.render.RelationshipsXmlRenderer
 
 class ModelCatalogueCoreGrailsPlugin {
     // the plugin version
@@ -73,6 +74,7 @@ Model catalogue core plugin (metadata registry)
         mergeConfig(application)
 
         xlsxListRenderer(XLSXListRenderer)
+        relationshipsXmlRenderer(RelationshipsXmlRenderer)
         reportsRegistry(ReportsRegistry)
         jsonMarshallingCustomizerRegistry(JsonMarshallingCustomizerRegistry)
         frontendConfigurationProviderRegistry(FrontendConfigurationProviderRegistry)
@@ -336,6 +338,26 @@ Model catalogue core plugin (metadata registry)
                 [url: element.getDefaultModelCatalogueId(false) + '?format=xml']
             }
         }
+
+        // generic export of relationships to catalogue XML
+//        reportsRegistry.register {
+//            creates link
+//            title { Relationships rels ->
+//                "Export ${rels.direction != RelationshipDirection.INCOMING ? rels.type.sourceToDestination : rels.type.destinationToSource} to Catalogue XML"
+//            }
+//            type Relationships
+//            link {
+//                GrailsWebRequest webRequest = RequestContextHolder.currentRequestAttributes() as GrailsWebRequest
+//                Map params = [:]
+//                params.putAll(webRequest.params)
+//                params.format = 'xml'
+//                params.remove('sort')
+//                params.remove('order')
+//                params.remove('max')
+//                params.remove('offset')
+//                [controller: webRequest.controllerName, action: webRequest.actionName, params: params]
+//            }
+//        }
 
 
 

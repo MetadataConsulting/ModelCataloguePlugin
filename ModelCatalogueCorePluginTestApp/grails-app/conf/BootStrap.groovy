@@ -40,6 +40,7 @@ class BootStrap {
     private static void initSecurity() {
         def roleUser = Role.findByAuthority('ROLE_USER') ?: new Role(authority: 'ROLE_USER').save(failOnError: true)
         def roleAdmin = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
+        def roleStacktrace = Role.findByAuthority('ROLE_STACKTRACE') ?: new Role(authority: 'ROLE_STACKTRACE').save(failOnError: true)
         def metadataCurator = Role.findByAuthority('ROLE_METADATA_CURATOR') ?: new Role(authority: 'ROLE_METADATA_CURATOR').save(failOnError: true)
 
         Role.findByAuthority('ROLE_REGISTERED') ?: new Role(authority: 'ROLE_REGISTERED').save(failOnError: true)
@@ -54,6 +55,7 @@ class BootStrap {
         if (!admin.authorities.contains(roleAdmin)) {
             UserRole.create admin, roleUser
             UserRole.create admin, metadataCurator
+            UserRole.create admin, roleStacktrace
             UserRole.create admin, roleAdmin, true
         }
 

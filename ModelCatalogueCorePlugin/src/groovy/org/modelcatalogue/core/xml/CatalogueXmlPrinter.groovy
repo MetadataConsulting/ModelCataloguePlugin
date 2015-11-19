@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.xml
 
 import groovy.xml.MarkupBuilder
+import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.DataClassService
@@ -9,6 +10,7 @@ import org.modelcatalogue.core.RelationshipType
 class CatalogueXmlPrinter {
 
     static final String NAMESPACE_URL = 'http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd'
+    static final String ASSETS_NAMESPACE_URL = 'http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry_asset.xsd'
 
     DataModelService dataModelService
     DataClassService modelService
@@ -22,12 +24,37 @@ class CatalogueXmlPrinter {
         PrintContext context = new PrintContext(dataModelService, modelService)
         context.with contextConfigurer
 
+        Map<String, String> ns = [xmlns : NAMESPACE_URL]
+
+        if (element.instanceOf(Asset)) {
+            ns.xmlns = ASSETS_NAMESPACE_URL
+        }
+
         return { Writer writer ->
             EscapeSpecialWriter escapeSpecialWriter = new EscapeSpecialWriter(writer)
             MarkupBuilder builder = new MarkupBuilder(escapeSpecialWriter)
             builder.doubleQuotes = true
-            builder.catalogue ('xmlns' : NAMESPACE_URL) {
+            builder.catalogue (ns) {
                 CatalogueElementPrintHelper.printElement(builder, element, context, null)
+                printRelationshipTypes(builder, context)
+            }
+
+            writer
+        } as Writable
+    }
+
+    public <CE extends CatalogueElement> Writable bind(Iterable<CE> elements, @DelegatesTo(PrintContext) Closure contextConfigurer = {}) {
+        PrintContext context = new PrintContext(dataModelService, modelService)
+        context.with contextConfigurer
+
+        return { Writer writer ->
+            EscapeSpecialWriter escapeSpecialWriter = new EscapeSpecialWriter(writer)
+            MarkupBuilder builder = new MarkupBuilder(escapeSpecialWriter)
+            builder.doubleQuotes = true
+            builder.catalogue (xmlns : NAMESPACE_URL) {
+                for (CE element in elements) {
+                    CatalogueElementPrintHelper.printElement(builder, element, context, null)
+                }
                 printRelationshipTypes(builder, context)
             }
 

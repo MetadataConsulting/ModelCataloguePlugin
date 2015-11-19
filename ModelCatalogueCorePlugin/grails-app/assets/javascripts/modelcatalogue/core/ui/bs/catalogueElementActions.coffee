@@ -195,12 +195,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not $scope.element?.downloadUrl?
 
     {
-      position:   - 50
+      position:   -50
       label:      ''
       icon:       'fa fa-fw fa-download'
       type:       'primary'
       action:     ->
-        $window.open $scope.element.downloadUrl, '_blank'; return true
+        $window.open "#{$scope.element.downloadUrl}?force=true", '_blank'; return true
 
     }
   ]
