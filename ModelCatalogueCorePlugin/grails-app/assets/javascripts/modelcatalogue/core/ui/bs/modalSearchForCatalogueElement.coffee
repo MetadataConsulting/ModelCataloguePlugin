@@ -15,14 +15,12 @@ module.config ['messagesProvider', (messagesProvider)->
                 <input id="value" class="form-control" ng-model="query" placeholder="Search for #{names.getNaturalName(names.getPropertyNameFromType(args.resource ? 'catalogueElement'))}" ng-model-options="{debounce: 500}" focus-me="true" autofocus='true'>
               </div>
             </div>
-            <div ng-if="elements.length == 0 &amp;&amp; !loading">
-              <alert type="warning" >No Results</alert>
-            </div>
+            <div class="search-divider" ng-if="loading || elements.length > 0"></div>
             <div>
               <div class class="list-group">
                 <a ng-repeat="element in elements" class="list-group-item with-pointer item-found" ng-class="{'list-group-item-warning': element.status == 'DRAFT', 'list-group-item-info': element.status == 'PENDING', 'list-group-item-danger': element.status == 'DEPRECATED', 'active': $index == selected}" ng-click="$close(element)">
                     <h4 class="list-group-item-heading"><catalogue-element-icon type="element.elementType"></catalogue-element-icon> {{element.classifiedName}}</h4>
-                    <p ng-if="element.description" class="list-group-item-text preserve-new-lines">{{element.description}}</p>
+                    <p ng-if="element.description" class="list-group-item-text preserve-new-lines modal-search-for-catalogue-element-description">{{element.description}}</p>
                 </a>
                 <a class="list-group-item disabled" ng-if="loading">
                   <div class="text-center"><span class="fa fa-refresh fa-spin"></span></div>
@@ -50,7 +48,7 @@ module.config ['messagesProvider', (messagesProvider)->
 
           reset = ->
             $scope.elements = []
-            $scope.loading  = true
+            $scope.loading  = not args.empty
             $scope.selected = -1
 
           listOrSearch = (query, callback) ->
@@ -58,11 +56,11 @@ module.config ['messagesProvider', (messagesProvider)->
             params.status = args.status if args.status
 
             if $state.params.dataModelId and $state.params.dataModelId != 'catalogue'
-                   params.dataModel = $state.params.dataModelId
+              params.dataModel = $state.params.dataModelId
 
             if query
               catalogueElementResource(args.resource ? 'catalogueElement').search(query, params).then(callback)
-            else
+            else unless args.empty
               catalogueElementResource(args.resource ? 'catalogueElement').list(params).then(callback)
 
           reset()
@@ -73,7 +71,7 @@ module.config ['messagesProvider', (messagesProvider)->
             $scope.list.next().then(appendToElements)
 
           $scope.$watch 'query', (query) ->
-            $scope.loading  = true
+            $scope.loading  = if query then true else not args.empty
             listOrSearch(query, replaceElements)
 
           ARROW_DOWN = 40

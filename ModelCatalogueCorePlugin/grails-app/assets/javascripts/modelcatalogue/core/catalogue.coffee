@@ -82,18 +82,6 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
       params.dataModel = dataModelId if dataModelId and dataModelId isnt 'catalogue'
       rest method: 'GET', url: "#{modelCatalogueApiRoot}/dashboard", params: params
 
-    catalogue.getCurrentDataModel = ->
-      $rootScope.currentDataModel
-
-    catalogue.isFilteredByDataModel = ->
-      $rootScope.currentDataModel?
-
-    catalogue.select = (dataModel) ->
-      deferred = $q.defer()
-      $rootScope.currentDataModel = angular.copy dataModel
-      deferred.resolve($rootScope.currentDataModel)
-      deferred.promise
-
     catalogue
   ]
 
@@ -103,11 +91,4 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
 # make catalogue property of the root scope (i.e. global property)
 catalogueModule.run ['$rootScope', 'catalogue', '$state', 'security', ($rootScope, catalogue, $state, security) ->
   $rootScope.catalogue = catalogue
-
-  $rootScope.$on 'newVersionCreated', (ignored, element) ->
-    if angular.isFunction(element.isInstanceOf) and element.isInstanceOf('dataModel') and catalogue.isFilteredByDataModel()
-      catalogue.select(element).then ->
-        $state.go '.', {dataModelId: element.id}, {reload: true}
-        security.requireUser().then ->
-          $rootScope.$broadcast 'redrawContextualActions'
 ]

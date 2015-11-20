@@ -83,7 +83,7 @@ angular.module('mc.core.ui.bs', [
         return
       # shift + space
       if e.shiftKey and e.which is 32
-        messages.prompt(null, null, type: 'search-catalogue-element').then (element) ->
+        messages.prompt(null, null, type: 'search-catalogue-element', empty: true).then (element) ->
           element.show()
         e.preventDefault()
 ]

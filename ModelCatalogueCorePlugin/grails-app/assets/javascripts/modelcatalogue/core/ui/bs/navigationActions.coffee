@@ -46,85 +46,6 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
         }
       ]
 
-
-  actionsProvider.registerActionInRole 'navbar-data-architect', actionsProvider.ROLE_NAVIGATION, ['security', (security) ->
-    return undefined if not security.hasRole('CURATOR')
-
-    {
-      navigation: true
-      abstract:   true
-      position:   1000
-      label:      'Data Architect'
-    }
-  ]
-
-  actionsProvider.registerChildAction 'navbar-data-architect', 'navbar-relations-by-metadata-key', ['$scope', '$state', ($scope, $state) ->
-    action = {
-      position:    300
-      label:      'Create COSD Synonym Data Element Relationships'
-      icon:       'fa fa-fw fa-exchange'
-      action: ->
-        $state.go 'mc.dataArchitect.findRelationsByMetadataKeys'
-    }
-
-    $scope.$on '$stateChangeSuccess', (ignored, state) ->
-      action.active = state.name == 'mc.dataArchitect.findRelationsByMetadataKeys'
-
-    action
-  ]
-
-  actionsProvider.registerChildAction 'navbar-data-architect', 'navbar-element-without-key', ['$scope', '$state', ($scope, $state) ->
-    action = {
-      position:    400
-      label:      'Data Elements without Metadata Key'
-      icon:       'fa fa-fw fa-key'
-      action: ->
-        $state.go 'mc.dataArchitect.metadataKey'
-    }
-
-    $scope.$on '$stateChangeSuccess', (ignored, state) ->
-      action.active = state.name == 'mc.dataArchitect.metadataKey'
-
-    action
-  ]
-
-  actionsProvider.registerActionInRole 'currentDataModel', actionsProvider.ROLE_NAVIGATION, ['security', '$scope', '$state', '$rootScope', (security, $scope, $state, $rootScope) ->
-    return undefined if not security.isUserLoggedIn()
-
-    getLabel = ->
-      return 'All Data Models' unless $rootScope.currentDataModel
-      return "#{ $rootScope.currentDataModel.name} (draft)" if $rootScope.currentDataModel.status == 'DRAFT'
-      return $rootScope.currentDataModel.name
-
-    action = {
-      position:   - 100000
-      label: getLabel()
-      icon: 'fa fa-book'
-      watches: ['currentDataModel']
-    }
-
-    action
-  ]
-
-  actionsProvider.registerChildAction 'currentDataModel', 'show-data-model', ['catalogue', '$scope', '$state', '$rootScope', (catalogue, $scope, $state, $rootScope) ->
-    return undefined if not catalogue.isFilteredByDataModel()
-
-    action = {
-
-      position:   2000
-      label: 'Show Detail'
-      icon: 'fa fa-book fa-fw'
-      active: $state.name == 'mc.resource.show' and $state.params.id == ('' + catalogue.getCurrentDataModel().id)
-      action: ->
-        $state.go 'mc.resource.show', {resource: 'dataModel', id: catalogue.getCurrentDataModel().id, dataModelId: catalogue.getCurrentDataModel().id}
-    }
-
-    $rootScope.$on '$stateChangeSuccess', (ignored, state, params) ->
-      action.active = state.name == 'mc.resource.show' and params.id == ('' + catalogue.getCurrentDataModel().id) if angular.isFunction(catalogue.getCurrentDataModel) and catalogue.getCurrentDataModel()
-
-    action
-  ]
-
   actionsProvider.registerActionInRole 'all-data-models', actionsProvider.ROLE_GLOBAL_ACTION ,['security', '$scope', '$state', 'catalogue', (security, $scope, $state, catalogue) ->
     return undefined if not security.isUserLoggedIn()
 
@@ -137,9 +58,11 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     }
   ]
 
-  actionsProvider.registerChildAction 'currentDataModel', 'add-import', ['$scope', 'messages', 'names', 'security', 'catalogue', ($scope, messages, names, security, catalogue) ->
+  actionsProvider.registerChildAction 'catalogue-element', 'add-import', ['$scope', 'messages', 'names', 'security', 'catalogue', ($scope, messages, names, security, catalogue) ->
     return undefined if not security.isUserLoggedIn()
-    return undefined if not catalogue.isFilteredByDataModel()
+    return undefined if not $scope.element
+    return undefined if not angular.isFunction($scope.element.isInstanceOf)
+    return undefined if not $scope.element.isInstanceOf('dataModel')
 
     {
       position:   2000
@@ -150,7 +73,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
         messages.prompt('Add Data Model Import', 'If you want to reuse data classes, data types or measurement units form different data models you need to import the containing data model first.', {type: 'catalogue-elements', resource: 'dataModel', status: 'finalized' }).then (elements) ->
           angular.forEach elements, (element) ->
             unless angular.isString(element)
-              catalogue.getCurrentDataModel().imports.add element
+              $scope.element.imports.add element
     }
   ]
 

@@ -20,14 +20,14 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
             messages.error err.message
 
 
-  actionsProvider.registerActionInRoles 'catalogue-element', [actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'security', 'names', 'catalogue', ($scope, security, name, catalogue)->
+  actionsProvider.registerActionInRoles 'catalogue-element',[actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'security', 'names', 'catalogue', ($scope, security, name, catalogue)->
     return undefined if not security.hasRole('CURATOR')
     return undefined unless $scope.element
     if $scope.element
       return undefined if not angular.isFunction $scope.element.isInstanceOf
-      return undefined if $scope.element.isInstanceOf 'dataImport'
 
     {
+      show:       true
       position:   3000
       label:      names.getNaturalName(names.getPropertyNameFromQualifier($scope.element.elementType))
       icon:       catalogue.getIcon($scope.element.elementType)
@@ -37,25 +37,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     }
   ]
 
-  actionsProvider.registerActionInRole 'select-data-model', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'security', 'catalogue', '$state', '$rootScope', ($scope, security, catalogue, $state, $rootScope) ->
-    return undefined if not $scope.element
-    return undefined if not angular.isFunction $scope.element.isInstanceOf
-    return undefined if not $scope.element.isInstanceOf 'dataModel'
-    return undefined if not security.hasRole('VIEWER')
-
-    {
-      position:   -10000
-      label:      "Select #{$scope.element.name}"
-      icon:       'fa fa-book'
-      type:       'primary'
-      action: ->
-        catalogue.select($scope.element).then ->
-          $state.go 'mc.resource.list', { dataModelId: $scope.element.id, resource: 'dataClass'}, reload: true
-          $rootScope.$broadcast 'redrawContextualActions'
-    }
-
-  ]
-  actionsProvider.registerActionInRole 'edit-catalogue-element', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
+  actionsProvider.registerActionInRoles 'edit-catalogue-element',[actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
     return undefined if not angular.isFunction $scope.element.getResourceName
@@ -65,7 +47,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
     {
       position:   4000
-      label:      ''
+      label:      'Edit'
       icon:       'fa fa-fw fa-edit'
       type:       'primary'
       disabled:   $scope.element.archived or $scope.element?.status == 'FINALIZED'
@@ -78,7 +60,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
   ]
 
-  actionsProvider.registerChildActionInRoles 'catalogue-element', 'create-new-relationship', [actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
+  actionsProvider.registerChildActionInRoles 'catalogue-element', 'create-new-relationship',[actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction($scope.element.isInstanceOf)
     return undefined if not $scope.element.isInstanceOf('catalogueElement')
@@ -99,7 +81,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
   ]
 
-  actionsProvider.registerChildActionInRole 'catalogue-element', 'compare-catalogue-element', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'messages', '$state', ($scope, messages, $state) ->
+  actionsProvider.registerChildActionInRoles 'catalogue-element', 'compare-catalogue-element',[actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'messages', '$state', ($scope, messages, $state) ->
     elementPresent = $scope.element and angular.isFunction($scope.element.getResourceName) and angular.isFunction($scope.element.getElementTypeName) and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('catalogueElement')
     diffView = $state.current.name == 'mc.resource.diff'
 
@@ -121,7 +103,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
 
 
-  actionsProvider.registerChildActionInRole 'catalogue-element', 'create-new-mapping', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
+  actionsProvider.registerChildActionInRoles 'catalogue-element', 'create-new-mapping',[actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if not $scope.element.hasOwnProperty('mappings')
     return undefined if not security.hasRole('CURATOR')
@@ -137,7 +119,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
 
 
-  actionsProvider.registerChildActionInRole 'catalogue-element', 'validate-value', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'security', ($scope, messages) ->
+  actionsProvider.registerChildActionInRoles 'catalogue-element', 'validate-value',[actionsProvider.ROLE_ITEM_ACTION], [ '$scope', 'messages', 'security', ($scope, messages) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
     return undefined if not $scope.element.isInstanceOf('dataType')
@@ -157,7 +139,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
 
 
-  actionsProvider.registerChildActionInRole 'catalogue-element', 'convert', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'security', ($scope, messages) ->
+  actionsProvider.registerChildActionInRoles 'catalogue-element', 'convert',[actionsProvider.ROLE_ITEM_ACTION], [ '$scope', 'messages', 'security', ($scope, messages) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
     return undefined if not $scope.element.isInstanceOf('dataType') and not $scope.element.isInstanceOf('mapping')
@@ -176,7 +158,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     }
   ]
 
-  actionsProvider.registerChildActionInRole 'catalogue-element', 'validate-xsd-schema', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'catalogue', ($scope, messages, catalogue) ->
+  actionsProvider.registerChildActionInRoles 'catalogue-element', 'validate-xsd-schema',[actionsProvider.ROLE_ITEM_ACTION], [ '$scope', 'messages', 'catalogue', ($scope, messages, catalogue) ->
     return undefined if not catalogue.isInstanceOf($scope.element?.elementType, 'asset')
 
     {
@@ -191,7 +173,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
 
 
-  actionsProvider.registerActionInRole 'download-asset', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', '$window', ($scope, $window) ->
+  actionsProvider.registerActionInRoles 'download-asset',[actionsProvider.ROLE_ITEM_ACTION], [ '$scope', '$window', ($scope, $window) ->
     return undefined if not $scope.element?.downloadUrl?
 
     {
@@ -206,7 +188,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
 
 
-  actionsProvider.registerActionInRole 'remove-relationship', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', '$state', 'messages', 'names', 'security', '$q', ($rootScope, $scope, $state, messages, names, security, $q) ->
+  actionsProvider.registerActionInRoles 'remove-relationship',[actionsProvider.ROLE_ITEM_ACTION], ['$rootScope','$scope', '$state', 'messages', 'names', 'security', '$q', ($rootScope, $scope, $state, messages, names, security, $q) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction($scope.element.isInstanceOf)
     return undefined if not $scope.element.isInstanceOf('relationship')
@@ -246,7 +228,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     }
   ]
 
-  actionsProvider.registerChildActionInRole 'catalogue-element',  'restore-relationship', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', '$state', 'messages', 'names', 'security', '$q', 'rest', 'enhance', 'modelCatalogueApiRoot', ($rootScope, $scope, $state, messages, names, security, $q, rest, enhance, modelCatalogueApiRoot) ->
+  actionsProvider.registerChildActionInRoles 'catalogue-element',  'restore-relationship',[actionsProvider.ROLE_ITEM_ACTION], ['$rootScope','$scope', '$state', 'messages', 'names', 'security', '$q', 'rest', 'enhance', 'modelCatalogueApiRoot', ($rootScope, $scope, $state, messages, names, security, $q, rest, enhance, modelCatalogueApiRoot) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction($scope.element.isInstanceOf)
     return undefined if not $scope.element.isInstanceOf('relationship')
@@ -280,7 +262,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return action
   ]
 
-  actionsProvider.registerActionInRole 'edit-relationship', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', '$state', 'messages', 'names', 'security', ($rootScope, $scope, $state, messages, names, security) ->
+  actionsProvider.registerActionInRoles 'edit-relationship', [actionsProvider.ROLE_ITEM_ACTION], ['$rootScope','$scope', '$state', 'messages', 'names', 'security', ($rootScope, $scope, $state, messages, names, security) ->
     getRelationship = ->
       $scope.element ? $scope.tab?.value
     return undefined if not getRelationship()
@@ -306,7 +288,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     }
   ]
 
-  actionsProvider.registerActionInRole 'edit-mapping', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'security', ($scope, messages) ->
+  actionsProvider.registerActionInRoles 'edit-mapping', [actionsProvider.ROLE_ITEM_ACTION], [ '$scope', 'messages', 'security', ($scope, messages) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
     return undefined if not $scope.element.isInstanceOf('mapping')
@@ -328,7 +310,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
   ]
 
-  actionsProvider.registerActionInRole 'remove-mapping', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', '$state', 'messages', 'names', 'security', '$q', ($rootScope, $scope, $state, messages, names, security, $q) ->
+  actionsProvider.registerActionInRoles 'remove-mapping', [actionsProvider.ROLE_ITEM_ACTION], ['$rootScope','$scope', '$state', 'messages', 'names', 'security', '$q', ($rootScope, $scope, $state, messages, names, security, $q) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction($scope.element.isInstanceOf)
     return undefined if not $scope.element.isInstanceOf('mapping')
@@ -364,7 +346,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     }
   ]
 
-  actionsProvider.registerChildActionInRole 'catalogue-element', 'change-type', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', ($rootScope, $scope, messages, names, security, catalogueElementResource) ->
+  actionsProvider.registerChildActionInRoles 'catalogue-element', 'change-type',[actionsProvider.ROLE_ITEM_ACTION], ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', ($rootScope, $scope, messages, names, security, catalogueElementResource) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
     return undefined if not $scope.element.isInstanceOf('dataType')

@@ -6,7 +6,5 @@ angular.module('mc.core.ui.states.mc.resource', []).config(['$stateProvider', ($
       views:
         "":
           templateUrl: 'modelcatalogue/core/ui/state/parent.html'
-        'navbar-left':
-          template: '<contextual-menu></contextual-menu><div ui-view="navbar-left"></div>'
     }
 ])

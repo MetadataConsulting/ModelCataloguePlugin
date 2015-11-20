@@ -18,9 +18,6 @@ angular.module('mc.core.ui.states.simple.resource.show', ['mc.core.ui.states.con
         element: ['$stateParams','catalogueElementResource', ($stateParams, catalogueElementResource) ->
           catalogueElementResource($stateParams.resource).get($stateParams.id)
         ]
-      onExit: ['$rootScope', ($rootScope) ->
-        $rootScope.elementToShow = null
-      ]
     }
 
 ])

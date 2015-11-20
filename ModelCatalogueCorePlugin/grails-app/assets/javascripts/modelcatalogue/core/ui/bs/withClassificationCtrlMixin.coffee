@@ -38,10 +38,9 @@ angular.module('mc.core.ui.bs.withClassificationCtrlMixin', ['mc.util.security']
   $scope.$watchCollection 'copy.dataModels', dataModelsChanged
 
   $scope.hideDataModels = ->
-    catalogue.isFilteredByDataModel()
+    $scope.currentDataModel?
 
-  if catalogue.isFilteredByDataModel() and not $scope.copy.dataModels.length
-    if catalogue.isFilteredByDataModel()
-      $scope.addToDataModels catalogue.getCurrentDataModel()
+  if $scope.currentDataModel and not $scope.copy.dataModels.length
+      $scope.addToDataModels $scope.currentDataModel
 
 ]

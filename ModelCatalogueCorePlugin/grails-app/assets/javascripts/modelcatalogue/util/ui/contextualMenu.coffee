@@ -43,6 +43,7 @@ angular.module('mc.util.ui.contextualMenu', ['mc.util.ui.bs.menuItemDropdown','m
 
       $element.empty()
       for action in actions.getActions($scope.scope ? $scope.$parent, $scope.role ? actions.ROLE_NAVIGATION)
+        watches = []
         if action.active and action.disabled
           action.$$class = 'active disabled'
         else if action.active

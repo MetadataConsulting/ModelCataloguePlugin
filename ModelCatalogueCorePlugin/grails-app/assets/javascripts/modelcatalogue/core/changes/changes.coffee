@@ -95,7 +95,7 @@ changes.config ['enhanceProvider', (enhanceProvider)->
 
 changes.config ['actionsProvider', (actionsProvider)->
 
-  actionsProvider.registerActionInRole 'undo-change', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'messages', 'security', '$http', 'modelCatalogueApiRoot', '$state', ($scope, messages, security, $http, modelCatalogueApiRoot, $state) ->
+  actionsProvider.registerActionInRoles 'undo-change',[actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'messages', 'security', '$http', 'modelCatalogueApiRoot', '$state', ($scope, messages, security, $http, modelCatalogueApiRoot, $state) ->
     return undefined unless $scope.element
     return undefined unless $scope.element.changed
     return undefined unless $scope.element.changed.status == 'DRAFT' or ($scope.element.changed.isInstanceOf('asset') and $scope.element.changed.status == 'FINALIZED')
@@ -121,21 +121,6 @@ changes.config ['actionsProvider', (actionsProvider)->
               messages.error msg
     }
   ]
-
-  actionsProvider.registerChildAction 'currentDataModel', 'feed', ['$state', '$rootScope', ($state, $rootScope) ->
-    action = {
-      position:   500
-      label: 'Activity'
-      icon: 'fa fa-fw fa-rss'
-      action: ->
-        $state.go 'mc.resource.list', resource: 'change', dataModelId: if $rootScope.currentDataModel then $rootScope.currentDataModel.id else 'catalogue'
-    }
-
-    $rootScope.$on '$stateChangeSuccess', (ignored, state, params) ->
-      action.active = state.name == 'mc.resource.list' and params.resource == 'change'
-
-    action
-  ], [actionsProvider.ROLE_NAVIGATION]
 ]
 
 changes.config ['catalogueProvider', (catalogueProvider)->

@@ -51,115 +51,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerActionInRole 'new-import', actionsProvider.ROLE_LIST_ACTION, [
-    '$scope', 'names','security', '$state',
-    ($scope ,  names , security ,  $state ) ->
-      return undefined if not security.hasRole('CURATOR')
-      return undefined if $state.current.name != 'mc.resource.list'
-      return undefined if $scope.resource != 'asset'
-
-      {
-        position: 100
-        label: "Import"
-        icon: 'fa fa-cloud-upload'
-        type: 'success'
-      }
-  ]
-
-  actionsProvider.registerActionInRoles 'user-last-seen', [actionsProvider.ROLE_GLOBAL_ACTION], [
-    '$scope', 'names','security', '$state', 'messages',
-    ($scope ,  names , security ,  $state ,  messages) ->
-      return undefined if not security.hasRole('ADMIN')
-
-      {
-      position: 1000
-      label: "Activity"
-      icon: 'fa fa-users'
-      type: 'success'
-      action: ->
-        messages.prompt('Recent Activity', '', type: 'current-activity')
-      }
-  ]
-
-  actionsProvider.registerActionInRoles 'reindex-catalogue', [actionsProvider.ROLE_GLOBAL_ACTION], [
-    '$scope', 'names','security', '$state', 'messages', 'rest', 'modelCatalogueApiRoot'
-    ($scope ,  names , security ,  $state ,  messages ,  rest ,  modelCatalogueApiRoot ) ->
-      return undefined if not security.hasRole('ADMIN')
-
-      {
-      position: 1000
-      label: "Reindex Catalogue"
-      icon: 'fa fa-search'
-      type: 'success'
-      action: ->
-        messages.confirm("Do you want to reindex catalogue?", "Whole catalogue will be reindexed. This may take a long time and it can have negative impact on the performance.").then ->
-          rest(url: "#{modelCatalogueApiRoot}/search/reindex", method: 'POST').then ->
-            messages.success('Reindex Catalogue', 'Reindexing the catalogue scheduled.')
-      }
-  ]
-
-  annotate = ['$scope', 'messages', ($scope, messages) -> {
-    label: "Annotate Letter"
-    action: ->
-      messages.prompt('Annotate Letter', '', type: 'annotate-letter')
-  }]
-  actionsProvider.registerChildAction 'new-import', 'annotate-letter', annotate
-  actionsProvider.registerActionInRole 'global-annotate-letter', actionsProvider.ROLE_GLOBAL_ACTION, annotate
-
-
-  loincImport = ['$scope', 'messages', ($scope, messages) -> {
-    label: "Import Loinc"
-    action: ->
-      messages.prompt('Import Loinc File', '', type: 'new-loinc-import')
-  }]
-  actionsProvider.registerChildAction 'new-import', 'import-loinc', loincImport
-  actionsProvider.registerActionInRole 'global-import-loinc', actionsProvider.ROLE_GLOBAL_ACTION, loincImport
-
-  excelImport = ['$scope', 'messages', ($scope, messages) -> {
-    label:  "Import Excel"
-    action: ->
-      messages.prompt('Import Excel File', '', type: 'new-excel-import')
-  }]
-  actionsProvider.registerChildAction 'new-import', 'import-excel', excelImport
-  actionsProvider.registerActionInRole 'global-import-excel', actionsProvider.ROLE_GLOBAL_ACTION, excelImport
-
-  oboImport = ['$scope', 'messages', ($scope, messages) -> {
-    label: "Import OBO"
-    action: ->
-      messages.prompt('Import OBO File', '', type: 'new-obo-import')
-  }]
-  actionsProvider.registerChildAction 'new-import', 'import-obo', oboImport
-  actionsProvider.registerActionInRole 'global-import-obo', actionsProvider.ROLE_GLOBAL_ACTION, oboImport
-
-  umlImport = ['$scope', 'messages', ($scope, messages) -> {
-    label: "Import Star Uml"
-    action: ->
-      messages.prompt('Import Star Uml File', '', type: 'new-umlj-import')
-  }]
-  actionsProvider.registerChildAction 'new-import', 'import-umlj', umlImport
-  actionsProvider.registerActionInRole 'global-import-uml', actionsProvider.ROLE_GLOBAL_ACTION, umlImport
-
-  mcImport = ['$scope', 'messages', ($scope, messages) -> {
-    label: "Import MC"
-    action: ->
-      messages.prompt('Import Model Catalogue DSL File', '', type: 'new-mc-import')
-  }]
-  actionsProvider.registerChildAction 'new-import', 'import-mc', mcImport
-  actionsProvider.registerActionInRole 'global-import-mc', actionsProvider.ROLE_GLOBAL_ACTION, mcImport
-
-
-  xmlImport = ['$scope', 'messages', ($scope, messages) -> {
-    label: "Import Catalogue XML"
-    action: ->
-      messages.prompt('Import Model Catalogue XML File', '', type: 'new-catalogue-xml-import')
-  }]
-  actionsProvider.registerChildAction 'new-import', 'import-catalogue-xml', xmlImport
-  actionsProvider.registerActionInRole 'global-import-xml', actionsProvider.ROLE_GLOBAL_ACTION, xmlImport
-
-
-
-
-  actionsProvider.registerActionInRole 'favorite-element', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'messages', '$state', 'security', 'catalogueElementResource', 'modelCatalogueApiRoot', 'enhance', 'rest', ($scope, messages, $state, security, catalogueElementResource, modelCatalogueApiRoot, enhance, rest) ->
+  actionsProvider.registerActionInRoles 'favorite-element',[actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'messages', '$state', 'security', 'catalogueElementResource', 'modelCatalogueApiRoot', 'enhance', 'rest', ($scope, messages, $state, security, catalogueElementResource, modelCatalogueApiRoot, enhance, rest) ->
     elementPresent = $scope.element and angular.isFunction($scope.element.getResourceName) and angular.isFunction($scope.element.getElementTypeName) and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('catalogueElement')
 
     return undefined if not elementPresent
@@ -219,7 +111,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerActionInRole 'archive-batch', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
+  actionsProvider.registerActionInRoles 'archive-batch',[actionsProvider.ROLE_ITEM_ACTION], ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
     return undefined unless $scope.element and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('batch') or $scope.batch
     return undefined if not security.hasRole('CURATOR')
 
@@ -283,7 +175,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerActionInRole 'transform-csv', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'security', ($scope, messages, security) ->
+  actionsProvider.registerActionInRoles 'transform-csv',[actionsProvider.ROLE_ITEM_ACTION], [ '$scope', 'messages', 'security', ($scope, messages, security) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
     return undefined if not $scope.element.isInstanceOf('csvTransformation')
@@ -300,7 +192,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerActionInRole 'refresh-asset', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', '$rootScope', 'catalogueElementResource', ($scope, $rootScope, catalogueElementResource) ->
+  actionsProvider.registerActionInRoles 'refresh-asset',[actionsProvider.ROLE_ITEM_ACTION], [ '$scope', '$rootScope', 'catalogueElementResource', ($scope, $rootScope, catalogueElementResource) ->
     return undefined if $scope.element?.elementType != 'org.modelcatalogue.core.Asset'
     return undefined if $scope.element.status != 'PENDING'
 
@@ -348,7 +240,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerActionInRoles 'export', [actionsProvider.ROLE_LIST_ACTION, actionsProvider.ROLE_ITEM_ACTION, actionsProvider.ROLE_LIST_HEADER_ACTION], ['$scope', 'security', ($scope, security)->
+  actionsProvider.registerActionInRoles 'export', [actionsProvider.ROLE_LIST_ACTION, actionsProvider.ROLE_ITEM_ACTION, actionsProvider.ROLE_NAVIGATION, actionsProvider.ROLE_LIST_HEADER_ACTION], ['$scope', 'security', ($scope, security)->
     return undefined unless security.hasRole('VIEWER')
     return undefined unless $scope.list or $scope.element
     if $scope.list
@@ -394,7 +286,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
             return true
         }
 
-  actionsProvider.registerChildActionInRole 'export', 'catalogue-element-export-specific-reports', actionsProvider.ROLE_ITEM_ACTION, ['$scope', '$window', 'enhance', 'rest', ($scope, $window, enhance, rest) ->
+  actionsProvider.registerChildActionInRoles 'export', 'catalogue-element-export-specific-reports',[actionsProvider.ROLE_ITEM_ACTION], ['$scope', '$window', 'enhance', 'rest', ($scope, $window, enhance, rest) ->
     return undefined if not $scope.element
 
     {
@@ -610,7 +502,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
 
-  actionsProvider.registerActionInRoles 'reload-actions', [ROLE_ACTION_ACTION, actionsProvider.ROLE_ITEM_ACTION], ['$scope', ($scope) ->
+  actionsProvider.registerActionInRoles 'reload-actions', [ROLE_ACTION_ACTION, actionsProvider.ROLE_ITEM_ACTION, actionsProvider.ROLE_NAVIGATION], ['$scope', ($scope) ->
     return undefined unless angular.isFunction($scope.reload) and ($scope.action and $scope.action.state == 'PERFORMING') or ($scope.batch and not $scope.action)
 
     {
@@ -680,7 +572,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
 
-  actionsProvider.registerActionInRole 'run-all-actions-in-batch', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'messages', 'modelCatalogueApiRoot', 'enhance', 'rest', '$timeout', 'security', ($scope, messages, modelCatalogueApiRoot, enhance, rest, $timeout, security) ->
+  actionsProvider.registerActionInRoles 'run-all-actions-in-batch',[actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'messages', 'modelCatalogueApiRoot', 'enhance', 'rest', '$timeout', 'security', ($scope, messages, modelCatalogueApiRoot, enhance, rest, $timeout, security) ->
     return undefined if not security.hasRole('CURATOR')
     return undefined unless $scope.element and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('batch') or $scope.batch
 

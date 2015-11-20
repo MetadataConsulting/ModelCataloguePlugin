@@ -45,58 +45,9 @@ angular.module('mc.core.ui.states', [
   $rootScope.$on 'resourceNotFound', ->
     messages.error 'Selected resource cannot be found in the catalogue.'
     if $stateParams.resource
-      $state.go 'mc.resource.list', resource: $stateParams.resource
+      $state.go 'simple.resource.list', resource: $stateParams.resource
     else
       $state.go 'landing'
-])
-
-.config(['$provide', ($provide) ->
-  fixStateParams = (state, params) ->
-    return params if not state
-
-    stateName = if angular.isString(state) then state else state.name
-
-    return params if not state
-
-    if stateName?.startsWith 'mc'
-      return {dataModelId: 'catalogue' } if not params
-
-      if not params.dataModelId
-        params.dataModelId = 'catalogue'
-
-    return params
-
-
-  $provide.decorator('$state', ['$delegate', ($delegate) ->
-    originalHref = $delegate.href
-
-    $delegate.href = (stateOrName, params, options) ->
-      return originalHref(stateOrName, fixStateParams(stateOrName, params), options)
-
-
-    originalTransitionTo = $delegate.transitionTo
-
-    $delegate.transitionTo = (to, toParams, options) ->
-      return originalTransitionTo(to, fixStateParams(to, toParams), options)
-
-    $delegate
-
-  ])
-
-])
-
-# keep track of the data model used
-.run(['$rootScope', 'catalogueElementResource', ($rootScope, catalogueElementResource) ->
-  $rootScope.$on '$stateChangeStart', (event, toState, toParams, fromState, fromParams) ->
-    if toParams.dataModelId isnt fromParams.dataModelId or (toParams.dataModelId and not $rootScope.currentDataModel)
-      if not toParams.dataModelId or toParams.dataModelId is 'catalogue'
-        $rootScope.currentDataModel = undefined
-        $rootScope.$broadcast 'redrawContextualActions'
-        return
-      if toParams.dataModelId isnt $rootScope.currentDataModel?.id?.toString
-        catalogueElementResource('dataModel').get(toParams.dataModelId).then (dataModel) ->
-          $rootScope.currentDataModel = dataModel
-          $rootScope.$broadcast 'redrawContextualActions'
 ])
 
 .config([ '$modalProvider', ($modalProvider) ->

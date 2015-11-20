@@ -198,8 +198,8 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             if args.parent
               $scope.parents.push {element: args.parent, name: args.parent.name, metadata: orderedMapEnhancer.emptyOrderedMap()}
 
-            if catalogue.isFilteredByDataModel()
-              $scope.dataModels.push  {element: catalogue.getCurrentDataModel(), name: catalogue.getCurrentDataModel().name}
+            if $scope.currentDataModel
+              $scope.dataModels.push  {element: $scope.currentDataModel, name: $scope.currentDataModel.name}
 
           $scope.reset()
 
