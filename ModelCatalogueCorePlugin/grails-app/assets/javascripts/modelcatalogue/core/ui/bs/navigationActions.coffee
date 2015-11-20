@@ -1,7 +1,6 @@
 angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.util.security']).config ['actionsProvider', 'names', (actionsProvider, names)->
 
   RESOURCES = [
-    'dataModel'
     'dataClass'
     'dataElement'
     'dataType'
@@ -177,7 +176,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     action
   ]
 
-  actionsProvider.registerChildAction 'currentDataModel', 'all-data-models', ['security', '$scope', '$state', 'catalogue', (security, $scope, $state, catalogue) ->
+  actionsProvider.registerActionInRole 'all-data-models', actionsProvider.ROLE_GLOBAL_ACTION ,['security', '$scope', '$state', 'catalogue', (security, $scope, $state, catalogue) ->
     return undefined if not security.isUserLoggedIn()
 
     {
@@ -185,7 +184,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
       label: 'Show All Data Models'
       icon:  'fa fa-book fa-fw'
       action: ->
-        $state.go 'mc.resource.list', {resource: 'dataModel', dataModelId: 'catalogue', status: undefined }
+        $state.go 'dataModels'
     }
   ]
 

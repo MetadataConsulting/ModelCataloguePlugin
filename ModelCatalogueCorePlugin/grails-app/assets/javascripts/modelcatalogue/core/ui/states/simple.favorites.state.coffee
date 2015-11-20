@@ -1,8 +1,8 @@
-angular.module('mc.core.ui.states.mc.favorites', ['mc.core.ui.states.controllers.FavoritesCtrl'])
+angular.module('mc.core.ui.states.simple.favorites', ['mc.core.ui.states.controllers.FavoritesCtrl'])
 
 .config(['$stateProvider', ($stateProvider) ->
 
-    $stateProvider.state 'mc.favorites', {
+    $stateProvider.state 'simple.favorites', {
       url: '/favorites'
       templateUrl: 'modelcatalogue/core/ui/state/favorites.html'
       onEnter: ['applicationTitle', (applicationTitle) ->

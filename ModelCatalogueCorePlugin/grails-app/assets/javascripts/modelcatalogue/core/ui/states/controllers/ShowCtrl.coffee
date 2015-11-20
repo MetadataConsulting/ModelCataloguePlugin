@@ -2,6 +2,10 @@ angular.module('mc.core.ui.states.controllers.ShowCtrl', ['ui.router', 'mc.util.
   '$scope', '$stateParams', '$state', 'element', '$rootScope', 'enhance',
   ($scope ,  $stateParams ,  $state ,  element ,  $rootScope ,  enhance) ->
 
+    if (not $stateParams.dataModelId or $stateParams.dataModelId == 'catalogue') and element.getDataModelId()
+      $state.go '.', {dataModelId: element.getDataModelId()}, {reload: true}
+      return
+
     listEnhancer = enhance.getEnhancer('list')
 
     $scope.element = element
