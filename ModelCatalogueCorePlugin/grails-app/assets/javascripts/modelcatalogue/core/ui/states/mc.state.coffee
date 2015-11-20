@@ -8,6 +8,9 @@ angular.module('mc.core.ui.states.mc', ['mc.core.ui.states.bs.mc.html', 'mc.core
         "":
           templateUrl: 'modelcatalogue/core/ui/state/mc.html'
           controller: 'mc.core.ui.states.controllers.DataModelTreeCtrl'
+
+        'navbar-left':
+          template: '<contextual-menu></contextual-menu><div ui-view="navbar-left"></div>'
       resolve:
         currentDataModel: ['catalogue', '$rootScope', '$stateParams', '$q', 'catalogueElementResource', (catalogue, $rootScope, $stateParams, $q, catalogueElementResource) ->
           if !$stateParams.dataModelId or $stateParams.dataModelId == 'catalogue'

@@ -162,7 +162,7 @@ changes.config ['actionsProvider', (actionsProvider)->
   ]
 
 
-  actionsProvider.registerActionInRoles 'open-discourse', [actionsProvider.ROLE_SIDENAV, actionsProvider.ROLE_GLOBAL_ACTIONS], ['discourseUrl', 'discourseSSOEnabled', '$window', 'security', (discourseUrl, discourseSSOEnabled, $window, security) ->
+  actionsProvider.registerChildAction 'user-menu', 'open-discourse', ['discourseUrl', 'discourseSSOEnabled', '$window', 'security', (discourseUrl, discourseSSOEnabled, $window, security) ->
     return undefined unless security.isUserLoggedIn()
     return undefined unless discourseUrl
 

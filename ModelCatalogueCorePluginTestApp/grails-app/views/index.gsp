@@ -180,7 +180,6 @@
         </div>
 
         <div class="container-fluid container-main">
-            <sidenav></sidenav>
             <div class="row content-row">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                     <div id="jserrors"></div>

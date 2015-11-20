@@ -22,38 +22,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
 
 
   angular.forEach RESOURCES, (resource, index) ->
-    goToResource = ['$rootScope', '$scope', '$state', '$stateParams', 'names', 'security', 'messages', 'catalogue', ($rootScope, $scope, $state, $stateParams, names, security, messages, catalogue) ->
-      return undefined if not security.hasRole('VIEWER')
-      return undefined if (resource == 'batch' or resource == 'relationshipType' or resource == 'csvTransformation') and not security.hasRole('CURATOR')
 
-      label = names.getNaturalName(resource) + 's'
-
-      if resource == 'batch'
-        label = 'Actions'
-      else if resource == 'csvTransformation'
-        label = 'CSV Transformations'
-      else if resource == 'dataClass'
-        label = 'Data Classes'
-
-      action = {
-        active:     $stateParams.resource == resource || $stateParams.resource == 'dataModel' and $state.current?.name?.startsWith('landing')
-        icon:       catalogue.getIcon(resource)
-        position:   index * 100
-        label:      label
-        currentStatus: if resource isnt 'dataModel' then $rootScope.currentDataModel?.status?.toLowerCase() else undefined
-        action: ->
-
-          $state.go 'mc.resource.list', {resource: resource, status: @currentStatus, dataModelId: $stateParams.dataModelId}, {inherit: false}
-      }
-
-      $scope.$on '$stateChangeSuccess', (ignored, state, toParams) ->
-        action.active = toParams.resource == resource || toParams.resource == 'dataModel' and state.current?.name?.startsWith('landing')
-        action.currentStatus = toParams.status if toParams.hasOwnProperty('status') and resource isnt 'dataModel'
-
-      action
-    ]
-    actionsProvider.registerActionInRole  'sidenav-' + resource, actionsProvider.ROLE_SIDENAV , goToResource
-    actionsProvider.registerActionInRole 'global-list-' + resource, actionsProvider.ROLE_GLOBAL_ACTION, goToResource
     unless resource == 'batch'
       actionsProvider.registerActionInRole 'global-create-' + resource, actionsProvider.ROLE_GLOBAL_ACTION, ['$scope', 'names', 'security', 'messages', '$state', '$log', ($scope, names, security, messages, $state, $log) ->
         return undefined if not security.hasRole('CURATOR')
@@ -118,26 +87,6 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
 
     action
   ]
-
-
-  actionsProvider.registerActionInRoles 'cart', [actionsProvider.ROLE_SIDENAV, actionsProvider.ROLE_GLOBAL_ACTION], ['security', '$state', '$rootScope',  (security, $state, $rootScope) ->
-    return undefined if not security.isUserLoggedIn()
-
-    action = {
-      position:   10000
-      label:      'Favorites'
-      icon:       'fa fa-star'
-      active:     $state.current.name == 'mc.favorites'
-      action: ->
-        $state.go 'mc.favorites', {dataModelId: $rootScope.currentDataModel?.id}
-
-    }
-    $rootScope.$on '$stateChangeSuccess', (ignored, state) ->
-      action.active = state.name == 'mc.favorites'
-
-    action
-  ]
-
 
   actionsProvider.registerActionInRole 'currentDataModel', actionsProvider.ROLE_NAVIGATION, ['security', '$scope', '$state', '$rootScope', (security, $scope, $state, $rootScope) ->
     return undefined if not security.isUserLoggedIn()

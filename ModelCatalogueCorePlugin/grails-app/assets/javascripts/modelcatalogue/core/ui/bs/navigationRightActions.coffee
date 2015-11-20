@@ -11,7 +11,19 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     }
   ]
 
+  actionsProvider.registerActionInRole 'fast-action', actionsProvider.ROLE_NAVIGATION_RIGHT, ['security', (security) ->
+    {
+    position:   -5000
+    icon:       'fa fa-flash'
+    label:      'Fast Actions'
+    iconOnly:   true
+    action: ->
+        # TODO implement with the new admin state
+    }
+  ]
+
   actionsProvider.registerActionInRole 'user-menu', actionsProvider.ROLE_NAVIGATION_RIGHT, ['security', (security) ->
+    return undefined unless security.isUserLoggedIn()
     {
       position:   10000
       icon:       'fa fa-user'
@@ -22,9 +34,8 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   ]
 
   actionsProvider.registerChildAction 'user-menu', 'user-login-right', ['security', (security) ->
-    return undefined if security.isUserLoggedIn()
     {
-      position:   10000
+      position:   100000
       icon:       'fa fa-sign-in fa-fw'
       label:      'Log In'
       action: ->
@@ -35,7 +46,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   actionsProvider.registerChildAction 'user-menu', 'user-login-right', ['security', (security) ->
     return undefined unless security.isUserLoggedIn()
     {
-      position:   10000
+      position:   100000
       icon:       'fa fa-sign-out fa-fw'
       label:      'Log Out'
       action: ->
@@ -43,19 +54,21 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     }
   ]
 
-
-
-  actionsProvider.registerChildAction 'user-menu', 'user-favorites', ['security', (security) ->
-    return undefined unless security.isUserLoggedIn()
-    {
+  actionsProvider.registerChildAction 'user-menu', 'user-favorites', ['security', '$state', '$rootScope',  (security, $state, $rootScope) ->
+    return undefined if not security.isUserLoggedIn()
+    action =
       position:   1000
-      icon:       'fa fa-star fa-fw'
       label:      'Favorites'
+      icon:       'fa fa-star fa-fw'
+      active:     $state.current.name == 'simple.favorites'
       action: ->
-        # TODO implement with the new admin state
-    }
-  ]
+        $state.go 'simple.favorites'
 
+    $rootScope.$on '$stateChangeSuccess', (ignored, state) ->
+        action.active = state.name == 'simple.favorites'
+
+    action
+  ]
 
 
   actionsProvider.registerActionInRole 'admin-menu', actionsProvider.ROLE_NAVIGATION_RIGHT, ['security', (security) ->
