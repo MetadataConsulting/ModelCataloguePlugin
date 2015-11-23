@@ -1,12 +1,21 @@
 angular.module('mc.core.ui.states.mc.resource.diff', ['mc.core.ui.states.controllers.DiffCtrl']).config(['$stateProvider', ($stateProvider) ->
 
     $stateProvider.state 'mc.resource.diff', {
+      views:
+        "":
+          templateUrl: 'modelcatalogue/core/ui/state/diff.html'
+          controller: 'mc.core.ui.states.controllers.DiffCtrl'
+
+        'navbar-left@':
+          template: '<contextual-menu role="item"></contextual-menu>'
+          controller: 'mc.core.ui.states.controllers.ElementsCtrl'
+
       url: '/diff/{ids:(?:\\d+)(?:\\~\\d+)+}'
-      templateUrl: 'modelcatalogue/core/ui/state/diff.html'
+
       resolve:
         elements: ['$stateParams','catalogueElementResource', '$q', ($stateParams, catalogueElementResource, $q) ->
           $q.all (catalogueElementResource($stateParams.resource).get(id) for id in $stateParams.ids.split('~'))
         ]
-      controller: 'mc.core.ui.states.controllers.DiffCtrl'
+
     }
 ])

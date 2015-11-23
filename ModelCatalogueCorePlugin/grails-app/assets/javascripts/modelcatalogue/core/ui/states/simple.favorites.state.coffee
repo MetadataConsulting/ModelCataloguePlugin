@@ -3,11 +3,21 @@ angular.module('mc.core.ui.states.simple.favorites', ['mc.core.ui.states.control
 .config(['$stateProvider', ($stateProvider) ->
 
     $stateProvider.state 'simple.favorites', {
+      views:
+        "":
+          templateUrl: 'modelcatalogue/core/ui/state/favorites.html'
+          controller: 'mc.core.ui.states.controllers.FavoritesCtrl'
+
+        'navbar-left@':
+          template: '<contextual-menu role="list"></contextual-menu>'
+          controller: 'mc.core.ui.states.controllers.FavoritesCtrl'
+
       url: '/favorites'
-      templateUrl: 'modelcatalogue/core/ui/state/favorites.html'
+
       onEnter: ['applicationTitle', (applicationTitle) ->
         applicationTitle "Favorites"
       ]
+
       resolve:
         user: [ 'security', 'catalogueElementResource', '$q', (security, catalogueElementResource, $q) ->
           userId = security.getCurrentUser()?.id
@@ -15,7 +25,7 @@ angular.module('mc.core.ui.states.simple.favorites', ['mc.core.ui.states.control
 
           catalogueElementResource('user').get(userId)
         ]
-      controller: 'mc.core.ui.states.controllers.FavoritesCtrl'
+
 
     }
 

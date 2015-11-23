@@ -2,7 +2,14 @@ angular.module('mc.core.ui.states.mc.search', ['mc.core.ui.states.controllers.Li
 
     $stateProvider.state('mc.search', {
       url: "/search/{q}",
-      templateUrl: 'modelcatalogue/core/ui/state/list.html'
+      views:
+        "":
+          templateUrl: 'modelcatalogue/core/ui/state/list.html'
+          controller: 'mc.core.ui.states.controllers.ListCtrl'
+
+        'navbar-left@':
+          template: '<contextual-menu role="list"></contextual-menu>'
+          controller: 'mc.core.ui.states.controllers.ListCtrl'
       resolve: {
         list: ['$stateParams','modelCatalogueSearch', ($stateParams, modelCatalogueSearch) ->
           $stateParams.resource = "searchResult"
@@ -13,7 +20,6 @@ angular.module('mc.core.ui.states.mc.search', ['mc.core.ui.states.controllers.Li
           return modelCatalogueSearch($stateParams.q, params)
         ]
       },
-      controller: 'mc.core.ui.states.controllers.ListCtrl'
     })
 
 ])

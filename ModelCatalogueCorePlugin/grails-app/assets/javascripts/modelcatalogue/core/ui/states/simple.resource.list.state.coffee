@@ -6,8 +6,15 @@ angular.module('mc.core.ui.states.simple.resource.list', ['mc.core.ui.states.con
 
     $stateProvider.state 'simple.resource.list', {
       url: '/all?page&order&sort&status&q&max&classification&display'
+      views:
+        "":
+          templateUrl: 'modelcatalogue/core/ui/state/list.html'
+          controller: 'mc.core.ui.states.controllers.ListCtrl'
 
-      templateUrl: 'modelcatalogue/core/ui/state/list.html'
+        'navbar-left@':
+          template: '<contextual-menu role="list"></contextual-menu>'
+          controller: 'mc.core.ui.states.controllers.ListCtrl'
+
 
       resolve:
         list: ['$stateParams', 'catalogueElementResource', ($stateParams, catalogueElementResource) ->
@@ -33,7 +40,6 @@ angular.module('mc.core.ui.states.simple.resource.list', ['mc.core.ui.states.con
           catalogueElementResource($stateParams.resource).list(params)
         ]
 
-      controller: 'mc.core.ui.states.controllers.ListCtrl'
     }
 
 ])

@@ -8,11 +8,14 @@ angular.module('mc.core.ui.states.simple.resource.show', ['mc.core.ui.states.con
           templateUrl: 'modelcatalogue/core/ui/state/show.html'
           controller: 'mc.core.ui.states.controllers.ShowCtrl'
 
-#        'navbar-left@':
-#          template: '<contextual-menu></contextual-menu>'
-#        'navbar-right@':
-#          template: '<contextual-actions role="item"></contextual-actions>'
-#          controller: 'mc.core.ui.states.controllers.ElementCtrl'
+      views:
+        "":
+          templateUrl: 'modelcatalogue/core/ui/state/show.html'
+          controller: 'mc.core.ui.states.controllers.ShowCtrl'
+
+        'navbar-left@':
+          template: '<contextual-menu role="item"></contextual-menu>'
+          controller: 'mc.core.ui.states.controllers.ElementCtrl'
 
       resolve:
         element: ['$stateParams','catalogueElementResource', ($stateParams, catalogueElementResource) ->
