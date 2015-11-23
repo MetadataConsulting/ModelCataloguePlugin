@@ -4,8 +4,8 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     return undefined unless security.isUserLoggedIn()
     {
       position:   -10000
-      icon:       'fa fa-search fa-2x'
-      label:      'Search (Shift + Space)'
+      icon:       'fa fa-search fa-fw fa-2x-if-wide'
+      label:      'Search'
       iconOnly:   true
       action: ->
         # TODO: act differently when not in mc.* state
@@ -18,8 +18,8 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     return undefined unless security.isUserLoggedIn()
     {
       position:   -5000
-      icon:       'fa fa-flash fa-2x'
-      label:      'Fast Actions (Ctrl + Space)'
+      icon:       'fa fa-flash fa-fw fa-2x-if-wide'
+      label:      'Fast Actions'
       iconOnly:   true
       action: ->
         messages.prompt null, null, type: 'search-action'
@@ -30,7 +30,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     return undefined unless security.isUserLoggedIn()
     {
       position:   10000
-      icon:       'fa fa-user fa-2x'
+      icon:       'fa fa-user fa-fw fa-2x-if-wide'
       abstract:   true
       label:      'User'
       iconOnly:   true
@@ -79,7 +79,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     return undefined unless security.hasRole('ADMIN')
     {
       position:   5000
-      icon:       'fa fa-cog fa-2x'
+      icon:       'fa fa-cog fa-fw fa-2x-if-wide'
       label:      'Admin'
       iconOnly:   true
     }
@@ -148,7 +148,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     return undefined unless security.hasRole('CURATOR')
     {
       position:   1000
-      icon:       'fa fa-object-group fa-2x'
+      icon:       'fa fa-object-group fa-2x-if-wide'
       label:      'Curator'
       iconOnly:   true
     }
@@ -172,9 +172,9 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
       return undefined if $scope.resource != 'asset'
 
       {
-        position: 100
+        position: 10000
         label: "Import"
-        icon: 'fa fa-cloud-upload'
+        icon: 'fa fa-upload'
         type: 'success'
       }
   ]
@@ -194,7 +194,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   loincImport = ['$scope', 'messages', ($scope, messages) -> {
     position: 13001
     label: "Import Loinc"
-    icon:  'fa fa-cloud-upload fa-fw'
+    icon:  'fa fa-upload fa-fw'
     action: ->
       messages.prompt('Import Loinc File', '', type: 'new-loinc-import')
   }]
@@ -205,7 +205,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   excelImport = ['$scope', 'messages', ($scope, messages) -> {
     position: 13002
     label:  "Import Excel"
-    icon:  'fa fa-cloud-upload fa-fw'
+    icon:  'fa fa-upload fa-fw'
     action: ->
       messages.prompt('Import Excel File', '', type: 'new-excel-import')
   }]
@@ -216,7 +216,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   oboImport = ['$scope', 'messages', ($scope, messages) -> {
     position: 13003
     label: "Import OBO"
-    icon:  'fa fa-cloud-upload fa-fw'
+    icon:  'fa fa-upload fa-fw'
     action: ->
       messages.prompt('Import OBO File', '', type: 'new-obo-import')
   }]
@@ -227,7 +227,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   umlImport = ['$scope', 'messages', ($scope, messages) -> {
     position: 13004
     label: "Import Star Uml"
-    icon:  'fa fa-cloud-upload fa-fw'
+    icon:  'fa fa-upload fa-fw'
     action: ->
       messages.prompt('Import Star Uml File', '', type: 'new-umlj-import')
   }]
@@ -238,7 +238,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   mcImport = ['$scope', 'messages', ($scope, messages) -> {
     position: 13005
     label: "Import MC"
-    icon:  'fa fa-cloud-upload fa-fw'
+    icon:  'fa fa-upload fa-fw'
     action: ->
       messages.prompt('Import Model Catalogue DSL File', '', type: 'new-mc-import')
   }]
@@ -250,7 +250,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   xmlImport = ['$scope', 'messages', ($scope, messages) -> {
     position: 13006
     label: "Import Catalogue XML"
-    icon:  'fa fa-cloud-upload fa-fw'
+    icon:  'fa fa-upload fa-fw'
     action: ->
       messages.prompt('Import Model Catalogue XML File', '', type: 'new-catalogue-xml-import')
   }]

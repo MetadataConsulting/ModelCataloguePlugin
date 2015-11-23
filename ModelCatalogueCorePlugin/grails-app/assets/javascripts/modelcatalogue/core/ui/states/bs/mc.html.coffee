@@ -7,7 +7,7 @@ angular.module('mc.core.ui.states.bs.mc.html', []).run(['$templateCache', ($temp
           <div class="split-view-content">
             <div class="row">
               <div class="col-md-12">
-                <h3 class="trucate"><span class="text-muted"><catalogue-element-icon type="'dataModel'"></catalogue-element-icon></span> {{currentDataModel.name}}</h3>
+                <h3 class="truncate"><span class="text-muted"><catalogue-element-icon type="'dataModel'"></catalogue-element-icon></span> {{currentDataModel.name}}</h3>
               </div>
               <div class="col-md-12">
                 <catalogue-element-treeview list="elementAsList" descend="'content'" on-select="onTreeviewSelected($element)"></catalogue-element-treeview>

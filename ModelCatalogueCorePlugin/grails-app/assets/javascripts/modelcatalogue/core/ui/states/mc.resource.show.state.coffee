@@ -10,7 +10,7 @@ angular.module('mc.core.ui.states.mc.resource.show', ['mc.core.ui.states.control
 
         'navbar-left@':
           template: '<contextual-menu role="item"></contextual-menu>'
-          controller: 'mc.core.ui.states.controllers.ElementCtrl'
+          controller: 'mc.core.ui.states.controllers.ElementWithDataModelCtrl'
 
       resolve:
         element: ['$stateParams','catalogueElementResource', ($stateParams, catalogueElementResource) ->

@@ -51,12 +51,4 @@ angular.module('mc.core.ui.states.controllers.DashboardCtrl', ['ui.router', 'mc.
     # context path doesn't end with slash
         "#{security.contextPath}/assets#{relativePath}"
 
-
-    $scope.dataModelHref = (dataModel) ->
-      $state.href 'mc.resource.list', {dataModelId: dataModel.id, resource: 'dataClass'}
-
-    $scope.createDataModel = ->
-      messages.prompt("New Data Model", '', {type: 'create-dataModel', create: 'dataModel'}).then (element)->
-        catalogue.select(element)
-
 ])

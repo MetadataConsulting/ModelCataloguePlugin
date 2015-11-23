@@ -28,7 +28,7 @@ angular.module('mc.core.ui.bs.statesActions', ['mc.util.ui.actions']).config ['a
       return undefined if not angular.isFunction $scope.element.isInstanceOf
 
     action = {
-      position:   2000
+      position:   10000
       label:      'Status'
       icon:       'fa fa-check-circle'
       type:       'primary'

@@ -48,6 +48,7 @@ angular.module('mc.core.ui.bs.modalPromptMeasurementUnitEdit', ['mc.util.message
           $scope.original = args.element ? {}
           $scope.messages = messages.createNewMessages()
           $scope.create   = args.create
+          $scope.currentDataModel = args.currentDataModel
 
           $scope.hasChanged   = ->
             $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or $scope.copy.symbol != $scope.original.symbol or $scope.copy.modelCatalogueId != $scope.original.modelCatalogueId or not angular.equals($scope.original.dataModels ? {}, $scope.copy.dataModels ? {})

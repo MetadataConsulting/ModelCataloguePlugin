@@ -28,7 +28,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
     {
       show:       true
-      position:   3000
+      position:   0
       label:      names.getNaturalName(names.getPropertyNameFromQualifier($scope.element.elementType))
       icon:       catalogue.getIcon($scope.element.elementType)
       type:       'primary'
@@ -45,7 +45,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not security.hasRole('CURATOR')
 
     {
-      position:   4000
+      position:   -1000
       label:      'Edit'
       icon:       'fa fa-fw fa-edit'
       type:       'primary'

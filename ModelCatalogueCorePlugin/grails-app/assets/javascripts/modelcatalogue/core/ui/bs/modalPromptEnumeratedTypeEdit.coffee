@@ -81,6 +81,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
           $scope.original = args.element ? $scope.newEntity()
           $scope.messages = messages.createNewMessages()
           $scope.ruleCollapsed  = not $scope.copy.rule
+          $scope.currentDataModel = args.currentDataModel
           $scope.create   = args.create
           if args.create
             $scope.subtype = args.create

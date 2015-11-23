@@ -43,13 +43,22 @@ angular.module('mc.util.ui.contextualMenu', ['mc.util.ui.bs.menuItemDropdown','m
 
       $element.empty()
       for action in actions.getActions($scope.scope ? $scope.$parent, $scope.role ? actions.ROLE_NAVIGATION)
+        if action.children
+          for child in action.children
+            childClasses = []
+            childClasses.push 'text-muted navbar-dropdown-heading' if child.heading
+            childClasses.push 'active' if child.active
+            childClasses.push 'disabled' if child.disabled
+
+            child.$$class = childClasses.join ' '
+
         watches = []
-        if action.active and action.disabled
-          action.$$class = 'active disabled'
-        else if action.active
-          action.$$class = 'active'
-        else if action.disabled
-          action.$$class = 'disabled'
+        classes = []
+        classes.push('active') if action.active
+        classes.push('disabled') if action.disabled
+        classes.push('icon-only') if action.iconOnly
+
+        action.$$class = classes.join(' ')
 
         newScope = $scope.$new()
         newScope.action = action

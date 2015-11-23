@@ -50,6 +50,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'ngFil
           $scope.original = args.element ? {}
           $scope.messages = messages.createNewMessages()
           $scope.create   = args.create
+          $scope.currentDataModel = args.currentDataModel
 
           angular.extend(this, $controller('withClassificationCtrlMixin', {$scope: $scope}))
 

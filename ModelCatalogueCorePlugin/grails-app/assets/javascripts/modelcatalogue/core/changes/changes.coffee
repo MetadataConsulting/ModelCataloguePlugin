@@ -56,7 +56,7 @@ changes.config ['enhanceProvider', (enhanceProvider)->
 
     getIconForChangeType = (change) ->
       switch change.type
-        when 'EXTERNAL_UPDATE' then """fa fa-cloud-upload fa-fw text-success"""
+        when 'EXTERNAL_UPDATE' then """fa fa-upload fa-fw text-success"""
         when 'NEW_ELEMENT_CREATED' then """fa fa-plus fa-fw text-success"""
         when 'NEW_VERSION_CREATED' then """fa fa-arrow-circle-up fa-fw text-success"""
         when 'PROPERTY_CHANGED' then """fa fa-edit fa-fw text-info"""
@@ -131,7 +131,7 @@ changes.config ['columnsProvider', 'names', (columnsProvider, names)->
 
   getIconForChangeType = (change) ->
     switch change.type
-      when 'EXTERNAL_UPDATE' then """<span title="External Change"><span class="#{change.changed.getIcon()} fa-fw text-success"></span> <span class="fa fa-cloud-upload fa-fw text-success"></span></span>"""
+      when 'EXTERNAL_UPDATE' then """<span title="External Change"><span class="#{change.changed.getIcon()} fa-fw text-success"></span> <span class="fa fa-upload fa-fw text-success"></span></span>"""
       when 'NEW_ELEMENT_CREATED' then """<span title="New Element Created"><span class="#{change.changed.getIcon()} fa-fw text-success"></span> <span class="fa fa-plus fa-fw text-success"></span></span>"""
       when 'NEW_VERSION_CREATED' then """<span title="New Version Created"><span class="#{change.changed.getIcon()} fa-fw text-success"></span> <span class="fa fa-arrow-circle-up fa-fw text-success"></span></span>"""
       when 'PROPERTY_CHANGED' then """<span title="Property Changed"><span class="#{change.changed.getIcon()} fa-fw text-info"></span> <span class="fa fa-edit fa-fw text-info"></span></span>"""

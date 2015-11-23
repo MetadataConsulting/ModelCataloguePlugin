@@ -6,6 +6,7 @@ angular.module('mc.core.ui.bs.saveOrUpdatePublishedElementCtrl', ['mc.core.ui.bs
   $scope.original       = args.element ? {}
   $scope.messages       = messages.createNewMessages()
   $scope.create         = args.create
+  $scope.currentDataModel = args.currentDataModel
 
   angular.extend(this, $controller('withClassificationCtrlMixin', {$scope: $scope}))
   angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))

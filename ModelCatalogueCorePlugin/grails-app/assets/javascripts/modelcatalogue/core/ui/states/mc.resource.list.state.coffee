@@ -10,11 +10,11 @@ angular.module('mc.core.ui.states.mc.resource.list', ['mc.core.ui.states.control
       views:
         "":
           templateUrl: 'modelcatalogue/core/ui/state/list.html'
-          controller: 'mc.core.ui.states.controllers.ListCtrl'
+          controller: 'mc.core.ui.states.controllers.ListWithDataModelCtrl'
 
         'navbar-left@':
           template: '<contextual-menu role="list"></contextual-menu>'
-          controller: 'mc.core.ui.states.controllers.ListCtrl'
+          controller: 'mc.core.ui.states.controllers.ListWithDataModelCtrl'
 
 
       resolve:

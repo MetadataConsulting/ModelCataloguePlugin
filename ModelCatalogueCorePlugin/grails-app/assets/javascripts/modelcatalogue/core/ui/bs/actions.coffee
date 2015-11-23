@@ -33,7 +33,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     icon:       'glyphicon glyphicon-plus-sign'
     type:       'success'
     action:     ->
-      args      = {create: ($scope.resource)}
+      args      = {create: ($scope.resource), currentDataModel: $scope.currentDataModel}
       args.type = if messages.hasPromptFactory('create-' + $scope.resource) then "create-#{$scope.resource}" else "edit-#{$scope.resource}"
 
       if ($scope.resource == 'model' || $scope.resource == 'dataClass') and $scope.element and $scope.elementSelectedInTree
@@ -58,11 +58,12 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     return undefined if not security.getCurrentUser()?.id
 
     action =
-      position: -200
-      label: ''
+      position: -20000
+      label: 'Favorite'
+      iconOnly: true
       icon: 'fa fa-star'
       type: 'primary'
-      watches: 'element.favourite'
+      watches: ['element.favourite', 'element.id']
       action: ->
         catalogueElementResource('user').get(security.getCurrentUser()?.id).then (user) ->
           favourite = $scope.element.favourite
@@ -248,7 +249,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     if $scope.element
       return undefined if not angular.isFunction $scope.element.isInstanceOf
     {
-      position:   1000
+      position:   100000
       label:      'Export'
       icon:       'glyphicon glyphicon-download-alt'
       type:       'primary'
@@ -261,7 +262,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     return undefined if not $state.current.name == 'mc.favorites'
 
     {
-    position:   10000
+    position:   100000
     label:      'Export Favorites'
     action: ->
       $window.open "#{modelCatalogueApiRoot}/user/#{security.getCurrentUser().id}/outgoing/favourite?format=xml"

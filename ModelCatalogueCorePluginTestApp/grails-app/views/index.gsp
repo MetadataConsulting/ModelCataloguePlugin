@@ -164,7 +164,7 @@
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                     <div id="jserrors"></div>
                     <ui-view>
-                    <div class="jumbotron">
+                    <div class="jumbotron leave-10-before">
                         <div>
                             <div class="text-center"><span class="fa fa-fw fa-5x fa-spin fa-spinner"></span></div>
                         </div>
