@@ -247,7 +247,6 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       return undefined if $scope.resource == 'import'
     if $scope.element
       return undefined if not angular.isFunction $scope.element.isInstanceOf
-      return undefined if $scope.element.isInstanceOf 'dataImport'
     {
       position:   1000
       label:      'Export'

@@ -58,8 +58,6 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
           self.show           = () ->
             if self.isInstanceOf "batch"
               return $state.go('mc.actions.show', {id: self.id}); self
-            if self.isInstanceOf "dataImport"
-              return $state.go('mc.dataArchitect.imports.show', {id: self.id}); self
             if self.isInstanceOf "csvTransformation"
               return $state.go('mc.csvTransformations.show', {id: self.id}); self
 
@@ -71,8 +69,6 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
           self.href           = () ->
             if self.isInstanceOf "batch"
               return $state.href('mc.actions.show', {id: self.id})
-            if self.isInstanceOf "dataImport"
-              return $state.href('mc.dataArchitect.imports.show', {id: self.id})
             if self.isInstanceOf "csvTransformation"
               return $state.href('mc.csvTransformations.show', {id: self.id})
 

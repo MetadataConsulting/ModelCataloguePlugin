@@ -41,7 +41,6 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
     return undefined if not angular.isFunction $scope.element.getResourceName
-    return undefined if $scope.element.isInstanceOf 'dataImport'
     return undefined if not messages.hasPromptFactory('create-' + $scope.element.getResourceName()) and not messages.hasPromptFactory('edit-' + $scope.element.getResourceName())
     return undefined if not security.hasRole('CURATOR')
 
@@ -64,7 +63,6 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not $scope.element
     return undefined if not angular.isFunction($scope.element.isInstanceOf)
     return undefined if not $scope.element.isInstanceOf('catalogueElement')
-    return undefined if $scope.element.isInstanceOf 'dataImport'
     return undefined if not security.hasRole('CURATOR')
 
     {

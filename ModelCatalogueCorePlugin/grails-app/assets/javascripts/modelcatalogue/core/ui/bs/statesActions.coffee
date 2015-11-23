@@ -26,7 +26,6 @@ angular.module('mc.core.ui.bs.statesActions', ['mc.util.ui.actions']).config ['a
     return undefined unless $scope.element.status
     if $scope.element
       return undefined if not angular.isFunction $scope.element.isInstanceOf
-      return undefined if $scope.element.isInstanceOf 'dataImport'
 
     action = {
       position:   2000

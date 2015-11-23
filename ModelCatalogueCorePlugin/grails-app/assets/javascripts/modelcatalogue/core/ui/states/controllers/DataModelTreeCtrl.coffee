@@ -1,6 +1,7 @@
 angular.module('mc.core.ui.states.controllers.DataModelTreeCtrl', ['ui.router', 'mc.util.ui']).controller('mc.core.ui.states.controllers.DataModelTreeCtrl', [
   '$scope', 'currentDataModel', 'enhance', '$state' , 'names'
   ($scope ,  currentDataModel ,  enhance ,  $state  ,  names) ->
+    $scope.currentDataModel = currentDataModel
     listEnhancer = enhance.getEnhancer('list')
     $scope.elementAsList = listEnhancer.createSingletonList(currentDataModel) if currentDataModel
 
