@@ -82,8 +82,8 @@ changes.config ['enhanceProvider', (enhanceProvider)->
         getTitleChangeType(this, catalogueElementProperties)
 
       element.name = element.getLabel()
-      element.show = -> $state.go('mc.resource.show', {resource: 'change', id: element.id}); element
-      element.href = -> $state.href('mc.resource.show', {resource: 'change', id: element.id})
+      element.show = -> $state.go('simple.resource.show', {resource: 'change', id: element.id}); element
+      element.href = -> $state.href('simple.resource.show', {resource: 'change', id: element.id})
       element.refresh = -> {then: (callback) -> callback(element) }
       element.getIcon = -> getIconForChangeType(element)
 
