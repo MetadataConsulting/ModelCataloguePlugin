@@ -13,10 +13,12 @@ module.config ['messagesProvider', (messagesProvider)->
               </div>
             </div>
             <div ng-if="actions.length == 0 &amp;&amp; !loading">
+              <div class="leave-10-before"></div>
               <alert type="warning" >No Results</alert>
             </div>
             <div>
               <div class class="list-group">
+                <div class="leave-10-before"></div>
                 <a ng-repeat="action in actions | limitTo:10" class="list-group-item with-pointer item-found" ng-class="{'active': $index == selected}" ng-click="performAction(action)">
                     <h4 class="list-group-item-heading"><span class="fa fa-fw" ng-class="getIcon(action)"></span> {{action.label}}</h4>
                 </a>

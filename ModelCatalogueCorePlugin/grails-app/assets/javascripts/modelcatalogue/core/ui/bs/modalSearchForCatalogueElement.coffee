@@ -15,9 +15,13 @@ module.config ['messagesProvider', (messagesProvider)->
                 <input id="value" class="form-control" ng-model="query" placeholder="Search for #{names.getNaturalName(names.getPropertyNameFromType(args.resource ? 'catalogueElement'))}" ng-model-options="{debounce: 500}" focus-me="true" autofocus='true'>
               </div>
             </div>
-            <div class="search-divider" ng-if="loading || elements.length > 0"></div>
+            <div ng-if="elements.length == 0 &amp;&amp; !loading">
+              <div class="leave-10-before"></div>
+              <alert type="warning" >No Results</alert>
+            </div>
             <div>
-              <div class class="list-group">
+              <div class="list-group">
+                <div class="leave-10-before"></div>
                 <a ng-repeat="element in elements" class="list-group-item with-pointer item-found" ng-class="{'list-group-item-warning': element.status == 'DRAFT', 'list-group-item-info': element.status == 'PENDING', 'list-group-item-danger': element.status == 'DEPRECATED', 'active': $index == selected}" ng-click="$close(element)">
                     <h4 class="list-group-item-heading"><catalogue-element-icon type="element.elementType"></catalogue-element-icon> {{element.classifiedName}}</h4>
                     <p ng-if="element.description" class="list-group-item-text preserve-new-lines modal-search-for-catalogue-element-description">{{element.description}}</p>
