@@ -580,6 +580,12 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
+        if (!instance.instanceOf(DataModel) && !instance.dataModels) {
+            instance.errors.reject 'catalogue.element.at.least.one.data.model', "'$instance.name' has to be declared wihtin a data model"
+            respond instance.errors
+            return
+        }
+
         instance = elementService.finalizeElement(instance)
 
         if (instance.hasErrors()) {

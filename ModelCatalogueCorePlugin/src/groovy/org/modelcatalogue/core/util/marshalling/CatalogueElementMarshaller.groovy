@@ -22,6 +22,7 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
     protected Map<String, Object> prepareJsonMap(el) {
         if (!el) return [:]
         def ret = [
+                dataModel: minimalCatalogueElementJSON(el.dataModel),
                 id: el.id,
                 latestVersionId: el.latestVersionId ?: el.id,
 				modelCatalogueId: el.modelCatalogueId ?: el.defaultModelCatalogueId,
@@ -85,7 +86,15 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
         relationships.bidirectional?.each   addRelationsJson('relationships', el, ret, types, incomingCounts, outgoingCounts)
 
         ret.availableReports = getAvailableReports(el)
-        ret.dataModels = relationshipService.getDataModelsInfo(el)
+
+        // TODO: remove soon
+        ret.dataModels = [ret.dataModel]
+
+        def oldDataModels = relationshipService.getDataModelsInfo(el)
+        if (oldDataModels) {
+            // for a review
+            ret.originalDataModels = oldDataModels
+        }
 
         if (modelCatalogueSecurityService.currentUser) {
             RelationshipType favorite = RelationshipType.readByName('favourite')

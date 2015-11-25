@@ -6,6 +6,7 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.RelationshipDefinition
@@ -29,8 +30,12 @@ class CopyAssociationsAndRelationships {
     }
 
 
-    void copyClassifications(Set<String> createdRelationshipHashes) {
+    void copyClassifications(DataModel dataModel, Set<String> createdRelationshipHashes) {
         relationshipService.eachRelationshipPartitioned(RelationshipDirection.INCOMING, element, RelationshipType.declarationType) { Relationship r ->
+            if (dataModel && dataModel.getLatestVersionId() != r.source.getLatestVersionId()) {
+                // don't copy outside the data model
+                return
+            }
             CatalogueElement source = DraftContext.preferDraft(r.source)
 
             String hash = DraftContext.hashForRelationship(source, draft, RelationshipType.declarationType)
@@ -60,13 +65,13 @@ class CopyAssociationsAndRelationships {
         }
     }
 
-    void copyRelationships(Set<String> createdRelationshipHashes) {
+    void copyRelationships(DataModel dataModel, Set<String> createdRelationshipHashes) {
         if (context.importFriendly && context.isUnderControl(draft)) {
             return
         }
 
-        copyRelationshipsInternal(RelationshipDirection.INCOMING, createdRelationshipHashes)
-        copyRelationshipsInternal(RelationshipDirection.OUTGOING, createdRelationshipHashes)
+        copyRelationshipsInternal(dataModel, RelationshipDirection.INCOMING, createdRelationshipHashes)
+        copyRelationshipsInternal(dataModel, RelationshipDirection.OUTGOING, createdRelationshipHashes)
 
         Class type = context.newType ?: HibernateProxyHelper.getClassWithoutInitializingProxy(draft)
 
@@ -83,13 +88,22 @@ class CopyAssociationsAndRelationships {
     }
 
 
-    void copyRelationshipsInternal(RelationshipDirection direction, Set<String> createdRelationshipHashes) {
-        RelationshipType supersession =  RelationshipType.readByName('supersession')
+    void copyRelationshipsInternal(DataModel dataModel, RelationshipDirection direction, Set<String> createdRelationshipHashes) {
+        RelationshipType supersession =  RelationshipType.supersessionType
+        RelationshipType declaration = RelationshipType.declarationType
 
         List<Relationship> toRemove = []
 
         relationshipService.eachRelationshipPartitioned(direction, element) { Relationship r ->
             if (r.relationshipType == supersession) {
+                return
+            }
+
+            if (r.relationshipType == declaration) {
+                return
+            }
+
+            if (dataModel && r.relationshipType.versionSpecific && r.source.status != ElementStatus.DRAFT && !(dataModel in r.source.dataModels)) {
                 return
             }
 
@@ -146,13 +160,13 @@ class CopyAssociationsAndRelationships {
     }
 
     static boolean isOverriding(Relationship created, Relationship old) {
-        if (!(created.source.status == org.modelcatalogue.core.api.ElementStatus.DRAFT && created.destination.status == org.modelcatalogue.core.api.ElementStatus.DRAFT)) {
+        if (!(created.source.status == ElementStatus.DRAFT && created.destination.status == ElementStatus.DRAFT)) {
             return false
         }
-        if (old.source.status == org.modelcatalogue.core.api.ElementStatus.DRAFT && old.destination.status != org.modelcatalogue.core.api.ElementStatus.DRAFT) {
+        if (old.source.status == ElementStatus.DRAFT && old.destination.status != ElementStatus.DRAFT) {
             return true
         }
-        if (old.source.status != org.modelcatalogue.core.api.ElementStatus.DRAFT && old.destination.status == org.modelcatalogue.core.api.ElementStatus.DRAFT) {
+        if (old.source.status != ElementStatus.DRAFT && old.destination.status == ElementStatus.DRAFT) {
             return true
         }
         return false

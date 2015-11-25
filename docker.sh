@@ -23,7 +23,7 @@ function docker_exec() {
 }
 
 function docker_restart() {
-    docker stop "$1" && mute docker start "$1" &>/dev/null
+    docker stop "$1" && docker start "$1" &>/dev/null
 }
 
 function docker_stop() {

@@ -1,7 +1,7 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Legacy
 
 class DataModel extends CatalogueElement {
@@ -27,7 +27,7 @@ class DataModel extends CatalogueElement {
     static transients = ['namespace']
 
     static relationships = [
-            outgoing: [declaration: 'declares', classificationFilter: 'usedAsFilterBy', 'import': 'imports'],
+            outgoing: [classificationFilter: 'usedAsFilterBy', 'import': 'imports'],
             incoming: ['import': 'importedBy']
     ]
 
@@ -47,4 +47,38 @@ class DataModel extends CatalogueElement {
         // TODO: remove when the class is renamed
         return Legacy.fixModelCatalogueId(super.getDefaultModelCatalogueId(withoutVersion))
     }
+
+    @Override
+    protected PublishingChain prepareDraftChain(PublishingChain chain) {
+        return super.prepareDraftChain(chain).add(this.declares)
+    }
+
+    /**
+     * @deprecated use CatalogueElement#setDataModel(DataModel) instead
+     */
+    void addToDeclares(CatalogueElement element) {
+        element.dataModel = this
+        FriendlyErrors.failFriendlySave(element)
+    }
+
+    /**
+     * @deprecated use CatalogueElement#setDataModel(DataModel) instead
+     */
+    void removeFromDeclares(CatalogueElement element) {
+        element.dataModel = null
+        FriendlyErrors.failFriendlySave(element)
+    }
+
+    List<CatalogueElement> getDeclares() {
+        CatalogueElement.findAllByDataModel(this)
+    }
+
+    Number countDeclares() {
+        CatalogueElement.countByDataModel(this)
+    }
+
+
+
+
+
 }

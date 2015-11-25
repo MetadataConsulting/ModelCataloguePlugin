@@ -1,9 +1,11 @@
 package org.modelcatalogue.core.publishing
 
+import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 
+@Log4j
 abstract class PublishingChain {
 
     protected CatalogueElement published
@@ -76,8 +78,16 @@ abstract class PublishingChain {
     protected void restoreStatus() {
         if (published.status != initialStatus) {
             published.status = initialStatus
-            published.clearErrors()
-            FriendlyErrors.failFriendlySave(published)
+
+            if (published.hasErrors()) {
+                log.error FriendlyErrors.printErrors("Errors while creating drafts for $published:", published.errors)
+                published.clearErrors()
+            }
+            try {
+                FriendlyErrors.failFriendlySave(published)
+            } catch (e) {
+                log.error("Error restoring $published state", e)
+            }
         }
     }
 

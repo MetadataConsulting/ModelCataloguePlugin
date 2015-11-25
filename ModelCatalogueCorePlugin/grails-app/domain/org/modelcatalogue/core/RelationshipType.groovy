@@ -179,6 +179,9 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
         readByName("containment")
     }
 
+    /**
+     * @deprecated no longer used, set the data model directly to the CatalogueElement
+     */
     static RelationshipType getDeclarationType() {
         readByName("declaration")
     }

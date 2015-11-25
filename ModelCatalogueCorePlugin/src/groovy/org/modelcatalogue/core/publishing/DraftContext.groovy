@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.publishing
 
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.RelationshipType
 
@@ -10,6 +11,8 @@ class DraftContext {
     private boolean forceNew
 
     private Set<Long> elementsUnderControl
+
+    private DataModel dataModel
 
     private Class<? extends CatalogueElement> newType
 
@@ -77,14 +80,23 @@ class DraftContext {
 
     void classifyDrafts() {
         pendingRelationshipsTasks.each {
-            it.copyClassifications(createdRelationshipHashes)
+            it.copyClassifications(dataModel, createdRelationshipHashes)
         }
     }
 
     void resolvePendingRelationships() {
         pendingRelationshipsTasks.each {
-            it.copyRelationships(createdRelationshipHashes)
+            it.copyRelationships(dataModel, createdRelationshipHashes)
         }
+    }
+
+    DataModel getDataModel() {
+        return dataModel
+    }
+
+    DraftContext within(DataModel dataModel) {
+        this.dataModel = dataModel
+        return this
     }
 
     static CatalogueElement preferDraft(CatalogueElement element) {

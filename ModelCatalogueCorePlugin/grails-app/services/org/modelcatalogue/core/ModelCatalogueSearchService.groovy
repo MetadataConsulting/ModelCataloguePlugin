@@ -14,6 +14,8 @@ import rx.Observable
  */
 class ModelCatalogueSearchService implements SearchCatalogue {
 
+    static transactional = false
+
     def dataModelService
     def modelCatalogueSecurityService
 

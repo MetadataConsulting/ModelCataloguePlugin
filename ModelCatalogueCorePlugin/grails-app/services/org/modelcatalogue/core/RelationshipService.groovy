@@ -324,7 +324,7 @@ class RelationshipService {
             return []
         }
 
-        if (!element.id) {
+        if (!element.getId()) {
             return []
         }
 

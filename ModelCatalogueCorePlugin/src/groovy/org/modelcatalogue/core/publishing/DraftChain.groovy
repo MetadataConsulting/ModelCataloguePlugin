@@ -52,10 +52,15 @@ class DraftChain extends PublishingChain {
 
         for (Collection<CatalogueElement> elements in queue) {
             for (CatalogueElement element in elements) {
+                if (context.dataModel && !(context.dataModel in element.dataModels)) {
+                    processed << element.id
+                    continue
+                }
                 if (element.id in processed || isUpdatingInProgress(element) || isDeprecated(element)) {
                     continue
                 }
                 processed << element.id
+                log.debug "Requesting draft creation of $element from $published"
                 CatalogueElement draft = element.createDraftVersion(publisher, context)
                 if (draft.hasErrors()) {
                     String message = FriendlyErrors.printErrors("Draft version $draft has errors", draft.errors)

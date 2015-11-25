@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import com.google.common.base.Function
+import com.google.common.collect.ImmutableList
 import com.google.common.collect.Lists
 import grails.util.GrailsNameUtils
 import org.hibernate.StaleObjectStateException
@@ -31,6 +32,8 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     def relationshipService
     def auditService
     def mappingService
+
+    DataModel dataModel
 
     String name
     String description
@@ -65,7 +68,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping, extensions: ExtensionValue]
 
     static relationships = [
-            incoming: [base: 'isBasedOn', declaration: 'declaredWithin', supersession: 'supersedes', favourite: 'isFavouriteOf'],
+            incoming: [base: 'isBasedOn', supersession: 'supersedes', favourite: 'isFavouriteOf'],
             outgoing: [base: 'isBaseFor', attachment: 'hasAttachmentOf', supersession: 'supersededBy'],
             bidirectional: [relatedTo: 'relatedTo', synonym: 'isSynonymFor']
     ]
@@ -79,6 +82,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         archived bindable: false
         versionNumber bindable: false
         latestVersionId bindable: false, nullable: true
+        dataModel nullable: true
     }
 
     static mapping = {
@@ -365,7 +369,14 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         listExtensions()?.find { it.name == name }
     }
 
+    /**
+     * @deprecated use #getDataModel() instead
+     */
     List<DataModel> getDataModels() {
+        // once set, prefer the data model stored in the element
+        if (getDataModel()) {
+            return ImmutableList.of(getDataModel())
+        }
         try {
             return relationshipService.getDataModels(this)
         } catch (StaleObjectStateException stale) {
@@ -568,4 +579,32 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     List<String> getInheritedAssociationsNames() { Collections.emptyList() }
+
+
+    /**
+     * @deprecated use #setDataModel(DataModel) instead
+     */
+    void addToDeclaredWithin(DataModel dataModel) {
+        setDataModel(dataModel)
+        FriendlyErrors.failFriendlySave(this)
+    }
+
+    /**
+     * @deprecated use #setDataModel(DataModel) instead
+     */
+    void removeFromDeclaredWithin(DataModel dataModel) {
+        setDataModel(null)
+        FriendlyErrors.failFriendlySave(this)
+    }
+
+    /**
+     * @deprecated use #getDataModel() instead
+     */
+    List<CatalogueElement> getDeclaredWithin() {
+        getDataModels()
+    }
+
+    Number countDeclaredWithin() {
+
+    }
 }
