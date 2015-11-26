@@ -55,12 +55,13 @@ grails.project.dependency.resolution = {
         // compile 'io.reactivex:rxgroovy:1.0.3'
 
 
-        String mcToolkitVersion = '1.0.0-rename-8'
+        String mcToolkitVersion = '2.0.0-alpha-01'
         compile "org.modelcatalogue:mc-core-api:$mcToolkitVersion"
         compile "org.modelcatalogue:mc-builder-api:$mcToolkitVersion"
         compile "org.modelcatalogue:mc-integration-excel:$mcToolkitVersion"
         compile "org.modelcatalogue:mc-integration-obo:$mcToolkitVersion"
         compile "org.modelcatalogue:mc-integration-xml:$mcToolkitVersion"
+        compile "org.modelcatalogue:mc-integration-mc:$mcToolkitVersion"
         test "org.modelcatalogue:mc-builder-xml:$mcToolkitVersion"
 
         compile 'com.craigburke.document:word:0.4.10-fix31'
