@@ -8,17 +8,17 @@ class ReferenceTypeControllerIntegrationSpec extends AbstractCatalogueElementCon
 
     @Override
     Map getPropertiesToEdit(){
-        [name: "changedName", description: "edited description ",  dataModels: dataModelsForSpec]
+        [name: "changedName", description: "edited description ",  dataModel: dataModelForSpec]
     }
 
     @Override
     Map getNewInstance(){
-        [name: "etTest2123", dataModels: dataModelsForSpec, dataClass: CatalogueElementMarshaller.minimalCatalogueElementJSON(DataClass.findByName("book"))]
+        [name: "etTest2123", dataModel: dataModelForSpec, dataClass: CatalogueElementMarshaller.minimalCatalogueElementJSON(DataClass.findByName("book"))]
     }
 
     @Override
     Map getBadInstance(){
-        [name: "t"*300, description: "asdf", dataModels: dataModelsForSpec]
+        [name: "t"*300, description: "asdf", dataModel: dataModelForSpec]
     }
 
     @Override

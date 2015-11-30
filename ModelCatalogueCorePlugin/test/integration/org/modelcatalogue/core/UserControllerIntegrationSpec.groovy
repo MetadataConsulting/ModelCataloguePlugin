@@ -8,17 +8,17 @@ class UserControllerIntegrationSpec extends AbstractCatalogueElementControllerIn
 
     @Override
     Map getPropertiesToEdit(){
-        [name: "changedName", description: "edited description ", dataModels: dataModelsForSpec]
+        [name: "changedName", description: "edited description ", dataModel: dataModelForSpec]
     }
 
     @Override
     Map getNewInstance(){
-        [name: 'user', username: 'user', password: 'password', dataModels: dataModelsForSpec]
+        [name: 'user', username: 'user', password: 'password', dataModel: dataModelForSpec]
     }
 
     @Override
     Map getBadInstance() {
-        [name: "t" * 300, description: "asdf", dataModels: dataModelsForSpec]
+        [name: "t" * 300, description: "asdf", dataModel: dataModelForSpec]
     }
 
     @Override

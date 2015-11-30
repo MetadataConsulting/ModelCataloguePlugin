@@ -36,7 +36,6 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
 
         then:
         dt1
-        dt2
         dt3
         dt4
     }

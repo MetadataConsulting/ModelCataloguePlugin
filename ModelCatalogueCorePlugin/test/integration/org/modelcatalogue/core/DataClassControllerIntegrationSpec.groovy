@@ -15,17 +15,17 @@ class DataClassControllerIntegrationSpec extends AbstractCatalogueElementControl
 
     @Override
     Map getPropertiesToEdit(){
-        [name: "changedName", description: "edited description ", dataModels: dataModelsForSpec]
+        [name: "changedName", description: "edited description ", dataModel: dataModelForSpec]
     }
 
     @Override
     Map getNewInstance(){
-       [name:"new model", description: "the model of the book", dataModels: dataModelsForSpec]
+       [name:"new model", description: "the model of the book", dataModel: dataModelForSpec]
     }
 
     @Override
     Map getBadInstance(){
-        [name: "t"*300, description: "asdf", dataModels: dataModelsForSpec]
+        [name: "t"*300, description: "asdf", dataModel: dataModelForSpec]
     }
 
     @Override

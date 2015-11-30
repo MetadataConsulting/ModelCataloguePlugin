@@ -7,17 +7,17 @@ class PrimitiveTypeControllerIntegrationSpec extends AbstractCatalogueElementCon
 
     @Override
     Map getPropertiesToEdit(){
-        [name: "changedName", description: "edited description ",  dataModels: dataModelsForSpec]
+        [name: "changedName", description: "edited description ",  dataModel: dataModelForSpec]
     }
 
     @Override
     Map getNewInstance(){
-        [name: "ptTest2123", dataModels: dataModelsForSpec, measurementUnit: CatalogueElementMarshaller.minimalCatalogueElementJSON(notNull(MeasurementUnit.findByName("Degrees Celsius")))]
+        [name: "ptTest2123", dataModel: dataModelForSpec, measurementUnit: CatalogueElementMarshaller.minimalCatalogueElementJSON(notNull(MeasurementUnit.findByName("Degrees Celsius")))]
     }
 
     @Override
     Map getBadInstance(){
-        [name: "t"*300, description: "asdf", dataModels: dataModelsForSpec]
+        [name: "t"*300, description: "asdf", dataModel: dataModelForSpec]
     }
 
     @Override

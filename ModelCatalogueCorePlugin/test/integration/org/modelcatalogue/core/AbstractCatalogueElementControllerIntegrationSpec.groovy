@@ -38,7 +38,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         controller.request.method = 'PUT'
         controller.params.id = another.id
         controller.params.newVersion = true
-        controller.request.json = [name: newName, dataModels: dataModelsForSpec]
+        controller.request.json = [name: newName, dataModel: dataModelForSpec]
         controller.response.format = "json"
 
         controller.update()
@@ -529,7 +529,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         assert item.type
         assert item.type.name == "relatedTo"
         assert item.type.sourceToDestination == "related to"
-        assert item.direction == incomingOrOutgoing == "incoming" ? "destinationToSource" : "sourceToDestination"
+        assert item.direction == (incomingOrOutgoing == "incoming" ? "destinationToSource" : "sourceToDestination")
         assert item.type.destinationToSource == "related to"
         assert item.relation
         assert item.relation.id
@@ -746,7 +746,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         controller.request.method       = 'PUT'
         controller.params.id            = another.id
         controller.params.newVersion    = true
-        controller.request.json         = [name: newName, ext: OrderedMap.toJsonMap(keyValue), dataModels: dataModelsForSpec]
+        controller.request.json         = [name: newName, ext: OrderedMap.toJsonMap(keyValue), dataModel: dataModelForSpec]
         controller.response.format      = "json"
 
         controller.update()
@@ -785,14 +785,19 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     }
 
-
-
+    /**
+     * @deprecated use dataModelForSpec instead
+     */
     def getDataModelsForSpec() {
-        [CatalogueElementMarshaller.minimalCatalogueElementJSON(DataModel.findOrCreateByName("data set 1").save(failOnError: true))]
+        [dataModelForSpec]
+    }
+
+    def getDataModelForSpec() {
+        CatalogueElementMarshaller.minimalCatalogueElementJSON(DataModel.findOrCreateByName("data set 1").save(failOnError: true))
     }
 
     protected  getBadNameJSON() {
-        [name: "g" * 256, dataModels: dataModelsForSpec]
+        [name: "g" * 256, dataModel: dataModelForSpec]
     }
 
 

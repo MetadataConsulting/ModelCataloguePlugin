@@ -93,17 +93,17 @@ class AssetControllerIntegrationSpec extends AbstractCatalogueElementControllerI
 
     @Override
     Map getPropertiesToEdit(){
-        [name: "changedName", description: "edited description ", code: "AA123", dataModels: dataModelsForSpec]
+        [name: "changedName", description: "edited description ", code: "AA123", dataModel: dataModelForSpec]
     }
 
     @Override
     Map getNewInstance(){
-       [name:"new data element", description: "the DE_author of the book", code: "12312312308", dataModels: dataModelsForSpec]
+       [name:"new data element", description: "the DE_author of the book", code: "12312312308", dataModel: dataModelForSpec]
     }
 
     @Override
     Map getBadInstance(){
-        [name: "t"*300, description: "asdf", dataModels: dataModelsForSpec]
+        [name: "t"*300, description: "asdf", dataModel: dataModelForSpec]
     }
 
     @Override

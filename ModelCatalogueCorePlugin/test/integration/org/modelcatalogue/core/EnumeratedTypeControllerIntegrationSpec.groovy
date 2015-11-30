@@ -10,17 +10,17 @@ class EnumeratedTypeControllerIntegrationSpec extends AbstractCatalogueElementCo
 
     @Override
     Map getPropertiesToEdit(){
-        [name: "changedName", description: "edited description ", enumerations:['d26':'test28', 'sadf':'asdgsadg'], dataModels: dataModelsForSpec]
+        [name: "changedName", description: "edited description ", enumerations:['d26':'test28', 'sadf':'asdgsadg'], dataModel: dataModelForSpec]
     }
 
     @Override
     Map getNewInstance(){
-        [name: "etTest2123", enumerations:['d2n':'test2123', 't':'asdfsadfsadf'], dataModels: dataModelsForSpec]
+        [name: "etTest2123", enumerations:['d2n':'test2123', 't':'asdfsadfsadf'], dataModel: dataModelForSpec]
     }
 
     @Override
     Map getBadInstance(){
-        [name: "t"*300, description: "asdf", dataModels: dataModelsForSpec]
+        [name: "t"*300, description: "asdf", dataModel: dataModelForSpec]
     }
 
     @Override
