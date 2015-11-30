@@ -127,13 +127,11 @@ class DataModelServiceSpec extends IntegrationSpec {
     }
 
     def "get top level models with include and exclude classification filter"() {
-        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelDataClasses(DataModelFilter.create([model1], [model2]), [:])
+        when:
+        dataClassService.getTopLevelDataClasses(DataModelFilter.create([model1], [model2]), [:])
 
-        expect:
-        models.total >= 1
-        !(class0 in models.items)
-        class1 in models.items
-        !(class2 in models.items)
+        then:
+        thrown(IllegalStateException)
     }
 
     def "is able to return models classified by or are imported"() {

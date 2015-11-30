@@ -100,7 +100,7 @@ class DataModelService {
                 criteria.'in' 'dataModel.id', modelFilter.includes
             } else if (modelFilter.excludes) {
                 criteria.not {
-                    'in' 'dataModel.id', modelFilter.includes
+                    'in' 'dataModel.id', modelFilter.excludes
                 }
             }
         } else if (Relationship.isAssignableFrom(criteria.persistentEntity.javaClass)) {
@@ -110,7 +110,7 @@ class DataModelService {
                         criteria.'in' 'dataModel.id', modelFilter.includes
                     } else if (modelFilter.excludes) {
                         criteria.not {
-                            'in' 'dataModel.id', modelFilter.includes
+                            'in' 'dataModel.id', modelFilter.excludes
                         }
                     }
                 }

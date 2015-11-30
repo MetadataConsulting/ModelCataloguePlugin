@@ -18,10 +18,6 @@ class DataClassService {
     }
 
     ListWithTotalAndType<DataClass> getTopLevelDataClasses(DataModelFilter dataModelFilter, Map params) {
-        if (dataModelFilter.unclassifiedOnly) {
-            return getTopLevelDataClasses(DataModelFilter.excludes(DataModel.list()), params)
-        }
-
         RelationshipType hierarchy = RelationshipType.hierarchyType
         List<ElementStatus> status = ElementService.getStatusFromParams(params)
 
@@ -65,9 +61,9 @@ class DataClassService {
                         select distinct r.destination.id
                         from Relationship r
                         where r.relationshipType = :type
-                        and r.source.dataModel.id not in (:dataModels)
+                        and (r.source.dataModel.id not in (:dataModels) or r.source.dataModel is null)
                     )
-                    and m.dataModel.id not in (:dataModels)
+                    and m.dataModel.id not in (:dataModels) or m.dataModel is null
                 group by m.name, m.id
                 order by m.name
             ""","""
@@ -78,9 +74,9 @@ class DataClassService {
                         select distinct r.destination.id
                         from Relationship r
                         where r.relationshipType = :type
-                        and r.source.dataModel.id not in (:dataModels)
+                        and (r.source.dataModel.id not in (:dataModels) or r.source.dataModel is null)
                     )
-                    and m.dataModel.id not in (:dataModels)
+                    and m.dataModel.id not in (:dataModels) or m.dataModel is null
             """, [type: hierarchy, status: status, dataModels: dataModelFilter.excludes])
         }
         if (dataModelFilter.excludes && dataModelFilter.includes) {
@@ -90,7 +86,7 @@ class DataClassService {
             // language=HQL
             return Lists.fromQuery(params, DataClass, """
                 select distinct m
-                from DataClass as m join m.incomingRelationships as rel
+                from DataClass as m
                 where m.status in :status
                     and m.id not in (
                         select distinct r.destination.id
@@ -103,7 +99,7 @@ class DataClassService {
                 order by m.name
             ""","""
                 select count(m.id)
-                from DataClass as m join m.incomingRelationships as rel
+                from DataClass as m
                 where m.status in :status
                     and m.id not in (
                         select distinct r.destination.id
