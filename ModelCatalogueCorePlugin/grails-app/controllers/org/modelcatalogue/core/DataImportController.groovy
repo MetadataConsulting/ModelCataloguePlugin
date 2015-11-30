@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.integration.excel.ExcelLoader
 import org.modelcatalogue.integration.excel.HeadersMap
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
@@ -226,9 +227,8 @@ class DataImportController  {
                     Asset updated = Asset.get(id)
                     updated.status = ElementStatus.FINALIZED
                     updated.description = "Your import has finished."
+                    updated.dataModel = dataModel
                     updated.save(flush: true, failOnError: true)
-                    updated.addToDeclaredWithin(dataModel, skipUniqueChecking: true)
-                    dataModel.addToDeclares(updated, skipUniqueChecking: true)
                 } catch (Exception e) {
                     Asset updated = Asset.get(id)
                     updated.refresh()
@@ -256,7 +256,8 @@ class DataImportController  {
 
     protected static assignAssetToModel(Asset asset, DataModel dataModel){
         if (dataModel) {
-            asset.addToDeclaredWithin(dataModel, skipUniqueChecking: true)
+            asset.dataModel = dataModel
+            FriendlyErrors.failFriendlySave(asset)
         }
     }
 

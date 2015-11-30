@@ -56,8 +56,7 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
 
         DataModel vdDataModel = new DataModel(name: "Data Model ${System.currentTimeMillis()}").save(failOnError: true)
         for (int i in 1..3) {
-            DataType domain = new DataType(name: "Test Data Type ${i}").save(failOnError: true)
-            vdDataModel.addToDeclares domain
+            DataType domain = new DataType(name: "Test Data Type ${i}", dataModel: vdDataModel).save(failOnError: true)
         }
 
         List<DataType> types = dataModelService.classified(DataType, DataModelFilter.includes(vdDataModel)).list()

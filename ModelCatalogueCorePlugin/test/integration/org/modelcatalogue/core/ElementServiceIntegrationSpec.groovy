@@ -146,20 +146,16 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         DataType dataType = new DataType(name: "merger test type").save(failOnError: true)
 
-        DataElement source = new DataElement(name: "merge tester", dataType: dataType).save(failOnError: true)
-        source.addToDeclaredWithin(sact)
+        DataElement source = new DataElement(dataModel: sact,  name: "merge tester", dataType: dataType).save(failOnError: true)
 
-        DataElement destination = new DataElement(name: "merge tester").save(failOnError: true)
-        destination.addToDeclaredWithin(cosd)
+        DataElement destination = new DataElement(dataModel: cosd, name: "merge tester").save(failOnError: true)
 
         DataClass m1 = new DataClass(name: 'merge test container 1').save(failOnError: true)
         DataClass m2 = new DataClass(name: 'merge test container 2').save(failOnError: true)
 
-        DataClass m3cosd = new DataClass(name: 'merge test container 3').save(failOnError: true)
-        m3cosd.addToDeclaredWithin(cosd)
+        DataClass m3cosd = new DataClass(dataModel: cosd, name: 'merge test container 3').save(failOnError: true)
 
-        DataClass m3sact = new DataClass(name: 'merge test container 3').save(failOnError: true)
-        m3sact.addToDeclaredWithin(sact)
+        DataClass m3sact = new DataClass(dataModel: sact, name: 'merge test container 3').save(failOnError: true)
 
         m1.addToContains(source)
         m2.addToContains(destination)

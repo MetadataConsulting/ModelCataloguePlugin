@@ -107,6 +107,10 @@ import org.modelcatalogue.core.util.Legacy
             name = value?.toString()
         }
 
+        if (key == 'dataModel') {
+            classification = value?.name
+        }
+
         parameters.put(key, value)
     }
 
@@ -345,7 +349,7 @@ import org.modelcatalogue.core.util.Legacy
 
     @Override
     void addToPendingRelationships(RelationshipProxy relationshipProxy) {
-        if (!classification && relationshipProxy.relationshipTypeName == RelationshipType.declarationType.name && repository.equals(this, relationshipProxy.destination)) {
+        if (!classification && relationshipProxy.relationshipTypeName in [ 'classification', 'declaration' ] && repository.equals(this, relationshipProxy.destination)) {
             classification = relationshipProxy.source.name
         }
         relationships << relationshipProxy

@@ -91,42 +91,27 @@ class DataModelService {
         }
 
         if (modelFilter.unclassifiedOnly) {
-            criteria.not {
-                // this should work (better) without calling the .list()
-                // but at the moment we're getting ConverterNotFoundException
-                'in' 'id', new DetachedCriteria<Relationship>(Relationship).build {
-                    projections { property 'destination.id' }
-                    eq 'relationshipType', RelationshipType.declarationType
-                }.list()
-            }
+            criteria.isNull('dataModel')
             return criteria
         }
 
         if (CatalogueElement.isAssignableFrom(criteria.persistentEntity.javaClass)) {
-            criteria.incomingRelationships {
-                'eq' 'relationshipType', RelationshipType.declarationType
-                source {
-                    if (modelFilter.excludes) {
-                        not {
-                            'in' 'id', modelFilter.excludes
-                        }
-                    }
-                    if (modelFilter.includes) {
-                        'in'  'id', modelFilter.includes
-                    }
+            if (modelFilter.includes) {
+                criteria.'in' 'dataModel.id', modelFilter.includes
+            } else if (modelFilter.excludes) {
+                criteria.not {
+                    'in' 'dataModel.id', modelFilter.includes
                 }
-
             }
         } else if (Relationship.isAssignableFrom(criteria.persistentEntity.javaClass)) {
             criteria.or {
                 and {
-                    if (modelFilter.excludes) {
-                        not {
-                            'in' 'dataModel.id', modelFilter.excludes
-                        }
-                    }
                     if (modelFilter.includes) {
-                        'in'  'dataModel.id', modelFilter.includes
+                        criteria.'in' 'dataModel.id', modelFilter.includes
+                    } else if (modelFilter.excludes) {
+                        criteria.not {
+                            'in' 'dataModel.id', modelFilter.includes
+                        }
                     }
                 }
                 isNull('dataModel')

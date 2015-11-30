@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet
 import grails.util.GrailsNameUtils
 import org.hibernate.FetchMode
 import org.modelcatalogue.core.util.DataModelFilter
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
@@ -83,17 +84,13 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
 
 
 	private Collection getDataClassesForDataModel(Long dataModelId) {
-		def classificationType = RelationshipType.declarationType
 		def results = DataClass.createCriteria().list {
 			fetchMode "extensions", FetchMode.JOIN
 			fetchMode "outgoingRelationships.extensions", FetchMode.JOIN
 			fetchMode "outgoingRelationships.destination.classifications", FetchMode.JOIN
-			incomingRelationships {
-				and {
-					eq("relationshipType", classificationType)
-					source { eq('id', dataModelId) }
-				}
-			}
+            dataModel {
+                eq 'id', dataModelId
+            }
 		}
 		return results
 	}
@@ -108,13 +105,13 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
 	protected bindRelations(DataModel instance, boolean newVersion, Object objectToBind) {
 		if (objectToBind.declares != null) {
 			for (domain in instance.declares.findAll { !(it.id in objectToBind.declares*.id) }) {
-				instance.removeFromDeclares(domain)
-				domain.removeFromDeclaredWithin(instance)
+				domain.dataModel = null
+                FriendlyErrors.failFriendlySave(domain)
 			}
 			for (domain in objectToBind.declares) {
 				CatalogueElement catalogueElement = CatalogueElement.get(domain.id as Long)
-				instance.addToDeclares catalogueElement
-				catalogueElement.addToDeclaredWithin instance
+                catalogueElement.dataModel = instance
+                FriendlyErrors.failFriendlySave(catalogueElement)
 			}
 		}
 	}

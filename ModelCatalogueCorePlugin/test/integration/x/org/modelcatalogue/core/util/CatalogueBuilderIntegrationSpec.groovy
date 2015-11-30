@@ -309,10 +309,8 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
     def "reuses existing data type with given name"() {
         DataModel cls  = new DataModel(name: 'Some').save(failOnError: true)
-        DataType dt1 = new DataType(name: 'SomeType').save(failOnError: true)
+        DataType dt1 = new DataType(name: 'SomeType', dataModel: cls).save(failOnError: true)
         DataType dt2 = new DataType(name: 'SomeType').save(failOnError: true)
-
-        cls.addToDeclares(dt1)
 
         build {
             dataType name: 'SomeType'

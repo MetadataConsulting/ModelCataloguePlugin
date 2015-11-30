@@ -29,42 +29,6 @@ class CopyAssociationsAndRelationships {
         relationshipService = Holders.applicationContext.getBean(RelationshipService)
     }
 
-
-    void copyClassifications(DataModel dataModel, Set<String> createdRelationshipHashes) {
-        relationshipService.eachRelationshipPartitioned(RelationshipDirection.INCOMING, element, RelationshipType.declarationType) { Relationship r ->
-            if (dataModel && dataModel.getLatestVersionId() != r.source.getLatestVersionId()) {
-                // don't copy outside the data model
-                return
-            }
-            CatalogueElement source = DraftContext.preferDraft(r.source)
-
-            String hash = DraftContext.hashForRelationship(source, draft, RelationshipType.declarationType)
-
-            if (hash in createdRelationshipHashes) {
-                return
-            }
-
-            RelationshipDefinitionBuilder definitionBuilder = RelationshipDefinition.create(source, draft, RelationshipType.declarationType)
-
-            definitionBuilder
-                    .withArchived(r.archived)
-                    .withDataModel(r.dataModel)
-                    .withIncomingIndex(r.incomingIndex)
-                    .withOutgoingIndex(r.outgoingIndex)
-                    .withCombinedIndex(r.combinedIndex)
-                    .withMetadata(r.ext)
-                    .withSkipUniqueChecking(true)
-
-            Relationship created = relationshipService.link definitionBuilder.definition
-
-            if (created.hasErrors()) {
-                throw new IllegalStateException(FriendlyErrors.printErrors("Cannot transfer classification", created.errors))
-            }
-
-            createdRelationshipHashes << hash
-        }
-    }
-
     void copyRelationships(DataModel dataModel, Set<String> createdRelationshipHashes) {
         if (context.importFriendly && context.isUnderControl(draft)) {
             return
@@ -89,17 +53,10 @@ class CopyAssociationsAndRelationships {
 
 
     void copyRelationshipsInternal(DataModel dataModel, RelationshipDirection direction, Set<String> createdRelationshipHashes) {
-        RelationshipType supersession =  RelationshipType.supersessionType
-        RelationshipType declaration = RelationshipType.declarationType
-
         List<Relationship> toRemove = []
 
         relationshipService.eachRelationshipPartitioned(direction, element) { Relationship r ->
-            if (r.relationshipType == supersession) {
-                return
-            }
-
-            if (r.relationshipType == declaration) {
+            if (r.relationshipType.system) {
                 return
             }
 

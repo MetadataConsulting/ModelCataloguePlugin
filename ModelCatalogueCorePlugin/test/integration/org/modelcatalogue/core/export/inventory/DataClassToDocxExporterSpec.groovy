@@ -52,9 +52,8 @@ class DataClassToDocxExporterSpec extends IntegrationSpec {
 
         if (!domains) {
             for (int i in 1..10) {
-                DataType domain = new DataType(name: "C4CTDE Test Value Domain #${i}").save(failOnError: true)
                 DataModel classification = new DataModel(name: "C4CTDE Classification ${System.currentTimeMillis()}").save(failOnError: true)
-                classification.addToDeclares domain
+                new DataType(name: "C4CTDE Test Value Domain #${i}", dataModel: classification).save(failOnError: true)
             }
             domains = DataType.list()
         }

@@ -463,10 +463,6 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     void clearAssociationsBeforeDelete() {
-        for (DataModel c in this.dataModels) {
-            this.removeFromDeclaredWithin(c)
-        }
-
         // it is safe to remove all versioning informations
         for (CatalogueElement e in this.supersededBy) {
             this.removeFromSupersededBy(e)
@@ -579,32 +575,4 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     List<String> getInheritedAssociationsNames() { Collections.emptyList() }
-
-
-    /**
-     * @deprecated use #setDataModel(DataModel) instead
-     */
-    void addToDeclaredWithin(DataModel dataModel) {
-        setDataModel(dataModel)
-        FriendlyErrors.failFriendlySave(this)
-    }
-
-    /**
-     * @deprecated use #setDataModel(DataModel) instead
-     */
-    void removeFromDeclaredWithin(DataModel dataModel) {
-        setDataModel(null)
-        FriendlyErrors.failFriendlySave(this)
-    }
-
-    /**
-     * @deprecated use #getDataModel() instead
-     */
-    List<CatalogueElement> getDeclaredWithin() {
-        getDataModels()
-    }
-
-    Number countDeclaredWithin() {
-
-    }
 }

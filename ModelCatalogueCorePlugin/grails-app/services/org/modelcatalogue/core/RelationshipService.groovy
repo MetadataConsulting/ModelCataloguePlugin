@@ -302,23 +302,16 @@ class RelationshipService {
             return element.name
         }
 
-        RelationshipType dataModel = RelationshipType.declarationType
-
-        String dataModels = Relationship.executeQuery("""
-            select r.source.name
-            from Relationship as r
-            where r.relationshipType.id = :dataModel
-            and r.destination.id = :elementId
-            order by r.source.name
-        """, [dataModel: dataModel.id, elementId: element.id]).join(', ')
-
-        if (dataModels) {
-            return "${element.name} (${dataModels})"
+        if (element.dataModel) {
+            return "${element.name} (${element.dataModel.name})"
         }
 
         return element.name
     }
 
+    /**
+     * @deprecated overcomplicated
+     */
     def getDataModelsInfo(CatalogueElement element) {
         if (!element) {
             return []
@@ -328,42 +321,24 @@ class RelationshipService {
             return []
         }
 
-        RelationshipType dataModel = RelationshipType.declarationType
+        if (!element.dataModel) {
+            return []
+        }
 
-        Relationship.executeQuery("""
-            select r.source.name, r.source.id, r.source.status
-            from Relationship as r
-            where r.relationshipType.id = :dataModel
-            and r.destination.id = :elementId
-            order by r.source.name
-        """, [dataModel: dataModel.id, elementId: element.id]).collect {
-            [name: it[0], id: it[1], status: "${it[2]}", elementType: DataModel.name, link:  "/dataModel/${it[1]}"]
+        [element.dataModel].collect {
+            [name: it.name, id: it.getId(), status: "${it.status}", elementType: DataModel.name, link:  "/dataModel/${it.getId()}"]
         }
     }
 
+    /**
+     * @deprecated overcomplicated
+     */
     def List<DataModel> getDataModels(CatalogueElement element) {
-        if (!element) {
+        if (!element || !element.dataModel) {
             return []
         }
 
-        if (!element.getId()) {
-            return []
-        }
-
-        if (!element.isReadyForQueries()) {
-            return []
-        }
-
-        RelationshipType dataModel = RelationshipType.declarationType
-
-        DataModel.executeQuery """
-            select c
-            from DataModel as c
-            join c.outgoingRelationships as rel
-            where rel.relationshipType.id = :dataModel
-            and rel.destination.id = :elementId
-            order by c.name
-        """, [dataModel: dataModel.id, elementId: element.id], [cache: true]
+        return [element.dataModel]
     }
 
     Relationship moveAfter(RelationshipDirection direction, CatalogueElement owner,  Relationship relationship, Relationship other) {

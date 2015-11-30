@@ -720,21 +720,17 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         if (!dataModels && !instance.dataModels && !(instance.instanceOf(DataModel))) {
             instance.errors.reject 'catalogue.element.at.least.one.data.model', "'$instance.name' has to be declared wihtin a data model"
         }
-        if (instance.dataModels && !dataModels) {
-            // data models not present in the request
+        if (dataModels?.size() > 1) {
+            instance.errors.reject 'catalogue.element.no.more.than.one.data.model', "'$instance.name' has to be declared wihtin a single data model"
             return
-        }
-        for (dataModel in instance.dataModels.findAll { !(it.id in dataModels.collect { it.id as Long } || it.latestVersionId in dataModels.collect { it.id as Long })  }) {
-            instance.removeFromDeclaredWithin dataModel
-            dataModel.removeFromDeclares instance
         }
         for (domain in dataModels) {
             DataModel dataModel = DraftContext.preferDraft(DataModel.get(domain.id as Long)) as DataModel
             if (!(dataModel.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
                 dataModel = elementService.createDraftVersion(dataModel, DraftContext.userFriendly())
             }
-            instance.addToDeclaredWithin dataModel
-            dataModel.addToDeclares instance
+            instance.dataModel = dataModel
+            instance.save()
         }
     }
 

@@ -238,8 +238,6 @@ databaseChangeLog = {
                     if (!dataClass) {
                         dataClass = new DataClass(dataModel: dataModel, name: "$dataModel.name Classes")
                         dataClass.save(failOnError: true, deepValidate: false)
-                        dataModel.addToDeclares(dataClass)
-                        dataModel.save(failOnError: true, deepValidate: false)
                     }
 
                     for (Number id in dataClassIds) {

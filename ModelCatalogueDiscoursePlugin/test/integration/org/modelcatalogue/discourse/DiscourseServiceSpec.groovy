@@ -15,10 +15,8 @@ class DiscourseServiceSpec extends IntegrationSpec {
 
         Long time = System.currentTimeMillis()
 
-        MeasurementUnit mu = new MeasurementUnit(name: "Degree of Gray $time", description: "There are fifty of these...").save(failOnError: true)
         DataModel classification = new DataModel(name: "Discourse Test").save(failOnError: true)
-
-        mu.addToDeclaredWithin classification
+        MeasurementUnit mu = new MeasurementUnit(dataModel: classification, name: "Degree of Gray $time", description: "There are fifty of these...").save(failOnError: true)
 
         Long id = discourseService.findOrCreateDiscourseTopic(mu.id)
 

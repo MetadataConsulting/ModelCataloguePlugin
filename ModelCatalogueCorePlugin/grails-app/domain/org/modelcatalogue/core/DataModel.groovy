@@ -52,23 +52,7 @@ class DataModel extends CatalogueElement {
     protected PublishingChain prepareDraftChain(PublishingChain chain) {
         return super.prepareDraftChain(chain).add(this.declares)
     }
-
-    /**
-     * @deprecated use CatalogueElement#setDataModel(DataModel) instead
-     */
-    void addToDeclares(CatalogueElement element) {
-        element.dataModel = this
-        FriendlyErrors.failFriendlySave(element)
-    }
-
-    /**
-     * @deprecated use CatalogueElement#setDataModel(DataModel) instead
-     */
-    void removeFromDeclares(CatalogueElement element) {
-        element.dataModel = null
-        FriendlyErrors.failFriendlySave(element)
-    }
-
+    
     List<CatalogueElement> getDeclares() {
         CatalogueElement.findAllByDataModel(this)
     }

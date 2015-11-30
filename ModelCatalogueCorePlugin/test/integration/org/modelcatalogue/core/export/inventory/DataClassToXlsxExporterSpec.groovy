@@ -49,9 +49,8 @@ class DataClassToXlsxExporterSpec extends IntegrationSpec {
 
         if (!domains) {
             for (int i in 1..10) {
-                DataType domain = new DataType(name: "Test Data Type #${i}").save(failOnError: true)
                 DataModel data = new DataModel(name: "Data Model ${System.currentTimeMillis()}").save(failOnError: true)
-                data.addToDeclares domain
+                DataType domain = new DataType(name: "Test Data Type #${i}", dataModel: data).save(failOnError: true)
             }
             domains = DataType.list()
         }

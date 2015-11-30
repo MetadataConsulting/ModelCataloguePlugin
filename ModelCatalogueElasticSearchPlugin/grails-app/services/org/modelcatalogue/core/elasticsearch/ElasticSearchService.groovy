@@ -347,7 +347,7 @@ class ElasticSearchService implements SearchCatalogue {
 
         result = result.concatWith(from(DataModel.list(sort: 'lastUpdated', order: 'desc'))
         .doOnNext {
-            log.info "[${dataModelCounter++}/$total] Reindexing data model ${it.name} (${it.combinedVersion}) - ${it.countOutgoingRelationshipsByType(RelationshipType.declarationType)} items"
+            log.info "[${dataModelCounter++}/$total] Reindexing data model ${it.name} (${it.combinedVersion}) - ${it.countDeclares()} items"
         }.flatMap {
             return getDataModelWithDeclaredElements(it).flatMap { element ->
                 return index(session, element)
@@ -459,12 +459,10 @@ class ElasticSearchService implements SearchCatalogue {
     private Observable<CatalogueElement> getDataModelWithDeclaredElements(DataModel element) {
         ReplaySubject<CatalogueElement> subject = ReplaySubject.create()
 
-        RelationshipType declaration = RelationshipType.declarationType
-
         executorService.submit {
             subject.onNext(element)
-            DetachedCriteria<Relationship> criteria = Relationship.where {
-                source == element && relationshipType == declaration
+            DetachedCriteria<Relationship> criteria = CatalogueElement.where {
+                dataModel == element
             }
 
             Number total = criteria.count()

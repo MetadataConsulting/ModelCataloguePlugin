@@ -78,12 +78,6 @@ class DraftContext {
         pendingRelationshipsTasks << new CopyAssociationsAndRelationships(draft, oldVersion, this)
     }
 
-    void classifyDrafts() {
-        pendingRelationshipsTasks.each {
-            it.copyClassifications(dataModel, createdRelationshipHashes)
-        }
-    }
-
     void resolvePendingRelationships() {
         pendingRelationshipsTasks.each {
             it.copyRelationships(dataModel, createdRelationshipHashes)

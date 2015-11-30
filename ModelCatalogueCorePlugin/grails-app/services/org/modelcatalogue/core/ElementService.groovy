@@ -44,7 +44,6 @@ class ElementService implements Publisher<CatalogueElement> {
                     status?.setRollbackOnly()
                     return element
                 }
-                context.classifyDrafts()
                 context.resolvePendingRelationships()
                 return draft
             }
@@ -175,17 +174,13 @@ class ElementService implements Publisher<CatalogueElement> {
         }
 
         destination.status = ElementStatus.UPDATED
+
+        if (!destination.dataModel) {
+            destination.dataModel = source.dataModel
+        }
+
         destination.save(flush: true, validate: false)
 
-
-        if (!destination.dataModels) {
-            for (DataModel dataModel in new HashSet<DataModel>(source.dataModels)) {
-                dataModel.removeFromDeclares(source)
-                source.removeFromDeclaredWithin(dataModel)
-                dataModel.addToDeclares(destination)
-                destination.addToDeclaredWithin(dataModel)
-            }
-        }
 
         for (Map.Entry<String, String> extension in new HashMap<String, String>(source.ext)) {
             if(!destination.ext.containsKey(extension.key)) {
@@ -196,10 +191,6 @@ class ElementService implements Publisher<CatalogueElement> {
         for (Relationship rel in new HashSet<Relationship>(source.outgoingRelationships)) {
             if (rel.relationshipType.system) {
                 // skip system, currently only supersession
-                continue
-            }
-
-            if (rel.relationshipType == RelationshipType.declarationType) {
                 continue
             }
 
@@ -235,10 +226,6 @@ class ElementService implements Publisher<CatalogueElement> {
 
         for (Relationship rel in new HashSet<Relationship>(source.incomingRelationships)) {
             if (rel.relationshipType.system) {
-                continue
-            }
-
-            if (rel.relationshipType == RelationshipType.declarationType) {
                 continue
             }
 
