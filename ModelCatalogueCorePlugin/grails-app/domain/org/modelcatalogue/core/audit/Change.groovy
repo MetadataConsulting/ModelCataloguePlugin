@@ -49,6 +49,8 @@ class Change {
     static mapping = {
         table '`change`'
         version false
+        newValue type: 'text'
+        oldValue type: 'text'
     }
 
     @Override

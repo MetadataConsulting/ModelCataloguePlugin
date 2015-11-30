@@ -1,3 +1,9 @@
+import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.DataClass
+import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.api.ElementStatus
+
 databaseChangeLog = {
 
     changeSet(author: "Vladimir Orany", id: "1432717677788-01") {
@@ -175,6 +181,84 @@ databaseChangeLog = {
             join catalogue_element dest on rel.destination_id = dest.id
             join catalogue_element other_dm on dest.data_model_id = other_dm.id and other_dm.latest_version_id != dm.latest_version_id
         """
+    }
+
+    changeSet(author: "Vladimir Orany", id: "1432717677788-07") {
+        preConditions(onFail: 'MARK_RAN') {
+            foreignKeyConstraintExists foreignKeyName: 'version_number'
+        }
+        dropForeignKeyConstraint baseTableName: 'catalogue_element', constraintName: 'version_number'
+    }
+
+
+    changeSet(author: "Vladimir Orany", id: "1432717677788-08") {
+        grailsChange {
+            change {
+                // if an exception happens here you have to
+                // 1) first - export the current database migrated so far data only, always use 'complete-insert' option (see e.g. Advanced Options in the Workbench)
+                // 2) create new database
+                // 3) run the application against the database
+                // 4) export the structure of the database and reimport or simply truncate all tables
+                // 5) load the data into the database - you may need to update the import script as some of the tables or columns no longer exist
+                // 6) run the migraiton again
+                Map<Number, Set<Number>> dataModelToDataClasses = [:].withDefault { new LinkedHashSet<Number>() }
+                sql.eachRow('''
+                    /* find which top level classes are not declared with the particular model */
+                    select distinct dm.id, m.id
+                    from catalogue_element as m
+                    join data_class m_classifier on m_classifier.id = m.id
+                    join relationship rel
+                        on rel.destination_id = m.id
+                    join catalogue_element dm
+                        on rel.source_id = dm.id
+                        and rel.relationship_type_id = (select id from relationship_type where name = 'declaration')
+                    join data_model dm_classifier on dm_classifier.id = dm.id
+                    where m.id not in (
+                            select distinct r.destination_id
+                            from relationship r
+                            where r.relationship_type_id = (select id from relationship_type where name = 'hierarchy')
+                            and r.source_id in (
+                                select distinct d.destination_id
+                                from relationship d
+                                where d.relationship_type_id = (select id from relationship_type where name = 'declaration')
+                                and d.source_id = dm.id
+                            )
+                        )
+                    and m.data_model_id != dm.id
+                    order by dm.id, rel.outgoing_index
+                ''') { row ->
+                    dataModelToDataClasses[row[0]].add(row[1])
+                }
+
+                dataModelToDataClasses.each { dataModelId, dataClassIds ->
+                    DataModel dataModel = DataModel.get(dataModelId)
+
+                    DataClass dataClass = DataClass.findByDataModelAndName(dataModel, "$dataModel.name Classes")
+
+                    if (!dataClass) {
+                        dataClass = new DataClass(dataModel: dataModel, name: "$dataModel.name Classes")
+                        dataClass.save(failOnError: true, deepValidate: false)
+                        dataModel.addToDeclares(dataClass)
+                        dataModel.save(failOnError: true, deepValidate: false)
+                    }
+
+                    for (Number id in dataClassIds) {
+                        DataClass dc = DataClass.get(id)
+                        if (dc.status == ElementStatus.DEPRECATED) {
+                            if (dataModel.status == ElementStatus.DRAFT) {
+                                continue
+                            }
+                            dataClass.createLinkTo(dc, RelationshipType.hierarchyType, ignoreRules: true, skipUniqueChecking: true, archived: true)
+                        } else {
+                            dataClass.createLinkTo(dc, RelationshipType.hierarchyType, ignoreRules: true, skipUniqueChecking: true)
+                        }
+
+                    }
+                }
+
+
+            }
+        }
     }
 
 }

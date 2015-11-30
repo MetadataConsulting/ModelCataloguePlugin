@@ -100,6 +100,8 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
         sort "name"
 		name index: 'RelationType_name_idx'
 		destinationClass index: 'RelationType_destinationClass_idx'
+        metadataHints type: 'text'
+        rule type: 'text'
     }
 
     void setRule(String rule) {
