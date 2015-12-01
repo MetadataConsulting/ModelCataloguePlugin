@@ -225,7 +225,7 @@ databaseChangeLog = {
                             )
                         )
                     and m.data_model_id != dm.id
-                    order by dm.id, rel.outgoing_index
+                    order by dm.id, m.id
                 ''') { row ->
                     dataModelToDataClasses[row[0]].add(row[1])
                 }
