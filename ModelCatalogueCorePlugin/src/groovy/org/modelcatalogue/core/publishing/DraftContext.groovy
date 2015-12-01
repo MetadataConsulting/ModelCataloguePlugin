@@ -94,6 +94,9 @@ class DraftContext {
     }
 
     static <E extends CatalogueElement> E preferDraft(E element) {
+        if (!element) {
+            return element
+        }
         if (element.status == ElementStatus.DRAFT || element.status == ElementStatus.UPDATED) {
             return element
         }
@@ -102,7 +105,7 @@ class DraftContext {
             return element
         }
 
-        CatalogueElement existingDraft =  element.class.findByLatestVersionIdAndStatusInList(element.latestVersionId, [ElementStatus.DRAFT, ElementStatus.UPDATED], [sort: 'versionNumber', order: 'desc'])
+        E existingDraft =  element.class.findByLatestVersionIdAndStatusInList(element.latestVersionId, [ElementStatus.DRAFT, ElementStatus.UPDATED], [sort: 'versionNumber', order: 'desc'])
 
         if (existingDraft) {
             return existingDraft

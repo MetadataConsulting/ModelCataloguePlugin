@@ -726,6 +726,10 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
         for (domain in dataModels) {
             DataModel dataModel = DraftContext.preferDraft(DataModel.get(domain.id as Long)) as DataModel
+            if (!dataModel) {
+                log.error "No data model exists for $domain"
+                continue
+            }
             if (!(dataModel.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
                 dataModel = elementService.createDraftVersion(dataModel, DraftContext.userFriendly())
             }
