@@ -36,8 +36,8 @@ describe "mc.core.ui.catalogueElementView", ->
     element.find('ul.nav.nav-tabs li').each (index, element) ->
       console.log $(element).data('tab-name')
 
-    expect(element.find('ul.nav.nav-tabs li').length).toBe(numberOfTabs - 2)
-    expect(element.find('div.tab-pane').length).toBe(numberOfTabs - 2)
+    expect(element.find('ul.nav.nav-tabs li').length).toBe(numberOfTabs - 1)
+    expect(element.find('div.tab-pane').length).toBe(numberOfTabs - 1)
 
     expect(element.find('.dl-table-item-row').length).toBe(0)
 
