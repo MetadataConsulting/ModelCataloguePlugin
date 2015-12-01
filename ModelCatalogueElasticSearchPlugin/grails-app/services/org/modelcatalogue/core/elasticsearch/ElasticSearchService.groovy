@@ -461,7 +461,7 @@ class ElasticSearchService implements SearchCatalogue {
 
         executorService.submit {
             subject.onNext(element)
-            DetachedCriteria<Relationship> criteria = CatalogueElement.where {
+            DetachedCriteria<CatalogueElement> criteria = CatalogueElement.where {
                 dataModel == element
             }
 
@@ -469,7 +469,7 @@ class ElasticSearchService implements SearchCatalogue {
 
             for (int page = 0 ; page * EMIT_RELATIONSHIPS_PAGE < total ; page++) {
                 criteria.list(max: EMIT_RELATIONSHIPS_PAGE, offset: page * EMIT_RELATIONSHIPS_PAGE).each {
-                    subject.onNext(it.destination)
+                    subject.onNext(it)
                 }
             }
 
