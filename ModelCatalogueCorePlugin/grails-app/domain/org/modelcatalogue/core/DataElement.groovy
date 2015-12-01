@@ -38,7 +38,7 @@ class DataElement extends CatalogueElement {
 
     @Override
     protected PublishingChain prepareDraftChain(PublishingChain chain) {
-        chain.add(this.containedIn).add(this.dataModels)
+        chain.add(this.containedIn).add(this.dataModel)
     }
 
     @Override

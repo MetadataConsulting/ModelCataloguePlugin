@@ -580,7 +580,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        if (!instance.instanceOf(DataModel) && !instance.dataModels) {
+        if (!instance.instanceOf(DataModel) && !instance.dataModel) {
             instance.errors.reject 'catalogue.element.at.least.one.data.model', "'$instance.name' has to be declared wihtin a data model"
             respond instance.errors
             return
@@ -717,7 +717,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
         def dataModels = objectToBind.classifications ?: objectToBind.dataModels ?: []
-        if (!dataModels && !instance.dataModels && !(instance.instanceOf(DataModel))) {
+        if (!dataModels && !instance.dataModel && !(instance.instanceOf(DataModel))) {
             instance.errors.reject 'catalogue.element.at.least.one.data.model', "'$instance.name' has to be declared wihtin a data model"
         }
         if (dataModels?.size() > 1) {

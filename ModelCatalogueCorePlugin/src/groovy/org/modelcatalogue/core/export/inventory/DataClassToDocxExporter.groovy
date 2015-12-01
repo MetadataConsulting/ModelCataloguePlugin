@@ -106,9 +106,9 @@ class DataClassToDocxExporter {
 
                         paragraph attrs, dataType.name
 
-                        if (dataType.dataModels) {
+                        if (dataType.dataModel) {
                             paragraph {
-                                text DOMAIN_CLASSIFICATION_NAME, "(${dataType.dataModels.first().name})"
+                                text DOMAIN_CLASSIFICATION_NAME, "(${dataType.dataModel.name})"
                             }
                         }
 
@@ -303,10 +303,10 @@ class DataClassToDocxExporter {
     }
 
     private static String getSameAs(CatalogueElement element) {
-        if (!element.dataModels) {
+        if (!element.dataModel) {
             return "${element.name}"
         }
-        "${element.name} (${element.ext['Data Item No'] ? "${element.ext['Data Item No']} from " : ''}${element.dataModels.first().name})"
+        "${element.name} (${element.ext['Data Item No'] ? "${element.ext['Data Item No']} from " : ''}${element.dataModel.name})"
     }
 
     private static String getMultiplicity(Relationship relationship) {

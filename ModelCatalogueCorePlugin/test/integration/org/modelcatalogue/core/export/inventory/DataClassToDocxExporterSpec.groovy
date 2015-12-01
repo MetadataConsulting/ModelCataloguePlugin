@@ -71,7 +71,7 @@ class DataClassToDocxExporterSpec extends IntegrationSpec {
                                 dataElement name: "C4CTDE Model $i Data Element $j", {
                                     description "This is a description for Model $i Data Element $j"
                                     DataType data = domains[random.nextInt(domains.size())]
-                                    dataClass name: data.name, dataModel: data.dataModels ? data.dataModels.first().name : null
+                                    dataClass name: data.name, dataModel: data.dataModel ? data.dataModel.name : null
                                 }
                             }
                             for (int j in 1..3) {
@@ -82,7 +82,7 @@ class DataClassToDocxExporterSpec extends IntegrationSpec {
                                         dataElement name: "C4CTDE Model $i Child Model $j Data Element $k", {
                                             description "This is a description for Model $i Child Model $j Data Element $k"
                                             DataType domain = domains[random.nextInt(domains.size())]
-                                            dataType name: domain.name, dataModel: domain.dataModels ? domain.dataModels.first().name : null
+                                            dataType name: domain.name, dataModel: domain.dataModel ? domain.dataModel.name : null
                                         }
                                     }
                                 }

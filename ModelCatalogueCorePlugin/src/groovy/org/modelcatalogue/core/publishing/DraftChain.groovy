@@ -53,7 +53,7 @@ class DraftChain extends PublishingChain {
 
         for (Collection<CatalogueElement> elements in queue) {
             for (CatalogueElement element in elements) {
-                if (context.dataModel && !(context.dataModel in element.dataModels)) {
+                if (context.dataModel && context.dataModel != element.dataModel) {
                     processed << element.id
                     continue
                 }

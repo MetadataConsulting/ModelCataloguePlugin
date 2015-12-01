@@ -81,10 +81,10 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
                                 dataElement name: "Data Class $i Data Element $j", {
                                     description "This is a description for Data Class $i Data Element $j"
                                     DataType type = types[random.nextInt(types.size())]
-                                    while (!type.dataModels) {
+                                    while (!type.dataModel) {
                                         type = types[random.nextInt(types.size())]
                                     }
-                                    dataType name: type.name, dataModel: type.dataModels.first().name
+                                    dataType name: type.name, dataModel: type.dataModel.name
 
                                     relationship {
                                         ext 'Min Occurs': '0', 'Max Occurs': "$j"
@@ -99,10 +99,10 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
                                         dataElement name: "Data Class $i Inner Data Class $j Data Element $k", {
                                             description "This is a description for Data Class $i Inner Data Class $j Data Element $k"
                                             DataType type = types[random.nextInt(types.size())]
-                                            while (!type.dataModels) {
+                                            while (!type.dataModel) {
                                                 type = types[random.nextInt(types.size())]
                                             }
-                                            dataType name: type.name, dataModel: type.dataModels.first().name
+                                            dataType name: type.name, dataModel: type.dataModel.name
                                         }
                                     }
                                 }

@@ -71,7 +71,7 @@ class DataModelServiceSpec extends IntegrationSpec {
         DetachedCriteria<DataType> criteria = dataModelService.classified(DataType, DataModelFilter.create(true))
 
         expect:
-        criteria.count() == DataType.list().count { !it.dataModels }
+        criteria.count() == DataType.list().count { !it.dataModel }
 
         Lists.fromCriteria([:], criteria).items.size() == criteria.count()
     }

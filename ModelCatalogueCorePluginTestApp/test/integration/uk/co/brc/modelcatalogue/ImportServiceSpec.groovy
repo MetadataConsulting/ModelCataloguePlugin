@@ -34,8 +34,8 @@ class ImportServiceSpec extends IntegrationSpec {
         dataElement.id
         patientIdentity.childOf.contains(core)
         core.parentOf.contains(patientIdentity)
-        patientIdentity.dataModels.contains(NHICConceptualDomain)
-        core.dataModels.contains(NHICConceptualDomain)
+        patientIdentity.dataModel == NHICConceptualDomain
+        core.dataModel == NHICConceptualDomain
 
         when:
         HashMap<String, String> icodehash = new HashMap(

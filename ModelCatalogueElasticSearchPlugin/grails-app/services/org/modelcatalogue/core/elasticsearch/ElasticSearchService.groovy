@@ -550,8 +550,8 @@ class ElasticSearchService implements SearchCatalogue {
 
         if (CatalogueElement.isAssignableFrom(clazz)) {
             CatalogueElement element = object as CatalogueElement
-            if (element.dataModels) {
-                return [MC_ALL_INDEX] + element.dataModels.collect { getDataModelIndex(it) }
+            if (element.dataModel) {
+                return [MC_ALL_INDEX] + [getDataModelIndex(element.dataModel)]
             }
             return [ORPHANED_INDEX, MC_ALL_INDEX]
         }

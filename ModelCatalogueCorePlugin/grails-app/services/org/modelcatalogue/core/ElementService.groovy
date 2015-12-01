@@ -117,7 +117,7 @@ class ElementService implements Publisher<CatalogueElement> {
     }
 
 
-    public <E extends CatalogueElement> E merge(E source, E destination, Set<DataModel> classifications = new HashSet(source.dataModels)) {
+    public <E extends CatalogueElement> E merge(E source, E destination, DataModel dataModel = source.dataModel) {
         log.info "Merging $source into $destination"
         if (destination == null) return null
 
@@ -208,8 +208,8 @@ class ElementService implements Publisher<CatalogueElement> {
 
             if (existing) {
                 if (rel.destination instanceof CatalogueElement && existing.destination instanceof CatalogueElement && rel.destination.class == existing.destination.class && existing.destination != destination) {
-                    if (rel.destination.dataModels.intersect(classifications)) {
-                        merge rel.destination, existing.destination, classifications
+                    if (rel.destination.dataModel == dataModel) {
+                        merge rel.destination, existing.destination, dataModel
                     }
                 }
                 continue
@@ -243,8 +243,8 @@ class ElementService implements Publisher<CatalogueElement> {
 
             if (existing) {
                 if (rel.source.class == existing.source.class && existing.source != destination) {
-                    if (rel.source.dataModels.intersect(classifications)) {
-                        merge rel.source, existing.source, classifications
+                    if (rel.source.dataModel == dataModel) {
+                        merge rel.source, existing.source, dataModel
                     }
                 }
                 continue

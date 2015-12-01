@@ -63,7 +63,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     Set<Mapping> outgoingMappings = []
     Set<Mapping> incomingMappings = []
 
-    static transients = ['relations', 'info', 'archived', 'relations', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext', 'classifications', 'combinedVersion', 'inheritedAssociationsNames', 'modelCatalogueResourceName']
+    static transients = ['relations', 'info', 'archived', 'relations', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext', 'combinedVersion', 'inheritedAssociationsNames', 'modelCatalogueResourceName']
 
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping, extensions: ExtensionValue]
 
@@ -370,27 +370,6 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         listExtensions()?.find { it.name == name }
     }
 
-    /**
-     * @deprecated use #getDataModel() instead
-     */
-    List<DataModel> getDataModels() {
-        // once set, prefer the data model stored in the element
-        if (getDataModel()) {
-            return ImmutableList.of(getDataModel())
-        }
-        try {
-            return relationshipService.getDataModels(this)
-        } catch (StaleObjectStateException stale) {
-            log.error("Stale object exception getting data models for $this, errors=${ this.validate() ; this.errors }", stale)
-            return []
-        }
-    }
-
-    @Deprecated
-    List<DataModel> getClassifications() {
-        relationshipService.getDataModels(this)
-    }
-
     boolean isReadyForQueries() {
         isAttached() && !hasErrors()
     }
@@ -408,7 +387,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     protected PublishingChain prepareDraftChain(PublishingChain chain) {
-        chain.add(dataModels)
+        chain.add(dataModel)
     }
 
     @Override

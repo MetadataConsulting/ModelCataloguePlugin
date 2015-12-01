@@ -110,7 +110,7 @@ class DataClassToXlsxExporter {
                     colspan 2
                 }
                 cell {
-                    value dataClass.dataModels.collect { it.name }.unique().sort().join(', ')
+                    value dataClass.dataModel?.name
                     style 'property-value'
                 }
             }
@@ -406,7 +406,7 @@ class DataClassToXlsxExporter {
 
             row {
                 cell {
-                    value dataClass.dataModels.collect { it.name }.unique().sort().join(', ')
+                    value dataClass.dataModel?.name
                     style 'property-value'
                     style 'model-catalogue-id'
                     colspan 2

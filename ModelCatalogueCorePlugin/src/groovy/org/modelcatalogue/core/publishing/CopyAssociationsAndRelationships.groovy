@@ -60,7 +60,7 @@ class CopyAssociationsAndRelationships {
                 return
             }
 
-            if (dataModel && r.relationshipType.versionSpecific && r.source.status != ElementStatus.DRAFT && !(dataModel in r.source.dataModels)) {
+            if (dataModel && r.relationshipType.versionSpecific && r.source.status != ElementStatus.DRAFT && dataModel != r.source.dataModel) {
                 return
             }
 

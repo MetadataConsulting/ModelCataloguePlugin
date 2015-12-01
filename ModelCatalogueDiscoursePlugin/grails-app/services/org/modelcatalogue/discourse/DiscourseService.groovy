@@ -115,7 +115,7 @@ class DiscourseService implements LogoutListener, CommentsService {
 
         String title = "${element.name} (${GrailsNameUtils.getNaturalName(element.getClass().simpleName)})"
 
-        String categoryName = element.classifications ? findOrCreateDiscourseCategoryName(element.classifications.first().id) : null
+        String categoryName = element.dataModel ? findOrCreateDiscourseCategoryName(element.dataModel.id) : null
 
         String link = "[Open in Model Catalogue](${element.getDefaultModelCatalogueId(true)} \"$title\")"
         String description = element.description ? "$element.description\n\n$link" : link

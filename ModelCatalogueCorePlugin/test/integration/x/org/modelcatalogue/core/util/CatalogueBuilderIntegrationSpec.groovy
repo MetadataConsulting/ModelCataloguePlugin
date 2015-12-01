@@ -849,7 +849,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
         then:
         noExceptionThrown()
-        CatalogueElement.findByNameAndStatus('C4CR GP', ElementStatus.DRAFT).classifications.any { it.name == 'C4CR'}
+        CatalogueElement.findByNameAndStatus('C4CR GP', ElementStatus.DRAFT).dataModel?.name == 'C4CR'
     }
 
 
