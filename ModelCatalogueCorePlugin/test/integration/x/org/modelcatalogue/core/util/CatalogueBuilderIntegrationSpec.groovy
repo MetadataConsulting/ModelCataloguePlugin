@@ -127,10 +127,11 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
             }
         }
 
+        println MeasurementUnit.findAllByName('ExistingUnit2')
+
         then:
-        RuntimeException ex = thrown(RuntimeException)
-        ex.cause instanceof IllegalStateException
-        ex.cause.message.startsWith('Cannot create relationship of type declaration between')
+        IllegalArgumentException ex = thrown(IllegalArgumentException)
+        ex.message.startsWith('New draft requested for Proxy of MeasurementUnit')
     }
 
     def "complain if measurement unit name is missing"() {

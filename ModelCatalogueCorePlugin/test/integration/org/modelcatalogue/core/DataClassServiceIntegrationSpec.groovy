@@ -123,10 +123,10 @@ class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
         DC4
         DC2 in DC1.parentOf
         DC3 in DC1.parentOf
-        DM1 in DC1.dataModels
-        DM2 in DC2.dataModels
-        DM4 in DC4.dataModels
-        DC3.dataModels.empty
+        DM1 == DC1.dataModel
+        DM2 == DC2.dataModel
+        DM4 == DC4.dataModel
+        DC3.dataModel == null
 
         when:
         ListWithTotalAndType<DataClass> includedClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.includes(DM2), [status: 'DRAFT'])
@@ -146,19 +146,7 @@ class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
         DC2 in excludedClasses.items
         DC3 in excludedClasses.items
         DC4 in excludedClasses.items
-        excludedClasses.total == 12L
-
-        when:
-        ListWithTotalAndType<DataClass> incExlClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.create([DM1],[DM2]), [status: 'DRAFT'])
-
-        then:
-        !(DC1 in includedClasses.items)
-        DC2 in includedClasses.items
-        !(DC3 in includedClasses.items)
-        !(DC4 in includedClasses.items)
-        includedClasses.total == 1L
-
-
+        excludedClasses.total >= 12L
 
         when:
         ListWithTotalAndType<DataClass> unclassifiedClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.create(true), [status: 'DRAFT'])
@@ -167,7 +155,7 @@ class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
         DC3 in unclassifiedClasses.items
         !(DC1 in unclassifiedClasses.items)
         !(DC2 in unclassifiedClasses.items)
-        unclassifiedClasses.total == 10L
+        unclassifiedClasses.total >= 10L
 
     }
 }

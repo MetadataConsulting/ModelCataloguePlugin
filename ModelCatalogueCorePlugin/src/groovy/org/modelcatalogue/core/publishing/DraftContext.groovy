@@ -93,7 +93,7 @@ class DraftContext {
         return this
     }
 
-    static CatalogueElement preferDraft(CatalogueElement element) {
+    static <E extends CatalogueElement> E preferDraft(E element) {
         if (element.status == ElementStatus.DRAFT || element.status == ElementStatus.UPDATED) {
             return element
         }
@@ -113,5 +113,15 @@ class DraftContext {
 
     static String hashForRelationship(CatalogueElement source, CatalogueElement destination, RelationshipType type) {
         "$source.id:$type.id:$destination.id"
+    }
+
+    DataModel getDestinationDataModel(CatalogueElement catalogueElement) {
+        if (catalogueElement.dataModel) {
+            return preferDraft(catalogueElement.dataModel)
+        }
+        if (dataModel) {
+           return preferDraft(dataModel)
+        }
+        return null
     }
 }

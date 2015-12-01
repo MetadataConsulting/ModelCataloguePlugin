@@ -92,6 +92,8 @@ class DraftChain extends PublishingChain {
 
         CatalogueElement draft = type.newInstance()
 
+        draft.dataModel = context.getDestinationDataModel(published)
+
         for (prop in domainClass.persistentProperties) {
             if (!prop.association && published.hasProperty(prop.name)) {
                 draft.setProperty(prop.name, published.getProperty(prop.name))
