@@ -91,6 +91,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 		name index :'CtlgElement_name_idx'
         description type: "text"
         extensions lazy: false, sort: 'orderIndex'
+        dataModel lazy: false
     }
 
     static mappedBy = [outgoingRelationships: 'source', incomingRelationships: 'destination', outgoingMappings: 'source', incomingMappings: 'destination']
