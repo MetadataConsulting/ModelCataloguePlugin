@@ -127,11 +127,8 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
             }
         }
 
-        println MeasurementUnit.findAllByName('ExistingUnit2')
-
         then:
-        IllegalArgumentException ex = thrown(IllegalArgumentException)
-        ex.message.startsWith('New draft requested for Proxy of MeasurementUnit')
+        MeasurementUnit.countByName('ExistingUnit2') == 1
     }
 
     def "complain if measurement unit name is missing"() {

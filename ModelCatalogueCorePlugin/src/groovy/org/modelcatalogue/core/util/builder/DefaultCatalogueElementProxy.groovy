@@ -139,7 +139,8 @@ import org.modelcatalogue.core.util.Legacy
 
 
         if (existing.dataModel && classification && classification != existing.dataModel.name || !existing.dataModel && classification) {
-            throw new IllegalArgumentException("New draft requested for $this but you cannot update element which does not belong to current data model ${classification}. If you need an update, please, declare the element within the dataModel closure first (or update the element outside the data model definition if it does not belong to any data model).")
+            log.warn "New draft requested for $this but you cannot update element which does not belong to current data model ${classification}. If you need an update, please, declare the element within the dataModel closure first (or update the element outside the data model definition if it does not belong to any data model)."
+            return existing
         }
 
         if (existing.status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED] || HibernateProxyHelper.getClassWithoutInitializingProxy(existing) != domain) {
