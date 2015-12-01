@@ -31,7 +31,7 @@ class DraftChain extends PublishingChain {
             }
 
             if (published.latestVersionId) {
-                def existingDrafts = published.class.findAllByLatestVersionIdAndStatus(published.latestVersionId, ElementStatus.DRAFT, [sort: 'versionNumber', order: 'desc'])
+                def existingDrafts = HibernateProxyHelper.getClassWithoutInitializingProxy(published).findAllByLatestVersionIdAndStatus(published.latestVersionId, ElementStatus.DRAFT, [sort: 'versionNumber', order: 'desc'])
                 for (existing in existingDrafts) {
                     if (existing.id != published.id) {
                         return existing

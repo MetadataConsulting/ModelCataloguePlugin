@@ -1,7 +1,9 @@
 package org.modelcatalogue.core.publishing
 
+import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.util.FriendlyErrors
 
 class FinalizationChain extends PublishingChain {
 
@@ -52,7 +54,7 @@ class FinalizationChain extends PublishingChain {
         published.save(flush: true, deepValidate: false)
 
         if (published.latestVersionId) {
-            List<CatalogueElement> previousFinalized = published.getClass().findAllByLatestVersionIdAndStatus(published.latestVersionId, ElementStatus.FINALIZED)
+            List<CatalogueElement> previousFinalized = HibernateProxyHelper.getClassWithoutInitializingProxy(published).findAllByLatestVersionIdAndStatus(published.latestVersionId, ElementStatus.FINALIZED)
             for (CatalogueElement e in previousFinalized) {
                 if (e != published) {
                     archiver.archive(e, true)
@@ -65,6 +67,7 @@ class FinalizationChain extends PublishingChain {
 
 
     private CatalogueElement rejectFinalizationDependency(CatalogueElement element) {
+        log.info FriendlyErrors.printErrors("Rejected dependency for $element", element.errors)
         restoreStatus()
         published.errors.reject('org.modelcatalogue.core.CatalogueElement.cannot.finalize.dependency', "Cannot finalize dependency ${element}, please, resolve the issue first. You'll see more details when you try to finalize it manualy")
         published
