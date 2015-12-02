@@ -92,7 +92,7 @@ class DataClassService {
                         select distinct r.destination.id
                         from Relationship r
                         where r.relationshipType = :type
-                        and r.source.id in (:dataModels)
+                        and r.source.dataModel.id in (:dataModels)
                     )
                     and m.dataModel.id in (:dataModels)
                 group by m.name, m.id
@@ -105,7 +105,7 @@ class DataClassService {
                         select distinct r.destination.id
                         from Relationship r
                         where r.relationshipType = :type
-                        and r.source.id in (:dataModels)
+                        and r.source.dataModel.id in (:dataModels)
                     )
                     and m.dataModel.id in (:dataModels)
             """, [type: hierarchy, status: status, dataModels: dataModelFilter.includes])
