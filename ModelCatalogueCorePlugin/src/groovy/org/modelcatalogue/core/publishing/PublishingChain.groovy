@@ -8,14 +8,14 @@ import org.modelcatalogue.core.util.FriendlyErrors
 @Log4j
 abstract class PublishingChain {
 
-    protected CatalogueElement published
-    protected ElementStatus initialStatus
+    protected final CatalogueElement published
 
     // using collection of collection because some of them could be lazy collections
-    protected Collection<Collection<CatalogueElement>> queue = []
-    protected Collection<CatalogueElement> required = []
-    protected Set<Long> processed = []
+    protected final Collection<Collection<CatalogueElement>> queue = []
+    protected final Collection<CatalogueElement> required = []
+    protected final Set<Long> processed = []
 
+    protected ElementStatus initialStatus
 
     public static PublishingChain finalize(CatalogueElement published) {
         FinalizationChain.create(published)

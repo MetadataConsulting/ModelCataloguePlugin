@@ -4,6 +4,7 @@ import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.springframework.validation.ObjectError
 
 class FinalizationChain extends PublishingChain {
 
@@ -39,6 +40,10 @@ class FinalizationChain extends PublishingChain {
                 if (element.id in processed || isUpdatingInProgress(element)) {
                     continue
                 }
+                if (!ableToFinalize(element)) {
+                    element.errors.rejectValue('status', 'org.modelcatalogue.core.CatalogueElement.dependency.not.finalized', "Dependencies outside the current data model $published.dataModel must be finalized.")
+                    return rejectFinalizationDependency(element)
+                }
                 processed << element.id
                 CatalogueElement finalized = element.publish(publisher)
                 if (finalized.hasErrors()) {
@@ -47,6 +52,24 @@ class FinalizationChain extends PublishingChain {
             }
         }
         return doPublish(publisher)
+    }
+
+    private boolean ableToFinalize(CatalogueElement element) {
+        if (element.status == ElementStatus.FINALIZED) {
+            // it's finalized already
+            return true
+        }
+
+        if (element.dataModel == published.dataModel) {
+            // in the same data model
+            return true
+        }
+
+        if (element.dataModel == published) {
+            // the data model is the initiator of the publish chain
+            return true
+        }
+        return false
     }
 
     private CatalogueElement doPublish(Publisher<CatalogueElement> archiver) {
@@ -69,6 +92,12 @@ class FinalizationChain extends PublishingChain {
     private CatalogueElement rejectFinalizationDependency(CatalogueElement element) {
         log.info FriendlyErrors.printErrors("Rejected dependency for $element", element.errors)
         restoreStatus()
+        for (ObjectError error in element.errors.getFieldErrors('status')) {
+            published.errors.reject(error.code, error.arguments, error.defaultMessage)
+        }
+        for (ObjectError error in element.errors.globalErrors) {
+            published.errors.reject(error.code, error.arguments, error.defaultMessage)
+        }
         published.errors.reject('org.modelcatalogue.core.CatalogueElement.cannot.finalize.dependency', "Cannot finalize dependency ${element}, please, resolve the issue first. You'll see more details when you try to finalize it manualy")
         published
     }
