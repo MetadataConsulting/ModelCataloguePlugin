@@ -424,4 +424,16 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         vd.status == ElementStatus.FINALIZED
     }
 
+    def "creating draft of data model won't set previous version as a data model"() {
+        DataModel firstModel = new DataModel(name: "DataModel 4 DataModel DRAFT", status: ElementStatus.FINALIZED).save(failOnError: true, flush: true)
+
+        when:
+        DataModel newModel = elementService.createDraftVersion(firstModel, DraftContext.userFriendly())
+
+        then:
+        newModel != firstModel
+        newModel.dataModel != firstModel
+        newModel.dataModel == null
+    }
+
 }

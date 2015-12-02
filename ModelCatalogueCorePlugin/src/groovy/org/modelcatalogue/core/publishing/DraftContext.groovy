@@ -119,6 +119,13 @@ class DraftContext {
     }
 
     DataModel getDestinationDataModel(CatalogueElement catalogueElement) {
+        if (!catalogueElement) {
+            return null
+        }
+
+        if (catalogueElement.instanceOf(DataModel)) {
+            return null
+        }
         if (catalogueElement.dataModel) {
             return preferDraft(catalogueElement.dataModel)
         }
