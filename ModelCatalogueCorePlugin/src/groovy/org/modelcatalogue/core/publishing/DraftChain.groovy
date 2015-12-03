@@ -142,12 +142,4 @@ class DraftChain extends PublishingChain {
         published
     }
 
-    private static isDraft(CatalogueElement element) {
-        element.status == ElementStatus.DRAFT
-    }
-
-    private static isDeprecated(CatalogueElement element) {
-        element.status == ElementStatus.DEPRECATED
-    }
-
 }

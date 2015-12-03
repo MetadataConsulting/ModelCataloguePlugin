@@ -119,7 +119,7 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
         }
 
         if (rule && rule.trim()) {
-            def result = null
+            def result
             try {
                 result = validateRule(source, destination, ext)
             } catch (e) {
@@ -206,6 +206,10 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
 
     static RelationshipType getSupersessionType() {
         readByName("supersession")
+    }
+
+    static RelationshipType getOriginType() {
+        readByName("origin")
     }
 
     static RelationshipType getBaseType() {

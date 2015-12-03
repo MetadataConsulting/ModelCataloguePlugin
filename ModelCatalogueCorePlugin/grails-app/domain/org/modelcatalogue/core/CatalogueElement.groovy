@@ -7,6 +7,7 @@ import grails.util.GrailsNameUtils
 import org.hibernate.StaleObjectStateException
 import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Published
 import org.modelcatalogue.core.publishing.Publisher
@@ -68,8 +69,8 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping, extensions: ExtensionValue]
 
     static relationships = [
-            incoming: [base: 'isBasedOn', supersession: 'supersedes', favourite: 'isFavouriteOf'],
-            outgoing: [base: 'isBaseFor', attachment: 'hasAttachmentOf', supersession: 'supersededBy'],
+            incoming: [base: 'isBasedOn', supersession: 'supersedes', favourite: 'isFavouriteOf', origin: 'isClonedFrom'],
+            outgoing: [base: 'isBaseFor', attachment: 'hasAttachmentOf', supersession: 'supersededBy', origin: 'isOriginFor'],
             bidirectional: [relatedTo: 'relatedTo', synonym: 'isSynonymFor']
     ]
 
@@ -382,8 +383,12 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     protected PublishingChain preparePublishChain(PublishingChain chain) { chain }
 
     @Override
-    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftContext strategy) {
+    final CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftContext strategy) {
         prepareDraftChain(PublishingChain.createDraft(this, strategy.within(dataModel))).run(publisher)
+    }
+
+    final CatalogueElement cloneElement(Publisher<CatalogueElement> publisher, DataModel destination, CloningContext strategy) {
+        preparePublishChain(PublishingChain.clone(this, strategy)).run(publisher)
     }
 
     protected PublishingChain prepareDraftChain(PublishingChain chain) {

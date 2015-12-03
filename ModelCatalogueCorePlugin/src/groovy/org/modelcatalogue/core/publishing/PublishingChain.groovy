@@ -25,6 +25,10 @@ abstract class PublishingChain {
         DraftChain.create(published, strategy)
     }
 
+    public static PublishingChain clone(CatalogueElement toBeCloned, CloningContext context) {
+        CloningChain.create(toBeCloned, context)
+    }
+
     protected PublishingChain(CatalogueElement published) {
         this.published = published
         this.initialStatus = published.status
@@ -99,6 +103,14 @@ abstract class PublishingChain {
 
     protected static boolean isUpdatingInProgress(CatalogueElement element) {
         element.status == ElementStatus.UPDATED
+    }
+
+    protected static boolean isDraft(CatalogueElement element) {
+        element.status == ElementStatus.DRAFT
+    }
+
+    protected static boolean isDeprecated(CatalogueElement element) {
+        element.status == ElementStatus.DEPRECATED
     }
 
 }
