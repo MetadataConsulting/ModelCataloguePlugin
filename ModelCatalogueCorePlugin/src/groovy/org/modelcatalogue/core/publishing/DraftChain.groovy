@@ -30,7 +30,7 @@ class DraftChain extends PublishingChain {
             }
 
             if (published.latestVersionId) {
-                def existingDrafts = published.class.findAllByLatestVersionIdAndStatus(published.latestVersionId, ElementStatus.DRAFT, [sort: 'versionNumber', order: 'desc'])
+                def existingDrafts = HibernateProxyHelper.getClassWithoutInitializingProxy(published).findAllByLatestVersionIdAndStatus(published.latestVersionId, ElementStatus.DRAFT, [sort: 'versionNumber', order: 'desc'])
                 for (existing in existingDrafts) {
                     if (existing.id != published.id) {
                         return existing
@@ -52,10 +52,15 @@ class DraftChain extends PublishingChain {
 
         for (Collection<CatalogueElement> elements in queue) {
             for (CatalogueElement element in elements) {
+                if (context.dataModel && context.dataModel != element.dataModel && context.dataModel != element) {
+                    processed << element.id
+                    continue
+                }
                 if (element.id in processed || isUpdatingInProgress(element) || isDeprecated(element)) {
                     continue
                 }
                 processed << element.id
+                log.debug "Requesting draft creation of $element from $published"
                 CatalogueElement draft = element.createDraftVersion(publisher, context)
                 if (draft.hasErrors()) {
                     String message = FriendlyErrors.printErrors("Draft version $draft has errors", draft.errors)
@@ -86,8 +91,10 @@ class DraftChain extends PublishingChain {
 
         CatalogueElement draft = type.newInstance()
 
+        draft.dataModel = context.getDestinationDataModel(published)
+
         for (prop in domainClass.persistentProperties) {
-            if (!prop.association && published.hasProperty(prop.name)) {
+            if (!prop.association && published.hasProperty(prop.name) && prop.name != 'dataModel') {
                 draft.setProperty(prop.name, published.getProperty(prop.name))
             }
         }
@@ -133,14 +140,6 @@ class DraftChain extends PublishingChain {
         restoreStatus()
         published.errors.reject('org.modelcatalogue.core.CatalogueElement.required.draft.dependency', "Dependency ${element} is not draft. Please, create draft for it first.")
         published
-    }
-
-    private static isDraft(CatalogueElement element) {
-        element.status == ElementStatus.DRAFT
-    }
-
-    private static isDeprecated(CatalogueElement element) {
-        element.status == ElementStatus.DEPRECATED
     }
 
 }

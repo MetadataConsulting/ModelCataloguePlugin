@@ -11,6 +11,7 @@ import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.util.CatalogueBuilderScript
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.TestDataHelper
+import org.modelcatalogue.integration.mc.ModelCatalogueLoader
 
 class InitCatalogueService {
 
@@ -121,33 +122,13 @@ class InitCatalogueService {
         if (skipDraft) {
             builder.skip ElementStatus.DRAFT
         }
-        GroovyShell shell = prepareGroovyShell(builder)
-        CatalogueBuilderScript script = shell.parse(inputStream.newReader()) as CatalogueBuilderScript
-        script.run()
+
+        ModelCatalogueLoader.build(builder)
+                .classLoader(grailsApplication.classLoader)
+                .blackList(GormStaticApi)
+                .create().load(inputStream)
+
         builder.created
     }
-
-    private GroovyShell prepareGroovyShell(CatalogueBuilder builder) {
-        CompilerConfiguration configuration = new CompilerConfiguration()
-        configuration.scriptBaseClass = CatalogueBuilderScript.name
-
-        SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
-        secureASTCustomizer.with {
-            packageAllowed = false
-            indirectImportCheckEnabled = true
-
-            importsWhitelist = [Object.name, CatalogueBuilder.name]
-            starImportsWhitelist = [Object.name, CatalogueBuilder.name]
-            staticImportsWhitelist = [Object.name, CatalogueBuilder.name]
-            staticStarImportsWhitelist = [Object.name, CatalogueBuilder.name]
-
-            receiversClassesBlackList = [System, GormStaticApi]
-        }
-        configuration.addCompilationCustomizers secureASTCustomizer
-
-
-        new GroovyShell(grailsApplication.classLoader, new Binding(builder: builder), configuration)
-    }
-
 
 }

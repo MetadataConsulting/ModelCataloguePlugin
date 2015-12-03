@@ -84,4 +84,12 @@ class QueryListWithTotalAndType<T> implements ListWithTotalAndType<T> {
         return type
     }
 
+    @Override
+    String toString() {
+        return """
+        QueryListWithTotalAndType:
+            count query: $countQuery
+            list query: $listQuery
+        """.stripIndent().trim()
+    }
 }

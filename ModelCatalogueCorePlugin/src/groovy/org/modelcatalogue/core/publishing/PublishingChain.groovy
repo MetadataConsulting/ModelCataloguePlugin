@@ -1,19 +1,21 @@
 package org.modelcatalogue.core.publishing
 
+import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 
+@Log4j
 abstract class PublishingChain {
 
-    protected CatalogueElement published
-    protected ElementStatus initialStatus
+    protected final CatalogueElement published
 
     // using collection of collection because some of them could be lazy collections
-    protected Collection<Collection<CatalogueElement>> queue = []
-    protected Collection<CatalogueElement> required = []
-    protected Set<Long> processed = []
+    protected final Collection<Collection<CatalogueElement>> queue = []
+    protected final Collection<CatalogueElement> required = []
+    protected final Set<Long> processed = []
 
+    protected ElementStatus initialStatus
 
     public static PublishingChain finalize(CatalogueElement published) {
         FinalizationChain.create(published)
@@ -21,6 +23,10 @@ abstract class PublishingChain {
 
     public static PublishingChain createDraft(CatalogueElement published, DraftContext strategy) {
         DraftChain.create(published, strategy)
+    }
+
+    public static PublishingChain clone(CatalogueElement toBeCloned, CloningContext context) {
+        CloningChain.create(toBeCloned, context)
     }
 
     protected PublishingChain(CatalogueElement published) {
@@ -76,8 +82,16 @@ abstract class PublishingChain {
     protected void restoreStatus() {
         if (published.status != initialStatus) {
             published.status = initialStatus
-            published.clearErrors()
-            FriendlyErrors.failFriendlySave(published)
+
+            if (published.hasErrors()) {
+                log.error FriendlyErrors.printErrors("Errors while creating drafts for $published:", published.errors)
+                published.clearErrors()
+            }
+            try {
+                FriendlyErrors.failFriendlySave(published)
+            } catch (e) {
+                log.error("Error restoring $published state", e)
+            }
         }
     }
 
@@ -89,6 +103,14 @@ abstract class PublishingChain {
 
     protected static boolean isUpdatingInProgress(CatalogueElement element) {
         element.status == ElementStatus.UPDATED
+    }
+
+    protected static boolean isDraft(CatalogueElement element) {
+        element.status == ElementStatus.DRAFT
+    }
+
+    protected static boolean isDeprecated(CatalogueElement element) {
+        element.status == ElementStatus.DEPRECATED
     }
 
 }

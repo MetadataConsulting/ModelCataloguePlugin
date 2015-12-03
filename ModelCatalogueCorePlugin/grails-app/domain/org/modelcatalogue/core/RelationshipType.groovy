@@ -100,6 +100,8 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
         sort "name"
 		name index: 'RelationType_name_idx'
 		destinationClass index: 'RelationType_destinationClass_idx'
+        metadataHints type: 'text'
+        rule type: 'text'
     }
 
     void setRule(String rule) {
@@ -117,7 +119,7 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
         }
 
         if (rule && rule.trim()) {
-            def result = null
+            def result
             try {
                 result = validateRule(source, destination, ext)
             } catch (e) {
@@ -179,6 +181,9 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
         readByName("containment")
     }
 
+    /**
+     * @deprecated no longer used, set the data model directly to the CatalogueElement
+     */
     static RelationshipType getDeclarationType() {
         readByName("declaration")
     }
@@ -201,6 +206,10 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
 
     static RelationshipType getSupersessionType() {
         readByName("supersession")
+    }
+
+    static RelationshipType getOriginType() {
+        readByName("origin")
     }
 
     static RelationshipType getBaseType() {

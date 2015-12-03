@@ -47,17 +47,17 @@ class MeasurementUnitControllerIntegrationSpec extends AbstractCatalogueElementC
 
     @Override
     Map getPropertiesToEdit(){
-        [name: "changedName", description: "edited description ", symbol: "R", dataModels: dataModelsForSpec]
+        [name: "changedName", description: "edited description ", symbol: "R", dataModel: dataModelForSpec]
     }
 
     @Override
     Map getNewInstance(){
-       [symbol: "FS", name: "Something", description: "blah blah blah", dataModels: dataModelsForSpec]
+       [symbol: "FS", name: "Something", description: "blah blah blah", dataModel: dataModelForSpec]
     }
 
     @Override
     Map getBadInstance(){
-        [name: "t"*300, description: "asdf", dataModels: dataModelsForSpec]
+        [name: "t"*300, description: "asdf", dataModel: dataModelForSpec]
     }
 
 

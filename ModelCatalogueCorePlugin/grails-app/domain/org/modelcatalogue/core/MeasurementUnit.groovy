@@ -17,7 +17,7 @@ class MeasurementUnit extends CatalogueElement {
     static transients = ['primitiveTypes']
 
     String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}, symbol: ${symbol}, status: ${status}, modelCatalogueId: ${modelCatalogueId}]"
+        "${getClass().simpleName}[id: ${id}, name: ${name}, symbol: ${symbol}, status: ${status}, modelCatalogueId: ${modelCatalogueId}, dataModel: ${dataModel?.name} (${dataModel?.combinedVersion})]"
     }
 
     List<PrimitiveType> getPrimitiveTypes() {

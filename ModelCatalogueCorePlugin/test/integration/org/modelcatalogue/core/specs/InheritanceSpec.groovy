@@ -341,14 +341,14 @@ class InheritanceSpec extends IntegrationSpec  {
 
     def "handle data models"() {
         expect: "both data classes belongs to right models"
-        dataModel1 in parentClass.dataModels
-        dataModel2 in childClass.dataModels
+        dataModel1 == parentClass.dataModel
+        dataModel2 == childClass.dataModel
 
         when:
         addBasedOn()
 
         then:
-        !(dataModel1 in childClass.dataModels)
+        dataModel1 != childClass.dataModel
     }
 
 

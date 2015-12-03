@@ -86,7 +86,7 @@ class EnumeratedType extends DataType {
     }
 
     String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}, status: ${status}, modelCatalogueId: ${modelCatalogueId}, enumerations: ${enumerations}]"
+        "${getClass().simpleName}[id: ${id}, name: ${name}, status: ${status}, modelCatalogueId: ${modelCatalogueId},  dataModel: ${dataModel?.name} (${dataModel?.combinedVersion}), enumerations: ${enumerations}]"
     }
 
     /**

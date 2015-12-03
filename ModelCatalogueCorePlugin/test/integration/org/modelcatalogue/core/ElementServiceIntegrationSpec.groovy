@@ -1,6 +1,8 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.RelationshipDirection
 import spock.lang.Issue
@@ -15,6 +17,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
     def elementService
     def relationshipService
     def mappingService
+    CatalogueBuilder catalogueBuilder
 
     def "return finalized and draft elements by default"() {
         expect:
@@ -146,20 +149,16 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         DataType dataType = new DataType(name: "merger test type").save(failOnError: true)
 
-        DataElement source = new DataElement(name: "merge tester", dataType: dataType).save(failOnError: true)
-        source.addToDeclaredWithin(sact)
+        DataElement source = new DataElement(dataModel: sact,  name: "merge tester", dataType: dataType).save(failOnError: true)
 
-        DataElement destination = new DataElement(name: "merge tester").save(failOnError: true)
-        destination.addToDeclaredWithin(cosd)
+        DataElement destination = new DataElement(dataModel: cosd, name: "merge tester").save(failOnError: true)
 
         DataClass m1 = new DataClass(name: 'merge test container 1').save(failOnError: true)
         DataClass m2 = new DataClass(name: 'merge test container 2').save(failOnError: true)
 
-        DataClass m3cosd = new DataClass(name: 'merge test container 3').save(failOnError: true)
-        m3cosd.addToDeclaredWithin(cosd)
+        DataClass m3cosd = new DataClass(dataModel: cosd, name: 'merge test container 3').save(failOnError: true)
 
-        DataClass m3sact = new DataClass(name: 'merge test container 3').save(failOnError: true)
-        m3sact.addToDeclaredWithin(sact)
+        DataClass m3sact = new DataClass(dataModel: sact, name: 'merge test container 3').save(failOnError: true)
 
         m1.addToContains(source)
         m2.addToContains(destination)
@@ -183,8 +182,8 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         destination.ext.two == 'two'
         source.countContainedIn() == 2
         destination.countContainedIn() == 3
-        source.dataModels.size() == 1
-        destination.dataModels.size() == 1
+        source.dataModel
+        destination.dataModel
         source.archived
         destination.supersededBy.contains source
         !m3cosd.archived
@@ -427,5 +426,177 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         then:
         vd.status == ElementStatus.FINALIZED
     }
+
+    def "creating draft of data model won't set previous version as a data model"() {
+        DataModel firstModel = new DataModel(name: "DataModel 4 DataModel DRAFT", status: ElementStatus.FINALIZED).save(failOnError: true, flush: true)
+
+        when:
+        DataModel newModel = elementService.createDraftVersion(firstModel, DraftContext.userFriendly())
+
+        then:
+        newModel != firstModel
+        newModel.dataModel != firstModel
+        newModel.dataModel == null
+    }
+
+
+    def "clone whole data model"() {
+        final String dataTypeName = 'DT SM'
+        final String sourceName = 'Source Model'
+        final String destinationName = 'Destination Name'
+
+        catalogueBuilder.build {
+            dataModel name: sourceName, {
+                dataType name: dataTypeName
+            }
+            dataModel name: destinationName
+        }
+
+
+        DataModel source = DataModel.findByName(sourceName)
+        DataModel destination = DataModel.findByName(destinationName)
+
+        when:
+        DataType original = DataType.findByName(dataTypeName)
+        DataModel stillDestination = elementService.cloneElement(source, destination, CloningContext.create(source, destination))
+        DataType clone = DataType.findByNameAndDataModel(dataTypeName, destination)
+
+        then:
+        destination == stillDestination
+        verifyCloned source, destination, original, clone
+    }
+
+    def "clone data type"() {
+        DataModel source = new DataModel(name: 'Source Model').save(failOnError: true)
+        DataModel destination = new DataModel(name: 'Destination').save(failOnError: true)
+
+        when:
+        DataType original = new DataType(dataModel: source, name: 'DT SM')
+        DataType clone = elementService.cloneElement(original, destination, CloningContext.create(source, destination))
+
+        then:
+        verifyCloned source, destination, original, clone
+    }
+
+    def "clone data element"() {
+        final String sourceModelName = 'Source Model 2'
+        final String destinationModelName = 'Destination Model 2'
+        final String originalDataElementName = 'DE CDE'
+        final String originalDataTypeName = 'DT CDE'
+
+        when:
+        catalogueBuilder.build {
+            dataModel(name: sourceModelName) {
+                dataElement name: originalDataElementName, {
+                    dataType name: originalDataTypeName
+                }
+            }
+            dataModel name: destinationModelName
+        }
+
+        DataModel source = DataModel.findByName(sourceModelName)
+        DataModel destination = DataModel.findByName(destinationModelName)
+
+        DataElement originalDataElement = DataElement.findByName(originalDataElementName)
+        DataType originalDataType = DataType.findByName(originalDataTypeName)
+
+        then:
+        source
+        destination
+        originalDataElement
+        originalDataType
+
+        originalDataElement.dataModel == source
+        originalDataType.dataModel == source
+        originalDataElement.dataType == originalDataType
+
+        when:
+        DataElement clonedDataElement = elementService.cloneElement(originalDataElement, destination, CloningContext.create(source, destination))
+        DataType clonedDataType = DataType.findByNameAndDataModel(originalDataTypeName, destination)
+
+        then:
+        verifyCloned source, destination, originalDataElement, clonedDataElement
+        verifyCloned source, destination, originalDataType, clonedDataType
+
+        clonedDataElement.dataType == clonedDataType
+    }
+
+    def "clone data class"() {
+        final String sourceModelName = 'Source Model 3'
+        final String destinationModelName = 'Destination Model 3'
+        final String originalDataClassName = 'DC CDC'
+        final String originalDataElementName = 'DE CDC'
+        final String originalDataTypeName = 'DT CDC'
+
+        when:
+        catalogueBuilder.build {
+            dataModel(name: sourceModelName) {
+                dataClass name: originalDataClassName, {
+                    dataElement name: originalDataElementName, {
+                        dataType name: originalDataTypeName
+                    }
+                }
+            }
+            dataModel name: destinationModelName
+        }
+
+        DataModel source = DataModel.findByName(sourceModelName)
+        DataModel destination = DataModel.findByName(destinationModelName)
+
+        DataClass originalDataClass = DataClass.findByName(originalDataClassName)
+        DataElement originalDataElement = DataElement.findByName(originalDataElementName)
+        DataType originalDataType = DataType.findByName(originalDataTypeName)
+
+        then:
+        source
+        destination
+        originalDataClass
+        originalDataElement
+        originalDataType
+
+        originalDataClass.dataModel == source
+        originalDataElement.dataModel == source
+        originalDataType.dataModel == source
+
+        originalDataElement in originalDataClass.contains
+        originalDataElement.dataType == originalDataType
+
+        when:
+        DataClass clonedDataClass = elementService.cloneElement(originalDataClass, destination, CloningContext.create(source, destination))
+        DataElement clonedDataElement = DataElement.findByNameAndDataModel(originalDataElementName, destination)
+        DataType clonedDataType = DataType.findByNameAndDataModel(originalDataTypeName, destination)
+
+        then:
+        verifyCloned source, destination, originalDataClass, clonedDataClass
+        verifyCloned source, destination, originalDataElement, clonedDataElement
+        verifyCloned source, destination, originalDataType, clonedDataType
+
+        clonedDataElement in clonedDataClass.contains
+        clonedDataElement.dataType == clonedDataType
+    }
+
+    private static <E extends CatalogueElement> boolean verifyCloned(DataModel source, DataModel destination, E original, E clone) {
+        assert clone
+        assert clone.errors.errorCount == 0
+
+        assert original != clone
+
+        assert original.dataModel == source
+        assert original.status == ElementStatus.DRAFT
+
+        assert clone.dataModel == destination
+        assert clone.status == ElementStatus.DRAFT
+
+        assert clone.latestVersionId
+        assert clone.latestVersionId != original.latestVersionId
+        assert clone.latestVersionId != original.id
+
+        assert original.name == clone.name
+        assert original.description == clone.description
+        assert original.ext == clone.ext
+
+        return true
+    }
+
 
 }

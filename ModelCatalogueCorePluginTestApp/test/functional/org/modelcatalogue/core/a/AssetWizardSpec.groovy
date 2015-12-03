@@ -54,6 +54,11 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         waitFor {
             $('.inf-table tbody .inf-table-item-row').size() == 1
         }
+
+        and:
+        waitFor {
+            !modalDialog
+        }
     }
 
     def "Check the asset shows up with own detail page"(){
@@ -187,7 +192,6 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         waitFor {
             subviewTitle.text() == 'MET-523 DRAFT'
         }
-        totalOf('declares') == 39
     }
 
     def "upload excel file"() {
@@ -245,7 +249,6 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         waitFor(60) {
             subviewTitle.text() == 'MET-522 DRAFT'
         }
-        totalOf('declares') == 28
 
         when:
         goToDetailUsingSearch('MET-522.M1', 'MET-522')
@@ -281,8 +284,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         }
 
         then:
-
-        true
+        noExceptionThrown()
     }
 
     void waitUntilFinalized(String expectedName) {

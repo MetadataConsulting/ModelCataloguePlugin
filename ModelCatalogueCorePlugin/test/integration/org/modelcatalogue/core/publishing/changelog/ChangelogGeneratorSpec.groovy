@@ -56,8 +56,7 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
 
         DataModel vdDataModel = new DataModel(name: "Data Model ${System.currentTimeMillis()}").save(failOnError: true)
         for (int i in 1..3) {
-            DataType domain = new DataType(name: "Test Data Type ${i}").save(failOnError: true)
-            vdDataModel.addToDeclares domain
+            DataType domain = new DataType(name: "Test Data Type ${i}", dataModel: vdDataModel).save(failOnError: true)
         }
 
         List<DataType> types = dataModelService.classified(DataType, DataModelFilter.includes(vdDataModel)).list()
@@ -82,10 +81,10 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
                                 dataElement name: "Data Class $i Data Element $j", {
                                     description "This is a description for Data Class $i Data Element $j"
                                     DataType type = types[random.nextInt(types.size())]
-                                    while (!type.dataModels) {
+                                    while (!type.dataModel) {
                                         type = types[random.nextInt(types.size())]
                                     }
-                                    dataType name: type.name, dataModel: type.dataModels.first().name
+                                    dataType name: type.name, dataModel: type.dataModel.name
 
                                     relationship {
                                         ext 'Min Occurs': '0', 'Max Occurs': "$j"
@@ -100,10 +99,10 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
                                         dataElement name: "Data Class $i Inner Data Class $j Data Element $k", {
                                             description "This is a description for Data Class $i Inner Data Class $j Data Element $k"
                                             DataType type = types[random.nextInt(types.size())]
-                                            while (!type.dataModels) {
+                                            while (!type.dataModel) {
                                                 type = types[random.nextInt(types.size())]
                                             }
-                                            dataType name: type.name, dataModel: type.dataModels.first().name
+                                            dataType name: type.name, dataModel: type.dataModel.name
                                         }
                                     }
                                 }

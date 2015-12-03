@@ -128,9 +128,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         }
 
         then:
-        RuntimeException ex = thrown(RuntimeException)
-        ex.cause instanceof IllegalStateException
-        ex.cause.message.startsWith('Cannot create relationship of type declaration between')
+        MeasurementUnit.countByName('ExistingUnit2') == 1
     }
 
     def "complain if measurement unit name is missing"() {
@@ -309,10 +307,8 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
     def "reuses existing data type with given name"() {
         DataModel cls  = new DataModel(name: 'Some').save(failOnError: true)
-        DataType dt1 = new DataType(name: 'SomeType').save(failOnError: true)
+        DataType dt1 = new DataType(name: 'SomeType', dataModel: cls).save(failOnError: true)
         DataType dt2 = new DataType(name: 'SomeType').save(failOnError: true)
-
-        cls.addToDeclares(dt1)
 
         build {
             dataType name: 'SomeType'
@@ -495,7 +491,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         }
 
         created.each {
-            it.publish(elementService)
+            assert it.publish(elementService).errors.errorCount == 0
         }
 
         build {
@@ -520,6 +516,10 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         DataClass.findByName("ModelNV2")?.modelCatalogueId  == "http://www.example.com/models/ModelNV1"
         DataClass.findByName("ModelNV2")?.latestVersionId   == DataClass.findByName("ModelNV1")?.id
         DataClass.findByName("ModelNV2")?.status            == ElementStatus.DRAFT
+        DataClass.findByName("ModelNV2")?.dataModel
+        DataClass.findByName("ModelNV2")?.dataModel?.status == ElementStatus.DRAFT
+        DataClass.findByName("ModelNV2")?.dataModel?.name   == 'NewVersion1'
+
 
         and: "the old model is still finalized"
         DataClass.findByName("ModelNV1")?.status            == ElementStatus.FINALIZED
@@ -853,7 +853,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
         then:
         noExceptionThrown()
-        CatalogueElement.findByNameAndStatus('C4CR GP', ElementStatus.DRAFT).classifications.any { it.name == 'C4CR'}
+        CatalogueElement.findByNameAndStatus('C4CR GP', ElementStatus.DRAFT).dataModel?.name == 'C4CR'
     }
 
 

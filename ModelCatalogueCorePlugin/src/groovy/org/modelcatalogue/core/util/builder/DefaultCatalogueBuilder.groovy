@@ -586,9 +586,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         }
 
         context.withContextElement(DataModel) {
-            RelationshipProxy relationshipProxy = new RelationshipProxy(RelationshipType.declarationType.name, it, element, [:])
-            element.addToPendingRelationships(relationshipProxy)
-            it.addToPendingRelationships(relationshipProxy)
+            element.setParameter('dataModel', it)
         }
     }
 

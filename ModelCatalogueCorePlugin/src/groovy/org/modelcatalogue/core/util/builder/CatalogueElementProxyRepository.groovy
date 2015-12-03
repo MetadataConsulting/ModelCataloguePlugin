@@ -348,7 +348,7 @@ class CatalogueElementProxyRepository {
         }
 
         // only return unclassified results
-        if (result.classifications && !(type in HAS_UNIQUE_NAMES)) {
+        if (result.dataModel && !(type in HAS_UNIQUE_NAMES)) {
             return null
         }
 
@@ -412,7 +412,7 @@ class CatalogueElementProxyRepository {
                 return elements.first()
             }
             for (T element in elements) {
-                if (!element.classifications) {
+                if (!element.dataModel) {
                     return element
                 }
             }

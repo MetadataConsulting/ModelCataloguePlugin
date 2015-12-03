@@ -4,6 +4,7 @@ import grails.util.Environment
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.util.FriendlyErrors
@@ -38,13 +39,12 @@ class ElementService implements Publisher<CatalogueElement> {
 
     public <E extends CatalogueElement> E createDraftVersion(E element, DraftContext context) {
         Closure<E> code = { TransactionStatus status = null ->
-            auditService.logNewVersionCreated(element) {
+            return (E) auditService.logNewVersionCreated(element) {
                 E draft = element.createDraftVersion(this, context) as E
                 if (draft.hasErrors()) {
                     status?.setRollbackOnly()
                     return element
                 }
-                context.classifyDrafts()
                 context.resolvePendingRelationships()
                 return draft
             }
@@ -52,7 +52,21 @@ class ElementService implements Publisher<CatalogueElement> {
         if (context.importFriendly) {
             return code()
         } else {
-            return CatalogueElement.withTransaction(code)
+            return (E) CatalogueElement.withTransaction(code)
+        }
+    }
+
+    public <E extends CatalogueElement> E cloneElement(E element, DataModel destination, CloningContext context) {
+        return (E) CatalogueElement.withTransaction { TransactionStatus status = null ->
+            return (E) auditService.logNewVersionCreated(element) {
+                E draft = element.cloneElement(this, destination, context) as E
+                if (draft.hasErrors()) {
+                    status?.setRollbackOnly()
+                    return element
+                }
+                context.resolvePendingRelationships()
+                return draft
+            }
         }
     }
 
@@ -96,7 +110,7 @@ class ElementService implements Publisher<CatalogueElement> {
 
 
     public <E extends CatalogueElement> E finalizeElement(E draft) {
-        CatalogueElement.withTransaction { TransactionStatus status ->
+        return (E) CatalogueElement.withTransaction { TransactionStatus status ->
             auditService.logElementFinalized(draft) {
                 E finalized = draft.publish(this) as E
                 if (finalized.hasErrors()) {
@@ -112,13 +126,13 @@ class ElementService implements Publisher<CatalogueElement> {
             return [ElementStatus.FINALIZED, ElementStatus.DRAFT]
         }
         if (params.status instanceof ElementStatus) {
-            return [params.status]
+            return [params.status as ElementStatus]
         }
         return [ElementStatus.valueOf(params.status.toString().toUpperCase())]
     }
 
 
-    public <E extends CatalogueElement> E merge(E source, E destination, Set<DataModel> classifications = new HashSet(source.dataModels)) {
+    public <E extends CatalogueElement> E merge(E source, E destination, DataModel dataModel = source.dataModel) {
         log.info "Merging $source into $destination"
         if (destination == null) return null
 
@@ -175,17 +189,13 @@ class ElementService implements Publisher<CatalogueElement> {
         }
 
         destination.status = ElementStatus.UPDATED
+
+        if (!destination.dataModel) {
+            destination.dataModel = source.dataModel
+        }
+
         destination.save(flush: true, validate: false)
 
-
-        if (!destination.dataModels) {
-            for (DataModel dataModel in new HashSet<DataModel>(source.dataModels)) {
-                dataModel.removeFromDeclares(source)
-                source.removeFromDeclaredWithin(dataModel)
-                dataModel.addToDeclares(destination)
-                destination.addToDeclaredWithin(dataModel)
-            }
-        }
 
         for (Map.Entry<String, String> extension in new HashMap<String, String>(source.ext)) {
             if(!destination.ext.containsKey(extension.key)) {
@@ -196,10 +206,6 @@ class ElementService implements Publisher<CatalogueElement> {
         for (Relationship rel in new HashSet<Relationship>(source.outgoingRelationships)) {
             if (rel.relationshipType.system) {
                 // skip system, currently only supersession
-                continue
-            }
-
-            if (rel.relationshipType == RelationshipType.declarationType) {
                 continue
             }
 
@@ -217,8 +223,8 @@ class ElementService implements Publisher<CatalogueElement> {
 
             if (existing) {
                 if (rel.destination instanceof CatalogueElement && existing.destination instanceof CatalogueElement && rel.destination.class == existing.destination.class && existing.destination != destination) {
-                    if (rel.destination.dataModels.intersect(classifications)) {
-                        merge rel.destination, existing.destination, classifications
+                    if (rel.destination.dataModel == dataModel) {
+                        merge rel.destination, existing.destination, dataModel
                     }
                 }
                 continue
@@ -238,10 +244,6 @@ class ElementService implements Publisher<CatalogueElement> {
                 continue
             }
 
-            if (rel.relationshipType == RelationshipType.declarationType) {
-                continue
-            }
-
             if (rel.source == destination) {
                 // do not self-reference
                 continue
@@ -256,8 +258,8 @@ class ElementService implements Publisher<CatalogueElement> {
 
             if (existing) {
                 if (rel.source.class == existing.source.class && existing.source != destination) {
-                    if (rel.source.dataModels.intersect(classifications)) {
-                        merge rel.source, existing.source, classifications
+                    if (rel.source.dataModel == dataModel) {
+                        merge rel.source, existing.source, dataModel
                     }
                 }
                 continue

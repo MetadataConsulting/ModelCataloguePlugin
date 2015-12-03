@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.publishing
 
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.RelationshipType
 
@@ -10,6 +11,8 @@ class DraftContext {
     private boolean forceNew
 
     private Set<Long> elementsUnderControl
+
+    private DataModel dataModel
 
     private Class<? extends CatalogueElement> newType
 
@@ -75,19 +78,25 @@ class DraftContext {
         pendingRelationshipsTasks << new CopyAssociationsAndRelationships(draft, oldVersion, this)
     }
 
-    void classifyDrafts() {
-        pendingRelationshipsTasks.each {
-            it.copyClassifications(createdRelationshipHashes)
-        }
-    }
-
     void resolvePendingRelationships() {
         pendingRelationshipsTasks.each {
-            it.copyRelationships(createdRelationshipHashes)
+            it.copyRelationships(dataModel, createdRelationshipHashes)
         }
     }
 
-    static CatalogueElement preferDraft(CatalogueElement element) {
+    DataModel getDataModel() {
+        return dataModel
+    }
+
+    DraftContext within(DataModel dataModel) {
+        this.dataModel = dataModel
+        return this
+    }
+
+    static <E extends CatalogueElement> E preferDraft(E element) {
+        if (!element) {
+            return element
+        }
         if (element.status == ElementStatus.DRAFT || element.status == ElementStatus.UPDATED) {
             return element
         }
@@ -96,7 +105,7 @@ class DraftContext {
             return element
         }
 
-        CatalogueElement existingDraft =  element.class.findByLatestVersionIdAndStatusInList(element.latestVersionId, [ElementStatus.DRAFT, ElementStatus.UPDATED], [sort: 'versionNumber', order: 'desc'])
+        E existingDraft =  element.class.findByLatestVersionIdAndStatusInList(element.latestVersionId, [ElementStatus.DRAFT, ElementStatus.UPDATED], [sort: 'versionNumber', order: 'desc'])
 
         if (existingDraft) {
             return existingDraft
@@ -107,5 +116,22 @@ class DraftContext {
 
     static String hashForRelationship(CatalogueElement source, CatalogueElement destination, RelationshipType type) {
         "$source.id:$type.id:$destination.id"
+    }
+
+    DataModel getDestinationDataModel(CatalogueElement catalogueElement) {
+        if (!catalogueElement) {
+            return null
+        }
+
+        if (catalogueElement.instanceOf(DataModel)) {
+            return null
+        }
+        if (catalogueElement.dataModel) {
+            return preferDraft(catalogueElement.dataModel)
+        }
+        if (dataModel) {
+           return preferDraft(dataModel)
+        }
+        return null
     }
 }

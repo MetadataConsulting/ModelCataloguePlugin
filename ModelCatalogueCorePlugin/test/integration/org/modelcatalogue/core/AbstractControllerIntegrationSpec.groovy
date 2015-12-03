@@ -462,11 +462,6 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     }
 
     boolean removeAllRelations(Object instance) {
-        if (instance.hasProperty('dataModels'))
-        for (DataModel dataModel in instance.dataModels) {
-            instance.removeFromDeclaredWithin(dataModel)
-        }
-
         return true
     }
 

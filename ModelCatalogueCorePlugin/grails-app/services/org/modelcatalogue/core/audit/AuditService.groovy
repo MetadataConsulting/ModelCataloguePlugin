@@ -160,13 +160,12 @@ class AuditService {
     }
 
     private static String getClassifiedElementsSubQuery(DataModelFilter classifications, Map<String, Object> args) {
-        args.classificationType = RelationshipType.declarationType
         if (classifications.unclassifiedOnly) {
             // language=HQL
             return """
                 select ce.id
                 from CatalogueElement ce
-                where ce not in (select r.destination from Relationship r where r.relationshipType = :classificationType)
+                where ce.dataModel is null
             """
         }
         if (classifications.excludes && !classifications.includes) {
@@ -176,26 +175,18 @@ class AuditService {
                 select ce
                 from CatalogueElement ce
                 where
-                    ce.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:excludes)) or ce.id not in (:excludes)
+                    ce.dataModel.id not in (:excludes) or ce.id not in (:excludes)
             """
         }
         if (classifications.excludes && classifications.includes) {
-            args.excludes = classifications.excludes
-            args.includes = classifications.includes
-            // language=HQL
-            return """
-                select ce
-                from CatalogueElement ce
-                where (ce.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:excludes)) or ce.id not in (:excludes))
-                  and (ce.id     in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:includes)) or ce.id     in (:includes))
-            """
+            throw new IllegalStateException("Combining exclusion and inclusion is no longer supported. Exclusion would be ignored!")
         }
         if (classifications.includes && !classifications.excludes) {
             args.includes = classifications.includes
             // language=HQL
             return """
                 select ce from CatalogueElement ce
-                where ce.id in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:includes)) or ce.id in (:includes)
+                where ce.dataModel.id in (:includes) or ce.id in (:includes)
             """
         }
         throw new IllegalArgumentException("Data model filter must be set")

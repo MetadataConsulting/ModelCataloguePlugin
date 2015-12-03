@@ -19,7 +19,7 @@ class CatalogueElementDocumentSerializer<T extends CatalogueElement> implements 
         safePut(builder, 'description', element.description)
         safePut(builder, 'fully_qualified_type', clazz.name)
         safePut(builder, 'type_human_readable', GrailsNameUtils.getNaturalName(clazz.simpleName))
-        safePut(builder, 'data_model', element.dataModels ? element.dataModels.first().name : null)
+        safePut(builder, 'data_model', element.dataModel ? element.dataModel.name : null)
         safePut(builder, 'full_version', element.combinedVersion)
         safePut(builder, 'latest_id', (element.latestVersionId ?: element.getId()).toString())
         safePut(builder, 'version_number', element.versionNumber)

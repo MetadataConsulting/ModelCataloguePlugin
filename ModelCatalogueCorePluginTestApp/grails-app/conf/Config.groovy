@@ -154,13 +154,18 @@ environments {
     production {
         grails.logging.jul.usebridge = false
 
+        // ---
+        // you can overrides in your mc-config.groovy
+        mc.sync.relationshipTypes=true
+        grails.assets.minifyJs = true
+        // ---
+
         grails.assets.minifyOptions = [
                 strictSemicolons: false,
                 mangleOptions: [mangle: false, toplevel: false, defines: null, except: null, no_functions:false],
                 genOptions: [indent_start:0, indent_level:4, quote_keys: false, space_colon: false, beautify: false, ascii_only: false, inline_script:false]
         ]
 
-        grails.assets.minifyJs = true
 
         if (System.properties["mc.config.location"]) {
             // for running
@@ -207,6 +212,9 @@ log4j.main = {
     debug 'org.modelcatalogue.core.gel'
     debug 'org.modelcatalogue.core.export'
     debug 'org.modelcatalogue.discourse'
+
+    info 'grails.app.services.org.grails.plugins.console'
+    info 'org.grails.plugins.console'
 
 //    debug 'org.codehaus.groovy.grails.web.mapping'
 //    debug 'org.springframework.security'

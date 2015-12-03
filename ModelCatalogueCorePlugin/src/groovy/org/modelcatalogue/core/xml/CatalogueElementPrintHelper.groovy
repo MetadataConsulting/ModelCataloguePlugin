@@ -68,12 +68,12 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
     Map<String, Object> collectAttributes(E element, PrintContext context) {
         Map<String, Object> attrs = [name: element.name]
 
-        if (element.dataModels && !(context.currentClassification in element.dataModels)) {
-            attrs.dataModel = element.dataModels.first().name
+        if (element.dataModel && context.currentClassification != element.dataModel) {
+            attrs.dataModel = element.dataModel.name
         }
 
         if (element.hasModelCatalogueId()) {
-            attrs.id   = element.modelCatalogueId
+            attrs.id = element.modelCatalogueId
             if (!context.noHref) {
                 attrs.href = element.getDefaultModelCatalogueId(!context.idIncludeVersion)
             }
@@ -178,11 +178,11 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             return [ref: element.modelCatalogueId, href: element.getDefaultModelCatalogueId(!context.idIncludeVersion)]
         }
 
-        if (element.dataModels) {
-            if (context.currentClassification in element.dataModels) {
+        if (element.dataModel) {
+            if (context.currentClassification == element.dataModel) {
                 return [name: element.name]
             } else {
-                return [name: element.name, dataModel: element.dataModels.first().name]
+                return [name: element.name, dataModel: element.dataModel.name]
             }
         }
 

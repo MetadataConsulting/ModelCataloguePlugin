@@ -56,6 +56,12 @@ if [ "$TEST_SUITE" = "gel_integration" ] || [ "$TEST_SUITE" = "" ] ; then
 fi
 cd ..
 
+cd ModelCatalogueElasticSearchPlugin
+if [ "$TEST_SUITE" = "es_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+    ./grailsw test-app integration: --non-interactive
+fi
+cd ..
+
 cd ModelCatalogueCorePlugin
 # karma tests, part of the integration as they needs the fixtures generated from the integration tests
 if [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "" ] ; then

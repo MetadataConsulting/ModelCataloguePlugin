@@ -9,20 +9,18 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.RelationshipDirection
-import org.modelcatalogue.core.RelationshipDefinition
-import org.modelcatalogue.core.RelationshipDefinitionBuilder
 
 @Log4j
-class CopyAssociationsAndRelationships {
+class CloningCopyAssociationsAndRelationshipsTask {
 
     private final CatalogueElement draft
     private final CatalogueElement element
-    private final DraftContext context
+    private final CloningContext context
 
     private RelationshipService relationshipService
 
 
-    CopyAssociationsAndRelationships(CatalogueElement draft, CatalogueElement element, DraftContext context) {
+    CloningCopyAssociationsAndRelationshipsTask(CatalogueElement draft, CatalogueElement element, CloningContext context) {
         this.draft = draft
         this.element = element
         this.context = context
@@ -30,22 +28,16 @@ class CopyAssociationsAndRelationships {
     }
 
     void copyRelationships(DataModel dataModel, Set<String> createdRelationshipHashes) {
-        if (context.importFriendly && context.isUnderControl(draft)) {
-            return
-        }
-
-        copyRelationshipsInternal(dataModel, RelationshipDirection.INCOMING, createdRelationshipHashes)
+        // copy only outgoing relationships as they define the structure
         copyRelationshipsInternal(dataModel, RelationshipDirection.OUTGOING, createdRelationshipHashes)
 
-        Class type = context.newType ?: HibernateProxyHelper.getClassWithoutInitializingProxy(draft)
-
-        GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(type.name) as GrailsDomainClass
+        GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(HibernateProxyHelper.getClassWithoutInitializingProxy(draft).name) as GrailsDomainClass
 
         for (prop in domainClass.persistentProperties) {
             if (prop.association && (prop.manyToOne || prop.oneToOne) && element.hasProperty(prop.name) && prop.name != 'dataModel') {
                 def value = element.getProperty(prop.name)
                 if (value instanceof CatalogueElement) {
-                    draft.setProperty(prop.name, DraftContext.preferDraft(value))
+                    draft.setProperty(prop.name, context.preferClone(value))
                 }
             }
         }
@@ -57,6 +49,11 @@ class CopyAssociationsAndRelationships {
 
         relationshipService.eachRelationshipPartitioned(direction, element) { Relationship r ->
             if (r.relationshipType.system) {
+                return
+            }
+
+            if (!r.relationshipType.versionSpecific) {
+                // don't copy other relationships than version specific as these define the structure
                 return
             }
 
@@ -72,10 +69,10 @@ class CopyAssociationsAndRelationships {
             String hash
 
             if (direction == RelationshipDirection.INCOMING) {
-                otherSide = DraftContext.preferDraft(r.source)
+                otherSide = context.preferClone(r.source)
                 hash = DraftContext.hashForRelationship(otherSide, draft, r.relationshipType)
             } else {
-                otherSide = DraftContext.preferDraft(r.destination)
+                otherSide = context.preferClone(r.destination)
                 hash = DraftContext.hashForRelationship(draft, otherSide, r.relationshipType)
             }
 
@@ -133,7 +130,7 @@ class CopyAssociationsAndRelationships {
         if (this.is(o)) return true
         if (getClass() != o.class) return false
 
-        CopyAssociationsAndRelationships that = (CopyAssociationsAndRelationships) o
+        CloningCopyAssociationsAndRelationshipsTask that = (CloningCopyAssociationsAndRelationshipsTask) o
 
         if (draft != that.draft) return false
         if (element != that.element) return false

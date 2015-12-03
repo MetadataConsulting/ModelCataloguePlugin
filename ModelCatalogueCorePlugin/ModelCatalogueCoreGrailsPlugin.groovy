@@ -430,10 +430,10 @@ Model catalogue core plugin (metadata registry)
     }
 
     def static getDataModelsString(CatalogueElement dataElement) {
-        if (!dataElement?.dataModels) {
+        if (!dataElement?.dataModel) {
             return ""
         }
-        dataElement.dataModels.first().name
+        dataElement.dataModel.name
     }
 
     def static getEnumerationString(DataType dataType){

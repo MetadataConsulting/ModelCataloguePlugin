@@ -50,7 +50,7 @@
 
             return true</rule>
     </relationshipType>
-    <relationshipType name="declaration" source="org.modelcatalogue.core.DataModel" destination="org.modelcatalogue.core.CatalogueElement" versionSpecific="true">
+    <relationshipType name="declaration" source="org.modelcatalogue.core.DataModel" destination="org.modelcatalogue.core.CatalogueElement" versionSpecific="true" system="true">
       <sourceToDestination label="declares">Data models can declare multiple elements. Based on this relationship you can narrow the elements shown in the catalogue using the data model filter in the bottom left corner. When data model is finalized all defined elements are finalized as well.</sourceToDestination>
       <destinationToSource label="declared within">Any element can be declared within multiple data models. When new draft of the element is created then drafts for data models are created as well.</destinationToSource>
       <rule>if (!destination.dataModels) {

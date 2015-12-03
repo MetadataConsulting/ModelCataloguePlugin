@@ -1,11 +1,13 @@
 package org.modelcatalogue.core
 
 import com.google.common.base.Function
+import com.google.common.collect.ImmutableList
 import com.google.common.collect.Lists
 import grails.util.GrailsNameUtils
 import org.hibernate.StaleObjectStateException
 import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Published
 import org.modelcatalogue.core.publishing.Publisher
@@ -31,6 +33,8 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     def relationshipService
     def auditService
     def mappingService
+
+    DataModel dataModel
 
     String name
     String description
@@ -60,25 +64,26 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     Set<Mapping> outgoingMappings = []
     Set<Mapping> incomingMappings = []
 
-    static transients = ['relations', 'info', 'archived', 'relations', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext', 'classifications', 'combinedVersion', 'inheritedAssociationsNames', 'modelCatalogueResourceName']
+    static transients = ['relations', 'info', 'archived', 'relations', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext', 'combinedVersion', 'inheritedAssociationsNames', 'modelCatalogueResourceName']
 
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping, extensions: ExtensionValue]
 
     static relationships = [
-            incoming: [base: 'isBasedOn', declaration: 'declaredWithin', supersession: 'supersedes', favourite: 'isFavouriteOf'],
-            outgoing: [base: 'isBaseFor', attachment: 'hasAttachmentOf', supersession: 'supersededBy'],
+            incoming: [base: 'isBasedOn', supersession: 'supersedes', favourite: 'isFavouriteOf', origin: 'isClonedFrom'],
+            outgoing: [base: 'isBaseFor', attachment: 'hasAttachmentOf', supersession: 'supersededBy', origin: 'isOriginFor'],
             bidirectional: [relatedTo: 'relatedTo', synonym: 'isSynonymFor']
     ]
 
     static constraints = {
         name size: 1..255
         description nullable: true, maxSize: 2000
-		modelCatalogueId nullable: true, unique: 'versionNumber', size: 1..255, url: true
+		modelCatalogueId nullable: true, /* unique: 'versionNumber', */ size: 1..255, url: true
         dateCreated bindable: false
         lastUpdated bindable: false
         archived bindable: false
         versionNumber bindable: false
         latestVersionId bindable: false, nullable: true
+        dataModel nullable: true
     }
 
     static mapping = {
@@ -87,6 +92,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 		name index :'CtlgElement_name_idx'
         description type: "text"
         extensions lazy: false, sort: 'orderIndex'
+        dataModel lazy: false
     }
 
     static mappedBy = [outgoingRelationships: 'source', incomingRelationships: 'destination', outgoingMappings: 'source', incomingMappings: 'destination']
@@ -321,7 +327,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}, status: ${status}, modelCatalogueId: ${modelCatalogueId}]"
+        "${getClass().simpleName}[id: ${id}, name: ${name}, status: ${status}, modelCatalogueId: ${modelCatalogueId}, dataModel: ${dataModel?.name} (${dataModel?.combinedVersion})]"
     }
 
     @Override
@@ -365,20 +371,6 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         listExtensions()?.find { it.name == name }
     }
 
-    List<DataModel> getDataModels() {
-        try {
-            return relationshipService.getDataModels(this)
-        } catch (StaleObjectStateException stale) {
-            log.error("Stale object exception getting data models for $this, errors=${ this.validate() ; this.errors }", stale)
-            return []
-        }
-    }
-
-    @Deprecated
-    List<DataModel> getClassifications() {
-        relationshipService.getDataModels(this)
-    }
-
     boolean isReadyForQueries() {
         isAttached() && !hasErrors()
     }
@@ -391,12 +383,16 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     protected PublishingChain preparePublishChain(PublishingChain chain) { chain }
 
     @Override
-    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftContext strategy) {
-        prepareDraftChain(PublishingChain.createDraft(this, strategy)).run(publisher)
+    final CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftContext strategy) {
+        prepareDraftChain(PublishingChain.createDraft(this, strategy.within(dataModel))).run(publisher)
+    }
+
+    final CatalogueElement cloneElement(Publisher<CatalogueElement> publisher, DataModel destination, CloningContext strategy) {
+        preparePublishChain(PublishingChain.clone(this, strategy)).run(publisher)
     }
 
     protected PublishingChain prepareDraftChain(PublishingChain chain) {
-        chain.add(dataModels)
+        chain.add(dataModel)
     }
 
     @Override
@@ -452,10 +448,6 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     void clearAssociationsBeforeDelete() {
-        for (DataModel c in this.dataModels) {
-            this.removeFromDeclaredWithin(c)
-        }
-
         // it is safe to remove all versioning informations
         for (CatalogueElement e in this.supersededBy) {
             this.removeFromSupersededBy(e)

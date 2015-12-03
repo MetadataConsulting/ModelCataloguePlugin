@@ -81,6 +81,7 @@ class ModelCatalogueCorePluginUrlMappings {
                 "/api/modelCatalogue/core/$elementName/$id/archive"(controller: controllerName, action: 'archive', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$elementName/$id/restore"(controller: controllerName, action: 'restore', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$elementName/$id/finalize"(controller: controllerName, action: 'finalizeElement', method: HttpMethod.POST)
+                "/api/modelCatalogue/core/$elementName/$id/clone/$destinationDataModelId"(controller: controllerName, action: 'cloneElement', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$elementName/$source/merge/$destination"(controller: controllerName, action: 'merge', method: HttpMethod.POST)
 
                 if (controllerName == 'dataType' || controllerName == 'enumeratedType' || controllerName == 'referenceType' || controllerName == 'primitiveType') {

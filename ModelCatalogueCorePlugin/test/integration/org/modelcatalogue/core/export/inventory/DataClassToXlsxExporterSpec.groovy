@@ -49,9 +49,8 @@ class DataClassToXlsxExporterSpec extends IntegrationSpec {
 
         if (!domains) {
             for (int i in 1..10) {
-                DataType domain = new DataType(name: "Test Data Type #${i}").save(failOnError: true)
                 DataModel data = new DataModel(name: "Data Model ${System.currentTimeMillis()}").save(failOnError: true)
-                data.addToDeclares domain
+                DataType domain = new DataType(name: "Test Data Type #${i}", dataModel: data).save(failOnError: true)
             }
             domains = DataType.list()
         }
@@ -69,7 +68,7 @@ class DataClassToXlsxExporterSpec extends IntegrationSpec {
                                 dataElement name: "C4CTXE Model $i Data Element $j", {
                                     description "This is a description for Model $i Data Element $j"
                                     DataType type = domains[random.nextInt(domains.size())]
-                                    dataType name: type.name, dataModel: type.dataModels ? type.dataModels.first().name : null
+                                    dataType name: type.name, dataModel: type.dataModel ? type.dataModel.name : null
                                 }
                             }
                             for (int j in 1..3) {
@@ -80,7 +79,7 @@ class DataClassToXlsxExporterSpec extends IntegrationSpec {
                                         dataElement name: "C4CTXE Model $i Child Model $j Data Element $k", {
                                             description "This is a description for Model $i Child Model $j Data Element $k"
                                             DataType type = domains[random.nextInt(domains.size())]
-                                            dataType name: type.name, dataModel: type.dataModels ? type.dataModels.first().name : null
+                                            dataType name: type.name, dataModel: type.dataModel ? type.dataModel.name : null
                                         }
                                     }
                                 }

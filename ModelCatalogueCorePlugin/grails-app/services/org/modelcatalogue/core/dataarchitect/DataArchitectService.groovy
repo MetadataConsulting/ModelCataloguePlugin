@@ -25,9 +25,7 @@ class DataArchitectService {
     private Map<String,Runnable> suggestions = [
             'Inline Models': this.&generateInlineModel,
             'Merge Models': this.&generateMergeModels,
-            'Enum Duplicates and Synonyms': this.&generatePossibleEnumDuplicatesAndSynonyms,
-            'Deep Declaration': this.&generateDeepClassify.curry(false),
-            'Deep Declaration (Orpahned Only)': this.&generateDeepClassify.curry(true)
+            'Enum Duplicates and Synonyms': this.&generatePossibleEnumDuplicatesAndSynonyms
     ]
 
     Set<String> getSuggestionsNames() {
@@ -292,81 +290,6 @@ class DataArchitectService {
                 return
             }
             execute suggestion, runnable
-        }
-    }
-
-
-    private void generateDeepClassify(boolean unclassifiedOnly = false) {
-        Batch.findAllByNameIlike("Deep Declaration '%'").each reset
-
-        List<ElementStatus> statuses = [ElementStatus.FINALIZED, ElementStatus.DRAFT]
-
-        log.info "Generating deep declaration suggestions for models => models/data elements"
-        generateDeepClassification(Relationship.executeQuery(unclassifyIfNeeded(unclassifiedOnly,  '''
-            select rel.source, destination
-            from Relationship rel
-            join rel.destination source
-            join source.outgoingRelationships outgoing
-            join outgoing.destination destination
-            where rel.relationshipType = :classificationType
-            and outgoing.relationshipType in :inheriting
-            and source.status in :statuses
-            and destination.status in :statuses
-            and destination not in (
-                select rel2.destination
-                from Relationship rel2
-                where rel2.relationshipType = :classificationType
-                and (rel2.source.id = rel.source.id or rel2.source.latestVersionId = rel.source.latestVersionId)
-            )
-        '''), [
-            classificationType: RelationshipType.declarationType,
-            inheriting: [RelationshipType.hierarchyType, RelationshipType.containmentType],
-            statuses: statuses
-        ]))
-
-        log.info "Generating deep declaration suggestions for data element => data types"
-        //language=HQL
-        generateDeepClassification(Relationship.executeQuery(unclassifyIfNeeded(unclassifiedOnly, '''
-            select rel.source, destination
-            from DataElement source
-            join source.incomingRelationships rel
-            join source.dataType destination
-            where rel.relationshipType = :classificationType
-            and source.status in :statuses
-            and destination.status in :statuses
-            and destination not in (
-                select rel2.destination
-                from Relationship rel2
-                where rel2.relationshipType = :classificationType
-                and (rel2.source.id = rel.source.id or rel2.source.latestVersionId = rel.source.latestVersionId)
-            )
-        '''), [
-                classificationType: RelationshipType.declarationType,
-                statuses: statuses
-        ]))
-    }
-
-    private static String unclassifyIfNeeded(boolean unclassifiedOnly, String hql, String classifier = "and (rel2.source.id = rel.source.id or rel2.source.latestVersionId = rel.source.latestVersionId)") {
-        if (!unclassifiedOnly) {
-            return hql
-        }
-        return hql.replace(classifier, '')
-    }
-
-    private void generateDeepClassification(result) {
-        for (Object[] row in result) {
-            DataModel classification = row[0] as DataModel
-            CatalogueElement element = row[1] as CatalogueElement
-
-            Batch batch = Batch.findOrSaveByName("Deep Declare '$classification.name'")
-
-            Action action = actionService.create batch, CreateRelationship, source: AbstractActionRunner.encodeEntity(DraftContext.preferDraft(classification)), destination: AbstractActionRunner.encodeEntity(DraftContext.preferDraft(element)), type: "gorm://org.modelcatalogue.core.RelationshipType:${RelationshipType.declarationType.id}"
-            if (action.hasErrors()) {
-                log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating deep declaration action", action.errors))
-            }
-
-            batch.archived = false
-            batch.save(flush: true)
         }
     }
 

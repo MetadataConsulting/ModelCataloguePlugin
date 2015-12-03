@@ -440,7 +440,7 @@ class GelXmlService {
         if (!dataType) {
             return printDataElementSchemaType(xml, dataElement, minOccurs, maxOccurs)
         } else {
-            if (dataType.dataModels.contains(xmlSchema)) {
+            if (dataType.dataModel == xmlSchema) {
                 return printDataElementSchemaType(xml, dataElement, minOccurs, maxOccurs)
             } else {
                 //copy or overwrite all ext entries from dataElemnt to value domain

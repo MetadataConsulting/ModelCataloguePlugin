@@ -28,12 +28,9 @@ class DataModelServiceSpec extends IntegrationSpec {
         model2 = new DataModel(name: "Test Classification 2 ${System.currentTimeMillis()}").save(failOnError: true)
         model3 = new DataModel(name: "Test Classification 3 ${System.currentTimeMillis()}").save(failOnError: true)
         class0 = new DataClass(name: "Not Classified", status: ElementStatus.FINALIZED).save(failOnError: true)
-        class1 = new DataClass(name: "Classified 1", status: ElementStatus.FINALIZED).save(failOnError: true)
-        class1.addToDeclaredWithin(model1)
-        class2 = new DataClass(name: "Classified 2 ", status: ElementStatus.FINALIZED).save(failOnError: true)
-        class2.addToDeclaredWithin(model2)
-        class3 = new DataClass(name: "Classified 3 ", status: ElementStatus.FINALIZED).save(failOnError: true)
-        class3.addToDeclaredWithin(model3)
+        class1 = new DataClass(dataModel: model1, name: "Classified 1", status: ElementStatus.FINALIZED).save(failOnError: true)
+        class2 = new DataClass(dataModel: model2, name: "Classified 2 ", status: ElementStatus.FINALIZED).save(failOnError: true)
+        class3 = new DataClass(dataModel: model3, name: "Classified 3 ", status: ElementStatus.FINALIZED).save(failOnError: true)
         model2.addToImports(model3)
 
     }
@@ -70,12 +67,11 @@ class DataModelServiceSpec extends IntegrationSpec {
     }
 
     def "does not fail when there are no results"() {
-        DataType domain = new DataType(name: "Test Domain").save(failOnError: true)
-        domain.addToDeclaredWithin model1
+        new DataType(name: "Test Domain", dataModel: model1).save(failOnError: true)
         DetachedCriteria<DataType> criteria = dataModelService.classified(DataType, DataModelFilter.create(true))
 
         expect:
-        criteria.count() == DataType.list().count { !it.dataModels }
+        criteria.count() == DataType.list().count { !it.dataModel }
 
         Lists.fromCriteria([:], criteria).items.size() == criteria.count()
     }
@@ -131,13 +127,11 @@ class DataModelServiceSpec extends IntegrationSpec {
     }
 
     def "get top level models with include and exclude classification filter"() {
-        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelDataClasses(DataModelFilter.create([model1], [model2]), [:])
+        when:
+        dataClassService.getTopLevelDataClasses(DataModelFilter.create([model1], [model2]), [:])
 
-        expect:
-        models.total >= 1
-        !(class0 in models.items)
-        class1 in models.items
-        !(class2 in models.items)
+        then:
+        thrown(IllegalStateException)
     }
 
     def "is able to return models classified by or are imported"() {

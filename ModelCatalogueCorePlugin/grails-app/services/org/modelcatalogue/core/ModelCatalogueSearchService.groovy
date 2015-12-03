@@ -14,6 +14,8 @@ import rx.Observable
  */
 class ModelCatalogueSearchService implements SearchCatalogue {
 
+    static transactional = false
+
     def dataModelService
     def modelCatalogueSecurityService
 
@@ -128,12 +130,11 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                             or lower(${alias}.modelCatalogueId) like lower(:query)
                             or ${alias} in (select ev.element from ExtensionValue ev where lower(ev.extensionValue) like lower(:query))
                         )
-                        and ${alias} not in (select rel.destination from Relationship rel where rel.relationshipType = :classificationType)
+                        and ${alias}.dataModel is null
                     """
-                    arguments.classificationType = RelationshipType.declarationType
                 } else {
                     listQuery = """
-                    from ${resource.simpleName} ${alias} left join ${alias}.incomingRelationships as rel
+                    from ${resource.simpleName} ${alias}
                     where
                         ${alias}.status in :statuses
                         and (
@@ -142,19 +143,18 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                             or lower(${alias}.modelCatalogueId) like lower(:query)
                             or ${alias} in (select ev.element from ExtensionValue ev where lower(ev.extensionValue) like lower(:query))
                         )
-                        and rel.relationshipType = :classificationType
                     """
 
                     if (classifications.includes) {
-                        listQuery += " and rel.source.id in :includes "
+                        listQuery += " and ${alias}.dataModel.id in :includes "
                         arguments.includes = classifications.includes
                     }
 
                     if (classifications.excludes) {
-                        listQuery += " and rel.source.id not in :excludes "
+                        listQuery += " and r${alias}.dataModel.id not in :excludes "
                         arguments.excludes = classifications.excludes
                     }
-                    arguments.classificationType = RelationshipType.declarationType
+
                 }
             }
 

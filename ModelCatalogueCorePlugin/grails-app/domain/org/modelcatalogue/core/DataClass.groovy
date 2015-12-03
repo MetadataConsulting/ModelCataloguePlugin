@@ -21,7 +21,7 @@ class DataClass extends CatalogueElement {
 
     @Override
     protected PublishingChain prepareDraftChain(PublishingChain chain) {
-        chain.add(this.childOf).add(this.dataModels).add(referringDataTypes)
+        chain.add(this.childOf).add(this.dataModel).add(referringDataTypes)
     }
 
     @Override

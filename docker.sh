@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
 
 # you can have multiple docker machines on your computer, default should present after installation
-DOCKER_MACHINE_ENV="default"
+: ${MC_DOCKER_MACHINE_ENV:="default"}
 
 command -v docker-machine >/dev/null 2>&1 || { echo "Docker Machine is required to run this script.  Please, install it from https://www.docker.com/docker-toolbox." >&2; exit 1; }
 
-docker-machine start "$DOCKER_MACHINE_ENV" &>/dev/null
+docker-machine start "$MC_DOCKER_MACHINE_ENV" &>/dev/null
 
-eval "$(docker-machine env "$DOCKER_MACHINE_ENV")"
+eval "$(docker-machine env "$MC_DOCKER_MACHINE_ENV")"
 
-DOCKER_MACHINE_IP=$(docker-machine ip default)
+DOCKER_MACHINE_IP=$(docker-machine ip "$MC_DOCKER_MACHINE_ENV")
 
+export MC_DOCKER_MACHINE_ENV
+export DOCKER_MACHINE_IP
 export DOCKER_TLS_VERIFY
 export DOCKER_HOST
 export DOCKER_CERT_PATH
@@ -23,7 +25,7 @@ function docker_exec() {
 }
 
 function docker_restart() {
-    docker stop "$1" && mute docker start "$1" &>/dev/null
+    docker stop "$1" && docker start "$1" &>/dev/null
 }
 
 function docker_stop() {

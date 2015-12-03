@@ -347,7 +347,7 @@ class ElasticSearchService implements SearchCatalogue {
 
         result = result.concatWith(from(DataModel.list(sort: 'lastUpdated', order: 'desc'))
         .doOnNext {
-            log.info "[${dataModelCounter++}/$total] Reindexing data model ${it.name} (${it.combinedVersion}) - ${it.countOutgoingRelationshipsByType(RelationshipType.declarationType)} items"
+            log.info "[${dataModelCounter++}/$total] Reindexing data model ${it.name} (${it.combinedVersion}) - ${it.countDeclares()} items"
         }.flatMap {
             return getDataModelWithDeclaredElements(it).flatMap { element ->
                 return index(session, element)
@@ -459,19 +459,17 @@ class ElasticSearchService implements SearchCatalogue {
     private Observable<CatalogueElement> getDataModelWithDeclaredElements(DataModel element) {
         ReplaySubject<CatalogueElement> subject = ReplaySubject.create()
 
-        RelationshipType declaration = RelationshipType.declarationType
-
         executorService.submit {
             subject.onNext(element)
-            DetachedCriteria<Relationship> criteria = Relationship.where {
-                source == element && relationshipType == declaration
+            DetachedCriteria<CatalogueElement> criteria = CatalogueElement.where {
+                dataModel == element
             }
 
             Number total = criteria.count()
 
             for (int page = 0 ; page * EMIT_RELATIONSHIPS_PAGE < total ; page++) {
                 criteria.list(max: EMIT_RELATIONSHIPS_PAGE, offset: page * EMIT_RELATIONSHIPS_PAGE).each {
-                    subject.onNext(it.destination)
+                    subject.onNext(it)
                 }
             }
 
@@ -552,8 +550,8 @@ class ElasticSearchService implements SearchCatalogue {
 
         if (CatalogueElement.isAssignableFrom(clazz)) {
             CatalogueElement element = object as CatalogueElement
-            if (element.dataModels) {
-                return [MC_ALL_INDEX] + element.dataModels.collect { getDataModelIndex(it) }
+            if (element.dataModel) {
+                return [MC_ALL_INDEX] + [getDataModelIndex(element.dataModel)]
             }
             return [ORPHANED_INDEX, MC_ALL_INDEX]
         }

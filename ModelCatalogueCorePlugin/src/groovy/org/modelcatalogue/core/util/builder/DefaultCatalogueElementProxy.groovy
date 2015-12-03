@@ -107,6 +107,10 @@ import org.modelcatalogue.core.util.Legacy
             name = value?.toString()
         }
 
+        if (key == 'dataModel') {
+            classification = value?.name
+        }
+
         parameters.put(key, value)
     }
 
@@ -131,6 +135,12 @@ import org.modelcatalogue.core.util.Legacy
 
         if (!existing) {
             return null
+        }
+
+
+        if (existing.dataModel && classification && classification != existing.dataModel.name || !existing.dataModel && classification) {
+            log.warn "New draft requested for $this but you cannot update element $existing which does not belong to current data model ${classification}. If you need an update, please, declare the element within the dataModel closure first (or update the element outside the data model definition if it does not belong to any data model)."
+            return existing
         }
 
         if (existing.status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED] || HibernateProxyHelper.getClassWithoutInitializingProxy(existing) != domain) {
@@ -345,7 +355,7 @@ import org.modelcatalogue.core.util.Legacy
 
     @Override
     void addToPendingRelationships(RelationshipProxy relationshipProxy) {
-        if (!classification && relationshipProxy.relationshipTypeName == RelationshipType.declarationType.name && repository.equals(this, relationshipProxy.destination)) {
+        if (!classification && relationshipProxy.relationshipTypeName in [ 'classification', 'declaration' ] && repository.equals(this, relationshipProxy.destination)) {
             classification = relationshipProxy.source.name
         }
         relationships << relationshipProxy
