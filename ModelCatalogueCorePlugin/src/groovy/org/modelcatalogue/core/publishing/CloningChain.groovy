@@ -7,8 +7,6 @@ import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 
