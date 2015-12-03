@@ -42,7 +42,7 @@ class CopyAssociationsAndRelationships {
         GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(type.name) as GrailsDomainClass
 
         for (prop in domainClass.persistentProperties) {
-            if (prop.association && (prop.manyToOne || prop.oneToOne) && element.hasProperty(prop.name)) {
+            if (prop.association && (prop.manyToOne || prop.oneToOne) && element.hasProperty(prop.name) && prop.name != 'dataModel') {
                 def value = element.getProperty(prop.name)
                 if (value instanceof CatalogueElement) {
                     draft.setProperty(prop.name, DraftContext.preferDraft(value))

@@ -10,7 +10,6 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 
 @Log4j
-// TODO: ensure data model is copied
 class DraftChain extends PublishingChain {
 
     private final DraftContext context
@@ -95,7 +94,7 @@ class DraftChain extends PublishingChain {
         draft.dataModel = context.getDestinationDataModel(published)
 
         for (prop in domainClass.persistentProperties) {
-            if (!prop.association && published.hasProperty(prop.name)) {
+            if (!prop.association && published.hasProperty(prop.name) && prop.name != 'dataModel') {
                 draft.setProperty(prop.name, published.getProperty(prop.name))
             }
         }
