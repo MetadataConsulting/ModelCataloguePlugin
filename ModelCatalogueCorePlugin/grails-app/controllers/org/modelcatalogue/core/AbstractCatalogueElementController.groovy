@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import grails.transaction.Transactional
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.*
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
@@ -594,6 +595,52 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
 
         respond instance, [status: OK]
+    }
+
+    /**
+     * Clone element
+     * @param id cloned element id
+     * @param destinationDataModelId destination data model id
+     */
+    @Transactional
+    def cloneElement() {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
+
+        if (handleReadOnly()) {
+            return
+        }
+
+        T instance = queryForResource(params.id)
+        if (instance == null) {
+            notFound()
+            return
+        }
+
+        DataModel destinationDataModel = DataModel.get(params.destinationDataModelId)
+        if (destinationDataModel == null) {
+            notFound()
+            return
+        }
+
+        if (!instance.instanceOf(DataModel) && !instance.dataModel) {
+            instance.errors.reject 'catalogue.element.at.least.one.data.model', "'$instance.name' has to be declared wihtin a data model to be cloned"
+            respond instance.errors
+            return
+        }
+
+
+        DataModel sourceDataModel = instance.instanceOf(DataModel) ? instance as DataModel : instance.dataModel
+        T clone = elementService.cloneElement(instance, sourceDataModel, CloningContext.create(sourceDataModel, destinationDataModel))
+
+        if (clone.hasErrors()) {
+            respond clone.errors, view: 'edit' // STATUS CODE 422
+            return
+        }
+
+        respond clone, [status: OK]
     }
 
     /**

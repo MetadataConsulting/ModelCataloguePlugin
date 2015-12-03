@@ -28,7 +28,7 @@ class CloningCopyAssociationsAndRelationshipsTask {
     }
 
     void copyRelationships(DataModel dataModel, Set<String> createdRelationshipHashes) {
-        copyRelationshipsInternal(dataModel, RelationshipDirection.INCOMING, createdRelationshipHashes)
+        // copy only outgoing relationships as they define the structure
         copyRelationshipsInternal(dataModel, RelationshipDirection.OUTGOING, createdRelationshipHashes)
 
         GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(HibernateProxyHelper.getClassWithoutInitializingProxy(draft).name) as GrailsDomainClass
@@ -49,6 +49,11 @@ class CloningCopyAssociationsAndRelationshipsTask {
 
         relationshipService.eachRelationshipPartitioned(direction, element) { Relationship r ->
             if (r.relationshipType.system) {
+                return
+            }
+
+            if (!r.relationshipType.versionSpecific) {
+                // don't copy other relationships than version specific as these define the structure
                 return
             }
 
