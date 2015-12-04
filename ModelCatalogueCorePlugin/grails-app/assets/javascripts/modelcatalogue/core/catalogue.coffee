@@ -114,7 +114,7 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
     catalogue.isContentCandidate = (list, element, extra) ->
       for test in contentTests
         result = $injector.invoke(test, undefined , list: list, element: element, extra: extra ? {})
-        return 1 if angular.isBoolean(result) and result
+        return 1 if result == true
         return result if angular.isNumber(result) and result > 0
       return false
 
@@ -125,6 +125,6 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
 ]
 
 # make catalogue property of the root scope (i.e. global property)
-catalogueModule.run ['$rootScope', 'catalogue', '$state', 'security', ($rootScope, catalogue, $state, security) ->
+catalogueModule.run ['$rootScope', 'catalogue', ($rootScope, catalogue) ->
   $rootScope.catalogue = catalogue
 ]

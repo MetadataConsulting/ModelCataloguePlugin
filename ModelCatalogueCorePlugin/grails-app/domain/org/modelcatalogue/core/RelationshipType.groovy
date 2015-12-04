@@ -216,6 +216,10 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
         readByName("base")
     }
 
+    static RelationshipType getImportType() {
+        readByName("import")
+    }
+
     static readByName(String name) {
         // TODO: temporary give warning if 'classification' type is requested
         if (name == 'classification') {

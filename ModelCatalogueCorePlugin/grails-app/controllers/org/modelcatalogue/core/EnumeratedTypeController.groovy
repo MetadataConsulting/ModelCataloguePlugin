@@ -43,7 +43,7 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
         ret.id = type.getId()
         ret.elementType = "${EnumeratedType.name}.EnumeratedValue"
         ret.name = "${enumeratedValue.getKey() ?: ''}: ${enumeratedValue.getValue() ?: ''}"
-        ret.link = link
+        ret.link = "$link#${enumeratedValue.getKey()}"
         ret.status = type.status.toString()
         ret.dataModels = relationshipService.getDataModelsInfo(type)
         ret

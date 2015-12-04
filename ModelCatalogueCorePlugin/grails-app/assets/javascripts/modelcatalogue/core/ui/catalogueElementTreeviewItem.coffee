@@ -12,8 +12,6 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
     compile: recursiveCompile.compile
 
     controller: ['$scope', '$rootScope', '$element', 'catalogue', ($scope, $rootScope, $element, catalogue) ->
-      endsWith = (text, suffix) -> text.indexOf(suffix, text.length - suffix.length) != -1
-
       getLocalName = (item) ->
         return undefined if not item
         return undefined if not item.ext

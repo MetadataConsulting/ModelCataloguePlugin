@@ -18,6 +18,7 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setIcon 'user',               "fa fa-fw fa-user"
   catalogueProvider.setIcon 'csvTransformation',  "fa fa-fw fa-long-arrow-right"
   catalogueProvider.setIcon 'relationship',       "fa fa-fw fa-link"
+  catalogueProvider.setIcon 'relationships',      "fa fa-fw fa-link"
   catalogueProvider.setIcon 'mapping',            "fa fa-fw fa-superscript"
 
   # this should be generated automatically in the future
@@ -51,6 +52,10 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
 
     return undefined
 
+#  catalogueProvider.addContainsCandidateTest ['list', 'element', 'extra', '$log', (list, result, extra, $log) ->
+#    $log.info 'testing candidates:',list, result, extra
+#  ]
+
   catalogueProvider.addContainsCandidateTest ['list', 'element', 'extra', (list, result, extra) ->
     endsWith = (text, suffix) -> text.indexOf(suffix, text.length - suffix.length) != -1
     element = extra.owner ? {}
@@ -74,14 +79,26 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
     return 0 unless newElement.isInstanceOf and newElement.isInstanceOf(list.itemType)
     return 0 unless url
     return 0 unless list.base
-    return 0 unless url.indexOf("#{modelCatalogueApiRoot}#{list.base}") >= 0 \
-      or "#{modelCatalogueApiRoot}#{list.base}".indexOf(url) >= 0 \
-      or url.indexOf("#{modelCatalogueApiRoot}#{list.base.replace('/relationships/', '/outgoing/')}") >= 0 \
-      or "#{modelCatalogueApiRoot}#{list.base.replace('/relationships/', '/outgoing/')}".indexOf(url) >= 0 \
-      or "#{modelCatalogueApiRoot}#{list.base.replace('/dataType/', '/enumeratedType/')}".indexOf(url) >= 0 \
-      or "#{modelCatalogueApiRoot}#{list.base.replace('/dataType/', '/primitiveType/')}".indexOf(url) >= 0 \
-      or "#{modelCatalogueApiRoot}#{list.base.replace('/dataType/', '/referenceType/')}".indexOf(url) >= 0
 
-    return 1
+    return 1 if url.indexOf("#{modelCatalogueApiRoot}#{list.base}") >= 0
+    return 1 if "#{modelCatalogueApiRoot}#{list.base}".indexOf(url) >= 0
+    return 1 if url.indexOf("#{modelCatalogueApiRoot}#{list.base.replace('/relationships/', '/outgoing/')}") >= 0
+    return 1 if "#{modelCatalogueApiRoot}#{list.base.replace('/relationships/', '/outgoing/')}".indexOf(url) >= 0
+    return 1 if "#{modelCatalogueApiRoot}#{list.base.replace('/dataType/', '/enumeratedType/')}".indexOf(url) >= 0
+    return 1 if "#{modelCatalogueApiRoot}#{list.base.replace('/dataType/', '/primitiveType/')}".indexOf(url) >= 0
+    return 1 if "#{modelCatalogueApiRoot}#{list.base.replace('/dataType/', '/referenceType/')}".indexOf(url) >= 0
+
+    return 0.5 if "#{modelCatalogueApiRoot}#{list.base.replace('/content', '/outgoing/hierarchy')}".indexOf(url) >= 0
+    return 0.5 if "#{modelCatalogueApiRoot}#{list.base.replace('/content', '/outgoing/containment')}".indexOf(url) >= 0
+
+    return 0
+  ]
+
+  catalogueProvider.addContainsCandidateTest ['list', 'element', 'extra', (list, newElement, extra) ->
+    return 0 unless newElement.id
+    return 0 unless extra.owner
+    return 0 unless extra.owner.id
+
+    return 0.5 if newElement.id == extra.owner.id
   ]
 ]

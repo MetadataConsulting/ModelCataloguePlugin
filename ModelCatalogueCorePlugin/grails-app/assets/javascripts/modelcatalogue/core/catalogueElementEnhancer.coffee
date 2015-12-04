@@ -60,7 +60,8 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
               return $state.go('mc.actions.show', {id: self.id}); self
             if self.isInstanceOf "csvTransformation"
               return $state.go('mc.csvTransformations.show', {id: self.id}); self
-
+            if self.isInstanceOf "relationships"
+              return $state.go('mc.resource.show.property', {dataModelId: self.element.getDataModelId(), id: self.element.id, resource: names.getPropertyNameFromType(self.element.elementType), property: self.property})
             if self.isInstanceOf "enumeratedValue"
               $state.go('mc.resource.show.property', {resource: 'enumeratedType', id: self.id, dataModelId: self.getDataModelId(), property: 'enumerations'}) ; self
 
@@ -71,6 +72,8 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
               return $state.href('mc.actions.show', {id: self.id})
             if self.isInstanceOf "csvTransformation"
               return $state.href('mc.csvTransformations.show', {id: self.id})
+            if self.isInstanceOf "relationships"
+              return $state.href('mc.resource.show.property', {dataModelId: self.element.getDataModelId(), id: self.element.id, resource: names.getPropertyNameFromType(self.element.elementType), property: self.property})
             if self.getDataModelId() != 'catalogue'
               return $state.href('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id, dataModelId: self.getDataModelId()})
             $state.href('simple.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id})
@@ -80,14 +83,14 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
               if @classifications? && @classifications.length > 0
                 classificationNames = commaSeparatedList(@classifications)
                 return "#{@name} (#{@getElementTypeName()} in #{classificationNames})"
-              else if @isInstanceOf('relationship')
+              if @isInstanceOf('relationship')
                 return "#{@source.getLabel()} #{@type.sourceToDestination} {@destination.getLabel()}"
-              else if @isInstanceOf('mapping')
+              if @isInstanceOf('mapping')
                 return "#{@source.getLabel()} #{@type.sourceToDestination} {@destination.getLabel()}"
-              else if (@elementType?)
+              if (@elementType?)
                 return "#{@name} (#{@getElementTypeName()})"
-              else
-                return @name
+
+              return @name
 
           self.getUpdatableProperties = -> angular.copy(@updatableProperties)
 

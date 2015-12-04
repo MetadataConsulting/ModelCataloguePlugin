@@ -7,6 +7,8 @@ import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
+import org.modelcatalogue.core.util.RelationshipDirection
+import org.modelcatalogue.core.util.Relationships
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 
 
@@ -59,9 +61,11 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
             List<Map> contentDescriptors = []
 
             contentDescriptors << createContentDescriptor(dataModel, 'Data Classes', DataClass, dataClasses.total)
+            contentDescriptors << createContentDescriptor(dataModel, 'Data Elements', DataElement, stats["totalDataElementCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Data Types', DataType, stats["totalDataTypeCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Measurement Units', MeasurementUnit, stats["totalMeasurementUnitCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Assets', Asset, stats["totalAssetCount"])
+            contentDescriptors << createContentDescriptorForRelationship('Imported Data Models', 'imports',  dataModel, RelationshipType.importType, RelationshipDirection.OUTGOING)
 
             contentDescriptors
         }
@@ -83,6 +87,23 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
         ret
     }
 
+	private Map createContentDescriptorForRelationship(String name, String property, DataModel dataModel, RelationshipType relationshipType, RelationshipDirection direction) {
+		String link = "/dataModel/${dataModel.getId()}/${direction.actionName}/${relationshipType.name}"
+		Map ret = [:]
+		ret.id = link
+		ret.dataModels = [CatalogueElementMarshaller.minimalCatalogueElementJSON(dataModel)]
+		ret.elementType = Relationships.name
+		ret.name = name
+		ret.content = [count: relationshipService.getRelationships([:], direction, dataModel, relationshipType).total, itemType: Relationship.name, link: link]
+		ret.link = link
+        ret.relationshipType = relationshipType
+        ret.direction = direction.actionName
+		ret.status = dataModel.status.toString()
+        ret.element = dataModel
+        ret.property = property
+
+		ret
+	}
 
 	private Collection getDataClassesForDataModel(Long dataModelId) {
 		def results = DataClass.createCriteria().list {

@@ -14,11 +14,19 @@ angular.module('mc.core.ui.states.controllers.DataModelTreeCtrl', ['ui.router', 
       if element.elementType and element.id
         type = names.getPropertyNameFromType(element.elementType)
         property = 'properties'
+        id = element.id
+        dataModelId = currentDataModel?.id
+        resource = type
 
         if type == 'enumeratedValue'
-          type = 'enumeratedType'
+          resource = 'enumeratedType'
           property = 'enumerations'
-        $state.go 'mc.resource.show.property', dataModelId: currentDataModel?.id, resource: type, id: element.id, property: property
+        if type == 'relationships'
+          property = element.property
+          id = element.element.id
+          resource = names.getPropertyNameFromType(element.element.elementType)
+
+        $state.go 'mc.resource.show.property', dataModelId: dataModelId, resource: resource, id: id, property: property
 
     $scope.$on 'newVersionCreated', (ignored, element) ->
         $state.go '.', {dataModelId: element.getDataModelId(), resource: names.getPropertyNameFromType(element.elementType), id: element.id, property: 'history', page: undefined, q: undefined}

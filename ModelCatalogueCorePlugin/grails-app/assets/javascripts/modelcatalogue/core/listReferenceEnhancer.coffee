@@ -37,6 +37,9 @@ angular.module('mc.core.listReferenceEnhancer', ['mc.util.rest', 'mc.util.enhanc
           $rootScope.$broadcast 'listReferenceReordered', query, moved, current
           result
 
+      query.toString = ->
+        """listReference {\n  link: #{@link},\n  total: #{@total},\n  base: #{@base},\n  itemType: #{@itemType} \n}"""
+
       query
   ]
 
