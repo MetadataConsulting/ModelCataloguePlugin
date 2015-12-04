@@ -8,6 +8,7 @@ import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.RelationshipDefinition
 import org.modelcatalogue.core.RelationshipDefinitionBuilder
@@ -37,7 +38,7 @@ class CopyAssociationsAndRelationships {
         copyRelationshipsInternal(dataModel, RelationshipDirection.INCOMING, createdRelationshipHashes)
         copyRelationshipsInternal(dataModel, RelationshipDirection.OUTGOING, createdRelationshipHashes)
 
-        Class type = context.newType ?: HibernateProxyHelper.getClassWithoutInitializingProxy(draft)
+        Class type = context.newType ?: HibernateHelper.getEntityClass(draft)
 
         GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(type.name) as GrailsDomainClass
 

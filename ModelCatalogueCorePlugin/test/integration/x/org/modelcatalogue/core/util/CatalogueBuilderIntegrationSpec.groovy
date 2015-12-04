@@ -1,13 +1,14 @@
 package x.org.modelcatalogue.core.util
 
 import grails.util.Holders
-import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import spock.lang.Issue
+
+import static org.modelcatalogue.core.util.HibernateHelper.*
 
 class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
@@ -899,7 +900,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         type
         type.instanceOf(DataType)
         !type.instanceOf(PrimitiveType)
-        HibernateProxyHelper.getClassWithoutInitializingProxy(type) == DataType
+        getEntityClass(type) == DataType
 
 
         when:
@@ -917,7 +918,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         type
         type.instanceOf(DataType)
         type.instanceOf(PrimitiveType)
-        HibernateProxyHelper.getClassWithoutInitializingProxy(type) == PrimitiveType
+        getEntityClass(type) == PrimitiveType
 
     }
 }

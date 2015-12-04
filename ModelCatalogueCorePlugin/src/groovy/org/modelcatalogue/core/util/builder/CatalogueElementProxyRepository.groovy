@@ -11,6 +11,8 @@ import org.modelcatalogue.core.util.FriendlyErrors
 import org.springframework.util.StopWatch
 import org.modelcatalogue.core.util.Legacy
 
+import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
+
 @Log4j
 class CatalogueElementProxyRepository {
 
@@ -276,7 +278,7 @@ class CatalogueElementProxyRepository {
 
     private <T extends CatalogueElement> DraftContext createDraftContext(CatalogueElementProxy proxy, T element) {
         if (copyRelationships) {
-            if (proxy.domain == HibernateProxyHelper.getClassWithoutInitializingProxy(element)) {
+            if (proxy.domain == getEntityClass(element)) {
                 return DraftContext.userFriendly()
             }
             if ((element.getLatestVersionId() ?: element.getId()) in elementsUnderControl) {
@@ -284,7 +286,7 @@ class CatalogueElementProxyRepository {
             }
             return DraftContext.userFriendly()
         }
-        if (proxy.domain == HibernateProxyHelper.getClassWithoutInitializingProxy(element)) {
+        if (proxy.domain == getEntityClass(element)) {
             return DraftContext.importFriendly(elementsUnderControl)
         }
         if ((element.getLatestVersionId() ?: element.getId()) in elementsUnderControl) {

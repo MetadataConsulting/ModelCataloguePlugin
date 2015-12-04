@@ -8,6 +8,8 @@ import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipMetadata
 import org.modelcatalogue.core.SearchCatalogue
 
+import static org.modelcatalogue.core.util.HibernateHelper.*
+
 class SearchNotifier extends AbstractAuditor {
 
     final SearchCatalogue searchService
@@ -24,7 +26,7 @@ class SearchNotifier extends AbstractAuditor {
         if (currentChangeId && !parentChangeId) {
             Set<Object> queued = queues.remove(currentChangeId)
             if (queued) {
-                searchService.index(queued.collect{ HibernateProxyHelper.getClassWithoutInitializingProxy(it).get(it.getId()) }).subscribe()
+                searchService.index(queued.collect{ getEntityClass(it).get(it.getId()) }).subscribe()
             }
         }
 

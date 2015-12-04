@@ -1,10 +1,8 @@
 package org.modelcatalogue.core
 
 import com.google.common.base.Function
-import com.google.common.collect.ImmutableList
 import com.google.common.collect.Lists
 import grails.util.GrailsNameUtils
-import org.hibernate.StaleObjectStateException
 import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.CloningContext
@@ -20,6 +18,8 @@ import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.RelationshipDirection
 
 import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
+
+import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
 /**
 * Catalogue Element - there are a number of catalogue elements that make up the model
@@ -280,7 +280,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
 
     protected String getModelCatalogueResourceName() {
-        fixResourceName GrailsNameUtils.getPropertyName(HibernateProxyHelper.getClassWithoutInitializingProxy(this))
+        fixResourceName GrailsNameUtils.getPropertyName(getEntityClass(this))
     }
 
     String getDefaultModelCatalogueId(boolean withoutVersion = false) {
@@ -387,7 +387,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         prepareDraftChain(PublishingChain.createDraft(this, strategy.within(dataModel))).run(publisher)
     }
 
-    final CatalogueElement cloneElement(Publisher<CatalogueElement> publisher, DataModel destination, CloningContext strategy) {
+    final CatalogueElement cloneElement(Publisher<CatalogueElement> publisher, CloningContext strategy) {
         preparePublishChain(PublishingChain.clone(this, strategy)).run(publisher)
     }
 

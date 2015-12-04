@@ -5,6 +5,7 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.util.HibernateHelper
 
 class CloningContext {
 
@@ -56,7 +57,7 @@ class CloningContext {
         Long cloneId = clones[publishedId]
 
         if (cloneId) {
-            return (E) HibernateProxyHelper.getClassWithoutInitializingProxy(published).get(cloneId)
+            return (E) HibernateHelper.getEntityClass(published).get(cloneId)
         }
 
         DataModel theDataModel = dataModel

@@ -8,6 +8,7 @@ import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.RelationshipDirection
 
 @Log4j
@@ -31,7 +32,7 @@ class CloningCopyAssociationsAndRelationshipsTask {
         // copy only outgoing relationships as they define the structure
         copyRelationshipsInternal(dataModel, RelationshipDirection.OUTGOING, createdRelationshipHashes)
 
-        GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(HibernateProxyHelper.getClassWithoutInitializingProxy(draft).name) as GrailsDomainClass
+        GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(HibernateHelper.getEntityClass(draft).name) as GrailsDomainClass
 
         for (prop in domainClass.persistentProperties) {
             if (prop.association && (prop.manyToOne || prop.oneToOne) && element.hasProperty(prop.name) && prop.name != 'dataModel') {

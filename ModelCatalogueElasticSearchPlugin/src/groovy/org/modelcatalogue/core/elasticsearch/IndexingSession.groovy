@@ -4,6 +4,7 @@ import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.google.common.collect.ImmutableMap
 import org.hibernate.proxy.HibernateProxyHelper
+import org.modelcatalogue.core.util.HibernateHelper
 import rx.Observable
 
 class IndexingSession {
@@ -18,13 +19,13 @@ class IndexingSession {
     private IndexingSession() {}
 
     Document getDocument(Object o) {
-        documentCache.get("${HibernateProxyHelper.getClassWithoutInitializingProxy(o)}:${o.getId()}") {
+        documentCache.get("${HibernateHelper.getEntityClass(o)}:${o.getId()}") {
             createDocument(o)
         }
     }
 
     Observable<Boolean> indexOnlyOnce(Object o, Closure<Observable<Boolean>> index) {
-        indexingCache.get("${HibernateProxyHelper.getClassWithoutInitializingProxy(o)}:${o.getId()}") {
+        indexingCache.get("${HibernateHelper.getEntityClass(o)}:${o.getId()}") {
             index().cache()
         }
     }
@@ -48,6 +49,6 @@ class IndexingSession {
             throw new IllegalArgumentException("Payload for $object cannot contain _type")
         }
 
-        new Document(ElasticSearchService.getTypeName(HibernateProxyHelper.getClassWithoutInitializingProxy(object)), object.getId()?.toString(), result)
+        new Document(ElasticSearchService.getTypeName(HibernateHelper.getEntityClass(object)), object.getId()?.toString(), result)
     }
 }

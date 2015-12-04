@@ -9,6 +9,8 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 
+import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
+
 @Log4j
 class DraftChain extends PublishingChain {
 
@@ -30,7 +32,7 @@ class DraftChain extends PublishingChain {
             }
 
             if (published.latestVersionId) {
-                def existingDrafts = HibernateProxyHelper.getClassWithoutInitializingProxy(published).findAllByLatestVersionIdAndStatus(published.latestVersionId, ElementStatus.DRAFT, [sort: 'versionNumber', order: 'desc'])
+                def existingDrafts = getEntityClass(published).findAllByLatestVersionIdAndStatus(published.latestVersionId, ElementStatus.DRAFT, [sort: 'versionNumber', order: 'desc'])
                 for (existing in existingDrafts) {
                     if (existing.id != published.id) {
                         return existing
@@ -85,7 +87,7 @@ class DraftChain extends PublishingChain {
             return published
         }
 
-        Class<? extends CatalogueElement> type = context.newType ?: HibernateProxyHelper.getClassWithoutInitializingProxy(published)
+        Class<? extends CatalogueElement> type = context.newType ?: getEntityClass(published)
 
         GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(type.name) as GrailsDomainClass
 

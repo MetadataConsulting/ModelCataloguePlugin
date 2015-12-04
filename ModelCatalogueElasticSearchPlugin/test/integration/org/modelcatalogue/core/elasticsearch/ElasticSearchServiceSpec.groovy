@@ -18,6 +18,7 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.InitCatalogueService
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
 import rx.Observable
@@ -74,7 +75,7 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
         DataModel dataModel = DataModel.findByName("ES Test Model")
         DataClass element = DataClass.findByName("Foo")
 
-        Class elementClass = HibernateProxyHelper.getClassWithoutInitializingProxy(element)
+        Class elementClass = HibernateHelper.getEntityClass(element)
 
         String index = elasticSearchService.getDataModelIndex(dataModel)
         String type  = elasticSearchService.getTypeName(elementClass)

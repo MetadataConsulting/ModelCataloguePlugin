@@ -56,10 +56,10 @@ class ElementService implements Publisher<CatalogueElement> {
         }
     }
 
-    public <E extends CatalogueElement> E cloneElement(E element, DataModel destination, CloningContext context) {
+    public <E extends CatalogueElement> E cloneElement(E element, CloningContext context) {
         return (E) CatalogueElement.withTransaction { TransactionStatus status = null ->
             return (E) auditService.logNewVersionCreated(element) {
-                E draft = element.cloneElement(this, destination, context) as E
+                E draft = element.cloneElement(this, context) as E
                 if (draft.hasErrors()) {
                     status?.setRollbackOnly()
                     return element

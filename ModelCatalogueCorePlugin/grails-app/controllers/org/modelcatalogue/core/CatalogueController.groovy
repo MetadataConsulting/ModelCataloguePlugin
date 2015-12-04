@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import grails.gorm.DetachedCriteria
 import grails.util.GrailsNameUtils
 import org.hibernate.proxy.HibernateProxyHelper
+import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 import org.springframework.http.HttpStatus
 
@@ -89,7 +90,7 @@ class CatalogueController {
             return
         }
 
-        redirect url: "${grailsApplication.config.grails.serverURL}/catalogue/${GrailsNameUtils.getPropertyName(HibernateProxyHelper.getClassWithoutInitializingProxy(element))}/${element.id}"
+        redirect url: "${grailsApplication.config.grails.serverURL}/catalogue/${GrailsNameUtils.getPropertyName(HibernateHelper.getEntityClass(element))}/${element.id}"
     }
 
 }

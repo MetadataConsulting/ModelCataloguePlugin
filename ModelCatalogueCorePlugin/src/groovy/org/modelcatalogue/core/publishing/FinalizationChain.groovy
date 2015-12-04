@@ -4,6 +4,7 @@ import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.HibernateHelper
 import org.springframework.validation.ObjectError
 
 class FinalizationChain extends PublishingChain {
@@ -77,7 +78,7 @@ class FinalizationChain extends PublishingChain {
         published.save(flush: true, deepValidate: false)
 
         if (published.latestVersionId) {
-            List<CatalogueElement> previousFinalized = HibernateProxyHelper.getClassWithoutInitializingProxy(published).findAllByLatestVersionIdAndStatus(published.latestVersionId, ElementStatus.FINALIZED)
+            List<CatalogueElement> previousFinalized = HibernateHelper.getEntityClass(published).findAllByLatestVersionIdAndStatus(published.latestVersionId, ElementStatus.FINALIZED)
             for (CatalogueElement e in previousFinalized) {
                 if (e != published) {
                     archiver.archive(e, true)
