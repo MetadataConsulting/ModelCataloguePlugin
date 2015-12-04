@@ -4,6 +4,7 @@ catalogueModule = angular.module('mc.core.catalogue', ['mc.util.security', 'mc.u
 catalogueModule.provider 'catalogue', ['names', (names) ->
   # registries
   typesMetadata = {}
+  contentTests = []
 
   # helper functions
 
@@ -65,8 +66,25 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
     return false
 
 
+  ###
+  # Adds test which can determine if element could be included in list provided.
+  #
+  # @param test function which handles 2 or 3 parameters (in particular order)
+  # * list - required - object which should be enhanced by listEnhancer or listReferenceEnhancer.
+  # * element - required - the element which is tested to be possible included in the list
+  # * extra - optional - extra context available such as
+  #   * owner - owning element of the list reference enhancer
+  #   * url - the url where the newly created element were posted (useful with 'catalogueElementCreated' event)
+  #
+  # * returns number from 0 to 1 where 0 is no probability of being contained by the list and 1 means
+  #     that the element is certainly contained by the list
+  ###
+  catalogueProvider.addContainsCandidateTest = (test) ->
+    contentTests.push test
+
+
   # factory function
-  catalogueProvider.$get = ['rest', 'modelCatalogueApiRoot', 'security', '$q', '$rootScope', (rest, modelCatalogueApiRoot, security, $q, $rootScope)->
+  catalogueProvider.$get = ['rest', 'modelCatalogueApiRoot', '$injector', (rest, modelCatalogueApiRoot, $injector)->
     catalogue = {}
 
     catalogue.getIcon = (type) ->
@@ -81,6 +99,24 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
       params = {}
       params.dataModel = dataModelId if dataModelId and dataModelId isnt 'catalogue'
       rest method: 'GET', url: "#{modelCatalogueApiRoot}/dashboard", params: params
+
+    ###
+    # Tests if the element is contained in particular list.
+    # * list - required - object which should be enhanced by listEnhancer or listReferenceEnhancer.
+    # * element - required - the element which is tested to be possible included in the list
+    # * extra - optional - extra context available such as
+    #   * owner - owning element of the list reference enhancer
+    #   * url - the url where the newly created element were posted (useful with 'catalogueElementCreated' event)
+    #
+    # * returns number from 0 to 1 where 0 is no probability of being contained by the list and 1 means
+    #     that the element is certainly contained by the list
+    ###
+    catalogue.isContentCandidate = (list, element, extra) ->
+      for test in contentTests
+        result = $injector.invoke(test, undefined , list: list, element: element, extra: extra ? {})
+        return 1 if angular.isBoolean(result) and result
+        return result if angular.isNumber(result) and result > 0
+      return false
 
     catalogue
   ]

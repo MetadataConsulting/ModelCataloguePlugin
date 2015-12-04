@@ -51,7 +51,37 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
 
     return undefined
 
+  catalogueProvider.addContainsCandidateTest ['list', 'element', 'extra', (list, result, extra) ->
+    endsWith = (text, suffix) -> text.indexOf(suffix, text.length - suffix.length) != -1
+    element = extra.owner ? {}
 
+    return 0 unless result and result.relation and result.element and result.type and result.direction
 
+    direction = if result.direction == 'destinationToSource' then 'incoming' else 'outgoing'
+    oppositeDirection = if result.direction == 'destinationToSource' then 'outgoing' else 'incoming'
 
+    currentDescend = list
+
+    return 0.5 if result.element.link == element.link and endsWith(currentDescend.link, "/#{direction}/#{result.type.name}")
+    return 0.5 if result.relation.link == element.link and endsWith(currentDescend.link, "/#{oppositeDirection}/#{result.type.name}")
+  ]
+
+  catalogueProvider.addContainsCandidateTest ['list', 'element', 'extra', 'modelCatalogueApiRoot', (list, newElement, extra, modelCatalogueApiRoot) ->
+    url = extra.url
+    return 0 unless list
+    return 0 unless list.itemType
+    return 0 unless newElement
+    return 0 unless newElement.isInstanceOf and newElement.isInstanceOf(list.itemType)
+    return 0 unless url
+    return 0 unless list.base
+    return 0 unless url.indexOf("#{modelCatalogueApiRoot}#{list.base}") >= 0 \
+      or "#{modelCatalogueApiRoot}#{list.base}".indexOf(url) >= 0 \
+      or url.indexOf("#{modelCatalogueApiRoot}#{list.base.replace('/relationships/', '/outgoing/')}") >= 0 \
+      or "#{modelCatalogueApiRoot}#{list.base.replace('/relationships/', '/outgoing/')}".indexOf(url) >= 0 \
+      or "#{modelCatalogueApiRoot}#{list.base.replace('/dataType/', '/enumeratedType/')}".indexOf(url) >= 0 \
+      or "#{modelCatalogueApiRoot}#{list.base.replace('/dataType/', '/primitiveType/')}".indexOf(url) >= 0 \
+      or "#{modelCatalogueApiRoot}#{list.base.replace('/dataType/', '/referenceType/')}".indexOf(url) >= 0
+
+    return 1
+  ]
 ]

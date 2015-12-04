@@ -28,7 +28,7 @@ angular.module('mc.core.ui.states.mc.resource.list', ['mc.core.ui.states.control
           params = offset: (page - 1) * DEFAULT_ITEMS_PER_PAGE, toplevel: true, system: true
           params.order = $stateParams.order ? defaultSorts.order
           params.sort = $stateParams.sort ? defaultSorts.sort
-          params.status = $stateParams.status ? (if $stateParams.resource is 'dataModel' then 'active' else 'finalized')
+          params.status = $stateParams.status ? 'active'
           params.max = $stateParams.max ? 10
           params.classification = $stateParams.classification ? undefined
 

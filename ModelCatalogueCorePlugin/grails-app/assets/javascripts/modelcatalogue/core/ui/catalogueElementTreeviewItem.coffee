@@ -11,7 +11,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
     compile: recursiveCompile.compile
 
-    controller: ['$scope', '$rootScope', '$element', '$timeout', '$stateParams', ($scope, $rootScope, $element) ->
+    controller: ['$scope', '$rootScope', '$element', 'catalogue', ($scope, $rootScope, $element, catalogue) ->
       endsWith = (text, suffix) -> text.indexOf(suffix, text.length - suffix.length) != -1
 
       getLocalName = (item) ->
@@ -167,15 +167,9 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
         $scope.collapseOrExpand()
         $scope.treeview.select(element)
 
-      reloadChildrenOnChange = (_, result) ->
-        if result and result.relation and result.element and result.type and result.direction
-          direction = if result.direction == 'destinationToSource' then 'incoming' else 'outgoing'
-          oppositeDirection = if result.direction == 'destinationToSource' then 'outgoing' else 'incoming'
-          currentDescend = $scope.element[$scope.currentDescend]
-          if result.element.link == $scope.element.link and endsWith(currentDescend.link, "/#{direction}/#{result.type.name}")
-            $scope.element.$$loadChildren()
-          if result.relation.link == $scope.element.link and endsWith(currentDescend.link, "/#{oppositeDirection}/#{result.type.name}")
-            $scope.element.$$loadChildren()
+      reloadChildrenOnChange = (_, result, url) ->
+        if catalogue.isContentCandidate($scope.element[$scope.currentDescend], result, owner: $scope.element, url: url)
+          $scope.element.$$loadChildren()
 
       $scope.$on 'catalogueElementDeleted', (event, element) ->
         indexesToRemove = []
