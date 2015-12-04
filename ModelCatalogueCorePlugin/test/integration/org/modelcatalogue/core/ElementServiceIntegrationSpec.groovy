@@ -390,6 +390,84 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     }
 
+    def "draft elements has the draft model I"() {
+        final String dataModelName = "DM4DMA"
+        final String dataTypeName = "DT4DMA"
+        catalogueBuilder.build {
+            dataModel name: dataModelName, {
+                dataType name: dataTypeName
+            }
+        }
+
+        DataModel source = DataModel.findByName(dataModelName)
+
+        expect:
+        source
+        source.status == ElementStatus.DRAFT
+
+
+        when:
+        DataModel finalized = elementService.finalizeElement(source)
+        DataType finalizedType = DataType.findByName(dataTypeName)
+
+        then:
+        finalized
+        finalized.status == ElementStatus.FINALIZED
+        source == finalized
+
+        finalizedType.dataModel == source
+
+        when:
+        DataModel draft = elementService.createDraftVersion(finalized, DraftContext.userFriendly())
+        DataType draftType = DataType.findByNameAndStatus(dataTypeName, ElementStatus.DRAFT)
+
+        then:
+        draft
+        draft != finalized
+
+        draftType
+        draftType.dataModel == draft
+    }
+
+    def "draft elements has the draft model II"() {
+        final String dataModelName = "DM4DMA2"
+        final String dataTypeName = "DT4DMA2"
+        catalogueBuilder.build {
+            dataModel name: dataModelName, {
+                dataType name: dataTypeName
+            }
+        }
+
+        DataModel source = DataModel.findByName(dataModelName)
+
+        expect:
+        source
+        source.status == ElementStatus.DRAFT
+
+
+        when:
+        DataModel finalized = elementService.finalizeElement(source)
+        DataType finalizedType = DataType.findByName(dataTypeName)
+
+        then:
+        finalized
+        finalized.status == ElementStatus.FINALIZED
+        source == finalized
+
+        finalizedType.dataModel == source
+
+        when:
+        DataType draftType = elementService.createDraftVersion(finalizedType, DraftContext.userFriendly())
+        DataModel draft = DataModel.findByNameAndStatus(dataModelName, ElementStatus.DRAFT)
+
+        then:
+        draft
+        draft != finalized
+
+        draftType
+        draftType.dataModel == draft
+    }
+
     @Unroll
     def "can change data type type when creating new draft to #type"() {
         DataType d1 = new DataType(name: "DT4CDT").save(failOnError: true, flush: true)
