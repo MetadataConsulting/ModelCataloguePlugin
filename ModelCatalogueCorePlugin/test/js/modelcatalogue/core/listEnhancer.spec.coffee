@@ -176,7 +176,7 @@ describe "mc.core.listEnhancer", ->
 
     listEnhancer = enhance.getEnhancer('list')
 
-    emptyList = listEnhancer.createEmptyList('relationships')
+    emptyList = listEnhancer.createEmptyList(itemType: 'relationships')
     expect(emptyList.total).toBe(0)
     expect(emptyList.size).toBe(0)
     expect(emptyList.list).toEqual([])
@@ -195,7 +195,7 @@ describe "mc.core.listEnhancer", ->
     expect(singletonList.itemType).toBe('the.type')
 
     theList     = [{one: 'one'}, {two: 2}, {3: 'three'}]
-    wrappedList = listEnhancer.createArrayList(theList, 'the.list.type')
+    wrappedList = listEnhancer.createArrayList(theList, itemType: 'the.list.type')
     expect(wrappedList.total).toBe(3)
     expect(wrappedList.size).toBe(3)
     expect(wrappedList.list).toEqual(theList)

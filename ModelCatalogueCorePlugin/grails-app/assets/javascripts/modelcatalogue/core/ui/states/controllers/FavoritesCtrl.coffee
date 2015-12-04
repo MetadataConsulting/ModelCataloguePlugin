@@ -6,7 +6,7 @@ angular.module('mc.core.ui.states.controllers.FavoritesCtrl', ['ui.router', 'mc.
     $scope.user = user
 
     listEnhancer = enhance.getEnhancer('list')
-    $scope.list = angular.extend(listEnhancer.createEmptyList(), base: "/user/#{user.id}/outgoing/favourite")
+    $scope.list = listEnhancer.createEmptyList(base: "/user/#{user.id}/outgoing/favourite")
 
     $scope.columns = columns()
 

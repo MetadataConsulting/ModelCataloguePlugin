@@ -101,37 +101,34 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
       # return new list decorator
       new ListDecorator(list)
 
-    listEnhancer.createEmptyList = (itemType = null, total = 0) ->
-      enhanced = listEnhancer {
+    listEnhancer.createEmptyList = (extra = {}) ->
+      enhanced = listEnhancer angular.extend({
         list: []
         size: 0
         next: ''
         previous: ''
-        total: total
+        total: 0
         empty: true
-        itemType: itemType
         sort: 'name'
         order: 'asc'
-
-      }
+      }, extra)
       enhanced.reload = -> $q.when(enhanced)
       enhanced
 
-    listEnhancer.createArrayList = (array, itemType = null) ->
-      enhanced = listEnhancer {
+    listEnhancer.createArrayList = (array, extra = {}) ->
+      enhanced = listEnhancer angular.extend({
         list: array
         size: array.length
         next: ''
         previous: ''
         total: array.length
-        itemType: itemType
         sort: 'name'
         order: 'asc'
-      }
+      }, extra)
       enhanced.reload = -> $q.when(enhanced)
       enhanced
 
-    listEnhancer.createSingletonList = (item) -> listEnhancer.createArrayList([item])
+    listEnhancer.createSingletonList = (item, extra = {base: item.link}) -> listEnhancer.createArrayList([item], extra)
 
     listEnhancer
 

@@ -197,7 +197,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
 
     {
       heading:  propertyConfiguration.label
-      value:    angular.extend(listEnhancer.createEmptyList($value.itemType, $value.total), {base: $value.base})
+      value:    listEnhancer.createEmptyList(itemType: $value.itemType, total: $value.total, base: $value.base)
       disabled: $value.total == 0
       loader:   $value
       type:     'decorated-list'
