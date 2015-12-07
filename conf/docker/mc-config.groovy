@@ -1,12 +1,12 @@
 // config
 grails.logging.jul.usebridge = false
-grails.serverURL =  "http://${System.getenv('VIRTUAL_HOST') ?: System.getenv('METADATA_URL')}"
+grails.serverURL =  "http://${System.getenv('VIRTUAL_HOST') ?: System.getenv('METADATA_URL') ?: System.getenv('DOCKER_MACHINE_IP') ?: new URL("http://checkip.amazonaws.com").text.trim()}"
 
 // datasource
 dataSource {
 
-    def metadataDbPassword = System.getenv('METADATA_PASSWORD')
-    def metadataDbUsername = System.getenv('METADATA_USERNAME')
+    def metadataDbPassword = System.getenv('METADATA_PASSWORD') ?: 'metadata'
+    def metadataDbUsername = System.getenv('METADATA_USERNAME') ?: 'metadata'
     def metadataJdbcString = System.getenv('METADATA_JDBC_URL')
 
     if (!metadataJdbcString && System.getenv("MC_MYSQL_NAME")) {
