@@ -12,7 +12,7 @@ echo -e "Starting Tomcat v$TOMCAT_VERSION instance with docker.\nInitializing co
 docker_start_or_run router -d -p 80:80 -p 443:443 -v /var/run/docker.sock:/tmp/docker.sock:ro jwilder/nginx-proxy
 docker_start_or_run mc-tomcat -e VIRTUAL_HOST="$MC_TOMCAT_HOST" -e VIRTUAL_PORT=8080 -e CATALINA_OPTS="-Djava.awt.headless=true -Dfile.encoding=UTF-8 -server -Xms2g -Xmx1g -XX:NewSize=512m -XX:MaxNewSize=512m -XX:PermSize=512m -XX:MaxPermSize=512m -XX:+DisableExplicitGC" --link "$MYSQL_CONTAINER":mc-mysql --link "$ES_CONTAINER":mc-es tomcat:"$TOMCAT_VERSION"
 
-docker cp conf/docker/mc-config-docker.groovy mc-tomcat:/usr/local/tomcat/conf/mc-config.groovy
+docker cp conf/docker/mc-config.groovy mc-tomcat:/usr/local/tomcat/conf/mc-config.groovy
 docker cp build/ModelCatalogueCorePluginTestApp-2.0.0.war mc-tomcat:/usr/local/tomcat/webapps/ROOT.war
 
 echo -e "Tomcat v$TOMCAT_VERSION started at http://$MC_TOMCAT_HOST/."
