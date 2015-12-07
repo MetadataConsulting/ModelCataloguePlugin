@@ -13,7 +13,8 @@ mkdir -p build
 cd ModelCatalogueCorePluginTestApp
 ./grailsw war
 
-cp target/*.war ../build/
+rm build/*
+cp target/*.war ../build/mc.war
 
 echo "War created in ./build/ directory. You need to have put mc-config.groovy configuration file in your Tomcat's conf directory"
 

@@ -28,4 +28,16 @@ before_install:
 script:
   - "./run-all-tests.sh"
 after_script:
-  - "./update-gh-pages.sh"
+- ./update-gh-pages.sh
+
+# deployment
+before_deploy: "./war.sh"
+deploy:
+  provider: releases
+  api_key:
+    secure: OwYHBvi8Mpb/VstwqmfPh+pvnA3xLx8ZSqtZSOTlCh6uzlP1To8Hv/mKAVjXSRrFrSL1udUais3K3yu29eX+AGAVpzZ+QYerSAY4oQWoNolBrE4O2Q6fINXk9jELJXdQU/xYiylt8WX3bYOKFsotXt2Bv3zyzsoUgaAHkk+Mp+8=
+  file:
+    - "build/mc.war"
+    - "conf/docker/mc-config.groovy"
+  on:
+    tags: true
