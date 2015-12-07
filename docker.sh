@@ -27,25 +27,25 @@ fi
 function docker_exec() {
     local NAME=$1
     shift
-    docker exec -it "$NAME" "$@"  &>/dev/null
+    docker exec -it "$NAME" "$@"
 }
 
 function docker_restart() {
-    docker stop "$1" && docker start "$1" &>/dev/null
+    docker stop "$1" && docker start "$1"
 }
 
 function docker_stop() {
-    docker stop "$1" &>/dev/null
+    docker stop "$1"
 }
 
 function docker_rm() {
-    docker rm -f "$1" &>/dev/null
+    docker rm -f "$1"
 }
 
 function docker_start_or_run() {
     local NAME=$1
     shift
-    docker start "$NAME"  &>/dev/null || docker run -d --name="$NAME" "$@" &>/dev/null
+    docker start "$NAME"  &>/dev/null || docker run -d --name="$NAME" "$@"
 }
 
 function write_docker_file() {
@@ -53,5 +53,5 @@ function write_docker_file() {
 }
 
 function remove_docker_file() {
-    rm .docker-ip &>/dev/null
+    rm .docker-ip
 }
