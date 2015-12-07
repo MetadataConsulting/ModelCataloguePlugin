@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+AVAILABLE_CORES=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || sysctl -n hw.ncpu)
+HALF_OF_CPU=$((AVAILABLE_CORES * 100000 / 2))
+
 if [ "$(uname)" == "Darwin" ] ||  [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ] ; then
     # you can have multiple docker machines on your computer, default should present after installation
     : ${MC_DOCKER_MACHINE_ENV:="default"}
@@ -45,7 +48,7 @@ function docker_rm() {
 function docker_start_or_run() {
     local NAME=$1
     shift
-    docker start "$NAME"  &>/dev/null || docker run -d --name="$NAME" "$@"
+    docker start "$NAME"  &>/dev/null || docker run --restart=always --cpu-quota="$HALF_OF_CPU" -d --name="$NAME" "$@"
 }
 
 function write_docker_file() {
