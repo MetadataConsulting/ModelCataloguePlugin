@@ -29,5 +29,6 @@ grails.plugin.console.enabled=true
 
 mc.legacy.dataModels=true
 
+// unless we find out the way how to preload the database, it doesn't make sense to migrate automatically
 // grails.plugin.databasemigration.updateOnStart=true
 // grails.plugin.databasemigration.updateOnStartFileNames=["changelog.groovy"]
