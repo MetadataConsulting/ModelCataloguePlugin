@@ -32,6 +32,7 @@ after_script:
 
 # deployment
 before_deploy: "./war.sh"
+after_deploy: "./catalogue docker notify"
 deploy:
   provider: releases
   api_key:
