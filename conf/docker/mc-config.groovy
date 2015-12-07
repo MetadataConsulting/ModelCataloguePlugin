@@ -1,6 +1,6 @@
 // config
 grails.logging.jul.usebridge = false
-grails.serverURL =  "http://${System.getenv('VIRTUAL_HOST') ?: System.getenv('METADATA_URL') ?: System.getenv('DOCKER_MACHINE_IP') ?: new URL("http://checkip.amazonaws.com").text.trim()}"
+grails.serverURL =  "http://${System.getenv('VIRTUAL_HOST') ?: System.getenv('METADATA_HOST') ?: System.getenv('DOCKER_MACHINE_IP') ?: new URL("http://checkip.amazonaws.com").text.trim()}"
 
 // datasource
 dataSource {
