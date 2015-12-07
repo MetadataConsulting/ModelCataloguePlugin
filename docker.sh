@@ -1,22 +1,28 @@
 #!/usr/bin/env bash
 
-# you can have multiple docker machines on your computer, default should present after installation
-: ${MC_DOCKER_MACHINE_ENV:="default"}
+if [ "$(uname)" == "Darwin" ] ||  [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ] ; then
+    # you can have multiple docker machines on your computer, default should present after installation
+    : ${MC_DOCKER_MACHINE_ENV:="default"}
 
-command -v docker-machine >/dev/null 2>&1 || { echo "Docker Machine is required to run this script.  Please, install it from https://www.docker.com/docker-toolbox." >&2; exit 1; }
+    command -v docker-machine >/dev/null 2>&1 || { echo "Docker Machine is required to run this script.  Please, install it from https://www.docker.com/docker-toolbox." >&2; exit 1; }
 
-docker-machine start "$MC_DOCKER_MACHINE_ENV" &>/dev/null
+    docker-machine start "$MC_DOCKER_MACHINE_ENV" &>/dev/null
 
-eval "$(docker-machine env "$MC_DOCKER_MACHINE_ENV")"
+    eval "$(docker-machine env "$MC_DOCKER_MACHINE_ENV")"
 
-DOCKER_MACHINE_IP=$(docker-machine ip "$MC_DOCKER_MACHINE_ENV")
+    # only reliable variable on every operation system
+    DOCKER_MACHINE_IP=$(docker-machine ip "$MC_DOCKER_MACHINE_ENV")
 
-export MC_DOCKER_MACHINE_ENV
-export DOCKER_MACHINE_IP
-export DOCKER_TLS_VERIFY
-export DOCKER_HOST
-export DOCKER_CERT_PATH
-export DOCKER_MACHINE_NAME
+    # to be able to connect with simple docker command
+    export DOCKER_MACHINE_IP
+    export DOCKER_TLS_VERIFY
+    export DOCKER_HOST
+    export DOCKER_CERT_PATH
+    export DOCKER_MACHINE_NAME
+
+elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+    DOCKER_MACHINE_IP=$(dig +short myip.opendns.com @resolver1.opendns.com || ip route get 8.8.8.8 | head -1 | cut -d' ' -f8 || ip a s|sed -ne '/127.0.0.1/!{s/^[ \t]*inet[ \t]*\([0-9.]\+\)\/.*$/\1/p}')
+fi
 
 function docker_exec() {
     local NAME=$1
