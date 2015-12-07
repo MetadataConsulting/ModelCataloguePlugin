@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-echo "Travis reported branch $TRAVIS_BRANCH"
-
 #go to home and setup git
 cd $HOME
 git config --global user.email "travis@travis-ci.org"
