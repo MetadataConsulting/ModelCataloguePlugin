@@ -1,1 +1,1 @@
-tests the command
+tests the nested command

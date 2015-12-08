@@ -1,0 +1,4 @@
+Notifies repository with Dockerfile about the new version being published
+
+This is expected to be called from Travis CI build and will commit to https://github.com/MetadataRegistry/registry/
+as Travis CI fake user.

@@ -51,7 +51,19 @@ function delegate_to_folder() {
     shift 2
 
 
-    if [ -d "$COMMAND" ]; then
+    if [ "$1" == "--help" ] || [ "$1" == "--help" ] ; then
+        if [ -f "$COMMAND.txt" ] ; then
+            echo
+            cat "$COMMAND.txt"
+            if [ -d "$COMMAND" ]; then
+                echo
+                echo
+                print_usage_for_folder "$COMMAND"
+            fi
+            echo
+            echo
+        fi
+    elif [ -d "$COMMAND" ]; then
         delegate_to_folder "$COMMAND" "$@"
     elif [ -f "$COMMAND.sh" ]; then
         "$COMMAND.sh" "$@"
