@@ -633,7 +633,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
 
         DataModel sourceDataModel = instance.instanceOf(DataModel) ? instance as DataModel : instance.dataModel
-        T clone = elementService.cloneElement(instance, sourceDataModel, CloningContext.create(sourceDataModel, destinationDataModel))
+        T clone = elementService.cloneElement(instance, CloningContext.create(sourceDataModel, destinationDataModel))
 
         if (clone.hasErrors()) {
             respond clone.errors, view: 'edit' // STATUS CODE 422

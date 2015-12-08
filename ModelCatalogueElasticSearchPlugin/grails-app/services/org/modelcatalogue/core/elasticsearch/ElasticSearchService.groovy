@@ -31,6 +31,7 @@ import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 import java.util.concurrent.ExecutorService
 
+import static org.modelcatalogue.core.util.HibernateHelper.*
 import static rx.Observable.from
 import static rx.Observable.just
 
@@ -295,7 +296,7 @@ class ElasticSearchService implements SearchCatalogue {
     @Override
     Observable<Boolean> unindex(Object object) {
         log.debug "Unindexing $object"
-        Class clazz = HibernateProxyHelper.getClassWithoutInitializingProxy(object)
+        Class clazz = getEntityClass(object)
         if (DataModel.isAssignableFrom(clazz)) {
             String indexName = getDataModelIndex(object as DataModel)
             return indexExists(just(indexName)).flatMap {
@@ -413,7 +414,7 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     private Observable<SimpleIndexResponse> indexAsync(IndexingSession session, object) {
-        Class clazz = HibernateProxyHelper.getClassWithoutInitializingProxy(object)
+        Class clazz = getEntityClass(object)
         if (DataModel.isAssignableFrom(clazz)) {
             return safeIndex(getIndices(object), getElementWithRelationships(session, object as CatalogueElement), [DataModel])
         }
@@ -543,7 +544,7 @@ class ElasticSearchService implements SearchCatalogue {
 
 
     protected static List<String> getIndices(object) {
-        Class clazz = HibernateProxyHelper.getClassWithoutInitializingProxy(object)
+        Class clazz = getEntityClass(object)
         if (DataModel.isAssignableFrom(clazz)) {
             return [DATA_MODEL_INDEX]
         }

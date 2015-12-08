@@ -10,6 +10,8 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 
+import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
+
 @Log4j
 class CloningChain extends PublishingChain {
 
@@ -53,7 +55,7 @@ class CloningChain extends PublishingChain {
                 }
                 processed << element.id
                 log.debug "Requesting clone creation of $element from $published"
-                CatalogueElement clone = element.cloneElement(publisher, context.destination, context)
+                CatalogueElement clone = element.cloneElement(publisher, context)
                 if (clone.hasErrors()) {
                     String message = FriendlyErrors.printErrors("Draft version $clone has errors", clone.errors)
                     log.warn(message)
@@ -76,9 +78,13 @@ class CloningChain extends PublishingChain {
             return published
         }
 
-        Class<? extends CatalogueElement> type = HibernateProxyHelper.getClassWithoutInitializingProxy(published)
+        Class<? extends CatalogueElement> type = getEntityClass(published)
 
         GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(type.name) as GrailsDomainClass
+
+        if (!domainClass) {
+            throw new IllegalStateException("Cannot find domain class for ${type}")
+        }
 
         CatalogueElement clone = type.newInstance()
 

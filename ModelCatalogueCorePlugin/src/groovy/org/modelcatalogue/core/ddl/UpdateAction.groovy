@@ -6,7 +6,9 @@ import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.RelationshipType
-import org.modelcatalogue.core.util.FriendlyErrors;
+import org.modelcatalogue.core.util.FriendlyErrors
+
+import static org.modelcatalogue.core.util.HibernateHelper.*;
 
 class UpdateAction {
 
@@ -21,7 +23,7 @@ class UpdateAction {
     }
 
     void to(Object newValue) {
-        GrailsDomainClass clazz = Holders.grailsApplication.getDomainClass(HibernateProxyHelper.getClassWithoutInitializingProxy(element).name)
+        GrailsDomainClass clazz = Holders.grailsApplication.getDomainClass(getEntityClass(element).name)
         if (element.hasProperty(property)) {
             GrailsDomainClassProperty prop = clazz.getPersistentProperty(property)
             if (prop.association) {

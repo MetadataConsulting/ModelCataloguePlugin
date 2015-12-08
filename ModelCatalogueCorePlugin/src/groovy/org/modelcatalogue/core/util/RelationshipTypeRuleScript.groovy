@@ -24,8 +24,8 @@ abstract class RelationshipTypeRuleScript extends Script {
 
 
     boolean isSameClass() {
-        Class sourceClass = HibernateProxyHelper.getClassWithoutInitializingProxy(source)
-        Class destinationClass = HibernateProxyHelper.getClassWithoutInitializingProxy(destination)
+        Class sourceClass = HibernateHelper.getEntityClass(source)
+        Class destinationClass = HibernateHelper.getEntityClass(destination)
         if (sourceClass == destinationClass) {
             return true
         }

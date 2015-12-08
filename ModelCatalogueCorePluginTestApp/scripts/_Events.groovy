@@ -25,6 +25,13 @@ try {
     if (branch != 'master') {
         version = "$version ($branch)"
     }
+
+    def travisTag = System.getenv('TRAVIS_TAG')
+
+    if (travisTag) {
+        version = travisTag
+        hash = travisTag
+    }
     new FileOutputStream("grails-app/views/_version.gsp", false) << """<a href="https://github.com/MetadataRegistry/ModelCataloguePlugin/tree/$hash" target="_blank">$version</a>"""
 } catch (e) {
     println "Cannot determine current version: $e"

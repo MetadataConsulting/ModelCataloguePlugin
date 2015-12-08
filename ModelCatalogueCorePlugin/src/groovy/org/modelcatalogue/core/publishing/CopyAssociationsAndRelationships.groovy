@@ -8,6 +8,7 @@ import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.RelationshipDefinition
 import org.modelcatalogue.core.RelationshipDefinitionBuilder
@@ -37,12 +38,12 @@ class CopyAssociationsAndRelationships {
         copyRelationshipsInternal(dataModel, RelationshipDirection.INCOMING, createdRelationshipHashes)
         copyRelationshipsInternal(dataModel, RelationshipDirection.OUTGOING, createdRelationshipHashes)
 
-        Class type = context.newType ?: HibernateProxyHelper.getClassWithoutInitializingProxy(draft)
+        Class type = context.newType ?: HibernateHelper.getEntityClass(draft)
 
         GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(type.name) as GrailsDomainClass
 
         for (prop in domainClass.persistentProperties) {
-            if (prop.association && (prop.manyToOne || prop.oneToOne) && element.hasProperty(prop.name) && prop.name != 'dataModel') {
+            if (prop.association && (prop.manyToOne || prop.oneToOne) && element.hasProperty(prop.name)) {
                 def value = element.getProperty(prop.name)
                 if (value instanceof CatalogueElement) {
                     draft.setProperty(prop.name, DraftContext.preferDraft(value))

@@ -6,12 +6,14 @@ import grails.util.GrailsNameUtils
 import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.CatalogueElement
 
+import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
+
 class CatalogueElementDocumentSerializer<T extends CatalogueElement> implements DocumentSerializer<T> {
 
 
     @Override
     ImmutableMap.Builder<String, Object> buildDocument(IndexingSession session, T element, ImmutableMap.Builder<String, Object> builder) {
-        Class<? extends CatalogueElement> clazz = HibernateProxyHelper.getClassWithoutInitializingProxy(element)
+        Class<? extends CatalogueElement> clazz = getEntityClass(element)
 
         safePut(builder, 'name', element.name)
         safePut(builder, 'name_not_analyzed', element.name)

@@ -20,6 +20,8 @@ import org.modelcatalogue.core.util.docx.ModelCatalogueWordDocumentBuilder
 
 import java.text.SimpleDateFormat
 
+import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
+
 @Log4j
 class ChangelogGenerator {
 
@@ -144,7 +146,7 @@ class ChangelogGenerator {
             return "${changedProperties.join(', ')} ${changedProperties.size() > 1 ? 'have' : 'has'} been changed"
         }
 
-        GrailsDomainClass grailsDomainClass = Holders.grailsApplication.getDomainClass(HibernateProxyHelper.getClassWithoutInitializingProxy(element).name)
+        GrailsDomainClass grailsDomainClass = Holders.grailsApplication.getDomainClass(getEntityClass(element).name)
 
         grailsDomainClass.persistentProperties.findAll { it.oneToOne || it.manyToOne }.sort { it.name }.each {
             def value = element.getProperty(it.name)
@@ -233,7 +235,7 @@ class ChangelogGenerator {
                 printChangesTable builder, rows
             }
 
-            GrailsDomainClass grailsDomainClass = Holders.grailsApplication.getDomainClass(HibernateProxyHelper.getClassWithoutInitializingProxy(element).name)
+            GrailsDomainClass grailsDomainClass = Holders.grailsApplication.getDomainClass(getEntityClass(element).name)
 
             grailsDomainClass.persistentProperties.findAll { it.oneToOne || it.manyToOne }.sort{ it.name }.each {
                 def value = element.getProperty(it.name)

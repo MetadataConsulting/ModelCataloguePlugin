@@ -6,6 +6,8 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.Legacy
 
+import static org.modelcatalogue.core.util.HibernateHelper.*
+
 @Log4j class DefaultCatalogueElementProxy<T extends CatalogueElement> implements CatalogueElementProxy<T>, org.modelcatalogue.core.api.CatalogueElement {
 
     static final List<Class> KNOWN_DOMAIN_CLASSES = [Asset, CatalogueElement, DataModel, DataElement, DataType, EnumeratedType, ReferenceType, MeasurementUnit, DataClass, PrimitiveType]
@@ -143,7 +145,7 @@ import org.modelcatalogue.core.util.Legacy
             return existing
         }
 
-        if (existing.status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED] || HibernateProxyHelper.getClassWithoutInitializingProxy(existing) != domain) {
+        if (existing.status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED] || getEntityClass(existing) != domain) {
             log.info("New draft version created for $this. Reason: $draftRequest")
             return repository.createDraftVersion(existing, this)
         }
@@ -207,7 +209,7 @@ import org.modelcatalogue.core.util.Legacy
                 return changed = "Does Not Exist Yet"
             }
 
-            if (domain != HibernateProxyHelper.getClassWithoutInitializingProxy(existing)) {
+            if (domain != getEntityClass(existing)) {
                 return changed = "Type Changed"
             }
 

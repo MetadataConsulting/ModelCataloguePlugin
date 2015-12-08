@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+source bin/lib/delegate.sh
+
+delegate_to_folder "bin" "$@"

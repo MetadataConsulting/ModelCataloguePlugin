@@ -390,6 +390,84 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     }
 
+    def "draft elements has the draft model I"() {
+        final String dataModelName = "DM4DMA"
+        final String dataTypeName = "DT4DMA"
+        catalogueBuilder.build {
+            dataModel name: dataModelName, {
+                dataType name: dataTypeName
+            }
+        }
+
+        DataModel source = DataModel.findByName(dataModelName)
+
+        expect:
+        source
+        source.status == ElementStatus.DRAFT
+
+
+        when:
+        DataModel finalized = elementService.finalizeElement(source)
+        DataType finalizedType = DataType.findByName(dataTypeName)
+
+        then:
+        finalized
+        finalized.status == ElementStatus.FINALIZED
+        source == finalized
+
+        finalizedType.dataModel == source
+
+        when:
+        DataModel draft = elementService.createDraftVersion(finalized, DraftContext.userFriendly())
+        DataType draftType = DataType.findByNameAndStatus(dataTypeName, ElementStatus.DRAFT)
+
+        then:
+        draft
+        draft != finalized
+
+        draftType
+        draftType.dataModel == draft
+    }
+
+    def "draft elements has the draft model II"() {
+        final String dataModelName = "DM4DMA2"
+        final String dataTypeName = "DT4DMA2"
+        catalogueBuilder.build {
+            dataModel name: dataModelName, {
+                dataType name: dataTypeName
+            }
+        }
+
+        DataModel source = DataModel.findByName(dataModelName)
+
+        expect:
+        source
+        source.status == ElementStatus.DRAFT
+
+
+        when:
+        DataModel finalized = elementService.finalizeElement(source)
+        DataType finalizedType = DataType.findByName(dataTypeName)
+
+        then:
+        finalized
+        finalized.status == ElementStatus.FINALIZED
+        source == finalized
+
+        finalizedType.dataModel == source
+
+        when:
+        DataType draftType = elementService.createDraftVersion(finalizedType, DraftContext.userFriendly())
+        DataModel draft = DataModel.findByNameAndStatus(dataModelName, ElementStatus.DRAFT)
+
+        then:
+        draft
+        draft != finalized
+
+        draftType
+        draftType.dataModel == draft
+    }
+
     @Unroll
     def "can change data type type when creating new draft to #type"() {
         DataType d1 = new DataType(name: "DT4CDT").save(failOnError: true, flush: true)
@@ -458,7 +536,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         when:
         DataType original = DataType.findByName(dataTypeName)
-        DataModel stillDestination = elementService.cloneElement(source, destination, CloningContext.create(source, destination))
+        DataModel stillDestination = elementService.cloneElement(source, CloningContext.create(source, destination))
         DataType clone = DataType.findByNameAndDataModel(dataTypeName, destination)
 
         then:
@@ -472,7 +550,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         when:
         DataType original = new DataType(dataModel: source, name: 'DT SM')
-        DataType clone = elementService.cloneElement(original, destination, CloningContext.create(source, destination))
+        DataType clone = elementService.cloneElement(original, CloningContext.create(source, destination))
 
         then:
         verifyCloned source, destination, original, clone
@@ -488,7 +566,10 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         catalogueBuilder.build {
             dataModel(name: sourceModelName) {
                 dataElement name: originalDataElementName, {
-                    dataType name: originalDataTypeName
+                    dataType name: originalDataTypeName, enumerations: [
+                            one: '1',
+                            two: '2'
+                    ]
                 }
             }
             dataModel name: destinationModelName
@@ -506,15 +587,19 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         originalDataElement
         originalDataType
 
+        originalDataType.instanceOf EnumeratedType
+
         originalDataElement.dataModel == source
         originalDataType.dataModel == source
         originalDataElement.dataType == originalDataType
 
         when:
-        DataElement clonedDataElement = elementService.cloneElement(originalDataElement, destination, CloningContext.create(source, destination))
+        DataElement clonedDataElement = elementService.cloneElement(originalDataElement, CloningContext.create(source, destination))
         DataType clonedDataType = DataType.findByNameAndDataModel(originalDataTypeName, destination)
 
         then:
+        clonedDataType.instanceOf EnumeratedType
+
         verifyCloned source, destination, originalDataElement, clonedDataElement
         verifyCloned source, destination, originalDataType, clonedDataType
 
@@ -533,7 +618,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
             dataModel(name: sourceModelName) {
                 dataClass name: originalDataClassName, {
                     dataElement name: originalDataElementName, {
-                        dataType name: originalDataTypeName
+                        dataType name: originalDataTypeName, enumerations: [one: '1', two: '2']
                     }
                 }
             }
@@ -554,6 +639,8 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         originalDataElement
         originalDataType
 
+        originalDataType instanceof EnumeratedType
+
         originalDataClass.dataModel == source
         originalDataElement.dataModel == source
         originalDataType.dataModel == source
@@ -562,11 +649,13 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         originalDataElement.dataType == originalDataType
 
         when:
-        DataClass clonedDataClass = elementService.cloneElement(originalDataClass, destination, CloningContext.create(source, destination))
+        DataClass clonedDataClass = elementService.cloneElement(originalDataClass, CloningContext.create(source, destination))
         DataElement clonedDataElement = DataElement.findByNameAndDataModel(originalDataElementName, destination)
         DataType clonedDataType = DataType.findByNameAndDataModel(originalDataTypeName, destination)
 
         then:
+        clonedDataType instanceof EnumeratedType
+
         verifyCloned source, destination, originalDataClass, clonedDataClass
         verifyCloned source, destination, originalDataElement, clonedDataElement
         verifyCloned source, destination, originalDataType, clonedDataType
