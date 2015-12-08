@@ -16,28 +16,22 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
     @Rule TemporaryFolder tmp = new TemporaryFolder()
 
     def "go to login"() {
-        go "#/"
-        loginAdmin()
-
         when:
-        go "#/catalogue/asset/all"
+        loginAdmin()
+        openDataModel "Test 1"
+        selectInTree "Test 1"
+        selectInTree "Assets"
 
         then:
         at AssetListPage
-        waitFor(120) {
-            viewTitle.displayed
-        }
         waitFor {
-            viewTitle.text().trim() == 'Asset List'
-        }
-        waitFor {
-            actionButton('create-catalogue-element', 'list').displayed
+            menuItem('create-catalogue-element', 'list').displayed
         }
     }
 
     def "upload new asset"() {
         when:
-        actionButton('create-catalogue-element', 'list').click()
+        menuItem('create-catalogue-element', 'list').click()
 
         then:
         waitFor {
@@ -81,15 +75,15 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "validate xml schema"() {
         when:
-        actionButton('catalogue-element').click()
+        menuItem('catalogue-element', 'item').click()
 
         then:
         waitFor {
-            actionButton('validate-xsd-schema')
+            menuItem('validate-xsd-schema', "")
         }
 
         when:
-        actionButton('validate-xsd-schema').click()
+        menuItem('validate-xsd-schema', "").click()
 
         then:
         waitFor {
@@ -123,26 +117,20 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
 
     def "upload mc file"() {
-        when:
-        go "#/catalogue/asset/all"
-
-        then:
-        at AssetListPage
-
         waitFor {
-            actionButton('new-import', 'list').displayed
+            menuItem('curator-menu', 'navigation-right').displayed
         }
 
         when:
-        actionButton('new-import', 'list').click()
+        menuItem('curator-menu', 'navigation-right').click()
 
         then:
         waitFor {
-            actionButton('import-mc').displayed
+            menuItem('import-mc', "").displayed
         }
 
         when:
-        actionButton('import-mc').click()
+        menuItem('import-mc', "").click()
 
         then:
         waitFor {
@@ -170,7 +158,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         10.times {
-            actionButton('refresh-asset').click()
+            menuItem('refresh-asset', 'item').click()
             try {
                 waitFor {
                     subviewTitle.text() == 'Import for MET-523.mc FINALIZED'
@@ -195,26 +183,20 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "upload excel file"() {
-        when:
-        go "#/catalogue/asset/all"
-
-        then:
-        at AssetListPage
-
         waitFor {
-            actionButton('new-import', 'list').displayed
+            menuItem('curator-menu', 'navigation-right').displayed
         }
 
         when:
-        actionButton('new-import', 'list').click()
+        menuItem('curator-menu', 'navigation-right').click()
 
         then:
         waitFor {
-            actionButton('import-excel').displayed
+            menuItem('import-excel', '').displayed
         }
 
         when:
-        actionButton('import-excel').click()
+        menuItem('import-excel', '').click()
 
         then:
         waitFor {
@@ -259,7 +241,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         }
 
         when:
-        actionButton('export').click()
+        menuItem('export', 'item').click()
 
         noStale({ $('span', text: 'Export All Elements of MET-522.M1 to Excel XSLX').parent('a') }) { exportAll ->
             if (exportAll.displayed) {
@@ -290,7 +272,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
     void waitUntilFinalized(String expectedName) {
         10.times {
             if (subviewTitle.text() == "${expectedName} PENDING") {
-                actionButton('refresh-asset').click()
+                menuItem('refresh-asset', 'item').click()
                 try {
                     waitFor(10) {
                         subviewTitle.text() == "${expectedName} FINALIZED"

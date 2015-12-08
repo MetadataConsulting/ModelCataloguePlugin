@@ -1,6 +1,8 @@
 package org.modelcatalogue.core.dataarchitect
 
 import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 
 class LoincImportService {
 
@@ -8,7 +10,7 @@ class LoincImportService {
 
     CatalogueBuilder catalogueBuilder
 
-    def serviceMethod(InputStream loinc ) {
+    Set<CatalogueElement> serviceMethod(InputStream loinc ) {
 
         loinc.toCsvReader([charset: 'UTF-8', skipLines: 1]).eachLine { tokens ->
             catalogueBuilder.build {
@@ -44,6 +46,7 @@ class LoincImportService {
 
             println "importing : first token" + tokens[0] + ":STUFF"
         }
+        return ((DefaultCatalogueBuilder)catalogueBuilder).created
     }
 
 }

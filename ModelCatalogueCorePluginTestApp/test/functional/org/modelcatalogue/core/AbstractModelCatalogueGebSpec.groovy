@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import geb.navigator.Navigator
 import geb.spock.GebReportingSpec
 import geb.waiting.WaitTimeoutException
+import org.modelcatalogue.core.api.ElementStatus
 import org.openqa.selenium.StaleElementReferenceException
 import org.openqa.selenium.logging.LogEntries
 import org.openqa.selenium.logging.LogEntry
@@ -23,29 +24,36 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         }
     }
 
+    def openDataModel(String dataModelName) {
+        go "#/dataModels"
+
+        waitFor {
+            title == 'Data Models'
+        }
+
+        waitFor {
+            $("h3.panel-title", title: dataModelName).displayed
+        }
+
+        noStale({$("h3.panel-title", title: dataModelName)}) {
+            it.find('a').click()
+        }
+
+        waitFor {
+            title == dataModelName
+        }
+    }
+
     def loginUser(String user, String pwd) {
-        if (!$('.login-modal-prompt').displayed) {
-            if (!$(".navbar-form i.glyphicon.glyphicon-log-in").displayed) {
-                $(".navbar-form i.glyphicon.glyphicon-log-out").click()
-            }
+        go "login/auth"
 
-            waitFor {
-                $(".navbar-form i.glyphicon.glyphicon-log-in").displayed
-            }
+        $("#username").value(user)
+        $("#password").value(pwd)
 
-            $(".navbar-form i.glyphicon.glyphicon-log-in").click()
-        }
+        $("#loginForm").find("button.btn-primary").click()
 
         waitFor {
-            $("div.login-modal-prompt").displayed
-        }
-
-        $("div.modal").find("#username").value(user)
-        $("div.modal").find("#password").value(pwd)
-        $("div.modal").find("button.btn-success").click()
-
-        waitFor {
-            !$("div.login-modal-prompt").displayed
+            $("#role_navigation-right_user-menu-menu-item-link").displayed
         }
     }
 
@@ -128,7 +136,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
             attempt++
             try {
                 navigator = navigatorClosure()
-                waitFor {
+                waitFor(1) {
                     navigator.displayed
                 }
                 return resultClosure(navigator)
@@ -211,6 +219,12 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
         noStale({$('a.item-found h4', text: name)}) { Navigator item ->
             item.parent().click()
+        }
+    }
+
+    def selectInTree(String name) {
+        noStale({ $('.catalogue-element-treeview-name', text: name) }) {
+            it.click()
         }
     }
 

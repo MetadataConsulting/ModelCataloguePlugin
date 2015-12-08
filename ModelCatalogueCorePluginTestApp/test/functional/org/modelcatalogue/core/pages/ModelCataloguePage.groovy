@@ -12,7 +12,7 @@ abstract class ModelCataloguePage extends Page {
     static content = {
 
         viewTitle(OPT)          { $("h2") }
-        subviewTitle(OPT)       { $("h3:not(.ng-hide)") }
+        subviewTitle(OPT)       { $("h3:not(.ng-hide):not(.data-model-heading)") }
         subviewStatus(OPT)      { $("h3 small span.label") }
 
         showLoginButton(OPT)    { $(".navbar-form i.glyphicon.glyphicon-log-in") }

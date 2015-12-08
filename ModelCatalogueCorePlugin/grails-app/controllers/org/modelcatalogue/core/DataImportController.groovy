@@ -115,6 +115,8 @@ class DataImportController  {
         def confType = file.getContentType()
         boolean isAdmin = modelCatalogueSecurityService.hasRole('ADMIN')
 
+        DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService, isAdmin)
+
         if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xls")) {
             def asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
             def id = asset.id
@@ -122,10 +124,9 @@ class DataImportController  {
             HeadersMap headersMap = HeadersMap.create(request.JSON.headersMap ?: [:])
             executeInBackground(id, "Imported from Excel") {
                 try {
-                    DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService, isAdmin)
                     ExcelLoader parser = new ExcelLoader(builder)
                     parser.importData(headersMap, inputStream)
-                    finalizeAsset(id)
+                    finalizeAsset(id, (DataModel) (builder.created.find {it.instanceOf(DataModel)} ?: builder.created.find{it.dataModel}?.dataModel))
                 } catch (Exception e) {
                     logError(id, e)
                 }
@@ -140,9 +141,9 @@ class DataImportController  {
             InputStream inputStream = file.inputStream
             executeInBackground(id, "Imported from XML") {
                 try {
-                    CatalogueXmlLoader loader = new CatalogueXmlLoader(new DefaultCatalogueBuilder(dataModelService, elementService, isAdmin))
+                    CatalogueXmlLoader loader = new CatalogueXmlLoader(builder)
                     loader.load(inputStream)
-                    finalizeAsset(id)
+                    finalizeAsset(id, (DataModel) (builder.created.find {it.instanceOf(DataModel)} ?: builder.created.find{it.dataModel}?.dataModel))
                 } catch (Exception e) {
                     logError(id, e)
                 }
@@ -159,13 +160,10 @@ class DataImportController  {
             String idpattern = params.idpattern
             executeInBackground(id, "Imported from OBO") {
                 try {
-                    DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService, isAdmin)
                     OboLoader loader = new OboLoader(builder)
                     idpattern = idpattern ?: "${grailsApplication.config.grails.serverURL}/catalogue/ext/${OboLoader.OBO_ID}/:id".toString().replace(':id', '$id')
                     loader.load(inputStream, name, idpattern)
-                    DataModel dataModel = builder.created.find { it.instanceOf(DataModel) } as DataModel
-                    Asset updated = finalizeAsset(id)
-                    assignAssetToModel(updated, dataModel)
+                    finalizeAsset(id, (DataModel) (builder.created.find {it.instanceOf(DataModel)} ?: builder.created.find{it.dataModel}?.dataModel))
                 } catch (Exception e) {
                     logError(id, e)
                 }
@@ -182,8 +180,8 @@ class DataImportController  {
 
             executeInBackground(id, "Imported from LOINC")  {
                 try {
-                    loincImportService.serviceMethod(inputStream)
-                    finalizeAsset(id)
+                    Set<CatalogueElement> created = loincImportService.serviceMethod(inputStream)
+                    finalizeAsset(id, (DataModel) (created.find {it.instanceOf(DataModel)} ?: created.find{it.dataModel}?.dataModel))
                 } catch (Exception e) {
                     logError(id, e)
                 }
@@ -201,9 +199,7 @@ class DataImportController  {
             executeInBackground(id, "Imported from Model Catalogue DSL")  {
                 try {
                     Set<CatalogueElement> created = initCatalogueService.importMCFile(inputStream)
-                    Asset updated = finalizeAsset(id)
-                    DataModel dataModel = created.find { it instanceof DataModel } as DataModel
-                    assignAssetToModel(updated, dataModel)
+                    finalizeAsset(id, (DataModel) (created.find {it.instanceOf(DataModel)} ?: created.find{it.dataModel}?.dataModel))
                 } catch (Exception e) {
                     logError(id, e)
                 }
@@ -225,6 +221,7 @@ class DataImportController  {
                     if(!dataModel) dataModel =  new DataModel(name: name).save(flush:true, failOnError:true)
                     umljService.importUmlDiagram(inputStream, name, dataModel)
                     Asset updated = Asset.get(id)
+                    updated.dataModel = dataModel
                     updated.status = ElementStatus.FINALIZED
                     updated.description = "Your import has finished."
                     updated.dataModel = dataModel
@@ -254,15 +251,9 @@ class DataImportController  {
         respond "errors": errors
     }
 
-    protected static assignAssetToModel(Asset asset, DataModel dataModel){
-        if (dataModel) {
-            asset.dataModel = dataModel
-            FriendlyErrors.failFriendlySave(asset)
-        }
-    }
-
-    protected static Asset finalizeAsset(Long id){
+    protected static Asset finalizeAsset(Long id, DataModel dataModel){
         Asset updated = Asset.get(id)
+        updated.dataModel = dataModel
         updated.status = ElementStatus.FINALIZED
         updated.description = "Your import has finished."
         updated.save(flush: true, failOnError: true)

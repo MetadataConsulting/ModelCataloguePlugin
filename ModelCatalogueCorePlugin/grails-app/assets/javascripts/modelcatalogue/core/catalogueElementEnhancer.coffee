@@ -51,7 +51,7 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
 
           self.getDataModelId = ->
             return self.id if self.isInstanceOf "dataModel"
-            return self.dataModels[0].id if self.dataModels?.length > 0
+            return self.dataModels[0].id if self.dataModels?.length > 0 and self.dataModels[0]
             return 'catalogue'
 
 
@@ -64,8 +64,9 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
               return $state.go('mc.resource.show.property', {dataModelId: self.element.getDataModelId(), id: self.element.id, resource: names.getPropertyNameFromType(self.element.elementType), property: self.property})
             if self.isInstanceOf "enumeratedValue"
               $state.go('mc.resource.show.property', {resource: 'enumeratedType', id: self.id, dataModelId: self.getDataModelId(), property: 'enumerations'}) ; self
-
-            $state.go('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id, dataModelId: self.getDataModelId()}) ; self
+            if self.getDataModelId() != 'catalogue'
+              return $state.href('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id, dataModelId: self.getDataModelId()})
+            $state.go('simple.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id}) ; self
 
           self.href = () ->
             if self.isInstanceOf "batch"
