@@ -14,7 +14,7 @@ class EnumeratedTypeMarshaller extends DataTypeMarshaller {
         if (!element) return [:]
         def ret = super.prepareJsonMap(element)
         ret.enumerations = OrderedMap.toJsonMap(element.enumerations)
-        ret.content = [count: element.enumerations.size(), itemType: "${EnumeratedType.name}.EnumeratedValue", link: "/${GrailsNameUtils.getPropertyName(element.getClass())}/$element.id/content"]
+        ret.content = [count: element.enumerations?.size() ?: 0, itemType: "${EnumeratedType.name}.EnumeratedValue", link: "/${GrailsNameUtils.getPropertyName(element.getClass())}/$element.id/content"]
         ret
     }
 
