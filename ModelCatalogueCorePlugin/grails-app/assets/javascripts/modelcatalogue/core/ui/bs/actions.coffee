@@ -127,7 +127,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
         batch = $scope.batch ? $scope.element
         messages.confirm("Do you want to archive batch #{batch.name} ?", "The batch #{batch.name} will be archived").then ->
           enhance(rest(url: "#{modelCatalogueApiRoot}#{batch.link}/archive", method: 'POST')).then (archived) ->
-            updateFroms batch, archived
+            updateFrom batch, archived
           , showErrorsUsingMessages(messages)
     }
   ]
@@ -452,6 +452,8 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       action:   ->
         $scope.action.run().then ->
           $scope.reload() if angular.isFunction($scope.reload)
+          $scope.batch.$$reload()  if angular.isFunction($scope.batch?.$$reload)
+
     }
   ]
 
@@ -468,6 +470,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       action:   ->
         $scope.action.dismiss().then ->
           $scope.reload() if angular.isFunction($scope.reload)
+          $scope.batch.$$reload()  if angular.isFunction($scope.batch?.$$reload)
     }
   ]
 
@@ -484,6 +487,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       action:   ->
         $scope.action.reactivate().then ->
           $scope.reload() if angular.isFunction($scope.reload)
+          $scope.batch.$$reload()  if angular.isFunction($scope.batch?.$$reload)
     }
   ]
 
@@ -498,12 +502,13 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       action:   ->
         $scope.action.reactivate().then ->
           $scope.reload() if angular.isFunction($scope.reload)
+          $scope.batch.$$reload()  if angular.isFunction($scope.batch?.$$reload)
     }
   ]
 
 
   actionsProvider.registerActionInRoles 'reload-actions', [ROLE_ACTION_ACTION, actionsProvider.ROLE_ITEM_ACTION, actionsProvider.ROLE_NAVIGATION], ['$scope', ($scope) ->
-    return undefined unless angular.isFunction($scope.reload) and ($scope.action and $scope.action.state == 'PERFORMING') or ($scope.batch and not $scope.action)
+    return undefined unless angular.isFunction($scope.batch?.$$reload) and ($scope.action and $scope.action.state == 'PERFORMING') or ($scope.batch and not $scope.action)
 
     {
       position: 900
@@ -511,7 +516,11 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       icon:     'glyphicon glyphicon-refresh'
       label:    'Reload'
       action:   ->
-        $scope.reload()
+        if $scope.batch?.$$reload
+          $scope.batch?.$$reload()
+          return
+          $scope.reload() if angular.isFunction($scope.reload)
+          $scope.batch.$$reload()  if angular.isFunction($scope.batch?.$$reload)
     }
   ]
 
@@ -536,10 +545,12 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
               messages.prompt('Add Dependency', 'Please, provide the name of the role for the new dependency').then (role) ->
                 selected.addDependency($scope.action.id, role).then ->
                   $scope.reload() if angular.isFunction($scope.reload)
+                  $scope.batch.$$reload()  if angular.isFunction($scope.batch?.$$reload)
             else if @mode == 'remove'
               messages.confirm('Remove Dependency', 'Do you really want to remove dependency between these two actions? This may cause problems executing given action!').then ->
                 selected.removeDependency(selected.dependsOn['' + $scope.action.id]).then ->
                   $scope.reload() if angular.isFunction($scope.reload)
+                  $scope.batch.$$reload()  if angular.isFunction($scope.batch?.$$reload)
             $rootScope.selectedAction = undefined
 
 

@@ -6,6 +6,7 @@ angular.module('mc.core.ui.states.controllers', [
   'mc.core.ui.states.controllers.DashboardCtrl'
   'mc.core.ui.states.controllers.ShowCtrl'
   'mc.core.ui.states.controllers.BatchCtrl'
+  'mc.core.ui.states.controllers.BatchOnlyCtrl'
   'mc.core.ui.states.controllers.CsvTransformationCtrl'
   'mc.core.ui.states.controllers.FavoritesCtrl'
   'mc.core.ui.states.controllers.DiffCtrl'

@@ -1,6 +1,6 @@
-angular.module('mc.core.ui.states.mc.actions.show', ['mc.core.ui.states.controllers.BatchCtrl']).config(['$stateProvider', ($stateProvider) ->
+angular.module('mc.core.ui.states.simple.actions.show', ['mc.core.ui.states.controllers.BatchCtrl']).config(['$stateProvider', ($stateProvider) ->
 
-    $stateProvider.state 'mc.actions.show', {
+    $stateProvider.state 'simple.actions.show', {
       url: '/{id:\\d+}'
 
       views:
@@ -10,7 +10,7 @@ angular.module('mc.core.ui.states.mc.actions.show', ['mc.core.ui.states.controll
 
         'navbar-left@':
           template: '<contextual-menu role="item"></contextual-menu>'
-          controller: 'mc.core.ui.states.controllers.ElementCtrl'
+          controller: 'mc.core.ui.states.controllers.BatchOnlyCtrl'
 
       resolve:
         element: ['$stateParams','catalogueElementResource', ($stateParams, catalogueElementResource) ->

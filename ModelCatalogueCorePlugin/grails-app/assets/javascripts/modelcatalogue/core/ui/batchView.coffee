@@ -50,7 +50,7 @@ angular.module('mc.core.ui.batchView', ['mc.core.catalogueElementEnhancer', 'mc.
       loadActions($scope.batch.actions).then(assignActions, (->), assignActions).then ->
         $scope.loading = false
 
-      $scope.reload = ->
+      $scope.batch.$$reload = ->
         loadActions($scope.batch.actions).then assignActions
 
 

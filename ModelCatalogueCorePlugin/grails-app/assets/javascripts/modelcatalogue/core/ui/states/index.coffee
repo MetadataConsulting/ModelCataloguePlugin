@@ -6,8 +6,8 @@ angular.module('mc.core.ui.states', [
   # list of modules
   'mc.core.ui.states.landing'
   'mc.core.ui.states.dataModels'
-  'mc.core.ui.states.mc.actions.show'
-  'mc.core.ui.states.mc.actions'
+  'mc.core.ui.states.simple.actions.show'
+  'mc.core.ui.states.simple.actions'
   'mc.core.ui.states.mc.csvTransformations.show'
   'mc.core.ui.states.mc.csvTransformations'
   'mc.core.ui.states.mc.search'

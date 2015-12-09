@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.bs.batch.html', []).run([
+angular.module('mc.core.ui.states.bs.dashboard.html', []).run([
   '$templateCache',
   ($templateCache) ->
 

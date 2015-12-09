@@ -11,25 +11,36 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
 
 
     def "see test batch in action "() {
-        go "#/"
         loginAdmin()
 
         when:
-        go "#/catalogue/batch/all"
+        waitFor {
+            menuItem('admin-menu', 'navigation-right').displayed
+        }
+
+        menuItem('admin-menu', 'navigation-right').click()
+
+        then:
+        waitFor {
+            menuItem('action-batches', "").displayed
+        }
+
+        when:
+        menuItem('action-batches', "").click()
 
         then:
         at BatchListPage
 
         waitFor {
             linkToTestBatch.displayed
-            actionButton('generate-merge-models', 'list').displayed
+            menuItem('generate-merge-models', 'list').displayed
         }
     }
 
     def "generate suggestions"() {
         waitUntilModalClosed()
         when:
-        actionButton('generate-merge-models', 'list').click()
+        menuItem('generate-merge-models', 'list').click()
 
         then:
         waitFor {
@@ -40,7 +51,7 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         waitFor(120) {
-            actionButton('refresh-batches', 'list').click()
+            menuItem('refresh-batches', 'list').click()
             Thread.sleep(100)
             linkToRename.displayed
         }
@@ -97,7 +108,7 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
             }
             return true
         } catch (WaitTimeoutException ignored) {
-            actionButton('reload-actions').click()
+            menuItem('reload-actions', 'item').click()
             waitFor (5) {
                 performedActions.size() == 1
             }
