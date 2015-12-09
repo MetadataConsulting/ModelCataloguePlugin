@@ -13,6 +13,7 @@ import org.modelcatalogue.core.Extendible
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.ListWrapper
+import org.modelcatalogue.core.util.DataModelAware
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.context.request.RequestContextHolder
 import pl.touk.excel.export.WebXlsxExporter
@@ -95,7 +96,7 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
         exporter.save(context.webRequest.currentResponse.outputStream)
     }
 
-    private void renderAsAsset(container, XLSXRowWriter writer, ServletRenderContext context) {
+    private void renderAsAsset(ListWrapper container, XLSXRowWriter writer, ServletRenderContext context) {
         String layoutFileName = getLayoutResourceFileName()
 
         String theName = extractName(writer, context)
@@ -109,6 +110,10 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
                 size: 0
         )
 
+        if (container instanceof DataModelAware) {
+            asset.dataModel = container.dataModel
+        }
+
         asset.save(flush: true, failOnError: true)
 
         Long id = asset.id
@@ -118,6 +123,7 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
         executorService.submit {
             auditService.withDefaultAuthorId(authorId) {
                 try {
+                    DataModel dataModel = null
                     WebXlsxExporter exporter
                     if (layoutFileName) {
                         exporter = new WebXlsxExporter(layoutFileName)
@@ -162,6 +168,9 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
                         }
 
                         for (item in container.items) {
+                            if (!dataModel && item instanceof DataModelAware) {
+                                dataModel = item.dataModel
+                            }
                             List<List<Object>> rows = writer.getRows(item)
                             for (List<Object> row in rows) {
                                 exporter.fillRow(row, counter++)
@@ -175,6 +184,9 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
                         exporter.save(it)
                     }
 
+                    if (!updated.dataModel) {
+                        updated.dataModel = dataModel
+                    }
                     updated.status = org.modelcatalogue.core.api.ElementStatus.FINALIZED
                     updated.description = "Your export is ready. Use Download button to view it."
                     updated.save(flush: true, failOnError: true)

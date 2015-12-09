@@ -99,6 +99,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
 
         Long modelId = model.id
         def assetId= assetService.storeReportAsAsset(
+                model.dataModel,
                 name: "${model.name} report as MS Word Document",
                 originalFileName: "${model.name}-${model.status}-${model.version}.docx",
                 contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -117,6 +118,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
 
         Long modelId = model.id
         def assetId= assetService.storeReportAsAsset(
+                model.dataModel,
                 name: "${model.name} report as MS Excel Document",
                 originalFileName: "${model.name}-${model.status}-${model.version}.xlsx",
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -134,6 +136,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
 
         Long modelId = model.id
         def assetId = assetService.storeReportAsAsset(
+                model.dataModel,
                 name: "${model.name} changelog as MS Word Document",
                 originalFileName: "${model.name}-${model.status}-${model.version}-changelog.docx",
                 contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"

@@ -16,7 +16,7 @@ class ModelCatalogueIDFilters {
 
 
 
-                    String dataModelId = element.dataModels ? element.dataModels.first().getId() : 'catalogue'
+                    String dataModelId = element.dataModel ? element.dataModel.getId() : 'catalogue'
 
                     redirect(uri: "/#/${dataModelId}/${controllerName}/${params.id}")
                 }

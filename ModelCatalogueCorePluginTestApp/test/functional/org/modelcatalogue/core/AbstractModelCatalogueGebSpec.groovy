@@ -3,7 +3,6 @@ package org.modelcatalogue.core
 import geb.navigator.Navigator
 import geb.spock.GebReportingSpec
 import geb.waiting.WaitTimeoutException
-import org.modelcatalogue.core.api.ElementStatus
 import org.openqa.selenium.StaleElementReferenceException
 import org.openqa.selenium.logging.LogEntries
 import org.openqa.selenium.logging.LogEntry
@@ -182,16 +181,23 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         sampleXsd
     }
 
-    void goToDetailUsingSearch(String name, String classification = null) {
-        String qualifiedName = classification ? "$name ($classification)" : name
+    void goToDetailUsingSearch(String name, String dataModel = null) {
+        String qualifiedName = dataModel ? "$name ($dataModel)" : name
 
-        noStale({ $('#search-term')}) { searchTerm ->
+        waitFor {
+            menuItem('search-menu', 'navigation-right').displayed
+        }
+
+        menuItem('search-menu', 'navigation-right').click()
+
+        noStale({ $('.search-lg input#value')}) { searchTerm ->
             searchTerm.value(name)
         }
+
         waitFor {
-            $('span.omnisearch-text', text: qualifiedName).displayed
+            $('a.list-group-item.with-pointer .classified-name', text: qualifiedName).displayed
         }
-        noStale({ $('span.omnisearch-text', text: qualifiedName).parent('a')}) { resultLink ->
+        noStale({ $('a.list-group-item.with-pointer .classified-name', text: qualifiedName).parent().parent() }) { resultLink ->
             resultLink.click()
         }
     }

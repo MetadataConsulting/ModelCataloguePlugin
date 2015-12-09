@@ -11,6 +11,7 @@ import org.modelcatalogue.core.publishing.Published
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.util.DataModelAware
 import org.modelcatalogue.core.util.ExtensionsWrapper
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Inheritance
@@ -27,7 +28,7 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 * DataElement) they extend catalogue element which allows creation of incoming and outgoing
 * relationships between them. They also  share a number of characteristics.
 * */
-abstract class  CatalogueElement implements Extendible<ExtensionValue>, Published<CatalogueElement>, ApiCatalogueElement {
+abstract class  CatalogueElement implements Extendible<ExtensionValue>, Published<CatalogueElement>, ApiCatalogueElement, DataModelAware {
 
     def grailsLinkGenerator
     def relationshipService

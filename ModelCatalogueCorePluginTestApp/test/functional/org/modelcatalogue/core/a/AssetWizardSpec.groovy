@@ -249,21 +249,17 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
             }
         }
 
-        withWindow({
-            title != 'MET-522.M1 (MET-522)'
-        }) {
-            waitFor {
-                subviewTitle.text().startsWith 'Data Elements to Excel.xlsx'
-            }
-            waitUntilFinalized('Data Elements to Excel.xlsx')
-
-            StringWriter sw = new StringWriter()
-            CatalogueBuilder builder = new XmlCatalogueBuilder(sw)
-            ExcelLoader parser = new ExcelLoader(builder)
-            parser.importData(HeadersMap.create(), new ByteArrayInputStream(downloadBytes("api/modelCatalogue/core/asset/${currentId}/download")))
-
-            sw.toString().count('<dataElement') == 15
+        waitFor {
+            subviewTitle.text().startsWith 'Data Elements to Excel.xlsx'
         }
+        waitUntilFinalized('Data Elements to Excel.xlsx')
+
+        StringWriter sw = new StringWriter()
+        CatalogueBuilder builder = new XmlCatalogueBuilder(sw)
+        ExcelLoader parser = new ExcelLoader(builder)
+        parser.importData(HeadersMap.create(), new ByteArrayInputStream(downloadBytes("api/modelCatalogue/core/asset/${currentId}/download")))
+
+        sw.toString().count('<dataElement') == 15
 
         then:
         noExceptionThrown()

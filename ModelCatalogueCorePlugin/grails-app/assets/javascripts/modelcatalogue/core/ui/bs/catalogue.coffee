@@ -101,4 +101,16 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
 
     return 0.5 if newElement.id == extra.owner.id
   ]
+
+  catalogueProvider.addContainsCandidateTest ['list', 'element', 'extra', (list, newElement, extra) ->
+    return 0 unless extra.url
+    return 0 unless extra.url.indexOf("/asset/upload") >= 0
+
+    return 0 unless list
+    return 0 unless list.base
+
+    return 0.5 if list.base.indexOf("/asset") >= 0
+
+    return 0
+  ]
 ]

@@ -89,7 +89,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'ngFil
             if $scope.copy.file
               $scope.uploading = true
               $scope.upload = Upload.upload({
-                params: {id: $scope.copy.id, name: $scope.copy.name, description: $scope.copy.description}
+                params: {id: $scope.copy.id, name: $scope.copy.name, description: $scope.copy.description, dataModel: $scope.currentDataModel?.id}
                 url:                "#{modelCatalogueApiRoot}/asset/upload"
                 file:               $scope.copy.file
                 fileFormDataName:   'asset'

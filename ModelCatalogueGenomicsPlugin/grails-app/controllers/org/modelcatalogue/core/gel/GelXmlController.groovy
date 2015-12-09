@@ -98,6 +98,7 @@ class GelXmlController {
      */
     private def storeAssetFromString(DataClass model,Closure closure,String assetName=null,String mimeType="application/octet-stream",String assetPendingDesc="",String assetFinalizedDesc="",String assetErrorDesc="",String originalFileName="unknown"){
         Asset asset = new Asset(
+                dataModel: model.dataModel,
                 name:assetName ,
                 originalFileName: originalFileName,
                 description: assetPendingDesc,

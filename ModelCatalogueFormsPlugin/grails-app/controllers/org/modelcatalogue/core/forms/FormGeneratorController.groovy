@@ -28,6 +28,7 @@ class FormGeneratorController {
         }
 
         Asset asset = new Asset(
+                dataModel: model.dataModel,
                 name: "$model.name Case Report Form",
                 originalFileName: "$model.name Case Report Form.xls",
                 description: "Your form will be available in this asset soon. Use Refresh action to reload",

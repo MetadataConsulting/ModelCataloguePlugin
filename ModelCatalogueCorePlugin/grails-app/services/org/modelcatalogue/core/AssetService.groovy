@@ -39,14 +39,15 @@ class AssetService {
         "$value B"
     }
 
-    Asset upload(Long id, String name, String description, MultipartFile file) {
+    Asset upload(Long id, Long dataModelId, String name, String description, MultipartFile file) {
+        Asset asset = dataModelId ? new Asset(dataModel: DataModel.get(dataModelId)) : new Asset()
+
         if (file.size > modelCatalogueStorageService.maxFileSize) {
-            Asset asset = new Asset()
             asset.errors.rejectValue('md5', 'asset.uploadfailed', "You cannot upload files greater than ${toBytes(modelCatalogueStorageService.maxFileSize)}")
             return asset
         }
 
-        Asset asset = new Asset()
+        // TODO: set data model
 
         asset.name              = name ?: file.originalFilename
         asset.description       = description
@@ -161,6 +162,7 @@ class AssetService {
     protected Asset storeAsset(Map param, MultipartFile file, String contentType = 'application/xslt'){
         String theName = (param.name ?: param.action)
 
+        // data model unknown at the moment
         Asset asset = new Asset(
                 name: "Import for " + theName,
                 originalFileName: file.originalFilename,
@@ -174,7 +176,7 @@ class AssetService {
         return asset
     }
 
-    Long storeReportAsAsset(Map<String, String> assetParams, @ClosureParams(value = FromString, options= "java.io.OutputStream") Closure worker){
+    Long storeReportAsAsset(Map<String, Object> assetParams, DataModel dataModel, @ClosureParams(value = FromString, options= "java.io.OutputStream") Closure worker){
         assert assetParams.name
         assert assetParams.contentType
         assert assetParams.originalFileName
@@ -184,7 +186,7 @@ class AssetService {
         assetParams.description = assetParams.description ?: "Your report will be available in this asset soon. Use Refresh action to reload"
 
         Asset asset = new Asset(assetParams)
-
+        asset.dataModel = dataModel
         asset.save(flush: true, failOnError: true)
 
         Long id = asset.id
@@ -195,7 +197,7 @@ class AssetService {
                 Asset updated = Asset.get(id)
                 try {
                     //do the hard work
-                    storeAssetWithSteam(updated, assetParams.contentType, worker)
+                    storeAssetWithSteam(updated, assetParams.contentType?.toString(), worker)
 
                     updated.status = ElementStatus.FINALIZED
                     updated.description = "Your report is ready. Use Download button to download it."

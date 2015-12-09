@@ -81,6 +81,7 @@ class DataImportController  {
 
         String letter = file.inputStream.text
         def id = assetService.storeReportAsAsset(
+                DataModel.get(dataModels.first()),
                 name: params.name,
                 originalFileName: params.name.endsWith('.html') ? params.name : "${params.name}.annotated.html",
                 contentType: "text/html",

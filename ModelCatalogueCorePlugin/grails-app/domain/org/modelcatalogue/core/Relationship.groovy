@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.util.DataModelAware
 import org.modelcatalogue.core.util.ExtensionsWrapper
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Inheritance
@@ -24,7 +25,7 @@ import org.modelcatalogue.core.util.OrderedMap
 *
 */
 
-class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalogue.core.api.Relationship {
+class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalogue.core.api.Relationship, DataModelAware {
 
     // when the relationship class is first loaded set the next index to current time in milliseconds
     static long nextIndex = System.currentTimeMillis()
@@ -181,4 +182,6 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
         }
         FriendlyErrors.failFriendlySaveWithoutFlush(old)
     }
+
+
 }
