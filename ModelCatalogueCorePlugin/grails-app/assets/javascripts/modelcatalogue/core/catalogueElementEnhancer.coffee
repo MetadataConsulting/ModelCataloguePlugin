@@ -6,6 +6,18 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
     )
     names.join(', ')
 
+  updateFrom = (original, update) ->
+    for originalKey of original
+      if originalKey.indexOf('$') != 0 # keep the private fields such as number of children in tree view
+        delete original[originalKey]
+
+    for newKey of update
+      original[newKey] = update[newKey]
+    original
+
+
+
+
   condition = (element) -> element.hasOwnProperty('elementType') and element.hasOwnProperty('link')
   factory   = [ 'modelCatalogueApiRoot', 'rest', '$rootScope', '$state', 'names', 'enhance', (modelCatalogueApiRoot, rest, $rootScope, $state, names, enhance) ->
     (element) ->
@@ -92,6 +104,9 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
                 return "#{@name} (#{@getElementTypeName()})"
 
               return @name
+
+          self.updateFrom = (update) ->
+              updateFrom this, update
 
           self.getUpdatableProperties = -> angular.copy(@updatableProperties)
 

@@ -221,15 +221,6 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
             if value.key == propertyName
               return value.value
 
-      updateFrom = (original, update) ->
-        for originalKey of original
-          if originalKey.indexOf('$') != 0 # keep the private fields such as number of children in tree view
-            delete original[originalKey]
-
-        for newKey of update
-          original[newKey] = update[newKey]
-        original
-
       resource = catalogueElementResource($element.elementType) if $element and $element.elementType
       propertyConfiguration = catalogueElementProperties.getConfigurationFor("#{$element.elementType}.#{$name}")
 
@@ -257,7 +248,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
           payload[@name] = angular.copy(@value)
           self = @
           resource.update(payload).then (updated) ->
-            updateFrom($element, updated)
+            $element.updateFrom updated
             messages.success("Property #{if propertyConfiguration.label then propertyConfiguration.label else names.getNaturalName(self.name)} of #{$element.name} successfully updated")
             updated
           ,  (response) ->

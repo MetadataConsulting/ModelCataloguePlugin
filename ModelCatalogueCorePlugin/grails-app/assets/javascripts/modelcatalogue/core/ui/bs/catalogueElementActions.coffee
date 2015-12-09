@@ -1,15 +1,5 @@
 angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).config ['actionsProvider', 'names', (actionsProvider, names)->
 
-  updateFrom = (original, update) ->
-    for originalKey of original
-      if originalKey.indexOf('$') != 0 # keep the private fields such as number of children in tree view
-        delete original[originalKey]
-
-    for newKey of update
-      original[newKey] = update[newKey]
-    original
-
-
   showErrorsUsingMessages = (messages) ->
     (response) ->
       if response?.data and response.data.errors
@@ -53,7 +43,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       watches:    ['element.status', 'element.archived']
       action:     ->
         messages.prompt('Edit ' + $scope.element.getElementTypeName(), '', {type: 'edit-' + names.getPropertyNameFromType($scope.element.elementType), element: $scope.element}).then (updated)->
-          updateFrom $scope.element, updated
+          $scope.element.updateFrom updated
 
     }
 
@@ -302,7 +292,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
         $scope.element.source.refresh().then (element)->
           args = {type: 'new-mapping', update: true, element: element, mapping: $scope.element}
           messages.prompt('Update Mapping', '', args).then (updated)->
-            updateFrom $scope.element, updated
+            $scope.element.updateFrom  updated
 
     }
 
@@ -366,7 +356,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
         messages.prompt('Change Type', "To which type should be #{$scope.element.name} converted? WARNING: any extra information such as enumerated values, data classes and measurement units will be lost!", {type: 'with-options', selected: names.getPropertyNameFromType($scope.element.elementType), options: options}).then (type)->
           catalogueElementResource($scope.element.elementType).update($scope.element, {newVersion: true, newType: type}).then (updated) ->
-            updateFrom $scope.element, updated
+            $scope.element.updateFrom  updated
             messages.success("#{$scope.element.name} is now #{options[type]}")
             $rootScope.$broadcast 'newVersionCreated', updated
             $rootScope.$broadcast 'catalogueElementUpdated', updated

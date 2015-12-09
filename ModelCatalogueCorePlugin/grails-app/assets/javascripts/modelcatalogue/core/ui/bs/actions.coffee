@@ -2,16 +2,6 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ROLE_ACTION_ACTION = 'action'
 
 
-  updateFrom = (original, update) ->
-    for originalKey of original
-      if originalKey.indexOf('$') != 0 # keep the private fields such as number of children in tree view
-        delete original[originalKey]
-
-    for newKey of update
-      original[newKey] = update[newKey]
-    original
-
-
   showErrorsUsingMessages = (messages) ->
     (response) ->
       if response?.data and response.data.errors
@@ -127,7 +117,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
         batch = $scope.batch ? $scope.element
         messages.confirm("Do you want to archive batch #{batch.name} ?", "The batch #{batch.name} will be archived").then ->
           enhance(rest(url: "#{modelCatalogueApiRoot}#{batch.link}/archive", method: 'POST')).then (archived) ->
-            updateFrom batch, archived
+            batch.updateFrom archived
           , showErrorsUsingMessages(messages)
     }
   ]
@@ -204,7 +194,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       type:       'primary'
       action:     ->
         catalogueElementResource($scope.element.elementType).get($scope.element.id).then (refreshed) ->
-          updateFrom $scope.element, refreshed
+          $scope.element.updateFrom refreshed
           $rootScope.$broadcast 'redrawContextualActions'
           $rootScope.$broadcast 'catalogueElementUpdated', refreshed
 
@@ -597,7 +587,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
         batch = $scope.batch ? $scope.element
         messages.confirm('Run All Actions', "Do you really wan to run all actions from '#{batch.name}' batch").then ->
           enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}#{batch.link}/run")).then (updated) ->
-            updateFrom(batch, updated)
+            batch.updateFrom(updated)
           $timeout($scope.reload, 1000) if angular.isFunction($scope.reload)
     }
 

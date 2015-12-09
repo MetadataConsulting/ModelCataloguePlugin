@@ -36,7 +36,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
               <li>
                 <button id="step-elements" ng-disabled="!dataClass.name || step == 'summary'" ng-click="select('elements')" class="btn btn-default" ng-class="{'btn-primary': step == 'elements', 'btn-info': step != 'elements' &amp;&amp; dataElements.length > 0}">5. Elements</button>
               </li>
-              <li>
+              <li ng-if="dataModels.length == 0">
                 <button id="step-dataModels" ng-disabled="!dataClass.name || step == 'summary'" ng-click="select('dataModels')" class="btn btn-default" ng-class="{'btn-primary': step == 'dataModels', 'btn-info': step != 'dataModels' &amp;&amp; dataModels.length > 0}">6. Data Models*</button>
               </li>
               <li>

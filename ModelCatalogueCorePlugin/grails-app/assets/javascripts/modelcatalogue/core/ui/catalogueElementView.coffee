@@ -24,16 +24,6 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           result = $injector.invoke(factory, undefined, $element: element, $name: name, $value: value, $scope: $scope)
           return result if result
 
-      updateFrom = (original, update) ->
-        for originalKey of original
-          if originalKey.indexOf('$') != 0 # keep the private fields such as number of children in tree view
-            delete original[originalKey]
-
-        for newKey of update
-          original[newKey] = update[newKey]
-        original
-
-
       tabsByName = {}
 
       $scope.property ?= $rootScope?.$stateParams?.property
@@ -197,7 +187,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       refreshElement = ->
         if $scope.element
           $scope.element.refresh().then (refreshed)->
-            updateFrom($scope.element, refreshed)
+            $scope.element.updateFrom(refreshed)
             onElementUpdate($scope.element)
 
       $scope.$on 'userLoggedIn', refreshElement

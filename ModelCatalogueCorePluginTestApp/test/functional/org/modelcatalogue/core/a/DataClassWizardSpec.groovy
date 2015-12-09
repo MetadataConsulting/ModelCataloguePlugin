@@ -9,31 +9,58 @@ import spock.lang.Stepwise
 class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {
-        go "#/"
         loginAdmin()
 
-        when:
-        go "#/catalogue/dataClass/all"
+        openDataModel('Test 2')
+        selectInTree "Test 2"
 
-        then:
+
+        waitFor {
+            menuItem('catalogue-element', 'item').displayed
+        }
+
+        menuItem('catalogue-element', 'item').click()
+
+        waitFor {
+            menuItem('add-import', '').displayed
+        }
+
+        menuItem('add-import', '').click()
+
+        noStale({ $('div.modal #elements') }) {
+            it.value('nhic')
+        }
+
+        selectCepItemIfExists()
+
+        noStale({ $('div.modal .btn-primary') }) {
+            it.click()
+        }
+
+        waitFor {
+            !$('div.modal').displayed
+        }
+
+        selectInTree "Data Classes"
+
+        expect:
         at ModalTreeViewPage
+
         waitFor(120) {
             !$('#jserrors').displayed && $('h3').displayed
         }
         waitFor {
-            $('h3').text()?.trim().contains('Data Classes')
+            subviewTitle.text()?.trim()?.contains('Data Class List')
         }
-
-        waitFor {
-            addModelButton.displayed
-        }
-
     }
 
     def "Add new data class"() {
-        when: 'I click the add data class button'
-        addModelButton.click()
+        waitFor {
+            menuItem('create-catalogue-element', 'list').displayed
+        }
 
+        when:
+        menuItem('create-catalogue-element', 'list').click()
 
         then: 'the model dialog opens'
         waitFor {
@@ -99,19 +126,6 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         name = 'nhs'
         selectCepItemIfExists()
 
-        and: 'the classifications step is clicked'
-        stepClassifications.click()
-
-        then:
-        waitFor {
-            stepClassifications.hasClass('btn-primary')
-        }
-
-        when: 'the classification is selected'
-        name = 'TEST DATA MODEL'
-        selectCepItemIfExists()
-        name << Keys.ENTER
-
         and: 'finish is clicked'
         stepFinish.click()
 
@@ -129,81 +143,14 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 
         waitUntilModalClosed(30)
     }
-    def "filter by classification"() {
-        when:
-        go "#/catalogue/dataModel/all"
-
-        then:
-        waitFor {
-            $('h3', title: 'XMLSchema').displayed
-        }
-
-        when:
-        $('h3', title: 'XMLSchema').find('a').click()
-
-        then:
-        waitFor {
-            menuItem('currentDataModel').text().contains('XMLSchema')
-        }
-        waitFor {
-            $('#role_sidenav_sidenav-dataClass').displayed
-        }
-
-        when:
-        $('#role_sidenav_sidenav-dataClass').click()
-
-        then:
-        waitFor {
-            !$('span.catalogue-element-treeview-name', text: "New 1").displayed
-        }
-
-        when:
-        waitFor {
-            menuItem('currentDataModel').displayed
-        }
-        menuItem('currentDataModel').click()
-
-        then:
-        waitFor {
-            menuItem('all-data-models', '').displayed
-        }
-
-        when:
-        menuItem('all-data-models', '').click()
-
-        then:
-        waitFor {
-            $('h3', title: 'XMLSchema').displayed
-        }
-        waitFor {
-            menuItem('currentDataModel').text().contains('All Data Models')
-        }
-
-        when:
-        go "#/catalogue/dataClass/all?status=draft"
-
-        then:
-        waitFor {
-            $('span.catalogue-element-treeview-name', text: startsWith("New")).displayed
-        }
-
-    }
-
-
-
 
     def "Add another data class"(){
-        when:
-        go "#/catalogue/dataClass/all"
-
-        then:
-        at ModalTreeViewPage
-        waitFor(120) {
-            $('h3').displayed
+        waitFor {
+            menuItem('create-catalogue-element', 'list').displayed
         }
 
-        when: 'I click the add data class button'
-        addModelButton.click()
+        when:
+        menuItem('create-catalogue-element', 'list').click()
 
 
         then: 'the data class dialog opens'
@@ -214,18 +161,6 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         when: 'the data class details are filled in'
         name = "Another New"
 
-        and: 'the classifications step is clicked'
-        stepClassifications.click()
-
-        then:
-        waitFor {
-            stepClassifications.hasClass('btn-primary')
-        }
-
-        when: 'the classification is selected'
-        name = 'TEST DATA MODEL'
-        selectCepItemIfExists()
-        name << Keys.ENTER
 
         and: 'finish is clicked'
         stepFinish.click()
@@ -244,6 +179,9 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when: "click the footer action"
         $('span.catalogue-element-treeview-name', text: startsWith("Another New")).click()
+
+        selectTab('contains')
+
         tableFooterAction.click()
 
         then: "modal is shown"
@@ -267,10 +205,10 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "edit child data class"() {
         expect:
-        actionButton('edit-catalogue-element').displayed
+        menuItem('edit-catalogue-element', 'item').displayed
 
         when:
-        actionButton('edit-catalogue-element').click()
+        menuItem('edit-catalogue-element', 'item').click()
 
         then:
         waitFor {

@@ -1,15 +1,5 @@
 angular.module('mc.core.ui.bs.statesActions', ['mc.util.ui.actions']).config ['actionsProvider', 'names', (actionsProvider, names)->
 
-  updateFrom = (original, update) ->
-    for originalKey of original
-      if originalKey.indexOf('$') != 0 # keep the private fields such as number of children in tree view
-        delete original[originalKey]
-
-    for newKey of update
-      original[newKey] = update[newKey]
-    original
-
-
   showErrorsUsingMessages = (messages) ->
     (response) ->
       if response?.data and response.data.errors
@@ -66,7 +56,7 @@ angular.module('mc.core.ui.bs.statesActions', ['mc.util.ui.actions']).config ['a
       action:     ->
         messages.confirm('Do you want to create new version?', "New version will be created for #{$scope.element.getElementTypeName()} #{$scope.element.name}").then ->
           catalogueElementResource($scope.element.elementType).update($scope.element, {newVersion: true}).then (updated) ->
-            updateFrom $scope.element, updated
+            $scope.element.updateFrom  updated
             messages.success("New version created for #{$scope.element.name}")
             $rootScope.$broadcast 'newVersionCreated', updated
           , showErrorsUsingMessages(messages)
@@ -88,7 +78,7 @@ angular.module('mc.core.ui.bs.statesActions', ['mc.util.ui.actions']).config ['a
       action:     ->
         messages.confirm("Do you want to finalize #{$scope.element.getElementTypeName()} #{$scope.element.name} ?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} and all it's dependencies will be finalized recursively. This means all elements declared by data model, all inner data classes and data elements of data classes and all data types of data elements. If any data type is using measurement unit which is not finalized yet the whole finalization process will fail.").then ->
           enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/finalize", method: 'POST')).then (finalized) ->
-            updateFrom $scope.element, finalized
+            $scope.element.updateFrom finalized
             $rootScope.$broadcast 'catalogueElementUpdated', finalized
             $rootScope.$broadcast 'catalogueElementFinalized', finalized
           , showErrorsUsingMessages(messages)
@@ -108,13 +98,13 @@ angular.module('mc.core.ui.bs.statesActions', ['mc.util.ui.actions']).config ['a
           if security.hasRole('ADMIN')
             messages.confirm("Do you want to restore #{$scope.element.getElementTypeName()} #{$scope.element.name} as finalized?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will no longer be deprecated").then ->
               enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/restore", method: 'POST')).then (restored) ->
-                updateFrom $scope.element, restored
+                $scope.element.updateFrom restored
                 $rootScope.$broadcast 'catalogueElementUpdated', restored
               , showErrorsUsingMessages(messages)
         else
           messages.confirm("Do you want to mark #{$scope.element.getElementTypeName()} #{$scope.element.name} as deprecated?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be marked as deprecated").then ->
             enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/archive", method: 'POST')).then (archived) ->
-              updateFrom $scope.element, archived
+              $scope.element.updateFrom archived
               $rootScope.$broadcast 'catalogueElementUpdated', archived
             , showErrorsUsingMessages(messages)
     }

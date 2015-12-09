@@ -91,6 +91,14 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
     return 0.5 if "#{modelCatalogueApiRoot}#{list.base.replace('/content', '/outgoing/hierarchy')}".indexOf(url) >= 0
     return 0.5 if "#{modelCatalogueApiRoot}#{list.base.replace('/content', '/outgoing/containment')}".indexOf(url) >= 0
 
+    return 0.3 if url.indexOf("#{modelCatalogueApiRoot}#{list.base.replace('/relationships/', '/incoming/')}") >= 0
+    return 0.3 if "#{modelCatalogueApiRoot}#{list.base.replace('/relationships/', '/incoming/')}".indexOf(url) >= 0
+
+    return 0.2 if url.indexOf("#{modelCatalogueApiRoot}#{list.base.replace('/outgoing/', '/incoming/')}") >= 0
+    return 0.2 if "#{modelCatalogueApiRoot}#{list.base.replace('/outgoing/', '/incoming/')}".indexOf(url) >= 0
+    return 0.2 if url.indexOf("#{modelCatalogueApiRoot}#{list.base.replace('/incoming/', '/outgoing/')}") >= 0
+    return 0.2 if "#{modelCatalogueApiRoot}#{list.base.replace('/incoming/', '/outgoing/')}".indexOf(url) >= 0
+
     return 0
   ]
 

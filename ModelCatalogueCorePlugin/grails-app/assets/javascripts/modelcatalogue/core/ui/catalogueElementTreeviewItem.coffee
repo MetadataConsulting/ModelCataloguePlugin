@@ -166,6 +166,8 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
         $scope.treeview.select(element)
 
       reloadChildrenOnChange = (_, result, url) ->
+        if result.link == $scope.element.link
+          $scope.element.updateFrom result
         if catalogue.isContentCandidate($scope.element[$scope.currentDescend], result, owner: $scope.element, url: url)
           $scope.element.$$loadChildren()
 
