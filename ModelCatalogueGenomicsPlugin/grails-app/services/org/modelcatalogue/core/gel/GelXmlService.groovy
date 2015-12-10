@@ -34,9 +34,13 @@ class GelXmlService {
     static final String METADATA_MIN_OCCURS="Min Occurs"
     static final String METADATA_MAX_OCCURS="Max Occurs"
     static final String XSL_TABLE_NAME="http://xsl.modelcatalogue.org/tableName"
+    static final String XSD_DEFAULT_NAMESPACE="http://xsd.modelcatalogue.org/defaultNamespace"
+    static final String XSD_TARGET_NAMESPACE="http://xsd.modelcatalogue.org/targetNamespace"
+    static final String XSD_PREFIX_NAMESPACE="http://xsd.modelcatalogue.org/prefixNamespace"
 
     static final def XSD_RESTRICTION_LIST=[XSD_RESTRICTION_LENGTH,XSD_RESTRICTION_MIN_LENGTH,XSD_RESTRICTION_MAX_LENGTH,XSD_RESTRICTION_MAX_INCLUSIVE,
-        XSD_RESTRICTION_MIN_INCLUSIVE,XSD_RESTRICTION_MAX_EXCLUSIVE,XSD_RESTRICTION_MIN_EXCLUSIVE,XSD_RESTRICTION_TOTAL_DIGITS,XSD_RESTRICTION_FRACTION_DIGITS,XSD_RESTRICTION_PATTERN]
+        XSD_RESTRICTION_MIN_INCLUSIVE,XSD_RESTRICTION_MAX_EXCLUSIVE,XSD_RESTRICTION_MIN_EXCLUSIVE,XSD_RESTRICTION_TOTAL_DIGITS,XSD_RESTRICTION_FRACTION_DIGITS,XSD_RESTRICTION_PATTERN,
+        XSD_DEFAULT_NAMESPACE, XSD_TARGET_NAMESPACE, XSD_PREFIX_NAMESPACE]
 
     static final def XSD_BUILTIN_DATA_TYPES=["xs:decimal","xs:float","xs:double","xs:integer","xs:positiveInteger","xs:negativeInteger","xs:nonPositiveInteger",
         "xs:nonNegativeInteger","xs:long","xs:int","xs:short","xs:byte","xs:unsignedLong","xs:unsignedInt","xs:unsignedShort","xs:unsignedByte","xs:dateTime","xs:date",
@@ -200,10 +204,31 @@ class GelXmlService {
     }
 
 
+    protected printXSDFriendlyString(CatalogueElement ce){
+        def text = ce.name
+        if (text==null) return "null"
+        text = text.trim()
+        text = text.replaceAll("\\(", "").replaceAll("\\)", "").replaceAll("[^a-zA-Z0-9]+","-").toLowerCase()
+        if(text[0].matches("[0-9]")) text = "_" + text
+        return text + "-" + getModelCatalogueId(ce)
+    }
+
 
     protected printXSDFriendlyString(String text){
         if (text==null) return "null"
-        return text.replaceAll(" ", "-").replaceAll("\\(", "").replaceAll("\\)", "").replaceAll("/", "-").toLowerCase()
+        text = text.trim()
+        text = text.replaceAll("\\(", "").replaceAll("\\)", "").replaceAll("[^a-zA-Z0-9]+","-").toLowerCase()
+        if(text[0].matches("[0-9]")) text = "_" + text
+        return text
+    }
+
+
+
+
+    protected getModelCatalogueId(CatalogueElement ce){
+        def id = ce.getLatestVersionId() ? ce.getLatestVersionId() + "." + ce.getVersionNumber()  :  ce.getId() + "." + ce.getVersionNumber()
+        return id
+
     }
 
     protected defaultMinOccurs(String min){
@@ -230,7 +255,7 @@ class GelXmlService {
      * @throw Exception with text error messages corresponding for missing fields
      */
     def printXSDModel(Model targetModel) {
-        def valueDomains = new TreeSet({ k1, k2 -> k1.name+k1.id <=> k2.name+k1.id } as Comparator)
+        def valueDomains = new TreeSet({ k1, k2 -> printXSDFriendlyString(k1) <=> printXSDFriendlyString(k2) } as Comparator)
         StringWriter writer = new StringWriter()
         def xmlSchema = Classification.findByName("XMLSchema")
         def xml = new MarkupBuilder(writer)
@@ -242,7 +267,14 @@ class GelXmlService {
         //check if the metadata occurs it's already filled in for models
         validateMetadataOccurs(childRelations)
 
-        xml.'xs:schema'('xmlns:xs': 'http://www.w3.org/2001/XMLSchema', 'xmlns:vc': 'http://www.w3.org/2007/XMLSchema-versioning', 'xmlns:gel': 'https://genomicsengland.co.uk/xsd/', 'vc:minVersion': '1.1') {
+
+
+        xml.'xs:schema'('xmlns:xs': 'http://www.w3.org/2001/XMLSchema',
+                "xmlns:vc": "http://www.w3.org/2007/XMLSchema-versioning",
+                "xmlns:gelRD" : "https://genomicsengland.co.uk/xsd/raredisease/1.3.1",
+                "xmlns": "https://genomicsengland.co.uk/xsd/raredisease/1.3.1",
+                "targetNamespace":'https://genomicsengland.co.uk/xsd/raredisease/1.3.1',
+                'vc:minVersion': '1.1') {
             'xs:annotation'{
                 'xs:documentation'{
                     'h1'("Title:"+targetModel.ext.get(XSD_SCHEMA_NAME)? targetModel.ext.get(XSD_SCHEMA_NAME):targetModel.name)
@@ -264,7 +296,7 @@ class GelXmlService {
                     'xs:sequence'{
                         'xs:element'(name:'metadata',type:'metadata',minOccurs:'1',maxOccurs:'1')
                         targetModel.getOutgoingRelationshipsByType(RelationshipType.hierarchyType).each { Relationship r ->
-                            'xs:element'(name:printXSDFriendlyString(r.destination.name),type:printXSDFriendlyString(r.destination.name),
+                            'xs:element'(name:printXSDFriendlyString(r.destination.name),type:printXSDFriendlyString(r.destination),
                             minOccurs:defaultMinOccurs(r.ext.get(METADATA_MIN_OCCURS)),
                             maxOccurs:defaultMinOccurs(r.ext.get(METADATA_MAX_OCCURS)))
                         }
@@ -315,7 +347,21 @@ class GelXmlService {
                     'xs:element'(name:'source-organisation',type:"xs:string",minOccurs:'1',maxOccurs:'1'){
                         'xs:annotation'{
                             'xs:documentation'{
-                                'p'("ODS code of the source organisation within the GMC")
+                                'p'("ODS code of the source organisation within the GMC sending the message")
+                            }
+                        }
+                    }
+                    'xs:element'(name:'source-system',type:"xs:string",minOccurs:'0',maxOccurs:'1'){
+                        'xs:annotation'{
+                            'xs:documentation'{
+                                'p'("Source system. Optional but may be used to supply source with information if there are any issues with the submitted XML.")
+                            }
+                        }
+                    }
+                    'xs:element'(name:'localReportId',type:"xs:string",minOccurs:'0',maxOccurs:'1'){
+                        'xs:annotation'{
+                            'xs:documentation'{
+                                'p'("Source system report Id. Optional but may be used to supply source with information if there are any issues with the submitted XML.")
                             }
                         }
                     }
@@ -337,7 +383,7 @@ class GelXmlService {
         validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType))
         validateModelsNameLength(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType).collect{it.destination})
         
-        return xml.'xs:complexType'(name: printXSDFriendlyString(model.name)){
+        return xml.'xs:complexType'(name: printXSDFriendlyString(model)){
             "${sectionType}"{
              
                 
@@ -357,8 +403,9 @@ class GelXmlService {
      * @return
      */
     protected def isXsdBasicDataType(ValueDomain valueDomain){
-        return  (XSD_BUILTIN_DATA_TYPES.find{it==valueDomain.dataType?.name}!=null && (!valueDomain.ext.keySet().any {idx->(idx in XSD_RESTRICTION_LIST)}&&(!valueDomain.regexDef)))
-
+        return  (XSD_BUILTIN_DATA_TYPES.find{it==valueDomain.dataType?.name}!=null && (!valueDomain.ext.keySet().any { idx->
+            (idx in XSD_RESTRICTION_LIST) && (valueDomain.ext.get(idx)!=null)
+        }&&(!valueDomain.regexDef)))
     }
 
 
@@ -431,7 +478,7 @@ class GelXmlService {
     }
 
     protected printModelElements(MarkupBuilder xml, Model model, String minOccurs, String maxOccurs){
-        return xml.'xs:element'(name: printXSDFriendlyString(model.name), type: printXSDFriendlyString(model.name), minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)){
+        return xml.'xs:element'(name: printXSDFriendlyString(model.name), type: printXSDFriendlyString(model), minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)){
             }
 
     }
@@ -453,7 +500,7 @@ class GelXmlService {
                     dataType=valueDomain.dataType.name
                 }else{
                     valueDomains.add(valueDomain)
-                    dataType=valueDomain.name+valueDomain.id
+                    dataType=printXSDFriendlyString(valueDomain)
                 }
                 return printDataElementSimpleType(xml, dataElement, dataType, minOccurs, maxOccurs)
             }
@@ -461,26 +508,68 @@ class GelXmlService {
     }
 
     protected printDataElementSchemaType(MarkupBuilder xml, DataElement dataElement, String type, String minOccurs = "0", String maxOccurs = "unbounded"){
-        return xml.'xs:element'(name: printXSDFriendlyString(dataElement.name), type:dataElement.valueDomain.dataType.name, minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)){
-            if (dataElement?.description){
-                'xs:annotation'{
-                    'xs:documentation'{
-                        'p'(XmlUtil.escapeXml(dataElement?.description))
+
+        if(type=="xs:string" && minOccurs.toInteger()>=1){
+
+            return xml.'xs:element'(name: printXSDFriendlyString(dataElement.name), minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)) {
+                if (dataElement?.description) {
+                    'xs:annotation' {
+                        'xs:documentation' {
+                            'p'(XmlUtil.escapeXml(dataElement?.description))
+                        }
+                    }
+                }
+                'xs:simpleType'{
+                    'xs:restriction'(base: "xs:string"){
+                        'xs:minLength'(value: 1)
+                    }
+                }
+
+            }
+        }else{
+                return xml.'xs:element'(name: printXSDFriendlyString(dataElement.name), type: dataElement.valueDomain.dataType.name, minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)) {
+                    if (dataElement?.description) {
+                        'xs:annotation' {
+                            'xs:documentation' {
+                                'p'(XmlUtil.escapeXml(dataElement?.description))
+                            }
+                        }
                     }
                 }
             }
-        }
     }
 
 
 
 
     protected printDataElementSimpleType(MarkupBuilder xml, DataElement dataElement, String type, String minOccurs = "0", String maxOccurs = "unbounded"){
-        return xml.'xs:element'(name: printXSDFriendlyString(dataElement.name), type: printXSDFriendlyString(type), minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)){
-            if (dataElement?.description){
-                'xs:annotation'{
-                    'xs:documentation'{
-                        'p'(XmlUtil.escapeXml(dataElement?.description))
+
+        if(type=="xs:string" && minOccurs.toInteger()>=1){
+
+            return xml.'xs:element'(name: printXSDFriendlyString(dataElement.name), minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)) {
+                if (dataElement?.description) {
+                    'xs:annotation' {
+                        'xs:documentation' {
+                            'p'(XmlUtil.escapeXml(dataElement?.description))
+                        }
+                    }
+                }
+                'xs:simpleType'{
+                    'xs:restriction'(base: "xs:string"){
+                        'xs:minLength'(value: 1)
+                    }
+                }
+
+            }
+
+        }else {
+
+            return xml.'xs:element'(name: printXSDFriendlyString(dataElement.name), type: type, minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)) {
+                if (dataElement?.description) {
+                    'xs:annotation' {
+                        'xs:documentation' {
+                            'p'(XmlUtil.escapeXml(dataElement?.description))
+                        }
                     }
                 }
             }
@@ -488,10 +577,13 @@ class GelXmlService {
     }
 
 
+
+
+
     protected printSimpleType(MarkupBuilder xml, ValueDomain valueDomain){
 
         if(valueDomain?.dataType instanceof EnumeratedType){
-            return xml.'xs:simpleType'(name: printXSDFriendlyString(valueDomain.name+valueDomain.id), final: 'restriction'){
+            return xml.'xs:simpleType'(name: printXSDFriendlyString(valueDomain), final: 'restriction'){
                 'xs:restriction'(base:'xs:string'){
                         valueDomain?.dataType.enumerationsAsBeans.each { enumeration ->
                             'xs:enumeration'(value: enumeration.code) {
@@ -505,7 +597,7 @@ class GelXmlService {
                 }
             }
         }else{
-            return xml.'xs:simpleType'(name: printXSDFriendlyString(valueDomain.name+valueDomain.id), final: 'restriction'){
+            return xml.'xs:simpleType'(name: printXSDFriendlyString(valueDomain), final: 'restriction'){
                 'xs:simpleContent'
                     def dataType='xs:string'
                     if (valueDomain.ext.get(XSD_RESTRICTION_PATTERN)|| valueDomain?.regexDef){
@@ -567,5 +659,8 @@ class GelXmlService {
             xml.'xs:pattern'(value:valueDomain.ext.get(XSD_RESTRICTION_PATTERN)?valueDomain.ext.get(XSD_RESTRICTION_PATTERN):valueDomain?.regexDef)
         }
     }
+
+
+
    
 }
