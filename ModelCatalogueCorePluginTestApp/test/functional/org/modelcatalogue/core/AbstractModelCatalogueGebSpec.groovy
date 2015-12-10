@@ -23,7 +23,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         }
     }
 
-    def openDataModel(String dataModelName) {
+    DataModelNavigator dataModel(String dataModelName) {
         go "#/dataModels"
 
         waitFor {
@@ -41,6 +41,8 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         waitFor {
             title == dataModelName
         }
+
+        return new DataModelNavigator(this)
     }
 
     def loginUser(String user, String pwd) {
@@ -78,6 +80,80 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
             return false
         }
 
+    }
+
+    FormFiller fill(String nameOrId) {
+        new FormFiller(this, nameOrId)
+    }
+
+    NavigatorCondition check(Map<String, Object> attributes, String selector) {
+        check({$(attributes, selector)})
+    }
+
+    NavigatorCondition check(Object content) {
+        if (content != null) {
+            check content.toString()
+        }
+        throw new IllegalArgumentException("Selector cannot be null!")
+    }
+
+    NavigatorCondition check(String selector) {
+        check({$(selector)})
+    }
+
+    /**
+     * @deprecated may produce stale element reference exceptions
+     */
+    NavigatorCondition check(Navigator navigator) {
+        new NavigatorCondition(this, { navigator })
+    }
+
+    NavigatorCondition check(Closure<Navigator> navigator) {
+        new NavigatorCondition(this, navigator)
+    }
+
+    boolean no(Navigator navigator) {
+        waitFor {
+            !navigator.displayed
+        }
+    }
+
+    void click(Object selector) {
+        if (selector != null) {
+            click selector.toString()
+        }
+        throw new IllegalArgumentException("Selector cannot be null!")
+    }
+
+    /**
+     * @deprecated may produce stale references
+     */
+    @Deprecated
+    void click(Navigator navigator) {
+        click { navigator }
+    }
+
+    void click(Closure<Navigator> navigatorClosure) {
+        try {
+            noStale(navigatorClosure) {
+                it.click()
+            }
+        } catch (IllegalArgumentException iae) {
+            throw new IllegalArgumentException("${navigatorClosure()} didn't return any results after a 10 attempts", iae)
+        }
+    }
+
+    void click(String role = '', String id) {
+        try {
+            click {
+                if (role == '') {
+                    return $("#${id}-menu-item-link, #${id}Btn, #role_null_${id}Btn").last()
+                }
+                return $("#role_${role}_${id}-menu-item-link, #role_${role}_${id}Btn").last()
+            }
+        } catch (IllegalArgumentException iae) {
+            throw new IllegalArgumentException("Cannot click action element $id in role '$role'", iae)
+        }
     }
 
     Navigator actionButton(String id, String role = "item") {

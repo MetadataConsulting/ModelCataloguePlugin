@@ -2,7 +2,6 @@ package org.modelcatalogue.core.a
 
 import org.modelcatalogue.core.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.pages.ModalTreeViewPage
-import org.openqa.selenium.Keys
 import spock.lang.Stepwise
 
 @Stepwise
@@ -11,7 +10,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
     def "go to login"() {
         loginAdmin()
 
-        openDataModel('Test 2')
+        dataModel('Test 2')
         selectInTree "Test 2"
 
 
