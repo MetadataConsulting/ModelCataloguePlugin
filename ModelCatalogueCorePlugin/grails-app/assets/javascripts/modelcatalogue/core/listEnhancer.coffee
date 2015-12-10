@@ -128,7 +128,10 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
       enhanced.reload = -> $q.when(enhanced)
       enhanced
 
-    listEnhancer.createSingletonList = (item, extra = {base: item.link}) -> listEnhancer.createArrayList([item], extra)
+    listEnhancer.createSingletonList = (item, extra = {base: item.link}) ->
+      enhanced = listEnhancer.createArrayList([item], extra)
+      enhanced.itemType = item.elementType if not enhanced.itemType and item.elementType
+      enhanced
 
     listEnhancer
 

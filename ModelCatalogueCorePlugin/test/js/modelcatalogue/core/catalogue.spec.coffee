@@ -16,7 +16,3 @@ describe "mc.core.catalogue", ->
     expect(catalogue.isInstanceOf('org.modelcatalogue.core.Model', 'org.modelcatalogue.core.Model')).toBeTruthy()
     expect(catalogue.isInstanceOf('org.modelcatalogue.core.Model',
       'org.modelcatalogue.core.CatalogueElement')).toBeTruthy()
-
-
-  it "test contains", inject (catalogue) ->
-    expect(false).toBeTruthy()

@@ -1,4 +1,4 @@
-angular.module('mc.util.ui.applicationTitle', []).provider 'applicationTitle', ->
+angular.module('mc.util.ui.applicationTitle', ['ui.router']).provider 'applicationTitle', ->
   applicationTitleProvider  = {defaultTitle: angular.element('title').text()}
 
   applicationTitleProvider.$get = ['$rootScope', '$state', ($rootScope, $state) ->

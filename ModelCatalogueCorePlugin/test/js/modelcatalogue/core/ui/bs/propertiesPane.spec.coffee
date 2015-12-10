@@ -1,6 +1,6 @@
 describe "mc.core.ui.propertiesPane", ->
 
-  beforeEach module 'mc.core.ui.states'
+  beforeEach module 'mc.core.ui.states.bs'
   beforeEach module 'mc.core.modelCatalogueApiRoot'
   beforeEach module 'mc.core.catalogueElementEnhancer'
   beforeEach module 'mc.core.ui.bs.propertiesPane'
