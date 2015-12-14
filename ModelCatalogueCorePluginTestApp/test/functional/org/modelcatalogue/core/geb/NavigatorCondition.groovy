@@ -23,6 +23,26 @@ class NavigatorCondition {
         }
     }
 
+    boolean isDisabled() {
+        spec.noStale(NUM_OF_RETRIES, navigator) {
+            it.disabled
+        }
+    }
+
+    boolean isEnabled() {
+        spec.noStale(NUM_OF_RETRIES, navigator) {
+            !it.disabled
+        }
+    }
+
+    boolean has(String clazz) {
+        spec.noStale(NUM_OF_RETRIES, navigator) {
+            it.hasClass(clazz)
+        }
+    }
+
+
+
     boolean isGone() {
         spec.waitFor {
             !navigator().displayed

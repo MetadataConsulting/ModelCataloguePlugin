@@ -10,10 +10,6 @@ import org.openqa.selenium.logging.LogType
 
 abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
-    protected static final ApplicationUser admin = ApplicationUser.create('admin')
-    protected static final ApplicationUser viewer = ApplicationUser.create('viewer')
-    protected static final ApplicationUser curator = ApplicationUser.create('curator')
-
     // keep the passwords simply stupid, they are only for dev/test or very first setup
     // sauce labs connector for some reason fails with the six in the input
     def loginAdmin() { loginUser("admin", "admin") }
@@ -91,7 +87,11 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     FormFiller fill(String nameOrId) {
-        new FormFiller(this, { $("input[name=$nameOrId], #$nameOrId") })
+        Closure<Navigator> navigator =  { $("input[name=$nameOrId], #$nameOrId") }
+        if (nameOrId.contains('#') || startsWith('.')) {
+            navigator = { $(nameOrId) }
+        }
+        new FormFiller(this, navigator)
     }
 
     FormFiller fill(Closure<Navigator> navigatorClosure) {
@@ -184,15 +184,20 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     int totalOf(String name) {
-        Navigator totalSpan = tab(name).find('span.badge.tab-value-total')
-        if (!totalSpan.displayed) {
-            return 0
+        noStale({ tab(name).find('span.badge.tab-value-total') }) {
+            if (!it.displayed) {
+                return 0
+            }
+            it.text() to Integer
         }
-        return totalSpan.text() as Integer
     }
 
     Navigator tab(String name) {
         $('li', 'data-tab-name': name)
+    }
+
+    String tabTotal(String name) {
+        "li[data-tab-name=$name] span.badge.tab-value-total"
     }
 
     void selectTab(String name) {

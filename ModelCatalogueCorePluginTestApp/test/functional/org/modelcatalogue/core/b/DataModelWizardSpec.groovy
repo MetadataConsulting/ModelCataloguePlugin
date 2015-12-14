@@ -1,102 +1,66 @@
 package org.modelcatalogue.core.b
 
+import static org.modelcatalogue.core.geb.Common.*
+
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.modelcatalogue.core.pages.DataModelListPage
 import spock.lang.Stepwise
 
 @Stepwise
 class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
+    static final String classificationWizzard = 'div.create-classification-wizard'
+    static final String name = 'div.create-classification-wizard #name'
+    static final String description ='div.create-classification-wizard #description'
+    static final String modelCatalogueId ='div.create-classification-wizard #modelCatalogueId'
+    static final String stepImports = "#step-imports"
+    static final String stepFinish = "#step-finish"
+    static final String exitButton = "#exit-wizard"
+
+
     def "go to login"() {
-        go "#/"
-        loginAdmin()
+        login admin
 
-        when:
-        go "#/catalogue/dataModel/all"
-
-        then:
-        at DataModelListPage
-
-        waitFor(120) {
-           browser.title == 'Data Models'
-        }
+        expect:
+        waitFor(120) { browser.title == 'Data Models' }
     }
 
     def "add new data model"() {
-        waitFor {
-            $('a.infinite-list-create-action').displayed
-        }
-        when:
-        $('a.infinite-list-create-action').click()
+        click createActionInInfiniteList
 
-
-        then: 'the model dialog opens'
-        waitFor {
-            classificationWizzard.displayed
-        }
+        expect: 'the model dialog opens'
+        check classificationWizzard displayed
 
         when:
-        name = "New Data Model"
-        modelCatalogueId = "http://www.example.com/${UUID.randomUUID().toString()}"
-        description = "Description of Data Model"
+        fill name with "New Data Model"
+        fill modelCatalogueId with "http://www.example.com/${UUID.randomUUID().toString()}"
+        fill description with "Description of Data Model"
 
         then:
-        waitFor {
-            !stepImports.disabled
-        }
+        check stepImports enabled
 
         when:
-        stepImports.click()
+        click stepImports
 
         then:
-        waitFor {
-            stepImports.hasClass('btn-primary')
-        }
-
-        and:
-        stepImports.click()
-
-        then:
-        waitFor {
-            stepImports.hasClass('btn-primary')
-        }
+        check stepImports has 'btn-primary'
 
         when:
-        name = 'NHIC'
+        fill name with 'NHIC'
         selectCepItemIfExists()
 
 
         and:
-        stepFinish.click()
+        click stepFinish
 
         then:
-        waitFor {
-            $('div.messages-panel span', text: "Data Model New Data Model created").displayed
-        }
-        when:
-        exitButton.click()
-
-        then:
-        waitFor {
-            menuItem('currentDataModel').text().contains('New Data Model (draft)')
-        }
+        check 'div.messages-panel span', text: "Data Model New Data Model created"
 
         when:
-        menuItem('currentDataModel').click()
+        click exitButton
 
         then:
-        waitFor {
-            menuItem('show-data-model', '').displayed
-        }
-
-        when:
-        menuItem('show-data-model', '').click()
-
-        then:
-        waitFor {
-            totalOf('imports') == 1
-        }
-
+        check rightSideTitle is 'New Data Model DRAFT'
+        check tabTotal('imports') is '1'
     }
 
 

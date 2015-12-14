@@ -1,7 +1,8 @@
     package org.modelcatalogue.core.b
 
+    import static org.modelcatalogue.core.geb.Common.*
+
     import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-    import org.modelcatalogue.core.geb.CatalogueAction
     import spock.lang.Stepwise
 
     /**
@@ -10,26 +11,6 @@
     @Stepwise
     class DataElementWizardSpec extends AbstractModelCatalogueGebSpec  {
 
-        protected static final CatalogueAction save = CatalogueAction.create('modal', 'modal-save-element')
-        protected static final CatalogueAction create = CatalogueAction.create('list', 'create-catalogue-element')
-        protected static final CatalogueAction finalize = CatalogueAction.create('item', 'change-element-state', 'finalize')
-        protected static final CatalogueAction newVersion = CatalogueAction.create('item', 'change-element-state', 'create-new-version')
-        protected static final CatalogueAction archive = CatalogueAction.create('item', 'change-element-state', 'archive')
-        protected static final CatalogueAction delete = CatalogueAction.create('item', 'change-element-state', 'delete')
-
-        protected static final String name = 'name'
-        protected static final String description = 'description'
-
-        protected static final String status = "h3 small span.label"
-        protected static final String rightSideTitle = "h3:not(.ng-hide):not(.data-model-heading)"
-        protected static final String dataWizard = 'div.basic-edit-modal-prompt'
-        protected static final String subviewStatus = "h3 small span.label"
-        protected static final String modalDialog = "div.modal"
-        protected static final String backdrop = '.modal-backdrop'
-        protected static final String confirm = '.modal.messages-modal-confirm'
-        protected static final String OK = '.modal.messages-modal-confirm .btn-primary'
-        protected static final String nameInTheFirstRow = 'div.inf-table-body tbody tr:nth-child(1) td:nth-child(3)'
-        protected static final String firstRowLink = 'div.inf-table-body tbody tr:nth-child(1) td:nth-child(3) a'
 
         def "login and select Data Element"() {
             login admin
@@ -46,7 +27,7 @@
             click create
 
             then: 'the data element dialog opens'
-            check dataWizard displayed
+            check wizard displayed
 
             when:
             fill name with "NewDE1"
