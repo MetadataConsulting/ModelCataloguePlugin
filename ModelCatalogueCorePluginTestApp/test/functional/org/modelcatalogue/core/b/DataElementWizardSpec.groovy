@@ -1,7 +1,7 @@
     package org.modelcatalogue.core.b
 
-    import org.modelcatalogue.core.AbstractModelCatalogueGebSpec
-    import org.modelcatalogue.core.pages.DataViewPage
+    import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+    import org.modelcatalogue.core.geb.CatalogueAction
     import spock.lang.Stepwise
 
     /**
@@ -10,161 +10,132 @@
     @Stepwise
     class DataElementWizardSpec extends AbstractModelCatalogueGebSpec  {
 
+        protected static final CatalogueAction save = CatalogueAction.create('modal', 'modal-save-element')
+        protected static final CatalogueAction create = CatalogueAction.create('list', 'create-catalogue-element')
+        protected static final CatalogueAction finalize = CatalogueAction.create('item', 'change-element-state', 'finalize')
+        protected static final CatalogueAction newVersion = CatalogueAction.create('item', 'change-element-state', 'create-new-version')
+        protected static final CatalogueAction archive = CatalogueAction.create('item', 'change-element-state', 'archive')
+        protected static final CatalogueAction delete = CatalogueAction.create('item', 'change-element-state', 'delete')
+
+        protected static final String name = 'name'
+        protected static final String description = 'description'
+
+        protected static final String status = "h3 small span.label"
+        protected static final String rightSideTitle = "h3:not(.ng-hide):not(.data-model-heading)"
+        protected static final String dataWizard = 'div.basic-edit-modal-prompt'
+        protected static final String subviewStatus = "h3 small span.label"
+        protected static final String modalDialog = "div.modal"
+        protected static final String backdrop = '.modal-backdrop'
+        protected static final String confirm = '.modal.messages-modal-confirm'
+        protected static final String OK = '.modal.messages-modal-confirm .btn-primary'
+        protected static final String nameInTheFirstRow = 'div.inf-table-body tbody tr:nth-child(1) td:nth-child(3)'
+        protected static final String firstRowLink = 'div.inf-table-body tbody tr:nth-child(1) td:nth-child(3) a'
+
         def "login and select Data Element"() {
-            go "#/"
-            loginAdmin()
+            login admin
 
-            when:
-            go "#/catalogue/dataElement/all"
+            dataModel('Test 1') / 'Test 1' / 'Data Elements'
 
-            then:
-            at DataViewPage
-            waitFor(120) {
-                viewTitle.displayed
-            }
-            waitFor(120) {
-                viewTitle.text().trim() == 'Data Element List'
-            }
-
-            waitFor {
-                addNewDataElementButton.displayed
-            }
+            expect:
+            check rightSideTitle is 'Data Element List'
         }
 
 
         def "Add new data element"(){
-            waitUntilModalClosed()
             when: 'I click the add model button'
-            addNewDataElementButton.click()
-
+            click create
 
             then: 'the data element dialog opens'
-            waitFor {
-                dataWizard.displayed
-            }
+            check dataWizard displayed
 
-            when: 'the data element details are filled in'
-
-            classifications = "NT1"
-            selectCepItemIfExists()
-
-            name        = "NewDE1"
-            description = "NT1 Description"
+            when:
+            fill name with "NewDE1"
+            fill description with "NT1 Description"
 
             and: 'save button clicked'
-            saveButton.click()
+            click save
+
             then: 'the data element is saved and displayed at the top of the table'
-            waitFor {
-                $('div.inf-table-body tbody tr:nth-child(1) td:nth-child(3)', text: "NewDE1").displayed
-            }
+            check nameInTheFirstRow, text: "NewDE1" displayed
 
         }
 
 
         def "Check the data element shows up with own details"(){
-            waitUntilModalClosed()
+            expect:
+            check backdrop gone
+            
             when: 'Data Element is located'
 
-            waitFor {
-                $('div.inf-table-body tbody tr:nth-child(1) td:nth-child(3)', text: "NewDE1").displayed
-            }
+            check nameInTheFirstRow, text: "NewDE1" displayed
+
             then: 'Click the element'
 
-            $('div.inf-table-body tbody tr:nth-child(1) td:nth-child(3) a').click()
+            click firstRowLink
 
-            waitFor(60) {
-                pageTitle.displayed
-            }
-
-            pageTitle.text().trim()     == 'NewDE1 DRAFT'
+            check rightSideTitle is 'NewDE1 DRAFT'
 
         }
 
         def "finalize element"() {
-            waitUntilModalClosed()
+            check backdrop gone
             when: "finalize is clicked"
-            noStale({ actionButton('change-element-state') }) {
-                it.click()
-            }
-            noStale({ actionButton('finalize') }) {
-                it.click()
-            }
+            click finalize
 
             then: "modal prompt is displayed"
-            waitFor {
-                confirmDialog.displayed
-            }
+            check confirm displayed
 
             when: "ok is clicked"
-            confirmOk.click()
+            click OK
 
             then: "the element is finalized"
-            waitFor(120) {
-                subviewStatus.text() == 'FINALIZED'
-            }
-
+            check status is 'FINALIZED'
         }
 
         def "create new version of the element"() {
-            waitUntilModalClosed()
+            check backdrop gone
             when: "new version is clicked"
-            actionButton('change-element-state').click()
-            actionButton('create-new-version').click()
+            click newVersion
 
             then: "modal prompt is displayed"
-            waitFor {
-                confirmDialog.displayed
-            }
+            check confirm displayed
 
             when: "ok is clicked"
-            confirmOk.click()
+            click OK
 
             then: "the element new draft version is created"
-            waitFor(120) {
-                subviewStatus.text() == 'DRAFT'
-            }
-
+            check status is 'DRAFT'
         }
 
         def "deprecate the element"() {
             waitUntilModalClosed()
             when: "depracete action is clicked"
-            actionButton('change-element-state').click()
-            actionButton('archive').click()
+            click archive
 
             then: "modal prompt is displayed"
-            waitFor {
-                confirmDialog.displayed
-            }
+            check confirm displayed
 
             when: "ok is clicked"
-            confirmOk.click()
+            click OK
 
             then: "the element is now deprecated"
-            waitFor {
-                subviewStatus.text() == 'DEPRECATED'
-            }
+            check subviewStatus is 'DEPRECATED'
 
         }
 
         def "hard delete the element"() {
-            waitUntilModalClosed()
+            check backdrop gone
             when: "delete action is clicked"
-            actionButton('change-element-state').click()
-            actionButton('delete').click()
+            click delete
 
             then: "modal prompt is displayed"
-            waitFor {
-                confirmDialog.displayed
-            }
+            check confirm displayed
 
             when: "ok is clicked"
-            confirmOk.click()
+            click OK
 
             then: "you are redirected to the list page"
-            waitFor {
-                url == '#/catalogue/dataElement/all'
-            }
+            check rightSideTitle is 'Data Element List'
 
         }
     }

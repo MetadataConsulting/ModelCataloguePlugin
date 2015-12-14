@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.b
 
-import org.modelcatalogue.core.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.pages.GlobalChangesPage
 import spock.lang.Stepwise
 
@@ -15,7 +16,7 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
         fill 'name' with "Data Type Change Test"
         fill 'dataModel' with "Data Model Change Test"
 
-        click 'modal', 'modal-save-element'
+        click CatalogueAction.create('modal', 'modal-save-element')
 
         expect:
         check 'div.modal' gone
@@ -40,7 +41,7 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
         check ".pp-table-property-element-value", 'data-value-for': 'Undone' is 'false'
 
         when:
-        click 'item', 'undo-change'
+        click CatalogueAction.create('item', 'undo-change')
 
         then:
         check confirmDialog displayed

@@ -52,7 +52,6 @@ angular.module('mc.util.ui.contextualMenu', ['mc.util.ui.bs.menuItemDropdown','m
 
             child.$$class = childClasses.join ' '
 
-        watches = []
         classes = []
         classes.push('active') if action.active
         classes.push('disabled') if action.disabled
@@ -64,11 +63,6 @@ angular.module('mc.util.ui.contextualMenu', ['mc.util.ui.bs.menuItemDropdown','m
         newScope.action = action
 
         scopes.push newScope
-
-        if angular.isArray(action.watches)
-          watches = action.watches
-        else if action.watches
-          watches.push action.watches
 
         watches = collectWatchers(action)
 

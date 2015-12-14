@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.b
 
-import org.modelcatalogue.core.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.pages.MeasurementUnitListPage
 import spock.lang.Stepwise
 

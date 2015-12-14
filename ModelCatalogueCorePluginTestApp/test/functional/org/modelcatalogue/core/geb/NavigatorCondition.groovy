@@ -1,19 +1,24 @@
-package org.modelcatalogue.core
+package org.modelcatalogue.core.geb
 
 import geb.navigator.Navigator
 
 class NavigatorCondition {
+
+    private static final int NUM_OF_RETRIES = 10
 
     final AbstractModelCatalogueGebSpec spec
     final Closure<Navigator> navigator
 
     NavigatorCondition(AbstractModelCatalogueGebSpec spec, Closure<Navigator> navigator) {
         this.spec = spec
-        this.navigator = navigator
+        this.navigator = (Closure<Navigator>) navigator.clone()
+
+        this.navigator.delegate = spec
+        this.navigator.resolveStrategy = Closure.DELEGATE_FIRST
     }
 
     boolean isDisplayed() {
-        spec.noStale(50, navigator) {
+        spec.noStale(NUM_OF_RETRIES, navigator) {
             it.displayed
         }
     }
@@ -26,14 +31,14 @@ class NavigatorCondition {
 
     boolean is(String text) {
         isDisplayed()
-        spec.noStale(50, navigator) {
+        spec.noStale(NUM_OF_RETRIES, navigator) {
             it.text().trim() == text
         }
     }
 
     boolean contains(String text) {
         isDisplayed()
-        spec.noStale(50, navigator) {
+        spec.noStale(NUM_OF_RETRIES, navigator) {
             it.text().contains text
         }
     }

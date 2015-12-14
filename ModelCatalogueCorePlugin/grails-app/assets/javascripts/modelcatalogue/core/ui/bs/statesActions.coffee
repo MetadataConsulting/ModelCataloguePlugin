@@ -59,6 +59,7 @@ angular.module('mc.core.ui.bs.statesActions', ['mc.util.ui.actions']).config ['a
             $scope.element.updateFrom  updated
             messages.success("New version created for #{$scope.element.name}")
             $rootScope.$broadcast 'newVersionCreated', updated
+            $rootScope.$broadcast 'redrawContextualActions'
           , showErrorsUsingMessages(messages)
     }
   ]
@@ -81,6 +82,7 @@ angular.module('mc.core.ui.bs.statesActions', ['mc.util.ui.actions']).config ['a
             $scope.element.updateFrom finalized
             $rootScope.$broadcast 'catalogueElementUpdated', finalized
             $rootScope.$broadcast 'catalogueElementFinalized', finalized
+            $rootScope.$broadcast 'redrawContextualActions'
           , showErrorsUsingMessages(messages)
     }
   ]
@@ -100,12 +102,14 @@ angular.module('mc.core.ui.bs.statesActions', ['mc.util.ui.actions']).config ['a
               enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/restore", method: 'POST')).then (restored) ->
                 $scope.element.updateFrom restored
                 $rootScope.$broadcast 'catalogueElementUpdated', restored
+                $rootScope.$broadcast 'redrawContextualActions'
               , showErrorsUsingMessages(messages)
         else
           messages.confirm("Do you want to mark #{$scope.element.getElementTypeName()} #{$scope.element.name} as deprecated?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be marked as deprecated").then ->
             enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/archive", method: 'POST')).then (archived) ->
               $scope.element.updateFrom archived
               $rootScope.$broadcast 'catalogueElementUpdated', archived
+              $rootScope.$broadcast 'redrawContextualActions'
             , showErrorsUsingMessages(messages)
     }
 
@@ -142,6 +146,7 @@ angular.module('mc.core.ui.bs.statesActions', ['mc.util.ui.actions']).config ['a
             oldName = $scope.element.classifiedName
             messages.success "Element #{oldName} merged successfully into  #{$scope.element.classifiedName}"
             merged.show()
+            $rootScope.$broadcast 'redrawContextualActions'
           , showErrorsUsingMessages(messages)
     }
   ]

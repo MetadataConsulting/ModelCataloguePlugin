@@ -1,4 +1,4 @@
-package org.modelcatalogue.core
+package org.modelcatalogue.core.geb
 
 import geb.navigator.Navigator
 import geb.spock.GebReportingSpec
@@ -10,11 +10,19 @@ import org.openqa.selenium.logging.LogType
 
 abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
+    protected static final ApplicationUser admin = ApplicationUser.create('admin')
+    protected static final ApplicationUser viewer = ApplicationUser.create('viewer')
+    protected static final ApplicationUser curator = ApplicationUser.create('curator')
+
     // keep the passwords simply stupid, they are only for dev/test or very first setup
     // sauce labs connector for some reason fails with the six in the input
     def loginAdmin() { loginUser("admin", "admin") }
     def loginViewer() { loginUser("viewer", "viewer") }
     def loginCurator() { loginUser("curator", "creator") }
+
+    def login(ApplicationUser user) {
+        loginUser(user.username, user.password)
+    }
 
     def cleanup() {
         LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
@@ -83,18 +91,15 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     FormFiller fill(String nameOrId) {
-        new FormFiller(this, nameOrId)
+        new FormFiller(this, { $("input[name=$nameOrId], #$nameOrId") })
+    }
+
+    FormFiller fill(Closure<Navigator> navigatorClosure) {
+        new FormFiller(this, navigatorClosure)
     }
 
     NavigatorCondition check(Map<String, Object> attributes, String selector) {
         check({$(attributes, selector)})
-    }
-
-    NavigatorCondition check(Object content) {
-        if (content != null) {
-            check content.toString()
-        }
-        throw new IllegalArgumentException("Selector cannot be null!")
     }
 
     NavigatorCondition check(String selector) {
@@ -118,19 +123,16 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         }
     }
 
-    void click(Object selector) {
-        if (selector != null) {
-            click selector.toString()
-        }
-        throw new IllegalArgumentException("Selector cannot be null!")
-    }
-
     /**
      * @deprecated may produce stale references
      */
     @Deprecated
     void click(Navigator navigator) {
         click { navigator }
+    }
+
+    void click(CatalogueAction action) {
+        action.perform(this)
     }
 
     void click(Closure<Navigator> navigatorClosure) {
@@ -143,16 +145,13 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         }
     }
 
-    void click(String role = '', String id) {
+    void click(String idOrSelector) {
         try {
             click {
-                if (role == '') {
-                    return $("#${id}-menu-item-link, #${id}Btn, #role_null_${id}Btn").last()
-                }
-                return $("#role_${role}_${id}-menu-item-link, #role_${role}_${id}Btn").last()
+                $(idOrSelector)
             }
         } catch (IllegalArgumentException iae) {
-            throw new IllegalArgumentException("Cannot click action element $id in role '$role'", iae)
+            throw new IllegalArgumentException("Cannot click action element $idOrSelector", iae)
         }
     }
 
@@ -211,12 +210,17 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
             attempt++
             try {
                 navigator = navigatorClosure()
-                waitFor(1) {
-                    navigator.displayed
+
+                if (!navigator.displayed) {
+                    waitFor(attempt ** 2) {
+                        navigator.displayed
+                    }
                 }
-                return resultClosure(navigator)
+                return (R) waitFor(attempt ** 2) {
+                    return resultClosure(navigator)
+                }
             } catch (StaleElementReferenceException | WaitTimeoutException e) {
-                Thread.sleep(Math.round(Math.pow(2, attempt)))
+                println "Condition not met after ${attempt ** 2} seconds, next waiting ${(attempt + 1) ** 2} seconds"
                 error = e
             }
         }

@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.a
 
-import org.modelcatalogue.core.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.pages.ModalTreeViewPage
 import spock.lang.Stepwise
 
