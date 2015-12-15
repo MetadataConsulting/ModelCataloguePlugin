@@ -12,6 +12,10 @@ angular.module('mc.core.ui.states.mc', ['mc.core.ui.states.bs.mc.html', 'mc.core
         'navbar-left@':
           template: '<contextual-menu></contextual-menu>'
 
+        'navbar-right@':
+          template: '<contextual-menu role="navigation-right" right="true"></contextual-menu>'
+          controller: 'mc.core.ui.states.controllers.DataModelCtrl'
+
       resolve:
         currentDataModel: ['catalogue', '$rootScope', '$stateParams', '$q', 'catalogueElementResource', (catalogue, $rootScope, $stateParams, $q, catalogueElementResource) ->
           deferred = $q.defer()

@@ -18,5 +18,6 @@ angular.module('mc.core.ui.states.controllers', [
   'mc.core.ui.states.controllers.ElementWithDataModelCtrl'
   'mc.core.ui.states.controllers.ElementsCtrl'
   'mc.core.ui.states.controllers.DataModelTreeCtrl'
+  'mc.core.ui.states.controllers.DataModelCtrl'
   'mc.core.ui.states.controllers.PanelsCtrl'
 ])

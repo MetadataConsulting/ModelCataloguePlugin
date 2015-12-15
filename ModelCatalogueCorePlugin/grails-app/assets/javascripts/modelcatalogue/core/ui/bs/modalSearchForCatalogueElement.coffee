@@ -14,6 +14,10 @@ module.config ['messagesProvider', (messagesProvider)->
                 <span class="input-group-addon"><span class="fa fa-fw fa-search"></span></span>
                 <input id="value" class="form-control" ng-model="query" placeholder="Search for #{names.getNaturalName(names.getPropertyNameFromType(args.resource ? 'catalogueElement'))}" ng-model-options="{debounce: 500}" focus-me="true" autofocus='true'>
               </div>
+              <p class='help-block' ng-if='currentDataModel'>
+                <span ng-if="!global">Showing only results from {{currentDataModel.name}} and its imports. <a ng-if="allowGlobal" ng-click='setGlobal(true)'>Show All</a><span ng-if='allowGlobal &amp;&amp; canAddImports'> or </span><a ng-if='canAddImports' ng-click='addImport()'>Add Import</a></span>
+                <span ng-if="global">Showing all results. <a ng-click='setGlobal(false)'>Show only results from {{currentDataModel.name}} and its imports </a></span>
+              </p>
             </div>
             <div ng-if="elements.length == 0 &amp;&amp; !loading">
               <div class="leave-10-before"></div>
@@ -37,8 +41,26 @@ module.config ['messagesProvider', (messagesProvider)->
         </div>
         """
 
-        controller: ['$scope', 'catalogueElementResource', '$modalInstance', '$window', '$state', ($scope, catalogueElementResource, $modalInstance, $window, $state) ->
+        controller: ['$scope', 'catalogueElementResource', '$modalInstance', '$window', '$state', 'security', 'messages', ($scope, catalogueElementResource, $modalInstance, $window, $state, security, messages) ->
           $scope.title = title
+          $scope.currentDataModel = args.currentDataModel
+          $scope.global = args.global
+          $scope.allowGlobal = args.allowGlobal
+          $scope.canAddImports = security.hasRole('CURATOR')
+
+          $scope.setGlobal = (global) ->
+            $scope.global = global
+            listOrSearch($scope.query ? args.query, replaceElements)
+
+          $scope.addImport = ->
+            unless $scope.currentDataModel
+              messages.info('There is no contextual data model present at the moment')
+              return
+            messages.prompt('Add Data Model Import', 'If you want to reuse data classes, data types or measurement units form different data models you need to import the containing data model first.', {type: 'catalogue-elements', resource: 'dataModel', status: 'finalized' }).then (elements) ->
+              angular.forEach elements, (element) ->
+                unless angular.isString(element)
+                  $scope.currentDataModel.imports.add(element).then ->
+                    listOrSearch($scope.query ? args.query, replaceElements)
 
           appendToElements = (list) ->
             $scope.list     = list
@@ -59,7 +81,7 @@ module.config ['messagesProvider', (messagesProvider)->
             params = {}
             params.status = args.status if args.status
 
-            if $state.params.dataModelId and $state.params.dataModelId != 'catalogue'
+            if not $scope.global and $state.params.dataModelId and $state.params.dataModelId != 'catalogue'
               params.dataModel = $state.params.dataModelId
 
             if query
@@ -77,6 +99,10 @@ module.config ['messagesProvider', (messagesProvider)->
           $scope.$watch 'query', (query) ->
             $scope.loading  = if query then true else not args.empty
             listOrSearch(query, replaceElements)
+
+          if $state.params.dataModelId and not $scope.currentDataModel
+            catalogueElementResource('dataModel').get($state.params.dataModelId).then (dataModel) ->
+              $scope.currentDataModel = dataModel
 
           ARROW_DOWN = 40
           ARROW_UP   = 38

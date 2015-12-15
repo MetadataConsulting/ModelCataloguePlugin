@@ -1,17 +1,20 @@
 angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'mc.util.security']).config ['actionsProvider', 'names', (actionsProvider, names)->
 
-  actionsProvider.registerActionInRole 'search-menu', actionsProvider.ROLE_NAVIGATION_RIGHT, ['security', 'messages', (security, messages) ->
-    return undefined unless security.isUserLoggedIn()
-    {
-      position:   -10000
-      icon:       'fa fa-search fa-fw fa-2x-if-wide'
-      label:      'Search'
-      iconOnly:   true
-      action: ->
-        # TODO: act differently when not in mc.* state
-        messages.prompt(null, null, type: 'search-catalogue-element', empty: true).then (element) ->
-          element.show()
-    }
+  actionsProvider.registerActionInRole 'search-menu', actionsProvider.ROLE_NAVIGATION_RIGHT, [
+    '$scope', 'security', 'messages',
+    ($scope ,  security ,  messages) ->
+
+      return undefined unless security.isUserLoggedIn()
+      {
+        position:   -10000
+        icon:       'fa fa-search fa-fw fa-2x-if-wide'
+        label:      'Search'
+        iconOnly:   true
+        action: ->
+          # TODO: act differently when not in mc.* state
+          messages.prompt(null, null, type: 'search-catalogue-element', empty: true, currentDataModel: $scope.currentDataModel, allowGlobal: true).then (element) ->
+            element.show()
+      }
   ]
 
   actionsProvider.registerActionInRole 'fast-action', actionsProvider.ROLE_NAVIGATION_RIGHT, ['security', 'messages', (security, messages) ->
