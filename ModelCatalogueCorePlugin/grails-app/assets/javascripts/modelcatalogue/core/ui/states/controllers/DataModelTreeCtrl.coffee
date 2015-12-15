@@ -9,7 +9,10 @@ angular.module('mc.core.ui.states.controllers.DataModelTreeCtrl', ['ui.router', 
       return if not element
 
       if element.resource
-        $state.go 'mc.resource.list', dataModelId: currentDataModel?.id, resource: element.resource
+        if element.getDataModelId() == currentDataModel?.id
+          $state.go 'mc.resource.list', dataModelId: currentDataModel?.id, resource: element.resource
+        else
+          $state.go 'mc.resource.list-imported', dataModelId: currentDataModel?.id, otherDataModelId: element.getDataModelId(), resource: element.resource
 
       if element.elementType and element.id
         type = names.getPropertyNameFromType(element.elementType)

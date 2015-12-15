@@ -15,6 +15,7 @@ angular.module('mc.core.ui.states', [
   'mc.core.ui.states.mc.resource.show.property'
   'mc.core.ui.states.mc.resource.show'
   'mc.core.ui.states.mc.resource.list'
+  'mc.core.ui.states.mc.resource.list-imported'
   'mc.core.ui.states.mc.resource'
   'mc.core.ui.states.mc'
   'mc.core.ui.states.simple.favorites'
