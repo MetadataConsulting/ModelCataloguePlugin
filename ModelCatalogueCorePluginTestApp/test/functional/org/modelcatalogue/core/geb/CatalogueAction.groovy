@@ -1,44 +1,80 @@
 package org.modelcatalogue.core.geb
 
+import geb.navigator.Navigator
+
 class CatalogueAction {
 
     private final String role
     private final String id
-
     private final String child
+    private final boolean first
 
-    static CatalogueAction create(String id) {
-        return new CatalogueAction('', id, null)
+    static CatalogueAction runLast(String id) {
+        return new CatalogueAction('', id, null, false)
     }
 
-    static CatalogueAction create(String role, String id) {
-        return new CatalogueAction(role, id, null)
+    static CatalogueAction runLast(String role, String id) {
+        return new CatalogueAction(role, id, null, false)
     }
 
-    static CatalogueAction create(String parentRole, String parentId, String id) {
-        return new CatalogueAction(parentRole, parentId, id)
+    static CatalogueAction runLast(String parentRole, String parentId, String id) {
+        return new CatalogueAction(parentRole, parentId, id, false)
     }
 
+    static CatalogueAction runFirst(String id) {
+        return new CatalogueAction('', id, null, true)
+    }
 
-    private CatalogueAction(String role, String id, String child) {
+    static CatalogueAction runFirst(String role, String id) {
+        return new CatalogueAction(role, id, null, true)
+    }
+
+    static CatalogueAction runFirst(String parentRole, String parentId, String id) {
+        return new CatalogueAction(parentRole, parentId, id, true)
+    }
+
+    public CatalogueAction first() {
+        if (first) {
+            return this
+        }
+        return new CatalogueAction(role, id, child, true)
+    }
+
+    public CatalogueAction last() {
+        if (!first) {
+            return this
+        }
+        return new CatalogueAction(role, id, child, false)
+    }
+
+    private CatalogueAction(String role, String id, String child, boolean first) {
         this.role = role
         this.id = id
         this.child = child
+        this.first = first
+    }
+
+    private firstOrLast(Navigator nav) {
+        if (first) {
+            return nav.first()
+        }
+        return nav.last()
     }
 
     void perform(AbstractModelCatalogueGebSpec spec) {
         if (role) {
             spec.click {
-                spec.$("#role_${role}_${id}-menu-item-link, #role_${role}_${id}Btn").last()
+                firstOrLast spec.$("#role_${role}_${id}-menu-item-link, #role_${role}_${id}Btn")
+
             }
         } else {
             spec.click {
-                spec.$("#${id}-menu-item-link, #${id}Btn, #role_null_${id}Btn").last()
+                firstOrLast spec.$("#${id}-menu-item-link, #${id}Btn, #role_null_${id}Btn")
             }
         }
         if (child) {
             spec.click {
-                spec.$("#${child}-menu-item-link, #${child}Btn, #role_null_${child}Btn").last()
+                firstOrLast spec.$("#${child}-menu-item-link, #${child}Btn, #role_null_${child}Btn")
             }
         }
     }

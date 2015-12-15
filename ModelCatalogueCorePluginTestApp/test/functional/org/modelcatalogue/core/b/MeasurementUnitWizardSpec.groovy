@@ -1,86 +1,52 @@
 package org.modelcatalogue.core.b
 
+import static org.modelcatalogue.core.geb.Common.*
+
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.modelcatalogue.core.pages.MeasurementUnitListPage
 import spock.lang.Stepwise
 
 @Stepwise
 class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {
-        go "#/"
-        loginAdmin()
-
-        // poor man's fix
-        browser.driver.navigate().refresh()
+        login admin
 
         when:
-        go "#/catalogue/measurementUnit/all"
+        select('Test 2') / 'Test 2' / "Measurement Units"
 
         then:
-        at MeasurementUnitListPage
-        waitFor(120) {
-            viewTitle.displayed
-        }
-        waitFor {
-            viewTitle.text().trim() == 'Measurement Unit List'
-        }
-
-        waitFor {
-            actionButton('create-catalogue-element', 'list').displayed
-        }
-
+        check rightSideTitle is 'Measurement Unit List'
     }
 
     def "create new unit"() {
-
         when:
-        actionButton('create-catalogue-element', 'list').click()
+        click create
 
         then:
-        waitFor {
-            modalDialog.displayed
-        }
+        check modalDialog displayed
 
         when:
-        $('#name').value('Foos')
-        $('#symbol').value('Foo')
+        fill 'name' with 'Foos'
+        fill 'symbol' with 'Foo'
 
-        classifications = "NT1"
-        selectCepItemIfExists()
-
-        actionButton('modal-save-element', 'modal').click()
+        click save
 
         then:
-        waitFor {
-            infTableCell(1, 2, text: 'Foos').displayed
-        }
+        check { infTableCell(1, 2, text: 'Foos') } displayed
     }
 
     def "check the unit shows up with own detail page"(){
-        when:
-        waitFor {
-            infTableCell(1, 2, text: "Foos").displayed
-        }
+        click { infTableCell(1, 2).find('a') }
 
-        then:
-
-        infTableCell(1, 2).find('a').click()
-
-        waitFor(60) {
-            subviewTitle.displayed
-        }
-
-        subviewTitle.text().trim() == 'Foos DRAFT'
+        expect:
+        check rightSideTitle is 'Foos DRAFT'
     }
 
     def "going to metadata tab changes the url"() {
-        waitFor {
-            $('li', 'data-tab-name': 'ext').displayed
-        }
+        check { $('li', 'data-tab-name': 'ext') } displayed
 
         when:
-        $('li', 'data-tab-name': 'ext').find('a').click()
+        click { $('li', 'data-tab-name': 'ext').find('a') }
 
         then:
         waitFor {
@@ -89,66 +55,52 @@ class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "finalize element"() {
-        waitUntilModalClosed()
+        check backdrop gone
+
         when: "finalize is clicked"
-        actionButton('change-element-state').click()
-        actionButton('finalize').click()
+        click finalize
 
         then: "modal prompt is displayed"
-        waitFor {
-            confirmDialog.displayed
-        }
+        check confirm displayed
 
         when: "ok is clicked"
-        confirmOk.click()
+        click OK
 
         then: "the element is finalized"
-        waitFor(120) {
-            subviewStatus.text() == 'FINALIZED'
-        }
-
+        check subviewStatus is 'FINALIZED'
     }
 
     def "deprecate the element"() {
-        waitUntilModalClosed()
+        check backdrop gone
+
         when: "depracete action is clicked"
-        actionButton('change-element-state').click()
-        actionButton('archive').click()
+        click archive
 
         then: "modal prompt is displayed"
-        waitFor {
-            confirmDialog.displayed
-        }
+        check confirm displayed
 
         when: "ok is clicked"
-        confirmOk.click()
+        click OK
 
         then: "the element is now deprecated"
-        waitFor {
-            subviewStatus.text() == 'DEPRECATED'
-        }
+        check subviewStatus is 'DEPRECATED'
 
     }
 
     def "restore the element"() {
-        waitUntilModalClosed()
+        check backdrop gone
+
         when: "restore action is clicked"
-        actionButton('change-element-state').click()
-        actionButton('archive').click()
+        click archive
 
         then: "modal prompt is displayed"
-        waitFor {
-            confirmDialog.displayed
-        }
+        check confirm displayed
 
         when: "ok is clicked"
-        confirmOk.click()
+        click OK
 
         then: "the element is now finalized"
-        waitFor {
-            subviewStatus.text() == 'FINALIZED'
-        }
-
+        check subviewStatus is 'FINALIZED'
     }
 
 }

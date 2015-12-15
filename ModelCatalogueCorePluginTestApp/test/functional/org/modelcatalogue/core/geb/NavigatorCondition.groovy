@@ -1,10 +1,12 @@
 package org.modelcatalogue.core.geb
 
 import geb.navigator.Navigator
+import groovy.transform.stc.ClosureParams
+import groovy.transform.stc.FromString
 
 class NavigatorCondition {
 
-    private static final int NUM_OF_RETRIES = 10
+    private static final int NUM_OF_RETRIES = 5
 
     final AbstractModelCatalogueGebSpec spec
     final Closure<Navigator> navigator
@@ -63,6 +65,10 @@ class NavigatorCondition {
         }
     }
 
+    boolean test(@ClosureParams(value=FromString, options='geb.navigator.Navigator') Closure<Boolean> test) {
+        spec.noStale(1, true, navigator, test)
+    }
+
     boolean asBoolean() {
         isDisplayed()
     }
@@ -70,6 +76,6 @@ class NavigatorCondition {
     @Override
     String toString() {
         Navigator current = navigator()
-        return "Navigator condition based on ${current} (text='${current.text().trim()}', size=${current.size()})".toString()
+        return "Navigator condition based on ${current} (text='${current.text()?.trim()}', size=${current.size()})".toString()
     }
 }

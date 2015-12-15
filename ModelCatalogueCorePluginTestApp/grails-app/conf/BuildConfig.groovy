@@ -105,7 +105,7 @@ grails.project.dependency.resolution = {
 
         compile ":grails-melody:1.55.0"
 
-        test ":geb:0.9.3"
+        test ":geb:0.12.2"
 
         // Uncomment these (or add new ones) to enable additional resources capabilities
         //runtime ":zipped-resources:1.0.1"

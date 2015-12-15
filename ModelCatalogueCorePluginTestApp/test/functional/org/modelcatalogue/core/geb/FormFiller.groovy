@@ -7,6 +7,8 @@ class FormFiller {
     final AbstractModelCatalogueGebSpec spec;
     final Closure<Navigator> navigator
 
+    private boolean strict = false
+
     FormFiller(AbstractModelCatalogueGebSpec spec, Closure<Navigator> navigator) {
         this.spec = spec
         this.navigator = (Closure<Navigator>) navigator.clone()
@@ -15,9 +17,35 @@ class FormFiller {
         this.navigator.resolveStrategy = Closure.DELEGATE_FIRST
     }
 
-    void with(Object value) {
+    FormFiller with(Object value) {
         spec.noStale(navigator) {
             it.value(value)
         }
+        this
     }
+
+    FormFiller and(Keywords pick) {
+        if (pick == Keywords.SELECT) {
+            strict = true
+        }
+        this
+    }
+
+    FormFiller first(Keywords item) {
+        if (spec.selectCepItemIfExists()) {
+            return this
+        }
+        if (!strict || item == Keywords.EXISTING) {
+            return this
+        }
+        throw new IllegalStateException("There is no item to be selected")
+    }
+
+
+    FormFiller getItem() {
+        // syntactic sugger
+        return this
+    }
+
+
 }

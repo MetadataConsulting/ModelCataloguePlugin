@@ -15,7 +15,7 @@
         def "login and select Data Element"() {
             login admin
 
-            dataModel('Test 1') / 'Test 1' / 'Data Elements'
+            select('Test 1') / 'Test 1' / 'Data Elements'
 
             expect:
             check rightSideTitle is 'Data Element List'

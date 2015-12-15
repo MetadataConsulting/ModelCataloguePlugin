@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.geb
 
+import geb.Browser
 import geb.navigator.Navigator
 import geb.spock.GebReportingSpec
 import geb.waiting.WaitTimeoutException
@@ -7,6 +8,11 @@ import org.openqa.selenium.StaleElementReferenceException
 import org.openqa.selenium.logging.LogEntries
 import org.openqa.selenium.logging.LogEntry
 import org.openqa.selenium.logging.LogType
+
+import static org.modelcatalogue.core.geb.Common.backdrop
+import static org.modelcatalogue.core.geb.Common.closeGrowlMessage
+import static org.modelcatalogue.core.geb.Common.existing
+import static org.modelcatalogue.core.geb.Common.prefer
 
 abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
@@ -27,7 +33,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         }
     }
 
-    DataModelNavigator dataModel(String dataModelName) {
+    DataModelNavigator select(String dataModelName) {
         go "#/dataModels"
 
         waitFor {
@@ -78,7 +84,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
             waitFor(waitTime) {
                 $('.cep-item, .item-found').displayed
             }
-            $('.cep-item, .item-found').click()
+            $('.cep-item, .item-found').first().click()
             return true
         } catch (ignored) {
             return false
@@ -86,9 +92,15 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
     }
 
+    FormFiller fill(CatalogueContent content) {
+        fill { content.select(this) }
+    }
+
+
     FormFiller fill(String nameOrId) {
+        check closeGrowlMessage gone
         Closure<Navigator> navigator =  { $("input[name=$nameOrId], #$nameOrId") }
-        if (nameOrId.contains('#') || startsWith('.')) {
+        if (nameOrId.contains('#') || nameOrId.startsWith('.')) {
             navigator = { $(nameOrId) }
         }
         new FormFiller(this, navigator)
@@ -117,6 +129,10 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         new NavigatorCondition(this, navigator)
     }
 
+    NavigatorCondition check(CatalogueContent content) {
+        check { content.select(this) }
+    }
+
     boolean no(Navigator navigator) {
         waitFor {
             !navigator.displayed
@@ -131,8 +147,22 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         click { navigator }
     }
 
+    PositionalClick click(Keywords first) {
+        if (first == Keywords.FIRST) {
+            return new PositionalClick(true, this)
+        }
+        if (first == Keywords.LAST) {
+            return new PositionalClick(false, this)
+        }
+        throw new IllegalArgumentException("Only 'first' or 'last keyword supported")
+    }
+
     void click(CatalogueAction action) {
         action.perform(this)
+    }
+
+    void click(CatalogueContent content) {
+        click { content.select(this) }
     }
 
     void click(Closure<Navigator> navigatorClosure) {
@@ -184,12 +214,17 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     int totalOf(String name) {
-        noStale({ tab(name).find('span.badge.tab-value-total') }) {
+        int result = noStale(5, true, { tab(name).find('span.badge.tab-value-total') }) {
             if (!it.displayed) {
-                return 0
+                // cannot be null, otherwise the wait block will fail
+                return -1
             }
             it.text() to Integer
         }
+        if (result == -1) {
+            return 0
+        }
+        return result
     }
 
     Navigator tab(String name) {
@@ -201,13 +236,14 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     void selectTab(String name) {
+        check closeGrowlMessage gone
         noStale({ $("li[data-tab-name='$name'] a") }) {
             it.click()
         }
     }
 
 
-    public <R> R noStale(int maxAttempts = 10, Closure<Navigator> navigatorClosure, Closure<R> resultClosure) {
+    public <R> R noStale(int maxAttempts = 5, boolean ignoreMissing = false, Closure<Navigator> navigatorClosure, Closure<R> resultClosure) {
         int attempt = 0
         Throwable error = null
         Navigator navigator = null
@@ -216,9 +252,12 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
             try {
                 navigator = navigatorClosure()
 
-                if (!navigator.displayed) {
+                if (!navigator.displayed && !ignoreMissing) {
                     waitFor(attempt ** 2) {
                         navigator.displayed
+                    }
+                    return (R) waitFor(1) {
+                        return resultClosure(navigator)
                     }
                 }
                 return (R) waitFor(attempt ** 2) {
@@ -313,10 +352,25 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         }
     }
 
+
     def selectInTree(String name) {
         noStale({ $('.catalogue-element-treeview-name', text: name) }) {
             it.click()
         }
+    }
+
+    void refresh(Browser browser) {
+        browser.driver.navigate().refresh()
+    }
+
+
+    void addDataModelImport(String... imported) {
+        click CatalogueAction.runFirst('item', 'catalogue-element', 'add-import')
+        for (String dataModel in imported) {
+            fill 'div.modal #elements' with dataModel and prefer first existing
+        }
+        click 'div.modal .btn-primary'
+        check backdrop gone
     }
 
 }

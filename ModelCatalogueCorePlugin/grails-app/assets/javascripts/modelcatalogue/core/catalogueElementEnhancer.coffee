@@ -20,7 +20,7 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
 
   condition = (element) -> element.hasOwnProperty('elementType') and element.hasOwnProperty('link')
   factory   = [ 'modelCatalogueApiRoot', 'rest', '$rootScope', '$state', 'names', 'enhance', (modelCatalogueApiRoot, rest, $rootScope, $state, names, enhance) ->
-    (element) ->
+    catalogueElementEnhancer = (element) ->
       class CatalogueElement
         constructor: (element) ->
           angular.extend(@, element)
@@ -112,6 +112,10 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
 
       # wrap original element
       new CatalogueElement(element)
+
+    catalogueElementEnhancer.updateFrom = updateFrom
+
+    catalogueElementEnhancer
   ]
   enhanceProvider.registerEnhancerFactory('catalogueElement', condition, factory)
 ]

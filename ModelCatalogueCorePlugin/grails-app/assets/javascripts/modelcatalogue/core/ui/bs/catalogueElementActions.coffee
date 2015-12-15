@@ -276,10 +276,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     }
   ]
 
-  actionsProvider.registerActionInRoles 'edit-mapping', [actionsProvider.ROLE_ITEM_ACTION], [ '$scope', 'messages', 'security', ($scope, messages) ->
+  actionsProvider.registerActionInRoles 'edit-mapping', [actionsProvider.ROLE_ITEM_ACTION], [ '$scope', 'messages', 'enhance', ($scope, messages, enhance) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
     return undefined if not $scope.element.isInstanceOf('mapping')
+
+    catalogueElementEnhancer = enhance.getEnhancer('catalogueElement')
 
     {
       position:   100
@@ -292,7 +294,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
         $scope.element.source.refresh().then (element)->
           args = {type: 'new-mapping', update: true, element: element, mapping: $scope.element}
           messages.prompt('Update Mapping', '', args).then (updated)->
-            $scope.element.updateFrom  updated
+            catalogueElementEnhancer.updateFrom $scope.element, updated
 
     }
 

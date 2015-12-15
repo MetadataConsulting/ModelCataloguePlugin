@@ -18,7 +18,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
     def "go to login"() {
         when:
         loginAdmin()
-        dataModel "Test 1"
+        select "Test 1"
         selectInTree "Test 1"
         selectInTree "Assets"
 

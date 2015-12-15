@@ -16,7 +16,7 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
         fill 'name' with "Data Type Change Test"
         fill 'dataModel' with "Data Model Change Test"
 
-        click CatalogueAction.create('modal', 'modal-save-element')
+        click CatalogueAction.runLast('modal', 'modal-save-element')
 
         expect:
         check 'div.modal' gone
@@ -41,7 +41,7 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
         check ".pp-table-property-element-value", 'data-value-for': 'Undone' is 'false'
 
         when:
-        click CatalogueAction.create('item', 'undo-change')
+        click CatalogueAction.runLast('item', 'undo-change')
 
         then:
         check confirmDialog displayed
@@ -85,7 +85,7 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
 
     def "classifications have activity feed"() {
         when:
-        dataModel 'XMLSchema'
+        select 'XMLSchema'
 
         then:
         check { tab('activity') }

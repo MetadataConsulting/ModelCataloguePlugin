@@ -4,41 +4,17 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.pages.ModalTreeViewPage
 import spock.lang.Stepwise
 
+import static org.modelcatalogue.core.geb.Common.admin
+
 @Stepwise
 class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {
-        loginAdmin()
+        login admin
 
-        dataModel('Test 2')
-        selectInTree "Test 2"
+        select('Test 2') / "Test 2"
 
-
-        waitFor {
-            menuItem('catalogue-element', 'item').displayed
-        }
-
-        menuItem('catalogue-element', 'item').click()
-
-        waitFor {
-            menuItem('add-import', '').displayed
-        }
-
-        menuItem('add-import', '').click()
-
-        noStale({ $('div.modal #elements') }) {
-            it.value('nhic')
-        }
-
-        selectCepItemIfExists()
-
-        noStale({ $('div.modal .btn-primary') }) {
-            it.click()
-        }
-
-        waitFor {
-            !$('div.modal').displayed
-        }
+        addDataModelImport 'nhic'
 
         selectInTree "Data Classes"
 
@@ -52,6 +28,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
             subviewTitle.text()?.trim()?.contains('Data Class List')
         }
     }
+
 
     def "Add new data class"() {
         waitFor {

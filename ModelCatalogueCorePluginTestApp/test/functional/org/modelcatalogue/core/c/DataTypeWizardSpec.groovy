@@ -1,496 +1,396 @@
 package org.modelcatalogue.core.c
 
+import org.modelcatalogue.core.geb.CatalogueAction
+import org.modelcatalogue.core.geb.CatalogueContent
+
+import static org.modelcatalogue.core.geb.Common.*
+
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.modelcatalogue.core.pages.DataTypeListPage
 import spock.lang.Stepwise
 
 @Stepwise
 class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
+
+    public static final String expandTableHeader = '.inf-table thead .inf-cell-expand'
+    public static final CatalogueContent nameFilter = CatalogueContent.create('input.form-control', placeholder: 'Filter Name')
+    public static final CatalogueContent enumerationsTableEditor = CatalogueContent.create('table', title: 'Enumerations')
+    public static final String tableRows = '.inf-table tbody .inf-table-item-row'
+    public static final String pickReferenceType = '#pickReferenceType'
+    public static final String pickPrimitiveType = '#pickPrimitiveType'
+    public static final String pickEnumeratedType = '#pickEnumeratedType'
+    public static final String updateMetadataButton = 'button.btn-primary.update-object'
+    public static final String addMetadataButton = '.btn.add-metadata'
+    public static final String removeMetadataRow = 'a.soe-remove-row'
+    public static final CatalogueAction createMapping = CatalogueAction.runFirst('item', 'catalogue-element', 'create-new-mapping')
+    public static final CatalogueAction createRelationship = CatalogueAction.runLast('item', 'catalogue-element', 'create-new-relationship')
+    public static final CatalogueAction convert = CatalogueAction.runLast('item', 'catalogue-element', 'convert')
+    public static final CatalogueAction removeRelationship = CatalogueAction.runLast('item', 'remove-relationship')
+    public static final CatalogueAction removeMapping = CatalogueAction.runLast('item', 'remove-mapping')
+    public static final String dataType = 'dataType'
+    public static final String mapping = 'mapping'
+    public static final String modalPrimaryButton = 'div.modal button.btn-primary, div.modal a.btn-primary'
+    public static final String value = 'value'
+    public static final GString modalResponse = "$modalDialog pre"
+    public static final CatalogueAction editMapping = CatalogueAction.runLast('item', 'edit-mapping')
+    public static final String expandMetadata = '.expand-metadata'
+    public static final String metadataHelpBlock = '.metadata-help-block'
+
     def "go to login"() {
-        go "#/"
-        loginAdmin()
+        login admin
 
         when:
-        go "#/catalogue/dataType/all"
+        select('NHIC') / 'NHIC' / 'Data Types'
 
         then:
-        at DataTypeListPage
-        waitFor(120) {
-            viewTitle.displayed
-        }
-        waitFor {
-            viewTitle.text().trim() == 'Data Type List'
-        }
-        waitFor {
-            actionButton('create-catalogue-element', 'list').displayed
-        }
-
+        check rightSideTitle is 'Data Type List'
     }
 
 
     def "filter by name in header"() {
-        waitUntilModalClosed()
+        check backdrop gone
+
         when: "the header is expanded"
-        $('.inf-table thead .inf-cell-expand').click()
+        click expandTableHeader
 
         then: "the name filter is displayed"
-        waitFor {
-            $('input.form-control', placeholder: 'Filter Name').displayed
-        }
+        check nameFilter
 
         when: "we filter by anatomical side"
-        $('input.form-control', placeholder: 'Filter Name').value('anatomical side')
+        fill nameFilter with 'anatomical side'
 
         then: "only one row will be shown"
-        waitFor {
-            $('.inf-table tbody .inf-table-item-row').size() == 1
-        }
+        check tableRows test { it.size() == 1 }
 
         when: "the filter is reset"
-        $('input.form-control', placeholder: 'Filter Name').value('')
+        fill nameFilter with ''
 
         then: "we see many rows again"
-        waitFor {
-            $('.inf-table tbody .inf-table-item-row').size() > 1
-        }
+        check tableRows test { it.size() >= 1 }
     }
 
 
 
     def "create reference"() {
+        select('Test 1') / 'Test 1'
+
+        addDataModelImport 'SI', 'XMLSchema', 'NHIC'
+
+        selectInTree 'Data Types'
 
         when:
-        actionButton('create-catalogue-element', 'list').click()
+        click create
 
         then:
-        waitFor {
-            modalDialog.displayed
-        }
+        check modalDialog displayed
 
         when:
-        $('#name').value('New Reference Type')
+        fill name with 'New Reference Type'
 
-        classifications = "NT1"
-        selectCepItemIfExists()
+        click pickReferenceType
 
-        $('#pickReferenceType').click()
+        fill 'input#dataClass' with 'DEMOGRAPHICS' and prefer first existing item
 
-
-        waitFor {
-            $('input#dataClass').displayed
-        }
-
-        noStale({$('input#dataClass')}) {
-            it.value('DEMOGRAPHICS')
-        }
-
-        selectCepItemIfExists()
-
-        actionButton('modal-save-element', 'modal').click()
+        click save
 
         then:
-        waitFor {
-            infTableCell(1, 1, text: 'New Reference Type').displayed
-        }
-        waitFor {
-            infTableCell(1, 2, text: 'DEMOGRAPHICS').displayed
-        }
+        check { infTableCell(1, 1, text: 'New Reference Type') } displayed
+        check { infTableCell(1, 2, text: 'DEMOGRAPHICS') } displayed
     }
 
     def "create primitive"() {
-
         when:
-        actionButton('create-catalogue-element', 'list').click()
+        click create
 
         then:
-        waitFor {
-            modalDialog.displayed
-        }
+        check modalDialog displayed
 
         when:
-        $('#name').value('New Primitive Type')
+        fill name with 'New Primitive Type'
 
-        classifications = "NT1"
-        selectCepItemIfExists()
-
-        $('#pickPrimitiveType').click()
+        click pickPrimitiveType
 
 
-        waitFor {
-            $('input#measurementUnit').displayed
-        }
+        fill 'input#measurementUnit' with 'new unit'
 
-        noStale({$('input#measurementUnit')}) {
-            it.value('celsius')
-        }
-
-        selectCepItemIfExists()
-
-        actionButton('modal-save-element', 'modal').click()
+        click save
 
         then:
-        waitFor {
-            infTableCell(1, 1, text: 'New Primitive Type').displayed
-        }
-        waitFor {
-            infTableCell(1, 2, text: 'celsius').displayed
-        }
+        check { infTableCell(1, 1, text: 'New Primitive Type') } displayed
+        check { infTableCell(1, 2, text: 'new unit') } displayed
     }
 
     def "create enum"() {
 
         when:
-        actionButton('create-catalogue-element', 'list').click()
+        click create
 
         then:
-        waitFor {
-            modalDialog.displayed
-        }
+        check modalDialog displayed
 
         when:
-        $('#name').value('New Enum Type')
+        fill name with 'New Enum Type'
 
-        classifications = "NT1"
-        selectCepItemIfExists()
-
-        $('#pickEnumeratedType').click()
+        click pickEnumeratedType
 
 
-        waitFor {
-            $('table', title: 'Enumerations').displayed
-        }
+        check enumerationsTableEditor displayed
 
         fillMetadata '01': 'one', '02': 'two'
 
-        actionButton('modal-save-element', 'modal').click()
+        click save
 
         then:
-        waitFor {
-            infTableCell(1, 1, text: 'New Enum Type').displayed
-        }
+        check backdrop gone
+        check { infTableCell(1, 1, text: 'New Enum Type') } displayed
     }
 
     def "create standard"() {
 
         when:
-        actionButton('create-catalogue-element', 'list').click()
+        click create
 
         then:
-        waitFor {
-            modalDialog.displayed
-        }
+        check modalDialog displayed
 
         when:
-        $('#name').value('New Data Type')
+        fill name with 'New Data Type'
 
-        classifications = "NT1"
-        selectCepItemIfExists()
-
-        actionButton('modal-save-element', 'modal').click()
+        click save
 
         then:
-        waitFor {
-            infTableCell(1, 1, text: 'New Data Type').displayed
-        }
+        check backdrop gone
+        check { infTableCell(1, 1, text: 'New Data Type')} displayed
     }
 
     def "check it shows up with own detail page"(){
         when:
-        waitFor {
-            infTableCell(1, 1, text: "New Data Type").displayed
-        }
-
+        click { infTableCell(1, 1).find('a:not(.inf-cell-expand)') }
         then:
 
-        infTableCell(1, 1).find('a:not(.inf-cell-expand)').click()
-
-        waitFor(60) {
-            subviewTitle.displayed
-        }
-
-        subviewTitle.text().trim() == 'New Data Type DRAFT'
+        check rightSideTitle is 'New Data Type DRAFT'
     }
 
 
 
     def "update metadata"() {
-        waitUntilModalClosed()
-        when:
-        selectTab('ext')
-
-        then:
-        waitFor {
-            $('button.btn-primary.update-object').disabled
-        }
-        waitFor {
-            $('.btn.add-metadata').displayed
-        }
+        check backdrop gone
 
         when:
-        noStale({$('.btn.add-metadata')}) {
-            it.click()
-        }
-
-        fillMetadata(foo: 'bar', one: 'two', free: 'for')
+        selectTab 'ext'
 
         then:
-        waitFor {
-            !$('button.btn-primary.update-object').disabled
-        }
+        check updateMetadataButton disabled
+        check closeGrowlMessage gone
 
         when:
-        $('button.btn-primary.update-object').click()
+        click addMetadataButton
 
         then:
-        waitFor {
-            $('button.btn-primary.update-object').displayed
-        }
-        waitFor(30) {
-            $('button.btn-primary.update-object').disabled
-        }
+        check addMetadataButton gone
+
+        when:
+        fillMetadata foo: 'bar', one: 'two', free: 'for'
+
+        then:
+        check updateMetadataButton enabled
+
+        when:
+        click updateMetadataButton
+
+        then:
+        check updateMetadataButton disabled
 
         when:
         3.times {
-            noStale({$('a.soe-remove-row')}) {
-                it.click()
-            }
+            click removeMetadataRow
         }
 
         then:
-        waitFor {
-            !$('button.btn-primary.update-object').disabled
-        }
+        check updateMetadataButton enabled
 
         when:
-        $('button.btn-primary.update-object').click()
+        click updateMetadataButton
 
         then:
-        waitFor(30) {
-            $('button.btn-primary.update-object').displayed && $('button.btn-primary.update-object').disabled
-        }
+        check updateMetadataButton disabled
 
         when:
-        browser.driver.navigate().refresh()
+        refresh browser
 
         then:
-        waitFor {
-            $('.btn.add-metadata').displayed
-        }
-
+        check addMetadataButton displayed
     }
 
     def "create new mapping"() {
-        waitUntilModalClosed()
+        check backdrop gone
+
         when: "create new mapping action is clicked"
-        actionButton('catalogue-element').click()
-        actionButton('create-new-mapping').click()
+        click createMapping
 
 
         then: "crate new mapping dialog opens"
-        waitFor {
-            modalDialog.displayed
-            modalHeader.text() == 'Create new mapping for New Data Type'
-        }
+        check modalHeader is 'Create new mapping for New Data Type'
 
         when: "value domain is selected"
-        dataType = 'xs:boolean'
-        selectCepItemIfExists()
+        fill dataType with 'xs:boolean' and pick first item
 
         and: "new mapping rule is created"
-        mapping = "number(x).asType(Boolean)"
+        fill mapping with "number(x).asType(Boolean)"
 
         and: "the create mapping button is clicked"
-        modalPrimaryButton.click()
+        click modalPrimaryButton
 
         then: "there is exactly one mapping"
-        waitFor {
-            totalOf('mappings') == 1
-        }
+        check backdrop gone
+        check tabTotal('mappings') is '1'
     }
 
     def "convert value"() {
-        waitUntilModalClosed()
+        check backdrop gone
+
         when: "convert action is clicked"
-        actionButton('catalogue-element').click()
-        actionButton('convert').click()
+        click convert
 
         then: "modal is shown"
-        waitFor {
-            modalDialog.displayed
-            modalHeader.text() == 'Convert Value from New Data Type'
-        }
+        check modalHeader is 'Convert Value from New Data Type'
 
         when: "truthy value is entered"
-        value = '10'
+        fill value with '10'
 
         then: "true is shown"
-        waitFor {
-            modalDialog.find('pre').text().trim() == 'true'
-        }
+        check modalResponse is 'true'
 
         when: "falsy value is entered"
-        value = '0'
+        fill value with '0'
 
         then: "false is shown"
-        waitFor {
-            modalDialog.find('pre').text().trim() == 'false'
-        }
-
-//        when: "invalid value is entered"
-//        value = 'foo'
-//
-//        then: "INVALID is shown"
-//        waitFor {
-//            modalDialog.find('pre').text().trim().contains('INVALID')
-//        }
+        check modalResponse is 'false'
 
         when:
-        modalCloseButton.click()
+        click modalCloseButton
 
         then:
-        waitFor {
-            !modalDialog
-        }
+        check modalDialog gone
     }
 
     def "edit mapping"() {
-        waitUntilModalClosed()
         when: "mappings tab selected"
-        selectTab('mappings')
+        selectTab 'mappings'
 
 
         then: "mappings tab is active"
-        waitFor {
-            tabActive('mappings')
-        }
+        waitFor { tabActive('mappings') }
 
         when:
         toggleInfTableRow(1)
-        actionButton('edit-mapping').click()
+
+        click editMapping
 
         then:
-        waitFor {
-            modalDialog.displayed
-        }
+        check modalDialog displayed
 
         when:
-        mapping = 'x'
-        modalPrimaryButton.click()
+        fill mapping with 'x'
+        click modalPrimaryButton
 
         then:
-        waitFor {
-            infTableCell(1, 2).text().trim() == 'x'
-        }
+        check { infTableCell(1, 2) } is 'x'
     }
 
 
     def "create relationship"() {
-        waitUntilModalClosed()
+        check backdrop gone
+
         when: "create relationship action is clicked"
-        actionButton('catalogue-element').click()
-        actionButton('create-new-relationship').click()
+        click createRelationship
 
         then: "modal is shown"
-        waitFor {
-            modalDialog.displayed
-        }
+        check modalDialog displayed
 
         when:
-        type    = 'related to'
-        element = 'xs:boolean'
-        selectCepItemIfExists()
+        fill 'type' with 'related to'
 
+        fill 'element' with 'xs:boolean' and pick first item
 
-        noStale({ $('.expand-metadata') })  {
-            it.click()
-        }
+        click expandMetadata
 
         then:
-        waitFor {
-            $('.metadata-help-block').displayed
-        }
+        check metadataHelpBlock displayed
 
         when:
-        fillMetadata(modalDialog, foo: 'bar', one: 'two')
+        fillMetadata($(modalDialog), foo: 'bar', one: 'two')
 
-        modalPrimaryButton.click()
+        check closeGrowlMessage gone
+
+        click modalPrimaryButton
 
         then:
-        waitFor {
-            totalOf('relatedTo') == 1
-        }
+        check backdrop gone
+        check tabTotal('relatedTo') is '1'
 
     }
 
     def "create relationship from footer action"() {
-        waitUntilModalClosed()
+        check backdrop gone
+
         when: "related to tab selected"
         selectTab('relatedTo')
 
 
         then: "related to tab is active"
-        waitFor {
-            tabActive('relatedTo')
-        }
-        waitFor {
-            tableFooterAction.displayed
-        }
+        waitFor { tabActive('relatedTo') }
 
         when: "click the footer action"
-        tableFooterAction.click()
+        click tableFooterAction
 
         then: "modal is shown"
-        waitFor {
-            modalDialog.displayed
-        }
+        check modalDialog displayed
 
         when:
-        element = 'xs:string'
-        selectCepItemIfExists()
+        fill 'element' with 'xs:string' and pick first item
 
-        modalPrimaryButton.click()
+        check closeGrowlMessage gone
+
+        click modalPrimaryButton
 
         then:
-        waitFor {
-            totalOf('relatedTo') == 2
-        }
+        check backdrop gone
+        check tabTotal('relatedTo') is '2'
     }
 
     def "remove relationship"() {
-        waitUntilModalClosed()
+        check backdrop gone
+        check closeGrowlMessage gone
         when:
         toggleInfTableRow(1)
-        actionButton('remove-relationship').click()
+
+        click removeRelationship
 
         then:
-        waitFor {
-            confirmDialog.displayed
-        }
+        check confirm displayed
 
         when:
-        confirmOk.click()
+        click OK
 
         then:
-        waitFor {
-            totalOf('relatedTo') == 1
-        }
+        check tabTotal('relatedTo') is '1'
     }
 
     def "remove mapping"() {
-        waitUntilModalClosed()
+        check backdrop gone
+        check closeGrowlMessage gone
         when:
         selectTab('mappings')
         toggleInfTableRow(1)
-        actionButton('remove-mapping').click()
+        click removeMapping
 
         then:
-        waitFor {
-            confirmDialog.displayed
-        }
+        check confirm displayed
 
         when:
-        confirmOk.click()
+        click OK
+        check closeGrowlMessage gone
 
         then:
         waitFor {
@@ -502,73 +402,52 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     // following is just copy-pasted until we find better way how to run feature methods stepwise
     def "finalize domain"() {
-        waitUntilModalClosed()
+        check backdrop gone
         when: "finalize is clicked"
-        actionButton('change-element-state').click()
-        actionButton('finalize').click()
+        click finalize
 
         then: "modal prompt is displayed"
-        waitFor {
-            confirmDialog.displayed
-        }
+        check confirm displayed
 
         when: "ok is clicked"
-        confirmOk.click()
+        click OK
 
         then: "the element is finalized"
-        waitFor {
-            subviewStatus.text() == 'FINALIZED'
-        }
-
+        check subviewStatus is 'FINALIZED'
     }
 
     def "create new version of the domain"() {
-        waitUntilModalClosed()
+        check backdrop gone
+
         when: "new version is clicked"
-        actionButton('change-element-state').click()
-        actionButton('create-new-version').click()
+        click newVersion
 
         then: "modal prompt is displayed"
-        waitFor {
-            confirmDialog.displayed
-        }
+        check confirm displayed
 
         when: "ok is clicked"
-        confirmOk.click()
+        click OK
 
         then: "the element new draft version is created"
-        waitFor(30) {
-            totalOf('history') == 2
-        }
-        waitFor(30) {
-            subviewStatus.text() == 'DRAFT'
-        }
-
+        check tabTotal('history') is '2'
+        check subviewStatus is 'DRAFT'
     }
 
     def "merge domain"() {
-        waitUntilModalClosed()
+        check backdrop gone
         when:
-        actionButton('change-element-state').click()
-        actionButton('merge').click()
+        click merge
 
         then:
-        waitFor {
-            modalDialog.displayed
-            modalHeader.text() == 'Merge Data Type New Data Type to another Data Type'
-        }
+        check modalHeader is 'Merge Data Type New Data Type to another Data Type'
 
         when: "type is select and confirmed"
-        value = 'same name'
-        selectCepItemIfExists()
+        fill value with 'same name' and pick first item
 
-        modalPrimaryButton().click()
+        click modalPrimaryButton
 
         then: "the item is merged and we are redirected to destination domain"
-        waitFor {
-            subviewTitle.text().trim() == 'Same Name DRAFT'
-        }
-
+        check rightSideTitle is 'Same Name DRAFT'
     }
 
 }
