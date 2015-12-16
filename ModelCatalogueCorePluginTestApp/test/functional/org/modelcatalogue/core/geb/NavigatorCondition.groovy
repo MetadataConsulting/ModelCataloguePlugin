@@ -65,8 +65,19 @@ class NavigatorCondition {
         }
     }
 
-    boolean test(@ClosureParams(value=FromString, options='geb.navigator.Navigator') Closure<Boolean> test) {
-        spec.noStale(1, true, navigator, test)
+    SizeCondition present(int times) {
+        return new SizeCondition(times, this)
+    }
+
+    boolean present(Keywords once) {
+        if (once == Keywords.ONCE) {
+            return spec.noStale(NUM_OF_RETRIES, true, navigator) { it.size() == 1}
+        }
+        throw new IllegalArgumentException("Only 'once' allowed here")
+    }
+
+    boolean test(int retries = 1, @ClosureParams(value=FromString, options='geb.navigator.Navigator') Closure<Boolean> test) {
+        spec.noStale(retries, true, navigator, test)
     }
 
     boolean asBoolean() {

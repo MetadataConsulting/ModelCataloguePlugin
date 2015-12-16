@@ -79,5 +79,15 @@ class CatalogueAction {
         }
     }
 
+    String toSelector() {
+        if (child) {
+            throw new IllegalStateException("Child actions cannot be converted into selectors")
+        }
+        if (role) {
+            return "#role_${role}_${id}-menu-item-link, #role_${role}_${id}Btn"
+        }
+        "#${id}-menu-item-link, #${id}Btn, #role_null_${id}Btn"
+    }
+
 
 }

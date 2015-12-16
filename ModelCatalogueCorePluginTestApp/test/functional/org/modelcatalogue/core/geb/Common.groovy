@@ -24,6 +24,7 @@ class Common {
     static final String modalDialog = "div.modal"
     static final String modalHeader = "div.modal-header h4"
     static final String modalCloseButton = 'div.modal button.close'
+    static final String modalSuccessButton = 'div.modal button.btn-success'
     static final String backdrop = '.modal-backdrop'
     static final String confirm = '.modal.messages-modal-confirm'
     static final String OK = '.modal.messages-modal-confirm .btn-primary'
@@ -39,4 +40,5 @@ class Common {
     static final Keywords existing = Keywords.EXISTING
     static final Keywords last = Keywords.LAST
     static final Keywords first = Keywords.FIRST
+    static final Keywords once = Keywords.ONCE
 }

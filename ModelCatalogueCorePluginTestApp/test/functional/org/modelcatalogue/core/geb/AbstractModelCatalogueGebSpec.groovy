@@ -114,6 +114,10 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         check({$(attributes, selector)})
     }
 
+    NavigatorCondition check(CatalogueAction action) {
+        check(action.toSelector())
+    }
+
     NavigatorCondition check(String selector) {
         check({$(selector)})
     }
@@ -264,7 +268,16 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
                     return resultClosure(navigator)
                 }
             } catch (StaleElementReferenceException | WaitTimeoutException e) {
-                println "Condition not met after ${attempt ** 2} seconds, next waiting ${(attempt + 1) ** 2} seconds"
+                println "Condition not met for after ${attempt ** 2} seconds, next waiting ${(attempt + 1) ** 2} seconds - elements: ${navigator.allElements()}"
+
+                try {
+                    throw new RuntimeException()
+                } catch (RuntimeException re) {
+                    println ' > ' + re.stackTrace.findAll {
+                        it.className.startsWith('org.modelcatalogue') && !it.methodName?.contains('noStale') && it.lineNumber && it.fileName
+                    }.join('\n > ')
+                }
+
                 error = e
             }
         }
@@ -303,27 +316,6 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         out << new URL(url).openStream()
         out.close()
         sampleXsd
-    }
-
-    void goToDetailUsingSearch(String name, String dataModel = null) {
-        String qualifiedName = dataModel ? "$name ($dataModel)" : name
-
-        waitFor {
-            menuItem('search-menu', 'navigation-right').displayed
-        }
-
-        menuItem('search-menu', 'navigation-right').click()
-
-        noStale({ $('.search-lg input#value')}) { searchTerm ->
-            searchTerm.value(name)
-        }
-
-        waitFor {
-            $('a.list-group-item.with-pointer .classified-name', text: qualifiedName).displayed
-        }
-        noStale({ $('a.list-group-item.with-pointer .classified-name', text: qualifiedName).parent().parent() }) { resultLink ->
-            resultLink.click()
-        }
     }
 
     String getCurrentId() {

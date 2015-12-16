@@ -7,6 +7,7 @@ enum Keywords {
     ITEM,
     PREFER,
     FIRST,
-    LAST
+    LAST,
+    ONCE
 
 }

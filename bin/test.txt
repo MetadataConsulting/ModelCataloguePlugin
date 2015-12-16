@@ -1,1 +1,15 @@
-tests the command
+Run specific test or all tests if no suite is provided
+
+Available suits
+ - all
+ - app_functional
+ - app_functional_a
+ - app_functional_b
+ - app_functional_c
+ - core_unit
+ - core_integration
+ - core_integration_slow
+ - app_integration
+ - forms_integration
+ - gel_integration
+ - es_integration
