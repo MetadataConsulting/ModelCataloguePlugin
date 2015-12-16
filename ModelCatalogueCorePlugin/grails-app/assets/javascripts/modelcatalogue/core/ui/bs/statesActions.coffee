@@ -11,11 +11,11 @@ angular.module('mc.core.ui.bs.statesActions', ['mc.util.ui.actions']).config ['a
 
 
   actionsProvider.registerActionInRoles 'change-element-state', [actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'security', 'names', ($scope, security, names)->
-    return undefined if not security.hasRole('CURATOR')
+    return undefined unless security.hasRole('CURATOR')
     return undefined unless $scope.element
     return undefined unless $scope.element.status
-    if $scope.element
-      return undefined if not angular.isFunction $scope.element.isInstanceOf
+    return undefined unless angular.isFunction $scope.element.isInstanceOf
+    return undefined unless $scope.element.isInstanceOf('dataModel')
 
     action = {
       position:   10000

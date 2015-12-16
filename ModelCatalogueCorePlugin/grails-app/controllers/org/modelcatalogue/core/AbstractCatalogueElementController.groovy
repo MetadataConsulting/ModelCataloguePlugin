@@ -565,7 +565,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      */
     @Transactional
     def finalizeElement() {
-
+        // TODO: this should be moved to DataModelController
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
             notAuthorized()
             return
@@ -649,7 +649,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      */
     @Transactional
     def archive() {
-
+        // TODO: this should be moved to DataModelController
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
             notAuthorized()
             return
@@ -682,7 +682,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      */
     @Transactional
     def restore() {
-
+        // TODO: this should be moved to DataModelController
         if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
             notAuthorized()
             return

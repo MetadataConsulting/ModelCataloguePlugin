@@ -63,5 +63,67 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         check tabTotal('imports') is '1'
     }
 
+    def "finalize element"() {
+        check backdrop gone
+        when: "finalize is clicked"
+        click finalize
+
+        then: "modal prompt is displayed"
+        check confirm displayed
+
+        when: "ok is clicked"
+        click OK
+
+        then: "the element is finalized"
+        check status is 'FINALIZED'
+    }
+
+    def "create new version of the element"() {
+        check backdrop gone
+        when: "new version is clicked"
+        click newVersion
+
+        then: "modal prompt is displayed"
+        check confirm displayed
+
+        when: "ok is clicked"
+        click OK
+
+        then: "the element new draft version is created"
+        check status is 'DRAFT'
+    }
+
+    def "deprecate the data model"() {
+        waitUntilModalClosed()
+        when: "deprecate action is clicked"
+        click archive
+
+        then: "modal prompt is displayed"
+        check confirm displayed
+
+        when: "ok is clicked"
+        click OK
+
+        then: "the element is now deprecated"
+        check subviewStatus is 'DEPRECATED'
+
+    }
+
+    def "hard delete the data model"() {
+        check backdrop gone
+        when: "delete action is clicked"
+        click delete
+
+        then: "modal prompt is displayed"
+        check confirm displayed
+
+        when: "ok is clicked"
+        click OK
+
+        then: "you are redirected to the data models page"
+        waitFor(120) { browser.title == 'Data Models' }
+
+    }
+
 
 }
