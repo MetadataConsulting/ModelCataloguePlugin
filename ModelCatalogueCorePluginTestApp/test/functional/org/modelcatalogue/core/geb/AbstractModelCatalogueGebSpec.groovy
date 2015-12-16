@@ -256,6 +256,18 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
             try {
                 navigator = navigatorClosure()
 
+                if (navigator == null) {
+                    System.err.println("Navigator is null!")
+                    try {
+                        throw new RuntimeException()
+                    } catch (RuntimeException re) {
+                        System.err.println ' > ' + re.stackTrace.findAll {
+                            it.className.startsWith('org.modelcatalogue') && !it.methodName?.contains('noStale') && it.lineNumber && it.fileName
+                        }.join('\n > ')
+                    }
+                    return null
+                }
+
                 if (!navigator.displayed && !ignoreMissing) {
                     waitFor(attempt ** 2) {
                         navigator.displayed
@@ -268,7 +280,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
                     return resultClosure(navigator)
                 }
             } catch (StaleElementReferenceException | WaitTimeoutException e) {
-                println "Condition not met for after ${attempt ** 2} seconds, next waiting ${(attempt + 1) ** 2} seconds - elements: ${navigator.allElements()}"
+                println "Condition not met for after ${attempt ** 2} seconds, next waiting ${(attempt + 1) ** 2} seconds - elements: ${navigator?.allElements()}"
 
                 try {
                     throw new RuntimeException()
