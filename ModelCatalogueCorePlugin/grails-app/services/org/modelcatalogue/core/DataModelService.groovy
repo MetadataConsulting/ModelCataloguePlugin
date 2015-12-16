@@ -27,21 +27,27 @@ class DataModelService {
                 property 'status'
                 property 'id'
             }
-            criteria.inList('status', [ElementStatus.DRAFT, ElementStatus.FINALIZED])
+            criteria.inList('status', [ElementStatus.DRAFT, ElementStatus.FINALIZED, ElementStatus.DEPRECATED, ElementStatus.PENDING])
 
 
             int draft = 0
             int finalized = 0
+            int deprecated = 0
+            int pending = 0
 
             for (Object[] row in criteria.list()) {
                 ElementStatus status = row[0] as ElementStatus
                 if (status == ElementStatus.DRAFT) draft++
                 else if (status == ElementStatus.FINALIZED) finalized++
+                else if (status == ElementStatus.DEPRECATED) deprecated++
+                else if (status == ElementStatus.PENDING) pending++
             }
 
             model["draft${type.simpleName}Count"]       = draft
             model["finalized${type.simpleName}Count"]   = finalized
-            model["total${type.simpleName}Count"]       = draft + finalized
+            model["pending${type.simpleName}Count"]     = pending
+            model["deprecated${type.simpleName}Count"]  = deprecated
+            model["total${type.simpleName}Count"]       = draft + finalized + pending + deprecated
         }
 
         model.putAll([

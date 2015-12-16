@@ -24,6 +24,10 @@ angular.module('mc.core.ui.states.controllers.DataModelTreeCtrl', ['ui.router', 
         if type == 'enumeratedValue'
           resource = 'enumeratedType'
           property = 'enumerations'
+        if type == 'versions'
+          resource = 'dataModel'
+          property = 'history'
+          id = currentDataModel?.id
         if type == 'relationships'
           property = element.property
           id = element.element.id

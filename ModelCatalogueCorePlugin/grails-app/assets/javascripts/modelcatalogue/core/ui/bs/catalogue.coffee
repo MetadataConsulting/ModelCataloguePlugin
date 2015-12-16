@@ -7,6 +7,7 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setIcon 'primitiveType',      "fa fa-fw fa-cog"
   catalogueProvider.setIcon 'enumeratedType',     "fa fa-fw fa-list-alt"
   catalogueProvider.setIcon 'enumeratedValue',    "fa fa-fw fa-th-list"
+  catalogueProvider.setIcon 'versions',           "fa fa-fw fa-history"
   catalogueProvider.setIcon 'referenceType',      "fa fa-fw fa-external-link-square"
   catalogueProvider.setIcon 'dataType',           "fa fa-fw fa-th-large"
   catalogueProvider.setIcon 'measurementUnit',    "fa fa-fw fa-tachometer"
@@ -98,6 +99,8 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
     return 0.2 if "#{modelCatalogueApiRoot}#{list.base.replace('/outgoing/', '/incoming/')}".indexOf(url) >= 0
     return 0.2 if url.indexOf("#{modelCatalogueApiRoot}#{list.base.replace('/incoming/', '/outgoing/')}") >= 0
     return 0.2 if "#{modelCatalogueApiRoot}#{list.base.replace('/incoming/', '/outgoing/')}".indexOf(url) >= 0
+
+    return 0.1 if list.base.indexOf('/history') >= 0
 
     return 0
   ]

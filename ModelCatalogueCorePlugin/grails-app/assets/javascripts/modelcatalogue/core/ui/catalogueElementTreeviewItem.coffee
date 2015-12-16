@@ -62,12 +62,12 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
         $scope.element.$$numberOfChildren = firstList.total
         $scope.element.$$cachedChildren = {}
         for child in $scope.element.$$children ? []
-          $scope.element.$$cachedChildren[child.latestVersionId ? child.link] = child # beware of id, it's 'all' for containers
+          $scope.element.$$cachedChildren[child.link] = child # beware of id, it's 'all' for containers
 
         newChildren = []
         for item in firstList.list
           it = if item.relation then item.relation else item
-          id = it.latestVersionId ? it.link
+          id = it.link
           objectToExtend = {}
 
 

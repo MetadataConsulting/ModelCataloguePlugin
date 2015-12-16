@@ -55,7 +55,7 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
 
         Map<String, Integer> stats = dataModelService.getStatistics(filter)
 
-        ListWithTotalAndType<DataClass> dataClasses = dataClassService.getTopLevelDataClasses(filter, [toplevel: true, status: 'active'])
+        ListWithTotalAndType<DataClass> dataClasses = dataClassService.getTopLevelDataClasses(filter, [toplevel: true])
 
         ListWithTotalAndType<Map> list = Lists.lazy(params, Map) {
             List<Map> contentDescriptors = []
@@ -66,6 +66,7 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
             contentDescriptors << createContentDescriptor(dataModel, 'Measurement Units', MeasurementUnit, stats["totalMeasurementUnitCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Assets', Asset, stats["totalAssetCount"])
             contentDescriptors << createContentDescriptorForRelationship('Imported Data Models', 'imports',  dataModel, RelationshipType.importType, RelationshipDirection.OUTGOING)
+            contentDescriptors << createVersionsDescriptor(dataModel)
 
             contentDescriptors
         }
@@ -74,7 +75,7 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
     }
 
     private static Map createContentDescriptor(DataModel dataModel, String name, Class clazz, long count) {
-        String link = "/${GrailsNameUtils.getPropertyName(clazz)}?status=active&toplevel=true&dataModel=${dataModel.getId()}"
+        String link = "/${GrailsNameUtils.getPropertyName(clazz)}?toplevel=true&dataModel=${dataModel.getId()}"
         Map ret = [:]
         ret.id = 'all'
         ret.dataModels = [CatalogueElementMarshaller.minimalCatalogueElementJSON(dataModel)]
@@ -83,6 +84,19 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
         ret.content = [count: count, itemType: clazz.name, link: link]
         ret.link = link
         ret.resource = GrailsNameUtils.getPropertyName(clazz)
+		ret.status = dataModel.status.toString()
+        ret
+    }
+
+    private static Map createVersionsDescriptor(DataModel dataModel) {
+        String link = "/dataModel/${dataModel.getId()}/history"
+        Map ret = [:]
+        ret.id = link
+        ret.dataModels = [CatalogueElementMarshaller.minimalCatalogueElementJSON(dataModel)]
+        ret.elementType = "${DataModel.name}.Versions"
+        ret.name = 'Versions'
+        ret.content = [count: dataModel.countVersions(), itemType: DataModel.name, link: link]
+        ret.link = link
 		ret.status = dataModel.status.toString()
         ret
     }

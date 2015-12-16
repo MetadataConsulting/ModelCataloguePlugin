@@ -122,7 +122,9 @@ class ElementService implements Publisher<CatalogueElement> {
     }
 
     static List<ElementStatus> getStatusFromParams(params) {
-        if (!params.status || params.status == 'active') {
+        if (!params.status) {
+            return ElementStatus.values().toList()
+        } else if (params.status == 'active') {
             return [ElementStatus.FINALIZED, ElementStatus.DRAFT]
         }
         if (params.status instanceof ElementStatus) {

@@ -409,14 +409,19 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 return
             }
             respond dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
-                eq 'status', ElementStatus.FINALIZED
+                'eq' 'status', ElementStatus.FINALIZED
             }, overridableDataModelFilter)
             return
         }
 
-        respond dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
-            'in' 'status', ElementService.getStatusFromParams(params)
-        }, overridableDataModelFilter)
+        if (params.status) {
+            respond dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+                'in' 'status', ElementService.getStatusFromParams(params)
+            }, overridableDataModelFilter)
+            return
+        }
+
+        respond dataModelService.classified(Lists.all(params, resource, "/${resourceName}/"), overridableDataModelFilter)
     }
 
     /**

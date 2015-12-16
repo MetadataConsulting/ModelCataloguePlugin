@@ -76,6 +76,8 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
               return $state.go('mc.resource.show.property', {dataModelId: self.element.getDataModelId(), id: self.element.id, resource: names.getPropertyNameFromType(self.element.elementType), property: self.property})
             if self.isInstanceOf "enumeratedValue"
               $state.go('mc.resource.show.property', {resource: 'enumeratedType', id: self.id, dataModelId: self.getDataModelId(), property: 'enumerations'}) ; self
+            if self.isInstanceOf "versions"
+              $state.go('mc.resource.show.property', {resource: 'dataModel', id:  self.getDataModelId(), dataModelId: self.getDataModelId(), property: 'history'}) ; self
             if self.getDataModelId() != 'catalogue'
               return $state.go('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id, dataModelId: self.getDataModelId()})
             $state.go('simple.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id}) ; self
@@ -87,6 +89,10 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
               return $state.href('mc.csvTransformations.show', {id: self.id})
             if self.isInstanceOf "relationships"
               return $state.href('mc.resource.show.property', {dataModelId: self.element.getDataModelId(), id: self.element.id, resource: names.getPropertyNameFromType(self.element.elementType), property: self.property})
+            if self.isInstanceOf "enumeratedValue"
+              return $state.href('mc.resource.show.property', {resource: 'enumeratedType', id: self.id, dataModelId: self.getDataModelId(), property: 'enumerations'})
+            if self.isInstanceOf "versions"
+              return $state.href('mc.resource.show.property', {resource: 'dataModel', id:  self.getDataModelId(), dataModelId: self.getDataModelId(), property: 'history'})
             if self.getDataModelId() != 'catalogue'
               return $state.href('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id, dataModelId: self.getDataModelId()})
             $state.href('simple.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id})
