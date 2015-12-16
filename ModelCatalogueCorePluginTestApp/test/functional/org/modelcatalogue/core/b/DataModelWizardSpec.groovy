@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.b
 
+import spock.lang.Ignore
+
 import static org.modelcatalogue.core.geb.Common.*
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
@@ -109,6 +111,10 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
     }
 
+    /**
+     * Currently not supported - in future deleting whole data model should simply delete all its content
+     */
+    @Ignore
     def "hard delete the data model"() {
         check backdrop gone
         when: "delete action is clicked"
