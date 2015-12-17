@@ -5,12 +5,12 @@ grails.serverURL =  "http://${System.getenv('VIRTUAL_HOST') ?: System.getenv('ME
 // datasource
 dataSource {
 
-    def metadataDbPassword = System.getenv('METADATA_PASSWORD') ?: 'metadata'
-    def metadataDbUsername = System.getenv('METADATA_USERNAME') ?: 'metadata'
+    def metadataDbPassword = System.getenv('METADATA_PASSWORD') ?: System.getenv('MC_MYSQL_ENV_MYSQL_PASSWORD') ?: 'metadata'
+    def metadataDbUsername = System.getenv('METADATA_USERNAME') ?: System.getenv('MC_MYSQL_ENV_MYSQL_USER') ?: 'metadata'
     def metadataJdbcString = System.getenv('METADATA_JDBC_URL')
 
     if (!metadataJdbcString && System.getenv("MC_MYSQL_NAME")) {
-        metadataJdbcString = "jdbc:mysql://mc-mysql:3306/metadata?autoReconnect=true&useUnicode=yes"
+        metadataJdbcString = "jdbc:mysql://mc-mysql:3306/${System.getenv('MC_MYSQL_ENV_MYSQL_DATABASE') ?: 'metadata'}?autoReconnect=true&useUnicode=yes"
     }
 
     if (metadataJdbcString) {
@@ -66,6 +66,8 @@ grails.plugin.console.enabled=true
 
 mc.legacy.dataModels=true
 
-// unless we find out the way how to preload the database, it doesn't make sense to migrate automatically
-// grails.plugin.databasemigration.updateOnStart=true
-// grails.plugin.databasemigration.updateOnStartFileNames=["changelog.groovy"]
+if (System.getenv("MC_DB_MIGRATE")) {
+    // you can e.g. create separate container just for database migration
+    grails.plugin.databasemigration.updateOnStart=true
+    grails.plugin.databasemigration.updateOnStartFileNames=["changelog.groovy"]
+}
