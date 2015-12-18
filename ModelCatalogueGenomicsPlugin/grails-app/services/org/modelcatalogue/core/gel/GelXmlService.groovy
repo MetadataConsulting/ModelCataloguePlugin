@@ -76,7 +76,7 @@ class GelXmlService {
         //validate to see if have the element schema metadata
         validateFormMetadata(model, subModels)
         validateMetadataOccurs(childsRelationship)
-        validateModelsNameLength(subModels)
+        validateTableNameCompliance(subModels)
 
         def writer = new StringWriter()
         def builder = new MarkupBuilder(writer)
@@ -107,7 +107,7 @@ class GelXmlService {
 
     def printSection(Relationship relationship, MarkupBuilder builder){
         Model model=relationship.destination
-        Map ext=[fromDestination(relationship, METADATA_MIN_OCCURS),fromDestination(relationship, METADATA_MAX_OCCURS)].grep();
+        Map ext=[METADATA_MIN_OCCURS:fromDestination(relationship, METADATA_MIN_OCCURS),METADATA_MAX_OCCURS:fromDestination(relationship, METADATA_MAX_OCCURS)]
         if(model.ext.repeating=='true') {
             return builder.repeatingGroup(id: printXSDFriendlyString(model.name), minRepeat: defaultMinOccurs(ext.get(METADATA_MIN_OCCURS)), maxRepeat: defaultMaxOccurs(ext.get(METADATA_MAX_OCCURS))) {
                 setOmitEmptyAttributes(true)
@@ -156,7 +156,7 @@ class GelXmlService {
      */
     def printQuestion(Relationship rel, MarkupBuilder builder){
         DataElement dataElement=rel.destination
-        Map ext=[fromDestination(rel, METADATA_MIN_OCCURS),fromDestination(rel, METADATA_MAX_OCCURS)].grep();
+        Map ext=[METADATA_MIN_OCCURS:fromDestination(rel, METADATA_MIN_OCCURS),METADATA_MAX_OCCURS:fromDestination(rel, METADATA_MAX_OCCURS)]
         return builder.question(id: "R_${dataElement.id}", minRepeat: ext.get(METADATA_MIN_OCCURS), maxRepeat: ext.get(METADATA_MAX_OCCURS)){
             setOmitEmptyAttributes(true)
             setOmitNullAttributes(true)
@@ -222,7 +222,7 @@ class GelXmlService {
 
     protected printXSDFriendlyString(String text){
        if (text==null) return "null"
-        text = text.replaceAll("[\\(\\)\\+]", "").replaceAll("[^.a-zA-Z0-9]+","-").toLowerCase()
+        text = text.replaceAll("[\\(\\)]", "").replaceAll("[^.a-zA-Z0-9]+","-").toLowerCase()
         if(text[0].matches("[0-9]")) text = "_" + text
         return text
     }
@@ -391,10 +391,10 @@ class GelXmlService {
         
         //validate for required metadata occurs
         validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.containmentType))
-        validateModelsNameLength(model.getOutgoingRelationshipsByType(RelationshipType.containmentType).collect{it.destination})
+        validateTableNameCompliance(model.getOutgoingRelationshipsByType(RelationshipType.containmentType).collect{it.destination})
         
         validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType))
-        validateModelsNameLength(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType).collect{it.destination})
+        validateTableNameCompliance(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType).collect{it.destination})
         
         return xml.'xs:complexType'(name: printXSDFriendlyString(model)){
             "${sectionType}"{
@@ -457,18 +457,32 @@ class GelXmlService {
 
     }
     
-    protected void validateModelsNameLength(List subModels){
+    
+    protected void validateTableNameCompliance(List subModels){
         String exceptionMessages="";
+        Map mappedModels=subModels.collect{[it,getXSLTableName(it)]}.collectEntries()
+        List tableNames=mappedModels.collect{key, value ->value}
+   
+        def duplicates=tableNames.findAll{tableNames.count(it) > 1}.unique()
+        println(duplicates)
         
-        for (def model in subModels) {
-            String tableName=getXSLTableName(model)
-            if (tableName.length()>MAX_COLUMN_NAME_63){
-                exceptionMessages+="element with  '${model.name}' further table name '${tableName}' exceded in maximum allowed name size of ${MAX_COLUMN_NAME_63}\n,";
+        mappedModels.each{  model, table->
+            if (duplicates?.contains(table)){
+                exceptionMessages+="element with  '${model.name}' with id ${getModelCatalogueId(model)} is duplicated '${table};";
             }
         }
         if (!exceptionMessages.empty) throw new Exception(exceptionMessages)
+        
+        
+        mappedModels.each{ model, table->
+            if (table.length()>MAX_COLUMN_NAME_63){
+                exceptionMessages+="element with  '${model}' further table name '${table}' exceded in maximum allowed name size of ${MAX_COLUMN_NAME_63};";
+            }
+        }
+
+        if (!exceptionMessages.empty) throw new Exception(exceptionMessages)
     }
-    
+
     
     protected void validateMetadataOccurs(List rels){
         String exceptionMessages="";
@@ -687,9 +701,5 @@ class GelXmlService {
           return value
       }
       return defaultValue
-  }
-
-  
-
-   
+  }  
 }
