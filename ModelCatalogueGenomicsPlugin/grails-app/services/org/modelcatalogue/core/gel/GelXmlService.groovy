@@ -1,5 +1,8 @@
 package org.modelcatalogue.core.gel
 
+import java.util.Collection;
+import java.util.List;
+
 import grails.transaction.Transactional
 import groovy.xml.MarkupBuilder
 import groovy.xml.XmlUtil
@@ -87,8 +90,8 @@ class GelXmlService {
                 versionDescription model.ext.get(XSD_SCHEMA_VERSION_DESCRIPTION)
                 //order all elements based on their ext.order
                 //these are actually CRFs
-                subModels[0].outgoingRelationships.sort({ it.ext?.order }).each { Relationship rel ->
-                    
+                subModels.get(0).outgoingRelationships.sort({ it.ext?.order }).each { Relationship rel ->
+                
                     if (rel.relationshipType == RelationshipType.containmentType) {
                         
                         printQuestion(rel, builder)
@@ -118,7 +121,6 @@ class GelXmlService {
                 //recursive printing 
                 model.outgoingRelationships.each { Relationship rel ->
 
-                    //TODO check rel.ext to be collected from rel.ext or rel.destionation.ext
                     if (rel.relationshipType == RelationshipType.containmentType) this.printQuestion(rel, builder)
                     if (rel.relationshipType == RelationshipType.hierarchyType) this.printSection(rel, builder)
 
@@ -138,7 +140,6 @@ class GelXmlService {
                 
                 model.outgoingRelationships.each { Relationship rel ->
 
-                    //FIXME fix rel.ext with fromDestination
                     if (rel.relationshipType == RelationshipType.containmentType) this.printQuestion(rel, builder)
                     if (rel.relationshipType == RelationshipType.hierarchyType) this.printSection(rel, builder)
                 }
@@ -218,30 +219,26 @@ class GelXmlService {
     }
 
 
-    protected printXSDFriendlyString(CatalogueElement ce){
-        def text = ce.name
-        if (text==null) return "null"
-        text = text.trim()
-        text = text.replaceAll("\\(", "").replaceAll("\\)", "").replaceAll("[^a-zA-Z0-9]+","-").toLowerCase()
-        if(text[0].matches("[0-9]")) text = "_" + text
-        return text + "-" + getModelCatalogueId(ce)
-    }
-
 
     protected printXSDFriendlyString(String text){
-        if (text==null) return "null"
-        text = text.trim()
-        text = text.replaceAll("\\(", "").replaceAll("\\)", "").replaceAll("[^a-zA-Z0-9]+","-").toLowerCase()
+       if (text==null) return "null"
+        text = text.replaceAll("[\\(\\)\\+]", "").replaceAll("[^.a-zA-Z0-9]+","-").toLowerCase()
         if(text[0].matches("[0-9]")) text = "_" + text
         return text
     }
-
-
+    
+    protected printXSDFriendlyString(CatalogueElement el){
+        if (el.name==null) return "null"
+        String text="${el.name}-${getModelCatalogueId(el)}"
+        return printXSDFriendlyString(text);
+ 
+    }
 
 
     protected getModelCatalogueId(CatalogueElement ce){
         def id = ce.getLatestVersionId() ? ce.getLatestVersionId() + "." + ce.getVersionNumber()  :  ce.getId() + "." + ce.getVersionNumber()
         return id
+
 
     }
 
@@ -311,8 +308,10 @@ class GelXmlService {
                         'xs:element'(name:'metadata',type:'metadata',minOccurs:'1',maxOccurs:'1')
                         targetModel.getOutgoingRelationshipsByType(RelationshipType.hierarchyType).each { Relationship r ->
                             'xs:element'(name:printXSDFriendlyString(r.destination.name),type:printXSDFriendlyString(r.destination),
-                            minOccurs:defaultMinOccurs(r.ext.get(METADATA_MIN_OCCURS)),
-                            maxOccurs:defaultMinOccurs(r.ext.get(METADATA_MAX_OCCURS)))
+                                
+                            minOccurs:defaultMinOccurs(fromDestination(r,METADATA_MIN_OCCURS)),
+                            maxOccurs:defaultMinOccurs(fromDestination(r,METADATA_MAX_OCCURS)))
+
                         }
                     }
                 }
@@ -402,11 +401,11 @@ class GelXmlService {
              
                 
                 model.getOutgoingRelationshipsByType(RelationshipType.containmentType).each { Relationship relationship ->
-                    printDataElements(xml, relationship.destination, relationship.ext.get(METADATA_MIN_OCCURS), relationship.ext.get(METADATA_MAX_OCCURS),valueDomains,xmlSchema,relationship.ext)
+                    printDataElements(xml, relationship.destination, fromDestination(relationship,METADATA_MIN_OCCURS), fromDestination(relationship,METADATA_MAX_OCCURS),valueDomains,xmlSchema,relationship.ext)
                 }
 
                 model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType).each { Relationship relationship ->
-                    printModelElements(xml, relationship.destination, relationship.ext.get(METADATA_MIN_OCCURS), relationship.ext.get(METADATA_MAX_OCCURS))
+                    printModelElements(xml, relationship.destination, fromDestination(relationship,METADATA_MIN_OCCURS), fromDestination(relationship,METADATA_MAX_OCCURS))
                 }
             }
         }
@@ -471,18 +470,18 @@ class GelXmlService {
     protected void validateMetadataOccurs(List rels){
         String exceptionMessages="";
         for (Relationship rel in rels) {
-            if (!rel.ext.get(METADATA_MIN_OCCURS)){
+            if (!fromDestination(rel,METADATA_MIN_OCCURS)){
                 exceptionMessages+="metadata 'Min Occurs' for model '${rel.destination.name}'  is missing, "
             }else{
-                if ((!rel.ext.get(METADATA_MIN_OCCURS).isLong())){
+                if ((!fromDestination(rel,METADATA_MIN_OCCURS)?.isLong())){
                     exceptionMessages+="metadata 'Min Occurs' for model '${rel.destination.name}'  is not a number, "
                 }
             }
-            if (!rel.ext.get(METADATA_MAX_OCCURS)){
+            if (!fromDestination(rel,METADATA_MAX_OCCURS)){
                 exceptionMessages+="metadata 'Max Occurs' for model '${rel.destination.name}'  is missing, ";
             }else{
-                if (rel.ext.get(METADATA_MAX_OCCURS).isLong()==false){
-                    if(rel.ext.get(METADATA_MAX_OCCURS)!='unbounded'){
+                if (fromDestination(rel,METADATA_MAX_OCCURS)?.isLong()==false){
+                    if(fromDestination(rel,METADATA_MAX_OCCURS)!='unbounded'){
                         exceptionMessages+="metadata 'Max Occurs' for model '${rel.destination.name}'  is not a number, "
                     }
                 }
@@ -636,7 +635,7 @@ class GelXmlService {
  * @param valueDomain
  * @return MarkupBuilder completed
  */
-  protected def printXsdDataTypeRestrictions(MarkupBuilder xml,ValueDomain valueDomain){
+  private String printXsdDataTypeRestrictions(MarkupBuilder xml,ValueDomain valueDomain){
         if (valueDomain.ext.get(XSD_RESTRICTION_MAX_LENGTH)){
             xml.'xs:maxLength'(value:valueDomain.ext.get(XSD_RESTRICTION_MAX_LENGTH))
         }
@@ -674,7 +673,20 @@ class GelXmlService {
         }
     }
 
+ 
+  private  String fromDestination(Relationship rel, String extensionName, String defaultValue = null) {
+      String value = rel.ext[extensionName]
+      if (value) {
+          return value
+      }
+      value = rel.destination.ext[extensionName]
+      if (value) {
+          return value
+      }
+      return defaultValue
+  }
 
+  
 
    
 }
