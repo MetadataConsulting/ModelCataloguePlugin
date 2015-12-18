@@ -459,13 +459,16 @@ class GelXmlService {
     
     protected void validateModelsNameLength(List subModels){
         String exceptionMessages="";
+        
         for (def model in subModels) {
-            if (model.name.length()>MAX_COLUMN_NAME_63){
-                exceptionMessages+="element '${model.name}' exceded in maximum allowed name size of ${MAX_COLUMN_NAME_63}\n,";
+            String tableName=getXSLTableName(model)
+            if (tableName.length()>MAX_COLUMN_NAME_63){
+                exceptionMessages+="element with  '${model.name}' further table name '${tableName}' exceded in maximum allowed name size of ${MAX_COLUMN_NAME_63}\n,";
             }
         }
         if (!exceptionMessages.empty) throw new Exception(exceptionMessages)
     }
+    
     
     protected void validateMetadataOccurs(List rels){
         String exceptionMessages="";
