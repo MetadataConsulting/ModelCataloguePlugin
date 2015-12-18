@@ -45,10 +45,9 @@ class GelXmlController {
         def assetErrorDesc="Error generating xml model"
         def assetMimeType="application/octet-stream"
         
-        //TODO pass this operation inside of closure
-        def result=gelXmlService.printXmlModelShredder(model)
+       
         
-        Closure closure={return result}
+        Closure closure={gelXmlService.printXmlModelShredder(model)}
 
         def assetId=storeAssetFromString(model,closure,assetName,assetMimeType,assetPendingDesc,assetFinalizedDesc,assetErrorDesc,assetFileName)
 
