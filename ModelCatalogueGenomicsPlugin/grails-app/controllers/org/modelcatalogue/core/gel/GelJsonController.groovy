@@ -1,7 +1,5 @@
 package org.modelcatalogue.core.gel
 
-import groovy.lang.Closure;
-
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.AssetService
 import org.modelcatalogue.core.api.ElementStatus
@@ -9,6 +7,9 @@ import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.SecurityService
 import org.modelcatalogue.core.audit.AuditService
 import org.springframework.http.HttpStatus
+
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 
 
 /**
@@ -18,6 +19,8 @@ import org.springframework.http.HttpStatus
  *
  */
 class GelJsonController {
+
+    private static final DateFormat FORMAT = new SimpleDateFormat("yyyyMMddHHmmss")
 
     def gelJsonService
     def executorService
@@ -45,7 +48,7 @@ class GelJsonController {
         }
 
         def assetName="$model.name version "
-        def assetFileName="${model.name}_v${model.version}_${model.lastUpdated}.json"
+        def assetFileName="${model.name}_v${model.version}_${FORMAT.format(model.lastUpdated)}.json"
 
 
         def assetPendingDesc="Your Rare Disease Ontology list as JSON   will be available in this asset soon. Use Refresh action to reload"

@@ -36,7 +36,7 @@ class CsvTransformationController extends AbstractRestfulController<CsvTransform
 
         params.separator = params.separator ?: ';'
 
-        response.setHeader("Content-Disposition", "filename=${transformation.name}.csv")
+        response.setHeader("Content-Disposition", "attachment; filename=\"${transformation.name}.csv\"")
         response.setHeader("Content-Type", "text/csv")
         file.inputStream.withReader {
             dataArchitectService.transformData(params, transformation, it, response.getWriter())
