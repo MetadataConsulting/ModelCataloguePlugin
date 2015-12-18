@@ -120,9 +120,10 @@ class GelXmlService {
                 validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType))
                 //recursive printing 
                 model.outgoingRelationships.each { Relationship rel ->
-                    //TODO check rel.ext to be collected from rel.ext or rel.destionation.ext
+
                     if (rel.relationshipType == RelationshipType.containmentType) this.printQuestion(rel, builder)
                     if (rel.relationshipType == RelationshipType.hierarchyType) this.printSection(rel, builder)
+
                 }
             }
         }else{
@@ -138,7 +139,7 @@ class GelXmlService {
                 validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType))
                 
                 model.outgoingRelationships.each { Relationship rel ->
-                    //FIXME fix rel.ext with fromDestination
+
                     if (rel.relationshipType == RelationshipType.containmentType) this.printQuestion(rel, builder)
                     if (rel.relationshipType == RelationshipType.hierarchyType) this.printSection(rel, builder)
                 }
@@ -458,13 +459,16 @@ class GelXmlService {
     
     protected void validateModelsNameLength(List subModels){
         String exceptionMessages="";
+        
         for (def model in subModels) {
-            if (model.name.length()>MAX_COLUMN_NAME_63){
-                exceptionMessages+="element '${model.name}' exceded in maximum allowed name size of ${MAX_COLUMN_NAME_63}\n,";
+            String tableName=getXSLTableName(model)
+            if (tableName.length()>MAX_COLUMN_NAME_63){
+                exceptionMessages+="element with  '${model.name}' further table name '${tableName}' exceded in maximum allowed name size of ${MAX_COLUMN_NAME_63}\n,";
             }
         }
         if (!exceptionMessages.empty) throw new Exception(exceptionMessages)
     }
+    
     
     protected void validateMetadataOccurs(List rels){
         String exceptionMessages="";
@@ -683,9 +687,5 @@ class GelXmlService {
           return value
       }
       return defaultValue
-  }
-
-  
-
-   
+  }  
 }
