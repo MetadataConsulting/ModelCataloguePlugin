@@ -39,8 +39,7 @@ class GelXmlService {
     static final String XSD_PREFIX_NAMESPACE="http://xsd.modelcatalogue.org/prefixNamespace"
 
     static final def XSD_RESTRICTION_LIST=[XSD_RESTRICTION_LENGTH,XSD_RESTRICTION_MIN_LENGTH,XSD_RESTRICTION_MAX_LENGTH,XSD_RESTRICTION_MAX_INCLUSIVE,
-        XSD_RESTRICTION_MIN_INCLUSIVE,XSD_RESTRICTION_MAX_EXCLUSIVE,XSD_RESTRICTION_MIN_EXCLUSIVE,XSD_RESTRICTION_TOTAL_DIGITS,XSD_RESTRICTION_FRACTION_DIGITS,XSD_RESTRICTION_PATTERN,
-        XSD_DEFAULT_NAMESPACE, XSD_TARGET_NAMESPACE, XSD_PREFIX_NAMESPACE]
+        XSD_RESTRICTION_MIN_INCLUSIVE,XSD_RESTRICTION_MAX_EXCLUSIVE,XSD_RESTRICTION_MIN_EXCLUSIVE,XSD_RESTRICTION_TOTAL_DIGITS,XSD_RESTRICTION_FRACTION_DIGITS,XSD_RESTRICTION_PATTERN]
 
     static final def XSD_BUILTIN_DATA_TYPES=["xs:decimal","xs:float","xs:double","xs:integer","xs:positiveInteger","xs:negativeInteger","xs:nonPositiveInteger",
         "xs:nonNegativeInteger","xs:long","xs:int","xs:short","xs:byte","xs:unsignedLong","xs:unsignedInt","xs:unsignedShort","xs:unsignedByte","xs:dateTime","xs:date",
