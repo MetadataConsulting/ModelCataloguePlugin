@@ -94,10 +94,10 @@ class GelXmlService {
                 
                     if (rel.relationshipType == RelationshipType.containmentType) {
                         
-                        printQuestion(rel.destination, rel.ext, builder)
+                        printQuestion(rel, builder)
                     }
                     if (rel.relationshipType == RelationshipType.hierarchyType) {
-                        printSection(rel.destination, rel.ext, builder)
+                        printSection(rel, builder)
                     }
                 }
             }
@@ -105,7 +105,9 @@ class GelXmlService {
         return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n" + writer.toString()
     }
 
-    def printSection(Model model, Map ext, MarkupBuilder builder){
+    def printSection(Relationship relationship, MarkupBuilder builder){
+        Model model=relationship.destination
+        Map ext=[fromDestination(relationship, METADATA_MIN_OCCURS),fromDestination(relationship, METADATA_MAX_OCCURS)].grep();
         if(model.ext.repeating=='true') {
             return builder.repeatingGroup(id: printXSDFriendlyString(model.name), minRepeat: defaultMinOccurs(ext.get(METADATA_MIN_OCCURS)), maxRepeat: defaultMaxOccurs(ext.get(METADATA_MAX_OCCURS))) {
                 setOmitEmptyAttributes(true)
@@ -119,12 +121,12 @@ class GelXmlService {
                 //recursive printing 
                 model.outgoingRelationships.each { Relationship rel ->
                     //TODO check rel.ext to be collected from rel.ext or rel.destionation.ext
-                    if (rel.relationshipType == RelationshipType.containmentType) this.printQuestion(rel.destination, rel.ext, builder)
-                    if (rel.relationshipType == RelationshipType.hierarchyType) this.printSection(rel.destination, rel.ext, builder)
+                    if (rel.relationshipType == RelationshipType.containmentType) this.printQuestion(rel, builder)
+                    if (rel.relationshipType == RelationshipType.hierarchyType) this.printSection(rel, builder)
                 }
             }
         }else{
-            return builder.section(id: model.name, minRepeat: ext.get(METADATA_MIN_OCCURS), maxRepeat: ext.get("Max Occurs")) {
+            return builder.section(id: model.name, minRepeat: ext.get(METADATA_MIN_OCCURS), maxRepeat: ext.get(METADATA_MAX_OCCURS),) {
                 setOmitEmptyAttributes(true)
                 setOmitNullAttributes(true)
                 name model.name
@@ -137,15 +139,23 @@ class GelXmlService {
                 
                 model.outgoingRelationships.each { Relationship rel ->
                     //FIXME fix rel.ext with fromDestination
-                    if (rel.relationshipType == RelationshipType.containmentType) this.printQuestion(rel.destination, rel.ext, builder)
-                    if (rel.relationshipType == RelationshipType.hierarchyType) this.printSection(rel.destination, rel.ext, builder)
+                    if (rel.relationshipType == RelationshipType.containmentType) this.printQuestion(rel, builder)
+                    if (rel.relationshipType == RelationshipType.hierarchyType) this.printSection(rel, builder)
                 }
             }
 
         }
     }
 
-    def printQuestion(DataElement dataElement, Map ext, MarkupBuilder builder){
+    /**
+     * Print as a question for Relationship which contains DataElements
+     * @param rel
+     * @param builder
+     * @return
+     */
+    def printQuestion(Relationship rel, MarkupBuilder builder){
+        DataElement dataElement=rel.destination
+        Map ext=[fromDestination(rel, METADATA_MIN_OCCURS),fromDestination(rel, METADATA_MAX_OCCURS)].grep();
         return builder.question(id: "R_${dataElement.id}", minRepeat: ext.get(METADATA_MIN_OCCURS), maxRepeat: ext.get(METADATA_MAX_OCCURS)){
             setOmitEmptyAttributes(true)
             setOmitNullAttributes(true)
