@@ -51,6 +51,7 @@ class GelXmlService {
 
     private static final int MAX_COLUMN_NAME_63 = 63
 
+    
     protected List<Model> listChildren(Model model,List results = [],Boolean isRoot=false) {
         if (model && !results.contains(model)){
            //if we send root model as parameter means that this is a child and we have to add in the list
@@ -607,9 +608,6 @@ class GelXmlService {
     }
 
 
-
-
-
     protected printSimpleType(MarkupBuilder xml, ValueDomain valueDomain){
 
         if(valueDomain?.dataType instanceof EnumeratedType){
@@ -702,4 +700,18 @@ class GelXmlService {
       }
       return defaultValue
   }  
+  
+  protected List<CatalogueElement> findAllTableCandidates(CatalogueElement model,List results = [],Boolean isRoot=false) {
+      if (model && !results.contains(model)){
+         //if we send root model as parameter means that this is a child and we have to add in the list
+         if (isRoot==false){
+           results += model
+         }
+          model.parentOf?.each { child ->
+              results += listChildren(child,results,false)
+          }
+      }
+      //TODO search for data elements which have occurence >1 
+      results.unique()
+  }
 }
