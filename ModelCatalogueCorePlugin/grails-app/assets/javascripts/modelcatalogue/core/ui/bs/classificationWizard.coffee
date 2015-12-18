@@ -39,6 +39,12 @@ angular.module('mc.core.ui.bs.dataModelWIzard', ['mc.util.messages', 'mc.util.ui
                 <div class="form-group">
                   <label for="name" class="">Name</label>
                   <input type="text" class="form-control" id="name" placeholder="Name (Required)" ng-model="classification.name" focus-me="step=='classification'" required ng-model-options="{debounce: 500}">
+                  <p class="help-block">Please, keep the name short. It will be dislayed next to the declared elements' names.</p>
+                </div>
+                <div class="form-group">
+                  <label for="semanticVersion" class="">Semantic Version</label>
+                  <input type="text" class="form-control" id="semanticVersion" placeholder="Semantic Version (e.g. 1.0.0)" ng-model="classification.semanticVersion" >
+                  <p class="help-block">You will be able to change semantic version when the data model will be published</p>
                 </div>
                 <div class="form-group">
                   <label for="name" class="">Catalogue ID (URL)</label>
@@ -79,7 +85,7 @@ angular.module('mc.core.ui.bs.dataModelWIzard', ['mc.util.messages', 'mc.util.ui
           execAfter50 = delayedQueueExecutor(500)
 
           $scope.reset = ->
-            $scope.classification = {classifies:{}}
+            $scope.classification = { classifies:{}, semanticVersion: '0.0.1' }
             $scope.import = {}
             $scope.imports = []
             $scope.messages = messages.createNewMessages()

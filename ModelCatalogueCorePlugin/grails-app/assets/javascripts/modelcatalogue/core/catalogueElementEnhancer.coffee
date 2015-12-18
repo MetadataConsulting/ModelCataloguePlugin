@@ -116,6 +116,34 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
 
           self.getUpdatableProperties = -> angular.copy(@updatableProperties)
 
+          self.getDataModelWithVersion = ->
+            ret = ''
+            semver = ''
+            versionNumber = 1
+            if @dataModel
+              ret = @dataModel.name
+              semver = @dataModel.semanticVersion
+              versionNumber = @versionNumber
+            else if @isInstanceOf('dataModel')
+              ret = @name
+              semver = @semanticVersion
+              versionNumber = @versionNumber
+            else
+              ret = 'None'
+              semver = '0.0.0'
+
+            semver = "0.0.#{versionNumber}" unless semver
+
+            return "#{ret} #{semver}"
+
+          self.getDataModelStatus = ->
+            if @dataModel
+              return @dataModel.status
+            if @isInstanceOf('dataModel')
+              return @status
+
+            return 'PENDING'
+
       # wrap original element
       new CatalogueElement(element)
 

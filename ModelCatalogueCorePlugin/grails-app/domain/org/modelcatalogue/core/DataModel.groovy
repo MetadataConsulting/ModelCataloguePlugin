@@ -1,12 +1,12 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.publishing.CloningContext
-import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
-import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Legacy
 
 class DataModel extends CatalogueElement {
+
+    String semanticVersion = '0.0.1'
+    String revisionNotes
 
     /**
      * @deprecated use model catalogue id instead
@@ -24,6 +24,8 @@ class DataModel extends CatalogueElement {
 
     static constraints = {
         name unique: 'versionNumber'
+        semanticVersion size: 1..20, nullable: true
+        revisionNotes maxSize: 2000, nullable: true
     }
 
     static transients = ['namespace']
@@ -63,8 +65,24 @@ class DataModel extends CatalogueElement {
         CatalogueElement.countByDataModel(this)
     }
 
+    @Override
+    void beforeUpdate() {
+        super.beforeUpdate()
+        if (!getSemanticVersion()) {
+            setSemanticVersion("1.0.$versionNumber")
+        }
+    }
 
-
-
-
+    void checkNewSemanticVersion(String newSemanticVersion) {
+        if (!newSemanticVersion) {
+            errors.rejectValue('semanticVersion', 'dataModel.semanticVersion.null', 'Semantic version must be specified!')
+            return
+        }
+        if (getLatestVersionId()) {
+            if (countByLatestVersionIdAndSemanticVersion(getLatestVersionId(), newSemanticVersion)) {
+                errors.rejectValue('semanticVersion', 'dataModel.semanticVersion.alreadyExist', 'Semantic version already exists for current data model!')
+                return
+            }
+        }
+    }
 }

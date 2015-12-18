@@ -17,4 +17,5 @@ databaseChangeLog = {
     include file: 'changelog_015_oauth.groovy'
     include file: 'changelog_016_dataModelAndDataClass.groovy'
     include file: 'changelog_017_singleDataModel.groovy'
+    include file: 'changelog_018_semanticVersioning.groovy'
 }

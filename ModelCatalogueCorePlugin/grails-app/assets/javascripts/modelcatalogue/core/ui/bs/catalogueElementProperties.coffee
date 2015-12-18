@@ -170,6 +170,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
 
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataElement.relationships', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Asset.synonyms', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataModel.namespace', hidden: true
 
   catalogueElementPropertiesProvider.configureProperty 'relationships', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'content', hidden: true
@@ -178,6 +179,10 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'supersededBy', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'supersedes', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'classifications', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'dataModel', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'dataModels', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'originalDataModels', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'versionNumber', hidden: true
 
   catalogueElementPropertiesProvider.configureProperty '$$relationship', tabDefinition: [ '$element', '$name', ($element, $name) ->
 

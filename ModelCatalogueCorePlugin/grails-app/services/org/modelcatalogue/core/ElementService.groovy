@@ -37,6 +37,42 @@ class ElementService implements Publisher<CatalogueElement> {
     }
 
 
+
+    public DataModel createDraftVersion(DataModel dataModel, String newSemanticVersion, DraftContext context) {
+        dataModel.checkNewSemanticVersion(newSemanticVersion)
+
+        if (dataModel.hasErrors()) {
+            return dataModel
+        }
+
+        Closure<DataModel> code = { TransactionStatus status = null ->
+            return (DataModel) auditService.logNewVersionCreated(dataModel) {
+                DataModel draft = (DataModel) dataModel.createDraftVersion(this, context)
+                if (draft.hasErrors()) {
+                    status?.setRollbackOnly()
+                    return dataModel
+                }
+                context.resolvePendingRelationships()
+                draft.semanticVersion = newSemanticVersion
+                draft.save(deepValidate: false, flush: true)
+                if (draft.hasErrors()) {
+                    log.warn FriendlyErrors.printErrors("Couldn't set semantic version of $draft", draft.errors)
+                }
+                draft.clearErrors()
+                return draft
+            }
+        }
+        if (context.importFriendly) {
+            return code()
+        } else {
+            return (DataModel) CatalogueElement.withTransaction(code)
+        }
+    }
+
+    /**
+     * @deprecated use #createDraftVersion(DatModel, String, DraftContext) instead
+     */
+
     public <E extends CatalogueElement> E createDraftVersion(E element, DraftContext context) {
         Closure<E> code = { TransactionStatus status = null ->
             return (E) auditService.logNewVersionCreated(element) {
