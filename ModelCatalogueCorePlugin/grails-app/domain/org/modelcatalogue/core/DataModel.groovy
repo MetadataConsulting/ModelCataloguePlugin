@@ -65,21 +65,13 @@ class DataModel extends CatalogueElement {
         CatalogueElement.countByDataModel(this)
     }
 
-    @Override
-    void beforeUpdate() {
-        super.beforeUpdate()
-        if (!getSemanticVersion()) {
-            setSemanticVersion("1.0.$versionNumber")
-        }
-    }
-
     void checkNewSemanticVersion(String newSemanticVersion) {
         if (!newSemanticVersion) {
             errors.rejectValue('semanticVersion', 'dataModel.semanticVersion.null', 'Semantic version must be specified!')
             return
         }
         if (getLatestVersionId()) {
-            if (countByLatestVersionIdAndSemanticVersion(getLatestVersionId(), newSemanticVersion)) {
+            if (DataModel.countByLatestVersionIdAndSemanticVersion(getLatestVersionId(), newSemanticVersion)) {
                 errors.rejectValue('semanticVersion', 'dataModel.semanticVersion.alreadyExist', 'Semantic version already exists for current data model!')
                 return
             }

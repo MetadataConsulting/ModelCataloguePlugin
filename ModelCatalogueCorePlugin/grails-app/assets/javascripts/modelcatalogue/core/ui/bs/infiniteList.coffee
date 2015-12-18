@@ -27,7 +27,7 @@ angular.module('mc.core.ui.bs.infiniteList', ['mc.core.ui.infiniteList', 'ngSani
         <div ng-repeat="element in elements" class="col-lg-3 col-sm-4 col-md-3 infinite-scroll-item" ng-if="isNotFiltered(element)">
           <div class="panel panel-fixed-height-300" ng-class="{'panel-warning': element.status == 'DRAFT', 'panel-info': element.status == 'PENDING', 'panel-default': element.status == 'FINALIZED' || !element.status, 'panel-danger': element.status == 'DEPRECATED'}">
             <div class="panel-heading">
-              <h3 class="panel-title" title="{{element.name}}"><span ng-class="element.getIcon()" class="text-muted"></span> <a ng-href="{{href(element)}}">{{element.name}}</a></h3>
+              <h3 class="panel-title" title="{{element.name}}"><span ng-class="element.getIcon()" class="text-muted"></span> <a ng-href="{{href(element)}}">{{element.name}} <small>{{element.getSemanticVersion()}}</small></a></h3>
             </div>
             <div class="panel-body preserve-new-lines">
               {{element.description}}

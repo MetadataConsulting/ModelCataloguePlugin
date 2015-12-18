@@ -13,6 +13,7 @@ class DraftContext {
     private Set<Long> elementsUnderControl
 
     private DataModel dataModel
+    private String semanticVersion
 
     private Class<? extends CatalogueElement> newType
 
@@ -93,6 +94,11 @@ class DraftContext {
         return this
     }
 
+    DraftContext version(String semanticVersion) {
+        this.semanticVersion = semanticVersion
+        return this
+    }
+
     static <E extends CatalogueElement> E preferDraft(E element) {
         if (!element) {
             return element
@@ -133,5 +139,13 @@ class DraftContext {
            return preferDraft(dataModel)
         }
         return null
+    }
+
+    boolean hasVersion() {
+        return semanticVersion != null
+    }
+
+    String getVersion() {
+        return semanticVersion
     }
 }

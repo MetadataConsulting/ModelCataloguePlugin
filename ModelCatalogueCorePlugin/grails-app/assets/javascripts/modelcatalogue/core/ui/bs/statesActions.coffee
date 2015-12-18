@@ -54,8 +54,8 @@ angular.module('mc.core.ui.bs.statesActions', ['mc.util.ui.actions']).config ['a
       watches:    ['element.status', 'element.archived']
       disabled:   $scope.element.archived || $scope.element.status == 'DRAFT'
       action:     ->
-        messages.confirm('Do you want to create new version?', "New version will be created for #{$scope.element.getElementTypeName()} #{$scope.element.name}").then ->
-          catalogueElementResource($scope.element.elementType).update($scope.element, {newVersion: true}).then (updated) ->
+        messages.prompt('Do you want to create new version?', "New version will be created for #{$scope.element.getElementTypeName()} #{$scope.element.name}. Please, enter the new semantic version. You will be able to change it again when you publish the data model.").then (semanticVersion) ->
+          catalogueElementResource($scope.element.elementType).update($scope.element, {newVersion: true, semanticVersion: semanticVersion}).then (updated) ->
             $scope.element.updateFrom  updated
             messages.success("New version created for #{$scope.element.name}")
             $rootScope.$broadcast 'newVersionCreated', updated

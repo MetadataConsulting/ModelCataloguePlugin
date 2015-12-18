@@ -194,7 +194,7 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
 
     static Map<String, Object> minimalCatalogueElementJSON(DataModel element) {
         if (!element) return null
-        [name: element.name, id: element.id, elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", versionNumber: element.versionNumber, latestVersionId: element.latestVersionId ?: element.id, semanticVersion: element.semanticVersion ?: "0.0.${element.versionNumber}"]
+        [name: element.name, id: element.id, elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", versionNumber: element.versionNumber, latestVersionId: element.latestVersionId ?: element.id, semanticVersion: element.semanticVersion]
     }
 
     static Map<String, Object> minimumDataType(DataType element) {

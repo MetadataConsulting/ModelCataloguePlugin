@@ -187,6 +187,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       refreshElement = ->
         if $scope.element
           $scope.element.refresh().then (refreshed)->
+            return unless angular.isFunction($scope.element.updateFrom)
             $scope.element.updateFrom(refreshed)
             onElementUpdate($scope.element)
 

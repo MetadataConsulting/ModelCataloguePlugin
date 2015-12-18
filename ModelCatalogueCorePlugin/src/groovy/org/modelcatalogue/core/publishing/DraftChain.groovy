@@ -6,6 +6,7 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 
@@ -107,6 +108,10 @@ class DraftChain extends PublishingChain {
         draft.latestVersionId = published.latestVersionId ?: published.id
         draft.status = ElementStatus.UPDATED
         draft.dateCreated = published.dateCreated
+
+        if (draft.instanceOf(DataModel) && context.hasVersion()) {
+            draft.semanticVersion = context.version
+        }
 
         draft.beforeDraftPersisted()
 

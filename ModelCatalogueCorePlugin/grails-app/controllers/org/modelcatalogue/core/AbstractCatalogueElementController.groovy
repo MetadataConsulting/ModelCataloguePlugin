@@ -467,6 +467,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
 
         def newVersion = params.boolean('newVersion',false)
+        def semanticVersion = params.semanticVersion
 
         if (instance.status.ordinal() >= ElementStatus.FINALIZED.ordinal() && !newVersion) {
             instance.errors.rejectValue 'status', 'cannot.modify.finalized.or.deprecated', 'Cannot modify element in finalized or deprecated state!'
@@ -483,10 +484,14 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         def includeParams = includeFields
 
         if (!newVersion) newVersion = (request.JSON?.newVersion) ? request.JSON?.newVersion?.toBoolean() : false
+        if (!semanticVersion) semanticVersion = request.JSON?.semanticVersion
         if (!ext) ext = OrderedMap.fromJsonMap(request.JSON?.ext)
 
 
-        if (newVersion) includeParams.remove('status')
+        if (newVersion) {
+            includeParams.remove('status')
+            includeParams.remove('semanticVersion')
+        }
 
         bindData(helper, getObjectToBind(), [include: includeParams])
 
@@ -508,7 +513,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
             DraftContext context = newType?.implementation ? DraftContext.typeChangingUserFriendly(newType.implementation) : DraftContext.userFriendly()
             if (instance.instanceOf(DataModel)) {
-                instance = elementService.createDraftVersion((DataModel) instance, params.semanticVersion, context) as T
+                instance = elementService.createDraftVersion((DataModel) instance, semanticVersion, context) as T
             } else {
                 instance = elementService.createDraftVersion(instance, context) as T
             }

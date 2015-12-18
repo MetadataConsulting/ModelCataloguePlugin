@@ -130,11 +130,27 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
               versionNumber = @versionNumber
             else
               ret = 'None'
-              semver = '0.0.0'
+              semver = 'unknown'
 
-            semver = "0.0.#{versionNumber}" unless semver
+            semver = "rev#{versionNumber}" unless semver
 
             return "#{ret} #{semver}"
+
+          self.getSemanticVersion = ->
+            semver = ''
+            versionNumber = 1
+            if @dataModel
+              semver = @dataModel.semanticVersion
+              versionNumber = @versionNumber
+            else if @isInstanceOf('dataModel')
+              semver = @semanticVersion
+              versionNumber = @versionNumber
+            else
+              semver = 'unknown'
+
+            semver = "rev#{versionNumber}" unless semver
+
+            return semver
 
           self.getDataModelStatus = ->
             if @dataModel

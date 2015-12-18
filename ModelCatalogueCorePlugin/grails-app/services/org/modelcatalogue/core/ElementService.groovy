@@ -45,6 +45,8 @@ class ElementService implements Publisher<CatalogueElement> {
             return dataModel
         }
 
+        context.version(newSemanticVersion)
+
         Closure<DataModel> code = { TransactionStatus status = null ->
             return (DataModel) auditService.logNewVersionCreated(dataModel) {
                 DataModel draft = (DataModel) dataModel.createDraftVersion(this, context)
@@ -53,12 +55,6 @@ class ElementService implements Publisher<CatalogueElement> {
                     return dataModel
                 }
                 context.resolvePendingRelationships()
-                draft.semanticVersion = newSemanticVersion
-                draft.save(deepValidate: false, flush: true)
-                if (draft.hasErrors()) {
-                    log.warn FriendlyErrors.printErrors("Couldn't set semantic version of $draft", draft.errors)
-                }
-                draft.clearErrors()
                 return draft
             }
         }
