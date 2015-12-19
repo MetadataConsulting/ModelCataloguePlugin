@@ -152,8 +152,8 @@ changes.config ['columnsProvider', 'names', (columnsProvider, names)->
 
   getLinkTo = (element) ->
     return "<code>null</code>" unless element
-    return """<span class="text-muted"><span class="#{element.getIcon()}"></span> #{element.name} [#{element.versionNumber}]</span>""" if element.deleted
-    return """<a href="#{element.href()}"><span class="#{element.getIcon()}"></span> #{element.name} [#{element.versionNumber}]</a>"""
+    return """<span class="text-muted"><span class="#{element.getIcon()}"></span> #{element.name} (#{element.getDataModelWithVersion()})</span>""" if element.deleted
+    return """<a href="#{element.href()}"><span class="#{element.getIcon()}"></span> #{element.name} (#{element.getDataModelWithVersion()})</a>"""
 
   getValue = (value) ->
     return "<code>null</code>" unless value

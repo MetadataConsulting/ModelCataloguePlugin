@@ -116,6 +116,27 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
 
           self.getUpdatableProperties = -> angular.copy(@updatableProperties)
 
+          self.getDataModelWithVersionAndId = ->
+            ret = ''
+            semver = ''
+            versionNumber = 1
+            if @dataModel
+              ret = @dataModel.name
+              semver = @dataModel.semanticVersion
+              versionNumber = @versionNumber
+            else if @isInstanceOf('dataModel')
+              ret = @name
+              semver = @semanticVersion
+              versionNumber = @versionNumber
+            else
+              ret = 'None'
+              semver = 'unknown'
+
+            semver = "rev#{versionNumber}" unless semver
+
+            return "#{ret} #{@latestVersionId}@#{semver}"
+
+
           self.getDataModelWithVersion = ->
             ret = ''
             semver = ''
