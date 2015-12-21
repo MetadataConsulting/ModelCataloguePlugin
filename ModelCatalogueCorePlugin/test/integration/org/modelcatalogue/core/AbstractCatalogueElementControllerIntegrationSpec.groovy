@@ -38,6 +38,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         controller.request.method = 'PUT'
         controller.params.id = another.id
         controller.params.newVersion = true
+        controller.params.semanticVersion = "${System.currentTimeMillis()}"
         controller.request.json = [name: newName, dataModel: dataModelForSpec]
         controller.response.format = "json"
 
@@ -746,6 +747,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         controller.request.method       = 'PUT'
         controller.params.id            = another.id
         controller.params.newVersion    = true
+        controller.params.semanticVersion = "${System.currentTimeMillis()}"
         controller.request.json         = [name: newName, ext: OrderedMap.toJsonMap(keyValue), dataModel: dataModelForSpec]
         controller.response.format      = "json"
 

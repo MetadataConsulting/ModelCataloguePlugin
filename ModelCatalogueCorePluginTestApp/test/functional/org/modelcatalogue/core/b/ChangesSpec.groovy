@@ -64,7 +64,7 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
         click { infTableCell(1, 2).find('a', text: 'admin') }
 
         then:
-        check 'h3' is 'admin FINALIZED'
+        check 'h3' contains 'admin'
 
         check { tab('activity') } displayed
         check { tab('history') } displayed

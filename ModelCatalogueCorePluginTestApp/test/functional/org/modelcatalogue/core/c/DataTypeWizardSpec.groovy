@@ -168,7 +168,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click { infTableCell(1, 1).find('a:not(.inf-cell-expand)') }
         then:
 
-        check rightSideTitle is 'New Data Type DRAFT'
+        check rightSideTitle is 'New Data Type Test 1 rev1'
     }
 
 

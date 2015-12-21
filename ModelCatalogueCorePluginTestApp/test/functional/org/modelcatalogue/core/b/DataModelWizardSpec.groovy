@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.b
 
+import org.modelcatalogue.core.geb.CatalogueAction
 import spock.lang.Ignore
 
 import static org.modelcatalogue.core.geb.Common.*
@@ -17,6 +18,8 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
     static final String stepImports = "#step-imports"
     static final String stepFinish = "#step-finish"
     static final String exitButton = "#exit-wizard"
+    public static final CatalogueAction modalFinalize = CatalogueAction.runLast('modal', 'modal-finalize-data-modal')
+    public static final CatalogueAction modalCreateNewVersion = CatalogueAction.runLast('modal', 'modal-create-new-version')
 
 
     def "go to login"() {
@@ -61,7 +64,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         click exitButton
 
         then:
-        check rightSideTitle is 'New Data Model DRAFT'
+        check rightSideTitle is 'New Data Model New Data Model 0.0.1'
         check tabTotal('imports') is '1'
     }
 
@@ -71,13 +74,15 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         click finalize
 
         then: "modal prompt is displayed"
-        check confirm displayed
+        check modalDialog displayed
 
         when: "ok is clicked"
-        click OK
+        fill 'semanticVersion' with '1.0.0'
+        fill 'revisionNotes' with 'initial commit'
+        click modalFinalize
 
         then: "the element is finalized"
-        check status is 'FINALIZED'
+        check status has 'label-primary'
     }
 
     def "create new version of the element"() {
@@ -86,13 +91,15 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         click newVersion
 
         then: "modal prompt is displayed"
-        check confirm displayed
+        check modalDialog displayed
 
         when: "ok is clicked"
-        click OK
+        fill 'semanticVersion' with '1.0.1'
+
+        click modalCreateNewVersion
 
         then: "the element new draft version is created"
-        check status is 'DRAFT'
+        check status has 'label-warning'
     }
 
     def "deprecate the data model"() {
@@ -107,7 +114,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         click OK
 
         then: "the element is now deprecated"
-        check subviewStatus is 'DEPRECATED'
+        check subviewStatus has 'label-danger'
 
     }
 

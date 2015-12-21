@@ -66,7 +66,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
         click { infTableCell(1, 2).find('a:not(.inf-cell-expand)') }
 
-        check rightSideTitle is 'Sample XSD DRAFT'
+        check rightSideTitle is 'Sample XSD Test 1 rev1'
     }
 
     def "validate xml schema"() {
@@ -115,13 +115,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         waitUntilFinalized('Import for MET-523.mc')
 
         then:
-        check dataModelsProperty is 'MET-523'
-
-        when:
-        click { $('td', 'data-value-for': 'Data Models').find('a') }
-
-        then:
-        check rightSideTitle is 'MET-523 DRAFT'
+        check 'h3' contains 'Import for MET-523.mc MET-523 0.0.1'
     }
 
     def "upload excel file"() {
@@ -144,13 +138,13 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         select 'MET-522'
 
         then:
-        check rightSideTitle is 'MET-522 DRAFT'
+        check rightSideTitle is 'MET-522 MET-522 0.0.1'
 
         when:
         select('MET-522')/ 'MET-522' / 'Data Classes' / 'MET-522.M1'
 
         then:
-        check rightSideTitle is 'MET-522.M1 DRAFT'
+        check rightSideTitle is 'MET-522.M1 MET-522 0.0.1'
 
         when:
         click export
@@ -179,11 +173,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
             // ! + gone does not implicitly require the element
             if ($(refreshAsset.toSelector()).displayed) {
                 click refreshAsset
-                try {
-                    waitFor { $('h3').text() == "${expectedName} FINALIZED".toString() }
-                } catch (e) {
-                    if (it == 9) throw new RuntimeException("Waiting for element finalization. Expected '${expectedName} FINALIZED' got '${$('h3').text()}", e)
-                }
+                Thread.sleep(10000)
             }
         }
     }

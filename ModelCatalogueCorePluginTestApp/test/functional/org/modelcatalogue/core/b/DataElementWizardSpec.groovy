@@ -54,7 +54,7 @@
 
             click firstRowLink
 
-            check rightSideTitle is 'NewDE1 DRAFT'
+            check rightSideTitle is 'NewDE1 Test 1 rev1'
 
         }
     }
