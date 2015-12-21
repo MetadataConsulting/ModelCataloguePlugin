@@ -66,7 +66,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
         click { infTableCell(1, 2).find('a:not(.inf-cell-expand)') }
 
-        check rightSideTitle is 'Sample XSD Test 1 rev1'
+        check rightSideTitle contains 'Sample XSD Test 1'
     }
 
     def "validate xml schema"() {
