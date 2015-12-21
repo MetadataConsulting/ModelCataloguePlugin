@@ -35,6 +35,8 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.messagesPanel'
   'mc.core.ui.bs.modalConfirm'
   'mc.core.ui.bs.modalPrompt'
+  'mc.core.ui.bs.modalFinalize'
+  'mc.core.ui.bs.modalNewVersion'
   'mc.core.ui.bs.modalPromptCsvHeaders'
   'mc.core.ui.bs.modalPromptCsvTransform'
   'mc.core.ui.bs.modalPromptEditRelationship'

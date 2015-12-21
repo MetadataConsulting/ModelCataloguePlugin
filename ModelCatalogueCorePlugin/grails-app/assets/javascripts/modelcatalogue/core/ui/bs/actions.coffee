@@ -554,7 +554,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
   actionsProvider.registerActionInRole 'modal-cancel', actionsProvider.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
-    return undefined if not $scope.$dismiss
+    return undefined if not angular.isFunction($scope.$dismiss)
 
     {
       position:   10000
@@ -564,6 +564,35 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       action: -> $scope.$dismiss()
     }
   ]
+
+
+  actionsProvider.registerActionInRole 'modal-finalize-data-modal', actionsProvider.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
+    return undefined unless angular.isFunction($scope.finalizeElement)
+
+    {
+      position:   1000
+      label:      'Finalize'
+      icon:       'glyphicon glyphicon-ok'
+      type:       'success'
+      action: ->
+       $scope.finalizeElement()
+    }
+  ]
+
+
+  actionsProvider.registerActionInRole 'modal-create-new-version', actionsProvider.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
+    return undefined unless angular.isFunction($scope.createDraftVersion)
+
+    {
+      position:   1000
+      label:      'Create New Version'
+      icon:       'glyphicon glyphicon-ok'
+      type:       'success'
+      action: ->
+       $scope.createDraftVersion()
+    }
+  ]
+
 
   actionsProvider.registerActionInRole 'modal-save-element', actionsProvider.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
     return undefined unless $scope.hasChanged and $scope.saveElement and ($scope.hasDataModels or $scope.copy?.elementType == 'org.modelcatalogue.core.DataModel')

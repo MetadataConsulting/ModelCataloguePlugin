@@ -604,7 +604,11 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        instance = elementService.finalizeElement(instance)
+        if (instance.instanceOf(DataModel)) {
+            instance = elementService.finalizeDataModel(instance, params.semanticVersion, params.revisionNotes)
+        } else {
+            instance = elementService.finalizeElement(instance)
+        }
 
         if (instance.hasErrors()) {
             respond instance.errors, view: 'edit' // STATUS CODE 422

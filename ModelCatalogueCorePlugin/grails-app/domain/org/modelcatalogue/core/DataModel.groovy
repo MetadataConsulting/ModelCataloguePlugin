@@ -70,11 +70,35 @@ class DataModel extends CatalogueElement {
             errors.rejectValue('semanticVersion', 'dataModel.semanticVersion.null', 'Semantic version must be specified!')
             return
         }
-        if (getLatestVersionId()) {
-            if (DataModel.countByLatestVersionIdAndSemanticVersion(getLatestVersionId(), newSemanticVersion)) {
-                errors.rejectValue('semanticVersion', 'dataModel.semanticVersion.alreadyExist', 'Semantic version already exists for current data model!')
-                return
+
+        if (newSemanticVersion == semanticVersion) {
+            rejectSemanticVersion()
+        } else if (latestVersionId) {
+            if (DataModel.countByLatestVersionIdAndSemanticVersion(latestVersionId, newSemanticVersion)) {
+                rejectSemanticVersion()
             }
         }
+    }
+
+    void checkPublishSemanticVersion(String newSemanticVersion) {
+        if (!newSemanticVersion) {
+            errors.rejectValue('semanticVersion', 'dataModel.semanticVersion.null', 'Semantic version must be specified!')
+            return
+        }
+        if (getLatestVersionId()) {
+            if (DataModel.countByLatestVersionIdAndSemanticVersionAndIdNotEqual(getLatestVersionId(), newSemanticVersion, this.getId())) {
+                rejectSemanticVersion()
+            }
+        }
+    }
+
+    private void rejectSemanticVersion() {
+        errors.rejectValue('semanticVersion', 'dataModel.semanticVersion.alreadyExist', 'Semantic version already exists for current data model!')
+    }
+
+    @Override
+    void beforeDraftPersisted() {
+        super.beforeDraftPersisted()
+        revisionNotes = null
     }
 }

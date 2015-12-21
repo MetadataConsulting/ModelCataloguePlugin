@@ -39,7 +39,7 @@ angular.module('mc.core.ui.bs.statesActions', ['mc.util.ui.actions']).config ['a
     action
   ]
 
-  actionsProvider.registerChildActionInRole 'change-element-state', 'create-new-version', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', ($rootScope, $scope, messages, names, security, catalogueElementResource) ->
+  actionsProvider.registerChildActionInRole 'change-element-state', 'create-new-version', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'security', ($rootScope, $scope, messages, security) ->
     return undefined if not $scope.element
     return undefined if not $scope.element.status
     return undefined if not security.hasRole('CURATOR')
@@ -54,17 +54,11 @@ angular.module('mc.core.ui.bs.statesActions', ['mc.util.ui.actions']).config ['a
       watches:    ['element.status', 'element.archived']
       disabled:   $scope.element.archived || $scope.element.status == 'DRAFT'
       action:     ->
-        messages.prompt('Do you want to create new version?', "New version will be created for #{$scope.element.getElementTypeName()} #{$scope.element.name}. Please, enter the new semantic version. You will be able to change it again when you publish the data model.").then (semanticVersion) ->
-          catalogueElementResource($scope.element.elementType).update($scope.element, {newVersion: true, semanticVersion: semanticVersion}).then (updated) ->
-            $scope.element.updateFrom  updated
-            messages.success("New version created for #{$scope.element.name}")
-            $rootScope.$broadcast 'newVersionCreated', updated
-            $rootScope.$broadcast 'redrawContextualActions'
-          , showErrorsUsingMessages(messages)
+        messages.prompt(null, null, type: 'new-version', element: $scope.element)
     }
   ]
 
-  actionsProvider.registerChildActionInRole 'change-element-state', 'finalize', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, catalogueElementResource, enhance, rest, modelCatalogueApiRoot) ->
+  actionsProvider.registerChildActionInRole 'change-element-state', 'finalize', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'security', ($rootScope, $scope, messages, security) ->
     return undefined if not $scope.element
     return undefined if not $scope.element.status
     return undefined if not security.hasRole('CURATOR')
@@ -77,13 +71,7 @@ angular.module('mc.core.ui.bs.statesActions', ['mc.util.ui.actions']).config ['a
       disabled:   $scope.element?.status != 'DRAFT'
       watches:    ['element.status', 'element.archived']
       action:     ->
-        messages.confirm("Do you want to finalize #{$scope.element.getElementTypeName()} #{$scope.element.name} ?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} and all it's dependencies will be finalized recursively. This means all elements declared by data model, all inner data classes and data elements of data classes and all data types of data elements. If any data type is using measurement unit which is not finalized yet the whole finalization process will fail.").then ->
-          enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/finalize", method: 'POST')).then (finalized) ->
-            $scope.element.updateFrom finalized
-            $rootScope.$broadcast 'catalogueElementUpdated', finalized
-            $rootScope.$broadcast 'catalogueElementFinalized', finalized
-            $rootScope.$broadcast 'redrawContextualActions'
-          , showErrorsUsingMessages(messages)
+        messages.prompt(null, null, type: 'finalize', element: $scope.element)
     }
   ]
 

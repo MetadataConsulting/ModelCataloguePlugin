@@ -141,6 +141,32 @@ class ElementService implements Publisher<CatalogueElement> {
     }
 
 
+    public DataModel finalizeDataModel(DataModel draft, String version, String revisionNotes) {
+        draft.checkPublishSemanticVersion(version)
+
+        if (!revisionNotes) {
+            draft.errors.rejectValue('revisionNotes', 'finalize.revisionNotes.null', 'Please, provide the revision notes')
+        }
+
+        if (draft.hasErrors()) {
+            return draft
+        }
+        return (DataModel) CatalogueElement.withTransaction { TransactionStatus status ->
+            auditService.logElementFinalized(draft) {
+                DataModel finalized = draft.publish(this) as DataModel
+
+                if (finalized.hasErrors()) {
+                    status.setRollbackOnly()
+                }
+
+                finalized.semanticVersion = version
+                finalized.revisionNotes = revisionNotes
+
+                finalized
+            }
+        }
+    }
+
     public <E extends CatalogueElement> E finalizeElement(E draft) {
         return (E) CatalogueElement.withTransaction { TransactionStatus status ->
             auditService.logElementFinalized(draft) {
