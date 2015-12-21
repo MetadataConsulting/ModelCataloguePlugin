@@ -30,7 +30,7 @@ describe "mc.core.ui.catalogueElementView", ->
     $rootScope.$digest()
 
     expect(element.prop('tagName').toLowerCase()).toBe('div')
-    expect(element.find('h3.ce-name').text().trim()).toBe("#{catEl.name} FINALIZED".trim())
+    expect(element.find('h3.ce-name').text().trim()).toBe("#{catEl.name} None 0.0.0".trim())
     expect(element.find('blockquote.ce-description').text()).toBe(catEl.description)
 
     element.find('ul.nav.nav-tabs li').each (index, element) ->

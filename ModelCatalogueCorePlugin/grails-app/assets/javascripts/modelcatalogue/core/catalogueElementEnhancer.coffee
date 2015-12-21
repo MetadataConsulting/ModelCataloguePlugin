@@ -130,7 +130,7 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
               versionNumber = @versionNumber
             else
               ret = 'None'
-              semver = 'unknown'
+              semver = '0.0.0'
 
             semver = "rev#{versionNumber}" unless semver
 
@@ -151,7 +151,7 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
               versionNumber = @versionNumber
             else
               ret = 'None'
-              semver = 'unknown'
+              semver = '0.0.0'
 
             semver = "rev#{versionNumber}" unless semver
 
@@ -167,7 +167,7 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
               semver = @semanticVersion
               versionNumber = @versionNumber
             else
-              semver = 'unknown'
+              semver = '0.0.0'
 
             semver = "rev#{versionNumber}" unless semver
 
