@@ -52,10 +52,10 @@ class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
         ListWithTotal subModels = dataClassService.getInnerClasses(parent1)
 
         then:
-        subModels.count == 3
-        subModels.list.contains(parent1)
-        subModels.list.contains(child1)
-        subModels.list.contains(grandChild)
+        subModels.total == 3L
+        subModels.items.contains(parent1)
+        subModels.items.contains(child1)
+        subModels.items.contains(grandChild)
     }
 
 
@@ -68,10 +68,10 @@ class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
         ListWithTotal dataElements = dataClassService.getDataElementsFromClasses([parent1, child1, grandChild])
 
         then:
-        dataElements.count ==3
-        dataElements.list.contains(de1)
-        dataElements.list.contains(de2)
-        dataElements.list.contains(de3)
+        dataElements.total == 3L
+        dataElements.items.contains(de1)
+        dataElements.items.contains(de2)
+        dataElements.items.contains(de3)
     }
 
     def "test infinite recursion"(){
@@ -79,7 +79,7 @@ class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
         ListWithTotal subModels = dataClassService.getInnerClasses(parent1)
 
         then:
-        subModels.count ==3
+        subModels.total == 3L
     }
 
 

@@ -19,6 +19,10 @@ class DataModelControllerIntegrationSpec extends AbstractCatalogueElementControl
         [name: "t"*300, description: "asdf"]
     }
 
+    protected  getBadNameJSON() {
+        [name: "g" * 300]
+    }
+
     @Override
     Class getResource() {
         DataModel

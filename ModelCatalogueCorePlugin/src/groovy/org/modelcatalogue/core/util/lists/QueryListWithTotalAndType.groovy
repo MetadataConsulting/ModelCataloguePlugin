@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.util.lists
 
-class QueryListWithTotalAndType<T> implements ListWithTotalAndType<T> {
+class QueryListWithTotalAndType<T> extends CustomizableJsonListWithTotalAndType<T> {
 
     final String listQuery
     final String countQuery
@@ -11,11 +11,11 @@ class QueryListWithTotalAndType<T> implements ListWithTotalAndType<T> {
     private Long total = null
     private List<T> items = null
 
-    public static <T> ListWithTotalAndType<T> create(Map params, Class<T> type, String query){
+    public static <T> CustomizableJsonListWithTotalAndType<T> create(Map params, Class<T> type, String query){
         create(params, type, query, [:])
     }
 
-    public static <T> ListWithTotalAndType<T> create(Map params, Class<T> type, String query, Map<String, Object> arguments){
+    public static <T> CustomizableJsonListWithTotalAndType<T> create(Map params, Class<T> type, String query, Map<String, Object> arguments){
         def alias = type.simpleName[0].toLowerCase()
         String expectedStart = "from ${type.simpleName} ${alias}"
         if (!query.trim().startsWith(expectedStart)) {
@@ -24,11 +24,11 @@ class QueryListWithTotalAndType<T> implements ListWithTotalAndType<T> {
         create(params, type, "select $alias $query", "select count($alias) $query", arguments)
     }
 
-    public static <T> ListWithTotalAndType<T> create(Map params, Class<T> type, String listQuery, String countQuery){
+    public static <T> CustomizableJsonListWithTotalAndType<T> create(Map params, Class<T> type, String listQuery, String countQuery){
         create(params, type, listQuery, countQuery, [:])
     }
 
-    public static <T> ListWithTotalAndType<T> create(Map params, Class<T> type, String listQuery, String countQuery, Map<String, Object> arguments){
+    public static <T> CustomizableJsonListWithTotalAndType<T> create(Map params, Class<T> type, String listQuery, String countQuery, Map<String, Object> arguments){
         if (!countQuery.trim().toLowerCase().startsWith("select count(")) {
             throw new IllegalArgumentException("Query must start with 'select count(<alias>)' but was ${countQuery.trim()}")
         }

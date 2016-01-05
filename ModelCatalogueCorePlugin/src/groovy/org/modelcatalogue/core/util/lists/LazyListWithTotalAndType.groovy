@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.util.lists
 
-class LazyListWithTotalAndType<T> implements ListWithTotalAndType<T> {
+class LazyListWithTotalAndType<T> extends CustomizableJsonListWithTotalAndType<T> {
 
     final Class<T> itemType
     final Map<String, Object> params
@@ -11,11 +11,11 @@ class LazyListWithTotalAndType<T> implements ListWithTotalAndType<T> {
     private Long total = null
     private List<T> items = null
 
-    public static <T> ListWithTotalAndType<T> create(Map params, Class<T> type, Closure itemsClosure){
+    public static <T> CustomizableJsonListWithTotalAndType<T> create(Map params, Class<T> type, Closure itemsClosure){
         new LazyListWithTotalAndType<T>(params, type, itemsClosure, null)
     }
 
-    public static <T> ListWithTotalAndType<T> create(Map params, Class<T> type, Closure<List<T>> itemsClosure, Closure<Long> totalClosure){
+    public static <T> CustomizableJsonListWithTotalAndType<T> create(Map params, Class<T> type, Closure<List<T>> itemsClosure, Closure<Long> totalClosure){
         new LazyListWithTotalAndType<T>(params, type, itemsClosure, totalClosure)
     }
 

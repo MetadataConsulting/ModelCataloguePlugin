@@ -46,7 +46,7 @@ class Lists {
      * @param type      type to be used as wrapper's itemType
      * @return
      */
-    static <T> ListWithTotalAndType<T> all(Map params, Class<T> type){
+    static <T> CustomizableJsonListWithTotalAndType<T> all(Map params, Class<T> type){
         fromCriteria(params, type, {})
     }
 
@@ -96,7 +96,7 @@ class Lists {
      *
      * @see DetachedCriteria
      */
-    static <T> ListWithTotalAndType<T> fromCriteria(Map params, Class<T> type, @DelegatesTo(DetachedCriteria) Closure buildClosure){
+    static <T> CustomizableJsonListWithTotalAndType<T> fromCriteria(Map params, Class<T> type, @DelegatesTo(DetachedCriteria) Closure buildClosure){
         DetachedListWithTotalAndType.create(params, new DetachedCriteria<T>(type).build(buildClosure))
     }
 
@@ -129,7 +129,7 @@ class Lists {
      *
      * @see DetachedCriteria
      */
-    static <T> ListWithTotalAndType<T> fromCriteria(Map params, DetachedCriteria<T> criteria){
+    static <T> CustomizableJsonListWithTotalAndType<T> fromCriteria(Map params, DetachedCriteria<T> criteria){
         DetachedListWithTotalAndType.create(params, criteria)
     }
 
@@ -141,7 +141,7 @@ class Lists {
      * @param totalClosure      closure returning the total count of the items
      * @return new ListWithTotalAndType which items will initialized by itemsClosure closure
      */
-    static <T> ListWithTotalAndType<T> lazy(Map params, Class<T> type, Closure<List<T>> itemsClosure, Closure<Long> totalClosure = null){
+    static <T> CustomizableJsonListWithTotalAndType<T> lazy(Map params, Class<T> type, Closure<List<T>> itemsClosure, Closure<Long> totalClosure = null){
         LazyListWithTotalAndType.create(params, type, itemsClosure, totalClosure)
     }
 
@@ -174,7 +174,7 @@ class Lists {
      * @param arguments         named arguments for the HQL query
      * @return new ListWithTotalAndType from HQL query
      */
-    static <T> ListWithTotalAndType<T> fromQuery(Map params, Class<T> type, String query, Map<String, Object> arguments = [:]){
+    static <T> CustomizableJsonListWithTotalAndType<T> fromQuery(Map params, Class<T> type, String query, Map<String, Object> arguments = [:]){
         QueryListWithTotalAndType.create(params, type, query, arguments)
     }
 
@@ -191,7 +191,7 @@ class Lists {
      * @param arguments         named arguments for the HQL query
      * @return new ListWithTotalAndType from HQL query
      */
-    static <T> ListWithTotalAndType<T> fromQuery(Map params, Class<T> type, String listQuery, String countQuery, Map<String, Object> arguments = [:]){
+    static <T> CustomizableJsonListWithTotalAndType<T> fromQuery(Map params, Class<T> type, String listQuery, String countQuery, Map<String, Object> arguments = [:]){
         QueryListWithTotalAndType.create(params, type, listQuery, countQuery, arguments)
     }
     //<-- not providing wrapper variant because it should be used in service classes

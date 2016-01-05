@@ -2,7 +2,7 @@ package org.modelcatalogue.core.util.lists
 
 import grails.gorm.DetachedCriteria
 
-class DetachedListWithTotalAndType<T> implements ListWithTotalAndType<T> {
+class DetachedListWithTotalAndType<T> extends CustomizableJsonListWithTotalAndType<T> {
 
     final DetachedCriteria<T> criteria
     final Map<String, Object> params
@@ -10,11 +10,11 @@ class DetachedListWithTotalAndType<T> implements ListWithTotalAndType<T> {
     private Long total = null
     private List<T> items = null
 
-    public static <T> ListWithTotalAndType<T> create(Map params, Class<T> type, @DelegatesTo(DetachedCriteria) Closure buildClosure){
+    public static <T> CustomizableJsonListWithTotalAndType<T> create(Map params, Class<T> type, @DelegatesTo(DetachedCriteria) Closure buildClosure){
         create(params, new DetachedCriteria<T>(type).build(buildClosure))
     }
 
-    public static <T> ListWithTotalAndType<T> create(Map params, DetachedCriteria<T> criteria){
+    public static <T> CustomizableJsonListWithTotalAndType<T> create(Map params, DetachedCriteria<T> criteria){
         new DetachedListWithTotalAndType<T>(criteria, new HashMap(params))
     }
 
