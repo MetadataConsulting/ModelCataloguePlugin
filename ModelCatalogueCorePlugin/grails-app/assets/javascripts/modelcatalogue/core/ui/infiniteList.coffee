@@ -6,6 +6,7 @@ angular.module('mc.core.ui.infiniteList', ['mc.core.ui.infiniteListCtrl', 'ngAni
       noActions: '=?'
       itemHref: '&?'
       onCreateRequested: '&?'
+      onSearch: '&?'
       heading: '=?'
 
     templateUrl: 'modelcatalogue/core/ui/infinitePanels.html'
@@ -17,6 +18,9 @@ angular.module('mc.core.ui.infiniteList', ['mc.core.ui.infiniteListCtrl', 'ngAni
 
       unless $attrs.onCreateRequested
         $scope.onCreateRequested = undefined
+
+      unless $attrs.onSearch
+        $scope.onSearch = undefined
 
       unless $attrs.itemHref
         $scope.itemHref = (obj) -> obj.$element.href()
@@ -34,6 +38,9 @@ angular.module('mc.core.ui.infiniteList', ['mc.core.ui.infiniteListCtrl', 'ngAni
 
 
       $scope.$watch 'nameFilter', (newFilter)->
+        if $scope.onSearch
+          $scope.onSearch($term: newFilter)
+          return
         $scope.$emit "infiniteList:filtered", newFilter
     ]
   }

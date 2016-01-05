@@ -16,6 +16,7 @@ angular.module('mc.core.ui.states.dataModels', ['mc.core.ui.states.controllers.P
         ]
 
       data:
+        resource: 'dataModel'
         applicationTitle: 'Data Models'
         createDialogArgs:
           type: 'create-dataModel'
