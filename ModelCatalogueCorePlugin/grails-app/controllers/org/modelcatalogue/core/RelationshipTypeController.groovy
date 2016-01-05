@@ -2,7 +2,7 @@ package org.modelcatalogue.core
 
 import grails.transaction.Transactional
 import org.modelcatalogue.core.util.CatalogueElementFinder
-import org.modelcatalogue.core.util.Lists
+import org.modelcatalogue.core.util.lists.Lists
 
 import javax.servlet.http.HttpServletResponse
 

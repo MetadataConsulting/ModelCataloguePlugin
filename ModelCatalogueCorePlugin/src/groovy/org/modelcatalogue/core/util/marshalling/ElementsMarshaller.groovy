@@ -1,10 +1,7 @@
 package org.modelcatalogue.core.util.marshalling
 
-import org.modelcatalogue.core.util.Elements
+import org.modelcatalogue.core.util.lists.Elements
 
-/**
- * Created by ladin on 19.02.14.
- */
 class ElementsMarshaller extends ListWrapperMarshaller {
 
     ElementsMarshaller() {

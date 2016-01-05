@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.actions
 
 import org.modelcatalogue.core.AbstractRestfulController
-import org.modelcatalogue.core.util.Lists
+import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.http.HttpStatus
 
 class BatchController extends AbstractRestfulController<Batch> {

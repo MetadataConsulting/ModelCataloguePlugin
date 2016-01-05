@@ -1,7 +1,4 @@
-package org.modelcatalogue.core.util
-
-import grails.util.GrailsNameUtils
-
+package org.modelcatalogue.core.util.lists
 /**
  * Wrapper used for easier marshalling of relations result lists
  */

@@ -2,6 +2,8 @@ package org.modelcatalogue.core.util
 
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.util.lists.ListWrapper
+import org.modelcatalogue.core.util.lists.Lists
 import spock.lang.Unroll
 
 class DetachedListWrapperSpec extends IntegrationSpec {

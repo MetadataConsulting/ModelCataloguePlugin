@@ -1,8 +1,5 @@
-package org.modelcatalogue.core.util
+package org.modelcatalogue.core.util.lists
 
-/**
- * Created by ladin on 14.07.14.
- */
 class LazyListWithTotalAndType<T> implements ListWithTotalAndType<T> {
 
     final Class<T> itemType

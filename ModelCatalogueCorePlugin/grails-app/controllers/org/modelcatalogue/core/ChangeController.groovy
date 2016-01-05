@@ -4,7 +4,7 @@ import grails.rest.RestfulController
 import org.modelcatalogue.core.audit.Change
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.DataModelFilter
-import org.modelcatalogue.core.util.Lists
+import org.modelcatalogue.core.util.lists.Lists
 
 import static org.springframework.http.HttpStatus.*
 

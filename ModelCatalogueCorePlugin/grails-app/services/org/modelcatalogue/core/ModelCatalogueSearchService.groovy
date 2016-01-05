@@ -3,8 +3,8 @@ package org.modelcatalogue.core
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.DataModelFilter
-import org.modelcatalogue.core.util.ListWithTotalAndType
-import org.modelcatalogue.core.util.Lists
+import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
 import rx.Observable
 

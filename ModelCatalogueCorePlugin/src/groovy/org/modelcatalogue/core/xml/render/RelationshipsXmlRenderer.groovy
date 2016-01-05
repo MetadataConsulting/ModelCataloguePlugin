@@ -10,7 +10,7 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.util.Relationships
+import org.modelcatalogue.core.util.lists.Relationships
 import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 import org.springframework.beans.factory.annotation.Autowired
 

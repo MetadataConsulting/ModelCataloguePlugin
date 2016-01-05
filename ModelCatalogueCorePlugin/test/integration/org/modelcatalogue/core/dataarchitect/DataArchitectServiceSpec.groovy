@@ -4,8 +4,7 @@ import au.com.bytecode.opencsv.CSVReader
 import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataClass
-import org.modelcatalogue.core.util.ListWithTotal
-import spock.lang.Ignore
+import org.modelcatalogue.core.util.lists.ListWithTotal
 
 class DataArchitectServiceSpec extends AbstractIntegrationSpec {
 

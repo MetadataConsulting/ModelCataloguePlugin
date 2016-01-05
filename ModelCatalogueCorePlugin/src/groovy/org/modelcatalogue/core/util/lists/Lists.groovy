@@ -1,6 +1,7 @@
-package org.modelcatalogue.core.util
+package org.modelcatalogue.core.util.lists
 
 import grails.gorm.DetachedCriteria
+import org.modelcatalogue.core.util.RelationshipDirection
 
 /**
  * Facade class for creating list with count instances with strong focus on late evaluation so they can be used

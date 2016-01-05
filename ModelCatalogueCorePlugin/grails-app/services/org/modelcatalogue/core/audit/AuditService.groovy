@@ -7,8 +7,8 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
-import org.modelcatalogue.core.util.ListWithTotalAndType
-import org.modelcatalogue.core.util.Lists
+import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.Lists
 
 import javax.annotation.PostConstruct
 import java.util.concurrent.Callable

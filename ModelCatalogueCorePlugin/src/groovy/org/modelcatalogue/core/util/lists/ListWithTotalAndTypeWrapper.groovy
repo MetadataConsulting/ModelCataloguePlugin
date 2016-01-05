@@ -1,7 +1,5 @@
-package org.modelcatalogue.core.util
-/**
- * Created by ladin on 14.07.14.
- */
+package org.modelcatalogue.core.util.lists
+
 class ListWithTotalAndTypeWrapper<T> implements ListWrapper<T> {
 
     final Map<String, Object> params
@@ -45,11 +43,11 @@ class ListWithTotalAndTypeWrapper<T> implements ListWrapper<T> {
         this.next = links.next
     }
 
-    void setNext(String ignored) {
+    static void setNext(String ignored) {
         throw new UnsupportedOperationException("Setting next link from outside the wrapper is not supported")
     }
 
-    void setPrevious(String ignored) {
+    static void setPrevious(String ignored) {
         throw new UnsupportedOperationException("Setting previous link from outside the wrapper is not supported")
     }
 

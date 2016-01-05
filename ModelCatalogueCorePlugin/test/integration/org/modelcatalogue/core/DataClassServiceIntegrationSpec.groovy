@@ -2,8 +2,8 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.util.DataModelFilter
-import org.modelcatalogue.core.util.ListWithTotal
-import org.modelcatalogue.core.util.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.ListWithTotal
+import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 
 class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
 

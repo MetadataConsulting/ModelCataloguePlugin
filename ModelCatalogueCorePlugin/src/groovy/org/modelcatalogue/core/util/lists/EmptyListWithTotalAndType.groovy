@@ -1,8 +1,5 @@
-package org.modelcatalogue.core.util
+package org.modelcatalogue.core.util.lists
 
-/**
- * Created by ladin on 05.08.14.
- */
 class EmptyListWithTotalAndType<T> implements ListWithTotalAndType<T>{
 
     Class<T> itemType

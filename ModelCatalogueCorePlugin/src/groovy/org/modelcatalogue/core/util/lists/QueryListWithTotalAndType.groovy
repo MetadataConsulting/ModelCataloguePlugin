@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.util
+package org.modelcatalogue.core.util.lists
 
 class QueryListWithTotalAndType<T> implements ListWithTotalAndType<T> {
 

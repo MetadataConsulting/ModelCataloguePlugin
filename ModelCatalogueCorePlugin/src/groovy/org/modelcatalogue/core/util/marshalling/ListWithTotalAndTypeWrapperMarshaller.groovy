@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.util.marshalling
 
-import org.modelcatalogue.core.util.JsonAwareListWithTotalAndType
-import org.modelcatalogue.core.util.ListWithTotalAndTypeWrapper
+import org.modelcatalogue.core.util.lists.JsonAwareListWithTotalAndType
+import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeWrapper
 
 class ListWithTotalAndTypeWrapperMarshaller extends ListWrapperMarshaller {
 

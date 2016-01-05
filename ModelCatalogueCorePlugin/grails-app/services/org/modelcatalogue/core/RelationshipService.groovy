@@ -7,8 +7,8 @@ import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Inheritance
-import org.modelcatalogue.core.util.ListWithTotal
-import org.modelcatalogue.core.util.Lists
+import org.modelcatalogue.core.util.lists.ListWithTotal
+import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
 
 class RelationshipService {

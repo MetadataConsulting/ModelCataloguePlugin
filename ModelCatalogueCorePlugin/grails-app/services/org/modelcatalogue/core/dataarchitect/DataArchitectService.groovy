@@ -6,8 +6,8 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
-import org.modelcatalogue.core.util.ListWithTotal
-import org.modelcatalogue.core.util.Lists
+import org.modelcatalogue.core.util.lists.ListWithTotal
+import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.SecuredRuleExecutor
 
 class DataArchitectService {

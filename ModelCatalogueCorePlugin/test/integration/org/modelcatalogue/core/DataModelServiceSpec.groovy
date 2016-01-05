@@ -4,8 +4,8 @@ import grails.gorm.DetachedCriteria
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.DataModelFilter
-import org.modelcatalogue.core.util.ListWithTotalAndType
-import org.modelcatalogue.core.util.Lists
+import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.Lists
 
 class DataModelServiceSpec extends IntegrationSpec {
 

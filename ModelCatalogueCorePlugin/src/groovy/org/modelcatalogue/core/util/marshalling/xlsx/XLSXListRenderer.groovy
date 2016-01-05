@@ -12,7 +12,7 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.Extendible
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.reports.ReportsRegistry
-import org.modelcatalogue.core.util.ListWrapper
+import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.DataModelAware
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.context.request.RequestContextHolder

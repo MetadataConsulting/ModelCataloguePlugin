@@ -2,11 +2,8 @@ package org.modelcatalogue.core.util.marshalling.xlsx
 
 import grails.rest.render.RenderContext
 import groovy.util.logging.Log4j
-import org.modelcatalogue.core.util.ListWrapper
+import org.modelcatalogue.core.util.lists.ListWrapper
 
-/**
- * Created by ladin on 09.04.14.
- */
 @Log4j
 class XLSXRowWriterBuilder {
 

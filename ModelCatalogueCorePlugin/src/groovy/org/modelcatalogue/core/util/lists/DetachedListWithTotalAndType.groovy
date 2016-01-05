@@ -1,10 +1,7 @@
-package org.modelcatalogue.core.util
+package org.modelcatalogue.core.util.lists
 
 import grails.gorm.DetachedCriteria
 
-/**
- * Created by ladin on 14.07.14.
- */
 class DetachedListWithTotalAndType<T> implements ListWithTotalAndType<T> {
 
     final DetachedCriteria<T> criteria

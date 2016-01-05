@@ -5,8 +5,8 @@ import org.elasticsearch.action.search.SearchRequestBuilder
 import org.elasticsearch.action.search.SearchResponse
 import org.elasticsearch.search.SearchHit
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.util.JsonAwareListWithTotalAndType
-import org.modelcatalogue.core.util.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.JsonAwareListWithTotalAndType
+import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 
 @Log4j
 class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {

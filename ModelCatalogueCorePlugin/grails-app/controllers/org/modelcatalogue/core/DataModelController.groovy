@@ -5,10 +5,10 @@ import grails.util.GrailsNameUtils
 import org.hibernate.FetchMode
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
-import org.modelcatalogue.core.util.ListWithTotalAndType
-import org.modelcatalogue.core.util.Lists
+import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
-import org.modelcatalogue.core.util.Relationships
+import org.modelcatalogue.core.util.lists.Relationships
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 
 

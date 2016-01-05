@@ -4,8 +4,8 @@ import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
-import org.modelcatalogue.core.util.ListWithTotal
-import org.modelcatalogue.core.util.Lists
+import org.modelcatalogue.core.util.lists.ListWithTotal
+import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
 import spock.lang.Specification
 import spock.util.mop.ConfineMetaClassChanges

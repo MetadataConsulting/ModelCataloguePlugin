@@ -2,14 +2,11 @@ package org.modelcatalogue.core.actions
 
 import grails.test.spock.IntegrationSpec
 import grails.util.Holders
-import org.modelcatalogue.core.util.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.FutureTask
 
-/**
- * Created by ladin on 20.02.15.
- */
 class ActionServiceSpec extends IntegrationSpec {
 
     ActionService service
@@ -89,7 +86,7 @@ class ActionServiceSpec extends IntegrationSpec {
 
         then:
         one.state == ActionState.FAILED
-        one.outcome == "Action failed because at least one of the dependencies failed. The error from the dependency follows:\n\nCircular dependency found: ${one.id} -> ${three.id} -> ${two.id} -> ${one.id}"
+        one.outcome == "Action failed because at least one of the dependencies failed. The error from the dependency follows:\n\nCircular dependency found: ${one.id} -> ${three.id} -> ${two.id} -> ${one.id}".toString()
     }
 
     private void setupExecutorServiceForImmediateExecution() {

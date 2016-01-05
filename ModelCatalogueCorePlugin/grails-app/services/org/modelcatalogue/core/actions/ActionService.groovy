@@ -6,8 +6,8 @@ import org.codehaus.groovy.grails.exceptions.DefaultStackTraceFilterer
 import org.modelcatalogue.core.SecurityService
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.util.FriendlyErrors
-import org.modelcatalogue.core.util.ListWithTotalAndType
-import org.modelcatalogue.core.util.Lists
+import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 

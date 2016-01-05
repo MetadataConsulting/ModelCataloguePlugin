@@ -5,9 +5,9 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.reports.ReportsRegistry
-import org.modelcatalogue.core.util.Elements
-import org.modelcatalogue.core.util.ListWrapper
-import org.modelcatalogue.core.util.Relationships
+import org.modelcatalogue.core.util.lists.Elements
+import org.modelcatalogue.core.util.lists.ListWrapper
+import org.modelcatalogue.core.util.lists.Relationships
 import spock.lang.Specification
 
 class XLSXRendererSpec extends Specification {

@@ -1,7 +1,5 @@
-package org.modelcatalogue.core.util
-/**
- * Created by ladin on 14.07.14.
- */
+package org.modelcatalogue.core.util.lists
+
 class ListWithTotalWrapper<T> implements ListWithTotalAndType<T> {
 
     final Class<T> itemType

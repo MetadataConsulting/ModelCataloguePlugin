@@ -1,7 +1,7 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.util.Lists
+import org.modelcatalogue.core.util.lists.Lists
 
 class MeasurementUnitController extends AbstractCatalogueElementController<MeasurementUnit> {
 

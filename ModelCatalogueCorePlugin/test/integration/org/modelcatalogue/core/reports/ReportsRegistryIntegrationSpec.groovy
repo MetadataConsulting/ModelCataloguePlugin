@@ -5,10 +5,10 @@ import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.util.Elements
-import org.modelcatalogue.core.util.ListWrapper
-import org.modelcatalogue.core.util.Relationships
-import org.modelcatalogue.core.util.SimpleListWrapper
+import org.modelcatalogue.core.util.lists.Elements
+import org.modelcatalogue.core.util.lists.ListWrapper
+import org.modelcatalogue.core.util.lists.Relationships
+import org.modelcatalogue.core.util.lists.SimpleListWrapper
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import spock.lang.Stepwise
 

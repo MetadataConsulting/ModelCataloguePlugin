@@ -2,7 +2,7 @@ package org.modelcatalogue.core.util.marshalling
 
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.util.OrderedMap
-import org.modelcatalogue.core.util.Relationships
+import org.modelcatalogue.core.util.lists.Relationships
 
 class RelationshipsMarshaller extends ListWrapperMarshaller {
 

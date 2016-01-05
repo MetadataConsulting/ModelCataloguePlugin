@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.util.marshalling.xlsx
 
 import grails.rest.render.RenderContext
-import org.modelcatalogue.core.util.ListWrapper
+import org.modelcatalogue.core.util.lists.ListWrapper
 
 interface XLSXRowWriter<T> {
 

@@ -5,9 +5,9 @@ import org.modelcatalogue.core.export.inventory.DataClassToDocxExporter
 import org.modelcatalogue.core.export.inventory.DataClassToXlsxExporter
 import org.modelcatalogue.core.publishing.changelog.ChangelogGenerator
 import org.modelcatalogue.core.util.DataModelFilter
-import org.modelcatalogue.core.util.Lists
+import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
-import org.modelcatalogue.core.util.Relationships
+import org.modelcatalogue.core.util.lists.Relationships
 
 class DataClassController extends AbstractCatalogueElementController<DataClass> {
 

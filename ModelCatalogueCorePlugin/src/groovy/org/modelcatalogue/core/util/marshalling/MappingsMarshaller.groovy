@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.util.marshalling
 
 import org.modelcatalogue.core.Mapping
-import org.modelcatalogue.core.util.Mappings
+import org.modelcatalogue.core.util.lists.Mappings
 
 class MappingsMarshaller extends ListWrapperMarshaller {
 

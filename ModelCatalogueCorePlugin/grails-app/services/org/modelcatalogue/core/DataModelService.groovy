@@ -5,10 +5,10 @@ import org.modelcatalogue.core.actions.Batch
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
 import org.modelcatalogue.core.util.DataModelFilter
-import org.modelcatalogue.core.util.DetachedListWithTotalAndType
-import org.modelcatalogue.core.util.ListWithTotalAndType
-import org.modelcatalogue.core.util.ListWithTotalAndTypeWrapper
-import org.modelcatalogue.core.util.ListWrapper
+import org.modelcatalogue.core.util.lists.DetachedListWithTotalAndType
+import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeWrapper
+import org.modelcatalogue.core.util.lists.ListWrapper
 
 class DataModelService {
 
