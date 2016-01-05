@@ -40,12 +40,12 @@ class DataArchitectServiceSpec extends AbstractIntegrationSpec {
 
         then:
         relatedDataElements.each { row ->
-            relatedDataElements.list.collect { it.source } contains(de1)
-            relatedDataElements.list.collect { it.destination } contains(de2)
+            relatedDataElements.items.collect { it.source } contains(de1)
+            relatedDataElements.items.collect { it.destination } contains(de2)
         }
 
         when:
-        dataArchitectService.actionRelationshipList(relatedDataElements.list)
+        dataArchitectService.actionRelationshipList(relatedDataElements.items)
 
 
         then:
