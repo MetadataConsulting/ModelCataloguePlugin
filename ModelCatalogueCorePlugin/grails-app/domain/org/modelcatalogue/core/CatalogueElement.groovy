@@ -236,7 +236,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     private void removeModelCatalogueIdIfDefault() {
         if (modelCatalogueId) {
             String defaultId = getDefaultModelCatalogueId(true)
-            if (defaultId && modelCatalogueId.startsWith(defaultId)) {
+            if (defaultId && (modelCatalogueId.startsWith(defaultId) || modelCatalogueId.contains('//localhost'))) {
                 modelCatalogueId = null
             }
         }
