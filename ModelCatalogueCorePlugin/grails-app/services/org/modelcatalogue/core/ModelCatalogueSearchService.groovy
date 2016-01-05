@@ -90,7 +90,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                 criteria.eq('status', ElementStatus.valueOf(params.status.toString().toUpperCase()))
             }
             return Lists.fromCriteria(params, criteria).customize {
-                it.collect { model -> CatalogueElementMarshaller.minimalCatalogueElementJSON(model as DataModel) }
+                it.collect { item -> CatalogueElementMarshaller.minimalCatalogueElementJSON(item) }
             }
         }
 
