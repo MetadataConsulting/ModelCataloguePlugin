@@ -6,6 +6,7 @@ import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
+import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import rx.Observable
 
 /**
@@ -88,7 +89,9 @@ class ModelCatalogueSearchService implements SearchCatalogue {
             if (params.status) {
                 criteria.eq('status', ElementStatus.valueOf(params.status.toString().toUpperCase()))
             }
-            return Lists.fromCriteria(params, criteria)
+            return Lists.fromCriteria(params, criteria).customize {
+                it.collect { model -> CatalogueElementMarshaller.minimalCatalogueElementJSON(model as DataModel) }
+            }
         }
 
         if (CatalogueElement.isAssignableFrom(resource)) {
@@ -158,7 +161,9 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                 }
             }
 
-            return Lists.fromQuery(params, resource, listQuery, arguments)
+            return Lists.fromQuery(params, resource, listQuery, arguments).customize {
+                it.collect { element -> CatalogueElementMarshaller.minimalCatalogueElementJSON(element as CatalogueElement) }
+            }
         }
 
         if (RelationshipType.isAssignableFrom(resource)) {

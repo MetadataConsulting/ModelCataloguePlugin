@@ -5,6 +5,7 @@ import org.modelcatalogue.core.export.inventory.DataClassToDocxExporter
 import org.modelcatalogue.core.export.inventory.DataClassToXlsxExporter
 import org.modelcatalogue.core.publishing.changelog.ChangelogGenerator
 import org.modelcatalogue.core.util.DataModelFilter
+import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.Relationships
@@ -18,17 +19,11 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
     }
 
     @Override
-    def index(Integer max) {
+    protected ListWithTotalAndType<DataClass> getAllEffectiveItems(Integer max) {
         if (!params.boolean("toplevel")) {
-            return super.index(max)
+            return super.getAllEffectiveItems(max)
         }
-        if(params.status && params.status.toLowerCase() != 'finalized' && !modelCatalogueSecurityService.hasRole('VIEWER')) {
-            notAuthorized()
-            return
-        }
-        handleParams(max)
-
-        respond Lists.wrap(params, "/${resourceName}/", dataClassService.getTopLevelDataClasses(overridableDataModelFilter, params))
+        return Lists.wrap(params, "/${resourceName}/", dataClassService.getTopLevelDataClasses(overridableDataModelFilter, params))
     }
 
     def referenceTypes(Integer max){

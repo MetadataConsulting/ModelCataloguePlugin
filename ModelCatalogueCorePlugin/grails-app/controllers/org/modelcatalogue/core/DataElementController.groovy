@@ -9,15 +9,6 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
         super(DataElement, false)
     }
 
-    @Override
-    def index(Integer max) {
-        if(params.status && params.status.toLowerCase() != 'finalized' && !modelCatalogueSecurityService.hasRole('VIEWER')) {
-            notAuthorized()
-            return
-        }
-        super.index(max)
-    }
-
     def content() {
         DataElement dataElement = DataElement.get(params.id)
         if (!dataElement) {

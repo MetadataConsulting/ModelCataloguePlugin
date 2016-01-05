@@ -6,7 +6,10 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.*
+import org.modelcatalogue.core.util.lists.CustomizableJsonListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeWrapper
+import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.lists.Mappings
 import org.modelcatalogue.core.util.lists.Relationships
@@ -405,27 +408,42 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
+
+        ListWithTotalAndType<T> items = getAllEffectiveItems(max)
+
+        if (params.boolean('minimal') && items instanceof ListWithTotalAndTypeWrapper) {
+            ListWithTotalAndTypeWrapper<T> listWrapper = items as ListWithTotalAndTypeWrapper<T>
+
+            if (listWrapper.list instanceof CustomizableJsonListWithTotalAndType) {
+                CustomizableJsonListWithTotalAndType<T> customizable = listWrapper.list as CustomizableJsonListWithTotalAndType<T>
+                customizable.customize {
+                    it.collect { CatalogueElementMarshaller.minimalCatalogueElementJSON(it) }
+                }
+            }
+        }
+
+        respond items
+    }
+
+    protected ListWithTotalAndType<T> getAllEffectiveItems(Integer max) {
         if (params.status?.toLowerCase() == 'active') {
             if (modelCatalogueSecurityService.hasRole('CURATOR')){
-                respond dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+                return dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
                     'in' 'status', [ElementStatus.FINALIZED, ElementStatus.DRAFT]
                 }, overridableDataModelFilter)
-                return
             }
-            respond dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+            return dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
                 'eq' 'status', ElementStatus.FINALIZED
             }, overridableDataModelFilter)
-            return
         }
 
         if (params.status) {
-            respond dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+            return dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
                 'in' 'status', ElementService.getStatusFromParams(params)
             }, overridableDataModelFilter)
-            return
         }
 
-        respond dataModelService.classified(Lists.all(params, resource, "/${resourceName}/"), overridableDataModelFilter)
+        return dataModelService.classified(Lists.all(params, resource, "/${resourceName}/"), overridableDataModelFilter)
     }
 
     /**

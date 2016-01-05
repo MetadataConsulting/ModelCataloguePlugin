@@ -12,7 +12,7 @@ angular.module('mc.core.ui.states.dataModels', ['mc.core.ui.states.controllers.P
 
       resolve:
         list: ['catalogueElementResource', (catalogueElementResource) ->
-          catalogueElementResource('dataModel').list(status: 'active')
+          catalogueElementResource('dataModel').list(status: 'active', minimal: true, max: 25)
         ]
 
       data:

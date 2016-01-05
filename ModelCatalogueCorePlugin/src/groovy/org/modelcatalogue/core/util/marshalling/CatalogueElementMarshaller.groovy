@@ -189,26 +189,26 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
 
     static Map<String, Object> minimalCatalogueElementJSON(CatalogueElement element) {
         if (!element) return null
-        [name: element.name, id: element.id, elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", versionNumber: element.versionNumber, latestVersionId: element.latestVersionId ?: element.id, dataModel: minimalCatalogueElementJSON(element.dataModel)]
+        [minimal: true, name: element.name, id: element.id, description: element.description, elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", versionNumber: element.versionNumber, latestVersionId: element.latestVersionId ?: element.id, dataModel: minimalCatalogueElementJSON(element.dataModel)]
     }
 
     static Map<String, Object> minimalCatalogueElementJSON(DataModel element) {
         if (!element) return null
-        [name: element.name, id: element.id, elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", versionNumber: element.versionNumber, latestVersionId: element.latestVersionId ?: element.id, semanticVersion: element.semanticVersion]
+        [minimal: true, name: element.name, id: element.id, description: element.description, elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", versionNumber: element.versionNumber, latestVersionId: element.latestVersionId ?: element.id, semanticVersion: element.semanticVersion]
     }
 
     static Map<String, Object> minimumDataType(DataType element) {
         if (!element) return null
         if (element instanceof EnumeratedType) {
-            return [name: element.name, id: element.id, enumerations: OrderedMap.toJsonMap(element.enumerations),  elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", latestVersionId: element.latestVersionId ?: element.id, dataModel: minimalCatalogueElementJSON(element.dataModel), versionNumber: element.versionNumber]
+            return [minimal: true, name: element.name, id: element.id, description: element.description, enumerations: OrderedMap.toJsonMap(element.enumerations),  elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", latestVersionId: element.latestVersionId ?: element.id, dataModel: minimalCatalogueElementJSON(element.dataModel), versionNumber: element.versionNumber]
         }
         if (element instanceof ReferenceType) {
-            return [name: element.name, id: element.id, dataClass: minimalCatalogueElementJSON(element.dataClass),  elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", latestVersionId: element.latestVersionId ?: element.id, dataModel: minimalCatalogueElementJSON(element.dataModel), versionNumber: element.versionNumber]
+            return [minimal: true, name: element.name, id: element.id, description: element.description, dataClass: minimalCatalogueElementJSON(element.dataClass),  elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", latestVersionId: element.latestVersionId ?: element.id, dataModel: minimalCatalogueElementJSON(element.dataModel), versionNumber: element.versionNumber]
         }
         if (element instanceof PrimitiveType) {
-            return [name: element.name, id: element.id, measurementUnit: minimalCatalogueElementJSON(element.measurementUnit),  elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", latestVersionId: element.latestVersionId ?: element.id, dataModel: minimalCatalogueElementJSON(element.dataModel), versionNumber: element.versionNumber]
+            return [minimal: true, name: element.name, id: element.id, description: element.description, measurementUnit: minimalCatalogueElementJSON(element.measurementUnit),  elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", latestVersionId: element.latestVersionId ?: element.id, dataModel: minimalCatalogueElementJSON(element.dataModel), versionNumber: element.versionNumber]
         }
-        return [name: element.name, id: element.id,  elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", latestVersionId: element.latestVersionId ?: element.id, dataModel: minimalCatalogueElementJSON(element.dataModel), versionNumber: element.versionNumber]
+        return [minimal: true, name: element.name, id: element.id, description: element.description, elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", latestVersionId: element.latestVersionId ?: element.id, dataModel: minimalCatalogueElementJSON(element.dataModel), versionNumber: element.versionNumber]
     }
 
 
