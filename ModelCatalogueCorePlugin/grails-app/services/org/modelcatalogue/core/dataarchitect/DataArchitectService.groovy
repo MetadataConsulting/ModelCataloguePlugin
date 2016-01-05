@@ -5,11 +5,10 @@ import au.com.bytecode.opencsv.CSVWriter
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.util.ListAndCount
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.SecuredRuleExecutor
-import org.modelcatalogue.core.publishing.DraftContext
 
 class DataArchitectService {
 
@@ -49,35 +48,34 @@ class DataArchitectService {
 
     ListWithTotal<Relationship> findRelationsByMetadataKeys(String keyOne, String keyTwo, Map params){
 
-        ListAndCount<Relationship> results = new ListAndCount<Relationship>()
-        def searchParams = getParams(params)
-        List<Relationship> synonymDataElements = []
-        //FIXME the relationship type should be configurable
-        def relType = RelationshipType.readByName("relatedTo")
+        return Lists.lazy(params, Relationship) {
+            def searchParams = getParams(params)
+            List<Relationship> synonymDataElements = []
+            //FIXME the relationship type should be configurable
+            def relType = RelationshipType.readByName("relatedTo")
 
-        def key1Elements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
-                "inner join a.extensions e " +
-                "WHERE e.name = ?)", [keyOne])//, [max: searchParams.max, offset: searchParams.offset])
-
-        key1Elements.eachWithIndex { DataElement dataElement, int dataElementIndex ->
-            def extensionName = dataElement.extensions[dataElement.extensions.findIndexOf {
-                it.name == keyOne
-            }].extensionValue
-            def key2Elements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
+            def key1Elements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
                     "inner join a.extensions e " +
-                    "WHERE e.name = ? and e.extensionValue = ?) ", [keyTwo, extensionName], [max: searchParams.max, offset: searchParams.offset])
+                    "WHERE e.name = ?)", [keyOne])//, [max: searchParams.max, offset: searchParams.offset])
 
-            // Create a Map
-            key2Elements.each {
-                //FIXME the relationship type needs to be configurable
-                def relationship = new Relationship(source: dataElement, destination: it, relationshipType: relType)
-                synonymDataElements << relationship
+            key1Elements.eachWithIndex { DataElement dataElement, Integer dataElementIndex ->
+                def extensionName = dataElement.extensions[dataElement.extensions.findIndexOf {
+                    it.name == keyOne
+                }].extensionValue
+                def key2Elements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
+                        "inner join a.extensions e " +
+                        "WHERE e.name = ? and e.extensionValue = ?) ", [keyTwo, extensionName], [max: searchParams.max, offset: searchParams.offset])
+
+                // Create a Map
+                key2Elements.each {
+                    //FIXME the relationship type needs to be configurable
+                    def relationship = new Relationship(source: dataElement, destination: it, relationshipType: relType)
+                    synonymDataElements << relationship
+                }
             }
+            synonymDataElements
         }
 
-        results.list = synonymDataElements
-        results.count = synonymDataElements.size()
-        return results
     }
 
     def actionRelationshipList(Collection<Relationship> list){
@@ -102,25 +100,25 @@ class DataArchitectService {
         List<Object> elements = []
 
         for (String header in headers) {
-            def element = DataElement.findByNameIlikeAndStatus(header, org.modelcatalogue.core.api.ElementStatus.FINALIZED)
+            def element = DataElement.findByNameIlikeAndStatus(header, ElementStatus.FINALIZED)
             if (!element) {
                 element = DataElement.findByModelCatalogueId(header)
             }
             if (!element) {
                 if (header.contains('_')) {
-                    element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), org.modelcatalogue.core.api.ElementStatus.FINALIZED)
+                    element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), ElementStatus.FINALIZED)
                 } else {
-                    element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), org.modelcatalogue.core.api.ElementStatus.FINALIZED)
+                    element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), ElementStatus.FINALIZED)
                 }
             }
             if (!element) {
-                element = DataElement.findByNameIlikeAndStatus(header, org.modelcatalogue.core.api.ElementStatus.DRAFT)
+                element = DataElement.findByNameIlikeAndStatus(header, ElementStatus.DRAFT)
             }
             if (!element) {
                 if (header.contains('_')) {
-                    element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), org.modelcatalogue.core.api.ElementStatus.DRAFT)
+                    element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), ElementStatus.DRAFT)
                 } else {
-                    element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), org.modelcatalogue.core.api.ElementStatus.DRAFT)
+                    element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), ElementStatus.DRAFT)
                 }
             }
             if (element) {
@@ -143,25 +141,25 @@ class DataArchitectService {
         List<Object> elements = []
 
         for (String header in headers) {
-            def element = DataClass.findByNameIlikeAndStatus(header, org.modelcatalogue.core.api.ElementStatus.FINALIZED)
+            def element = DataClass.findByNameIlikeAndStatus(header, ElementStatus.FINALIZED)
             if (!element) {
                 element = DataClass.findByModelCatalogueId(header)
             }
             if (!element) {
                 if (header.contains('_')) {
-                    element = DataClass.findByNameIlikeAndStatus(header.replace('_', ' '), org.modelcatalogue.core.api.ElementStatus.FINALIZED)
+                    element = DataClass.findByNameIlikeAndStatus(header.replace('_', ' '), ElementStatus.FINALIZED)
                 } else {
-                    element = DataClass.findByNameIlikeAndStatus(header.replace(' ', '_'), org.modelcatalogue.core.api.ElementStatus.FINALIZED)
+                    element = DataClass.findByNameIlikeAndStatus(header.replace(' ', '_'), ElementStatus.FINALIZED)
                 }
             }
             if (!element) {
-                element = DataClass.findByNameIlikeAndStatus(header, org.modelcatalogue.core.api.ElementStatus.DRAFT)
+                element = DataClass.findByNameIlikeAndStatus(header, ElementStatus.DRAFT)
             }
             if (!element) {
                 if (header.contains('_')) {
-                    element = DataClass.findByNameIlikeAndStatus(header.replace('_', ' '), org.modelcatalogue.core.api.ElementStatus.DRAFT)
+                    element = DataClass.findByNameIlikeAndStatus(header.replace('_', ' '), ElementStatus.DRAFT)
                 } else {
-                    element = DataClass.findByNameIlikeAndStatus(header.replace(' ', '_'), org.modelcatalogue.core.api.ElementStatus.DRAFT)
+                    element = DataClass.findByNameIlikeAndStatus(header.replace(' ', '_'), ElementStatus.DRAFT)
                 }
             }
             if (element) {
@@ -301,7 +299,7 @@ class DataArchitectService {
             batch.description = """Data Class '$model.name' was created from XML Schema element but it is actually used only in one place an can be replaced by its type"""
             Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.DataClass:$sourceId", destination: "gorm://org.modelcatalogue.core.DataClass:$destId"
             if (action.hasErrors()) {
-                log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating merge data class action", action.errors))
+                log.error(FriendlyErrors.printErrors("Error generating merge data class action", action.errors))
             }
             batch.archived = false
             batch.save(flush: true)
@@ -319,7 +317,7 @@ class DataArchitectService {
             sources.each { srcId ->
                 Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.DataClass:$srcId", destination: "gorm://org.modelcatalogue.core.DataClass:$destId", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
                 if (action.hasErrors()) {
-                    log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
+                    log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
             }
             batch.archived = false
@@ -333,7 +331,7 @@ class DataArchitectService {
             sources.each { srcId ->
                 Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.DataClass:$srcId", destination: "gorm://org.modelcatalogue.core.DataClass:$destId"
                 if (action.hasErrors()) {
-                    log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
+                    log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
             }
             batch.archived = false
@@ -352,7 +350,7 @@ class DataArchitectService {
             other.each { otherId ->
                 Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.EnumeratedType:$otherId", destination: "gorm://org.modelcatalogue.core.EnumeratedType:$first", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
                 if (action.hasErrors()) {
-                    log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
+                    log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
             }
             batch.archived = false
@@ -367,7 +365,7 @@ class DataArchitectService {
             other.each { otherId ->
                 Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.EnumeratedType:$otherId", destination: "gorm://org.modelcatalogue.core.EnumeratedType:$first"
                 if (action.hasErrors()) {
-                    log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating merge model action", action.errors))
+                    log.error(FriendlyErrors.printErrors("Error generating merge model action", action.errors))
                 }
             }
             batch.archived = false

@@ -3,7 +3,7 @@ package org.modelcatalogue.core
 import grails.transaction.Transactional
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.DataModelFilter
-import org.modelcatalogue.core.util.ListCountAndType
+
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
 
@@ -125,17 +125,19 @@ class DataClassService {
     }
 
     ListWithTotalAndType<DataClass> getInnerClasses(DataClass dataClass) {
-        Map<String, DataClass> dataClasses = collectChildren(3, dataClass, new TreeMap<String, DataClass>())
-        new ListCountAndType<DataClass>(count: dataClasses.size(), list: dataClasses.values().toList(), itemType: DataClass)
-
+        Lists.lazy([:], DataClass) {
+            collectChildren(3, dataClass, new TreeMap<String, DataClass>()).values().toList()
+        }
     }
 
     ListWithTotalAndType<DataElement> getDataElementsFromClasses(List<DataClass> models){
-        def results = []
-        models.each{ model ->
-            results.addAll(model.contains)
+        Lists.lazy([:], DataElement) {
+            List<DataElement> results = []
+            models.each{ model ->
+                results.addAll(model.contains)
+            }
+            results
         }
-        new ListCountAndType<DataElement>(count: results.size(), list: results, itemType: DataElement)
     }
 
 
