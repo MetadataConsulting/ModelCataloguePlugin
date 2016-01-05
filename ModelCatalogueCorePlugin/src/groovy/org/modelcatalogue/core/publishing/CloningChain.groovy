@@ -47,6 +47,11 @@ class CloningChain extends PublishingChain {
         for (Collection<CatalogueElement> elements in queue) {
             for (CatalogueElement element in elements) {
                 if (context.dataModel && context.dataModel != element.dataModel && context.dataModel != element) {
+                    if (element.instanceOf(DataModel)) {
+                        context.addImport(element as DataModel)
+                    } else {
+                        context.addImport(element.dataModel)
+                    }
                     processed << element.id
                     continue
                 }

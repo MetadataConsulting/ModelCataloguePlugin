@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.publishing
 
-import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.Relationship
@@ -14,6 +13,7 @@ class CloningContext {
 
     private final Set<CloningCopyAssociationsAndRelationshipsTask> pendingRelationshipsTasks = new LinkedHashSet<CloningCopyAssociationsAndRelationshipsTask>()
     private final Set<String> createdRelationshipHashes = []
+    private final Set<Long> imports = []
 
     private final Map<Long, Long> clones = [:]
 
@@ -41,6 +41,9 @@ class CloningContext {
     void resolvePendingRelationships() {
         pendingRelationshipsTasks.each {
             it.copyRelationships(dataModel, createdRelationshipHashes)
+        }
+        for (Long importId in imports) {
+            destinationDataModel.addToImports DataModel.get(importId)
         }
     }
 
@@ -85,5 +88,9 @@ class CloningContext {
 
     public <E extends CatalogueElement> void addClone(E original, E clone) {
         clones[original.getId()] = clone.getId()
+    }
+
+    public void addImport(DataModel dataModel) {
+        imports.add(dataModel.getId())
     }
 }

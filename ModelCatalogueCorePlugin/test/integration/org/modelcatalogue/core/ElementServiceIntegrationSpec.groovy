@@ -44,14 +44,14 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         elementService.list(DataElement, status: ElementStatus.DRAFT).size()    == 5
         elementService.list(Asset, status: 'DRAFT').size()                      == 5
         elementService.list(Asset, status: ElementStatus.DRAFT).size()          == 5
-        elementService.count(status: 'DRAFT')                                   == 17
-        elementService.count(status: ElementStatus.DRAFT)                       == 17
-        elementService.count(DataClass, status: 'DRAFT')                        == 7
-        elementService.count(DataClass, status: ElementStatus.DRAFT)            == 7
-        elementService.count(DataElement, status: 'DRAFT')                      == 5
-        elementService.count(DataElement, status: ElementStatus.DRAFT)          == 5
-        elementService.count(Asset, status: 'DRAFT')                            == 5
-        elementService.count(Asset, status: ElementStatus.DRAFT)                == 5
+        elementService.count(status: 'DRAFT')                                   == 17L
+        elementService.count(status: ElementStatus.DRAFT)                       == 17L
+        elementService.count(DataClass, status: 'DRAFT')                        == 7L
+        elementService.count(DataClass, status: ElementStatus.DRAFT)            == 7L
+        elementService.count(DataElement, status: 'DRAFT')                      == 5L
+        elementService.count(DataElement, status: ElementStatus.DRAFT)          == 5L
+        elementService.count(Asset, status: 'DRAFT')                            == 5L
+        elementService.count(Asset, status: ElementStatus.DRAFT)                == 5L
     }
 
 
@@ -521,11 +521,20 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
     def "clone whole data model"() {
         final String dataTypeName = 'DT SM'
         final String sourceName = 'Source Model'
-        final String destinationName = 'Destination Name'
+        final String anotherName = 'Another Model'
+        final String anotherTypeName = 'Another Type'
+        final String destinationName = 'Destination'
+        final String dataElementName = 'Data Element'
 
         catalogueBuilder.build {
+            dataModel name: anotherName, {
+                dataType name: anotherTypeName
+            }
             dataModel name: sourceName, {
                 dataType name: dataTypeName
+                dataElement name: dataElementName, {
+                    dataType name: anotherTypeName, dataModel: anotherName
+                }
             }
             dataModel name: destinationName
         }
@@ -533,6 +542,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         DataModel source = DataModel.findByName(sourceName)
         DataModel destination = DataModel.findByName(destinationName)
+        DataModel another = DataModel.findByName(anotherName)
 
         when:
         DataType original = DataType.findByName(dataTypeName)
@@ -542,6 +552,10 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         then:
         destination == stillDestination
         verifyCloned source, destination, original, clone
+
+        another
+        destination.imports
+        another in destination.imports
     }
 
     def "clone data type"() {
