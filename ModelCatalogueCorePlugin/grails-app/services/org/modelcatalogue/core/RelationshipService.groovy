@@ -293,22 +293,6 @@ class RelationshipService {
     }
 
 
-    String getClassifiedName(CatalogueElement element) {
-        if (!element) {
-            return null
-        }
-
-        if (!element.id) {
-            return element.name
-        }
-
-        if (element.dataModel) {
-            return "${element.name} (${element.dataModel.name})"
-        }
-
-        return element.name
-    }
-
     /**
      * @deprecated overcomplicated
      */

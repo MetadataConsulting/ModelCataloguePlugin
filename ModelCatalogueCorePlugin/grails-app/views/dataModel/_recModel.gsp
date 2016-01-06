@@ -42,9 +42,9 @@
                         </td>
                         <td width="200">
                             <g:each in="${relationship.destination.isSynonymFor}" var="synonym">
-                                <g:if test="${synonym.classifications[0].name!="Genomics England Forms" && synonym.classifications[0].name!="Rare Diseases" && synonym.classifications[0].name!="Cancer"}">
+                                <g:if test="${synonym.dataModel.name!="Genomics England Forms" && synonym.dataModel.name!="Rare Diseases" && synonym.dataModel.name!="Cancer"}">
                                     <%=synonym.name%>
-                                    (<g:if test="${synonym.ext.get("Data Item No")}"><%= synonym.ext.get("Data Item No") %></g:if><g:else>GE<%= synonym.id %></g:else>) from <%=synonym.classifications[0].name%>
+                                    (<g:if test="${synonym.ext.get("Data Item No")}"><%= synonym.ext.get("Data Item No") %></g:if><g:else>GE<%= synonym.id %></g:else>) from <%=synonym.dataModel.name%>
 
                                 </g:if>
                             </g:each>

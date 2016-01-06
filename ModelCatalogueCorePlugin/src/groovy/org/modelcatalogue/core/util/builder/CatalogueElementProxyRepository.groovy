@@ -2,7 +2,6 @@ package org.modelcatalogue.core.util.builder
 
 import grails.gorm.DetachedCriteria
 import groovy.util.logging.Log4j
-import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
@@ -306,7 +305,7 @@ class CatalogueElementProxyRepository {
         tryFindWithClassification(type, null, name, id)
     }
 
-    protected <T extends CatalogueElement> T tryFindWithClassification(Class<T> type, List<DataModel> classifications, Object name, Object id) {
+    protected <T extends CatalogueElement> T tryFindWithClassification(Class<T> type, List<DataModel> dataModels, Object name, Object id) {
         if (type in DATA_TYPE_CLASSES) {
             type = DataType
         }
@@ -324,8 +323,8 @@ class CatalogueElementProxyRepository {
             eq 'name', name.toString()
         }
 
-        if (classifications) {
-            T result = getLatestFromCriteria(dataModelService.classified(criteria, DataModelFilter.includes(classifications)))
+        if (dataModels) {
+            T result = getLatestFromCriteria(dataModelService.classified(criteria, DataModelFilter.includes(dataModels)))
 
             if (result) {
                 if (!id || !result.hasModelCatalogueId()) {
@@ -386,7 +385,7 @@ class CatalogueElementProxyRepository {
 
             if (version) {
                 result = CatalogueElement.findByLatestVersionIdAndVersionNumber(theId, version) as T
-                if (result && result.getDefaultModelCatalogueId(false) == org.modelcatalogue.core.util.Legacy.fixModelCatalogueId(id).toString()) {
+                if (result && result.getDefaultModelCatalogueId(false) == Legacy.fixModelCatalogueId(id).toString()) {
                     return result
                 }
                 return null
@@ -394,7 +393,7 @@ class CatalogueElementProxyRepository {
 
             result = CatalogueElement.findByLatestVersionId(theId, [sort: 'versionNumber', order: 'desc']) as T
 
-            if (result && org.modelcatalogue.core.util.Legacy.fixModelCatalogueId(id).toString().startsWith(result.getDefaultModelCatalogueId(true))) {
+            if (result && Legacy.fixModelCatalogueId(id).toString().startsWith(result.getDefaultModelCatalogueId(true))) {
                 return result
             }
 

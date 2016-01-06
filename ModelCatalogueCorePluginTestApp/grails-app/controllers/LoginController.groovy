@@ -83,8 +83,6 @@ class LoginController {
      * Callback after a failed login. Redirects to the auth page with a warning message.
      */
     def authfail = {
-
-        def username = session[UsernamePasswordAuthenticationFilter.SPRING_SECURITY_LAST_USERNAME_KEY]
         String msg = ''
         def exception = session[WebAttributes.AUTHENTICATION_EXCEPTION]
         if (exception) {
@@ -126,7 +124,7 @@ class LoginController {
             username: springSecurityService.authentication.name,
             roles: springSecurityService.authentication.authorities*.authority,
             id: springSecurityService.authentication.hasProperty('id') ? springSecurityService.authentication.id : null,
-            dataModels: springSecurityService.authentication.hasProperty('id') ? springSecurityService.authentication.classifications?.collect{ CatalogueElementMarshaller.minimalCatalogueElementJSON(it) } : []
+            dataModels: springSecurityService.authentication.hasProperty('id') ? [springSecurityService.authentication.dataModel?.collect{ CatalogueElementMarshaller.minimalCatalogueElementJSON(it) }] : []
         ] as JSON)
     }
 

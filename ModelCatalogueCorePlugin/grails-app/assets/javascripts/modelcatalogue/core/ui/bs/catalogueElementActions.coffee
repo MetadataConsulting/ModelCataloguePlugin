@@ -373,13 +373,33 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not $scope.element.isInstanceOf('catalogueElement')
 
     {
-      position:   20000
-      label:      'Clone'
+      position:   20100
+      label:      'Clone Current Element into Another Data Model'
       icon:       'fa fa-fw fa-clone'
       type:       'primary'
       action:     ->
         messages.prompt("Clone #{$scope.element.name}", "Please, select the destination data model for the cloned element.", type: 'catalogue-element', status: 'draft', resource: 'dataModel').then (destinationDataModel) ->
           enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/clone/#{destinationDataModel.id}", method: 'POST')).then (finalized) ->
+            finalized.show()
+          , showErrorsUsingMessages(messages)
+    }
+  ]
+
+  actionsProvider.registerChildActionInRole 'catalogue-element', 'clone-from', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, catalogueElementResource, enhance, rest, modelCatalogueApiRoot) ->
+    return undefined if not security.hasRole('CURATOR')
+    return undefined if not $scope.element
+    return undefined if not angular.isFunction($scope.element.isInstanceOf)
+    return undefined if not $scope.element.isInstanceOf('dataModel')
+    return undefined if not $scope.element.status == 'DRAFT'
+
+    {
+      position:   20000
+      label:      'Clone Another Element into Current Data Model'
+      icon:       'fa fa-fw fa-clone fa-flip-horizontal'
+      type:       'primary'
+      action:     ->
+        messages.prompt("Clone into #{$scope.element.name}", "Please, select the element to be cloned", type: 'catalogue-element', status: 'finalized', resource: 'catalogueElement', global: true).then (elementToBeCloned) ->
+          enhance(rest(url: "#{modelCatalogueApiRoot}#{elementToBeCloned.link}/clone/#{$scope.element.id}", method: 'POST')).then (finalized) ->
             finalized.show()
           , showErrorsUsingMessages(messages)
     }

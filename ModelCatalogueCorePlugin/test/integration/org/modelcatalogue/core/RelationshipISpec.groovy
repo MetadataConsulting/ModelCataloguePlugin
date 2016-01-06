@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.RelationshipDirection
+import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import spock.lang.Unroll
 
 class RelationshipISpec extends AbstractIntegrationSpec{
@@ -107,15 +108,15 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
     def "get classified name"() {
         expect:
-        relationshipService.getClassifiedName(null)                     ==  null
-        relationshipService.getClassifiedName(new DataClass(name: 'BLAH'))  == 'BLAH'
+        CatalogueElementMarshaller.getClassifiedName(null)                     ==  null
+        CatalogueElementMarshaller.getClassifiedName(new DataClass(name: 'BLAH'))  == 'BLAH'
 
         when:
         DataModel classification = new DataModel(name: "classy").save(failOnError: true)
         DataClass model = new DataClass(dataModel: classification, name: "Supermodel").save(failOnError: true)
 
         then:
-        relationshipService.getClassifiedName(model) == 'Supermodel (classy)'
+        CatalogueElementMarshaller.getClassifiedName(model) == 'Supermodel (classy)'
 
         cleanup:
         classification?.delete()

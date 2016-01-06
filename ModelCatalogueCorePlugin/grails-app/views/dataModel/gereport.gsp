@@ -46,7 +46,7 @@
             <br/>
                 <g:each status="i" in="${dataTypes}" var="dataType">
                     <div>
-                        <g:if test="${dataType.classifications[0]}"> <span class="pull-right">${dataType.classifications[0].name}</span></g:if>
+                        <g:if test="${dataType.dataModel}"> <span class="pull-right">${dataType.dataModel.name}</span></g:if>
                         <h7 id="${dataType.id}"><strong>${dataType.name}</strong></h7>
                         <p>${dataType.description}</p>
                         <g:if test="${dataType instanceof EnumeratedType}">
@@ -67,8 +67,8 @@
                             <g:if test="${dataType.name}">(${dataType.name})</g:if>
                             <g:if test="${dataType.description}">(${dataType.description})</g:if>
                             <g:if test="${dataType.rule}"><p> Format: <code>${dataType.rule}</code></p></g:if>
-                            <g:if test="${dataType instanceof org.modelcatalogue.core.PrimitiveType && dataType.measurementUnit?.name}">(${dataType.measurementUnit?.name})</g:if>
-                            <g:if test="${dataType instanceof org.modelcatalogue.core.PrimitiveType && dataType.measurementUnit?.symbol}">(${dataType.measurementUnit?.symbol})</g:if>
+                            <g:if test="${dataType instanceof PrimitiveType && dataType.measurementUnit?.name}">(${dataType.measurementUnit?.name})</g:if>
+                            <g:if test="${dataType instanceof PrimitiveType && dataType.measurementUnit?.symbol}">(${dataType.measurementUnit?.symbol})</g:if>
                         </g:else>
                     </div>
                 </g:each>

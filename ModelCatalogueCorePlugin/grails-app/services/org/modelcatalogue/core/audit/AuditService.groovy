@@ -134,13 +134,13 @@ class AuditService {
         }
     }
 
-    ListWithTotalAndType<Change> getGlobalChanges(Map params, DataModelFilter classifications) {
+    ListWithTotalAndType<Change> getGlobalChanges(Map params, DataModelFilter dataModels) {
         if (!params.sort) {
             params.sort  = 'dateCreated'
             params.order = 'desc'
         }
 
-        if (!classifications) {
+        if (!dataModels) {
             return Lists.fromCriteria(params, Change) {
                 ne 'system', true
                 ne 'otherSide', true
@@ -151,7 +151,7 @@ class AuditService {
 
 
         Map<String, Object> args = [:]
-        String subquery = getClassifiedElementsSubQuery(classifications, args)
+        String subquery = getClassifiedElementsSubQuery(dataModels, args)
 
         //language=HQL
         Lists.fromQuery params, Change, """
@@ -159,8 +159,8 @@ class AuditService {
             where c.system != true and c.otherSide != true and c.parentId is null and c.changedId  in (""" + subquery + """)""", args
     }
 
-    private static String getClassifiedElementsSubQuery(DataModelFilter classifications, Map<String, Object> args) {
-        if (classifications.unclassifiedOnly) {
+    private static String getClassifiedElementsSubQuery(DataModelFilter dataModels, Map<String, Object> args) {
+        if (dataModels.unclassifiedOnly) {
             // language=HQL
             return """
                 select ce.id
@@ -168,8 +168,8 @@ class AuditService {
                 where ce.dataModel is null
             """
         }
-        if (classifications.excludes && !classifications.includes) {
-            args.excludes = classifications.excludes
+        if (dataModels.excludes && !dataModels.includes) {
+            args.excludes = dataModels.excludes
             // language=HQL
             return """
                 select ce
@@ -178,11 +178,11 @@ class AuditService {
                     ce.dataModel.id not in (:excludes) or ce.id not in (:excludes)
             """
         }
-        if (classifications.excludes && classifications.includes) {
+        if (dataModels.excludes && dataModels.includes) {
             throw new IllegalStateException("Combining exclusion and inclusion is no longer supported. Exclusion would be ignored!")
         }
-        if (classifications.includes && !classifications.excludes) {
-            args.includes = classifications.includes
+        if (dataModels.includes && !dataModels.excludes) {
+            args.includes = dataModels.includes
             // language=HQL
             return """
                 select ce from CatalogueElement ce

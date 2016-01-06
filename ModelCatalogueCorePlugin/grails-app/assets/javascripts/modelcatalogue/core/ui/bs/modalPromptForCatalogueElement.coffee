@@ -1,5 +1,5 @@
 angular.module('mc.core.ui.bs.modalPromptForCatalogueElement', ['mc.util.messages', 'mc.util.ui.focusMe']).config ['messagesProvider', (messagesProvider)->
-  messagesProvider.setPromptFactory 'catalogue-element',  [ '$modal', '$q', ($modal, $q) ->
+  messagesProvider.setPromptFactory 'catalogue-element',  [ '$modal', ($modal) ->
     (title, body, args) ->
       dialog = $modal.open {
         windowClass: 'messages-modal-prompt'
@@ -11,7 +11,7 @@ angular.module('mc.core.ui.bs.modalPromptForCatalogueElement', ['mc.util.message
             <form role="form" ng-submit="close(value)">
             <div class="form-group">
                 <label for="value">''' + body + '''</label>
-                <input id="value" ng-model="value" class="form-control" status="''' + (args.status ? '') + '''" catalogue-element-picker="''' + (args.resource ? 'catalogueElement') + '''" focus-me="true">
+                <input id="value" ng-model="value" class="form-control" status="''' + (args.status ? '') + '''" global="''' + (args.global ? false) + '''" catalogue-element-picker="''' + (args.resource ? 'catalogueElement') + '''" focus-me="true">
             </div>
             </form>
         </div>

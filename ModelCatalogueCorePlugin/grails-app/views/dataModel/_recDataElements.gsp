@@ -34,9 +34,9 @@
                 <p>${relationship.destination.description}</p>
                 <g:if test="${relationship?.destination?.dataType}">
                     <div class="panel panel-default">
-                        <g:each in="${relationship.destination?.dataType?.classifications}" var="cls">
-                            <span class="pull-right badge">${cls.name}</span>
-                        </g:each>
+                        <g:if test="${relationship.destination?.dataType?.dataModel}">
+                            <span class="pull-right badge">${relationship.destination?.dataType?.dataModel}</span>
+                        </g:if>
                         <p><strong>${relationship?.destination?.dataType?.name}</strong>
                             <g:if test="${relationship?.destination?.dataType?.description!=relationship?.destination?.description}">
                                 - ${relationship?.destination?.dataType?.description}
@@ -64,8 +64,8 @@
                             <g:if test="${relationship.destination?.dataType?.name}">(${relationship.destination?.dataType?.name})</g:if>
                             <g:if test="${relationship.destination?.dataType?.description}">(${relationship.destination?.dataType?.description})</g:if>
                             <g:if test="${relationship.destination?.dataType?.rule}"><p> Format: <code>${relationship.destination?.rule}</code></p></g:if>
-                            <g:if test="${relationship.destination?.dataType instanceof org.modelcatalogue.core.PrimitiveType && relationship.destination?.dataType?.measurementUnit?.name}">(${relationship.destination?.measurementUnit?.name})</g:if>
-                            <g:if test="${relationship.destination?.dataType instanceof org.modelcatalogue.core.PrimitiveType && relationship.destination?.dataType?.measurementUnit?.symbol}">(${relationship.destination?.measurementUnit?.symbol})</g:if>
+                            <g:if test="${relationship.destination?.dataType instanceof PrimitiveType && relationship.destination?.dataType?.measurementUnit?.name}">(${relationship.destination?.measurementUnit?.name})</g:if>
+                            <g:if test="${relationship.destination?.dataType instanceof PrimitiveType && relationship.destination?.dataType?.measurementUnit?.symbol}">(${relationship.destination?.measurementUnit?.symbol})</g:if>
                         </g:else>
 
                     %{--<g:if test="${relationship.destination?.dataType?.enumerations}">--}%

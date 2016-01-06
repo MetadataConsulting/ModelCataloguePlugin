@@ -4,6 +4,7 @@ import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.RelationshipService
+import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import org.springframework.beans.factory.annotation.Autowired
 
 /**
@@ -36,7 +37,7 @@ class MergePublishedElements extends AbstractActionRunner {
     """
 
     String getMessage() {
-        normalizeDescription """Merge ${GrailsNameUtils.getNaturalName(source.class.simpleName)} <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(source.class.simpleName)}/${source.id}">${relationshipService.getClassifiedName(source)}</a> into ${GrailsNameUtils.getNaturalName(destination.class.simpleName)} <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(destination.class.simpleName)}/${destination.id}">${relationshipService.getClassifiedName(destination)}</a> including all related elements having at least one data model as the source"""
+        normalizeDescription """Merge ${GrailsNameUtils.getNaturalName(source.class.simpleName)} <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(source.class.simpleName)}/${source.id}">${CatalogueElementMarshaller.getClassifiedName(element)}</a> into ${GrailsNameUtils.getNaturalName(destination.class.simpleName)} <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(destination.class.simpleName)}/${destination.id}">${CatalogueElementMarshaller.getClassifiedName(element)}</a> including all related elements having at least one data model as the source"""
     }
 
     @Override
@@ -80,17 +81,17 @@ class MergePublishedElements extends AbstractActionRunner {
                 GrailsNameUtils.getNaturalName(source.class.simpleName)
             } <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(source.class.simpleName)}/${
                 source.id
-            }">${relationshipService.getClassifiedName(source as CatalogueElement)}</a> into ${
+            }">${CatalogueElementMarshaller.getClassifiedName(source as CatalogueElement)}</a> into ${
                 GrailsNameUtils.getNaturalName(destination.class.simpleName)
             } <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(destination.class.simpleName)}/${
                 destination.id
-            }">${relationshipService.getClassifiedName(destination as CatalogueElement)}</a>"""
+            }">${CatalogueElementMarshaller.getClassifiedName(destination as CatalogueElement)}</a>"""
             result = encodeEntity merged
         } else {
             fail("""Unable to merge ${GrailsNameUtils.getNaturalName(source.class.simpleName)} ${
-                relationshipService.getClassifiedName(source as CatalogueElement)
+                CatalogueElementMarshaller.getClassifiedName(source as CatalogueElement)
             } into ${GrailsNameUtils.getNaturalName(destination.class.simpleName)} ${
-                relationshipService.getClassifiedName(destination as CatalogueElement)
+                CatalogueElementMarshaller.getClassifiedName(destination as CatalogueElement)
             }""")
             printErrors(merged.errors.allErrors)
         }

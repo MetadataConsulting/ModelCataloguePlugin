@@ -95,7 +95,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         }
 
         if (CatalogueElement.isAssignableFrom(resource)) {
-            DataModelFilter classifications = getOverridableDataModelFilter(params).withImports()
+            DataModelFilter dataModels = getOverridableDataModelFilter(params).withImports()
 
             String alias = resource.simpleName[0].toLowerCase()
             String listQuery = """
@@ -121,8 +121,8 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                     statuses: statuses
             ]
 
-            if (classifications) {
-                if (classifications.unclassifiedOnly) {
+            if (dataModels) {
+                if (dataModels.unclassifiedOnly) {
                     listQuery = """
                     from ${resource.simpleName} ${alias}
                     where
@@ -148,14 +148,14 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                         )
                     """
 
-                    if (classifications.includes) {
+                    if (dataModels.includes) {
                         listQuery += " and ${alias}.dataModel.id in :includes "
-                        arguments.includes = classifications.includes
+                        arguments.includes = dataModels.includes
                     }
 
-                    if (classifications.excludes) {
+                    if (dataModels.excludes) {
                         listQuery += " and r${alias}.dataModel.id not in :excludes "
-                        arguments.excludes = classifications.excludes
+                        arguments.excludes = dataModels.excludes
                     }
 
                 }
