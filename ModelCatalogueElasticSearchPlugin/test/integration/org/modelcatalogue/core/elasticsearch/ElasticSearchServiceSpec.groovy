@@ -97,8 +97,6 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
                 .get().exists
 
         when:
-
-
         ListWithTotalAndType<DataClass> foundClasses = elasticSearchService.search(DataClass, [search: 'foo'])
 
         then:
@@ -111,6 +109,13 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
 
         then: "there are no results if the related item does not contain the search term"
         foundRelationships.total == 0L
+
+        when:
+        ListWithTotalAndType<DataModel> foundDataModels = elasticSearchService.search(DataModel, [search: 'test'])
+
+        then:
+        foundDataModels.total == 1L
+        dataModel in foundDataModels.items
 
     }
 
