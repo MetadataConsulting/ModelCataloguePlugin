@@ -37,7 +37,7 @@ class MergePublishedElements extends AbstractActionRunner {
     """
 
     String getMessage() {
-        normalizeDescription """Merge ${GrailsNameUtils.getNaturalName(source.class.simpleName)} <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(source.class.simpleName)}/${source.id}">${CatalogueElementMarshaller.getClassifiedName(element)}</a> into ${GrailsNameUtils.getNaturalName(destination.class.simpleName)} <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(destination.class.simpleName)}/${destination.id}">${CatalogueElementMarshaller.getClassifiedName(element)}</a> including all related elements having at least one data model as the source"""
+        normalizeDescription """Merge ${GrailsNameUtils.getNaturalName(source.class.simpleName)} <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(source.class.simpleName)}/${source.id}">${CatalogueElementMarshaller.getClassifiedName(source)}</a> into ${GrailsNameUtils.getNaturalName(destination.class.simpleName)} <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(destination.class.simpleName)}/${destination.id}">${CatalogueElementMarshaller.getClassifiedName(destination)}</a> including all related elements having at least one data model as the source"""
     }
 
     @Override
