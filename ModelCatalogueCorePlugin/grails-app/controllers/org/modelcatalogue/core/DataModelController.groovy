@@ -44,6 +44,40 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
 		render view: 'gereport', model: ['models': results, 'dataTypes': dataTypes]
     }
 
+	def containsOrImports() {
+        DataModel dataModel = DataModel.get(params.id)
+        if (!dataModel) {
+            notFound()
+            return
+        }
+
+        CatalogueElement other = CatalogueElement.get(params.other)
+        if (!other) {
+            notFound()
+            return
+        }
+
+        if (!other.dataModel) {
+            respond(success: false, contains: false, imports: false)
+            return
+        }
+
+        if (dataModel == other.dataModel) {
+            respond(success: true, contains: true, imports: false)
+            return
+        }
+
+        DataModelFilter filter = DataModelFilter.includes(dataModel).withImports()
+
+
+        if (filter.isIncluding(other.dataModel)) {
+            respond(success: true, contains: false, imports: true)
+            return
+        }
+        respond(success: false, contains: false, imports: false)
+        return
+    }
+
     def content() {
         DataModel dataModel = DataModel.get(params.id)
         if (!dataModel) {

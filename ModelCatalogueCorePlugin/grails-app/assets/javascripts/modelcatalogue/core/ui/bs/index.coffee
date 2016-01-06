@@ -62,6 +62,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalAbout'
   'mc.core.ui.bs.modalPromptAnnotateLetter'
   'mc.core.ui.bs.saveOrUpdatePublishedElementCtrl'
+  'mc.core.ui.bs.watchAndAskForImportOrCloneCtrl'
   'mc.core.ui.bs.saveAndCreateAnotherCtrlMixin'
   'mc.core.ui.bs.modalPromptConvert'
   'mc.core.ui.bs.modalPromptCurrentActivity'
@@ -75,6 +76,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.metadataEditors'
   'mc.core.ui.bs.metadataEditor'
   'mc.core.ui.bs.navigationRightActions'
+  'mc.core.ui.bs.modalOptions'
 ]).run ['messages', (messages) ->
   if jQuery
     jQuery(document).on 'keypress', (e) ->

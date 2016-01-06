@@ -51,7 +51,9 @@ class DataModelFilter {
     }
 
     static DataModelFilter create(Iterable<DataModel> includes, Iterable<DataModel> excludes) {
-        new DataModelFilter(ImmutableSet.copyOf(includes.collect { it.id }), ImmutableSet.copyOf(excludes.collect { it.id }), false)
+        new DataModelFilter(ImmutableSet.copyOf(includes.collect { it.id }), ImmutableSet.copyOf(excludes.collect {
+            it.id
+        }), false)
     }
 
     static DataModelFilter includes(DataModel... includes) {
@@ -66,7 +68,9 @@ class DataModelFilter {
         if (json.unclassifiedOnly) {
             return create(true)
         }
-        return create((json.includes ?: []).collect { DataModel.get(it.id) }, (json.excludes ?: []).collect { DataModel.get(it.id) })
+        return create((json.includes ?: []).collect { DataModel.get(it.id) }, (json.excludes ?: []).collect {
+            DataModel.get(it.id)
+        })
     }
 
     static DataModelFilter from(Object other) {
@@ -140,8 +144,12 @@ class DataModelFilter {
     Map<String, Object> toMap() {
         [
                 unclassifiedOnly: unclassifiedOnly,
-                includes: includes.collect { CatalogueElementMarshaller.minimalCatalogueElementJSON(DataModel.get(it)) },
-                excludes: excludes.collect { CatalogueElementMarshaller.minimalCatalogueElementJSON(DataModel.get(it)) }
+                includes        : includes.collect {
+                    CatalogueElementMarshaller.minimalCatalogueElementJSON(DataModel.get(it))
+                },
+                excludes        : excludes.collect {
+                    CatalogueElementMarshaller.minimalCatalogueElementJSON(DataModel.get(it))
+                }
         ]
     }
 
@@ -160,4 +168,13 @@ class DataModelFilter {
 
         return new DataModelFilter(includes.build(), excludes, true)
     }
+
+    boolean isIncluding(DataModel model) {
+        return model.getId() in includes
+    }
+
+    boolean isExcluding(DataModel model) {
+        return model.getId() in excludes
+    }
+
 }

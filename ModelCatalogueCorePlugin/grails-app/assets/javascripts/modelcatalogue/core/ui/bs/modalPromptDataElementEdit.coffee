@@ -36,7 +36,7 @@ angular.module('mc.core.ui.bs.modalPromptDataElementEdit', ['mc.util.messages'])
               </div>
               <div class="form-group">
                 <label for="dataType" class="">Data Type</label>
-                <input type="text" id="dataType" placeholder="Data Type" ng-model="copy.dataType" catalogue-element-picker="dataType" label="el.name">
+                <input type="text" id="dataType" placeholder="Data Type" ng-model="copy.dataType" catalogue-element-picker="dataType" global="'allow'" label="el.name">
               </div>
             </form>
         </div>

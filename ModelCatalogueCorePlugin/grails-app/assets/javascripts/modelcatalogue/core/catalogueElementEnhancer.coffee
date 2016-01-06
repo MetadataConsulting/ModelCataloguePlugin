@@ -49,10 +49,19 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
           self.dataModels = [] unless self.dataModels
           self.classifications = self.dataModels
 
-          self['delete']      = () ->
+          self['delete'] = () ->
             enhance(rest(method: 'DELETE', url: "#{modelCatalogueApiRoot}#{self.link}")).then (result)->
               $rootScope.$broadcast 'catalogueElementDeleted', self
               result
+
+          self.execute = (tail, method = 'GET', data = undefined) ->
+            params =
+              method: method
+              url:  "#{modelCatalogueApiRoot}#{self.link}/#{tail}"
+
+            params.data = data if data
+
+            enhance rest params
 
           self.refresh        = () -> enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{self.link}"
           self.validate       = () -> enhance rest method: 'POST', url: "#{modelCatalogueApiRoot}#{self.link}/validate", data: self.getUpdatePayload()

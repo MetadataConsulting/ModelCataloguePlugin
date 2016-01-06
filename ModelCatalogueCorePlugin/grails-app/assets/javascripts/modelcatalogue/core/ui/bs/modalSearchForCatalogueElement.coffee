@@ -44,8 +44,17 @@ module.config ['messagesProvider', (messagesProvider)->
         controller: ['$scope', 'catalogueElementResource', '$modalInstance', '$window', '$state', 'security', 'messages', ($scope, catalogueElementResource, $modalInstance, $window, $state, security, messages) ->
           $scope.title = title
           $scope.currentDataModel = args.currentDataModel
-          $scope.global = args.global
-          $scope.allowGlobal = args.allowGlobal
+
+          if args.global == 'allow'
+            $scope.allowGlobal = true
+            $scope.global = false
+          else if args.global == true
+            $scope.allowGlobal = true
+            $scope.global = true
+          else
+            $scope.allowGlobal = false
+            $scope.global = false
+
           $scope.canAddImports = security.hasRole('CURATOR')
 
           $scope.setGlobal = (global) ->

@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages', 'mc.core.ui.bs.withClassificationCtrlMixin']).config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages', 'mc.core.ui.bs.withClassificationCtrlMixin', 'mc.core.ui.bs.watchAndAskForImportOrCloneCtrl']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
     (title, body, args) ->
       if not args?.element? and not args?.create?
@@ -57,13 +57,13 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
             <div collapse="subtype != 'referenceType'">
               <div class="form-group">
                 <label for="dataClass" class="">Data Class</label>
-                <input type="text" id="dataClass" placeholder="Data Class" ng-model="copy.dataClass" catalogue-element-picker="dataClass" label="el.name">
+                <input type="text" id="dataClass" placeholder="Data Class" ng-model="copy.dataClass" global="'allow'" catalogue-element-picker="dataClass" label="el.name">
               </div>
             </div>
             <div collapse="subtype != 'primitiveType'">
               <div class="form-group">
                 <label for="measurementUnit" class="">Measurement Unit</label>
-                <input type="text" id="measurementUnit" placeholder="Measurement Unit" ng-model="copy.measurementUnit" catalogue-element-picker="measurementUnit" label="el.name">
+                <input type="text" id="measurementUnit" placeholder="Measurement Unit" global="'allow'" ng-model="copy.measurementUnit" catalogue-element-picker="measurementUnit" label="el.name">
               </div>
             </div>
         </div>
@@ -115,6 +115,10 @@ x in ['apple', 'banana', 'cherry']
 
           angular.extend(this, $controller('withClassificationCtrlMixin', {$scope: $scope}))
           angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))
+          angular.extend(this, $controller('watchAndAskForImportOrCloneCtrl', {$scope: $scope}))
+
+          $scope.watchAndAskForImportOrClone('copy.measurementUnit')
+          $scope.watchAndAskForImportOrClone('copy.dataClass')
 
           $scope.hasChanged   = ->
             $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or $scope.copy.modelCatalogueId != $scope.original.modelCatalogueId or not angular.equals($scope.original.enumerations ? {}, $scope.copy.enumerations ? {}) or not angular.equals($scope.original.dataModels ? {}, $scope.copy.dataModels ? {})

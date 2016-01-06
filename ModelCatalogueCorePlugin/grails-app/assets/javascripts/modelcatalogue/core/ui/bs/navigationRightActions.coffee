@@ -12,7 +12,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
         iconOnly:   true
         action: ->
           # TODO: act differently when not in mc.* state
-          messages.prompt(null, null, type: 'search-catalogue-element', empty: true, currentDataModel: $scope.currentDataModel, allowGlobal: true).then (element) ->
+          messages.prompt(null, null, type: 'search-catalogue-element', empty: true, currentDataModel: $scope.currentDataModel, global: 'allow').then (element) ->
             element.show()
       }
   ]
