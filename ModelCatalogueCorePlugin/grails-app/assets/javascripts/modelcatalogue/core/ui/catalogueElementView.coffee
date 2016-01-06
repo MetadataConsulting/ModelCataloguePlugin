@@ -102,8 +102,9 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
         page = undefined if page == 1 or isNaN(page)
         options.location = "replace" if newProperty and not oldProperty
-        if($state.$current.name isnt "mc.resource.list") and $scope.element
-          $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page, q: $state.params.q, dataModelId: $state.params.dataModelId}, options
+        if $state.$current.name isnt "mc.resource.list" and $state.$current.name isnt "simple.resource.list" and $scope.element
+          nextState = if $state.includes 'mc' then 'mc.resource.show.property' else 'simple.resource.show.property'
+          $state.go nextState, {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page, q: $state.params.q, dataModelId: $state.params.dataModelId}, options
 
       onElementUpdate = (element, oldEl) ->
 
@@ -199,7 +200,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       $scope.$on 'catalogueElementUpdated', refreshElement
 
       $scope.$on '$stateChangeSuccess', (event, state, params) ->
-        return if state.name != 'mc.resource.show.property'
+        return if state.name != 'mc.resource.show.property' and state.name != 'simple.resource.show.property'
         $scope.property = params.property
 
       # init

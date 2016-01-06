@@ -80,7 +80,7 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
         selectInTree 'admin'
 
         then:
-        check { $('span.catalogue-element-treeview-name', text: "admin (User) [1] created") }
+        check { $('span.catalogue-element-treeview-name', text: "admin [1] created") }
     }
 
     def "classifications have activity feed"() {
