@@ -18,7 +18,7 @@ import org.modelcatalogue.core.ValueDomain
 
 @Transactional
 class GelXmlService {
-    
+    static final String XSD_STUDY_NAME = "http://xsd.modelcatalogue.org/metadata#study"
     static final String XSD_SCHEMA_NAME = "http://xsd.modelcatalogue.org/metadata#schemaName"
     static final String XSD_SCHEMA_VERSION = "http://xsd.modelcatalogue.org/metadata#schemaVersion"
     static final String XSD_SCHEMA_VERSION_DESCRIPTION = "http://xsd.modelcatalogue.org/metadata#schemaVersionDescription"
@@ -51,17 +51,21 @@ class GelXmlService {
 
     private static final int MAX_COLUMN_NAME_63 = 63
 
+    
     protected List<Model> listChildren(Model model,List results = [],Boolean isRoot=false) {
         if (model && !results.contains(model)){
-           //if we send root model as parameter means that this is a child and we have to add in the list
-           if (isRoot==false){
-             results += model
-           }
-            model.parentOf?.each { child ->
-                results += listChildren(child,results,false)
+            //if we send root model as parameter means that this is a child and we have to add in the list
+            if (isRoot==false){
+                results.add(model)
+
+
             }
+            for(Relationship r : model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)){
+                listChildren(r.destination,results,false)
+            }              
         }
-        results.unique()
+        
+        return results
     }
 
     
@@ -71,12 +75,25 @@ class GelXmlService {
      * @return a string with xml formed
      */
     def printXmlModelShredder(Model model) {
+        log.info("++++beginning to generate xml shredder model for  '${model.name}'   ++++++++++ " )
+        def time=System.currentTimeMillis()
         def subModels = listChildren(model,[],true)
+      
+ 
+        log.debug("getting all childrens counting  ${subModels.size()} in ${(System.currentTimeMillis()-time)/1000} s" )
+   
         def childsRelationship=model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)
         //validate to see if have the element schema metadata
+        time=System.currentTimeMillis()
         validateFormMetadata(model, subModels)
+        log.debug(" validating  metadata for   '${model.name}'  in ${(System.currentTimeMillis()-time)/1000} s" )
+        time=System.currentTimeMillis()
         validateMetadataOccurs(childsRelationship)
-        validateTableNameCompliance(subModels)
+        log.debug(" validating occurences  for  '${model.name}'  in ${(System.currentTimeMillis()-time)/1000} s" )
+        time=System.currentTimeMillis()
+        validateTableNameCompliance(model)
+        log.debug(" validateTableNameCompliance for  '${model.name}' in ${(System.currentTimeMillis()-time)/1000} s" )
+        time=System.currentTimeMillis()
 
         def writer = new StringWriter()
         def builder = new MarkupBuilder(writer)
@@ -102,6 +119,8 @@ class GelXmlService {
                 }
             }
         }
+        log.debug(" converted elements string in  ${model.name} in ${System.currentTimeMillis()-time} ms" )
+  
         return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n" + writer.toString()
     }
 
@@ -116,8 +135,10 @@ class GelXmlService {
                 tableName getXSLTableName(model)
                 
                 //validate occurs
-                validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.containmentType))
-                validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType))
+                def elements=model.getOutgoingRelationshipsByType(RelationshipType.containmentType)
+                def childrens=model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)
+                validateMetadataOccurs(elements+childrens)
+
                 //recursive printing 
                 model.outgoingRelationships.each { Relationship rel ->
 
@@ -135,8 +156,9 @@ class GelXmlService {
                 instructions model.ext.instructions
                 
                 //validate occurs
-                validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.containmentType))
-                validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType))
+                def childrens=model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)
+                def elements=model.getOutgoingRelationshipsByType(RelationshipType.containmentType)
+                validateMetadataOccurs(elements+childrens)
                 
                 model.outgoingRelationships.each { Relationship rel ->
 
@@ -278,13 +300,14 @@ class GelXmlService {
         //check if the metadata occurs it's already filled in for models
         validateMetadataOccurs(childRelations)
 
+        def namespace=targetModel.ext.get(XSD_STUDY_NAME)=='cancer'?'gelCancer':'gelRD'
 
 
         xml.'xs:schema'('xmlns:xs': 'http://www.w3.org/2001/XMLSchema',
                 "xmlns:vc": "http://www.w3.org/2007/XMLSchema-versioning",
-                "xmlns:gelRD" : "https://genomicsengland.co.uk/xsd/raredisease/1.3.1",
-                "xmlns": "https://genomicsengland.co.uk/xsd/raredisease/1.3.1",
-                "targetNamespace":'https://genomicsengland.co.uk/xsd/raredisease/1.3.1',
+                "xmlns:${namespace}" : "https://genomicsengland.co.uk/xsd/${targetModel.ext.get(XSD_STUDY_NAME)}/1.3.1",
+                "xmlns": "https://genomicsengland.co.uk/xsd/${targetModel.ext.get(XSD_STUDY_NAME)}/1.3.1",
+                "targetNamespace":"https://genomicsengland.co.uk/xsd/${targetModel.ext.get(XSD_STUDY_NAME)}/1.3.1",
                 'vc:minVersion': '1.1') {
             'xs:annotation'{
                 'xs:documentation'{
@@ -390,21 +413,18 @@ class GelXmlService {
         }
         
         //validate for required metadata occurs
-        validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.containmentType))
-        validateTableNameCompliance(model.getOutgoingRelationshipsByType(RelationshipType.containmentType).collect{it.destination})
-        
-        validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType))
-        validateTableNameCompliance(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType).collect{it.destination})
-        
+        def containementRelationships=model.getOutgoingRelationshipsByType(RelationshipType.containmentType)
+        def hieracrchyRelationships=model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)
+        validateMetadataOccurs(hieracrchyRelationships+containementRelationships)
+         
         return xml.'xs:complexType'(name: printXSDFriendlyString(model)){
             "${sectionType}"{
-             
-                
-                model.getOutgoingRelationshipsByType(RelationshipType.containmentType).each { Relationship relationship ->
+                  
+                containementRelationships.each { Relationship relationship ->
                     printDataElements(xml, relationship.destination, fromDestination(relationship,METADATA_MIN_OCCURS), fromDestination(relationship,METADATA_MAX_OCCURS),valueDomains,xmlSchema,relationship.ext)
                 }
 
-                model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType).each { Relationship relationship ->
+                hieracrchyRelationships.each { Relationship relationship ->
                     printModelElements(xml, relationship.destination, fromDestination(relationship,METADATA_MIN_OCCURS), fromDestination(relationship,METADATA_MAX_OCCURS))
                 }
             }
@@ -458,13 +478,15 @@ class GelXmlService {
     }
     
     
-    protected void validateTableNameCompliance(List subModels){
+    protected void validateTableNameCompliance(Model currModel){
+        def subModels=findAllTableCandidates(currModel);
+        log.debug(" all possible tables for shredder counting  ${subModels.size()}" )
+        
         String exceptionMessages="";
         Map mappedModels=subModels.collect{[it,getXSLTableName(it)]}.collectEntries()
         List tableNames=mappedModels.collect{key, value ->value}
    
         def duplicates=tableNames.findAll{tableNames.count(it) > 1}.unique()
-        println(duplicates)
         
         mappedModels.each{  model, table->
             if (duplicates?.contains(table)){
@@ -499,7 +521,7 @@ class GelXmlService {
             }else{
                 if (fromDestination(rel,METADATA_MAX_OCCURS)?.isLong()==false){
                     if(fromDestination(rel,METADATA_MAX_OCCURS)!='unbounded'){
-                        exceptionMessages+="metadata 'Max Occurs' for model '${rel.destination.name}'  is not a number, "
+                        exceptionMessages+="metadata 'Max Occurs' for model '${rel.destination.name}'  is not accepted notation, "
                     }
                 }
             }
@@ -539,7 +561,7 @@ class GelXmlService {
 
     protected printDataElementSchemaType(MarkupBuilder xml, DataElement dataElement, String type, String minOccurs = "0", String maxOccurs = "unbounded"){
 
-        if(type=="xs:string" && minOccurs.toInteger()>=1){
+        if(type=="xs:string" && ( minOccurs.contains("unbounded")||minOccurs.toInteger()>=1)){
 
             return xml.'xs:element'(name: printXSDFriendlyString(dataElement.name), minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)) {
                 if (dataElement?.description) {
@@ -574,7 +596,7 @@ class GelXmlService {
 
     protected printDataElementSimpleType(MarkupBuilder xml, DataElement dataElement, String type, String minOccurs = "0", String maxOccurs = "unbounded"){
 
-        if(type=="xs:string" && minOccurs.toInteger()>=1){
+        if(type=="xs:string" && ( minOccurs.contains("unbounded")||minOccurs.toInteger()>=1)){
 
             return xml.'xs:element'(name: printXSDFriendlyString(dataElement.name), minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)) {
                 if (dataElement?.description) {
@@ -699,4 +721,27 @@ class GelXmlService {
       }
       return defaultValue
   }  
+  
+    protected List<CatalogueElement> findAllTableCandidates(CatalogueElement model,List results = [],Boolean isRoot=false) {
+        
+            //if we send root model as parameter means that this is a child and we have to add in the list
+            if (isRoot==false){
+                results.add(model)
+            }
+
+            //search in data elements
+            for ( Relationship r:model.getOutgoingRelationshipsByType(RelationshipType.containmentType)) {
+                def maxOccurs=fromDestination(r,METADATA_MAX_OCCURS)
+                if (( maxOccurs.contains("unbounded")||maxOccurs.toInteger()>1)){
+                    results.add(r.destination)
+                }
+            }
+            
+            for (Relationship r: model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)){
+                findAllTableCandidates(r.destination,results,false)
+            }
+            
+        return results;
+    }
+
 }
