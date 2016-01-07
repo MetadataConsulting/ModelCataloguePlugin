@@ -18,7 +18,7 @@ import org.modelcatalogue.core.ValueDomain
 
 @Transactional
 class GelXmlService {
-    
+    static final String XSD_STUDY_NAME = "http://xsd.modelcatalogue.org/metadata#study"
     static final String XSD_SCHEMA_NAME = "http://xsd.modelcatalogue.org/metadata#schemaName"
     static final String XSD_SCHEMA_VERSION = "http://xsd.modelcatalogue.org/metadata#schemaVersion"
     static final String XSD_SCHEMA_VERSION_DESCRIPTION = "http://xsd.modelcatalogue.org/metadata#schemaVersionDescription"
@@ -80,19 +80,19 @@ class GelXmlService {
         def subModels = listChildren(model,[],true)
       
  
-        log.info("getting all childrens counting  ${subModels.size()} in ${(System.currentTimeMillis()-time)/1000} s" )
+        log.debug("getting all childrens counting  ${subModels.size()} in ${(System.currentTimeMillis()-time)/1000} s" )
    
         def childsRelationship=model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)
         //validate to see if have the element schema metadata
         time=System.currentTimeMillis()
         validateFormMetadata(model, subModels)
-        log.info(" validating  metadata for   '${model.name}'  in ${(System.currentTimeMillis()-time)/1000} s" )
+        log.debug(" validating  metadata for   '${model.name}'  in ${(System.currentTimeMillis()-time)/1000} s" )
         time=System.currentTimeMillis()
         validateMetadataOccurs(childsRelationship)
-        log.info(" validating occurences  for  '${model.name}'  in ${(System.currentTimeMillis()-time)/1000} s" )
+        log.debug(" validating occurences  for  '${model.name}'  in ${(System.currentTimeMillis()-time)/1000} s" )
         time=System.currentTimeMillis()
         validateTableNameCompliance(model)
-        log.info(" validateTableNameCompliance for  '${model.name}' in ${(System.currentTimeMillis()-time)/1000} s" )
+        log.debug(" validateTableNameCompliance for  '${model.name}' in ${(System.currentTimeMillis()-time)/1000} s" )
         time=System.currentTimeMillis()
 
         def writer = new StringWriter()
@@ -119,7 +119,7 @@ class GelXmlService {
                 }
             }
         }
-        log.info(" converted elements string in  ${model.name} in ${System.currentTimeMillis()-time} ms" )
+        log.debug(" converted elements string in  ${model.name} in ${System.currentTimeMillis()-time} ms" )
   
         return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n" + writer.toString()
     }
@@ -135,8 +135,10 @@ class GelXmlService {
                 tableName getXSLTableName(model)
                 
                 //validate occurs
-                validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.containmentType))
-                validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType))
+                def elements=model.getOutgoingRelationshipsByType(RelationshipType.containmentType)
+                def childrens=model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)
+                validateMetadataOccurs(elements+childrens)
+
                 //recursive printing 
                 model.outgoingRelationships.each { Relationship rel ->
 
@@ -154,8 +156,9 @@ class GelXmlService {
                 instructions model.ext.instructions
                 
                 //validate occurs
-                validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.containmentType))
-                validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType))
+                def childrens=model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)
+                def elements=model.getOutgoingRelationshipsByType(RelationshipType.containmentType)
+                validateMetadataOccurs(elements+childrens)
                 
                 model.outgoingRelationships.each { Relationship rel ->
 
@@ -297,13 +300,14 @@ class GelXmlService {
         //check if the metadata occurs it's already filled in for models
         validateMetadataOccurs(childRelations)
 
+        def namespace=targetModel.ext.get(XSD_STUDY_NAME)=='cancer'?'gelCancer':'gelRD'
 
 
         xml.'xs:schema'('xmlns:xs': 'http://www.w3.org/2001/XMLSchema',
                 "xmlns:vc": "http://www.w3.org/2007/XMLSchema-versioning",
-                "xmlns:gelRD" : "https://genomicsengland.co.uk/xsd/raredisease/1.3.1",
-                "xmlns": "https://genomicsengland.co.uk/xsd/raredisease/1.3.1",
-                "targetNamespace":'https://genomicsengland.co.uk/xsd/raredisease/1.3.1',
+                "xmlns:${namespace}" : "https://genomicsengland.co.uk/xsd/${targetModel.ext.get(XSD_STUDY_NAME)}/1.3.1",
+                "xmlns": "https://genomicsengland.co.uk/xsd/${targetModel.ext.get(XSD_STUDY_NAME)}/1.3.1",
+                "targetNamespace":"https://genomicsengland.co.uk/xsd/${targetModel.ext.get(XSD_STUDY_NAME)}/1.3.1",
                 'vc:minVersion': '1.1') {
             'xs:annotation'{
                 'xs:documentation'{
@@ -411,7 +415,7 @@ class GelXmlService {
         //validate for required metadata occurs
         def containementRelationships=model.getOutgoingRelationshipsByType(RelationshipType.containmentType)
         def hieracrchyRelationships=model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)
-        validateMetadataOccurs(containementRelationships.join(hieracrchyRelationships))      
+        validateMetadataOccurs(hieracrchyRelationships+containementRelationships)
          
         return xml.'xs:complexType'(name: printXSDFriendlyString(model)){
             "${sectionType}"{
@@ -476,7 +480,7 @@ class GelXmlService {
     
     protected void validateTableNameCompliance(Model currModel){
         def subModels=findAllTableCandidates(currModel);
-        log.info(" all possible tables for shredder counting  ${subModels.size()}" )
+        log.debug(" all possible tables for shredder counting  ${subModels.size()}" )
         
         String exceptionMessages="";
         Map mappedModels=subModels.collect{[it,getXSLTableName(it)]}.collectEntries()

@@ -11,6 +11,7 @@ xsd.config ['metadataEditorsProvider', (metadataEditorsProvider)->
       '=[hierarchy]=>'
     ]
     keys: [
+      "http://xsd.modelcatalogue.org/metadata#study"
       "http://xsd.modelcatalogue.org/metadata#schemaName"
       "http://xsd.modelcatalogue.org/metadata#schemaVersion"
       "http://xsd.modelcatalogue.org/metadata#schemaVersionDescription"
@@ -65,6 +66,14 @@ xsd.run ['$templateCache', ($templateCache) ->
  $templateCache.put 'modelcatalogue/core/ui/metadataEditors/xsdMetadata.html', '''
   <div class="alert alert-warning">This XSD metadata only applies on the root model of the Xml Schema.Every GEL Schema should have included these mandatory fields</div>
   <form class="form">
+
+      <div class="form-group">
+          <label for="schema-name" class="control-label">XML Schema Name</label>
+          <input maxlength="50" type="text" class="form-control" id="schema-name" ng-model="object.access('http://xsd.modelcatalogue.org/metadata#schemaName')" ng-model-options="{ getterSetter: true }">
+              <p class="help-block">
+                  XML Schema Name. Limit to maximum 50 chars. Attention! use lower case without without spaces or unaccepted chars for an xsd element name 
+              </p>
+      </div>
       <div class="form-group">
           <label for="xsl-table-name1" class="control-label">Table Name(XSL)</label>
           <input maxlength="63" type="text" class="form-control" id="xsl-table-name1" ng-model="object.access('http://xsl.modelcatalogue.org/tableName')" ng-model-options="{ getterSetter: true }">
@@ -73,10 +82,10 @@ xsd.run ['$templateCache', ($templateCache) ->
           </p>
       </div>
       <div class="form-group">
-          <label for="schema-name" class="control-label">XML Schema Name</label>
-          <input maxlength="50" type="text" class="form-control" id="schema-name" ng-model="object.access('http://xsd.modelcatalogue.org/metadata#schemaName')" ng-model-options="{ getterSetter: true }">
-              <p class="help-block">
-                  XML Schema Name. Limit to maximum 50 chars. Attention! use lower case without without spaces or unaccepted chars for an xsd element name 
+          <label for="study" class="control-label">Study </label>
+           <select id="section-type" class="form-control" ng-options="key for (key, value) in {'Rare Diseases':'rarediseases', 'Cancer': 'cancer',}" ng-model="object.access('http://xsd.modelcatalogue.org/metadata#study')" ng-model-options="{ getterSetter: true }"></select>
+           <p class="help-block">
+                  The study for which the current xml schema is designed to be.  Will be associated with the xml namespace specific . 
               </p>
       </div>
       <div class="form-group">
