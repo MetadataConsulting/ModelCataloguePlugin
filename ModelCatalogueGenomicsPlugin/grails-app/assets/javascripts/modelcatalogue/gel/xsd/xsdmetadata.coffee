@@ -5,7 +5,7 @@ xsd = angular.module('mc.core.xsd', ['mc.core.ui.metadataEditors'])
 # TODO: inline help
 xsd.config ['metadataEditorsProvider', (metadataEditorsProvider)->
   metadataEditorsProvider.register {
-    title: 'XSD-XSL(Metadata)'
+    title: 'XSD-XSL (Metadata)'
     types: [
       'dataClass'
       '=[hierarchy]=>'
@@ -21,7 +21,7 @@ xsd.config ['metadataEditorsProvider', (metadataEditorsProvider)->
   }
 
   metadataEditorsProvider.register {
-    title: 'XSD-XSL( Datatype Restrictions)'
+    title: 'XSD-XSL (Datatype Restrictions)'
     types: [
       'dataElement'   
       'dataType'
@@ -44,7 +44,7 @@ xsd.config ['metadataEditorsProvider', (metadataEditorsProvider)->
     template: 'modelcatalogue/core/ui/metadataEditors/xsdItemDataTypeRestriction.html'
   }
   metadataEditorsProvider.register {
-    title: 'Occurences(Metadata)'
+    title: 'Occurrences (Metadata)'
     types: [
           'dataElement'   
           'dataType'
