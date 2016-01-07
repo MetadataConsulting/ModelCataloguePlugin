@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 'mc.core.ui.bs.watchAndAskForImportOrCloneCtrl']).config ['messagesProvider', (messagesProvider)->
   messagesProvider.setPromptFactory 'create-new-relationship', [ '$modal', '$q', 'messages', 'catalogueElementResource', 'enhance', ($modal, $q, messages, catalogueElementResource, enhance) ->
     (title, body, args) ->
       if not args?.element?
@@ -27,8 +27,9 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
                 <div class="panel-body">
                   <messages-panel messages="destination.messages"></messages-panel>
                   <div class="form-group">
-                    <input id="element" type="text" class="form-control" ng-model="destination.relation" catalogue-element-picker resource="relationType" typeahead-on-select="destination.updateRelation(destination.relation)" ng-disabled="!relationshipTypeInfo.type">
+                    <input id="element" type="text" class="form-control" ng-model="destination.relation" global="'allow'" catalogue-element-picker resource="relationType" typeahead-on-select="destination.updateRelation(destination.relation)" ng-disabled="!relationshipTypeInfo.type">
                   </div>
+                  <!--
                   <div class="form-group">
                     <label for="classification" ng-click="destination.classificationExpanded = ! destination.classificationExpanded">Data Model <span class="fa fa-fw" ng-class="{'fa-toggle-up': destination.classificationExpanded, 'fa-toggle-down': !destination.classificationExpanded}"></span></label>
                     <div collapse="!destination.classificationExpanded">
@@ -36,6 +37,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
                       <p class="help-block">Select a data model only if the relationship applies for given classification only. This usually happens when you are reusing catalogue elements form some standard data model</p>
                     </div>
                   </div>
+                  -->
                   <div class="form-group">
                     <label ng-click="destination.metadataExpanded = ! destination.metadataExpanded" class="expand-metadata"">Metadata <span class="fa fa-fw" ng-class="{'fa-toggle-up': destination.metadataExpanded, 'fa-toggle-down': !destination.metadataExpanded}"></label>
                     <div collapse="!destination.metadataExpanded">
@@ -53,7 +55,13 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
             <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
         </div>
         '''
-        controller: ['$scope', 'messages', '$modalInstance', ($scope, messages, $modalInstance) ->
+        controller: ['$scope', 'messages', '$modalInstance', '$controller', '$stateParams', 'catalogueElementResource', ($scope, messages, $modalInstance, $controller, $stateParams, catalogueElementResource) ->
+
+          if not args.currentDataModel and $stateParams.dataModelId and $stateParams.dataModelId != 'catalogue'
+            catalogueElementResource('dataModel').get($stateParams.dataModelId).then (dataModel) ->
+              args.currentDataModel = dataModel
+
+          angular.extend(this, $controller('watchAndAskForImportOrCloneCtrl', {$scope: $scope}))
 
           $scope.relationshipTypes = []
           $scope.relationshipTypeInfo = null
@@ -82,16 +90,23 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
           $scope.addDestination = ->
             destination = messages: messages.createNewMessages(), metadata: enhance.getEnhancer('orderedMap').emptyOrderedMap()
             destination.updateRelation = (relation) ->
-              @metadataOwner =
-                type: $scope.relationshipTypeInfo?.type
-                element: $scope.element
-                relation: if relation then relation else {elementType: $scope.relationType}
-                direction: if $scope.direction == 'outgoing' then 'sourceToDestination' else 'destinationToSource'
-                ext:
-                  type: 'orderedMap'
-                elementType: 'relationship'
 
-              @relation = relation
+              doUpdateRelation = (relation) =>
+                @metadataOwner =
+                  type: $scope.relationshipTypeInfo?.type
+                  element: $scope.element
+                  relation: if relation then relation else {elementType: $scope.relationType}
+                  direction: if $scope.direction == 'outgoing' then 'sourceToDestination' else 'destinationToSource'
+                  ext:
+                    type: 'orderedMap'
+                  elementType: 'relationship'
+
+                @relation = relation
+
+              if $scope.relationshipType?.versionSpecific
+                $scope.cloneOrImport(relation, args.currentDataModel).then doUpdateRelation
+              else
+                doUpdateRelation(relation)
 
             destination.updateClassification = (classification) -> @classification = classification
 

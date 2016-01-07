@@ -64,7 +64,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       watches:    ['element.status', 'element.archived']
       disabled:   $scope.element.archived
       action:     ->
-        messages.prompt('Create Relationship', '', {type: 'create-new-relationship', element: $scope.element}).catch showErrorsUsingMessages(messages)
+        messages.prompt('Create Relationship', '', {type: 'create-new-relationship', element: $scope.element, currentDataModel: $scope.currentDataModel}).catch showErrorsUsingMessages(messages)
     }
 
   ]

@@ -145,7 +145,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
         (scope) -> scope.$parent.element.archived
       ]
       action:     ->
-        messages.prompt('Create Relationship', '', {type: 'create-new-relationship', element: $scope.$parent.element, direction: direction, relationshipTypeName: relationshipType}).catch showErrorsUsingMessages(messages)
+        messages.prompt('Create Relationship', '', {type: 'create-new-relationship', currentDataModel: $scope.currentDataModel, element: $scope.$parent.element, direction: direction, relationshipTypeName: relationshipType}).catch showErrorsUsingMessages(messages)
     }
   ]
 
