@@ -63,7 +63,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
             <div collapse="subtype != 'primitiveType'">
               <div class="form-group">
                 <label for="measurementUnit" class="">Measurement Unit</label>
-                <input type="text" id="measurementUnit" placeholder="Measurement Unit" global="'allow'" ng-model="copy.measurementUnit" catalogue-element-picker="measurementUnit" label="el.name">
+                <input type="text" id="measurementUnit" placeholder="Measurement Unit" ng-model="copy.measurementUnit" catalogue-element-picker="measurementUnit" label="el.name">
               </div>
             </div>
         </div>
@@ -117,7 +117,8 @@ x in ['apple', 'banana', 'cherry']
           angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))
           angular.extend(this, $controller('watchAndAskForImportOrCloneCtrl', {$scope: $scope}))
 
-          $scope.watchAndAskForImportOrClone('copy.measurementUnit')
+          # measurement unit are bit different - they are not supposed to be cloned at the moment
+          # $scope.watchAndAskForImportOrClone('copy.measurementUnit')
           $scope.watchAndAskForImportOrClone('copy.dataClass')
 
           $scope.hasChanged   = ->
