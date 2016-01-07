@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.focusMe']).config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.focusMe', 'mc.core.ui.bs.watchAndAskForImportOrCloneCtrl']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', '$q', 'messages', '$rootScope', ($modal, $q, messages,$rootScope) ->
     (title, body, args) ->
 
@@ -101,16 +101,16 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   <label for="name" class="">Child Data Class</label>
                   <elements-as-tags elements="children"></elements-as-tags>
                   <div class="input-group">
-                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="child.element" focus-me="step=='children'" catalogue-element-picker="dataClass" typeahead-on-select="push('children', 'child')">
+                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="child.element" focus-me="step=='children'" catalogue-element-picker="dataClass" global="'allow'" typeahead-on-select="pushWithDataModelCheck('children', 'child')">
                     <span class="input-group-btn">
-                      <button class="btn btn-success" ng-click="push('children', 'child')" ng-disabled="isEmpty(child.element)"><span class="glyphicon glyphicon-plus"></span></button>
+                      <button class="btn btn-success" ng-click="pushWithDataModelCheck('children', 'child')" ng-disabled="isEmpty(child.element)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
                   </div>
                   <p class="help-block">Child data class is destination for the hierarchy relationship</p>
                 </div>
                 <div ng-click="importChildModelsFromCSV()">
                   <alert type="info">
-                    <strong>Hint:</strong> If you have CSV file with sample data you can <a class="alert-link"><span class="fa fa-magic"></span> import child data elements from CSV file headers</a>.
+                    <strong>Hint:</strong> If you have CSV file with sample data you can <a class="alert-link"><span class="fa fa-magic"></span> import child data classes from CSV file headers</a>.
                   </alert>
                 </div>
                 <metadata-editor object="child.ext" title="Relationship Metadata" owner="owners.children"></metadata-editor>
@@ -123,9 +123,9 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   <label for="name" class="">Data Element</label>
                   <elements-as-tags elements="dataElements"></elements-as-tags>
                   <div class="input-group">
-                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="dataElement.element" focus-me="step=='elements'" catalogue-element-picker="dataElement"  typeahead-on-select="push('dataElements', 'dataElement')">
+                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="dataElement.element" focus-me="step=='elements'" catalogue-element-picker="dataElement" global="'allow'" typeahead-on-select="pushWithDataModelCheck('dataElements', 'dataElement')">
                     <span class="input-group-btn">
-                      <button class="btn btn-success" ng-click="push('dataElements', 'dataElement')" ng-disabled="isEmpty(dataElement.element)"><span class="glyphicon glyphicon-plus"></span></button>
+                      <button class="btn btn-success" ng-click="pushWithDataModelCheck('dataElements', 'dataElement')" ng-disabled="isEmpty(dataElement.element)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
                   </div>
                   <p class="help-block">Data element is destination for the containment relationship</p>
@@ -166,7 +166,10 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
           <button ng-disabled="!finished" class="btn btn-default"  ng-click="$close(dataClass)" id="exit-wizard"><span class="glyphicon glyphicon-remove"></span> Close</button>
         </div>
         '''
-        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', 'args', 'delayedQueueExecutor', '$q', '$log', 'enhance', 'metadataEditors', 'catalogue', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout, args, delayedQueueExecutor, $q, $log, enhance, metadataEditors, catalogue) ->
+        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', 'args', 'delayedQueueExecutor', '$q', '$log', 'enhance', 'metadataEditors', 'catalogue', '$controller', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout, args, delayedQueueExecutor, $q, $log, enhance, metadataEditors, catalogue, $controller) ->
+
+          angular.extend(this, $controller('watchAndAskForImportOrCloneCtrl', {$scope: $scope}))
+
           execAfter50 = delayedQueueExecutor(500)
 
           orderedMapEnhancer = enhance.getEnhancer('orderedMap')
@@ -223,6 +226,27 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
               value.name = value.element.name
             $scope[arrayName].push value
             $scope[propertyName] = {ext: orderedMapEnhancer.emptyOrderedMap()}
+
+          $scope.pushWithDataModelCheck = (arrayName, propertyName) ->
+            value = $scope[propertyName]
+            unless value
+              $log.warn "no scope value for #{propertyName}", $scope
+              return
+
+
+            $scope.cloneOrImport(value.element, args.currentDataModel).then (element) ->
+              value.element = element
+
+              if angular.isString element
+                value.name = element
+                value.create = true
+              else
+                value.name = element.name
+
+
+
+              $scope[arrayName].push value
+              $scope[propertyName] = {ext: orderedMapEnhancer.emptyOrderedMap()}
 
           $scope.openElementInNewWindow = (element) ->
             url = $state.href('mc.resource.show', {resource: names.getPropertyNameFromType(element.elementType), id: element.id})
