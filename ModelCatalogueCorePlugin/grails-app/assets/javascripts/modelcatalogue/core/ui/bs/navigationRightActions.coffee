@@ -182,17 +182,6 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
       }
   ]
 
-  annotate = ['$scope', 'messages', ($scope, messages) -> {
-    position: 2000
-    label: "Annotate Letter"
-    icon:  'fa fa-envelope-o fa-fw'
-    action: ->
-      messages.prompt('Annotate Letter', '', type: 'annotate-letter')
-  }]
-  actionsProvider.registerChildAction 'new-import', 'annotate-letter', annotate
-  actionsProvider.registerChildAction 'curator-menu', 'annotate-letter', annotate
-  actionsProvider.registerActionInRole 'global-annotate-letter', actionsProvider.ROLE_GLOBAL_ACTION, annotate
-
 
   loincImport = ['$scope', 'messages', ($scope, messages) -> {
     position: 13001
