@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.util.builder
 
 import groovy.util.logging.Log4j
-import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.Legacy
@@ -11,6 +10,11 @@ import static org.modelcatalogue.core.util.HibernateHelper.*
 @Log4j class DefaultCatalogueElementProxy<T extends CatalogueElement> implements CatalogueElementProxy<T>, org.modelcatalogue.core.api.CatalogueElement {
 
     static final List<Class> KNOWN_DOMAIN_CLASSES = [Asset, CatalogueElement, DataModel, DataElement, DataType, EnumeratedType, ReferenceType, MeasurementUnit, DataClass, PrimitiveType]
+    public static final String CHANGE_NEW = "Does Not Exist Yet"
+    public static final String CHANGE_TYPE = "Type Changed"
+    public static final String CHANGE_PARAMETERS = "Parameters Changed"
+    public static final String CHANGE_EXTENSIONS = "Extensions Changed"
+    public static final String CHANGE_RELATIONSHIP = "Relationship Changed"
 
     Class<T> domain
 
@@ -20,6 +24,7 @@ import static org.modelcatalogue.core.util.HibernateHelper.*
 
     boolean newlyCreated
     boolean underControl
+    boolean referenceNotPresentInTheCatalogue
 
     protected CatalogueElementProxyRepository repository
 
@@ -75,10 +80,15 @@ import static org.modelcatalogue.core.util.HibernateHelper.*
                 return resolved
             }
 
-            log.debug "$this not found, creating new one"
+            try {
+                log.debug "$this not found, creating new one"
 
-            newlyCreated = true
-            resolved = fill(domain.newInstance())
+                newlyCreated = true
+                resolved = fill(domain.newInstance())
+            } catch (InstantiationException ignored) {
+                throw new ReferenceNotPresentInTheCatalogueException("Cannot create element from reference $this")
+            }
+
 
             return resolved
         } catch (Exception e) {
@@ -129,7 +139,7 @@ import static org.modelcatalogue.core.util.HibernateHelper.*
     }
 
     T createDraftIfRequested() {
-        if (!draftRequest) {
+        if (!draftRequest || referenceNotPresentInTheCatalogue) {
             return null
         }
 
@@ -204,25 +214,48 @@ import static org.modelcatalogue.core.util.HibernateHelper.*
 
     String getChanged() {
         try {
-            T existing = findExisting()
+            T existing = null
+
+            try {
+                existing = findExisting()
+            } catch (ReferenceNotPresentInTheCatalogueException e) {
+                if (!referenceNotPresentInTheCatalogue) {
+                    throw e
+                }
+            }
             if (!existing) {
-                return changed = "Does Not Exist Yet"
+                return changed = CHANGE_NEW
             }
 
-            if (domain != getEntityClass(existing)) {
-                return changed = "Type Changed"
+            if (domain != getEntityClass(existing) && domain != CatalogueElement) {
+                return changed = CHANGE_TYPE
+            }
+
+            if (domain == DataType && parameters.enumerations) {
+                domain = EnumeratedType
+                return changed = CHANGE_TYPE
+            }
+
+            if (domain == DataType && parameters.dataClass) {
+                domain = ReferenceType
+                return changed = CHANGE_TYPE
+            }
+
+            if (domain == DataType && parameters.measurementUnit) {
+                domain = PrimitiveType
+                return changed = CHANGE_TYPE
             }
 
             if (isParametersChanged(existing)) {
-                return changed = "Parameters Changed"
+                return changed = CHANGE_PARAMETERS
             }
 
             if (isExtensionsChanged(existing)) {
-                return changed = "Extensions Changed"
+                return changed = CHANGE_EXTENSIONS
             }
 
             if (isRelationshipsChanged()) {
-                return changed = "Relationship Changed"
+                return changed = CHANGE_RELATIONSHIP
             }
 
             return ""
@@ -235,17 +268,38 @@ import static org.modelcatalogue.core.util.HibernateHelper.*
         Set<Long> foundRelationships = []
 
         boolean relationshipsChanged = relationships.any {
-            CatalogueElement source = it.source.findExisting()
-
-            if (!source) return true
-
-            CatalogueElement destination = it.destination.findExisting()
-
-            if (!destination) return true
-
             RelationshipType type = RelationshipType.readByName(it.relationshipTypeName)
 
             if (!type) return true
+
+            CatalogueElement source = null
+
+            try {
+                source = it.source.findExisting()
+            } catch (ReferenceNotPresentInTheCatalogueException e) {
+                if (e.isIgnorable(type)) {
+                    log.warn("Source ${it.source} cannot be found in the catalogue!", e)
+                    return false
+                }
+                throw e
+            }
+
+            if (!source) return true
+
+
+            CatalogueElement destination = null
+
+            try {
+                destination = it.destination.findExisting()
+            } catch (ReferenceNotPresentInTheCatalogueException e) {
+                if (e.isIgnorable(type)) {
+                    log.warn("Destination ${it.destination} cannot be found in the catalogue!", e)
+                    return false
+                }
+                throw e
+            }
+
+            if (!destination) return true
 
             Relationship found = Relationship.findBySourceAndDestinationAndRelationshipType(source, destination, type)
 
@@ -290,7 +344,8 @@ import static org.modelcatalogue.core.util.HibernateHelper.*
                 return result
             }
             if (!name) {
-                throw new IllegalStateException("Missing id, classification and name so there is no way how to find existing element")
+                markAsReferenceNotPresentInTheCatalogue()
+                throw new ReferenceNotPresentInTheCatalogueException("Element not found by ID and there is no name provided to help to find the element")
             }
         }
         if (name) {
@@ -300,6 +355,13 @@ import static org.modelcatalogue.core.util.HibernateHelper.*
             return repository.tryFindUnclassified(domain, name, modelCatalogueId)
         }
         throw new IllegalStateException("Missing id, classification and name so there is no way how to find existing element")
+    }
+
+    void markAsReferenceNotPresentInTheCatalogue() {
+        referenceNotPresentInTheCatalogue = true
+        if (replacedBy && replacedBy instanceof DefaultCatalogueElementProxy) {
+            replacedBy.referenceNotPresentInTheCatalogue = true
+        }
     }
 
     private T fill(T element) {
@@ -315,12 +377,17 @@ import static org.modelcatalogue.core.util.HibernateHelper.*
             return element
         }
 
-        updateProperties(element)
+        if (changed != CHANGE_RELATIONSHIP) {
+            // if there are only changed relationships no need to update
 
-        log.debug "Saving properties of $this"
-        repository.save(element)
+            if (changed != CHANGE_EXTENSIONS) {
+                updateProperties(element)
+                log.debug "Saving properties of $this"
+                repository.save(element)
+            }
 
-        updateExtensions(element)
+            updateExtensions(element)
+        }
 
         element
     }
@@ -373,6 +440,10 @@ import static org.modelcatalogue.core.util.HibernateHelper.*
             throw new IllegalArgumentException("Can only merge with other default catalogue element proxies")
         }
 
+        if (replacedBy && replacedBy == other) {
+            return other
+        }
+
         other.extensions.each { String key, String value ->
             if (value != null) {
                 setExtension(key, value)
@@ -399,6 +470,8 @@ import static org.modelcatalogue.core.util.HibernateHelper.*
             }
         }
 
+
+
         other.replacedBy = this
 
         if (domain != other.domain) {
@@ -408,6 +481,7 @@ import static org.modelcatalogue.core.util.HibernateHelper.*
         }
 
         this.underControl = this.underControl || other.underControl
+        this.referenceNotPresentInTheCatalogue = this.referenceNotPresentInTheCatalogue || other.referenceNotPresentInTheCatalogue
 
         this
     }

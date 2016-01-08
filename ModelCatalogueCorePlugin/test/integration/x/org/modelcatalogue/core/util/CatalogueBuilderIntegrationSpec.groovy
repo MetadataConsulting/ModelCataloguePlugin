@@ -5,6 +5,7 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import spock.lang.Issue
 
@@ -919,6 +920,55 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         type.instanceOf(DataType)
         type.instanceOf(PrimitiveType)
         getEntityClass(type) == PrimitiveType
+
+    }
+
+
+    def "ignores missing references"() {
+        final String assetModelName = 'Asset Model'
+        final String testAssetName = 'Test Asset'
+        final String dataClassName = 'Test Data Class'
+        final String valueDomainName = 'ValueDomain IMR'
+        final String valueDomainId1 = 'http://www.example.com/200'
+        final String valueDomainId2 = 'http://www.example.com/201'
+
+
+        User admin = User.findByName('admin') ?: new User(name: 'admin', username: 'admin', enabled: true, password: 'admin').save(failOnError: true)
+        DataModel assetDataModel = new DataModel(name: assetModelName).save(failOnError: true)
+        Asset asset = new Asset(dataModel: assetDataModel, name: testAssetName).save(failOnError: true)
+
+        expect:
+        admin
+        asset.dataModel == assetDataModel
+        asset in assetDataModel.declares
+
+        when:
+        build {
+            dataModel name: assetModelName, {
+                dataClass name: dataClassName, {
+                    rel 'favourite' from(ref(admin.getDefaultModelCatalogueId(true)))
+                    rel 'relatedTo' from(ref(asset.getDefaultModelCatalogueId(true)))
+                }
+            }
+        }
+        then:
+        noExceptionThrown()
+
+        when:
+        build {
+            dataModel name: assetModelName, {
+                rel 'classificationFilter' to(ref(admin.getDefaultModelCatalogueId(true))) {}
+                dataClass name: dataClassName, {
+                    rel 'synonym' from ref('http://www.example.com/100.1')
+                    rel 'synonym' from 'Foo', 'Bar'
+                }
+                valueDomain name:  valueDomainName, id: valueDomainId1, dataModel: 'Some other model', {
+                    dataType name: valueDomainName, id: valueDomainId2, enumerations: [foo: 'bar']
+                }
+            }
+        }
+        then:
+        noExceptionThrown()
 
     }
 }

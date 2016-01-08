@@ -90,13 +90,19 @@ class DefaultRelationshipBuilder implements RelationshipBuilder {
      * @param extensions closure defining the metadata
      */
     void to(CatalogueElementProxy element, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
-        context.withContextElement(getSourceHintOrClass()) {
+        def sourceClass = getSourceHintOrClass()
+        context.withContextElement(sourceClass) {
             RelationshipProxy relationshipProxy = new RelationshipProxy(type.name, it, element, extensions)
             element.addToPendingRelationships(relationshipProxy)
             return it.addToPendingRelationships(relationshipProxy)
 
         } or {
-            throw new IllegalStateException("There is no contextual element available of type ${getSourceHintOrClass()}")
+            if (sourceClass.superclass && sourceClass.superclass != Object) {
+                sourceClassHint = sourceClass.superclass
+
+                return to(element, extensions)
+            }
+            throw new IllegalStateException("There is no contextual element available of type ${sourceClass}")
         }
     }
 
@@ -171,12 +177,18 @@ class DefaultRelationshipBuilder implements RelationshipBuilder {
      * @param extensions closure defining the metadata
      */
     public void from(CatalogueElementProxy element, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
-        context.withContextElement(getDestinationHintOrClass()) {
+        def destinationClass = getDestinationHintOrClass()
+        context.withContextElement(destinationClass) {
             RelationshipProxy proxy = new RelationshipProxy(type.name, element, it, extensions)
             element.addToPendingRelationships(proxy)
             return it.addToPendingRelationships(proxy)
         } or {
-            throw new IllegalStateException("There is no contextual element available of type ${getDestinationHintOrClass()}")
+            if (destinationClass.superclass && destinationClass.superclass != Object) {
+                destinationClassHint = destinationClass.superclass
+
+                return from(element, extensions)
+            }
+            throw new IllegalStateException("There is no contextual element available of type ${destinationClass}")
         }
     }
 

@@ -171,8 +171,16 @@ class CatalogueElementProxyRepository {
         int elNumberOfPositions = Math.floor(Math.log10(elementProxiesToBeResolved.size())) + 2
         elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
             log.debug "[${(i + 1).toString().padLeft(elNumberOfPositions, '0')}/${elementProxiesToBeResolved.size().toString().padLeft(elNumberOfPositions, '0')}] Resolving $element"
-            created << element.resolve()
-            relationshipProxiesToBeResolved.addAll element.pendingRelationships
+            try {
+                created << element.resolve()
+                relationshipProxiesToBeResolved.addAll element.pendingRelationships
+            } catch (e) {
+                if (anyCause(e, ReferenceNotPresentInTheCatalogueException)) {
+                    log.warn "Reference ${element} not present in the catalogue"
+                } else {
+                    throw e
+                }
+            }
         }
         watch.stop()
 
@@ -183,7 +191,15 @@ class CatalogueElementProxyRepository {
         int relNumberOfPositions = Math.floor(Math.log10(relationshipProxiesToBeResolved.size())) + 2
         relationshipProxiesToBeResolved.eachWithIndex { RelationshipProxy relationshipProxy, i ->
             log.debug "[${(i + 1).toString().padLeft(relNumberOfPositions, '0')}/${relationshipProxiesToBeResolved.size().toString().padLeft(relNumberOfPositions, '0')}] Resolving $relationshipProxy"
-            resolvedRelationships << relationshipProxy.resolve(this)?.getId()
+            try {
+                resolvedRelationships << relationshipProxy.resolve(this)?.getId()
+            } catch (e) {
+                if (anyCause(e,ReferenceNotPresentInTheCatalogueException)) {
+                    log.warn "Some item referred by ${relationshipProxy} not present in the catalogue"
+                } else {
+                    throw e
+                }
+            }
         }
 
         // TODO: collect the ids of relationships resolved and than do the same comparison like in the is relationship
@@ -215,17 +231,28 @@ class CatalogueElementProxyRepository {
             log.debug "[${(i + 1).toString().padLeft(elNumberOfPositions, '0')}/${elementProxiesToBeResolved.size().toString().padLeft(elNumberOfPositions, '0')}] Resolving status changes for $element"
 
             ElementStatus status = element.getParameter('status') as ElementStatus
-            CatalogueElement catalogueElement = element.resolve()
 
-            if (status && catalogueElement.status != status) {
-                if (status == ElementStatus.FINALIZED) {
-                    elementService.finalizeElement(catalogueElement)
-                } else if (status == ElementStatus.DRAFT) {
-                    elementService.createDraftVersion(catalogueElement, DraftContext.userFriendly())
-                } else if (status == ElementStatus.DEPRECATED) {
-                    elementService.archive(catalogueElement, true)
+            try {
+                CatalogueElement catalogueElement = element.resolve()
+
+                if (status && catalogueElement.status != status) {
+                    if (status == ElementStatus.FINALIZED) {
+                        elementService.finalizeElement(catalogueElement)
+                    } else if (status == ElementStatus.DRAFT) {
+                        elementService.createDraftVersion(catalogueElement, DraftContext.userFriendly())
+                    } else if (status == ElementStatus.DEPRECATED) {
+                        elementService.archive(catalogueElement, true)
+                    }
+                }
+            } catch (e) {
+                if (anyCause(e, ReferenceNotPresentInTheCatalogueException)) {
+                    // already printed
+                } else {
+                    throw e
                 }
             }
+
+
         }
         watch.stop()
 
@@ -463,6 +490,16 @@ class CatalogueElementProxyRepository {
         createdRelationships[hash] = relationship
 
         return relationship
+    }
+
+    private static boolean anyCause(Throwable th, Class<? extends Throwable> error) {
+        if (error.isInstance(th)) {
+            return true
+        }
+        if (!th.cause) {
+            return false
+        }
+        return anyCause(th.cause, error)
     }
 
 }

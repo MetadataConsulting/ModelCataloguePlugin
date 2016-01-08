@@ -193,6 +193,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         }
 
         context.withContextElement(DataType) {
+            // this is here to simplify importing legacy 1.x XML
             if (!parameters.name) {
                 parameters.name = it.getParameter('name')
             }
@@ -221,7 +222,9 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         }
 
         context.withContextElement(DataType) { outerDataType, Closure relConf ->
-            if (outerDataType.name != dataType.name) {
+            if (outerDataType.name == dataType.name) {
+                dataType.merge(outerDataType)
+            } else {
                 basedOn dataType, relConf
             }
         }
@@ -480,7 +483,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @param draft must be "draft" or PublishingStatus#DRAFT
      */
     void skip(ElementStatus draft) {
-        if (draft == org.modelcatalogue.core.api.ElementStatus.DRAFT) {
+        if (draft == ElementStatus.DRAFT) {
             skipDrafts = true
             return
         }
