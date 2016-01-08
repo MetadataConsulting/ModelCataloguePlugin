@@ -15,10 +15,15 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 @Log4j
 class CatalogueElementProxyRepository {
 
+
     static Set<Class> HAS_UNIQUE_NAMES = [MeasurementUnit, DataModel]
+
     static final Set<Class> DATA_TYPE_CLASSES = [EnumeratedType, ReferenceType, DataType, PrimitiveType]
+
     static final String AUTOMATIC_NAME_FLAG = '__automatic_name__'
     static final String AUTOMATIC_DESCRIPTION_FLAG = '__automatic_description__'
+    static final String MISSING_REFERENCE_ID = "http://www.modelcatalogue.org/builder/#missing_reference_id"
+
     private static final Map LATEST = [sort: 'versionNumber', order: 'desc', max: 1]
 
     private final DataModelService dataModelService
@@ -502,4 +507,7 @@ class CatalogueElementProxyRepository {
         return anyCause(th.cause, error)
     }
 
+    def <T extends CatalogueElement> T findByMissingReferenceId(String missingReferenceId) {
+        (T) ExtensionValue.findByNameAndExtensionValue(MISSING_REFERENCE_ID, missingReferenceId)?.element
+    }
 }

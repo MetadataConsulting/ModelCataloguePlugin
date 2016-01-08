@@ -10,11 +10,12 @@ import static org.modelcatalogue.core.util.HibernateHelper.*
 @Log4j class DefaultCatalogueElementProxy<T extends CatalogueElement> implements CatalogueElementProxy<T>, org.modelcatalogue.core.api.CatalogueElement {
 
     static final List<Class> KNOWN_DOMAIN_CLASSES = [Asset, CatalogueElement, DataModel, DataElement, DataType, EnumeratedType, ReferenceType, MeasurementUnit, DataClass, PrimitiveType]
-    public static final String CHANGE_NEW = "Does Not Exist Yet"
-    public static final String CHANGE_TYPE = "Type Changed"
-    public static final String CHANGE_PARAMETERS = "Parameters Changed"
-    public static final String CHANGE_EXTENSIONS = "Extensions Changed"
-    public static final String CHANGE_RELATIONSHIP = "Relationship Changed"
+
+    private static final String CHANGE_NEW = "Does Not Exist Yet"
+    private static final String CHANGE_TYPE = "Type Changed"
+    private static final String CHANGE_PARAMETERS = "Parameters Changed"
+    private static final String CHANGE_EXTENSIONS = "Extensions Changed"
+    private static final String CHANGE_RELATIONSHIP = "Relationship Changed"
 
     Class<T> domain
 
@@ -348,6 +349,14 @@ import static org.modelcatalogue.core.util.HibernateHelper.*
                 throw new ReferenceNotPresentInTheCatalogueException("Element not found by ID and there is no name provided to help to find the element")
             }
         }
+
+        if (modelCatalogueId && modelCatalogueId.contains('//localhost')) {
+            // these are ignored and not saved to the database, need to store them in the metadata
+            // the metadata get saved if not found in a resolved method
+            extensions.put CatalogueElementProxyRepository.MISSING_REFERENCE_ID, modelCatalogueId
+            return repository.findByMissingReferenceId(extensions[CatalogueElementProxyRepository.MISSING_REFERENCE_ID])
+        }
+
         if (name) {
             if (classification) {
                 return repository.tryFind(domain, classification, name, modelCatalogueId)
