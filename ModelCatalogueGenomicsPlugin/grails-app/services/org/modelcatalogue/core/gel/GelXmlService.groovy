@@ -132,7 +132,7 @@ class GelXmlService {
                 setOmitEmptyAttributes(true)
                 setOmitNullAttributes(true)
                 name model.name
-                tableName getXSLTableName(model)
+                tableName getXSLTableName(relationship)
                 
                 //validate occurs
                 def elements=model.getOutgoingRelationshipsByType(RelationshipType.containmentType)
@@ -152,7 +152,7 @@ class GelXmlService {
                 setOmitEmptyAttributes(true)
                 setOmitNullAttributes(true)
                 name model.name
-                tableName getXSLTableName(model)
+                tableName getXSLTableName(relationship)
                 instructions model.ext.instructions
                 
                 //validate occurs
@@ -184,7 +184,7 @@ class GelXmlService {
             setOmitNullAttributes(true)
             name dataElement.name
             if (ext.get(METADATA_MIN_OCCURS)>0||"unbounded".equals(ext.get(METADATA_MAX_OCCURS))){
-             tableName getXSLTableName(dataElement)
+             tableName getXSLTableName(rel)
             }
             text dataElement.ext.text
             instructions dataElement.description
@@ -208,7 +208,14 @@ class GelXmlService {
     }
 
     def getXSLTableName(CatalogueElement element){
-        return (element.ext.get(XSL_TABLE_NAME))?element.ext.get(XSL_TABLE_NAME):element.name
+        def tableName= (element.ext.get(XSL_TABLE_NAME))?element.ext.get(XSL_TABLE_NAME):element.name
+        tableName=tableName.replaceAll("\\s+", " ").replaceAll("[()?*.;!]", "").replaceAll("[^a-zA-Z0-9]+","_").toLowerCase().replaceAll("_+", "_")
+        return tableName
+    }
+    def getXSLTableName(Relationship relationship){
+        def tableName=fromDestination(relationship, XSL_TABLE_NAME)?fromDestination(relationship, XSL_TABLE_NAME):relationship.destination.name
+        tableName=tableName.replaceAll("\\s+", " ").replaceAll("[()?*.;!]", "").replaceAll("[^a-zA-Z0-9]+","_").toLowerCase().replaceAll("_+", "_")
+        return tableName
     }
     
     protected transformDataType(String dataType) {
@@ -300,7 +307,8 @@ class GelXmlService {
         //check if the metadata occurs it's already filled in for models
         validateMetadataOccurs(childRelations)
 
-        def namespace=targetModel.ext.get(XSD_STUDY_NAME)=='cancer'?'gelCancer':'gelRD'
+        def hasNamespace=(targetModel.ext.get(XSD_STUDY_NAME)=='cancer'||targetModel.ext.get(XSD_STUDY_NAME)=='rarediseases')?true:false
+        def namespace=targetModel.ext.get(XSD_STUDY_NAME)=='cancer'?'gelCAN':'gelRD'
 
 
         xml.'xs:schema'('xmlns:xs': 'http://www.w3.org/2001/XMLSchema',
@@ -479,26 +487,35 @@ class GelXmlService {
     
     
     protected void validateTableNameCompliance(Model currModel){
+        //take submodels with override  table names if any from relationship
         def subModels=findAllTableCandidates(currModel);
-        log.debug(" all possible tables for shredder counting  ${subModels.size()}" )
+        log.debug(" all possible tables for shredder are  ${subModels.size()}" )
         
         String exceptionMessages="";
         Map mappedModels=subModels.collect{[it,getXSLTableName(it)]}.collectEntries()
         List tableNames=mappedModels.collect{key, value ->value}
-   
+
         def duplicates=tableNames.findAll{tableNames.count(it) > 1}.unique()
         
-        mappedModels.each{  model, table->
-            if (duplicates?.contains(table)){
-                exceptionMessages+="element with  '${model.name}' with id ${getModelCatalogueId(model)} is duplicated '${table};";
+        duplicates.each {  duplTableName ->
+            def duplIds=[]
+            mappedModels.each{  model, table->
+                
+                if (duplTableName==table){
+                    duplIds.add getModelCatalogueId(model)
+                }
+               
             }
-        }
-        if (!exceptionMessages.empty) throw new Exception(exceptionMessages)
-        
+            exceptionMessages+="element name or it's chosen tableName with value  '${duplTableName}' is present more than once for models ${duplIds};  ";
+        }        
         
         mappedModels.each{ model, table->
+            if (table[0].matches("[0-9]")){
+                exceptionMessages+="model '${model}'  with further table name '${table}' must not begin with numbers;";
+            }
+            
             if (table.length()>MAX_COLUMN_NAME_63){
-                exceptionMessages+="element with  '${model}' further table name '${table}' exceded in maximum allowed name size of ${MAX_COLUMN_NAME_63};";
+                exceptionMessages+="mode  '${model}' with further table name '${table}' exceded in maximum allowed name size of ${MAX_COLUMN_NAME_63};";
             }
         }
 
@@ -732,12 +749,19 @@ class GelXmlService {
             //search in data elements
             for ( Relationship r:model.getOutgoingRelationshipsByType(RelationshipType.containmentType)) {
                 def maxOccurs=fromDestination(r,METADATA_MAX_OCCURS)
+               
                 if (( maxOccurs.contains("unbounded")||maxOccurs.toInteger()>1)){
+                    //override table name to take from relation if any 
+                    def tableName=fromDestination(r,XSL_TABLE_NAME)
+                    if(tableName) r.destination.ext.put(XSL_TABLE_NAME, tableName)
                     results.add(r.destination)
                 }
             }
             
             for (Relationship r: model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)){
+                //override table name to take from relation if any
+                def tableName=fromDestination(r,XSL_TABLE_NAME)
+                if(tableName) r.destination.ext.put(XSL_TABLE_NAME, tableName)
                 findAllTableCandidates(r.destination,results,false)
             }
             
