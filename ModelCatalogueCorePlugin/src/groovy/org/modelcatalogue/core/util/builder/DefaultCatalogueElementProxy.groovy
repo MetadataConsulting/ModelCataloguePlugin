@@ -119,7 +119,7 @@ import static org.modelcatalogue.core.util.HibernateHelper.*
             name = value?.toString()
         }
 
-        if (key == 'dataModel') {
+        if (key == 'dataModel' || key == 'classification') {
             classification = value?.name
         }
 

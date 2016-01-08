@@ -115,11 +115,11 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @return proxy to classification specified by the parameters map and the DSL closure
      */
     void dataModel(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        CatalogueElementProxy<DataModel> classification = createProxy(DataModel, parameters, null, true)
+        CatalogueElementProxy<DataModel> dataModel = createProxy(DataModel, parameters, null, true)
 
-        context.withNewContext classification, c
+        context.withNewContext dataModel, c
 
-        classification
+        dataModel
     }
 
     /**
@@ -663,6 +663,10 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
             element.setParameter('modelCatalogueId', parameters.id)
         } else if(idBuilder != null) {
             element.setParameter('modelCatalogueId', idBuilder(element.name, domain))
+        }
+
+        if (parameters.classification || parameters.dataModel) {
+            element.setParameter('dataModel', createProxy(DataModel, [name: parameters.dataModel ?: parameters.classification]))
         }
 
         parameters.each { String key, Object value ->

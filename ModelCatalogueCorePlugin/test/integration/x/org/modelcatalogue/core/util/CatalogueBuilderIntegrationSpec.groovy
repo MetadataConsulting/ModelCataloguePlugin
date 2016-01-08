@@ -971,4 +971,33 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         noExceptionThrown()
 
     }
+
+
+    def "data models in paramters will create new data models"() {
+        final String parentDataClassName = 'Parent DMIP'
+        final String childDataClassName = 'Child DMIP'
+        final String modelOneName = 'Model #001'
+        final String modelTwoName = 'Model #002'
+
+        build {
+            dataClass name: parentDataClassName, dataModel: modelOneName, {
+                dataClass name: childDataClassName, classification: modelTwoName
+            }
+        }
+
+        DataModel modelOne = DataModel.findByName(modelOneName)
+        DataModel modelTwo = DataModel.findByName(modelTwoName)
+        DataClass parentDataClass = DataClass.findByName(parentDataClassName)
+        DataClass childDataClass = DataClass.findByName(childDataClassName)
+
+        expect:
+        modelOne
+        modelTwo
+        parentDataClass
+        childDataClass
+
+        parentDataClass.dataModel == modelOne
+        childDataClass.dataModel == modelTwo
+
+    }
 }
