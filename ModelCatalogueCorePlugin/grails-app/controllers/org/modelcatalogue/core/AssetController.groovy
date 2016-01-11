@@ -76,7 +76,7 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
     def delete() {
         def response = super.delete()
 
-        modelCatalogueStorageService.delete('assets', params.id)
+        modelCatalogueStorageService.delete('assets', "${params.id}")
 
         return response
     }
