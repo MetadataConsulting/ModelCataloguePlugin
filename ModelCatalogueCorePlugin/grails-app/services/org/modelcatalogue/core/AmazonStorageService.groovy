@@ -74,6 +74,14 @@ class AmazonStorageService implements StorageService {
         provider[bucket]["$directory/$filename"].exists()
     }
 
+    boolean delete(String directory, String filename) {
+        if (exists(directory, filename)) {
+            provider[bucket]["$directory/$filename"].delete()
+            return true
+        }
+        return false
+    }
+
     /**
      * Fetches the file from the storage as input stream.
      * @param directory

@@ -75,6 +75,12 @@ class ModelCatalogueStorageService implements StorageService {
         AssetFile.findByPath(getPath(directory, filename))?.content?.binaryStream ?: new ByteArrayInputStream(new byte[0])
     }
 
+    boolean delete(String directory, String filename) {
+        if (!exists(directory, filename)) return false
+        AssetFile.findByPath(getPath(directory, filename)).delete(flush: true, failOnError: true)
+        return true
+    }
+
 
     private static String getPath(String directory, String filename) {
         "$directory/$filename"

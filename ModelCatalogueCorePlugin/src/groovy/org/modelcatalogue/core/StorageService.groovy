@@ -1,8 +1,5 @@
 package org.modelcatalogue.core
 
-/**
- * Created by ladin on 13.06.14.
- */
 public interface StorageService {
     /**
      * Returns serving url if available or null if the content has to be served from current application.
@@ -34,6 +31,14 @@ public interface StorageService {
      * @return <code>true</code> if the file exits in the store
      */
     boolean exists(String directory, String filename)
+
+    /**
+     * Deletes the file from the store.
+     * @param directory
+     * @param filename
+     * @return <code>true</code> if the file exited in the store
+     */
+    boolean delete(String directory, String filename)
 
     /**
      * Fetches the file from the storage as input stream.

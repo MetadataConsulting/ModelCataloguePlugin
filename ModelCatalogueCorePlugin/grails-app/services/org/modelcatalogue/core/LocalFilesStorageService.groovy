@@ -69,4 +69,16 @@ class LocalFilesStorageService implements StorageService {
         if (!exists(directory, filename)) throw new FileNotFoundException("No such file $filename in $directory")
         new File(new File(fileStoreBase, directory), filename).newInputStream()
     }
+
+    /**
+     * Removes the file from the file system.
+     * @param directory
+     * @param filename
+     * @throws FileNotFoundException if the file does not exist in the store
+     * @return true if the file existed in the storage
+     */
+    boolean delete(String directory, String filename) {
+        if (!exists(directory, filename)) return false
+        return new File(new File(fileStoreBase, directory), filename).delete()
+    }
 }

@@ -405,4 +405,28 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     }
   ]
 
+
+  actionsProvider.registerChildActionInRole 'catalogue-element', 'delete', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', '$state', 'messages', 'names', 'security', ($rootScope, $scope, $state, messages, names, security) ->
+    return undefined if not $scope.element
+    return undefined if not angular.isFunction($scope.element.delete)
+    return undefined unless security.hasRole('CURATOR')
+    # currently constrained for assets only
+    return undefined unless $scope.element.isInstanceOf('asset')
+
+    {
+      position:   50000
+      label:      'Delete'
+      icon:       'fa fa-fw fa-times-circle'
+      type:       'danger'
+      action:     ->
+        messages.confirm("Do you really want to delete #{$scope.element.getElementTypeName()} #{$scope.element.name} ?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be deleted permanently. This action cannot be undone.").then ->
+          $scope.element.delete()
+          .then ->
+            messages.success "#{$scope.element.getElementTypeName()} #{$scope.element.name} deleted."
+            if $state.current.name.indexOf('mc.resource.show') >= 0
+              $state.go('mc.resource.list', {resource: names.getPropertyNameFromType($scope.element.elementType)}, {reload: true})
+          .catch showErrorsUsingMessages(messages)
+    }
+  ]
+
 ]

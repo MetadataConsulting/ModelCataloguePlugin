@@ -72,6 +72,15 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
         serveOrDownload(false)
     }
 
+    @Override
+    def delete() {
+        def response = super.delete()
+
+        modelCatalogueStorageService.delete('assets', params.id)
+
+        return response
+    }
+
     protected serveOrDownload(boolean serve) {
         Asset currentAsset = Asset.get(params.id)
         if (!currentAsset) {
