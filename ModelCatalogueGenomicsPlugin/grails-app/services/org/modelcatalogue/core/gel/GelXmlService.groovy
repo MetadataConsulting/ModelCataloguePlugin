@@ -126,7 +126,9 @@ class GelXmlService {
 
     def printSection(Relationship relationship, MarkupBuilder builder){
         Model model=relationship.destination
-        Map ext=[METADATA_MIN_OCCURS:fromDestination(relationship, METADATA_MIN_OCCURS),METADATA_MAX_OCCURS:fromDestination(relationship, METADATA_MAX_OCCURS)]
+        Map ext=[(METADATA_MIN_OCCURS):fromDestination(relationship, METADATA_MIN_OCCURS),(METADATA_MAX_OCCURS):fromDestination(relationship, METADATA_MAX_OCCURS)]
+
+        
         if(model.ext.repeating=='true') {
             return builder.repeatingGroup(id: printXSDFriendlyString(model.name), minRepeat: defaultMinOccurs(ext.get(METADATA_MIN_OCCURS)), maxRepeat: defaultMaxOccurs(ext.get(METADATA_MAX_OCCURS))) {
                 setOmitEmptyAttributes(true)
@@ -178,12 +180,13 @@ class GelXmlService {
      */
     def printQuestion(Relationship rel, MarkupBuilder builder){
         DataElement dataElement=rel.destination
-        Map ext=[METADATA_MIN_OCCURS:fromDestination(rel, METADATA_MIN_OCCURS),METADATA_MAX_OCCURS:fromDestination(rel, METADATA_MAX_OCCURS)]
-        return builder.question(id: "R_${dataElement.id}", minRepeat: ext.get(METADATA_MIN_OCCURS), maxRepeat: ext.get(METADATA_MAX_OCCURS)){
+        Map ext=[(METADATA_MIN_OCCURS):fromDestination(rel, METADATA_MIN_OCCURS),(METADATA_MAX_OCCURS):fromDestination(rel, METADATA_MAX_OCCURS)]
+
+        return builder.question(id: "R_${dataElement.id}", minRepeat: ext.get(METADATA_MIN_OCCURS), maxRepeat:  ext.get(METADATA_MAX_OCCURS)){
             setOmitEmptyAttributes(true)
             setOmitNullAttributes(true)
             name dataElement.name
-            if (ext.get(METADATA_MIN_OCCURS)>0||"unbounded".equals(ext.get(METADATA_MAX_OCCURS))){
+            if ((ext.get(METADATA_MAX_OCCURS).isInteger()&&ext.get(METADATA_MAX_OCCURS).toInteger()>0)||"unbounded".equals(ext.get(METADATA_MAX_OCCURS))){
              tableName getXSLTableName(rel)
             }
             text dataElement.ext.text
@@ -213,7 +216,8 @@ class GelXmlService {
         return tableName
     }
     def getXSLTableName(Relationship relationship){
-        def tableName=fromDestination(relationship, XSL_TABLE_NAME)?fromDestination(relationship, XSL_TABLE_NAME):relationship.destination.name
+        def candidateName=fromDestination(relationship, XSL_TABLE_NAME)
+        def tableName=candidateName?:relationship.destination.name
         tableName=tableName.replaceAll("\\s+", " ").replaceAll("[()?*.;!]", "").replaceAll("[^a-zA-Z0-9]+","_").toLowerCase().replaceAll("_+", "_")
         return tableName
     }
@@ -251,15 +255,15 @@ class GelXmlService {
 
     protected printXSDFriendlyString(String text){
        if (text==null) return "null"
-        text = text.replaceAll("[\\(\\)]", "").replaceAll("[^.a-zA-Z0-9]+","-").toLowerCase()
+        text = text.replaceAll("[\\(\\)]", "").replaceAll("[^a-zA-Z0-9]+","-").toLowerCase()
         if(text[0].matches("[0-9]")) text = "_" + text
         return text
     }
     
     protected printXSDFriendlyString(CatalogueElement el){
         if (el.name==null) return "null"
-        String text="${el.name}-${getModelCatalogueId(el)}"
-        return printXSDFriendlyString(text);
+        String text="${printXSDFriendlyString(el.name)}-${getModelCatalogueId(el)}"
+        return text;
  
     }
 
@@ -307,15 +311,16 @@ class GelXmlService {
         //check if the metadata occurs it's already filled in for models
         validateMetadataOccurs(childRelations)
 
-        def hasNamespace=(targetModel.ext.get(XSD_STUDY_NAME)=='cancer'||targetModel.ext.get(XSD_STUDY_NAME)=='rarediseases')?true:false
+    
         def namespace=targetModel.ext.get(XSD_STUDY_NAME)=='cancer'?'gelCAN':'gelRD'
+        def study=(targetModel.ext.get(XSD_STUDY_NAME)=='cancer')?'cancer':'rarediseases'
 
 
         xml.'xs:schema'('xmlns:xs': 'http://www.w3.org/2001/XMLSchema',
                 "xmlns:vc": "http://www.w3.org/2007/XMLSchema-versioning",
-                "xmlns:${namespace}" : "https://genomicsengland.co.uk/xsd/${targetModel.ext.get(XSD_STUDY_NAME)}/1.3.1",
-                "xmlns": "https://genomicsengland.co.uk/xsd/${targetModel.ext.get(XSD_STUDY_NAME)}/1.3.1",
-                "targetNamespace":"https://genomicsengland.co.uk/xsd/${targetModel.ext.get(XSD_STUDY_NAME)}/1.3.1",
+                "xmlns:${namespace}" : "https://genomicsengland.co.uk/xsd/${study}/1.3.1",
+                "xmlns": "https://genomicsengland.co.uk/xsd/${study}/1.3.1",
+                "targetNamespace":"https://genomicsengland.co.uk/xsd/${study}/1.3.1",
                 'vc:minVersion': '1.1') {
             'xs:annotation'{
                 'xs:documentation'{
@@ -488,8 +493,9 @@ class GelXmlService {
     
     protected void validateTableNameCompliance(Model currModel){
         //take submodels with override  table names if any from relationship
-        def subModels=findAllTableCandidates(currModel);
-        log.debug(" all possible tables for shredder are  ${subModels.size()}" )
+        def subModels=findAllTableCandidates(currModel)
+        log.debug(" all possible tables for shredder are  ${subModels.size}" )
+        
         
         String exceptionMessages="";
         Map mappedModels=subModels.collect{[it,getXSLTableName(it)]}.collectEntries()
@@ -739,9 +745,9 @@ class GelXmlService {
       return defaultValue
   }  
   
-    protected List<CatalogueElement> findAllTableCandidates(CatalogueElement model,List results = [],Boolean isRoot=false) {
-        
-            //if we send root model as parameter means that this is a child and we have to add in the list
+    protected List<CatalogueElement> findAllTableCandidates(CatalogueElement model,List results = [],Boolean isRoot=false) {    
+        if (model){ 
+           //if we send root model as parameter means that this is a child and we have to add in the list
             if (isRoot==false){
                 results.add(model)
             }
@@ -750,8 +756,8 @@ class GelXmlService {
             for ( Relationship r:model.getOutgoingRelationshipsByType(RelationshipType.containmentType)) {
                 def maxOccurs=fromDestination(r,METADATA_MAX_OCCURS)
                
-                if (( maxOccurs.contains("unbounded")||maxOccurs.toInteger()>1)){
-                    //override table name to take from relation if any 
+                if ( maxOccurs.contains("unbounded")|| (maxOccurs.isInteger()&&maxOccurs.toInteger()>1)){
+                    //override table name to take from relation if any                    
                     def tableName=fromDestination(r,XSL_TABLE_NAME)
                     if(tableName) r.destination.ext.put(XSL_TABLE_NAME, tableName)
                     results.add(r.destination)
@@ -764,7 +770,7 @@ class GelXmlService {
                 if(tableName) r.destination.ext.put(XSL_TABLE_NAME, tableName)
                 findAllTableCandidates(r.destination,results,false)
             }
-            
+        }             
         return results;
     }
 
