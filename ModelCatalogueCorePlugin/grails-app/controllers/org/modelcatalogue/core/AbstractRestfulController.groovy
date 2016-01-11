@@ -55,7 +55,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     protected handleParams(Integer max) {
         withFormat {
             json {
-                params.max = Math.min(max ?: 10, 100)
+                params.max = Math.min(max ?: 25, 100)
             }
             xml {
                 params.max = Math.min(max ?: 10000, 10000)
@@ -276,29 +276,6 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         T instance = resource.newInstance()
         bindData instance, getObjectToBind(), [include: includeFields]
         instance
-    }
-
-    /**
-     * @deprecated use DetachedListWrapper instead where possible
-     */
-    @Deprecated
-    protected void respondWithLinks(Class itemType = resource, ListWrapper listWrapper) {
-        if (!listWrapper.itemType) {
-            listWrapper.itemType = itemType
-        }
-        respond withLinks(listWrapper)
-    }
-
-    @Deprecated
-    private <T> ListWrapper<T> withLinks(ListWrapper<T> listWrapper) {
-        def links = Lists.nextAndPreviousLinks(params, listWrapper.base, listWrapper.total)
-        listWrapper.previous = links.previous
-        listWrapper.next = links.next
-        listWrapper.offset = params.int('offset') ?: 0
-        listWrapper.page = params.int('max') ?: 10
-        listWrapper.sort = params.sort ?: defaultSort
-        listWrapper.order = params.order ?: defaultOrder
-        listWrapper
     }
 
     /**

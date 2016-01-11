@@ -1,3 +1,5 @@
+nodeid = 0
+
 angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.recursiveCompile', 'ui.router']).directive 'catalogueElementTreeviewItem',  [ 'recursiveCompile', (recursiveCompile) -> {
     restrict: 'E'
     replace: true
@@ -12,6 +14,8 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
     compile: recursiveCompile.compile
 
     controller: ['$scope', '$rootScope', '$element', 'catalogue', ($scope, $rootScope, $element, catalogue) ->
+      $scope.nodeid = nodeid++
+
       getLocalName = (item) ->
         return undefined if not item
         return undefined if not item.ext
@@ -40,8 +44,9 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
       loadMoreIfNeeded = ->
         return if not $scope.element.$$numberOfChildren > $scope.element.$$children?.length
         return if $scope.element.$$showingMore
-        showMore = $element.find('.catalogue-element-treeview-show-more')
+        showMore = angular.element('.show-more-' + $scope.nodeid)
         return if showMore.hasClass '.hide'
+        return if showMore.offset()?.top < 0
         root = $element.closest('.catalogue-element-treeview-list-root')
         if showMore.offset()?.top < root.offset()?.top + 3 * root.height() and angular.isFunction($scope.element.$$showMore)
           $scope.element.$$showMore()
