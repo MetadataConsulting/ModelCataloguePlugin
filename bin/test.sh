@@ -54,12 +54,6 @@ if [ "$TEST_SUITE" = "forms_integration" ] || [ "$TEST_SUITE" = "" ] ; then
 fi
 cd ..
 
-cd ModelCatalogueGenomicsPlugin
-if [ "$TEST_SUITE" = "gel_integration" ] || [ "$TEST_SUITE" = "" ] ; then
-    ./grailsw test-app integration: --non-interactive
-fi
-cd ..
-
 cd ModelCatalogueElasticSearchPlugin
 if [ "$TEST_SUITE" = "es_integration" ] || [ "$TEST_SUITE" = "" ] ; then
     ./grailsw test-app integration: --non-interactive

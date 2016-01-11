@@ -18,7 +18,6 @@ env:
   - TEST_SUITE=core_integration_slow
   - TEST_SUITE=app_integration
   - TEST_SUITE=forms_integration
-  - TEST_SUITE=gel_integration
   - TEST_SUITE=es_integration
 jdk:
   - oraclejdk8
