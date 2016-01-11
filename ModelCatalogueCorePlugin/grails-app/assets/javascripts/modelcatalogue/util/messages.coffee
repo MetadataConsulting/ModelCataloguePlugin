@@ -6,7 +6,8 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
 
   nextId = 1
 
-  hideAfter = 10000
+  hideAfter = 3000
+  errorHideAfter = 15000
 
   messagesProvider = @
 
@@ -119,13 +120,13 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
         Shows the warning message to the user. Returns the message instance.
       ###
       messages.warning = (title, body) ->
-        addMessage(title, body, 'warning')
+        addMessage(title, body, 'warning').timeout(errorHideAfter)
 
       ###
         Shows the error message to the user. Returns the message instance.
       ###
       messages.error = (title, body) ->
-        addMessage(title, body, 'danger')
+        addMessage(title, body, 'danger').timeout(errorHideAfter)
 
       ###
         Shows the confirm dialog and returns a promise which is always resolved to boolean value which
