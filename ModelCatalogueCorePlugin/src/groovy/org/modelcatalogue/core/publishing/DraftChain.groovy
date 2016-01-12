@@ -102,7 +102,7 @@ class DraftChain extends PublishingChain {
             }
         }
 
-        draft.versionNumber = (CatalogueElement.findByLatestVersionId(published.latestVersionId, [sort: 'versionNumber', order: 'desc'])?.versionNumber ?: 1) + 1
+        draft.versionNumber = published.countVersions() + 1
         draft.versionCreated = new Date()
 
         draft.latestVersionId = published.latestVersionId ?: published.id
