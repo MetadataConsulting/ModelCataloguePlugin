@@ -13,14 +13,18 @@ import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
+import org.modelcatalogue.core.Relationship
 
 @Log4j
 class DataClassToXlsxExporter {
 
+    static final String EXT_MIN_OCCURS = "Min Occurs"
+    static final String EXT_MAX_OCCURS = "Max Occurs"
+
     final DataClassService dataClassService
     final Long dataClassId
-    final Map<Long, DataClass> processedDataClasss = [:]
 
+    final Map<Long, DataClass> processedDataClasss = [:]
 
     DataClassToXlsxExporter(DataClass dataClass, DataClassService dataClassService) {
         this.dataClassId = dataClass.getId()
@@ -61,7 +65,10 @@ class DataClassToXlsxExporter {
                     width 30
                 }
                 cell {
-                    width 40
+                    width 30
+                }
+                cell {
+                    width 10
                 }
                 cell {
                     width 10
@@ -87,7 +94,7 @@ class DataClassToXlsxExporter {
                     value dataClass.name
                     name getReferenceName(dataClass)
                     style 'h1'
-                    colspan 3
+                    colspan 4
                 }
             }
             row {
@@ -98,7 +105,7 @@ class DataClassToXlsxExporter {
                         height 100
 
                         style 'description'
-                        colspan 3
+                        colspan 4
                     }
                 }
             }
@@ -112,6 +119,7 @@ class DataClassToXlsxExporter {
                 cell {
                     value dataClass.dataModel?.name
                     style 'property-value'
+                    colspan 2
                 }
             }
             for(DataClass parent in dataClass.childOf) {
@@ -127,6 +135,7 @@ class DataClassToXlsxExporter {
                         if (parent.getId() in processedDataClasss.keySet()) {
                             link to name getReferenceName(parent)
                         }
+                        colspan 2
                     }
                 }
             }
@@ -139,6 +148,7 @@ class DataClassToXlsxExporter {
                 cell {
                     value dataClass.combinedVersion
                     style 'property-value'
+                    colspan 2
                 }
             }
             row {
@@ -150,6 +160,7 @@ class DataClassToXlsxExporter {
                 cell {
                     value dataClass.status
                     style 'property-value'
+                    colspan 2
                 }
             }
 
@@ -165,6 +176,7 @@ class DataClassToXlsxExporter {
                     value dataClass.lastUpdated
                     style 'date'
                     style 'property-value'
+                    colspan 2
                 }
             }
 
@@ -182,7 +194,7 @@ class DataClassToXlsxExporter {
                     value '<< Back to all Data Classes'
                     link to name 'DataClasses'
                     style 'note'
-                    colspan 3
+                    colspan 4
                 }
             }
         }
@@ -194,7 +206,7 @@ class DataClassToXlsxExporter {
                 cell {
                     value 'All Contained Data Elements'
                     style 'h2'
-                    colspan 3
+                    colspan 4
                 }
             }
             row {
@@ -207,6 +219,11 @@ class DataClassToXlsxExporter {
                     value 'Data Element Name'
                     style 'inner-table-header'
                     colspan 2
+                }
+
+                cell {
+                    value 'Multiplicity'
+                    style 'inner-table-header'
                 }
 
                 cell {
@@ -241,7 +258,8 @@ class DataClassToXlsxExporter {
             }
 
 
-            for (DataElement element in dataClass.contains) {
+            for (Relationship containsRelationship in dataClass.containsRelationships) {
+                DataElement element = containsRelationship.destination as DataElement
                 row {
                     style 'data-element-row'
                     cell {
@@ -253,6 +271,12 @@ class DataClassToXlsxExporter {
                     cell {
                         value element.name
                         colspan 2
+                    }
+                    cell {
+                        value getMultiplicity(containsRelationship)
+                        style {
+                            align top right
+                        }
                     }
                     if (element.dataType) {
                         cell {
@@ -302,22 +326,22 @@ class DataClassToXlsxExporter {
 
                     cell('B') {
                         value element.description
-                        colspan 2
+                        colspan 3
                     }
 
                     if (element.dataType) {
-                        cell ('E') { Cell theCell ->
+                        cell ('F') { Cell theCell ->
                             createDescriptionAndOrEnums(theCell, element.dataType)
                         }
 
                         if (element.dataType.instanceOf(PrimitiveType) && element.dataType.measurementUnit) {
-                            cell ('G') {
+                            cell ('H') {
                                 value element.dataType.measurementUnit.description
                             }
                         }
 
                         if (element.dataType.instanceOf(ReferenceType) && element.dataType.dataClass) {
-                            cell ('I') {
+                            cell ('J') {
                                 value element.dataType.dataClass.description
                             }
                         }
@@ -335,12 +359,24 @@ class DataClassToXlsxExporter {
                             cell {
                                 value entry.value
                                 style 'metadata-value'
+                                colspan 2
                             }
                         }
                     }
                 }
             }
         }
+    }
+
+    private static String getMultiplicity(Relationship relationship) {
+        String min = relationship.ext[EXT_MIN_OCCURS] ?: '0'
+        String max = relationship.ext[EXT_MAX_OCCURS] ?: '*'
+
+        if (max.toLowerCase() in ['unbounded', '' + Integer.MAX_VALUE]) {
+            max = '*'
+        }
+
+        return "${min}..${max}"
     }
 
     static void createDescriptionAndOrEnums(Cell cell, DataType dataType) {
