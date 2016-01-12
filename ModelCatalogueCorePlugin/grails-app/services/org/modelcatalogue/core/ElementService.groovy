@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
 import grails.util.Environment
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
@@ -12,7 +14,9 @@ import org.springframework.transaction.TransactionStatus
 
 class ElementService implements Publisher<CatalogueElement> {
 
-    static transactional = true
+    private static final Cache<Long, Integer> VERSION_COUNT_CACHE = CacheBuilder.newBuilder().initialCapacity(1000).build()
+
+    static transactional = false
 
     def grailsApplication
     def relationshipService
@@ -55,6 +59,10 @@ class ElementService implements Publisher<CatalogueElement> {
                     return dataModel
                 }
                 context.resolvePendingRelationships()
+
+                // TODO: better target the changes
+                VERSION_COUNT_CACHE.invalidateAll()
+
                 return draft
             }
         }
@@ -78,6 +86,10 @@ class ElementService implements Publisher<CatalogueElement> {
                     return element
                 }
                 context.resolvePendingRelationships()
+
+                // TODO: better target the changes
+                VERSION_COUNT_CACHE.invalidateAll()
+
                 return draft
             }
         }
@@ -500,6 +512,27 @@ class ElementService implements Publisher<CatalogueElement> {
         element.status = ElementStatus.FINALIZED
         element.save(flush: true)
         return element
+    }
+
+    int countVersions(CatalogueElement catalogueElement) {
+        Long id = catalogueElement.getId()
+
+        if (!id) {
+            return 1
+        }
+
+        VERSION_COUNT_CACHE.get(id) {
+            if (!catalogueElement.getLatestVersionId()) {
+                return 1
+            }
+            CatalogueElement.countByLatestVersionId(catalogueElement.getLatestVersionId())
+        }
+
+    }
+
+    static void clearCache() {
+        VERSION_COUNT_CACHE.invalidateAll()
+        VERSION_COUNT_CACHE.cleanUp()
     }
 
 }

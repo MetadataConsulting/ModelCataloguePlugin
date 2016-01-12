@@ -5,12 +5,12 @@ import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.reports.ReportsRegistry
+import org.modelcatalogue.core.util.RelationshipDirection
 import org.springframework.beans.factory.annotation.Autowired
 import org.modelcatalogue.core.util.OrderedMap
 
 abstract class CatalogueElementMarshaller extends AbstractMarshaller {
 
-    @Autowired ReportsRegistry reportsRegistry
     @Autowired RelationshipTypeService relationshipTypeService
     @Autowired RelationshipService relationshipService
     @Autowired DataModelService dataModelService
@@ -36,9 +36,9 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
                 classifiedName: getClassifiedName(el),
                 ext: OrderedMap.toJsonMap(el.ext),
                 link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id",
-                relationships: [count: el.countRelations(), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/relationships"],
-                outgoingRelationships: [count: el.countOutgoingRelations(), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing", search: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing/search"],
-                incomingRelationships: [count: el.countIncomingRelations(), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming", search: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming/search"],
+                relationships: [count: Integer.MAX_VALUE, itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/relationships"],
+                outgoingRelationships: [count: Integer.MAX_VALUE, itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing", search: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing/search"],
+                incomingRelationships: [count: Integer.MAX_VALUE, itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming", search: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming/search"],
                 versionNumber        : el.versionNumber,
                 status               : el.status.toString(),
                 versionCreated       : el.versionCreated,
@@ -49,67 +49,29 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
 
         Map<String, RelationshipType> types = getRelationshipTypesFor(el.getClass())
 
-        Map<Long, Integer> incomingCounts = [:]
-        Map<Long, Integer> outgoingCounts = [:]
+        ret.outgoingRelationships = [count: Integer.MAX_VALUE, itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing", search: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing/search"]
+        ret.incomingRelationships = [count: Integer.MAX_VALUE, itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming", search: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming/search"]
 
-        if (el.readyForQueries) {
-            DetachedCriteria<Relationship> incomingTypes = new DetachedCriteria<Relationship>(Relationship).build {
-                projections {
-                    id()
-                    property('relationshipType.id')
-                }
-                eq 'destination', el
-            }
-
-            incomingCounts.putAll dataModelService.classified(incomingTypes).list().countBy { row ->
-                row[1]
-            }
-
-            DetachedCriteria<Relationship> outgoingTypes = new DetachedCriteria<Relationship>(Relationship).build {
-                projections {
-                    id()
-                    property('relationshipType.id')
-                }
-                eq 'source', el
-            }
-
-            outgoingCounts.putAll dataModelService.classified(outgoingTypes).list().countBy { row ->
-                row[1]
-            }
-        }
-
-        ret.outgoingRelationships = [count: outgoingCounts.inject(0) { total, k, v -> total + v }, itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing", search: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing/search"]
-        ret.incomingRelationships = [count: incomingCounts.inject(0) { total, k, v -> total + v }, itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming", search: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming/search"]
-
-        relationships.incoming?.each        addRelationsJson('incoming', el, ret, types, incomingCounts, outgoingCounts)
-        relationships.outgoing?.each        addRelationsJson('outgoing', el, ret, types, incomingCounts, outgoingCounts)
-        relationships.bidirectional?.each   addRelationsJson('relationships', el, ret, types, incomingCounts, outgoingCounts)
+        relationships.incoming?.each        addRelationsJson(RelationshipDirection.INCOMING, el, ret, types)
+        relationships.outgoing?.each        addRelationsJson(RelationshipDirection.OUTGOING, el, ret, types)
+        relationships.bidirectional?.each   addRelationsJson(RelationshipDirection.BOTH, el, ret, types)
 
         ret.availableReports = getAvailableReports(el)
 
         // TODO: remove soon
         ret.dataModels = [ret.dataModel]
 
-        def oldDataModels = relationshipService.getDataModelsInfo(el)
-        if (oldDataModels) {
-            // for a review
-            ret.originalDataModels = oldDataModels
-        }
-
-        if (modelCatalogueSecurityService.currentUser) {
-            RelationshipType favorite = RelationshipType.readByName('favourite')
-            if (favorite) {
-                Number count = Relationship.where {
-                    relationshipType == favorite && destination == el && source == modelCatalogueSecurityService.currentUser
-                }.count()
-                if (count > 0) {
-                    ret.favourite = true
-                }
+        if (dataModelService.legacyDataModels) {
+            def oldDataModels = relationshipService.getDataModelsInfo(el)
+            if (oldDataModels) {
+                // for a review
+                ret.originalDataModels = oldDataModels
             }
         }
 
-        ret
+        ret.favourite = relationshipService.isFavorite(el)
 
+        return ret
     }
 
     protected getRelationshipTypesFor(Class elementClass){
@@ -166,19 +128,19 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
         relationships
     }
 
-    private static Closure addRelationsJson(String incomingOrOutgoing, CatalogueElement el, Map ret, Map<String, RelationshipType> types, Map<Long, Integer> incomingCounts, Map<Long, Integer> outgoingCounts) {
+    private static Closure addRelationsJson(RelationshipDirection direction, CatalogueElement el, Map ret, Map<String, RelationshipType> types) {
         { String relationshipType, String name ->
             RelationshipType type = types[relationshipType]
-            def relation = [itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${incomingOrOutgoing}/${relationshipType}", search: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${incomingOrOutgoing}/${relationshipType}/search"]
-            switch (incomingOrOutgoing) {
-                case 'relationships':
-                    relation.count = (incomingCounts[type.id] ?: 0) + (outgoingCounts[type.id] ?: 0)
+            def relation = [itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${direction.actionName}/${relationshipType}", search: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${direction.actionName}/${relationshipType}/search"]
+            switch (RelationshipDirection) {
+                case RelationshipDirection.INCOMING:
+                    relation.count = el.countIncomingRelationshipsByType(type)
                     break
-                case 'incoming':
-                    relation.count = incomingCounts[type.id] ?: 0
+                case RelationshipDirection.OUTGOING:
+                    relation.count = el.countOutgoingRelationshipsByType(type)
                     break
-                case 'outgoing':
-                    relation.count = outgoingCounts[type.id] ?: 0
+                case RelationshipDirection.BOTH:
+                    relation.count = el.countRelationshipsByType(type)
                     break
             }
 

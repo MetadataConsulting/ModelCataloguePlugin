@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import com.google.common.collect.ImmutableMap
+import grails.gorm.DetachedCriteria
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
 import org.modelcatalogue.core.api.ElementStatus
@@ -7,11 +9,19 @@ import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Inheritance
+import org.modelcatalogue.core.util.RelationshipsCounts
 import org.modelcatalogue.core.util.lists.ListWithTotal
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
 
+
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
+
 class RelationshipService {
+
+    private static final Cache<Long, Set<Long>> FAVORITE_CACHE = CacheBuilder.newBuilder().initialCapacity(20).build()
+    private static final Cache<Long, RelationshipsCounts> RELATIONSHIPS_COUNT_CACHE = CacheBuilder.newBuilder().initialCapacity(1000).build()
 
     static final long INDEX_STEP = 1000
 
@@ -25,6 +35,7 @@ class RelationshipService {
 
     def modelCatalogueSecurityService
     def auditService
+    def dataModelService
 
     /**
      * Executes the callback for each relationship found.
@@ -166,6 +177,12 @@ class RelationshipService {
             }
         }
 
+        if (relationshipDefinition.relationshipType == RelationshipType.favouriteType) {
+            FAVORITE_CACHE.invalidate(relationshipDefinition.source.getId())
+        }
+
+        RELATIONSHIPS_COUNT_CACHE.invalidate(relationshipDefinition.source.getId())
+        RELATIONSHIPS_COUNT_CACHE.invalidate(relationshipDefinition.destination.getId())
 
         relationshipInstance
     }
@@ -233,11 +250,6 @@ class RelationshipService {
                     relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedDataElement.remove', [source.status.toString()] as Object[], "Cannot changed finalized elements.")
                     return relationshipInstance
                 }
-                // TODO: enable as soon as all the test are fixed
-/*                if (relationshipType == RelationshipType.declarationType && (destination.dataModels - [source]).size() == 0) {
-                    relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.single.owning.dataModel.remove', [] as Object[], "Cannot remove single owning data model.")
-                    return relationshipInstance
-                }*/
 
                 if (relationshipInstance.inherited) {
                     relationshipInstance.errors.rejectValue('inherited', 'org.modelcatalogue.core.RelationshipType.cannot.change.inherited',  "Cannot changed inherited relationships.")
@@ -286,6 +298,13 @@ class RelationshipService {
             if (relationshipType == RelationshipType.baseType) {
                 source.removeInheritedAssociations(destination)
             }
+
+            if (relationshipType == RelationshipType.favouriteType) {
+                FAVORITE_CACHE.invalidate(source.getId())
+            }
+
+            RELATIONSHIPS_COUNT_CACHE.invalidate(source.getId())
+            RELATIONSHIPS_COUNT_CACHE.invalidate(destination.getId())
 
             return relationshipInstance
         }
@@ -382,6 +401,85 @@ class RelationshipService {
             FriendlyErrors.failFriendlySave(entry)
         }
         relationship
+    }
+
+    boolean isFavorite(CatalogueElement el) {
+        if (modelCatalogueSecurityService.currentUser) {
+            return el.getId() in FAVORITE_CACHE.get(modelCatalogueSecurityService.currentUser.getId()) {
+                RelationshipType favorite = RelationshipType.favouriteType
+                if (!favorite) {
+                    return [] as Set<Long>
+                }
+                Relationship.where {
+                    relationshipType == favorite && source == modelCatalogueSecurityService.currentUser
+                }.list().collect { it.destination.id }.toSet()
+            }
+        }
+        return false
+    }
+
+    static void clearCache() {
+        FAVORITE_CACHE.invalidateAll()
+        FAVORITE_CACHE.cleanUp()
+
+        RELATIONSHIPS_COUNT_CACHE.invalidateAll()
+        RELATIONSHIPS_COUNT_CACHE.cleanUp()
+    }
+
+    int countIncomingRelationshipsByType(CatalogueElement element, RelationshipType type) {
+        getRelationshipsCounts(element).count(RelationshipDirection.INCOMING, type)
+    }
+
+    int countOutgoingRelationshipsByType(CatalogueElement element, RelationshipType type) {
+        getRelationshipsCounts(element).count(RelationshipDirection.OUTGOING, type)
+    }
+
+    int countRelationshipsByType(CatalogueElement element, RelationshipType type) {
+        getRelationshipsCounts(element).count(RelationshipDirection.BOTH, type)
+    }
+
+    int countRelationshipsByDirectionAndType(CatalogueElement element, RelationshipDirection direction, RelationshipType type) {
+        getRelationshipsCounts(element).count(direction, type)
+    }
+
+
+    private RelationshipsCounts getRelationshipsCounts(CatalogueElement el) {
+        RELATIONSHIPS_COUNT_CACHE.get(el.getId()) {
+            prepareCounts(el)
+        }
+    }
+
+    private RelationshipsCounts prepareCounts(CatalogueElement el) {
+        // TODO: does it need to exclude archived relationships?
+        if (!el.readyForQueries) {
+            return RelationshipsCounts.EMPTY
+        }
+
+        DetachedCriteria<Relationship> incomingTypes = new DetachedCriteria<Relationship>(Relationship).build {
+            projections {
+                id()
+                property('relationshipType.id')
+            }
+            eq 'destination.id', el.getId()
+        }
+
+        Map<Long, Integer> incomingCounts = dataModelService.classified(incomingTypes).list().countBy { row ->
+            row[1] as Long
+        }
+
+        DetachedCriteria<Relationship> outgoingTypes = new DetachedCriteria<Relationship>(Relationship).build {
+            projections {
+                id()
+                property('relationshipType.id')
+            }
+            eq 'source.id', el.getId()
+        }
+
+        Map<Long, Integer> outgoingCounts = dataModelService.classified(outgoingTypes).list().countBy { row ->
+            row[1] as Long
+        }
+
+        return RelationshipsCounts.create(ImmutableMap.copyOf(incomingCounts), ImmutableMap.copyOf(outgoingCounts))
     }
 
 

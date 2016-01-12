@@ -16,13 +16,12 @@ class AuditJsonMarshallingCustomizer extends JsonMarshallingCustomizer {
     @Override def customize(Object el, Object json) {
         def result = json ?: [:]
         if (el instanceof CatalogueElement) {
-            result.history = [count: el.countVersions(), itemType: el.getClass().name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/history"]
-            result.changes = [count: auditService.getChanges([:], el).total, itemType: Change, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/changes"]
+            result.changes = [count: Integer.MAX_VALUE /* auditService.getChanges([:], el).total */, itemType: Change, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/changes"]
         }
         if (el instanceof DataModel) {
-            result.activity = [count: auditService.getGlobalChanges([:], DataModelFilter.includes(el)).total, itemType: Change, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/activity"]
+            result.activity = [count: Integer.MAX_VALUE, itemType: Change, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/activity"]
         } else if (el instanceof User) {
-            result.activity = [count: auditService.getChangesForUser([:], el).total, itemType: Change, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/activity"]
+            result.activity = [count: Integer.MAX_VALUE, itemType: Change, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/activity"]
         }
         return result
     }

@@ -10,11 +10,21 @@ import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeWrapper
 import org.modelcatalogue.core.util.lists.ListWrapper
 
+import javax.annotation.PostConstruct
+
 class DataModelService {
 
     static transactional = false
 
     def modelCatalogueSecurityService
+    def grailsApplication
+
+    private boolean legacyDataModels
+
+    @PostConstruct
+    void init() {
+        this.legacyDataModels = grailsApplication.config.mc.legacy.dataModels
+    }
 
     public Map<String, Integer> getStatistics(DataModelFilter filter) {
         def model = [:]
@@ -141,5 +151,9 @@ class DataModelService {
 
 
         DataModelFilter.from(modelCatalogueSecurityService.currentUser)
+    }
+
+    public boolean isLegacyDataModels() {
+        return this.legacyDataModels
     }
 }

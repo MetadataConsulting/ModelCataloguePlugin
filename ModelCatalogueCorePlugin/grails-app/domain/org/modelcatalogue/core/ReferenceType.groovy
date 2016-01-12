@@ -11,6 +11,8 @@ class ReferenceType extends DataType {
         dataClass nullable: true, fetch: 'join'
     }
 
+    static fetchMode = [dataClass: 'eager']
+
 
     @Override
     protected PublishingChain prepareDraftChain(PublishingChain chain) {

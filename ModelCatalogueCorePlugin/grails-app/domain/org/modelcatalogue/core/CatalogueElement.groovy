@@ -3,7 +3,6 @@ package org.modelcatalogue.core
 import com.google.common.base.Function
 import com.google.common.collect.Lists
 import grails.util.GrailsNameUtils
-import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
@@ -34,6 +33,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     def relationshipService
     def auditService
     def mappingService
+    def elementService
 
     DataModel dataModel
 
@@ -91,12 +91,15 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         tablePerHierarchy false
         sort "name"
 		name index :'CtlgElement_name_idx'
+		latestVersionId index :'CtlgElement_latestVersionId_idx'
         description type: "text"
         extensions lazy: false, sort: 'orderIndex'
         dataModel lazy: false
     }
 
     static mappedBy = [outgoingRelationships: 'source', incomingRelationships: 'destination', outgoingMappings: 'source', incomingMappings: 'destination']
+
+    static fetchMode = [extensions: 'eager', dataModel: 'eager']
 
     /**
      * Functions for specifying relationships between catalogue elements using the
@@ -122,24 +125,6 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         Lists.transform(relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, this).items, {
             it.destination
         } as Function<Relationship, CatalogueElement>)
-    }
-
-    Long countIncomingRelations() {
-        CatalogueElement refreshed = getClass().get(this.id)
-        if (!refreshed) return 0
-        relationshipService.getRelationships([:], RelationshipDirection.INCOMING, refreshed).total
-    }
-
-    Long countOutgoingRelations() {
-        CatalogueElement refreshed = getClass().get(this.id)
-        if (!refreshed) return 0
-        relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, refreshed).total
-    }
-
-    Long countRelations() {
-        CatalogueElement refreshed = getClass().get(this.id)
-        if (!refreshed) return 0
-        relationshipService.getRelationships([:], RelationshipDirection.BOTH, refreshed).total
     }
 
 
@@ -172,24 +157,19 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     int countIncomingRelationshipsByType(RelationshipType type) {
-        CatalogueElement self = this.isAttached() ? this : get(this.id)
-        if (archived) {
-            return Relationship.countByDestinationAndRelationshipType(self, type)
-        }
-        Relationship.countByDestinationAndRelationshipTypeAndArchived(self, type, false)
-
+        relationshipService.countIncomingRelationshipsByType(this, type)
     }
 
     int countOutgoingRelationshipsByType(RelationshipType type) {
-        CatalogueElement self = this.isAttached() ? this : get(this.id)
-        if (archived) {
-            return Relationship.countBySourceAndRelationshipType(self, type)
-        }
-        Relationship.countBySourceAndRelationshipTypeAndArchived(self, type, false)
+        relationshipService.countOutgoingRelationshipsByType(this, type)
     }
 
     int countRelationshipsByType(RelationshipType type) {
-        countOutgoingRelationshipsByType(type) + countIncomingRelationshipsByType(type)
+        relationshipService.countRelationshipsByType(this, type)
+    }
+
+    int countRelationshipsByDirectionAndType(RelationshipDirection direction, RelationshipType type) {
+        relationshipService.countRelationshipsByDirectionAndType(this, direction, type)
     }
 
     Relationship createLinkTo(Map<String, Object> params, CatalogueElement destination, RelationshipType type) {
@@ -273,10 +253,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     Integer countVersions() {
-        if (!latestVersionId) {
-            return 1
-        }
-        getClass().countByLatestVersionId(latestVersionId)
+        elementService.countVersions(this)
     }
 
 

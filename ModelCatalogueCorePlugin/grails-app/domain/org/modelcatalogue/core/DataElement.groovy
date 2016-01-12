@@ -22,6 +22,8 @@ class DataElement extends CatalogueElement {
             incoming: [containment: 'containedIn'],
     ]
 
+    static fetchMode = [dataType: 'eager']
+
     @Override
     protected PublishingChain preparePublishChain(PublishingChain chain) {
         super.preparePublishChain(chain).add(this.dataType)

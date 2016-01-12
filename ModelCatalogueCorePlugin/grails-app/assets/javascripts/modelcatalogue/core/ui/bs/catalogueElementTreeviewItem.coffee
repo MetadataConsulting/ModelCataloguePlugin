@@ -6,7 +6,7 @@ cetiModule.run [ '$templateCache', ($templateCache) ->
     $templateCache.put 'modelcatalogue/core/ui/catalogueElementTreeviewItem.html', '''
     <li class="catalogue-element-treeview-item">
       <div class="catalogue-element-treeview-text-content" ng-class="{'active': element.$$active, 'archived': element.$$archived}">
-        <span class="badge pull-right" ng-if="currentDescend &amp;&amp; element.$$numberOfChildren">{{element.$$numberOfChildren}}</span>
+        <span class="badge pull-right" ng-if="currentDescend &amp;&amp; element.$$numberOfChildren"><span ng-if="element.$$numberOfChildren != 2147483647">{{element.$$numberOfChildren}}</span><span ng-if="element.$$numberOfChildren == 2147483647" class="fa fa-question fa-inverse"></span></span>
         <span class="catalogue-element-treeview-labels">
           <span ng-if="!element.elementType"><a class="catalogue-element-treeview-icon btn btn-link"><span class="fa fa-fw fa-ban"></span></a> No Data</span>
           <a ng-if="currentDescend &amp;&amp; element.elementType" class="catalogue-element-treeview-icon  btn btn-link" ng-click="select(element)">

@@ -75,7 +75,6 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
             return
         }
         respond(success: false, contains: false, imports: false)
-        return
     }
 
     def content() {
@@ -135,14 +134,14 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
         ret
     }
 
-	private Map createContentDescriptorForRelationship(String name, String property, DataModel dataModel, RelationshipType relationshipType, RelationshipDirection direction) {
+	private static Map createContentDescriptorForRelationship(String name, String property, DataModel dataModel, RelationshipType relationshipType, RelationshipDirection direction) {
 		String link = "/dataModel/${dataModel.getId()}/${direction.actionName}/${relationshipType.name}"
 		Map ret = [:]
 		ret.id = link
 		ret.dataModels = [CatalogueElementMarshaller.minimalCatalogueElementJSON(dataModel)]
 		ret.elementType = Relationships.name
 		ret.name = name
-		ret.content = [count: relationshipService.getRelationships([:], direction, dataModel, relationshipType).total, itemType: Relationship.name, link: link]
+		ret.content = [count: dataModel.countRelationshipsByDirectionAndType(direction, relationshipType), itemType: Relationship.name, link: link]
 		ret.link = link
         ret.relationshipType = relationshipType
         ret.direction = direction.actionName

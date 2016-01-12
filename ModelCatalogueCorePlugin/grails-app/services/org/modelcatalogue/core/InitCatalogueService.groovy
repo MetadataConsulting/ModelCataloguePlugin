@@ -1,14 +1,10 @@
 package org.modelcatalogue.core
 
-import org.codehaus.groovy.control.CompilerConfiguration
-import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import org.codehaus.groovy.grails.io.support.PathMatchingResourcePatternResolver
 import org.codehaus.groovy.grails.io.support.Resource
 import org.grails.datastore.gorm.GormStaticApi
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
-import org.modelcatalogue.builder.api.CatalogueBuilder
-import org.modelcatalogue.builder.util.CatalogueBuilderScript
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.TestDataHelper
 import org.modelcatalogue.integration.mc.ModelCatalogueLoader
@@ -79,7 +75,11 @@ class InitCatalogueService {
     }
 
     def initDefaultRelationshipTypes() {
+
         RelationshipType.clearCache()
+        RelationshipService.clearCache()
+        ElementService.clearCache()
+
         def defaultDataTypes = grailsApplication.config.modelcatalogue.defaults.relationshiptypes
 
         for (Map definition in defaultDataTypes) {
