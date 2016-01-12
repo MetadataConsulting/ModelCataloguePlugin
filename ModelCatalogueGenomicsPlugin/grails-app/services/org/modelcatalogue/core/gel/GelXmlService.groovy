@@ -186,7 +186,7 @@ class GelXmlService {
             setOmitEmptyAttributes(true)
             setOmitNullAttributes(true)
             name dataElement.name
-            if ((ext.get(METADATA_MAX_OCCURS).isInteger()&&ext.get(METADATA_MAX_OCCURS).toInteger()>0)||"unbounded".equals(ext.get(METADATA_MAX_OCCURS))){
+            if ((ext.get(METADATA_MAX_OCCURS).isInteger()&&ext.get(METADATA_MAX_OCCURS).toInteger()>1)||"unbounded".equals(ext.get(METADATA_MAX_OCCURS))){
              tableName getXSLTableName(rel)
             }
             text dataElement.ext.text
