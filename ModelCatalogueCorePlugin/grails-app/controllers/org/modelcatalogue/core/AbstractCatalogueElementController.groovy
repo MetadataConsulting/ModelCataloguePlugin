@@ -128,6 +128,12 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
+        if (current.relationshipType.versionSpecific && current.source.status != ElementStatus.DRAFT) {
+            respond(error: 'You can only reorder items when the element is draft!')
+            return
+        }
+
+
         rel = relationshipService.moveAfter(direction, owner, rel, current)
 
         respond(id: rel.id, type: rel.relationshipType, ext: OrderedMap.toJsonMap(rel.ext), element: rel.source, relation: rel.destination, direction: 'sourceToDestination', removeLink: RelationshipsMarshaller.getDeleteLink(rel.source, rel), archived: rel.archived, elementType: Relationship.name)

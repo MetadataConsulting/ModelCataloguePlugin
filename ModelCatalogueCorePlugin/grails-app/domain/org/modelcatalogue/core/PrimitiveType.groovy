@@ -8,6 +8,8 @@ class PrimitiveType extends DataType {
         measurementUnit nullable: true, fetch: 'join'
     }
 
+    static fetchMode = [measurementUnit: 'eager']
+
     List<String> getInheritedAssociationsNames() { ['measurementUnit'] }
 
 }

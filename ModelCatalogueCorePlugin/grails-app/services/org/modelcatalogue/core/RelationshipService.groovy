@@ -333,17 +333,6 @@ class RelationshipService {
         }
     }
 
-    /**
-     * @deprecated overcomplicated
-     */
-    def List<DataModel> getDataModels(CatalogueElement element) {
-        if (!element || !element.dataModel) {
-            return []
-        }
-
-        return [element.dataModel]
-    }
-
     Relationship moveAfter(RelationshipDirection direction, CatalogueElement owner,  Relationship relationship, Relationship other) {
         if (!relationship || relationship.hasErrors()) {
             return relationship

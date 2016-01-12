@@ -1,6 +1,6 @@
 angular.module('mc.core.listReferenceEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot']).config ['enhanceProvider', (enhanceProvider)->
   condition = (list) -> list.hasOwnProperty('count') and list.hasOwnProperty('link')
-  factory   = ['modelCatalogueApiRoot', 'rest', '$rootScope', 'enhance', (modelCatalogueApiRoot, rest, $rootScope, enhance) ->
+  factory   = ['modelCatalogueApiRoot', 'rest', '$rootScope', 'enhance', '$q', (modelCatalogueApiRoot, rest, $rootScope, enhance, $q) ->
     (listReference) ->
       link = "#{modelCatalogueApiRoot}#{listReference.link}"
       query = (tail = null, params = {}) ->
@@ -34,6 +34,8 @@ angular.module('mc.core.listReferenceEnhancer', ['mc.util.rest', 'mc.util.enhanc
 
       query.reorder = (moved, current) ->
         enhance(rest(method: 'PUT', url: link, data: {moved: moved, current: current})).then (result)->
+          if result.error
+            return $q.reject(result.error)
           $rootScope.$broadcast 'listReferenceReordered', query, moved, current
           result
 
