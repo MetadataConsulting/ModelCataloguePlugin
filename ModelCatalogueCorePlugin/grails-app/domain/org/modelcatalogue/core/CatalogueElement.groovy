@@ -99,7 +99,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     static mappedBy = [outgoingRelationships: 'source', incomingRelationships: 'destination', outgoingMappings: 'source', incomingMappings: 'destination']
 
-    static fetchMode = [extensions: 'eager', dataModel: 'eager']
+    static fetchMode = [dataModel: 'eager']
 
     /**
      * Functions for specifying relationships between catalogue elements using the

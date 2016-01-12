@@ -132,7 +132,7 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
         { String relationshipType, String name ->
             RelationshipType type = types[relationshipType]
             def relation = [itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${direction.actionName}/${relationshipType}", search: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${direction.actionName}/${relationshipType}/search"]
-            switch (RelationshipDirection) {
+            switch (direction) {
                 case RelationshipDirection.INCOMING:
                     relation.count = el.countIncomingRelationshipsByType(type)
                     break
