@@ -238,15 +238,15 @@ enum RelationshipDirection {
         }
     }
 
-    abstract DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, DataModelFilter filter)
-    abstract String getDirection(CatalogueElement owner, Relationship relationship)
-    abstract CatalogueElement getRelation(CatalogueElement owner, Relationship relationship)
-    abstract CatalogueElement getElement(CatalogueElement owner, Relationship relationship)
-    abstract String getActionName()
-    abstract String getSortProperty()
-    abstract Long getIndex(Relationship rel)
-    abstract boolean isOwnedBy(CatalogueElement owner, Relationship relationship)
-    abstract Long getMinIndexAfter(CatalogueElement owner, RelationshipType relationshipType, Long current)
+    /* GROOVY-7415 abstract */ DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, DataModelFilter filter) { throw new UnsupportedOperationException("Not Yet Implemented")}
+    /* GROOVY-7415 abstract */ String getDirection(CatalogueElement owner, Relationship relationship) { throw new UnsupportedOperationException("Not Yet Implemented")}
+    /* GROOVY-7415 abstract */ CatalogueElement getRelation(CatalogueElement owner, Relationship relationship) { throw new UnsupportedOperationException("Not Yet Implemented")}
+    /* GROOVY-7415 abstract */ CatalogueElement getElement(CatalogueElement owner, Relationship relationship) { throw new UnsupportedOperationException("Not Yet Implemented")}
+    /* GROOVY-7415 abstract */ String getActionName() { throw new UnsupportedOperationException("Not Yet Implemented")}
+    /* GROOVY-7415 abstract */ String getSortProperty() { throw new UnsupportedOperationException("Not Yet Implemented")}
+    /* GROOVY-7415 abstract */ Long getIndex(Relationship rel) { throw new UnsupportedOperationException("Not Yet Implemented")}
+    /* GROOVY-7415 abstract */ boolean isOwnedBy(CatalogueElement owner, Relationship relationship) { throw new UnsupportedOperationException("Not Yet Implemented")}
+    /* GROOVY-7415 abstract */ Long getMinIndexAfter(CatalogueElement owner, RelationshipType relationshipType, Long current) { throw new UnsupportedOperationException("Not Yet Implemented")}
 
     void setIndex(Relationship rel, Long value) {
         rel.setProperty(sortProperty, value)
