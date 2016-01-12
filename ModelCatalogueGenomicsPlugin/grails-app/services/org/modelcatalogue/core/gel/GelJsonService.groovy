@@ -28,10 +28,9 @@ class GelJsonService {
 
         def jsonStringBuffer = new StringBuffer(10*1024);
 
-        jsonStringBuffer<<='{\"DiseaseGroups\": [\n"'
-        jsonStringBuffer<<="    {\n"
+        jsonStringBuffer<<='{\"DiseaseGroups\": [\n'
         jsonStringBuffer<<=printChild(model, 0)
-        jsonStringBuffer<<="]\n}\n}"
+        jsonStringBuffer<<="]\n}"
         return jsonStringBuffer.toString();
     }
 
@@ -43,7 +42,8 @@ class GelJsonService {
 
 
         if(level==0){
-            child.parentOf?.each { Model cd ->
+            child.parentOf?.eachWithIndex { Model cd, index ->
+                if(index!=0){jsonString<<=','}
                 jsonString<<=printChild(cd, level + 1)
             }
         }
@@ -55,12 +55,13 @@ class GelJsonService {
             jsonString<<='   "name" : "' + child.name+ '",'
             jsonString<<='   "subGroups" : ['
 
-            child.parentOf.each { Model cd ->
+            child.parentOf.eachWithIndex { Model cd, index ->
+                if(index!=0){jsonString<<=','}
                 jsonString<<=printChild(cd, level + 1)
             }
 
             jsonString<<="]\n"
-            jsonString<<='        },'
+            jsonString<<='        }'
         }
 
         if (level == 2) {
@@ -71,12 +72,13 @@ class GelJsonService {
             jsonString<<='       "name" : "' + child.name+ '",'
             jsonString<<='       "specificDisorders" : ['
 
-            child.parentOf.each { Model cd ->
+            child.parentOf.eachWithIndex { Model cd, index ->
+                if(index!=0){jsonString<<=','}
                 jsonString<<=printChild(cd, level + 1)
             }
 
             jsonString<<="       ]\n"
-            jsonString<<="       },\n"
+            jsonString<<="       }\n"
         }
 
         if (level == 3) {
@@ -85,7 +87,7 @@ class GelJsonService {
             jsonString<<='           "id" : "' + id  +'",\n'
             jsonString<<='            "name" : "' + child.name+ '",\n'
             jsonString<<='                "eligibilityQuestion": {\n'
-            jsonString<<='                        "date:"'+child.lastUpdated+',\n'
+            jsonString<<='                        "date":"' + child.lastUpdated.format("yyyy-mm-dd") + '",\n'
             jsonString<<='                        "version": "' +child.versionNumber +'"\n'
             jsonString<<='                   },\n'
 
@@ -96,11 +98,12 @@ class GelJsonService {
             }
 
             jsonString<<="           ]\n"
-            jsonString<<="           },\n"
+            jsonString<<="           }\n"
         }
 
-        if (level == 4 && child.name.matches("(?i:.*Phenotypes.*)")) {
-            child.parentOf.each { Model cd ->
+        if (level == 4 && child.name.matches("(?i:.*Phenotypes.*)") && !child.name.matches("(?i:.*Eligibility.*)") && !child.name.matches("(?i:.*Test.*)") && !child.name.matches("(?i:.*Guidance.*)")) {
+            child.parentOf.eachWithIndex { Model cd, index ->
+                if(index!=0){jsonString<<=','}
                 jsonString<<=printChild(cd, level + 1)
             }
         }
@@ -110,7 +113,7 @@ class GelJsonService {
             jsonString<<='                    {\n'
             jsonString<<='                        "name" : "' + child.name  + '",\n'
             jsonString<<='                        "id"   : "' + child.ext.get("OBO ID") + '"\n'
-            jsonString<<='                    },\n'
+            jsonString<<='                    }\n'
         }
 
         return jsonString.toString()
