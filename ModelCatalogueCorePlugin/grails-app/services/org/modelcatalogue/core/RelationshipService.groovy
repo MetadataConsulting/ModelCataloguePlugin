@@ -433,6 +433,9 @@ class RelationshipService {
 
 
     private RelationshipsCounts getRelationshipsCounts(CatalogueElement el) {
+        if (!el.getId()) {
+            return RelationshipsCounts.EMPTY
+        }
         RELATIONSHIPS_COUNT_CACHE.get(el.getId()) {
             prepareCounts(el)
         }
