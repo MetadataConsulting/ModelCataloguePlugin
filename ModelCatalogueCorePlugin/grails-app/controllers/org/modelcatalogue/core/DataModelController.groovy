@@ -99,7 +99,10 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
             contentDescriptors << createContentDescriptor(dataModel, 'Measurement Units', MeasurementUnit, stats["totalMeasurementUnitCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Assets', Asset, stats["totalAssetCount"])
             contentDescriptors << createContentDescriptorForRelationship('Imported Data Models', 'imports',  dataModel, RelationshipType.importType, RelationshipDirection.OUTGOING)
-            contentDescriptors << createVersionsDescriptor(dataModel)
+
+            if (params.boolean('root')) {
+                contentDescriptors << createVersionsDescriptor(dataModel)
+            }
 
             contentDescriptors
         }

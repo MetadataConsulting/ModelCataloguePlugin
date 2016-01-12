@@ -8,6 +8,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
       descend:  '='
       repeat:   '='
       treeview: '='
+      extraParameters: '=?'
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementTreeviewItem.html'
 
@@ -55,7 +56,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
         # function to load more items to existing $$children helper property
         ->
           $scope.element.$$showingMore = true
-          list.next().then (nextList) ->
+          list.next($scope.extraParameters).then (nextList) ->
             for item in nextList.list
               it = if item.relation then item.relation else item
               $scope.element.$$children.push(angular.extend(it, {$$relationship: (if item.relation then item else undefined), $$metadata: item.ext, $$archived: item.archived, $$localName: getLocalName(item) }))
@@ -143,7 +144,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
           # first load
           $scope.element.$$loadingChildren = true
-          $scope.descendFun().then(loadNewChildren).then ->
+          $scope.descendFun(null, $scope.extraParameters).then(loadNewChildren).then ->
             $scope.element.$$loadingChildren = false
 
       $scope.collapseOrExpand = ->
