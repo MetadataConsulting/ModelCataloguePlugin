@@ -3,7 +3,6 @@ package org.modelcatalogue.core
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.google.common.util.concurrent.UncheckedExecutionException
-import grails.util.Environment
 import grails.util.GrailsNameUtils
 import org.apache.log4j.Logger
 import org.codehaus.groovy.grails.exceptions.DefaultStackTraceFilterer
