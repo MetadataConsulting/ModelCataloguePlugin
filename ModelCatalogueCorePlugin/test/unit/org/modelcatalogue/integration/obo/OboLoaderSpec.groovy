@@ -2,6 +2,7 @@ package org.modelcatalogue.integration.obo
 
 import org.custommonkey.xmlunit.DetailedDiff
 import org.custommonkey.xmlunit.Diff
+import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier
 import org.custommonkey.xmlunit.XMLUnit
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
@@ -48,11 +49,10 @@ class OboLoaderSpec extends Specification {
         println expected
 
 
-        new File('/tmp/obo.xml').text = xml
-
 
         Diff diff = new Diff(xml.replaceAll(/(?m)\s+/, ' '), expected.replaceAll(/(?m)\s+/, ' '))
         DetailedDiff detailedDiff = new DetailedDiff(diff)
+        diff.overrideElementQualifier(new ElementNameAndAttributeQualifier('name'))
 
         assert detailedDiff.similar(), detailedDiff.toString()
         return true
