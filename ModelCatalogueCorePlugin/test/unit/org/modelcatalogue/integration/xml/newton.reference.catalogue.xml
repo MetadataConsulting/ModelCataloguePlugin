@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd">
+    <measurementUnit id="http://www.example.com/units/Newton" symbol="N" status="DRAFT" name="Newton">
+        <description>The newton (symbol: N) is the International System of Units (SI) derived unit of force.</description>
+        <extensions>
+            <extension key="From">SI</extension>
+        </extensions>
+        <relationships>
+            <to relationshipType="relatedTo" ref="http://www.bipm.org/en/publications/si-brochure/kilogram.html" />
+            <to relationshipType="derivedFrom" ref="http://www.bipm.org/en/publications/si-brochure/metre.html" />
+        </relationships>
+    </measurementUnit>
+    <relationshipTypes>
+        <relationshipType name="derivedFrom" source="org.modelcatalogue.integration.MeasurementUnit" destination="org.modelcatalogue.integration.MeasurementUnit">
+            <sourceToDestination label="is derived from" />
+            <destinationToSource label="derives" />
+        </relationshipType>
+        <relationshipType name="relatedTo" source="org.modelcatalogue.integration.CatalogueElement" destination="org.modelcatalogue.integration.CatalogueElement" bidirectional="true">
+            <sourceToDestination label="related to">Any element can be related to multiple elements. This relationship has no specific meaning.</sourceToDestination>
+            <destinationToSource label="related to" />
+        </relationshipType>
+    </relationshipTypes>
+</catalogue>

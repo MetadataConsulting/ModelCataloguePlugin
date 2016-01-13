@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd">
+    <dataType id="http://www.example.com/domains/Force" status="DRAFT" name="Force">
+        <description>A force is a push or pull upon an object resulting from the object's interaction with another object.</description>
+        <regex>\d+</regex>
+        <measurementUnit id="http://www.example.com/units/Newton" symbol="N" status="DRAFT" name="Newton">
+            <description>The newton (symbol: N) is the International System of Units (SI) derived unit of force.</description>
+            <extensions>
+                <extension key="From">SI</extension>
+            </extensions>
+            <relationships>
+                <to relationshipType="relatedTo" ref="http://www.example.com/domains/Pressure">
+                    <metadata>
+                        <extension key="Relation">Derived From</extension>
+                    </metadata>
+                </to>
+            </relationships>
+        </measurementUnit>
+        <dataType id="http://www.example.com/types/Decimal" status="DRAFT" name="Decimal">
+            <description>A number that uses a decimal point followed by digits that show a value smaller than one.</description>
+        </dataType>
+    </dataType>
+    <relationshipTypes>
+        <relationshipType name="relatedTo" source="org.modelcatalogue.integration.CatalogueElement" destination="org.modelcatalogue.integration.CatalogueElement" bidirectional="true">
+            <sourceToDestination label="related to">Any element can be related to multiple elements. This relationship has no specific meaning.</sourceToDestination>
+            <destinationToSource label="related to" />
+        </relationshipType>
+    </relationshipTypes>
+</catalogue>

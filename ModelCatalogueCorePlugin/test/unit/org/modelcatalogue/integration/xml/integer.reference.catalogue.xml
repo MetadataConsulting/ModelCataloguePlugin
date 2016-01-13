@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd">
+    <dataType id="http://www.example.com/types/Integer" status="DRAFT" name="Integer">
+        <description>A number with no fractional part.</description>
+        <relationships>
+            <from relationshipType="base" ref="http://www.example.com/types/Decimal" />
+        </relationships>
+    </dataType>
+    <relationshipTypes>
+        <relationshipType name="base" source="org.modelcatalogue.integration.CatalogueElement" destination="org.modelcatalogue.integration.CatalogueElement">
+            <sourceToDestination label="is base for">Any catalogue element can be base for multiple elements of the same type.</sourceToDestination>
+            <destinationToSource label="is based on">Any catalogue element can be based on multiple elements of the same type. Value domains will first use rules of the base value domains and than their owns when validating input values.</destinationToSource>
+            <rule>source.class == destination.class</rule>
+        </relationshipType>
+    </relationshipTypes>
+</catalogue>

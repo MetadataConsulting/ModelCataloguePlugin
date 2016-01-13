@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd">
+    <dataModel id="http://www.example.com/datasets/Transportation" status="DRAFT" name="Transportation">
+        <dataClass id="http://www.example.com/models/Locomotive" status="DRAFT" name="Locomotive">
+            <dataElement id="http://www.example.com/elements/Adhesion" status="DRAFT" name="Factor of Adhesion">
+                <dataType id="http://www.example.com/domains/Force" status="DRAFT" name="Force">
+                    <description>A force is a push or pull upon an object resulting from the object's interaction with another object.</description>
+                    <regex>\d+</regex>
+                    <measurementUnit id="http://www.example.com/units/Newton" symbol="N" status="DRAFT" name="Newton">
+                        <description>The newton (symbol: N) is the International System of Units (SI) derived unit of force.</description>
+                        <extensions>
+                            <extension key="From">SI</extension>
+                        </extensions>
+                    </measurementUnit>
+                    <dataType id="http://www.example.com/types/Decimal" status="DRAFT" name="Decimal">
+                        <description>A number that uses a decimal point followed by digits that show a value smaller than one.</description>
+                    </dataType>
+                </dataType>
+            </dataElement>
+        </dataClass>
+        <dataClass id="http://www.example.com/models/Engine" status="DRAFT" name="Engine">
+            <dataElement id="http://www.example.com/elements/Adhesion" />
+        </dataClass>
+    </dataModel>
+    <relationshipTypes>
+        <relationshipType name="classification" source="org.modelcatalogue.integration.Classification" destination="org.modelcatalogue.integration.CatalogueElement" versionSpecific="true">
+            <sourceToDestination label="classifies">Classification can classify multiple elements. Based on this relationship you can narrow the elements shown in the catalogue using the classifications filter in the bottom left corner. When classification is finalized all classified elements are finalized as well.</sourceToDestination>
+            <destinationToSource label="is classified by">Any element can be classified by multiple classifications. When new draft of the classified element is created then drafts for classifications are created as well.</destinationToSource>
+        </relationshipType>
+        <relationshipType name="containment" source="org.modelcatalogue.integration.Model" destination="org.modelcatalogue.integration.DataElement" versionSpecific="true">
+            <sourceToDestination label="contains">Model can contain multiple data elements. Contained data elements are finalized when the model is finalized.</sourceToDestination>
+            <destinationToSource label="contained in">Data element can be contained in multiple models. When new draft of the data element is created then drafts for all containing models are created as well.</destinationToSource>
+            <rule>/* A RULE */</rule>
+        </relationshipType>
+    </relationshipTypes>
+</catalogue>

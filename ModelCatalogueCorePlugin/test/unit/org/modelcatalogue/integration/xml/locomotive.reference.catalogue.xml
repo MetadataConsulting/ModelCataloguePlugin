@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd">
+    <dataClass id="http://www.example.com/models/Locomotive" status="DRAFT" name="Locomotive">
+        <dataElement id="http://www.example.com/elements/Adhesion" status="DRAFT" name="Factor of Adhesion">
+            <dataType id="http://www.example.com/domains/Force" status="DRAFT" name="Force">
+                <description>A force is a push or pull upon an object resulting from the object's interaction with another object.</description>
+                <regex>\d+</regex>
+                <measurementUnit id="http://www.example.com/units/Newton" symbol="N" status="DRAFT" name="Newton">
+                    <description>The newton (symbol: N) is the International System of Units (SI) derived unit of force.</description>
+                    <extensions>
+                        <extension key="From">SI</extension>
+                    </extensions>
+                </measurementUnit>
+                <dataType id="http://www.example.com/types/Decimal" status="DRAFT" name="Decimal">
+                    <description>A number that uses a decimal point followed by digits that show a value smaller than one.</description>
+                </dataType>
+            </dataType>
+        </dataElement>
+        <dataClass id="http://www.example.com/models/Engine" status="DRAFT" name="Engine">
+            <dataElement id="http://www.example.com/elements/Adhesion">
+                <metadata>
+                    <extension key="Min. Occurs">0</extension>
+                </metadata>
+            </dataElement>
+        </dataClass>
+    </dataClass>
+    <relationshipTypes>
+        <relationshipType name="containment" source="org.modelcatalogue.integration.Model" destination="org.modelcatalogue.integration.DataElement" versionSpecific="true">
+            <sourceToDestination label="contains">Model can contain multiple data elements. Contained data elements are finalized when the model is finalized.</sourceToDestination>
+            <destinationToSource label="contained in">Data element can be contained in multiple models. When new draft of the data element is created then drafts for all containing models are created as well.</destinationToSource>
+            <rule>/* A RULE */</rule>
+        </relationshipType>
+        <relationshipType name="hierarchy" source="org.modelcatalogue.integration.Model" destination="org.modelcatalogue.integration.Model" versionSpecific="true">
+            <sourceToDestination label="parent of">Model can contain (be parent of) multiple models. Child models are finalized when parent model is finalized,</sourceToDestination>
+            <destinationToSource label="child of">Model can be contained (be child model) in multiple models. When draft is created for child model drafts for parent models are created as well.</destinationToSource>
+        </relationshipType>
+    </relationshipTypes>
+</catalogue>

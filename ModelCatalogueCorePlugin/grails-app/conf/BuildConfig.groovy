@@ -58,10 +58,10 @@ grails.project.dependency.resolution = {
         String mcToolkitVersion = '2.0.0-alpha-02'
         compile "org.modelcatalogue:mc-core-api:$mcToolkitVersion"
         compile "org.modelcatalogue:mc-builder-api:$mcToolkitVersion"
-        compile "org.modelcatalogue:mc-integration-excel:$mcToolkitVersion"
-        compile "org.modelcatalogue:mc-integration-obo:$mcToolkitVersion"
-        compile "org.modelcatalogue:mc-integration-xml:$mcToolkitVersion"
-        compile "org.modelcatalogue:mc-integration-mc:$mcToolkitVersion"
+        //compile "org.modelcatalogue:mc-integration-excel:$mcToolkitVersion"
+        //compile "org.modelcatalogue:mc-integration-obo:$mcToolkitVersion"
+        //compile "org.modelcatalogue:mc-integration-xml:$mcToolkitVersion"
+        // compile "org.modelcatalogue:mc-integration-mc:$mcToolkitVersion"
         test "org.modelcatalogue:mc-builder-xml:$mcToolkitVersion"
 
         compile 'com.craigburke.document:word:0.4.10-fix31'
@@ -74,6 +74,9 @@ grails.project.dependency.resolution = {
         compile 'org.apache.poi:poi-ooxml:3.13'
         compile 'org.apache.poi:ooxml-schemas:1.1'
 
+        compile 'net.sourceforge.owlapi:owlapi-oboformat:3.5.1'
+        compile 'net.sourceforge.owlapi:owlapi-api:3.5.1'
+        compile 'net.sourceforge.owlapi:owlapi-parsers:3.5.1'
 
         test 'xmlunit:xmlunit:1.6'
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd">
+    <copyRelationships>true</copyRelationships>
+    <dataModel name="MET-522">
+        <globalSearchFor>dataType</globalSearchFor>
+        <dataClass name="MET-522.M1">
+            <dataElement name="MET-522.M1.DE1">
+                <dataType name="MET-522.DT1">
+                    <measurementUnit name="MET-522.MU1" />
+                </dataType>
+            </dataElement>
+        </dataClass>
+    </dataModel>
+    <dataModel name="MET-522">
+        <globalSearchFor>dataType</globalSearchFor>
+        <dataClass name="MET-522.M1">
+            <dataElement name="MET-522.M1.DE2">
+                <dataType name="MET-522.DT2">
+                    <measurementUnit name="MET-522.MU2" />
+                </dataType>
+            </dataElement>
+        </dataClass>
+    </dataModel>
+    <dataModel name="MET-522">
+        <globalSearchFor>dataType</globalSearchFor>
+        <dataClass name="MET-522.M1">
+            <dataElement name="MET-522.M1.DE3">
+                <dataType name="MET-522.DT3">
+                    <measurementUnit name="MET-522.MU3" />
+                </dataType>
+            </dataElement>
+        </dataClass>
+    </dataModel>
+    <dataModel name="MET-522">
+        <globalSearchFor>dataType</globalSearchFor>
+        <dataClass name="MET-522.M1">
+            <dataElement name="MET-522.M1.DE4">
+                <dataType name="MET-522.DT4">
+                    <measurementUnit name="MET-522.MU4" />
+                </dataType>
+            </dataElement>
+        </dataClass>
+    </dataModel>
+    <dataModel name="MET-522">
+        <globalSearchFor>dataType</globalSearchFor>
+        <dataClass name="MET-522.M1">
+            <dataElement name="MET-522.M1.DE5">
+                <dataType name="MET-522.DT5">
+                    <measurementUnit name="MET-522.MU5" />
+                </dataType>
+            </dataElement>
+        </dataClass>
+    </dataModel>
+    <dataModel name="MET-522">
+        <globalSearchFor>dataType</globalSearchFor>
+        <dataClass name="MET-522.M2">
+            <dataElement name="MET-522.M2.DE1">
+                <dataType name="MET-522.DT1">
+                    <measurementUnit name="MET-522.MU1" />
+                </dataType>
+            </dataElement>
+        </dataClass>
+    </dataModel>
+    <dataModel name="MET-522">
+        <globalSearchFor>dataType</globalSearchFor>
+        <dataClass name="MET-522.M2">
+            <dataElement name="MET-522.M2.DE2">
+                <dataType name="MET-522.DT2">
+                    <measurementUnit name="MET-522.MU2" />
+                </dataType>
+            </dataElement>
+        </dataClass>
+    </dataModel>
+    <dataModel name="MET-522">
+        <globalSearchFor>dataType</globalSearchFor>
+        <dataClass name="MET-522.M2">
+            <dataElement name="MET-522.M2.DE3">
+                <dataType name="MET-522.DT3">
+                    <measurementUnit name="MET-522.MU3" />
+                </dataType>
+            </dataElement>
+        </dataClass>
+    </dataModel>
+    <dataModel name="MET-522">
+        <globalSearchFor>dataType</globalSearchFor>
+        <dataClass name="MET-522.M2">
+            <dataElement name="MET-522.M2.DE4">
+                <dataType name="MET-522.DT4">
+                    <measurementUnit name="MET-522.MU4" />
+                </dataType>
+            </dataElement>
+        </dataClass>
+    </dataModel>
+    <dataModel name="MET-522">
+        <globalSearchFor>dataType</globalSearchFor>
+        <dataClass name="MET-522.M2">
+            <dataElement name="MET-522.M2.DE5">
+                <dataType name="MET-522.DT5">
+                    <measurementUnit name="MET-522.MU5" />
+                </dataType>
+            </dataElement>
+        </dataClass>
+    </dataModel>
+    <dataModel name="MET-522">
+        <globalSearchFor>dataType</globalSearchFor>
+        <dataClass name="MET-522.M3">
+            <dataElement name="MET-522.M3.DE1">
+                <dataType name="MET-522.DT1">
+                    <measurementUnit name="MET-522.MU1" />
+                </dataType>
+            </dataElement>
+        </dataClass>
+    </dataModel>
+    <dataModel name="MET-522">
+        <globalSearchFor>dataType</globalSearchFor>
+        <dataClass name="MET-522.M3">
+            <dataElement name="MET-522.M3.DE2">
+                <dataType name="MET-522.DT2">
+                    <measurementUnit name="MET-522.MU2" />
+                </dataType>
+            </dataElement>
+        </dataClass>
+    </dataModel>
+    <dataModel name="MET-522">
+        <globalSearchFor>dataType</globalSearchFor>
+        <dataClass name="MET-522.M3">
+            <dataElement name="MET-522.M3.DE3">
+                <dataType name="MET-522.DT3">
+                    <measurementUnit name="MET-522.MU3" />
+                </dataType>
+            </dataElement>
+        </dataClass>
+    </dataModel>
+    <dataModel name="MET-522">
+        <globalSearchFor>dataType</globalSearchFor>
+        <dataClass name="MET-522.M3">
+            <dataElement name="MET-522.M3.DE4">
+                <dataType name="MET-522.DT4">
+                    <measurementUnit name="MET-522.MU4" />
+                </dataType>
+            </dataElement>
+        </dataClass>
+    </dataModel>
+    <dataModel name="MET-522">
+        <globalSearchFor>dataType</globalSearchFor>
+        <dataClass name="MET-522.M3">
+            <dataElement name="MET-522.M3.DE5">
+                <dataType name="MET-522.DT5">
+                    <measurementUnit name="MET-522.MU5" />
+                </dataType>
+            </dataElement>
+        </dataClass>
+    </dataModel>
+</catalogue>
