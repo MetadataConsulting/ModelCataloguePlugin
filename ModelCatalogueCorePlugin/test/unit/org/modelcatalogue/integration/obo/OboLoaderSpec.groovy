@@ -48,6 +48,8 @@ class OboLoaderSpec extends Specification {
         println expected
 
 
+        new File('/tmp/obo.xml').text = xml
+
 
         Diff diff = new Diff(xml.replaceAll(/(?m)\s+/, ' '), expected.replaceAll(/(?m)\s+/, ' '))
         DetailedDiff detailedDiff = new DetailedDiff(diff)

@@ -3,13 +3,15 @@ package org.modelcatalogue.integration.obo
 import groovy.text.SimpleTemplateEngine
 import groovy.text.Template
 import groovy.util.logging.Log
+import groovy.util.logging.Log4j
 import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.core.api.ElementStatus
 import org.obolibrary.oboformat.model.Clause
 import org.obolibrary.oboformat.model.Frame
 import org.obolibrary.oboformat.model.OBODoc
 import org.obolibrary.oboformat.parser.OBOFormatParser
 
-@Log
+@Log4j
 class OboLoader {
 
     final CatalogueBuilder builder
@@ -180,11 +182,10 @@ class OboLoader {
                 }
 
                 document.termFrames.eachWithIndex { Frame frame, i ->
-                    log.fine "[${(i + 1).toString().padLeft(6, '0')}/${document.termFrames.size().toString().padLeft(6, '0')}] Importing model ${frame.id}: ${frame.getClause('name')?.value}"
+                    log.info "[${(i + 1).toString().padLeft(6, '0')}/${document.termFrames.size().toString().padLeft(6, '0')}] Importing model ${frame.id}: ${frame.getClause('name')?.value}".toString()
 
 
-                    String modelId = getId(frame.id, idTemplate)
-                    model(name: getName(frame), id: modelId) {
+                    model(getModelAttributes(frame, idTemplate)) {
                         ext OBO_ID, frame.id
 
                         handleDefAndComment(frame)
@@ -193,7 +194,6 @@ class OboLoader {
                         handleNamespaceAndSubsets(frame, namespacesToClassifications)
                         handleAltIds(frame)
                         handleXrefs(frame)
-                        handleStatusForObsoleteAndReplacedBy(frame)
                         handlePropertyValues(frame)
                         handleIsA(frame, idTemplate, oboIdsToNames)
                         handleSynonym(frame)
@@ -212,7 +212,20 @@ class OboLoader {
 //            }
         }
 
-        log.fine "Import finished for ${name}"
+        log.info "Import finished for ${name}"
+    }
+
+    private static Map<String, Object> getModelAttributes(Frame frame, Template idTemplate) {
+        Map<String, Object> attrs = [:]
+
+        attrs.id = getId(frame.id, idTemplate)
+        attrs.name = getName(frame)
+
+        if (frame.getClause('is_obsolete') || frame.getClause('replaced_by')) {
+            attrs.status = ElementStatus.DEPRECATED
+        }
+
+        attrs
     }
 
     private void handleIsA(Frame frame, Template idTemplate, Map<String, String> oboIdsToNames) {
@@ -333,12 +346,6 @@ class OboLoader {
             return ''
         }
         clauses*.value*.toString().join(', ')
-    }
-
-    private void handleStatusForObsoleteAndReplacedBy(Frame frame) {
-        if (frame.getClause('is_obsolete') || frame.getClause('replaced_by')) {
-            builder.status builder.deprecated
-        }
     }
 
     private void handlePropertyValues(Frame frame) {
