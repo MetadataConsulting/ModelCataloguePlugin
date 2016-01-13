@@ -34,4 +34,7 @@ describe "mc.core.ui.catalogueElementTreeview", ->
     $rootScope.$digest()
 
     expect(element.find(':first-child').prop('tagName').toLowerCase()).toBe('ul')
-    expect(element.find('li').length).toBe(2) # one per item plus
+
+    console.log element.find('li')
+
+    expect(element.find('li').length).toBe(3)
