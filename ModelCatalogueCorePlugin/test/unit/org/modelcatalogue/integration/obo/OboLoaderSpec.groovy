@@ -52,7 +52,6 @@ class OboLoaderSpec extends Specification {
 
         Diff diff = new Diff(xml.replaceAll(/(?m)\s+/, ' '), expected.replaceAll(/(?m)\s+/, ' '))
         DetailedDiff detailedDiff = new DetailedDiff(diff)
-        diff.overrideElementQualifier(new ElementNameAndAttributeQualifier('name'))
 
         assert detailedDiff.similar(), detailedDiff.toString()
         return true

@@ -226,7 +226,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
     def "value domain calls are delegated to the data type"() {
         build {
-            valueDomain name: 'Domain'
+            dataType name: 'Domain'
         }
 
         expect:
@@ -235,7 +235,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
     def "if there is a nested data type with name missing - it is merged into single data type"() {
         build {
-            valueDomain name: 'Merged Type', {
+            dataType name: 'Merged Type', {
                 dataType(description: 'MT DESC')
             }
         }
@@ -248,7 +248,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
     def "if there is a nested data type with different name - it's set as base"() {
         build {
-            valueDomain name: 'Inherited Type', {
+            dataType name: 'Inherited Type', {
                 dataType(name: 'Base Type', description: 'MT DESC')
             }
         }
@@ -309,7 +309,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
     def "reuses existing data type with given name"() {
         DataModel cls  = new DataModel(name: 'Some').save(failOnError: true)
-        DataType dt1 = new DataType(name: 'SomeType', dataModel: cls).save(failOnError: true)
+        new DataType(name: 'SomeType', dataModel: cls).save(failOnError: true)
         DataType dt2 = new DataType(name: 'SomeType').save(failOnError: true)
 
         build {
@@ -837,17 +837,17 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
     def "should be able to copy relationships where the classification is finalized"() {
         build {
-            classification(name: 'C4CR', status: finalized)
+            dataModel(name: 'C4CR', status: finalized)
         }
         when:
         build {
             // copy relationships
-            classification(name: 'C4CR') {
-                model(name: 'C4CR GP') {
-                    model(name: 'C4CR P') {
-                        model(name: 'C4CR C1')
-                        model(name: 'C4CR C2')
-                        model(name: 'C4CR C3')
+            dataModel(name: 'C4CR') {
+                dataClass(name: 'C4CR GP') {
+                    dataClass(name: 'C4CR P') {
+                        dataClass(name: 'C4CR C1')
+                        dataClass(name: 'C4CR C2')
+                        dataClass(name: 'C4CR C3')
                     }
                 }
             }
@@ -861,19 +861,19 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
     def "should be able to copy relationships where the model is finalized"() {
         build {
-            classification(name: 'C4CR2', status: finalized) {
-                model(name: 'C4CR2 GP', status: finalized)
+            dataModel(name: 'C4CR2', status: finalized) {
+                dataClass(name: 'C4CR2 GP', status: finalized)
             }
         }
         when:
         build {
             copy relationships
-            classification(name: 'C4CR2') {
-                model(name: 'C4CR2 GP') {
-                    model(name: 'C4CR2 P') {
-                        model(name: 'C4CR2 C1')
-                        model(name: 'C4CR2 C2')
-                        model(name: 'C4CR2 C3')
+            dataModel(name: 'C4CR2') {
+                dataClass(name: 'C4CR2 GP') {
+                    dataClass(name: 'C4CR2 P') {
+                        dataClass(name: 'C4CR2 C1')
+                        dataClass(name: 'C4CR2 C2')
+                        dataClass(name: 'C4CR2 C3')
                     }
                 }
             }
@@ -962,7 +962,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
                     rel 'synonym' from ref('http://www.example.com/100.1')
                     rel 'synonym' from 'Foo', 'Bar'
                 }
-                valueDomain name:  valueDomainName, id: valueDomainId1, dataModel: 'Some other model', {
+                dataType name:  valueDomainName, id: valueDomainId1, dataModel: 'Some other model', {
                     dataType name: valueDomainName, id: valueDomainId2, enumerations: [foo: 'bar']
                 }
             }
@@ -999,5 +999,21 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         parentDataClass.dataModel == modelOne
         childDataClass.dataModel == modelTwo
 
+    }
+
+    def "adds a data model if there is an attempt to add classification or declaration relationship"() {
+        build {
+            dataModel name: 'DTDMCDR Test'
+            dataType name: 'DTDMCDR', {
+                rel 'declaration' from 'DTDMCDR Test'
+            }
+        }
+
+        DataType dataType = DataType.findByName('DTDMCDR')
+
+        expect:
+        dataType
+        dataType.dataModel
+        dataType.dataModel.name == 'DTDMCDR Test'
     }
 }

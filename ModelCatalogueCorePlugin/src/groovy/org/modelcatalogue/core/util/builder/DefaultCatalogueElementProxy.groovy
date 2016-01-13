@@ -121,7 +121,11 @@ import static org.modelcatalogue.core.util.HibernateHelper.*
         }
 
         if (key == 'dataModel' || key == 'classification') {
-            classification = value?.name
+            if (value instanceof String) {
+                classification = value
+            } else if (value instanceof org.modelcatalogue.core.api.CatalogueElement) {
+                classification = value.name
+            }
         }
 
         parameters.put(key, value)

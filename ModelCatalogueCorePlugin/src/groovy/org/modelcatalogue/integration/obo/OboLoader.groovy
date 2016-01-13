@@ -173,7 +173,7 @@ class OboLoader {
 
         log.info "Building new models"
         builder.build {
-            classification(name: name) {
+            dataModel(name: name) {
 
                 String defaultNamespace = document.headerFrame.getClause('default-namespace')?.value?.toString()
                 if (defaultNamespace) {
@@ -185,7 +185,7 @@ class OboLoader {
                     log.info "[${(i + 1).toString().padLeft(6, '0')}/${document.termFrames.size().toString().padLeft(6, '0')}] Importing model ${frame.id}: ${frame.getClause('name')?.value}".toString()
 
 
-                    model(getModelAttributes(frame, idTemplate)) {
+                    dataClass(getModelAttributes(frame, idTemplate)) {
                         ext OBO_ID, frame.id
 
                         handleDefAndComment(frame)

@@ -414,6 +414,9 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @see RelationshipBuilder
      */
     RelationshipBuilder rel(String relationshipTypeName) {
+        if (relationshipTypeName == 'classification' || relationshipTypeName == 'declaration') {
+            return new SetDataModelBuilder(context, repository)
+        }
         return new DefaultRelationshipBuilder(context, repository, relationshipTypeName)
     }
 
