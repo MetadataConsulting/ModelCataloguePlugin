@@ -19,9 +19,10 @@ if [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "app_functional_a" 
   #using token clone gh-pages branch
   git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/MetadataRegistry/ModelCataloguePluginReports.git gh-pages > /dev/null
 
-  #go into diractory and copy data we're interested in to that directory
+  #go into directory and copy data we're interested in to that directory
   cd gh-pages
-  rm -rf ./reports/latest/
+  # cannot remove everything as the tests are running in parallel
+  # rm -rf ./reports/latest/
   mkdir -p ./reports/latest/
   cp -Rf $HOME/reports/* ./reports/latest/
 
