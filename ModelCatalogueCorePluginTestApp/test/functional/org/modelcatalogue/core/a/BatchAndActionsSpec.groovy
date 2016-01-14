@@ -6,6 +6,8 @@ import org.modelcatalogue.core.pages.BatchActionsPage
 import org.modelcatalogue.core.pages.BatchListPage
 import spock.lang.Stepwise
 
+import static org.modelcatalogue.core.geb.Common.getCloseGrowlMessage
+
 @Stepwise
 class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
 
@@ -81,6 +83,9 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
 
 
         then:
+        check '.modal-body' gone
+        check closeGrowlMessage gone
+
         waitFor {
             pendingActions[0].text().contains('BrandNewModel')
         }

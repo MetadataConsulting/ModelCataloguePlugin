@@ -9,7 +9,6 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.obolibrary.oboformat.model.Clause
 import org.obolibrary.oboformat.model.Frame
 import org.obolibrary.oboformat.model.OBODoc
-import org.obolibrary.oboformat.parser.OBOFormatParser
 
 @Log4j
 class OboLoader {
@@ -159,7 +158,7 @@ class OboLoader {
     void load(InputStream is, String name, String mcIDPattern) {
         assert mcIDPattern, "Id pattern must be provided"
         log.info "Parsing OBO file for ${name}"
-        OBODoc document = new OBOFormatParser().parse(new BufferedReader(new InputStreamReader(is)))
+        OBODoc document = new OrderKeepingOboFormatParser().parse(new BufferedReader(new InputStreamReader(is)))
 
         Map<String, String> namespacesToClassifications = [:]
         Map<String, String> oboIdsToNames = [:]

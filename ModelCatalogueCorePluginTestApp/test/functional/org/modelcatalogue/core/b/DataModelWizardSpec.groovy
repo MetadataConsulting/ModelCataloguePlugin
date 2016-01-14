@@ -62,6 +62,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         click exitButton
+        check closeGrowlMessage gone
 
         then:
         check rightSideTitle is 'New Data Model New Data Model 0.0.1'

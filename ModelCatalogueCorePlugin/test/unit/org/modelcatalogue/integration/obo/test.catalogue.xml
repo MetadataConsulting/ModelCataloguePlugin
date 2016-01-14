@@ -1,181 +1,181 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd">
-    <dataModel name="test.obo">
-        <dataClass name="Abnormality of the genitourinary system" id="http://www.example.com/obo/HP:0000119">
-            <description>The presence of any abnormality of the genitourinary system.</description>
-            <extensions>
-                <extension key="OBO ID">HP:0000119</extension>
-                <extension key="Alternative IDs">HP:0008658, HP:0008688, HP:0008704, HP:0008713</extension>
-                <extension key="xrefs">&lt;MeSH:D014564 "Urogenital Abnormalities"&gt;, &lt;UMLS:C1844502 "GENITOURINARY TRACT ANOMALIES"&gt;</extension>
-                <extension key="HP:0040005">The presence of any abnormality of the `genitourinary system` (FMA:280610).</extension>
-                <extension key="HP:0040005 Type">xsd:string</extension>
-                <extension key="Synonyms">Genitourinary abnormality, Genitourinary disease, Genitourinary dysplasia, Genitourinary tract anomalies, Genitourinary tract malformation, Urogenital abnormalities, Urogenital anomalies</extension>
-            </extensions>
-            <relationships>
-                <from relationshipType="classification" name="test.obo" />
-                <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000118" />
-            </relationships>
-        </dataClass>
-        <dataClass name="Phenotypic abnormality" id="http://www.example.com/obo/HP:0000118">
-            <description>A phenotypic abnormality.
+  <dataModel name="test.obo">
+    <dataClass id="http://www.example.com/obo/HP:0000001" name="All">
+      <description>Root of all terms in the Human Phenotype Ontology.</description>
+      <extensions>
+        <extension key="OBO ID">HP:0000001</extension>
+        <extension key="Synonyms"></extension>
+      </extensions>
+      <relationships>
+        <from relationshipType="classification" name="test.obo" />
+      </relationships>
+    </dataClass>
+    <dataClass id="http://www.example.com/obo/HP:0000118" name="Phenotypic abnormality">
+      <description>A phenotypic abnormality.
 
-                Comment:
-                This is the root of the phenotypic abnormality subontology of the HPO.</description>
-            <extensions>
-                <extension key="OBO ID">HP:0000118</extension>
-                <extension key="Synonyms">Organ abnormality</extension>
-            </extensions>
-            <relationships>
-                <from relationshipType="classification" name="test.obo" />
-                <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000001" />
-            </relationships>
-        </dataClass>
-        <dataClass name="All" id="http://www.example.com/obo/HP:0000001">
-            <description>Root of all terms in the Human Phenotype Ontology.</description>
-            <extensions>
-                <extension key="OBO ID">HP:0000001</extension>
-                <extension key="Synonyms"></extension>
-            </extensions>
-            <relationships>
-                <from relationshipType="classification" name="test.obo" />
-            </relationships>
-        </dataClass>
-        <dataClass name="Abnormality of the renal cortex" id="http://www.example.com/obo/HP:0011035">
-            <description>An abnormality of the cortex of the kidney.</description>
-            <extensions>
-                <extension key="OBO ID">HP:0011035</extension>
-                <extension key="Created by">peter</extension>
-                <extension key="Creation Date">2011-03-06T11:31:39Z</extension>
-                <extension key="HP:0040005">An abnormality of the `cortex of the kidney` (FMA:15581).</extension>
-                <extension key="HP:0040005 Type">xsd:string</extension>
-                <extension key="Synonyms"></extension>
-            </extensions>
-            <relationships>
-                <from relationshipType="classification" name="test.obo" />
-                <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0012210" />
-            </relationships>
-        </dataClass>
-        <dataClass name="Renal cyst" id="http://www.example.com/obo/HP:0000107">
-            <description>A fluid filled sac in the kidney.</description>
-            <extensions>
-                <extension key="OBO ID">HP:0000107</extension>
-                <extension key="Alternative IDs">HP:0000088, HP:0000109</extension>
-                <extension key="xrefs">&lt;UMLS:C0268800 "Renal cysts"&gt;</extension>
-                <extension key="Synonyms">Cystic kidney disease, CYSTIC KIDNEYS, RENAL CYSTS</extension>
-            </extensions>
-            <relationships>
-                <from relationshipType="classification" name="test.obo" />
-                <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0012210" />
-            </relationships>
-        </dataClass>
-        <dataClass name="Abnormality of the upper urinary tract" id="http://www.example.com/obo/HP:0010935">
-            <description>An abnormality of the upper urinary tract.
+Comment:
+This is the root of the phenotypic abnormality subontology of the HPO.</description>
+      <extensions>
+        <extension key="OBO ID">HP:0000118</extension>
+        <extension key="Synonyms">Organ abnormality</extension>
+      </extensions>
+      <relationships>
+        <from relationshipType="classification" name="test.obo" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000001" />
+      </relationships>
+    </dataClass>
+    <dataClass id="http://www.example.com/obo/HP:0001507" name="Growth abnormality">
+      <extensions>
+        <extension key="OBO ID">HP:0001507</extension>
+        <extension key="Alternative IDs">HP:0008904</extension>
+        <extension key="Synonyms">ABNORMAL GROWTH</extension>
+      </extensions>
+      <relationships>
+        <from relationshipType="classification" name="test.obo" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000118" />
+      </relationships>
+    </dataClass>
+    <dataClass id="http://www.example.com/obo/HP:0000002" name="Abnormality of body height">
+      <description>Deviation from the norm of height with respect to that which is expected according to age and gender norms.</description>
+      <extensions>
+        <extension key="OBO ID">HP:0000002</extension>
+        <extension key="Created by">peter</extension>
+        <extension key="Creation Date">2008-02-27T02:20:00Z</extension>
+        <extension key="Synonyms"></extension>
+      </extensions>
+      <relationships>
+        <from relationshipType="classification" name="test.obo" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0001507" />
+      </relationships>
+    </dataClass>
+    <dataClass id="http://www.example.com/obo/HP:0000119" name="Abnormality of the genitourinary system">
+      <description>The presence of any abnormality of the genitourinary system.</description>
+      <extensions>
+        <extension key="OBO ID">HP:0000119</extension>
+        <extension key="Alternative IDs">HP:0008658, HP:0008688, HP:0008704, HP:0008713</extension>
+        <extension key="xrefs">&lt;MeSH:D014564 "Urogenital Abnormalities"&gt;, &lt;UMLS:C1844502 "GENITOURINARY TRACT ANOMALIES"&gt;</extension>
+        <extension key="HP:0040005">The presence of any abnormality of the `genitourinary system` (FMA:280610).</extension>
+        <extension key="HP:0040005 Type">xsd:string</extension>
+        <extension key="Synonyms">Genitourinary abnormality, Genitourinary disease, Genitourinary dysplasia, Genitourinary tract anomalies, Genitourinary tract malformation, Urogenital abnormalities, Urogenital anomalies</extension>
+      </extensions>
+      <relationships>
+        <from relationshipType="classification" name="test.obo" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000118" />
+      </relationships>
+    </dataClass>
+    <dataClass id="http://www.example.com/obo/HP:0000079" name="Abnormality of the urinary system">
+      <description>An abnormality of the urinary system.</description>
+      <extensions>
+        <extension key="OBO ID">HP:0000079</extension>
+        <extension key="xrefs">&lt;UMLS:C0158698 "URINARY TRACT ANOMALY"&gt;</extension>
+        <extension key="HP:0040005">An abnormality of the `urinary system` (FMA:7159).</extension>
+        <extension key="HP:0040005 Type">xsd:string</extension>
+        <extension key="Synonyms">Urinary tract abnormalities, Urinary tract abnormality, Urinary tract anomalies</extension>
+      </extensions>
+      <relationships>
+        <from relationshipType="classification" name="test.obo" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000119" />
+      </relationships>
+    </dataClass>
+    <dataClass id="http://www.example.com/obo/HP:0010935" name="Abnormality of the upper urinary tract">
+      <description>An abnormality of the upper urinary tract.
 
-                Comment:
-                The upper urinary tract is a subdivision of urinary system which consists of the kidney and the ureters.</description>
-            <extensions>
-                <extension key="OBO ID">HP:0010935</extension>
-                <extension key="Created by">peter</extension>
-                <extension key="Creation Date">2011-01-16T11:37:29Z</extension>
-                <extension key="HP:0040005">An abnormality of the `upper urinary tract` (FMA:45658).</extension>
-                <extension key="HP:0040005 Type">xsd:string</extension>
-                <extension key="Synonyms"></extension>
-            </extensions>
-            <relationships>
-                <from relationshipType="classification" name="test.obo" />
-                <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000079" />
-                <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000079" />
-            </relationships>
-        </dataClass>
-        <dataClass name="Abnormality of the kidney" id="http://www.example.com/obo/HP:0000077">
-            <description>An abnormality of the kidney.
+Comment:
+The upper urinary tract is a subdivision of urinary system which consists of the kidney and the ureters.</description>
+      <extensions>
+        <extension key="OBO ID">HP:0010935</extension>
+        <extension key="Created by">peter</extension>
+        <extension key="Creation Date">2011-01-16T11:37:29Z</extension>
+        <extension key="HP:0040005">An abnormality of the `upper urinary tract` (FMA:45658).</extension>
+        <extension key="HP:0040005 Type">xsd:string</extension>
+        <extension key="Synonyms"></extension>
+      </extensions>
+      <relationships>
+        <from relationshipType="classification" name="test.obo" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000079" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000079" />
+      </relationships>
+    </dataClass>
+    <dataClass id="http://www.example.com/obo/HP:0000077" name="Abnormality of the kidney">
+      <description>An abnormality of the kidney.
 
-                Comment:
-                The kidney is a paired organ whose primary function is the production of urine.</description>
-            <extensions>
-                <extension key="OBO ID">HP:0000077</extension>
-                <extension key="HP:0040005">An abnormality of the `kidney` (FMA:7203).</extension>
-                <extension key="HP:0040005 Type">xsd:string</extension>
-                <extension key="Synonyms">Kidney disease, Renal anomalies, Renal anomaly</extension>
-            </extensions>
-            <relationships>
-                <from relationshipType="classification" name="test.obo" />
-                <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0010935" />
-            </relationships>
-        </dataClass>
-        <dataClass name="Abnormal renal morphology" id="http://www.example.com/obo/HP:0012210">
-            <description>Any structural anomaly of the kidney.</description>
-            <extensions>
-                <extension key="OBO ID">HP:0012210</extension>
-                <extension key="Created by">peter</extension>
-                <extension key="Creation Date">2013-03-14T07:41:11Z</extension>
-                <extension key="Alternative IDs">HP:0000792, HP:0004726, HP:0004735, HP:0008712</extension>
-                <extension key="xrefs">&lt;UMLS:C0266292 "Kidney malformation"&gt;</extension>
-                <extension key="HP:0040005">Any structural anomaly of the `kidney` (FMA:7203).</extension>
-                <extension key="HP:0040005 Type">xsd:string</extension>
-                <extension key="Synonyms">Kidney malformation, Renal malformation, Structural anomalies of the renal tract, Structural kidney abnormalities, Structural renal anomalies</extension>
-            </extensions>
-            <relationships>
-                <from relationshipType="classification" name="test.obo" />
-                <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000077" />
-            </relationships>
-        </dataClass>
-        <dataClass name="Multicystic kidney dysplasia" id="http://www.example.com/obo/HP:0000003">
-            <description>Multicystic dysplasia of the kidney is characterized by multiple cysts of varying size in the kidney and the absence of a normal pelvocaliceal system. The condition is associated with ureteral or ureteropelvic atresia, and the affected kidney is nonfunctional.
+Comment:
+The kidney is a paired organ whose primary function is the production of urine.</description>
+      <extensions>
+        <extension key="OBO ID">HP:0000077</extension>
+        <extension key="HP:0040005">An abnormality of the `kidney` (FMA:7203).</extension>
+        <extension key="HP:0040005 Type">xsd:string</extension>
+        <extension key="Synonyms">Kidney disease, Renal anomalies, Renal anomaly</extension>
+      </extensions>
+      <relationships>
+        <from relationshipType="classification" name="test.obo" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0010935" />
+      </relationships>
+    </dataClass>
+    <dataClass id="http://www.example.com/obo/HP:0012210" name="Abnormal renal morphology">
+      <description>Any structural anomaly of the kidney.</description>
+      <extensions>
+        <extension key="OBO ID">HP:0012210</extension>
+        <extension key="Created by">peter</extension>
+        <extension key="Creation Date">2013-03-14T07:41:11Z</extension>
+        <extension key="Alternative IDs">HP:0000792, HP:0004726, HP:0004735, HP:0008712</extension>
+        <extension key="xrefs">&lt;UMLS:C0266292 "Kidney malformation"&gt;</extension>
+        <extension key="HP:0040005">Any structural anomaly of the `kidney` (FMA:7203).</extension>
+        <extension key="HP:0040005 Type">xsd:string</extension>
+        <extension key="Synonyms">Kidney malformation, Renal malformation, Structural anomalies of the renal tract, Structural kidney abnormalities, Structural renal anomalies</extension>
+      </extensions>
+      <relationships>
+        <from relationshipType="classification" name="test.obo" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000077" />
+      </relationships>
+    </dataClass>
+    <dataClass id="http://www.example.com/obo/HP:0000107" name="Renal cyst">
+      <description>A fluid filled sac in the kidney.</description>
+      <extensions>
+        <extension key="OBO ID">HP:0000107</extension>
+        <extension key="Alternative IDs">HP:0000088, HP:0000109</extension>
+        <extension key="xrefs">&lt;UMLS:C0268800 "Renal cysts"&gt;</extension>
+        <extension key="Synonyms">Cystic kidney disease, CYSTIC KIDNEYS, RENAL CYSTS</extension>
+      </extensions>
+      <relationships>
+        <from relationshipType="classification" name="test.obo" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0012210" />
+      </relationships>
+    </dataClass>
+    <dataClass id="http://www.example.com/obo/HP:0011035" name="Abnormality of the renal cortex">
+      <description>An abnormality of the cortex of the kidney.</description>
+      <extensions>
+        <extension key="OBO ID">HP:0011035</extension>
+        <extension key="Created by">peter</extension>
+        <extension key="Creation Date">2011-03-06T11:31:39Z</extension>
+        <extension key="HP:0040005">An abnormality of the `cortex of the kidney` (FMA:15581).</extension>
+        <extension key="HP:0040005 Type">xsd:string</extension>
+        <extension key="Synonyms"></extension>
+      </extensions>
+      <relationships>
+        <from relationshipType="classification" name="test.obo" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0012210" />
+      </relationships>
+    </dataClass>
+    <dataClass id="http://www.example.com/obo/HP:0000003" name="Multicystic kidney dysplasia">
+      <description>Multicystic dysplasia of the kidney is characterized by multiple cysts of varying size in the kidney and the absence of a normal pelvocaliceal system. The condition is associated with ureteral or ureteropelvic atresia, and the affected kidney is nonfunctional.
 
-                Comment:
-                Multicystic kidney dysplasia is the result of abnormal fetal renal development in which the affected kidney is replaced by multiple cysts and has little or no residual function. The vast majority of multicystic kidneys are unilateral. Multicystic kidney can be diagnosed on prenatal ultrasound.</description>
-            <extensions>
-                <extension key="OBO ID">HP:0000003</extension>
-                <extension key="Alternative IDs">HP:0004715</extension>
-                <extension key="xrefs">&lt;MeSH:D021782 "Multicystic Kidney Dysplasia"&gt;, &lt;UMLS:C0345335 "Multicystic Kidney Dysplasia"&gt;</extension>
-                <extension key="Synonyms">Multicystic dysplastic kidney, Multicystic kidneys, Multicystic renal dysplasia</extension>
-            </extensions>
-            <relationships>
-                <from relationshipType="classification" name="test.obo" />
-                <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000107" />
-            </relationships>
-        </dataClass>
-        <dataClass name="Abnormality of the urinary system" id="http://www.example.com/obo/HP:0000079">
-            <description>An abnormality of the urinary system.</description>
-            <extensions>
-                <extension key="OBO ID">HP:0000079</extension>
-                <extension key="xrefs">&lt;UMLS:C0158698 "URINARY TRACT ANOMALY"&gt;</extension>
-                <extension key="HP:0040005">An abnormality of the `urinary system` (FMA:7159).</extension>
-                <extension key="HP:0040005 Type">xsd:string</extension>
-                <extension key="Synonyms">Urinary tract abnormalities, Urinary tract abnormality, Urinary tract anomalies</extension>
-            </extensions>
-            <relationships>
-                <from relationshipType="classification" name="test.obo" />
-                <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000119" />
-            </relationships>
-        </dataClass>
-        <dataClass name="Abnormality of body height" id="http://www.example.com/obo/HP:0000002">
-            <description>Deviation from the norm of height with respect to that which is expected according to age and gender norms.</description>
-            <extensions>
-                <extension key="OBO ID">HP:0000002</extension>
-                <extension key="Created by">peter</extension>
-                <extension key="Creation Date">2008-02-27T02:20:00Z</extension>
-                <extension key="Synonyms"></extension>
-            </extensions>
-            <relationships>
-                <from relationshipType="classification" name="test.obo" />
-                <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0001507" />
-            </relationships>
-        </dataClass>
-        <dataClass name="Growth abnormality" id="http://www.example.com/obo/HP:0001507">
-            <extensions>
-                <extension key="OBO ID">HP:0001507</extension>
-                <extension key="Alternative IDs">HP:0008904</extension>
-                <extension key="Synonyms">ABNORMAL GROWTH</extension>
-            </extensions>
-            <relationships>
-                <from relationshipType="classification" name="test.obo" />
-                <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000118" />
-            </relationships>
-        </dataClass>
-        <extensions>
-            <extension key="namespace">human_phenotype</extension>
-        </extensions>
-    </dataModel>
+Comment:
+Multicystic kidney dysplasia is the result of abnormal fetal renal development in which the affected kidney is replaced by multiple cysts and has little or no residual function. The vast majority of multicystic kidneys are unilateral. Multicystic kidney can be diagnosed on prenatal ultrasound.</description>
+      <extensions>
+        <extension key="OBO ID">HP:0000003</extension>
+        <extension key="Alternative IDs">HP:0004715</extension>
+        <extension key="xrefs">&lt;MeSH:D021782 "Multicystic Kidney Dysplasia"&gt;, &lt;UMLS:C0345335 "Multicystic Kidney Dysplasia"&gt;</extension>
+        <extension key="Synonyms">Multicystic dysplastic kidney, Multicystic kidneys, Multicystic renal dysplasia</extension>
+      </extensions>
+      <relationships>
+        <from relationshipType="classification" name="test.obo" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000107" />
+      </relationships>
+    </dataClass>
+    <extensions>
+      <extension key="namespace">human_phenotype</extension>
+    </extensions>
+  </dataModel>
 </catalogue>
