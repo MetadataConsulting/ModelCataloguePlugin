@@ -53,19 +53,6 @@
     <relationshipType name="declaration" source="org.modelcatalogue.core.DataModel" destination="org.modelcatalogue.core.CatalogueElement" versionSpecific="true" system="true">
       <sourceToDestination label="declares">Data models can declare multiple elements. Based on this relationship you can narrow the elements shown in the catalogue using the data model filter in the bottom left corner. When data model is finalized all defined elements are finalized as well.</sourceToDestination>
       <destinationToSource label="declared within">Any element can be declared within multiple data models. When new draft of the element is created then drafts for data models are created as well.</destinationToSource>
-      <rule>if (!destination.dataModels) {
-                return true
-            }
-
-            long newModelLatestVersionId = source.latestVersionId ?: source.id
-
-            for (int i = 0; i &lt; destination.dataModels.size() ; i++) {
-               def dataModel = destination.dataModels[i]
-               long existingDataModelLatestVersionId = dataModel.latestVersionId ?: dataModel.id
-               if (newModelLatestVersionId != existingDataModelLatestVersionId) {
-                   return ["catalogue.element.can.have.only.one.data.model", "'$destination.name' is already owned by data model '$dataModel.name'"]
-               }
-            }</rule>
     </relationshipType>
   </relationshipTypes>
 </catalogue>
