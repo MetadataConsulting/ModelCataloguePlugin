@@ -11,28 +11,37 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
           for err in response.data.errors
             messages.error err.message
 
-  actionsProvider.registerActionInRole 'create-catalogue-element', actionsProvider.ROLE_LIST_ACTION, ['$scope', 'names', 'security', 'messages', '$state', '$log', ($scope, names, security, messages, $state, $log) ->
+  anyParentDataModel = ($scope) ->
+    return $scope.currentDataModel if $scope.currentDataModel
+    return anyParentDataModel($scope.$parent) if $scope.$parent
+    return undefined
+
+  actionsProvider.registerActionInRoles 'create-catalogue-element', [actionsProvider.ROLE_LIST_ACTION, actionsProvider.ROLE_LIST_FOOTER_ACTION], ['$scope', 'names', 'security', 'messages', '$state', '$log', ($scope, names, security, messages, $state, $log) ->
+    resource = $scope.resource
+    if not resource and $state.current.name == 'mc.resource.list'
+      resource = $state.params.resource
+    
     return undefined if not security.hasRole('CURATOR')
-    return undefined if not $scope.resource
-    return undefined if $scope.resource == 'batch'
-    return undefined if not messages.hasPromptFactory('create-' + $scope.resource) and not messages.hasPromptFactory('edit-' + $scope.resource)
+    return undefined if not resource
+    return undefined if resource == 'batch'
+    return undefined if not messages.hasPromptFactory('create-' + resource) and not messages.hasPromptFactory('edit-' + resource)
 
     {
     position:   100
-    label:      "New #{names.getNaturalName($scope.resource)}"
-    icon:       'glyphicon glyphicon-plus-sign'
+    label:      "New #{names.getNaturalName(resource)}"
+    icon:       'fa fa-plus-circle'
     type:       'success'
     action:     ->
-      args      = {create: ($scope.resource), currentDataModel: $scope.currentDataModel}
-      args.type = if messages.hasPromptFactory('create-' + $scope.resource) then "create-#{$scope.resource}" else "edit-#{$scope.resource}"
+      args      = {create: (resource), currentDataModel: anyParentDataModel($scope)}
+      args.type = if messages.hasPromptFactory('create-' + resource) then "create-#{resource}" else "edit-#{resource}"
 
-      if ($scope.resource == 'model' || $scope.resource == 'dataClass') and $scope.element and $scope.elementSelectedInTree
+      if (resource == 'model' || resource == 'dataClass') and $scope.element and $scope.elementSelectedInTree
         args.parent = $scope.element
 
       security.requireRole('CURATOR')
       .then ->
-        messages.prompt('Create ' + names.getNaturalName($scope.resource), '', args).then ->
-          if ($scope.resource == 'model' || $scope.resource == 'dataClass')and $state.current.name == 'mc.resource.list'
+        messages.prompt('Create ' + names.getNaturalName(resource), '', args).then ->
+          if (resource == 'model' || resource == 'dataClass')and $state.current.name == 'mc.resource.list'
             # reload in draft mode
             $state.go '.', {status: 'draft'}, {reload: true}
       , (errors)->
