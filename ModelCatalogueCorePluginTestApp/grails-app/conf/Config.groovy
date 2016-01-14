@@ -262,6 +262,7 @@ def assetExcludes = [
         "angular-bootstrap/**/*.*",
         "angular-cookies/**/*.*",
         "angular-i18n/**/*.*",
+        "angular-i18n/*.js",
         "angular-mocks/**/*.*",
         "angular-sanitize/**/*.*",
         "jasmine/**/*.*",
