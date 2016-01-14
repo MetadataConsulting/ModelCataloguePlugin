@@ -79,6 +79,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         selectInTree 'Data Types'
 
         when:
+        check closeGrowlMessage gone
         click create
 
         then:
@@ -100,6 +101,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "create primitive"() {
         when:
+        check closeGrowlMessage gone
         click create
 
         then:
@@ -121,8 +123,8 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "create enum"() {
-
         when:
+        check closeGrowlMessage gone
         click create
 
         then:
@@ -146,8 +148,8 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "create standard"() {
-
         when:
+        check closeGrowlMessage gone
         click create
 
         then:
