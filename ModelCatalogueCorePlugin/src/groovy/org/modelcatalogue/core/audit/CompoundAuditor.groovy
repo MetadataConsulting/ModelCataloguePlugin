@@ -5,6 +5,7 @@ import org.modelcatalogue.core.ExtensionValue
 import org.modelcatalogue.core.Mapping
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipMetadata
+import rx.Observable
 
 class CompoundAuditor implements Auditor {
 
@@ -49,97 +50,97 @@ class CompoundAuditor implements Auditor {
     }
 
     @Override
-    Long logExternalChange(CatalogueElement source, String message, Long authorId) {
+    Observable<Long> logExternalChange(CatalogueElement source, String message, Long authorId) {
         return pickFirst(auditors*.logExternalChange(source, message, authorId))
     }
 
     @Override
-    Long logNewVersionCreated(CatalogueElement element, Long authorId) {
+    Observable<Long> logNewVersionCreated(CatalogueElement element, Long authorId) {
         return pickFirst(auditors*.logNewVersionCreated(element, authorId))
     }
 
     @Override
-    Long logElementFinalized(CatalogueElement element, Long authorId) {
+    Observable<Long> logElementFinalized(CatalogueElement element, Long authorId) {
         return pickFirst(auditors*.logElementFinalized(element, authorId))
     }
 
     @Override
-    Long logElementDeprecated(CatalogueElement element, Long authorId) {
+    Observable<Long> logElementDeprecated(CatalogueElement element, Long authorId) {
         return pickFirst(auditors*.logElementDeprecated(element, authorId))
     }
 
     @Override
-    Long logElementCreated(CatalogueElement element, Long authorId) {
+    Observable<Long> logElementCreated(CatalogueElement element, Long authorId) {
         return pickFirst(auditors*.logElementCreated(element, authorId))
     }
 
     @Override
-    Long logElementDeleted(CatalogueElement element, Long authorId) {
+    Observable<Long> logElementDeleted(CatalogueElement element, Long authorId) {
         return pickFirst(auditors*.logElementDeleted(element, authorId))
     }
 
     @Override
-    Long logElementUpdated(CatalogueElement element, Long authorId) {
+    Observable<Long> logElementUpdated(CatalogueElement element, Long authorId) {
         return pickFirst(auditors*.logElementUpdated(element, authorId))
     }
 
     @Override
-    Long logMappingCreated(Mapping mapping, Long authorId) {
+    Observable<Long> logMappingCreated(Mapping mapping, Long authorId) {
         return pickFirst(auditors*.logMappingCreated(mapping, authorId))
     }
 
     @Override
-    Long logMappingDeleted(Mapping mapping, Long authorId) {
+    Observable<Long> logMappingDeleted(Mapping mapping, Long authorId) {
         return pickFirst(auditors*.logMappingDeleted(mapping, authorId))
     }
 
     @Override
-    Long logMappingUpdated(Mapping mapping, Long authorId) {
+    Observable<Long> logMappingUpdated(Mapping mapping, Long authorId) {
         return pickFirst(auditors*.logMappingUpdated(mapping, authorId))
     }
 
     @Override
-    Long logNewMetadata(ExtensionValue extension, Long authorId) {
+    Observable<Long> logNewMetadata(ExtensionValue extension, Long authorId) {
         return pickFirst(auditors*.logNewMetadata(extension, authorId))
     }
 
     @Override
-    Long logMetadataUpdated(ExtensionValue extension, Long authorId) {
+    Observable<Long> logMetadataUpdated(ExtensionValue extension, Long authorId) {
         return pickFirst(auditors*.logMetadataUpdated(extension, authorId))
     }
 
     @Override
-    Long logMetadataDeleted(ExtensionValue extension, Long authorId) {
+    Observable<Long> logMetadataDeleted(ExtensionValue extension, Long authorId) {
         return pickFirst(auditors*.logMetadataDeleted(extension, authorId))
     }
 
     @Override
-    Long logNewRelation(Relationship relationship, Long authorId) {
+    Observable<Long> logNewRelation(Relationship relationship, Long authorId) {
         return pickFirst(auditors*.logNewRelation(relationship, authorId))
     }
 
     @Override
-    Long logRelationRemoved(Relationship relationship, Long authorId) {
+    Observable<Long> logRelationRemoved(Relationship relationship, Long authorId) {
         return pickFirst(auditors*.logRelationRemoved(relationship, authorId))
     }
 
     @Override
-    Long logRelationArchived(Relationship relationship, Long authorId) {
+    Observable<Long> logRelationArchived(Relationship relationship, Long authorId) {
         return pickFirst(auditors*.logRelationArchived(relationship, authorId))
     }
 
     @Override
-    Long logNewRelationshipMetadata(RelationshipMetadata extension, Long authorId) {
+    Observable<Long> logNewRelationshipMetadata(RelationshipMetadata extension, Long authorId) {
         return pickFirst(auditors*.logNewRelationshipMetadata(extension, authorId))
     }
 
     @Override
-    Long logRelationshipMetadataUpdated(RelationshipMetadata extension, Long authorId) {
+    Observable<Long> logRelationshipMetadataUpdated(RelationshipMetadata extension, Long authorId) {
         return pickFirst(auditors*.logRelationshipMetadataUpdated(extension, authorId))
     }
 
     @Override
-    Long logRelationshipMetadataDeleted(RelationshipMetadata extension, Long authorId) {
+    Observable<Long> logRelationshipMetadataDeleted(RelationshipMetadata extension, Long authorId) {
         return pickFirst(auditors*.logRelationshipMetadataDeleted(extension, authorId))
     }
 

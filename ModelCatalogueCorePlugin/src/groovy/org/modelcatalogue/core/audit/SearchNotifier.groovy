@@ -1,12 +1,12 @@
 package org.modelcatalogue.core.audit
 
-import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.ExtensionValue
 import org.modelcatalogue.core.Mapping
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipMetadata
 import org.modelcatalogue.core.SearchCatalogue
+import rx.Observable
 
 import static org.modelcatalogue.core.util.HibernateHelper.*
 
@@ -33,190 +33,190 @@ class SearchNotifier extends AbstractAuditor {
     }
 
     @Override
-    Long logExternalChange(CatalogueElement source, String message, Long authorId) {
+    Observable<Long> logExternalChange(CatalogueElement source, String message, Long authorId) {
         if(!parentChangeId) {
             searchService.index(source).subscribe()
-            return null
+            return Observable.empty()
         }
         queues[parentChangeId].add(source)
-        return null
+        return Observable.empty()
     }
 
     @Override
-    Long logNewVersionCreated(CatalogueElement element, Long authorId) {
+    Observable<Long> logNewVersionCreated(CatalogueElement element, Long authorId) {
         if(!parentChangeId) {
             searchService.index(element).subscribe()
-            return null
+            return Observable.empty()
         }
         queues[parentChangeId].add(element)
-        return null
+        return Observable.empty()
     }
 
     @Override
-    Long logElementFinalized(CatalogueElement element, Long authorId) {
+    Observable<Long> logElementFinalized(CatalogueElement element, Long authorId) {
         if(!parentChangeId) {
             searchService.index(element).subscribe()
-            return null
+            return Observable.empty()
         }
         queues[parentChangeId].add(element)
-        return null
+        return Observable.empty()
     }
 
     @Override
-    Long logElementDeprecated(CatalogueElement element, Long authorId) {
+    Observable<Long> logElementDeprecated(CatalogueElement element, Long authorId) {
         if(!parentChangeId) {
             searchService.index(element).subscribe()
-            return null
+            return Observable.empty()
         }
         queues[parentChangeId].add(element)
-        return null
+        return Observable.empty()
     }
 
     @Override
-    Long logElementCreated(CatalogueElement element, Long authorId) {
+    Observable<Long> logElementCreated(CatalogueElement element, Long authorId) {
         if(!parentChangeId) {
             searchService.index(element).subscribe()
-            return null
+            return Observable.empty()
         }
         queues[parentChangeId].add(element)
-        return null
+        return Observable.empty()
     }
 
     @Override
-    Long logElementDeleted(CatalogueElement element, Long authorId) {
+    Observable<Long> logElementDeleted(CatalogueElement element, Long authorId) {
         searchService.unindex(element).subscribe()
-        return null
+        return Observable.empty()
     }
 
     @Override
-    Long logElementUpdated(CatalogueElement element, Long authorId) {
+    Observable<Long> logElementUpdated(CatalogueElement element, Long authorId) {
         if(!parentChangeId) {
             searchService.index(element).subscribe()
-            return null
+            return Observable.empty()
         }
         queues[parentChangeId].add(element)
-        return null
+        return Observable.empty()
     }
 
     @Override
-    Long logMappingCreated(Mapping mapping, Long authorId) {
+    Observable<Long> logMappingCreated(Mapping mapping, Long authorId) {
         if(!parentChangeId) {
             searchService.index(mapping.source).subscribe()
             searchService.index(mapping.destination).subscribe()
-            return null
+            return Observable.empty()
         }
         queues[parentChangeId].add(mapping.source)
         queues[parentChangeId].add(mapping.destination)
-        return null
+        return Observable.empty()
     }
 
     @Override
-    Long logMappingDeleted(Mapping mapping, Long authorId) {
+    Observable<Long> logMappingDeleted(Mapping mapping, Long authorId) {
         if(!parentChangeId) {
             searchService.index(mapping.source).subscribe()
             searchService.index(mapping.destination).subscribe()
-            return null
+            return Observable.empty()
         }
         queues[parentChangeId].add(mapping.source)
         queues[parentChangeId].add(mapping.destination)
-        return null
+        return Observable.empty()
     }
 
     @Override
-    Long logMappingUpdated(Mapping mapping, Long authorId) {
+    Observable<Long> logMappingUpdated(Mapping mapping, Long authorId) {
         if(!parentChangeId) {
             searchService.index(mapping.source).subscribe()
             searchService.index(mapping.destination).subscribe()
-            return null
+            return Observable.empty()
         }
         queues[parentChangeId].add(mapping.source)
         queues[parentChangeId].add(mapping.destination)
-        return null
+        return Observable.empty()
     }
 
     @Override
-    Long logNewMetadata(ExtensionValue extension, Long authorId) {
+    Observable<Long> logNewMetadata(ExtensionValue extension, Long authorId) {
         if(!parentChangeId) {
             searchService.index(extension.element).subscribe()
-            return null
+            return Observable.empty()
         }
         queues[parentChangeId].add(extension.element)
-        return null
+        return Observable.empty()
     }
 
     @Override
-    Long logMetadataUpdated(ExtensionValue extension, Long authorId) {
+    Observable<Long> logMetadataUpdated(ExtensionValue extension, Long authorId) {
         if(!parentChangeId) {
             searchService.index(extension.element).subscribe()
-            return null
+            return Observable.empty()
         }
         queues[parentChangeId].add(extension.element)
-        return null
+        return Observable.empty()
     }
 
     @Override
-    Long logMetadataDeleted(ExtensionValue extension, Long authorId) {
+    Observable<Long> logMetadataDeleted(ExtensionValue extension, Long authorId) {
         if(!parentChangeId) {
             searchService.index(extension.element).subscribe()
-            return null
+            return Observable.empty()
         }
         queues[parentChangeId].add(extension.element)
-        return null
+        return Observable.empty()
     }
 
     @Override
-    Long logNewRelation(Relationship relationship, Long authorId) {
+    Observable<Long> logNewRelation(Relationship relationship, Long authorId) {
         if(!parentChangeId) {
             searchService.index(relationship).subscribe()
-            return null
+            return Observable.empty()
         }
         queues[parentChangeId].add(relationship)
-        return null
+        return Observable.empty()
     }
 
     @Override
-    Long logRelationRemoved(Relationship relationship, Long authorId) {
+    Observable<Long> logRelationRemoved(Relationship relationship, Long authorId) {
         searchService.unindex(relationship).subscribe()
-        return null
+        return Observable.empty()
     }
 
     @Override
-    Long logRelationArchived(Relationship relationship, Long authorId) {
+    Observable<Long> logRelationArchived(Relationship relationship, Long authorId) {
         if(!parentChangeId) {
             searchService.index(relationship).subscribe()
-            return null
+            return Observable.empty()
         }
         queues[parentChangeId].add(relationship)
-        return null
+        return Observable.empty()
     }
 
     @Override
-    Long logNewRelationshipMetadata(RelationshipMetadata extension, Long authorId) {
+    Observable<Long> logNewRelationshipMetadata(RelationshipMetadata extension, Long authorId) {
         if(!parentChangeId) {
             searchService.index(extension.relationship).subscribe()
-            return null
+            return Observable.empty()
         }
         queues[parentChangeId].add(extension.relationship)
-        return null
+        return Observable.empty()
     }
 
     @Override
-    Long logRelationshipMetadataUpdated(RelationshipMetadata extension, Long authorId) {
+    Observable<Long> logRelationshipMetadataUpdated(RelationshipMetadata extension, Long authorId) {
         if(!parentChangeId) {
             searchService.index(extension.relationship).subscribe()
-            return null
+            return Observable.empty()
         }
         queues[parentChangeId].add(extension.relationship)
-        return null
+        return Observable.empty()
     }
 
     @Override
-    Long logRelationshipMetadataDeleted(RelationshipMetadata extension, Long authorId) {
+    Observable<Long> logRelationshipMetadataDeleted(RelationshipMetadata extension, Long authorId) {
         if(!parentChangeId) {
             searchService.index(extension.relationship).subscribe()
-            return null
+            return Observable.empty()
         }
         queues[parentChangeId].add(extension.relationship)
-        return null
+        return Observable.empty()
     }
 }

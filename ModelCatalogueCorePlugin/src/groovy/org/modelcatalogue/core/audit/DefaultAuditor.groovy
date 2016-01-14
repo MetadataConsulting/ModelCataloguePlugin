@@ -5,19 +5,29 @@ import groovy.json.JsonSlurper
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import org.modelcatalogue.core.util.marshalling.RelationshipMarshallers
+import rx.Observable
+import rx.subjects.AsyncSubject
+
+import java.util.concurrent.ExecutorService
 
 /**
  * Default auditor auditing the changes using the change table/entity.
  */
 @Log4j
 class DefaultAuditor extends AbstractAuditor {
-
     static List<String> IGNORED_PROPERTIES = ['password', 'version', 'versionNumber', 'outgoingRelationships', 'incomingRelationships', 'outgoingMappings', 'incomingMappings', 'latestVersionId', 'extensions']
 
-    Long logExternalChange(CatalogueElement source, String message, Long authorId) {
+    private final ExecutorService executorService
+
+    DefaultAuditor(ExecutorService executorService) {
+        this.executorService = executorService
+    }
+
+    Observable<Long> logExternalChange(CatalogueElement source, String message, Long authorId) {
         logChange(source,
                 changedId: source.id,
                 latestVersionId: source.latestVersionId ?: source.id,
@@ -28,7 +38,7 @@ class DefaultAuditor extends AbstractAuditor {
         )
     }
 
-    Long logNewVersionCreated(CatalogueElement element, Long authorId) {
+    Observable<Long> logNewVersionCreated(CatalogueElement element, Long authorId) {
         logChange(element,
                 changedId: element.id,
                 latestVersionId: element.latestVersionId ?: element.id,
@@ -38,7 +48,7 @@ class DefaultAuditor extends AbstractAuditor {
         )
     }
 
-    Long logElementFinalized(CatalogueElement element, Long authorId) {
+    Observable<Long> logElementFinalized(CatalogueElement element, Long authorId) {
         logChange(element,
                 changedId: element.id,
                 latestVersionId: element.latestVersionId ?: element.id,
@@ -47,11 +57,11 @@ class DefaultAuditor extends AbstractAuditor {
                 property: 'status',
                 type: ChangeType.ELEMENT_FINALIZED,
                 oldValue: storeValue(element.status),
-                newValue: storeValue(org.modelcatalogue.core.api.ElementStatus.FINALIZED)
+                newValue: storeValue(ElementStatus.FINALIZED)
         )
     }
 
-    Long logElementDeprecated(CatalogueElement element, Long authorId) {
+    Observable<Long> logElementDeprecated(CatalogueElement element, Long authorId) {
         logChange(element,
                 changedId: element.id,
                 latestVersionId: element.latestVersionId ?: element.id,
@@ -60,11 +70,11 @@ class DefaultAuditor extends AbstractAuditor {
                 property: 'status',
                 type: ChangeType.ELEMENT_DEPRECATED,
                 oldValue: storeValue(element.status),
-                newValue: storeValue(org.modelcatalogue.core.api.ElementStatus.DEPRECATED)
+                newValue: storeValue(ElementStatus.DEPRECATED)
         )
     }
 
-    Long logElementCreated(CatalogueElement element, Long authorId) {
+    Observable<Long> logElementCreated(CatalogueElement element, Long authorId) {
         logChange(element,
                 changedId: element.id,
                 latestVersionId: element.latestVersionId ?: element.id,
@@ -74,7 +84,7 @@ class DefaultAuditor extends AbstractAuditor {
         )
     }
 
-    Long logNewMetadata(ExtensionValue extension, Long authorId) {
+    Observable<Long> logNewMetadata(ExtensionValue extension, Long authorId) {
         logChange(extension.element,
                 changedId: extension.element.id,
                 latestVersionId: extension.element.latestVersionId ?: extension.element.id,
@@ -86,7 +96,7 @@ class DefaultAuditor extends AbstractAuditor {
         )
     }
 
-    Long logMetadataUpdated(ExtensionValue extension, Long authorId) {
+    Observable<Long> logMetadataUpdated(ExtensionValue extension, Long authorId) {
         logChange(extension.element,
                 changedId: extension.element.id,
                 latestVersionId: extension.element.latestVersionId ?: extension.element.id,
@@ -99,7 +109,7 @@ class DefaultAuditor extends AbstractAuditor {
         )
     }
 
-    Long logMetadataDeleted(ExtensionValue extension, Long authorId) {
+    Observable<Long> logMetadataDeleted(ExtensionValue extension, Long authorId) {
         if (!extension.element) {
             return null
         }
@@ -114,7 +124,7 @@ class DefaultAuditor extends AbstractAuditor {
         )
     }
 
-    Long logNewRelationshipMetadata(RelationshipMetadata extension, Long authorId) {
+    Observable<Long> logNewRelationshipMetadata(RelationshipMetadata extension, Long authorId) {
         if (extension.relationship.relationshipType.system) {
             return null
         }
@@ -139,7 +149,7 @@ class DefaultAuditor extends AbstractAuditor {
         )
     }
 
-    Long logRelationshipMetadataUpdated(RelationshipMetadata extension, Long authorId) {
+    Observable<Long> logRelationshipMetadataUpdated(RelationshipMetadata extension, Long authorId) {
         if (extension.relationship.relationshipType.system) {
             return null
         }
@@ -166,7 +176,7 @@ class DefaultAuditor extends AbstractAuditor {
         )
     }
 
-    Long logRelationshipMetadataDeleted(RelationshipMetadata extension, Long authorId) {
+    Observable<Long> logRelationshipMetadataDeleted(RelationshipMetadata extension, Long authorId) {
         if (extension.relationship.relationshipType.system) {
             return null
         }
@@ -191,7 +201,7 @@ class DefaultAuditor extends AbstractAuditor {
         )
     }
 
-    Long logElementDeleted(CatalogueElement element, Long authorId) {
+    Observable<Long> logElementDeleted(CatalogueElement element, Long authorId) {
         logChange(element,
                 changedId: element.id,
                 latestVersionId: element.latestVersionId ?: element.id,
@@ -202,7 +212,7 @@ class DefaultAuditor extends AbstractAuditor {
         )
     }
 
-    Long logElementUpdated(CatalogueElement element, Long authorId) {
+    Observable<Long> logElementUpdated(CatalogueElement element, Long authorId) {
         for (String name in element.dirtyPropertyNames) {
             if (name in IGNORED_PROPERTIES) {
                 continue
@@ -237,7 +247,7 @@ class DefaultAuditor extends AbstractAuditor {
     }
 
     @Override
-    Long logMappingCreated(Mapping mapping, Long authorId) {
+    Observable<Long> logMappingCreated(Mapping mapping, Long authorId) {
         logChange(mapping.destination,
                 changedId: mapping.destination.id,
                 latestVersionId: mapping.destination.latestVersionId ?: mapping.destination.id,
@@ -258,7 +268,7 @@ class DefaultAuditor extends AbstractAuditor {
     }
 
     @Override
-    Long logMappingDeleted(Mapping mapping, Long authorId) {
+    Observable<Long> logMappingDeleted(Mapping mapping, Long authorId) {
         logChange(mapping.destination,
                 changedId: mapping.destination.id,
                 latestVersionId: mapping.destination.latestVersionId ?: mapping.destination.id,
@@ -279,7 +289,7 @@ class DefaultAuditor extends AbstractAuditor {
     }
 
     @Override
-    Long logMappingUpdated(Mapping mapping, Long authorId) {
+    Observable<Long> logMappingUpdated(Mapping mapping, Long authorId) {
         logChange(mapping.destination,
                 changedId: mapping.destination.id,
                 latestVersionId: mapping.destination.latestVersionId ?: mapping.destination.id,
@@ -301,23 +311,40 @@ class DefaultAuditor extends AbstractAuditor {
         )
     }
 
-    Long logChange(Map <String, Object> changeProps, CatalogueElement element) {
-        try {
-            Change change = new Change(changeProps)
-            change.system = change.system || system
-            change.validate()
-            if (change.hasErrors()) {
-                log.warn FriendlyErrors.printErrors("Error logging ${changeProps.type} of $element", change.errors)
+    Observable<Long> logChange(Map <String, Object> changeProps, CatalogueElement element) {
+        AsyncSubject<Long> subject = AsyncSubject.create()
+
+        boolean currentSystem = system
+
+        executorService.submit {
+
+            try {
+                Change change = new Change(changeProps)
+                change.system = change.system || currentSystem
+                change.validate()
+
+                if (change.hasErrors()) {
+                    log.warn FriendlyErrors.printErrors("Error logging ${changeProps.type} of $element", change.errors)
+
+                    subject.onNext(0)
+                    subject.onCompleted()
+                    return
+                }
+
+                change.save()
+                subject.onNext(change.id)
+            } catch (Exception e) {
+                log.error "Exception writing audit log for $element", e
+                subject.onError(e)
             }
-            change.save()
-            return change.id
-        } catch (Exception e) {
-            log.error "Exception writing audit log for $element", e
+
+            subject.onCompleted()
         }
 
+        return subject
     }
 
-    Long logNewRelation(Relationship relationship, Long authorId) {
+    Observable<Long> logNewRelation(Relationship relationship, Long authorId) {
         logChange(relationship.destination,
                 changedId: relationship.destination.id,
                 latestVersionId: relationship.destination.latestVersionId ?: relationship.destination.id,
@@ -341,7 +368,7 @@ class DefaultAuditor extends AbstractAuditor {
         )
     }
 
-    Long logRelationRemoved(Relationship relationship, Long authorId) {
+    Observable<Long> logRelationRemoved(Relationship relationship, Long authorId) {
         logChange(relationship.destination,
                 changedId: relationship.destination.id,
                 latestVersionId: relationship.destination.latestVersionId ?: relationship.destination.id,
@@ -366,7 +393,7 @@ class DefaultAuditor extends AbstractAuditor {
     }
 
 
-    Long logRelationArchived(Relationship relationship, Long authorId) {
+    Observable<Long> logRelationArchived(Relationship relationship, Long authorId) {
         logChange(relationship.destination,
                 changedId: relationship.destination.id,
                 latestVersionId: relationship.destination.latestVersionId ?: relationship.destination.id,

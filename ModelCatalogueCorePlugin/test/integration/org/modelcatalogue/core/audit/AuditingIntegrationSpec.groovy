@@ -5,6 +5,7 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.DataModelFilter
 
+
 class AuditingIntegrationSpec extends IntegrationSpec {
 
     def elementService
@@ -13,9 +14,13 @@ class AuditingIntegrationSpec extends IntegrationSpec {
     def mappingService
     def auditService
 
+
     def "creation of new element is logged"() {
         when:
         DataType type = new DataType(name: "DT4CL").save(failOnError: true)
+
+        Thread.sleep(100)
+
         Change change = Change.findByChangedId(type.id)
 
         then:
@@ -34,6 +39,9 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         when:
         DataType vOne = new DataType(name: "DT4DCL").save(failOnError: true)
         DataType type = elementService.createDraftVersion(vOne.publish(elementService), DraftContext.userFriendly()) as DataType
+
+        Thread.sleep(100)
+
         Change change = Change.findByChangedId(type.id)
 
         then:
@@ -51,6 +59,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         initCatalogueService.initDefaultRelationshipTypes()
         when:
         DataType vOne = elementService.finalizeElement(new DataType(name: "DT4DEF").save(flush: true, failOnError: true))
+
+        Thread.sleep(100)
 
         Change change = Change.findByChangedIdAndType(vOne.id, ChangeType.ELEMENT_FINALIZED)
 
@@ -70,6 +80,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         DataType vOne = new DataType(name: "DT4DEF").save(flush: true, failOnError: true)
         vOne = elementService.archive(vOne, true)
         vOne.save(flush: true, failOnError: true)
+
+        Thread.sleep(100)
 
         Change change = Change.findByChangedIdAndType(vOne.id, ChangeType.ELEMENT_DEPRECATED)
 
@@ -91,6 +103,9 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         DataType type = new DataType(name: "DT4ULV", description: original).save(failOnError: true, flush: true)
         type.description = changed
         type.save(failOnError: true, flush: true)
+
+        Thread.sleep(100)
+
         Change change = Change.findByChangedIdAndProperty(type.id, 'description')
 
         then:
@@ -121,6 +136,9 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         DataType type = new DataType(name: "DT4ULI", description: original).save(failOnError: true, flush: true)
         type.description = changed
         type.save()
+
+        Thread.sleep(100)
+
         Change change = Change.findByChangedIdAndProperty(type.id, 'description')
 
         then:
@@ -135,6 +153,9 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         String expectedOldValue = DefaultAuditor.storeValue(type)
 
         type.delete(flush: true)
+
+        Thread.sleep(100)
+
         Change change = Change.findByChangedIdAndType(type.id, ChangeType.ELEMENT_DELETED)
 
         then:
@@ -149,6 +170,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
     def "adding new metadata is logged"() {
         DataType type = new DataType(name: 'DT4ANM').save(failOnError: true, flush: true)
         type.ext.foo = 'bar'
+
+        Thread.sleep(100)
 
         Change change = Change.findByChangedIdAndType(type.id, ChangeType.METADATA_CREATED)
 
@@ -177,6 +200,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         DataType type = new DataType(name: 'DT4ANM').save(failOnError: true, flush: true)
         type.ext.foo = 'bar'
         type.ext.foo = 'boo'
+
+        Thread.sleep(100)
 
         Change change = Change.findByChangedIdAndType(type.id, ChangeType.METADATA_UPDATED)
 
@@ -210,6 +235,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         type.ext.remove('foo')
         sessionFactory.currentSession.flush()
 
+        Thread.sleep(100)
+
         Change change = Change.findByChangedIdAndType(type.id, ChangeType.METADATA_DELETED)
 
         expect:
@@ -239,6 +266,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         DataType base = new DataType(name: 'DT4ANR BASE').save(failOnError: true, flush: true)
 
         Relationship rel = type.addToIsBasedOn base
+
+        Thread.sleep(100)
 
         Change change1 = Change.findByChangedIdAndType(type.id, ChangeType.RELATIONSHIP_CREATED)
         Change change2 = Change.findByChangedIdAndType(base.id, ChangeType.RELATIONSHIP_CREATED)
@@ -281,6 +310,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
         String initialValue = DefaultAuditor.storeValue(type.addToIsBasedOn(base))
         type.removeFromIsBasedOn base
+
+        Thread.sleep(100)
 
         Change change1 = Change.findByChangedIdAndType(type.id, ChangeType.RELATIONSHIP_DELETED)
         Change change2 = Change.findByChangedIdAndType(base.id, ChangeType.RELATIONSHIP_DELETED)
@@ -325,6 +356,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         Relationship relationship = type.addToIsBasedOn base
 
         relationship.ext.foo = 'bar'
+
+        Thread.sleep(100)
 
         Change change1 = Change.findByChangedIdAndType(type.id, ChangeType.RELATIONSHIP_METADATA_CREATED)
         Change change2 = Change.findByChangedIdAndType(base.id, ChangeType.RELATIONSHIP_METADATA_CREATED)
@@ -372,6 +405,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
         String newValue = DefaultAuditor.storeValue(new RelationshipMetadata(name: 'foo', extensionValue: 'baz', relationship: relationship))
 
+        Thread.sleep(100)
+
         Change change1 = Change.findByChangedIdAndType(type.id, ChangeType.RELATIONSHIP_METADATA_UPDATED)
         Change change2 = Change.findByChangedIdAndType(base.id, ChangeType.RELATIONSHIP_METADATA_UPDATED)
 
@@ -416,6 +451,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         relationship.ext.remove('foo')
         sessionFactory.currentSession.flush()
 
+        Thread.sleep(100)
+
         Change change1 = Change.findByChangedIdAndType(type.id, ChangeType.RELATIONSHIP_METADATA_DELETED)
         Change change2 = Change.findByChangedIdAndType(base.id, ChangeType.RELATIONSHIP_METADATA_DELETED)
 
@@ -450,6 +487,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         type.status = org.modelcatalogue.core.api.ElementStatus.DRAFT
         type.save(failOnError: true, flush: true)
 
+        Thread.sleep(100)
+
         expect:
         !Change.findByTypeAndChangedIdAndPropertyAndSystemNotEqual(ChangeType.PROPERTY_CHANGED, type.id, 'status', true)
     }
@@ -458,6 +497,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         DataType type = auditService.mute {
              new DataType(name: 'DT4DIS', status: org.modelcatalogue.core.api.ElementStatus.FINALIZED).save(failOnError: true, flush: true)
         }
+
+        Thread.sleep(100)
 
         expect:
         !Change.findByTypeAndChangedIdAndSystemNotEqual(ChangeType.NEW_ELEMENT_CREATED, type.id, true)
@@ -468,6 +509,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         DataType type = auditService.withDefaultAuthorId(defaultAuthorId) {
             new DataType(name: 'DT4DA', status: org.modelcatalogue.core.api.ElementStatus.FINALIZED).save(failOnError: true, flush: true)
         }
+
+        Thread.sleep(100)
 
         Change change = Change.findByTypeAndChangedId(ChangeType.NEW_ELEMENT_CREATED, type.id)
 
@@ -481,6 +524,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         DataType base = new DataType(name: 'DT4ANM TWO').save(failOnError: true, flush: true)
 
         Mapping mapping = mappingService.map(type, base, "x / 2")
+
+        Thread.sleep(100)
 
         Change change1 = Change.findByChangedIdAndType(type.id, ChangeType.MAPPING_CREATED)
         Change change2 = Change.findByChangedIdAndType(base.id, ChangeType.MAPPING_CREATED)
@@ -521,6 +566,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         Mapping mapping = mappingService.map(type, base, "x / 2")
         String mappingVal = DefaultAuditor.storeValue(mapping)
         mappingService.unmap(type, base)
+
+        Thread.sleep(100)
 
         Change change1 = Change.findByChangedIdAndType(type.id, ChangeType.MAPPING_DELETED)
         Change change2 = Change.findByChangedIdAndType(base.id, ChangeType.MAPPING_DELETED)
@@ -564,7 +611,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
         mapping = mappingService.map(type, base, "x / 3")
 
-
+        Thread.sleep(100)
 
         Change change1 = Change.findByChangedIdAndType(type.id, ChangeType.MAPPING_UPDATED)
         Change change2 = Change.findByChangedIdAndType(base.id, ChangeType.MAPPING_UPDATED)
@@ -600,6 +647,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
     def "some global changes are available"() {
         new DataType(name: "DT4GF").save(failOnError: true)
+
+        Thread.sleep(100)
 
         expect:
         auditService.getGlobalChanges([:], DataModelFilter.NO_FILTER).total > 0

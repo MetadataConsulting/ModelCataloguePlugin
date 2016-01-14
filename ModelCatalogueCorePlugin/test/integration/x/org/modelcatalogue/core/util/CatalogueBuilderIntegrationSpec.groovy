@@ -1016,4 +1016,37 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         dataType.dataModel
         dataType.dataModel.name == 'DTDMCDR Test'
     }
+
+    def "updating relationship to deprecated item will trigger new draft"() {
+        String dm1name = "URD DM1"
+        String dc1name = "URD DC1"
+        String dc2name = "URD DC2"
+
+        build {
+            dataModel name: dm1name,  {
+                dataClass name: dc1name, status: deprecated
+            }
+        }
+
+        expect:
+        DataClass.countByName(dc1name) == 1
+        DataClass.findByName(dc1name).status == ElementStatus.DEPRECATED
+
+        when:
+        build {
+            dataModel name: dm1name, {
+                dataClass name: dc2name, {
+                    rel 'hierarchy' from dc1name
+                }
+            }
+        }
+
+        then:
+        noExceptionThrown()
+        DataClass.countByName(dc1name) == 2
+        // and the original deprecated
+        DataClass.findByNameAndStatus(dc1name, ElementStatus.DEPRECATED)
+        // there is one draft
+        DataClass.findByNameAndStatus(dc1name, ElementStatus.DRAFT)
+    }
 }

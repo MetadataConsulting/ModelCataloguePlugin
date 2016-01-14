@@ -22,7 +22,7 @@ class AuditService {
     def dataModelService
     def executorService
 
-    static Callable<Auditor> auditorFactory = { return new DefaultAuditor(); }
+    static Callable<Auditor> auditorFactory = { throw new IllegalStateException("Application is not initialized yet") }
 
     private static ThreadLocal<Auditor> auditor = new ThreadLocal<Auditor>() {
         protected Auditor initialValue() {
@@ -33,6 +33,7 @@ class AuditService {
 
    @PostConstruct
    void hookSearchService() {
+       auditorFactory =  { return new DefaultAuditor(executorService) }
        if (modelCatalogueSearchService.indexingManually) {
         Callable<Auditor> oldFactory = auditorFactory
         auditorFactory = { CompoundAuditor.from(oldFactory(), new SearchNotifier(modelCatalogueSearchService))}
@@ -226,7 +227,7 @@ class AuditService {
     }
 
     CatalogueElement logNewVersionCreated(CatalogueElement element, Closure<CatalogueElement> createDraftBlock) {
-        Long changeId = auditor.get().logNewVersionCreated(element, modelCatalogueSecurityService.currentUser?.id)
+        Long changeId = auditor.get().logNewVersionCreated(element, modelCatalogueSecurityService.currentUser?.id).toBlocking().first()
         CatalogueElement ce = withParentId(changeId, createDraftBlock)
         if (!ce) {
             return ce
@@ -241,16 +242,16 @@ class AuditService {
     }
 
     CatalogueElement logElementFinalized(CatalogueElement element, Closure<CatalogueElement> createDraftBlock) {
-        withParentId(auditor.get().logElementFinalized(element, modelCatalogueSecurityService.currentUser?.id), createDraftBlock)
+        withParentId(auditor.get().logElementFinalized(element, modelCatalogueSecurityService.currentUser?.id).toBlocking().first(), createDraftBlock)
     }
 
 
     CatalogueElement logElementDeprecated(CatalogueElement element, Closure<CatalogueElement> createDraftBlock) {
-        withParentId(auditor.get().logElementDeprecated(element, modelCatalogueSecurityService.currentUser?.id), createDraftBlock)
+        withParentId(auditor.get().logElementDeprecated(element, modelCatalogueSecurityService.currentUser?.id).toBlocking().first(), createDraftBlock)
     }
 
     CatalogueElement logExternalChange(CatalogueElement source, Long authorId, String message, Closure<CatalogueElement> createDraftBlock) {
-        withDefaultAuthorAndParentAction(authorId ,auditor.get().logExternalChange(source, message, modelCatalogueSecurityService.currentUser?.id), createDraftBlock)
+        withDefaultAuthorAndParentAction(authorId ,auditor.get().logExternalChange(source, message, modelCatalogueSecurityService.currentUser?.id).toBlocking().first(), createDraftBlock)
     }
 
     void logNewMetadata(ExtensionValue extension) {
