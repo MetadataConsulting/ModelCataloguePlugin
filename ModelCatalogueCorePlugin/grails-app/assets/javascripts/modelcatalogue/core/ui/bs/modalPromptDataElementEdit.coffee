@@ -38,6 +38,7 @@ angular.module('mc.core.ui.bs.modalPromptDataElementEdit', ['mc.util.messages'])
                 <label for="dataType" class="">Data Type</label>
                 <input type="text" id="dataType" placeholder="Data Type" ng-model="copy.dataType" catalogue-element-picker="dataType" global="'allow'" label="el.name">
               </div>
+              <fake-submit-button/>
             </form>
         </div>
         <div class="modal-footer">

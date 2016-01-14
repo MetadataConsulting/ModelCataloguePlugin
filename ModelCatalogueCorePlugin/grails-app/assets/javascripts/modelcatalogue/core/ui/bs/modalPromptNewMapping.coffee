@@ -28,6 +28,7 @@ angular.module('mc.core.ui.bs.modalPromptNewMapping', ['mc.util.messages']).conf
                 <textarea rows="10" ng-model="copy.mapping" placeholder="Mapping" class="form-control" id="mapping"></textarea>
                 <p class="help-block">Enter valid <a href="http://www.groovy-lang.org/" target="_blank">Groovy</a> code. Variable <code>x</code> refers to the value from current domain. Last row is the result. For example you can <a ng-click="showMapExample()"><span class="fa fa-magic"></span> map string values</a> or <a ng-click="showConvertExample()"><span class="fa fa-magic"></span> convert numeric values</a></p>
               </div>
+              <fake-submit-button/>
             </form>
         </div>
         <div class="modal-footer">

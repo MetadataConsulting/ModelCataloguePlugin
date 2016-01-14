@@ -20,6 +20,7 @@ angular.module('mc.core.ui.bs.modalNewVersion', ['mc.util.messages']).config ['m
                 <label for="semanticVersion" class="">Semantic Version</label>
                 <input type="text" class="form-control" id="semanticVersion" placeholder="Semantic Version e.g. 1.2.3" ng-model="semanticVersion">
               </div>
+              <fake-submit-button/>
             </form>
         </div>
         <div class="modal-footer">

@@ -18,6 +18,7 @@ angular.module('mc.core.ui.bs.modalPromptActionParametersEdit', ['mc.util.messag
               <div class="new-relationship-modal-prompt-metadata">
                 <simple-object-editor object="parameters" title="Parameters"></simple-object-editor>
               </div>
+              <fake-submit-button/>
             </form>
         </div>
         <div class="modal-footer">

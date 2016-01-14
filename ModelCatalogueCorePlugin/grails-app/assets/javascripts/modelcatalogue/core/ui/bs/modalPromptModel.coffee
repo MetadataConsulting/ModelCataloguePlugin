@@ -33,6 +33,7 @@ angular.module('mc.core.ui.bs.modalPromptModel', ['mc.util.messages']).config ['
                 <label for="description" class="">Description</label>
                 <textarea rows="10" ng-model="copy.description" placeholder="Description" class="form-control" id="description"></textarea>
               </div>
+              <fake-submit-button/>
             </form>
         </div>
         <div class="modal-footer">

@@ -48,6 +48,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 
                 </div>
               </div>
               <a class="btn btn-success btn-block" ng-click="addDestination()"><span class="fa fa-fw fa-plus"></span> Add Another</a>
+              <fake-submit-button/>
             </form>
         </div>
         <div class="modal-footer">

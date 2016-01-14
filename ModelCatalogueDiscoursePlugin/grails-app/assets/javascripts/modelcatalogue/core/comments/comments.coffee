@@ -48,6 +48,7 @@ changes.run ['$templateCache', ($templateCache) ->
                           <div class="form-group">
                             <button type="submit" class="btn btn-success btn-block" ng-disabled="!tab.raw || !tab.user" ng-submit="tab.submitPost()"><span class="fa fa-fw fa-comment"></span> Submit New Comment</a>
                           </div>
+                          <fake-submit-button/>
                         </form>
                     </div>
                   </li>

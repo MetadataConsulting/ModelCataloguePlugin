@@ -20,10 +20,11 @@ angular.module('mc.core.ui.bs.modalFinalize', ['mc.util.messages']).config ['mes
                 <label for="semanticVersion" class="">Semantic Version</label>
                 <input type="text" class="form-control" id="semanticVersion" placeholder="Semantic Version e.g. 1.2.3" ng-model="semanticVersion">
               </div>
-                <div class="form-group">
-                  <label for="revisionNotes" class="">Revision Notes</label>
-                  <textarea rows="10" class="form-control" id="revisionNotes" placeholder="Please, describe the changes in current version" ng-model="revisionNotes"></textarea>
-                </div>
+              <div class="form-group">
+                <label for="revisionNotes" class="">Revision Notes</label>
+                <textarea rows="10" class="form-control" id="revisionNotes" placeholder="Please, describe the changes in current version" ng-model="revisionNotes"></textarea>
+              </div>
+              <fake-submit-button/>
             </form>
         </div>
         <div class="modal-footer">

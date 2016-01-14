@@ -67,6 +67,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   <label for="description" class="">Description</label>
                   <textarea rows="10" ng-model="dataClass.description" placeholder="Description (Optional)" class="form-control" id="description" ng-keydown="navigateOnKey($event, 9, 'metadata')"></textarea>
                 </div>
+                <fake-submit-button/>
               </form>
           </div>
           <div ng-switch-when="metadata" id="metadata">
@@ -75,6 +76,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   <h4>Metadata</h4>
                   <metadata-editor title="Key" value-title="Value" object="metadata" owner="owners.dataClass"></metadata-editor>
                 </div>
+                <fake-submit-button/>
               </form>
           </div>
           <div ng-switch-when="parents" id="parents">

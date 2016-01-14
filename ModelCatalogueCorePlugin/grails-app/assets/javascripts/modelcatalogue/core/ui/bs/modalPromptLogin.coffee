@@ -28,7 +28,7 @@ angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies
                   <input type="checkbox" ng-model="user.rememberMe"> Remember Me
                 </label>
               </div>
-              <button type="submit" class="hide" ng-click="login()"></button>
+              <fake-submit-button/>
             </form>
         </div>
         <div class="modal-footer">

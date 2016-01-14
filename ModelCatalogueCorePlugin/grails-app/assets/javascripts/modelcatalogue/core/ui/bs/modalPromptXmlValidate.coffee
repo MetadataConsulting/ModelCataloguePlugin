@@ -19,6 +19,7 @@ angular.module('mc.core.ui.bs.modalPromptXmlValidate', ['mc.util.messages']).con
                 <input ng-hide="uploading &amp;&amp; progress" type="file" class="form-control" id="xml" placeholder="XML File" ngf-model="copy.xml" ngf-select="onFileSelect($files)">
                 <progressbar value="progress" ng-show="uploading &amp;&amp; progress">{{progress}} %</progressbar>
               </div>
+              <fake-submit-button/>
             </form>
         </div>
         <div class="modal-footer">

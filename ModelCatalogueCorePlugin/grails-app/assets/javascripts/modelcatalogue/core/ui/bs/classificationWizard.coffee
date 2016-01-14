@@ -54,6 +54,7 @@ angular.module('mc.core.ui.bs.dataModelWIzard', ['mc.util.messages', 'mc.util.ui
                   <label for="description" class="">Description</label>
                   <textarea rows="10" ng-model="classification.description" placeholder="Description (Optional)" class="form-control" id="description" ng-keydown="navigateOnKey($event, 9, 'imports')"></textarea>
                 </div>
+                <fake-submit-button/>
               </form>
           </div>
           <div ng-switch-when="imports" id="imports">

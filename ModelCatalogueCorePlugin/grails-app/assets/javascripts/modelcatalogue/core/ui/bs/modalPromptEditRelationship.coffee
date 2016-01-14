@@ -24,6 +24,7 @@ angular.module('mc.core.ui.bs.modalPromptEditRelationship', ['mc.util.messages']
                   <p class="help-block">Metadata specific to this relationship. For example <code>contains</code> and <code>parent of</code> relationship types supports <code>Name</code> metadata as an alias of nested model or data element.</p>
                   <metadata-editor object="metadata" owner="metadataOwner"></metadata-editor>
                 </div>
+                <fake-submit-button/>
               </form>
             </div>
         </div>

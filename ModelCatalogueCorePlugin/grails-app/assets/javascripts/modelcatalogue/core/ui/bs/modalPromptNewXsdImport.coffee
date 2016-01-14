@@ -32,6 +32,7 @@ angular.module('mc.core.ui.bs.modalPromptNewXsdImport', ['mc.util.messages', 'mc
                   <input type="checkbox" ng-model="copy.createModelsForElements"> Create models for elements with the same name
                 </label>
               </div>
+              <fake-submit-button/>
             </form>
         </div>
         <div class="modal-footer">

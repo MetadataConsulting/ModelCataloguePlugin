@@ -9,9 +9,11 @@ angular.module('mc.core.ui.bs.modalPrompt', ['mc.util.messages']).config ['messa
         </div>
         <div class="modal-body">
             <form role="form" ng-submit="$close(value)">
-            <div class="form-group">
+              <div class="form-group">
                 <label for="value">''' + body + '''</label>
                 <input type="''' + (args?.type ? 'text') + '''" id="value" ng-model="value" class="form-control">
+                <fake-submit-button/>
+              </div>
             </form>
         </div>
         <div class="modal-footer">

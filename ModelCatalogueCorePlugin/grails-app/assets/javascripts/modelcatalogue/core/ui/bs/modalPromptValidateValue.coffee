@@ -20,6 +20,7 @@ angular.module('mc.core.ui.bs.modalPromptValidateValue', ['mc.util.messages']).c
                 <label for="value">Value</label>
                 <input type="text" class="form-control" id="value" placeholder="Value" ng-model="definition.value" ng-change="validate()">
               </div>
+              <fake-submit-button/>
             </form>
         </div>
         <div class="modal-footer">

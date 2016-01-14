@@ -85,6 +85,7 @@ angular.module('mc.core.ui.bs.modalPromptNewExcelImport', ['mc.util.messages', '
                       <input type="text" class="form-control" id="metadata" placeholder="Metadata" ng-model="headersMap.metadata">
                     </div>
               </div>
+              <fake-submit-button/>
             </form>
         </div>
         <div class="modal-footer">
