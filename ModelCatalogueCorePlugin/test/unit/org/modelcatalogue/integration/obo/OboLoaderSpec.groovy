@@ -30,13 +30,6 @@ class OboLoaderSpec extends Specification {
 
     }
 
-    def "test hpo file output"() {
-        expect:
-        similar 'hp.obo', 'hp.catalogue.xml'
-
-    }
-
-
     boolean similar(String sampleFile, String xmlReference) {
         loader.load(getClass().getResourceAsStream(sampleFile), sampleFile, 'http://www.example.com/obo/$id')
         String xml = stringWriter.toString()
