@@ -16,24 +16,29 @@ angular.module('mc.core.ui.states.controllers.DataModelTreeCtrl', ['ui.router', 
 
       if element.elementType and element.id
         type = names.getPropertyNameFromType(element.elementType)
-        property = 'properties'
-        id = element.id
-        dataModelId = currentDataModel?.id
-        resource = type
+        params =
+          dataModelId: currentDataModel?.id
+          resource: type
+          id: element.id
+          property: 'properties'
+          focused: undefined
 
         if type == 'enumeratedValue'
-          resource = 'enumeratedType'
-          property = 'enumerations'
+          params.resource = 'enumeratedType'
+          params.property = 'enumerations'
+          params.focused = true
         if type == 'versions'
-          resource = 'dataModel'
-          property = 'history'
-          id = currentDataModel?.id
+          params.resource = 'dataModel'
+          params.property = 'history'
+          params.id = currentDataModel?.id
+          params.focused = true
         if type == 'relationships'
-          property = element.property
-          id = element.element.id
-          resource = names.getPropertyNameFromType(element.element.elementType)
+          params.property = element.property
+          params.id = element.element.id
+          params.resource = names.getPropertyNameFromType(element.element.elementType)
+          params.focused = true
 
-        $state.go 'mc.resource.show.property', dataModelId: dataModelId, resource: resource, id: id, property: property
+        $state.go 'mc.resource.show.property', params
 
     $scope.$on 'newVersionCreated', (ignored, element) ->
         $state.go '.', {dataModelId: element.getDataModelId(), resource: names.getPropertyNameFromType(element.elementType), id: element.id, property: 'history', page: undefined, q: undefined}

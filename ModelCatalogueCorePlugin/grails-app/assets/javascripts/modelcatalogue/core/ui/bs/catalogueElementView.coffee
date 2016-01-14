@@ -106,20 +106,31 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
 
     $templateCache.put 'modelcatalogue/core/ui/catalogueElementView.html', '''
     <div class="row catalogue-element-view">
-      <div class="col-md-12">
-      <h3 class="ce-name"><small ng-class="element.getIcon()" title="{{element.getElementTypeName()}}"></small> <span class="text-danger fa fa-fw fa-warning" ng-if="getDeprecationWarning()" title="{{getDeprecationWarning()}}"></span> {{element.name}} <small><span class="label" ng-class="{'label-warning': element.getDataModelStatus() == 'DRAFT', 'label-info': element.getDataModelStatus() == 'PENDING', 'label-primary': element.getDataModelStatus() == 'FINALIZED', 'label-danger': element.getDataModelStatus() == 'DEPRECATED'}">{{element.getDataModelWithVersion()}}</span></small></h3>
-      <blockquote class="ce-description" ng-show="element.description" ng-bind-html="'' + element.description | linky:'_blank'"></blockquote>
+      <div ng-if="!displayOnly">
+        <div class="col-md-12">
+          <h3 class="ce-name"><small ng-class="element.getIcon()" title="{{element.getElementTypeName()}}"></small> <span class="text-danger fa fa-fw fa-warning" ng-if="getDeprecationWarning()" title="{{getDeprecationWarning()}}"></span> {{element.name}} <small><span class="label" ng-class="{'label-warning': element.getDataModelStatus() == 'DRAFT', 'label-info': element.getDataModelStatus() == 'PENDING', 'label-primary': element.getDataModelStatus() == 'FINALIZED', 'label-danger': element.getDataModelStatus() == 'DEPRECATED'}">{{element.getDataModelWithVersion()}}</span></small></h3>
+          <blockquote class="ce-description" ng-show="element.description" ng-bind-html="'' + element.description | linky:'_blank'"></blockquote>
 
-      <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" ng-repeat="tab in tabs" ng-class="{active: tab.active}" data-tab-name="{{tab.name}}"><a ng-click="select(tab)"><span  ng-class="{'text-muted': tab.type == 'decorated-list' &amp;&amp; tab.value.total == 0}">{{tab.heading}}</span><span ng-show="tab.value.total"> <span class="badge tab-value-total" ng-if="tab.value.total != 2147483647">{{tab.value.total}}</span><span class="badge tab-value-total" ng-if="tab.value.total == 2147483647"><span class="fa fa-question fa-inverse"</span></span></a></li>
-      </ul>
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" ng-repeat="tab in tabs" ng-class="{active: tab.active}" data-tab-name="{{tab.name}}"><a ng-click="select(tab)"><span  ng-class="{'text-muted': tab.type == 'decorated-list' &amp;&amp; tab.value.total == 0}">{{tab.heading}}</span><span ng-show="tab.value.total"> <span class="badge tab-value-total" ng-if="tab.value.total != 2147483647">{{tab.value.total}}</span><span class="badge tab-value-total" ng-if="tab.value.total == 2147483647"><span class="fa fa-question fa-inverse"</span></span></a></li>
+          </ul>
 
-      <div ng-repeat="tab in tabs" class="tab-pane">
-          <div  id="{{tab.name}}-tab" class="cev-tab-content" ng-if="tab.active">
-            <ng-include src="'modelcatalogue/core/ui/catalogueElementView/' + tab.type + '.html'"></ng-include>
+          <div ng-repeat="tab in tabs" class="tab-pane">
+            <div  id="{{tab.name}}-tab" class="cev-tab-content" ng-if="tab.active">
+              <ng-include src="'modelcatalogue/core/ui/catalogueElementView/' + tab.type + '.html'"></ng-include>
+            </div>
           </div>
+        </div>
       </div>
-
+      <div ng-if="displayOnly">
+        <div class="col-md-12">
+          <div ng-repeat="tab in tabs" class="tab-pane">
+            <div id="{{tab.name}}-tab" class="cev-tab-content" ng-if="tab.active">
+              <h3 class="ce-name"><small ng-class="element.getIcon()" title="{{element.getElementTypeName()}}"></small> <span class="text-danger fa fa-fw fa-warning" ng-if="getDeprecationWarning()" title="{{getDeprecationWarning()}}"></span> {{element.name}} {{tab.heading}} <small><span class="label" ng-class="{'label-warning': element.getDataModelStatus() == 'DRAFT', 'label-info': element.getDataModelStatus() == 'PENDING', 'label-primary': element.getDataModelStatus() == 'FINALIZED', 'label-danger': element.getDataModelStatus() == 'DEPRECATED'}">{{element.getDataModelWithVersion()}}</span></small></h3>
+              <ng-include src="'modelcatalogue/core/ui/catalogueElementView/' + tab.type + '.html'"></ng-include>
+            </div>
+           </div>
+        </div>
       </div>
     </div>
     '''

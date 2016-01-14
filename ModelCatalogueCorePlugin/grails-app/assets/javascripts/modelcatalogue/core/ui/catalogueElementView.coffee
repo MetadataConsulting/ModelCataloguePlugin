@@ -5,6 +5,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       element: '='
       property: '=?'
       id: '@'
+      displayOnly: '=?'
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
@@ -204,6 +205,11 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       $scope.$on '$stateChangeSuccess', (event, state, params) ->
         return if state.name != 'mc.resource.show.property' and state.name != 'simple.resource.show.property'
         $scope.property = params.property
+        if params.focused
+          $scope.displayOnly = params.property
+        else
+          $scope.displayOnly = undefined
+
 
       # init
       onElementUpdate($scope.element)

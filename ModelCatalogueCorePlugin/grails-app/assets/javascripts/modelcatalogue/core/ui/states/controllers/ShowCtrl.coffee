@@ -8,4 +8,11 @@ angular.module('mc.core.ui.states.controllers.ShowCtrl', ['ui.router', 'mc.util.
 
     $scope.element = element
     $scope.original = element
+
+    $scope.propertyToDisplay = $state.params.property
+
+    console.log $state
+
+    if $state.params.focused
+      $scope.displayOnly = $state.params.property
 ])
