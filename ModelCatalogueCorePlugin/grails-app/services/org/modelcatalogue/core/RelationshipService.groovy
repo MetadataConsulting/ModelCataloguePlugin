@@ -17,6 +17,7 @@ import org.modelcatalogue.core.util.RelationshipDirection
 
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import org.springframework.util.StopWatch
 
 class RelationshipService {
 
@@ -85,6 +86,23 @@ class RelationshipService {
                 .definition
     }
 
+
+    // Typical timing for last measurement:
+    //    StopWatch 'Relationship Service Link': running time (millis) = 16
+    //    -----------------------------------------
+    //    ms     %     Task name
+    //    -----------------------------------------
+    //    00000  000%  finding existing relationships
+    //    00008  050%  creating new instance
+    //    00002  012%  validating
+    //    00001  006%  validating relationship rule
+    //    00001  006%  presisting instance
+    //    00001  006%  adding to source and destination
+    //    00002  012%  logging new relation created
+    //    00001  006%  handling existing inheritance
+    //    00000  000%  invalidating counts' cache
+    //
+    // flushing while saving can make this method slowing down 10 times
     Relationship link(RelationshipDefinition relationshipDefinition) {
         if (relationshipDefinition.source?.readyForQueries && relationshipDefinition.destination?.readyForQueries && relationshipDefinition.relationshipType?.getId()) {
             Relationship relationshipInstance = relationshipDefinition.skipUniqueChecking ? null : findExistingRelationship(relationshipDefinition)
@@ -101,7 +119,10 @@ class RelationshipService {
                 if (relationshipDefinition.resetIndices) {
                     relationshipInstance.resetIndexes()
                 }
-                relationshipInstance.archived = relationshipDefinition.archived
+                if (relationshipInstance.archived != relationshipDefinition.archived) {
+                    relationshipInstance.archived = relationshipDefinition.archived
+                    relationshipInstance.save(deepValidate: false)
+                }
                 return relationshipInstance
             }
         }
@@ -137,11 +158,14 @@ class RelationshipService {
             return relationshipInstance
         }
 
-        relationshipInstance.save(validate: false, flush: true)
-        relationshipDefinition.source?.addToOutgoingRelationships(relationshipInstance)?.save(validate: false, flush: true)
-        relationshipDefinition.destination?.addToIncomingRelationships(relationshipInstance)?.save(validate: false, flush: true)
+
+        relationshipInstance.save(validate: false/* , flush: true*/)
+
+        relationshipDefinition.source?.addToOutgoingRelationships(relationshipInstance)?.save(validate: false/*, flush: true*/)
+        relationshipDefinition.destination?.addToIncomingRelationships(relationshipInstance)?.save(validate: false/*, flush: true*/)
+
         auditService.logNewRelation(relationshipInstance)
-        
+
         if (relationshipDefinition.metadata) {
             relationshipInstance.ext = relationshipDefinition.metadata
         }
