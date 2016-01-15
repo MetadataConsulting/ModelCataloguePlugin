@@ -7,6 +7,9 @@ import org.modelcatalogue.core.Relationship
 class Inheritance {
 
     static void withAllChildren(CatalogueElement element, Set<CatalogueElement> processed = new HashSet<CatalogueElement>([element]),  @DelegatesTo(CatalogueElement) Closure closure) {
+        if (!element.countOutgoingRelationshipsByType(RelationshipType.baseType)) {
+            return
+        }
         for (Relationship relationship in new ArrayList<Relationship>(element.getOutgoingRelationshipsByType(RelationshipType.baseType))) {
             if (relationship.destination in processed) {
                 continue
@@ -18,6 +21,9 @@ class Inheritance {
     }
 
     static void withAllParents(CatalogueElement element, Set<CatalogueElement> processed = new HashSet<CatalogueElement>([element]),  @DelegatesTo(CatalogueElement) Closure closure) {
+        if (!element.countIncomingRelationshipsByType(RelationshipType.baseType)) {
+            return
+        }
         for (Relationship relationship in new ArrayList<Relationship>(element.getIncomingRelationshipsByType(RelationshipType.baseType))) {
             if (relationship.source in processed) {
                 continue
@@ -29,12 +35,18 @@ class Inheritance {
     }
 
     static void withChildren(CatalogueElement element, @DelegatesTo(CatalogueElement) Closure closure) {
+        if (!element.countOutgoingRelationshipsByType(RelationshipType.baseType)) {
+            return
+        }
         for (Relationship relationship in new ArrayList<Relationship>(element.getOutgoingRelationshipsByType(RelationshipType.baseType))) {
             relationship.destination.with closure
         }
     }
 
     static void withParents(CatalogueElement element, @DelegatesTo(CatalogueElement) Closure closure) {
+        if (!element.countIncomingRelationshipsByType(RelationshipType.baseType)) {
+            return
+        }
         for (Relationship relationship in new ArrayList<Relationship>(element.getIncomingRelationshipsByType(RelationshipType.baseType))) {
             relationship.source.with closure
         }
