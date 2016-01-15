@@ -4,6 +4,8 @@ import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import grails.gorm.DetachedCriteria
 import grails.util.GrailsNameUtils
+import groovy.json.JsonBuilder
+import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
@@ -60,7 +62,7 @@ class ElasticSearchService implements SearchCatalogue {
     ]
 
     private Set<Class> mappedTypesInDataModel = [
-            Asset, DataClass, DataElement, DataType, EnumeratedType, MeasurementUnit, PrimitiveType, ReferenceType, Relationship
+            DataModel, Asset, DataClass, DataElement, DataType, EnumeratedType, MeasurementUnit, PrimitiveType, ReferenceType, Relationship
     ]
 
     ExecutorService executorService
@@ -313,11 +315,15 @@ class ElasticSearchService implements SearchCatalogue {
         if (CatalogueElement.isAssignableFrom(clazz)) {
             CatalogueElement element = object as CatalogueElement
             return from(getIndices(element)).flatMap { idx ->
-                from(client.prepareDelete(idx, getTypeName(clazz), "${element.getId()}").execute()).map {
-                    it.found
-                }.onErrorReturn { error ->
-                    log.debug "Exception unindexing $element: $error"
-                    return false
+                indexExists(just(idx)).flatMap { response ->
+                    if (response.exists) {
+                        from(client.prepareDelete(idx, getTypeName(clazz), "${element.getId()}").execute()).map {
+                            it.found
+                        }.onErrorReturn { error ->
+                            log.debug "Exception unindexing $element: $error"
+                            return false
+                        }
+                    }
                 }
             }
         }
@@ -373,10 +379,12 @@ class ElasticSearchService implements SearchCatalogue {
             return [:]
         }
 
-        Map<String, Map> mapping = [(getTypeName(clazz)): [:]]
+
+        String typeName = getTypeName(clazz)
+        Map<String, Map> mapping = [(typeName): [:]]
 
         if (clazz.superclass && clazz.superclass != Object) {
-            merge mapping[getTypeName(clazz)], getMapping(clazz.superclass)[getTypeName(clazz.superclass)]
+            merge mapping[typeName], getMapping(clazz.superclass)[getTypeName(clazz.superclass)]
         }
 
 
@@ -387,26 +395,26 @@ class ElasticSearchService implements SearchCatalogue {
         if (url) {
             File mappingFile = new File(url.toURI())
             Map parsed = new JsonSlurper().parse(mappingFile) as Map
-            Map parsedMapping = parsed[getTypeName(clazz)] as Map
+            Map parsedMapping = parsed[typeName] as Map
             if (!parsedMapping) {
-                log.warn "the mapping does not contain expected root entry ${getTypeName(clazz)}"
+                log.warn "the mapping does not contain expected root entry ${typeName}"
             } else {
-                merge mapping[getTypeName(clazz)], parsedMapping
+                merge mapping[typeName], parsedMapping
             }
         }
 
         if (clazz == DataElement) {
             // data type is embedded into data element
-            mapping.data_type = getMapping(DataType)
+            mapping[typeName].properties.data_type = getMapping(DataType).data_type
         } else if (clazz == Relationship) {
             // source and destination combines all available catalogue element mappings
             // relationship copies relationship type mapping
-            mapping.relationship_type = getMapping(RelationshipType)
+            mapping[typeName].properties.relationship_type = getMapping(RelationshipType).relationship_type
 
             Map catalogueElementMappingCombined = combineMappingForAllCatalogueElements()
 
-            mapping.source = catalogueElementMappingCombined
-            mapping.destination = catalogueElementMappingCombined
+            mapping[typeName].properties.source = catalogueElementMappingCombined.catalogue_element
+            mapping[typeName].properties.destination = catalogueElementMappingCombined.catalogue_element
         }
 
         return mapping
@@ -415,7 +423,7 @@ class ElasticSearchService implements SearchCatalogue {
     private Observable<SimpleIndexResponse> indexAsync(IndexingSession session, object) {
         Class clazz = getEntityClass(object)
         if (DataModel.isAssignableFrom(clazz)) {
-            return safeIndex(getIndices(object), getElementWithRelationships(session, object as CatalogueElement), [DataModel])
+            return safeIndex(getIndices(object), getElementWithRelationships(session, object as CatalogueElement), mappedTypesInDataModel)
         }
 
         if (CatalogueElement.isAssignableFrom(clazz)) {
@@ -517,7 +525,7 @@ class ElasticSearchService implements SearchCatalogue {
     private Observable<SimpleIndicesExistsResponse> indexExists(Observable<String> indices) {
         return indices.flatMap { index ->
             return from(client.admin().indices().prepareExists(index).execute()).map {
-                return new SimpleIndicesExistsResponse(exists: it, index: index)
+                return new SimpleIndicesExistsResponse(exists: it.exists, index: index)
             }
         }
     }
@@ -577,7 +585,10 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     private Map combineMappingForAllCatalogueElements() {
-        collectSubclasses(CatalogueElement).inject([:] as Map) { Map collector, Class type -> merge collector, getMapping(type) } as Map
+        collectSubclasses(CatalogueElement).inject([catalogue_element: [:]] as Map) { Map collector, Class type ->
+            merge collector.catalogue_element, getMapping(type)[getTypeName(type)]
+            collector
+        } as Map
     }
 
 
@@ -585,7 +596,13 @@ class ElasticSearchService implements SearchCatalogue {
         GrailsNameUtils.getNaturalName(clazz.simpleName).replaceAll(/\s/, '_').toLowerCase()
     }
 
-    private static void merge(Map<String, Map> current, Map<String, Map> fromSuper) {
+    private static Map<String, Map> merge(Map<String, Map> current, Map<String, Map> fromSuper) {
+        if (current == null) {
+            if (fromSuper == null) {
+                return [:]
+            }
+            return new LinkedHashMap<String, Map>(fromSuper)
+        }
         for (Map.Entry<String, Map> entry in fromSuper) {
             if (current.containsKey(entry.key)) {
                 current[entry.key].putAll entry.value
@@ -593,6 +610,7 @@ class ElasticSearchService implements SearchCatalogue {
                 current[entry.key] = entry.value
             }
         }
+        return current
     }
 
     private DataModelFilter getOverridableDataModelFilter(Map params) {

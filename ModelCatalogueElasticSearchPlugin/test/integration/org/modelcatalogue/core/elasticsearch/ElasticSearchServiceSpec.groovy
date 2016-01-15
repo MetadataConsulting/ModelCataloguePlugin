@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.elasticsearch
-
 import grails.test.spock.IntegrationSpec
+import groovy.json.JsonOutput
 import org.elasticsearch.client.Client
 import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.node.Node
@@ -8,16 +8,10 @@ import org.elasticsearch.node.NodeBuilder
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.builder.api.CatalogueBuilder
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.DataClass
-import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.InitCatalogueService
-import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.HibernateHelper
-import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
+import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 
 class ElasticSearchServiceSpec extends IntegrationSpec {
 
@@ -45,7 +39,7 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
 //                .builder()
 //                .settings(settings)
 //                .build()
-//                .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("192.168.99.100"), 9300))
+//                .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("192.168.1.9"), 9300))
 
         elasticSearchService.client = client
 
@@ -64,6 +58,11 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
             dataModel(name: "ES Test Model") {
                 dataClass(name: "Foo") {
                     description "foo bar"
+                    ext 'foo', 'bar'
+                    ext 'date_in_class_metadata', '2014-06-06T06:34:24Z'
+                    relationship {
+                       //  ext 'date_in_relationship_metadata', '2014-06-06T06:34:24Z'
+                    }
                 }
             }
         }
@@ -122,7 +121,7 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
 
     def "read catalogue element mapping"() {
         def mapping = elasticSearchService.getMapping(CatalogueElement)
-        println mapping
+        println JsonOutput.prettyPrint(JsonOutput.toJson(mapping))
         expect:
         mapping
         mapping.catalogue_element
@@ -132,13 +131,30 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
 
     def "read data element mapping"() {
         def mapping = elasticSearchService.getMapping(DataElement)
-        println mapping
+        println JsonOutput.prettyPrint(JsonOutput.toJson(mapping))
         expect:
         mapping
         mapping.data_element
         mapping.data_element.properties
         mapping.data_element.properties.name
         mapping.data_element.properties.data_type
+    }
+
+    def "read relationship mapping"() {
+        def mapping = elasticSearchService.getMapping(Relationship)
+        println JsonOutput.prettyPrint(JsonOutput.toJson(mapping))
+        expect:
+        mapping
+        mapping.relationship
+        mapping.relationship.properties
+        mapping.relationship.properties.ext
+        mapping.relationship.properties.relationship_type
+        mapping.relationship.properties.source
+        mapping.relationship.properties.source.properties
+        mapping.relationship.properties.source.properties.data_type
+        mapping.relationship.properties.source.properties.data_class
+        mapping.relationship.properties.source.properties.measurement_unit
+        mapping.relationship.properties.destination
     }
 
 }

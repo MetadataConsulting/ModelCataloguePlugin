@@ -1,49 +1,38 @@
 {
-  "relationship_type" : {
-
-    "properties" : {
-
-      "name" : {
-        "type" : "string",
-        "index" : "not_analyzed"
+  "relationship_type": {
+    "properties": {
+      "name": {
+        "type": "string",
+        "index": "not_analyzed"
       },
-
-      "source_to_destination" : {
-        "type" : "string"
+      "source_to_destination": {
+        "type": "string"
       },
-
-      "source_to_destination_description" : {
-        "type" : "string"
+      "source_to_destination_description": {
+        "type": "string"
       },
-
-      "destination_to_source" : {
-        "type" : "string"
+      "destination_to_source": {
+        "type": "string"
       },
-
-      "destination_to_source_description" : {
-        "type" : "string"
+      "destination_to_source_description": {
+        "type": "string"
       },
-
-      "system" : {
-        "type" : "boolean"
+      "system": {
+        "type": "boolean"
       },
-
-      "bidirectional" : {
-        "type" : "boolean"
+      "bidirectional": {
+        "type": "boolean"
       },
-
-      "version_specific" : {
-        "type" : "boolean"
+      "version_specific": {
+        "type": "boolean"
       },
-
-      "source_class" : {
-        "type" : "string",
-        "index" : "not_analyzed"
+      "source_class": {
+        "type": "string",
+        "index": "not_analyzed"
       },
-
-      "destination_class" : {
-        "type" : "string",
-        "index" : "not_analyzed"
+      "destination_class": {
+        "type": "string",
+        "index": "not_analyzed"
       }
     }
   }
