@@ -17,7 +17,6 @@ import org.modelcatalogue.core.util.RelationshipDirection
 
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
-import org.springframework.util.StopWatch
 
 class RelationshipService {
 
