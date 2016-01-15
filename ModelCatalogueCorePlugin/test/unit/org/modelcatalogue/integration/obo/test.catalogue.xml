@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd">
   <dataModel name="test.obo">
-    <dataClass id="http://www.example.com/obo/HP:0000001" name="All">
+    <dataClass id="http://www.example.com/obo/HP%3A0000001" name="All">
       <description>Root of all terms in the Human Phenotype Ontology.</description>
       <extensions>
         <extension key="OBO ID">HP:0000001</extension>
@@ -11,7 +11,7 @@
         <from relationshipType="classification" name="test.obo" />
       </relationships>
     </dataClass>
-    <dataClass id="http://www.example.com/obo/HP:0000118" name="Phenotypic abnormality">
+    <dataClass id="http://www.example.com/obo/HP%3A0000118" name="Phenotypic abnormality">
       <description>A phenotypic abnormality.
 
 Comment:
@@ -22,10 +22,10 @@ This is the root of the phenotypic abnormality subontology of the HPO.</descript
       </extensions>
       <relationships>
         <from relationshipType="classification" name="test.obo" />
-        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000001" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP%3A0000001" />
       </relationships>
     </dataClass>
-    <dataClass id="http://www.example.com/obo/HP:0001507" name="Growth abnormality">
+    <dataClass id="http://www.example.com/obo/HP%3A0001507" name="Growth abnormality">
       <extensions>
         <extension key="OBO ID">HP:0001507</extension>
         <extension key="Alternative IDs">HP:0008904</extension>
@@ -33,10 +33,10 @@ This is the root of the phenotypic abnormality subontology of the HPO.</descript
       </extensions>
       <relationships>
         <from relationshipType="classification" name="test.obo" />
-        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000118" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP%3A0000118" />
       </relationships>
     </dataClass>
-    <dataClass id="http://www.example.com/obo/HP:0000002" name="Abnormality of body height">
+    <dataClass id="http://www.example.com/obo/HP%3A0000002" name="Abnormality of body height">
       <description>Deviation from the norm of height with respect to that which is expected according to age and gender norms.</description>
       <extensions>
         <extension key="OBO ID">HP:0000002</extension>
@@ -46,10 +46,10 @@ This is the root of the phenotypic abnormality subontology of the HPO.</descript
       </extensions>
       <relationships>
         <from relationshipType="classification" name="test.obo" />
-        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0001507" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP%3A0001507" />
       </relationships>
     </dataClass>
-    <dataClass id="http://www.example.com/obo/HP:0000119" name="Abnormality of the genitourinary system">
+    <dataClass id="http://www.example.com/obo/HP%3A0000119" name="Abnormality of the genitourinary system">
       <description>The presence of any abnormality of the genitourinary system.</description>
       <extensions>
         <extension key="OBO ID">HP:0000119</extension>
@@ -61,10 +61,10 @@ This is the root of the phenotypic abnormality subontology of the HPO.</descript
       </extensions>
       <relationships>
         <from relationshipType="classification" name="test.obo" />
-        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000118" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP%3A0000118" />
       </relationships>
     </dataClass>
-    <dataClass id="http://www.example.com/obo/HP:0000079" name="Abnormality of the urinary system">
+    <dataClass id="http://www.example.com/obo/HP%3A0000079" name="Abnormality of the urinary system">
       <description>An abnormality of the urinary system.</description>
       <extensions>
         <extension key="OBO ID">HP:0000079</extension>
@@ -75,10 +75,10 @@ This is the root of the phenotypic abnormality subontology of the HPO.</descript
       </extensions>
       <relationships>
         <from relationshipType="classification" name="test.obo" />
-        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000119" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP%3A0000119" />
       </relationships>
     </dataClass>
-    <dataClass id="http://www.example.com/obo/HP:0010935" name="Abnormality of the upper urinary tract">
+    <dataClass id="http://www.example.com/obo/HP%3A0010935" name="Abnormality of the upper urinary tract">
       <description>An abnormality of the upper urinary tract.
 
 Comment:
@@ -93,11 +93,11 @@ The upper urinary tract is a subdivision of urinary system which consists of the
       </extensions>
       <relationships>
         <from relationshipType="classification" name="test.obo" />
-        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000079" />
-        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000079" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP%3A0000079" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP%3A0000079" />
       </relationships>
     </dataClass>
-    <dataClass id="http://www.example.com/obo/HP:0000077" name="Abnormality of the kidney">
+    <dataClass id="http://www.example.com/obo/HP%3A0000077" name="Abnormality of the kidney">
       <description>An abnormality of the kidney.
 
 Comment:
@@ -110,10 +110,10 @@ The kidney is a paired organ whose primary function is the production of urine.<
       </extensions>
       <relationships>
         <from relationshipType="classification" name="test.obo" />
-        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0010935" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP%3A0010935" />
       </relationships>
     </dataClass>
-    <dataClass id="http://www.example.com/obo/HP:0012210" name="Abnormal renal morphology">
+    <dataClass id="http://www.example.com/obo/HP%3A0012210" name="Abnormal renal morphology">
       <description>Any structural anomaly of the kidney.</description>
       <extensions>
         <extension key="OBO ID">HP:0012210</extension>
@@ -127,10 +127,10 @@ The kidney is a paired organ whose primary function is the production of urine.<
       </extensions>
       <relationships>
         <from relationshipType="classification" name="test.obo" />
-        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000077" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP%3A0000077" />
       </relationships>
     </dataClass>
-    <dataClass id="http://www.example.com/obo/HP:0000107" name="Renal cyst">
+    <dataClass id="http://www.example.com/obo/HP%3A0000107" name="Renal cyst">
       <description>A fluid filled sac in the kidney.</description>
       <extensions>
         <extension key="OBO ID">HP:0000107</extension>
@@ -140,10 +140,10 @@ The kidney is a paired organ whose primary function is the production of urine.<
       </extensions>
       <relationships>
         <from relationshipType="classification" name="test.obo" />
-        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0012210" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP%3A0012210" />
       </relationships>
     </dataClass>
-    <dataClass id="http://www.example.com/obo/HP:0011035" name="Abnormality of the renal cortex">
+    <dataClass id="http://www.example.com/obo/HP%3A0011035" name="Abnormality of the renal cortex">
       <description>An abnormality of the cortex of the kidney.</description>
       <extensions>
         <extension key="OBO ID">HP:0011035</extension>
@@ -155,10 +155,10 @@ The kidney is a paired organ whose primary function is the production of urine.<
       </extensions>
       <relationships>
         <from relationshipType="classification" name="test.obo" />
-        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0012210" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP%3A0012210" />
       </relationships>
     </dataClass>
-    <dataClass id="http://www.example.com/obo/HP:0000003" name="Multicystic kidney dysplasia">
+    <dataClass id="http://www.example.com/obo/HP%3A0000003" name="Multicystic kidney dysplasia">
       <description>Multicystic dysplasia of the kidney is characterized by multiple cysts of varying size in the kidney and the absence of a normal pelvocaliceal system. The condition is associated with ureteral or ureteropelvic atresia, and the affected kidney is nonfunctional.
 
 Comment:
@@ -171,7 +171,7 @@ Multicystic kidney dysplasia is the result of abnormal fetal renal development i
       </extensions>
       <relationships>
         <from relationshipType="classification" name="test.obo" />
-        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP:0000107" />
+        <from relationshipType="hierarchy" ref="http://www.example.com/obo/HP%3A0000107" />
       </relationships>
     </dataClass>
     <extensions>
