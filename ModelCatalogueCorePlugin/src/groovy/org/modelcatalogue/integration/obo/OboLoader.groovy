@@ -259,7 +259,7 @@ class OboLoader {
     private static String getId(oboId, Template idTemplate) {
         assert idTemplate
         StringWriter sw = new StringWriter()
-        idTemplate.make(id: oboId).writeTo(sw)
+        idTemplate.make(id: URLEncoder.encode(oboId?.toString(), 'UTF-8')).writeTo(sw)
         return sw.toString()
     }
 

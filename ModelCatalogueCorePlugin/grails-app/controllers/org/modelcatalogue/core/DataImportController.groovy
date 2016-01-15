@@ -112,7 +112,7 @@ class DataImportController  {
             executeInBackground(id, "Imported from OBO") {
                 try {
                     OboLoader loader = new OboLoader(builder)
-                    idpattern = idpattern ?: "${grailsApplication.config.grails.serverURL}/catalogue/ext/${OboLoader.OBO_ID}/:id".toString().replace(':id', '$id')
+                    idpattern = idpattern ?: "${grailsApplication.config.grails.serverURL}/catalogue/ext/${URLEncoder.encode(OboLoader.OBO_ID, 'UTF-8')}/:id".toString().replace(':id', '$id')
                     loader.load(inputStream, name, idpattern)
                     finalizeAsset(id, (DataModel) (builder.created.find {it.instanceOf(DataModel)} ?: builder.created.find{it.dataModel}?.dataModel))
                 } catch (Exception e) {
