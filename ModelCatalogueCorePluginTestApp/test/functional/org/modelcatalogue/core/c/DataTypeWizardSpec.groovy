@@ -225,6 +225,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "create new mapping"() {
+        check closeGrowlMessage gone
         check backdrop gone
 
         when: "create new mapping action is clicked"
@@ -277,6 +278,8 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "edit mapping"() {
+        check closeGrowlMessage gone
+
         when: "mappings tab selected"
         selectTab 'mappings'
 
