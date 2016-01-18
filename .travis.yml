@@ -10,9 +10,12 @@ cache:
     - $HOME/.grails/wrapper
 
 env:
-  - TEST_SUITE=app_functional_a
-  - TEST_SUITE=app_functional_b
-  - TEST_SUITE=app_functional_c
+  # each runs for 11 ~ 13 minutes
+  # - TEST_SUITE=app_functional_a
+  # - TEST_SUITE=app_functional_b
+  # - TEST_SUITE=app_functional_c
+  # single run for 15 minutes
+  - TEST_SUITE=app_functional
   - TEST_SUITE=core_unit
   - TEST_SUITE=core_integration
   - TEST_SUITE=core_integration_slow
