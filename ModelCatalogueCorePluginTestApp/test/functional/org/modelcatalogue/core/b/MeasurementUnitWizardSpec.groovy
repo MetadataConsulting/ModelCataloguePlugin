@@ -36,6 +36,7 @@ class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "check the unit shows up with own detail page"(){
+        check closeGrowlMessage gone
         click { infTableCell(1, 2).find('a') }
 
         expect:

@@ -66,6 +66,11 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         check rightSideTitle is 'New Data Model New Data Model 0.0.1'
+
+        when:
+        selectTab 'imports'
+
+        then:
         check tabTotal('imports') is '1'
     }
 

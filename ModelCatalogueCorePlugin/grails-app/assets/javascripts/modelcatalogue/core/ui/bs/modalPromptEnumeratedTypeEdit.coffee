@@ -31,42 +31,42 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
                 <label for="description" class="">Description</label>
                 <textarea rows="10" ng-model="copy.description" placeholder="Description" class="form-control" id="description"></textarea>
               </div>
-              <fake-submit-button/>
-            </form>
-            <div class="form-group">
-                <label for="rule" ng-click="ruleCollapsed = !ruleCollapsed">Rule <span class="glyphicon" ng-class="{'glyphicon-collapse-down': ruleCollapsed, 'glyphicon-collapse-up': !ruleCollapsed}"></span></label>
-                <div collapse="ruleCollapsed" >
-                  <textarea rows="10" ng-model="copy.rule" placeholder="Rule" class="form-control" id="rule"></textarea>
-                  <p class="help-block">Enter valid <a href="http://www.groovy-lang.org/" target="_blank">Groovy</a> code. Variable <code>x</code> refers to the value validated value and  <code>dataType</code> to current data type. Last row is the result which should be <code>boolean</code> value. For example you can <a ng-click="showRegexExample()"><span class="fa fa-magic"></span> validate using regular expression</a> or <a ng-click="showSetExample()"><span class="fa fa-magic"></span> values in set</a></p>
+              <div class="form-group">
+                  <label for="rule" ng-click="ruleCollapsed = !ruleCollapsed">Rule <span class="glyphicon" ng-class="{'glyphicon-collapse-down': ruleCollapsed, 'glyphicon-collapse-up': !ruleCollapsed}"></span></label>
+                  <div collapse="ruleCollapsed" >
+                    <textarea rows="10" ng-model="copy.rule" placeholder="Rule" class="form-control" id="rule"></textarea>
+                    <p class="help-block">Enter valid <a href="http://www.groovy-lang.org/" target="_blank">Groovy</a> code. Variable <code>x</code> refers to the value validated value and  <code>dataType</code> to current data type. Last row is the result which should be <code>boolean</code> value. For example you can <a ng-click="showRegexExample()"><span class="fa fa-magic"></span> validate using regular expression</a> or <a ng-click="showSetExample()"><span class="fa fa-magic"></span> values in set</a></p>
+                  </div>
+                </div>
+              <label class="radio-inline">
+                <input ng-disabled="!create" type="radio" ng-model="subtype" name="subtype" id="pickSimpleType" value="dataType"> Simple
+              </label>
+              <label class="radio-inline">
+                <input ng-disabled="!create" ng-model="subtype" type="radio"  name="subtype" id="pickEnumeratedType" value="enumeratedType"> Enumerated
+              </label>
+              <label class="radio-inline">
+                <input ng-disabled="!create" ng-model="subtype" type="radio" name="subtype" id="pickPrimitiveType" value="primitiveType"> Primitive
+              </label>
+              <label class="radio-inline">
+                <input ng-disabled="!create" ng-model="subtype" type="radio" name="subtype" id="pickReferenceType" value="referenceType"> Reference
+              </label>
+              <div collapse="subtype != 'enumeratedType'">
+                <ordered-map-editor object="copy.enumerations" title="Enumerations" key-placeholder="Value" value-placeholder="Description"></ordered-map-editor>
+              </div>
+              <div collapse="subtype != 'referenceType'">
+                <div class="form-group">
+                  <label for="dataClass" class="">Data Class</label>
+                  <input type="text" id="dataClass" placeholder="Data Class" ng-model="copy.dataClass" global="'allow'" catalogue-element-picker="dataClass" label="el.name">
                 </div>
               </div>
-            <label class="radio-inline">
-              <input ng-disabled="!create" type="radio" ng-model="subtype" name="subtype" id="pickSimpleType" value="dataType"> Simple
-            </label>
-            <label class="radio-inline">
-              <input ng-disabled="!create" ng-model="subtype" type="radio"  name="subtype" id="pickEnumeratedType" value="enumeratedType"> Enumerated
-            </label>
-            <label class="radio-inline">
-              <input ng-disabled="!create" ng-model="subtype" type="radio" name="subtype" id="pickPrimitiveType" value="primitiveType"> Primitive
-            </label>
-            <label class="radio-inline">
-              <input ng-disabled="!create" ng-model="subtype" type="radio" name="subtype" id="pickReferenceType" value="referenceType"> Reference
-            </label>
-            <div collapse="subtype != 'enumeratedType'">
-              <ordered-map-editor object="copy.enumerations" title="Enumerations" key-placeholder="Value" value-placeholder="Description"></ordered-map-editor>
-            </div>
-            <div collapse="subtype != 'referenceType'">
-              <div class="form-group">
-                <label for="dataClass" class="">Data Class</label>
-                <input type="text" id="dataClass" placeholder="Data Class" ng-model="copy.dataClass" global="'allow'" catalogue-element-picker="dataClass" label="el.name">
+              <div collapse="subtype != 'primitiveType'">
+                <div class="form-group">
+                  <label for="measurementUnit" class="">Measurement Unit</label>
+                  <input type="text" id="measurementUnit" placeholder="Measurement Unit" ng-model="copy.measurementUnit" catalogue-element-picker="measurementUnit" label="el.name">
+                </div>
               </div>
-            </div>
-            <div collapse="subtype != 'primitiveType'">
-              <div class="form-group">
-                <label for="measurementUnit" class="">Measurement Unit</label>
-                <input type="text" id="measurementUnit" placeholder="Measurement Unit" ng-model="copy.measurementUnit" catalogue-element-picker="measurementUnit" label="el.name">
-              </div>
-            </div>
+              <fake-submit-button />
+            </form>
         </div>
         <div class="modal-footer">
           <contextual-actions role="modal"></contextual-actions>

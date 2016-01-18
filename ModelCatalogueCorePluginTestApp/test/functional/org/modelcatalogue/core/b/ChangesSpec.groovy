@@ -5,6 +5,8 @@ import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.pages.GlobalChangesPage
 import spock.lang.Stepwise
 
+import static org.modelcatalogue.core.geb.Common.getCloseGrowlMessage
+
 @Stepwise
 class ChangesSpec extends AbstractModelCatalogueGebSpec {
 
@@ -20,6 +22,7 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
 
         expect:
         check 'div.modal' gone
+        check closeGrowlMessage gone
 
         when:
         go "#/catalogue/change/all"
