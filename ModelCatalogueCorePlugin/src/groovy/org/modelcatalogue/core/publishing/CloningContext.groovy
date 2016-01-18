@@ -63,10 +63,8 @@ class CloningContext {
             return (E) HibernateHelper.getEntityClass(published).get(cloneId)
         }
 
-        DataModel theDataModel = dataModel
-
         List<Relationship> existing = Relationship.where {
-            source.id == publishedId && relationshipType == RelationshipType.originType && destination.dataModel == theDataModel
+            source.id == publishedId && relationshipType == RelationshipType.originType && destination.dataModel == destinationDataModel
         }.list(max: 1, sort: 'outgoingIndex')
 
         if (!existing) {

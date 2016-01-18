@@ -678,6 +678,64 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         clonedDataElement.dataType == clonedDataType
     }
 
+
+    def "cloning nested first than parent class crates duplicates"() {
+        final String sourceDataModelName = 'Source DM MET-922'
+        final String rootDataClassName = 'DC Root MET-922'
+        final String parentDataClassName = 'DC Parent MET-922'
+        final String destinationDataModelName = 'Destination DM MET-922'
+
+        catalogueBuilder.build {
+            dataModel name: sourceDataModelName, {
+                dataClass name: rootDataClassName, {
+                    dataClass name: parentDataClassName, {
+                        5.times { i ->
+                            dataClass name: "DC MET-922 #$i", {
+                                5.times { j ->
+                                    dataElement name: "DE MET-922 #$i/$j"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            dataModel name: destinationDataModelName
+        }
+
+        DataModel source = DataModel.findByName(sourceDataModelName)
+        DataModel destination = DataModel.findByName(destinationDataModelName)
+
+        DataClass root = DataClass.findByName(rootDataClassName)
+        DataClass parent = DataClass.findByName(parentDataClassName)
+
+        expect:
+        source
+        destination
+        root
+        parent
+
+        DataElement.countByNameLike("DE MET-922%") == 25
+
+        when:
+        elementService.cloneElement(parent, CloningContext.create(source, destination))
+
+        then:
+        DataClass.findByNameAndDataModel(parentDataClassName, source)
+        DataClass.findByNameAndDataModel(parentDataClassName, destination)
+
+        DataElement.countByNameLike("DE MET-922%") == 50
+
+        when:
+        elementService.cloneElement(root, CloningContext.create(source, destination))
+
+        then:
+        DataClass.findByNameAndDataModel(rootDataClassName, source)
+        DataClass.findByNameAndDataModel(rootDataClassName, destination)
+
+        DataElement.countByNameLike("DE MET-922%") == 50
+    }
+
     private static <E extends CatalogueElement> boolean verifyCloned(DataModel source, DataModel destination, E original, E clone) {
         assert clone
         assert clone.errors.errorCount == 0
