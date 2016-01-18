@@ -39,16 +39,16 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
                   </div>
                 </div>
               <label class="radio-inline">
-                <input ng-disabled="!create" type="radio" ng-model="subtype" name="subtype" id="pickSimpleType" value="dataType"> Simple
+                <input type="radio" ng-model="subtype" name="subtype" id="pickSimpleType" value="dataType"> Simple
               </label>
               <label class="radio-inline">
-                <input ng-disabled="!create" ng-model="subtype" type="radio"  name="subtype" id="pickEnumeratedType" value="enumeratedType"> Enumerated
+                <input ng-model="subtype" type="radio"  name="subtype" id="pickEnumeratedType" value="enumeratedType"> Enumerated
               </label>
               <label class="radio-inline">
-                <input ng-disabled="!create" ng-model="subtype" type="radio" name="subtype" id="pickPrimitiveType" value="primitiveType"> Primitive
+                <input ng-model="subtype" type="radio" name="subtype" id="pickPrimitiveType" value="primitiveType"> Primitive
               </label>
               <label class="radio-inline">
-                <input ng-disabled="!create" ng-model="subtype" type="radio" name="subtype" id="pickReferenceType" value="referenceType"> Reference
+                <input ng-model="subtype" type="radio" name="subtype" id="pickReferenceType" value="referenceType"> Reference
               </label>
               <div collapse="subtype != 'enumeratedType'">
                 <ordered-map-editor object="copy.enumerations" title="Enumerations" key-placeholder="Value" value-placeholder="Description"></ordered-map-editor>
@@ -87,7 +87,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
           if args.create
             $scope.subtype = args.create
           else if args.element and args.element.elementType
-            $scope.subtype = names.getPropertyNameFromType(args.element.elementType)
+            $scope.original.subtype = $scope.subtype = names.getPropertyNameFromType(args.element.elementType)
           else
             $scope.subtype = 'dataType'
 
@@ -126,6 +126,9 @@ x in ['apple', 'banana', 'cherry']
             $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or $scope.copy.modelCatalogueId != $scope.original.modelCatalogueId or not angular.equals($scope.original.enumerations ? {}, $scope.copy.enumerations ? {}) or not angular.equals($scope.original.dataModels ? {}, $scope.copy.dataModels ? {})
 
           $scope.beforeSave = ->
+            if $scope.original.subtype and $scope.original.subtype isnt $scope.subtype
+              $scope.copy.newType = $scope.subtype
+
             promise = $q.when {}
 
             if $scope.pending.dataModel and angular.isString($scope.pending.dataModel)
@@ -151,6 +154,13 @@ x in ['apple', 'banana', 'cherry']
               $scope.copy.measurementUnit = undefined
 
             promise
+
+          $scope.$watch 'subtype', ->
+            if $scope.original.subtype
+              if $scope.original.subtype isnt $scope.subtype
+                $scope.messages.warning "You have changed the subtype of the data element. New version will be created!"
+              else
+                $scope.messages.clearAllMessages()
 
         ]
 

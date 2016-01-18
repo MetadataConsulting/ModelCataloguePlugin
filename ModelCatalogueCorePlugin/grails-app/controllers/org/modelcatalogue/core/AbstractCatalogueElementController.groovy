@@ -532,9 +532,9 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         if (newVersion) {
             ModelCatalogueTypes newType = null
             if (params.newType) {
-                newType = ModelCatalogueTypes.getType(params.newType)
+                newType = ModelCatalogueTypes.values().find { it.toString() == params.newType }
             } else if(request.JSON?.newType) {
-                newType = ModelCatalogueTypes.getType(request.JSON?.newType)
+                newType = ModelCatalogueTypes.values().find { it.toString() == request.JSON?.newType }
             }
 
             // when draft version is created from the UI still just create plain draft ignoring dependencies

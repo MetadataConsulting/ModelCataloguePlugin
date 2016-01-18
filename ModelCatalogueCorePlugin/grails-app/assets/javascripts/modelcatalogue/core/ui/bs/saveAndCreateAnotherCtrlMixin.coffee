@@ -37,6 +37,7 @@ angular.module('mc.core.ui.bs.saveAndCreateAnotherCtrlMixin', []).controller 'sa
     if $scope.create
       promise = promise.then -> catalogueElementResource($scope.create).save($scope.copy)
     else
+      newVersion = newVersion or $scope.copy.newType?
       promise = promise.then -> catalogueElementResource($scope.copy.elementType).update($scope.copy, {newVersion: newVersion})
 
     promise.then (result) ->

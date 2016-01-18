@@ -241,9 +241,20 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
     void selectTab(String name) {
         check closeGrowlMessage gone
-        noStale({ $("li[data-tab-name='$name'] a") }) {
-            it.click()
+        5.times {
+            try {
+                noStale({ $("li[data-tab-name='$name'] a") }) {
+                    it.click()
+                }
+                waitFor { tabActive(name) }
+            } catch (e) {
+                if (it >= 4) {
+                    throw e
+                }
+            }
+
         }
+
     }
 
 
