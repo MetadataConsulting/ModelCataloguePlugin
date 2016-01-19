@@ -13,6 +13,8 @@ import org.obolibrary.oboformat.model.OBODoc
 @Log4j
 class OboLoader {
 
+    private static final String DEPRECATED_DATA_CLASS_NAME = 'Obsolete'
+
     final CatalogueBuilder builder
 
     private SimpleTemplateEngine engine = new SimpleTemplateEngine()
@@ -180,11 +182,15 @@ class OboLoader {
                     namespacesToClassifications[defaultNamespace] = name
                 }
 
+                boolean needsDeprecated = false
+
                 document.termFrames.eachWithIndex { Frame frame, i ->
                     log.info "[${(i + 1).toString().padLeft(6, '0')}/${document.termFrames.size().toString().padLeft(6, '0')}] Importing model ${frame.id}: ${frame.getClause('name')?.value}".toString()
 
 
-                    dataClass(getModelAttributes(frame, idTemplate)) {
+                    Map<String, Object> modelAttributes = getModelAttributes(frame, idTemplate)
+
+                    dataClass(modelAttributes) {
                         ext OBO_ID, frame.id
 
                         handleDefAndComment(frame)
@@ -197,7 +203,16 @@ class OboLoader {
                         handleIsA(frame, idTemplate, oboIdsToNames)
                         handleSynonym(frame)
                         handleReplacedBy(frame, idTemplate, oboIdsToNames)
+
+                        if (modelAttributes.status == deprecated) {
+                            needsDeprecated = true
+                            rel 'hierarchy' from dataClass called name,  DEPRECATED_DATA_CLASS_NAME
+                        }
                     }
+                }
+
+                if (needsDeprecated) {
+                    dataClass name: DEPRECATED_DATA_CLASS_NAME, status: deprecated
                 }
             }
             // TODO: find better way how to do this
