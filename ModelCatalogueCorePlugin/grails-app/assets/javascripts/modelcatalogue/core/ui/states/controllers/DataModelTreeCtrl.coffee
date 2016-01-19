@@ -1,12 +1,14 @@
 angular.module('mc.core.ui.states.controllers.DataModelTreeCtrl', ['ui.router', 'mc.util.ui']).controller('mc.core.ui.states.controllers.DataModelTreeCtrl', [
-  '$scope', 'currentDataModel', 'enhance', '$state' , 'names'
-  ($scope ,  currentDataModel ,  enhance ,  $state  ,  names) ->
+  '$scope', 'currentDataModel', 'lastSelectedElementHolder', 'enhance', '$state' , 'names'
+  ($scope ,  currentDataModel ,  lastSelectedElementHolder ,  enhance ,  $state  ,  names) ->
     $scope.currentDataModel = currentDataModel
     listEnhancer = enhance.getEnhancer('list')
     $scope.elementAsList = listEnhancer.createSingletonList(currentDataModel) if currentDataModel
 
     $scope.onTreeviewSelected = (element) ->
       return if not element
+
+      lastSelectedElementHolder.element = element
 
       if element.resource
         if element.getDataModelId() == currentDataModel?.id

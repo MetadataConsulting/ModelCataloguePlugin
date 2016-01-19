@@ -25,6 +25,8 @@ angular.module('mc.core.ui.states.mc', ['mc.core.ui.states.bs.mc.html', 'mc.core
 
           deferred.promise
         ]
+
+        lastSelectedElementHolder: -> {element: null}
     }
 
 ])

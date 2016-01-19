@@ -13,8 +13,15 @@ angular.module('mc.core.ui.states.mc.resource.show', ['mc.core.ui.states.control
           controller: 'mc.core.ui.states.controllers.ElementWithDataModelCtrl'
 
       resolve:
-        element: ['$stateParams','catalogueElementResource', ($stateParams, catalogueElementResource) ->
-          catalogueElementResource($stateParams.resource).get($stateParams.id)
+        element: [
+          '$stateParams','catalogueElementResource', 'lastSelectedElementHolder', 'names',
+          ($stateParams , catalogueElementResource ,  lastSelectedElementHolder ,  names) ->
+            if lastSelectedElementHolder.element \
+              and "#{lastSelectedElementHolder.element.id}" == "#{$stateParams.id}" \
+              and $stateParams.resource == names.getPropertyNameFromType(lastSelectedElementHolder.element.elementType)
+                return lastSelectedElementHolder.element
+
+            catalogueElementResource($stateParams.resource).get($stateParams.id)
         ]
     }
 
