@@ -143,6 +143,8 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
 
             semver = "rev#{versionNumber}" unless semver
 
+            return "#{@latestVersionId}@#{semver}" if @isInstanceOf('dataModel')
+
             return "#{ret} #{@latestVersionId}@#{semver}"
 
 
@@ -163,6 +165,8 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
               semver = '0.0.0'
 
             semver = "rev#{versionNumber}" unless semver
+
+            return semver if @isInstanceOf('dataModel')
 
             return "#{ret} #{semver}"
 

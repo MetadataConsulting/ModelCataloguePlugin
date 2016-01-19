@@ -51,31 +51,32 @@ angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingl
 
       actionsScope = $scope.scope ? $scope.$parent
 
-      for action in actions.getActions(actionsScope, $scope.role)
-        watches = []
-        hasActions = hasActions || true
-        newScope = $scope.$new()
-        newScope.action = action
+      for role in ($scope.role ? 'item').split(',')
+        for action in actions.getActions(actionsScope, role)
+          watches = []
+          hasActions = hasActions || true
+          newScope = $scope.$new()
+          newScope.action = action
 
-        scopes.push newScope
+          scopes.push newScope
 
-        if angular.isArray(action.watches)
-          watches = action.watches
-        else if action.watches
-          watches.push action.watches
+          if angular.isArray(action.watches)
+            watches = action.watches
+          else if action.watches
+            watches.push action.watches
 
-        watches = collectWatchers(action)
+          watches = collectWatchers(action)
 
-        $element.append($compile(getTemplate(action))(newScope))
+          $element.append($compile(getTemplate(action))(newScope))
 
-        if watches.length > 0
-          $scope.$$actionWatcherToBeRemoved.push(actionsScope.$watchGroup(watches, (newValue, oldValue) ->
-            if angular.equals(newValue, oldValue)
-              return
-            updateActions()
-          ))
-          newScope.$on '$destroy', ->
-            removeWatchers($scope)
+          if watches.length > 0
+            $scope.$$actionWatcherToBeRemoved.push(actionsScope.$watchGroup(watches, (newValue, oldValue) ->
+              if angular.equals(newValue, oldValue)
+                return
+              updateActions()
+            ))
+            newScope.$on '$destroy', ->
+              removeWatchers($scope)
 
 
       if not hasActions and $scope.noActions

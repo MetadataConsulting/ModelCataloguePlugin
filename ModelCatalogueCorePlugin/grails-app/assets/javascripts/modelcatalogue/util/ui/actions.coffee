@@ -8,6 +8,7 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
     ROLE_NAVIGATION_RIGHT:        'navigation-right'
     ROLE_LIST_ACTION:             'list'
     ROLE_ITEM_ACTION:             'item'
+    ROLE_ITEM_DETAIL_ACTION:      'item-detail'
     ROLE_MODAL_ACTION:            'modal'
     ROLE_LIST_HEADER_ACTION:      'header'
     ROLE_LIST_FOOTER_ACTION:      'footer'
@@ -137,6 +138,7 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
       ROLE_NAVIGATION_RIGHT:        actionsProvider.ROLE_NAVIGATION_RIGHT
       ROLE_LIST_ACTION:             actionsProvider.ROLE_LIST_ACTION
       ROLE_ITEM_ACTION:             actionsProvider.ROLE_ITEM_ACTION
+      ROLE_ITEM_DETAIL_ACTION:      actionsProvider.ROLE_ITEM_DETAIL_ACTION
       ROLE_MODAL_ACTION:            actionsProvider.ROLE_MODAL_ACTION
       ROLE_LIST_HEADER_ACTION:      actionsProvider.ROLE_LIST_HEADER_ACTION
       ROLE_LIST_FOOTER_ACTION:      actionsProvider.ROLE_LIST_FOOTER_ACTION

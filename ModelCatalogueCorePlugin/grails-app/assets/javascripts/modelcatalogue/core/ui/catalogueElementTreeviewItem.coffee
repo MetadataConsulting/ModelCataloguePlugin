@@ -147,7 +147,11 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
           $scope.descendFun(null, $scope.extraParameters).then(loadNewChildren).then ->
             $scope.element.$$loadingChildren = false
 
+        if $scope.extraParameters?.root
+          $scope.element.$$loadChildren()
+
       $scope.collapseOrExpand = ->
+        return if $scope.extraParameters?.root
         return if $scope.element.$$loadingChildren
         unless $scope.element.$$collapsed
           $scope.element.$$collapsed = true

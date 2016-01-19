@@ -55,11 +55,11 @@ angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSa
                 <td class="actions-cell col-md-12" colspan="{{columns.length}}">
                   <div class="text-right" ng-if="row.element.relation" ng-init="element = row.element.relation">
                     <span class="pull-left text-muted"><em>Actions for {{row.element.relation.getElementTypeName()}}</em></span>
-                    <contextual-actions size="sm" no-colors="true" role="item" no-actions="true"></contextual-actions>
+                    <contextual-actions size="sm" no-colors="true" role="item-detail,item" no-actions="true"></contextual-actions>
                   </div>
                   <div class="text-right" ng-init="element = row.element">
                     <span class="pull-left text-muted"><em>Actions for {{row.element.getElementTypeName()}}</em></span>
-                    <contextual-actions size="sm" no-colors="true" role="item" no-actions="true"></contextual-actions>
+                    <contextual-actions size="sm" no-colors="true" role="item-detail,item" no-actions="true"></contextual-actions>
                   </div>
                   <blockquote ng-if="row.element.description || row.element.relation.description" class="preserve-new-lines" ng-bind-html="row.element.description || row.element.relation.description"></blockquote>
                   <div class="infinite-row-additional-info">

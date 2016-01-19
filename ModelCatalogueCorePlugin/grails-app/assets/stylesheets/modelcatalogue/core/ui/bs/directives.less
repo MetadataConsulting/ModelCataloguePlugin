@@ -322,7 +322,7 @@ a div.panel-footer, .with-pointer {
 
 .infinite-scroll-item:hover .panel-actions {
   display: block;
-  postion: absolute;
+  position: absolute;
   padding: 0 10px;
   top: 50px;
   float: right;
@@ -573,12 +573,6 @@ tr.inherited, .catalogue-element-treeview-text-content.inherited {
   padding-right: 15px;
 }
 
-.split-view-left {
-  border-right: 1px solid lightgrey;
-  border-bottom: 1px solid lightgrey;
-  border-bottom-right-radius: 7px;
-}
-
 .catalogue-element-view {
   blockquote {
     font-size: small;
@@ -644,6 +638,67 @@ tr.inherited, .catalogue-element-treeview-text-content.inherited {
 .navbar-dropdown-heading {
   font-style: italic;
 }
+
+.data-model-treeview-pane {
+  padding-top: 15px;
+  @media (min-width: 768px) {
+    position: fixed!important;
+    top: 50px;
+    bottom: 0;
+    left: 0;
+    width: 30%;
+    border-right: 1px solid lightgrey;
+    .split-view-content {
+      height: 100%;
+
+      .catalogue-element-treeview-list-container {
+        height: 100%;
+
+        .catalogue-element-treeview-list-root {
+          height: 100%;
+        }
+
+      }
+
+    }
+  }
+  @media (max-width: 767px) {
+    border: 1px solid lightgrey;
+    border-radius: 5px;
+    left: 15px;
+    top: 10px;
+  }
+}
+
+.data-model-detail-pane {
+  @media (min-width: 768px) {
+    margin-left: 30%;
+    width: 70%;
+  }
+  width: 100%;
+  margin-left: 0;
+}
+
+.catalogue-element-detail-actions {
+  float: right;
+  margin-top: 5px;
+}
+
+.catalogue-element-detail-model-catalogue-id {
+
+}
+
+.catalogue-element-detail-description {
+  white-space: pre-line;
+  background-color: whitesmoke;
+  padding: 10px;
+  border-style: solid;
+  border-color: lightgrey;
+  border-width: 1px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
 
 
 

@@ -42,40 +42,41 @@ angular.module('mc.util.ui.contextualMenu', ['mc.util.ui.bs.menuItemDropdown','m
       scopes = []
 
       $element.empty()
-      for action in actions.getActions($scope.scope ? $scope.$parent, $scope.role ? actions.ROLE_NAVIGATION)
-        if action.children
-          for child in action.children
-            childClasses = []
-            childClasses.push 'text-muted navbar-dropdown-heading' if child.heading
-            childClasses.push 'active' if child.active
-            childClasses.push 'disabled' if child.disabled
+      for role in ($scope.role ? actions.ROLE_NAVIGATION).split(',')
+        for action in actions.getActions($scope.scope ? $scope.$parent, role)
+          if action.children
+            for child in action.children
+              childClasses = []
+              childClasses.push 'text-muted navbar-dropdown-heading' if child.heading
+              childClasses.push 'active' if child.active
+              childClasses.push 'disabled' if child.disabled
 
-            child.$$class = childClasses.join ' '
+              child.$$class = childClasses.join ' '
 
-        classes = []
-        classes.push('active') if action.active
-        classes.push('disabled') if action.disabled
-        classes.push('icon-only') if action.iconOnly
+          classes = []
+          classes.push('active') if action.active
+          classes.push('disabled') if action.disabled
+          classes.push('icon-only') if action.iconOnly
 
-        action.$$class = classes.join(' ')
+          action.$$class = classes.join(' ')
 
-        newScope = $scope.$new()
-        newScope.action = action
+          newScope = $scope.$new()
+          newScope.action = action
 
-        scopes.push newScope
+          scopes.push newScope
 
-        watches = collectWatchers(action)
+          watches = collectWatchers(action)
 
-        $element.append($compile(getTemplate(action))(newScope))
+          $element.append($compile(getTemplate(action))(newScope))
 
-        if watches.length > 0
-          $scope.$$actionWatcherToBeRemoved.push($scope.$watchGroup(watches, (newValue, oldValue) ->
-            if angular.equals(newValue, oldValue)
-              return
-            updateActions()
-          ))
-          newScope.$on '$destroy', ->
-            removeWatchers($scope)
+          if watches.length > 0
+            $scope.$$actionWatcherToBeRemoved.push($scope.$watchGroup(watches, (newValue, oldValue) ->
+              if angular.equals(newValue, oldValue)
+                return
+              updateActions()
+            ))
+            newScope.$on '$destroy', ->
+              removeWatchers($scope)
 
     updateActions()
 

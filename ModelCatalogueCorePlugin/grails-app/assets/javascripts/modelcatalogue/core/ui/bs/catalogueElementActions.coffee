@@ -27,7 +27,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     }
   ]
 
-  actionsProvider.registerActionInRoles 'edit-catalogue-element',[actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
+  actionsProvider.registerActionInRoles 'edit-catalogue-element',[actionsProvider.ROLE_ITEM_DETAIL_ACTION], ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
     return undefined if not angular.isFunction $scope.element.getResourceName

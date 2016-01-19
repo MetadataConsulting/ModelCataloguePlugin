@@ -150,7 +150,7 @@
 
                 <div class="navbar-collapse collapse">
                     <div ui-view="navbar-left">
-                        <contextual-menu></contextual-menu>
+                        <contextual-menu role="navigation"></contextual-menu>
                     </div>
                     <div ui-view="navbar-right">
                         <contextual-menu role="navigation-right" right="true"></contextual-menu>

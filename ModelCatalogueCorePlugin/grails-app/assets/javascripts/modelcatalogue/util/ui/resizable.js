@@ -43,14 +43,17 @@
                             var windowWidth = jQuery($window).width();
 
                             if (!opts.breakWidth || !opts.mirror) {
+                                element.removeClass('narrow-screen');
                                 return false;
                             }
                             if (windowWidth > opts.breakWidth) {
+                                element.removeClass('narrow-screen');
                                 return false;
                             }
 
                             jQuery(opts.mirror).width(windowWidth - (opts.windowWidthCorrection ? opts.windowWidthCorrection : 1));
                             element.width(windowWidth - (opts.windowWidthCorrection ? opts.windowWidthCorrection : 1));
+                            element.addClass('narrow-screen');
                             return true;
                         };
 
@@ -87,6 +90,7 @@
                                 newWidth = jQuery(opts.mirror).data('resizestartwidth') + delta - 1;
 
                                 jQuery(opts.mirror).width(newWidth);
+                                jQuery(opts.mirror).offset({left: ui.size.width});
 
                                 $rootScope.$broadcast('infiniteTableRedraw');
 
@@ -115,6 +119,7 @@
                                 newWidth = parentWidth - elementWidth - (opts.parentWidthCorrection ? opts.parentWidthCorrection : 1);
 
                                 jQuery(opts.mirror).width(newWidth);
+                                jQuery(opts.mirror).offset({left: elementWidth})
                             })
                         }
                     }
