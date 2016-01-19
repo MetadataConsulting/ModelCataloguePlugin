@@ -306,6 +306,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "create relationship"() {
         check backdrop gone
+        check closeGrowlMessage gone
 
         when: "create relationship action is clicked"
         click createRelationship
@@ -338,6 +339,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "create relationship from footer action"() {
         check backdrop gone
+        check closeGrowlMessage gone
 
         when: "related to tab selected"
         selectTab('relatedTo')
