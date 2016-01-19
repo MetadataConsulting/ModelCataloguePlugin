@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurper
+
 // config
 grails.logging.jul.usebridge = false
 grails.serverURL =  "http://${System.getenv('VIRTUAL_HOST') ?: System.getenv('METADATA_HOST') ?: System.getenv('DOCKER_MACHINE_IP') ?: new URL("http://checkip.amazonaws.com").text.trim()}"
@@ -71,3 +73,36 @@ if (System.getenv("MC_DB_MIGRATE")) {
     grails.plugin.databasemigration.updateOnStart=true
     grails.plugin.databasemigration.updateOnStartFileNames=["changelog.groovy"]
 }
+
+if (System.getenv("MC_USE_LOCAL_STORAGE")) {
+    // you can e.g. create separate container just for database migration
+    mc.storage.directory="${System.properties['catalina.base']}/storage"
+} else {
+    mc.storage.directory = null
+}
+
+if (System.getenv("MC_MAIL_HOST")) {
+    grails {
+        mail {
+            host = System.getenv("MC_MAIL_HOST")
+
+            if (System.getenv("MC_MAIL_PORT")) {
+                port = System.getenv("MC_MAIL_PORT") as Integer
+            }
+
+            if (System.getenv("MC_MAIL_USERNAME")) {
+                username = System.getenv("MC_MAIL_USERNAME")
+            }
+
+            if (System.getenv("MC_MAIL_PASSWORD")) {
+                password = System.getenv("MC_MAIL_PASSWORD")
+            }
+
+            if (System.getenv("MC_MAIL_PROPS")) {
+                props = new JsonSlurper().parseText(System.getenv("MC_MAIL_PROPS"))
+            }
+
+        }
+    }
+}
+

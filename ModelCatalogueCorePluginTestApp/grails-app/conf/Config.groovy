@@ -78,6 +78,10 @@ grails.exceptionresolver.params.exclude = ['password', 'password1', 'password2',
 // configure auto-caching of queries by default (if false you can documentCache individual queries with 'documentCache: true')
 grails.hibernate.cache.queries = false
 
+// configure the default storage
+mc.storage.directory = "/tmp/mc/storage"
+mc.storage.maxSize = 50 * 1024 * 1024
+
 environments {
     development {
         grails.logging.jul.usebridge = true
@@ -243,9 +247,6 @@ log4j.main = {
 }
 grails.views.gsp.encoding = "UTF-8"
 
-// configure the default storage
-modelcatalogue.storage.directory = "/tmp/modelcatalogue/storage"
-modelcatalogue.storage.maxSize = 50 * 1024 * 1024
 // Added by the Spring Security Core plugin:
 grails.plugin.springsecurity.userLookup.userDomainClassName = 'org.modelcatalogue.core.security.User'
 grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'org.modelcatalogue.core.security.UserRole'
