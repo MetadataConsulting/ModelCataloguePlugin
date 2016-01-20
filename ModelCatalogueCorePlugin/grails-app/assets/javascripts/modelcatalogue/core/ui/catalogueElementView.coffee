@@ -9,7 +9,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
-    controller: ['$scope', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'security', 'catalogueElementProperties', '$injector', 'applicationTitle', 'catalogue', ($scope, $filter, $q, $state, enhance, names, columns, messages, $rootScope, security, catalogueElementProperties, $injector, applicationTitle, catalogue) ->
+    controller: ['$scope', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'security', 'catalogueElementProperties', '$injector', 'applicationTitle', 'catalogue', 'detailSections', ($scope, $filter, $q, $state, enhance, names, columns, messages, $rootScope, security, catalogueElementProperties, $injector, applicationTitle, catalogue, detailSections) ->
       getTabDefinition = (element, name, value) ->
         possibilities = ["#{element.elementType}.#{name}"]
         if enhance.isEnhanced(value)
@@ -140,7 +140,8 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
         tabDefinition = getTabDefinition element, 'properties', undefined
 
-        unless not tabDefinition or not tabDefinition.name or not tabDefinition.hidden
+        propertyConfiguration = catalogueElementProperties.getConfigurationFor("#{element.elementType}.properties")
+        unless not tabDefinition or not tabDefinition.name or propertyConfiguration.hidden(security)
           if 'properties' == $scope.property
             tabDefinition.active = true
             $scope.$broadcast 'infiniteTableRedraw'
@@ -169,11 +170,14 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
         $scope.tabs = tabs
         $scope.showTabs = showTabs
+        $scope.detailSections = detailSections.getAvailableViews($scope.element)
 
       $scope.getDeprecationWarning = ->
         return catalogue.getDeprecationWarning($scope.element.elementType)($scope.element) if $scope.element and $scope.element.elementType
 
       $scope.tabs   = []
+      $scope.negativeDetailSections = []
+      $scope.detailSections = []
       $scope.select = (tab) ->
         $scope.property = tab.name
         $scope.$broadcast 'infiniteTableRedraw'

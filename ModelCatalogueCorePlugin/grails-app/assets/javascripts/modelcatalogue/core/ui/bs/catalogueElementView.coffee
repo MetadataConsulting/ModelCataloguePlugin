@@ -110,10 +110,9 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
         <div class="col-md-12">
           <div class="catalogue-element-detail-actions"><contextual-actions icon-only="true" role="item-detail" size="xs" no-colors="true"></contextual-actions></div>
           <h3 class="ce-name"><small ng-class="element.getIcon()" title="{{element.getElementTypeName()}}"></small> <span class="text-danger fa fa-fw fa-warning" ng-if="getDeprecationWarning()" title="{{getDeprecationWarning()}}"></span> {{element.name}} <small><span class="label" ng-class="{'label-warning': element.getDataModelStatus() == 'DRAFT', 'label-info': element.getDataModelStatus() == 'PENDING', 'label-primary': element.getDataModelStatus() == 'FINALIZED', 'label-danger': element.getDataModelStatus() == 'DEPRECATED'}">{{element.getDataModelWithVersion()}}</span></small></h3>
-          <div class="catalogue-element-detail-model-catalogue-id">
-            <strong>Model Catalogue ID:</strong> <a ng-href="element.internalModelCatalogueId">{{element.internalModelCatalogueId}}</a>
+          <div class="row" ng-repeat="view in detailSections">
+            <ng-include src="view.getTemplate()"></ng-include>
           </div>
-          <div class="catalogue-element-detail-description" ng-show="element.description" ng-bind-html="'' + element.description| linky:'_blank'"></div>
           <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" ng-repeat="tab in tabs" ng-class="{active: tab.active}" data-tab-name="{{tab.name}}"><a ng-click="select(tab)"><span  ng-class="{'text-muted': tab.type == 'decorated-list' &amp;&amp; tab.value.total == 0}">{{tab.heading}}</span><span ng-show="tab.value.total"> <span class="badge tab-value-total" ng-if="tab.value.total != 2147483647">{{tab.value.total}}</span><span class="badge tab-value-total" ng-if="tab.value.total == 2147483647"><span class="fa fa-question fa-inverse"</span></span></a></li>
           </ul>

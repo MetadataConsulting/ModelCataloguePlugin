@@ -7,6 +7,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
 
       dialog = $modal.open {
         windowClass: 'basic-edit-modal-prompt'
+        size: 'lg'
         template: '''
          <div class="modal-header">
             <h4>''' + title + '''</h4>

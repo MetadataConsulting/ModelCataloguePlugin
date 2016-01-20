@@ -74,6 +74,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.orderedMapEditor'
   'mc.core.ui.bs.metadataEditors'
   'mc.core.ui.bs.metadataEditor'
+  'mc.core.ui.bs.detailSections'
   'mc.core.ui.bs.navigationRightActions'
   'mc.core.ui.bs.modalOptions'
 ]).run ['messages', (messages) ->

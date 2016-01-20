@@ -7,6 +7,7 @@ angular.module('mc.core.ui.bs.modalPromptModel', ['mc.util.messages']).config ['
 
       dialog = $modal.open {
         windowClass: 'basic-edit-modal-prompt'
+        size: 'lg'
         resolve:
           args: -> args
         template: '''

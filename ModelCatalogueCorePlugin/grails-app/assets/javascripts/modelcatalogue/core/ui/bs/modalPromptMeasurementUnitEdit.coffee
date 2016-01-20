@@ -7,6 +7,7 @@ angular.module('mc.core.ui.bs.modalPromptMeasurementUnitEdit', ['mc.util.message
 
       dialog = $modal.open {
         windowClass: 'basic-edit-modal-prompt'
+        size: 'lg'
         template: '''
          <div class="modal-header">
             <h4>''' + title + '''</h4>

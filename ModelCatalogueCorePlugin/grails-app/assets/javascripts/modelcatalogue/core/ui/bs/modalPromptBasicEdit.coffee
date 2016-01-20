@@ -7,6 +7,7 @@ angular.module('mc.core.ui.bs.modalPromptBasicEdit', ['mc.util.messages', 'mc.co
 
       dialog = $modal.open {
         windowClass: 'basic-edit-modal-prompt'
+        size: 'lg'
         template: '''
          <div class="modal-header">
             <h4>''' + title + '''</h4>
@@ -26,6 +27,8 @@ angular.module('mc.core.ui.bs.modalPromptBasicEdit', ['mc.util.messages', 'mc.co
                 <label for="description" class="">Description</label>
                 <textarea rows="10" ng-model="copy.description" placeholder="Description" class="form-control" id="description"></textarea>
               </div>
+              <h4>Metadata</h4>
+              <metadata-editor object="copy.ext" title="Key" value-title="Value" owner="element"></metadata-editor>
               <fake-submit-button/>
             </form>
         </div>

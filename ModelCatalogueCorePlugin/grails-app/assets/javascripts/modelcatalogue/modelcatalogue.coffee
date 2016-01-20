@@ -7,6 +7,7 @@
 #= require angular-ui-router/release/angular-ui-router
 #= require google-diff-match-patch/javascript/diff_match_patch
 #= require angular-diff-match-patch.js
+#= require angular-xeditable/dist/js/xeditable
 
 #= require_self
 #= require_full_tree .
@@ -20,6 +21,7 @@ modules = [
   'ui.bootstrap'
   'angular-loading-bar'
   'ngAnimate'
+  'xeditable'
 ]
 
 modelcatalogue =

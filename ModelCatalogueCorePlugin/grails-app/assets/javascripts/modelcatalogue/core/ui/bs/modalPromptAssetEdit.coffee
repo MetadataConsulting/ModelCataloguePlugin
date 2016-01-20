@@ -9,6 +9,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'ngFil
         windowClass: 'basic-edit-modal-prompt'
         backdrop: 'static'
         keyboard: false
+        size: 'lg'
         resolve:
           args: -> args
         template: '''

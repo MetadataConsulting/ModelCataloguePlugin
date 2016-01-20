@@ -180,6 +180,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataModel.isSynonymFor', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataModel.activity', active: true
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataModel.properties', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataModel.ext', hidden: true
 
   catalogueElementPropertiesProvider.configureProperty 'relationships', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'content', hidden: true
