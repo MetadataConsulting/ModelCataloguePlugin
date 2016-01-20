@@ -49,7 +49,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         }
 
         waitFor {
-            title == dataModelName
+            title == "Activity of $dataModelName".toString()
         }
 
         return new DataModelNavigator(this)

@@ -43,6 +43,8 @@ describe "mc.util.ui.bs.contextualActions", ->
 
     expect($rootScope.element.name).toBe('The Element')
 
+    console.log element
+
     element.find('button:first-child').click()
 
     expect($rootScope.element.name).toBe('The Earth Element')

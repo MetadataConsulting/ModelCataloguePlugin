@@ -37,4 +37,4 @@ describe "mc.core.ui.catalogueElementTreeview", ->
 
     console.log element.find('li')
 
-    expect(element.find('li').length).toBe(3)
+    expect(element.find('li').length).toBe(2)
