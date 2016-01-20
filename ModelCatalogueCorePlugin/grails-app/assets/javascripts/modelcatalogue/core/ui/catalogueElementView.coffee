@@ -225,7 +225,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         messages.error reason
 
       $scope.supportsInlineEdit = (editableForm) ->
-        return editableForm and $scope.element?.isInstanceOf('dataModel') and $scope.element?.status == 'DRAFT'
+        return security.hasRole('CURATOR') and editableForm and $scope.element?.isInstanceOf('dataModel') and $scope.element?.status == 'DRAFT'
 
       $scope.inlineUpdateElement = ->
         deferred = $q.defer()

@@ -39,10 +39,11 @@ angular.module('mc.core.ui.bs.statesActions', ['mc.util.ui.actions']).config ['a
     action
   ]
 
-  actionsProvider.registerChildActionInRole 'change-element-state', 'create-new-version', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'security', ($rootScope, $scope, messages, security) ->
+  newVersionAction = ['$rootScope','$scope', 'messages', 'security', ($rootScope, $scope, messages, security) ->
     return undefined if not $scope.element
     return undefined if not $scope.element.status
     return undefined if not security.hasRole('CURATOR')
+    return undefined if $scope.element.status == 'DRAFT'
 
 
 
@@ -57,6 +58,10 @@ angular.module('mc.core.ui.bs.statesActions', ['mc.util.ui.actions']).config ['a
         messages.prompt(null, null, type: 'new-version', element: $scope.element)
     }
   ]
+
+
+  actionsProvider.registerChildActionInRole 'change-element-state', 'create-new-version', actionsProvider.ROLE_ITEM_ACTION, newVersionAction
+  actionsProvider.registerActionInRole 'create-new-version-tiny', actionsProvider.ROLE_ITEM_DETAIL_ACTION, newVersionAction
 
   actionsProvider.registerChildActionInRole 'change-element-state', 'finalize', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'security', ($rootScope, $scope, messages, security) ->
     return undefined if not $scope.element

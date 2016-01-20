@@ -34,6 +34,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not messages.hasPromptFactory('create-' + $scope.element.getResourceName()) and not messages.hasPromptFactory('edit-' + $scope.element.getResourceName())
     return undefined if not security.hasRole('CURATOR')
     return undefined if angular.isFunction($scope.supportsInlineEdit) and $scope.supportsInlineEdit($scope.editableForm)
+    return undefined if $scope.element.isInstanceOf('dataModel') and $scope.element.status != 'DRAFT'
 
     {
       position:   -1000
