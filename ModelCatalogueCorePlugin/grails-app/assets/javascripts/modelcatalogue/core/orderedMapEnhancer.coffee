@@ -62,6 +62,45 @@ angular.module('mc.core.orderedMapEnhancer', ['mc.util.enhance']).config ['enhan
           @values = [{key: ''}]
       orderedMap
 
+      orderedMap.remove = (key) ->
+        if angular.isNumber(key)
+          @values.splice(key, 1)
+          @addPlaceholderIfEmpty()
+          return
+
+        indexOf = -1
+        for value, index in @values
+          if value.key == key
+            indexOf = index
+            break
+
+        @remove(indexOf) if indexOf >= 0
+
+
+      orderedMap.asMap = ->
+        ret = {}
+
+        for value in @values
+          ret[value.key] = value.value
+
+        return ret
+
+      orderedMap.updateFrom = (map) ->
+        return orderedMap if not map
+
+        if condition(map)
+          for value in map.values
+            @access(value.key).set(value.value)
+          return orderedMap
+
+        for key, value of map
+          @access(key).set(value)
+
+        return orderedMap
+
+      orderedMap
+
+
 
     orderedMapEnhancer.emptyOrderedMap = -> enhance orderedMapEnhancer({
       type: 'orderedMap'

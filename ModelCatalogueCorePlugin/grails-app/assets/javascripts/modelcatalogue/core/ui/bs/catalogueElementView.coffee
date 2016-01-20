@@ -108,20 +108,31 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
     <div class="row catalogue-element-view">
       <div ng-if="!displayOnly">
         <div class="col-md-12">
-          <div class="catalogue-element-detail-actions"><contextual-actions icon-only="true" role="item-detail" size="xs" no-colors="true"></contextual-actions></div>
-          <h3 class="ce-name"><small ng-class="element.getIcon()" title="{{element.getElementTypeName()}}"></small> <span class="text-danger fa fa-fw fa-warning" ng-if="getDeprecationWarning()" title="{{getDeprecationWarning()}}"></span> {{element.name}} <small><span class="label" ng-class="{'label-warning': element.getDataModelStatus() == 'DRAFT', 'label-info': element.getDataModelStatus() == 'PENDING', 'label-primary': element.getDataModelStatus() == 'FINALIZED', 'label-danger': element.getDataModelStatus() == 'DEPRECATED'}">{{element.getDataModelWithVersion()}}</span></small></h3>
-          <div class="row" ng-repeat="view in detailSections">
-            <ng-include src="view.getTemplate()"></ng-include>
-          </div>
-          <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" ng-repeat="tab in tabs" ng-class="{active: tab.active}" data-tab-name="{{tab.name}}"><a ng-click="select(tab)"><span  ng-class="{'text-muted': tab.type == 'decorated-list' &amp;&amp; tab.value.total == 0}">{{tab.heading}}</span><span ng-show="tab.value.total"> <span class="badge tab-value-total" ng-if="tab.value.total != 2147483647">{{tab.value.total}}</span><span class="badge tab-value-total" ng-if="tab.value.total == 2147483647"><span class="fa fa-question fa-inverse"</span></span></a></li>
-          </ul>
-
-          <div ng-repeat="tab in tabs" class="tab-pane">
-            <div  id="{{tab.name}}-tab" class="cev-tab-content" ng-if="tab.active">
-              <ng-include src="'modelcatalogue/core/ui/catalogueElementView/' + tab.type + '.html'"></ng-include>
+          <form editable-form name="editableForm" onaftersave="inlineUpdateElement()">
+            <div class="catalogue-element-detail-actions">
+              <contextual-actions icon-only="true" role="item-detail" size="xs" no-colors="true">
+                  <a class="btn btn-xs btn-default" ng-click="editableForm.$show()" ng-if="supportsInlineEdit(editableForm) && !editableForm.$visible"><span class="fa fa-edit"></span></a>
+                  <button type="submit" class="btn btn-xs btn-success" ng-if="supportsInlineEdit(editableForm) && editableForm.$visible"><span class="fa fa-check"></span></button>
+                  <a class="btn btn-xs btn-warning" ng-click="editableForm.$cancel()" ng-if="supportsInlineEdit(editableForm) && editableForm.$visible"><span class="fa fa-ban"></span></a>
+              </contextual-actions>
             </div>
-          </div>
+            <h3 class="ce-name"><small ng-class="element.getIcon()" title="{{element.getElementTypeName()}}"></small> <span class="text-danger fa fa-fw fa-warning" ng-if="getDeprecationWarning()" title="{{getDeprecationWarning()}}"></span> <span editable-text="copy.name" e-name="name">{{element.name}}</span> <small><span class="label" ng-class="{'label-warning': element.getDataModelStatus() == 'DRAFT', 'label-info': element.getDataModelStatus() == 'PENDING', 'label-primary': element.getDataModelStatus() == 'FINALIZED', 'label-danger': element.getDataModelStatus() == 'DEPRECATED'}">{{element.getDataModelWithVersion()}}</span></small></h3>
+            <messages-panel messages="messages"></messages-panel>
+            <div class="row detail-section" ng-repeat="view in detailSections">
+              <p ng-if="view.getTitle()" class="text-center detail-section-title small"><span class="title">{{view.getTitle()}}</span></p>
+              <ng-include src="view.getTemplate()"></ng-include>
+            </div>
+
+            <ul class="nav nav-tabs" role="tablist">
+              <li role="presentation" ng-repeat="tab in tabs" ng-class="{active: tab.active}" data-tab-name="{{tab.name}}"><a ng-click="select(tab)"><span  ng-class="{'text-muted': tab.type == 'decorated-list' &amp;&amp; tab.value.total == 0}">{{tab.heading}}</span><span ng-show="tab.value.total"> <span class="badge tab-value-total" ng-if="tab.value.total != 2147483647">{{tab.value.total}}</span><span class="badge tab-value-total" ng-if="tab.value.total == 2147483647"><span class="fa fa-question fa-inverse"</span></span></a></li>
+            </ul>
+
+            <div ng-repeat="tab in tabs" class="tab-pane">
+              <div  id="{{tab.name}}-tab" class="cev-tab-content" ng-if="tab.active">
+                <ng-include src="'modelcatalogue/core/ui/catalogueElementView/' + tab.type + '.html'"></ng-include>
+              </div>
+            </div>
+          </form>
         </div>
       </div>
       <div ng-if="displayOnly">

@@ -10,9 +10,10 @@ cetiModule.run [ '$templateCache', ($templateCache) ->
         <span class="catalogue-element-treeview-labels">
           <span ng-if="!element.elementType"><a class="catalogue-element-treeview-icon btn btn-link"><span class="fa fa-fw fa-ban"></span></a> No Data</span>
           <a ng-if="currentDescend &amp;&amp; element.elementType" class="catalogue-element-treeview-icon  btn btn-link" ng-click="select(element)">
-            <span class="fa fa-fw fa-caret-right text-muted"    ng-if="element.$$collapsed &amp;&amp; element.$$numberOfChildren &amp;&amp; !element.$$loadingChildren"></span>
-            <span class="fa fa-fw fa-caret-down text-muted"     ng-if="!element.$$collapsed &amp;&amp; element.$$numberOfChildren &amp;&amp; !element.$$loadingChildren"></span>
+            <span class="fa fa-fw fa-caret-right text-muted"    ng-if="!extraParameters.root &amp;&amp; element.$$collapsed &amp;&amp; element.$$numberOfChildren &amp;&amp; !element.$$loadingChildren"></span>
+            <span class="fa fa-fw fa-caret-down text-muted"     ng-if="!extraParameters.root &amp;&amp;!element.$$collapsed &amp;&amp; element.$$numberOfChildren &amp;&amp; !element.$$loadingChildren"></span>
             <span class="fa fa-fw fa-refresh text-muted"        ng-if="element.$$loadingChildren" ></span>
+            <span class="fa fa-fw text-muted"        ng-if="extraParameters.root" ></span>
             <span class="fa fa-fw"                              ng-if="!element.$$numberOfChildren && !element.$$loadingChildren"></span>
           </a>
           <a ng-if="!currentDescend &amp;&amp; element.elementType" class="catalogue-element-treeview-icon btn btn-link">

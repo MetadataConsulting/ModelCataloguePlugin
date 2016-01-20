@@ -33,11 +33,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not angular.isFunction $scope.element.getResourceName
     return undefined if not messages.hasPromptFactory('create-' + $scope.element.getResourceName()) and not messages.hasPromptFactory('edit-' + $scope.element.getResourceName())
     return undefined if not security.hasRole('CURATOR')
+    return undefined if angular.isFunction($scope.supportsInlineEdit) and $scope.supportsInlineEdit($scope.editableForm)
 
     {
       position:   -1000
       label:      'Edit'
-      icon:       'fa fa-fw fa-edit'
+      icon:       'fa fa-edit'
       type:       'primary'
       disabled:   $scope.element.archived or $scope.element?.status == 'FINALIZED'
       watches:    ['element.status', 'element.archived']

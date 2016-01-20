@@ -33,7 +33,7 @@ angular.module('mc.core.ui.bs.modalFinalize', ['mc.util.messages']).config ['mes
         '''
         controller: ['$rootScope', '$scope', 'messages', '$modalInstance', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, $modalInstance, enhance, rest, modelCatalogueApiRoot) ->
           $scope.semanticVersion = args.element.semanticVersion
-          $scope.revisionNotes = ''
+          $scope.revisionNotes = args.element.revisionNotes
           $scope.messages = messages.createNewMessages()
 
           $scope.$dismiss = $modalInstance.dismiss

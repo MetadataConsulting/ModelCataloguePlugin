@@ -108,6 +108,11 @@
 
         }]);
 
+        demoConfig.run(function(editableOptions, editableThemes) {
+            editableThemes.bs3.inputClass = 'input-xs';
+            editableThemes.bs3.buttonsClass = 'btn-sm';
+            editableOptions.theme = 'bs3';
+        });
 
         modelcatalogue.registerModule('demo.config');
 

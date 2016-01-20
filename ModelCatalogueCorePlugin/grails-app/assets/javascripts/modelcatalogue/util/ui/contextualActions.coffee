@@ -1,6 +1,7 @@
 angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingle','mc.util.ui.bs.actionButtonDropdown']).directive 'contextualActions',  ['$compile', '$templateCache', 'actions', ($compile, $templateCache, actions)-> {
   restrict: 'E'
   replace:  true
+  transclude: true
  scope:
     scope:      '=?'
     group:      '@'
@@ -13,7 +14,7 @@ angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingl
 
   templateUrl: 'modelcatalogue/util/ui/contextualActions.html'
 
-  link: ($scope, $element) ->
+  link: ($scope, $element, $attrs, $controller, $transcludeFn) ->
     getTemplate = (action) ->
       $templateCache.get(if action.children?.length or action.abstract then 'modelcatalogue/util/ui/actionButtonDropdown.html' else 'modelcatalogue/util/ui/actionButtonSingle.html')
 
@@ -78,6 +79,7 @@ angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingl
             newScope.$on '$destroy', ->
               removeWatchers($scope)
 
+      $element.append($transcludeFn())
 
       if not hasActions and $scope.noActions
         $element.append("""<em>No Actions</em>""")

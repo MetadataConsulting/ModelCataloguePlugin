@@ -9,7 +9,18 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
-    controller: ['$scope', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'security', 'catalogueElementProperties', '$injector', 'applicationTitle', 'catalogue', 'detailSections', ($scope, $filter, $q, $state, enhance, names, columns, messages, $rootScope, security, catalogueElementProperties, $injector, applicationTitle, catalogue, detailSections) ->
+    controller: [
+     '$scope', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'security', 'catalogueElementProperties', '$injector', 'applicationTitle', 'catalogue', 'catalogueElementResource', 'detailSections',
+     ($scope ,  $filter ,  $q ,  $state ,  enhance ,  names ,  columns ,  messages ,  $rootScope ,  security ,  catalogueElementProperties ,  $injector ,  applicationTitle ,  catalogue ,  catalogueElementResource ,  detailSections) ->
+      showErrorsUsingMessages = (messages) ->
+        (response) ->
+          if response?.data and response.data.errors
+            if angular.isString response.data.errors
+              messages.error response.data.errors
+            else
+              for err in response.data.errors
+                messages.error err.message
+
       getTabDefinition = (element, name, value) ->
         possibilities = ["#{element.elementType}.#{name}"]
         if enhance.isEnhanced(value)
@@ -29,6 +40,8 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
       $scope.property ?= $rootScope?.$stateParams?.property
       $scope.reports  = []
+      $scope.messages = messages.createNewMessages()
+
 
 
 
@@ -108,9 +121,29 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           nextState = if $state.includes 'mc' then 'mc.resource.show.property' else 'simple.resource.show.property'
           $state.go nextState, {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page, q: $state.params.q, dataModelId: $state.params.dataModelId}, options
 
-      onElementUpdate = (element, oldEl) ->
+      updateInlineEditHelperVariables = (element) ->
+        $scope.copy = angular.copy(element)
+        $scope.extAsMap = $scope.copy.ext.asMap()
+        $scope.detailSections = detailSections.getAvailableViews(element)
+        $scope.customMetadata = angular.copy($scope.copy.ext)
 
+        for section in $scope.detailSections
+          for key in (section.getKeys() ? [])
+            $scope.customMetadata.remove(key)
+
+        $scope.customMetadataKeys = []
+        for value in $scope.customMetadata.values
+          $scope.customMetadataKeys.push value.key
+
+
+        return
+
+
+
+      onElementUpdate = (element, oldEl) ->
         return if angular.equals element, oldEl
+
+        updateInlineEditHelperVariables element
 
         applicationTitle "#{element.getLabel()}" if angular.isFunction(element?.getLabel)
 
@@ -170,7 +203,6 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
         $scope.tabs = tabs
         $scope.showTabs = showTabs
-        $scope.detailSections = detailSections.getAvailableViews($scope.element)
 
       $scope.getDeprecationWarning = ->
         return catalogue.getDeprecationWarning($scope.element.elementType)($scope.element) if $scope.element and $scope.element.elementType
@@ -191,6 +223,31 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
       $scope.reorder = (tab, $row, $current) -> tab.loader.reorder($row.row.element, $current?.row?.element).catch (reason) ->
         messages.error reason
+
+      $scope.supportsInlineEdit = (editableForm) ->
+        return editableForm and $scope.element?.isInstanceOf('dataModel') and $scope.element?.status == 'DRAFT'
+
+      $scope.inlineUpdateElement = ->
+        deferred = $q.defer()
+        $scope.copy.ext.updateFrom($scope.extAsMap)
+
+        for key in $scope.customMetadataKeys
+          $scope.copy.ext.remove(key)
+
+        $scope.copy.ext.updateFrom($scope.customMetadata)
+
+        catalogueElementResource($scope.copy.elementType).update($scope.copy).then (updated) ->
+          $scope.element.updateFrom(updated)
+
+          updateInlineEditHelperVariables updated
+
+          deferred.resolve()
+          $scope.messages.clearAllMessages()
+        , (response) ->
+          showErrorsUsingMessages($scope.messages)(response)
+          deferred.resolve("Invalid values")
+
+        return deferred.promise
 
 
       refreshElement = ->
