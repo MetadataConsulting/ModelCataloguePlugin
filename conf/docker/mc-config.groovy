@@ -106,3 +106,15 @@ if (System.getenv("MC_MAIL_HOST")) {
     }
 }
 
+if (System.getenv("MC_NAME")) {
+    mc.name = System.getenv("MC_NAME")
+}
+
+if (System.getenv("MC_WELCOME_JUMBO")) {
+    mc.welcome.jumbo = System.getenv("MC_WELCOME_JUMBO")
+}
+
+if (System.getenv("MC_WELCOME_INFO")) {
+    mc.welcome.info = System.getenv("MC_WELCOME_INFO")
+}
+
