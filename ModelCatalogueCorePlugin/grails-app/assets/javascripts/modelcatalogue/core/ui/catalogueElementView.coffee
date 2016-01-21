@@ -123,9 +123,9 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
       updateInlineEditHelperVariables = (element) ->
         $scope.copy = angular.copy(element)
-        $scope.extAsMap = $scope.copy.ext.asMap()
         $scope.detailSections = detailSections.getAvailableViews(element)
-        $scope.customMetadata = angular.copy($scope.copy.ext)
+        $scope.extAsMap = $scope.copy.ext?.asMap() ? {values: []}
+        $scope.customMetadata = angular.copy($scope.copy?.ext ? {values: []})
 
         for section in $scope.detailSections
           for key in (section.getKeys() ? [])
@@ -229,12 +229,13 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
       $scope.inlineUpdateElement = ->
         deferred = $q.defer()
-        $scope.copy.ext.updateFrom($scope.extAsMap)
+        if $scope.copy.ext
+          $scope.copy.ext.updateFrom($scope.extAsMap)
 
-        for key in $scope.customMetadataKeys
-          $scope.copy.ext.remove(key)
+          for key in $scope.customMetadataKeys
+            $scope.copy.ext.remove(key)
 
-        $scope.copy.ext.updateFrom($scope.customMetadata)
+          $scope.copy.ext.updateFrom($scope.customMetadata)
 
         catalogueElementResource($scope.copy.elementType).update($scope.copy).then (updated) ->
           $scope.element.updateFrom(updated)

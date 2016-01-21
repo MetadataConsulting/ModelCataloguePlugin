@@ -58,20 +58,14 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         click stepFinish
 
         then:
-        check 'div.messages-panel span', text: "Data Model New Data Model created"
+        check '#summary' is "Data Model New Data Model created"
 
         when:
         click exitButton
         check closeGrowlMessage gone
 
         then:
-        check rightSideTitle is 'New Data Model New Data Model 0.0.1'
-
-        when:
-        selectTab 'imports'
-
-        then:
-        check tabTotal('imports') is '1'
+        check rightSideTitle is 'New Data Model 0.0.1'
     }
 
     def "finalize element"() {

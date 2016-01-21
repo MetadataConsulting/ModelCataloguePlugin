@@ -5,7 +5,9 @@ import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.pages.GlobalChangesPage
 import spock.lang.Stepwise
 
+import static org.modelcatalogue.core.geb.Common.create
 import static org.modelcatalogue.core.geb.Common.getCloseGrowlMessage
+import static org.modelcatalogue.core.geb.Common.save
 
 @Stepwise
 class ChangesSpec extends AbstractModelCatalogueGebSpec {
@@ -13,12 +15,13 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
     def "go to login"() {
         loginAdmin()
 
-        fastAction 'New Data Type'
+        select('Test 1') /'Data Types'
+
+        click create
 
         fill 'name' with "Data Type Change Test"
-        fill 'dataModel' with "Data Model Change Test"
 
-        click CatalogueAction.runLast('modal', 'modal-save-element')
+        click save
 
         expect:
         check 'div.modal' gone
