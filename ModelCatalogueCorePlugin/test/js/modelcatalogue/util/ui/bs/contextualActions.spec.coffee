@@ -4,7 +4,7 @@ describe "mc.util.ui.bs.contextualActions", ->
   beforeEach module 'mc.util.security'
 
   beforeEach module (actionsProvider) ->
-    actionsProvider.registerAction 'edit-catalogue-element-3', ['$scope', ($scope)->
+    actionsProvider.registerActionInRole 'edit-catalogue-element-3', actionsProvider.ROLE_ITEM_ACTION, ['$scope', ($scope)->
       {
         position:   100
         label:      'Edit'
@@ -31,7 +31,7 @@ describe "mc.util.ui.bs.contextualActions", ->
     $rootScope.element = {name: 'The Element'}
 
     element = $compile('''
-        <contextual-actions />
+        <contextual-actions role="item" />
       ''')($rootScope)
 
     $rootScope.$digest()

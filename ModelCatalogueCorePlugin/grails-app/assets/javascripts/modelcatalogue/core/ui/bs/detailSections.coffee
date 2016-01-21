@@ -81,7 +81,7 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       <div class="col-md-3">
           <strong class="small">Description</strong>
       </div>
-      <div class="col-md-9 preserve-new-lines"><small editable-textarea="copy.description" e-rows="5" e-cols="1000">{{element.description || 'empty'}}</small></div>
+      <div class="col-md-9 preserve-new-lines"><small editable-textarea="copy.description" e-rows="5" e-cols="1000" class="ce-description">{{element.description || 'empty'}}</small></div>
   '''
 ]
 
