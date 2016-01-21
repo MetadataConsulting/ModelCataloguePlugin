@@ -159,7 +159,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
           </div>
           <div ng-switch-when="summary" id="summary">
               <h4 ng-show="dataClass.name &amp;&amp; !finished">Creating new data class <strong>{{dataClass.name}}</strong></h4>
-              <h4 ng-show="dataClass.name &amp;&amp;  finished">Data Class <strong>{{dataClass.name}} created</strong></h4>
+              <h4 ng-show="dataClass.name &amp;&amp;  finished" class='wizard-summary'>Data Class <strong>{{dataClass.name}} created</strong></h4>
               <progressbar type="{{finished ? 'success' : 'primary'}}" value="pendingActionsCount == 0 ? 100 : Math.round(100 * (totalActions - pendingActionsCount) / totalActions)">{{totalActions - pendingActionsCount}} / {{totalActions}}</progressbar>
           </div>
         </div>

@@ -299,6 +299,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     void setExt(Map<String, String> ext) {
         ext = OrderedMap.fromJsonMap(ext)
         for (String key in this.ext.keySet() - ext.keySet()) {
+
             this.ext.remove key
         }
         this.ext.putAll(ext)

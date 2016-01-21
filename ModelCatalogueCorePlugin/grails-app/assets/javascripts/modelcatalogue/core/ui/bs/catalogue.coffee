@@ -66,6 +66,8 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
     direction = if result.direction == 'destinationToSource' then 'incoming' else 'outgoing'
     oppositeDirection = if result.direction == 'destinationToSource' then 'outgoing' else 'incoming'
 
+    return 0 unless list
+
     currentDescend = list
 
     return 0.5 if result.element.link == element.link and endsWith(currentDescend.link, "/#{direction}/#{result.type.name}")

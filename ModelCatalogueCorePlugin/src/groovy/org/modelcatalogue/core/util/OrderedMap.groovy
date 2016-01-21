@@ -30,7 +30,7 @@ class OrderedMap {
                 Map<String, String> newVal = [:]
                 for (Map<String, Object> item in (jsonOrMap.values as List<Map<String, Object>>)) {
                     if (item.key) {
-                        newVal[item.key as String] = item.value as String
+                        newVal[item.key as String] = "${item.value}".toString() == "null" ? null : "${item.value}".toString()
                     }
                 }
                 return newVal

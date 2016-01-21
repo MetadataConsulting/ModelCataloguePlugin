@@ -16,6 +16,8 @@ class Common {
 
     static final String name = 'name'
     static final String description = 'description'
+    static final String modelCatalogueId = 'modelCatalogueId'
+
 
     static final String status = "h3 small span.label"
     static final String rightSideTitle = "h3:not(.ng-hide):not(.data-model-heading)"
@@ -25,6 +27,7 @@ class Common {
     static final String modalHeader = "div.modal-header h4"
     static final String modalCloseButton = 'div.modal button.close'
     static final String modalSuccessButton = 'div.modal button.btn-success'
+    static final String modalPrimaryButton = 'div.modal button.btn-primary'
     static final String backdrop = '.modal-backdrop'
     static final String confirm = '.modal.messages-modal-confirm'
     static final String OK = '.modal.messages-modal-confirm .btn-primary'

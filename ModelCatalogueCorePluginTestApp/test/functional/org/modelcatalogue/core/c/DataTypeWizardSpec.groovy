@@ -2,6 +2,7 @@ package org.modelcatalogue.core.c
 
 import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
+import spock.lang.Ignore
 
 import static org.modelcatalogue.core.geb.Common.*
 
@@ -19,9 +20,9 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     public static final String pickReferenceType = '#pickReferenceType'
     public static final String pickPrimitiveType = '#pickPrimitiveType'
     public static final String pickEnumeratedType = '#pickEnumeratedType'
-    public static final String updateMetadataButton = 'button.btn-primary.update-object'
-    public static final String addMetadataButton = '.btn.add-metadata'
-    public static final String removeMetadataRow = 'a.soe-remove-row'
+    public static final String updateMetadataButton = '.tab-pane button.btn-primary.update-object'
+    public static final String addMetadataButton = '.tab-pane .btn.add-metadata'
+    public static final String removeMetadataRow = '.tab-pane a.soe-remove-row'
     public static final CatalogueAction createMapping = CatalogueAction.runFirst('item', 'catalogue-element', 'create-new-mapping')
     public static final CatalogueAction createRelationship = CatalogueAction.runLast('item', 'catalogue-element', 'create-new-relationship')
     public static final CatalogueAction convert = CatalogueAction.runLast('item', 'catalogue-element', 'convert')
@@ -174,55 +175,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
 
-
-    def "update metadata"() {
-        check backdrop gone
-
-        when:
-        selectTab 'ext'
-
-        then:
-        check updateMetadataButton disabled
-        check closeGrowlMessage gone
-
-        when:
-        click addMetadataButton
-
-        then:
-        check addMetadataButton gone
-
-        when:
-        fillMetadata foo: 'bar', one: 'two', free: 'for'
-
-        then:
-        check updateMetadataButton enabled
-
-        when:
-        click updateMetadataButton
-
-        then:
-        check updateMetadataButton disabled
-
-        when:
-        3.times {
-            click removeMetadataRow
-        }
-
-        then:
-        check updateMetadataButton enabled
-
-        when:
-        click updateMetadataButton
-
-        then:
-        check updateMetadataButton disabled
-
-        when:
-        refresh browser
-
-        then:
-        check addMetadataButton displayed
-    }
 
     def "create new mapping"() {
         check closeGrowlMessage gone
@@ -403,6 +355,57 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         waitFor {
             totalOf('mappings') == 0
         }
+    }
+
+
+    @Ignore("The metadata tab will be soon replaced by inline editor")
+    def "update metadata"() {
+        check backdrop gone
+
+        when:
+        selectTab 'ext'
+
+        then:
+        check updateMetadataButton disabled
+        check closeGrowlMessage gone
+
+        when:
+        click addMetadataButton
+
+        then:
+        check addMetadataButton gone
+
+        when:
+        fillMetadata foo: 'bar', one: 'two', free: 'for'
+
+        then:
+        check updateMetadataButton enabled
+
+        when:
+        click updateMetadataButton
+
+        then:
+        check updateMetadataButton disabled
+
+        when:
+        3.times {
+            click removeMetadataRow
+        }
+
+        then:
+        check updateMetadataButton enabled
+
+        when:
+        click updateMetadataButton
+
+        then:
+        check updateMetadataButton disabled
+
+        when:
+        refresh browser
+
+        then:
+        check addMetadataButton displayed
     }
 
 }

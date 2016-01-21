@@ -265,6 +265,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             response.status = HttpServletResponse.SC_CREATED
             RelationshipDirection direction = outgoing ? RelationshipDirection.OUTGOING : RelationshipDirection.INCOMING
 
+            rel.save(flush: true, deepValidate: false, validate: false)
+
             respond(id: rel.id, type: rel.relationshipType, ext: OrderedMap.toJsonMap(rel.ext), element: CatalogueElementMarshaller.minimalCatalogueElementJSON(direction.getElement(source, rel)), relation: direction.getRelation(source, rel), direction: direction.getDirection(source, rel), removeLink: RelationshipsMarshaller.getDeleteLink(source, rel), archived: rel.archived, elementType: Relationship.name, classification: rel.dataModel, dataModel: rel.dataModel)
         }
     }
@@ -557,7 +559,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         instance.save flush:true
 
         if (ext != null) {
-            instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
+            instance.setExt(ext)
         }
 
         bindRelations(instance, newVersion)

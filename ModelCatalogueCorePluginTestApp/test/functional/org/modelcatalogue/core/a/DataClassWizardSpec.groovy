@@ -2,17 +2,23 @@ package org.modelcatalogue.core.a
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
-import org.modelcatalogue.core.pages.ModalTreeViewPage
+import org.modelcatalogue.core.geb.CatalogueContent
 import spock.lang.Stepwise
 
-import static org.modelcatalogue.core.geb.Common.admin
-import static org.modelcatalogue.core.geb.Common.closeGrowlMessage
-import static org.modelcatalogue.core.geb.Common.modalSuccessButton
+import static org.modelcatalogue.core.geb.Common.*
 
 @Stepwise
 class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 
     CatalogueAction edit = CatalogueAction.runLast('item-detail', 'edit-catalogue-element')
+
+    private static final String stepMetadata         = "#step-metadata"
+    private static final String stepChildren         = "#step-children"
+    private static final String stepElements         = "#step-elements"
+    private static final String stepFinish           = "#step-finish"
+    private static final String exitButton           = "#exit-wizard"
+    private static final String wizardSummary        = '.wizard-summary'
+
 
     def "go to login"() {
         login admin
@@ -24,163 +30,125 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         selectInTree "Data Classes"
 
         expect:
-        at ModalTreeViewPage
-
-        waitFor(120) {
-            !$('#jserrors').displayed && $('h3').displayed
-        }
-        waitFor {
-            subviewTitle.text()?.trim()?.contains('Data Class List')
-        }
+        check '#jserrors' gone
+        check rightSideTitle contains "Data Class List"
     }
 
 
     def "Add new data class"() {
-        waitFor {
-            menuItem('create-catalogue-element', 'list').displayed
-        }
-
-        when:
-        menuItem('create-catalogue-element', 'list').click()
-
-        then: 'the model dialog opens'
-        waitFor {
-            modelWizard.displayed
-        }
+        click create
+        expect: 'the model dialog opens'
+        check modalDialog displayed
 
         when: 'the model details are filled in'
-        name = "New"
-        modelCatalogueId = "http://www.example.com/${UUID.randomUUID().toString()}"
-        description = "Description"
+        fill name  with "New"
+        fill modelCatalogueId with "http://www.example.com/${UUID.randomUUID().toString()}"
+        fill description with "Description"
 
         then: 'metadata step is not disabled'
-        waitFor {
-            !stepMetadata.disabled
-        }
+        check stepMetadata enabled
 
         when: 'metadata step is clicked'
-        stepMetadata.click()
+        click stepMetadata
 
         then:
-        waitFor {
-            stepMetadata.hasClass('btn-primary')
-        }
+        check stepMetadata has 'btn-primary'
 
         when: 'metadata are filled in'
         fillMetadata foo: 'bar', one: 'two'
 
 
         and: 'children step is clicked'
-        stepChildren.click()
+        click stepChildren
 
         then:
-        waitFor {
-            stepChildren.hasClass('btn-primary')
-        }
+        check stepChildren has 'btn-primary'
 
         when: 'child metadata are filled in'
         fillMetadata 'Min Occurs': '1', 'Max Occurs': '10'
 
         and: 'the child is selected'
-        $('.search-for-more-icon').click()
-        $('.modal-body .input-group-lg input').value('patient')
+        click '.search-for-more-icon'
+        fill '.modal-body .input-group-lg input' with 'patient'
 
-        noStale({ $('.list-group-item.item-found') }) {
-            it.click()
-        }
+        click '.list-group-item.item-found'
 
         and: 'create child from scratch and leave it filled in'
-        name = 'This should create new child data class'
+        fill name with 'This should create new child data class'
 
         and: 'elements step is clicked'
-        stepElements.click()
+        click stepElements
 
         then:
-        waitFor {
-            stepElements.hasClass('btn-primary')
-        }
+        check stepElements has 'btn-primary'
 
         when: 'element metadata are filled in'
         fillMetadata 'Min Occurs': '2', 'Max Occurs': '25'
 
         and: 'the element is selected'
-        name = 'nhs'
+        fill name with 'nhs'
         selectCepItemIfExists()
 
         and: 'finish is clicked'
-        stepFinish.click()
+        click stepFinish
 
         then: 'the data class is saved'
-        waitFor(60) {
-            $('div.messages-panel span', text: "Data Class New created").displayed
-        }
+        check wizardSummary is "Data Class New created"
+
         when:
-        exitButton.click()
+        click exitButton
 
         then:
-        waitFor {
-            $('span.catalogue-element-treeview-name', text: startsWith("New")).displayed
-        }
+        check CatalogueContent.create('span.catalogue-element-treeview-name', text: startsWith("New")) displayed
 
-        waitUntilModalClosed(30)
+        check modalDialog gone
     }
 
     def "Add another data class"(){
-        waitFor {
-            menuItem('create-catalogue-element', 'list').displayed
-        }
-
-        when:
-        menuItem('create-catalogue-element', 'list').click()
+        click create
 
 
-        then: 'the data class dialog opens'
-        waitFor {
-            modelWizard.displayed
-        }
+        expect: 'the data class dialog opens'
+        check modalDialog displayed
 
         when: 'the data class details are filled in'
-        name = "Another New"
+        fill name with "Another New"
 
 
         and: 'finish is clicked'
-        stepFinish.click()
+        click stepFinish
 
         then: 'the data class is saved'
-        waitFor {
-            $('div.messages-panel span', text: "Data Class Another New created").displayed
-        }
+        check wizardSummary is "Data Class Another New created"
+
         when:
-        exitButton.click()
+        click exitButton
 
         then:
-        waitFor {
-            $('span.catalogue-element-treeview-name', text: startsWith("Another New")).displayed
-        }
+        check CatalogueContent.create('span.catalogue-element-treeview-name', text: startsWith("Another New")) displayed
+
 
         when: "click the footer action"
-        $('span.catalogue-element-treeview-name', text: startsWith("Another New")).click()
+        click CatalogueContent.create('span.catalogue-element-treeview-name', text: startsWith("Another New"))
 
         selectTab('contains')
 
-        tableFooterAction.click()
+        click tableFooterAction
 
         then: "modal is shown"
-        waitFor {
-            modalDialog.displayed
-        }
+        check modalDialog displayed
 
         when:
-        type    = 'parent of'
-        element = 'demographics'
+        fill 'type' with 'parent of'
+        fill 'element' with 'demographics'
         selectCepItemIfExists()
 
-        modalPrimaryButton.click()
+        click modalPrimaryButton
 
         then: 'the number of children of Another New must be 1'
-        waitFor {
-            $('span.catalogue-element-treeview-name', text: startsWith("Another New")).parent().parent().find('.badge').text() == '1'
-        }
+        check {
+            $('span.catalogue-element-treeview-name', text: startsWith("Another New")).parent().parent().find('.badge')
+        } is '1'
 
     }
 
