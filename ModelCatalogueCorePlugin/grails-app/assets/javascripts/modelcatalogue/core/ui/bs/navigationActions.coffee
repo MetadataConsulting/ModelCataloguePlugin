@@ -1,52 +1,52 @@
 angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.util.security']).config ['actionsProvider', 'names', (actionsProvider, names)->
 
+  anyParentDataModel = ($scope) ->
+    return $scope.currentDataModel if $scope.currentDataModel
+    return anyParentDataModel($scope.$parent) if $scope.$parent
+    return undefined
+
   RESOURCES = [
     'dataClass'
     'dataElement'
     'dataType'
     'measurementUnit'
     'asset'
-    'relationshipType'
-    'csvTransformation'
-    'batch'
   ]
-
-  actionsProvider.registerActionInRole 'navbar-catalogue-elements', actionsProvider.ROLE_NAVIGATION, ['security', (security) ->
-    return undefined if not security.isUserLoggedIn()
-    {
-      position:   100
-      abstract:   true
-      label:      'Catalogue'
-    }
-  ]
-
 
   angular.forEach RESOURCES, (resource, index) ->
 
-    unless resource == 'batch'
-      actionsProvider.registerActionInRole 'global-create-' + resource, actionsProvider.ROLE_GLOBAL_ACTION, ['$scope', 'names', 'security', 'messages', '$state', '$log', ($scope, names, security, messages, $state, $log) ->
-        return undefined if not security.hasRole('CURATOR')
-        return undefined if not messages.hasPromptFactory('create-' + resource) and not messages.hasPromptFactory('edit-' + resource)
+    actionsProvider.registerChildAction 'catalogue-element', 'catalogue-element-create-' + resource, ['$scope', 'names', 'security', 'messages', '$state', '$log', 'catalogue', ($scope, names, security, messages, $state, $log, catalogue) ->
+        dataModel = anyParentDataModel($scope)
+
+        return undefined unless security.hasRole('CURATOR')
+        return undefined unless messages.hasPromptFactory('create-' + resource) or messages.hasPromptFactory('edit-' + resource)
+        return undefined unless dataModel
+        return undefined unless dataModel.status == 'DRAFT'
+        return undefined if not angular.isFunction($scope.element.isInstanceOf)
+        return undefined if not $scope.element.isInstanceOf('dataModel')
+
 
         {
-        label:      "New #{names.getNaturalName(resource)}"
-        icon:       'fa fa-plus'
-        type:       'success'
-        action:     ->
-          args      = {create: (resource)}
-          args.type = if messages.hasPromptFactory('create-' + resource) then "create-#{resource}" else "edit-#{resource}"
+          label:      "New #{names.getNaturalName(resource)}"
+          icon:       catalogue.getIcon(resource)
+          type:       'success'
+          position:   5000 + index
+          action:     ->
+            args      = {create: (resource), currentDataModel: dataModel }
+            args.type = if messages.hasPromptFactory('create-' + resource) then "create-#{resource}" else "edit-#{resource}"
 
-          security.requireRole('CURATOR')
-          .then ->
-            messages.prompt('Create ' + names.getNaturalName(resource), '', args).then ->
-              $state.go 'mc.resource.list', {status: 'draft'}, {reload: true}
-          , (errors)->
-            $log.error errors
-            messages.error('You don\'t have rights to create new elements')
+            security.requireRole('CURATOR')
+            .then ->
+              messages.prompt('Create ' + names.getNaturalName(resource), '', args).then ->
+                $state.go 'mc.resource.list', {status: 'draft'}, {reload: true}
+            , (errors)->
+              $log.error errors
+              messages.error('You don\'t have rights to create new elements')
         }
       ]
 
-  actionsProvider.registerActionInRole 'all-data-models', actionsProvider.ROLE_GLOBAL_ACTION ,['security', '$scope', '$state', 'catalogue', (security, $scope, $state, catalogue) ->
+
+  actionsProvider.registerActionInRole 'all-data-models', actionsProvider.ROLE_GLOBAL_ACTION ,['security', '$scope', '$state', (security, $scope, $state) ->
     return undefined if not security.isUserLoggedIn()
 
     {
@@ -65,7 +65,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     return undefined if not $scope.element.isInstanceOf('dataModel')
 
     {
-      position:   2000
+      position:   -1000
       label:      'Add Data Model Import'
       icon:       'fa fa-fw fa-puzzle-piece'
       type:       'success'

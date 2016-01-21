@@ -37,15 +37,21 @@ angular.module('mc.core.ui.bs.modalFinalize', ['mc.util.messages']).config ['mes
           $scope.messages = messages.createNewMessages()
 
           $scope.$dismiss = $modalInstance.dismiss
+          $scope.working = false
 
           $scope.finalizeElement = ->
+            $scope.working = true
             enhance(rest(url: "#{modelCatalogueApiRoot}#{args.element.link}/finalize", method: 'POST', params: {semanticVersion: $scope.semanticVersion, revisionNotes: $scope.revisionNotes})).then (finalized) ->
               args.element.updateFrom finalized
               $rootScope.$broadcast 'catalogueElementUpdated', finalized
               $rootScope.$broadcast 'catalogueElementFinalized', finalized
               $rootScope.$broadcast 'redrawContextualActions'
               $modalInstance.close(finalized)
-            , $scope.messages.showErrorsFromResponse
+              $scope.working = false
+            , (response) ->
+              $scope.messages.showErrorsFromResponse(response)
+              $scope.working = false
+
 
         ]
 

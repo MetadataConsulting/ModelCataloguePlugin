@@ -22,7 +22,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       label:      names.getNaturalName(names.getPropertyNameFromQualifier($scope.element.elementType))
       icon:       catalogue.getIcon($scope.element.elementType)
       type:       'primary'
-      watches:    'element.elementType'
+      watches:    ['element.elementType', 'element.status']
       expandToLeft: true
     }
   ]
@@ -81,7 +81,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     ids = if elementPresent then [element.id] else (e.id for e in $scope.elements)
 
     {
-      position: 500
+      position: -500
       label: if elementPresent then 'Compare' else 'Compare Another'
       icon: 'fa fa-fw fa-arrows-h'
       type: 'primary'
@@ -382,11 +382,11 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not $scope.element
     return undefined if not angular.isFunction($scope.element.delete)
     return undefined unless security.hasRole('CURATOR')
-    # currently constrained for assets only
-    return undefined unless $scope.element.isInstanceOf('asset')
+    # currently constrained for assets and data models only
+    return undefined unless $scope.element.isInstanceOf('asset') or $scope.element.isInstanceOf('dataModel')
 
     {
-      position:   50000
+      position:   -1500
       label:      'Delete'
       icon:       'fa fa-fw fa-times-circle'
       type:       'danger'
@@ -398,6 +398,113 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
             if $state.current.name.indexOf('mc.resource.show') >= 0
               $state.go('mc.resource.list', {resource: names.getPropertyNameFromType($scope.element.elementType)}, {reload: true})
           .catch showErrorsUsingMessages(messages)
+    }
+  ]
+
+  actionsProvider.registerChildActionInRole 'catalogue-element', 'finalize', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'security', ($rootScope, $scope, messages, security) ->
+    return undefined unless security.hasRole('CURATOR')
+    return undefined unless $scope.element
+    return undefined unless $scope.element.status
+    return undefined unless $scope.element.status == 'DRAFT'
+    return undefined unless angular.isFunction($scope.element.isInstanceOf)
+    return undefined unless $scope.element.isInstanceOf('dataModel')
+
+    {
+      position:   -2000
+      label:      'Finalize'
+      icon:       'fa fa-fw fa-check-circle'
+      type:       'primary'
+      disabled:   $scope.element?.status != 'DRAFT'
+      watches:    ['element.status', 'element.archived']
+      action:     ->
+        messages.prompt(null, null, type: 'finalize', element: $scope.element)
+    }
+  ]
+
+  newVersionAction = ['$rootScope','$scope', 'messages', 'security', ($rootScope, $scope, messages, security) ->
+    return undefined if not $scope.element
+    return undefined if not $scope.element.status
+    return undefined if not security.hasRole('CURATOR')
+    return undefined if $scope.element.status == 'DRAFT'
+
+    {
+      position:   -1900
+      label:      'New Version'
+      icon:       'fa fa-fw fa-arrow-circle-up'
+      type:       'primary'
+      watches:    ['element.status', 'element.archived']
+      disabled:   $scope.element.archived || $scope.element.status == 'DRAFT'
+      action:     ->
+        messages.prompt(null, null, type: 'new-version', element: $scope.element)
+    }
+  ]
+
+
+  actionsProvider.registerChildActionInRole 'catalogue-element', 'create-new-version', actionsProvider.ROLE_ITEM_ACTION, newVersionAction
+  actionsProvider.registerActionInRole 'create-new-version-tiny', actionsProvider.ROLE_ITEM_DETAIL_ACTION, newVersionAction
+
+  actionsProvider.registerChildActionInRole 'catalogue-element', 'archive', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
+    return undefined if not $scope.element
+    return undefined if not $scope.element.status
+    return undefined if not security.hasRole('CURATOR')
+    return undefined if $scope.element.archived and not security.hasRole('ADMIN')
+
+    action = {
+      position:   -1800
+      watches:    ['element.status', 'element.archived']
+      action:     ->
+        if $scope.element.archived
+          if security.hasRole('ADMIN')
+            messages.confirm("Do you want to restore #{$scope.element.getElementTypeName()} #{$scope.element.name} as finalized?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will no longer be deprecated").then ->
+              enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/restore", method: 'POST')).then (restored) ->
+                $scope.element.updateFrom restored
+                $rootScope.$broadcast 'catalogueElementUpdated', restored
+                $rootScope.$broadcast 'redrawContextualActions'
+              , showErrorsUsingMessages(messages)
+        else
+          messages.confirm("Do you want to mark #{$scope.element.getElementTypeName()} #{$scope.element.name} as deprecated?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be marked as deprecated").then ->
+            enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/archive", method: 'POST')).then (archived) ->
+              $scope.element.updateFrom archived
+              $rootScope.$broadcast 'catalogueElementUpdated', archived
+              $rootScope.$broadcast 'redrawContextualActions'
+            , showErrorsUsingMessages(messages)
+    }
+
+    if $scope.element.archived
+      if not security.hasRole('ADMIN')
+        action.disabled = true
+      else
+        action.label = 'Restore'
+        action.icon = 'fa fa-fw fa-repeat'
+        action.type = 'primary'
+    else
+      action.label = 'Deprecate'
+      action.icon = 'fa fa-fw fa-ban'
+      action.type = 'danger'
+
+    action
+  ]
+
+  actionsProvider.registerChildActionInRole 'catalogue-element', 'merge', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
+    return undefined if not $scope.element
+    return undefined if not $scope.element.status
+    return undefined if not security.hasRole('CURATOR')
+
+    {
+      position:   10000
+      label:      'Merge'
+      icon:       'fa fa-fw fa-code-fork fa-rotate-180 fa-flip-vertical'
+      type:       'danger'
+      watches:    ['element.status', 'element.archived']
+      disabled:   $scope.element.status != 'DRAFT'
+      action:     ->
+        messages.prompt("Merge #{$scope.element.getElementTypeName()} #{$scope.element.name} to another #{$scope.element.getElementTypeName()}", "All non-system relationships of the #{$scope.element.getElementTypeName()} #{$scope.element.name} will be moved to the following destination and than the #{$scope.element.getElementTypeName()} #{$scope.element.name} will be archived", {type: 'catalogue-element', resource: $scope.element.elementType, status: 'draft'}).then (destination)->
+          enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/merge/#{destination.id}", method: 'POST')).then (merged) ->
+            oldName = $scope.element.classifiedName
+            messages.success "Element #{oldName} merged successfully into  #{$scope.element.classifiedName}"
+            merged.show()
+            $rootScope.$broadcast 'redrawContextualActions'
+          , showErrorsUsingMessages(messages)
     }
   ]
 

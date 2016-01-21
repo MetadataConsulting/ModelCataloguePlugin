@@ -111,6 +111,7 @@ class DraftChain extends PublishingChain {
 
         if (draft.instanceOf(DataModel) && context.hasVersion()) {
             draft.semanticVersion = context.version
+            draft.revisionNotes = null
         }
 
         draft.beforeDraftPersisted()
