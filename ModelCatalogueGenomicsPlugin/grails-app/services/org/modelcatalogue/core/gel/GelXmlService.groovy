@@ -143,9 +143,9 @@ class GelXmlService {
 
                 //recursive printing 
                 model.outgoingRelationships.each { Relationship rel ->
-
-                    if (rel.relationshipType == RelationshipType.containmentType) this.printQuestion(rel, builder)
                     if (rel.relationshipType == RelationshipType.hierarchyType) this.printSection(rel, builder)
+                    if (rel.relationshipType == RelationshipType.containmentType) this.printQuestion(rel, builder)
+
 
                 }
             }
@@ -163,9 +163,8 @@ class GelXmlService {
                 validateMetadataOccurs(elements+childrens)
                 
                 model.outgoingRelationships.each { Relationship rel ->
-
-                    if (rel.relationshipType == RelationshipType.containmentType) this.printQuestion(rel, builder)
                     if (rel.relationshipType == RelationshipType.hierarchyType) this.printSection(rel, builder)
+                    if (rel.relationshipType == RelationshipType.containmentType) this.printQuestion(rel, builder)
                 }
             }
 
@@ -314,14 +313,16 @@ class GelXmlService {
     
         def namespace=targetModel.ext.get(XSD_STUDY_NAME)=='cancer'?'gelCAN':'gelRD'
         def study=(targetModel.ext.get(XSD_STUDY_NAME)=='cancer')?'cancer':'rarediseases'
+        def version = targetModel.ext.get(XSD_SCHEMA_VERSION)?:''
 
 
         xml.'xs:schema'('xmlns:xs': 'http://www.w3.org/2001/XMLSchema',
                 "xmlns:vc": "http://www.w3.org/2007/XMLSchema-versioning",
-                "xmlns:${namespace}" : "https://genomicsengland.co.uk/xsd/${study}/1.3.1",
-                "xmlns": "https://genomicsengland.co.uk/xsd/${study}/1.3.1",
-                "targetNamespace":"https://genomicsengland.co.uk/xsd/${study}/1.3.1",
-                'vc:minVersion': '1.1') {
+                "xmlns:${namespace}" : "https://genomicsengland.co.uk/xsd/${study}/${version}",
+                "xmlns": "https://genomicsengland.co.uk/xsd/${study}/${version}",
+                "targetNamespace":"https://genomicsengland.co.uk/xsd/${study}/${version}",
+                'vc:minVersion': '1.1',
+                'elementFormDefault':'qualified') {
             'xs:annotation'{
                 'xs:documentation'{
                     'h1'("Title:"+targetModel.ext.get(XSD_SCHEMA_NAME)? targetModel.ext.get(XSD_SCHEMA_NAME):targetModel.name)
@@ -407,7 +408,7 @@ class GelXmlService {
                             }
                         }
                     }
-                    'xs:element'(name:'localReportId',type:"xs:string",minOccurs:'0',maxOccurs:'1'){
+                    'xs:element'(name:'local-report-id',type:"xs:string",minOccurs:'0',maxOccurs:'1'){
                         'xs:annotation'{
                             'xs:documentation'{
                                 'p'("Source system report Id. Optional but may be used to supply source with information if there are any issues with the submitted XML.")
@@ -432,14 +433,15 @@ class GelXmlService {
          
         return xml.'xs:complexType'(name: printXSDFriendlyString(model)){
             "${sectionType}"{
+
+                hieracrchyRelationships.each { Relationship relationship ->
+                    printModelElements(xml, relationship.destination, fromDestination(relationship,METADATA_MIN_OCCURS), fromDestination(relationship,METADATA_MAX_OCCURS))
+                }
                   
                 containementRelationships.each { Relationship relationship ->
                     printDataElements(xml, relationship.destination, fromDestination(relationship,METADATA_MIN_OCCURS), fromDestination(relationship,METADATA_MAX_OCCURS),valueDomains,xmlSchema,relationship.ext)
                 }
 
-                hieracrchyRelationships.each { Relationship relationship ->
-                    printModelElements(xml, relationship.destination, fromDestination(relationship,METADATA_MIN_OCCURS), fromDestination(relationship,METADATA_MAX_OCCURS))
-                }
             }
         }
     }
@@ -752,6 +754,13 @@ class GelXmlService {
                 results.add(model)
             }
 
+            for (Relationship r: model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)){
+                //override table name to take from relation if any
+                def tableName=fromDestination(r,XSL_TABLE_NAME)
+                if(tableName) r.destination.ext.put(XSL_TABLE_NAME, tableName)
+                findAllTableCandidates(r.destination,results,false)
+            }
+
             //search in data elements
             for ( Relationship r:model.getOutgoingRelationshipsByType(RelationshipType.containmentType)) {
                 def maxOccurs=fromDestination(r,METADATA_MAX_OCCURS)
@@ -764,12 +773,7 @@ class GelXmlService {
                 }
             }
             
-            for (Relationship r: model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)){
-                //override table name to take from relation if any
-                def tableName=fromDestination(r,XSL_TABLE_NAME)
-                if(tableName) r.destination.ext.put(XSL_TABLE_NAME, tableName)
-                findAllTableCandidates(r.destination,results,false)
-            }
+
         }             
         return results;
     }
