@@ -8,11 +8,11 @@ class Common {
 
     static final CatalogueAction save = CatalogueAction.runLast('modal', 'modal-save-element')
     static final CatalogueAction create = CatalogueAction.runLast('list', 'create-catalogue-element')
-    static final CatalogueAction finalize = CatalogueAction.runLast('item', 'change-element-state', 'finalize')
-    static final CatalogueAction newVersion = CatalogueAction.runLast('item', 'change-element-state', 'create-new-version')
-    static final CatalogueAction archive = CatalogueAction.runLast('item', 'change-element-state', 'archive')
-    static final CatalogueAction delete = CatalogueAction.runLast('item', 'change-element-state', 'delete')
-    static final CatalogueAction merge = CatalogueAction.runLast('item', 'change-element-state', 'merge')
+    static final CatalogueAction finalize = CatalogueAction.runLast('item', 'catalogue-element', 'finalize')
+    static final CatalogueAction newVersion = CatalogueAction.runLast('item', 'catalogue-element', 'create-new-version')
+    static final CatalogueAction archive = CatalogueAction.runLast('item', 'catalogue-element', 'archive')
+    static final CatalogueAction delete = CatalogueAction.runLast('item', 'catalogue-element', 'delete')
+    static final CatalogueAction merge = CatalogueAction.runLast('item', 'catalogue-element', 'merge')
 
     static final String name = 'name'
     static final String description = 'description'

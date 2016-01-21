@@ -78,10 +78,6 @@ grails.exceptionresolver.params.exclude = ['password', 'password1', 'password2',
 // configure auto-caching of queries by default (if false you can documentCache individual queries with 'documentCache: true')
 grails.hibernate.cache.queries = false
 
-// configure the default storage
-mc.storage.directory = "/tmp/mc/storage"
-mc.storage.maxSize = 50 * 1024 * 1024
-
 environments {
     development {
         grails.logging.jul.usebridge = true
@@ -162,6 +158,9 @@ environments {
         // you can overrides in your mc-config.groovy
         mc.sync.relationshipTypes=true
         grails.assets.minifyJs = true
+        // configure the default storage
+        mc.storage.directory = "/tmp/mc/storage"
+        mc.storage.maxSize = 50 * 1024 * 1024
         // ---
 
         grails.assets.minifyOptions = [

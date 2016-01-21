@@ -14,6 +14,9 @@ class LocalFilesStorageService implements StorageService {
     private void init() {
         fileStoreBase   = new File(grailsApplication.config.mc.storage.directory ?: 'storage')
         maxSize         = grailsApplication.config.mc.storage.maxSize ?: (20 * 1024 * 1024)
+
+        // create all necessary directories
+        fileStoreBase.mkdirs()
     }
 
     /**

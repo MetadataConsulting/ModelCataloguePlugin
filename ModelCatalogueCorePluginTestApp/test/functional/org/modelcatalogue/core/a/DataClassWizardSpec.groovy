@@ -1,13 +1,18 @@
 package org.modelcatalogue.core.a
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.pages.ModalTreeViewPage
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.admin
+import static org.modelcatalogue.core.geb.Common.closeGrowlMessage
+import static org.modelcatalogue.core.geb.Common.modalSuccessButton
 
 @Stepwise
 class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
+
+    CatalogueAction edit = CatalogueAction.runLast('item-detail', 'edit-catalogue-element')
 
     def "go to login"() {
         login admin
@@ -180,25 +185,23 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "edit child data class"() {
+        click edit
+
         expect:
-        menuItem('edit-catalogue-element', 'item').displayed
+        check modalDialog displayed
 
         when:
-        menuItem('edit-catalogue-element', 'item').click()
+        fill 'name' with 'Changed Name'
 
-        then:
-        waitFor {
-            modalDialog.displayed
-        }
-
-        when:
-        modalDialog.find('#name').value('Changed Name')
-        modalDialog.find("button.btn-success").click()
+        click modalSuccessButton
 
         then: "same number of children are still shown"
-        waitFor {
-            $('span.catalogue-element-treeview-name', text: startsWith("Changed Name")).parent().parent().find('.badge').text() == '1'
-        }
+        check modalDialog gone
+        check closeGrowlMessage gone
+
+        check {
+            $('span.catalogue-element-treeview-name', text: startsWith("Changed Name")).parent().parent().find('.badge')
+        } is '1'
     }
 
 }
