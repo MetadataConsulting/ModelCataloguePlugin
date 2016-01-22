@@ -48,7 +48,7 @@ angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSa
                 <td class="inf-table-item-cell" ng-class="cell.classes" ng-repeat="cell in row.tail" ng-switch="cell.type">
                   <a    ng-switch-when="link" ng-href="{{cell.href}}" class="preserve-new-lines">{{cell.value}}</a>
                   <span ng-switch-when="html" ><span ng-bind-html="cell.value" class="preserve-new-lines"></span></span>
-                  <span ng-switch-when="plain"><span class="preserve-new-lines">{{cell.value}}</span></span>
+                  <span ng-switch-when="plain"><span class="preserve-new-lines">{{cell.value}}</span><span ng-if="cell.shorten" ng-click="cell.value = cell.fullValue ; cell.shorten = false" class="fa fa-fw fa-plus-square-o"></span></span>
                 </td>
              </tr>
              <tr class="actions-row active" ng-repeat-end="" ng-if="row.$$expanded && isNotFiltered(row)">

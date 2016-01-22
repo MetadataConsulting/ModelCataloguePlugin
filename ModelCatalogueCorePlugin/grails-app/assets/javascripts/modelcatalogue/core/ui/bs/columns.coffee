@@ -15,9 +15,8 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
     return enumeratedType.description if not enumeratedType.enumerations.values
     enumerations = []
     for enumeration, i in enumeratedType.enumerations.values
-      if i == 10
-        enumerations.push('...')
-        break
+      if i == 10 and enumeratedType.enumerations.values.length isnt 10
+        enumerations.push(columnsProvider.LONG_TEXT_BREAK)
       enumerations.push "#{enumeration.key}: #{enumeration.value}"
     enumerations.join('\n')
 

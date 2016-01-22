@@ -9,9 +9,6 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
     return enumeratedType.description if not enumeratedType.enumerations.values
     enumerations = []
     for enumeration, i in enumeratedType.enumerations.values
-      if i == 10
-        enumerations.push('...')
-        break
       enumerations.push "#{enumeration.key}: #{enumeration.value}"
     enumerations.join('\n')
 
@@ -25,7 +22,14 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
       classes:  $scope.evaluateClasses(column.classes, element)
     cell.type = 'link'  if cell.href and cell.value
     cell.type = 'html'  if not cell.type and cell.value and cell.value.indexOf('<') < cell.value.indexOf('>')
-    cell.type = 'plain' if not cell.type and cell.value
+    if not cell.type and cell.value
+      cell.type = 'plain'
+      if cell.value
+        cell.value = cell.value.toString()
+        if cell.value.indexOf(columns.LONG_TEXT_BREAK) >= 0
+          cell.shorten = true
+          cell.fullValue = cell.value.replace("\n#{columns.LONG_TEXT_BREAK}\n", '\n')
+          cell.value = cell.value.substring(0, cell.value.indexOf(columns.LONG_TEXT_BREAK))
 
     cell
 
