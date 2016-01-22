@@ -182,6 +182,9 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataModel.properties', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataModel.ext', hidden: true
 
+
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.EnumeratedType.enumerations', hidden: true
+
   catalogueElementPropertiesProvider.configureProperty 'relationships', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'content', hidden: true
   catalogueElementPropertiesProvider.configureProperty '$$metadata', hidden: true

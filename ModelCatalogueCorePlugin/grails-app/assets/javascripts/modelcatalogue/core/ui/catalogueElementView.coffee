@@ -228,7 +228,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         return security.hasRole('CURATOR') \
             and editableForm \
             and angular.isFunction($scope.element?.isInstanceOf) \
-            and $scope.element?.isInstanceOf('dataModel') \
+            and ($scope.element?.isInstanceOf('dataModel') or $scope.element?.isInstanceOf('enumeratedType'))\
             and $scope.element?.status == 'DRAFT'
 
       $scope.inlineUpdateElement = ->
