@@ -357,8 +357,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         }
     }
 
-
-    @Ignore("The metadata tab will be soon replaced by inline editor")
     def "update metadata"() {
         check backdrop gone
 
