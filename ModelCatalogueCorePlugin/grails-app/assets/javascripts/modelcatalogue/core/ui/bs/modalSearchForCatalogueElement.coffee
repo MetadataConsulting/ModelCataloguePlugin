@@ -4,6 +4,7 @@ module.config ['messagesProvider', (messagesProvider)->
     (title, body, args) ->
       dialog = $modal.open {
         size: 'lg'
+        backdrop: true
         template: """
         <div class="modal-header" ng-if="title">
           <h4>{{title}}</h4>
@@ -13,6 +14,7 @@ module.config ['messagesProvider', (messagesProvider)->
               <div class="input-group input-group-lg">
                 <span class="input-group-addon"><span class="fa fa-fw fa-search"></span></span>
                 <input id="value" class="form-control" ng-model="query" placeholder="Search for #{names.getNaturalName(names.getPropertyNameFromType(args.resource ? 'catalogueElement'))}" ng-model-options="{debounce: 500}" focus-me="true" autofocus='true'>
+                <div class="input-group-addon with-pointer" ng-click='$dismiss()'><span class='fa fa-fw fa-close'></span></div>
               </div>
               <p class='help-block' ng-if='currentDataModel'>
                 <span ng-if="!global">Showing only results from {{currentDataModel.name}} and its imports. <a ng-if="allowGlobal" ng-click='setGlobal(true)'>Show All</a><span ng-if='allowGlobal &amp;&amp; canAddImports'> or </span><a ng-if='canAddImports' ng-click='addImport()'>Add Import</a></span>
@@ -28,6 +30,7 @@ module.config ['messagesProvider', (messagesProvider)->
                 <div class="leave-10-before"></div>
                 <a ng-repeat="element in elements" class="list-group-item with-pointer item-found" ng-class="{'list-group-item-warning': element.status == 'DRAFT', 'list-group-item-info': element.status == 'PENDING', 'list-group-item-danger': element.status == 'DEPRECATED', 'active': $index == selected}" ng-click="$close(element)">
                     <h4 class="list-group-item-heading"><catalogue-element-icon type="element.elementType"></catalogue-element-icon> <span class='classified-name'>{{element.classifiedName}}</span></h4>
+                    <p ng-if="element.modelCatalogueId || element.internalModelCatalogueId" class="search-model-catalogue-id small">{{element.modelCatalogueId || element.internalModelCatalogueId}}</p>
                     <p ng-if="element.description" class="list-group-item-text preserve-new-lines modal-search-for-catalogue-element-description">{{element.description}}</p>
                 </a>
                 <a class="list-group-item disabled" ng-if="loading">

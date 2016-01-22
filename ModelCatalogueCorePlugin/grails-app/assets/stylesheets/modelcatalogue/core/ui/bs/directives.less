@@ -745,7 +745,18 @@ tr.inherited, .catalogue-element-treeview-text-content.inherited {
   font-size: 1.2em!important;
   line-height: 28px;
   margin-left: 10px;
+  -ms-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 
-
+.mc-name-parent {
+  @media (min-width: 768px) {
+    max-width: 150px;
+  }
+  @media (min-width: 1000px) {
+    max-width: 250px;
+  }
+}
