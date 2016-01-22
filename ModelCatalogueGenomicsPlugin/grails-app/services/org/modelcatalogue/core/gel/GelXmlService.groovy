@@ -394,10 +394,15 @@ class GelXmlService {
                             }
                         }
                     }
-                    'xs:element'(name:'source-organisation',type:"xs:string",minOccurs:'1',maxOccurs:'1'){
+                    'xs:element'(name:'source-organisation',minOccurs:'1',maxOccurs:'1'){
                         'xs:annotation'{
                             'xs:documentation'{
                                 'p'("ODS code of the source organisation within the GMC sending the message")
+                            }
+                        }
+                        'xs:simpleType'{
+                            'xs:restriction'(base: "xs:string"){
+                                'xs:minLength'(value: 1)
                             }
                         }
                     }

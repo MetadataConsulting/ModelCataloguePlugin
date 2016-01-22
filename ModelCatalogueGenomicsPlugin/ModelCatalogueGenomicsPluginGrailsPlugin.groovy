@@ -76,6 +76,13 @@ Genomics England Custom Additions to Model Catalogue
             link controller: 'gelJson', action: 'printDiseaseOntology',id: true
         }
 
+        reportsRegistry.register {
+            creates link
+            title { "Rare Disease Inventory Report Document" }
+            type Model
+            link controller: 'model', action: 'rareDiseasesInventoryDoc', id: true
+        }
+
     }
 
     def onChange = { event ->
