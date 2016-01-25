@@ -7,6 +7,7 @@ import grails.transaction.Transactional
 import groovy.xml.MarkupBuilder
 import groovy.xml.XmlUtil
 
+import org.apache.commons.collections.map.MultiValueMap
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.DataElement
@@ -505,7 +506,7 @@ class GelXmlService {
         
         
         String exceptionMessages="";
-        Map mappedModels=subModels.collect{[it,getXSLTableName(it)]}.collectEntries()
+        MultiValueMap mappedModels=subModels.collect{[it,getXSLTableName(it)]}.collectEntries( new  MultiValueMap())
         List tableNames=mappedModels.collect{key, value ->value}
 
         def duplicates=tableNames.findAll{tableNames.count(it) > 1}.unique()
