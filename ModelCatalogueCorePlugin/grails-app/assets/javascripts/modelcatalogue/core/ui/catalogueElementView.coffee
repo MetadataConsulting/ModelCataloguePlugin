@@ -117,7 +117,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
         page = undefined if page == 1 or isNaN(page)
         options.location = "replace" if newProperty and not oldProperty
-        if $state.$current.name isnt "mc.resource.list" and $state.$current.name isnt "simple.resource.list" and $scope.element
+        if $scope.element and $state.includes 'mc' or $state.includes 'simple'
           nextState = if $state.includes 'mc' then 'mc.resource.show.property' else 'simple.resource.show.property'
           $state.go nextState, {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page, q: $state.params.q, dataModelId: $state.params.dataModelId}, options
 
@@ -208,7 +208,6 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         return catalogue.getDeprecationWarning($scope.element.elementType)($scope.element) if $scope.element and $scope.element.elementType
 
       $scope.tabs   = []
-      $scope.negativeDetailSections = []
       $scope.detailSections = []
       $scope.select = (tab) ->
         $scope.property = tab.name

@@ -22,6 +22,9 @@ names = {
   getPropertyNameFromQualifier: (type) ->
     return null if not type
     propertyNamesFromQualifiers[type] = propertyNamesFromQualifiers[type] ? if type.indexOf('.') > -1 then type.substring(type.lastIndexOf('.') + 1) else type
+
+  capitalize: (words) ->
+    return words.replace /(?:^|\s)\S/g, (a) -> return a.toUpperCase()
 }
 
 angular.module( 'mc.util.names', []).constant 'names', names

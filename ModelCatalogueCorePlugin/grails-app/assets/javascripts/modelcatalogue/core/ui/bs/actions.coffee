@@ -50,7 +50,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerActionInRoles 'favorite-element',[actionsProvider.ROLE_ITEM_DETAIL_ACTION], ['$scope', 'messages', '$state', 'security', 'catalogueElementResource', 'modelCatalogueApiRoot', 'enhance', 'rest', ($scope, messages, $state, security, catalogueElementResource, modelCatalogueApiRoot, enhance, rest) ->
+  actionsProvider.registerActionInRoles 'favorite-element',[actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INIFINITE_LIST], ['$scope', 'messages', '$state', 'security', 'catalogueElementResource', 'modelCatalogueApiRoot', 'enhance', 'rest', ($scope, messages, $state, security, catalogueElementResource, modelCatalogueApiRoot, enhance, rest) ->
     elementPresent = $scope.element and angular.isFunction($scope.element.getResourceName) and angular.isFunction($scope.element.getElementTypeName) and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('catalogueElement')
 
     return undefined if not elementPresent
@@ -669,6 +669,18 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
           @label = 'Expand All'
           @icon  = 'fa fa-plus-square-o'
 
+    }
+  ]
+
+  actionsProvider.registerActionInRole 'import-data-models-screen', 'data-models', [ ->
+
+    {
+      position:   10000
+      label:      'Import'
+      icon:       'fa fa-fw fa-upload'
+      type:       'primary'
+      abstract:     true
+      expandToLeft: true
     }
   ]
 

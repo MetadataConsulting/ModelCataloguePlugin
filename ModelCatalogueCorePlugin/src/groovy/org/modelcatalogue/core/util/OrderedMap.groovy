@@ -20,6 +20,20 @@ class OrderedMap {
         [type: 'orderedMap', values: map.collect { key, value -> [key: key, value: value]}]
     }
 
+    static Map<String, Object> toJsonMap(Object value) {
+        if (!value) {
+            return toJsonMap(null as Map<String, String>)
+        }
+        throw new IllegalArgumentException("Unknown type for ordered map!")
+    }
+
+    static Map<String, Object> toJsonMap(List<Map<String, String>> values) {
+        if (!values) {
+            return toJsonMap(null as Map<String, String>)
+        }
+        [type: 'orderedMap', values: values]
+    }
+
 
     static Map<String, String> fromJsonMap(Map<String, Object> jsonOrMap) {
         if (!jsonOrMap) {

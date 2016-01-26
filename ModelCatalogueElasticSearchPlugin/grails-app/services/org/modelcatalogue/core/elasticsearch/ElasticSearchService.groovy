@@ -73,9 +73,9 @@ class ElasticSearchService implements SearchCatalogue {
 
     @PostConstruct
     private void init() {
-        if (grailsApplication.config.mc.search.elasticsearch.local) {
+        if (grailsApplication.config.mc.search.elasticsearch.local || System.getProperty('mc.search.elasticsearch.local')) {
             node = NodeBuilder.nodeBuilder()
-                    .settings(Settings.builder().put('path.home', grailsApplication.config.mc.search.elasticsearch.local.toString()).build())
+                    .settings(Settings.builder().put('path.home', (grailsApplication.config.mc.search.elasticsearch.local ?:  System.getProperty('mc.search.elasticsearch.local')).toString()).build())
                     .local(true).node()
 
             client = node.client()

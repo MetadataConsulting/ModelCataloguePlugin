@@ -5,43 +5,30 @@ angular.module('mc.core.ui.infiniteList', ['mc.core.ui.infiniteListCtrl', 'ngAni
       list: '='
       noActions: '=?'
       itemHref: '&?'
-      onCreateRequested: '&?'
-      onSearch: '&?'
-      heading: '=?'
+      transform: '&?'
 
     templateUrl: 'modelcatalogue/core/ui/infinitePanels.html'
 
-    controller: ['$scope', '$animate', '$window', '$controller', '$element', '$attrs', ($scope, $animate, $window, $controller, $element, $attrs) ->
+    controller: ['$scope', '$animate', '$window', '$controller', '$element', '$attrs', 'detailSections', ($scope, $animate, $window, $controller, $element, $attrs, detailSections) ->
+
       unless $attrs.transform
         $scope.transform = (args) -> args.$element
+
       angular.extend(this, $controller('infiniteListCtrl', {$scope: $scope, $element: $element}))
-
-      unless $attrs.onCreateRequested
-        $scope.onCreateRequested = undefined
-
-      unless $attrs.onSearch
-        $scope.onSearch = undefined
 
       unless $attrs.itemHref
         $scope.itemHref = (obj) -> obj.$element.href()
 
-      $scope.requestCreate = ->
-        $scope.onCreateRequested($list: $scope.list)
-
-      $scope.nameFilter = ''
       $scope.href = (element) ->
         $scope.itemHref($element: element)
-      $scope.isNotFiltered = (element) ->
-        return true unless $scope.nameFilter
-        return false if element.name?.toLowerCase().indexOf($scope.nameFilter?.toLowerCase()) == -1
-        return true
+
+      $scope.getElement = (item) ->
+        $scope.transform($element: item)
 
 
-      $scope.$watch 'nameFilter', (newFilter)->
-        if $scope.onSearch
-          $scope.onSearch($term: newFilter)
-          return
-        $scope.$emit "infiniteList:filtered", newFilter
+      $scope.getDetailSections = (element) ->
+        detailSections.getAvailableViews(element)
+
     ]
   }
 ]

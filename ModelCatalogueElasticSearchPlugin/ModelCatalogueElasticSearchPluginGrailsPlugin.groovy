@@ -51,7 +51,7 @@ ElasticSearch support for Model Catalogue
     }
 
     def doWithSpring = {
-        if (application.config.mc.search.elasticsearch.local || application.config.mc.search.elasticsearch.host || System.getProperty('mc.search.elasticsearch.host')) {
+        if (application.config.mc.search.elasticsearch.local || application.config.mc.search.elasticsearch.host || System.getProperty('mc.search.elasticsearch.host') || System.getProperty('mc.search.elasticsearch.local')) {
             springConfig.addAlias('modelCatalogueSearchService','elasticSearchService')
         }
     }

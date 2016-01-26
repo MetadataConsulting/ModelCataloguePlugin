@@ -28,7 +28,8 @@ class CatalogueElementDocumentSerializer<T extends CatalogueElement> implements 
         safePut(builder, 'model_catalogue_id', element.modelCatalogueId ?: element.getDefaultModelCatalogueId(false))
         safePut(builder, 'entity_id', element.getId().toString())
         safePut(builder, 'status', element.status.toString())
-        safePut(builder, 'date_create', new Date(element.dateCreated.time))
+        safePut(builder, 'date_created', new Date(element.dateCreated.time))
+        safePut(builder, 'version_created', new Date(element.versionCreated.time))
         safePut(builder, 'last_updated', new Date(element.lastUpdated.time))
         safePut(builder, 'ext', getExtensions(element.ext))
 

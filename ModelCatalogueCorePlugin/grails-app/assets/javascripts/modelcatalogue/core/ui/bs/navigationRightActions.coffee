@@ -191,6 +191,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
       messages.prompt('Import Loinc File', '', type: 'new-loinc-import')
   }]
   actionsProvider.registerChildAction 'new-import', 'import-loinc', loincImport
+  actionsProvider.registerChildAction 'import-data-models-screen', 'import-loinc', loincImport
   actionsProvider.registerChildAction 'curator-menu', 'import-loinc', loincImport
   actionsProvider.registerActionInRole 'global-import-loinc', actionsProvider.ROLE_GLOBAL_ACTION, loincImport
 
@@ -202,6 +203,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
       messages.prompt('Import Excel File', '', type: 'new-excel-import')
   }]
   actionsProvider.registerChildAction 'new-import', 'import-excel', excelImport
+  actionsProvider.registerChildAction 'import-data-models-screen', 'import-excel', excelImport
   actionsProvider.registerChildAction 'curator-menu', 'import-excel', excelImport
   actionsProvider.registerActionInRole 'global-import-excel', actionsProvider.ROLE_GLOBAL_ACTION, excelImport
 
@@ -213,6 +215,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
       messages.prompt('Import OBO File', '', type: 'new-obo-import')
   }]
   actionsProvider.registerChildAction 'new-import', 'import-obo', oboImport
+  actionsProvider.registerChildAction 'import-data-models-screen', 'import-obo', oboImport
   actionsProvider.registerChildAction 'curator-menu', 'import-obo', oboImport
   actionsProvider.registerActionInRole 'global-import-obo', actionsProvider.ROLE_GLOBAL_ACTION, oboImport
 
@@ -224,6 +227,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
       messages.prompt('Import Star Uml File', '', type: 'new-umlj-import')
   }]
   actionsProvider.registerChildAction 'new-import', 'import-umlj', umlImport
+  actionsProvider.registerChildAction 'import-data-models-screen', 'import-umlj', umlImport
   actionsProvider.registerChildAction 'curator-menu', 'import-umlj', umlImport
   actionsProvider.registerActionInRole 'global-import-uml', actionsProvider.ROLE_GLOBAL_ACTION, umlImport
 
@@ -235,6 +239,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
       messages.prompt('Import Model Catalogue DSL File', '', type: 'new-mc-import')
   }]
   actionsProvider.registerChildAction 'new-import', 'import-mc', mcImport
+  actionsProvider.registerChildAction 'import-data-models-screen', 'import-mc', mcImport
   actionsProvider.registerChildAction 'curator-menu', 'import-mc', mcImport
   actionsProvider.registerActionInRole 'global-import-mc', actionsProvider.ROLE_GLOBAL_ACTION, mcImport
 
@@ -247,6 +252,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
       messages.prompt('Import Model Catalogue XML File', '', type: 'new-catalogue-xml-import')
   }]
   actionsProvider.registerChildAction 'new-import', 'import-catalogue-xml', xmlImport
+  actionsProvider.registerChildAction 'import-data-models-screen', 'import-catalogue-xml', xmlImport
   actionsProvider.registerChildAction 'curator-menu', 'import-catalogue-xml', xmlImport
   actionsProvider.registerActionInRole 'global-import-xml', actionsProvider.ROLE_GLOBAL_ACTION, xmlImport
 

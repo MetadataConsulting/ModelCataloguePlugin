@@ -174,7 +174,12 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
 		true
 	}
 
-	protected bindRelations(DataModel instance, boolean newVersion, Object objectToBind) {
+    @Override
+    protected boolean isFavoriteAfterUpdate() {
+        return true
+    }
+
+    protected bindRelations(DataModel instance, boolean newVersion, Object objectToBind) {
 		if (objectToBind.declares != null) {
 			for (domain in instance.declares.findAll { !(it.id in objectToBind.declares*.id) }) {
 				domain.dataModel = null

@@ -46,6 +46,27 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
       ]
 
 
+  actionsProvider.registerActionInRole 'create-data-model', 'data-models' ,['$scope', 'names', 'security', 'messages', '$state', '$log', ($scope, names, security, messages, $state, $log) ->
+      return undefined unless security.hasRole('CURATOR')
+
+      {
+        label:      "Create"
+        icon:       'fa fa-fw fa-plus-circle'
+        type:       'success'
+        position:   0
+        action:     ->
+          args      = {create: 'dataModel', type: 'create-dataModel'}
+
+          security.requireRole('CURATOR')
+          .then ->
+            messages.prompt('Create New Data Model', '', args).then (dataModel) ->
+              dataModel.show()
+          , (errors)->
+            $log.error errors
+            messages.error('You don\'t have rights to create new elements')
+      }
+  ]
+
   actionsProvider.registerActionInRole 'all-data-models', actionsProvider.ROLE_GLOBAL_ACTION ,['security', '$scope', '$state', (security, $scope, $state) ->
     return undefined if not security.isUserLoggedIn()
 

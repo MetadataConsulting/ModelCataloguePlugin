@@ -9,7 +9,6 @@ import org.modelcatalogue.core.util.*
 import org.modelcatalogue.core.util.lists.CustomizableJsonListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeWrapper
-import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.lists.Mappings
 import org.modelcatalogue.core.util.lists.Relationships
@@ -298,7 +297,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 type: type,
                 owner: element,
                 direction: direction,
-                list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), direction.composeWhere(element, type, DataModelFilter.from(modelCatalogueSecurityService.currentUser)))
+                list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), direction.composeWhere(element, type, ElementService.getStatusFromParams(params), DataModelFilter.from(modelCatalogueSecurityService.currentUser)))
         )
     }
 
@@ -567,6 +566,10 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         if (instance.hasErrors()) {
             respond instance.errors
             return
+        }
+
+        if (favoriteAfterUpdate) {
+            modelCatalogueSecurityService.currentUser.createLinkTo(instance, RelationshipType.favouriteType)
         }
 
         respond instance, [status: OK]
@@ -858,4 +861,5 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
         dataModelService.dataModelFilter
     }
+
 }

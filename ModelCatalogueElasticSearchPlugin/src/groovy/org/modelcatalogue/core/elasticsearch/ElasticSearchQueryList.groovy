@@ -4,7 +4,9 @@ import groovy.util.logging.Log4j
 import org.elasticsearch.action.search.SearchRequestBuilder
 import org.elasticsearch.action.search.SearchResponse
 import org.elasticsearch.search.SearchHit
+import org.elasticsearch.search.SearchHitField
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.lists.JsonAwareListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 
@@ -27,7 +29,7 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
         this.searchRequest = searchRequest
 
         if (CatalogueElement.isAssignableFrom(type)) {
-            searchRequest.addFields('name', '_id', 'fully_qualified_type','link','status','version_number','latest_id', 'data_model', 'model_catalogue_id', 'description')
+            searchRequest.addFields('name', '_id', 'fully_qualified_type','link','status','version_number','latest_id', 'data_model', 'model_catalogue_id', 'description', 'ext', 'date_created', 'last_updated', 'version_created')
         }
     }
 
@@ -83,10 +85,22 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
                         latestVersionId: hit.field('latest_id')?.value(),
                         classifiedName: hit.field('data_model')?.value() ? "${hit.field('name').value()} (${hit.field('data_model').value()})" : hit.field('name').value(),
                         modelCatalogueId: hit.field('model_catalogue_id')?.value(),
-                        description: hit.field('description')?.value()
+                        description: hit.field('description')?.value(),
+                        ext: OrderedMap.toJsonMap(hit.field('ext')?.value()),
+                        dateCreated: readDate(hit, 'data_created'),
+                        versionCreated: readDate(hit, 'version_created'),
+                        lastUpdated: readDate(hit, 'last_updated')
                 ]
             }
         }
         return items
+    }
+
+    private static Date readDate(SearchHit hit, String property) {
+        SearchHitField value = hit.field(property)
+        if (!value?.value) {
+            return null
+        }
+        return new Date(value.value as Long)
     }
 }

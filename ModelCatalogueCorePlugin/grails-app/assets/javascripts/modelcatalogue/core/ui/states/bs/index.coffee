@@ -12,6 +12,7 @@ angular.module('mc.core.ui.states.bs', [
   'mc.core.ui.states.bs.csvTransformation.html'
   'mc.core.ui.states.bs.mc.html'
   'mc.core.ui.states.bs.panels.html'
+  'mc.core.ui.states.bs.dataModels.html'
 ])
 
 window.modelcatalogue.registerModule 'mc.core.ui.states.bs'

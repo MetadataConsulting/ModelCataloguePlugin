@@ -87,12 +87,6 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
             return true
 
         return false
-      isEnabledFor: (orderedMap) ->
-        return false if not orderedMap
-        return false if not orderedMap.type == 'orderedMap'
-        for key in configuration.keys
-          return true if orderedMap.get(key)?
-        return false
       getTemplate: -> configuration.template
       getTitle: -> configuration.title
       getPosition: -> configuration.position

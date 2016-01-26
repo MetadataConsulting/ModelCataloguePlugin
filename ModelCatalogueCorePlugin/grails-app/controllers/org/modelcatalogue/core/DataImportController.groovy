@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.integration.excel.ExcelLoader
 import org.modelcatalogue.integration.excel.HeadersMap
@@ -68,6 +69,8 @@ class DataImportController  {
 
         DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService, isAdmin)
 
+        Long userId = modelCatalogueSecurityService.currentUser?.id
+
         if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xls")) {
             def asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
             def id = asset.id
@@ -77,7 +80,7 @@ class DataImportController  {
                 try {
                     ExcelLoader parser = new ExcelLoader(builder)
                     parser.importData(headersMap, inputStream)
-                    finalizeAsset(id, (DataModel) (builder.created.find {it.instanceOf(DataModel)} ?: builder.created.find{it.dataModel}?.dataModel))
+                    finalizeAsset(id, (DataModel) (builder.created.find {it.instanceOf(DataModel)} ?: builder.created.find{it.dataModel}?.dataModel), userId)
                 } catch (Exception e) {
                     logError(id, e)
                 }
@@ -94,7 +97,7 @@ class DataImportController  {
                 try {
                     CatalogueXmlLoader loader = new CatalogueXmlLoader(builder)
                     loader.load(inputStream)
-                    finalizeAsset(id, (DataModel) (builder.created.find {it.instanceOf(DataModel)} ?: builder.created.find{it.dataModel}?.dataModel))
+                    finalizeAsset(id, (DataModel) (builder.created.find {it.instanceOf(DataModel)} ?: builder.created.find{it.dataModel}?.dataModel), userId)
                 } catch (Exception e) {
                     logError(id, e)
                 }
@@ -114,7 +117,7 @@ class DataImportController  {
                     OboLoader loader = new OboLoader(builder)
                     idpattern = idpattern ?: "${grailsApplication.config.grails.serverURL}/catalogue/ext/${URLEncoder.encode(OboLoader.OBO_ID, 'UTF-8')}/:id".toString().replace(':id', '$id')
                     loader.load(inputStream, name, idpattern)
-                    finalizeAsset(id, (DataModel) (builder.created.find {it.instanceOf(DataModel)} ?: builder.created.find{it.dataModel}?.dataModel))
+                    finalizeAsset(id, (DataModel) (builder.created.find {it.instanceOf(DataModel)} ?: builder.created.find{it.dataModel}?.dataModel), userId)
                 } catch (Exception e) {
                     logError(id, e)
                 }
@@ -132,7 +135,7 @@ class DataImportController  {
             executeInBackground(id, "Imported from LOINC")  {
                 try {
                     Set<CatalogueElement> created = loincImportService.serviceMethod(inputStream)
-                    finalizeAsset(id, (DataModel) (created.find {it.instanceOf(DataModel)} ?: created.find{it.dataModel}?.dataModel))
+                    finalizeAsset(id, (DataModel) (created.find {it.instanceOf(DataModel)} ?: created.find{it.dataModel}?.dataModel), userId)
                 } catch (Exception e) {
                     logError(id, e)
                 }
@@ -150,7 +153,7 @@ class DataImportController  {
             executeInBackground(id, "Imported from Model Catalogue DSL")  {
                 try {
                     Set<CatalogueElement> created = initCatalogueService.importMCFile(inputStream)
-                    finalizeAsset(id, (DataModel) (created.find {it.instanceOf(DataModel)} ?: created.find{it.dataModel}?.dataModel))
+                    finalizeAsset(id, (DataModel) (created.find {it.instanceOf(DataModel)} ?: created.find{it.dataModel}?.dataModel), userId)
                 } catch (Exception e) {
                     logError(id, e)
                 }
@@ -202,12 +205,21 @@ class DataImportController  {
         respond "errors": errors
     }
 
-    protected static Asset finalizeAsset(Long id, DataModel dataModel){
+    protected static Asset finalizeAsset(Long id, DataModel dataModel, Long userId){
         Asset updated = Asset.get(id)
+
+        if (!dataModel) {
+            return updated
+        }
         updated.dataModel = dataModel
         updated.status = ElementStatus.FINALIZED
         updated.description = "Your import has finished."
         updated.save(flush: true, failOnError: true)
+
+        if (userId && User.exists(userId)) {
+            User.get(userId).createLinkTo(dataModel, RelationshipType.favouriteType)
+        }
+
         updated
     }
     protected redirectToAsset(Long id){

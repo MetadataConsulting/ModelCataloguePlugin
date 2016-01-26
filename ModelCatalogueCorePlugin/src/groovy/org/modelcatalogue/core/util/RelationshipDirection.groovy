@@ -4,13 +4,14 @@ import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.api.ElementStatus
 
 enum RelationshipDirection {
 
     INCOMING {
 
         @Override
-        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, DataModelFilter filter) {
+        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<ElementStatus> states, DataModelFilter filter) {
             DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
             criteria.join 'source'
             criteria.eq('destination', element)
@@ -30,6 +31,16 @@ enum RelationshipDirection {
                         if (filter.includes) {
                             criteria.'in'  'dataModel.id', filter.includes
                         }
+                    }
+                }
+            }
+
+            if (states && states.toSet().size() != ElementStatus.values().size()) {
+                criteria.source {
+                    if (states.size() == 1) {
+                        'eq' 'status', states.first()
+                    } else {
+                        'in' 'status', states
                     }
                 }
             }
@@ -85,7 +96,7 @@ enum RelationshipDirection {
     OUTGOING {
 
         @Override
-        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, DataModelFilter filter) {
+        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<ElementStatus> states, DataModelFilter filter) {
             DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
             criteria.join 'destination'
             criteria.eq('source', element)
@@ -105,6 +116,16 @@ enum RelationshipDirection {
                         if (filter.includes) {
                             criteria.'in'  'dataModel.id', filter.includes
                         }
+                    }
+                }
+            }
+
+            if (states && states.toSet().size() != ElementStatus.values().size()) {
+                criteria.destination {
+                    if (states.size() == 1) {
+                        'eq' 'status', states.first()
+                    } else {
+                        'in' 'status', states
                     }
                 }
             }
@@ -161,7 +182,7 @@ enum RelationshipDirection {
     },
     BOTH {
         @Override
-        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, DataModelFilter filter) {
+        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<ElementStatus> status, DataModelFilter filter) {
             DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
             criteria.join 'source'
             criteria.join 'destination'
@@ -238,7 +259,7 @@ enum RelationshipDirection {
         }
     }
 
-    /* GROOVY-7415 abstract */ DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, DataModelFilter filter) { throw new UnsupportedOperationException("Not Yet Implemented")}
+    /* GROOVY-7415 abstract */ DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<ElementStatus> status, DataModelFilter filter) { throw new UnsupportedOperationException("Not Yet Implemented")}
     /* GROOVY-7415 abstract */ String getDirection(CatalogueElement owner, Relationship relationship) { throw new UnsupportedOperationException("Not Yet Implemented")}
     /* GROOVY-7415 abstract */ CatalogueElement getRelation(CatalogueElement owner, Relationship relationship) { throw new UnsupportedOperationException("Not Yet Implemented")}
     /* GROOVY-7415 abstract */ CatalogueElement getElement(CatalogueElement owner, Relationship relationship) { throw new UnsupportedOperationException("Not Yet Implemented")}

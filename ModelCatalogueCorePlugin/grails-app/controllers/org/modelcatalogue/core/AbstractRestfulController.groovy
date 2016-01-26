@@ -8,7 +8,6 @@ import org.hibernate.StaleStateException
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
-import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.springframework.dao.ConcurrencyFailureException
@@ -165,6 +164,10 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         'CURATOR'
     }
 
+    protected boolean isFavoriteAfterUpdate() {
+        return false
+    }
+
     /**
      * Saves a resource
      */
@@ -218,6 +221,10 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
+        if (favoriteAfterUpdate) {
+            modelCatalogueSecurityService.currentUser.createLinkTo(instance, RelationshipType.favouriteType)
+        }
+
 
         respond instance, [status: CREATED]
     }
@@ -256,7 +263,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         bindRelations(instance, false)
 
-        if (instance.hasErrors()) {
+        if (instance.hasErrors()) {s
             respond instance.errors
             return
         }

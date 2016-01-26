@@ -69,7 +69,7 @@ class RelationshipService {
         if (!params.sort) {
             params.sort = direction.sortProperty
         }
-        Lists.fromCriteria(params, direction.composeWhere(element, type, element.instanceOf(User) ? DataModelFilter.NO_FILTER : DataModelFilter.from(modelCatalogueSecurityService.currentUser)))
+        Lists.fromCriteria(params, direction.composeWhere(element, type, ElementService.getStatusFromParams(params), element.instanceOf(User) ? DataModelFilter.NO_FILTER : DataModelFilter.from(modelCatalogueSecurityService.currentUser)))
     }
 
     /**
@@ -396,7 +396,7 @@ class RelationshipService {
     }
 
     private static Relationship moveAfterWithRearrange(RelationshipDirection direction, CatalogueElement owner, Relationship relationship, Relationship other) {
-        List<Relationship> relationships = direction.composeWhere(owner, relationship.relationshipType, DataModelFilter.NO_FILTER).list([sort: direction.sortProperty])
+        List<Relationship> relationships = direction.composeWhere(owner, relationship.relationshipType, [], DataModelFilter.NO_FILTER).list([sort: direction.sortProperty])
         int correction = 0
         relationships.eachWithIndex { Relationship entry, i ->
             if (entry == relationship) {
