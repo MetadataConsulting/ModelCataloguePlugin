@@ -221,7 +221,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
-        if (favoriteAfterUpdate) {
+        if (favoriteAfterUpdate && modelCatalogueSecurityService.userLoggedIn && instance) {
             modelCatalogueSecurityService.currentUser.createLinkTo(instance, RelationshipType.favouriteType)
         }
 
