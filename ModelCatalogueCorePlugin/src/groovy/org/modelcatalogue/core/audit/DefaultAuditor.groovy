@@ -28,7 +28,7 @@ class DefaultAuditor extends AbstractAuditor {
     }
 
     Observable<Long> logExternalChange(CatalogueElement source, String message, Long authorId) {
-        logChange(source,
+        logChange(source, false,
                 changedId: source.id,
                 latestVersionId: source.latestVersionId ?: source.id,
                 authorId: authorId ?: defaultAuthorId,
@@ -39,7 +39,7 @@ class DefaultAuditor extends AbstractAuditor {
     }
 
     Observable<Long> logNewVersionCreated(CatalogueElement element, Long authorId) {
-        logChange(element,
+        logChange(element, false,
                 changedId: element.id,
                 latestVersionId: element.latestVersionId ?: element.id,
                 authorId: authorId ?: defaultAuthorId,
@@ -49,7 +49,7 @@ class DefaultAuditor extends AbstractAuditor {
     }
 
     Observable<Long> logElementFinalized(CatalogueElement element, Long authorId) {
-        logChange(element,
+        logChange(element, false,
                 changedId: element.id,
                 latestVersionId: element.latestVersionId ?: element.id,
                 authorId: authorId ?: defaultAuthorId,
@@ -62,7 +62,7 @@ class DefaultAuditor extends AbstractAuditor {
     }
 
     Observable<Long> logElementDeprecated(CatalogueElement element, Long authorId) {
-        logChange(element,
+        logChange(element, false,
                 changedId: element.id,
                 latestVersionId: element.latestVersionId ?: element.id,
                 authorId: authorId ?: defaultAuthorId,
@@ -311,12 +311,12 @@ class DefaultAuditor extends AbstractAuditor {
         )
     }
 
-    Observable<Long> logChange(Map <String, Object> changeProps, CatalogueElement element) {
+    Observable<Long> logChange(Map <String, Object> changeProps, CatalogueElement element, boolean async = true) {
         AsyncSubject<Long> subject = AsyncSubject.create()
 
         boolean currentSystem = system
 
-        executorService.submit {
+        Closure code = {
 
             try {
                 Change change = new Change(changeProps)
@@ -339,6 +339,12 @@ class DefaultAuditor extends AbstractAuditor {
             }
 
             subject.onCompleted()
+        }
+
+        if (async) {
+            executorService.submit code
+        } else {
+            code()
         }
 
         return subject

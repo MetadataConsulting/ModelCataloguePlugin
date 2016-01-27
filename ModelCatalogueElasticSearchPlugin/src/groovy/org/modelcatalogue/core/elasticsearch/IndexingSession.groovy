@@ -7,6 +7,8 @@ import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.util.HibernateHelper
 import rx.Observable
 
+import static rx.Observable.just
+
 class IndexingSession {
 
     final Cache<String, Document> documentCache = CacheBuilder.newBuilder().build()
@@ -19,12 +21,18 @@ class IndexingSession {
     private IndexingSession() {}
 
     Document getDocument(Object o) {
+        if (!o) {
+            return new Document('','',ImmutableMap.of())
+        }
         documentCache.get("${HibernateHelper.getEntityClass(o)}:${o.getId()}") {
             createDocument(o)
         }
     }
 
     Observable<Boolean> indexOnlyOnce(Object o, Closure<Observable<Boolean>> index) {
+        if (!o) {
+            return just(false)
+        }
         indexingCache.get("${HibernateHelper.getEntityClass(o)}:${o.getId()}") {
             index().cache()
         }

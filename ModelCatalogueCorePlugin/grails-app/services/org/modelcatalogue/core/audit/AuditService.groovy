@@ -234,6 +234,16 @@ class AuditService {
         }
         if (changeId) {
             Change change = Change.get(changeId)
+            if (!change) {
+                Change.withSession {
+                    it.flush()
+                }
+                change = Change.get(changeId)
+                if (!change) {
+                    log.error("Cannot bind changedId to Change[$changeId] - not found")
+                    return ce
+                }
+            }
             change.changedId = ce.id
             change.dateCreated = new Date()
             FriendlyErrors.failFriendlySave(change)

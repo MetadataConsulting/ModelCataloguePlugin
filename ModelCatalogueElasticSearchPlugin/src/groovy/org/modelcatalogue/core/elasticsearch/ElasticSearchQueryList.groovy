@@ -5,7 +5,14 @@ import org.elasticsearch.action.search.SearchRequestBuilder
 import org.elasticsearch.action.search.SearchResponse
 import org.elasticsearch.search.SearchHit
 import org.elasticsearch.search.SearchHitField
+import org.joda.time.format.ISODateTimeFormat
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.EnumeratedType
+import org.modelcatalogue.core.MeasurementUnit
+import org.modelcatalogue.core.PrimitiveType
+import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.lists.JsonAwareListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
@@ -27,10 +34,6 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
         this.params = params
         this.type = type
         this.searchRequest = searchRequest
-
-        if (CatalogueElement.isAssignableFrom(type)) {
-            searchRequest.addFields('name', '_id', 'fully_qualified_type','link','status','version_number','latest_id', 'data_model', 'model_catalogue_id', 'description', 'ext', 'date_created', 'last_updated', 'version_created')
-        }
     }
 
     @Override
@@ -54,6 +57,9 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
             if (params.max) {
                 searchRequest.setSize(Integer.parseInt(params.max.toString(), 10))
             }
+            if (params.explain) {
+                log.info searchRequest.toString()
+            }
             searchRequest.execute().get()
         } catch (Exception e) {
             log.error("Exception searching query: ${searchRequest.toString()}")
@@ -76,31 +82,68 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
         // don't forget to add field into the fetched field in the constructor if you want to use it
         if (CatalogueElement.isAssignableFrom(type)) {
             return response.hits.hits.collect { SearchHit hit ->
-                [
-                        name: hit.field('name')?.value(),
-                        id: hit.id(),
-                        elementType: hit.field('fully_qualified_type')?.value(),
-                        link:  hit.field('link'), status: hit.field('status')?.value(),
-                        versionNumber: hit.field('version_number')?.value(),
-                        latestVersionId: hit.field('latest_id')?.value(),
-                        classifiedName: hit.field('data_model')?.value() ? "${hit.field('name').value()} (${hit.field('data_model').value()})" : hit.field('name').value(),
-                        modelCatalogueId: hit.field('model_catalogue_id')?.value(),
-                        description: hit.field('description')?.value(),
-                        ext: OrderedMap.toJsonMap(hit.field('ext')?.value()),
-                        dateCreated: readDate(hit, 'data_created'),
-                        versionCreated: readDate(hit, 'version_created'),
-                        lastUpdated: readDate(hit, 'last_updated')
-                ]
+                readSource(hit.id(), hit.source)
             }
         }
         return items
     }
 
-    private static Date readDate(SearchHit hit, String property) {
-        SearchHitField value = hit.field(property)
-        if (!value?.value) {
+    private static Date readDate(Map<String, Object> source, String property) {
+        Object value = source.get(property)
+        if (!value) {
             return null
         }
-        return new Date(value.value as Long)
+        return ISODateTimeFormat.dateOptionalTimeParser().parseDateTime(value.toString()).toDate()
+    }
+
+
+    private static Map<String, Object> readSource(String id, Map<String, Object> source) {
+        if (!source) {
+            return null
+        }
+
+        Map<String, Object> ret = [
+                name: source.get('name'),
+                id: id,
+                elementType: source.get('fully_qualified_type'),
+                link:  source.get('link'), status: source.get('status'),
+                versionNumber: source.get('version_number'),
+                latestVersionId: source.get('latest_id'),
+                dataModel: readSource(source.get('data_model')?.id?.toString(), source.get('data_model') as  Map<String, Object>),
+                classifiedName: source.get('data_model') ? "${source.get('name')} (${source.get('data_model').get('name')})" : source.get('name'),
+                modelCatalogueId: source.get('model_catalogue_id'),
+                internalModelCatalogueId: source.get('internal_model_catalogue_id'),
+                description: source.get('description'),
+                ext: OrderedMap.toJsonMap(source.get('ext')),
+                dateCreated: readDate(source, 'data_created'),
+                versionCreated: readDate(source, 'version_created'),
+                lastUpdated: readDate(source, 'last_updated'),
+                minimal: true
+        ]
+
+        if (ret.elementType == DataModel.name) {
+            ret.revisionNotes = source.get('revision_notes')
+            ret.semanticVersion = source.get('semantic_version')
+        } else if (ret.elementType == MeasurementUnit.name) {
+            ret.symbol = source.get('symbol')
+        } else if (ret.elementType == DataElement.name) {
+            if (source.data_type) {
+                ret.dataType = readSource(source.data_type.id.toString(), source.data_type)
+            }
+        } else if (ret.elementType == PrimitiveType.name) {
+            if (source.measurement_unit) {
+                ret.measurementUnit = readSource(source.measurement_unit.id.toString(), source.measurement_unit)
+            }
+        } else if (ret.elementType == ReferenceType.name) {
+            if (source.data_class) {
+                ret.dataClass = readSource(source.data_class.id.toString(), source.data_class)
+            }
+        } else if (ret.elementType == EnumeratedType.name) {
+            if (source.enumerated_value) {
+                ret.enumerations = OrderedMap.toJsonMap(source.enumerated_value)
+            }
+        }
+
+        return ret
     }
 }

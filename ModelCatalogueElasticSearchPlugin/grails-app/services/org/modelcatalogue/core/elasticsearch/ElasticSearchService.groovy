@@ -4,8 +4,6 @@ import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import grails.gorm.DetachedCriteria
 import grails.util.GrailsNameUtils
-import groovy.json.JsonBuilder
-import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
@@ -41,6 +39,7 @@ class ElasticSearchService implements SearchCatalogue {
     static transactional = false
 
     private static Cache<Class, List<Class>> subclassesCache = CacheBuilder.newBuilder().initialCapacity(20).build()
+    private static Cache<String, Map<String, Map>> mappingsCache = CacheBuilder.newBuilder().initialCapacity(20).build()
 
     private static String MC_PREFIX = "mc_"
     private static String GLOBAL_PREFIX = "${MC_PREFIX}global_"
@@ -112,16 +111,36 @@ class ElasticSearchService implements SearchCatalogue {
         List<String> indicies = collectDataModelIndicies(params)
         String search = params.search
 
-        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery().minimumNumberShouldMatch(1)
+
+        if (type) {
+            boolQuery.must(QueryBuilders.termQuery('relationship_type.name', type.name))
+        }
+
+        List<String> states = []
+
+        if (params.status) {
+            states = ElementService.getStatusFromParams(params)*.toString()
+        }
 
         switch (direction) {
             case RelationshipDirection.OUTGOING:
                 boolQuery.should(QueryBuilders.prefixQuery('destination.name', search))
                 boolQuery.should(QueryBuilders.matchQuery('destination.name', search))
+
+                if (states) {
+                    boolQuery.must(QueryBuilders.termsQuery('destination.status', states))
+                }
+
                 break;
             case RelationshipDirection.INCOMING:
                 boolQuery.should(QueryBuilders.prefixQuery('source.name', search))
                 boolQuery.should(QueryBuilders.matchQuery('source.name', search))
+
+                if (states) {
+                    boolQuery.must(QueryBuilders.termsQuery('source.status', states))
+                }
+
                 break;
             case RelationshipDirection.BOTH:
                 BoolQueryBuilder outgoing = QueryBuilders.boolQuery()
@@ -129,10 +148,18 @@ class ElasticSearchService implements SearchCatalogue {
                 outgoing.should(QueryBuilders.matchQuery('destination.name', search))
                 outgoing.mustNot(QueryBuilders.termQuery('destination.entity_id', element.id.toString()))
 
+                if (states) {
+                    outgoing.must(QueryBuilders.termsQuery('destination.status', states))
+                }
+
                 BoolQueryBuilder incoming = QueryBuilders.boolQuery()
                 incoming.should(QueryBuilders.prefixQuery('source.name', search))
                 incoming.should(QueryBuilders.matchQuery('source.name', search))
                 incoming.mustNot(QueryBuilders.termQuery('source.entity_id', element.id.toString()))
+
+                if (states) {
+                    incoming.must(QueryBuilders.termsQuery('source.status', states))
+                }
 
                 boolQuery.should(outgoing)
                 boolQuery.should(incoming)
@@ -142,7 +169,6 @@ class ElasticSearchService implements SearchCatalogue {
         SearchRequestBuilder request = client
                 .prepareSearch(indicies as String[])
                 .setTypes(getTypeName(Relationship))
-                .addField('_id')
                 .setQuery(boolQuery)
 
 
@@ -158,10 +184,10 @@ class ElasticSearchService implements SearchCatalogue {
         if (CatalogueElement.isAssignableFrom(resource)) {
             indicies = collectDataModelIndicies(params)
 
-            BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
+            BoolQueryBuilder boolQuery = QueryBuilders.boolQuery().minimumNumberShouldMatch(1)
 
             if (params.status) {
-                boolQuery.must(QueryBuilders.termQuery('status', params.status.toString().toUpperCase()))
+                boolQuery.must(QueryBuilders.termsQuery('status', ElementService.getStatusFromParams(params)*.toString()))
             }
 
             CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
@@ -174,10 +200,10 @@ class ElasticSearchService implements SearchCatalogue {
         } else if (RelationshipType.isAssignableFrom(resource)) {
             indicies = [getGlobalIndexName(resource)]
 
-            BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
+            BoolQueryBuilder boolQuery = QueryBuilders.boolQuery().minimumNumberShouldMatch(1)
 
             if (params.status) {
-                boolQuery.must(QueryBuilders.termQuery('status', params.status.toString().toUpperCase()))
+                boolQuery.must(QueryBuilders.termsQuery('status', ElementService.getStatusFromParams(params)*.toString()))
             }
 
             CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
@@ -194,8 +220,8 @@ class ElasticSearchService implements SearchCatalogue {
 
         SearchRequestBuilder request = client
                 .prepareSearch(indicies as String[])
+                .setFetchSource(true)
                 .setTypes(collectTypes(resource) as String[])
-                .addField('_id')
                 .setQuery(qb)
 
 
@@ -375,6 +401,18 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     Map<String, Map> getMapping(Class clazz) {
+        getMapping(clazz, clazz)
+    }
+
+    Map<String, Map> getMapping(Class clazz, Class implementation) {
+        mappingsCache.get("$clazz=>$implementation") {
+            getMappingInternal(clazz, implementation)
+        }
+    }
+
+    Map<String, Map> getMappingInternal(Class clazz, Class implementation) {
+        ElasticSearchService service = this
+
         if (!clazz) {
             return [:]
         }
@@ -384,10 +422,8 @@ class ElasticSearchService implements SearchCatalogue {
         Map<String, Map> mapping = [(typeName): [:]]
 
         if (clazz.superclass && clazz.superclass != Object) {
-            merge mapping[typeName], getMapping(clazz.superclass)[getTypeName(clazz.superclass)]
+            merge mapping[typeName], service.getMapping(clazz.superclass, implementation)[getTypeName(clazz.superclass)]
         }
-
-
 
         URL url = ElasticSearchService.getResource("${clazz.simpleName}.mapping.json")
 
@@ -415,9 +451,14 @@ class ElasticSearchService implements SearchCatalogue {
 
             mapping[typeName].properties.source = catalogueElementMappingCombined.catalogue_element
             mapping[typeName].properties.destination = catalogueElementMappingCombined.catalogue_element
+        } else if (clazz == CatalogueElement && implementation != DataModel) {
+            // source and destination combines all available catalogue element mappings
+            // relationship copies relationship type mapping
+            mapping[typeName].properties.data_model = getMapping(DataModel).data_model
         }
 
         return mapping
+
     }
 
     private Observable<SimpleIndexResponse> indexAsync(IndexingSession session, object) {
@@ -445,21 +486,27 @@ class ElasticSearchService implements SearchCatalogue {
 
     private Observable<Document> getElementWithRelationships(IndexingSession session, CatalogueElement element) {
         ReplaySubject<Document> subject = ReplaySubject.create()
+
         executorService.submit {
-            subject.onNext(session.getDocument(element))
-            DetachedCriteria<Relationship> criteria = Relationship.where {
-                source == element || destination == element
-            }
-
-            Number total = criteria.count()
-
-
-            for (int page = 0 ; page * EMIT_RELATIONSHIPS_PAGE < total ; page++) {
-                criteria.list(max: EMIT_RELATIONSHIPS_PAGE, offset: page * EMIT_RELATIONSHIPS_PAGE).each {
-                    subject.onNext(session.getDocument(it))
+            try {
+                subject.onNext(session.getDocument(element))
+                DetachedCriteria<Relationship> criteria = Relationship.where {
+                    source == element || destination == element
                 }
+
+                Number total = criteria.count()
+
+
+                for (int page = 0 ; page * EMIT_RELATIONSHIPS_PAGE < total ; page++) {
+                    criteria.list(max: EMIT_RELATIONSHIPS_PAGE, offset: page * EMIT_RELATIONSHIPS_PAGE).each {
+                        subject.onNext(session.getDocument(it))
+                    }
+                }
+                subject.onCompleted()
+            } catch (Exception e) {
+                subject.onError(e)
             }
-            subject.onCompleted()
+
         }
         return subject
     }
@@ -467,21 +514,31 @@ class ElasticSearchService implements SearchCatalogue {
     private Observable<CatalogueElement> getDataModelWithDeclaredElements(DataModel element) {
         ReplaySubject<CatalogueElement> subject = ReplaySubject.create()
 
+        DetachedCriteria<CatalogueElement> criteria = CatalogueElement.where {
+            dataModel == element
+        }
+
+        log.info "Going to index ${criteria.count()} items for $element"
+
         executorService.submit {
-            subject.onNext(element)
-            DetachedCriteria<CatalogueElement> criteria = CatalogueElement.where {
-                dataModel == element
-            }
+            try {
+                subject.onNext(element)
 
-            Number total = criteria.count()
+                Number total = criteria.count()
 
-            for (int page = 0 ; page * EMIT_RELATIONSHIPS_PAGE < total ; page++) {
-                criteria.list(max: EMIT_RELATIONSHIPS_PAGE, offset: page * EMIT_RELATIONSHIPS_PAGE).each {
-                    subject.onNext(it)
+                log.info "Emitting $total items for $element"
+
+                for (int page = 0 ; page * EMIT_RELATIONSHIPS_PAGE < total ; page++) {
+                    criteria.list(max: EMIT_RELATIONSHIPS_PAGE, offset: page * EMIT_RELATIONSHIPS_PAGE).each {
+                        subject.onNext(it)
+                    }
                 }
+
+                subject.onCompleted()
+            } catch (Exception e) {
+                subject.onError(e)
             }
 
-            subject.onCompleted()
         }
         return subject
     }
@@ -490,10 +547,14 @@ class ElasticSearchService implements SearchCatalogue {
         ReplaySubject<Document> subject = ReplaySubject.create()
 
         executorService.submit {
-            subject.onNext(session.getDocument(rel))
-            subject.onNext(session.getDocument(rel.source))
-            subject.onNext(session.getDocument(rel.destination))
-            subject.onCompleted()
+            try {
+                subject.onNext(session.getDocument(rel))
+                subject.onNext(session.getDocument(rel.source))
+                subject.onNext(session.getDocument(rel.destination))
+                subject.onCompleted()
+            } catch (Exception e) {
+                subject.onError(e)
+            }
         }
 
         return subject
@@ -542,7 +603,9 @@ class ElasticSearchService implements SearchCatalogue {
             for (Class type in supportedTypes) {
                 request.addMapping(getTypeName(type), getMapping(type))
             }
-            return from(request.execute()).map {
+            return from(request.execute()).doOnError {
+                log.error "Error creating index", it
+            } .map {
                 return response.index
             }
         }

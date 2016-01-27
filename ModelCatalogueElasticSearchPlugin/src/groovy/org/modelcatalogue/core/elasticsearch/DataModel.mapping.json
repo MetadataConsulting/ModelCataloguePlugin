@@ -1,0 +1,14 @@
+{
+  "data_model": {
+    "properties": {
+      "semantic_version": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "revision_notes": {
+        "type": "string",
+        "index": "not_analyzed"
+      }
+    }
+  }
+}

@@ -214,6 +214,7 @@ log4j.main = {
     debug 'org.modelcatalogue.core.util.test'
     debug 'org.modelcatalogue.core.gel'
     debug 'org.modelcatalogue.core.export'
+    debug 'org.modelcatalogue.core.elasticsearch'
     debug 'org.modelcatalogue.discourse'
 
     info 'grails.app.services.org.grails.plugins.console'
@@ -229,8 +230,8 @@ log4j.main = {
 //        debug 'org.hibernate.SQL'
 //    }
 
-    warn 'org.modelcatalogue'
-    warn 'grails.app.domain.org.modelcatalogue'
+    debug 'org.modelcatalogue'
+    debug 'grails.app.domain.org.modelcatalogue'
 
     error 'org.codehaus.groovy.grails.web.servlet',           // controllers
             'org.codehaus.groovy.grails.web.pages',          // GSP

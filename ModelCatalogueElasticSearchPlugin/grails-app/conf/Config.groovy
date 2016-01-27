@@ -30,8 +30,8 @@ log4j = {
 //        debug 'org.hibernate.SQL'
 //    }
 
-       warn 'org.modelcatalogue'
-       warn 'grails.app.domain.org.modelcatalogue'
+       debug 'org.modelcatalogue'
+       debug 'grails.app.domain.org.modelcatalogue'
 
        error 'org.codehaus.groovy.grails.web.servlet',           // controllers
                'org.codehaus.groovy.grails.web.pages',          // GSP
