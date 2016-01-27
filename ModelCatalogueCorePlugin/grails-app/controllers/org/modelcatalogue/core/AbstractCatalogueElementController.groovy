@@ -568,7 +568,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        if (favoriteAfterUpdate) {
+        if (favoriteAfterUpdate && modelCatalogueSecurityService.userLoggedIn) {
             modelCatalogueSecurityService.currentUser.createLinkTo(instance, RelationshipType.favouriteType)
         }
 

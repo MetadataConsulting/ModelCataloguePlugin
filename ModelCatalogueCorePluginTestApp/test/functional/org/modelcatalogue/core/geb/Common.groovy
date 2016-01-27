@@ -33,7 +33,7 @@ class Common {
     static final String OK = '.modal.messages-modal-confirm .btn-primary'
     static final String nameInTheFirstRow = 'div.inf-table-body tbody tr:nth-child(1) td:nth-child(3)'
     static final String firstRowLink = 'div.inf-table-body tbody tr:nth-child(1) td:nth-child(3) a'
-    static final String createActionInInfiniteList = 'a.infinite-list-create-action'
+    static final CatalogueAction createNewDataModel = CatalogueAction.runFirst('data-models', 'create-data-model')
     static final String tableFooterAction = 'tr.inf-table-footer-action'
     static final String closeGrowlMessage = "div.messages-panel.growl div.alert button.close"
 

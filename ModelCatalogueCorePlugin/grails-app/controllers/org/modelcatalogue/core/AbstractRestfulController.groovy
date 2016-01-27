@@ -263,7 +263,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         bindRelations(instance, false)
 
-        if (instance.hasErrors()) {s
+        if (instance.hasErrors()) {
             respond instance.errors
             return
         }

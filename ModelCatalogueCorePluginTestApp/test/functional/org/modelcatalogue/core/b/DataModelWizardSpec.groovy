@@ -30,7 +30,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "add new data model"() {
-        click createActionInInfiniteList
+        click createNewDataModel
 
         expect: 'the model dialog opens'
         check classificationWizzard displayed

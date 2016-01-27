@@ -34,7 +34,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     DataModelNavigator select(String dataModelName) {
-        go "#/dataModels"
+        go "#/dataModels?type=catalogue&q=${URLEncoder.encode(dataModelName, 'UTF-8')}"
 
         waitFor {
             title == 'Data Models'
@@ -45,7 +45,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         }
 
         noStale({$("h3.panel-title", title: dataModelName)}) {
-            it.find('a').click()
+            it.find('a.full-width-link').click()
         }
 
         waitFor {
