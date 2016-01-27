@@ -66,6 +66,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         waitFor {
             $("#role_navigation-right_user-menu-menu-item-link").displayed
         }
+        check "#my-models" displayed
     }
 
     boolean waitUntilModalClosed(int timeout = 10) {

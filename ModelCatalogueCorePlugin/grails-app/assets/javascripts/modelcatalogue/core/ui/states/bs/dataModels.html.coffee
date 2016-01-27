@@ -36,7 +36,7 @@ angular.module('mc.core.ui.states.bs.dataModels.html', []).run(['$templateCache'
             <contextual-actions role="data-models" no-colors="true" size="sm"></contextual-actions>
           </div>
           <ul class="nav nav-tabs" role="tablist">
-              <li ng-class="{'active' : getCurrentType() == 'My'}" role="presentation"><a href ng-click="showMyModels()">My Models</a></li>
+              <li id="my-models" ng-class="{'active' : getCurrentType() == 'My'}" role="presentation"><a href ng-click="showMyModels()">My Models</a></li>
               <li ng-class="{'active' : getCurrentType() == 'Catalogue'}" role="presentation"><a href ng-click="showAllModels()">Catalogue Models</a></li>
           </ul>
           <div class="leave-10-before"></div>
