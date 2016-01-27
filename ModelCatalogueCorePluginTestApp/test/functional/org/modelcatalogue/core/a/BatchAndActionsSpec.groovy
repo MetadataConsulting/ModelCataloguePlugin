@@ -2,6 +2,7 @@ package org.modelcatalogue.core.a
 
 import geb.waiting.WaitTimeoutException
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.pages.BatchActionsPage
 import org.modelcatalogue.core.pages.BatchListPage
 import spock.lang.Stepwise
@@ -11,26 +12,14 @@ import static org.modelcatalogue.core.geb.Common.getCloseGrowlMessage
 @Stepwise
 class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
 
+    private static final CatalogueAction showBatches = CatalogueAction.runFirst('navigation-right', 'admin-menu', 'action-batches')
 
     def "see test batch in action "() {
         loginAdmin()
 
-        when:
-        waitFor {
-            menuItem('admin-menu', 'navigation-right').displayed
-        }
+        click showBatches
 
-        menuItem('admin-menu', 'navigation-right').click()
-
-        then:
-        waitFor {
-            menuItem('action-batches', "").displayed
-        }
-
-        when:
-        menuItem('action-batches', "").click()
-
-        then:
+        expect:
         at BatchListPage
 
         waitFor {
