@@ -156,14 +156,14 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     }
   ]
 
-  actionsProvider.registerChildActionInRole 'catalogue-element', 'validate-xsd-schema', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'catalogue', ($scope, messages, catalogue) ->
+  actionsProvider.registerActionInRole 'validate-xsd-schema', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'catalogue', ($scope, messages, catalogue) ->
     return undefined if not catalogue.isInstanceOf($scope.element?.elementType, 'asset')
 
     {
-      position:   1100
-      label:      'Validate XML'
-      icon:       'fa fa-fw fa-check-circle-o'
-      type:       'default'
+      position:   - 50
+      label:      ''
+      icon:       'fa fa-fw fa-check'
+      type:       'primary'
       action:     ->
         messages.prompt('', '', {type: 'validate-xml-by-schema', asset: $scope.element})
 

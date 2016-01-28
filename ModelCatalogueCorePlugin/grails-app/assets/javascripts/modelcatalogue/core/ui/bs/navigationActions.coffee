@@ -25,7 +25,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
 
   angular.forEach RESOURCES, (resource, index) ->
     goToResource = ['$scope', '$state', '$stateParams', 'names', 'security', 'messages', 'catalogue', ($scope, $state, $stateParams, names, security, messages, catalogue) ->
-      return undefined if (resource == 'batch' or resource == 'relationshipType' or resource == 'csvTransformation') and not security.hasRole('CURATOR')
+      return undefined if (resource == 'batch' or resource == 'relationshipType' or resource == 'csvTransformation' or resource == 'asset') and not security.hasRole('CURATOR')
 
       label = names.getNaturalName(resource) + 's'
 
