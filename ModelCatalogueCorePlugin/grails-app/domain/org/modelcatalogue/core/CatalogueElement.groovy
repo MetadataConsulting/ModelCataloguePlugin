@@ -109,8 +109,9 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
      * @deprecated use #getOutgoingRelations() instead
      */
 
+    @Deprecated
     List getRelations() {
-        getOutgoingRelations()
+        getOutgoingRelations() + getIncomingRelations()
     }
 
     List getIncomingRelations() {
@@ -138,6 +139,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         }
     }
 
+    @Deprecated
     List getRelationsByType(RelationshipType type) {
         [getOutgoingRelationsByType(type), getIncomingRelationsByType(type)].flatten()
     }
@@ -150,6 +152,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, this, type).items
     }
 
+    @Deprecated
     List<Relationship> getRelationshipsByType(RelationshipType type) {
         [getOutgoingRelationshipsByType(type), getIncomingRelationshipsByType(type)].flatten()
     }
@@ -471,7 +474,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         getOutgoingRelationshipsByType(type as RelationshipType)
     }
 
-    @Override
+    @Override @Deprecated
     List<org.modelcatalogue.core.api.Relationship> getRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
         getRelationshipsByType(type as RelationshipType)
     }
@@ -486,7 +489,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         countOutgoingRelationshipsByType(type as RelationshipType)
     }
 
-    @Override
+    @Override @Deprecated
     int countRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
         countOutgoingRelationshipsByType(type as RelationshipType)
     }

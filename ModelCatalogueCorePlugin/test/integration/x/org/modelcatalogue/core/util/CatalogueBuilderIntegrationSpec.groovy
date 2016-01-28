@@ -460,28 +460,63 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
     }
 
     def "create generic relationship"() {
+        final String vd1Name = 'VDRel1'
+        final String vd2Name = 'VDRel2'
+        final String vd3Name = 'VDRel3'
+        final String vd4Name = 'VDRel4'
+        final String other123Name = 'Other123'
+        final String other234Name = 'Other234'
+        final String wd40name = 'WD40'
+
+
         build {
-            dataModel name: "Other123", {
-                dataType name: 'WD40'
+            dataModel name: other123Name, {
+                dataType name: wd40name
             }
-            dataModel name: "Other234", {
-                dataType name: 'VDRel1'
-                dataType name: 'VDRel2'
-                dataType name: 'VDRel3'
-                dataType name: 'VDRel4', {
-                    rel 'synonym'   to      dataType called 'VDRel2'
-                    rel 'synonym'   from    'VDRel1'
-                    rel 'relatedTo' to      'Other123', 'WD40'
-                    rel 'base'      to      'Other123', 'WD40'
+            dataModel name: other234Name, {
+                dataType name: vd1Name
+                dataType name: vd2Name
+                dataType name: vd3Name
+                dataType name: vd4Name, {
+                    rel 'synonym'   to      dataType called vd2Name
+                    rel 'synonym'   from    vd1Name
+
+
+                    rel 'relatedTo' to      other123Name, wd40name
+                    rel 'base'      to      other123Name, wd40name
                 }
             }
         }
 
         expect:
-        DataType.findByName('VDRel4')
-        DataType.findByName('VDRel4').countRelationshipsByType(RelationshipType.readByName('synonym'))   == 2
-        DataType.findByName('VDRel4').countRelationshipsByType(RelationshipType.readByName('base'))      == 1
-        DataType.findByName('VDRel4').countRelationshipsByType(RelationshipType.readByName('relatedTo')) == 1
+        RelationshipType.synonymType.bidirectional
+        RelationshipType.relatedToType.bidirectional
+        !RelationshipType.baseType.bidirectional
+
+        when:
+        DataType vd1 = DataType.findByName(vd1Name)
+        DataType vd2 = DataType.findByName(vd2Name)
+        DataType vd4 = DataType.findByName(vd4Name)
+
+        DataType wd40 = DataType.findByName(wd40name)
+
+        then:
+        vd1
+        vd2
+        vd4
+        wd40
+
+        vd2 in vd4.isSynonymFor
+        vd4 in vd2.isSynonymFor
+
+        vd1 in vd4.isSynonymFor
+        vd4 in vd1.isSynonymFor
+
+        vd4 in wd40.relatedTo
+        wd40 in vd4.relatedTo
+
+        vd4 in wd40.isBasedOn
+        wd40 in vd4.isBaseFor
     }
 
     def "creates new version of the element"() {

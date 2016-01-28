@@ -249,12 +249,25 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         direction << RelationshipDirection.values()
     }
 
-    def "only one relationship is created for bidirectional relationship type"() {
-        Relationship rel1 = relationshipService.link(de1, de2, RelationshipType.synonymType)
-        Relationship rel2 = relationshipService.link(de2, de1, RelationshipType.synonymType)
-
+    def "opposite direction relationship is created for bidirectional relationship type"() {
         expect:
-        rel1 == rel2
+        RelationshipType.synonymType.bidirectional
+
+        when:
+        RelationshipDefinition definition = RelationshipDefinition.create(de1, de2, RelationshipType.synonymType).definition
+
+        // create new relationship which is bidirectional
+        Relationship rel1 = relationshipService.link(definition)
+
+        // opposite direction already exists
+        Relationship rel2 = relationshipService.findExistingRelationship(definition.inverted())
+
+        // so it will return the same instance
+        Relationship rel3 = relationshipService.link(definition.inverted())
+
+        then:
+        rel1 != rel2
+        rel2 == rel3
     }
 
     private static void printIndexes(Map<String, Relationship> relationships, RelationshipDirection direction, String label) {

@@ -241,12 +241,6 @@ class RelationshipService {
         if (relationships)  {
             return relationships.first()
         }
-        if (definition.relationshipType.bidirectional) {
-            params.source = definition.destination
-            params.destination = definition.source
-            relationships = Relationship.executeQuery(query, params)
-            return relationships ? relationships.first() : null
-        }
         log.info "Relationship $definition checked for presence but not found. Finding relationship is slow, consider using 'skipUniqueChecking' flag for optimistic relationship linking."
         return null
     }
