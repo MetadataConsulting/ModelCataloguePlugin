@@ -47,14 +47,6 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
     Long outgoingIndex
     Long incomingIndex
 
-    /*
-     * Reordeing bidirectional relationships is not supported as the combined index is
-     * actually same for all group of related elements
-     * and change from the other side would change the view from the opposite side
-     */
-    @Deprecated
-    Long combinedIndex
-
     // init the indexes
     {
         resetIndexes()
@@ -102,7 +94,6 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
         long nextIndex = getNextIndex()
         outgoingIndex = nextIndex
         incomingIndex = nextIndex
-        combinedIndex = nextIndex
     }
 
     @Override

@@ -198,6 +198,11 @@ class RelationshipService {
                     relationshipInstance.errors.reject('unable.to.copy.from.parent', FriendlyErrors.printErrors("Unable to propagate relationship $newDefinition from ${relationshipDefinition.source} to child ${newDefinition.source}", newRelationship.errors))
                 }
             }
+        } else if (relationshipDefinition.relationshipType.bidirectional && !relationshipDefinition.otherSide) {
+            Relationship backReference = link relationshipDefinition.inverted()
+            if (backReference.hasErrors()) {
+                log.error FriendlyErrors.printErrors("Errors saving the other side of bidirectional relationship", backReference.errors)
+            }
         }
 
         if (relationshipDefinition.relationshipType == RelationshipType.favouriteType) {
@@ -329,6 +334,11 @@ class RelationshipService {
             RELATIONSHIPS_COUNT_CACHE.invalidate(source.getId())
             RELATIONSHIPS_COUNT_CACHE.invalidate(destination.getId())
 
+
+            if (relationshipType.bidirectional) {
+                unlink relationshipInstance.destination, relationshipInstance.source, relationshipType, dataModel, ignoreRules, expectedMetadata
+            }
+
             return relationshipInstance
         }
         return null
@@ -444,10 +454,6 @@ class RelationshipService {
 
     int countOutgoingRelationshipsByType(CatalogueElement element, RelationshipType type) {
         getRelationshipsCounts(element).count(RelationshipDirection.OUTGOING, type)
-    }
-
-    int countRelationshipsByType(CatalogueElement element, RelationshipType type) {
-        getRelationshipsCounts(element).count(RelationshipDirection.BOTH, type)
     }
 
     int countRelationshipsByDirectionAndType(CatalogueElement element, RelationshipDirection direction, RelationshipType type) {

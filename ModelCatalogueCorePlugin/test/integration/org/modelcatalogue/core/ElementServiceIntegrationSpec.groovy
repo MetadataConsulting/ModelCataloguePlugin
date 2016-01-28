@@ -225,7 +225,8 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         int draftVersion        = draft.versionNumber
         int newVersion          = md2.versionNumber
 
-        List<Relationship> draftRelationships = relationshipService.getRelationships([:], RelationshipDirection.BOTH, draft, RelationshipType.hierarchyType).items
+        List<Relationship> outgoingDraftRelationships = relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, draft, RelationshipType.hierarchyType).items
+        List<Relationship> incomingDraftRelationships = relationshipService.getRelationships([:], RelationshipDirection.INCOMING, draft, RelationshipType.hierarchyType).items
 
         expect:
         md2 != draft
@@ -240,7 +241,8 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         md2.parentOf.contains(md3)
         !md1.parentOf.contains(draft)
         draft.parentOf.contains(md3)
-        draftRelationships.size() == 2
+        outgoingDraftRelationships.size() == 1
+        incomingDraftRelationships.size() == 1
 
         cleanup:
         md1.delete()

@@ -25,10 +25,8 @@ class RelationshipsCounts implements Serializable {
         switch (direction) {
             case RelationshipDirection.INCOMING:
                 return incomingCounts.get(type.getId()) ?: 0
-            case RelationshipDirection.OUTGOING:
+            default:
                 return outgoingCounts.get(type.getId()) ?: 0
-            case RelationshipDirection.BOTH:
-                return count(RelationshipDirection.INCOMING, type) + count(RelationshipDirection.OUTGOING, type)
         }
     }
 

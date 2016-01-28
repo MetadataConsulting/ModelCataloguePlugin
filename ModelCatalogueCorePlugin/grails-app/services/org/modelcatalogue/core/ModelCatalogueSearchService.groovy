@@ -32,14 +32,6 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, ElementService.getStatusFromParams(params), getOverridableDataModelFilter(params))
 
         switch (direction) {
-            case RelationshipDirection.OUTGOING:
-                criteria.destination {
-                    or {
-                        ilike('name', query)
-                        ilike('description', query)
-                    }
-                }
-                break
             case RelationshipDirection.INCOMING:
                 criteria.source {
                     or {
@@ -48,24 +40,14 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                     }
                 }
                 break
-            case RelationshipDirection.BOTH:
-                criteria.or {
-                    destination {
-                        or {
-                            ilike('name', query)
-                            ilike('description', query)
-                        }
-                        ne('id', element.id)
+            default:
+                criteria.destination {
+                    or {
+                        ilike('name', query)
+                        ilike('description', query)
                     }
-                    source {
-                        or {
-                            ilike('name', query)
-                            ilike('description', query)
-                        }
-                        ne('id', element.id)
-                    }
-
                 }
+                break
         }
 
         return Lists.fromCriteria(params, criteria)

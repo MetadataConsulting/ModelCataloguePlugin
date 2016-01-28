@@ -17,7 +17,6 @@ class RelationshipDefinition {
             archived = relationship.archived
             outgoingIndex = relationship.outgoingIndex
             incomingIndex = relationship.incomingIndex
-            combinedIndex = relationship.combinedIndex
         }
         definition
     }
@@ -44,12 +43,12 @@ class RelationshipDefinition {
     boolean inherited
     Long outgoingIndex
     Long incomingIndex
-    Long combinedIndex
 
     // processing flags
     boolean resetIndices
     boolean ignoreRules
     boolean skipUniqueChecking
+    boolean otherSide
 
     Relationship createRelationship() {
         new Relationship(
@@ -60,10 +59,28 @@ class RelationshipDefinition {
                 archived: archived,
                 inherited: inherited,
                 outgoingIndex: outgoingIndex ?: System.currentTimeMillis(),
-                incomingIndex: incomingIndex ?: System.currentTimeMillis(),
-                combinedIndex: combinedIndex ?: System.currentTimeMillis()
+                incomingIndex: incomingIndex ?: System.currentTimeMillis()
         )
     }
+
+    RelationshipDefinition inverted() {
+        RelationshipDefinition definition = new RelationshipDefinition(destination, source, relationshipType)
+
+        definition.dataModel = this.dataModel
+        definition.metadata = this.metadata
+        definition.archived = this.archived
+        definition.inherited = this.inherited
+        definition.outgoingIndex = this.outgoingIndex
+        definition.incomingIndex = this.incomingIndex
+        definition.resetIndices = this.resetIndices
+        definition.ignoreRules = this.ignoreRules
+        definition.skipUniqueChecking = this.skipUniqueChecking
+        definition.otherSide = !this.otherSide
+
+        return definition
+
+    }
+
 
     @Override String toString() {
         "$source.name =[$relationshipType.sourceToDestination${dataModel ? ('/' + dataModel.name) : ''}]=> $destination.name"

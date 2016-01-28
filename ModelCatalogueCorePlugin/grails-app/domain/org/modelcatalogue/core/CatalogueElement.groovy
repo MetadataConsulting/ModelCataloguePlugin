@@ -105,14 +105,12 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
      * Functions for specifying relationships between catalogue elements using the
      * org.modelcatalogue.core.Relationship class
      * @return list of items which contains incoming and outgoing relations
+     *
+     * @deprecated use #getOutgoingRelations() instead
      */
 
     List getRelations() {
-        CatalogueElement self = this
-        Lists.transform(relationshipService.getRelationships([:], RelationshipDirection.BOTH, this).items, {
-            if (it.source == self) return it.destination
-            it.source
-        } as Function<Relationship, CatalogueElement>)
+        getOutgoingRelations()
     }
 
     List getIncomingRelations() {
@@ -164,9 +162,6 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         relationshipService.countOutgoingRelationshipsByType(this, type)
     }
 
-    int countRelationshipsByType(RelationshipType type) {
-        relationshipService.countRelationshipsByType(this, type)
-    }
 
     int countRelationshipsByDirectionAndType(RelationshipDirection direction, RelationshipType type) {
         relationshipService.countRelationshipsByDirectionAndType(this, direction, type)
@@ -493,7 +488,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     @Override
     int countRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
-        countRelationshipsByType(type as RelationshipType)
+        countOutgoingRelationshipsByType(type as RelationshipType)
     }
 
     @Override

@@ -55,7 +55,7 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
 
         relationships.incoming?.each        addRelationsJson(RelationshipDirection.INCOMING, el, ret, types)
         relationships.outgoing?.each        addRelationsJson(RelationshipDirection.OUTGOING, el, ret, types)
-        relationships.bidirectional?.each   addRelationsJson(RelationshipDirection.BOTH, el, ret, types)
+        relationships.bidirectional?.each   addRelationsJson(RelationshipDirection.OUTGOING, el, ret, types)
 
         ret.availableReports = getAvailableReports(el)
 
@@ -137,11 +137,8 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
                 case RelationshipDirection.INCOMING:
                     relation.count = el.countIncomingRelationshipsByType(type)
                     break
-                case RelationshipDirection.OUTGOING:
+                default:
                     relation.count = el.countOutgoingRelationshipsByType(type)
-                    break
-                case RelationshipDirection.BOTH:
-                    relation.count = el.countRelationshipsByType(type)
                     break
             }
 

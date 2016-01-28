@@ -35,7 +35,7 @@ class ModelCatalogueTagLib {
                 throw new IllegalArgumentException("Relationship type of given name \"${attrs.type}\" does not exist")
             }
         }
-        RelationshipDirection direction = RelationshipDirection.BOTH
+        RelationshipDirection direction = RelationshipDirection.OUTGOING
         if (attrs.direction) {
             switch (attrs.direction) {
                 case 'outgoing':
@@ -45,7 +45,7 @@ class ModelCatalogueTagLib {
                     direction = RelationshipDirection.INCOMING
                     break
                 case 'bidirectional':
-                    direction = RelationshipDirection.BOTH
+                    direction = RelationshipDirection.OUTGOING
                     break
                 default:
                     throw new IllegalArgumentException("Direction 'incoming', 'outgoing' or 'bidirectional' expected but got '${attrs.direction}'")

@@ -41,10 +41,10 @@ class DataElementISpec extends AbstractIntegrationSpec{
 
         then:
 
-        auth2     in auth1.relations
-        auth1     in auth2.relations
-        auth3     in auth2.relations
-        auth2     in auth3.relations
+        auth2     in auth1.incomingRelations
+        auth1     in auth2.outgoingRelations
+        auth3     in auth2.incomingRelations
+        auth2     in auth3.outgoingRelations
 
         when:
 
@@ -54,10 +54,10 @@ class DataElementISpec extends AbstractIntegrationSpec{
 
         then:
 
-        !auth1.relations.contains(auth2)
-        !auth2.relations.contains(auth1)
-        !auth2.relations.contains(auth3)
-        !auth3.relations.contains(auth2)
+        !auth1.incomingRelations.contains(auth2)
+        !auth2.outgoingRelations.contains(auth1)
+        !auth2.incomingRelations.contains(auth3)
+        !auth3.outgoingRelations.contains(auth2)
 
 
     }

@@ -180,82 +180,55 @@ enum RelationshipDirection {
             """, [source: owner, type: relationshipType, current: current])[0] as Long
         }
     },
+
+    /**
+     * @deprecated bidirectional relationships are now mapped as two separate relationships, use #OUTGOING instead
+     */
     BOTH {
-        @Override
+        @Override @Deprecated
         DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<ElementStatus> status, DataModelFilter filter) {
-            DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
-            criteria.join 'source'
-            criteria.join 'destination'
-            criteria.or {
-                eq('source', element)
-                eq('destination', element)
-            }
-            if (type) {
-                criteria.eq('relationshipType', type)
-            }
-            if (filter) {
-                criteria.or {
-                    isNull 'dataModel'
-                    and {
-                        if (filter.excludes) {
-                            criteria.not {
-                                criteria.'in' 'dataModel.id', filter.excludes
-                            }
-                        }
-                        if (filter.includes) {
-                            criteria.'in'  'dataModel.id', filter.includes
-                        }
-                    }
-                }
-            }
-
-            criteria
+            OUTGOING.composeWhere(element, type, status, filter)
         }
 
-        @Override
+        @Override @Deprecated
         String getDirection(CatalogueElement owner, Relationship relationship) {
-            owner == relationship.source ? 'sourceToDestination' : 'destinationToSource'
+            OUTGOING.getDirection(owner, relationship)
         }
 
-        @Override
+        @Override @Deprecated
         CatalogueElement getRelation(CatalogueElement owner, Relationship relationship) {
-            owner == relationship.source ? relationship.destination : relationship.source
+            OUTGOING.getRelation(owner, relationship)
         }
 
-        @Override
+        @Override @Deprecated
         CatalogueElement getElement(CatalogueElement owner, Relationship relationship) {
-            owner
+            OUTGOING.getElement(owner, relationship)
         }
 
-        @Override
+        @Override @Deprecated
         String getActionName() {
-            "relationships"
+            OUTGOING.getActionName()
         }
 
-        @Override
+        @Override @Deprecated
         String getSortProperty() {
-            "combinedIndex"
+            OUTGOING.getSortProperty()
         }
 
-        @Override
+        @Override @Deprecated
         Long getIndex(Relationship rel) {
-            return rel.combinedIndex
+            OUTGOING.getIndex(rel)
         }
 
         @Override
         boolean isOwnedBy(CatalogueElement owner, Relationship relationship) {
-            relationship?.destination == owner || relationship?.source == owner
+            OUTGOING.isOwnedBy(owner, relationship)
         }
 
 
         @Override
         Long getMinIndexAfter(CatalogueElement owner, RelationshipType relationshipType, Long current) {
-            Relationship.executeQuery("""
-                select min(r.combinedIndex) from Relationship r
-                where (r.source = :owner or r.destination = :owner)
-                and r.relationshipType = :type
-                and r.combinedIndex > :current
-            """, [owner: owner, type: relationshipType, current: current])[0] as Long
+            OUTGOING.getMinIndexAfter(owner, relationshipType, current)
         }
     }
 
@@ -276,7 +249,7 @@ enum RelationshipDirection {
         switch (direction) {
             case ['incoming', 'destinationToSource']: return INCOMING
             case ['outgoing', 'sourceToDestination']: return OUTGOING
-            default: return BOTH
+            default: return OUTGOING
         }
 
     }

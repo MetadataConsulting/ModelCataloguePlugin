@@ -159,10 +159,8 @@ class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {
         ["GET"   , "/$controller/search"                                    , controller , "search"             , {}            ],
         ["GET"   , "/$controller/1/incoming/search"                         , controller , "searchIncoming"     , { id = "1" }  ],
         ["GET"   , "/$controller/1/outgoing/search"                         , controller , "searchOutgoing"     , { id = "1" }  ],
-        ["GET"   , "/$controller/1/relationships/search"                    , controller , "searchRelationships", { id = "1" }  ],
         ["GET"   , "/$controller/1/incoming/relationship/search"            , controller , "searchIncoming"     , { id = "1" ; type = "relationship" }  ],
         ["GET"   , "/$controller/1/outgoing/relationship/search"            , controller , "searchOutgoing"     , { id = "1" ; type = "relationship" }  ],
-        ["GET"   , "/$controller/1/relationships/relationship/search"       , controller , "searchRelationships", { id = "1" ; type = "relationship" }  ],
         ]
     }
 
@@ -179,7 +177,6 @@ class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {
         [ "POST"  , "/$controller/1/incoming/relationship"    , controller , "addIncoming"     , { id = "1" ; type = "relationship" }  ],
         [ "DELETE", "/$controller/1/outgoing/relationship"    , controller , "removeOutgoing"  , { id = "1" ; type = "relationship" }  ],
         [ "DELETE", "/$controller/1/incoming/relationship"    , controller , "removeIncoming"  , { id = "1" ; type = "relationship" }  ],
-        [ "GET"	  , "/$controller/1/relationships/relatedTo"  , controller , "relationships"   , { id = "1" ; type = "relatedTo" }  ]
         ]
     }
 

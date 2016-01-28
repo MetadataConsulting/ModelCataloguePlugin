@@ -88,7 +88,6 @@ class CloningCopyAssociationsAndRelationshipsTask {
                     .withDataModel(r.dataModel)
                     .withIncomingIndex(r.incomingIndex)
                     .withOutgoingIndex(r.outgoingIndex)
-                    .withCombinedIndex(r.combinedIndex)
                     .withMetadata(r.ext)
                     .withSkipUniqueChecking(true)
 

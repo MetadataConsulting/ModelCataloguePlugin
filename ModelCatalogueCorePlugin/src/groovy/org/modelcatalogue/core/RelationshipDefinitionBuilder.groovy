@@ -61,10 +61,6 @@ class RelationshipDefinitionBuilder {
         this
     }
 
-    RelationshipDefinitionBuilder withCombinedIndex(Long combinedIndex) {
-        definition.combinedIndex = combinedIndex
-        this
-    }
 
     RelationshipDefinitionBuilder withParams(Map<String, Object> params) {
         params.each { String key, Object value ->

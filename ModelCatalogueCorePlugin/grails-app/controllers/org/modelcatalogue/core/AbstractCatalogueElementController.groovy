@@ -49,9 +49,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         relationshipsInternal(max, type, RelationshipDirection.OUTGOING)
     }
 
-    def relationships(Integer max, String type) {
-        relationshipsInternal(max, type, RelationshipDirection.BOTH)
-    }
 
     def addOutgoing(Long id, String type) {
         addRelation(id, type, true)
@@ -79,11 +76,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     def reorderIncoming(Long id, String type) {
         reorderInternal(RelationshipDirection.INCOMING, id, type)
     }
-
-    def reorderCombined(Long id, String type) {
-        reorderInternal(RelationshipDirection.BOTH, id, type)
-    }
-
 
     private reorderInternal(RelationshipDirection direction, Long id, String type) {
         // begin sanity checks
@@ -307,11 +299,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
     def searchOutgoing(Integer max, String type) {
         searchWithinRelationshipsInternal(max, type, RelationshipDirection.OUTGOING)
-    }
-
-
-    def searchRelationships(Integer max, String type) {
-        searchWithinRelationshipsInternal(max, type, RelationshipDirection.BOTH)
     }
 
     private searchWithinRelationshipsInternal(Integer max, String type, RelationshipDirection direction){

@@ -321,32 +321,10 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
 
-    def "Return 404 for non-existing item as JSON for combined relationships queried by type"() {
-        controller.response.format = "json"
-        controller.params.id = "1"
-        controller.relationships(10, "no-such-type")
-
-        expect:
-        controller.response.text == ""
-        controller.response.status == HttpServletResponse.SC_NOT_FOUND
-        resourceCount == totalCount
-    }
-
     def "Return 404 for non-existing item as JSON for outgoing relationships queried by type"() {
         controller.response.format = "json"
         controller.params.id = "1"
         controller.outgoing(10, "no-such-type")
-
-        expect:
-        controller.response.text == ""
-        controller.response.status == HttpServletResponse.SC_NOT_FOUND
-        resourceCount == totalCount
-    }
-
-    def "Return 404 for non-existing item as JSON for combined relationships"() {
-        controller.response.format = "json"
-        controller.params.id = "1000000"
-        controller.relationships(10, null)
 
         expect:
         controller.response.text == ""
@@ -399,18 +377,6 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/incoming"))
     }
 
-
-    @Unroll
-    def "get json combined relationships pagination: #no where max: #max offset: #offset"() {
-        checkJsonRelations(no, size, max, offset, total, next, previous, "relationships")
-
-        expect:
-        resourceCount == totalCount
-
-        where:
-        [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships"))
-    }
-
     @Unroll
     def "get json outgoing relationships pagination with type: #no where max: #max offset: #offset"() {
         checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, "outgoing")
@@ -434,18 +400,6 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     @Unroll
-    def "get json combined relationships pagination with type: #no where max: #max offset: #offset"() {
-        checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, "relationships")
-
-        expect:
-        resourceCount == totalCount
-
-        where:
-        [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships/relatedTo"))
-    }
-
-
-    @Unroll
     def "get json outgoing relationships pagination with wrong type: #no where max: #max offset: #offset"() {
         checkJsonRelationsWithWrongType(no, size, max, offset, total, next, previous, "outgoing")
 
@@ -465,18 +419,6 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
         where:
         [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/incoming/xyz"))
-    }
-
-
-    @Unroll
-    def "get json combined relationships pagination with wrong type: #no where max: #max offset: #offset"() {
-        checkJsonRelationsWithWrongType(no, size, max, offset, total, next, previous, "relationships")
-
-        expect:
-        resourceCount == totalCount
-
-        where:
-        [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships/xyz"))
     }
 
     abstract Object getAnotherLoadItem()

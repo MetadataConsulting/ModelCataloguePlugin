@@ -124,15 +124,6 @@ class ElasticSearchService implements SearchCatalogue {
         }
 
         switch (direction) {
-            case RelationshipDirection.OUTGOING:
-                boolQuery.should(QueryBuilders.prefixQuery('destination.name', search))
-                boolQuery.should(QueryBuilders.matchQuery('destination.name', search))
-
-                if (states) {
-                    boolQuery.must(QueryBuilders.termsQuery('destination.status', states))
-                }
-
-                break;
             case RelationshipDirection.INCOMING:
                 boolQuery.should(QueryBuilders.prefixQuery('source.name', search))
                 boolQuery.should(QueryBuilders.matchQuery('source.name', search))
@@ -142,27 +133,14 @@ class ElasticSearchService implements SearchCatalogue {
                 }
 
                 break;
-            case RelationshipDirection.BOTH:
-                BoolQueryBuilder outgoing = QueryBuilders.boolQuery()
-                outgoing.should(QueryBuilders.prefixQuery('destination.name', search))
-                outgoing.should(QueryBuilders.matchQuery('destination.name', search))
-                outgoing.mustNot(QueryBuilders.termQuery('destination.entity_id', element.id.toString()))
+            default:
+                boolQuery.should(QueryBuilders.prefixQuery('destination.name', search))
+                boolQuery.should(QueryBuilders.matchQuery('destination.name', search))
 
                 if (states) {
-                    outgoing.must(QueryBuilders.termsQuery('destination.status', states))
+                    boolQuery.must(QueryBuilders.termsQuery('destination.status', states))
                 }
 
-                BoolQueryBuilder incoming = QueryBuilders.boolQuery()
-                incoming.should(QueryBuilders.prefixQuery('source.name', search))
-                incoming.should(QueryBuilders.matchQuery('source.name', search))
-                incoming.mustNot(QueryBuilders.termQuery('source.entity_id', element.id.toString()))
-
-                if (states) {
-                    incoming.must(QueryBuilders.termsQuery('source.status', states))
-                }
-
-                boolQuery.should(outgoing)
-                boolQuery.should(incoming)
                 break;
         }
 
