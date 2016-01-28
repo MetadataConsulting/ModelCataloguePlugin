@@ -38,12 +38,16 @@ class ReferenceTypeControllerIntegrationSpec extends AbstractCatalogueElementCon
 
     @Override
     ReferenceType getLoadItem() {
-        ReferenceType.findByName("Reference Test 1")
+        ReferenceType type = ReferenceType.findByName("Reference Test 1")
+        type.dataClass?.save(flush: true)
+        type
     }
 
     @Override
     ReferenceType getAnotherLoadItem() {
-        ReferenceType.findByName("Reference Test 2")
+        ReferenceType type = ReferenceType.findByName("Reference Test 2")
+        type.dataClass?.save(flush: true)
+        type
     }
 
     @Override

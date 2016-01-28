@@ -241,6 +241,7 @@ class RelationshipService {
         if (relationships)  {
             return relationships.first()
         }
+
         log.info "Relationship $definition checked for presence but not found. Finding relationship is slow, consider using 'skipUniqueChecking' flag for optimistic relationship linking."
         return null
     }

@@ -46,12 +46,16 @@ class PrimitiveTypeControllerIntegrationSpec extends AbstractCatalogueElementCon
 
     @Override
     PrimitiveType getLoadItem() {
-        PrimitiveType.findByName("Primitive Test 1")
+        PrimitiveType loadItem = PrimitiveType.findByName("Primitive Test 1")
+        loadItem.measurementUnit?.save(flush: true)
+        loadItem
     }
 
     @Override
     PrimitiveType getAnotherLoadItem() {
-        PrimitiveType.findByName("Primitive Test 2")
+        PrimitiveType loadItem = PrimitiveType.findByName("Primitive Test 2")
+        loadItem.measurementUnit?.save(flush: true)
+        loadItem
     }
 
     @Override
