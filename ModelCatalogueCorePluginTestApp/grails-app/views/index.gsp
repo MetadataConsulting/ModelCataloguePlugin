@@ -121,7 +121,9 @@
         modelcatalogue.welcome.info = "${grailsApplication.config.mc.welcome.info.encodeAsJSON()}";
 
         // create an app module based on registered modules
-        angular.module('metadataCurator', window.modelcatalogue.getModules())
+        angular.module('metadataCurator', window.modelcatalogue.getModules()).run(function($state){
+            // workaround https://github.com/angular-ui/ui-router/issues/2051
+        })
     </script>
     <g:if test="${Environment.current in [Environment.DEVELOPMENT, Environment.TEST, Environment.CUSTOM]}">
         <script type="text/javascript">

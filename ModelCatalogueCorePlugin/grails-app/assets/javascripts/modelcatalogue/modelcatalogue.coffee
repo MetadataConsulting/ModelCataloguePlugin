@@ -19,6 +19,7 @@ if !String.prototype.startsWith
 
 modules = [
   'ui.bootstrap'
+  'ui.router'
   'angular-loading-bar'
   'ngAnimate'
   'xeditable'

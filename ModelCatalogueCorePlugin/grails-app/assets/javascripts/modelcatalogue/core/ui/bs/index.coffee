@@ -76,7 +76,10 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.detailSections'
   'mc.core.ui.bs.navigationRightActions'
   'mc.core.ui.bs.modalOptions'
-]).run ['messages', (messages) ->
+]).run ['messages', '$rootScope', '$log', (messages, $rootScope, $log) ->
+  $rootScope.$on '$stateChangeError', (event, toState, toParams, fromState, fromParams, error) ->
+    $log.error "Error changing state:", event, toState, toParams, fromState, fromParams, error
+
   if jQuery
     jQuery(document).on 'keypress', (e) ->
       # ctrl + space

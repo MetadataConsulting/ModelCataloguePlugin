@@ -17,13 +17,24 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
     def "see test batch in action "() {
         loginAdmin()
 
-        click showBatches
+        // FIXME: temporary workaround of https://metadata.atlassian.net/browse/MET-949
+        // should be using action menu item
+        go "#/dataModels"
+        refresh browser
+
+        go "#/catalogue/relationshipType/all"
+        refresh browser
+
+        go "#/catalogue/batch/all"
+        refresh browser
 
         expect:
         at BatchListPage
 
         waitFor {
             linkToTestBatch.displayed
+        }
+        waitFor {
             menuItem('generate-merge-models', 'list').displayed
         }
     }

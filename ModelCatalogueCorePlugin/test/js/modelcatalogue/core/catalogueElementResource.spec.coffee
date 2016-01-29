@@ -62,7 +62,7 @@ describe "mc.core.catalogueElementResource", ->
           describe "fetched instance is enhanced", ->
             it "outgoing and incoming relationships are functions", ->
               $httpBackend
-              .when("GET", "#{modelCatalogueApiRoot}/dataType/#{testElementId}/relationships/relatedTo")
+              .when("GET", "#{modelCatalogueApiRoot}/dataType/#{testElementId}/outgoing/relatedTo")
               .respond(fixtures.dataType.incoming1)
 
               expect(angular.isFunction(result.isBaseFor)).toBeTruthy()

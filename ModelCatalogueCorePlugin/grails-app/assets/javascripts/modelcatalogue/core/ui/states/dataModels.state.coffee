@@ -12,8 +12,8 @@ angular.module('mc.core.ui.states.dataModels', ['mc.core.ui.states.controllers.P
 
       resolve:
         list: [
-          'catalogueElementResource', 'modelCatalogueApiRoot', 'enhance', 'rest', '$q', '$stateParams', 'security'
-          (catalogueElementResource ,  modelCatalogueApiRoot ,  enhance ,  rest ,  $q ,  $stateParams ,  security) ->
+          'catalogueElementResource', 'modelCatalogueApiRoot', 'enhance', 'rest', '$state', '$q', '$stateParams', 'security'
+          (catalogueElementResource ,  modelCatalogueApiRoot ,  enhance ,  rest ,  $state ,  $q ,  $stateParams ,  security) ->
             if $stateParams.type == 'catalogue'
               if $stateParams.q
                 return catalogueElementResource('dataModel').search($stateParams.q, status: $stateParams.status ? 'active', minimal: true, max: 25)
