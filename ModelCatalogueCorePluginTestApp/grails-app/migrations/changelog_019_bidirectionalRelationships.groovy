@@ -21,7 +21,7 @@ databaseChangeLog = {
 
                 //language=SQL
                 sql.eachRow("""
-                    select rel.id from relationship
+                    select rel.id from relationship rel
                     join relationship_type rt on rt.id = rel.relationship_type_id
 
                     where rt.bidirectional = true

@@ -6,6 +6,26 @@ import org.modelcatalogue.core.api.ElementStatus
 
 databaseChangeLog = {
 
+    changeSet(author: "Vladimir Orany", id: "1432717677788-00-01") {
+        preConditions (onFail: 'MARK_RAN') {
+            not {
+                columnExists tableName: "relationship", columnName: "combined_index"
+            }
+        }
+
+        addColumn(tableName: 'relationship') {
+            column name: 'combined_index', defaultValueNumeric: 0, type: 'BIGINT'
+        }
+    }
+
+    changeSet(author: "Vladimir Orany", id: "1432717677788-00-02") {
+        preConditions (onFail: 'MARK_RAN') {
+            columnExists tableName: "relationship", columnName: "combined_index"
+        }
+
+        addDefaultValue(tableName: 'relationship', columnName: 'combined_index', defaultValueNumeric: 0)
+    }
+
     changeSet(author: "Vladimir Orany", id: "1432717677788-01") {
         preConditions (onFail: 'MARK_RAN') {
             not {
