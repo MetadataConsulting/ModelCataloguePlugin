@@ -105,7 +105,7 @@
 
     <xs:simpleType name="JavaClass">
         <xs:restriction base="xs:string">
-            <xs:pattern value="([\p{L}_$][\p{L}\p{N}_$]*\.)*[\p{L}_$][\p{L}\p{N}_$]*"/>
+            <xs:pattern value="([a-zA-Z_$][a-zA-Z0-9_$]*\.)*[a-zA-Z_$][a-zA-Z0-9_$]*"/>
         </xs:restriction>
     </xs:simpleType>
 
