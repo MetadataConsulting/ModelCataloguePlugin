@@ -15,6 +15,7 @@ import org.springframework.transaction.TransactionStatus
 class ElementService implements Publisher<CatalogueElement> {
 
     private static final Cache<Long, Integer> VERSION_COUNT_CACHE = CacheBuilder.newBuilder().initialCapacity(1000).build()
+    private static Cache<Class, List<Class>> subclassesCache = CacheBuilder.newBuilder().initialCapacity(20).build()
 
     static transactional = false
 
@@ -533,6 +534,19 @@ class ElementService implements Publisher<CatalogueElement> {
     static void clearCache() {
         VERSION_COUNT_CACHE.invalidateAll()
         VERSION_COUNT_CACHE.cleanUp()
+    }
+
+
+    List<Class> collectSubclasses(Class<?> resource) {
+        subclassesCache.get(resource) {
+            GrailsDomainClass domainClass = grailsApplication.getDomainClass(resource.name) as GrailsDomainClass
+
+            if (domainClass.hasSubClasses()) {
+                return [resource] + domainClass.subClasses.collect { it.clazz }
+            }
+
+            return [resource]
+        }
     }
 
 }

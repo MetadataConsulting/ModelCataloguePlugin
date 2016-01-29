@@ -19,6 +19,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
     def dataModelService
     def modelCatalogueSecurityService
+    def elementService
 
     @Override
     boolean isIndexingManually() {
@@ -31,20 +32,36 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
         DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, ElementService.getStatusFromParams(params), getOverridableDataModelFilter(params))
 
+        List<String> states = []
+
+        if (params.status) {
+            states = ElementService.getStatusFromParams(params)*.toString()
+        }
+
         switch (direction) {
             case RelationshipDirection.INCOMING:
                 criteria.source {
-                    or {
-                        ilike('name', query)
-                        ilike('description', query)
+                    if (states) {
+                        'in' 'status', states
+                    }
+                    if (query != '*') {
+                        or {
+                            ilike('name', query)
+                            ilike('description', query)
+                        }
                     }
                 }
                 break
             default:
                 criteria.destination {
-                    or {
-                        ilike('name', query)
-                        ilike('description', query)
+                    if (states) {
+                        'in' 'status', states
+                    }
+                    if (query != '*') {
+                        or {
+                            ilike('name', query)
+                            ilike('description', query)
+                        }
                     }
                 }
                 break
@@ -201,5 +218,6 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         }
         dataModelService.dataModelFilter
     }
+
 
 }

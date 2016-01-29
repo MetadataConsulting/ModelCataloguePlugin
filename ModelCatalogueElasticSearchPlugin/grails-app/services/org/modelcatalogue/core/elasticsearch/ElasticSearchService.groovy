@@ -6,7 +6,7 @@ import grails.gorm.DetachedCriteria
 import grails.util.GrailsNameUtils
 import groovy.json.JsonSlurper
 import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.codehaus.groovy.grails.commons.GrailsDomainClass
+import org.codehaus.groovy.grails.commons.GrailsClass
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder
 import org.elasticsearch.action.bulk.BulkRequestBuilder
 import org.elasticsearch.action.search.SearchRequestBuilder
@@ -38,7 +38,6 @@ class ElasticSearchService implements SearchCatalogue {
 
     static transactional = false
 
-    private static Cache<Class, List<Class>> subclassesCache = CacheBuilder.newBuilder().initialCapacity(20).build()
     private static Cache<String, Map<String, Map>> mappingsCache = CacheBuilder.newBuilder().initialCapacity(20).build()
 
     private static String MC_PREFIX = "mc_"
@@ -67,6 +66,7 @@ class ElasticSearchService implements SearchCatalogue {
     ExecutorService executorService
     GrailsApplication grailsApplication
     DataModelService dataModelService
+    ElementService elementService
     Node node
     Client client
 
@@ -111,7 +111,11 @@ class ElasticSearchService implements SearchCatalogue {
         List<String> indicies = collectDataModelIndicies(params)
         String search = params.search
 
-        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery().minimumNumberShouldMatch(1)
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
+
+        if (search != '*') {
+            boolQuery.minimumNumberShouldMatch(1)
+        }
 
         if (type) {
             boolQuery.must(QueryBuilders.termQuery('relationship_type.name', type.name))
@@ -123,6 +127,26 @@ class ElasticSearchService implements SearchCatalogue {
             states = ElementService.getStatusFromParams(params)*.toString()
         }
 
+        List<String> types = []
+
+        if (params.elementType) {
+            String elementType = params.elementType.toString()
+            if (!elementType.contains('.')) {
+                GrailsClass clazz = grailsApplication.getDomainClasses().find { it.logicalPropertyName == elementType }
+                if (clazz && clazz.clazz) {
+                    elementType = clazz.name
+                }
+            }
+            try {
+                Class clazz = Class.forName(elementType, true, Thread.currentThread().getContextClassLoader())
+
+                types = elementService.collectSubclasses(clazz)*.name
+
+            } catch (ClassNotFoundException cnfe) {
+                log.error "Cannot filter by class $params.elementType", cnfe
+            }
+        }
+
         switch (direction) {
             case RelationshipDirection.INCOMING:
                 boolQuery.should(QueryBuilders.prefixQuery('source.name', search))
@@ -132,6 +156,10 @@ class ElasticSearchService implements SearchCatalogue {
                     boolQuery.must(QueryBuilders.termsQuery('source.status', states))
                 }
 
+                if (types) {
+                    boolQuery.must(QueryBuilders.termsQuery('source.fully_qualified_type', types))
+                }
+
                 break;
             default:
                 boolQuery.should(QueryBuilders.prefixQuery('destination.name', search))
@@ -139,6 +167,10 @@ class ElasticSearchService implements SearchCatalogue {
 
                 if (states) {
                     boolQuery.must(QueryBuilders.termsQuery('destination.status', states))
+                }
+
+                if (types) {
+                    boolQuery.must(QueryBuilders.termsQuery('destination.fully_qualified_type', types))
                 }
 
                 break;
@@ -210,21 +242,7 @@ class ElasticSearchService implements SearchCatalogue {
         "${GLOBAL_PREFIX}${getTypeName(resource)}"
     }
 
-    List<String> collectTypes(Class<?> resource) {
-        collectSubclasses(resource).collect { getTypeName(it) }
-    }
 
-    List<Class> collectSubclasses(Class<?> resource) {
-        subclassesCache.get(resource) {
-            GrailsDomainClass domainClass = grailsApplication.getDomainClass(resource.name) as GrailsDomainClass
-
-            if (domainClass.hasSubClasses()) {
-                return [resource] + domainClass.subClasses.collect { it.clazz }
-            }
-
-            return [resource]
-        }
-    }
 
     private List<String> collectDataModelIndicies(Map params) {
         DataModelFilter filter = getOverridableDataModelFilter(params)
@@ -626,7 +644,7 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     private Map combineMappingForAllCatalogueElements() {
-        collectSubclasses(CatalogueElement).inject([catalogue_element: [:]] as Map) { Map collector, Class type ->
+        elementService.collectSubclasses(CatalogueElement).inject([catalogue_element: [:]] as Map) { Map collector, Class type ->
             merge collector.catalogue_element, getMapping(type)[getTypeName(type)]
             collector
         } as Map
@@ -662,6 +680,10 @@ class ElasticSearchService implements SearchCatalogue {
             }
         }
         dataModelService.dataModelFilter
+    }
+
+    List<String> collectTypes(Class<?> resource) {
+        elementService.collectSubclasses(resource).collect { getTypeName(it) }
     }
 }
 

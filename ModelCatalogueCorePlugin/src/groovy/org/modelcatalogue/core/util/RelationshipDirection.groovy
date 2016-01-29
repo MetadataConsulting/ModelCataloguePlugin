@@ -179,57 +179,6 @@ enum RelationshipDirection {
                 and r.outgoingIndex > :current
             """, [source: owner, type: relationshipType, current: current])[0] as Long
         }
-    },
-
-    /**
-     * @deprecated bidirectional relationships are now mapped as two separate relationships, use #OUTGOING instead
-     */
-    BOTH {
-        @Override @Deprecated
-        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<ElementStatus> status, DataModelFilter filter) {
-            OUTGOING.composeWhere(element, type, status, filter)
-        }
-
-        @Override @Deprecated
-        String getDirection(CatalogueElement owner, Relationship relationship) {
-            OUTGOING.getDirection(owner, relationship)
-        }
-
-        @Override @Deprecated
-        CatalogueElement getRelation(CatalogueElement owner, Relationship relationship) {
-            OUTGOING.getRelation(owner, relationship)
-        }
-
-        @Override @Deprecated
-        CatalogueElement getElement(CatalogueElement owner, Relationship relationship) {
-            OUTGOING.getElement(owner, relationship)
-        }
-
-        @Override @Deprecated
-        String getActionName() {
-            OUTGOING.getActionName()
-        }
-
-        @Override @Deprecated
-        String getSortProperty() {
-            OUTGOING.getSortProperty()
-        }
-
-        @Override @Deprecated
-        Long getIndex(Relationship rel) {
-            OUTGOING.getIndex(rel)
-        }
-
-        @Override
-        boolean isOwnedBy(CatalogueElement owner, Relationship relationship) {
-            OUTGOING.isOwnedBy(owner, relationship)
-        }
-
-
-        @Override
-        Long getMinIndexAfter(CatalogueElement owner, RelationshipType relationshipType, Long current) {
-            OUTGOING.getMinIndexAfter(owner, relationshipType, current)
-        }
     }
 
     /* GROOVY-7415 abstract */ DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<ElementStatus> status, DataModelFilter filter) { throw new UnsupportedOperationException("Not Yet Implemented")}

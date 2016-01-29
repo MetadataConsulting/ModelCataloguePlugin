@@ -20,11 +20,12 @@ angular.module('mc.core.ui.states.dataModels', ['mc.core.ui.states.controllers.P
               return catalogueElementResource('dataModel').list(status: $stateParams.status ? 'active', max: 25)
             if $stateParams.q
               return security.requireUser().then (user) ->
-                enhance(rest(url: "#{modelCatalogueApiRoot}/user/#{user.id}/outgoing/favourite/search", params: {search: $stateParams.q, status: $stateParams.status ? 'active'}))
+                enhance(rest(url: "#{modelCatalogueApiRoot}/user/#{user.id}/outgoing/favourite/search", params: {elementType: 'org.modelcatalogue.core.DataModel', search: $stateParams.q, status: $stateParams.status ? 'active'}))
               ,  ->
                 security.requireLogin()
             return security.requireUser().then (user) ->
-              enhance(rest(url: "#{modelCatalogueApiRoot}/user/#{user.id}/outgoing/favourite", params: {status: $stateParams.status ? 'active'}))
+              # need to use the trick with search as regular fetching of relationship does not support constraining by elementType
+              enhance(rest(url: "#{modelCatalogueApiRoot}/user/#{user.id}/outgoing/favourite/search", params: {elementType: 'org.modelcatalogue.core.DataModel', search: '*', status: $stateParams.status ? 'active'}))
             ,  ->
               security.requireLogin()
         ]
