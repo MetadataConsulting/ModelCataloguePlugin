@@ -89,7 +89,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         page    = 1
         options = {}
         isTable = false
-        if $scope.showTabs and not propCfg.hidden(security)
+        if $scope.showTabs
           if newProperty
 
             $scope.naturalPropertyName = propCfg.label
@@ -153,13 +153,13 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         for name, obj of element
           propertyConfiguration = catalogueElementProperties.getConfigurationFor("#{element.elementType}.#{name}")
 
-          if propertyConfiguration.hidden(security)
-            continue
-
           tabDefinition = getTabDefinition element, name, obj
+
 
           if not tabDefinition or not tabDefinition.name
             continue
+
+          tabDefinition.hidden = propertyConfiguration.hidden(security)
 
           if tabDefinition.name == $scope.property
             tabDefinition.active = true
@@ -174,9 +174,10 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         tabDefinition = getTabDefinition element, 'properties', undefined
 
         propertyConfiguration = catalogueElementProperties.getConfigurationFor("#{element.elementType}.properties")
-        unless not tabDefinition or not tabDefinition.name or propertyConfiguration.hidden(security)
+        unless not tabDefinition or not tabDefinition.name
           if 'properties' == $scope.property
             tabDefinition.active = true
+            tabDefinition.hidden = propertyConfiguration.hidden(security)
             $scope.$broadcast 'infiniteTableRedraw'
             activeTabSet = true
 
