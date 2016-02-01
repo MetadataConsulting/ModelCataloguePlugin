@@ -97,36 +97,40 @@ class DataArchitectService {
     }
 
     List<Object> matchDataElementsWithCSVHeaders(String[] headers) {
+        matchCSVHeaders(DataElement, headers)
+    }
+
+    private List<Object> matchCSVHeaders(Class<? extends CatalogueElement> resource, String[] headers) {
         List<Object> elements = []
 
         for (String header in headers) {
-            def element = DataElement.findByNameIlikeAndStatus(header, ElementStatus.FINALIZED)
+            def element = resource.findByNameIlikeAndStatus(header, ElementStatus.FINALIZED)
             if (!element) {
-                element = DataElement.findByModelCatalogueId(header)
+                element = resource.findByModelCatalogueId(header)
             }
             if (!element) {
                 if (header.contains('_')) {
-                    element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), ElementStatus.FINALIZED)
+                    element = resource.findByNameIlikeAndStatus(header.replace('_', ' '), ElementStatus.FINALIZED)
                 } else {
-                    element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), ElementStatus.FINALIZED)
+                    element = resource.findByNameIlikeAndStatus(header.replace(' ', '_'), ElementStatus.FINALIZED)
                 }
             }
             if (!element) {
-                element = DataElement.findByNameIlikeAndStatus(header, ElementStatus.DRAFT)
+                element = resource.findByNameIlikeAndStatus(header, ElementStatus.DRAFT)
             }
             if (!element) {
                 if (header.contains('_')) {
-                    element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), ElementStatus.DRAFT)
+                    element = resource.findByNameIlikeAndStatus(header.replace('_', ' '), ElementStatus.DRAFT)
                 } else {
-                    element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), ElementStatus.DRAFT)
+                    element = resource.findByNameIlikeAndStatus(header.replace(' ', '_'), ElementStatus.DRAFT)
                 }
             }
             if (element) {
                 elements << element
             } else {
-                def searchResult = modelCatalogueSearchService.search(DataElement, [search: header])
-                // only if we have single hit
-                if (searchResult.total == 1L) {
+                def searchResult = modelCatalogueSearchService.search(resource, [search: header, max: 1])
+                // expect that the first hit is the best hit
+                if (searchResult.total >= 1L) {
                     elements << searchResult.items[0]
                 } else {
                     elements << header
@@ -138,44 +142,7 @@ class DataArchitectService {
     }
 
     List<Object> matchModelsWithCSVHeaders(String[] headers) {
-        List<Object> elements = []
-
-        for (String header in headers) {
-            def element = DataClass.findByNameIlikeAndStatus(header, ElementStatus.FINALIZED)
-            if (!element) {
-                element = DataClass.findByModelCatalogueId(header)
-            }
-            if (!element) {
-                if (header.contains('_')) {
-                    element = DataClass.findByNameIlikeAndStatus(header.replace('_', ' '), ElementStatus.FINALIZED)
-                } else {
-                    element = DataClass.findByNameIlikeAndStatus(header.replace(' ', '_'), ElementStatus.FINALIZED)
-                }
-            }
-            if (!element) {
-                element = DataClass.findByNameIlikeAndStatus(header, ElementStatus.DRAFT)
-            }
-            if (!element) {
-                if (header.contains('_')) {
-                    element = DataClass.findByNameIlikeAndStatus(header.replace('_', ' '), ElementStatus.DRAFT)
-                } else {
-                    element = DataClass.findByNameIlikeAndStatus(header.replace(' ', '_'), ElementStatus.DRAFT)
-                }
-            }
-            if (element) {
-                elements << element
-            } else {
-                def searchResult = modelCatalogueSearchService.search(DataClass, [search: header])
-                // only if we have single hit
-                if (searchResult.total == 1L) {
-                    elements << searchResult.items[0]
-                } else {
-                    elements << header
-                }
-            }
-        }
-
-        elements
+        matchCSVHeaders(DataClass, headers)
     }
 
     void transformData(Map<String, String> options = [separator: ';'],CsvTransformation transformation, Reader input, Writer output) {

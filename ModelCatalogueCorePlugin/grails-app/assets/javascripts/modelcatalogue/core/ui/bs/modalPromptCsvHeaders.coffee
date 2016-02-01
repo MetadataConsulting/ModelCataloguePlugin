@@ -35,7 +35,7 @@ angular.module('mc.core.ui.bs.modalPromptCsvHeaders', ['mc.util.messages', 'ngFi
 
           $scope.onFileSelect = ($files) ->
 
-            if(title=="Import Child Models") then url ="dataArchitect/modelsFromCSV" else url = "dataArchitect/elementsFromCSV"
+            if(title=="Import Child Data Classes") then url ="dataArchitect/modelsFromCSV" else url = "dataArchitect/elementsFromCSV"
 
             $scope.uploading = true
             $scope.upload = Upload.upload({
