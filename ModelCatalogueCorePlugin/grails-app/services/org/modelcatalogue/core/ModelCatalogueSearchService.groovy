@@ -32,41 +32,26 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
         DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, ElementService.getStatusFromParams(params), getOverridableDataModelFilter(params))
 
-        List<String> states = []
-
-        if (params.status) {
-            states = ElementService.getStatusFromParams(params)*.toString()
-        }
-
-        switch (direction) {
-            case RelationshipDirection.INCOMING:
-                criteria.source {
-                    if (states) {
-                        'in' 'status', states
-                    }
-                    if (query != '*') {
+        if (query != '%*%') {
+            switch (direction) {
+                case RelationshipDirection.INCOMING:
+                    criteria.source {
                         or {
                             ilike('name', query)
                             ilike('description', query)
                         }
                     }
-                }
-                break
-            default:
-                criteria.destination {
-                    if (states) {
-                        'in' 'status', states
-                    }
-                    if (query != '*') {
+                    break
+                default:
+                    criteria.destination {
                         or {
                             ilike('name', query)
                             ilike('description', query)
                         }
                     }
-                }
-                break
+                    break
+            }
         }
-
         return Lists.fromCriteria(params, criteria)
     }
 
