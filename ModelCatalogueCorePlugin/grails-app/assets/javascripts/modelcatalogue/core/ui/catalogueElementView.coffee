@@ -217,7 +217,6 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         return false unless $scope.element?.status == 'DRAFT'
         return false unless tab.value?.size > 1
         return false unless tab.value?.type
-        return false if tab.value.type.bidirectional
         return true
 
       $scope.reorder = (tab, $row, $current) -> tab.loader.reorder($row.row.element, $current?.row?.element).catch (reason) ->
