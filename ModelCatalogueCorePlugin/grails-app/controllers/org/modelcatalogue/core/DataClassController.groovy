@@ -51,6 +51,8 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
     def content(Integer max) {
         handleParams(max)
 
+        params.sort = 'outgoingIndex'
+
         DataClass element = queryForResource(params.id)
 
         if (!element) {

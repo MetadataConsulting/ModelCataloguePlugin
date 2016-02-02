@@ -119,7 +119,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        if (current.relationshipType.versionSpecific && current.source.status != ElementStatus.DRAFT) {
+        if (current && current.relationshipType.versionSpecific && current.source.status != ElementStatus.DRAFT) {
             respond(error: 'You can only reorder items when the element is draft!')
             return
         }

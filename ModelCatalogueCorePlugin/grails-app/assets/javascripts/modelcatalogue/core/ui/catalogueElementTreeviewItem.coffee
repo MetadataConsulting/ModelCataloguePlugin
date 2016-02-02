@@ -198,7 +198,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
       $scope.$on 'catalogueElementCreated', reloadChildrenOnChange
       $scope.$on 'catalogueElementUpdated', reloadChildrenOnChange
       $scope.$on 'listReferenceReordered', (ignored, listReference) ->
-        $scope.element.$$loadChildren() if $scope.descendFun.link == listReference.link
+        reloadChildrenOnChange(ignored, listReference, listReference?.link)
     ]
   }
 ]

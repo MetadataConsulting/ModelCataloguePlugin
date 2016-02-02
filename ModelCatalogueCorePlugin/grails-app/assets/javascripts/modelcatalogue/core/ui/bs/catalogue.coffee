@@ -79,7 +79,7 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
     return 0 unless list
     return 0 unless list.itemType
     return 0 unless newElement
-    return 0 unless newElement.isInstanceOf and newElement.isInstanceOf(list.itemType)
+    return 0 if angular.isFunction(newElement.isInstanceOf) and not newElement.isInstanceOf(list.itemType)
     return 0 unless url
     return 0 unless list.base
 
