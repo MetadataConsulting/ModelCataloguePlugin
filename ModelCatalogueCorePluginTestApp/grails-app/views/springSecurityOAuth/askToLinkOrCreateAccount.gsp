@@ -46,10 +46,10 @@
 
     <div class="container-fluid container-main">
         <div class="row">
-            <div class="${grailsApplication.config.grails.mc.allow.signup ? 'col-md-12' : 'col-md-9 col-md-offset-3'}">
+            <div class="${grailsApplication.config.mc.allow.signup ? 'col-md-12' : 'col-md-9 col-md-offset-3'}">
                 <div class="alert alert-info">
                     This is the first time you are logging in with your external account.
-                    <g:if test="${grailsApplication.config.grails.mc.allow.signup}">
+                    <g:if test="${grailsApplication.config.mc.allow.signup}">
                         You can sign up for a new model catalogue account or log in with existing catalogue account.
                     </g:if>
                     <g:else>
@@ -61,7 +61,7 @@
                     <div class='alert alert-danger'>${flash.message}</div>
                 </g:if>
             </div>
-            <g:if test="${grailsApplication.config.grails.mc.allow.signup}">
+            <g:if test="${grailsApplication.config.mc.allow.signup}">
                 <div class="col-md-6">
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -105,7 +105,7 @@
                     </div>
                 </div>
             </g:if>
-            <div class="col-md-6 ${grailsApplication.config.grails.mc.allow.signup ? '' : 'col-md-offset-3'}">
+            <div class="col-md-6 ${grailsApplication.config.mc.allow.signup ? '' : 'col-md-offset-3'}">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h3 class="panel-title"><g:message code="springSecurity.oauth.registration.login.legend" default="Link to an existing account"/></h3>

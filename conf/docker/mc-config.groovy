@@ -81,27 +81,34 @@ if (System.getenv("MC_USE_LOCAL_STORAGE")) {
     mc.storage.directory = null
 }
 
-if (System.getenv("MC_MAIL_HOST")) {
-    grails {
-        mail {
-            host = System.getenv("MC_MAIL_HOST")
+// this must be set to be able to send any mails
+if (System.getenv("MC_MAIL_FROM")) {
+    grails.mail.default.from = System.getenv("MC_MAIL_FROM")
+    grails.plugin.springsecurity.ui.register.emailFrom = System.getenv("MC_MAIL_FROM")
+    grails.plugin.springsecurity.ui.forgotPassword.emailFrom = System.getenv("MC_MAIL_FROM")
 
-            if (System.getenv("MC_MAIL_PORT")) {
-                port = System.getenv("MC_MAIL_PORT") as Integer
+    if (System.getenv("MC_MAIL_HOST")) {
+        grails {
+            mail {
+                host = System.getenv("MC_MAIL_HOST")
+
+                if (System.getenv("MC_MAIL_PORT")) {
+                    port = System.getenv("MC_MAIL_PORT") as Integer
+                }
+
+                if (System.getenv("MC_MAIL_USERNAME")) {
+                    username = System.getenv("MC_MAIL_USERNAME")
+                }
+
+                if (System.getenv("MC_MAIL_PASSWORD")) {
+                    password = System.getenv("MC_MAIL_PASSWORD")
+                }
+
+                if (System.getenv("MC_MAIL_PROPS")) {
+                    props = new JsonSlurper().parseText(System.getenv("MC_MAIL_PROPS"))
+                }
+
             }
-
-            if (System.getenv("MC_MAIL_USERNAME")) {
-                username = System.getenv("MC_MAIL_USERNAME")
-            }
-
-            if (System.getenv("MC_MAIL_PASSWORD")) {
-                password = System.getenv("MC_MAIL_PASSWORD")
-            }
-
-            if (System.getenv("MC_MAIL_PROPS")) {
-                props = new JsonSlurper().parseText(System.getenv("MC_MAIL_PROPS"))
-            }
-
         }
     }
 }
@@ -117,4 +124,26 @@ if (System.getenv("MC_WELCOME_JUMBO")) {
 if (System.getenv("MC_WELCOME_INFO")) {
     mc.welcome.info = System.getenv("MC_WELCOME_INFO")
 }
+
+if (System.getenv("MC_ALLOW_SIGNUP")) {
+    mc.allow.signup = true
+}
+
+if (System.getenv("MC_GOOGLE_KEY")) {
+    oauth {
+        providers {
+            google {
+                // this key is limited to localhost only so no need to hide it
+                api = org.modelcatalogue.repack.org.scribe.builder.api.GoogleApi20
+                key = System.getenv('MC_GOOGLE_KEY')
+                secret = System.getenv('MC_GOOGLE_SECRET')
+                successUri = '/oauth/google/success'
+                failureUri = '/oauth/google/error'
+                callback = "${grails.serverURL}/oauth/google/callback"
+                scope = 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
+            }
+        }
+    }
+}
+
 

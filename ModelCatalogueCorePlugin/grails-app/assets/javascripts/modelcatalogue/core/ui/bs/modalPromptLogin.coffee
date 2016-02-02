@@ -9,7 +9,7 @@ angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies
         </div>
         <div class="modal-body">
             <messages-panel messages="messages"></messages-panel>
-            <div ng-if="providers.length &amp;&amp; contextPath">
+            <div ng-if="providers.length">
               <a ng-repeat="provider in providers" ng-click="loginExternal(provider)" class="btn btn-primary btn-block"><span class="fa fa-fw" ng-class="'fa-' + provider"></span> Login with {{names.getNaturalName(provider)}}</a>
               <hr/>
             </div>

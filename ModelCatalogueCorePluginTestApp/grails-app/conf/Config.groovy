@@ -109,7 +109,7 @@ environments {
                 }
             }
         }
-        grails.mc.allow.signup = true
+        mc.allow.signup = true
 
         grails {
             mail {
@@ -146,7 +146,7 @@ environments {
                 }
             }
         }
-        grails.mc.allow.signup = true
+        mc.allow.signup = true
 
         grails.plugin.console.enabled = true
         grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
@@ -314,7 +314,7 @@ grails.plugin.springsecurity.logout.handlerNames = [
 // Added by the Spring Security OAuth plugin:
 grails.plugin.springsecurity.oauth.domainClass = 'org.modelcatalogue.core.security.OAuthID'
 
-if (!grails.mc.allow.signup) {
+if (!mc.allow.signup) {
     // for safety reasons, override the default class
     grails.plugin.springsecurity.oauth.registration.roleNames = ['ROLE_REGISTERED']
 }
