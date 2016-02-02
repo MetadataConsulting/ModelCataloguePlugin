@@ -20,7 +20,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
     public static final String successInFooter = '.modal-footer .alert-success'
     public static final String dangerInFooter = '.modal-footer .alert-danger'
     public static final CatalogueAction importMc = CatalogueAction.runFirst('navigation-right', 'curator-menu', 'import-mc')
-    public static final CatalogueAction refreshAsset = CatalogueAction.runFirst('item', 'refresh-asset')
+    public static final CatalogueAction refreshAsset = CatalogueAction.runFirst('item-detail', 'refresh-asset')
     public static final CatalogueContent dataModelsProperty = CatalogueContent.create('td', 'data-value-for': 'Data Models')
     public static final CatalogueAction importExcel = CatalogueAction.runFirst('navigation-right', 'curator-menu', 'import-excel')
     public static final CatalogueAction export = CatalogueAction.runFirst('item', 'export')

@@ -50,7 +50,7 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
 
   views = []
 
-  metadatViewsProvider = {}
+  detailSectionsProvider = {}
 
   ###
     Type is either element type or relationship pattern definition "sourceType=[relationshipType]=>destinationType"
@@ -62,7 +62,7 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
     @param position   position in the view (negative numbers goes before the description, positive after the description
     @param title      optional title to be displayed
   ###
-  metadatViewsProvider.register = (configuration) ->
+  detailSectionsProvider.register = (configuration) ->
     throw new Error('Please provide supported types configuration ("types" configuration property)') unless configuration.types?
     throw new Error('Provided types configuration must be an array ("types" configuration property)') unless angular.isArray(configuration.types)
     throw new Error('Please provide supported keys configuration ("keys" configuration property)') unless configuration.keys?
@@ -74,7 +74,7 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
 
     # TODO should handle $$relationship
 
-    views.push {
+    view = {
       isAvailableFor: (owner) ->
         return false if not owner
         return false if not owner.ext
@@ -93,9 +93,15 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
       getKeys: -> angular.copy configuration.keys
     }
 
-  metadatViewsProvider.createFakeOwner = (criteria) -> createFakeOwner(criteria)
+    # assign values to the view
+    view[key] = value for own key, value of configuration when angular.isFunction(value)
 
-  metadatViewsProvider.$get = [ '$filter', ($filter) ->
+    views.push view
+
+
+  detailSectionsProvider.createFakeOwner = (criteria) -> createFakeOwner(criteria)
+
+  detailSectionsProvider.$get = [ '$filter', ($filter) ->
     views = $filter('orderBy')(views, 'getPosition()')
 
 
@@ -111,5 +117,5 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
     detailSections
   ]
 
-  metadatViewsProvider
+  detailSectionsProvider
 ]

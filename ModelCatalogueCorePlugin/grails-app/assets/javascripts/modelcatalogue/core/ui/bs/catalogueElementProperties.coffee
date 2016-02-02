@@ -181,7 +181,17 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataModel.activity', active: true
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataModel.properties', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataModel.ext', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataModel.$$relationship', hidden: true
 
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Asset.hasAttachmentOf', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Asset.isAttachedTo', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Asset.ext', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Asset.isBaseFor', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Asset.isBasedOn', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Asset.isSynonymFor', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Asset.relatedTo', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Asset.properties', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Asset.$$relationship', hidden: true
 
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.EnumeratedType.enumerations', hidden: true
 

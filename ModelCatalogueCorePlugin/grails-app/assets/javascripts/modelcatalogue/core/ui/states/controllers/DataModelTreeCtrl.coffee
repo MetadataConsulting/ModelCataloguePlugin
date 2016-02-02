@@ -40,8 +40,14 @@ angular.module('mc.core.ui.states.controllers.DataModelTreeCtrl', ['ui.router', 
           params.resource = names.getPropertyNameFromType(element.element.elementType)
           params.focused = true
 
+        if type == 'dataModel'
+          params.property = 'activity'
+
+        if type == 'asset'
+          params.property = 'history'
+
         $state.go 'mc.resource.show.property', params
 
     $scope.$on 'newVersionCreated', (ignored, element) ->
-        $state.go '.', {dataModelId: element.getDataModelId(), resource: names.getPropertyNameFromType(element.elementType), id: element.id, property: 'history', page: undefined, q: undefined}
+        $state.go '.', {dataModelId: element.getDataModelId(), resource: names.getPropertyNameFromType(element.elementType), id: element.id, property: 'activity', page: undefined, q: undefined}
 ])

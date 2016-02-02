@@ -192,7 +192,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
         if not activeTabSet
           for tab in tabs
-            if not tab.disabled
+            if not tab.disabled and not tab.hidden
               tab.active = true
               $scope.$broadcast 'infiniteTableRedraw'
               $scope.property = tab.name
@@ -227,7 +227,11 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         return security.hasRole('CURATOR') \
             and editableForm \
             and angular.isFunction($scope.element?.isInstanceOf) \
-            and ($scope.element?.isInstanceOf('dataModel') or $scope.element?.isInstanceOf('enumeratedType'))\
+            and (\
+              $scope.element?.isInstanceOf('dataModel') \
+                or $scope.element?.isInstanceOf('enumeratedType')\
+                or $scope.element?.isInstanceOf('asset')\
+            )\
             and $scope.element?.status == 'DRAFT'
 
       $scope.inlineUpdateElement = ->

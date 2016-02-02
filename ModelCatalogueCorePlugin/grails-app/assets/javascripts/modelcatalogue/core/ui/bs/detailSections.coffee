@@ -40,6 +40,37 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       </div>
   '''
 
+  $templateCache.put 'modelcatalogue/core/ui/detailSections/assetBasic.html', '''
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-6"><strong class="small">Original File Name</strong></div>
+          <div class="col-md-6"><small>{{element.fileName || 'none'}}</small></div>
+        </div>
+        <div class="row">
+          <div class="col-md-6"><strong class="small">Content Type</strong></div>
+          <div class="col-md-6"><small>{{element.contentType || 'unknown'}}</small></div>
+        </div>
+        <div class="row">
+          <div class="col-md-6"><strong class="small">Size</strong></div>
+          <div class="col-md-6"><small>{{view.toHumanReadableSize(element.size || 0)}}</small></div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-6"><strong class="small">Last Updated</strong></div>
+          <div class="col-md-6"><small>{{element.lastUpdated | date}}</small></div>
+        </div>
+        <div class="row">
+          <div class="col-md-6"><strong class="small">Version Created</strong></div>
+          <div class="col-md-6"><small>{{element.versionCreated | date}}</small></div>
+        </div>
+        <div class="row">
+          <div class="col-md-6"><strong class="small">Status</strong></div>
+          <div class="col-md-6"><small>{{element.status}}</small></div>
+        </div>
+      </div>
+  '''
+
   $templateCache.put 'modelcatalogue/core/ui/detailSections/organization.html', '''
       <div class="col-md-3">
           <strong class="small">Organization</strong>
@@ -94,6 +125,14 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       </div>
       <div class="col-md-9 preserve-new-lines"><small editable-textarea="copy.description" e-rows="5" e-cols="1000" class="ce-description">{{element.description || 'empty'}}</small></div>
   '''
+
+  $templateCache.put 'modelcatalogue/core/ui/detailSections/assetPreview.html', '''
+      <div class="col-md-12">
+          <img style="max-width: 100%" ng-src="{{element.downloadUrl}}" ng-if="element.contentType.indexOf('image/') == 0"/>
+          <div ng-if="element.htmlPreview" ng-bind-html="element.htmlPreview"></div>
+          <pre ng-if="element.contentType.indexOf('image/') != 0 &amp;&amp; !element.htmlPreview" class="text-center">No preview available</pre>
+      </div>
+  '''
 ]
 
 metadataEditors.config ['detailSectionsProvider', (detailSectionsProvider)->
@@ -120,6 +159,26 @@ metadataEditors.config ['detailSectionsProvider', (detailSectionsProvider)->
 
      ]
      template: 'modelcatalogue/core/ui/detailSections/dataModelBasic.html'
+  }
+
+
+  detailSectionsProvider.register {
+     title: 'Basic'
+     position: -10000
+     types: [
+       'asset'
+     ]
+     keys: []
+     template: 'modelcatalogue/core/ui/detailSections/assetBasic.html'
+     toHumanReadableSize: (size) ->
+        GIGA = 1024 * 1024 * 1024
+        MEGA = 1024 * 1024
+        KILO = 1024
+        return "#{(size / GIGA).toFixed(2)} GB" if size > GIGA
+        return "#{(size / MEGA).toFixed(2)} MB" if size > MEGA
+        return "#{(size / KILO).toFixed(2)} kB" if size > KILO
+        return "#{size} B"
+
   }
 
 
@@ -157,12 +216,23 @@ metadataEditors.config ['detailSectionsProvider', (detailSectionsProvider)->
     template: 'modelcatalogue/core/ui/detailSections/revisionNotes.html'
   }
 
+  detailSectionsProvider.register {
+    title: 'Preview'
+    position: 1000
+    types: [
+      'asset'
+    ]
+    keys: []
+    template: 'modelcatalogue/core/ui/detailSections/assetPreview.html'
+  }
+
 
   detailSectionsProvider.register {
     title: 'Custom Metadata'
     position: 100000
     types: [
       'dataModel'
+      'asset'
     ]
     keys: []
     template: 'modelcatalogue/core/ui/detailSections/customMetadata.html'

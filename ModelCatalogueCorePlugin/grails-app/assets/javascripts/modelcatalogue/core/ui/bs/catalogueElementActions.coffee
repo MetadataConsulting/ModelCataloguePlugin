@@ -163,7 +163,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
 
 
-  actionsProvider.registerActionInRoles 'download-asset',[actionsProvider.ROLE_ITEM_ACTION], [ '$scope', '$window', ($scope, $window) ->
+  actionsProvider.registerActionInRoles 'download-asset',[actionsProvider.ROLE_ITEM_DETAIL_ACTION], [ '$scope', '$window', ($scope, $window) ->
     return undefined if not $scope.element?.downloadUrl?
 
     {
