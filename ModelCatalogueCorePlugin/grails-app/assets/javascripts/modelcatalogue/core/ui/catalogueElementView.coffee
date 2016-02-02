@@ -174,7 +174,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         tabDefinition = getTabDefinition element, 'properties', undefined
 
         propertyConfiguration = catalogueElementProperties.getConfigurationFor("#{element.elementType}.properties")
-        unless not tabDefinition or not tabDefinition.name
+        unless not tabDefinition or not tabDefinition.name or propertyConfiguration.hidden(security)
           if 'properties' == $scope.property
             tabDefinition.active = true
             tabDefinition.hidden = propertyConfiguration.hidden(security)
