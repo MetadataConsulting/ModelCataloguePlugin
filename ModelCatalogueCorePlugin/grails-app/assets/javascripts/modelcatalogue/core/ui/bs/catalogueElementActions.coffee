@@ -426,6 +426,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not $scope.element.status
     return undefined if not security.hasRole('CURATOR')
     return undefined if $scope.element.status == 'DRAFT'
+    return undefined if angular.isFunction($scope.element.isInstanceOf()) and $scope.element.isInstanceOf('asset')
 
     {
       position:   -1900
@@ -442,6 +443,32 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
   actionsProvider.registerChildActionInRole 'catalogue-element', 'create-new-version', actionsProvider.ROLE_ITEM_ACTION, newVersionAction
   actionsProvider.registerActionInRoles 'create-new-version-tiny', [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INIFINITE_LIST], newVersionAction
+
+
+  newAssetVersion = ['$rootScope','$scope', 'messages', 'security', ($rootScope, $scope, messages, security) ->
+    return undefined if not $scope.element
+    return undefined if not security.hasRole('CURATOR')
+    return undefined if not angular.isFunction($scope.element.isInstanceOf)
+    return undefined if not $scope.element.isInstanceOf('asset')
+
+    {
+      position:   -1900
+      label:      'Upload New Version'
+      icon:       'fa fa-fw fa-arrow-circle-up'
+      type:       'primary'
+      watches:    ['element.status', 'element.archived']
+      disabled:   $scope.element.archived
+      action:     ->
+        messages.prompt('Upload New Version', null, type: 'edit-asset', element: $scope.element, currentDataModel: $scope.element.dataModel).then (newOne) ->
+          newOne.show()
+    }
+  ]
+
+
+  actionsProvider.registerChildActionInRole 'catalogue-element', 'upload-new-asset-version', actionsProvider.ROLE_ITEM_ACTION, newAssetVersion
+  actionsProvider.registerActionInRoles 'upload-new-asset-version-tiny', [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INIFINITE_LIST], newAssetVersion
+
+
 
   actionsProvider.registerChildActionInRole 'catalogue-element', 'archive', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
     return undefined if not $scope.element

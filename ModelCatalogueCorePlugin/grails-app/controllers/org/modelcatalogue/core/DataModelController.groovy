@@ -97,7 +97,12 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
             contentDescriptors << createContentDescriptor(dataModel, 'Data Elements', DataElement, stats["totalDataElementCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Data Types', DataType, stats["totalDataTypeCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Measurement Units', MeasurementUnit, stats["totalMeasurementUnitCount"])
-            contentDescriptors << createContentDescriptor(dataModel, 'Assets', Asset, stats["totalAssetCount"])
+
+            Map assets = createContentDescriptor(dataModel, 'Assets', Asset, stats["totalAssetCount"])
+            assets.link = "${assets.link}&status=active"
+            assets.content.link = assets.link
+            contentDescriptors << assets
+
             contentDescriptors << createContentDescriptorForRelationship('Imported Data Models', 'imports',  dataModel, RelationshipType.importType, RelationshipDirection.OUTGOING)
 
             if (params.boolean('root')) {

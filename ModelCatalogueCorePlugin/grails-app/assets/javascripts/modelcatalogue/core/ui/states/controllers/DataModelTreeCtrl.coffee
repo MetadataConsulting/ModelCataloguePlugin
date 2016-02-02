@@ -12,9 +12,15 @@ angular.module('mc.core.ui.states.controllers.DataModelTreeCtrl', ['ui.router', 
 
       if element.resource
         if element.getDataModelId() == currentDataModel?.id
+          if element.resource == 'asset'
+            $state.go 'mc.resource.list', dataModelId: currentDataModel?.id, resource: element.resource, status: 'active'
+            return
+
           $state.go 'mc.resource.list', dataModelId: currentDataModel?.id, resource: element.resource
-        else
-          $state.go 'mc.resource.list-imported', dataModelId: currentDataModel?.id, otherDataModelId: element.getDataModelId(), resource: element.resource
+          return
+
+        $state.go 'mc.resource.list-imported', dataModelId: currentDataModel?.id, otherDataModelId: element.getDataModelId(), resource: element.resource
+        return
 
       if element.elementType and element.id
         type = names.getPropertyNameFromType(element.elementType)
