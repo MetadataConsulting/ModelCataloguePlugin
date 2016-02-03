@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema
-        xmlns:mdr="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd"
+        xmlns:mdr="http://www.metadataregistry.org.uk/assets/schema/2.0/metadataregistry.xsd"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        targetNamespace="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd"
+        targetNamespace="http://www.metadataregistry.org.uk/assets/schema/2.0/metadataregistry.xsd"
         elementFormDefault="qualified" version="1.0" xml:lang="EN">
+
+    <xs:simpleType name="SemanticVersion">
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="20"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="RevisionNotes">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="2000"/>
+        </xs:restriction>
+    </xs:simpleType>
+
 
     <xs:simpleType name="Name">
         <xs:restriction base="xs:string">
@@ -275,6 +289,7 @@
         <xs:complexContent>
             <xs:extension base="mdr:CatalogueElement">
                 <xs:sequence>
+                    <xs:element name="revisionNotes" type="mdr:RevisionNotes" />
                     <xs:choice minOccurs="0" maxOccurs="unbounded">
                         <xs:element name="dataModel"        type="mdr:DataModel"       />
                         <xs:element name="dataClass"        type="mdr:DataClass"       />
@@ -284,6 +299,7 @@
                     </xs:choice>
                 </xs:sequence>
                 <xs:attribute name="type" use="prohibited"/>
+                <xs:attribute name="semanticVersion" type="mdr:SemanticVersion" />
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

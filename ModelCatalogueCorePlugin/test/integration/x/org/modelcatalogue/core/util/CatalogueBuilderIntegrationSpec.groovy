@@ -429,8 +429,10 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         build {
             automatic dataType
 
-            dataModel name: 'Complex', {
+            dataModel name: 'Complex', semanticVersion: '1.0.0', {
                 id 'http://www.example.com/complex-model'
+
+                revisionNotes 'This is a brand new model'
 
                 dataClass name: "Complex Grand Parent", {
                     dataClass name: "Complex Parent", {
@@ -457,6 +459,9 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         DataClass.findByName('Complex Child')
         DataClass.findByName('Complex Child').contains
         DataClass.findByName('Complex Child').contains.size() == 2
+
+        DataModel.findByName('Complex').semanticVersion == '1.0.0'
+        DataModel.findByName('Complex').revisionNotes == 'This is a brand new model'
     }
 
     def "create generic relationship"() {

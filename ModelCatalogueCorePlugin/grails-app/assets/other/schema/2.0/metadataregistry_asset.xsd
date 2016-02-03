@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema
-        xmlns:asset="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry_asset.xsd"
+        xmlns:asset="http://www.metadataregistry.org.uk/assets/schema/2.0/metadataregistry_asset.xsd"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        targetNamespace="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry_asset.xsd"
+        targetNamespace="http://www.metadataregistry.org.uk/assets/schema/2.0/metadataregistry_asset.xsd"
         elementFormDefault="qualified" version="1.0" xml:lang="EN">
 
     <!-- simplified version of catalogue XML which can only contain one element called asset -->

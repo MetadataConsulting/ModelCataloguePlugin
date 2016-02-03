@@ -15,7 +15,8 @@ class CatalogueXmlLoader {
             'http://www.metadataregistry.org.uk/assets/schema/1.1/metadataregistry.xsd',
             'http://www.metadataregistry.org.uk/assets/schema/1.1.1/metadataregistry.xsd',
             'http://www.metadataregistry.org.uk/assets/schema/1.1.2/metadataregistry.xsd',
-            'http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd',
+            'http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd', // just for v2.0 compatibility
+            'http://www.metadataregistry.org.uk/assets/schema/2.0/metadataregistry.xsd',
     ].asImmutable()
 
     private static final String CATALOGUE_NAMESPACE_PREFIX = "http://www.metadataregistry.org.uk/assets/schema/"
@@ -94,6 +95,7 @@ class CatalogueXmlLoader {
             case 'dataType': handleDataType(element) ; break
             case 'valueDomain': handleValueDomain(element) ; break
             case 'description': handleDescription(element) ; break
+            case 'revisionNotes': handleDescription(element) ; break
             case 'regex': handleRegex(element) ; break
             case 'rule': handleRule(element) ; break
             case 'extensions': handleChildren(element) ; break
@@ -184,6 +186,10 @@ class CatalogueXmlLoader {
             }
             archived(element.archived.text() == 'true')
         }
+    }
+
+    private void handleRevisionNotes(NodeChild element) {
+        builder.revisionNotes(element.text())
     }
 
     private void handleDescription(NodeChild element) {

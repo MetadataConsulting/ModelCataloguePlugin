@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd">
+<?xml version="1.0" encoding="UTF-8"?><catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.0/metadataregistry.xsd">
   <dataModel name="Transportation" id="http://www.example.com/datasets/Transportation" status="DRAFT">
     <dataClass name="Engine" id="http://www.example.com/models/Engine" status="DRAFT">
       <dataElement name="Factor of Adhesion" id="http://www.example.com/elements/Adhesion" status="DRAFT">
