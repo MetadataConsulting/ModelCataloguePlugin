@@ -12,7 +12,7 @@ angular.module('mc.core.ui.states.bs.dataModels.html', []).run(['$templateCache'
             <div class="panel-heading">
               <div class="input-group input-group-lg">
                 <span class="input-group-addon"><span class="fa fa-search"></span> </span>
-                <input type="text" placeholder="{{'Search ' + getCurrentType() + ' Models'}}" class="form-control" ng-model="q" ng-model-options="{debounce: 500}" focus-me="true">
+                <input type="text" placeholder="{{'Search ' + getCurrentType() + ' Models'}}" class="form-control" ng-model="q" ng-model-options="{debounce: 500}">
                 <div class="input-group-btn">
                   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {{getCurrentStatus()}} <span class="caret"></span>

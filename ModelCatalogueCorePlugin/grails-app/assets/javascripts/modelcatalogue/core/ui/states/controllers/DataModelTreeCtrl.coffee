@@ -28,7 +28,7 @@ angular.module('mc.core.ui.states.controllers.DataModelTreeCtrl', ['ui.router', 
           dataModelId: currentDataModel?.id
           resource: type
           id: element.id
-          property: 'properties'
+          property: 'history'
           focused: undefined
 
         if type == 'enumeratedValue'

@@ -198,7 +198,18 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Asset.properties', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Asset.$$relationship', hidden: true
 
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataType.hasAttachmentOf', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataType.properties', hidden: true
+
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.EnumeratedType.hasAttachmentOf', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.EnumeratedType.properties', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.EnumeratedType.enumerations', hidden: true
+
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.PrimitiveType.properties', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.PrimitiveType.hasAttachmentOf', hidden: true
+
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.ReferenceType.properties', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.ReferenceType.hasAttachmentOf', hidden: true
 
   catalogueElementPropertiesProvider.configureProperty 'relationships', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'content', hidden: true

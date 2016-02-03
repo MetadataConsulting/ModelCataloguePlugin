@@ -29,6 +29,7 @@ class DraftChain extends PublishingChain {
     protected CatalogueElement doRun(Publisher<CatalogueElement> publisher) {
         if (!context.forceNew) {
             if (isDraft(published) || isUpdatingInProgress(published)) {
+                published.clearErrors()
                 return published
             }
 
