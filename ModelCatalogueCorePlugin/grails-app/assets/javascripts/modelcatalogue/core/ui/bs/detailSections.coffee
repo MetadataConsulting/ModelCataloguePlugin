@@ -166,7 +166,7 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
             <span ng-class="element.measurementUnit.getIcon()">&nbsp;</span>
             <span class="unit-name">{{element.measurementUnit.name}}&nbsp;</span>
             <small>
-              <span class="label" ng-class="{'label-warning': element.measurementUnit.getDataModelStatus() == 'DRAFT', 'label-info': element.measurementUnit.getDataModelStatus() == 'PENDING', 'label-primary': element.measurementUnit.getDataModelStatus() == 'FINALIZED', 'label-danger': element.measurementUnit.getDataModelStatus() == 'DEPRECATED'}">{{element.measurementUnit.getDataModelWithVersion()}}</span>
+              <a ng-href="{{element.dataModel.href()}}" class="label" ng-class="{'label-warning': element.measurementUnit.getDataModelStatus() == 'DRAFT', 'label-info': element.measurementUnit.getDataModelStatus() == 'PENDING', 'label-primary': element.measurementUnit.getDataModelStatus() == 'FINALIZED', 'label-danger': element.measurementUnit.getDataModelStatus() == 'DEPRECATED'}">{{element.measurementUnit.getDataModelWithVersion()}}</a>
             </small>
           </a>
 
@@ -186,7 +186,7 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
             <span ng-class="element.dataClass.getIcon()">&nbsp;</span>
             <span class="unit-name">{{element.dataClass.name}}&nbsp;</span>
             <small>
-              <span class="label" ng-class="{'label-warning': element.dataClass.getDataModelStatus() == 'DRAFT', 'label-info': element.dataClass.getDataModelStatus() == 'PENDING', 'label-primary': element.dataClass.getDataModelStatus() == 'FINALIZED', 'label-danger': element.dataClass.getDataModelStatus() == 'DEPRECATED'}">{{element.dataClass.getDataModelWithVersion()}}</span>
+              <a ng-href="{{element.dataModel.href()}}" class="label" ng-class="{'label-warning': element.dataClass.getDataModelStatus() == 'DRAFT', 'label-info': element.dataClass.getDataModelStatus() == 'PENDING', 'label-primary': element.dataClass.getDataModelStatus() == 'FINALIZED', 'label-danger': element.dataClass.getDataModelStatus() == 'DEPRECATED'}">{{element.dataClass.getDataModelWithVersion()}}</a>
             </small>
           </a>
 
