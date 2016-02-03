@@ -19,7 +19,6 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptNewXsdImport'
   'mc.core.ui.bs.modalPromptNewMCImport'
   'mc.core.ui.bs.modalPromptNewCatalogueXmlImport'
-  'mc.core.ui.bs.modalPromptClassificationFilter'
   'mc.core.ui.bs.batchView'
   'mc.core.ui.bs.catalogueElementTreeview'
   'mc.core.ui.bs.catalogueElementTreeviewItem'
