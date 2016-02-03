@@ -231,6 +231,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
               $scope.element?.isInstanceOf('dataModel') \
                 or $scope.element?.isInstanceOf('enumeratedType')\
                 or $scope.element?.isInstanceOf('asset')\
+                or $scope.element?.isInstanceOf('dataClass')\
             )\
             and $scope.element?.status == 'DRAFT'
 

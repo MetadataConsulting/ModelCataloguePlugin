@@ -39,6 +39,23 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
         </div>
       </div>
   '''
+  $templateCache.put 'modelcatalogue/core/ui/detailSections/dataClassBasic.html', '''
+      <div class="col-md-offset-6 col-md-6">
+        <div class="row">
+          <div class="col-md-6"><strong class="small">Last Updated</strong></div>
+          <div class="col-md-6"><small>{{element.lastUpdated | date}}</small></div>
+        </div>
+        <div class="row">
+          <div class="col-md-6"><strong class="small">Version Created</strong></div>
+          <div class="col-md-6"><small>{{element.versionCreated | date}}</small></div>
+        </div>
+        <div class="row">
+          <div class="col-md-6"><strong class="small">Status</strong></div>
+          <div class="col-md-6"><small>{{element.status}}</small></div>
+        </div>
+      </div>
+  '''
+
 
   $templateCache.put 'modelcatalogue/core/ui/detailSections/assetBasic.html', '''
       <div class="col-md-6">
@@ -182,6 +199,15 @@ metadataEditors.config ['detailSectionsProvider', (detailSectionsProvider)->
   }
 
 
+  detailSectionsProvider.register {
+     title: 'Basic'
+     position: -10000
+     types: [
+       'dataClass'
+     ]
+     keys: []
+     template: 'modelcatalogue/core/ui/detailSections/dataClassBasic.html'
+  }
 
   detailSectionsProvider.register {
      title: 'Namespace and Organization'
@@ -233,6 +259,8 @@ metadataEditors.config ['detailSectionsProvider', (detailSectionsProvider)->
     types: [
       'dataModel'
       'asset'
+      # data class has various metadata editors which need to be migrated first
+      # 'dataClass'
     ]
     keys: []
     template: 'modelcatalogue/core/ui/detailSections/customMetadata.html'
