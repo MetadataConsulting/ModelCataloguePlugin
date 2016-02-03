@@ -211,4 +211,12 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
 		bindData instance, getObjectToBind(), [include: includeFields]
 		instance
 	}
+
+    protected String getHistoryOrderDirection() {
+        'asc'
+    }
+
+    protected String getHistorySortProperty() {
+        'semanticVersion'
+    }
 }

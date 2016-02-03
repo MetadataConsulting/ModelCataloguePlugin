@@ -791,12 +791,20 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         def customParams = [:]
         customParams.putAll params
 
-        customParams.sort = 'versionNumber'
-        customParams.order = 'desc'
+        customParams.sort = historySortProperty
+        customParams.order = historyOrderDirection
 
         respond Lists.fromCriteria(customParams, type, "/${name}/${params.id}/history") {
             eq 'latestVersionId', latestVersionId
         }
+    }
+
+    protected String getHistoryOrderDirection() {
+        'desc'
+    }
+
+    protected String getHistorySortProperty() {
+        'versionNumber'
     }
 
     // classifications are marshalled with the published element so no need for special method to fetch them
