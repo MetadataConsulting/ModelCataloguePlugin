@@ -67,6 +67,9 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      */
     private boolean canCreateRelationshipTypes
 
+
+    ProgressMonitor monitor = ProgressMonitor.NOOP
+
     /**
      * Creates new catalogue builder with given classification and element services.
      * @param dataModelService classification service
@@ -626,6 +629,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
     private void reset() {
         context.clear()
         repository.clear()
+        repository.monitor = monitor
         createAutomatically.clear()
         created.clear()
     }

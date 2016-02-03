@@ -39,6 +39,8 @@ class CatalogueElementProxyRepository {
 
     private final Map<String, Relationship> createdRelationships = [:]
 
+    ProgressMonitor monitor = ProgressMonitor.NOOP
+
     CatalogueElementProxyRepository(DataModelService dataModelService, ElementService elementService) {
         this.dataModelService = dataModelService
         this.elementService = elementService
@@ -93,7 +95,7 @@ class CatalogueElementProxyRepository {
         Map<String, CatalogueElementProxy> byName   = [:]
 
         watch.start('merging proxies')
-        log.info "(1/6) merging proxies"
+        logInfo "(1/6) merging proxies"
         for (CatalogueElementProxy proxy in pendingProxies) {
             if (proxy.modelCatalogueId) {
                 CatalogueElementProxy existing = byID[proxy.modelCatalogueId]
@@ -135,7 +137,7 @@ class CatalogueElementProxyRepository {
         if (!skipDirtyChecking) {
             // Step 1:check something changed this must run before any other resolution happens
             watch.start('dirty checking')
-            log.info "(2/6) dirty checking"
+            logInfo "(2/6) dirty checking"
             for (CatalogueElementProxy element in elementProxiesToBeResolved) {
                 if (element.changed) {
                     element.requestDraft()
@@ -145,7 +147,7 @@ class CatalogueElementProxyRepository {
 
             // Step 2: if something changed, create new versions. if run in one step, it generates false changes
             watch.start('requesting drafts')
-            log.info "(3/6) requesting drafts"
+            logInfo "(3/6) requesting drafts"
 
             elementProxiesToBeResolved.each {
                 if (!it.underControl) {
@@ -172,16 +174,16 @@ class CatalogueElementProxyRepository {
 
         // Step 3: resolve elements (set properties, update metadata)
         watch.start('resolving elements')
-        log.info "(4/6) resolving elements"
+        logInfo "(4/6) resolving elements"
         int elNumberOfPositions = Math.floor(Math.log10(elementProxiesToBeResolved.size())) + 2
         elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
-            log.debug "[${(i + 1).toString().padLeft(elNumberOfPositions, '0')}/${elementProxiesToBeResolved.size().toString().padLeft(elNumberOfPositions, '0')}] Resolving $element"
+            logDebug "[${(i + 1).toString().padLeft(elNumberOfPositions, '0')}/${elementProxiesToBeResolved.size().toString().padLeft(elNumberOfPositions, '0')}] Resolving $element"
             try {
                 created << element.resolve()
                 relationshipProxiesToBeResolved.addAll element.pendingRelationships
             } catch (e) {
                 if (anyCause(e, ReferenceNotPresentInTheCatalogueException)) {
-                    log.warn "Reference ${element} not present in the catalogue"
+                    logWarn "Reference ${element} not present in the catalogue"
                 } else {
                     throw e
                 }
@@ -192,15 +194,15 @@ class CatalogueElementProxyRepository {
         // Step 4: resolve pending relationships
         watch.start('resolving relationships')
         Set<Long> resolvedRelationships = []
-        log.info "(5/6) resolving relationships"
+        logInfo "(5/6) resolving relationships"
         int relNumberOfPositions = Math.floor(Math.log10(relationshipProxiesToBeResolved.size())) + 2
         relationshipProxiesToBeResolved.eachWithIndex { RelationshipProxy relationshipProxy, i ->
-            log.debug "[${(i + 1).toString().padLeft(relNumberOfPositions, '0')}/${relationshipProxiesToBeResolved.size().toString().padLeft(relNumberOfPositions, '0')}] Resolving $relationshipProxy"
+            logDebug "[${(i + 1).toString().padLeft(relNumberOfPositions, '0')}/${relationshipProxiesToBeResolved.size().toString().padLeft(relNumberOfPositions, '0')}] Resolving $relationshipProxy"
             try {
                 resolvedRelationships << relationshipProxy.resolve(this)?.getId()
             } catch (e) {
                 if (anyCause(e,ReferenceNotPresentInTheCatalogueException)) {
-                    log.warn "Some item referred by ${relationshipProxy} not present in the catalogue"
+                    logWarn "Some item referred by ${relationshipProxy} not present in the catalogue"
                 } else {
                     throw e
                 }
@@ -231,9 +233,9 @@ class CatalogueElementProxyRepository {
 
         // Step 4: resolve state changes
         watch.start('resolving state changes')
-        log.info "(6/6) resolving state changes"
+        logInfo "(6/6) resolving state changes"
         elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
-            log.debug "[${(i + 1).toString().padLeft(elNumberOfPositions, '0')}/${elementProxiesToBeResolved.size().toString().padLeft(elNumberOfPositions, '0')}] Resolving status changes for $element"
+            logDebug "[${(i + 1).toString().padLeft(elNumberOfPositions, '0')}/${elementProxiesToBeResolved.size().toString().padLeft(elNumberOfPositions, '0')}] Resolving status changes for $element"
 
             ElementStatus status = element.getParameter('status') as ElementStatus
 
@@ -261,7 +263,7 @@ class CatalogueElementProxyRepository {
         }
         watch.stop()
 
-        log.info "Proxies resolved:\n${watch.prettyPrint()}"
+        logInfo "Proxies resolved:\n${watch.prettyPrint()}"
 
         created
     }
@@ -510,4 +512,21 @@ class CatalogueElementProxyRepository {
     def <T extends CatalogueElement> T findByMissingReferenceId(String missingReferenceId) {
         (T) ExtensionValue.findByNameAndExtensionValue(MISSING_REFERENCE_ID, missingReferenceId)?.element
     }
+
+    void logDebug(String string) {
+        monitor.log(string)
+        log.debug string
+    }
+
+    void logInfo(String string) {
+        monitor.log(string)
+        log.info string
+    }
+
+    void logWarn(String string) {
+        monitor.log(string)
+        log.warn string
+    }
+
+
 }

@@ -17,18 +17,16 @@ class UmljService {
 
     static transactional = false
 
-    void importUmlDiagram(InputStream is, String name, DataModel classification) {
+    void importUmlDiagram(CatalogueBuilder builder, InputStream is, String name, DataModel classification) {
         log.info "Parsing Umlj file for ${name}"
         def slurper = new JsonSlurper()
         def result  = slurper.parse(new BufferedReader(new InputStreamReader(is)))
         def umlFile = new StarUMLDiagram(result)
-        generateCatalogueElements(umlFile, classification)
+        generateCatalogueElements(builder, umlFile, classification)
     }
 
 
-    protected void generateCatalogueElements(StarUMLDiagram umlFile, DataModel clsf) {
-
-        CatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
+    protected void generateCatalogueElements(CatalogueBuilder builder, StarUMLDiagram umlFile, DataModel clsf) {
         builder.build {
             classification(name: clsf.name) {
                 globalSearchFor dataType

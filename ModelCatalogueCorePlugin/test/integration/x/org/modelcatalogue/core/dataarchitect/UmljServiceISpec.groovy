@@ -1,12 +1,11 @@
 package x.org.modelcatalogue.core.dataarchitect
-
 import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataClass
 
 class UmljServiceISpec extends AbstractIntegrationSpec {
 
-    def umljService, initCatalogueService
+    def umljService, initCatalogueService, catalogueBuilder
 
 //    @Ignore
     def "test import"() {
@@ -16,7 +15,7 @@ class UmljServiceISpec extends AbstractIntegrationSpec {
 
         when:
         InputStream inputStream = new FileInputStream(filenameXsd)
-        umljService.importUmlDiagram(inputStream, "rare_diseases_combined", classification)
+        umljService.importUmlDiagram(catalogueBuilder, inputStream, "rare_diseases_combined", classification)
 
         def patient = DataClass.findByName("Patient")
         def patientData = patient.contains

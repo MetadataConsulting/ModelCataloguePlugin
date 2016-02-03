@@ -117,8 +117,7 @@ class InitCatalogueService {
         }
     }
 
-    Set<CatalogueElement> importMCFile(InputStream inputStream, boolean skipDraft = false) {
-        DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
+    Set<CatalogueElement> importMCFile(InputStream inputStream, boolean skipDraft = false, DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)) {
         if (skipDraft) {
             builder.skip ElementStatus.DRAFT
         }

@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.integration.excel.ExcelLoader
 import org.modelcatalogue.integration.excel.HeadersMap
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
@@ -74,6 +75,7 @@ class DataImportController  {
         if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xls")) {
             def asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
             def id = asset.id
+            builder.monitor = BuildProgressMonitor.create(id)
             InputStream inputStream = file.inputStream
             HeadersMap headersMap = HeadersMap.create(request.JSON.headersMap ?: [:])
             executeInBackground(id, "Imported from Excel") {
@@ -92,6 +94,7 @@ class DataImportController  {
         if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xml")) {
             def asset = assetService.storeAsset(params, file, 'application/xml')
             def id = asset.id
+            builder.monitor = BuildProgressMonitor.create(id)
             InputStream inputStream = file.inputStream
             executeInBackground(id, "Imported from XML") {
                 try {
@@ -109,6 +112,7 @@ class DataImportController  {
         if (file.size > 0 && file.originalFilename.endsWith(".obo")) {
             def asset = assetService.storeAsset(params, file, 'text/obo')
             def id = asset.id
+            builder.monitor = BuildProgressMonitor.create(id)
             InputStream inputStream = file.inputStream
             String name = params?.name
             String idpattern = params.idpattern
@@ -130,6 +134,7 @@ class DataImportController  {
         if (file.size > 0 && file.originalFilename.endsWith("c.csv")) {
             def asset = assetService.storeAsset(params, file, 'application/model-catalogue')
             def id = asset.id
+            builder.monitor = BuildProgressMonitor.create(id)
             InputStream inputStream = file.inputStream
 
             executeInBackground(id, "Imported from LOINC")  {
@@ -148,11 +153,12 @@ class DataImportController  {
         if (file.size > 0 && file.originalFilename.endsWith(".mc")) {
             def asset = assetService.storeAsset(params, file, 'application/model-catalogue')
             def id = asset.id
+            builder.monitor = BuildProgressMonitor.create(id)
             InputStream inputStream = file.inputStream
 
             executeInBackground(id, "Imported from Model Catalogue DSL")  {
                 try {
-                    Set<CatalogueElement> created = initCatalogueService.importMCFile(inputStream)
+                    Set<CatalogueElement> created = initCatalogueService.importMCFile(inputStream, false, builder)
                     finalizeAsset(id, (DataModel) (created.find {it.instanceOf(DataModel)} ?: created.find{it.dataModel}?.dataModel), userId)
                 } catch (Exception e) {
                     logError(id, e)
@@ -166,6 +172,7 @@ class DataImportController  {
         if (file.size > 0 && file.originalFilename.endsWith(".umlj")) {
             def asset = assetService.storeAsset(params, file, 'text/umlj')
             def id = asset.id
+            builder.monitor = BuildProgressMonitor.create(id)
             InputStream inputStream = file.inputStream
             String name = params?.name
 
@@ -173,7 +180,7 @@ class DataImportController  {
                 try {
                     DataModel dataModel = DataModel.findByName(name)
                     if(!dataModel) dataModel =  new DataModel(name: name).save(flush:true, failOnError:true)
-                    umljService.importUmlDiagram(inputStream, name, dataModel)
+                    umljService.importUmlDiagram(builder, inputStream, name, dataModel)
                     Asset updated = Asset.get(id)
                     updated.dataModel = dataModel
                     updated.status = ElementStatus.FINALIZED
@@ -194,18 +201,13 @@ class DataImportController  {
             return
         }
 
-
-        if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xsd")) {
-            Asset asset = renderImportAsAsset(params, file, conceptualDomainName)
-            redirectToAsset(asset.id)
-            return
-        }
-
-        if (!CONTENT_TYPES.contains(confType)) errors.add("input should be an Excel file but uploaded content is ${confType}")
+        if (!CONTENT_TYPES.contains(confType)) errors.add("input should be an Excel, XML, MC, OBO, UML or LOINC file but uploaded content is ${confType}")
         respond "errors": errors
     }
 
     protected static Asset finalizeAsset(Long id, DataModel dataModel, Long userId){
+        BuildProgressMonitor.remove(id)
+
         Asset updated = Asset.get(id)
 
         if (!dataModel) {
