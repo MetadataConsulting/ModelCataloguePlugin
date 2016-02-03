@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.0/metadataregistry.xsd">
-    <dataModel id="http://www.example.com/datasets/Transportation" status="DRAFT" name="Transportation">
+    <dataModel semanticVersion="1.0.0" id="http://www.example.com/datasets/Transportation" status="DRAFT" name="Transportation">
+        <revisionNotes>This is a new model</revisionNotes>
         <dataClass id="http://www.example.com/models/Locomotive" status="DRAFT" name="Locomotive">
             <dataElement id="http://www.example.com/elements/Adhesion" status="DRAFT" name="Factor of Adhesion">
                 <dataType id="http://www.example.com/domains/Force" status="DRAFT" name="Force">

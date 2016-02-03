@@ -95,7 +95,7 @@ class CatalogueXmlLoader {
             case 'dataType': handleDataType(element) ; break
             case 'valueDomain': handleValueDomain(element) ; break
             case 'description': handleDescription(element) ; break
-            case 'revisionNotes': handleDescription(element) ; break
+            case 'revisionNotes': handleRevisionNotes(element) ; break
             case 'regex': handleRegex(element) ; break
             case 'rule': handleRule(element) ; break
             case 'extensions': handleChildren(element) ; break
