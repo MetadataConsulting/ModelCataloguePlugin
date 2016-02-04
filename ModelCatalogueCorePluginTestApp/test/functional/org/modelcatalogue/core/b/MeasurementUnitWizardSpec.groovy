@@ -44,14 +44,14 @@ class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "going to metadata tab changes the url"() {
-        check { $('li', 'data-tab-name': 'ext') } displayed
+        check { $('li', 'data-tab-name': 'relatedTo') } displayed
 
         when:
-        click { $('li', 'data-tab-name': 'ext').find('a') }
+        click { $('li', 'data-tab-name': 'relatedTo').find('a') }
 
         then:
         waitFor {
-            currentUrl.toString().endsWith('/ext')
+            currentUrl.toString().endsWith('/relatedTo')
         }
     }
 
