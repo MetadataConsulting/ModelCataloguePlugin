@@ -211,6 +211,13 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.ReferenceType.properties', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.ReferenceType.hasAttachmentOf', hidden: true
 
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.MeasurementUnit.properties', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.MeasurementUnit.hasAttachmentOf', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.MeasurementUnit.ext', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.MeasurementUnit.isBaseFor', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.MeasurementUnit.isBasedOn', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.MeasurementUnit.isSynonymFor', hidden: true
+
   catalogueElementPropertiesProvider.configureProperty 'relationships', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'content', hidden: true
   catalogueElementPropertiesProvider.configureProperty '$$metadata', hidden: true

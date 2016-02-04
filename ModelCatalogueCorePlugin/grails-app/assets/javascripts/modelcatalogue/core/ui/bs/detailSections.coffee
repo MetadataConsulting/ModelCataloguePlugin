@@ -13,15 +13,15 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       <div class="col-md-6">
         <div class="row">
           <div class="col-md-6"><strong class="small">Authors</strong></div>
-          <div class="col-md-6"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#authors']">{{element.ext.get('http://www.modelcatalogue.org/metadata/#authors') || 'empty'}}</small></div>
+          <div class="full-width-editable col-md-6"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#authors']">{{element.ext.get('http://www.modelcatalogue.org/metadata/#authors') || 'empty'}}</small></div>
         </div>
         <div class="row">
           <div class="col-md-6"><strong class="small">Reviewers</strong></div>
-          <div class="col-md-6"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#reviewers']">{{element.ext.get('http://www.modelcatalogue.org/metadata/#reviewers') || 'empty'}}</small></div>
+          <div class="full-width-editable col-md-6"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#reviewers']">{{element.ext.get('http://www.modelcatalogue.org/metadata/#reviewers') || 'empty'}}</small></div>
         </div>
         <div class="row">
           <div class="col-md-6"><strong class="small">Owner</strong></div>
-          <div class="col-md-6"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#owner']">{{element.ext.get('http://www.modelcatalogue.org/metadata/#owner') || 'empty'}}</small></div>
+          <div class="full-width-editable col-md-6"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#owner']">{{element.ext.get('http://www.modelcatalogue.org/metadata/#owner') || 'empty'}}</small></div>
         </div>
       </div>
       <div class="col-md-6">
@@ -88,22 +88,49 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       </div>
   '''
 
+  $templateCache.put 'modelcatalogue/core/ui/detailSections/measurementUnitBasic.html', '''
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-6"><strong class="small">Symbol</strong></div>
+          <div class="full-width-editable col-md-6"><small editable-text="copy.symbol">{{element.symbol || 'empty'}}</small></div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-6"><strong class="small">Last Updated</strong></div>
+          <div class="col-md-6"><small>{{element.lastUpdated | date}}</small></div>
+        </div>
+        <div class="row">
+          <div class="col-md-6"><strong class="small">Version Created</strong></div>
+          <div class="col-md-6"><small>{{element.versionCreated | date}}</small></div>
+        </div>
+        <div class="row">
+          <div class="col-md-6"><strong class="small">Status</strong></div>
+          <div class="col-md-6"><small>{{element.status}}</small></div>
+        </div>
+      </div>
+  '''
+
   $templateCache.put 'modelcatalogue/core/ui/detailSections/organization.html', '''
       <div class="col-md-3">
           <strong class="small">Organization</strong>
       </div>
-      <div class="col-md-9"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#organization']">{{element.ext.get('http://www.modelcatalogue.org/metadata/#organization') || 'empty'}}</small></div>
+      <div class="full-width-editable col-md-9"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#organization']">{{element.ext.get('http://www.modelcatalogue.org/metadata/#organization') || 'empty'}}</small></div>
       <div class="col-md-3">
           <strong class="small">Namespace</strong>
       </div>
-      <div class="col-md-9"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#namespace']">{{element.ext.get('http://www.modelcatalogue.org/metadata/#namespace') || 'empty'}}</small></div>
+      <div class="full-width-editable col-md-9"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#namespace']">{{element.ext.get('http://www.modelcatalogue.org/metadata/#namespace') || 'empty'}}</small></div>
   '''
 
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/internalId.html', '''
+  $templateCache.put 'modelcatalogue/core/ui/detailSections/modelCatalogueId.html', '''
       <div class="col-md-3">
           <strong class="small">Model Catalogue ID</strong>
       </div>
       <div class="col-md-9"><small>{{element.internalModelCatalogueId}}</small></div>
+      <div class="col-md-3" ng-if="element.modelCatalogueId &amp;&amp; element.modelCatalogueId != element.internalModelCatalogueId">
+          <strong class="small">External ID (URL)</strong>
+      </div>
+      <div class="full-width-editable col-md-9" ng-if="element.modelCatalogueId &amp;&amp; element.modelCatalogueId != element.internalModelCatalogueId"><a class="small" ng-href="{{element.modelCatalogueId}}" editable-text="copy.modelCatalogueId">{{element.modelCatalogueId}}</a></div>
   '''
 
   $templateCache.put 'modelcatalogue/core/ui/detailSections/customMetadata.html', '''
@@ -132,7 +159,7 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       <div class="col-md-3">
           <strong class="small">Revision Notes</strong>
       </div>
-      <div class="col-md-9 preserve-new-lines"><small editable-textarea="copy.revisionNotes" e-rows="5" e-cols="1000">{{element.revisionNotes || 'empty'}}</small></div>
+      <div class="full-width-editable col-md-9 preserve-new-lines"><small editable-textarea="copy.revisionNotes" e-rows="5" e-cols="1000">{{element.revisionNotes || 'empty'}}</small></div>
   '''
 
 
@@ -140,14 +167,14 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       <div class="col-md-3">
           <strong class="small">Description</strong>
       </div>
-      <div class="col-md-9 preserve-new-lines"><small editable-textarea="copy.description" e-rows="5" e-cols="1000" class="ce-description">{{element.description || 'empty'}}</small></div>
+      <div class="full-width-editable col-md-9 preserve-new-lines"><small editable-textarea="copy.description" e-rows="5" e-cols="1000" class="ce-description">{{element.description || 'empty'}}</small></div>
   '''
 
   $templateCache.put 'modelcatalogue/core/ui/detailSections/rule.html', '''
       <div class="col-md-3">
           <strong class="small">Rule</strong>
       </div>
-      <div class="col-md-9 preserve-new-lines">
+      <div class="full-width-editable col-md-9 preserve-new-lines">
         <pre editable-textarea="copy.rule" e-rows="5" e-cols="1000" class="ce-rule small">{{element.rule || 'empty'}}</pre>
         <p ng-if="editableForm.$visible" class="help-block">Enter valid <a href="http://www.groovy-lang.org/" target="_blank">Groovy</a> code. Variable <code>x</code> refers to the value validated value and  <code>dataType</code> to current data type. Last row is the result which should be <code>boolean</code> value. For example you can <a ng-click="view.showRegexExample(copy, messages)"><span class="fa fa-magic"></span> validate using regular expression</a> or <a ng-click="view.showSetExample(copy, messages)"><span class="fa fa-magic"></span> values in set</a></p>
       </div>
@@ -157,7 +184,7 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       <div class="col-md-3">
           <strong class="small">Measurement Unit</strong>
       </div>
-      <div class="col-md-9">
+      <div class="full-width-editable col-md-9">
           <div ng-if="editableForm.$visible">
             <input type="text" id="measurementUnit" placeholder="Measurement Unit" ng-model="copy.measurementUnit" catalogue-element-picker="measurementUnit" label="el.name">
           </div>
@@ -177,7 +204,7 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       <div class="col-md-3">
           <strong class="small">Data Class</strong>
       </div>
-      <div class="col-md-9">
+      <div class="full-width-editable col-md-9">
           <div ng-if="editableForm.$visible">
             <input type="text" id="dataClass" placeholder="Ddata Class" ng-model="copy.dataClass" catalogue-element-picker="dataClass" label="el.name">
           </div>
@@ -210,7 +237,7 @@ metadataEditors.config ['detailSectionsProvider', (detailSectionsProvider)->
         'catalogueElement'
       ]
       keys: []
-      template: 'modelcatalogue/core/ui/detailSections/internalId.html'
+      template: 'modelcatalogue/core/ui/detailSections/modelCatalogueId.html'
   }
 
   detailSectionsProvider.register {
@@ -226,6 +253,16 @@ metadataEditors.config ['detailSectionsProvider', (detailSectionsProvider)->
 
      ]
      template: 'modelcatalogue/core/ui/detailSections/dataModelBasic.html'
+  }
+
+  detailSectionsProvider.register {
+     title: 'Basic'
+     position: -10000
+     types: [
+       'measurementUnit'
+     ]
+     keys: []
+     template: 'modelcatalogue/core/ui/detailSections/measurementUnitBasic.html'
   }
 
 
@@ -357,6 +394,7 @@ x in ['apple', 'banana', 'cherry']
     types: [
       'dataModel'
       'asset'
+      'mesurementUnit'
       # data class has various metadata editors which need to be migrated first
       # 'dataClass'
     ]
