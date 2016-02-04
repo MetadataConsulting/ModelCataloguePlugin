@@ -353,10 +353,10 @@ class ChangelogGenerator {
 
                     def value = DefaultAuditor.readValue(deleteChange.oldValue)
 
-                    String heading = "${value.destination.name} (${value.destination.latestVersionId}.${value.destination.versionNumber}, $value.destination.status)"
+                    String heading = "${value.destination.name} (${value.destination.getCombinedVersion()}, $value.destination.status)"
 
                     if (configuration.incoming) {
-                        heading = "${value.source.name} (${value.source.latestVersionId}.${value.source.versionNumber}, $value.source.status)"
+                        heading = "${value.source.name} (${value.source.getCombinedVersion()}, $value.source.status)"
                     }
 
                     titleRows[heading] = configuration.removedRelationshipNote

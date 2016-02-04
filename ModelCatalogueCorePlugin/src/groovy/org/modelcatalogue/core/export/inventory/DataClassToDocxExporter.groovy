@@ -249,7 +249,7 @@ class DataClassToDocxExporter {
                         }
                         row {
                             cell {
-                                text CELL_TEXT_FIRST, "${dataElement.name} (${dataElement.getLatestVersionId() ?: dataElement.getId()}.${dataElement.getVersionNumber() ?: 1})"
+                                text CELL_TEXT_FIRST, "${dataElement.name} (${dataElement.getCombinedVersion()})"
                             }
                             cell {
                                 text CELL_TEXT, dataElement.description ?: ''
