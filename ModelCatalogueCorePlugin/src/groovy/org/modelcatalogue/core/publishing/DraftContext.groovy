@@ -5,6 +5,8 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.RelationshipType
 
+import java.util.regex.Matcher
+
 class DraftContext {
 
     private boolean copyRelationships
@@ -122,6 +124,36 @@ class DraftContext {
 
     static String hashForRelationship(CatalogueElement source, CatalogueElement destination, RelationshipType type) {
         "$source.id:$type.id:$destination.id"
+    }
+
+    static nextPatchVersion(String currentVersion) {
+        if (!currentVersion) {
+            // null is considered to be 0.0.1
+            return '0.0.2'
+        }
+
+        def majorMinorPatch = currentVersion =~ /^(\d+)(\.(\d+))?(\.(\d+))?$/
+
+        if (majorMinorPatch) {
+            Integer major = majorMinorPatch[0][1] as Integer
+            Integer minor = majorMinorPatch[0][3] as Integer ?: 0
+            Integer patch = majorMinorPatch[0][5] as Integer ?: 0
+
+            return "${major}.${minor}.${patch + 1}"
+        }
+
+        def numberSuffix = currentVersion =~ /(.*?)(\d+)$/
+
+        if (numberSuffix) {
+            String base = numberSuffix[0][1]
+            String suffix = numberSuffix[0][2]
+
+            Integer suffixAsNumber = suffix as Integer
+
+            return base + ("${suffixAsNumber + 1}".padLeft(suffix.size(), '0'))
+        }
+
+        return "${currentVersion}-01"
     }
 
     DataModel getDestinationDataModel(CatalogueElement catalogueElement) {

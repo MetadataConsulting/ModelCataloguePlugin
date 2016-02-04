@@ -18,7 +18,6 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
     def relationshipService
     def mappingService
     CatalogueBuilder catalogueBuilder
-    def grailsLinkGenerator
 
     def "return finalized and draft elements by default"() {
         expect:
@@ -756,7 +755,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         }
 
         when:
-        CatalogueElement dataType = elementService.findByModelCatalogueId(modelCatalogueId)
+        CatalogueElement dataType = elementService.findByModelCatalogueId(CatalogueElement, modelCatalogueId)
 
         then:
         dataType
@@ -766,49 +765,49 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         dataType.name == dataTypeName
 
         when:
-        CatalogueElement withoutVersion = elementService.findByModelCatalogueId(dataType.getDefaultModelCatalogueId(false))
+        CatalogueElement withoutVersion = elementService.findByModelCatalogueId(CatalogueElement, dataType.getDefaultModelCatalogueId(false))
 
         then:
         withoutVersion
         withoutVersion == dataType
 
         when:
-        CatalogueElement withVersion = elementService.findByModelCatalogueId(dataType.getDefaultModelCatalogueId(true))
+        CatalogueElement withVersion = elementService.findByModelCatalogueId(CatalogueElement, dataType.getDefaultModelCatalogueId(true))
 
         then:
         withVersion
         withVersion == dataType
 
         when:
-        CatalogueElement legacy = elementService.findByModelCatalogueId(dataType.getLegacyModelCatalogueId(false))
+        CatalogueElement legacy = elementService.findByModelCatalogueId(CatalogueElement, dataType.getLegacyModelCatalogueId(false))
 
         then:
         legacy
         legacy == dataType
 
         when:
-        CatalogueElement orphan = elementService.findByModelCatalogueId(orphanModelCatalogueId)
+        CatalogueElement orphan = elementService.findByModelCatalogueId(CatalogueElement, orphanModelCatalogueId)
 
         then:
         orphan
         orphan.name == orphanDataTypeName
 
         when:
-        CatalogueElement orphanWithVersion = elementService.findByModelCatalogueId(orphan.getDefaultModelCatalogueId(true))
+        CatalogueElement orphanWithVersion = elementService.findByModelCatalogueId(CatalogueElement, orphan.getDefaultModelCatalogueId(true))
 
         then:
         orphanWithVersion
         orphanWithVersion == orphan
 
         when:
-        CatalogueElement legacyWithVersion = elementService.findByModelCatalogueId(orphan.getLegacyModelCatalogueId(false))
+        CatalogueElement legacyWithVersion = elementService.findByModelCatalogueId(CatalogueElement, orphan.getLegacyModelCatalogueId(false))
 
         then:
         legacyWithVersion
         legacyWithVersion == orphan
 
         when:
-        CatalogueElement orphanWithoutVersion = elementService.findByModelCatalogueId(orphan.getDefaultModelCatalogueId(false))
+        CatalogueElement orphanWithoutVersion = elementService.findByModelCatalogueId(CatalogueElement, orphan.getDefaultModelCatalogueId(false))
 
         then:
         orphanWithoutVersion

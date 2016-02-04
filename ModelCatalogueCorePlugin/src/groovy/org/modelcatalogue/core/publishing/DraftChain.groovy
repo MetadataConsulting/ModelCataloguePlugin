@@ -110,8 +110,14 @@ class DraftChain extends PublishingChain {
         draft.status = ElementStatus.UPDATED
         draft.dateCreated = published.dateCreated
 
-        if (draft.instanceOf(DataModel) && context.hasVersion()) {
-            draft.semanticVersion = context.version
+        if (draft.instanceOf(DataModel)) {
+            if (context.hasVersion()) {
+                draft.semanticVersion = context.version
+            } else {
+                String nextVersion = DraftContext.nextPatchVersion(draft.semanticVersion)
+                draft.semanticVersion = nextVersion
+                context.version(nextVersion)
+            }
             draft.revisionNotes = null
         }
 

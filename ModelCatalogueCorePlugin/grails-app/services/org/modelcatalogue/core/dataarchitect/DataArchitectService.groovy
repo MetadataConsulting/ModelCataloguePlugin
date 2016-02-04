@@ -106,7 +106,7 @@ class DataArchitectService {
         for (String header in headers) {
             def element = resource.findByNameIlikeAndStatus(header, ElementStatus.FINALIZED)
             if (!element) {
-                element = elementService.findByModelCatalogueId(header)
+                element = elementService.findByModelCatalogueId(CatalogueElement, header)
             }
             if (!element) {
                 if (header.contains('_')) {

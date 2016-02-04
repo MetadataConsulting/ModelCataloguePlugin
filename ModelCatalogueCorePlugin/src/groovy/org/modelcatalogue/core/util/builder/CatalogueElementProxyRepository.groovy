@@ -8,7 +8,6 @@ import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.springframework.util.StopWatch
-import org.modelcatalogue.core.util.Legacy
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
@@ -397,7 +396,7 @@ class CatalogueElementProxyRepository {
     }
 
     protected <T extends CatalogueElement> T findById(Class<T> type, Object id) {
-        elementService.findByModelCatalogueId(id?.toString())?.asType(type)
+        elementService.findByModelCatalogueId(type, id?.toString())?.asType(type)
     }
 
     private static <T extends CatalogueElement> T getLatestFromCriteria(DetachedCriteria<T> criteria, boolean unclassifiedOnly = false) {

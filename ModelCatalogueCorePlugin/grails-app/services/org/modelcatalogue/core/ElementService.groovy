@@ -117,12 +117,14 @@ class ElementService implements Publisher<CatalogueElement> {
         }
     }
 
-    CatalogueElement findByModelCatalogueId(String theId) {
+    CatalogueElement findByModelCatalogueId(Class<? extends CatalogueElement> resource, String theId) {
         if (!theId) {
             return null
         }
 
-        CatalogueElement byExternalId = getLatestFromCriteria(CatalogueElement.where { modelCatalogueId == theId })
+        CatalogueElement byExternalId = getLatestFromCriteria(new DetachedCriteria<CatalogueElement>(resource).build {
+            eq 'modelCatalogueId', theId
+        })
 
         if (byExternalId) {
             return byExternalId
@@ -141,7 +143,7 @@ class ElementService implements Publisher<CatalogueElement> {
                 versionNumberFound = matchVersionNumber[0][1] as Long
             }
 
-            CatalogueElement result = getLatestFromCriteria(new DetachedCriteria<CatalogueElement>(CatalogueElement).build {
+            CatalogueElement result = getLatestFromCriteria(new DetachedCriteria<CatalogueElement>(resource).build {
                 or {
                     eq 'latestVersionId', urlId
                     eq 'id', urlId
@@ -163,7 +165,7 @@ class ElementService implements Publisher<CatalogueElement> {
             }
 
             if (versionNumberFound) {
-                CatalogueElement byVersionNumber = getLatestFromCriteria(new DetachedCriteria<CatalogueElement>(CatalogueElement).build {
+                CatalogueElement byVersionNumber = getLatestFromCriteria(new DetachedCriteria<CatalogueElement>(resource).build {
                     or {
                         eq 'latestVersionId', urlId
                         eq 'id', urlId
@@ -176,19 +178,19 @@ class ElementService implements Publisher<CatalogueElement> {
                 }
             }
 
-            return CatalogueElement.get(urlId)
+            return resource.get(urlId)
         }
 
         def matchLegacyScheme = theId.toString() =~ /\/(.\w+)\/(\d+)(\.(\d+))?$/
 
         if (matchLegacyScheme) {
-            Long id      = matchLegacyScheme[0][2] as Long
+            Long id  = matchLegacyScheme[0][2] as Long
             Integer version = matchLegacyScheme[0][4] as Integer
 
             if (version) {
-                CatalogueElement result = CatalogueElement.findByLatestVersionIdAndVersionNumber(id, version)
+                CatalogueElement result = resource.findByLatestVersionIdAndVersionNumber(id, version)
                 if (!result) {
-                    result = CatalogueElement.get(id)
+                    result = resource.get(id)
                 }
                 if (result && result.getLegacyModelCatalogueId(false) == Legacy.fixModelCatalogueId(theId).toString()) {
                     return result
@@ -196,13 +198,13 @@ class ElementService implements Publisher<CatalogueElement> {
                 return null
             }
 
-            CatalogueElement result = CatalogueElement.findByLatestVersionId(id, [sort: 'versionNumber', order: 'desc'])
+            CatalogueElement result = resource.findByLatestVersionId(id, [sort: 'versionNumber', order: 'desc'])
 
             if (result && Legacy.fixModelCatalogueId(theId).toString().startsWith(result.getLegacyModelCatalogueId(true))) {
                 return result
             }
 
-            result = CatalogueElement.get(id)
+            result = resource.get(id)
             if (result && result.getLegacyModelCatalogueId(true) == Legacy.fixModelCatalogueId(theId).toString()) {
                 return result
             }
@@ -211,7 +213,7 @@ class ElementService implements Publisher<CatalogueElement> {
         return null
     }
 
-    private static CatalogueElement  getLatestFromCriteria(DetachedCriteria<? extends CatalogueElement> criteria) {
+    private static CatalogueElement getLatestFromCriteria(DetachedCriteria<? extends CatalogueElement> criteria) {
         List<CatalogueElement> elements = criteria.list(sort: 'versionNumber', order: 'desc', max: 1)
         if (elements) {
             return elements.first()
