@@ -18,6 +18,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
     def relationshipService
     def mappingService
     CatalogueBuilder catalogueBuilder
+    def grailsLinkGenerator
 
     def "return finalized and draft elements by default"() {
         expect:
@@ -736,6 +737,83 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         DataClass.findByNameAndDataModel(rootDataClassName, destination)
 
         DataElement.countByNameLike("DE MET-922%") == 50
+    }
+
+
+    def "find by model catalogue id"() {
+        final String dataModelName = "FBMCIITII Data Model"
+        final String dataModelSemVer = "1.0.0"
+        final String orphanDataTypeName = "FBMCIITII Orpan Data Type"
+        final String orphanModelCatalogueId = "http://www.example.com/types/FBMCIITII_Orphan_Data_Type"
+        final String dataTypeName = "FBMCIITII Data Type"
+        final String modelCatalogueId = "http://www.example.com/types/FBMCIITII"
+
+        catalogueBuilder.build {
+            dataModel name: dataModelName, semanticVersion: dataModelSemVer, {
+                dataType name: dataTypeName, id: modelCatalogueId
+            }
+            dataType name: orphanDataTypeName, id: orphanModelCatalogueId
+        }
+
+        when:
+        CatalogueElement dataType = elementService.findByModelCatalogueId(modelCatalogueId)
+
+        then:
+        dataType
+        dataType.dataModel
+        dataType.dataModel.semanticVersion
+        dataType.dataModel.semanticVersion == dataModelSemVer
+        dataType.name == dataTypeName
+
+        when:
+        CatalogueElement withoutVersion = elementService.findByModelCatalogueId(dataType.getDefaultModelCatalogueId(false))
+
+        then:
+        withoutVersion
+        withoutVersion == dataType
+
+        when:
+        CatalogueElement withVersion = elementService.findByModelCatalogueId(dataType.getDefaultModelCatalogueId(true))
+
+        then:
+        withVersion
+        withVersion == dataType
+
+        when:
+        CatalogueElement legacy = elementService.findByModelCatalogueId(dataType.getLegacyModelCatalogueId(false))
+
+        then:
+        legacy
+        legacy == dataType
+
+        when:
+        CatalogueElement orphan = elementService.findByModelCatalogueId(orphanModelCatalogueId)
+
+        then:
+        orphan
+        orphan.name == orphanDataTypeName
+
+        when:
+        CatalogueElement orphanWithVersion = elementService.findByModelCatalogueId(orphan.getDefaultModelCatalogueId(true))
+
+        then:
+        orphanWithVersion
+        orphanWithVersion == orphan
+
+        when:
+        CatalogueElement legacyWithVersion = elementService.findByModelCatalogueId(orphan.getLegacyModelCatalogueId(false))
+
+        then:
+        legacyWithVersion
+        legacyWithVersion == orphan
+
+        when:
+        CatalogueElement orphanWithoutVersion = elementService.findByModelCatalogueId(orphan.getDefaultModelCatalogueId(false))
+
+        then:
+        orphanWithoutVersion
+        orphanWithoutVersion == orphan
+
     }
 
     private static <E extends CatalogueElement> boolean verifyCloned(DataModel source, DataModel destination, E original, E clone) {

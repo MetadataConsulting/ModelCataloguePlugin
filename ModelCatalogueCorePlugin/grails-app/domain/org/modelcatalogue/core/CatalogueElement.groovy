@@ -65,7 +65,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     Set<Mapping> outgoingMappings = []
     Set<Mapping> incomingMappings = []
 
-    static transients = ['relations', 'info', 'archived', 'relations', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext', 'combinedVersion', 'inheritedAssociationsNames', 'modelCatalogueResourceName']
+    static transients = ['relations', 'info', 'archived', 'relations', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext', 'combinedVersion', 'inheritedAssociationsNames', 'modelCatalogueResourceName', 'dataModelSemanticVersion', 'legacyModelCatalogueId']
 
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping, extensions: ExtensionValue]
 
@@ -259,7 +259,8 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         fixResourceName GrailsNameUtils.getPropertyName(getEntityClass(this))
     }
 
-    String getDefaultModelCatalogueId(boolean withoutVersion = false) {
+    @Deprecated
+    String getLegacyModelCatalogueId(boolean withoutVersion = false) {
         if (!grailsLinkGenerator) {
             return null
         }
@@ -268,6 +269,17 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
             return grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${getLatestVersionId() ?: getId()}")
         }
         return grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${getLatestVersionId() ?: getId()}.${getVersionNumber()}")
+    }
+
+    String getDefaultModelCatalogueId(boolean withoutVersion = false) {
+        if (!grailsLinkGenerator) {
+            return null
+        }
+        String resourceName = getModelCatalogueResourceName()
+        if (withoutVersion) {
+            return grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${getLatestVersionId() ?: getId()}")
+        }
+        return grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${getCombinedVersion()}")
     }
 
     /**
@@ -515,7 +527,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     String getCombinedVersion() {
-        "${getLatestVersionId() ?: getId() ?: '<id not assigned yet>'}.${getVersionNumber()}"
+        "${getLatestVersionId() ?: getId() ?: '<id not assigned yet>'}@${dataModelSemanticVersion ?: "0.0.${versionNumber}"}"
     }
 
     final void addInheritedAssociations(CatalogueElement child) {
@@ -537,4 +549,8 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     List<String> getInheritedAssociationsNames() { Collections.emptyList() }
+
+    String getDataModelSemanticVersion() {
+        return dataModel?.semanticVersion
+    }
 }

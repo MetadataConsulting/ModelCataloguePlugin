@@ -51,6 +51,7 @@ class ElasticSearchService implements SearchCatalogue {
 
     private static Map<String, Integer> CATALOGUE_ELEMENT_BOOSTS = [
 
+            name_not_analyzed: 200,
             name: 100,
             full_version: 90,
             latest_id: 80,

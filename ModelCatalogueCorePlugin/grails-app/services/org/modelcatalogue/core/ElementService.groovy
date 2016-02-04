@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import grails.gorm.DetachedCriteria
 import grails.util.Environment
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
@@ -10,6 +11,7 @@ import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.Legacy
 import org.springframework.transaction.TransactionStatus
 
 class ElementService implements Publisher<CatalogueElement> {
@@ -115,6 +117,107 @@ class ElementService implements Publisher<CatalogueElement> {
         }
     }
 
+    CatalogueElement findByModelCatalogueId(String theId) {
+        if (!theId) {
+            return null
+        }
+
+        CatalogueElement byExternalId = getLatestFromCriteria(CatalogueElement.where { modelCatalogueId == theId })
+
+        if (byExternalId) {
+            return byExternalId
+        }
+
+        def matchNewScheme = theId.toString() =~ /\/(.\w+)\/(\d+)(@(.+))?$/
+
+        if (matchNewScheme) {
+            Long urlId = matchNewScheme[0][2] as Long
+            String version = matchNewScheme[0][4] as String
+            Long versionNumberFound = null
+
+            def matchVersionNumber = version =~ /0\.0\.(\d+)/
+
+            if (matchVersionNumber) {
+                versionNumberFound = matchVersionNumber[0][1] as Long
+            }
+
+            CatalogueElement result = getLatestFromCriteria(new DetachedCriteria<CatalogueElement>(CatalogueElement).build {
+                or {
+                    eq 'latestVersionId', urlId
+                    eq 'id', urlId
+                }
+                if (version) {
+                        dataModel {
+                            or {
+                                eq 'semanticVersion', version
+                                if (versionNumberFound) {
+                                    eq 'versionNumber', versionNumberFound
+                                }
+                            }
+                        }
+                }
+            })
+
+            if (result && result.getDefaultModelCatalogueId(version == null) == Legacy.fixModelCatalogueId(theId).toString()) {
+                return result
+            }
+
+            if (versionNumberFound) {
+                CatalogueElement byVersionNumber = getLatestFromCriteria(new DetachedCriteria<CatalogueElement>(CatalogueElement).build {
+                    or {
+                        eq 'latestVersionId', urlId
+                        eq 'id', urlId
+                    }
+                    eq 'versionNumber', versionNumberFound
+                })
+
+                if (byVersionNumber && byVersionNumber.getDefaultModelCatalogueId(version == null) == Legacy.fixModelCatalogueId(theId).toString()) {
+                    return byVersionNumber
+                }
+            }
+
+            return null
+        }
+
+        def matchLegacyScheme = theId.toString() =~ /\/(.\w+)\/(\d+)(\.(\d+))?$/
+
+        if (matchLegacyScheme) {
+            Long id      = matchLegacyScheme[0][2] as Long
+            Integer version = matchLegacyScheme[0][4] as Integer
+
+            if (version) {
+                CatalogueElement result = CatalogueElement.findByLatestVersionIdAndVersionNumber(id, version)
+                if (!result) {
+                    result = CatalogueElement.get(id)
+                }
+                if (result && result.getLegacyModelCatalogueId(false) == Legacy.fixModelCatalogueId(theId).toString()) {
+                    return result
+                }
+                return null
+            }
+
+            CatalogueElement result = CatalogueElement.findByLatestVersionId(id, [sort: 'versionNumber', order: 'desc'])
+
+            if (result && Legacy.fixModelCatalogueId(theId).toString().startsWith(result.getLegacyModelCatalogueId(true))) {
+                return result
+            }
+
+            result = CatalogueElement.get(id)
+            if (result && result.getLegacyModelCatalogueId(true) == Legacy.fixModelCatalogueId(theId).toString()) {
+                return result
+            }
+        }
+
+        return null
+    }
+
+    private static CatalogueElement  getLatestFromCriteria(DetachedCriteria<? extends CatalogueElement> criteria) {
+        List<CatalogueElement> elements = criteria.list(sort: 'versionNumber', order: 'desc', max: 1)
+        if (elements) {
+            return elements.first()
+        }
+        return null
+    }
 
 
     CatalogueElement archive(CatalogueElement archived, boolean archiveRelationships) {

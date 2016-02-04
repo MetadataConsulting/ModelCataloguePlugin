@@ -19,6 +19,10 @@ log4j = {
     warn 'org.modelcatalogue.core.xml'
     info 'org.modelcatalogue.core.RelationshipType'
 
+//    trace 'org.hibernate.type'
+//    trace 'org.hibernate.stat'
+//    debug 'org.hibernate.SQL'
+
     error  'org.codehaus.groovy.grails.web.servlet',  //  controllers
            'org.codehaus.groovy.grails.web.pages', //  GSP
            'org.codehaus.groovy.grails.web.sitemesh', //  layouts

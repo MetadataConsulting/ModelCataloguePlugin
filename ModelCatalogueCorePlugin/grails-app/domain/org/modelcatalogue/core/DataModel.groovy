@@ -101,4 +101,9 @@ class DataModel extends CatalogueElement {
         super.beforeDraftPersisted()
         revisionNotes = null
     }
+
+    @Override
+    String getDataModelSemanticVersion() {
+        return semanticVersion
+    }
 }
