@@ -114,7 +114,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         click OK
 
         then: "the element is now deprecated"
-        check subviewStatus has 'label-danger'
+        check status has 'label-danger'
 
     }
 

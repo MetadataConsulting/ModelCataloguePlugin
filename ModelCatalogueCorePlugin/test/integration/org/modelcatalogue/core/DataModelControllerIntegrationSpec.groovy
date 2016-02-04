@@ -60,4 +60,13 @@ class DataModelControllerIntegrationSpec extends AbstractCatalogueElementControl
         ]
     }
 
+    def getHistoryPaginationParameters(String baseLink) {
+        [
+                // no,size, max , off. tot. next                           , previous
+                [1, 1, 1, 0, 3, "${baseLink}?max=1&sort=semanticVersion&order=asc&offset=1", ""],
+                [2, 1, 1, 1, 3, "${baseLink}?max=1&sort=semanticVersion&order=asc&offset=2", "${baseLink}?max=1&sort=semanticVersion&order=asc&offset=0"],
+                [3, 1, 1, 2, 3, "", "${baseLink}?max=1&sort=semanticVersion&order=asc&offset=1"],
+        ]
+    }
+
 }

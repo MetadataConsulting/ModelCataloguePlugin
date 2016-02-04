@@ -10,7 +10,6 @@ import static org.modelcatalogue.core.geb.Common.*
 @Stepwise
 class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 
-    CatalogueAction edit = CatalogueAction.runLast('item-detail', 'edit-catalogue-element')
 
     private static final String stepMetadata         = "#step-metadata"
     private static final String stepChildren         = "#step-children"
@@ -18,6 +17,8 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
     private static final String stepFinish           = "#step-finish"
     private static final String exitButton           = "#exit-wizard"
     private static final String wizardSummary        = '.wizard-summary'
+    private static final String inlineEdit           = "#inline-edit"
+    private static final String inlineEditSubmit     = "#inline-edit-submit"
 
 
     def "go to login"() {
@@ -153,18 +154,17 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "edit child data class"() {
-        click edit
+        click inlineEdit
 
         expect:
-        check modalDialog displayed
+        check "input[name='name']" displayed
 
         when:
         fill 'name' with 'Changed Name'
 
-        click modalSuccessButton
+        click inlineEditSubmit
 
         then: "same number of children are still shown"
-        check modalDialog gone
         check closeGrowlMessage gone
 
         check {

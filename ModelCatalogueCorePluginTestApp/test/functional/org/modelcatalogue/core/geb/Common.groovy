@@ -19,10 +19,9 @@ class Common {
     static final String modelCatalogueId = 'modelCatalogueId'
 
 
-    static final String status = "h3 small span.label"
+    static final String status = "h3 small a.label"
     static final String rightSideTitle = "h3:not(.ng-hide):not(.data-model-heading)"
     static final String wizard = 'div.basic-edit-modal-prompt'
-    static final String subviewStatus = "h3 small span.label"
     static final String modalDialog = "div.modal"
     static final String modalHeader = "div.modal-header h4"
     static final String modalCloseButton = 'div.modal button.close'
