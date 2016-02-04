@@ -176,7 +176,7 @@ class ElementService implements Publisher<CatalogueElement> {
                 }
             }
 
-            return null
+            return CatalogueElement.get(urlId)
         }
 
         def matchLegacyScheme = theId.toString() =~ /\/(.\w+)\/(\d+)(\.(\d+))?$/

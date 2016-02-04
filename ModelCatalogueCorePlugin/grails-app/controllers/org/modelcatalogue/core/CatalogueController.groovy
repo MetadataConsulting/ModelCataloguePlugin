@@ -2,7 +2,6 @@ package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
 import grails.util.GrailsNameUtils
-import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 import org.springframework.http.HttpStatus
@@ -11,38 +10,12 @@ class CatalogueController {
 
     def dataModelService
     def dataClassService
+    def elementService
 
     def xref() {
-        String resource = params.resource
-        String idString = params.id
-
-        if (!idString) {
-            render status: HttpStatus.NOT_FOUND
-            return
-        }
-
-        Long id
-        Integer version = 1
-        if (idString.contains('.')) {
-            String[] parts = idString.split(/\./)
-            id = Long.parseLong(parts[0], 10)
-            version = Long.parseLong(parts[1], 10)
-        } else {
-            id = Long.valueOf(idString)
-            version = params.int('version')
-        }
-
-        CatalogueElement element
-
-        if (version && version != 1) {
-            Long lastVersion = id
-            element = CatalogueElement.where {
-                versionNumber == version && latestVersionId == lastVersion
-            }.get()
-        } else {
-            element = CatalogueElement.get(id)
-        }
-        if (!element) {
+        CatalogueElement element = elementService.findByModelCatalogueId(request.forwardURI)
+        
+        if (!params.resource || !element) {
             render status: HttpStatus.NOT_FOUND
             return
         }
@@ -55,8 +28,7 @@ class CatalogueController {
             return
         }
 
-
-        redirect controller: resource, action: 'show', id: element.id
+        redirect controller: params.resource, action: 'show', id: element.id
     }
 
     def ext() {

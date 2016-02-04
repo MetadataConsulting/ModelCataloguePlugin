@@ -29,10 +29,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     def mappingService
     def auditService
 
-	def uuid(String uuid){
-        respond resource.findByModelCatalogueId(uuid)
-	}
-
     AbstractCatalogueElementController(Class<T> resource, boolean readOnly) {
         super(resource, readOnly)
     }
