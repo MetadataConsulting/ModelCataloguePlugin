@@ -10,8 +10,8 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
     controller: [
-     '$scope', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'security', 'catalogueElementProperties', '$injector', 'applicationTitle', 'catalogue', 'catalogueElementResource', 'detailSections',
-     ($scope ,  $filter ,  $q ,  $state ,  enhance ,  names ,  columns ,  messages ,  $rootScope ,  security ,  catalogueElementProperties ,  $injector ,  applicationTitle ,  catalogue ,  catalogueElementResource ,  detailSections) ->
+     '$scope', '$filter', '$q', '$timeout', '$state', 'enhance', 'names', 'columns', 'messages', '$element', '$rootScope', 'security', 'catalogueElementProperties', '$injector', 'applicationTitle', 'catalogue', 'catalogueElementResource', 'detailSections',
+     ($scope ,  $filter ,  $q ,  $timeout ,  $state ,  enhance ,  names ,  columns ,  messages ,  $element ,  $rootScope ,  security ,  catalogueElementProperties ,  $injector ,  applicationTitle ,  catalogue ,  catalogueElementResource ,  detailSections) ->
       showErrorsUsingMessages = (messages) ->
         (response) ->
           if response?.data and response.data.errors
@@ -256,6 +256,8 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
           deferred.resolve()
           $scope.messages.clearAllMessages()
+          $timeout ->
+            $scope.$broadcast 'redrawContextualActions'
         , (response) ->
           showErrorsUsingMessages($scope.messages)(response)
           deferred.resolve("Invalid values")

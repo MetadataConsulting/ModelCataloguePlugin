@@ -51,6 +51,60 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
   ]
 
+  actionsProvider.registerActionInRoles 'inline-edit',[actionsProvider.ROLE_ITEM_DETAIL_ACTION], ['$scope', 'messages', 'names', 'security', ($scope) ->
+    return undefined if not $scope.editableForm
+    return undefined if $scope.editableForm.$visible
+    return undefined if angular.isFunction($scope.supportsInlineEdit) and not $scope.supportsInlineEdit($scope.editableForm)
+
+    {
+      position:   -1000
+      label:      'Inline Edit'
+      icon:       'fa fa-edit'
+      type:       'primary'
+      disabled:   $scope.element.archived or $scope.element?.status == 'FINALIZED'
+      watches:    ['element.status', 'element.archived']
+      action:     ->
+        $scope.editableForm.$show()
+        $scope.$broadcast 'redrawContextualActions'
+
+    }
+
+  ]
+
+  actionsProvider.registerActionInRoles 'inline-edit-submit',[actionsProvider.ROLE_ITEM_DETAIL_ACTION], ['$scope', 'messages', 'names', 'security', ($scope) ->
+    return undefined if not $scope.editableForm
+    return undefined if not $scope.editableForm.$visible
+    return undefined if angular.isFunction($scope.supportsInlineEdit) and not $scope.supportsInlineEdit($scope.editableForm)
+
+    {
+      position:   2000
+      label:      'Save'
+      icon:       'fa fa-check'
+      type:       'success'
+      submit:     true
+      action:     ->
+        $scope.$broadcast 'redrawContextualActions'
+
+    }
+  ]
+
+  actionsProvider.registerActionInRoles 'inline-edit-cancel',[actionsProvider.ROLE_ITEM_DETAIL_ACTION], ['$scope', 'messages', 'names', 'security', ($scope) ->
+    return undefined if not $scope.editableForm
+    return undefined if not $scope.editableForm.$visible
+    return undefined if angular.isFunction($scope.supportsInlineEdit) and not $scope.supportsInlineEdit($scope.editableForm)
+
+    {
+      position:   3000
+      label:      'Cancel'
+      icon:       'fa fa-ban'
+      type:       'warning'
+      action:     ->
+        $scope.editableForm.$cancel()
+        $scope.$broadcast 'redrawContextualActions'
+
+    }
+  ]
+
   actionsProvider.registerChildActionInRoles 'catalogue-element', 'create-new-relationship',[actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction($scope.element.isInstanceOf)

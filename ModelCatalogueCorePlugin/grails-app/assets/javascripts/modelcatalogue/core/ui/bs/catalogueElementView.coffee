@@ -110,11 +110,7 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
         <div class="col-md-12">
           <form editable-form name="editableForm" onaftersave="inlineUpdateElement()">
             <div class="catalogue-element-detail-actions">
-              <contextual-actions icon-only="true" role="item-detail" size="xs" no-colors="true">
-                  <a id="inline-edit" class="btn btn-xs btn-default" ng-click="editableForm.$show()" ng-if="supportsInlineEdit(editableForm) && !editableForm.$visible"><span class="fa fa-edit"></span></a>
-                  <button id="inline-edit-submit" type="submit" class="btn btn-xs btn-success" ng-if="supportsInlineEdit(editableForm) && editableForm.$visible"><span class="fa fa-check"></span></button>
-                  <a id="inline-edit-cancel" class="btn btn-xs btn-warning" ng-click="editableForm.$cancel()" ng-if="supportsInlineEdit(editableForm) && editableForm.$visible"><span class="fa fa-ban"></span></a>
-              </contextual-actions>
+              <contextual-actions icon-only="true" role="item-detail" size="xs" no-colors="true"></contextual-actions>
             </div>
             <h3 class="ce-name"><small ng-class="element.getIcon()" title="{{element.getElementTypeName()}}"></small> <span class="text-danger fa fa-fw fa-warning" ng-if="getDeprecationWarning()" title="{{getDeprecationWarning()}}"></span> <span editable-text="copy.name" e-name="name">{{element.name}}</span> <small><a ng-href="{{element.dataModel.href()}}" class="label" ng-class="{'label-warning': element.getDataModelStatus() == 'DRAFT', 'label-info': element.getDataModelStatus() == 'PENDING', 'label-primary': element.getDataModelStatus() == 'FINALIZED', 'label-danger': element.getDataModelStatus() == 'DEPRECATED'}">{{element.getDataModelWithVersion()}}</a></small></h3>
             <messages-panel messages="messages"></messages-panel>

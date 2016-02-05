@@ -1,8 +1,7 @@
 angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingle','mc.util.ui.bs.actionButtonDropdown']).directive 'contextualActions',  ['$compile', '$templateCache', 'actions', ($compile, $templateCache, actions)-> {
   restrict: 'E'
   replace:  true
-  transclude: true
- scope:
+  scope:
     scope:      '=?'
     group:      '@'
     size:       '@'
@@ -14,9 +13,14 @@ angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingl
 
   templateUrl: 'modelcatalogue/util/ui/contextualActions.html'
 
-  link: ($scope, $element, $attrs, $controller, $transcludeFn) ->
+  link: ($scope, $element) ->
     getTemplate = (action) ->
-      $templateCache.get(if action.children?.length or action.abstract then 'modelcatalogue/util/ui/actionButtonDropdown.html' else 'modelcatalogue/util/ui/actionButtonSingle.html')
+      templateName = 'modelcatalogue/util/ui/actionButtonSingle.html'
+      if action.submit
+        templateName = 'modelcatalogue/util/ui/actionButtonSingleSubmit.html'
+      if action.children?.length or action.abstract
+        templateName = 'modelcatalogue/util/ui/actionButtonDropdown.html'
+      $templateCache.get(templateName)
 
     scopes = []
 
@@ -47,8 +51,8 @@ angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingl
       hasActions = false
       scope.$destroy() for scope in scopes
       scopes = []
+      content = []
 
-      $element.empty()
 
       actionsScope = $scope.scope ? $scope.$parent
 
@@ -68,7 +72,7 @@ angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingl
 
           watches = collectWatchers(action)
 
-          $element.append($compile(getTemplate(action))(newScope))
+          content.push($compile(getTemplate(action))(newScope))
 
           if watches.length > 0
             $scope.$$actionWatcherToBeRemoved.push(actionsScope.$watchGroup(watches, (newValue, oldValue) ->
@@ -79,10 +83,10 @@ angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingl
             newScope.$on '$destroy', ->
               removeWatchers($scope)
 
-      $element.append($transcludeFn())
-
       if not hasActions and $scope.noActions
-        $element.append("""<em>No Actions</em>""")
+        content.push("""<em>No Actions</em>""")
+
+      $element.empty().append(content)
 
     updateActions()
 
