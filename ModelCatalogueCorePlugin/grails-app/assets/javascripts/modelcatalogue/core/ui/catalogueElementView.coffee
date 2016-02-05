@@ -116,7 +116,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           $rootScope.$$searchContext = undefined
 
         page = undefined if page == 1 or isNaN(page)
-        if $scope.element and $state.includes 'mc' or $state.includes 'simple' and not propCfg.hidden(security)
+        if $scope.element and $state.includes 'mc' or $state.includes 'simple'
           nextState = if $state.includes 'mc' then 'mc.resource.show.property' else 'simple.resource.show.property'
           $state.go nextState, {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page, q: $state.params.q, dataModelId: $state.params.dataModelId}, options
 
