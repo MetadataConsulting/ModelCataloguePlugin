@@ -235,6 +235,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
                 or $scope.element?.isInstanceOf('primitiveType')\
                 or $scope.element?.isInstanceOf('referenceType')\
                 or $scope.element?.isInstanceOf('measurementUnit')\
+                or $scope.element?.isInstanceOf('dataElement')\
             )\
             and $scope.element?.status == 'DRAFT'
 

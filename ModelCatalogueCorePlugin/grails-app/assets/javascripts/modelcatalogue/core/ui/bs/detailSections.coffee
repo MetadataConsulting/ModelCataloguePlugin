@@ -40,7 +40,24 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       </div>
   '''
   $templateCache.put 'modelcatalogue/core/ui/detailSections/dataClassBasic.html', '''
-      <div class="col-md-offset-6 col-md-6">
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-6"><strong class="small">Last Updated</strong></div>
+          <div class="col-md-6"><small>{{element.lastUpdated | date}}</small></div>
+        </div>
+        <div class="row">
+          <div class="col-md-6"><strong class="small">Version Created</strong></div>
+          <div class="col-md-6"><small>{{element.versionCreated | date}}</small></div>
+        </div>
+        <div class="row">
+          <div class="col-md-6"><strong class="small">Status</strong></div>
+          <div class="col-md-6"><small>{{element.status}}</small></div>
+        </div>
+      </div>
+  '''
+
+  $templateCache.put 'modelcatalogue/core/ui/detailSections/dataElementBasic.html', '''
+      <div class="col-md-6">
         <div class="row">
           <div class="col-md-6"><strong class="small">Last Updated</strong></div>
           <div class="col-md-6"><small>{{element.lastUpdated | date}}</small></div>
@@ -193,7 +210,7 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
             <span ng-class="element.measurementUnit.getIcon()">&nbsp;</span>
             <span class="unit-name">{{element.measurementUnit.name}}&nbsp;</span>
             <small>
-              <a ng-href="{{element.dataModel.href()}}" class="label" ng-class="{'label-warning': element.measurementUnit.getDataModelStatus() == 'DRAFT', 'label-info': element.measurementUnit.getDataModelStatus() == 'PENDING', 'label-primary': element.measurementUnit.getDataModelStatus() == 'FINALIZED', 'label-danger': element.measurementUnit.getDataModelStatus() == 'DEPRECATED'}">{{element.measurementUnit.getDataModelWithVersion()}}</a>
+              <a ng-if="!editableForm.$visible" ng-href="{{element.mesurementUnit.dataModel.href()}}" class="label" ng-class="{'label-warning': element.measurementUnit.getDataModelStatus() == 'DRAFT', 'label-info': element.measurementUnit.getDataModelStatus() == 'PENDING', 'label-primary': element.measurementUnit.getDataModelStatus() == 'FINALIZED', 'label-danger': element.measurementUnit.getDataModelStatus() == 'DEPRECATED'}">{{element.measurementUnit.getDataModelWithVersion()}}</a>
             </small>
           </a>
 
@@ -206,17 +223,64 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       </div>
       <div class="full-width-editable col-md-9">
           <div ng-if="editableForm.$visible">
-            <input type="text" id="dataClass" placeholder="Ddata Class" ng-model="copy.dataClass" catalogue-element-picker="dataClass" label="el.name">
+            <input type="text" id="dataClass" placeholder="Data Class" ng-model="copy.dataClass" catalogue-element-picker="dataClass" label="el.name">
           </div>
           <span class="editable-empty" ng-if="!editableForm.$visible &amp;&amp; !element.dataClass">empty</span>
           <a ng-if="!editableForm.$visible &amp;&amp; element.dataClass" class="small with-pointer" ng-href="{{element.dataClass.href()}}">
             <span ng-class="element.dataClass.getIcon()">&nbsp;</span>
             <span class="unit-name">{{element.dataClass.name}}&nbsp;</span>
             <small>
-              <a ng-href="{{element.dataModel.href()}}" class="label" ng-class="{'label-warning': element.dataClass.getDataModelStatus() == 'DRAFT', 'label-info': element.dataClass.getDataModelStatus() == 'PENDING', 'label-primary': element.dataClass.getDataModelStatus() == 'FINALIZED', 'label-danger': element.dataClass.getDataModelStatus() == 'DEPRECATED'}">{{element.dataClass.getDataModelWithVersion()}}</a>
+              <a ng-if="!editableForm.$visible" ng-href="{{element.dataClass.dataModel.href()}}" class="label" ng-class="{'label-warning': element.dataClass.getDataModelStatus() == 'DRAFT', 'label-info': element.dataClass.getDataModelStatus() == 'PENDING', 'label-primary': element.dataClass.getDataModelStatus() == 'FINALIZED', 'label-danger': element.dataClass.getDataModelStatus() == 'DEPRECATED'}">{{element.dataClass.getDataModelWithVersion()}}</a>
             </small>
           </a>
 
+      </div>
+  '''
+
+  $templateCache.put 'modelcatalogue/core/ui/detailSections/dataType.html', '''
+      <div class="col-md-3">
+          <strong class="small">Data Type</strong>
+      </div>
+      <div class="full-width-editable col-md-9">
+          <div ng-if="editableForm.$visible">
+            <input type="text" id="dataType" placeholder="Data Type" ng-model="copy.dataType" catalogue-element-picker="dataType" label="el.name">
+          </div>
+          <span class="editable-empty" ng-if="!editableForm.$visible &amp;&amp; !element.dataType">empty</span>
+          <a ng-if="!editableForm.$visible &amp;&amp; element.dataType" class="small with-pointer" ng-href="{{element.dataType.href()}}">
+            <span ng-class="element.dataType.getIcon()">&nbsp;</span>
+            <span class="unit-name">{{element.dataType.name}}&nbsp;</span>
+            <small>
+              <a ng-if="!editableForm.$visible"  ng-href="{{element.dataType.dataModel.href()}}" class="label" ng-class="{'label-warning': element.dataType.getDataModelStatus() == 'DRAFT', 'label-info': element.dataType.getDataModelStatus() == 'PENDING', 'label-primary': element.dataType.getDataModelStatus() == 'FINALIZED', 'label-danger': element.dataType.getDataModelStatus() == 'DEPRECATED'}">{{element.dataType.getDataModelWithVersion()}}</a>
+            </small>
+          </a>
+
+      </div>
+      <div class="small col-md-9 col-md-offset-3" ng-if="!editableForm.$visible &amp;&amp; element.dataType.measurementUnit">
+          uses <a class="small with-pointer" ng-href="{{element.dataType.measurementUnit.href()}}">
+                <span ng-class="element.dataType.measurementUnit.getIcon()">&nbsp;</span>
+                <span class="unit-name">{{element.dataType.measurementUnit.name}}&nbsp;</span>
+                <small>
+                  <a ng-href="{{element.dataType.measurementUnit.dataModel.href()}}" class="label" ng-class="{'label-warning': element.dataType.measurementUnit.getDataModelStatus() == 'DRAFT', 'label-info': element.dataType.measurementUnit.getDataModelStatus() == 'PENDING', 'label-primary': element.dataType.measurementUnit.getDataModelStatus() == 'FINALIZED', 'label-danger': element.dataType.measurementUnit.getDataModelStatus() == 'DEPRECATED'}">{{element.dataType.measurementUnit.getDataModelWithVersion()}}</a>
+                </small>
+          </a>
+      </div>
+      <div class="small col-md-9 col-md-offset-3" ng-if="!editableForm.$visible &amp;&amp; element.dataType.dataClass">
+          refers to <a class="small with-pointer" ng-href="{{element.dataType.dataClass.href()}}">
+                <span ng-class="element.dataType.dataClass.getIcon()">&nbsp;</span>
+                <span class="unit-name">{{element.dataType.dataClass.name}}&nbsp;</span>
+                <small>
+                  <a ng-href="{{element.dataType.dataClass.dataModel.href()}}" class="label" ng-class="{'label-warning': element.dataType.dataClass.getDataModelStatus() == 'DRAFT', 'label-info': element.dataType.dataClass.getDataModelStatus() == 'PENDING', 'label-primary': element.dataType.dataClass.getDataModelStatus() == 'FINALIZED', 'label-danger': element.dataType.dataClass.getDataModelStatus() == 'DEPRECATED'}">{{element.dataType.dataClass.getDataModelWithVersion()}}</a>
+                </small>
+          </a>
+      </div>
+      <div class="small col-md-9 col-md-offset-3" ng-if="!editableForm.$visible &amp;&amp; element.dataType.enumerations">
+          <div class="row">
+            <div class="col-md-12" ><strong class="small">Enumerations</strong></div>
+            <div class="col-md-3" ng-repeat-start="value in element.dataType.enumerations.values">
+              <strong class="small">{{value.key}}</strong>
+            </div>
+            <div class="col-md-9 preserve-new-lines" ng-repeat-end><small>{{value.value}}</small></div>
+          </div>
       </div>
   '''
 
@@ -297,6 +361,16 @@ metadataEditors.config ['detailSectionsProvider', (detailSectionsProvider)->
   }
 
   detailSectionsProvider.register {
+     title: 'Basic'
+     position: -10000
+     types: [
+       'dataElement'
+     ]
+     keys: []
+     template: 'modelcatalogue/core/ui/detailSections/dataElementBasic.html'
+  }
+
+  detailSectionsProvider.register {
      title: 'Namespace and Organization'
      position: 2000
      types: [
@@ -365,6 +439,17 @@ x in ['apple', 'banana', 'cherry']
     ]
     keys: []
     template: 'modelcatalogue/core/ui/detailSections/measurementUnit.html'
+  }
+
+
+  detailSectionsProvider.register {
+    title: 'Data Type'
+    position: 500
+    types: [
+      'dataElement'
+    ]
+    keys: []
+    template: 'modelcatalogue/core/ui/detailSections/dataType.html'
   }
 
   detailSectionsProvider.register {
