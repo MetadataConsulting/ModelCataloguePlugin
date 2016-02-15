@@ -77,6 +77,13 @@ Genomics England Custom Additions to Model Catalogue
         }
 
         reportsRegistry.register {
+            creates asset
+            title { "Cancer Types JSON (Cancer types and subtypes)" }
+            type Model
+            link controller: 'gelJson', action: 'printCancerTypeList',id: true
+        }
+
+        reportsRegistry.register {
             creates link
             title { "Rare Disease Inventory Report Document" }
             type Model

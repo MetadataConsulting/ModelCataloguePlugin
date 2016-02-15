@@ -29,13 +29,13 @@ class GelJsonService {
         def jsonStringBuffer = new StringBuffer(10*1024);
 
         jsonStringBuffer<<='{\"DiseaseGroups\": [\n'
-        jsonStringBuffer<<=printChild(model, 0)
+        jsonStringBuffer<<=printRareDiseaseChild(model, 0)
         jsonStringBuffer<<="]\n}"
         return jsonStringBuffer.toString();
     }
 
 
-    def printChild(Model child, Integer level){
+    def printRareDiseaseChild(Model child, Integer level){
         def jsonString=''
         def id = child.latestVersionId ?: child.id
 
@@ -44,7 +44,7 @@ class GelJsonService {
         if(level==0){
             child.parentOf?.eachWithIndex { Model cd, index ->
                 if(index!=0){jsonString<<=','}
-                jsonString<<=printChild(cd, level + 1)
+                jsonString<<=printRareDiseaseChild(cd, level + 1)
             }
         }
 
@@ -57,7 +57,7 @@ class GelJsonService {
 
             child.parentOf.eachWithIndex { Model cd, index ->
                 if(index!=0){jsonString<<=','}
-                jsonString<<=printChild(cd, level + 1)
+                jsonString<<=printRareDiseaseChild(cd, level + 1)
             }
 
             jsonString<<="]\n"
@@ -74,7 +74,7 @@ class GelJsonService {
 
             child.parentOf.eachWithIndex { Model cd, index ->
                 if(index!=0){jsonString<<=','}
-                jsonString<<=printChild(cd, level + 1)
+                jsonString<<=printRareDiseaseChild(cd, level + 1)
             }
 
             jsonString<<="       ]\n"
@@ -94,7 +94,7 @@ class GelJsonService {
             jsonString<<='           "shallowPhenotypes" : [\n'
 
             child.parentOf.each { Model cd ->
-                jsonString<<=printChild(cd, level + 1)
+                jsonString<<=printRareDiseaseChild(cd, level + 1)
             }
 
             jsonString<<="           ]\n"
@@ -104,7 +104,7 @@ class GelJsonService {
         if (level == 4 && child.name.matches("(?i:.*Phenotypes.*)") && !child.name.matches("(?i:.*Eligibility.*)") && !child.name.matches("(?i:.*Test.*)") && !child.name.matches("(?i:.*Guidance.*)")) {
             child.parentOf.eachWithIndex { Model cd, index ->
                 if(index!=0){jsonString<<=','}
-                jsonString<<=printChild(cd, level + 1)
+                jsonString<<=printRareDiseaseChild(cd, level + 1)
             }
         }
 
@@ -118,4 +118,47 @@ class GelJsonService {
 
         return jsonString.toString()
     }
+
+
+    def printCancerTypeList(Model model){
+
+        def jsonStringBuffer = new StringBuffer(10*1024);
+
+        jsonStringBuffer<<='{\"CancerTypes\": [\n'
+        jsonStringBuffer<<=printCancerChild(model)
+        jsonStringBuffer<<="]\n}"
+        return jsonStringBuffer.toString();
+    }
+
+    def printCancerChild(Model model){
+        def jsonString=''
+        model.parentOf.eachWithIndex{ Model child, index ->
+                if(index!=0){jsonString<<=','}
+                def id = getVersionId(child)
+                jsonString<<='{ \n'
+                jsonString<<='   "id" : "' + id  + '",\n'
+                jsonString<<='   "type" : "' + child.name+ '",'
+                jsonString<<='   "subTypes" : ['
+
+                def de = child.contains[0]
+                de.valueDomain.dataType.enumerations.eachWithIndex { en, enIndex  ->
+                    if(enIndex!=0){jsonString<<=','}
+                    jsonString<<='{ \n'
+                    jsonString<<='   "subType" : "' + en.key+ '",'
+                    jsonString<<='   "description" : "' + en.value+ '"'
+                    jsonString<<='        }'
+                }
+
+                jsonString<<="]\n"
+                jsonString<<='        }'
+            }
+
+        return jsonString.toString()
+    }
+
+    def getVersionId(CatalogueElement c){
+        String id = (c.latestVersionId)? c.latestVersionId + "." + c.versionNumber : c.id + "." + c.versionNumber
+        return id
+    }
+
 }
