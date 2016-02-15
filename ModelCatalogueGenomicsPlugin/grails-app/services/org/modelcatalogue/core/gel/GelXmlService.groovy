@@ -507,29 +507,34 @@ class GelXmlService {
         
         String exceptionMessages="";
         MultiValueMap mappedModels=subModels.collect{[it,getXSLTableName(it)]}.collectEntries( new  MultiValueMap())
-        List tableNames=mappedModels.collect{key, value ->value}
-
+        def tableNames=mappedModels.values()
+        println "msdpprf"+ mappedModels.values()
+        
         def duplicates=tableNames.findAll{tableNames.count(it) > 1}.unique()
         
         duplicates.each {  duplTableName ->
             def duplIds=[]
-            mappedModels.each{  model, table->
-                
-                if (duplTableName==table){
-                    duplIds.add getModelCatalogueId(model)
+            mappedModels.each{  model, tableArray->
+                for(def table:tableArray){
+                    if (duplTableName==table){
+                        duplIds.add getModelCatalogueId(model)
+                    }
                 }
-               
+
             }
             exceptionMessages+="element name or it's chosen tableName with value  '${duplTableName}' is present more than once for models ${duplIds};  ";
-        }        
+        }
         
-        mappedModels.each{ model, table->
-            if (table[0].matches("[0-9]")){
-                exceptionMessages+="model '${model}'  with further table name '${table}' must not begin with numbers;";
-            }
-            
-            if (table.length()>MAX_COLUMN_NAME_63){
-                exceptionMessages+="mode  '${model}' with further table name '${table}' exceded in maximum allowed name size of ${MAX_COLUMN_NAME_63};";
+        mappedModels.each{ model, tableArray->
+            for(def table:tableArray){
+
+                if (table[0].matches("[0-9]")){
+                    exceptionMessages+="model '${model}'  with further table name '${table}' must not begin with numbers;";
+                }
+
+                if (table.length()>MAX_COLUMN_NAME_63){
+                    exceptionMessages+="mode  '${model}' with further table name '${table}' exceded in maximum allowed name size of ${MAX_COLUMN_NAME_63};";
+                }
             }
         }
 
