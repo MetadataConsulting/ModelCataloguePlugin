@@ -57,6 +57,8 @@ class InheritanceSpec extends IntegrationSpec  {
     DataType dataType2
     DataModel dataModel1
     DataModel dataModel2
+    Relationship baseClass
+    Relationship baseElement
 
     def setup() {
         initCatalogueService.initDefaultRelationshipTypes()
@@ -108,49 +110,112 @@ class InheritanceSpec extends IntegrationSpec  {
         addBasedOn()
 
         List<CatalogueElement> children = []
-        Inheritance.withChildren(parentClass) {
-            children << it
+        Inheritance.withChildren(parentClass) { CatalogueElement ce ->
+            children << ce
         }
 
         expect:
         children == [childClass]
+    }
+
+    def "with children works with relationship as well"(){
+        addBasedOn()
+
+        List<CatalogueElement> children = []
+        List<Relationship> relationships = []
+        Inheritance.withChildren(parentClass) { CatalogueElement ce, Relationship r ->
+            children << ce
+            relationships << r
+        }
+
+        expect:
+        children == [childClass]
+        relationships == [baseClass]
     }
 
     def "with all children works"(){
         addBasedOn()
 
         List<CatalogueElement> children = []
-        Inheritance.withAllChildren(parentClass) {
-            children << it
+        Inheritance.withAllChildren(parentClass) { CatalogueElement ce ->
+            children << ce
         }
 
         expect:
         children == [childClass]
     }
 
+    def "with all children works with relationship as well"(){
+        addBasedOn()
+
+        List<CatalogueElement> children = []
+        List<Relationship> relationships = []
+        Inheritance.withAllChildren(parentClass) { CatalogueElement ce, Relationship r ->
+            children << ce
+            relationships << r
+        }
+
+        expect:
+        children == [childClass]
+        relationships == [baseClass]
+    }
+
     def "with parents works"(){
         addBasedOn()
 
         List<CatalogueElement> parents = []
-        Inheritance.withParents(childClass) {
-            parents << it
+        Inheritance.withParents(childClass) { CatalogueElement ce ->
+            parents << ce
         }
 
         expect:
         parents == [parentClass]
+    }
+
+    def "with parents works with relationship as well"(){
+        addBasedOn()
+
+        List<CatalogueElement> parents = []
+        List<Relationship> relationships = []
+        Inheritance.withParents(childClass) { CatalogueElement ce, Relationship r ->
+            parents << ce
+            relationships << r
+        }
+
+        expect:
+        parents == [parentClass]
+        relationships == [baseClass]
+
     }
 
     def "with all parents works"(){
         addBasedOn()
 
         List<CatalogueElement> parents = []
-        Inheritance.withAllParents(childClass) {
-            parents << it
+        Inheritance.withAllParents(childClass) { CatalogueElement ce ->
+            parents << ce
         }
 
         expect:
         parents == [parentClass]
     }
+
+    def "with all parents works with relationship as well"(){
+        addBasedOn()
+
+        List<CatalogueElement> parents = []
+        List<Relationship> relationships = []
+        Inheritance.withAllParents(childClass) { CatalogueElement ce, Relationship r ->
+            parents << ce
+            relationships << r
+        }
+
+        expect:
+        parents == [parentClass]
+        relationships == [baseClass]
+    }
+
+
 
     def "Inherit relationships"() {
         addBasedOn()
@@ -359,8 +424,8 @@ class InheritanceSpec extends IntegrationSpec  {
     }
 
     private void addBasedOn() {
-        childClass.addToIsBasedOn parentClass
-        childDataElement.addToIsBasedOn parentDataElement
+        baseClass = childClass.addToIsBasedOn parentClass
+        baseElement = childDataElement.addToIsBasedOn parentDataElement
     }
 
     private void removeBasedOn() {

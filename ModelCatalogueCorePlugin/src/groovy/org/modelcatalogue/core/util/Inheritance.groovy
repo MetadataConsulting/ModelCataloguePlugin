@@ -15,7 +15,7 @@ class Inheritance {
                 continue
             }
             processed << relationship.destination
-            relationship.destination.with closure
+            withElementAndRelationship(closure, relationship.destination, relationship)
             withAllChildren(relationship.destination, processed, closure)
         }
     }
@@ -29,7 +29,7 @@ class Inheritance {
                 continue
             }
             processed << relationship.source
-            relationship.source.with closure
+            withElementAndRelationship(closure, relationship.source, relationship)
             withAllParents(relationship.source, processed, closure)
         }
     }
@@ -39,7 +39,7 @@ class Inheritance {
             return
         }
         for (Relationship relationship in new ArrayList<Relationship>(element.getOutgoingRelationshipsByType(RelationshipType.baseType))) {
-            relationship.destination.with closure
+            withElementAndRelationship(closure, relationship.destination, relationship)
         }
     }
 
@@ -48,8 +48,21 @@ class Inheritance {
             return
         }
         for (Relationship relationship in new ArrayList<Relationship>(element.getIncomingRelationshipsByType(RelationshipType.baseType))) {
-            relationship.source.with closure
+            withElementAndRelationship(closure, relationship.source, relationship)
         }
+    }
+
+    private static void withElementAndRelationship(Closure closure, CatalogueElement element, Relationship relationship) {
+        final Closure clonedClosure = closure.clone() as Closure
+        clonedClosure.resolveStrategy = Closure.DELEGATE_FIRST
+        clonedClosure.setDelegate(element)
+
+        if (clonedClosure.maximumNumberOfParameters == 2) {
+            clonedClosure.call(element, relationship)
+        } else {
+            clonedClosure.call(element)
+        }
+
     }
 
 }
