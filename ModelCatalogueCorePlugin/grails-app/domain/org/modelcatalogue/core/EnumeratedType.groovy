@@ -1,7 +1,9 @@
 package org.modelcatalogue.core
 
 import com.google.common.collect.ImmutableMap
+import org.modelcatalogue.core.util.Inheritance
 import org.modelcatalogue.core.util.OrderedMap
+import org.springframework.validation.Errors
 
 /*
 * Enumerated Types are data types that contain a list of enumerated values
@@ -28,7 +30,18 @@ class EnumeratedType extends DataType {
 
     static constraints = {
         name unique:false
-        enumAsString nullable: true, maxSize: 10000
+        enumAsString nullable: true, maxSize: 10000, validator: { String val, EnumeratedType obj, Errors errors ->
+            boolean attemptToOverrideSubset = false
+            Inheritance.withAllParents(obj) { CatalogueElement ce, Relationship rel ->
+                if (parseSubsetKeys(rel.ext)) {
+                    attemptToOverrideSubset = ce.getValueToBeInherited('enumAsString', rel.ext, false) != val
+                }
+            }
+            if (!attemptToOverrideSubset) {
+                return true
+            }
+            errors.rejectValue 'enumAsString', "cannot.override", new Object[0],  "Cannot override enumerations in subset"
+        }
     }
 
     /**

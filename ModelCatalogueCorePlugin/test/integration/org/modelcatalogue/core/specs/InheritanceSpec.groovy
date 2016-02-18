@@ -517,13 +517,13 @@ class InheritanceSpec extends IntegrationSpec  {
         then: "the description in subset is changed as well"
         enumeratedType2.enumerations.one == 'jedna'
 
-//        when: "you attempt to change the enumerations"
-//        enumeratedType2.enumerations = [foo: 'bar']
-//
-//        FriendlyErrors.failFriendlySave(enumeratedType2)
-//
-//        then:
-//        thrown(IllegalStateException)
+        when: "you attempt to change the enumerations"
+        enumeratedType2.enumerations = [foo: 'bar']
+
+        FriendlyErrors.failFriendlySave(enumeratedType2)
+
+        then:
+        thrown(IllegalStateException)
 
         when: "the parent is removed"
         enumeratedType2.removeFromIsBasedOn enumeratedType1

@@ -7,6 +7,9 @@ import org.modelcatalogue.core.Relationship
 class Inheritance {
 
     static void withAllChildren(CatalogueElement element, Set<CatalogueElement> processed = new HashSet<CatalogueElement>([element]),  @DelegatesTo(CatalogueElement) Closure closure) {
+        if (element == null) {
+            return
+        }
         if (!element.countOutgoingRelationshipsByType(RelationshipType.baseType)) {
             return
         }
@@ -21,6 +24,9 @@ class Inheritance {
     }
 
     static void withAllParents(CatalogueElement element, Set<CatalogueElement> processed = new HashSet<CatalogueElement>([element]),  @DelegatesTo(CatalogueElement) Closure closure) {
+        if (element == null) {
+            return
+        }
         if (!element.countIncomingRelationshipsByType(RelationshipType.baseType)) {
             return
         }
@@ -35,6 +41,9 @@ class Inheritance {
     }
 
     static void withChildren(CatalogueElement element, @DelegatesTo(CatalogueElement) Closure closure) {
+        if (element == null) {
+            return
+        }
         if (!element.countOutgoingRelationshipsByType(RelationshipType.baseType)) {
             return
         }
@@ -44,6 +53,9 @@ class Inheritance {
     }
 
     static void withParents(CatalogueElement element, @DelegatesTo(CatalogueElement) Closure closure) {
+        if (element == null) {
+            return
+        }
         if (!element.countIncomingRelationshipsByType(RelationshipType.baseType)) {
             return
         }
@@ -53,6 +65,9 @@ class Inheritance {
     }
 
     private static void withElementAndRelationship(Closure closure, CatalogueElement element, Relationship relationship) {
+        if (element == null || relationship == null) {
+            return
+        }
         final Closure clonedClosure = closure.clone() as Closure
         clonedClosure.resolveStrategy = Closure.DELEGATE_FIRST
         clonedClosure.setDelegate(element)
