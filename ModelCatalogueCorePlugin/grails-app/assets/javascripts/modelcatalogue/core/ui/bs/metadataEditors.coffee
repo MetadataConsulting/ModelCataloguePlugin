@@ -18,6 +18,15 @@ metadataEditors.config ['metadataEditorsProvider', (metadataEditorsProvider)->
      keys: ['Name']
      template: 'modelcatalogue/core/ui/metadataEditors/appearance.html'
    }
+
+   metadataEditorsProvider.register {
+     title: 'Subset'
+     types: [
+       'EnumeratedType=[base]=>EnumeratedType'
+     ]
+     keys: ['http://www.modelcatalogue.org/metadata/enumerateType#subset']
+     template: 'modelcatalogue/core/ui/metadataEditors/subset.html'
+   }
 ]
 metadataEditors.run ['$templateCache', ($templateCache) ->
   $templateCache.put 'modelcatalogue/core/ui/metadataEditors/occurence.html', '''
@@ -37,6 +46,15 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       <div class="form-group">
         <label for="local-name" class="control-label">Name</label>
         <input type="text" class="form-control" id="local-name"  ng-model="object.access('Name')" ng-model-options="{ getterSetter: true}">
+      </div>
+    </form>
+  '''
+
+  $templateCache.put 'modelcatalogue/core/ui/metadataEditors/subset.html', '''
+    <form class="form">
+      <div class="form-group">
+        <label for="subset" class="control-label">Subset</label>
+        <input type="text" class="form-control" id="subset"  ng-model="object.access('http://www.modelcatalogue.org/metadata/enumerateType#subset')" ng-model-options="{ getterSetter: true}">
       </div>
     </form>
   '''
