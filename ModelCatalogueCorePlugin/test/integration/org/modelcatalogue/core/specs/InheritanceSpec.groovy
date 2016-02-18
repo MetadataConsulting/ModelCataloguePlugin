@@ -8,8 +8,10 @@ import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.ElementService
+import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.InitCatalogueService
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Inheritance
 import spock.lang.Ignore
 
@@ -37,6 +39,8 @@ class InheritanceSpec extends IntegrationSpec  {
     public static final String TEST_CHILD_VALUE_DOMAIN_NAME = 'Test Child Value Domain'
     public static final String TEST_DATA_TYPE_1_NAME = 'Test Data Type 1'
     public static final String TEST_DATA_TYPE_2_NAME = 'Test Data Type 2'
+    public static final String TEST_ENUM_TYPE_1_NAME = 'Test Enum Type 1'
+    public static final String TEST_ENUM_TYPE_2_NAME = 'Test Enum Type 2'
     public static final String TEST_DATA_MODEL_1_NAME = 'Test Data Model 1'
     public static final String TEST_DATA_MODEL_2_NAME = 'Test Data Model 2'
 
@@ -55,10 +59,13 @@ class InheritanceSpec extends IntegrationSpec  {
     DataElement childDataElement
     DataType dataType1
     DataType dataType2
+    EnumeratedType enumeratedType1
+    EnumeratedType enumeratedType2
     DataModel dataModel1
     DataModel dataModel2
     Relationship baseClass
     Relationship baseElement
+    Relationship baseEnum
 
     def setup() {
         initCatalogueService.initDefaultRelationshipTypes()
@@ -79,6 +86,15 @@ class InheritanceSpec extends IntegrationSpec  {
                 }
                 dataElement name: TEST_CHILD_VALUE_DOMAIN_NAME
                 dataType name: TEST_DATA_TYPE_2_NAME
+                dataType name: TEST_ENUM_TYPE_1_NAME, enumerations: [
+                        'one': '1',
+                        'two': '2',
+                        'three': '3',
+                        'four': '4',
+                        'five': '5'
+                ]
+
+                dataType name: TEST_ENUM_TYPE_2_NAME, enumerations: [:]
             }
 
             dataModel name: TEST_DATA_MODEL_2_NAME, {
@@ -102,6 +118,8 @@ class InheritanceSpec extends IntegrationSpec  {
         dataType2 = DataType.findByName(TEST_DATA_TYPE_2_NAME)
         dataModel1 = DataModel.findByName(TEST_DATA_MODEL_1_NAME)
         dataModel2 = DataModel.findByName(TEST_DATA_MODEL_2_NAME)
+        enumeratedType1 = EnumeratedType.findByName(TEST_ENUM_TYPE_1_NAME)
+        enumeratedType2 = EnumeratedType.findByName(TEST_ENUM_TYPE_2_NAME)
 
         assertNothingInherited()
     }
@@ -458,7 +476,59 @@ class InheritanceSpec extends IntegrationSpec  {
         assert dataModel1
         assert dataModel2
 
+        assert enumeratedType1
+        assert enumeratedType1.enumerations.size() == 5
+        assert enumeratedType1.enumerations.one == '1'
+        assert enumeratedType1.enumerations.two == '2'
+        assert enumeratedType1.enumerations.three == '3'
+        assert enumeratedType1.enumerations.four == '4'
+        assert enumeratedType1.enumerations.five == '5'
+        assert enumeratedType2
+        assert enumeratedType2.enumerations.size() == 0
+
         assert parentDataElement.dataType == dataType1
         assert childDataElement.dataType == null
+    }
+
+
+    def "propagate changes in parent enumeration of subset "() {
+        when: "the child enumerated type is declared as subset"
+        enumeratedType2.addToIsBasedOn enumeratedType1, metadata: [(EnumeratedType.SUBSET_METADATA_KEY): 'one,two']
+
+
+        then: "it obtains the listed enumerations from the parent"
+        enumeratedType2.enumerations.size() == 2
+        enumeratedType2.enumerations.one == '1'
+        enumeratedType2.enumerations.two == '2'
+
+        when : "the description for value has changed"
+        Map<String, String> enums = new LinkedHashMap<String, String>(enumeratedType1.enumerations)
+        enums.one = 'jedna'
+        enumeratedType1.enumerations = enums
+
+        FriendlyErrors.failFriendlySave(enumeratedType1)
+
+        EnumeratedType.withSession {
+            it.flush()
+        }
+
+        enumeratedType2.refresh() // the changes must be stored to the database!
+
+        then: "the description in subset is changed as well"
+        enumeratedType2.enumerations.one == 'jedna'
+
+//        when: "you attempt to change the enumerations"
+//        enumeratedType2.enumerations = [foo: 'bar']
+//
+//        FriendlyErrors.failFriendlySave(enumeratedType2)
+//
+//        then:
+//        thrown(IllegalStateException)
+
+        when: "the parent is removed"
+        enumeratedType2.removeFromIsBasedOn enumeratedType1
+
+        then: "there are no longer any enumerations"
+        enumeratedType2.enumerations.size() == 0
     }
 }

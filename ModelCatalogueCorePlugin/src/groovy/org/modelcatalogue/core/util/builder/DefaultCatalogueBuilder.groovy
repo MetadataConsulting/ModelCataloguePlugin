@@ -190,7 +190,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @return proxy to data type specified by the parameters map and the DSL closure
      */
     void dataType(Map<String, Object> parameters = [:], @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        Class type = (parameters.enumerations ? EnumeratedType : DataType)
+        Class type = (parameters.enumerations != null ? EnumeratedType : DataType)
         if (parameters.containsKey('enumerations') && !parameters.enumerations) {
             parameters.remove('enumerations')
         }

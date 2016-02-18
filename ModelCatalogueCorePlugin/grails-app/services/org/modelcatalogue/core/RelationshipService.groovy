@@ -186,7 +186,7 @@ class RelationshipService {
                 }
             }
             relationshipDefinition.destination.ext.putAll relationshipDefinition.source.ext.subMap(relationshipDefinition.source.ext.keySet() - relationshipDefinition.destination.ext.keySet())
-            relationshipDefinition.source.addInheritedAssociations(relationshipDefinition.destination)
+            relationshipDefinition.source.addInheritedAssociations(relationshipDefinition.destination, relationshipDefinition.metadata)
         } else if (relationshipDefinition.relationshipType.versionSpecific) {
             // propagate relationship to the children
             Inheritance.withChildren(relationshipInstance.source) {
@@ -314,12 +314,15 @@ class RelationshipService {
 
             destination.removeFromIncomingRelationships(relationshipInstance)
             source.removeFromOutgoingRelationships(relationshipInstance)
+
+            Map<String,String> metadata = relationshipInstance.ext
+
             relationshipInstance.source = null
             relationshipInstance.destination = null
             relationshipInstance.dataModel = null
             relationshipInstance.delete(flush: true)
             if (relationshipType == RelationshipType.baseType) {
-                source.removeInheritedAssociations(destination)
+                source.removeInheritedAssociations(destination, metadata)
             }
 
             if (relationshipType == RelationshipType.favouriteType) {

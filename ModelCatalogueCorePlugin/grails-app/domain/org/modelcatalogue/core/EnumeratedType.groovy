@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import com.google.common.collect.ImmutableMap
 import org.modelcatalogue.core.util.OrderedMap
 
 /*
@@ -12,6 +13,8 @@ import org.modelcatalogue.core.util.OrderedMap
 
 class EnumeratedType extends DataType {
 
+    static final SUBSET_METADATA_KEY = 'http://www.modelcatalogue.org/metadata/enumerateType#subset'
+
     static final QUOTED_CHARS = [
             "\\": "&#92;",
             ":": "&#58;",
@@ -19,19 +22,13 @@ class EnumeratedType extends DataType {
             "%": "&#37;",
     ]
 
-    String enumAsString
+    String enumAsString = ""
 
     static transients = ['enumerations']
 
     static constraints = {
         name unique:false
-        enumAsString nullable: false, maxSize: 10000, validator: { encodedVal, obj ->
-            Map<String, String> val = stringToMap(encodedVal)
-            if (!val) return true
-            if (val.size() < 1) return false
-           // if (EnumeratedType.findByEnumAsString(encodedVal)) return false
-            return true
-        }
+        enumAsString nullable: true, maxSize: 10000
     }
 
     /**
@@ -112,14 +109,14 @@ class EnumeratedType extends DataType {
     }
 
     static String mapToString(Map<String, String> map) {
-        if (map == null) return null
+        if (!map) return ""
         map.collect { key, val ->
             "${quote(key)}:${quote(val)}"
         }.join('|')
     }
 
     static Map<String, String> stringToMap(String s) {
-        if (s == null) return null
+        if (!s) return ImmutableMap.of()
         Map<String, String> ret = [:]
         s.split(/\|/).each { String part ->
             if (!part) return
@@ -131,7 +128,7 @@ class EnumeratedType extends DataType {
                 ret[unquote(pair[0])] = unquote(pair[1])
             }
         }
-        return ret
+        return ImmutableMap.copyOf(ret)
     }
 
     static String quote(String s) {
@@ -161,5 +158,53 @@ class EnumeratedType extends DataType {
         if (!enumerations) {
             enumerations = ['default' : '']
         }
+    }
+
+    @Override
+    protected boolean canInherit(CatalogueElement child, String propertyName, Map<String, String> metadata) {
+        if (propertyName == 'enumAsString') {
+            return !child.enumerations || child.enumerations.size() == 1 && child.enumerations.default == ''
+        }
+        return super.canInherit(child, propertyName, metadata)
+    }
+
+    @Override
+    List<String> getInheritedAssociationsNames() {
+        return ['enumAsString']
+    }
+
+    @Override
+    protected boolean isInherited(CatalogueElement child, String propertyName, Map<String, String> metadata, boolean persistent) {
+        return super.isInherited(child, propertyName, metadata, persistent)
+    }
+
+    @Override
+    protected Object getValueToBeInherited(String propertyName, Map<String, String> metadata, boolean persistent) {
+        if (propertyName != 'enumAsString') {
+            return super.getValueToBeInherited(propertyName, metadata, persistent)
+        }
+
+        List<String> subsetKeys = parseSubsetKeys(metadata)
+
+        if (!subsetKeys) {
+            return super.getValueToBeInherited(propertyName, metadata, persistent)
+        }
+
+        Map<String, String> subset = [:]
+        Map<String, String> enumerations = new LinkedHashMap<String, String>(persistent ? stringToMap(getPersistentValue('enumAsString')) : this.enumerations)
+
+        for (String key in subsetKeys) {
+            subset[key] = enumerations[key]
+        }
+
+        return mapToString(subset)
+    }
+
+    static List<String> parseSubsetKeys(Map<String, String> metadata) {
+        String value = metadata[SUBSET_METADATA_KEY]
+        if (!value) {
+            return []
+        }
+        return value.split(/\s*,\s*/)*.replaceAll(/\\,/,',')
     }
 }

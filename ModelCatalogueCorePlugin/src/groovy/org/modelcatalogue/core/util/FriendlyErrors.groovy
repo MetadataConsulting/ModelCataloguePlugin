@@ -3,6 +3,7 @@ package org.modelcatalogue.core.util
 import grails.util.GrailsNameUtils
 import grails.util.Holders
 import grails.validation.ValidationException
+import org.modelcatalogue.core.CatalogueElement
 import org.springframework.context.MessageSource
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
@@ -38,19 +39,17 @@ class FriendlyErrors {
     }
 
     static <T> T failFriendlySave(T object, String message = "Exception while saving element", Class<? extends RuntimeException> exceptionType = IllegalStateException) {
-        try {
-            object.save(failOnError: true, flush: true, deepValidate: false)
-        } catch(ValidationException ve) {
-            throw exceptionType.newInstance(printErrors(message, ve.errors))
+        if (!object.validate(deepValidate: false)) {
+            throw exceptionType.newInstance(printErrors(message, object.errors))
         }
+        object.save(failOnError: true, flush: true, validate: false)
     }
 
     static <T> T failFriendlySaveWithoutFlush(T object, String message = "Exception while saving element", Class<? extends RuntimeException> exceptionType = IllegalStateException) {
-        try {
-            object.save(failOnError: true, deepValidate: false)
-        } catch(ValidationException ve) {
-            throw exceptionType.newInstance(printErrors(message, ve.errors))
+        if (!object.validate(deepValidate: false)) {
+            throw exceptionType.newInstance(printErrors(message, object.errors))
         }
+        object.save(failOnError: true, validate: false)
     }
 
 
