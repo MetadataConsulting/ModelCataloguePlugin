@@ -29,19 +29,8 @@ class EnumeratedType extends DataType {
     static transients = ['enumerations']
 
     static constraints = {
-        name unique:false
-        enumAsString nullable: true, maxSize: 10000, validator: { String val, EnumeratedType obj, Errors errors ->
-            boolean attemptToOverrideSubset = false
-            Inheritance.withAllParents(obj) { CatalogueElement ce, Relationship rel ->
-                if (parseSubsetKeys(rel.ext)) {
-                    attemptToOverrideSubset = ce.getValueToBeInherited('enumAsString', rel.ext, false) != val
-                }
-            }
-            if (!attemptToOverrideSubset) {
-                return true
-            }
-            errors.rejectValue 'enumAsString', "cannot.override", new Object[0],  "Cannot override enumerations in subset"
-        }
+        name unique: false
+        enumAsString nullable: true, maxSize: 10000
     }
 
     /**
@@ -176,7 +165,7 @@ class EnumeratedType extends DataType {
     @Override
     protected boolean canInherit(CatalogueElement child, String propertyName, Map<String, String> metadata) {
         if (propertyName == 'enumAsString') {
-            return !child.enumerations || child.enumerations.size() == 1 && child.enumerations.default == ''
+            return true // handled per enum value
         }
         return super.canInherit(child, propertyName, metadata)
     }
@@ -192,18 +181,30 @@ class EnumeratedType extends DataType {
     }
 
     @Override
-    protected Object getValueToBeInherited(String propertyName, Map<String, String> metadata, boolean persistent) {
+    protected void afterPropertyInherited(String s, Map<String, String> metadata) {
+        super.afterPropertyInherited(s, metadata)
+        ext[SUBSET_METADATA_KEY] = metadata[SUBSET_METADATA_KEY]
+    }
+
+    @Override
+    protected void afterInheritedPropertyRemoved(String s, Map<String, String> metadata) {
+        super.afterInheritedPropertyRemoved(s, metadata)
+        ext.remove(SUBSET_METADATA_KEY)
+    }
+
+    @Override
+    protected Object getValueToBeInherited(CatalogueElement child, String propertyName, Map<String, String> metadata, boolean persistent) {
         if (propertyName != 'enumAsString') {
-            return super.getValueToBeInherited(propertyName, metadata, persistent)
+            return super.getValueToBeInherited(child, propertyName, metadata, persistent)
         }
 
         List<String> subsetKeys = parseSubsetKeys(metadata)
 
         if (!subsetKeys) {
-            return super.getValueToBeInherited(propertyName, metadata, persistent)
+            return super.getValueToBeInherited(child, propertyName, metadata, persistent)
         }
 
-        Map<String, String> subset = [:]
+        Map<String, String> subset = new LinkedHashMap<String, String>((child as EnumeratedType).enumerations)
         Map<String, String> enumerations = new LinkedHashMap<String, String>(persistent ? stringToMap(getPersistentValue('enumAsString')) : this.enumerations)
 
         for (String key in subsetKeys) {

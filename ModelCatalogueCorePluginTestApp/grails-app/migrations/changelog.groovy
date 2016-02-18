@@ -19,4 +19,5 @@ databaseChangeLog = {
     include file: 'changelog_017_singleDataModel.groovy'
     include file: 'changelog_018_semanticVersioning.groovy'
     include file: 'changelog_019_bidirectionalRelationships.groovy'
+    include file: 'changelog_020_enum_subsets.groovy'
 }

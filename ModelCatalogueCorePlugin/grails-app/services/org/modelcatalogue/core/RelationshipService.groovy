@@ -109,7 +109,12 @@ class RelationshipService {
             if (relationshipInstance) {
 
                 if (relationshipDefinition.metadata) {
-                    relationshipInstance.ext = relationshipDefinition.metadata
+                    if (relationshipInstance.ext != relationshipDefinition.metadata) {
+                        relationshipInstance.ext = relationshipDefinition.metadata
+                        if (relationshipDefinition.relationshipType == RelationshipType.baseType) {
+                            relationshipDefinition.source.addInheritedAssociations(relationshipDefinition.destination, relationshipDefinition.metadata)
+                        }
+                    }
                 }
 
                 if (!relationshipDefinition.resetIndices && relationshipInstance.archived == relationshipDefinition.archived) {
@@ -174,19 +179,7 @@ class RelationshipService {
 
         if (relationshipDefinition.relationshipType == RelationshipType.baseType) {
             // copy relationships when new based on relationship is created
-            for (Relationship relationship in new LinkedHashSet<Relationship>(relationshipDefinition.source.outgoingRelationships)) {
-                if (relationship.relationshipType.versionSpecific) {
-                    RelationshipDefinition newDefinition = RelationshipDefinition.from(relationship)
-                    newDefinition.source = relationshipDefinition.destination
-                    newDefinition.inherited = true
-                    Relationship newRelationship = link newDefinition
-                    if (newRelationship.hasErrors()) {
-                        relationshipInstance.errors.reject('unable.to.copy.from.parent', FriendlyErrors.printErrors("Unable to copy relationship $newDefinition from ${relationshipDefinition.source} to child ${relationshipDefinition.destination}", newRelationship.errors))
-                    }
-                }
-            }
-            relationshipDefinition.destination.ext.putAll relationshipDefinition.source.ext.subMap(relationshipDefinition.source.ext.keySet() - relationshipDefinition.destination.ext.keySet())
-            relationshipDefinition.source.addInheritedAssociations(relationshipDefinition.destination, relationshipDefinition.metadata)
+            handleInheritance(relationshipDefinition, relationshipInstance)
         } else if (relationshipDefinition.relationshipType.versionSpecific) {
             // propagate relationship to the children
             Inheritance.withChildren(relationshipInstance.source) {
@@ -213,6 +206,22 @@ class RelationshipService {
         RELATIONSHIPS_COUNT_CACHE.invalidate(relationshipDefinition.destination.getId())
 
         relationshipInstance
+    }
+
+    private void handleInheritance(RelationshipDefinition relationshipDefinition, Relationship relationshipInstance) {
+        for (Relationship relationship in new LinkedHashSet<Relationship>(relationshipDefinition.source.outgoingRelationships)) {
+            if (relationship.relationshipType.versionSpecific) {
+                RelationshipDefinition newDefinition = RelationshipDefinition.from(relationship)
+                newDefinition.source = relationshipDefinition.destination
+                newDefinition.inherited = true
+                Relationship newRelationship = link newDefinition
+                if (newRelationship.hasErrors()) {
+                    relationshipInstance.errors.reject('unable.to.copy.from.parent', FriendlyErrors.printErrors("Unable to copy relationship $newDefinition from ${relationshipDefinition.source} to child ${relationshipDefinition.destination}", newRelationship.errors))
+                }
+            }
+        }
+        relationshipDefinition.destination.ext.putAll relationshipDefinition.source.ext.subMap(relationshipDefinition.source.ext.keySet() - relationshipDefinition.destination.ext.keySet())
+        relationshipDefinition.source.addInheritedAssociations(relationshipDefinition.destination, relationshipDefinition.metadata)
     }
 
     Relationship findExistingRelationship(RelationshipDefinition definition) {

@@ -167,6 +167,7 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       </div>
       <div class="col-md-9 preserve-new-lines" ng-repeat-end><small>{{value.value}}</small></div>
       <div class="custom-metadata col-md-12" ng-if="editableForm.$visible">
+          <div ng-if="copy.ext.get('http://www.modelcatalogue.org/metadata/enumerateType#subset')" class="alert alert-warning">Following values are inherited and will be overriden when the base enumeration changes: {{copy.ext.get('http://www.modelcatalogue.org/metadata/enumerateType#subset')}}</div>
           <ordered-map-editor object="copy.enumerations" title="Enumerations" key-placeholder="Value" value-placeholder="Description"></ordered-map-editor>
       </div>
   '''
@@ -487,14 +488,13 @@ x in ['apple', 'banana', 'cherry']
     template: 'modelcatalogue/core/ui/detailSections/customMetadata.html'
   }
 
-
   detailSectionsProvider.register {
     title: 'Enumerations'
     position: 1000
     types: [
       'enumeratedType'
     ]
-    keys: []
+    keys: ['http://www.modelcatalogue.org/metadata/enumerateType#subset']
     template: 'modelcatalogue/core/ui/detailSections/enumerations.html'
   }
 

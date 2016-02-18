@@ -413,8 +413,8 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
                 boolean changed = false
 
                 for (String propertyName in inheritedAssociationsNames) {
-                    if (self.isDirty(propertyName) && it.getProperty(propertyName) == self.getValueToBeInherited(propertyName, rel.ext, true)) {
-                        it.setProperty(propertyName, self.getValueToBeInherited(propertyName, rel.ext, false))
+                    if (self.isDirty(propertyName) && it.getProperty(propertyName) == self.getValueToBeInherited(it, propertyName, rel.ext, true)) {
+                        it.setProperty(propertyName, self.getValueToBeInherited(it, propertyName, rel.ext, false))
                         changed = true
                     }
                 }
@@ -533,11 +533,14 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     final void addInheritedAssociations(CatalogueElement child, Map<String, String> metadata) {
         for (String propertyName in inheritedAssociationsNames) {
             if (canInherit(child, propertyName, metadata)) {
-                child.setProperty(propertyName, getValueToBeInherited(propertyName, metadata, false))
+                child.setProperty(propertyName, getValueToBeInherited(child, propertyName, metadata, false))
+                child.afterPropertyInherited(propertyName, metadata)
             }
         }
         FriendlyErrors.failFriendlySave(child)
     }
+
+    protected void afterPropertyInherited(String s, Map<String, String> metadata) {}
 
     protected boolean canInherit(CatalogueElement child, String propertyName, Map<String, String> metadata) {
         return child.getProperty(propertyName) == null
@@ -547,17 +550,20 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         for (String propertyName in inheritedAssociationsNames) {
             if (isInherited(child, propertyName, metadata, false)) {
                 child.setProperty(propertyName, null)
+                child.afterInheritedPropertyRemoved(propertyName, metadata)
             }
         }
         FriendlyErrors.failFriendlySave(child)
     }
 
+    protected void afterInheritedPropertyRemoved(String s, Map<String, String> metadata) {}
+
     protected boolean isInherited(CatalogueElement child, String propertyName, Map<String, String> metadata, boolean persistent) {
-        return child.getProperty(propertyName) == getValueToBeInherited(propertyName, metadata, persistent)
+        return child.getProperty(propertyName) == getValueToBeInherited(child, propertyName, metadata, persistent)
     }
 
 
-    protected Object getValueToBeInherited(String propertyName, Map<String, String> metadata, boolean persistent) {
+    protected Object getValueToBeInherited(CatalogueElement child, String propertyName, Map<String, String> metadata, boolean persistent) {
         return persistent ? getPersistentValue(propertyName) : getProperty(propertyName)
     }
 

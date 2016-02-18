@@ -501,6 +501,9 @@ class InheritanceSpec extends IntegrationSpec  {
         enumeratedType2.enumerations.one == '1'
         enumeratedType2.enumerations.two == '2'
 
+        and: "the subtype is marked as subtype"
+        enumeratedType2.ext[EnumeratedType.SUBSET_METADATA_KEY] == 'one,two'
+
         when : "the description for value has changed"
         Map<String, String> enums = new LinkedHashMap<String, String>(enumeratedType1.enumerations)
         enums.one = 'jedna'
@@ -517,18 +520,39 @@ class InheritanceSpec extends IntegrationSpec  {
         then: "the description in subset is changed as well"
         enumeratedType2.enumerations.one == 'jedna'
 
-        when: "you attempt to change the enumerations"
-        enumeratedType2.enumerations = [foo: 'bar']
+        when: "you add an enumerated value"
+        Map<String, String> enums2 = new LinkedHashMap<String, String>(enumeratedType2.enumerations)
+
+        enums2.six = '6'
+
+        enumeratedType2.enumerations = enums2
 
         FriendlyErrors.failFriendlySave(enumeratedType2)
 
-        then:
-        thrown(IllegalStateException)
+        EnumeratedType.withSession {
+            it.flush()
+        }
+
+        then: "the change is stored properly"
+        noExceptionThrown()
+
+
+        when: "the relationship is changed"
+        enumeratedType2.addToIsBasedOn enumeratedType1, metadata: [(EnumeratedType.SUBSET_METADATA_KEY): 'one,two,five']
+
+        then: "the child is updated as well"
+        enumeratedType2.enumerations.five == '5'
+
+        and: "the enumerated value added was not removed"
+        enumeratedType2.enumerations.six == '6'
 
         when: "the parent is removed"
         enumeratedType2.removeFromIsBasedOn enumeratedType1
 
         then: "there are no longer any enumerations"
         enumeratedType2.enumerations.size() == 0
+
+        and: "the enum is no longer marked as subtype"
+        enumeratedType2.ext[EnumeratedType.SUBSET_METADATA_KEY] == null
     }
 }
