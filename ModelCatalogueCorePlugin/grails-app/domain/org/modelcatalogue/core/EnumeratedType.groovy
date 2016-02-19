@@ -134,7 +134,7 @@ class EnumeratedType extends DataType {
     }
 
     static String quote(String s) {
-        if (s == null) return null
+        if (s == null) return ""
         String ret = s
         QUOTED_CHARS.each { original, replacement ->
             ret = ret.replace(original, replacement)
@@ -143,7 +143,7 @@ class EnumeratedType extends DataType {
     }
 
     static String unquote(String s) {
-        if (s == null) return null
+        if (s == null) return ""
         String ret = s
         QUOTED_CHARS.reverseEach { original, pattern ->
             ret = ret.replace(pattern, original)

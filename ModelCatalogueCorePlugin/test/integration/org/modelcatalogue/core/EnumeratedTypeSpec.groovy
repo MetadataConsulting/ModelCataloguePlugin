@@ -37,12 +37,21 @@ class EnumeratedTypeSpec extends IntegrationSpec {
 
         where:
         enumerations                   | expected
-        null                           | null
         [one: 'one', two: "two"]       | "one:one|two:two"
         [one: 'o:ne', two: "tw|o"]     | "one:o&#58;ne|two:tw&#124;o"
         [one: 'o\\:ne', two: "tw\\|o"] | "one:o&#92;&#58;ne|two:tw&#92;&#124;o"
         [one: 'o\\ne', two: "tw\\o"]   | "one:o&#92;ne|two:tw&#92;o"
         [one: 'one ', two: " two"]     | "one:one |two: two"
+    }
+
+    def "null string produces empty map"() {
+        expect:
+        EnumeratedType.stringToMap(null) == [:]
+    }
+
+    def "null map produces empty string"() {
+        expect:
+        EnumeratedType.mapToString(null) == ""
     }
 
     @Unroll
@@ -53,7 +62,6 @@ class EnumeratedTypeSpec extends IntegrationSpec {
 
         where:
         original | expected
-        null     | ''
         'one'    | "one"
         'o:ne'   | "o&#58;ne"
         'o\\:ne' | "o&#92;&#58;ne"
@@ -61,6 +69,12 @@ class EnumeratedTypeSpec extends IntegrationSpec {
         'one '   | "one "
     }
 
+
+    def "null is (un)quoted as empty string"() {
+        expect:
+        EnumeratedType.quote(null) == ""
+        EnumeratedType.unquote(null) == ""
+    }
 
     def "Find enumerated types by key or value"() {
         expect:
