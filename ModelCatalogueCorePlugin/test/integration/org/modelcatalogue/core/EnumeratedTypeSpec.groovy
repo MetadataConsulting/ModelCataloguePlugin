@@ -23,10 +23,10 @@ class EnumeratedTypeSpec extends IntegrationSpec {
 
         validates | args
         false     | [:]
-        false | [name: 'test1']
-        false | [name: 'test2', enumerations: ['male']]
-        false | [name: 'test3', enumAsString: ('m:s|' * 2500) + 's:m']
-        true  | [name: 'test4', enumerations: ['m': 'male', 'f': 'female', 'u': 'unknown']]
+        true      | [name: 'test1']
+        false     | [name: 'test2', enumerations: ['male']]
+        false     | [name: 'test3', enumAsString: ('m:s|' * 2500) + 's:m']
+        true      | [name: 'test4', enumerations: ['m': 'male', 'f': 'female', 'u': 'unknown']]
     }
 
     @Unroll
@@ -53,7 +53,7 @@ class EnumeratedTypeSpec extends IntegrationSpec {
 
         where:
         original | expected
-        null     | null
+        null     | ''
         'one'    | "one"
         'o:ne'   | "o&#58;ne"
         'o\\:ne' | "o&#92;&#58;ne"

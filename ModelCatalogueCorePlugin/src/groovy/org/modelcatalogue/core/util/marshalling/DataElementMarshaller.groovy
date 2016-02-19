@@ -13,7 +13,7 @@ class DataElementMarshaller extends CatalogueElementMarshaller {
     protected Map<String, Object> prepareJsonMap(el) {
         if (!el) return [:]
         def ret = super.prepareJsonMap(el)
-        ret.putAll dataType: minimumDataType(el.dataType)
+        ret.putAll dataType: minimalCatalogueElementJSON(el.dataType)
 
         if (el.dataType) {
             ret.content = [count: 1, itemType: DataType.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/content"]
