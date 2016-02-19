@@ -113,7 +113,7 @@ grails.project.dependency.resolution = {
         // test coverage
         test ":code-coverage:1.2.7"
 
-        build ":tomcat:7.0.55"
+        build ':tomcat:8.0.30'
 		//jasper report generator see in dependencies
 
     }
