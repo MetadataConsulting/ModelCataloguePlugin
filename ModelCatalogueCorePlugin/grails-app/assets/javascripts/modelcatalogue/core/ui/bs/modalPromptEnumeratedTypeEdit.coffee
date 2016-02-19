@@ -51,6 +51,9 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
               <label class="radio-inline">
                 <input ng-model="subtype" type="radio" name="subtype" id="pickReferenceType" value="referenceType"> Reference
               </label>
+              <label class="radio-inline">
+                <input ng-model="subtype" type="radio" name="subtype" id="pickReferenceType" value="subset"> Subset
+              </label>
               <div collapse="subtype != 'enumeratedType'">
                 <ordered-map-editor object="copy.enumerations" title="Enumerations" key-placeholder="Value" value-placeholder="Description"></ordered-map-editor>
               </div>
@@ -64,6 +67,22 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
                 <div class="form-group">
                   <label for="measurementUnit" class="">Measurement Unit</label>
                   <input type="text" id="measurementUnit" placeholder="Measurement Unit" ng-model="copy.measurementUnit" catalogue-element-picker="measurementUnit" label="el.name">
+                </div>
+              </div>
+              <div collapse="subtype != 'subset'">
+                <div class="form-group">
+                  <label for="baseEnumeration" class="">Enumerated Type Base</label>
+                  <input type="text" id="baseEnumeration" placeholder="Enumerated Type Base" ng-model="copy.baseEnumeration" catalogue-element-picker="enumeratedType" label="el.name">
+                </div>
+                <div class="form-group" ng-if="copy.baseEnumeration.enumerations">
+                  <label for="subset">Subset</label>
+                    <div class="alert alert-warning" ng-if="copy.selectedEnumerations.values.length == 0">If no enumeration value selected, all values will be used</div>
+                    <div class="checkbox" ng-repeat="value in copy.baseEnumeration.enumerations.values">
+                      <label>
+                        <input type="checkbox" value="{{value}}" ng-checked="copy.selectedEnumerations.values.indexOf(value) > -1" ng-click="toggleSelection(copy.selectedEnumerations.values, value)">
+                        {{value.key}}: {{value.value}}
+                      </label>
+                    </div>
                 </div>
               </div>
               <fake-submit-button />
@@ -94,7 +113,8 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
 
           if $scope.create
             $scope.$watch 'subtype', (subtype) ->
-                $scope.create = subtype
+
+                $scope.create = if subtype == 'subset' then 'enumeratedType' else subtype
 
           REGEX_EXAMPLE = """// value is decimal number
 x ==~ /\\d+(\\.\\d+)?/
@@ -127,8 +147,9 @@ x in ['apple', 'banana', 'cherry']
             $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or $scope.copy.modelCatalogueId != $scope.original.modelCatalogueId or not angular.equals($scope.original.enumerations ? {}, $scope.copy.enumerations ? {}) or not angular.equals($scope.original.dataModels ? {}, $scope.copy.dataModels ? {})
 
           $scope.beforeSave = ->
+            # TODO verify this works as expected - you should be able to edit this even for subtype
             if $scope.original.subtype and $scope.original.subtype isnt $scope.subtype
-              $scope.copy.newType = $scope.subtype
+              $scope.copy.newType = if $scope.subtype == 'subset' then 'enumeratedType' else $scope.subtype
 
             promise = $q.when {}
 
@@ -162,6 +183,28 @@ x in ['apple', 'banana', 'cherry']
                 $scope.messages.warning "You have changed the subtype of the data element. New version will be created!"
               else
                 $scope.messages.clearAllMessages()
+
+          $scope.copy.selectedEnumerations = orderedMapEnhancer.emptyOrderedMap(true)
+
+          $scope.toggleSelection = (array, selection) ->
+            idx = array.indexOf(selection)
+            if idx > -1
+              array.splice(idx, 1)
+            else
+              array.push(selection)
+
+          originalValidate = $scope.validate
+
+          $scope.validate = ->
+            result = originalValidate()
+
+            return unless result
+
+            if $scope.subtype == 'subset' and not $scope.copy.baseEnumeration
+              $scope.messages.error "Empty base enumeration", "You need to select the base enumeration for a subset!"
+              return false
+
+            return true
 
         ]
 

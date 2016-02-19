@@ -102,10 +102,18 @@ angular.module('mc.core.orderedMapEnhancer', ['mc.util.enhance']).config ['enhan
 
 
 
-    orderedMapEnhancer.emptyOrderedMap = -> enhance orderedMapEnhancer({
-      type: 'orderedMap'
-      values: [{key: ''}]
-    })
+    orderedMapEnhancer.emptyOrderedMap = (noPlaceholder = false) ->
+
+      if noPlaceholder
+        return enhance orderedMapEnhancer({
+          type: 'orderedMap'
+          values: []
+        })
+
+      return enhance orderedMapEnhancer({
+        type: 'orderedMap'
+        values: [{key: ''}]
+      })
 
     orderedMapEnhancer
   ]

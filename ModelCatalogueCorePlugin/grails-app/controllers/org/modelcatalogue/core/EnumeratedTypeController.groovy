@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 
@@ -35,6 +36,18 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
         }
 
         respond Lists.wrap(params, "/${resourceName}/${params.id}/content", list)
+    }
+
+    @Override
+    protected bindRelations(DataType instance, boolean newVersion, Object objectToBind) {
+        super.bindRelations(instance, newVersion, objectToBind)
+
+        if (objectToBind.baseEnumeration) {
+            EnumeratedType baseEnum = EnumeratedType.get(objectToBind.baseEnumeration.id)
+            Map<String, String> selectedEnumerations = OrderedMap.fromJsonMap(objectToBind.selectedEnumerations)
+            instance.addToIsBasedOn baseEnum, metadata: [(EnumeratedType.SUBSET_METADATA_KEY): selectedEnumerations.keySet().collect { it.replace(/,/, /\\,/) } .join(',')]
+        }
+
     }
 
     private Map createDescriptor(EnumeratedType type, Map.Entry<String, String> enumeratedValue) {
