@@ -104,6 +104,8 @@ grails.project.dependency.resolution = {
 
         compile ":csv:0.3.1"
 
+        compile ":spring-websocket:1.2.0"
+
         test ':build-test-data:2.1.2'
         test ':fixtures:1.3'
 
