@@ -28,6 +28,9 @@ grails.plugin.location.'model-catalogue-security-ss2' = "../ModelCatalogueSpring
 grails.plugin.location.'model-catalogue-forms' = '../ModelCatalogueFormsPlugin'
 grails.plugin.location.'model-catalogue-elasticsearch' = '../ModelCatalogueElasticSearchPlugin'
 
+grails.tomcat.nio = true
+grails.tomcat.scan.enabled = true
+
 grails.project.dependency.resolver = "maven" // or ivy
 grails.project.dependency.resolution = {
     // inherit Grails' default dependencies
@@ -86,7 +89,7 @@ grails.project.dependency.resolution = {
     plugins {
 
 
-        build ':tomcat:8.0.30'
+        build ':tomcat:8.0.22'
 
 
         // plugins for the compile step

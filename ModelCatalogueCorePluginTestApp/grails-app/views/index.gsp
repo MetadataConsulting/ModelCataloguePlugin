@@ -12,6 +12,10 @@
     <![endif]-->
 
     <asset:javascript src="ng-file-upload-shim/angular-file-upload-shim.min.js"/>
+    <asset:javascript src="spring-websocket" />
+    <script type="text/javascript">
+        window.SockJSURL = "${createLink(uri: '/stomp')}";
+    </script>
 
     <title>Model Catalogue Demo App</title>
     <g:if test="${Environment.current in [Environment.DEVELOPMENT, Environment.TEST, Environment.CUSTOM]}">

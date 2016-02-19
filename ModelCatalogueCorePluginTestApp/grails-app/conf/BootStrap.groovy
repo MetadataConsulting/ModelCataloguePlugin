@@ -73,6 +73,7 @@ class BootStrap {
                 '/',
                 '/**/favicon.ico',
                 '/fonts/**',
+                '/stomp/**',
                 '/assets/**',
                 '/plugins/**/js/**',
                 '/js/vendor/**',

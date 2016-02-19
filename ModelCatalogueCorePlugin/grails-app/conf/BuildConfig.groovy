@@ -94,6 +94,7 @@ grails.project.dependency.resolution = {
         compile ":asset-pipeline:2.4.3"
         compile ":coffee-asset-pipeline:2.0.7"
         compile ":less-asset-pipeline:2.3.0"
+        compile "org.grails.plugins:angular-annotate-asset-pipeline:2.4.0"
 //        runtime ":hibernate4:4.3.5.5"
         runtime  ":hibernate:3.6.10.18"
 
@@ -115,7 +116,7 @@ grails.project.dependency.resolution = {
         // test coverage
         test ":code-coverage:1.2.7"
 
-        build ':tomcat:8.0.30'
+        build ':tomcat:8.0.22'
 		//jasper report generator see in dependencies
 
     }
@@ -135,4 +136,7 @@ codenarc.reports = {
 
 // release
 grails.project.repos.metadataSnapshots.url = "http://repository-metadata.forge.cloudbees.com/snapshot/"
+
+grails.tomcat.nio = true
+grails.tomcat.scan.enabled = true
 

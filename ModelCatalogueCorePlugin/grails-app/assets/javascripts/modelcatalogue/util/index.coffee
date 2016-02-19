@@ -7,4 +7,6 @@ angular.module 'mc.util', [
   'mc.util.security'
   'mc.util.messages'
   'mc.util.recursiveCompile'
+  'mc.util.MessagingClient'
+  'mc.util.Stomp'
 ]
