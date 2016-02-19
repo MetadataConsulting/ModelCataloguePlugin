@@ -434,15 +434,18 @@ class RelationshipService {
 
     boolean isFavorite(CatalogueElement el) {
         if (modelCatalogueSecurityService.currentUser) {
-            return el.getId() in FAVORITE_CACHE.get(modelCatalogueSecurityService.currentUser.getId()) {
+            Set<Long> favorites = FAVORITE_CACHE.getIfPresent(modelCatalogueSecurityService.currentUser.getId())
+            if (favorites == null) {
                 RelationshipType favorite = RelationshipType.favouriteType
                 if (!favorite) {
                     return [] as Set<Long>
                 }
-                Relationship.where {
+                favorites = Relationship.where {
                     relationshipType == favorite && source == modelCatalogueSecurityService.currentUser
                 }.list().collect { it.destination.id }.toSet()
+                FAVORITE_CACHE.put(modelCatalogueSecurityService.currentUser.getId(), favorites)
             }
+            return el.getId() in favorites
         }
         return false
     }
@@ -472,9 +475,14 @@ class RelationshipService {
         if (!el.getId()) {
             return RelationshipsCounts.EMPTY
         }
-        RELATIONSHIPS_COUNT_CACHE.get(el.getId()) {
-            prepareCounts(el)
+        RelationshipsCounts counts = RELATIONSHIPS_COUNT_CACHE.getIfPresent(el.getId())
+
+        if ((!counts)) {
+            counts = prepareCounts(el)
+            RELATIONSHIPS_COUNT_CACHE.put(el.getId(), counts)
         }
+
+        return counts
     }
 
     private RelationshipsCounts prepareCounts(CatalogueElement el) {

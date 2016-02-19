@@ -261,12 +261,12 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         instance.save flush:true
 
-        bindRelations(instance, false)
-
         if (instance.hasErrors()) {
             respond instance.errors
             return
         }
+
+        bindRelations(instance, false)
 
         respond instance, [status: OK]
     }
@@ -333,8 +333,10 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             bindRelations(instance, newVersion, objectToBind)
         } catch (IllegalArgumentException e) {
             instance.errors.reject 'error.binding.relations', e.message
+            log.warn "Error binding relations", e
         } catch (Exception e) {
             instance.errors.reject 'error.binding.relations', e.toString()
+            log.warn "Error binding relations", e
         }
     }
 
