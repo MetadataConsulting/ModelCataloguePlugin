@@ -82,6 +82,10 @@
             return deferred.promise;
         };
 
+        this._getStompClient = function() {
+            return StompClient;
+        };
+
         // to assign the handlers
         this.connect(true);
 

@@ -17,7 +17,8 @@ grails.project.fork = [
     console: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256]
 ]
 
-
+grails.tomcat.nio = true
+grails.tomcat.scan.enabled = true
 
 grails.project.dependency.resolver = "maven" // or ivy
 grails.project.dependency.resolution = {
@@ -116,7 +117,7 @@ grails.project.dependency.resolution = {
         // test coverage
         test ":code-coverage:1.2.7"
 
-        build ':tomcat:8.0.22'
+        build ':tomcat:8.0.30'
 		//jasper report generator see in dependencies
 
     }

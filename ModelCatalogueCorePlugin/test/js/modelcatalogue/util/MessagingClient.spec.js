@@ -74,9 +74,9 @@ describe("mc.util.MessagingClient module", function() {
         });
 
         it("send", function() {
-            MessagingClient.send('/foo/bar', {}, {foo: 'bar'});
+            console.log(MessagingClient._getStompClient());
 
-            expect(StompClient.getSendPayload()).toBeUndefined();
+            MessagingClient.send('/foo/bar', {}, {foo: 'bar'});
 
             $rootScope.$apply();
 
@@ -94,12 +94,12 @@ describe("mc.util.MessagingClient module", function() {
 
 function MockStompClient() {
 
-    this.sendPayload = undefined;
+    sendPayload = undefined;
 
     this.ws = {readyState: 1};
 
     this.getSendPayload = function() {
-        return this.sendPayload;
+        return sendPayload;
     };
 
     this.connect = function(headers, callback) {
@@ -122,7 +122,7 @@ function MockStompClient() {
     };
 
     this.send = function (destination, headers, body) {
-        this.sendPayload = {destination: destination, headers: headers, body: body}
+        sendPayload = {destination: destination, headers: headers, body: body}
     }
 
 }
