@@ -70,8 +70,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.latestVersionId == vOne.id
         change.authorId == null
         change.property == 'status'
-        change.newValue == DefaultAuditor.storeValue(org.modelcatalogue.core.api.ElementStatus.FINALIZED)
-        change.oldValue == DefaultAuditor.storeValue(org.modelcatalogue.core.api.ElementStatus.DRAFT)
+        change.newValue == LoggingAuditor.storeValue(org.modelcatalogue.core.api.ElementStatus.FINALIZED)
+        change.oldValue == LoggingAuditor.storeValue(org.modelcatalogue.core.api.ElementStatus.DRAFT)
     }
 
     def "deprecation is logged"() {
@@ -91,8 +91,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.latestVersionId == vOne.id
         change.authorId == null
         change.property == 'status'
-        change.newValue == DefaultAuditor.storeValue(org.modelcatalogue.core.api.ElementStatus.DEPRECATED)
-        change.oldValue == DefaultAuditor.storeValue(org.modelcatalogue.core.api.ElementStatus.DRAFT)
+        change.newValue == LoggingAuditor.storeValue(org.modelcatalogue.core.api.ElementStatus.DEPRECATED)
+        change.oldValue == LoggingAuditor.storeValue(org.modelcatalogue.core.api.ElementStatus.DRAFT)
     }
 
     def "valid updating property is logged"() {
@@ -115,8 +115,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.type == ChangeType.PROPERTY_CHANGED
         change.authorId == null
         change.property == 'description'
-        change.newValue == DefaultAuditor.storeValue(changed)
-        change.oldValue == DefaultAuditor.storeValue(original)
+        change.newValue == LoggingAuditor.storeValue(changed)
+        change.oldValue == LoggingAuditor.storeValue(original)
 
         expect:
         ChangeType.PROPERTY_CHANGED.undoSupported
@@ -150,7 +150,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         when:
         DataType type = new DataType(name: "DT4CL").save(failOnError: true, flush: true)
 
-        String expectedOldValue = DefaultAuditor.storeValue(type)
+        String expectedOldValue = LoggingAuditor.storeValue(type)
 
         type.delete(flush: true)
 
@@ -182,7 +182,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.latestVersionId == type.id
         change.authorId   == null
         change.property == 'foo'
-        change.newValue == DefaultAuditor.storeValue('bar')
+        change.newValue == LoggingAuditor.storeValue('bar')
         change.oldValue == null
 
         and:
@@ -212,8 +212,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.latestVersionId == type.id
         change.authorId   == null
         change.property == 'foo'
-        change.oldValue == DefaultAuditor.storeValue('bar')
-        change.newValue == DefaultAuditor.storeValue('boo')
+        change.oldValue == LoggingAuditor.storeValue('bar')
+        change.newValue == LoggingAuditor.storeValue('boo')
 
         and:
         ChangeType.METADATA_UPDATED.undoSupported
@@ -246,7 +246,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.latestVersionId == type.id
         change.authorId   == null
         change.property == 'foo'
-        change.oldValue == DefaultAuditor.storeValue('bar')
+        change.oldValue == LoggingAuditor.storeValue('bar')
         change.newValue == null
 
         and:
@@ -281,14 +281,14 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change1.latestVersionId == type.id
         change1.authorId   == null
         change1.property == 'is based on'
-        change1.newValue == DefaultAuditor.storeValue(rel)
+        change1.newValue == LoggingAuditor.storeValue(rel)
         change1.oldValue == null
 
         change2
         change2.latestVersionId == base.id
         change2.authorId   == null
         change2.property == 'is base for'
-        change2.newValue == DefaultAuditor.storeValue(rel)
+        change2.newValue == LoggingAuditor.storeValue(rel)
         change2.oldValue == null
 
         and:
@@ -308,7 +308,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         DataType type = new DataType(name: 'DT4ANR').save(failOnError: true, flush: true)
         DataType base = new DataType(name: 'DT4ANR').save(failOnError: true, flush: true)
 
-        String initialValue = DefaultAuditor.storeValue(type.addToIsBasedOn(base))
+        String initialValue = LoggingAuditor.storeValue(type.addToIsBasedOn(base))
         type.removeFromIsBasedOn base
 
         Thread.sleep(100)
@@ -362,7 +362,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         Change change1 = Change.findByChangedIdAndType(type.id, ChangeType.RELATIONSHIP_METADATA_CREATED)
         Change change2 = Change.findByChangedIdAndType(base.id, ChangeType.RELATIONSHIP_METADATA_CREATED)
 
-        String newValue = DefaultAuditor.storeValue(new RelationshipMetadata(name: 'foo', extensionValue: 'bar', relationship: relationship))
+        String newValue = LoggingAuditor.storeValue(new RelationshipMetadata(name: 'foo', extensionValue: 'bar', relationship: relationship))
 
         expect:
         change1
@@ -403,7 +403,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         relationship.ext.foo = 'baz'
         sessionFactory.currentSession.flush()
 
-        String newValue = DefaultAuditor.storeValue(new RelationshipMetadata(name: 'foo', extensionValue: 'baz', relationship: relationship))
+        String newValue = LoggingAuditor.storeValue(new RelationshipMetadata(name: 'foo', extensionValue: 'baz', relationship: relationship))
 
         Thread.sleep(100)
 
@@ -416,14 +416,14 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change1.authorId   == null
         change1.property == 'is based on'
         change1.newValue == newValue
-        change1.oldValue == DefaultAuditor.storeValue('bar')
+        change1.oldValue == LoggingAuditor.storeValue('bar')
 
         change2
         change2.latestVersionId == base.id
         change2.authorId   == null
         change2.property == 'is base for'
         change2.newValue == newValue
-        change2.oldValue == DefaultAuditor.storeValue('bar')
+        change2.oldValue == LoggingAuditor.storeValue('bar')
 
         and:
         ChangeType.RELATIONSHIP_METADATA_UPDATED
@@ -446,7 +446,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         relationship.ext.foo = 'bar'
         sessionFactory.currentSession.flush()
 
-        String oldValue = DefaultAuditor.storeValue(new RelationshipMetadata(name: 'foo', extensionValue: 'bar', relationship: relationship))
+        String oldValue = LoggingAuditor.storeValue(new RelationshipMetadata(name: 'foo', extensionValue: 'bar', relationship: relationship))
 
         relationship.ext.remove('foo')
         sessionFactory.currentSession.flush()
@@ -537,14 +537,14 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change1
         change1.latestVersionId == type.id
         change1.authorId == null
-        change1.newValue == DefaultAuditor.storeValue(mapping)
+        change1.newValue == LoggingAuditor.storeValue(mapping)
         change1.oldValue == null
         !change1.otherSide
 
         change2
         change2.latestVersionId == base.id
         change2.authorId == null
-        change2.newValue == DefaultAuditor.storeValue(mapping)
+        change2.newValue == LoggingAuditor.storeValue(mapping)
         change2.oldValue == null
         change2.otherSide
 
@@ -564,7 +564,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         DataType base = new DataType(name: 'DT4RM TWO').save(failOnError: true, flush: true)
 
         Mapping mapping = mappingService.map(type, base, "x / 2")
-        String mappingVal = DefaultAuditor.storeValue(mapping)
+        String mappingVal = LoggingAuditor.storeValue(mapping)
         mappingService.unmap(type, base)
 
         Thread.sleep(100)
@@ -607,7 +607,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
         Mapping mapping = mappingService.map(type, base, "x / 2")
 
-        String oldVal = DefaultAuditor.storeValue(mapping.mapping)
+        String oldVal = LoggingAuditor.storeValue(mapping.mapping)
 
         mapping = mappingService.map(type, base, "x / 3")
 
@@ -622,14 +622,14 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change1
         change1.latestVersionId == type.id
         change1.authorId == null
-        change1.newValue == DefaultAuditor.storeValue(mapping)
+        change1.newValue == LoggingAuditor.storeValue(mapping)
         change1.oldValue == oldVal
         !change1.otherSide
 
         change2
         change2.latestVersionId == base.id
         change2.authorId == null
-        change2.newValue == DefaultAuditor.storeValue(mapping)
+        change2.newValue == LoggingAuditor.storeValue(mapping)
         change2.oldValue == oldVal
         change2.otherSide
 

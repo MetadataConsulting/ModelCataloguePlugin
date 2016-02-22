@@ -52,7 +52,7 @@ enum ChangeType {
 
         @Override
         boolean doUndo(Change change, CatalogueElement target) {
-            target.setProperty(change.property, DefaultAuditor.readValue(change.oldValue))
+            target.setProperty(change.property, LoggingAuditor.readValue(change.oldValue))
             FriendlyErrors.failFriendlySave(target)
             return true
         }
@@ -117,7 +117,7 @@ enum ChangeType {
 
         @Override
         boolean doUndo(Change change, CatalogueElement target) {
-            target.ext.put(change.property, DefaultAuditor.readValue(change.oldValue) as String)
+            target.ext.put(change.property, LoggingAuditor.readValue(change.oldValue) as String)
             return true
         }
     },
@@ -130,7 +130,7 @@ enum ChangeType {
 
         @Override
         boolean doUndo(Change change, CatalogueElement target) {
-            target.ext.put(change.property, DefaultAuditor.readValue(change.oldValue) as String)
+            target.ext.put(change.property, LoggingAuditor.readValue(change.oldValue) as String)
             return true
         }
     },
@@ -143,7 +143,7 @@ enum ChangeType {
 
         @Override
         boolean doUndo(Change change, CatalogueElement target) {
-            Map<String, Object> mapping = DefaultAuditor.readValue(change.newValue) as Map<String, Object>
+            Map<String, Object> mapping = LoggingAuditor.readValue(change.newValue) as Map<String, Object>
             if (!mapping) {
                 return false
             }
@@ -160,11 +160,11 @@ enum ChangeType {
 
         @Override
         boolean doUndo(Change change, CatalogueElement target) {
-            Map<String, Object> mapping = DefaultAuditor.readValue(change.newValue) as Map<String, Object>
+            Map<String, Object> mapping = LoggingAuditor.readValue(change.newValue) as Map<String, Object>
             if (!mapping) {
                 return false
             }
-            Mapping updated = Holders.applicationContext.getBean(MappingService).map(CatalogueElement.get(mapping.source.id), CatalogueElement.get(mapping.destination.id), DefaultAuditor.readValue(change.oldValue))
+            Mapping updated = Holders.applicationContext.getBean(MappingService).map(CatalogueElement.get(mapping.source.id), CatalogueElement.get(mapping.destination.id), LoggingAuditor.readValue(change.oldValue))
             return !updated.hasErrors()
         }
     },
@@ -177,7 +177,7 @@ enum ChangeType {
 
         @Override
         boolean doUndo(Change change, CatalogueElement target) {
-            Map<String, Object> mapping = DefaultAuditor.readValue(change.oldValue) as Map<String, Object>
+            Map<String, Object> mapping = LoggingAuditor.readValue(change.oldValue) as Map<String, Object>
             if (!mapping) {
                 return false
             }
@@ -194,7 +194,7 @@ enum ChangeType {
 
         @Override
         boolean doUndo(Change change, CatalogueElement target) {
-            def rel = DefaultAuditor.readValue(change.newValue)
+            def rel = LoggingAuditor.readValue(change.newValue)
             CatalogueElement source = CatalogueElement.get(rel.source.id)
             CatalogueElement destination = CatalogueElement.get(rel.destination.id)
             RelationshipType type = RelationshipType.readByName(rel.type.name)
@@ -219,7 +219,7 @@ enum ChangeType {
 
         @Override
         boolean doUndo(Change change, CatalogueElement target) {
-            def rel = DefaultAuditor.readValue(change.oldValue)
+            def rel = LoggingAuditor.readValue(change.oldValue)
             CatalogueElement source = CatalogueElement.get(rel.source.id)
             CatalogueElement destination = CatalogueElement.get(rel.destination.id)
             RelationshipType type = RelationshipType.readByName(rel.type.name)
@@ -245,7 +245,7 @@ enum ChangeType {
 
         @Override
         boolean doUndo(Change change, CatalogueElement target) {
-            def rel = DefaultAuditor.readValue(change.oldValue)
+            def rel = LoggingAuditor.readValue(change.oldValue)
             if (!rel) {
                 return false
             }
@@ -264,7 +264,7 @@ enum ChangeType {
 
         @Override
         boolean doUndo(Change change, CatalogueElement target) {
-            def ext = DefaultAuditor.readValue(change.newValue)
+            def ext = LoggingAuditor.readValue(change.newValue)
 
             Relationship relationship = Relationship.get(ext.relationship.id)
 
@@ -284,7 +284,7 @@ enum ChangeType {
 
         @Override
         boolean doUndo(Change change, CatalogueElement target) {
-            def ext = DefaultAuditor.readValue(change.newValue)
+            def ext = LoggingAuditor.readValue(change.newValue)
 
             Relationship relationship = Relationship.get(ext.relationship.id)
 
@@ -292,7 +292,7 @@ enum ChangeType {
                 return false
             }
 
-            relationship.ext.put(ext.name, DefaultAuditor.readValue(change.oldValue))
+            relationship.ext.put(ext.name, LoggingAuditor.readValue(change.oldValue))
             return true
         }
     },
@@ -304,7 +304,7 @@ enum ChangeType {
 
         @Override
         boolean doUndo(Change change, CatalogueElement target) {
-            def ext = DefaultAuditor.readValue(change.oldValue)
+            def ext = LoggingAuditor.readValue(change.oldValue)
 
             Relationship relationship = Relationship.get(ext.relationship.id)
 

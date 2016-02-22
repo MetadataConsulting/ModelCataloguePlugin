@@ -12,7 +12,7 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.audit.Change
 import org.modelcatalogue.core.audit.ChangeType
-import org.modelcatalogue.core.audit.DefaultAuditor
+import org.modelcatalogue.core.audit.LoggingAuditor
 import org.modelcatalogue.core.comments.Comment
 import org.modelcatalogue.core.comments.CommentsService
 import org.modelcatalogue.core.util.delayable.Delayable
@@ -351,7 +351,7 @@ class ChangelogGenerator {
 
                     builder.requestRun()
 
-                    def value = DefaultAuditor.readValue(deleteChange.oldValue)
+                    def value = LoggingAuditor.readValue(deleteChange.oldValue)
 
                     String heading = "${value.destination.name} (${value.destination.getCombinedVersion()}, $value.destination.status)"
 
@@ -417,10 +417,10 @@ class ChangelogGenerator {
     private static String getRelationshipMetadataName(Change ch) {
         switch (ch.type) {
             case [ChangeType.RELATIONSHIP_METADATA_DELETED, ChangeType.RELATIONSHIP_METADATA_UPDATED]:
-                def value = DefaultAuditor.readValue(ch.oldValue)
+                def value = LoggingAuditor.readValue(ch.oldValue)
                 return value instanceof CharSequence ? value : value?.name
             case ChangeType.RELATIONSHIP_METADATA_CREATED:
-                def value = DefaultAuditor.readValue(ch.newValue)
+                def value = LoggingAuditor.readValue(ch.newValue)
                 return value instanceof CharSequence ? value : value?.name
 
             default:
@@ -431,7 +431,7 @@ class ChangelogGenerator {
     private static String getOldRelationshipMetadataValue(Change ch) {
         switch (ch.type) {
             case [ChangeType.RELATIONSHIP_METADATA_DELETED, ChangeType.RELATIONSHIP_METADATA_UPDATED]:
-                def value = DefaultAuditor.readValue(ch.oldValue)
+                def value = LoggingAuditor.readValue(ch.oldValue)
                 return value instanceof CharSequence ? value : value?.extensionValue
             case ChangeType.RELATIONSHIP_METADATA_CREATED:
                 return ''
@@ -444,7 +444,7 @@ class ChangelogGenerator {
     private static String getNewRelationshipMetadataValue(Change ch) {
         switch (ch.type) {
             case [ChangeType.RELATIONSHIP_METADATA_CREATED, ChangeType.RELATIONSHIP_METADATA_UPDATED]:
-                def value = DefaultAuditor.readValue(ch.newValue)
+                def value = LoggingAuditor.readValue(ch.newValue)
                 return value instanceof CharSequence ? value : value?.extensionValue
             case ChangeType.RELATIONSHIP_METADATA_DELETED:
                 return ''
@@ -457,13 +457,13 @@ class ChangelogGenerator {
     private static Object getRelationship(Change ch) {
         switch (ch.type) {
             case [ChangeType.RELATIONSHIP_CREATED, ChangeType.RELATIONSHIP_ARCHIVED]:
-                return DefaultAuditor.readValue(ch.newValue)
+                return LoggingAuditor.readValue(ch.newValue)
             case ChangeType.RELATIONSHIP_DELETED:
-                return DefaultAuditor.readValue(ch.oldValue)
+                return LoggingAuditor.readValue(ch.oldValue)
             case [ChangeType.RELATIONSHIP_METADATA_CREATED, ChangeType.RELATIONSHIP_METADATA_UPDATED]:
-                return DefaultAuditor.readValue(ch.newValue).relationship
+                return LoggingAuditor.readValue(ch.newValue).relationship
             case ChangeType.RELATIONSHIP_METADATA_DELETED:
-                return DefaultAuditor.readValue(ch.oldValue).relationship
+                return LoggingAuditor.readValue(ch.oldValue).relationship
 
             default:
                 throw new IllegalArgumentException("Cannot get relationship type from $ch")
@@ -507,7 +507,7 @@ class ChangelogGenerator {
         if (!storedValue) {
             return ''
         }
-        def value = DefaultAuditor.readValue(storedValue)
+        def value = LoggingAuditor.readValue(storedValue)
         if (!value) {
             return ''
         }
