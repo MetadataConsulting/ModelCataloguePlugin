@@ -1,4 +1,4 @@
-angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest', 'mc.util.enhance', 'mc.util.names' ,'mc.core.modelCatalogueApiRoot', 'mc.core.catalogue', 'mc.core.elementEnhancer']).config [ 'enhanceProvider', (enhanceProvider) ->
+angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest', 'mc.util.enhance', 'mc.util.names' ,'mc.core.modelCatalogueApiRoot', 'mc.core.catalogue', 'mc.core.elementEnhancer', 'mc.core.serverPushUpdates']).config [ 'enhanceProvider', (enhanceProvider) ->
   commaSeparatedList = (things)->
     names = []
     angular.forEach(things, (thing)->
@@ -6,20 +6,26 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
     )
     names.join(', ')
 
-  updateFrom = (original, update) ->
-    for originalKey of original
-      if originalKey.indexOf('$') != 0 # keep the private fields such as number of children in tree view
-        delete original[originalKey]
+  updateFrom = (original, update, relaxed) ->
+    unless update.updateFrom
+      console.log update
+    # ignore if the update is not catalogue element
+    if update and angular.isFunction(update.isInstanceOf) and update.link and update.elementType
+      unless relaxed
+        for own originalKey of original
+          # keep the private fields such as number of children in tree view
+          if originalKey.indexOf('$') != 0
+            delete original[originalKey]
 
-    for newKey of update
-      original[newKey] = update[newKey]
-    original
+      for newKey of update
+        original[newKey] = update[newKey]
+      original
 
 
 
 
   condition = (element) -> element.hasOwnProperty('elementType') and element.hasOwnProperty('link')
-  factory   = [ 'modelCatalogueApiRoot', 'rest', '$rootScope', '$state', 'names', 'enhance', (modelCatalogueApiRoot, rest, $rootScope, $state, names, enhance) ->
+  factory   = [ 'modelCatalogueApiRoot', 'rest', '$rootScope', '$state', 'names', 'enhance','serverPushUpdates', (modelCatalogueApiRoot, rest, $rootScope, $state, names, enhance, serverPushUpdates) ->
     catalogueElementEnhancer = (element) ->
       class CatalogueElement
         constructor: (element) ->
@@ -194,8 +200,19 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
 
             return 'PENDING'
 
+          self.setupUpdateHook = ->
+            if @isInstanceOf('catalogueElement')
+              serverPushUpdates.subscribe "/topic/changes#{@link}", (element) =>
+                updateFrom(@, enhance(element), true)
+                $rootScope.$broadcast 'catalogueElementUpdated', @
+
+
       # wrap original element
-      new CatalogueElement(element)
+      enhanced = new CatalogueElement(element)
+
+      enhanced.setupUpdateHook()
+
+      enhanced
 
     catalogueElementEnhancer.updateFrom = updateFrom
 

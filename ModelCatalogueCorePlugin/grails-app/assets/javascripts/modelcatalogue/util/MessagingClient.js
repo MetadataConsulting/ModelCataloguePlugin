@@ -5,36 +5,54 @@
 
     angular.module("mc.util.MessagingClient", []).provider("MessagingClient", MessagingClientProvider);
 
-    function MessagingClient(Stomp, SockJS, SockJSURL, $q, $log) {
-        var subscriptions = {}, StompClient = Stomp.over(new SockJS(SockJSURL));
+    function MessagingClient(Stomp, SockJS, SockJSURL, $q, $log, $interval) {
+        var subscriptions = {}, StompClient;
 
         this.isConnected = function () {
-            return StompClient.ws.readyState == 1;
+            return StompClient && StompClient.ws.readyState == 1;
         };
 
         this.connect = function (force) {
-            var deferred = $q.defer();
+            var deferred = $q.defer(), intervalPromise, self = this;
 
             if (!force && this.isConnected()) {
                 return $q.when({});
             }
 
-            StompClient.connect(headers, function (frame) {
-                $log.debug(frame);
-                deferred.resolve(frame)
-            }, function (err) {
-                $log.error(err);
+            if (!StompClient) {
+                StompClient = Stomp.over(new SockJS(SockJSURL))
+            }
+
+            StompClient.connect(headers, function () {}, function (err) {
+                if (intervalPromise) {
+                    $interval.cancel(intervalPromise)
+                }
                 deferred.reject(err)
             });
+
+            if (this.isConnected()) {
+                deferred.resolve();
+            } else {
+                intervalPromise = $interval(function(){
+                    if (self.isConnected()) {
+                        deferred.resolve();
+                        $interval.cancel(intervalPromise);
+                    }
+                }, 100)
+            }
 
             return deferred.promise;
         };
 
         this.disconnect = function () {
             var deferred = $q.defer();
+            if (!StompClient) {
+                return $q.when({});
+            }
             StompClient.disconnect(function () {
                 deferred.resolve();
             });
+            StompClient = undefined;
             return deferred.promise;
         };
 
@@ -92,8 +110,8 @@
         return this;
     }
 
-    function MessagingClientFactory(Stomp, SockJS, SockJSURL, $q, $log) {
-        return new MessagingClient(Stomp, SockJS, SockJSURL, $q, $log);
+    function MessagingClientFactory(Stomp, SockJS, SockJSURL, $q, $log, $interval) {
+        return new MessagingClient(Stomp, SockJS, SockJSURL, $q, $log, $interval);
     }
 
     function MessagingClientProvider() {

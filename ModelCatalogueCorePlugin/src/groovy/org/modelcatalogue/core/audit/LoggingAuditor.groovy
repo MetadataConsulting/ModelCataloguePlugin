@@ -390,7 +390,7 @@ abstract class LoggingAuditor extends AbstractAuditor {
         }.toString()
     }
 
-    private static objectToStore(Object object) {
+    protected static objectToStore(Object object) {
         if (object instanceof CatalogueElement) {
             return CatalogueElementMarshaller.minimalCatalogueElementJSON(object)
         }

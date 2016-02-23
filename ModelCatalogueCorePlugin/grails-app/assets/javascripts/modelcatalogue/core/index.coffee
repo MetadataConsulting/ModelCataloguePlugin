@@ -16,4 +16,5 @@ angular.module 'mc.core', [
   'mc.core.removableItemEnhancer'
   'mc.core.actionableItemEnhancer'
   'mc.core.orderedMapEnhancer'
+  'mc.core.serverPushUpdates'
 ]

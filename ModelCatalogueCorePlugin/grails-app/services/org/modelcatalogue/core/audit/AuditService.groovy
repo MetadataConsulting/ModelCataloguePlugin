@@ -9,6 +9,7 @@ import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
+import org.springframework.messaging.core.MessageSendingOperations
 
 import javax.annotation.PostConstruct
 import java.util.concurrent.Callable
@@ -21,6 +22,7 @@ class AuditService {
     def modelCatalogueSecurityService
     def dataModelService
     def executorService
+    MessageSendingOperations brokerMessagingTemplate
 
     static Callable<Auditor> auditorFactory = { throw new IllegalStateException("Application is not initialized yet") }
 
@@ -33,10 +35,10 @@ class AuditService {
 
    @PostConstruct
    void hookSearchService() {
-       auditorFactory =  { return new DefaultAuditor(executorService) }
+       auditorFactory =  { return CompoundAuditor.from(new DefaultAuditor(executorService), new EventNotifier(brokerMessagingTemplate, executorService)) }
        if (modelCatalogueSearchService.indexingManually) {
         Callable<Auditor> oldFactory = auditorFactory
-        auditorFactory = { CompoundAuditor.from(oldFactory(), new SearchNotifier(modelCatalogueSearchService))}
+        auditorFactory = { CompoundAuditor.from(oldFactory(), new SearchNotifier(modelCatalogueSearchService), new EventNotifier(brokerMessagingTemplate, executorService))}
        }
    }
 
