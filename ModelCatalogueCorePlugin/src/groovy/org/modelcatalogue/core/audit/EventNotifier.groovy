@@ -6,9 +6,9 @@ import com.google.common.cache.RemovalListener
 import com.google.common.cache.RemovalNotification
 import grails.converters.JSON
 import grails.util.GrailsNameUtils
+import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.util.HibernateHelper
-import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import org.springframework.messaging.core.MessageSendingOperations
 import rx.Observable
 import rx.subjects.PublishSubject
@@ -17,7 +17,6 @@ import rx.subjects.Subject
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.TimeUnit
 
-import static rx.Observable.merge
 
 class EventNotifier extends LoggingAuditor {
 
@@ -67,8 +66,12 @@ class EventNotifier extends LoggingAuditor {
     }
 
     private static String render(CatalogueElement element) {
-        StringWriter sw = new StringWriter()
-        new JSON(element).render(sw)
-        return sw.toString()
+        try {
+            StringWriter sw = new StringWriter()
+            new JSON(element).render(sw)
+            return sw.toString()
+        } catch (ConverterException ce) {
+            throw new IllegalArgumentException("Unable to convert $element to JSON", ce)
+        }
     }
 }

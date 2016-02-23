@@ -19,6 +19,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
     Set<CatalogueElement> created = []
 
     def setup() {
+        loadMarshallers()
         initRelationshipTypes()
     }
     

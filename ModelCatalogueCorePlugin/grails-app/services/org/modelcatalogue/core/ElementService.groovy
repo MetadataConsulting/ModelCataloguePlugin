@@ -627,13 +627,18 @@ class ElementService implements Publisher<CatalogueElement> {
             return 1
         }
 
-        VERSION_COUNT_CACHE.get(id) {
+        Integer count = VERSION_COUNT_CACHE.getIfPresent(id)
+
+        if (count == null) {
             if (!catalogueElement.getLatestVersionId()) {
-                return 1
+                count =  1
+            } else {
+                count = CatalogueElement.countByLatestVersionId(catalogueElement.getLatestVersionId())
             }
-            CatalogueElement.countByLatestVersionId(catalogueElement.getLatestVersionId())
+            VERSION_COUNT_CACHE.put(id, count)
         }
 
+        return count
     }
 
     static void clearCache() {
