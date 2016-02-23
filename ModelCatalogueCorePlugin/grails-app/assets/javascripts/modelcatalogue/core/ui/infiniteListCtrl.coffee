@@ -233,4 +233,18 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
 
       addElements elements
 
+  $scope.$on 'catalogueElementUpdated', (ignored, element) ->
+    angular.forEach $scope.elements, (item, index) ->
+      if item.link == element.link
+        if angular.isFunction(item.updateFrom)
+          console.log "item", item
+          item.updateFrom(element)
+          newRow = getRowForElement(item)
+          console.log "new row", newRow
+          $scope.rows[index] = newRow
+
+
+
+
+
 ]
