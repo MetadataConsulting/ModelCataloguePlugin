@@ -6,16 +6,19 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
     )
     names.join(', ')
 
-  updateFrom = (original, update) ->
+  updateFrom = (original, update, relaxed) ->
     if original == update
       return original
 
+    unless update.updateFrom
+      console.log update
     # ignore if the update is not catalogue element
     if update and angular.isFunction(update.isInstanceOf) and update.link and update.elementType
-      for own originalKey of original
-        # keep the private fields such as number of children in tree view
-        if originalKey.indexOf('$') != 0
-          delete original[originalKey]
+      unless relaxed
+        for own originalKey of original
+          # keep the private fields such as number of children in tree view
+          if originalKey.indexOf('$') != 0
+            delete original[originalKey]
 
       for newKey of update
         original[newKey] = update[newKey]
