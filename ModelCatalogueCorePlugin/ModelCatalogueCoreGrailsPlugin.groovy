@@ -284,7 +284,6 @@ Model catalogue core plugin (metadata registry)
 
         ReportsRegistry reportsRegistry = ctx.getBean(ReportsRegistry)
 
-
         reportsRegistry.register {
             creates asset
             title { "Export All Elements of ${it.name} to Excel XSLX" }
@@ -307,6 +306,13 @@ Model catalogue core plugin (metadata registry)
             title { "GE Inventory Report" }
             type DataModel
             link controller: 'dataModel', action: 'gereport', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Inventory Report Spreadsheet"}
+            type DataModel
+            link controller: 'dataModel', action: 'inventorySpreadsheet', id: true
         }
 		
 		reportsRegistry.register {

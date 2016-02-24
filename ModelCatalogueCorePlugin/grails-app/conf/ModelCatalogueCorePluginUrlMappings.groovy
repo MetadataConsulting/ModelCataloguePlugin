@@ -86,6 +86,7 @@ class ModelCatalogueCorePluginUrlMappings {
                     // /ModelCatalogueCorePluginTestApp/api/modelCatalogue/core/classification/24/report
                     "/api/modelCatalogue/core/$elementName/$id/report"(controller: controllerName, action: 'report', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/$id/gereport"(controller: controllerName, action: 'gereport', method: HttpMethod.GET)
+                    "/api/modelCatalogue/core/$elementName/$id/gereport"(controller: controllerName, action: 'inventorySpreadsheet', method: HttpMethod.GET)
                 }
 
                 if (controllerName == 'measurementUnit') {

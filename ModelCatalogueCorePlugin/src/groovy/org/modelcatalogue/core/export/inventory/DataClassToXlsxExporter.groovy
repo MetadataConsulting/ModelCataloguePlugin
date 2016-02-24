@@ -55,7 +55,7 @@ class DataClassToXlsxExporter {
         
     }
 
-    void buildDataClassDetailSheet(Workbook workbook, Map<Long, DataClass> processedDataClasss, DataClass dataClass) {
+    public static void buildDataClassDetailSheet(Workbook workbook, Map<Long, DataClass> processedDataClasss, DataClass dataClass) {
         workbook.sheet("${dataClass.combinedVersion} ${dataClass.name}") {
             row {
                 cell {

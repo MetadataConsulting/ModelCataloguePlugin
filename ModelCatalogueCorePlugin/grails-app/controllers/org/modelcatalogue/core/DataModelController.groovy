@@ -3,14 +3,14 @@ package org.modelcatalogue.core
 import com.google.common.collect.ImmutableSet
 import grails.util.GrailsNameUtils
 import org.hibernate.FetchMode
+import org.modelcatalogue.core.export.inventory.DataModelToXlsxExporter
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
-import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.Relationships
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
-
 
 class DataModelController extends AbstractCatalogueElementController<DataModel> {
 
@@ -42,6 +42,25 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
 		}
 
 		render view: 'gereport', model: ['models': results, 'dataTypes': dataTypes]
+    }
+
+    def inventorySpreadsheet() {
+        DataModel dataModel = DataModel.get(params.id)
+
+        def dataModelId = dataModel.id
+        def assetId = assetService.storeReportAsAsset(
+                dataModel,
+                name: "${dataModel.name} report as MS Excel Document",
+                originalFileName: "${dataModel.name}-${dataModel.status}-${dataModel.version}.xlsx",
+                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        ) { OutputStream outputStream ->
+            // reload domain class as this is called in separate thread
+            def exporter = new DataModelToXlsxExporter(dataClassService: dataClassService, dataModel: DataModel.get(dataModelId))
+            exporter.export(outputStream)
+        }
+
+        response.setHeader("X-Asset-ID", assetId.toString())
+        redirect controller: 'asset', id: assetId, action: 'show'
     }
 
 	def containsOrImports() {
