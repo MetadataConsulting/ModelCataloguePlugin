@@ -110,8 +110,8 @@
         return this;
     }
 
-    function MessagingClientFactory(Stomp, SockJS, SockJSURL, $q, $log, $interval) {
-        return new MessagingClient(Stomp, SockJS, SockJSURL, $q, $log, $interval);
+    function MessagingClientFactory(Stomp, SockJS, SockJSURL, $q, $interval) {
+        return new MessagingClient(Stomp, SockJS, SockJSURL, $q, $interval);
     }
 
     function MessagingClientProvider() {

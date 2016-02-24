@@ -35,6 +35,8 @@
     "angular-i18n": "~1.4.0",
     "font-awesome": "~4.4.0",
     "ngInfiniteScroll": "~1.2.1",
-    "angular-xeditable" : "0.1.9"
+    "angular-xeditable" : "0.1.9",
+    "rxjs": "~4.0.8",
+    "angular-rx": "~1.1.3"
   }
 }

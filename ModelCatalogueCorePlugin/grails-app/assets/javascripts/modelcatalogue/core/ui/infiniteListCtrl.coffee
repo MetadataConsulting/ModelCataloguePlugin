@@ -233,15 +233,15 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
 
       addElements elements
 
-  $scope.$on 'catalogueElementUpdated', (ignored, element) ->
+  DEBOUNCE_TIME = 500
+
+  $scope.$eventToObservable('catalogueElementUpdated').debounce(DEBOUNCE_TIME).subscribe (data) ->
+    element = data[1]
     angular.forEach $scope.elements, (item, index) ->
       if item.link == element.link
         if angular.isFunction(item.updateFrom)
-          console.log "item", item
           item.updateFrom(element)
-          newRow = getRowForElement(item)
-          console.log "new row", newRow
-          $scope.rows[index] = newRow
+          $scope.rows[index] = getRowForElement(item)
 
 
 

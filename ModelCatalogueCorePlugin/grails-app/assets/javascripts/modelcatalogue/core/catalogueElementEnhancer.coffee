@@ -1,4 +1,4 @@
-angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest', 'mc.util.enhance', 'mc.util.names' ,'mc.core.modelCatalogueApiRoot', 'mc.core.catalogue', 'mc.core.elementEnhancer', 'mc.core.serverPushUpdates']).config [ 'enhanceProvider', (enhanceProvider) ->
+angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest', 'mc.util.enhance', 'mc.util.names' ,'mc.core.modelCatalogueApiRoot', 'mc.core.catalogue', 'mc.core.elementEnhancer', 'mc.core.serverPushUpdates', 'rx']).config [ 'enhanceProvider', (enhanceProvider) ->
   commaSeparatedList = (things)->
     names = []
     angular.forEach(things, (thing)->
@@ -10,10 +10,7 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
     if original == update
       return original
 
-    unless update.updateFrom
-      console.log update
-    # ignore if the update is not catalogue element
-    if update and angular.isFunction(update.isInstanceOf) and update.link and update.elementType
+    if update and angular.isFunction(update.updateFrom) and angular.isFunction(update.isInstanceOf) and update.link and update.elementType
       unless relaxed
         for own originalKey of original
           # keep the private fields such as number of children in tree view
@@ -28,7 +25,7 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
 
 
   condition = (element) -> element.hasOwnProperty('elementType') and element.hasOwnProperty('link')
-  factory   = [ 'modelCatalogueApiRoot', 'rest', '$rootScope', '$state', 'names', 'enhance','serverPushUpdates', (modelCatalogueApiRoot, rest, $rootScope, $state, names, enhance, serverPushUpdates) ->
+  factory   = [ 'modelCatalogueApiRoot', 'rest', '$rootScope', '$state', 'names', 'enhance','serverPushUpdates', 'rx', (modelCatalogueApiRoot, rest, $rootScope, $state, names, enhance, serverPushUpdates, rx) ->
     catalogueElementEnhancer = (element) ->
       class CatalogueElement
         constructor: (element) ->

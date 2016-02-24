@@ -277,7 +277,12 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       $scope.$on 'userLoggedOut', refreshElement
       $scope.$on 'catalogueElementCreated', refreshElement
       $scope.$on 'catalogueElementDeleted', refreshElement
-      $scope.$on 'catalogueElementUpdated', refreshElement
+
+      isForCurrentElement = (data) -> data[1].link is $scope.element.link
+
+      DEBOUNCE_TIME = 500
+
+      $scope.$eventToObservable('catalogueElementUpdated').filter(isForCurrentElement).debounce(DEBOUNCE_TIME).subscribe refreshElement
 
       $scope.$on '$stateChangeSuccess', (event, state, params) ->
         return if state.name != 'mc.resource.show.property' and state.name != 'simple.resource.show.property'

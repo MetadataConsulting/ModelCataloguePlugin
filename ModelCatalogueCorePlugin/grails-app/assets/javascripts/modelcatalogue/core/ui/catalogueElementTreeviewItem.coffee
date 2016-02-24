@@ -1,6 +1,6 @@
 nodeid = 0
 
-angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.recursiveCompile', 'ui.router']).directive 'catalogueElementTreeviewItem',  [ 'recursiveCompile', (recursiveCompile) -> {
+angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.recursiveCompile', 'ui.router', 'rx']).directive 'catalogueElementTreeviewItem',  [ 'recursiveCompile', (recursiveCompile) -> {
     restrict: 'E'
     replace: true
     scope:
@@ -195,8 +195,16 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
         reloadChildrenOnChange event, element
 
-      $scope.$on 'catalogueElementCreated', reloadChildrenOnChange
-      $scope.$on 'catalogueElementUpdated', reloadChildrenOnChange
+      doReloadChildrenOnChange = (data) ->
+        reloadChildrenOnChange(data[0], data[1])
+
+      isForCurrentElement = (data) -> data[1].link is $scope.element.link
+
+      DEBOUNCE_TIME = 500
+
+      $scope.$eventToObservable('catalogueElementCreated').debounce(DEBOUNCE_TIME).subscribe doReloadChildrenOnChange
+      $scope.$eventToObservable('catalogueElementUpdated').filter(isForCurrentElement).debounce(DEBOUNCE_TIME).subscribe doReloadChildrenOnChange
+
       $scope.$on 'listReferenceReordered', (ignored, listReference) ->
         reloadChildrenOnChange(ignored, listReference, listReference?.link)
     ]

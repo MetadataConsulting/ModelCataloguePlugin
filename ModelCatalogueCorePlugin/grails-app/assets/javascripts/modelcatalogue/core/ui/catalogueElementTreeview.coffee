@@ -1,5 +1,5 @@
 class CatalogueElementTreeview
-  constructor: ($scope, enhance, $stateParams, $rootScope, $element, $attrs) ->
+  constructor: ($scope, enhance, $stateParams, $rootScope, $element, $attrs, rx) ->
     selected = undefined
 
     @id = $scope.id
@@ -103,15 +103,17 @@ class CatalogueElementTreeview
         $scope.list.reload(status: $stateParams.status, toplevel: true).then (newList) ->
           $scope.list = newList
 
-      $scope.$on 'catalogueElementCreated', refreshList
-      $scope.$on 'catalogueElementDeleted', refreshList
-      $scope.$on 'newVersionCreated', refreshList
-      $scope.$on 'catalogueElementUpdated', refreshList
+      DEBOUNCE_TIME = 500
+
+      $scope.$eventToObservable('catalogueElementCreated').debounce(DEBOUNCE_TIME).subscribe refreshList
+      $scope.$eventToObservable('catalogueElementUpdated').debounce(DEBOUNCE_TIME).subscribe refreshList
+      $scope.$eventToObservable('catalogueElementDeleted').debounce(DEBOUNCE_TIME).subscribe refreshList
+      $scope.$eventToObservable('newVersionCreated').debounce(DEBOUNCE_TIME).subscribe refreshList
 
       $element.find('.catalogue-element-treeview-root-list-root').on 'scroll', loadMoreIfNeeded
 
 
-angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElementTreeviewItem']).directive 'catalogueElementTreeview',  [-> {
+angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElementTreeviewItem', 'rx']).directive 'catalogueElementTreeview',  [-> {
     restrict: 'E'
     replace: true
     scope:
@@ -126,6 +128,6 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
 
     controllerAs: 'treeview'
 
-    controller: ['$scope', 'enhance', '$stateParams', '$rootScope', '$element', '$attrs', CatalogueElementTreeview]
+    controller: ['$scope', 'enhance', '$stateParams', '$rootScope', '$element', '$attrs', 'rx', CatalogueElementTreeview]
   }
 ]
