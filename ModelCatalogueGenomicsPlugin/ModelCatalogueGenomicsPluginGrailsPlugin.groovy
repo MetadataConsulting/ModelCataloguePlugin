@@ -1,7 +1,7 @@
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.reports.ReportsRegistry
 
-class ModelCatalogueFormsPluginGrailsPlugin {
+class ModelCatalogueGenomicsPluginGrailsPlugin {
     // the plugin version
     def version = "0.1"
     // the version or versions of Grails the plugin is designed for
@@ -54,6 +54,16 @@ Genomics England customisation plugin for Model Catalogue
     def doWithApplicationContext = { ctx ->
         // TODO Implement post initialization spring config (optional)
         ReportsRegistry reportsRegistry = ctx.getBean(ReportsRegistry)
+
+
+        // sample report
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases Report" }
+            type DataClass
+            link controller: 'genomics', action: 'exportRareDiseases', id: true
+        }
+
 
     }
 

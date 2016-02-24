@@ -1,9 +1,9 @@
 import org.springframework.http.HttpMethod
 
-class ModelCatalogueFormsUrlMappings {
+class ModelCatalogueGenomicsUrlMappings {
 
     static mappings = {
-        // put your controllers mappings here
+        "/api/modelCatalogue/core/genomics/exportRareDiseases/$id" (controller: 'genomics', action: 'exportRareDiseases', method: HttpMethod.GET)
     }
 
 }
