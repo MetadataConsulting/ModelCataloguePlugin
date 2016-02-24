@@ -2,13 +2,6 @@ describe("mc.util.MessagingClient module", function() {
 
     var StompClient;
 
-    beforeEach(angular.mock.module(function($provide) {
-        StompClient = new MockStompClient();
-        $provide.constant('SockJS', function(){});
-        $provide.constant('SockJSURL', "");
-        $provide.constant('Stomp', {over: function(){ return new MockStompClient()}});
-    }));
-
     beforeEach(angular.mock.module('mc.util.MessagingClient', function() {
 
     }));
@@ -18,7 +11,8 @@ describe("mc.util.MessagingClient module", function() {
 
         beforeEach(angular.mock.inject(function(_MessagingClient_, _$rootScope_) {
             MessagingClient = _MessagingClient_;
-            $rootScope = _$rootScope_
+            $rootScope = _$rootScope_;
+            StompClient = MessagingClient._getStompClient()
         }));
 
         it("client is defined", function() {
@@ -90,39 +84,3 @@ describe("mc.util.MessagingClient module", function() {
 
     });
 });
-
-
-function MockStompClient() {
-
-    sendPayload = undefined;
-
-    this.ws = {readyState: 1};
-
-    this.getSendPayload = function() {
-        return sendPayload;
-    };
-
-    this.connect = function(headers, callback) {
-        this.ws.readyState = 1;
-        callback(headers)
-    };
-
-    this.disconnect = function(callback) {
-        this.ws.readyState = 3;
-        callback();
-    };
-
-    this.subscribe = function(destination, callback, headers) {
-        var subscription = {
-            destination: destination,
-            headers: headers
-        };
-        callback(subscription);
-        return subscription;
-    };
-
-    this.send = function (destination, headers, body) {
-        sendPayload = {destination: destination, headers: headers, body: body}
-    }
-
-}

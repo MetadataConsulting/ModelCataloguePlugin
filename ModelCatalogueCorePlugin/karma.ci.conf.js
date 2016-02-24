@@ -33,16 +33,19 @@ module.exports = function(config) {
 
             'grails-app/assets/jslibs/google-diff-match-patch/javascript/diff_match_patch.js',
 
+            // Tests Helpers
+            'test/js/**/*.fixture.js',
+            'test/js/**/*.fixture.coffee',
+
             // App under test
             'grails-app/assets/javascripts/modelcatalogue/modelcatalogue.coffee',
             'grails-app/assets/javascripts/**/*.coffee',
             'grails-app/assets/javascripts/**/*.js',
 
-            // Tests
+            // Angular Mock
             'grails-app/assets/bower_components/angular-mocks/angular-mocks.js',
 
-            'test/js/**/*.fixture.js',
-            'test/js/**/*.fixture.coffee',
+            // Tests
             'test/js/**/*.!(fixture.)js',
             'test/js/**/*.!(fixture.)coffee'
         ],

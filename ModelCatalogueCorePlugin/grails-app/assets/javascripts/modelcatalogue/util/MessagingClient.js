@@ -3,9 +3,9 @@
 (function(window, angular) {
     var headers = {};
 
-    angular.module("mc.util.MessagingClient", []).provider("MessagingClient", MessagingClientProvider);
+    angular.module("mc.util.MessagingClient", ['mc.util.Stomp']).provider("MessagingClient", MessagingClientProvider);
 
-    function MessagingClient(Stomp, SockJS, SockJSURL, $q, $log, $interval) {
+    function MessagingClient(Stomp, SockJS, SockJSURL, $q, $interval) {
         var subscriptions = {}, StompClient;
 
         this.isConnected = function () {
