@@ -27,6 +27,7 @@ grails.plugin.location.'model-catalogue-discourse' = "../ModelCatalogueDiscourse
 grails.plugin.location.'model-catalogue-security-ss2' = "../ModelCatalogueSpringSecurity2xPlugin"
 grails.plugin.location.'model-catalogue-forms' = '../ModelCatalogueFormsPlugin'
 grails.plugin.location.'model-catalogue-elasticsearch' = '../ModelCatalogueElasticSearchPlugin'
+grails.plugin.location.'model-catalogue-genomics' = '../ModelCatalogueGenomicsPlugin'
 
 // XXX: triggers error on war deployment
 //grails.tomcat.nio = true

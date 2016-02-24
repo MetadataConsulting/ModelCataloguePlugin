@@ -174,6 +174,55 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check rightSideTitle contains 'New Data Type Test 1'
     }
 
+    def "update metadata"() {
+        check backdrop gone
+
+        when:
+        selectTab 'ext'
+
+        then:
+        check updateMetadataButton disabled
+        check closeGrowlMessage gone
+
+        when:
+        click addMetadataButton
+
+        then:
+        check addMetadataButton gone
+
+        when:
+        fillMetadata foo: 'bar', one: 'two', free: 'for'
+
+        then:
+        check updateMetadataButton enabled
+
+        when:
+        click updateMetadataButton
+
+        then:
+        check updateMetadataButton disabled
+
+        when:
+        3.times {
+            click removeMetadataRow
+        }
+
+        then:
+        check updateMetadataButton enabled
+
+        when:
+        click updateMetadataButton
+
+        then:
+        check updateMetadataButton disabled
+
+        when:
+        refresh browser
+
+        then:
+        check addMetadataButton displayed
+    }
+
 
 
     def "create new mapping"() {
@@ -356,54 +405,4 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
             totalOf('mappings') == 0
         }
     }
-
-    def "update metadata"() {
-        check backdrop gone
-
-        when:
-        selectTab 'ext'
-
-        then:
-        check updateMetadataButton disabled
-        check closeGrowlMessage gone
-
-        when:
-        click addMetadataButton
-
-        then:
-        check addMetadataButton gone
-
-        when:
-        fillMetadata foo: 'bar', one: 'two', free: 'for'
-
-        then:
-        check updateMetadataButton enabled
-
-        when:
-        click updateMetadataButton
-
-        then:
-        check updateMetadataButton disabled
-
-        when:
-        3.times {
-            click removeMetadataRow
-        }
-
-        then:
-        check updateMetadataButton enabled
-
-        when:
-        click updateMetadataButton
-
-        then:
-        check updateMetadataButton disabled
-
-        when:
-        refresh browser
-
-        then:
-        check addMetadataButton displayed
-    }
-
 }
