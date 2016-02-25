@@ -17,6 +17,6 @@ indent_size = 4
 indent_style = space
 indent_size = 2
 
-[*.{gsp,html,coffee}]
+[*.{gsp,html,coffee,less}]
 indent_style = space
 indent_size = 2
