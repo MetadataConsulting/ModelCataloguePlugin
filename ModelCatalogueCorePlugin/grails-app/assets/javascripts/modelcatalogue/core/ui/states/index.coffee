@@ -40,9 +40,9 @@ angular.module('mc.core.ui.states', [
   $rootScope.$on 'resourceNotFound', ->
     messages.error 'Selected resource cannot be found in the catalogue.'
     if $stateParams.resource
-      $state.go 'simple.resource.list', resource: $stateParams.resource
+      $state.go 'simple.resource.list', resource: $stateParams.resource, {location: 'replace'}
     else
-      $state.go 'landing'
+      $state.go 'landing', {}, {location: 'replace'}
 ])
 
 .config([ '$modalProvider', ($modalProvider) ->

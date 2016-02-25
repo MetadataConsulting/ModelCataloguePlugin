@@ -87,7 +87,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
         propCfg = catalogueElementProperties.getConfigurationFor("#{$scope.element.elementType}.#{newProperty}")
         page    = 1
-        options = {}
+
         isTable = false
         if $scope.showTabs
           if newProperty
@@ -114,11 +114,6 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
                 break
         else
           $rootScope.$$searchContext = undefined
-
-        page = undefined if page == 1 or isNaN(page)
-        if $scope.element and $state.includes 'mc' or $state.includes 'simple'
-          nextState = if $state.includes 'mc' then 'mc.resource.show.property' else 'simple.resource.show.property'
-          $state.go nextState, {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page, q: $state.params.q, dataModelId: $state.params.dataModelId}, options
 
       updateInlineEditHelperVariables = (element) ->
         $scope.copy = angular.copy(element)
@@ -210,8 +205,8 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       $scope.tabs   = []
       $scope.detailSections = []
       $scope.select = (tab) ->
-        $scope.property = tab.name
-        $scope.$broadcast 'infiniteTableRedraw'
+        nextState = if $state.includes 'mc' then 'mc.resource.show.property' else 'simple.resource.show.property'
+        $state.go nextState, {property: tab.name}
 
       $scope.isTableSortable = (tab) ->
         return false unless $scope.element?.status == 'DRAFT'

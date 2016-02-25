@@ -9,7 +9,7 @@ angular.module('mc.core.ui.states.controllers.DashboardCtrl', ['ui.router', 'mc.
     updateDashboard = (user) ->
       $scope.user = user
       if user?.id
-        $state.go 'dataModels'
+        $state.go 'dataModels', {}, {location: 'replace'}
 
     $scope.$on('userLoggedIn', (ignored, user) ->
       if user?.error
