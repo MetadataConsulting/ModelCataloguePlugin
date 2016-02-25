@@ -174,7 +174,7 @@ class OboLoader {
 
         log.info "Building new models"
         builder.build {
-            dataModel(name: name) {
+            dataModel(name: name, semanticVersion: document.headerFrame.getClause('data-version')?.value?.toString()) {
 
                 String defaultNamespace = document.headerFrame.getClause('default-namespace')?.value?.toString()
                 if (defaultNamespace) {
