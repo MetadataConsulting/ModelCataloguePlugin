@@ -47,6 +47,7 @@
         <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap${minSuffix}.css">
         <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome${minSuffix}.css">
 
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/rxjs/4.0.8/rx.all${minSuffix}.js"></script>
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery${minSuffix}.js"></script>
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui${minSuffix}.js"></script>
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap${minSuffix}.js"></script>
@@ -59,6 +60,7 @@
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular-animate${minSuffix}.js"></script>
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular-sanitize${minSuffix}.js"></script>
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular-cookies${minSuffix}.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/rx-angular/1.1.3/rx.angular${minSuffix}.js"></script>
 
         <!-- code -->
         <asset:stylesheet href="modelcatalogue.css"/>
@@ -69,6 +71,7 @@
         <asset:stylesheet href="font-awesome/css/font-awesome"/>
         <asset:stylesheet href="modelcatalogue.css"/>
 
+        <asset:javascript src="rxjs/dist/rx.all.js"/>
         <asset:javascript src="jquery/dist/jquery.js"/>
         <asset:javascript src="jquery-ui/jquery-ui.js"/>
         <asset:javascript src="bootstrap/dist/js/bootstrap.js"/>
@@ -78,6 +81,7 @@
         <asset:javascript src="angular-cookies/angular-cookies.js"/>
         <asset:javascript src="angular-sanitize/angular-sanitize.js"/>
         <asset:javascript src="angular-animate/angular-animate.js"/>
+        <asset:javascript src="angular-rx/dist/rx.angular.js"/>
         <asset:javascript src="modelcatalogue/modelcatalogue.js"/>
     </g:else>
     <g:set var="configurationProvider" bean="frontendConfigurationProviderRegistry"/>
