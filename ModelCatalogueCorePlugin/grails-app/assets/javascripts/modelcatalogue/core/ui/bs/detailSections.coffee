@@ -445,7 +445,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Data Type'
-    position: 500
+    position: -110000
     types: [
       'dataElement'
     ]
