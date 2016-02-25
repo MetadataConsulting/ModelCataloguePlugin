@@ -38,7 +38,7 @@ class DataClassToXlsxExporter {
         SpreadsheetBuilder builder = new PoiSpreadsheetBuilder()
         builder.build(outputStream) { Workbook workbook ->
             apply ModelCatalogueStyles
-            sheet('DataClasss') { Sheet sheet ->
+            sheet('DataClasses') { Sheet sheet ->
                 buildOutline(sheet, dataClass)
             }
 
@@ -55,7 +55,7 @@ class DataClassToXlsxExporter {
         
     }
 
-    void buildDataClassDetailSheet(Workbook workbook, Map<Long, DataClass> processedDataClasss, DataClass dataClass) {
+    public static void buildDataClassDetailSheet(Workbook workbook, Map<Long, DataClass> processedDataClasss, DataClass dataClass) {
         workbook.sheet("${dataClass.combinedVersion} ${dataClass.name}") {
             row {
                 cell {

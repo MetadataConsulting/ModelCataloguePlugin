@@ -13,11 +13,11 @@ class DataClassService {
     SecurityService modelCatalogueSecurityService
     DataModelService dataModelService
 
-    ListWithTotalAndType<DataClass> getTopLevelDataClasses(Map params) {
+    ListWithTotalAndType<DataClass> getTopLevelDataClasses(Map params = [:]) {
         getTopLevelDataClasses(dataModelService.dataModelFilter, params)
     }
 
-    ListWithTotalAndType<DataClass> getTopLevelDataClasses(DataModelFilter dataModelFilter, Map params) {
+    ListWithTotalAndType<DataClass> getTopLevelDataClasses(DataModelFilter dataModelFilter, Map params = [:]) {
         RelationshipType hierarchy = RelationshipType.hierarchyType
         List<ElementStatus> status = ElementService.getStatusFromParams(params)
 
