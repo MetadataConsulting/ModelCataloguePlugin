@@ -21,7 +21,7 @@ class DataModelToXlsxExporter {
     void export(OutputStream outputStream) {
         log.info "Exporting Data Model ${dataModel.name} (${dataModel.combinedVersion}) to inventory spreadsheet."
 
-        def dataClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.includes(dataModel))
+        def dataClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.includes(dataModel)).items
         def builder = new PoiSpreadsheetBuilder()
         builder.build(outputStream) { Workbook workbook ->
             apply ModelCatalogueStyles
@@ -40,7 +40,7 @@ class DataModelToXlsxExporter {
         log.info "data model ${dataModel.name} (${dataModel.combinedVersion}) exported to inventory spreadsheet."
     }
 
-    private void buildOutline(Sheet sheet, DataModel dataModel, ListWithTotalAndType<DataClass> dataClasses) {
+    private void buildOutline(Sheet sheet, DataModel dataModel, List<DataClass> dataClasses) {
         sheet.with {
             // data model
             row(2) {
@@ -120,8 +120,8 @@ class DataModelToXlsxExporter {
         }
     }
 
-    private void buildDataClassesOutline(Sheet sheet, ListWithTotalAndType<DataClass> dataClasses, int level = 1) {
-        dataClasses.items.each { DataClass dataClass ->
+    private void buildDataClassesOutline(Sheet sheet, List<DataClass> dataClasses, int level = 1) {
+        dataClasses.each { DataClass dataClass ->
             sheet.row {
                 cell {
                     value dataClass.combinedVersion
@@ -154,24 +154,7 @@ class DataModelToXlsxExporter {
 
             if (dataClass.countParentOf() > 0) {
                 sheet.group {
-                    def children = new ListWithTotalAndType() {
-
-                        @Override
-                        Class getItemType() {
-                            return DataClass
-                        }
-
-                        @Override
-                        Long getTotal() {
-                            return dataClass.parentOf.size()
-                        }
-
-                        @Override
-                        List getItems() {
-                            return dataClass.parentOf
-                        }
-                    }
-                    buildDataClassesOutline(sheet, children, level + 1)
+                    buildDataClassesOutline(sheet, dataClass.parentOf, level + 1)
                 }
             }
         }
