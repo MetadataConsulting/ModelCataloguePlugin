@@ -57,18 +57,18 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
   '''
 
   $templateCache.put 'modelcatalogue/core/ui/detailSections/dataElementBasic.html', '''
-      <div class="col-md-6">
+      <div class="col-md-12">
         <div class="row">
-          <div class="col-md-6"><strong class="small">Last Updated</strong></div>
-          <div class="col-md-6"><small>{{element.lastUpdated | date}}</small></div>
+          <div class="col-md-3"><strong class="small">Last Updated</strong></div>
+          <div class="col-md-3"><small>{{element.lastUpdated | date}}</small></div>
+          <div class="col-md-3"><strong class="small">Status</strong></div>
+          <div class="col-md-3"><small>{{element.status}}</small></div>
         </div>
         <div class="row">
-          <div class="col-md-6"><strong class="small">Version Created</strong></div>
-          <div class="col-md-6"><small>{{element.versionCreated | date}}</small></div>
+          <div class="col-md-3"><strong class="small">Version Created</strong></div>
+          <div class="col-md-3"><small>{{element.versionCreated | date}}</small></div>
         </div>
         <div class="row">
-          <div class="col-md-6"><strong class="small">Status</strong></div>
-          <div class="col-md-6"><small>{{element.status}}</small></div>
         </div>
       </div>
   '''
