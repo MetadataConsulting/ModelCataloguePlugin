@@ -1,12 +1,13 @@
 package org.modelcatalogue.core.publishing
 
-import org.hibernate.proxy.HibernateProxyHelper
+import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.HibernateHelper
 import org.springframework.validation.ObjectError
 
+@Log4j
 class FinalizationChain extends PublishingChain {
 
 
@@ -27,6 +28,8 @@ class FinalizationChain extends PublishingChain {
             published.errors.rejectValue('status', 'org.modelcatalogue.core.CatalogueElement.element.must.be.draft', 'Element is not draft!')
             return published
         }
+
+        log.debug("Finalizing $published ...")
 
         startUpdating()
 
@@ -85,6 +88,8 @@ class FinalizationChain extends PublishingChain {
                 }
             }
         }
+
+        log.debug("... finalized $published")
 
         published
     }
