@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.b
 
+import org.modelcatalogue.core.geb.CatalogueContent
+
 import static org.modelcatalogue.core.geb.Common.*
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
@@ -10,6 +12,9 @@ import spock.lang.Stepwise
  */
 @Stepwise
 class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
+
+    static final CatalogueContent detailSectionFormItem = CatalogueContent.create('data-view-name': 'Form (Item)')
+    static final String detailSectionFormItemContent = ".metadata-form-item-content"
 
     def "login and select Data Element"() {
         login admin
@@ -51,7 +56,7 @@ class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "Check Form (Item) detail section is present and collapsed"() {
         expect:
-        check detailSectionFormItem contains 'Form (Item)'
+        check detailSectionFormItem present once
         check detailSectionFormItemContent gone
 
         when: "Click the title"

@@ -117,7 +117,7 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
             <div class="row detail-section" ng-repeat="view in detailSections">
               <p ng-if="view.getTitle()"
                  class="text-center detail-section-title small"
-                 ng-class="view.getTitle().replace(' ', '-').replace('(', '').replace(')', '').toLowerCase()"
+                 data-view-name="{{view.getTitle()}}"
                  ng-init="view.templateHidden = view.hideIfNoData() && !view.hasData(element)">
                 <span class="title btn btn-link btn-sm"
                       ng-click="view.templateHidden = !view.templateHidden"
