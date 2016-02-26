@@ -1,0 +1,301 @@
+<div class="col-md-12">
+  <div class="row">
+    <div class="col-md-3">
+      <strong class="small">Protected Health Information</strong>
+      <i class="glyphicon glyphicon-question-sign"
+         popover="
+          Signifies whether this item would be considered Protected Health Information.
+
+          Leaving the field blank or selecting 0 means the item would not be considered Protected Health Information. This flag does not do anything to mask the data or prevent people from seeing it. The field is used as a label only.
+
+          When creating a data set, this label will show in the metadata and the user could choose to include this item in the dataset (create dataset step) or not based on this label.
+
+          This field should not be changed in any subsequent versions of the CRF. If you do change it and you are an owner of the CRF the PHI attribute for this item will be changed for all versions of the CRF."
+         popover-title="Protected Health Information"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9">
+      <span editable-checkbox="extAsMap['http://forms.modelcatalogue.org/item#phi']" class="small"
+            e-string-to-boolean>
+        {{ element.ext.get('http://forms.modelcatalogue.org/item#phi') ? (element.ext.get('http://forms.modelcatalogue.org/item#phi') == "false" ? "No": "Yes") : "" }}
+      </span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      <strong class="small">Question (Left Item Text)</strong>
+      <i class="glyphicon glyphicon-question-sign"
+         popover="
+          Descriptive text that appears to the left of the input on the CRF. Often phrased in the form of a question, or descriptive label for the form field input. Defaults to data element's name or local name (Name metadata on containment relationship)
+
+          HTML elements are allowed; however, only a limited subset of tags is officially supported (bold &lt;b&gt;, italics &lt;i&gt;, underline &lt;u&gt;, superscript &lt;sup&gt;, subscript &lt;sub&gt;, line break &lt;br/&gt;, link &lt;a href=&quot;&quot;&gt;, image &lt;img src=&quot;&quot;&gt;).
+
+          This field should be used as a way of describing the expected input to users entering or reviewing CRF data. The value of LEFT_ITEM_TEXT is displayed to the left of the form input. The text wraps after the first 20 characters.
+
+          An example question would be &quot;What is the subject's height?&quot;  Or, a simple one word &quot;Height&quot; suffices as well.
+
+          If the item is part of a repeating group (GRID), the LEFT_ITEM_TEXT is displayed as a column header above the field and not be displayed to the left of the item."
+         popover-title="Question (Left Item Text)"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9 full-width-editable">
+            <span editable-text="extAsMap['http://forms.modelcatalogue.org/item#question']" e-maxlength="2000"
+                  class="small">
+              {{element.ext.get('http://forms.modelcatalogue.org/item#question')}}
+            </span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      <strong class="small">Description Label</strong>
+      <i class="glyphicon glyphicon-question-sign"
+         popover="
+          The description or definition of the item. Should give an explanation of the data element and the value(s) it captures. It is not shown on the CRF but is in the data dictionary. Defaults to data element&#39;s description.&#39;
+
+          For example, if the variable were looking to collect HEIGHT, the DESCRIPTION_LABEL would be &quot;This variable collects the height of the subject.  It captures the value in inches.&quot;
+
+          This field should not be changed in any subsequent versions of the CRF. If you do change it  and you are the owner of the CRF the DESCRIPTION_LABEL attribute for this item will be changed for all versions of the CRF."
+         popover-title="Description Label"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9 full-width-editable">
+      <small editable-textarea="extAsMap['http://forms.modelcatalogue.org/item#description']" e-maxlength="4000"
+             e-rows="5">
+        {{element.ext.get('http://forms.modelcatalogue.org/item#description')}}
+      </small>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      <strong class="small">Default Value</strong>
+      <i class="glyphicon glyphicon-question-sign"
+         popover="
+          This field allows the user to specify a default value that will appear in the CRF section the first time the user accesses the form. For single-select default value does not have to be part of the response set and can be instructive text if need be.  It will be interpreted as a blank value if the user does not choose anything.
+
+          Be careful in using this field because if the default value corresponds to an option in the response set, it will be saved to the database even if the user does not select it."
+         popover-title="Default Value"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9 full-width-editable">
+      <small editable-text="extAsMap['http://forms.modelcatalogue.org/item#defaultValue']" e-maxlength="4000">
+        {{element.ext.get('http://forms.modelcatalogue.org/item#defaultValue')}}
+      </small>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      <strong class="small">Instructions (Right Item Text)</strong>
+      <i class="glyphicon glyphicon-question-sign"
+         popover="
+          Descriptive text that appears to the right of the form input on the CRF, and to the right of any UNITS that are specified too. Often phrased in the form of a question, or supporting instructions for the form field input.
+
+          HTML elements are allowed; however, only a limited subset of tags is officially supported (bold &lt;b&gt;, italics &lt;i&gt;, underline &lt;u&gt;, superscript &lt;sup&gt;, subscript &lt;sub&gt;, line break &lt;br/&gt;, link &lt;a href=&quot;&quot;&gt;, image &lt;img src=&quot;&quot;&gt;).
+
+          This field can be used as a way of describing the expected input to users entering or for field-specific instructions. The value of RIGHT_ITEM_TEXT is displayed to the right of the form input. The text wraps after the first 20 characters.
+
+          An example of use of right item text is &quot;If other, please specify&quot;.
+
+          If the item is part of a repeating group (GRID), the RIGHT_ITEM_TEXT will be ignored and never displayed."
+         popover-title="Instructions (Right Item Text)"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9 full-width-editable">
+      <small editable-textarea="extAsMap['http://forms.modelcatalogue.org/item#instructions']" e-maxlength="2000"
+             e-rows="5">
+        {{element.ext.get('http://forms.modelcatalogue.org/item#instructions')}}
+      </small>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      <strong class="small">Required</strong>
+      <i class="glyphicon glyphicon-question-sign"
+         popover="
+          This field determines whether the user must provide a value for it before saving the section the item appears in. Defaults to true if data element's Min Occurs is 1
+
+          Leaving the field blank means the item would be optional so the data entry person does not have to provide a value for it.  If selected, the data entry person must provide a value, or enter a discrepancy note explaining why the field is left blank. This can be used for any RESPONSE_TYPE."
+         popover-title="Required"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9">
+            <span editable-checkbox="extAsMap['http://forms.modelcatalogue.org/item#required']" class="small"
+                  e-string-to-boolean>
+              {{ element.ext.get('http://forms.modelcatalogue.org/item#required') ? (element.ext.get('http://forms.modelcatalogue.org/item#required') == "false" ? "No": "Yes") : "" }}
+            </span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      <strong class="small">Horizontal (for checkbox or radio)</strong>
+      <i class="glyphicon glyphicon-question-sign"
+         popover="
+          The layout of the options for radio and checkbox fields.
+
+          The options can be left to right, or top to bottom depending on the value specified in the Items worksheet.
+
+          Leaving unchecked the items will be displayred in a single column from top to bottom. Choosing Horizontal will put the items in a single row, left to right."
+         popover-title="Horizontal (for checkbox or radio)"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9 full-width-editable">
+      <span editable-checkbox="extAsMap['http://forms.modelcatalogue.org/item#layout']" class="small"
+            e-string-to-boolean>
+        {{ element.ext.get('http://forms.modelcatalogue.org/item#layout') ? (element.ext.get('http://forms.modelcatalogue.org/item#layout') == "false" ? "No": "Yes") : "" }}
+      </span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      <strong class="small">Column Number</strong>
+      <i class="glyphicon glyphicon-question-sign"
+         popover="
+          Assigns items to an item group.
+
+          This is to be used with only non-repeating items and controls display of multiple items on a single row. If you set the column to 3 for an item, the previous two items in the worksheet should have COLUMN_NUMBERS of 1 and 2.  Otherwise, it will just be applied to the first column.
+
+          Use of COLUMN_NUMBERS greater than 3 is not recommended due to typical screen width limitations."
+         popover-title="Column Number"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9 full-width-editable">
+      <small editable-number="extAsMap['http://forms.modelcatalogue.org/item#columnNumber']" e-min="1" e-max="3"
+             e-string-to-number>
+        {{element.ext.get('http://forms.modelcatalogue.org/item#columnNumber')}}
+      </small>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      <strong class="small">Question Number</strong>
+      <i class="glyphicon glyphicon-question-sign"
+         popover="
+          This field is used to specify an identifier for each item or question in the Items worksheet.  It appears to the left of the LEFT_ITEM_TEXT field, or if that field was left blank, to the left of the form input.
+
+          This field allows you to specify questions as 1, 2, 2a etc. in a field."
+         popover-title="Question Number"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9 full-width-editable">
+      <small editable-text="extAsMap['http://forms.modelcatalogue.org/item#questionNumber']" e-maxlength="20">
+        {{element.ext.get('http://forms.modelcatalogue.org/item#questionNumber')}}
+      </small>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      <strong class="small">Data Type</strong>
+      <i class="glyphicon glyphicon-question-sign"
+         popover="
+          Data type of the item. If you want to use data type file select the File response type.
+
+          XMLSchema and Java data types are mapped to their proper data types automatically. This includes if the current data type is based on one of the data types from XMLSchema or Java classification. For a partial date, use xs:gMonthYear data type."
+         popover-title="Data Type"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9 full-width-editable">
+      <small editable-select="extAsMap['http://forms.modelcatalogue.org/item#dataType']"
+             e-ng-options="key for (key, value) in {'String':'string', 'Integer': 'int', 'Real':'real', 'Date':'date', 'Partial Date': 'pdate'}">
+        {{element.ext.get('http://forms.modelcatalogue.org/item#dataType')}}
+      </small>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      <strong class="small">Response Type</strong>
+      <i class="glyphicon glyphicon-question-sign"
+         popover="
+          Response type of the item. If any metadata related to the item doesn't make sense for given context (e.g. default value for file) they are ignored. Reponse type is inherited from data type's base types.
+
+          If data type name is File the default response type is File. If data type is enumeration the default value is Single Select if data element's Max Occurs is 1. This can be changed to Radio. For other data types the default value is Text but can be customized to Textarea."
+         popover-title="Response Type"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9 full-width-editable">
+      <small editable-select="extAsMap['http://forms.modelcatalogue.org/item#responseType']"
+             e-ng-options="key for (key, value) in {'Text':'text', 'Textarea': 'textarea', 'Single Select':'singleselect', 'Radio':'radio', 'Multi Select': 'multiselect', 'Checkbox': 'checkbox', 'File': 'file'}">
+        {{element.ext.get('http://forms.modelcatalogue.org/item#responseType')}}
+      </small>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      <strong class="small">Units</strong>
+      <i class="glyphicon glyphicon-question-sign"
+         popover="
+           Used to define the type of values being collected.  It appears to the right of the input field on the CRF. Defaults to the symbol of primitive type's unit of measure.
+
+           If you are collecting data in Inches, this field can specify your units as Inches, IN, or in. This field should not be changed in any subsequent versions of the CRF. If you do change it and you are the owner of the CRF and no data have been entered for this item, the UNITS attribute for this item will be changed for all versions of the CRF.
+
+           There are no edit checks associated specifically with units. This will appear as text to right of the input field and will be displayed between parenthesis.
+
+           If you are exporting to CDISC ODM XML format, this will appear in the metadata as measurement units.
+
+           Can contain up to 5 characters."
+         popover-title="Units"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9 full-width-editable">
+      <small editable-text="extAsMap['http://forms.modelcatalogue.org/item#units']" e-maxlength="64">
+        {{element.ext.get('http://forms.modelcatalogue.org/item#units')}}
+      </small>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      <strong class="small">Max Length (String) or Number of All Digits (Numbers)</strong>
+      <i class="glyphicon glyphicon-question-sign"
+         popover="Maximal length of string (up to 2000) or number of digits of the number (up to 26)."
+         popover-title="Max Length (String) or Number of All Digits (Numbers)"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9 full-width-editable">
+      <small editable-number="extAsMap['http://forms.modelcatalogue.org/item#length']" e-min="1" e-max="2000"
+             e-string-to-number>
+        {{element.ext.get('http://forms.modelcatalogue.org/item#length')}}
+      </small>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      <strong class="small">Number of Decimal Digits</strong>
+      <i class="glyphicon glyphicon-question-sign"
+         popover="Number of digits after decimal point. Max 20."
+         popover-title="Number of Decimal Digits"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9 full-width-editable">
+      <small editable-number="extAsMap['http://forms.modelcatalogue.org/item#digits']" e-min="0" e-max="20"
+             e-string-to-number>
+        {{element.ext.get('http://forms.modelcatalogue.org/item#digits')}}
+      </small>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      <strong class="small">Regular Expression</strong>
+      <i class="glyphicon glyphicon-question-sign"
+         popover="Regular expresion the value has match. Defaults to regular expression set for the data type if it is in the format x ==~ /\\d+(\\.\\d+)?/"
+         popover-title="Regular Expression"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9 full-width-editable">
+      <small editable-text="extAsMap['http://forms.modelcatalogue.org/item#regexp']" e-maxlength="1000">
+        {{element.ext.get('http://forms.modelcatalogue.org/item#regexp')}}
+      </small>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      <strong class="small">Regular Expression Error Message</strong>
+      <i class="glyphicon glyphicon-question-sign"
+         popover-html="Message shown if the validation fails. Defaults to &quot;Value must match /regexpDef/&quot;"
+         popover-title="Regular Expression Error Message"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9 full-width-editable">
+      <small editable-text="extAsMap['http://forms.modelcatalogue.org/item#regexpErrorMessage']" e-maxlength="1000">
+        {{element.ext.get('http://forms.modelcatalogue.org/item#regexpErrorMessage')}}
+      </small>
+    </div>
+  </div>
+</div>

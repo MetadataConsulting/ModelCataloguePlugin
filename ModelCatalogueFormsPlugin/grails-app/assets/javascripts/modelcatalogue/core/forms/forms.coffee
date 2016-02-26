@@ -1,10 +1,10 @@
 window.modelcatalogue.registerModule 'mc.core.forms'
 
-forms = angular.module('mc.core.forms', ['mc.core.ui.metadataEditors'])
+forms = angular.module('mc.core.forms', ['mc.core.ui.metadataEditors', 'mc.core.ui.detailSections'])
 
 # TODO: inline help
 
-forms.config ['metadataEditorsProvider', (metadataEditorsProvider)->
+forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEditorsProvider, detailSectionsProvider)->
   metadataEditorsProvider.register {
     title: 'Form (Metadata)'
     types: [
@@ -85,7 +85,7 @@ forms.config ['metadataEditorsProvider', (metadataEditorsProvider)->
     ]
 
     keys: [
-   
+
       "http://forms.modelcatalogue.org/item#question"
       "http://forms.modelcatalogue.org/item#defaultValue"
       "http://forms.modelcatalogue.org/item#phi"
@@ -100,11 +100,38 @@ forms.config ['metadataEditorsProvider', (metadataEditorsProvider)->
       "http://forms.modelcatalogue.org/item#digits"
       "http://forms.modelcatalogue.org/item#length"
       "http://forms.modelcatalogue.org/item#regexp"
-      "http://forms.modelcatalogue.org/item#regexpErrorMessage"     
-      "http://forms.modelcatalogue.org/item#dataType"  
+      "http://forms.modelcatalogue.org/item#regexpErrorMessage"
+      "http://forms.modelcatalogue.org/item#dataType"
     ]
     template: 'modelcatalogue/core/ui/metadataEditors/formItemDataElement.html'
   }
+
+  detailSectionsProvider.register {
+      title: 'Form (Item)'
+      position: 101000
+      types: [
+        'dataElement'
+      ]
+      keys: [
+        "http://forms.modelcatalogue.org/item#question"
+        "http://forms.modelcatalogue.org/item#defaultValue"
+        "http://forms.modelcatalogue.org/item#phi"
+        "http://forms.modelcatalogue.org/item#instructions"
+        "http://forms.modelcatalogue.org/item#description"
+        "http://forms.modelcatalogue.org/item#layout"
+        "http://forms.modelcatalogue.org/item#columnNumber"
+        "http://forms.modelcatalogue.org/item#required"
+        "http://forms.modelcatalogue.org/item#questionNumber"
+        "http://forms.modelcatalogue.org/item#responseType"
+        "http://forms.modelcatalogue.org/item#units"
+        "http://forms.modelcatalogue.org/item#digits"
+        "http://forms.modelcatalogue.org/item#length"
+        "http://forms.modelcatalogue.org/item#regexp"
+        "http://forms.modelcatalogue.org/item#regexpErrorMessage"
+        "http://forms.modelcatalogue.org/item#dataType"
+      ]
+      template: '/mc/core/forms/formItem.html'
+    }
 
 ]
 
@@ -516,7 +543,7 @@ forms.run ['$templateCache', ($templateCache) ->
 	    <select id="item-response-type" class="form-control" ng-options="key for (key, value) in {'Text':'text', 'Textarea': 'textarea', 'Single Select':'singleselect', 'Radio':'radio', 'Multi Select': 'multiselect', 'Checkbox': 'checkbox', 'File': 'file'}" ng-model="object.access('http://forms.modelcatalogue.org/item#responseType')" ng-model-options="{ getterSetter: true }"></select>
 	    <p class="help-block">
 	      Response type of the item. If any metadata related to the item doesn't make sense for given context (e.g. default value for file) they are ignored. Reponse type is inherited from data type's base types.<br/>
-	
+
 	      If data type name is <code>File</code> the default response type is <code>File</code>. If data type is enumeration the default value is <code>Single Select</code>
 	      if data element's <code>Max Occurs</code> is <code>1</code>. This can be changed to <code>Radio</code>.
 	      For other data types the default value is <code>Text</code> but can be customized to <code>Textarea</code>.
@@ -527,17 +554,17 @@ forms.run ['$templateCache', ($templateCache) ->
 	    <input maxlength="64" type="text" class="form-control" id="item-units" ng-model="object.access('http://forms.modelcatalogue.org/item#units')" ng-model-options="{ getterSetter: true }">
 	    <p class="help-block">
 	        Used to define the type of values being collected.  It appears to the right of the input field on the CRF. Defaults to the symbol of primitive type's unit of measure.<br/>
-	
+
 	        If you are collecting data in Inches, this field can specify your units as Inches, IN, or in.
 	        This field should not be changed in any subsequent versions of the CRF. If you do change it and you are the owner
 	        of the CRF and no data have been entered for this item, the UNITS attribute for this item will be changed for all
 	        versions of the CRF.<br/>
-	
+
 	        There are no edit checks associated specifically with units. This will appear as text to right of the input field
 	        and will be displayed between parenthesis.<br/>
-	
+
 	        If you are exporting to CDISC ODM XML format, this will appear in the metadata as measurement units.<br/>
-	
+
 	        Can contain up to 5 characters.
 	    </p>
 	  </div>
@@ -568,8 +595,8 @@ forms.run ['$templateCache', ($templateCache) ->
 	    <p class="help-block">
 	      Message shown if the validation fails. Defaults to "Value must match /regexpDef/"
 	    </p>
-	  </div>   
-	  
+	  </div>
+
     </form>
   '''
 ]
