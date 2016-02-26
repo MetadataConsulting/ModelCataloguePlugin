@@ -80,7 +80,6 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
   metadataEditorsProvider.register {
     title: 'Form (Item)'
     types: [
-      'dataElement'
       '=[containment]=>'
     ]
 
