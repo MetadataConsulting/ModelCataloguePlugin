@@ -35,6 +35,8 @@ class Common {
     static final CatalogueAction createNewDataModel = CatalogueAction.runFirst('data-models', 'create-data-model')
     static final String tableFooterAction = 'tr.inf-table-footer-action'
     static final String closeGrowlMessage = "div.messages-panel.growl div.alert button.close"
+    static final String detailSectionFormItem = ".detail-section-title.form-item span"
+    static final String detailSectionFormItemContent = ".metadata-form-item-content"
 
     static final Keywords item = Keywords.ITEM
     static final Keywords pick = Keywords.SELECT

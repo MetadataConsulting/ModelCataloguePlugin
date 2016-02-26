@@ -48,4 +48,16 @@ class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
         click firstRowLink
         check rightSideTitle contains 'NewDE1 Test 1'
     }
+
+    def "Check Form (Item) detail section is present and collapsed"() {
+        expect:
+        check detailSectionFormItem contains 'Form (Item)'
+        check detailSectionFormItemContent gone
+
+        when: "Click the title"
+        click detailSectionFormItem
+
+        then: "Content is displayed"
+        check detailSectionFormItemContent displayed
+    }
 }

@@ -115,7 +115,10 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
             <h3 class="ce-name"><small ng-class="element.getIcon()" title="{{element.getElementTypeName()}}"></small> <span class="text-danger fa fa-fw fa-warning" ng-if="getDeprecationWarning()" title="{{getDeprecationWarning()}}"></span> <span editable-text="copy.name" e-name="name">{{element.name}}</span> <small><a ng-href="{{element.dataModel.href()}}" class="label" ng-class="{'label-warning': element.getDataModelStatus() == 'DRAFT', 'label-info': element.getDataModelStatus() == 'PENDING', 'label-primary': element.getDataModelStatus() == 'FINALIZED', 'label-danger': element.getDataModelStatus() == 'DEPRECATED'}">{{element.getDataModelWithVersion()}}</a></small></h3>
             <messages-panel messages="messages"></messages-panel>
             <div class="row detail-section" ng-repeat="view in detailSections">
-              <p ng-if="view.getTitle()" class="text-center detail-section-title small" ng-init="view.templateHidden = view.hideIfNoData() && !view.hasData(element)">
+              <p ng-if="view.getTitle()"
+                 class="text-center detail-section-title small"
+                 ng-class="view.getTitle().replace(' ', '-').replace('(', '').replace(')', '').toLowerCase()"
+                 ng-init="view.templateHidden = view.hideIfNoData() && !view.hasData(element)">
                 <span class="title btn btn-link btn-sm"
                       ng-click="view.templateHidden = !view.templateHidden"
                       ng-show="view.hideIfNoData() && !view.hasData(element)">
