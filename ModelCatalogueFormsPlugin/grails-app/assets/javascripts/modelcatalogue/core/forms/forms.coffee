@@ -129,6 +129,7 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
         "http://forms.modelcatalogue.org/item#regexpErrorMessage"
         "http://forms.modelcatalogue.org/item#dataType"
       ]
+      hideIfNoData: true
       template: '/mc/core/forms/formItem.html'
     }
 
