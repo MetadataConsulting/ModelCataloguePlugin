@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-md-3">
       <strong class="small">Protected Health Information</strong>
-      <i class="glyphicon glyphicon-question-sign"
+      <i class="fa fa-question"
          popover="
           Signifies whether this item would be considered Protected Health Information.
 
@@ -24,7 +24,7 @@
   <div class="row">
     <div class="col-md-3">
       <strong class="small">Question (Left Item Text)</strong>
-      <i class="glyphicon glyphicon-question-sign"
+      <i class="fa fa-question"
          popover="
           Descriptive text that appears to the left of the input on the CRF. Often phrased in the form of a question, or descriptive label for the form field input. Defaults to data element's name or local name (Name metadata on containment relationship)
 
@@ -48,7 +48,7 @@
   <div class="row">
     <div class="col-md-3">
       <strong class="small">Description Label</strong>
-      <i class="glyphicon glyphicon-question-sign"
+      <i class="fa fa-question"
          popover="
           The description or definition of the item. Should give an explanation of the data element and the value(s) it captures. It is not shown on the CRF but is in the data dictionary. Defaults to data element&#39;s description.&#39;
 
@@ -68,7 +68,7 @@
   <div class="row">
     <div class="col-md-3">
       <strong class="small">Default Value</strong>
-      <i class="glyphicon glyphicon-question-sign"
+      <i class="fa fa-question"
          popover="
           This field allows the user to specify a default value that will appear in the CRF section the first time the user accesses the form. For single-select default value does not have to be part of the response set and can be instructive text if need be.  It will be interpreted as a blank value if the user does not choose anything.
 
@@ -85,7 +85,7 @@
   <div class="row">
     <div class="col-md-3">
       <strong class="small">Instructions (Right Item Text)</strong>
-      <i class="glyphicon glyphicon-question-sign"
+      <i class="fa fa-question"
          popover="
           Descriptive text that appears to the right of the form input on the CRF, and to the right of any UNITS that are specified too. Often phrased in the form of a question, or supporting instructions for the form field input.
 
@@ -109,7 +109,7 @@
   <div class="row">
     <div class="col-md-3">
       <strong class="small">Required</strong>
-      <i class="glyphicon glyphicon-question-sign"
+      <i class="fa fa-question"
          popover="
           This field determines whether the user must provide a value for it before saving the section the item appears in. Defaults to true if data element's Min Occurs is 1
 
@@ -127,7 +127,7 @@
   <div class="row">
     <div class="col-md-3">
       <strong class="small">Horizontal (for checkbox or radio)</strong>
-      <i class="glyphicon glyphicon-question-sign"
+      <i class="fa fa-question"
          popover="
           The layout of the options for radio and checkbox fields.
 
@@ -147,7 +147,7 @@
   <div class="row">
     <div class="col-md-3">
       <strong class="small">Column Number</strong>
-      <i class="glyphicon glyphicon-question-sign"
+      <i class="fa fa-question"
          popover="
           Assigns items to an item group.
 
@@ -167,7 +167,7 @@
   <div class="row">
     <div class="col-md-3">
       <strong class="small">Question Number</strong>
-      <i class="glyphicon glyphicon-question-sign"
+      <i class="fa fa-question"
          popover="
           This field is used to specify an identifier for each item or question in the Items worksheet.  It appears to the left of the LEFT_ITEM_TEXT field, or if that field was left blank, to the left of the form input.
 
@@ -184,7 +184,7 @@
   <div class="row">
     <div class="col-md-3">
       <strong class="small">Data Type</strong>
-      <i class="glyphicon glyphicon-question-sign"
+      <i class="fa fa-question"
          popover="
           Data type of the item. If you want to use data type file select the File response type.
 
@@ -202,7 +202,7 @@
   <div class="row">
     <div class="col-md-3">
       <strong class="small">Response Type</strong>
-      <i class="glyphicon glyphicon-question-sign"
+      <i class="fa fa-question"
          popover="
           Response type of the item. If any metadata related to the item doesn't make sense for given context (e.g. default value for file) they are ignored. Reponse type is inherited from data type's base types.
 
@@ -220,7 +220,7 @@
   <div class="row">
     <div class="col-md-3">
       <strong class="small">Units</strong>
-      <i class="glyphicon glyphicon-question-sign"
+      <i class="fa fa-question"
          popover="
            Used to define the type of values being collected.  It appears to the right of the input field on the CRF. Defaults to the symbol of primitive type's unit of measure.
 
@@ -243,7 +243,7 @@
   <div class="row">
     <div class="col-md-3">
       <strong class="small">Max Length (String) or Number of All Digits (Numbers)</strong>
-      <i class="glyphicon glyphicon-question-sign"
+      <i class="fa fa-question"
          popover="Maximal length of string (up to 2000) or number of digits of the number (up to 26)."
          popover-title="Max Length (String) or Number of All Digits (Numbers)"
          popover-trigger="mouseenter"></i>
@@ -258,7 +258,7 @@
   <div class="row">
     <div class="col-md-3">
       <strong class="small">Number of Decimal Digits</strong>
-      <i class="glyphicon glyphicon-question-sign"
+      <i class="fa fa-question"
          popover="Number of digits after decimal point. Max 20."
          popover-title="Number of Decimal Digits"
          popover-trigger="mouseenter"></i>
@@ -273,7 +273,7 @@
   <div class="row">
     <div class="col-md-3">
       <strong class="small">Regular Expression</strong>
-      <i class="glyphicon glyphicon-question-sign"
+      <i class="fa fa-question"
          popover="Regular expresion the value has match. Defaults to regular expression set for the data type if it is in the format x ==~ /\\d+(\\.\\d+)?/"
          popover-title="Regular Expression"
          popover-trigger="mouseenter"></i>
@@ -287,7 +287,7 @@
   <div class="row">
     <div class="col-md-3">
       <strong class="small">Regular Expression Error Message</strong>
-      <i class="glyphicon glyphicon-question-sign"
+      <i class="fa fa-question"
          popover-html="Message shown if the validation fails. Defaults to &quot;Value must match /regexpDef/&quot;"
          popover-title="Regular Expression Error Message"
          popover-trigger="mouseenter"></i>
