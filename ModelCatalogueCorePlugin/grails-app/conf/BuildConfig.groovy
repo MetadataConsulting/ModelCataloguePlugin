@@ -82,7 +82,7 @@ grails.project.dependency.resolution = {
 
         test 'xmlunit:xmlunit:1.6'
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
-		 
+
     }
 
     plugins {
@@ -97,6 +97,7 @@ grails.project.dependency.resolution = {
         compile ":coffee-asset-pipeline:2.0.7"
         compile ":less-asset-pipeline:2.3.0"
         compile "org.grails.plugins:angular-annotate-asset-pipeline:2.4.0"
+        runtime ":angular-template-asset-pipeline:2.2.6"
 //        runtime ":hibernate4:4.3.5.5"
         runtime  ":hibernate:3.6.10.18"
 

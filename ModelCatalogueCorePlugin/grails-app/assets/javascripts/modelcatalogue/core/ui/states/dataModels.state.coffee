@@ -7,7 +7,7 @@ angular.module('mc.core.ui.states.dataModels', ['mc.core.ui.states.controllers.P
 
       views:
         "":
-          templateUrl: 'modelcatalogue/core/ui/state/dataModels.html'
+          templateUrl: '/mc/core/ui/states/dataModels.html'
           controller: 'mc.core.ui.states.controllers.DataModelsCtrl'
 
       resolve:

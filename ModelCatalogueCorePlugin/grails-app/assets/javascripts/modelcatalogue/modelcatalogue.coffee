@@ -10,6 +10,7 @@
 #= require angular-xeditable/dist/js/xeditable
 #= require_self
 #= require_full_tree .
+#= require mc/index
 
 if !String.prototype.startsWith
   String.prototype.startsWith = (searchString, position) ->
