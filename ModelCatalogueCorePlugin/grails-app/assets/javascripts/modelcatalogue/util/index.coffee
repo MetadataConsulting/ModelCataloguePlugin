@@ -9,4 +9,6 @@ angular.module 'mc.util', [
   'mc.util.recursiveCompile'
   'mc.util.MessagingClient'
   'mc.util.Stomp'
+  'mc.util.stringToBoolean'
+  'mc.util.stringToNumber'
 ]
