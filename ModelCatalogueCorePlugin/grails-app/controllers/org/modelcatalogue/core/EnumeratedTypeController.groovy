@@ -1,7 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
-import org.modelcatalogue.core.util.OrderedMap
+import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 
@@ -44,8 +44,8 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
 
         if (objectToBind.baseEnumeration) {
             EnumeratedType baseEnum = EnumeratedType.get(objectToBind.baseEnumeration.id)
-            Map<String, String> selectedEnumerations = OrderedMap.fromJsonMap(objectToBind.selectedEnumerations)
-            instance.addToIsBasedOn baseEnum, metadata: [(EnumeratedType.SUBSET_METADATA_KEY): selectedEnumerations.keySet().collect { it.replace(/,/, /\\,/) } .join(',')]
+            Enumerations selectedEnumerations = Enumerations.from(objectToBind.selectedEnumerations)
+            instance.addToIsBasedOn baseEnum, metadata: [(EnumeratedType.SUBSET_METADATA_KEY): selectedEnumerations.iterator().collect { it.id } .join(',')]
         }
 
     }

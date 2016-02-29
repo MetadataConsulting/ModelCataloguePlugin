@@ -4,7 +4,6 @@ import groovy.util.logging.Log4j
 import org.elasticsearch.action.search.SearchRequestBuilder
 import org.elasticsearch.action.search.SearchResponse
 import org.elasticsearch.search.SearchHit
-import org.elasticsearch.search.SearchHitField
 import org.joda.time.format.ISODateTimeFormat
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataElement
@@ -13,6 +12,7 @@ import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
+import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.lists.JsonAwareListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
@@ -140,7 +140,7 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
             }
         } else if (ret.elementType == EnumeratedType.name) {
             if (source.enumerated_value) {
-                ret.enumerations = OrderedMap.toJsonMap(source.enumerated_value)
+                ret.enumerations = Enumerations.from(source.enumerated_value).toJsonMap()
             }
         }
 

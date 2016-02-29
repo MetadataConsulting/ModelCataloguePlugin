@@ -26,6 +26,9 @@ import groovy.transform.CompileStatic
 
     @CompileDynamic
     static Enumerations from(String text) {
+        if (!text) {
+            return new Enumerations()
+        }
         try {
             JsonSlurper slurper = new JsonSlurper()
             def payload =  slurper.parseText(text)
@@ -58,8 +61,24 @@ import groovy.transform.CompileStatic
 
     }
 
+    @CompileDynamic
     static Enumerations from(Map<String, String> enumerations) {
+        if (!enumerations) {
+            return new Enumerations()
+        }
         Enumerations enums = new Enumerations()
+
+        if (enumerations.type && enumerations.type == 'orderedMap') {
+            for (value in (enumerations.values ?: [])) {
+                Long id = (value.id as Number)?.longValue()
+                if (id != null) {
+                    enums.put(id, value.key?.toString(), value.value?.toString())
+                } else {
+                    enums.put(value.key?.toString(), value.value?.toString())
+                }
+            }
+            return enums
+        }
 
         enumerations.each { String key, String value ->
             enums.put(key,value)
@@ -68,8 +87,8 @@ import groovy.transform.CompileStatic
         return enums
     }
 
-    private Set<Enumeration> enumerations = new LinkedHashSet<Enumeration>()
-    private Map<String, Enumeration> enumerationsByKeys = new LinkedHashMap<String, Enumeration>()
+    private final Set<Enumeration> enumerations = new LinkedHashSet<Enumeration>()
+    private final Map<String, Enumeration> enumerationsByKeys = new LinkedHashMap<String, Enumeration>()
     private long genid = 1;
 
     private Enumerations() {}
@@ -183,10 +202,11 @@ import groovy.transform.CompileStatic
 
     String toJsonString() {
         JsonBuilder json = new JsonBuilder()
-        json (
-            type: 'orderedMap',
-            values: enumerations.collect { [id: it.id, key: it.key, value: it.value ] }
-        )
+        json (toJsonMap())
         json.toString()
+    }
+
+    Map<String, Object> toJsonMap() {
+        [type: 'orderedMap', values: enumerations.collect { [id: it.id, key: it.key, value: it.value ] }]
     }
 }

@@ -55,26 +55,33 @@ class EnumerationsSpec extends Specification {
 
 
         where:
-        source << [jsonEnumerationsString, enumerationsMap, LegacyEnumerations.mapToString(enumerationsMap)]
+        source << [jsonEnumerationsString, enumerationsMap, LegacyEnumerations.mapToString(enumerationsMap), jsonEnumerationsMap]
     }
 
     def "enumerations are stored as JSON"() {
         expect:
         Enumerations.from(jsonEnumerationsString).toJsonString() == jsonEnumerationsString
+    }
 
+    def "return json enumerations map for marshallers"() {
+        expect:
+        Enumerations.from(jsonEnumerationsString).toJsonMap() == jsonEnumerationsMap
     }
 
 
-    private static String getJsonEnumerationsString() {
-        JsonBuilder json = new JsonBuilder()
-        json (
+    private static Map<String, Object> getJsonEnumerationsMap() {
+        return [
             type: 'orderedMap',
             values: [
                 [id: 1, key: '01', value: 'one'],
                 [id: 2, key: '02', value: 'two'],
                 [id: 3, key: '03', value: 'three'],
-            ]
-        )
+        ]]
+    }
+
+    private static String getJsonEnumerationsString() {
+        JsonBuilder json = new JsonBuilder()
+        json(jsonEnumerationsMap)
         json.toString()
     }
 

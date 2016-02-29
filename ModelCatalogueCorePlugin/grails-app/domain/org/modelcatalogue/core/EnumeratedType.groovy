@@ -1,8 +1,6 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.enumeration.Enumerations
-import org.modelcatalogue.core.enumeration.LegacyEnumerations
-import org.modelcatalogue.core.util.OrderedMap
 
 /*
 * Enumerated Types are data types that contain a list of enumerated values
@@ -19,7 +17,7 @@ class EnumeratedType extends DataType {
 
     String enumAsString = ""
 
-    static transients = ['enumerations']
+    static transients = ['enumerations', 'enumerationsObject']
 
     static constraints = {
         name unique: false
@@ -35,6 +33,10 @@ class EnumeratedType extends DataType {
      * @param map the map containing the enum values
      */
     void setEnumerations(Map<String, String> map) {
+        if (map instanceof Enumerations) {
+            enumAsString = map.toJsonString()
+            return
+        }
         enumAsString = Enumerations.from(map).toJsonString()
     }
 
@@ -45,9 +47,15 @@ class EnumeratedType extends DataType {
      *
      * @return the map containing the enum values
      */
-    Enumerations getEnumerations() {
+    Map<String, String> getEnumerations() {
         Enumerations.from(enumAsString)
     }
+
+    Enumerations getEnumerationsObject(){
+        Enumerations.from(enumAsString)
+    }
+
+
 
 	 class EnumBean{
 		String name
