@@ -350,7 +350,7 @@ import static org.modelcatalogue.core.util.HibernateHelper.*
             }
             if (!name) {
                 markAsReferenceNotPresentInTheCatalogue()
-                throw new ReferenceNotPresentInTheCatalogueException("Element not found by ID and there is no name provided to help to find the element")
+                throw new ReferenceNotPresentInTheCatalogueException("Element not found by ID and there is no name provided to help to find the element: $this")
             }
         }
 

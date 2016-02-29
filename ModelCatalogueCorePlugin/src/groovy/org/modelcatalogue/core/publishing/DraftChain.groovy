@@ -46,6 +46,8 @@ class DraftChain extends PublishingChain {
         // only the first element in the chain can be forced
         context.stopForcingNew()
 
+        log.debug("Creating draft for $published ($context) ...")
+
         startUpdating()
 
         for (CatalogueElement element in required) {
@@ -142,6 +144,10 @@ class DraftChain extends PublishingChain {
 
         draft.status = ElementStatus.DRAFT
         draft.save(flush: true, deepValidate: false)
+
+        log.debug("... cretated draft for $published ($context)")
+
+        return draft
     }
 
 

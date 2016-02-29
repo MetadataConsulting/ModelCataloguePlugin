@@ -741,7 +741,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def "find by model catalogue id"() {
         final String dataModelName = "FBMCIITII Data Model"
-        final String dataModelSemVer = "1.0.0"
+        final String dataModelSemVer = "release/1.0.0"
         final String orphanDataTypeName = "FBMCIITII Orpan Data Type"
         final String orphanModelCatalogueId = "http://www.example.com/types/FBMCIITII_Orphan_Data_Type"
         final String dataTypeName = "FBMCIITII Data Type"

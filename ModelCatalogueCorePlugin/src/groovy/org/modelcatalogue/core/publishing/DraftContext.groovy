@@ -5,8 +5,6 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.RelationshipType
 
-import java.util.regex.Matcher
-
 class DraftContext {
 
     private boolean copyRelationships
@@ -179,5 +177,17 @@ class DraftContext {
 
     String getVersion() {
         return semanticVersion
+    }
+
+
+    @Override
+    public String toString() {
+        return "DraftContext{" +
+            "copyRelationships=" + copyRelationships +
+            ", forceNew=" + forceNew +
+            ", dataModel=" + dataModel +
+            ", semanticVersion='" + semanticVersion + '\'' +
+            ", newType=" + newType +
+            '}';
     }
 }

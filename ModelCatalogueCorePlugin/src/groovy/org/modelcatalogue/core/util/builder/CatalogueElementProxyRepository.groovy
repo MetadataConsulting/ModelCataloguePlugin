@@ -138,8 +138,16 @@ class CatalogueElementProxyRepository {
             watch.start('dirty checking')
             logInfo "(2/6) dirty checking"
             for (CatalogueElementProxy element in elementProxiesToBeResolved) {
-                if (element.changed) {
-                    element.requestDraft()
+                try {
+                    if (element.changed) {
+                        element.requestDraft()
+                    }
+                } catch (e) {
+                    if (anyCause(e, ReferenceNotPresentInTheCatalogueException)) {
+                        logWarn "Reference ${element} not present in the catalogue"
+                    } else {
+                        throw e
+                    }
                 }
             }
             watch.stop()
@@ -152,13 +160,21 @@ class CatalogueElementProxyRepository {
                 if (!it.underControl) {
                     return
                 }
-                CatalogueElement e = it.findExisting()
+                try {
+                    CatalogueElement e = it.findExisting()
 
-                if (e) {
-                    if (e.getLatestVersionId()) {
-                        elementsUnderControl << e.getLatestVersionId()
+                    if (e) {
+                        if (e.getLatestVersionId()) {
+                            elementsUnderControl << e.getLatestVersionId()
+                        } else {
+                            elementsUnderControl << e.getId()
+                        }
+                    }
+                } catch (e) {
+                    if (anyCause(e, ReferenceNotPresentInTheCatalogueException)) {
+                        logWarn "Reference ${it} not present in the catalogue"
                     } else {
-                        elementsUnderControl << e.getId()
+                        throw e
                     }
                 }
             }
