@@ -7,6 +7,8 @@ import grails.util.Environment
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.enumeration.Enumerations
+import org.modelcatalogue.core.enumeration.LegacyEnumerations
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Publisher
@@ -577,7 +579,7 @@ class ElementService implements Publisher<CatalogueElement> {
         Map<String, Set<Long>> enums = [:].withDefault { [] as TreeSet<Long> }
 
         for (Object[] row in results) {
-            enums[getNormalizedEnumValues(EnumeratedType.stringToMap(row[1]))] << row[0]
+            enums[getNormalizedEnumValues(Enumerations.from(row[1]))] << row[0]
         }
 
         enums.findAll { String key, Set<Long> values -> values.size() > 1 }.collectEntries { String key, Set<Long> values ->

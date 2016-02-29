@@ -7,9 +7,8 @@ import groovy.json.JsonSlurper
  */
 import groovy.json.internal.LazyMap
 import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.builder.api.CatalogueBuilder
-import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
+import org.modelcatalogue.core.enumeration.LegacyEnumerations
 
 class UmljService {
 
@@ -175,8 +174,6 @@ class UmljService {
 
     }
 
-
-
     protected static getSubTypes(cls, umlFile){
         return umlFile.allClasses.findAll{
             id, subtype -> subtype.ownedElements.findAll{
@@ -185,16 +182,5 @@ class UmljService {
             }.size() > 0
         }
     }
-
-
-    static String quote(String s) {
-        if (s == null) return null
-        String ret = s
-        EnumeratedType.QUOTED_CHARS.each { original, replacement ->
-            ret = ret.replace(original, replacement)
-        }
-        ret
-    }
-
 
 }

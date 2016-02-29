@@ -80,7 +80,7 @@ Model catalogue core plugin (metadata registry)
         frontendConfigurationProviderRegistry(FrontendConfigurationProviderRegistry)
 
         apiRootFrontendConfigurationProvider(ApiRootFrontendConfigurationProvider)
-        
+
         auditJsonMarshallingCustomizer(AuditJsonMarshallingCustomizer)
 
         modelCatalogueCorePluginCustomObjectMarshallers(ModelCatalogueCorePluginCustomObjectMarshallers) {
@@ -314,7 +314,7 @@ Model catalogue core plugin (metadata registry)
             type DataModel
             link controller: 'dataModel', action: 'inventorySpreadsheet', id: true
         }
-		
+
 		reportsRegistry.register {
 			creates link
 			title { "Inventory Report Document" }
@@ -444,7 +444,7 @@ Model catalogue core plugin (metadata registry)
 
     def static getEnumerationString(DataType dataType){
         if (dataType instanceof EnumeratedType) {
-            return dataType.enumAsString
+            return dataType.prettyPrint()
         }
         return null
     }

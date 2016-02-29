@@ -7,7 +7,6 @@ import grails.util.GrailsNameUtils
 import grails.util.Holders
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
-import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.audit.Change
@@ -15,6 +14,8 @@ import org.modelcatalogue.core.audit.ChangeType
 import org.modelcatalogue.core.audit.LoggingAuditor
 import org.modelcatalogue.core.comments.Comment
 import org.modelcatalogue.core.comments.CommentsService
+import org.modelcatalogue.core.enumeration.Enumerations
+import org.modelcatalogue.core.enumeration.LegacyEnumerations
 import org.modelcatalogue.core.util.delayable.Delayable
 import org.modelcatalogue.core.util.docx.ModelCatalogueWordDocumentBuilder
 
@@ -513,7 +514,7 @@ class ChangelogGenerator {
         }
         if (value instanceof CharSequence) {
             if (propertyName == 'enumAsString') {
-                return EnumeratedType.stringToMap(value?.toString()).collect { "$it.key: $it.value" }.join('\n')
+                return Enumerations.from(value).collect { "$it.key: $it.value" }.join('\n')
             }
         }
         if (value instanceof CatalogueElement) {
