@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.enumeration.Enumeration
 import org.modelcatalogue.core.enumeration.Enumerations
 
 /*
@@ -139,27 +140,34 @@ class EnumeratedType extends DataType {
             return super.getValueToBeInherited(child, propertyName, metadata, persistent)
         }
 
-        List<String> subsetKeys = parseSubsetKeys(metadata)
+        List<Long> subsetIds = parseSubsetIds(metadata)
 
-        if (!subsetKeys) {
+        if (!subsetIds) {
             return super.getValueToBeInherited(child, propertyName, metadata, persistent)
         }
 
-        Map<String, String> subset = new LinkedHashMap<String, String>((child as EnumeratedType).enumerations)
-        Map<String, String> enumerations = new LinkedHashMap<String, String>(persistent ? Enumerations.from(getPersistentValue('enumAsString')) : this.enumerations)
+        Enumerations subset = (child as EnumeratedType).enumerationsObject.copy()
+        Enumerations enumerations = persistent ? Enumerations.from(getPersistentValue('enumAsString')) : this.enumerationsObject
 
-        for (String key in subsetKeys) {
-            subset[key] = enumerations[key]
+        for (Long id in subsetIds) {
+            Enumeration enumeration = enumerations.getEnumerationById(id)
+            if (enumeration) {
+                subset.put(enumeration.id, enumeration.key, enumeration.value)
+            } else {
+                subset.removeEnumerationById(id)
+            }
         }
 
-        return Enumerations.from(subset).toJsonString()
+        return subset.toJsonString()
     }
 
-    static List<String> parseSubsetKeys(Map<String, String> metadata) {
+    static List<Long> parseSubsetIds(Map<String, String> metadata) {
         String value = metadata[SUBSET_METADATA_KEY]
         if (!value) {
             return []
         }
-        return value.split(/\s*,\s*/)*.replaceAll(/\\,/,',')
+        return value.split(/\s*,\s*/)*.replaceAll(/\\,/,',').collect {
+            Long.parseLong(it, 10)
+        }
     }
 }

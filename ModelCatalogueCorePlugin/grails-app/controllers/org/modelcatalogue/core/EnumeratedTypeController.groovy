@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.enumeration.Enumeration
 import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
@@ -28,7 +29,7 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
         ListWithTotalAndType<Map> list = Lists.lazy(params, Map) {
             List<Map> descriptors = []
 
-            for (Map.Entry<String, String> entry in type.enumerations) {
+            for (Enumeration entry in type.enumerationsObject) {
                 descriptors << createDescriptor(type, entry)
             }
 
@@ -50,7 +51,7 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
 
     }
 
-    private Map createDescriptor(EnumeratedType type, Map.Entry<String, String> enumeratedValue) {
+    private Map createDescriptor(EnumeratedType type, Enumeration enumeratedValue) {
         String link = "/${GrailsNameUtils.getPropertyName(EnumeratedType)}/$type.id"
         Map ret = [:]
         ret.id = type.getId()

@@ -11,6 +11,7 @@ import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.InitCatalogueService
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Inheritance
 import spock.lang.Ignore
@@ -493,7 +494,7 @@ class InheritanceSpec extends IntegrationSpec  {
 
     def "propagate changes in parent enumeration of subset "() {
         when: "the child enumerated type is declared as subset"
-        enumeratedType2.addToIsBasedOn enumeratedType1, metadata: [(EnumeratedType.SUBSET_METADATA_KEY): 'one,two']
+        enumeratedType2.addToIsBasedOn enumeratedType1, metadata: [(EnumeratedType.SUBSET_METADATA_KEY): '1,2']
 
 
         then: "it obtains the listed enumerations from the parent"
@@ -502,12 +503,12 @@ class InheritanceSpec extends IntegrationSpec  {
         enumeratedType2.enumerations.two == '2'
 
         and: "the subtype is marked as subtype"
-        enumeratedType2.ext[EnumeratedType.SUBSET_METADATA_KEY] == 'one,two'
+        enumeratedType2.ext[EnumeratedType.SUBSET_METADATA_KEY] == '1,2'
 
         when : "the description for value has changed"
-        Map<String, String> enums = new LinkedHashMap<String, String>(enumeratedType1.enumerations)
-        enums.one = 'jedna'
-        enumeratedType1.enumerations = enums
+        Enumerations enum1 = enumeratedType1.enumerationsObject
+        enum1.put(1, 'one', 'jedna')
+        enumeratedType1.enumAsString = enum1.toJsonString()
 
         FriendlyErrors.failFriendlySave(enumeratedType1)
 
@@ -521,11 +522,9 @@ class InheritanceSpec extends IntegrationSpec  {
         enumeratedType2.enumerations.one == 'jedna'
 
         when: "you add an enumerated value"
-        Map<String, String> enums2 = new LinkedHashMap<String, String>(enumeratedType2.enumerations)
-
-        enums2.six = '6'
-
-        enumeratedType2.enumerations = enums2
+        Enumerations enum2 = enumeratedType2.enumerationsObject
+        enum2.put(6, 'six', '6')
+        enumeratedType2.enumAsString = enum2.toJsonString()
 
         FriendlyErrors.failFriendlySave(enumeratedType2)
 
@@ -538,7 +537,7 @@ class InheritanceSpec extends IntegrationSpec  {
 
 
         when: "the relationship is changed"
-        enumeratedType2.addToIsBasedOn enumeratedType1, metadata: [(EnumeratedType.SUBSET_METADATA_KEY): 'one,two,five']
+        enumeratedType2.addToIsBasedOn enumeratedType1, metadata: [(EnumeratedType.SUBSET_METADATA_KEY): '1,2,5']
 
         then: "the child is updated as well"
         enumeratedType2.enumerations.five == '5'

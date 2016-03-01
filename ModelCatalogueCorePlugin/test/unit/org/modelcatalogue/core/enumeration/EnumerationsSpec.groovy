@@ -32,6 +32,8 @@ class EnumerationsSpec extends Specification {
         first.key == '01'
         first.value == 'one'
 
+        enumerations.getEnumerationById(1L) == first
+
         iterator.hasNext()
 
         when:
@@ -43,6 +45,8 @@ class EnumerationsSpec extends Specification {
         second.key == '02'
         second.value == 'two'
 
+        enumerations.getEnumerationById(2L) == second
+
         iterator.hasNext()
 
         when:
@@ -53,6 +57,18 @@ class EnumerationsSpec extends Specification {
         third.key == '03'
         third.value == 'three'
 
+        enumerations.getEnumerationById(3L) == third
+
+        expect:
+        !iterator.hasNext()
+
+        when:
+        enumerations.removeEnumerationById(2L)
+
+        then:
+        enumerations.size() == 2
+        enumerations.getEnumerationById(1L)
+        enumerations.getEnumerationById(3L)
 
         where:
         source << [jsonEnumerationsString, enumerationsMap, LegacyEnumerations.mapToString(enumerationsMap), jsonEnumerationsMap]
@@ -68,6 +84,38 @@ class EnumerationsSpec extends Specification {
         Enumerations.from(jsonEnumerationsString).toJsonMap() == jsonEnumerationsMap
     }
 
+    def "copy enumeration"() {
+        Enumerations enumerations = Enumerations.from(one: 'jedna', two: 'dva')
+        Enumerations copy = enumerations.copy()
+
+        expect:
+        copy
+        copy.size() == 2
+        copy.get('one') == 'jedna'
+        copy.get('two') == 'dva'
+    }
+
+    def "gen id follows after last id"() {
+        Enumerations enumerations = Enumerations.create()
+        enumerations.put(20L, 'foo', 'bar')
+        enumerations.put('zoo', 'war') // should assign 21
+
+        expect:
+        enumerations.getEnumerationById(21L)
+    }
+
+    def "replace by id"() {
+        Enumerations enumerations = Enumerations.create()
+        enumerations.put(5, "foo", "bar")
+        enumerations.put(5, "zoo", "war")
+
+        expect:
+        enumerations.size() == 1
+        !enumerations.containsKey("foo")
+        enumerations.containsKey("zoo")
+        enumerations.getEnumerationById(5)
+        enumerations.getEnumerationById(5).key == "zoo"
+    }
 
     private static Map<String, Object> getJsonEnumerationsMap() {
         return [

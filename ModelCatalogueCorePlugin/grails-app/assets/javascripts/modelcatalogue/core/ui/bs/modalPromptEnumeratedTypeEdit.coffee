@@ -95,10 +95,10 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
         controller: ['$scope', 'messages', '$controller', '$modalInstance', 'enhance', 'names', 'catalogueElementResource', ($scope, messages, $controller, $modalInstance, enhance, names, catalogueElementResource) ->
           orderedMapEnhancer = enhance.getEnhancer('orderedMap')
 
-          $scope.newEntity = -> {enumerations: orderedMapEnhancer.emptyOrderedMap(), dataModels: []}
+          $scope.newEntity = -> {enumerations: orderedMapEnhancer.emptyOrderedMap(true), dataModels: []}
           $scope.pending  = {dataModel: null}
           $scope.copy     = angular.copy(args.element ? $scope.newEntity())
-          $scope.copy.enumerations = $scope.copy.enumerations ? orderedMapEnhancer.emptyOrderedMap()
+          $scope.copy.enumerations = $scope.copy.enumerations ? orderedMapEnhancer.emptyOrderedMap(true)
           $scope.original = args.element ? $scope.newEntity()
           $scope.messages = messages.createNewMessages()
           $scope.ruleCollapsed  = not $scope.copy.rule

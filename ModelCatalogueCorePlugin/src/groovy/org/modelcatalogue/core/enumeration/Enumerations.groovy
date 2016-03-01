@@ -35,8 +35,12 @@ import groovy.transform.CompileStatic
 
             Enumerations enumerations = new Enumerations()
 
-            if (payload.type && payload.type == 'orderedMap' && payload.values && payload.values instanceof List) {
+            if (payload.type && payload.type == 'orderedMap' && payload.values != null && payload.values instanceof List) {
                 for (value in payload.values) {
+                    if (!value.id && !value.key && !value.value) {
+                        continue
+                    }
+
                     if (!value.id) {
                         enumerations.put(value.key?.toString(), value.value?.toString())
                     }
@@ -70,6 +74,9 @@ import groovy.transform.CompileStatic
 
         if (enumerations.type && enumerations.type == 'orderedMap') {
             for (value in (enumerations.values ?: [])) {
+                if (!value.id && !value.key && !value.value) {
+                    continue
+                }
                 Long id = (value.id as Number)?.longValue()
                 if (id != null) {
                     enums.put(id, value.key?.toString(), value.value?.toString())
@@ -93,9 +100,19 @@ import groovy.transform.CompileStatic
 
     private final Set<Enumeration> enumerations = new LinkedHashSet<Enumeration>()
     private final Map<String, Enumeration> enumerationsByKeys = new LinkedHashMap<String, Enumeration>()
+    private final Map<Long, Enumeration> enumerationsById = new LinkedHashMap<Long, Enumeration>()
     private long genid = 1;
 
     private Enumerations() {}
+
+    Enumerations copy() {
+        Enumerations enumerations = new Enumerations()
+        enumerations.@genid = this.@genid
+        for (Enumeration e in this) {
+            enumerations.put(e.id, e.key, e.value)
+        }
+        return enumerations
+    }
 
     @Override
     Iterator<Enumeration> iterator() {
@@ -127,37 +144,45 @@ import groovy.transform.CompileStatic
         return enumerationsByKeys.get(key)?.value
     }
 
+    Enumeration getEnumerationById(Long id){
+        return enumerationsById.get(id)
+    }
+
     String put(Long id, String key, String value) {
-        Enumeration existing = enumerationsByKeys.get(key)
+        genid = Math.max(genid, id) + 1
+
+        Enumeration existing = enumerationsById.get(id)
+
         if (existing) {
-            Enumeration newOne = Enumeration.create(id, key, value)
-            enumerationsByKeys.put(key, newOne)
-            enumerations.remove(existing)
-            enumerations.add(newOne)
-            return existing.value
+            return replaceExistingEnumeration(id, key, value, existing)
+        }
+
+        existing = enumerationsByKeys.get(key)
+        if (existing) {
+            return replaceExistingEnumeration(id, key, value, existing)
         }
 
         Enumeration newOne = Enumeration.create(id, key, value)
         enumerations.add(newOne)
         enumerationsByKeys.put(key, newOne)
+        enumerationsById.put(id, newOne)
         return null
+    }
+
+    private String replaceExistingEnumeration(long id, String key, String value, Enumeration existing) {
+        Enumeration newOne = Enumeration.create(id, key, value)
+        enumerationsByKeys.remove(existing.key)
+        enumerationsByKeys.put(key, newOne)
+        enumerationsById.remove(existing.id)
+        enumerationsById.put(id, newOne)
+        enumerations.remove(existing)
+        enumerations.add(newOne)
+        return existing.value
     }
 
     @Override
     String put(String key, String value) {
-        Enumeration existing = enumerationsByKeys.get(key)
-        if (existing) {
-            Enumeration newOne = Enumeration.create(existing.id, key, value)
-            enumerationsByKeys.put(key, newOne)
-            enumerations.remove(existing)
-            enumerations.add(newOne)
-            return existing.value
-        }
-
-        Enumeration newOne = Enumeration.create(genid++, key, value)
-        enumerations.add(newOne)
-        enumerationsByKeys.put(key, newOne)
-        return null
+        put(genid, key, value)
     }
 
     @Override
@@ -166,9 +191,22 @@ import groovy.transform.CompileStatic
         if (existing) {
             enumerations.remove(existing)
             enumerationsByKeys.remove(key)
+            enumerationsById.remove(existing.id)
             return existing.value
         }
         return null
+    }
+
+    Enumeration removeEnumerationById(Long id) {
+        Enumeration existing = getEnumerationById(id)
+
+        if (!existing) {
+            return null
+        }
+
+        remove(existing.key)
+
+        return existing
     }
 
     @Override
@@ -182,6 +220,8 @@ import groovy.transform.CompileStatic
     void clear() {
         enumerations.clear()
         enumerationsByKeys.clear()
+        enumerationsById.clear()
+        genid = 1
     }
 
     @Override
