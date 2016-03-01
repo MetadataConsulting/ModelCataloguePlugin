@@ -115,6 +115,19 @@ class EnumerationsSpec extends Specification {
         enumerations.containsKey("zoo")
         enumerations.getEnumerationById(5)
         enumerations.getEnumerationById(5).key == "zoo"
+
+        when: "the existing key is put with different id"
+        enumerations.put(6, "zoo", "bar")
+        Enumeration by6 = enumerations.getEnumerationById(6)
+        Enumeration by5 = enumerations.getEnumerationById(5)
+
+        then: "it's get stored with the new id but the old one is replaced"
+        enumerations.get("zoo") == "bar"
+        !by5
+        by6
+        by6.key == 'zoo'
+        by6.value == 'bar'
+
     }
 
     private static Map<String, Object> getJsonEnumerationsMap() {
