@@ -5,6 +5,7 @@ import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.enumeration.Enumeration
 
 class DataTypePrintHelper extends CatalogueElementPrintHelper<DataType> {
 
@@ -23,11 +24,11 @@ class DataTypePrintHelper extends CatalogueElementPrintHelper<DataType> {
         }
         if (element instanceof EnumeratedType && element.enumerations) {
             mkp.enumerations {
-                for (Map.Entry<String, String> entry in element.enumerations) {
+                for (Enumeration entry in element.enumerations) {
                     if (entry.value) {
-                        enumeration(value: entry.key, entry.value)
+                        enumeration(value: entry.key, id: entry.id, entry.value)
                     } else {
-                        enumeration(value: entry.key)
+                        enumeration(value: entry.key, id: entry.id)
                     }
                 }
             }

@@ -87,6 +87,10 @@ import groovy.transform.CompileStatic
         return enums
     }
 
+    static Enumerations create() {
+        return new Enumerations()
+    }
+
     private final Set<Enumeration> enumerations = new LinkedHashSet<Enumeration>()
     private final Map<String, Enumeration> enumerationsByKeys = new LinkedHashMap<String, Enumeration>()
     private long genid = 1;

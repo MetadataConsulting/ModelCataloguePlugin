@@ -96,6 +96,7 @@
         <xs:simpleContent>
             <xs:extension base="xs:string">
                 <xs:attribute name="value" use="required" type="xs:string"/>
+                <xs:attribute name="id" type="xs:long"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>

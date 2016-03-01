@@ -4,6 +4,7 @@ import groovy.util.logging.Log
 import groovy.util.slurpersupport.GPathResult
 import groovy.util.slurpersupport.NodeChild
 import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.core.enumeration.Enumerations
 
 @Log
 class CatalogueXmlLoader {
@@ -232,9 +233,14 @@ class CatalogueXmlLoader {
         Map<String, Object> parameters = parameters(element)
 
         if (element.enumerations) {
-            Map<String, String> enumerations = [:]
+            Enumerations enumerations = Enumerations.create()
             element.enumerations.children().each {
-                enumerations[it.@value.text()] = it.text()
+                String idText = it.@id.text()
+                if (idText) {
+                    enumerations.put(Long.parseLong(idText, 10), it.@value.text(), it.text())
+                } else {
+                    enumerations.put(it.@value.text(), it.text())
+                }
             }
             parameters.enumerations = enumerations
         }
