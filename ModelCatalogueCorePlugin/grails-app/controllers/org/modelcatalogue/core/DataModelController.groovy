@@ -20,30 +20,6 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
 		super(DataModel, false)
 	}
 
-	def report() {
-		DataModel dataModel = DataModel.get(params.id)
-		if (!dataModel) {
-			notFound()
-			return
-		}
-		render view: 'report', model: [dataModel: dataModel]
-	}
-
-	def gereport() {
-		def results = getDataClassesForDataModel(params.id as Long)
-
-		def dataTypes = new TreeSet<DataType>([compare: { DataType a, DataType b ->
-				a?.name <=> b?.name
-			}] as Comparator<DataType>)
-
-		if (!results) {
-			notFound()
-			return
-		}
-
-		render view: 'gereport', model: ['models': results, 'dataTypes': dataTypes]
-    }
-
     def inventorySpreadsheet() {
         DataModel dataModel = DataModel.get(params.id)
 
