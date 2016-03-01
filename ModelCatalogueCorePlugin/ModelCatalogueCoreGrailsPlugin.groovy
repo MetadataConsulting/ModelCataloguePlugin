@@ -296,20 +296,6 @@ Model catalogue core plugin (metadata registry)
 
         reportsRegistry.register {
             creates link
-            title { "Inventory Report" }
-            type DataModel
-            link controller: 'dataModel', action: 'report', id: true
-        }
-
-        reportsRegistry.register {
-            creates link
-            title { "GE Inventory Report" }
-            type DataModel
-            link controller: 'dataModel', action: 'gereport', id: true
-        }
-
-        reportsRegistry.register {
-            creates link
             title { "Inventory Report Spreadsheet"}
             type DataModel
             link controller: 'dataModel', action: 'inventorySpreadsheet', id: true
