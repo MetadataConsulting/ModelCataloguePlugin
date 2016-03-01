@@ -112,7 +112,7 @@ angular.module('mc.core.orderedMapEnhancer', ['mc.util.enhance']).config ['enhan
 
       return enhance orderedMapEnhancer({
         type: 'orderedMap'
-        values: [{'': ''}]
+        values: [{key: ''}]
       })
 
     orderedMapEnhancer
