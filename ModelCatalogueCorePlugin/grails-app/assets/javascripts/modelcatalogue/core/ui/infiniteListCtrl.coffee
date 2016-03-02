@@ -38,8 +38,6 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
     if element and angular.isFunction(element.isInstanceOf)
       if element.isInstanceOf('catalogueElement')
         properties.push(label: 'Model Catalogue ID', value: -> element.modelCatalogueId)
-        properties.push(label: 'Version', value: -> "#{element.latestVersionId}.#{element.versionNumber}")
-
         properties.push(label: 'Data Model', value: -> element.classifications) if not element.isInstanceOf('classification')
       if element.isInstanceOf('dataElement')
         properties.push label: 'Data Type', value: -> element.dataType
@@ -242,9 +240,4 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
         if angular.isFunction(item.updateFrom)
           item.updateFrom(element)
           $scope.rows[index] = getRowForElement(item)
-
-
-
-
-
 ]
