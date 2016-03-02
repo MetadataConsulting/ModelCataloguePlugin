@@ -20,8 +20,6 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptNewMCImport'
   'mc.core.ui.bs.modalPromptNewCatalogueXmlImport'
   'mc.core.ui.bs.batchView'
-  'mc.core.ui.bs.catalogueElementTreeview'
-  'mc.core.ui.bs.catalogueElementTreeviewItem'
   'mc.core.ui.bs.catalogueElementProperties'
   'mc.core.ui.bs.propertiesPane'
   'mc.core.ui.bs.actions'

@@ -121,10 +121,11 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
       list:    '=?'
       descend: '='
       repeat:  '=?'
+      prefetch:'=?'
       id:      '@'
       onSelect: '&?'
 
-    templateUrl: 'modelcatalogue/core/ui/catalogueElementTreeview.html'
+    templateUrl: '/mc/core/ui/catalogueElementTreeview.html'
 
     controllerAs: 'treeview'
 

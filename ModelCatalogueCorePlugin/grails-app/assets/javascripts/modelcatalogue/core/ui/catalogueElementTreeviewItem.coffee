@@ -1,6 +1,10 @@
 nodeid = 0
 
-angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.recursiveCompile', 'ui.router', 'rx']).directive 'catalogueElementTreeviewItem',  [ 'recursiveCompile', (recursiveCompile) -> {
+angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.recursiveCompile', 'ui.router', 'rx'])
+.config(['$tooltipProvider', ($tooltipProvider) ->
+  $tooltipProvider.setTriggers mouseover: 'mouseout'
+])
+.directive 'catalogueElementTreeviewItem',  [ 'recursiveCompile', (recursiveCompile) -> {
     restrict: 'E'
     replace: true
     scope:
@@ -10,7 +14,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
       treeview: '='
       extraParameters: '=?'
 
-    templateUrl: 'modelcatalogue/core/ui/catalogueElementTreeviewItem.html'
+    templateUrl: '/mc/core/ui/catalogueElementTreeviewItem.html'
 
     compile: recursiveCompile.compile
 
@@ -147,11 +151,12 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
           $scope.descendFun(null, $scope.extraParameters).then(loadNewChildren).then ->
             $scope.element.$$loadingChildren = false
 
-        if $scope.extraParameters?.root
+        if $scope.extraParameters?.prefetch
+          console.log 'extra', $scope.extraParameters
           $scope.element.$$loadChildren()
 
       $scope.collapseOrExpand = ->
-        return if $scope.extraParameters?.root
+        return if $scope.extraParameters?.prefetch
         return if $scope.element.$$loadingChildren
         unless $scope.element.$$collapsed
           $scope.element.$$collapsed = true
