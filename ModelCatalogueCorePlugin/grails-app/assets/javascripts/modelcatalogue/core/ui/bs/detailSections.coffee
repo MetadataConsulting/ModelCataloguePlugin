@@ -57,18 +57,18 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
   '''
 
   $templateCache.put 'modelcatalogue/core/ui/detailSections/dataElementBasic.html', '''
-      <div class="col-md-6">
+      <div class="col-md-12">
         <div class="row">
-          <div class="col-md-6"><strong class="small">Last Updated</strong></div>
-          <div class="col-md-6"><small>{{element.lastUpdated | date}}</small></div>
+          <div class="col-md-3"><strong class="small">Last Updated</strong></div>
+          <div class="col-md-3"><small>{{element.lastUpdated | date}}</small></div>
+          <div class="col-md-3"><strong class="small">Status</strong></div>
+          <div class="col-md-3"><small>{{element.status}}</small></div>
         </div>
         <div class="row">
-          <div class="col-md-6"><strong class="small">Version Created</strong></div>
-          <div class="col-md-6"><small>{{element.versionCreated | date}}</small></div>
+          <div class="col-md-3"><strong class="small">Version Created</strong></div>
+          <div class="col-md-3"><small>{{element.versionCreated | date}}</small></div>
         </div>
         <div class="row">
-          <div class="col-md-6"><strong class="small">Status</strong></div>
-          <div class="col-md-6"><small>{{element.status}}</small></div>
         </div>
       </div>
   '''
@@ -445,7 +445,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Data Type'
-    position: 500
+    position: -110000
     types: [
       'dataElement'
     ]
@@ -481,6 +481,7 @@ x in ['apple', 'banana', 'cherry']
       'dataModel'
       'asset'
       'mesurementUnit'
+      'dataElement'
       # data class has various metadata editors which need to be migrated first
       # 'dataClass'
     ]
@@ -497,5 +498,6 @@ x in ['apple', 'banana', 'cherry']
     keys: ['http://www.modelcatalogue.org/metadata/enumerateType#subset']
     template: 'modelcatalogue/core/ui/detailSections/enumerations.html'
   }
+
 
 ]

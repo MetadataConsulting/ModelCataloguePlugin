@@ -56,11 +56,12 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
     Type is either element type or relationship pattern definition "sourceType=[relationshipType]=>destinationType"
     where every part is optional e.g. "model=>", "=[base]=>dataType", "=>"
 
-    @param types      supported types
-    @param keys       supported metadata keys
-    @param template   template to be used for rendering
-    @param position   position in the view (negative numbers goes before the description, positive after the description
-    @param title      optional title to be displayed
+    @param types          supported types
+    @param keys           supported metadata keys
+    @param template       template to be used for rendering
+    @param position       position in the view (negative numbers goes before the description, positive after the description
+    @param title          optional title to be displayed
+    @param hideIfNoData   optional hide template when no data are in there
   ###
   detailSectionsProvider.register = (configuration) ->
     throw new Error('Please provide supported types configuration ("types" configuration property)') unless configuration.types?
@@ -91,6 +92,10 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
       getTitle: -> configuration.title
       getPosition: -> configuration.position
       getKeys: -> angular.copy configuration.keys
+      hideIfNoData: () ->
+        return if configuration.hideIfNoData? then configuration.hideIfNoData else false
+      hasData: (element) ->
+        return configuration.keys.some (key) -> element.ext.get(key)?
     }
 
     # assign values to the view

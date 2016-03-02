@@ -7,6 +7,10 @@ class CatalogueContent {
     final String selector
     final Map<String, Object> args
 
+    static CatalogueContent create(Map arguments) {
+        new CatalogueContent("*", arguments)
+    }
+
     static CatalogueContent create(String selector) {
         new CatalogueContent(selector, [:])
     }
