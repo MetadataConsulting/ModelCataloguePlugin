@@ -8,7 +8,7 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
       columns: '=?'
       transform: '&?'
 
-    templateUrl: 'modelcatalogue/core/ui/infiniteTable.html'
+    templateUrl: '/mc/core/ui/infiniteTable.html'
 
     compile: (element, attrs) ->
       attrs.transform = '$element' unless attrs.transform

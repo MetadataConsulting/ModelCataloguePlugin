@@ -7,7 +7,6 @@ angular.module('mc.core.ui.bs', [
   'ngCookies'
   'infinite-scroll'
   # list of modules
-  'mc.core.ui.bs.infiniteTable'
   'mc.core.ui.bs.infiniteList'
   'mc.core.ui.bs.catalogueElementView'
   'mc.core.ui.bs.csvTransformationView'
