@@ -43,6 +43,12 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
   catalogueProvider.getIcon = (type) ->
     readMetadata type, 'icon'
 
+  catalogueProvider.setPlural = (type, plural) ->
+    writeMetadata type, 'plural', plural
+
+  catalogueProvider.getPlural = (type) ->
+    readMetadata(type, 'plural') ? "#{names.getNaturalName(type)}s"
+
   catalogueProvider.setDeprecationWarning = (type, warningFunction) ->
     writeMetadata type, 'deprecationWarning', warningFunction
 
@@ -89,6 +95,9 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
 
     catalogue.getIcon = (type) ->
       catalogueProvider.getIcon(type)
+
+    catalogue.getPlural = (type) ->
+      catalogueProvider.getPlural(type)
 
     catalogue.getDeprecationWarning = (type) ->
       catalogueProvider.getDeprecationWarning(type) ? ->

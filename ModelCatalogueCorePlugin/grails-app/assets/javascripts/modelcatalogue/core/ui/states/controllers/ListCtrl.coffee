@@ -1,12 +1,12 @@
 angular.module('mc.core.ui.states.controllers.ListCtrl', ['ui.router', 'mc.util.ui']).controller('mc.core.ui.states.controllers.ListCtrl', [
-  '$scope', '$stateParams', '$state', 'list', 'names', 'enhance', 'applicationTitle',
-  ($scope ,  $stateParams ,  $state ,  list ,  names ,  enhance ,  applicationTitle ) ->
+  '$scope', '$stateParams', '$state', 'list', 'names', 'catalogue', 'enhance', 'applicationTitle',
+  ($scope ,  $stateParams ,  $state ,  list ,  names ,  catalogue ,  enhance ,  applicationTitle ) ->
 
     if $stateParams.resource
-      applicationTitle  "#{names.getNaturalName($stateParams.resource)}s"
+      applicationTitle  catalogue.getPlural($stateParams.resource)
 
     $scope.list                     = list
-    $scope.title                    = names.getNaturalName($stateParams.resource) + ' List'
+    $scope.title                    = catalogue.getPlural($stateParams.resource)
     $scope.natural                  = (name) -> if name then names.getNaturalName(name) else "General"
     $scope.resource                 = $stateParams.resource
 
