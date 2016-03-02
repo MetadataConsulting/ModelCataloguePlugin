@@ -7,6 +7,8 @@ import org.modelcatalogue.core.util.FriendlyErrors
 
 enum ChangeType {
 
+    DATA_MODEL_CHANGED,
+
     NEW_ELEMENT_CREATED  {
         @Override
         boolean isUndoSupported() {

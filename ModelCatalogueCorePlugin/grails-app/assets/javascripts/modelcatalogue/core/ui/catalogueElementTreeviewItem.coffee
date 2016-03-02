@@ -183,6 +183,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
       reloadChildrenOnChange = (_, result, url) ->
         if result.link == $scope.element.link
           $scope.element.updateFrom result
+          $scope.element.$$loadChildren()
         if catalogue.isContentCandidate($scope.element[$scope.currentDescend], result, owner: $scope.element, url: url)
           $scope.element.$$loadChildren()
 
@@ -205,7 +206,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
       isForCurrentElement = (data) -> data[1].link is $scope.element.link
 
-      DEBOUNCE_TIME = 500
+      DEBOUNCE_TIME = 1000
 
       $scope.$eventToObservable('catalogueElementCreated').debounce(DEBOUNCE_TIME).subscribe doReloadChildrenOnChange
       $scope.$eventToObservable('catalogueElementUpdated').filter(isForCurrentElement).debounce(DEBOUNCE_TIME).subscribe doReloadChildrenOnChange
