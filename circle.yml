@@ -15,7 +15,8 @@ dependencies:
     - ~/.npm
 test:
   override:
-    - ./catalogue test
+    - ./catalogue test:
+       parallel: true
   post:
     - mkdir -p $CIRCLE_TEST_REPORTS/ModelCatalogueCorePlugin/reports
     - mv ModelCatalogueCorePlugin/target/reports/*  $CIRCLE_TEST_REPORTS/ModelCatalogueCorePlugin/reports 2>/dev/null || true
