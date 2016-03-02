@@ -1,6 +1,8 @@
 package org.modelcatalogue.core.util.builder
 
 import grails.util.GrailsNameUtils
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import groovy.util.logging.Log4j
 import org.modelcatalogue.builder.api.BuilderKeyword
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
@@ -24,6 +26,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
  * Practical example how the builder can be used are the imports present in the application or DSL MC files.
  *
  */
+@CompileStatic
 @Log4j class DefaultCatalogueBuilder extends AbstractCatalogueBuilder {
 
     /**
@@ -31,7 +34,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      *
      * @see #automatic(BuilderKeyword)
      */
-    private static Set<Class> SUPPORTED_FOR_AUTO = [DataType, EnumeratedType, ReferenceType, PrimitiveType]
+    private static Set<Class> SUPPORTED_FOR_AUTO = new LinkedHashSet<Class>([DataType, EnumeratedType, ReferenceType, PrimitiveType])
 
     /**
      * Repository handles fetching the right elements from the database based on id, value or classification.
@@ -102,7 +105,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         repository.clear()
         createAutomatically.clear()
 
-        repository.unclassifiedQueriesFor = [MeasurementUnit]
+        repository.unclassifiedQueriesFor = new LinkedHashSet<Class>([MeasurementUnit])
     }
 
     /**
@@ -203,7 +206,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         }
 
 
-        CatalogueElementProxy<? extends DataType> dataType = createProxy(type, parameters, DataElement, isUnderControlIfSameClassification(parameters))
+        CatalogueElementProxy<? extends DataType> dataType = createDataTypeProxy(type, parameters)
 
         context.withNewContext dataType, c
 
@@ -224,7 +227,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
             it.setParameter('dataType', dataType)
         }
 
-        context.withContextElement(DataType) { outerDataType, Closure relConf ->
+        context.withContextElement(DataType) { CatalogueElementProxy outerDataType, Closure relConf ->
             if (outerDataType.name == dataType.name) {
                 dataType.merge(outerDataType)
             } else {
@@ -233,6 +236,11 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         }
 
         dataType
+    }
+
+    @CompileDynamic
+    private CatalogueElementProxy<? extends DataType> createDataTypeProxy(Class<? extends DataType> type, Map<String, Object> parameters) {
+        createProxy(type, parameters, DataElement, isUnderControlIfSameClassification(parameters))
     }
 
     /**
@@ -407,7 +415,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @return proxy specified by given ID
      */
     ApiCatalogueElement ref(String id) {
-        repository.createProxy(CatalogueElement, [id: id])
+        repository.createProxy(CatalogueElement, [id: id as Object])
     }
 
     /**
@@ -669,7 +677,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         if (parameters.id) {
             element.setParameter('modelCatalogueId', parameters.id)
         } else if(idBuilder != null) {
-            element.setParameter('modelCatalogueId', idBuilder(element.name, domain))
+            element.setParameter('modelCatalogueId', getIdFromIdBuilder(element, domain))
         }
 
         if (parameters.classification || parameters.dataModel) {
@@ -687,6 +695,11 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         classifyIfNeeded element
 
         element
+    }
+
+    @CompileDynamic
+    private String getIdFromIdBuilder(ApiCatalogueElement element, Class domain) {
+        idBuilder(element.name, domain)
     }
 
     private boolean isUnderControlIfSameClassification(Map<String, Object> parameters) {

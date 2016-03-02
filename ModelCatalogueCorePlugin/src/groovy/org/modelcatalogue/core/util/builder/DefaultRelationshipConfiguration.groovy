@@ -1,7 +1,9 @@
 package org.modelcatalogue.core.util.builder
 
+import groovy.transform.CompileStatic
 import org.modelcatalogue.builder.api.RelationshipConfiguration
 
+@CompileStatic
 class DefaultRelationshipConfiguration implements RelationshipConfiguration {
 
     Map<String, String> extensions = [:]

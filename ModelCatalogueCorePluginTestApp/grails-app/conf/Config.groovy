@@ -209,7 +209,10 @@ log4j.main = {
 
     debug 'org.modelcatalogue.core.dataarchitect.xsd.XSDImporter'
 
-    debug 'org.modelcatalogue.core.util.builder'
+    // detailed feedback is now visible using the ProgressMonitor API
+    info 'org.modelcatalogue.core.util.builder'
+    info 'org.modelcatalogue.core.util.HibernateHelper' // for some reason the logging from builder is redirected here
+
     debug 'org.modelcatalogue.core.publishing'
     debug 'org.modelcatalogue.core.util.test'
     debug 'org.modelcatalogue.core.gel'

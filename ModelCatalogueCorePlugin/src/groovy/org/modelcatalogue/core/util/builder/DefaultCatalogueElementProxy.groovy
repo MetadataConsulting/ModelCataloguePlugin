@@ -1,12 +1,16 @@
 package org.modelcatalogue.core.util.builder
 
+import grails.compiler.GrailsCompileStatic
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.Legacy
 
-import static org.modelcatalogue.core.util.HibernateHelper.*
+import java.lang.reflect.Modifier
 
+import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
+
+@GrailsCompileStatic
 @Log4j class DefaultCatalogueElementProxy<T extends CatalogueElement> implements CatalogueElementProxy<T>, org.modelcatalogue.core.api.CatalogueElement {
 
     static final List<Class> KNOWN_DOMAIN_CLASSES = [Asset, CatalogueElement, DataModel, DataElement, DataType, EnumeratedType, ReferenceType, MeasurementUnit, DataClass, PrimitiveType]
@@ -82,10 +86,14 @@ import static org.modelcatalogue.core.util.HibernateHelper.*
             }
 
             try {
+                if (Modifier.isAbstract(domain.modifiers)) {
+                    throw new InstantiationException("$domain is abstract")
+                }
+
                 log.debug "$this not found, creating new one"
 
                 newlyCreated = true
-                resolved = fill(domain.newInstance())
+                resolved = fill(domain.newInstance() as T)
             } catch (InstantiationException ignored) {
                 throw new ReferenceNotPresentInTheCatalogueException("Cannot create element from reference $this")
             }
@@ -177,19 +185,20 @@ import static org.modelcatalogue.core.util.HibernateHelper.*
             }
             def currentValue = element.getProperty(key)
             if (value instanceof CatalogueElementProxy) {
-                def realValue = value.findExisting()
-                if (realValue?.latestVersionId && realValue?.latestVersionId != currentValue?.latestVersionId) {
-                    log.debug "$this has changed at least one property - property $key (different latest version id)\n\n===NEW===\n$realValue\n===OLD===\n${currentValue}\n========="
+                T realValue = (value as CatalogueElementProxy<T>).findExisting()
+                T typedCurrentValue = currentValue as T
+                if (realValue?.latestVersionId && realValue?.latestVersionId != typedCurrentValue?.latestVersionId) {
+                    log.debug "$this has changed at least one property - property $key (different latest version id)\n\n===NEW===\n$realValue\n===OLD===\n${typedCurrentValue}\n========="
                     return true
                 }
-                if (realValue?.modelCatalogueId != currentValue?.modelCatalogueId) {
-                    log.debug "$this has changed at least one property - property $key (different id)\n\n===NEW===\n$realValue\n===OLD===\n${currentValue}\n========="
+                if (realValue?.modelCatalogueId != typedCurrentValue?.modelCatalogueId) {
+                    log.debug "$this has changed at least one property - property $key (different id)\n\n===NEW===\n$realValue\n===OLD===\n${typedCurrentValue}\n========="
                     return true
                 }
                 return false
             }
             if (normalizeWhitespace(currentValue) != normalizeWhitespace(value)) {
-                if (key == 'modelCatalogueId' && Legacy.fixModelCatalogueId(value)?.toString()?.startsWith(element.getDefaultModelCatalogueId(true))) {
+                if (key == 'modelCatalogueId' && Legacy.fixModelCatalogueId(value?.toString())?.toString()?.startsWith(element.getDefaultModelCatalogueId(true))) {
                     return false
                 }
                 if (key == 'name' && parameters[CatalogueElementProxyRepository.AUTOMATIC_NAME_FLAG] && element.name) {
@@ -417,11 +426,12 @@ import static org.modelcatalogue.core.util.HibernateHelper.*
             if (key == 'name' && parameters[CatalogueElementProxyRepository.AUTOMATIC_NAME_FLAG] && element.name) return
             if (key == 'description' && parameters[CatalogueElementProxyRepository.AUTOMATIC_DESCRIPTION_FLAG] && element.description) return
             if (value instanceof CatalogueElementProxy) {
-                element.setProperty(key, value.resolve())
+                CatalogueElementProxy typedValue = value as CatalogueElementProxy
+                element.setProperty(key, typedValue.resolve())
                 return
             }
             if (value instanceof String) {
-                element.setProperty(key, value.trim())
+                element.setProperty(key, value.toString().trim())
             }
             element.setProperty(key, value)
         }
@@ -457,19 +467,21 @@ import static org.modelcatalogue.core.util.HibernateHelper.*
             return other
         }
 
-        other.extensions.each { String key, String value ->
+        DefaultCatalogueElementProxy<T> typedOther = other as DefaultCatalogueElementProxy<T>
+
+        typedOther.extensions.each { String key, String value ->
             if (value != null) {
                 setExtension(key, value)
             }
         }
 
-        other.parameters.each { String key, Object value ->
+        typedOther.parameters.each { String key, Object value ->
             if (value != null) {
                 setParameter(key, value)
             }
         }
 
-        other.relationships.each { RelationshipProxy relationship ->
+        typedOther.relationships.each { RelationshipProxy relationship ->
             if (repository.equals(this, relationship.source)) {
                 RelationshipProxy relationshipProxy = new RelationshipProxy(relationship.relationshipTypeName, this, relationship.destination, relationship.extensions)
                 addToPendingRelationships(relationshipProxy)
@@ -485,16 +497,16 @@ import static org.modelcatalogue.core.util.HibernateHelper.*
 
 
 
-        other.replacedBy = this
+        typedOther.replacedBy = this
 
-        if (domain != other.domain) {
-            if (domain.isAssignableFrom(other.domain)) {
-                domain = other.domain
+        if (domain != typedOther.domain) {
+            if (domain.isAssignableFrom(typedOther.domain)) {
+                domain = typedOther.domain
             }
         }
 
-        this.underControl = this.underControl || other.underControl
-        this.referenceNotPresentInTheCatalogue = this.referenceNotPresentInTheCatalogue || other.referenceNotPresentInTheCatalogue
+        this.underControl = this.underControl || typedOther.underControl
+        this.referenceNotPresentInTheCatalogue = this.referenceNotPresentInTheCatalogue || typedOther.referenceNotPresentInTheCatalogue
 
         this
     }

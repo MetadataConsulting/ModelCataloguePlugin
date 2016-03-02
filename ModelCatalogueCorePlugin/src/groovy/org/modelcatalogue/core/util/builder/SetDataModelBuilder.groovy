@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.util.builder
 
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import org.modelcatalogue.builder.api.BuilderKeyword
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.builder.api.RelationshipBuilder
@@ -11,6 +13,7 @@ import org.modelcatalogue.core.api.CatalogueElement
  * RelationshipBuilder is supplementary class to CatalogueBuilder handling part of the DSL dealing with creating
  * relationships.
  */
+@CompileStatic
 class SetDataModelBuilder implements RelationshipBuilder {
 
     /**
@@ -70,6 +73,7 @@ class SetDataModelBuilder implements RelationshipBuilder {
      * @param name name of the source
      * @param extensions closure defining the metadata
      */
+    @CompileDynamic
     void from(String classification, String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         context.withContextElement(org.modelcatalogue.core.CatalogueElement) {
             it.setParameter('dataModel', repository.createProxy(DataModel, [name: name, dataModel: repository.createProxy(DataModel, [name: classification])]))
@@ -104,6 +108,7 @@ class SetDataModelBuilder implements RelationshipBuilder {
         from element.name
     }
 
+    @CompileDynamic
     void from(String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         context.withContextElement(org.modelcatalogue.core.CatalogueElement) {
             it.setParameter('dataModel', repository.createProxy(DataModel, [name: name]))

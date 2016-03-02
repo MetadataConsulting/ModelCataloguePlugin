@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.util.builder
 
+import groovy.transform.CompileStatic
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
 import org.modelcatalogue.core.CatalogueElement
@@ -11,9 +12,10 @@ import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.api.RelationshipConfiguration
 
+@CompileStatic
 class CatalogueBuilderContext {
 
-    private static Set<Class> SUPPORTED_AS_CONTEXT  = [CatalogueElement, DataModel, DataType, DataClass, MeasurementUnit, DataElement]
+    private static Set<Class> SUPPORTED_AS_CONTEXT  = new LinkedHashSet<Class>([CatalogueElement, DataModel, DataType, DataClass, MeasurementUnit, DataElement])
 
     private List<Map<Class, ContextItem>> contexts = []
 
@@ -80,7 +82,7 @@ class CatalogueBuilderContext {
         if (!contextElement) {
             return contextElement
         }
-        ContextItem<T> item = new ContextItem<T>(element: contextElement)
+        ContextItem<T> item = new ContextItem<T>(element: contextElement as CatalogueElementProxy<T>)
         for (Class type in SUPPORTED_AS_CONTEXT) {
             if (type.isAssignableFrom(contextElement.domain)) {
                 contexts.last()[type] = item

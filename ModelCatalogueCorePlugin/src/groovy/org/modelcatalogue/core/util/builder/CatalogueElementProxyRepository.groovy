@@ -1,6 +1,9 @@
 package org.modelcatalogue.core.util.builder
 
+import com.google.common.collect.ImmutableSet
+import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
+import groovy.transform.CompileDynamic
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
@@ -11,13 +14,13 @@ import org.springframework.util.StopWatch
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
-@Log4j
+@Log4j @GrailsCompileStatic
 class CatalogueElementProxyRepository {
 
 
-    static Set<Class> HAS_UNIQUE_NAMES = [MeasurementUnit, DataModel]
+    static Set<Class> HAS_UNIQUE_NAMES = new LinkedHashSet<Class>([MeasurementUnit, DataModel])
 
-    static final Set<Class> DATA_TYPE_CLASSES = [EnumeratedType, ReferenceType, DataType, PrimitiveType]
+    static final Set<Class> DATA_TYPE_CLASSES = new LinkedHashSet<Class>([EnumeratedType, ReferenceType, DataType, PrimitiveType])
 
     static final String AUTOMATIC_NAME_FLAG = '__automatic_name__'
     static final String AUTOMATIC_DESCRIPTION_FLAG = '__automatic_description__'
@@ -161,7 +164,7 @@ class CatalogueElementProxyRepository {
                     return
                 }
                 try {
-                    CatalogueElement e = it.findExisting()
+                    CatalogueElement e = it.findExisting() as CatalogueElement
 
                     if (e) {
                         if (e.getLatestVersionId()) {
@@ -190,11 +193,11 @@ class CatalogueElementProxyRepository {
         // Step 3: resolve elements (set properties, update metadata)
         watch.start('resolving elements')
         logInfo "(4/6) resolving elements"
-        int elNumberOfPositions = Math.floor(Math.log10(elementProxiesToBeResolved.size())) + 2
+        int elNumberOfPositions = Math.floor(Math.log10(elementProxiesToBeResolved.size())).intValue() + 2
         elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
             logDebug "[${(i + 1).toString().padLeft(elNumberOfPositions, '0')}/${elementProxiesToBeResolved.size().toString().padLeft(elNumberOfPositions, '0')}] Resolving $element"
             try {
-                created << element.resolve()
+                created.add(element.resolve() as CatalogueElement)
                 relationshipProxiesToBeResolved.addAll element.pendingRelationships
             } catch (e) {
                 if (anyCause(e, ReferenceNotPresentInTheCatalogueException)) {
@@ -210,7 +213,7 @@ class CatalogueElementProxyRepository {
         watch.start('resolving relationships')
         Set<Long> resolvedRelationships = []
         logInfo "(5/6) resolving relationships"
-        int relNumberOfPositions = Math.floor(Math.log10(relationshipProxiesToBeResolved.size())) + 2
+        int relNumberOfPositions = Math.floor(Math.log10(relationshipProxiesToBeResolved.size())).intValue() + 2
         relationshipProxiesToBeResolved.eachWithIndex { RelationshipProxy relationshipProxy, i ->
             logDebug "[${(i + 1).toString().padLeft(relNumberOfPositions, '0')}/${relationshipProxiesToBeResolved.size().toString().padLeft(relNumberOfPositions, '0')}] Resolving $relationshipProxy"
             try {
@@ -231,7 +234,7 @@ class CatalogueElementProxyRepository {
                 if (!element.underControl) {
                     return
                 }
-                CatalogueElement catalogueElement = element.resolve()
+                CatalogueElement catalogueElement = element.resolve() as CatalogueElement
                 Set<Long> relations = []
                 relations.addAll catalogueElement.incomingRelationships*.getId()
                 relations.addAll catalogueElement.outgoingRelationships*.getId()
@@ -239,7 +242,7 @@ class CatalogueElementProxyRepository {
                 relations.removeAll resolvedRelationships
 
                 relations.collect { Relationship.get(it) } each {
-                    elementService.relationshipService.unlink(it.source, it.destination, it.relationshipType, it.dataModel, it.archived)
+                    unlink(it)
                 }
             }
         }
@@ -255,7 +258,7 @@ class CatalogueElementProxyRepository {
             ElementStatus status = element.getParameter('status') as ElementStatus
 
             try {
-                CatalogueElement catalogueElement = element.resolve()
+                CatalogueElement catalogueElement = element.resolve() as CatalogueElement
 
                 if (status && catalogueElement.status != status) {
                     if (status == ElementStatus.FINALIZED) {
@@ -281,6 +284,11 @@ class CatalogueElementProxyRepository {
         logInfo "Proxies resolved:\n${watch.prettyPrint()}"
 
         created
+    }
+
+
+    private Relationship unlink(Relationship relationship) {
+        elementService.relationshipService.unlink(relationship.source as CatalogueElement, relationship.destination as CatalogueElement, relationship.relationshipType as RelationshipType, relationship.dataModel, relationship.archived)
     }
 
     public <T extends CatalogueElement> CatalogueElementProxy<T> createProxy(Class<T> domain, Map<String, Object> parameters, boolean underControl = false) {
@@ -368,9 +376,7 @@ class CatalogueElementProxyRepository {
             return null
         }
 
-        DetachedCriteria<T> criteria = new DetachedCriteria<T>(type).build {
-            eq 'name', name.toString()
-        }
+        DetachedCriteria<T> criteria = getNameCriteria(type, name)
 
         if (dataModels) {
             T result = getLatestFromCriteria(dataModelService.classified(criteria, DataModelFilter.includes(dataModels)))
@@ -388,9 +394,7 @@ class CatalogueElementProxyRepository {
             }
         }
 
-        T result = getLatestFromCriteria(new DetachedCriteria<T>(type).build {
-            eq 'name', name.toString()
-        }, true)
+        T result = getLatestFromCriteria(getNameCriteria(type, name), true)
 
         // nothing found
         if (!result) {
@@ -411,8 +415,16 @@ class CatalogueElementProxyRepository {
         return null
     }
 
+    @CompileDynamic
+    private static <T> DetachedCriteria<T> getNameCriteria(Class<T> type, name) {
+        DetachedCriteria<T> criteria = new DetachedCriteria<T>(type).build {
+            eq 'name', name.toString()
+        }
+        criteria
+    }
+
     protected <T extends CatalogueElement> T findById(Class<T> type, Object id) {
-        elementService.findByModelCatalogueId(type, id?.toString())?.asType(type)
+        elementService.findByModelCatalogueId(type, id?.toString())?.asType(type) as T
     }
 
     private static <T extends CatalogueElement> T getLatestFromCriteria(DetachedCriteria<T> criteria, boolean unclassifiedOnly = false) {
@@ -420,7 +432,7 @@ class CatalogueElementProxyRepository {
         List<T> elements = criteria.list(params)
         if (elements) {
             if (!unclassifiedOnly || criteria.persistentEntity.javaClass in HAS_UNIQUE_NAMES) {
-                return elements.first()
+                return elements.first() as T
             }
             for (T element in elements) {
                 if (!element.dataModel) {
@@ -433,7 +445,7 @@ class CatalogueElementProxyRepository {
 
 
     public <T extends CatalogueElement,U extends CatalogueElement> Relationship resolveRelationship(RelationshipProxy<T,U> proxy) {
-        RelationshipType type = RelationshipType.readByName(proxy.relationshipTypeName)
+        RelationshipType type = RelationshipType.readByName(proxy.relationshipTypeName) as RelationshipType
 
         T sourceElement = proxy.source.resolve()
         U destinationElement = proxy.destination.resolve()
@@ -468,7 +480,7 @@ class CatalogueElementProxyRepository {
 
 
 
-        Relationship relationship = sourceElement.createLinkTo(destinationElement, type, archived: proxy.archived, resetIndices: true, skipUniqueChecking: proxy.source.new || proxy.destination.new)
+        Relationship relationship = sourceElement.createLinkTo(destinationElement, type, archived: proxy.archived as Object, resetIndices: true, skipUniqueChecking: (proxy.source.new || proxy.destination.new) as Object)
 
         createdRelationships[hash] = relationship
 
@@ -485,7 +497,7 @@ class CatalogueElementProxyRepository {
         return anyCause(th.cause, error)
     }
 
-    def <T extends CatalogueElement> T findByMissingReferenceId(String missingReferenceId) {
+    def static <T extends CatalogueElement> T findByMissingReferenceId(String missingReferenceId) {
         (T) ExtensionValue.findByNameAndExtensionValue(MISSING_REFERENCE_ID, missingReferenceId)?.element
     }
 

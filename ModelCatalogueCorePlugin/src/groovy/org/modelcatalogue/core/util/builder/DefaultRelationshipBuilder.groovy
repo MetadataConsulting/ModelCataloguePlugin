@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.util.builder
 
+import groovy.transform.CompileStatic
 import org.modelcatalogue.builder.api.BuilderKeyword
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.builder.api.RelationshipBuilder

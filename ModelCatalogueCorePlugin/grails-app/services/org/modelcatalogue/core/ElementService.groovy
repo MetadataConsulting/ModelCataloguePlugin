@@ -4,9 +4,11 @@ import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import grails.gorm.DetachedCriteria
 import grails.util.Environment
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.enumeration.LegacyEnumerations
 import org.modelcatalogue.core.publishing.CloningContext
@@ -23,11 +25,11 @@ class ElementService implements Publisher<CatalogueElement> {
 
     static transactional = false
 
-    def grailsApplication
-    def relationshipService
-    def modelCatalogueSearchService
+    GrailsApplication grailsApplication
+    RelationshipService relationshipService
+    SearchCatalogue modelCatalogueSearchService
     def messageSource
-    def auditService
+    AuditService auditService
 
     List<CatalogueElement> list(Map params = [:]) {
         CatalogueElement.findAllByStatusInList(getStatusFromParams(params), params)

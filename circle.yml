@@ -18,20 +18,20 @@ test:
     - ./catalogue test
   post:
     - mkdir -p $CIRCLE_TEST_REPORTS/ModelCatalogueCorePlugin/reports
-    - mv ModelCatalogueCorePlugin/target/reports/*  $CIRCLE_TEST_REPORTS/ModelCatalogueCorePlugin/reports
+    - mv ModelCatalogueCorePlugin/target/reports/*  $CIRCLE_TEST_REPORTS/ModelCatalogueCorePlugin/reports 2>/dev/null || true
     - mkdir -p $CIRCLE_TEST_REPORTS/ModelCatalogueCorePlugin/test-reports
-    - mv ModelCatalogueCorePlugin/target/test-reports/*  $CIRCLE_TEST_REPORTS/ModelCatalogueCorePlugin/test-reports
+    - mv ModelCatalogueCorePlugin/target/test-reports/*  $CIRCLE_TEST_REPORTS/ModelCatalogueCorePlugin/test-reports 2>/dev/null || true
     - mkdir -p $CIRCLE_TEST_REPORTS/ModelCatalogueDiscoursePlugin/test-reports
-    - mv ModelCatalogueDiscoursePlugin/target/test-reports/*  $CIRCLE_TEST_REPORTS/ModelCatalogueDiscoursePlugin/test-reports
+    - mv ModelCatalogueDiscoursePlugin/target/test-reports/*  $CIRCLE_TEST_REPORTS/ModelCatalogueDiscoursePlugin/test-reports 2>/dev/null || true
     - mkdir -p $CIRCLE_TEST_REPORTS/ModelCatalogueFormsPlugin/test-reports
-    - mv ModelCatalogueFormsPlugin/target/test-reports/*  $CIRCLE_TEST_REPORTS/ModelCatalogueFormsPlugin/test-reports
+    - mv ModelCatalogueFormsPlugin/target/test-reports/*  $CIRCLE_TEST_REPORTS/ModelCatalogueFormsPlugin/test-reports 2>/dev/null || true
     - mkdir -p $CIRCLE_TEST_REPORTS/ModelCatalogueGenomicsPlugin/test-reports
-    - mv ModelCatalogueGenomicsPlugin/target/test-reports/*  $CIRCLE_TEST_REPORTS/ModelCatalogueGenomicsPlugin/test-reports
+    - mv ModelCatalogueGenomicsPlugin/target/test-reports/*  $CIRCLE_TEST_REPORTS/ModelCatalogueGenomicsPlugin/test-reports 2>/dev/null || true
     - mkdir -p $CIRCLE_TEST_REPORTS/ModelCatalogueElasticSearchPlugin/test-reports
-    - mv ModelCatalogueElasticSearchPlugin/target/test-reports/*  $CIRCLE_TEST_REPORTS/ModelCatalogueElasticSearchPlugin/test-reports
+    - mv ModelCatalogueElasticSearchPlugin/target/test-reports/*  $CIRCLE_TEST_REPORTS/ModelCatalogueElasticSearchPlugin/test-reports 2>/dev/null || true
     - mkdir -p $CIRCLE_TEST_REPORTS/ModelCatalogueSpringSecurity2xPlugin/test-reports
-    - mv ModelCatalogueSpringSecurity2xPlugin/target/test-reports/*  $CIRCLE_TEST_REPORTS/ModelCatalogueSpringSecurity2xPlugin/test-reports
+    - mv ModelCatalogueSpringSecurity2xPlugin/target/test-reports/*  $CIRCLE_TEST_REPORTS/ModelCatalogueSpringSecurity2xPlugin/test-reports 2>/dev/null || true
     - mkdir -p $CIRCLE_TEST_REPORTS/ModelCatalogueCorePluginTestApp/geb-reports
-    - mv ModelCatalogueCorePluginTestApp/target/geb-reports/*  $CIRCLE_TEST_REPORTS/ModelCatalogueCorePluginTestApp/geb-reports
+    - mv ModelCatalogueCorePluginTestApp/target/geb-reports/*  $CIRCLE_TEST_REPORTS/ModelCatalogueCorePluginTestApp/geb-reports 2>/dev/null || true
     - mkdir -p $CIRCLE_TEST_REPORTS/ModelCatalogueCorePluginTestApp/test-reports
-    - mv ModelCatalogueCorePluginTestApp/target/test-reports/*  $CIRCLE_TEST_REPORTS/ModelCatalogueCorePluginTestApp/test-reports
+    - mv ModelCatalogueCorePluginTestApp/target/test-reports/*  $CIRCLE_TEST_REPORTS/ModelCatalogueCorePluginTestApp/test-reports 2>/dev/null || true

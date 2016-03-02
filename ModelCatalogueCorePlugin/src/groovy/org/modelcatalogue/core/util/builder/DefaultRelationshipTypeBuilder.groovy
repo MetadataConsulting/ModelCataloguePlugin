@@ -1,8 +1,10 @@
 package org.modelcatalogue.core.util.builder
 
+import groovy.transform.CompileStatic
 import org.modelcatalogue.builder.api.RelationshipTypeBuilder
 import org.modelcatalogue.core.RelationshipType
 
+@CompileStatic
 class DefaultRelationshipTypeBuilder implements RelationshipTypeBuilder {
 
     final RelationshipType relationshipType

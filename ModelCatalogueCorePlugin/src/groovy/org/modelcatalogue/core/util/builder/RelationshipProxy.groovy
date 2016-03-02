@@ -1,13 +1,13 @@
 package org.modelcatalogue.core.util.builder
 
+import groovy.transform.CompileStatic
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.builder.api.RelationshipConfiguration
-import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.util.FriendlyErrors
 
-@Log4j
+@Log4j @CompileStatic
 class RelationshipProxy<T extends CatalogueElement, U extends CatalogueElement> {
 
     final String relationshipTypeName

@@ -2,9 +2,11 @@ package org.modelcatalogue.core.util.builder
 
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import groovy.transform.CompileStatic
 
 import java.util.concurrent.TimeUnit
 
+@CompileStatic
 class BuildProgressMonitor implements Serializable, ProgressMonitor {
 
     static BuildProgressMonitor create(Serializable key, int stackSize = 5) {
