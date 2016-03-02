@@ -5,7 +5,7 @@ machine:
 dependencies:
   override:
     - ./setup-frontend.sh
-    - ./where grailsw run ./grailsw refresh-dependencies --non-interactive --stacktrace
+    - ./where grailsw run ./grailsw compile --non-interactive --stacktrace
   cache_directories:
     - "ModelCatalogueCorePlugin/node_modules"
     - ModelCatalogueCorePluginTestApp/target/work/plugins
