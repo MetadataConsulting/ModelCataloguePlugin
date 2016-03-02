@@ -2,6 +2,7 @@ package org.modelcatalogue.core.audit
 
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.DataModelFilter
 
@@ -70,8 +71,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.latestVersionId == vOne.id
         change.authorId == null
         change.property == 'status'
-        change.newValue == LoggingAuditor.storeValue(org.modelcatalogue.core.api.ElementStatus.FINALIZED)
-        change.oldValue == LoggingAuditor.storeValue(org.modelcatalogue.core.api.ElementStatus.DRAFT)
+        change.newValue == LoggingAuditor.storeValue(ElementStatus.FINALIZED)
+        change.oldValue == LoggingAuditor.storeValue(ElementStatus.DRAFT)
     }
 
     def "deprecation is logged"() {
@@ -91,8 +92,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.latestVersionId == vOne.id
         change.authorId == null
         change.property == 'status'
-        change.newValue == LoggingAuditor.storeValue(org.modelcatalogue.core.api.ElementStatus.DEPRECATED)
-        change.oldValue == LoggingAuditor.storeValue(org.modelcatalogue.core.api.ElementStatus.DRAFT)
+        change.newValue == LoggingAuditor.storeValue(ElementStatus.DEPRECATED)
+        change.oldValue == LoggingAuditor.storeValue(ElementStatus.DRAFT)
     }
 
     def "valid updating property is logged"() {
@@ -482,9 +483,9 @@ class AuditingIntegrationSpec extends IntegrationSpec {
     }
 
     def "creating draft is ignored as it is already logged as creating new version"() {
-        DataType type = new DataType(name: 'DT4DSI', status: org.modelcatalogue.core.api.ElementStatus.FINALIZED).save(failOnError: true, flush: true)
+        DataType type = new DataType(name: 'DT4DSI', status: ElementStatus.FINALIZED).save(failOnError: true, flush: true)
 
-        type.status = org.modelcatalogue.core.api.ElementStatus.DRAFT
+        type.status = ElementStatus.DRAFT
         type.save(failOnError: true, flush: true)
 
         Thread.sleep(100)
@@ -495,7 +496,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
     def "auditing can be disabled"() {
         DataType type = auditService.mute {
-             new DataType(name: 'DT4DIS', status: org.modelcatalogue.core.api.ElementStatus.FINALIZED).save(failOnError: true, flush: true)
+             new DataType(name: 'DT4DIS', status: ElementStatus.FINALIZED).save(failOnError: true, flush: true)
         }
 
         Thread.sleep(100)
@@ -507,7 +508,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
     def "you can set default author id"() {
         def defaultAuthorId = 1234567890
         DataType type = auditService.withDefaultAuthorId(defaultAuthorId) {
-            new DataType(name: 'DT4DA', status: org.modelcatalogue.core.api.ElementStatus.FINALIZED).save(failOnError: true, flush: true)
+            new DataType(name: 'DT4DA', status: ElementStatus.FINALIZED).save(failOnError: true, flush: true)
         }
 
         Thread.sleep(100)
