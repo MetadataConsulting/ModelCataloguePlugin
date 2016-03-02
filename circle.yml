@@ -1,18 +1,18 @@
 machine:
   java:
     version: oraclejdk8
+
 dependencies:
+  override:
+    - ./setup-frontend.sh
+    - ./where grailsw run ./grailsw refresh-dependencies --non-interactive --stacktrace
   cache_directories:
-    - ModelCatalogueCorePlugin/node_modules
+    - "ModelCatalogueCorePlugin/node_modules"
     - ModelCatalogueCorePluginTestApp/target/work/plugins
     - ~/.m2
     - ~/.grails/ivy-cache
     - ~/.grails/wrapper
     - ~/.npm
-dependencies:
-  override:
-    - ./setup-frontend.sh
-    - ./where grailsw run ./grailsw refresh-dependencies --non-interactive --stacktrace
 test:
   override:
     - ./catalogue test
