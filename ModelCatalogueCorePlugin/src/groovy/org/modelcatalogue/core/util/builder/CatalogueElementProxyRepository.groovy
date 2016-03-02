@@ -325,7 +325,7 @@ class CatalogueElementProxyRepository {
     public static <T extends CatalogueElement> T save(T element) {
         FriendlyErrors.withFriendlyFailure {
             element.save(/* flush: true, */ failOnError: true, deepValidate: false)
-        }
+        } as T
     }
 
     public <T extends CatalogueElement> T createDraftVersion(T element, CatalogueElementProxy proxy) {
