@@ -77,7 +77,7 @@ class ModelToFormExporterService {
     static final Set<String> DATA_TYPE_INTEGER_NAMES = ['int', 'integer', 'long', 'short', 'byte', 'xs:int', 'xs:integer', 'xs:long', 'xs:short', 'xs:byte','xs:nonNegativeInteger', 'xs:nonPositiveInteger', 'xs:negativeInteger', 'xs:positiveInteger', 'xs:unsignedLong', 'xs:unsignedInt', 'xs:unsignedShort', 'xs:unsignedByte']
     public static final ArrayList<String> DATA_TYPE_DATA_NAMES = ['date', 'xs:date']
     public static final ArrayList<String> DATA_TYPE_PDATE_NAMES = ['pdate', 'partialdate', 'xs:gYear', 'xs:gYearMonth']
-    
+
     private static class ItemIndex{private  int index=0}
 
 
@@ -192,7 +192,7 @@ class ModelToFormExporterService {
 
     private void generateItems(MutableInt itemNumber,String prefix, ItemContainer container, DataClass model, String aHeader = null, String aSubheader = null) {
         boolean first = true
-       
+
         for (Relationship rel in model.containsRelationships) {
             DataElement dataElement = rel.destination as DataElement
             DataType dataType = dataElement.dataType
@@ -213,7 +213,7 @@ class ModelToFormExporterService {
                 container.file(itemName)
             } else if (dataType && dataType.instanceOf(EnumeratedType)) {
                 // either value domain is marked as multiple or
-                Map<String, Object> enumOptions = (dataType as EnumeratedType).enumerations.collectEntries { key, value -> [value ?: key, key == ENUM_DEFAULT ? '' : key]}
+                Map<String, Object> enumOptions = (dataType as EnumeratedType).enumerationsObject.iterator().collectEntries { org.modelcatalogue.core.enumeration.Enumeration enumeration -> [enumeration.value ?: enumeration.key, enumeration.key == ENUM_DEFAULT ? '' : enumeration.key]}
                 if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) in [RESPONSE_TYPE_CHECKBOX, RESPONSE_TYPE_MULTI_SELECT] ||  rel.ext[EXT_MAX_OCCURS] && rel.ext[EXT_MAX_OCCURS] != '1') {
                     // multi select or checkbox (default)
                     if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) == RESPONSE_TYPE_MULTI_SELECT) {
@@ -259,7 +259,7 @@ class ModelToFormExporterService {
                 description fromCandidates(rel, candidates, EXT_ITEM_DESCRIPTION, dataElement.description)
                 question fromCandidates(rel, candidates, EXT_ITEM_QUESTION, localName)
                 def qNumber =fromCandidates(rel, candidates, EXT_ITEM_QUESTION_NUMBER)
-               
+
                 questionNumber =(qNumber==null?itemNumber.value++:qNumber)
                 if (!last.group) {
                     instructions generateItemElementId(dataElement,fromCandidates(rel, candidates, EXT_ITEM_INSTRUCTIONS),fromCandidates(rel, candidates, "id"),prefix+questionNumber) +generateItemInstructions(dataElement,fromCandidates(rel, candidates, EXT_ITEM_INSTRUCTIONS))
@@ -315,9 +315,9 @@ class ModelToFormExporterService {
             }
         }
     }
-    
+
     /**
-     * Generate an <span> element based on his datatype 
+     * Generate an <span> element based on his datatype
      * @param element
      * @param overridenInstructions
      * @return
@@ -326,37 +326,37 @@ class ModelToFormExporterService {
         if (overridenInstructions &&overridenInstructions.contains("</span>") &&overridenInstructions.contains("<span data-id")){
             return overridenInstructions.subSequence(overridenInstructions.indexOf("<span data-id"), overridenInstructions.indexOf("</span>")+7)
         }else{
-            //add a logic here to colect span ID and his associated datatype 
+            //add a logic here to colect span ID and his associated datatype
         }
-        
+
 
         DataType dataType=element?.dataType
         def regex=dataType?.regexDef?:''
         def dataTypeName=transformDataType(dataType)
         def defaultID=(spanID==null?defaultSpanID:spanID)
-        
+
         String hidden = "";
         String typeStr = " data-type=\"";
-        if("hidden"=="key")//TODO add additional metadata 
+        if("hidden"=="key")//TODO add additional metadata
         {
             hidden = " data-hidden=\"true\"";
         }
-        
+
         if(StringUtils.isNotEmpty(regex))
         {
             regex = " data-regex=\"" +  XmlUtil.escapeXml(dataType.regexDef) + "\"";
         }
-        
-        
+
+
         typeStr +=dataTypeName+ "\""
         return "<span data-id=\"" + defaultID+ "\"" +  typeStr + hidden + regex + "> </span>"
     }
-    
+
     /**
-     * Generate text description if was not already overriden. 
+     * Generate text description if was not already overriden.
      * @param element
      * @param overridenInstructions
-     * @return text description with or without previous saved instructions. Keep compatibility between old and new format. 
+     * @return text description with or without previous saved instructions. Keep compatibility between old and new format.
      */
     private static String  generateItemInstructions(DataElement element,String overridenInstructions){
        if (!overridenInstructions){
@@ -368,11 +368,11 @@ class ModelToFormExporterService {
             return overridenInstructions.substring(overridenInstructions.indexOf("</span>")+7)
        }
 
-       
+
        return '';
     }
-    
-    
+
+
     protected static transformDataType( DataType dataType) {
         if (dataType!=null){
             if (dataType instanceof EnumeratedType){
@@ -407,7 +407,7 @@ class ModelToFormExporterService {
             return dataType2.replaceAll(" ", "-").replaceAll("\\(", "").replaceAll("\\)", "").replaceAll("/", "-").toLowerCase()
         }
     }
-    
+
     private static FormDataType guessDataType(List<CatalogueElement> candidates, String extDataType) {
         if (extDataType) {
             switch (normalizeResponseType(extDataType)) {
