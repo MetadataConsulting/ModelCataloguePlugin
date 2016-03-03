@@ -1,13 +1,13 @@
 angular.module('mc.core.ui.states.controllers.ListWithDataModelCtrl', ['ui.router', 'mc.util.ui']).controller('mc.core.ui.states.controllers.ListWithDataModelCtrl', [
-  '$scope', '$stateParams', '$state', 'list', 'names', 'enhance', 'applicationTitle', 'currentDataModel'
-  ($scope ,  $stateParams ,  $state ,  list ,  names ,  enhance ,  applicationTitle ,  currentDataModel) ->
+  '$scope', '$stateParams', '$state', 'list', 'names', 'catalogue', 'enhance', 'applicationTitle', 'currentDataModel'
+  ($scope ,  $stateParams ,  $state ,  list ,  names ,  catalogue ,  enhance ,  applicationTitle ,  currentDataModel) ->
 
     if $stateParams.resource
-      applicationTitle  "#{names.getNaturalName($stateParams.resource)}s"
+      applicationTitle catalogue.getPlural($stateParams.resource)
 
     $scope.currentDataModel         = currentDataModel
     $scope.list                     = list
-    $scope.title                    = names.getNaturalName($stateParams.resource) + ' List'
+    $scope.title                    = applicationTitle catalogue.getPlural($stateParams.resource)
     $scope.natural                  = (name) -> if name then names.getNaturalName(name) else "General"
     $scope.resource                 = $stateParams.resource
 

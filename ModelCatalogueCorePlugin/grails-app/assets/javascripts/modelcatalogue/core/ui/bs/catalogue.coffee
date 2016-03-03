@@ -1,4 +1,7 @@
 angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalogueProvider', (catalogueProvider)->
+  catalogueProvider.setPlural 'dataClass', 'Data Classes'
+  catalogueProvider.setPlural 'batch', 'Batches'
+
   catalogueProvider.setIcon 'dataModel',          "fa fa-fw fa-book"
   catalogueProvider.setIcon 'classification',     "fa fa-fw fa-book"
   catalogueProvider.setIcon 'dataClass',          "fa fa-fw fa-cubes"

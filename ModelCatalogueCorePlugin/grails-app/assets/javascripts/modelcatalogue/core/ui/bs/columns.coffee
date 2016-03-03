@@ -26,29 +26,36 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
     return 'label-danger'   if status == 'DEPRECATED'
     return 'label-primary'
 
-  getClassificationsForDataElement = (dataElement) ->
-    return '' if not dataElement?.classifications
+  getDataModelAndDataElement = (dataElement) ->
+    result = ''
 
-    classificationNames = for classification in dataElement.classifications
-      """<a class="label #{getStatusClass(classification.status)}"  href='#/catalogue/classification/#{classification.id}'><span class="#{classification.getIcon()}"></span> #{classification.name}</a>"""
-    classificationNames.join(' ')
+    if dataElement.dataModel
+      result +=
+      """
+        <span>
+          <a class="label #{getStatusClass(dataElement.getDataModelStatus())}" href='#{dataElement.dataModel.href()}'><span class="#{dataElement.dataModel.getIcon()}"></span> #{dataElement.dataModel.name}</a>
+        </span>
+      """
+
+    result +=
+      """
+        <a class="small text-muted text-nowrap" href="#{dataElement.href()}">#{dataElement.getVersionAndId()}</a>
+      """
 
   # default
   columnsProvider.registerColumns 'org.modelcatalogue.core.DataClass', idNameAndDescription()
   columnsProvider.registerColumns 'org.modelcatalogue.core.Model',     idNameAndDescription()
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.DataElement', [
-    { header: 'Data Models',  value: getClassificationsForDataElement,  classes: 'col-md-2'}
-    { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-3", show: true, href: 'modelCatalogueId'}
-    { header: "Name", value: "name", classes: "col-md-3", show: true, href: 'href()', sort: {property: 'name', type: 'alpha'} }
-    { header: "Description", value: "description" , classes: "col-md-4"}
+    { header: 'Model / ID',  value: getDataModelAndDataElement,  classes: 'col-md-2'}
+    { header: "Name", value: "name", classes: "col-md-4", show: true, href: 'href()', sort: {property: 'name', type: 'alpha'} }
+    { header: "Description", value: "description" , classes: "col-md-6"}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.DataClass', [
-    { header: 'Data Models',  value: getClassificationsForDataElement,  classes: 'col-md-2'}
-    { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-3", show: true, href: 'modelCatalogueId'}
-    { header: "Name", value: "name", classes: "col-md-3", show: true, href: 'href()', sort: {property: 'name', type: 'alpha'} }
-    { header: "Description", value: "description" , classes: "col-md-4"}
+    { header: 'Model / ID',  value: getDataModelAndDataElement,  classes: 'col-md-2'}
+    { header: "Name", value: "name", classes: "col-md-4", show: true, href: 'href()', sort: {property: 'name', type: 'alpha'} }
+    { header: "Description", value: "description" , classes: "col-md-6"}
   ]
 
 

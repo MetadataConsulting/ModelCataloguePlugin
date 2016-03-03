@@ -7,7 +7,7 @@ angular.module('mc.core.ui.propertiesPane', []).directive 'propertiesPane',  [->
       title:        '@?'
       valueTitle:   '@?'
 
-    templateUrl: 'modelcatalogue/core/ui/propertiesPane.html'
+    templateUrl: '/mc/core/ui/propertiesPane.html'
 
     controller: ['$scope', ($scope) ->
       if not $scope.properties

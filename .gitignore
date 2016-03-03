@@ -20,3 +20,8 @@ ModelCatalogueCorePluginTestApp/test/integration/resources/rare_diseases_combine
 
 .default-mc-config-location
 .docker-ip
+
+### OsX
+.DS_Store
+.AppleDouble
+.LSOverride

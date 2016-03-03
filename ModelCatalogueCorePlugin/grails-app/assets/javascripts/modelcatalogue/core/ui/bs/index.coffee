@@ -7,7 +7,6 @@ angular.module('mc.core.ui.bs', [
   'ngCookies'
   'infinite-scroll'
   # list of modules
-  'mc.core.ui.bs.infiniteTable'
   'mc.core.ui.bs.infiniteList'
   'mc.core.ui.bs.catalogueElementView'
   'mc.core.ui.bs.csvTransformationView'
@@ -21,7 +20,6 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptNewCatalogueXmlImport'
   'mc.core.ui.bs.batchView'
   'mc.core.ui.bs.catalogueElementProperties'
-  'mc.core.ui.bs.propertiesPane'
   'mc.core.ui.bs.actions'
   'mc.core.ui.bs.catalogueElementActions'
   'mc.core.ui.bs.navigationActions'
