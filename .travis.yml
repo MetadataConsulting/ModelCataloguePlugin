@@ -12,15 +12,7 @@ addons:
   s3_region: us-east-1 # should be default but just to be sure
   artifacts:
     paths:
-      - ModelCatalogueCorePlugin/target/reports/
-      - ModelCatalogueCorePlugin/target/test-reports/
-      - ModelCatalogueDiscoursePlugin/target/test-reports/
-      - ModelCatalogueFormsPlugin/target/test-reports/
-      - ModelCatalogueGenomicsPlugin/target/test-reports/
-      - ModelCatalogueElasticSearchPlugin/target/test-reports/
-      - ModelCatalogueSpringSecurity2xPlugin/target/test-reports/
-      - ModelCatalogueCorePluginTestApp/target/geb-reports/
-      - ModelCatalogueCorePluginTestApp/target/test-reports/
+      - ~/reports
 env:
   - TEST_SUITE=app_functional_a
   - TEST_SUITE=app_functional_b

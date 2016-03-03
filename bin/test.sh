@@ -80,6 +80,8 @@ cd ModelCatalogueCorePlugin
 # karma tests, part of the integration as they needs the fixtures generated from the integration tests
 if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "" ] ; then
     ./node_modules/karma/bin/karma start --single-run --browsers Firefox
+    mkdir -p $HOME/reports/karma-tests-reports
+    cp -Rf target/reports $HOME/reports/karma-tests-reports
 fi
 cd ..
 
@@ -102,25 +104,33 @@ fi
 if [ "$TEST_SUITE" = "functional" ] || [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "" ] ; then
     ./grailsw test-app functional: -war --non-interactive
     mkdir -p $HOME/reports/test-app-functional-tests-reports
+    mkdir -p $HOME/reports/test-app-functional-geb-reports
     cp -Rf target/test-reports $HOME/reports/test-app-functional-tests-reports
+    cp -Rf target/geb-reports $HOME/reports/test-app-functional-geb-reports
 fi
 
 if [ "$TEST_SUITE" = "app_functional_a" ] ; then
     ./grailsw test-app functional: org.modelcatalogue.core.a.**.* -war --non-interactive
-    mkdir -p $HOME/reports/test-app-functional-tests-reports
-    cp -Rf target/test-reports $HOME/reports/test-app-functional-tests-reports
+    mkdir -p $HOME/reports/test-app-functional-a-tests-reports
+    mkdir -p $HOME/reports/test-app-functional-a-geb-reports
+    cp -Rf target/test-reports $HOME/reports/test-app-functional-a-tests-reports
+    cp -Rf target/geb-reports $HOME/reports/test-app-functional-a-geb-reports
 fi
 
 if [ "$TEST_SUITE" = "app_functional_b" ] ; then
     ./grailsw test-app functional: org.modelcatalogue.core.b.**.* -war --non-interactive
-    mkdir -p $HOME/reports/test-app-functional-tests-reports
-    cp -Rf target/test-reports $HOME/reports/test-app-functional-tests-reports
+    mkdir -p $HOME/reports/test-app-functional-b-tests-reports
+    mkdir -p $HOME/reports/test-app-functional-b-geb-reports
+    cp -Rf target/geb-reports $HOME/reports/test-app-functional-b-tests-reports
+    cp -Rf target/test-reports $HOME/reports/test-app-functional-b-geb-reports
 fi
 
 if [ "$TEST_SUITE" = "app_functional_c" ] ; then
     ./grailsw test-app functional: org.modelcatalogue.core.c.**.* -war --non-interactive
-    mkdir -p $HOME/reports/test-app-functional-tests-reports
-    cp -Rf target/test-reports $HOME/reports/test-app-functional-tests-reports
+    mkdir -p $HOME/reports/test-app-functional-c-tests-reports
+    mkdir -p $HOME/reports/test-app-functional-c-geb-reports
+    cp -Rf target/test-reports $HOME/reports/test-app-functional-c-tests-reports
+    cp -Rf target/geb-reports $HOME/reports/test-app-functional-c-geb-reports
 fi
 
 cd ..
