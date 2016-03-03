@@ -9,8 +9,8 @@ cache:
     - $HOME/.grails/ivy-cache
     - $HOME/.grails/wrapper
 addons:
-  artifacts: true
   s3_region: eu_central_1
+  artifacts:
     paths:
       - ModelCatalogueCorePlugin/target/reports/
       - ModelCatalogueCorePlugin/target/test-reports/
