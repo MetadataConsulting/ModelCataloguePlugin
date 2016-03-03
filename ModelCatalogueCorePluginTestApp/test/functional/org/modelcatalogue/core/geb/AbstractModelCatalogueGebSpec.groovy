@@ -9,10 +9,7 @@ import org.openqa.selenium.logging.LogEntries
 import org.openqa.selenium.logging.LogEntry
 import org.openqa.selenium.logging.LogType
 
-import static org.modelcatalogue.core.geb.Common.backdrop
-import static org.modelcatalogue.core.geb.Common.closeGrowlMessage
-import static org.modelcatalogue.core.geb.Common.existing
-import static org.modelcatalogue.core.geb.Common.prefer
+import static org.modelcatalogue.core.geb.Common.*
 
 abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
@@ -388,5 +385,4 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         click 'div.modal .btn-primary'
         check backdrop gone
     }
-
 }

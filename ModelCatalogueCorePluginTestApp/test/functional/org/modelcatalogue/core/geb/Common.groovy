@@ -43,4 +43,7 @@ class Common {
     static final Keywords last = Keywords.LAST
     static final Keywords first = Keywords.FIRST
     static final Keywords once = Keywords.ONCE
+
+    static final CatalogueAction inlineEdit = CatalogueAction.runFirst('item-detail', 'inline-edit')
+    static final CatalogueAction inlineEditSubmit = CatalogueAction.runFirst('item-detail', 'inline-edit-submit')
 }

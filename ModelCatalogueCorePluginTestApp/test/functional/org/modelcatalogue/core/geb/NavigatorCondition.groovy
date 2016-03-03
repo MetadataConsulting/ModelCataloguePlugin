@@ -65,6 +65,13 @@ class NavigatorCondition {
         }
     }
 
+    boolean missing(String text) {
+        isDisplayed()
+        spec.noStale(NUM_OF_RETRIES, navigator) {
+            !it.text().contains(text)
+        }
+    }
+
     SizeCondition present(int times) {
         return new SizeCondition(times, this)
     }
