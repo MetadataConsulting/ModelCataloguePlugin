@@ -38,7 +38,7 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
     if element and angular.isFunction(element.isInstanceOf)
       if element.isInstanceOf('catalogueElement')
         properties.push(label: 'Model Catalogue ID', value: -> element.modelCatalogueId)
-        properties.push(label: 'Data Model', value: -> element.classifications) if not element.isInstanceOf('classification')
+        properties.push(label: 'Data Model', value: -> element.dataModel) if element.dataModel
       if element.isInstanceOf('dataElement')
         properties.push label: 'Data Type', value: -> element.dataType
       if element.isInstanceOf('dataType')
