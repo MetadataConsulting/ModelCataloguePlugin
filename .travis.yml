@@ -8,7 +8,9 @@ cache:
     - $HOME/.m2
     - $HOME/.grails/ivy-cache
     - $HOME/.grails/wrapper
-
+addons:
+  artifacts: true
+  s3_region: eu_central_1
 env:
   - TEST_SUITE=app_functional_a
   - TEST_SUITE=app_functional_b
