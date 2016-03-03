@@ -18,6 +18,7 @@ test:
     - ./catalogue test:
        parallel: true
   post:
+    - echo "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX"
     - mkdir -p "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueCorePlugin/reports"
     - mv ModelCatalogueCorePlugin/target/reports/*  "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueCorePlugin/reports" || true
     - mkdir -p "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueCorePlugin/test-reports"
