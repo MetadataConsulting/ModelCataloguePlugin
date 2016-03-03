@@ -31,7 +31,7 @@ before_install:
 script:
   - "./catalogue test"
 after_script:
-- ./update-gh-pages.sh
+  - "./catalogue collect reports"
 
 # deployment
 before_deploy: "./war.sh"
