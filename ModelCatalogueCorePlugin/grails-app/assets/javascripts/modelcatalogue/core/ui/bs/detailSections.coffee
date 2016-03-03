@@ -310,6 +310,16 @@ x in ['apple', 'banana', 'cherry']
       copy.rule = example
 
   detailSectionsProvider.register {
+    title: 'Description'
+    position: -50
+    types: [
+      'catalogueElement'
+    ]
+    keys: []
+    template: 'modelcatalogue/core/ui/detailSections/description.html'
+  }
+
+  detailSectionsProvider.register {
     title: 'Enumerations'
     position: -40
     types: [
@@ -340,16 +350,6 @@ x in ['apple', 'banana', 'cherry']
     ]
     keys: []
     template: 'modelcatalogue/core/ui/detailSections/dataType.html'
-  }
-
-  detailSectionsProvider.register {
-      title: 'Model Catalogue ID'
-      position: -20
-      types: [
-        'catalogueElement'
-      ]
-      keys: []
-      template: 'modelcatalogue/core/ui/detailSections/modelCatalogueId.html'
   }
 
   detailSectionsProvider.register {
@@ -418,13 +418,13 @@ x in ['apple', 'banana', 'cherry']
   }
 
   detailSectionsProvider.register {
-    title: 'Description'
+    title: 'Model Catalogue ID'
     position: 0
     types: [
       'catalogueElement'
     ]
     keys: []
-    template: 'modelcatalogue/core/ui/detailSections/description.html'
+    template: 'modelcatalogue/core/ui/detailSections/modelCatalogueId.html'
   }
 
   detailSectionsProvider.register {
