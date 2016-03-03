@@ -1,19 +1,19 @@
 Model Catalogue Grails Plugin
 ====================
-[![Build Status](https://travis-ci.org/MetadataRegistry/ModelCataloguePlugin.svg?branch=develop)](https://travis-ci.org/MetadataRegistry/ModelCataloguePlugin) [![Gitter](https://badges.gitter.im/Join Chat.svg)] (https://gitter.im/MetadataRegistry/ModelCataloguePlugin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/MetadataRegistry/ModelCataloguePlugin.svg?branch=develop)](https://travis-ci.org/MetadataRegistry/ModelCataloguePlugin) [![Gitter](https://badges.gitter.im/Join Chat.svg)] (https://gitter.im/MetadataRegistry/ModelCataloguePlugin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [Test Results](http://mc-travis-results.orany.cz.s3.amazonaws.com/index.html?prefix=MetadataRegistry/ModelCataloguePlugin)
 
 To use the model catalogue core plugin in your grails app, include the following in your BuildConfig.groovy:
 
 ```
-repositories {	 
+repositories {
     mavenRepo 'http://dl.bintray.com/modelcatalogue-core/ModelCatalogueCorePlugin'
 }
 ```
 
-and 
+and
 
 ```
-plugins{ 
+plugins{
     compile "org.modelcatalogue.plugins:grails-model-catalogue-core-plugin:<version>"
 }
 ```
@@ -29,14 +29,14 @@ registry.
 
 ### Requirements
 
-To run application locally you need following installed on your machine 
+To run application locally you need following installed on your machine
 
   * [Java](https://java.com/en/download/)
   * [NodeJS](https://nodejs.org/download/)
-  * [Git](http://git-scm.com/) (Alternatively you can download the latest snapshot [in ZIP archive](https://github.com/MetadataRegistry/ModelCataloguePlugin/archive/develop.zip)) 
-  
+  * [Git](http://git-scm.com/) (Alternatively you can download the latest snapshot [in ZIP archive](https://github.com/MetadataRegistry/ModelCataloguePlugin/archive/develop.zip))
+
 To verify you have these requirements installed try following commands in the terminal:
- 
+
 ```
 java -version
 node --version
@@ -45,12 +45,12 @@ git --version
 ```
 
 All tools should return their versions.
-  
+
 
 ### Launching the application
 
 Model Catalogue provides rich web client which requires some other tools to be installed before launching the application.
-You need to install required NodeJS tools and dependencies for the JavaScript frontend. 
+You need to install required NodeJS tools and dependencies for the JavaScript frontend.
 
 ```
 git clone https://github.com/MetadataRegistry/ModelCataloguePlugin.git
@@ -78,9 +78,9 @@ open ModelCataloguePlugin/ModelCatalogueCorePluginTestApp/grails-app/conf/DataSo
 
 There are three default users available
 
-Username      | Description 
-------------- | -------------  
-viewer        | User with role `VIEWER` can only browse the catalogue without any   
+Username      | Description
+------------- | -------------
+viewer        | User with role `VIEWER` can only browse the catalogue without any
 curator       | User with role `CURATOR` has most of the privileges except editing relationship types and user management
 admin         | User with role `ADMIN`  has all the privileges
 
@@ -94,7 +94,7 @@ You find the code where new users are crated around line 40 so change the `passw
 solid passwords.
 
 
-When everything set up you can run the application with `./grailsw prod run-app`. You can also create a WAR file running 
+When everything set up you can run the application with `./grailsw prod run-app`. You can also create a WAR file running
 `./grailsw war`and than deploy the WAR file located under the `target` folder to your web server such as Tomcat.
 
 When application has started you can navigate to your browser to `http://localhost:8080/ModelCatalogueCorePluginTestApp`
