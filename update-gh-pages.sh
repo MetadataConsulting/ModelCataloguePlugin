@@ -2,14 +2,15 @@
 
 if [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "app_functional_a" ]|| [ "$TEST_SUITE" = "app_functional_b" ]|| [ "$TEST_SUITE" = "app_functional_c" ] ; then
   echo "Starting to update gh-pages\n"
+  set +x
 
   #copy data we're interested in to other place
-  mkdir -p $HOME/reports/last-tests-reports
-  cp -Rf ModelCatalogueCorePlugin/target/test-reports "$HOME/$TEST_SUITE/reports/last-tests-reports"
-  mkdir -p $HOME/reports/test-app-last-tests-reports
-  cp -Rf ModelCatalogueCorePluginTestApp/target/test-reports "$HOME/$TEST_SUITE/reports/test-app-last-tests-reports"
-  mkdir -p $HOME/reports/test-app-functional-geb-reports
-  cp -Rf ModelCatalogueCorePluginTestApp/target/geb-reports "$HOME/$TEST_SUITE/reports/test-app-functional-geb-reports"
+  mkdir -p "$HOME/$TEST_SUITE/reports/last-tests-reports"
+  cp -Rf ModelCatalogueCorePlugin/target/test-reports "$HOME/$TEST_SUITE/reports/last-tests-reports" || true
+  mkdir -p "$HOME/$TEST_SUITE/reports/test-app-last-tests-reports"
+  cp -Rf ModelCatalogueCorePluginTestApp/target/test-reports "$HOME/$TEST_SUITE/reports/test-app-last-tests-reports" || true
+  mkdir -p "$HOME/$TEST_SUITE/reports/test-app-functional-geb-reports"
+  cp -Rf ModelCatalogueCorePluginTestApp/target/geb-reports "$HOME/$TEST_SUITE/reports/test-app-functional-geb-reports" || true
 
   #go to home and setup git
   cd $HOME
