@@ -68,8 +68,6 @@ describe("mc.util.MessagingClient module", function() {
         });
 
         it("send", function() {
-            console.log(MessagingClient._getStompClient());
-
             MessagingClient.send('/foo/bar', {}, {foo: 'bar'});
 
             $rootScope.$apply();

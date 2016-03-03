@@ -1,6 +1,7 @@
 angular.module 'mc.core', [
   # depends on util
   'mc.util'
+  'ui.bootstrap'
   # list of modules
   'mc.core.catalogueElementEnhancer'
   'mc.core.catalogueElementResource'

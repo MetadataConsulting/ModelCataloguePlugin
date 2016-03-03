@@ -7,11 +7,9 @@ module.exports = function(config) {
         browsers: [
             'Chrome',
             'Firefox'
-            // 'Safari',  // Safari keeps old tabs open causing testing multiple times
         ],
-        reporters: ['progress', 'junit', 'coverage', 'osx'],
-        singleRun: false,
-        autoWatch : true,
+        reporters: ['progress', 'junit', 'coverage'],
+        singleRun: true,
 
         coverageReporter: {
             type: 'lcovonly',
@@ -46,6 +44,7 @@ module.exports = function(config) {
             'grails-app/assets/javascripts/modelcatalogue/modelcatalogue.coffee',
             'grails-app/assets/javascripts/**/*.coffee',
             'grails-app/assets/javascripts/**/*.js',
+            'grails-app/assets/javascripts/**/*.tpl.html',
 
             // Angular Mock
             'grails-app/assets/bower_components/angular-mocks/angular-mocks.js',
@@ -62,14 +61,14 @@ module.exports = function(config) {
             'karma-jasmine',
             'karma-chrome-launcher',
             'karma-firefox-launcher',
-            'karma-safari-launcher',
             'karma-junit-reporter',
-            'karma-osx-reporter',
-            'karma-coffee-preprocessor'
+            'karma-coffee-preprocessor',
+            'karma-ng-html2js-preprocessor'
         ],
 
         preprocessors: {
-            '**/*.coffee': ['coffee']
+            '**/*.coffee': ['coffee'],
+            '**/*.html': ['ng-html2js']
         },
 
         coffeePreprocessor: {
@@ -81,6 +80,23 @@ module.exports = function(config) {
             // transforming the filenames
             transformPath: function(path) {
                 return path.replace(/\.js$/, '.coffee');
+            }
+        },
+        ngHtml2JsPreprocessor: {
+            cacheIdFromPath: function(filepath) {
+                // example strips 'public/' from anywhere in the path
+                // module(app/templates/template.html) => app/public/templates/template.html
+                return filepath.replace('grails-app/assets/javascripts', '').replace('templates/', '').replace('.tpl', '');
+            },
+
+            // - setting this option will create only a single module that contains templates
+            //   from all the files, so you can load them all with module('foo')
+            // - you may provide a function(htmlPath, originalPath) instead of a string
+            //   if you'd like to generate modules dynamically
+            //   htmlPath is a originalPath stripped and/or prepended
+            //   with all provided suffixes and prefixes
+            moduleName: function(htmlPath) {
+                return htmlPath.substring(1, htmlPath.lastIndexOf('/')).replace(/\//g,'.');
             }
         }
     });

@@ -1,7 +1,6 @@
 describe "mc.core.ui.catalogueElementTreeviewItem", ->
 
   beforeEach module 'mc.core.ui.states.bs'
-  beforeEach module 'mc.core.ui.bs.catalogueElementTreeviewItem'
 
   it "element get compiled",  inject ($compile, $rootScope, enhance, modelCatalogueApiRoot, $httpBackend) ->
     $httpBackend.when('GET', '/api/modelCatalogue/core/dashboard').respond(fixtures.dashboard.index)
@@ -14,7 +13,7 @@ describe "mc.core.ui.catalogueElementTreeviewItem", ->
     $rootScope.element = catEl
     $rootScope.descend = ['outgoingRelationships']
     $rootScope.treeview =
-      select: (element) -> console.log element
+      select: -> # do nothing
 
     element = $compile('''
       <catalogue-element-treeview-item element="element" descend="descend" treeview="treeview"></catalogue-element-treeview-item>

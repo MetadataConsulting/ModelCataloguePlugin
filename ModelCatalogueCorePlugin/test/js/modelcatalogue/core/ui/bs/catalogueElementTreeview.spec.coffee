@@ -1,7 +1,6 @@
 describe "mc.core.ui.catalogueElementTreeview", ->
 
-  beforeEach module 'mc.core.ui.bs.catalogueElementTreeview'
-  beforeEach module 'mc.core.ui.bs.catalogueElementTreeviewItem'
+  beforeEach module 'mc.core.ui'
 
   it "treeview with single element",  inject ($compile, $rootScope, enhance) ->
 
@@ -34,7 +33,4 @@ describe "mc.core.ui.catalogueElementTreeview", ->
     $rootScope.$digest()
 
     expect(element.find(':first-child').prop('tagName').toLowerCase()).toBe('ul')
-
-    console.log element.find('li')
-
-    expect(element.find('li').length).toBe(2)
+    expect(element.find('li').length).toBe(3)
