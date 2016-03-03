@@ -22,10 +22,9 @@ if [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "app_functional_a" 
   #go into directory and copy data we're interested in to that directory
   cd gh-pages
 
-  rm -rf ./reports/latest/
-  rm -rf "./$TEST_SUITE/reports/latest/"
-  mkdir -p ./reports/latest/
-  cp -Rf "$HOME/$TEST_SUITE/reports/* ./$TEST_SUITE/reports/latest/"
+  rm -rf ./$TEST_SUITE/reports/
+  mkdir -p ./$TEST_SUITE/reports/
+  cp -Rf "$HOME/$TEST_SUITE/reports/* ./$TEST_SUITE/reports/"
 
   #add, commit and push files
   git add -A .
