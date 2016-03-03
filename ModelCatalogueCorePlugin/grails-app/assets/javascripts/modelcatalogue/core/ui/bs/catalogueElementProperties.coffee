@@ -206,6 +206,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataType.hasAttachmentOf', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataType.properties', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataType.isSynonymFor', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataType.$$relationship', hidden: true
 
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.EnumeratedType.hasAttachmentOf', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.EnumeratedType.properties', hidden: true
