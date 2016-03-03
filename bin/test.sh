@@ -2,7 +2,6 @@
 
 # fail if any line fails
 set -e
-set -x
 
 date ; echo -e "\n"
 
@@ -39,14 +38,14 @@ fi
 if [ "$TEST_SUITE" = "unit" ] || [ "$TEST_SUITE" = "core_unit" ] || [ "$TEST_SUITE" = "" ] ; then
     ./grailsw test-app unit: --non-interactive
     mkdir -p "$HOME/reports/unit-tests-reports"
-    cp -Rf target/test-reports "$HOME/reports/unit-tests-reports"
+    cp -Rf target/test-reports/ "$HOME/reports/unit-tests-reports"
 fi
 
 # plugin integration all tests
 if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "" ] ; then
     ./grailsw test-app integration:
     mkdir -p "$HOME/reports/fast-integration-tests-reports"
-    cp -Rf target/test-reports "$HOME/reports/fast-integration-tests-reports"
+    cp -Rf target/test-reports/ "$HOME/reports/fast-integration-tests-reports"
 fi
 
 
@@ -54,26 +53,30 @@ fi
 if [ "$TEST_SUITE" = "core_integration" ] ; then
     ./grailsw test-app integration: org.modelcatalogue.**.* --non-interactive
     mkdir -p "$HOME/reports/fast-integration-tests-reports"
-    cp -Rf target/test-reports "$HOME/reports/fast-integration-tests-reports"
+    cp -Rf target/test-reports/ "$HOME/reports/fast-integration-tests-reports"
 fi
 
 # slow and polluting (imports)
 if [ "$TEST_SUITE" = "core_integration_slow" ]  ; then
     ./grailsw test-app integration: x.org.modelcatalogue.**.* --non-interactive
     mkdir -p "$HOME/reports/slow-integration-tests-reports"
-    cp -Rf target/test-reports "$HOME/reports/slow-integration-tests-reports"
+    cp -Rf target/test-reports/ "$HOME/reports/slow-integration-tests-reports"
 fi
 cd ..
 
 cd ModelCatalogueFormsPlugin
 if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "forms_integration" ] || [ "$TEST_SUITE" = "" ] ; then
     ./grailsw test-app integration: --non-interactive
+    mkdir -p "$HOME/reports/forms-integration-tests-reports"
+    cp -Rf target/test-reports/ "$HOME/reports/forms-integration-tests-reports"
 fi
 cd ..
 
 cd ModelCatalogueElasticSearchPlugin
 if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "es_integration" ] || [ "$TEST_SUITE" = "" ] ; then
     ./grailsw test-app integration: --non-interactive
+    mkdir -p "$HOME/reports/es-integration-tests-reports"
+    cp -Rf target/test-reports/ "$HOME/reports/es-integration-tests-reports"
 fi
 cd ..
 
@@ -82,7 +85,7 @@ cd ModelCatalogueCorePlugin
 if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "" ] ; then
     ./node_modules/karma/bin/karma start --single-run --browsers Firefox
     mkdir -p "$HOME/reports/karma-tests-reports"
-    cp -Rf target/reports "$HOME/reports/karma-tests-reports"
+    cp -Rf target/reports/ "$HOME/reports/karma-tests-reports"
 fi
 cd ..
 
@@ -99,39 +102,43 @@ fi
 if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "app_integration" ] || [ "$TEST_SUITE" = "" ] ; then
     ./grailsw test-app integration: --non-interactive
     mkdir -p "$HOME/reports/test-app-integration-tests-reports"
-    cp -Rf target/test-reports "$HOME/reports/test-app-integration-tests-reports"
+    cp -Rf target/test-reports/ "$HOME/reports/test-app-integration-tests-reports"
 fi
 
 if [ "$TEST_SUITE" = "functional" ] || [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "" ] ; then
+    set -x
     ./grailsw test-app functional: -war --non-interactive
     mkdir -p "$HOME/reports/test-app-functional-tests-reports"
     mkdir -p "$HOME/reports/test-app-functional-geb-reports"
-    cp -Rf target/test-reports "$HOME/reports/test-app-functional-tests-reports"
-    cp -Rf target/geb-reports "$HOME/reports/test-app-functional-geb-reports"
+    cp -Rf target/test-reports/ "$HOME/reports/test-app-functional-tests-reports"
+    cp -Rf target/geb-reports/ "$HOME/reports/test-app-functional-geb-reports"
 fi
 
 if [ "$TEST_SUITE" = "app_functional_a" ] ; then
+    set -x
     ./grailsw test-app functional: org.modelcatalogue.core.a.**.* -war --non-interactive
     mkdir -p "$HOME/reports/test-app-functional-a-tests-reports"
     mkdir -p "$HOME/reports/test-app-functional-a-geb-reports"
-    cp -Rf target/test-reports "$HOME/reports/test-app-functional-a-tests-reports"
-    cp -Rf target/geb-reports "$HOME/reports/test-app-functional-a-geb-reports"
+    cp -Rf target/test-reports/ "$HOME/reports/test-app-functional-a-tests-reports"
+    cp -Rf target/geb-reports/ "$HOME/reports/test-app-functional-a-geb-reports"
 fi
 
 if [ "$TEST_SUITE" = "app_functional_b" ] ; then
+    set -x
     ./grailsw test-app functional: org.modelcatalogue.core.b.**.* -war --non-interactive
     mkdir -p "$HOME/reports/test-app-functional-b-tests-reports"
     mkdir -p "$HOME/reports/test-app-functional-b-geb-reports"
-    cp -Rf target/geb-reports "$HOME/reports/test-app-functional-b-tests-reports"
-    cp -Rf target/test-reports "$HOME/reports/test-app-functional-b-geb-reports"
+    cp -Rf target/test-reports/ "$HOME/reports/test-app-functional-b-tests-reports"
+    cp -Rf target/geb-reports/ "$HOME/reports/test-app-functional-b-geb-reports"
 fi
 
 if [ "$TEST_SUITE" = "app_functional_c" ] ; then
+    set -x
     ./grailsw test-app functional: org.modelcatalogue.core.c.**.* -war --non-interactive
     mkdir -p "$HOME/reports/test-app-functional-c-tests-reports"
     mkdir -p "$HOME/reports/test-app-functional-c-geb-reports"
-    cp -Rf target/test-reports "$HOME/reports/test-app-functional-c-tests-reports"
-    cp -Rf target/geb-reports "$HOME/reports/test-app-functional-c-geb-reports"
+    cp -Rf target/test-reports/ "$HOME/reports/test-app-functional-c-tests-reports"
+    cp -Rf target/geb-reports/ "$HOME/reports/test-app-functional-c-geb-reports"
 fi
 
 cd ..
