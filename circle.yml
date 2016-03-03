@@ -19,20 +19,20 @@ test:
        parallel: true
   post:
     - mkdir -p "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueCorePlugin/reports"
-    - mv ModelCatalogueCorePlugin/target/reports/*  "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueCorePlugin/reports" 2>/dev/null || true
+    - mv ModelCatalogueCorePlugin/target/reports/*  "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueCorePlugin/reports" || true
     - mkdir -p "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueCorePlugin/test-reports"
-    - mv ModelCatalogueCorePlugin/target/test-reports/*  "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueCorePlugin/test-reports" 2>/dev/null || true
+    - mv ModelCatalogueCorePlugin/target/test-reports/*  "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueCorePlugin/test-reports" || true
     - mkdir -p "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueDiscoursePlugin/test-reports"
-    - mv ModelCatalogueDiscoursePlugin/target/test-reports/*  "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueDiscoursePlugin/test-reports" 2>/dev/null || true
+    - mv ModelCatalogueDiscoursePlugin/target/test-reports/*  "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueDiscoursePlugin/test-reports" || true
     - mkdir -p "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueFormsPlugin/test-reports"
-    - mv ModelCatalogueFormsPlugin/target/test-reports/*  "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueFormsPlugin/test-reports" 2>/dev/null || true
+    - mv ModelCatalogueFormsPlugin/target/test-reports/*  "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueFormsPlugin/test-reports" || true
     - mkdir -p "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueGenomicsPlugin/test-reports"
-    - mv ModelCatalogueGenomicsPlugin/target/test-reports/*  "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueGenomicsPlugin/test-reports" 2>/dev/null || true
+    - mv ModelCatalogueGenomicsPlugin/target/test-reports/*  "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueGenomicsPlugin/test-reports" || true
     - mkdir -p "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueElasticSearchPlugin/test-reports"
-    - mv ModelCatalogueElasticSearchPlugin/target/test-reports/*  "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueElasticSearchPlugin/test-reports" 2>/dev/null || true
+    - mv ModelCatalogueElasticSearchPlugin/target/test-reports/*  "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueElasticSearchPlugin/test-reports" || true
     - mkdir -p "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueSpringSecurity2xPlugin/test-reports"
-    - mv ModelCatalogueSpringSecurity2xPlugin/target/test-reports/*  "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueSpringSecurity2xPlugin/test-reports" 2>/dev/null || true
+    - mv ModelCatalogueSpringSecurity2xPlugin/target/test-reports/*  "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueSpringSecurity2xPlugin/test-reports" || true
     - mkdir -p "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueCorePluginTestApp/geb-reports"
-    - mv ModelCatalogueCorePluginTestApp/target/geb-reports/*  "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueCorePluginTestApp/geb-reports" 2>/dev/null || true
+    - mv ModelCatalogueCorePluginTestApp/target/geb-reports/*  "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueCorePluginTestApp/geb-reports" || true
     - mkdir -p "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueCorePluginTestApp/test-reports"
-    - mv ModelCatalogueCorePluginTestApp/target/test-reports/*  "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueCorePluginTestApp/test-reports" 2>/dev/null || true
+    - mv ModelCatalogueCorePluginTestApp/target/test-reports/*  "$CIRCLE_TEST_REPORTS/$CIRCLE_NODE_INDEX/ModelCatalogueCorePluginTestApp/test-reports" || true
