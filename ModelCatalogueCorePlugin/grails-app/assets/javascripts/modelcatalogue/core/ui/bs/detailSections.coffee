@@ -482,6 +482,7 @@ x in ['apple', 'banana', 'cherry']
       'asset'
       'mesurementUnit'
       'dataElement'
+      'dataType'
       # data class has various metadata editors which need to be migrated first
       # 'dataClass'
     ]
@@ -498,6 +499,4 @@ x in ['apple', 'banana', 'cherry']
     keys: ['http://www.modelcatalogue.org/metadata/enumerateType#subset']
     template: 'modelcatalogue/core/ui/detailSections/enumerations.html'
   }
-
-
 ]
