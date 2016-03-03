@@ -36,6 +36,8 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     public static final CatalogueAction editMapping = CatalogueAction.runLast('item', 'edit-mapping')
     public static final String expandMetadata = '.expand-metadata'
     public static final String metadataHelpBlock = '.metadata-help-block'
+    static final CatalogueContent detailSectionFormItem = CatalogueContent.create('data-view-name': 'Form (Item)')
+    static final String detailSectionFormItemContent = ".metadata-form-item-content"
 
     def "go to login"() {
         login admin
@@ -46,7 +48,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         then:
         check rightSideTitle is 'Data Types'
     }
-
 
     def "filter by name in header"() {
         check backdrop gone
@@ -69,8 +70,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         then: "we see many rows again"
         check tableRows test { it.size() >= 1 }
     }
-
-
 
     def "create reference"() {
         select('Test 1') / 'Test 1'
@@ -174,6 +173,21 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check rightSideTitle contains 'New Data Type Test 1'
     }
 
+    def "Check Form (Item) detail section is present and collapsed"() {
+        expect:
+        check detailSectionFormItem present once
+        check detailSectionFormItemContent gone
+
+        when: "Click the title"
+        click detailSectionFormItem
+
+        then: "Content is displayed"
+        check detailSectionFormItemContent displayed
+
+        cleanup:
+        click detailSectionFormItem
+    }
+
     def "update metadata"() {
         check backdrop gone
 
@@ -222,8 +236,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         then:
         check addMetadataButton displayed
     }
-
-
 
     def "create new mapping"() {
         check closeGrowlMessage gone
@@ -303,7 +315,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         then:
         check { infTableCell(1, 2) } is 'x'
     }
-
 
     def "create relationship"() {
         check backdrop gone
