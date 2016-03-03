@@ -11,6 +11,16 @@ cache:
 addons:
   artifacts: true
   s3_region: eu_central_1
+    paths:
+      - ModelCatalogueCorePlugin/target/reports/
+      - ModelCatalogueCorePlugin/target/test-reports/
+      - ModelCatalogueDiscoursePlugin/target/test-reports/
+      - ModelCatalogueFormsPlugin/target/test-reports/
+      - ModelCatalogueGenomicsPlugin/target/test-reports/
+      - ModelCatalogueElasticSearchPlugin/target/test-reports/
+      - ModelCatalogueSpringSecurity2xPlugin/target/test-reports/
+      - ModelCatalogueCorePluginTestApp/target/geb-reports/
+      - ModelCatalogueCorePluginTestApp/target/test-reports/
 env:
   - TEST_SUITE=app_functional_a
   - TEST_SUITE=app_functional_b
