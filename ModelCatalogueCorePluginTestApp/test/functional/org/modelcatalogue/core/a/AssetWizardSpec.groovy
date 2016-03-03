@@ -37,7 +37,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         selectInTree "Assets"
 
         then:
-        check rightSideTitle is 'Active Asset List'
+        check rightSideTitle is 'Active Assets'
     }
 
     def "upload new asset"() {

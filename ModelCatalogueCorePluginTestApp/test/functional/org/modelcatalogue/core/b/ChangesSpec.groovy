@@ -33,7 +33,7 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
         then:
         at GlobalChangesPage
 
-        check 'h3' is 'Change List'
+        check 'h3' is 'Changes'
     }
 
     def "check the unit shows up with own detail page"(){

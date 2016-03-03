@@ -21,7 +21,7 @@ class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
         select('Test 1') / 'Test 1' / 'Data Elements'
 
         expect:
-        check rightSideTitle is 'Data Element List'
+        check rightSideTitle is 'Data Elements'
     }
 
     def "Add new data element"() {

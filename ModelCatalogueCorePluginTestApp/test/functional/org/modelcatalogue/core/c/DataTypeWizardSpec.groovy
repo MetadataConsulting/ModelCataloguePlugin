@@ -44,7 +44,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         select('NHIC') / 'NHIC' / 'Data Types'
 
         then:
-        check rightSideTitle is 'Data Type List'
+        check rightSideTitle is 'Data Types'
     }
 
 
