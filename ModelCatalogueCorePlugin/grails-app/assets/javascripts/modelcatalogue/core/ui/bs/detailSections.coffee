@@ -350,7 +350,6 @@ metadataEditors.config ['detailSectionsProvider', (detailSectionsProvider)->
 
   }
 
-
   detailSectionsProvider.register {
      title: 'Basic'
      position: -10000
@@ -411,7 +410,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Rule'
-    position: 10000
+    position: -108000
     types: [
       'dataType'
     ]
@@ -492,7 +491,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Enumerations'
-    position: 1000
+    position: -109000
     types: [
       'enumeratedType'
     ]
