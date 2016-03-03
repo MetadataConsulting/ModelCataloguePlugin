@@ -295,9 +295,56 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
 ]
 
 metadataEditors.config ['detailSectionsProvider', (detailSectionsProvider)->
+  REGEX_EXAMPLE = """// value is decimal number
+x ==~ /\\d+(\\.\\d+)?/
+"""
+  SET_EXAMPLE = """// value is one of predefined values
+x in ['apple', 'banana', 'cherry']
+"""
+
+  showExample = (copy, messages, example) ->
+    if copy.rule and copy.rule != REGEX_EXAMPLE and copy.rule != SET_EXAMPLE
+      messages.confirm("Replace current rule with example", "Do already have some rule, do you want to replace it with the example?").then ->
+        copy.rule = example
+    else
+      copy.rule = example
+
+  detailSectionsProvider.register {
+    title: 'Enumerations'
+    position: -40
+    types: [
+      'enumeratedType'
+    ]
+    keys: ['http://www.modelcatalogue.org/metadata/enumerateType#subset']
+    template: 'modelcatalogue/core/ui/detailSections/enumerations.html'
+  }
+
+  detailSectionsProvider.register {
+    title: 'Rule'
+    position: -30
+    types: [
+      'dataType'
+    ]
+    keys: []
+    template: 'modelcatalogue/core/ui/detailSections/rule.html'
+
+    showRegexExample: (copy, messages) -> showExample(copy, messages, REGEX_EXAMPLE)
+    showSetExample: (copy, messages) -> showExample(copy, messages, SET_EXAMPLE)
+  }
+
+  detailSectionsProvider.register {
+    title: 'Data Type'
+    position: -30
+    types: [
+      'dataElement'
+    ]
+    keys: []
+    template: 'modelcatalogue/core/ui/detailSections/dataType.html'
+  }
+
   detailSectionsProvider.register {
       title: 'Model Catalogue ID'
-      position: -100000
+      position: -20
       types: [
         'catalogueElement'
       ]
@@ -307,7 +354,7 @@ metadataEditors.config ['detailSectionsProvider', (detailSectionsProvider)->
 
   detailSectionsProvider.register {
      title: 'Basic'
-     position: -10000
+     position: -10
      types: [
        'dataModel'
      ]
@@ -322,7 +369,7 @@ metadataEditors.config ['detailSectionsProvider', (detailSectionsProvider)->
 
   detailSectionsProvider.register {
      title: 'Basic'
-     position: -10000
+     position: -10
      types: [
        'measurementUnit'
      ]
@@ -333,7 +380,7 @@ metadataEditors.config ['detailSectionsProvider', (detailSectionsProvider)->
 
   detailSectionsProvider.register {
      title: 'Basic'
-     position: -10000
+     position: -10
      types: [
        'asset'
      ]
@@ -352,7 +399,7 @@ metadataEditors.config ['detailSectionsProvider', (detailSectionsProvider)->
 
   detailSectionsProvider.register {
      title: 'Basic'
-     position: -10000
+     position: -10
      types: [
        'dataClass'
      ]
@@ -362,25 +409,12 @@ metadataEditors.config ['detailSectionsProvider', (detailSectionsProvider)->
 
   detailSectionsProvider.register {
      title: 'Basic'
-     position: -10000
+     position: -10
      types: [
        'dataElement'
      ]
      keys: []
      template: 'modelcatalogue/core/ui/detailSections/dataElementBasic.html'
-  }
-
-  detailSectionsProvider.register {
-     title: 'Namespace and Organization'
-     position: 2000
-     types: [
-       'dataModel'
-     ]
-     keys: [
-       'http://www.modelcatalogue.org/metadata/#namespace'
-       'http://www.modelcatalogue.org/metadata/#organization'
-     ]
-     template: 'modelcatalogue/core/ui/detailSections/organization.html'
   }
 
   detailSectionsProvider.register {
@@ -393,47 +427,9 @@ metadataEditors.config ['detailSectionsProvider', (detailSectionsProvider)->
     template: 'modelcatalogue/core/ui/detailSections/description.html'
   }
 
-  REGEX_EXAMPLE = """// value is decimal number
-x ==~ /\\d+(\\.\\d+)?/
-"""
-  SET_EXAMPLE = """// value is one of predefined values
-x in ['apple', 'banana', 'cherry']
-"""
-
-  showExample = (copy, messages, example) ->
-      if copy.rule and copy.rule != REGEX_EXAMPLE and copy.rule != SET_EXAMPLE
-        messages.confirm("Replace current rule with example", "Do already have some rule, do you want to replace it with the example?").then ->
-          copy.rule = example
-      else
-        copy.rule = example
-
-
-  detailSectionsProvider.register {
-    title: 'Rule'
-    position: -108000
-    types: [
-      'dataType'
-    ]
-    keys: []
-    template: 'modelcatalogue/core/ui/detailSections/rule.html'
-
-    showRegexExample: (copy, messages) -> showExample(copy, messages, REGEX_EXAMPLE)
-    showSetExample: (copy, messages) -> showExample(copy, messages, SET_EXAMPLE)
-  }
-
-  detailSectionsProvider.register {
-    title: 'Revision Notes'
-    position: 1000
-    types: [
-      'dataModel'
-    ]
-    keys: []
-    template: 'modelcatalogue/core/ui/detailSections/revisionNotes.html'
-  }
-
   detailSectionsProvider.register {
     title: 'Measurement Unit'
-    position: 500
+    position: 10
     types: [
       'primitiveType'
     ]
@@ -441,20 +437,9 @@ x in ['apple', 'banana', 'cherry']
     template: 'modelcatalogue/core/ui/detailSections/measurementUnit.html'
   }
 
-
-  detailSectionsProvider.register {
-    title: 'Data Type'
-    position: -110000
-    types: [
-      'dataElement'
-    ]
-    keys: []
-    template: 'modelcatalogue/core/ui/detailSections/dataType.html'
-  }
-
   detailSectionsProvider.register {
     title: 'Data Class'
-    position: 500
+    position: 10
     types: [
       'referenceType'
     ]
@@ -464,7 +449,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Preview'
-    position: 1000
+    position: 20
     types: [
       'asset'
     ]
@@ -472,10 +457,32 @@ x in ['apple', 'banana', 'cherry']
     template: 'modelcatalogue/core/ui/detailSections/assetPreview.html'
   }
 
+  detailSectionsProvider.register {
+    title: 'Revision Notes'
+    position: 20
+    types: [
+      'dataModel'
+    ]
+    keys: []
+    template: 'modelcatalogue/core/ui/detailSections/revisionNotes.html'
+  }
+
+  detailSectionsProvider.register {
+     title: 'Namespace and Organization'
+     position: 30
+     types: [
+       'dataModel'
+     ]
+     keys: [
+       'http://www.modelcatalogue.org/metadata/#namespace'
+       'http://www.modelcatalogue.org/metadata/#organization'
+     ]
+     template: 'modelcatalogue/core/ui/detailSections/organization.html'
+  }
 
   detailSectionsProvider.register {
     title: 'Custom Metadata'
-    position: 100000
+    position: 40
     types: [
       'dataModel'
       'asset'
@@ -487,15 +494,5 @@ x in ['apple', 'banana', 'cherry']
     ]
     keys: []
     template: 'modelcatalogue/core/ui/detailSections/customMetadata.html'
-  }
-
-  detailSectionsProvider.register {
-    title: 'Enumerations'
-    position: -109000
-    types: [
-      'enumeratedType'
-    ]
-    keys: ['http://www.modelcatalogue.org/metadata/enumerateType#subset']
-    template: 'modelcatalogue/core/ui/detailSections/enumerations.html'
   }
 ]
