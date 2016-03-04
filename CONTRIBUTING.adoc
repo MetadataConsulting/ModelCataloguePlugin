@@ -1,0 +1,29 @@
+= Contributing Guidelines
+
+Please, don't commit to 1.x and 2.x branches directly but create a feature branch for each new issue you are working on.
+
+After finishing the work on the branch, create a pull request which triggers new link:https://travis-ci.org/MetadataRegistry/ModelCataloguePlugin/pull_requests[pull request continuous integration build].
+If the build fails you can inspect link:http://mc-travis-results.orany.cz.s3.amazonaws.com/index.html?prefix=MetadataRegistry/ModelCataloguePlugin/[the test results] to see what's wrong. You can also
+run the particular test locally with following command.
+
+```
+./catalogue test $TEST_SUITE
+```
+
+where the `$TEST_SUITE` is the value of the failing test shown in the travis build (e.g. `app_functional_a`).
+
+=== Editor Configuration
+Whitespaces and other editor configuration is manages in `.editorconfig` file. IntelliJ IDEA uses these configuration
+by default. For other editors, please see link:http://EditorConfig.org[EditorConfig Website].
+
+
+=== Code Style
+If you are IntelliJ IDEA user, please, pay attention to the static inspection. Use `Perform code analysis` option. Some
+of the inspections produces false positives
+
+   * `*Config.groovy` files reports unused variables such as `log4j`
+   * typed Closure parameters, especially `eachWithIndex`
+
+Adding support for static code checkers such as CodeNarc is in progress.
+
+
