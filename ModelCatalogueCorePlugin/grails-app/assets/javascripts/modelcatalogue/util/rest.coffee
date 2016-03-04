@@ -20,7 +20,7 @@ angular.module('mc.util.rest', ['mc.util.messages']).factory 'rest',  [ '$q', '$
         return
       if response.status is 404
         if config.noRetry404
-          $rootScope.$broadcast 'resourceNotFound', response
+          $rootScope.$broadcast 'resourceNotFound', response, config
           deferred.reject response
           return
 
@@ -33,7 +33,7 @@ angular.module('mc.util.rest', ['mc.util.messages']).factory 'rest',  [ '$q', '$
           , (newResponse) ->
             deferred.reject newResponse
 
-        $timeout retryNotFound, (if config.retryAfter then config.retryAfter else 300)
+        $timeout retryNotFound, (if config.retryAfter then config.retryAfter else 1000)
 
         return
 

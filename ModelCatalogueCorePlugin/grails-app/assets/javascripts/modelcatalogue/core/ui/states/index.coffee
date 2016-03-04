@@ -37,10 +37,12 @@ angular.module('mc.core.ui.states', [
   $rootScope.$on 'applicationOffline', ->
     messages.error 'Application is not available at the moment, please, retry later'
 
-  $rootScope.$on 'resourceNotFound', ->
-    messages.error 'Selected resource cannot be found in the catalogue.'
-    if $stateParams.resource
+  $rootScope.$on 'resourceNotFound', (ignored, config) ->
+    messages.error 'Selected resource cannot be found in the catalogue', config.url
+    if $state.includes 'simple.resource'
       $state.go 'simple.resource.list', resource: $stateParams.resource, {location: 'replace'}
+    else if $state.includes 'mc.resource'
+      $state.go 'mc.resource.list', resource: $stateParams.resource, dataModelId: $stateParams.dataModelId, {location: 'replace'}
     else
       $state.go 'landing', {}, {location: 'replace'}
 ])

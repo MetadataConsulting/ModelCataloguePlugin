@@ -169,12 +169,13 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     void waitUntilFinalized(String expectedName) {
-        10.times {
+        int counter = 0
+        while ($(status).hasClass('label-info') && counter++ < 100) {
             // ! + gone does not implicitly require the element
             if ($(refreshAsset.toSelector()).displayed) {
                 click refreshAsset
-                Thread.sleep(10000)
             }
+            Thread.sleep(1000)
         }
     }
 
