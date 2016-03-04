@@ -1,6 +1,6 @@
 <div class="col-md-12 metadata-form-item-content"
      ng-init="grid = {'value': (element.ext.get('http://forms.modelcatalogue.org/group#grid') ? (element.ext.get('http://forms.modelcatalogue.org/group#grid') == 'false' ? false : true) : false)}">
-  <div class="row">
+  <div class="row" ng-if="editableForm.$visible">
     <div class="col-md-offset-1 col-md-10 alert alert-warning">
       The grid group metadata only applies on the direct children of the form's section model (grand children of root model) and is ignored for any other nested models.
     </div>
@@ -14,8 +14,8 @@
          popover-trigger="mouseenter"></i>
     </div>
     <div class="col-md-9 full-width-editable">
-      <span editable-checkbox="extAsMap['http://forms.modelcatalogue.org/group#grid']" class="small"
-            e-string-to-boolean e-ng-change="grid.value = !grid.value">
+      <span editable-checkbox="extAsMap['http://forms.modelcatalogue.org/group#grid']"
+            class="small" e-string-to-boolean e-ng-change="grid.value = !grid.value">
         {{ element.ext.get('http://forms.modelcatalogue.org/group#grid') ? (element.ext.get('http://forms.modelcatalogue.org/group#grid') == "false" ? "No": "Yes") : "" }}
       </span>
     </div>
