@@ -79,7 +79,7 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
 
   detailSectionsProvider.register {
     title: 'Form (Item)'
-    position: 101000
+    position: 50
     types: [
       'dataElement'
     ]
@@ -107,7 +107,7 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
 
   detailSectionsProvider.register {
     title: 'Form (Item)'
-    position: 101000
+    position: 50
     types: [
       'dataType'
     ]
