@@ -38,8 +38,9 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
     template: '/mc/core/forms/formSection.html'
   }
 
-  metadataEditorsProvider.register {
+  detailSectionsProvider.register {
     title: 'Form (Grid)'
+    position: 50
     types: [
       'dataClass'
       '=[hierarchy]=>'
@@ -50,7 +51,8 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
       "http://forms.modelcatalogue.org/group#repeatNum"
       "http://forms.modelcatalogue.org/group#repeatMax"
     ]
-    template: 'modelcatalogue/core/ui/metadataEditors/formGrid.html'
+    hideIfNoData: true
+    template: '/mc/core/forms/formGrid.html'
   }
 
   metadataEditorsProvider.register {
@@ -130,63 +132,6 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
 ]
 
 forms.run ['$templateCache', ($templateCache) ->
-  $templateCache.put 'modelcatalogue/core/ui/metadataEditors/formGrid.html', '''
-    <div class="alert alert-warning">The grid group metadata only applies on the direct children of the form's section model (grand children of root model) and is ignored for any other nested models.</div>
-    <form class="form">
-      <div class="checkbox">
-        <label>
-          <input type="checkbox" ng-model="object.access('http://forms.modelcatalogue.org/group#grid')" ng-model-options="{ getterSetter: true }">
-          Grid
-        </label>
-        <p class="help-block">
-          Make this model a repeatable group (grid)
-        </p>
-      </div>
-      <div class="form-group">
-        <label for="group-header" class="control-label">Header</label>
-        <input maxlength="64" type="text" class="form-control" id="group-header" ng-model="object.access('http://forms.modelcatalogue.org/group#header')" ng-model-options="{ getterSetter: true }" ng-disabled="!object.get('http://forms.modelcatalogue.org/group#grid')">
-        <p class="help-block">
-            The value is displayed above the GRID when a user is performing data entry. Defaults to model's name<br/>
-
-            This value is like a title for the group. An example of a GROUP_HEADER would be "Medications Log."<br/>
-
-            Can contain up to 5 characters.
-        </p>
-      </div>
-      <div class="form-group">
-        <label for="repeat-num" class="control-label">Initial Number of Rows (default 1)</label>
-        <input type="number" min="1" class="form-control" id="repeat-num" ng-model="object.access('http://forms.modelcatalogue.org/group#repeatNum').asInt" ng-model-options="{ getterSetter: true}" ng-disabled="!object.get('http://forms.modelcatalogue.org/group#grid')">
-        <p class="help-block">
-          The default (initial) number of repeats on the form should be provided here. If left blank, only one row of
-          information will be displayed by default.<br/>
-
-          This field should be used to specify how many rows of data should exist for the item group upon initiation of
-          data entry, or in printing of a blank CRF from OpenClinica. If three rows of information, specify the number 3
-          in the field. When a user accesses the CRF, the row will be repeated 3 times by default.<br/>
-
-          A user will be allowed to add more rows up to the GROUP_REPEAT_MAX and even remove some of the rows displayed
-          by default.
-        </p>
-      </div>
-      <div class="form-group">
-        <label for="repeat-max" class="control-label">Max Number of Rows (default 40)</label>
-        <input type="number" min="1" class="form-control" id="repeat-max" ng-model="object.access('http://forms.modelcatalogue.org/group#repeatMax').asInt" ng-model-options="{ getterSetter: true }" ng-disabled="!object.get('http://forms.modelcatalogue.org/group#grid')">
-        <p class="help-block">
-          The total number of rows a user will be allowed to repeat in the item group.  When left blank, the default number
-          of repeats is 40.<br/>
-
-          This field should be used to restrict users to a certain number of repeats for the GRID.  However, this
-          restriction works only if data are entered through OpenClinica Web UI. If data are imported using
-          Task-> Import Data option or through web services, all rows of data in the import file will be allowed to import,
-          even if the rows of data in the import exceed the GROUP_REPEAT_MAX.<br/>
-
-          If GROUP_REPEAT_MAX is less than GROUP_REPEAT_NUMBER group will have GROUP_REPEAT_MAX number of rows on initial
-          data entry displayed and no additional rows can be added.
-        </p>
-      </div>
-    </form>
-  '''
-
   $templateCache.put 'modelcatalogue/core/ui/metadataEditors/formItemDataElement.html', '''
     <form class="form">
       <div class="checkbox">
