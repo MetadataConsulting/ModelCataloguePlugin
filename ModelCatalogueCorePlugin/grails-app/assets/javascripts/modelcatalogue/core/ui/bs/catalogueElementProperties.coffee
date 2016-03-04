@@ -186,6 +186,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataClass.hasAttachmentOf', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataClass.properties', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataClass.contains', active: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataClass.ext', hidden: true
 
 
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Asset.hasAttachmentOf', hidden: true
