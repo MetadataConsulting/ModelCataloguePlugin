@@ -360,8 +360,7 @@ x in ['apple', 'banana', 'cherry']
       'mesurementUnit'
       'dataElement'
       'dataType'
-      # data class has various metadata editors which need to be migrated first
-      # 'dataClass'
+      'dataClass'
     ]
     keys: []
     template: 'modelcatalogue/core/ui/detailSections/customMetadata.html'

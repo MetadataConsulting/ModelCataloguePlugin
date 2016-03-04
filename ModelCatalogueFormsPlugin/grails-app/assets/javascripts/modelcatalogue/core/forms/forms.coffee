@@ -5,8 +5,9 @@ forms = angular.module('mc.core.forms', ['mc.core.ui.metadataEditors', 'mc.core.
 # TODO: inline help
 
 forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEditorsProvider, detailSectionsProvider)->
-  metadataEditorsProvider.register {
+  detailSectionsProvider.register {
     title: 'Form (Metadata)'
+    position: 50
     types: [
       'dataClass'
     ]
@@ -16,7 +17,8 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
       "http://forms.modelcatalogue.org/form#versionDescription"
       "http://forms.modelcatalogue.org/form#revisionNotes"
     ]
-    template: 'modelcatalogue/core/ui/metadataEditors/formMetadata.html'
+    hideIfNoData: true
+    template: '/mc/core/forms/formMetadata.html'
   }
 
   metadataEditorsProvider.register {
@@ -126,69 +128,6 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
 ]
 
 forms.run ['$templateCache', ($templateCache) ->
-  $templateCache.put 'modelcatalogue/core/ui/metadataEditors/formMetadata.html', '''
-    <div class="alert alert-warning">The form metadata only applies on the root model of the form and is ignored for any nested models.</div>
-    <form class="form">
-      <div class="form-group">
-        <label for="form-name" class="control-label">Name</label>
-        <input maxlength="255" type="text" class="form-control" id="form-name" ng-model="object.access('http://forms.modelcatalogue.org/form#name')" ng-model-options="{ getterSetter: true }">
-        <p class="help-block">
-            Defines the name of the CRF as it will be displayed in the OpenClinica user interface. Defaults to model's name.
-            When a user is assigning CRFs to an event definition, they will be viewing this name. A user performing data
-            entry will identify the form by this name. Can contain up to 255 alphanumeric characters.
-        </p>
-      </div>
-      <div class="form-group">
-        <label for="form-version" class="control-label">Version</label>
-        <input maxlength="255" type="text" class="form-control" id="form-version" ng-model="object.access('http://forms.modelcatalogue.org/form#version')" ng-model-options="{ getterSetter: true }">
-        <p class="help-block">
-            Defines the version of the CRF as it will be displayed in the OpenClinica user interface. Defaults to model version number.<br/>
-
-            You cannot provide a value that has already been used in the OpenClinica instance unless it has not been assigned
-            to an event definition yet.  If a particular CRF version has not been used in an event definition, you may
-            overwrite it.<br/>
-
-            If this is a new version of a CRF that already exists, the CRF_NAME field must match the value of the form
-            already in OpenClinica.<br/>
-
-            A new version of a CRF would be needed due to a protocol change, adding or removing an item from a CRF, or
-            changing some of the questions.<br/>
-
-            Can contain up to 255 alphanumeric characters.
-        </p>
-      </div>
-      <div class="form-group">
-        <label for="form-version-description" class="control-label">Version Description</label>
-        <textarea maxlength="4000" rows="5" class="form-control" id="form-version-description" ng-model="object.access('http://forms.modelcatalogue.org/form#versionDescription')" ng-model-options="{ getterSetter: true }"></textarea>
-        <p class="help-block">
-            This field is used for informational purposes to keep track of what this version of the CRF was created for. Defaults to Model description or <code>Generated from Model_Name</code>.<br/>
-
-            This information appears as part of the CRF Metadata when the user clicks on View (original). This information
-            is not displayed during data entry.<br/>
-
-            Can contain up to 4000 alphanumeric characters.
-        </p>
-      </div>
-      <div class="form-group">
-        <label for="form-revision-notes" class="control-label">Revision Notes</label>
-        <textarea maxlength="255" rows="5" class="form-control" id="form-revision-notes" ng-model="object.access('http://forms.modelcatalogue.org/form#revisionNotes')" ng-model-options="{ getterSetter: true }"></textarea>
-        <p class="help-block">
-           This field is used to keep track of the revisions you made to this particular CRF. Defaults to <code>Generated from Model_Name</code><br/>
-
-           This information appears as part of the CRF Metadata when the user clicks on View (original). This information is
-           not displayed during data entry.<br/>
-
-           If this is the first version of the CRF, you can simply state this is a brand new form.  Going forward, as you
-           make changes and update the versions you can provide information on what is different between the first version
-           and each subsequent version.<br/>
-
-           Can contain up to 255 alphanumeric characters.
-        </p>
-      </div>
-
-    </form>
-  '''
-
   $templateCache.put 'modelcatalogue/core/ui/metadataEditors/formSection.html', '''
     <div class="alert alert-warning">The form section metadata only applies on the direct children of the form's root model and is ignored for any other nested models.</div>
     <form class="form">
