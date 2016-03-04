@@ -353,78 +353,78 @@ x in ['apple', 'banana', 'cherry']
   }
 
   detailSectionsProvider.register {
-     title: 'Basic'
-     position: -10
-     types: [
-       'dataModel'
-     ]
-     keys: [
-       'http://www.modelcatalogue.org/metadata/#authors'
-       'http://www.modelcatalogue.org/metadata/#reviewers'
-       'http://www.modelcatalogue.org/metadata/#owner'
-
-     ]
-     template: 'modelcatalogue/core/ui/detailSections/dataModelBasic.html'
-  }
-
-  detailSectionsProvider.register {
-     title: 'Basic'
-     position: -10
-     types: [
-       'measurementUnit'
-     ]
-     keys: []
-     template: 'modelcatalogue/core/ui/detailSections/measurementUnitBasic.html'
-  }
-
-
-  detailSectionsProvider.register {
-     title: 'Basic'
-     position: -10
-     types: [
-       'asset'
-     ]
-     keys: []
-     template: 'modelcatalogue/core/ui/detailSections/assetBasic.html'
-     toHumanReadableSize: (size) ->
-        GIGA = 1024 * 1024 * 1024
-        MEGA = 1024 * 1024
-        KILO = 1024
-        return "#{(size / GIGA).toFixed(2)} GB" if size > GIGA
-        return "#{(size / MEGA).toFixed(2)} MB" if size > MEGA
-        return "#{(size / KILO).toFixed(2)} kB" if size > KILO
-        return "#{size} B"
-
-  }
-
-  detailSectionsProvider.register {
-     title: 'Basic'
-     position: -10
-     types: [
-       'dataClass'
-     ]
-     keys: []
-     template: 'modelcatalogue/core/ui/detailSections/dataClassBasic.html'
-  }
-
-  detailSectionsProvider.register {
-     title: 'Basic'
-     position: -10
-     types: [
-       'dataElement'
-     ]
-     keys: []
-     template: 'modelcatalogue/core/ui/detailSections/dataElementBasic.html'
-  }
-
-  detailSectionsProvider.register {
     title: 'Model Catalogue ID'
-    position: 0
+    position: -10
     types: [
       'catalogueElement'
     ]
     keys: []
     template: 'modelcatalogue/core/ui/detailSections/modelCatalogueId.html'
+  }
+
+  detailSectionsProvider.register {
+    title: 'Basic'
+    position: 0
+    types: [
+      'dataModel'
+    ]
+    keys: [
+      'http://www.modelcatalogue.org/metadata/#authors'
+      'http://www.modelcatalogue.org/metadata/#reviewers'
+      'http://www.modelcatalogue.org/metadata/#owner'
+
+    ]
+    template: 'modelcatalogue/core/ui/detailSections/dataModelBasic.html'
+  }
+
+  detailSectionsProvider.register {
+    title: 'Basic'
+    position: 0
+    types: [
+      'measurementUnit'
+    ]
+    keys: []
+    template: 'modelcatalogue/core/ui/detailSections/measurementUnitBasic.html'
+  }
+
+
+  detailSectionsProvider.register {
+    title: 'Basic'
+    position: 0
+    types: [
+      'asset'
+    ]
+    keys: []
+    template: 'modelcatalogue/core/ui/detailSections/assetBasic.html'
+    toHumanReadableSize: (size) ->
+      GIGA = 1024 * 1024 * 1024
+      MEGA = 1024 * 1024
+      KILO = 1024
+      return "#{(size / GIGA).toFixed(2)} GB" if size > GIGA
+      return "#{(size / MEGA).toFixed(2)} MB" if size > MEGA
+      return "#{(size / KILO).toFixed(2)} kB" if size > KILO
+      return "#{size} B"
+
+  }
+
+  detailSectionsProvider.register {
+    title: 'Basic'
+    position: 0
+    types: [
+      'dataClass'
+    ]
+    keys: []
+    template: 'modelcatalogue/core/ui/detailSections/dataClassBasic.html'
+  }
+
+  detailSectionsProvider.register {
+    title: 'Basic'
+    position: 0
+    types: [
+      'dataElement'
+    ]
+    keys: []
+    template: 'modelcatalogue/core/ui/detailSections/dataElementBasic.html'
   }
 
   detailSectionsProvider.register {
