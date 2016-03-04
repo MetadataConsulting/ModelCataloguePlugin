@@ -76,7 +76,6 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'containedIn', label: 'Data Classes', columns: nameAndIdAndMetadata()
   catalogueElementPropertiesProvider.configureProperty 'hasAttachmentOf', label: 'Attachments', columns: attachmentColumns()
   catalogueElementPropertiesProvider.configureProperty 'hasContextOf', label: 'Conceptual Domains', columns: nameAndIdent()
-  catalogueElementPropertiesProvider.configureProperty 'classifies', label: 'Defines', columns: localNameAndIdent()
 
   catalogueElementPropertiesProvider.configureProperty 'instantiates', label: 'Data Elements', columns: nameAndIdAndMetadata()
 
