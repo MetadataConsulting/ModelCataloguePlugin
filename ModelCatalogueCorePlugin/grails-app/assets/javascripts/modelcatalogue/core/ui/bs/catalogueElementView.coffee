@@ -128,7 +128,7 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
                   {{view.getTitle()}}
                 </span>
               </p>
-              <div ng-hide="view.templateHidden">
+              <div ng-hide="view.templateHidden" data-view-content-name="{{view.getTitle()}}">
                 <ng-include src="view.getTemplate()"></ng-include>
               </div>
             </div>

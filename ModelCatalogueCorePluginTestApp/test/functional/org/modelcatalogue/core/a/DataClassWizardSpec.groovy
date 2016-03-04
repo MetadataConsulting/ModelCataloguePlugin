@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.a
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
 import spock.lang.Stepwise
 
@@ -10,15 +9,12 @@ import static org.modelcatalogue.core.geb.Common.*
 @Stepwise
 class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 
-
     private static final String stepMetadata                = "#step-metadata"
     private static final String stepChildren                = "#step-children"
     private static final String stepElements                = "#step-elements"
     private static final String stepFinish                  = "#step-finish"
     private static final String exitButton                  = "#exit-wizard"
     private static final String wizardSummary               = '.wizard-summary'
-    private static final CatalogueAction inlineEdit         = CatalogueAction.runFirst('item-detail', 'inline-edit')
-    private static final CatalogueAction inlineEditSubmit   = CatalogueAction.runFirst('item-detail', 'inline-edit-submit')
 
 
     def "go to login"() {
@@ -171,5 +167,4 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
             $('span.catalogue-element-treeview-name', text: startsWith("Changed Name")).parent().parent().find('.badge')
         } is '1'
     }
-
 }

@@ -92,6 +92,7 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
       getTitle: -> configuration.title
       getPosition: -> configuration.position
       getKeys: -> angular.copy configuration.keys
+      handlesKey: (key) -> key in configuration.keys
       hideIfNoData: () ->
         return if configuration.hideIfNoData? then configuration.hideIfNoData else false
       hasData: (element) ->

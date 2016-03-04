@@ -12,7 +12,6 @@ import spock.lang.Stepwise
 @Stepwise
 class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
-
     public static final String expandTableHeader = '.inf-table thead .inf-cell-expand'
     public static final CatalogueContent nameFilter = CatalogueContent.create('input.form-control', placeholder: 'Filter Name')
     public static final CatalogueContent enumerationsTableEditor = CatalogueContent.create('table', title: 'Enumerations')
@@ -22,7 +21,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     public static final String pickEnumeratedType = '#pickEnumeratedType'
     public static final String updateMetadataButton = '.tab-pane button.btn-primary.update-object'
     public static final String addMetadataButton = '.tab-pane .btn.add-metadata'
-    public static final String removeMetadataRow = '.tab-pane a.soe-remove-row'
+    public static final String removeMetadataRow = '[data-view-content-name="Custom Metadata"] a.soe-remove-row'
     public static final CatalogueAction createMapping = CatalogueAction.runFirst('item', 'catalogue-element', 'create-new-mapping')
     public static final CatalogueAction createRelationship = CatalogueAction.runLast('item', 'catalogue-element', 'create-new-relationship')
     public static final CatalogueAction convert = CatalogueAction.runLast('item', 'catalogue-element', 'convert')
@@ -36,6 +35,9 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     public static final CatalogueAction editMapping = CatalogueAction.runLast('item', 'edit-mapping')
     public static final String expandMetadata = '.expand-metadata'
     public static final String metadataHelpBlock = '.metadata-help-block'
+    static final CatalogueContent detailSectionFormItem = CatalogueContent.create('data-view-name': 'Form (Item)')
+    static final String detailSectionFormItemContent = ".metadata-form-item-content"
+    static final String detailSectionCustomMetadataContent = '[data-view-content-name="Custom Metadata"]'
 
     def "go to login"() {
         login admin
@@ -46,7 +48,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         then:
         check rightSideTitle is 'Data Types'
     }
-
 
     def "filter by name in header"() {
         check backdrop gone
@@ -69,8 +70,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         then: "we see many rows again"
         check tableRows test { it.size() >= 1 }
     }
-
-
 
     def "create reference"() {
         select('Test 1') / 'Test 1'
@@ -174,56 +173,46 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check rightSideTitle contains 'New Data Type Test 1'
     }
 
-    def "update metadata"() {
-        check backdrop gone
+    def "Check Form (Item) detail section is present and collapsed"() {
+        expect:
+        check detailSectionFormItem present once
+        check detailSectionFormItemContent gone
 
-        when:
-        selectTab 'ext'
+        when: "Click the title"
+        click detailSectionFormItem
 
-        then:
-        check updateMetadataButton disabled
-        check closeGrowlMessage gone
+        then: "Content is displayed"
+        check detailSectionFormItemContent displayed
 
-        when:
-        click addMetadataButton
-
-        then:
-        check addMetadataButton gone
-
-        when:
-        fillMetadata foo: 'bar', one: 'two', free: 'for'
-
-        then:
-        check updateMetadataButton enabled
-
-        when:
-        click updateMetadataButton
-
-        then:
-        check updateMetadataButton disabled
-
-        when:
-        3.times {
-            click removeMetadataRow
-        }
-
-        then:
-        check updateMetadataButton enabled
-
-        when:
-        click updateMetadataButton
-
-        then:
-        check updateMetadataButton disabled
-
-        when:
-        refresh browser
-
-        then:
-        check addMetadataButton displayed
+        cleanup:
+        click detailSectionFormItem
     }
 
+    def "add metadata"() {
+        setup:
+        click inlineEdit
 
+        when:
+        fillMetadata foo: 'bar'
+        click inlineEditSubmit
+
+        then:
+        check detailSectionCustomMetadataContent contains "foo"
+        check detailSectionCustomMetadataContent contains "bar"
+    }
+
+    def "remove metadata"() {
+        setup:
+        click inlineEdit
+
+        when:
+        click removeMetadataRow
+        click inlineEditSubmit
+
+        then:
+        check detailSectionCustomMetadataContent missing "foo"
+        check detailSectionCustomMetadataContent missing "bar"
+    }
 
     def "create new mapping"() {
         check closeGrowlMessage gone
@@ -303,7 +292,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         then:
         check { infTableCell(1, 2) } is 'x'
     }
-
 
     def "create relationship"() {
         check backdrop gone
