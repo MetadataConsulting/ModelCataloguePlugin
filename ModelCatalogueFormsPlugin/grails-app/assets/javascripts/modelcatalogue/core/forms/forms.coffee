@@ -52,34 +52,6 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
   metadataEditorsProvider.register {
     title: 'Form (Item)'
     types: [
-      'dataType'
-    ]
-    keys: [
-      "http://forms.modelcatalogue.org/item#dataType"
-    ]
-    template: 'modelcatalogue/core/ui/metadataEditors/formItemDataType.html'
-  }
-
-  metadataEditorsProvider.register {
-    title: 'Form (Item)'
-    types: [
-      'dataType'
-    ]
-
-    keys: [
-      "http://forms.modelcatalogue.org/item#responseType"
-      "http://forms.modelcatalogue.org/item#units"
-      "http://forms.modelcatalogue.org/item#digits"
-      "http://forms.modelcatalogue.org/item#length"
-      "http://forms.modelcatalogue.org/item#regexp"
-      "http://forms.modelcatalogue.org/item#regexpErrorMessage"
-    ]
-    template: 'modelcatalogue/core/ui/metadataEditors/formItemDataType.html'
-  }
-
-  metadataEditorsProvider.register {
-    title: 'Form (Item)'
-    types: [
       '=[containment]=>'
     ]
 
@@ -133,6 +105,24 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
       template: '/mc/core/forms/formItem.html'
     }
 
+  detailSectionsProvider.register {
+      title: 'Form (Item)'
+      position: 101000
+      types: [
+        'dataType'
+      ]
+      keys: [
+        "http://forms.modelcatalogue.org/item#responseType"
+        "http://forms.modelcatalogue.org/item#units"
+        "http://forms.modelcatalogue.org/item#digits"
+        "http://forms.modelcatalogue.org/item#length"
+        "http://forms.modelcatalogue.org/item#regexp"
+        "http://forms.modelcatalogue.org/item#regexpErrorMessage"
+        "http://forms.modelcatalogue.org/item#dataType"
+      ]
+      hideIfNoData: true
+      template: '/mc/core/forms/formItem.html'
+    }
 ]
 
 forms.run ['$templateCache', ($templateCache) ->
@@ -316,82 +306,6 @@ forms.run ['$templateCache', ($templateCache) ->
     </form>
   '''
 
-  $templateCache.put 'modelcatalogue/core/ui/metadataEditors/formItemDataType.html', '''
-    <form class="form">
-      <div class="form-group">
-        <label for="item-data-type" class="control-label">Data Type</label>
-        <select id="item-data-type" class="form-control" ng-options="key for (key, value) in {'String':'string', 'Integer': 'int', 'Real':'real', 'Date':'date', 'Partial Date': 'pdate'}" ng-model="object.access('http://forms.modelcatalogue.org/item#dataType')" ng-model-options="{ getterSetter: true }"></select>
-        <p class="help-block">
-          Data type of the item. If you want to use data type <code>file</code> select the <code>File</code> response type on the data type.<br/>
-          XMLSchema and Java data types are mapped to their proper data types automatically. This includes if the current data type is based on one of the data types from XMLSchema or Java classification. For a partial date, use <code>xs:gMonthYear</code> data type.
-        </p>
-      </div>
-    </form>
-  '''
-
-  #language=HTML
-  $templateCache.put 'modelcatalogue/core/ui/metadataEditors/formItemDataType.html', '''
-    <form class="form">
-      <div class="form-group">
-        <label for="item-response-type" class="control-label">Response Type</label>
-        <select id="item-response-type" class="form-control" ng-options="key for (key, value) in {'Text':'text', 'Textarea': 'textarea', 'Single Select':'singleselect', 'Radio':'radio', 'Multi Select': 'multiselect', 'Checkbox': 'checkbox', 'File': 'file'}" ng-model="object.access('http://forms.modelcatalogue.org/item#responseType')" ng-model-options="{ getterSetter: true }"></select>
-        <p class="help-block">
-          Response type of the item. If any metadata related to the item doesn't make sense for given context (e.g. default value for file) they are ignored. Reponse type is inherited from data type's base domains.<br/>
-
-          If data type name is <code>File</code> the default response type is <code>File</code>. If data type is enumeration the default value is <code>Single Select</code>
-          if data element's <code>Max Occurs</code> is <code>1</code>. This can be changed to <code>Radio</code>.
-          For other data types the default value is <code>Text</code> but can be customized to <code>Textarea</code>.
-        </p>
-      </div>
-      <div class="form-group">
-        <label for="item-units" class="control-label">Units</label>
-        <input maxlength="64" type="text" class="form-control" id="item-units" ng-model="object.access('http://forms.modelcatalogue.org/item#units')" ng-model-options="{ getterSetter: true }">
-        <p class="help-block">
-            Used to define the type of values being collected.  It appears to the right of the input field on the CRF. Defaults to the symbol of primitive type's unit of measure.<br/>
-
-            If you are collecting data in Inches, this field can specify your units as Inches, IN, or in.
-            This field should not be changed in any subsequent versions of the CRF. If you do change it and you are the owner
-            of the CRF and no data have been entered for this item, the UNITS attribute for this item will be changed for all
-            versions of the CRF.<br/>
-
-            There are no edit checks associated specifically with units. This will appear as text to right of the input field
-            and will be displayed between parenthesis.<br/>
-
-            If you are exporting to CDISC ODM XML format, this will appear in the metadata as measurement units.<br/>
-
-            Can contain up to 5 characters.
-        </p>
-      </div>
-      <div class="form-group">
-        <label for="item-length" class="control-label">Max Length (String) or Number of All Digits (Numbers)</label>
-        <input type="number" min="1" max="2000" class="form-control" id="item-length" ng-model="object.access('http://forms.modelcatalogue.org/item#length').asInt" ng-model-options="{ getterSetter: true }">
-        <p class="help-block">
-          Maximal length of string (up to 2000) or number of digits of the number (up to 26).
-        </p>
-      </div>
-      <div class="form-group">
-        <label for="item-digits" class="control-label">Number of Decimal Digits</label>
-        <input type="number" min="0" max="20" class="form-control" id="item-digits" ng-model="object.access('http://forms.modelcatalogue.org/item#digits').asInt" ng-model-options="{ getterSetter: true }">
-        <p class="help-block">
-          Number of digits after decimal point. Max 20.
-        </p>
-      </div>
-      <div class="form-group">
-        <label for="item-regexp" class="control-label">Regular Expression</label>
-        <input maxlength="1000" type="text" class="form-control" id="item-regexp" ng-model="object.access('http://forms.modelcatalogue.org/item#regexp')" ng-model-options="{ getterSetter: true }">
-        <p class="help-block">
-          Regular expresion the value has match. Defaults to regular expression set for the data type if it is in the format <code>x ==~ /\\d+(\\.\\d+)?/</code>
-        </p>
-      </div>
-      <div class="form-group">
-        <label for="item-regexp-message" class="control-label">Regular Expression Error Message</label>
-        <input maxlength="1000" type="text" class="form-control" id="item-regexp-message" ng-model="object.access('http://forms.modelcatalogue.org/item#regexpErrorMessage')" ng-model-options="{ getterSetter: true }">
-        <p class="help-block">
-          Message shown if the validation fails. Defaults to "Value must match /regexpDef/"
-        </p>
-      </div>
-    </form>
-  '''
   $templateCache.put 'modelcatalogue/core/ui/metadataEditors/formItemDataElement.html', '''
     <form class="form">
       <div class="checkbox">
