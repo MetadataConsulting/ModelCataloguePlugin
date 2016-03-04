@@ -63,7 +63,7 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
         go "#/catalogue/user/all"
 
         expect:
-        check 'h3' is 'User List'
+        check 'h3' is 'Users'
         check { infTableCell(1, 2).find('a', text: 'admin') } displayed
 
         when:
