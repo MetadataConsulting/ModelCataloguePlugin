@@ -38,13 +38,9 @@ angular.module('mc.core.ui.states', [
     messages.error 'Application is not available at the moment, please, retry later'
 
   $rootScope.$on 'resourceNotFound', (ignored, config) ->
+    # let's keep it simple just showing the user the resource does not exist
     messages.error 'Selected resource cannot be found in the catalogue', config.url
-    if $state.includes 'simple.resource'
-      $state.go 'simple.resource.list', resource: $stateParams.resource, {location: 'replace'}
-    else if $state.includes 'mc.resource'
-      $state.go 'mc.resource.list', resource: $stateParams.resource, dataModelId: $stateParams.dataModelId, {location: 'replace'}
-    else
-      $state.go 'landing', {}, {location: 'replace'}
+
 ])
 
 .config([ '$modalProvider', ($modalProvider) ->

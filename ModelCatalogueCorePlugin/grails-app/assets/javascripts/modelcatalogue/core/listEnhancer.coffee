@@ -9,8 +9,12 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
           self = @
 
           $rootScope.$on 'catalogueElementDeleted', (event, element) ->
+            return unless element
+            return unless angular.isArray(self.list)
+
             indexesToRemove = []
-            for item, i in self.list when item.id == element.id and item.elementType == element.elementType
+
+            for item, i in self.list when item and item.id == element.id and item.elementType == element.elementType
               indexesToRemove.push i
 
             for index, i in indexesToRemove
