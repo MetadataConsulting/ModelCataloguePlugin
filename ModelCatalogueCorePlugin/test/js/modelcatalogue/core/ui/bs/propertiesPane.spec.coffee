@@ -1,9 +1,9 @@
 describe "mc.core.ui.propertiesPane", ->
 
   beforeEach module 'mc.core.ui.states.bs'
+  beforeEach module 'mc.core.ui.states'
   beforeEach module 'mc.core.modelCatalogueApiRoot'
   beforeEach module 'mc.core.catalogueElementEnhancer'
-  beforeEach module 'mc.core.ui.bs.propertiesPane'
 
   it "element get compiled",  inject ($compile, $rootScope, enhance, $httpBackend) ->
     $httpBackend.when('GET', '/api/modelCatalogue/core/dashboard').respond(fixtures.dashboard.index)
