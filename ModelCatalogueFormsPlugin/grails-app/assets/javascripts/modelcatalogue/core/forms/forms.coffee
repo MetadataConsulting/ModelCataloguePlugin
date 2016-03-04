@@ -21,8 +21,9 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
     template: '/mc/core/forms/formMetadata.html'
   }
 
-  metadataEditorsProvider.register {
+  detailSectionsProvider.register {
     title: 'Form (Section)'
+    position: 50
     types: [
       'dataClass'
       '=[hierarchy]=>'
@@ -33,7 +34,8 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
       "http://forms.modelcatalogue.org/section#instructions"
       "http://forms.modelcatalogue.org/section#pageNumber"
     ]
-    template: 'modelcatalogue/core/ui/metadataEditors/formSection.html'
+    hideIfNoData: true
+    template: '/mc/core/forms/formSection.html'
   }
 
   metadataEditorsProvider.register {
@@ -128,66 +130,6 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
 ]
 
 forms.run ['$templateCache', ($templateCache) ->
-  $templateCache.put 'modelcatalogue/core/ui/metadataEditors/formSection.html', '''
-    <div class="alert alert-warning">The form section metadata only applies on the direct children of the form's root model and is ignored for any other nested models.</div>
-    <form class="form">
-      <div class="form-group">
-        <label for="section-title" class="control-label">Title</label>
-        <textarea maxlength="2000" rows="5" class="form-control" id="section-title" ng-model="object.access('http://forms.modelcatalogue.org/section#title')" ng-model-options="{ getterSetter: true }"></textarea>
-        <p class="help-block">
-          The value in this field will be displayed at the top of each page when a user is performing data entry, as well
-          as in the tabs and drop down list used to navigate between sections in a CRF. It does not have to be unique but
-          should be a readable value that makes sense to people entering data.  An example would be 'Inclusion Criteria'.<br/>
-
-          Defaults to model's name.<br/>
-
-          Long section titles may not display well.<br/>
-
-          Can contain up to 2000  characters.
-        </p>
-      </div>
-      <div class="form-group">
-        <label for="section-subtitle" class="control-label">Subtitle</label>
-        <textarea maxlength="2000" rows="5" class="form-control" id="section-subtitle" ng-model="object.access('http://forms.modelcatalogue.org/section#subtitle')" ng-model-options="{ getterSetter: true }"></textarea>
-        <p class="help-block">
-          A sub-title shown under the section title.<br/>
-
-          HTML elements are supported for this field.<br/>
-
-          Can contain up to 2000 characters.
-        </p>
-      </div>
-      <div class="form-group">
-        <label for="section-instructions" class="control-label">Instructions</label>
-        <textarea maxlength="2000" rows="5" class="form-control" id="section-instructions" ng-model="object.access('http://forms.modelcatalogue.org/section#instructions')" ng-model-options="{ getterSetter: true }"></textarea>
-        <p class="help-block">
-          Instructions at the top of the section (under the subtitle) that explains to the data entry person what to do on
-          this section of the form.<br/>
-
-          HTML elements are supported for this field.<br/>
-
-          This field should be used if there are particular data entry instructions that should be conveyed or followed
-          to users.<br/>
-
-          Can contain up to 2000 characters.
-        </p>
-      </div>
-      <div class="form-group">
-        <label for="form-page-number" class="control-label">Page Number</label>
-        <input maxlength="5" type="text" class="form-control" id="form-page-number" ng-model="object.access('http://forms.modelcatalogue.org/section#pageNumber')" ng-model-options="{ getterSetter: true }">
-        <p class="help-block">
-          The page number on which the section begins. If using paper source documents and have a multi-page CRF,
-          put in the printed page number.<br/>
-
-          For the most part, this field is only used in studies collecting data on multi-page paper forms and then having
-          the data keyed in at a central location performing double data entry.<br/>
-
-          Can contain up to 5 characters.
-        </p>
-      </div>
-    </form>
-  '''
-
   $templateCache.put 'modelcatalogue/core/ui/metadataEditors/formGrid.html', '''
     <div class="alert alert-warning">The grid group metadata only applies on the direct children of the form's section model (grand children of root model) and is ignored for any other nested models.</div>
     <form class="form">
