@@ -4,6 +4,15 @@ set -x
 
 source ./bin/lib/test-setup.sh
 
+function copy_functional_test_results() {
+    mkdir -p "$HOME/reports/test-app-functional-tests-reports"
+    mkdir -p "$HOME/reports/test-app-functional-geb-reports"
+    mkdir -p "$HOME/reports/assets/modelcatalogue"
+    cp -Rf target/test-reports/ "$HOME/reports/test-app-functional-tests-reports" || true
+    cp -Rf target/geb-reports/ "$HOME/reports/test-app-functional-geb-reports" || true
+    cp -Rf target/assets/modelcatalogue/modelcatalogue*.js "$HOME/reports/assets/modelcatalogue" || true
+}
+
 cd ModelCatalogueCorePlugin
 
 # plugin unit tests
@@ -69,36 +78,8 @@ if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "app_integration" ] ||
     cp -Rf target/test-reports/ "$HOME/reports/test-app-integration-tests-reports" || true
 fi
 
-if [ "$TEST_SUITE" = "functional" ] || [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "" ] ; then
-    set -x
-    mkdir -p "$HOME/reports/test-app-functional-tests-reports"
-    mkdir -p "$HOME/reports/test-app-functional-geb-reports"
-    cp -Rf target/test-reports/ "$HOME/reports/test-app-functional-tests-reports" || true
-    cp -Rf target/geb-reports/ "$HOME/reports/test-app-functional-geb-reports" || true
-fi
-
-if [ "$TEST_SUITE" = "app_functional_a" ] ; then
-    set -x
-    mkdir -p "$HOME/reports/test-app-functional-a-tests-reports"
-    mkdir -p "$HOME/reports/test-app-functional-a-geb-reports"
-    cp -Rf target/test-reports/ "$HOME/reports/test-app-functional-a-tests-reports" || true
-    cp -Rf target/geb-reports/ "$HOME/reports/test-app-functional-a-geb-reports" || true
-fi
-
-if [ "$TEST_SUITE" = "app_functional_b" ] ; then
-    set -x
-    mkdir -p "$HOME/reports/test-app-functional-b-tests-reports"
-    mkdir -p "$HOME/reports/test-app-functional-b-geb-reports"
-    cp -Rf target/test-reports/ "$HOME/reports/test-app-functional-b-tests-reports" || true
-    cp -Rf target/geb-reports/ "$HOME/reports/test-app-functional-b-geb-reports" || true
-fi
-
-if [ "$TEST_SUITE" = "app_functional_c" ] ; then
-    set -x
-    mkdir -p "$HOME/reports/test-app-functional-c-tests-reports"
-    mkdir -p "$HOME/reports/test-app-functional-c-geb-reports"
-    cp -Rf target/test-reports/ "$HOME/reports/test-app-functional-c-tests-reports" || true
-    cp -Rf target/geb-reports/ "$HOME/reports/test-app-functional-c-geb-reports" || true
+if [ "$TEST_SUITE" = "functional" ] || [[ "$TEST_SUITE" == app_functional* ]] || [ "$TEST_SUITE" = "" ] ; then
+    copy_functional_test_results
 fi
 
 cd ..
