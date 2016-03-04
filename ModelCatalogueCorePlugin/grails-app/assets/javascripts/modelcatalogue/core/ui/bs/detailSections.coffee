@@ -39,22 +39,6 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
         </div>
       </div>
   '''
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/dataClassBasic.html', '''
-      <div class="col-md-6">
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Last Updated</strong></div>
-          <div class="col-md-6"><small>{{element.lastUpdated | date}}</small></div>
-        </div>
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Version Created</strong></div>
-          <div class="col-md-6"><small>{{element.versionCreated | date}}</small></div>
-        </div>
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Status</strong></div>
-          <div class="col-md-6"><small>{{element.status}}</small></div>
-        </div>
-      </div>
-  '''
 
   $templateCache.put 'modelcatalogue/core/ui/detailSections/dataElementBasic.html', '''
       <div class="col-md-12">
@@ -414,7 +398,7 @@ x in ['apple', 'banana', 'cherry']
       'dataClass'
     ]
     keys: []
-    template: 'modelcatalogue/core/ui/detailSections/dataClassBasic.html'
+    template: '/mc/core/ui/detail-sections/dataClassBasic.html'
   }
 
   detailSectionsProvider.register {
