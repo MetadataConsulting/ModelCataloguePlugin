@@ -78,51 +78,51 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
   }
 
   detailSectionsProvider.register {
-      title: 'Form (Item)'
-      position: 101000
-      types: [
-        'dataElement'
-      ]
-      keys: [
-        "http://forms.modelcatalogue.org/item#question"
-        "http://forms.modelcatalogue.org/item#defaultValue"
-        "http://forms.modelcatalogue.org/item#phi"
-        "http://forms.modelcatalogue.org/item#instructions"
-        "http://forms.modelcatalogue.org/item#description"
-        "http://forms.modelcatalogue.org/item#layout"
-        "http://forms.modelcatalogue.org/item#columnNumber"
-        "http://forms.modelcatalogue.org/item#required"
-        "http://forms.modelcatalogue.org/item#questionNumber"
-        "http://forms.modelcatalogue.org/item#responseType"
-        "http://forms.modelcatalogue.org/item#units"
-        "http://forms.modelcatalogue.org/item#digits"
-        "http://forms.modelcatalogue.org/item#length"
-        "http://forms.modelcatalogue.org/item#regexp"
-        "http://forms.modelcatalogue.org/item#regexpErrorMessage"
-        "http://forms.modelcatalogue.org/item#dataType"
-      ]
-      hideIfNoData: true
-      template: '/mc/core/forms/formItem.html'
-    }
+    title: 'Form (Item)'
+    position: 101000
+    types: [
+      'dataElement'
+    ]
+    keys: [
+      "http://forms.modelcatalogue.org/item#question"
+      "http://forms.modelcatalogue.org/item#defaultValue"
+      "http://forms.modelcatalogue.org/item#phi"
+      "http://forms.modelcatalogue.org/item#instructions"
+      "http://forms.modelcatalogue.org/item#description"
+      "http://forms.modelcatalogue.org/item#layout"
+      "http://forms.modelcatalogue.org/item#columnNumber"
+      "http://forms.modelcatalogue.org/item#required"
+      "http://forms.modelcatalogue.org/item#questionNumber"
+      "http://forms.modelcatalogue.org/item#responseType"
+      "http://forms.modelcatalogue.org/item#units"
+      "http://forms.modelcatalogue.org/item#digits"
+      "http://forms.modelcatalogue.org/item#length"
+      "http://forms.modelcatalogue.org/item#regexp"
+      "http://forms.modelcatalogue.org/item#regexpErrorMessage"
+      "http://forms.modelcatalogue.org/item#dataType"
+    ]
+    hideIfNoData: true
+    template: '/mc/core/forms/formItem.html'
+  }
 
   detailSectionsProvider.register {
-      title: 'Form (Item)'
-      position: 101000
-      types: [
-        'dataType'
-      ]
-      keys: [
-        "http://forms.modelcatalogue.org/item#responseType"
-        "http://forms.modelcatalogue.org/item#units"
-        "http://forms.modelcatalogue.org/item#digits"
-        "http://forms.modelcatalogue.org/item#length"
-        "http://forms.modelcatalogue.org/item#regexp"
-        "http://forms.modelcatalogue.org/item#regexpErrorMessage"
-        "http://forms.modelcatalogue.org/item#dataType"
-      ]
-      hideIfNoData: true
-      template: '/mc/core/forms/formItem.html'
-    }
+    title: 'Form (Item)'
+    position: 101000
+    types: [
+      'dataType'
+    ]
+    keys: [
+      "http://forms.modelcatalogue.org/item#responseType"
+      "http://forms.modelcatalogue.org/item#units"
+      "http://forms.modelcatalogue.org/item#digits"
+      "http://forms.modelcatalogue.org/item#length"
+      "http://forms.modelcatalogue.org/item#regexp"
+      "http://forms.modelcatalogue.org/item#regexpErrorMessage"
+      "http://forms.modelcatalogue.org/item#dataType"
+    ]
+    hideIfNoData: true
+    template: '/mc/core/forms/formItem.html'
+  }
 ]
 
 forms.run ['$templateCache', ($templateCache) ->
