@@ -4,7 +4,6 @@ import grails.util.Holders
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
-import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
@@ -125,7 +124,7 @@ class DraftChain extends PublishingChain {
 
         draft.beforeDraftPersisted()
 
-        if (!draft.save(flush: true, deepValidate: false)) {
+        if (!draft.save(/*flush: true, */ deepValidate: false)) {
             return draft
         }
 
@@ -143,7 +142,7 @@ class DraftChain extends PublishingChain {
         }
 
         draft.status = ElementStatus.DRAFT
-        draft.save(flush: true, deepValidate: false)
+        draft.save(/*flush: true, */ deepValidate: false)
 
         log.debug("... cretated draft for $published ($context)")
 

@@ -169,8 +169,9 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
         }
 
         if (existing.status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED] || getEntityClass(existing) != domain) {
-            log.info("New draft version created for $this. Reason: $draftRequest")
-            return repository.createDraftVersion(existing, this)
+            T draft = repository.createDraftVersion(existing, this)
+            log.info("New draft version created for $this. Reason: $draftRequest. Draft: $draft")
+            return draft
         }
         return existing
     }

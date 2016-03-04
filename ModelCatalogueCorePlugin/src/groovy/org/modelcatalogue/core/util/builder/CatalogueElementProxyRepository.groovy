@@ -34,6 +34,7 @@ class CatalogueElementProxyRepository {
     Set<Class> unclassifiedQueriesFor = []
 
     private Set<CatalogueElementProxy> pendingProxies = []
+    private Map<String, String> semanticVersions = [:]
 
     private Set<Long> elementsUnderControl = []
 
@@ -151,6 +152,9 @@ class CatalogueElementProxyRepository {
                     } else {
                         throw e
                     }
+                }
+                if (element.domain == DataModel && !semanticVersions[element.name]) {
+                    semanticVersions[element.name] = element.getParameter('semanticVersion')?.toString()
                 }
             }
             watch.stop()
@@ -329,7 +333,7 @@ class CatalogueElementProxyRepository {
     }
 
     public <T extends CatalogueElement> T createDraftVersion(T element, CatalogueElementProxy proxy) {
-        elementService.createDraftVersion(element, createDraftContext(proxy, element))
+        elementService.createDraftVersion(element, createDraftContext(proxy, element).version(semanticVersions[proxy.classification]))
     }
 
     private <T extends CatalogueElement> DraftContext createDraftContext(CatalogueElementProxy proxy, T element) {

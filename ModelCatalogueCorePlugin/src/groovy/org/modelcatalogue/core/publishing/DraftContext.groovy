@@ -124,7 +124,8 @@ class DraftContext {
         "$source.id:$type.id:$destination.id"
     }
 
-    static nextPatchVersion(String currentVersion) {
+    static String nextPatchVersion(Object patchVersion) {
+        String currentVersion = patchVersion?.toString()
         if (!currentVersion) {
             // null is considered to be 0.0.1
             return '0.0.2'
