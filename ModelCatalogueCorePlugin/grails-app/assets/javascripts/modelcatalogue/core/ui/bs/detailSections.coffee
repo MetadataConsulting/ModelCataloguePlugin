@@ -40,29 +40,6 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       </div>
   '''
 
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/measurementUnitBasic.html', '''
-      <div class="col-md-6">
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Symbol</strong></div>
-          <div class="full-width-editable col-md-6"><small editable-text="copy.symbol">{{element.symbol || 'empty'}}</small></div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Last Updated</strong></div>
-          <div class="col-md-6"><small>{{element.lastUpdated | date}}</small></div>
-        </div>
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Version Created</strong></div>
-          <div class="col-md-6"><small>{{element.versionCreated | date}}</small></div>
-        </div>
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Status</strong></div>
-          <div class="col-md-6"><small>{{element.status}}</small></div>
-        </div>
-      </div>
-  '''
-
   $templateCache.put 'modelcatalogue/core/ui/detailSections/organization.html', '''
       <div class="col-md-3">
           <strong class="small">Organization</strong>
@@ -319,7 +296,7 @@ x in ['apple', 'banana', 'cherry']
       'measurementUnit'
     ]
     keys: []
-    template: 'modelcatalogue/core/ui/detailSections/measurementUnitBasic.html'
+    template: '/mc/core/ui/detail-sections/measurementUnitBasic.html'
   }
 
 
