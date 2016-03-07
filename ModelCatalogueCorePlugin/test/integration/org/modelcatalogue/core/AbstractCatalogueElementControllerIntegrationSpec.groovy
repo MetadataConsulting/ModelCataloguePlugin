@@ -30,6 +30,8 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
             another = elementService.finalizeElement(another)
         }
 
+        addDataModelIfNotPresent(another)
+
         String currentName = another.name
         Integer currentVersionNumber = another.versionNumber
         Integer numberOfCurrentVersions = another.countVersions()
@@ -57,6 +59,13 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         oldVersion.versionNumber == currentVersionNumber
         oldVersion.name == currentName
         oldVersion.name != json.name
+    }
+
+    void addDataModelIfNotPresent(CatalogueElement another) {
+        if (!another.dataModel) {
+            another.dataModel = new DataModel(name: "DM${System.currentTimeMillis()}", status: ElementStatus.FINALIZED, semanticVersion: '0.1.1').save(failOnError: true)
+            another.save(failOnError: true)
+        }
     }
 
     @Unroll
@@ -103,6 +112,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     void createDraftVersions(CatalogueElement el) {
+        addDataModelIfNotPresent(el)
         int counter = 0
         while ((el.versionNumber != 3) && (counter++ < 3)) {
             el = elementService.createDraftVersion(elementService.finalizeElement(el), DraftContext.userFriendly())
@@ -684,6 +694,8 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         String newName                  = "UPDATED NAME"
         Map keyValue = new HashMap()
         keyValue.put('testKey', 'testValue')
+
+        addDataModelIfNotPresent(another)
 
         when:
         controller.request.method       = 'PUT'

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?><catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.0/metadataregistry.xsd">
-  <dataModel name="Transportation" id="http://www.example.com/datasets/Transportation" status="DRAFT">
+  <dataModel name="Transportation" id="http://www.example.com/datasets/Transportation" status="DRAFT" semanticVersion="0.0.1">
     <dataClass name="Engine" id="http://www.example.com/models/Engine" status="DRAFT">
       <dataElement name="Factor of Adhesion" id="http://www.example.com/elements/Adhesion" status="DRAFT">
         <dataType name="Force" id="http://www.example.com/domains/Force" status="DRAFT">
