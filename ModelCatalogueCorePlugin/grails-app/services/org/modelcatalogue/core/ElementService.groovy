@@ -85,7 +85,17 @@ class ElementService implements Publisher<CatalogueElement> {
      */
 
     public <E extends CatalogueElement> E createDraftVersion(E element, DraftContext context) {
-        Closure<E> code = { TransactionStatus status = null ->
+        if (!element) {
+            return element
+        }
+
+        if (element.instanceOf(DataModel)) {
+            DataModel dataModel = element as DataModel
+            return createDraftVersion(dataModel, DraftContext.nextPatchVersion(dataModel.semanticVersion), context) as E
+        }
+
+        if (context.forceNew) {
+            // use the legacy way how to create draft unless better way found
             return (E) auditService.logNewVersionCreated(element) {
                 E draft = element.createDraftVersion(this, context) as E
                 if (draft.hasErrors()) {
@@ -100,11 +110,20 @@ class ElementService implements Publisher<CatalogueElement> {
                 return draft
             }
         }
-        if (context.importFriendly) {
-            return code()
-        } else {
-            return (E) CatalogueElement.withTransaction(code)
+
+        if (!element.dataModel) {
+            throw new IllegalArgumentException("Cannot create draft version for element outside data model - $element")
         }
+
+        DataModel draftDataModel = createDraftVersion(element.dataModel, context.version ?: DraftContext.nextPatchVersion(element.dataModel.semanticVersion), context)
+
+        E draft = CatalogueElement.findByDataModelAndStatusAndLatestVersionId(draftDataModel, ElementStatus.DRAFT, element.latestVersionId ?: element.getId()) as E
+
+        if (!draft) {
+            throw new IllegalStateException("Data model $draftDataModel created without the draft version of $element")
+        }
+
+        return draft
     }
 
     public <E extends CatalogueElement> E cloneElement(E element, CloningContext context) {

@@ -5,6 +5,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.RelationshipDirection
+import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 import spock.lang.Issue
 import spock.lang.Unroll
 
@@ -12,6 +13,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def setup() {
         loadFixtures()
+
     }
 
     def elementService
@@ -59,9 +61,15 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         DataElement author = DataElement.findByName('auth5')
         DataType domain = DataType.findByName('test1')
 
+        DataModel dataModel = new DataModel(name: "auth5test1", semanticVersion: "1.0.0", status: ElementStatus.FINALIZED).save(failOnError: true)
+
+        domain.dataModel = dataModel
+        domain.save(failOnError: true)
 
         author.ext.something = 'anything'
         author.dataType = domain
+        author.dataModel = dataModel
+        author.save(failOnError: true)
 
         int originalVersion     = author.versionNumber
         DataElement draft       = elementService.createDraftVersion(author, DraftContext.forceNew()) as DataElement
@@ -208,20 +216,19 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
     def "create new version of hierarchy model"() {
 
         setup:
-        DataClass md1      = new DataClass(name:"test1").save()
-        DataClass md2      = new DataClass(name:"test2").save()
-        DataClass md3      = new DataClass(name:"test3").save()
+        DataModel dataModel = new DataModel(name: "cnvohm", semanticVersion: '1.0.0').save(failOnError: true)
+        DataClass md1      = new DataClass(name:"test1", dataModel: dataModel).save(failOnError: true)
+        DataClass md2      = new DataClass(name:"test2", dataModel: dataModel).save(failOnError: true)
+        DataClass md3      = new DataClass(name:"test3", dataModel: dataModel).save(failOnError: true)
 
         md1.addToParentOf(md2)
         md2.addToParentOf(md3)
 
-        elementService.finalizeElement(md1)
-        elementService.finalizeElement(md2)
-        elementService.finalizeElement(md3)
+        elementService.finalizeElement(dataModel)
 
 
         int originalVersion     = md2.versionNumber
-        DataClass draft             = elementService.createDraftVersion(md2, DraftContext.userFriendly()) as DataClass
+        DataClass draft         = elementService.createDraftVersion(md2, DraftContext.userFriendly()) as DataClass
         int draftVersion        = draft.versionNumber
         int newVersion          = md2.versionNumber
 
@@ -255,6 +262,8 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
     def "finalize element"(){
         when:
         DataElement author = DataElement.findByName('auth5')
+        author.dataModel = new DataModel(name: "fe", semanticVersion: "1.0.0", status: ElementStatus.FINALIZED).save(failOnError: true)
+        author.save(failOnError: true)
         DataElement draft = elementService.createDraftVersion(author, DraftContext.userFriendly()) as DataElement
 
         then:
@@ -373,8 +382,9 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
 
     def "mappings are transferred to the new draft"() {
-        DataType d1 = new DataType(name: "VD4MT1", status: ElementStatus.FINALIZED).save(failOnError: true, flush: true)
-        DataType d2 = new DataType(name: "VD4MT2", status: ElementStatus.FINALIZED).save(failOnError: true, flush: true)
+        DataModel dataModel = new DataModel(name: "mattnd", semanticVersion: "1.0.0", status: ElementStatus.FINALIZED).save(failOnError: true)
+        DataType d1 = new DataType(name: "VD4MT1", status: ElementStatus.FINALIZED, dataModel: dataModel).save(failOnError: true, flush: true)
+        DataType d2 = new DataType(name: "VD4MT2", status: ElementStatus.FINALIZED, dataModel: dataModel).save(failOnError: true, flush: true)
 
         Mapping mapping = mappingService.map(d1, d2, "x")
 
@@ -494,17 +504,26 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     @Issue("https://metadata.atlassian.net/browse/MET-732")
     def "can un-deprecate element if conditions are met"() {
-        DataType vd = new DataType(name: 'VD4MET-732').save(failOnError: true, flush: true)
+        DataType dataType = new DataType(name: 'VD4MET-732', status: ElementStatus.FINALIZED, dataModel: new DataModel(name: 'MET-732', semanticVersion: '0.0.1', status: ElementStatus.FINALIZED).save(failOnError: true)).save(failOnError: true, flush: true)
 
-        vd = elementService.createDraftVersion(vd, DraftContext.importFriendly([] as Set)) as DataType
-        vd = elementService.finalizeElement(vd)
-        vd = elementService.archive(vd, false)
+        dataType = elementService.createDraftVersion(dataType, DraftContext.importFriendly([] as Set)) as DataType
+
+        expect:
+        dataType
 
         when:
-        elementService.restore(vd)
+        dataType = elementService.finalizeElement(dataType)
 
         then:
-        vd.status == ElementStatus.FINALIZED
+        dataType
+
+        when:
+        dataType = elementService.archive(dataType, false)
+
+        elementService.restore(dataType)
+
+        then:
+        dataType.status == ElementStatus.FINALIZED
     }
 
     def "creating draft of data model won't set previous version as a data model"() {

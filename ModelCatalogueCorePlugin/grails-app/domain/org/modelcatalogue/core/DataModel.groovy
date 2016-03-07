@@ -56,7 +56,7 @@ class DataModel extends CatalogueElement {
     protected PublishingChain prepareDraftChain(PublishingChain chain) {
         return super.prepareDraftChain(chain).add(this.declares)
     }
-    
+
     List<CatalogueElement> getDeclares() {
         CatalogueElement.findAllByDataModel(this)
     }
@@ -105,5 +105,9 @@ class DataModel extends CatalogueElement {
     @Override
     String getDataModelSemanticVersion() {
         return semanticVersion
+    }
+
+    String toString() {
+        "${getClass().simpleName}[semanticVersion: ${semanticVersion}, id: ${id}, name: ${name}, status: ${status}, modelCatalogueId: ${modelCatalogueId}]"
     }
 }

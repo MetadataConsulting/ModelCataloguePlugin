@@ -153,8 +153,8 @@ class CatalogueElementProxyRepository {
                         throw e
                     }
                 }
-                if (element.domain == DataModel && !semanticVersions[element.name]) {
-                    semanticVersions[element.name] = element.getParameter('semanticVersion')?.toString()
+                if (element.domain == DataModel && !semanticVersions[element.name] && element.getParameter('semanticVersion')) {
+                    semanticVersions[element.name] = element.getParameter('semanticVersion').toString()
                 }
             }
             watch.stop()
