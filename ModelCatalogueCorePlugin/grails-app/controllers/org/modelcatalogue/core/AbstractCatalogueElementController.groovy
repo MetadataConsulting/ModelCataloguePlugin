@@ -5,6 +5,7 @@ import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
+import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.util.*
 import org.modelcatalogue.core.util.lists.CustomizableJsonListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
@@ -823,7 +824,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 continue
             }
             if (!(dataModel.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
-                dataModel = elementService.createDraftVersion(dataModel, DraftContext.userFriendly())
+                dataModel = elementService.createDraftVersion(dataModel, PublishingContext.nextPatchVersion(dataModel.semanticVersion), DraftContext.userFriendly())
             }
             instance.dataModel = dataModel
             instance.save()

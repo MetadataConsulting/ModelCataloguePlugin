@@ -53,11 +53,6 @@ class DataModel extends CatalogueElement {
         return Legacy.fixModelCatalogueId(super.getDefaultModelCatalogueId(withoutVersion))
     }
 
-    @Override
-    protected PublishingChain prepareDraftChain(PublishingChain chain) {
-        return super.prepareDraftChain(chain).add(this.declares)
-    }
-
     List<CatalogueElement> getDeclares() {
         CatalogueElement.findAllByDataModel(this)
     }

@@ -11,26 +11,27 @@ import org.modelcatalogue.core.util.FriendlyErrors
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
-/**
- * Publishing chain for creating drafts. It should be needed any longer to create drafts in this cmp
- */
 @Log4j
 class DraftChain extends PublishingChain {
 
     private final DraftContext context
 
-    private DraftChain(CatalogueElement published, DraftContext context) {
+    private DraftChain(DataModel published, DraftContext context) {
         super(published)
         this.context = context
     }
 
-    static DraftChain create(CatalogueElement published, DraftContext strategy) {
+    private DataModel getPublishedDataModel() {
+        return published as DataModel
+    }
+
+    static DraftChain create(DataModel published, DraftContext strategy) {
         return new DraftChain(published, strategy)
     }
 
     protected CatalogueElement doRun(Publisher<CatalogueElement> publisher) {
-        if (!context.forceNew && !context.typeChangeRequested) {
-            if (isDraft(published) || isUpdatingInProgress(published)) {
+        if (!context.forceNew) {
+            if (isDraft(published)) {
                 published.clearErrors()
                 return published
             }
@@ -45,74 +46,43 @@ class DraftChain extends PublishingChain {
             }
         }
 
-        // only the first element in the chain can be forced
-        context.stopForcingNew()
-
         log.debug("Creating draft for $published ($context) ...")
 
-        startUpdating()
+        DataModel draftDataModel = createDraft(publishedDataModel, null, publisher)
 
-        for (CatalogueElement element in required) {
-            if (!isDraft(element)) {
-                return rejectRequiredDependency(element)
-            }
+        for (CatalogueElement element in publishedDataModel.declares) {
+            createDraft(element, draftDataModel, publisher)
         }
 
-        for (Collection<CatalogueElement> elements in queue) {
-            for (CatalogueElement element in elements) {
-                if (context.dataModel && context.dataModel != element.dataModel && context.dataModel != element) {
-                    processed << element.id
-                    continue
-                }
-                if (element.id in processed || isUpdatingInProgress(element) || isDeprecated(element)) {
-                    continue
-                }
-                processed << element.id
-                log.debug "Requesting draft creation of $element from $published"
-                CatalogueElement draft = element.createDraftVersion(publisher, context)
-                if (draft.hasErrors()) {
-                    String message = FriendlyErrors.printErrors("Draft version $draft has errors", draft.errors)
-                    log.warn(message)
-                    return rejectDraftDependency(draft, message)
-                }
-            }
-        }
-        // TODO: the creating relationships must happen in two phase, first everything we need is turned into draft
-        // than the new relationships will link these existing drafts
-        return createDraft(publisher)
+        return draftDataModel
     }
 
-    private CatalogueElement createDraft(Publisher<CatalogueElement> archiver) {
-        if (!published.latestVersionId) {
-            published.latestVersionId = published.id
-            FriendlyErrors.failFriendlySave(published)
+    private <T extends CatalogueElement> T createDraft(T element, DataModel draftDataModel, Publisher<CatalogueElement> archiver) {
+        if (!element.latestVersionId) {
+            element.latestVersionId = element.id
+            FriendlyErrors.failFriendlySave(element)
         }
 
-        if (published.archived) {
-            published.errors.rejectValue('status', 'org.modelcatalogue.core.CatalogueElement.element.cannot.be.archived', 'Cannot create draft version from deprecated element!')
-            return published
-        }
-
-        Class<? extends CatalogueElement> type = context.getNewType(published) ?: getEntityClass(published)
+        Class<? extends CatalogueElement> type = context.getNewType(element) ?: getEntityClass(element)
 
         GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(type.name) as GrailsDomainClass
 
         CatalogueElement draft = type.newInstance()
 
-        draft.dataModel = context.getDestinationDataModel(published)
+        draft.dataModel = draftDataModel
 
         for (prop in domainClass.persistentProperties) {
-            if (!prop.association && published.hasProperty(prop.name) && prop.name != 'dataModel') {
-                draft.setProperty(prop.name, published.getProperty(prop.name))
+            if (!prop.association && element.hasProperty(prop.name) && prop.name != 'dataModel') {
+                draft.setProperty(prop.name, element.getProperty(prop.name))
             }
         }
 
-        draft.versionNumber = published.countVersions() + 1
+        draft.versionNumber = element.countVersions() + 1
         draft.versionCreated = new Date()
 
-        draft.latestVersionId = published.latestVersionId ?: published.id
+        draft.latestVersionId = element.latestVersionId ?: element.id
         draft.status = ElementStatus.UPDATED
-        draft.dateCreated = published.dateCreated
+        draft.dateCreated = element.dateCreated
 
         if (draft.instanceOf(DataModel)) {
             if (context.hasVersion()) {
@@ -128,41 +98,25 @@ class DraftChain extends PublishingChain {
         draft.beforeDraftPersisted(context)
 
         if (!draft.save(/*flush: true, */ deepValidate: false)) {
-            return draft
+            return draft as T
         }
 
-        restoreStatus()
+        draft.addToSupersedes(element, skipUniqueChecking: true)
 
+        context.delayRelationshipCopying(draft, element)
 
-        draft.addToSupersedes(published, skipUniqueChecking: true)
-
-        context.delayRelationshipCopying(draft, published)
-
-        if (published.status == ElementStatus.DRAFT) {
-            archiver.archive(published, true)
+        if (element.status == ElementStatus.DRAFT) {
+            archiver.archive(element, true)
         }
 
         draft.status = ElementStatus.DRAFT
         draft.save(/*flush: true, */ deepValidate: false)
 
-        context.addResolution(published, draft)
+        context.addResolution(element, draft)
 
-        log.debug("... cretated draft for $published ($context)")
+        log.debug("... created draft for $element ($context)")
 
-        return draft
-    }
-
-
-    private CatalogueElement rejectDraftDependency(CatalogueElement element, String message) {
-        restoreStatus()
-        published.errors.reject('org.modelcatalogue.core.CatalogueElement.cannot.create.draft.dependency', "Cannot create draft of dependency ${element}, please, resolve the issue first. You'll see more details when you try to create draft manualy\n\n$message")
-        published
-    }
-
-    private CatalogueElement rejectRequiredDependency(CatalogueElement element) {
-        restoreStatus()
-        published.errors.reject('org.modelcatalogue.core.CatalogueElement.required.draft.dependency', "Dependency ${element} is not draft. Please, create draft for it first.")
-        published
+        return draft as T
     }
 
 }

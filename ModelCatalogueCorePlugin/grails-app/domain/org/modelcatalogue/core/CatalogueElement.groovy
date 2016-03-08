@@ -372,17 +372,8 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     protected PublishingChain preparePublishChain(PublishingChain chain) { chain }
 
-    @Override
-    final CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftContext strategy) {
-        prepareDraftChain(PublishingChain.createDraft(this, strategy.within(dataModel))).run(publisher)
-    }
-
     final CatalogueElement cloneElement(Publisher<CatalogueElement> publisher, CloningContext strategy) {
         preparePublishChain(PublishingChain.clone(this, strategy)).run(publisher)
-    }
-
-    protected PublishingChain prepareDraftChain(PublishingChain chain) {
-        chain.add(dataModel)
     }
 
     @Override

@@ -26,10 +26,9 @@ class DraftContext extends PublishingContext<DraftContext> {
         new DraftContext(false, elementsUnderControl)
     }
 
-    static DraftContext forceNew() {
-        DraftContext context = new DraftContext(true, [] as Set)
-        context.forceNew = true
-        context
+    DraftContext forceNew() {
+        this.forceNew = true
+        this
     }
 
     boolean isForceNew() {
@@ -45,10 +44,6 @@ class DraftContext extends PublishingContext<DraftContext> {
             return element.getLatestVersionId() in elementsUnderControl
         }
         return element.getId() in elementsUnderControl
-    }
-
-    void stopForcingNew() {
-        forceNew = false
     }
 
     DraftContext within(DataModel dataModel) {

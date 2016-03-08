@@ -11,10 +11,6 @@ public interface CatalogueElementProxy<T> extends CatalogueElement {
 
     CatalogueElementProxy<T> merge(CatalogueElementProxy<T> other);
 
-    void requestDraft();
-
-    T createDraftIfRequested();
-
     T findExisting();
 
     String getChanged();

@@ -153,11 +153,6 @@ class DataType extends CatalogueElement {
     }
 
     @Override
-    protected PublishingChain prepareDraftChain(PublishingChain chain) {
-        super.prepareDraftChain(chain).add(relatedDataElements)
-    }
-
-    @Override
     protected String getModelCatalogueResourceName() {
         'dataType'
     }

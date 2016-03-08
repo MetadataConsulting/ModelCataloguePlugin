@@ -12,8 +12,10 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.publishing.CloningContext
+import org.modelcatalogue.core.publishing.DraftChain
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Publisher
+import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Legacy
@@ -61,7 +63,7 @@ class ElementService implements Publisher<CatalogueElement> {
 
         Closure<DataModel> code = { TransactionStatus status = null ->
             return (DataModel) auditService.logNewVersionCreated(dataModel) {
-                DataModel draft = (DataModel) dataModel.createDraftVersion(this, context)
+                DataModel draft = PublishingChain.createDraft(dataModel, context.within(dataModel)).run(this) as DataModel
                 if (draft.hasErrors()) {
                     status?.setRollbackOnly()
                     return dataModel

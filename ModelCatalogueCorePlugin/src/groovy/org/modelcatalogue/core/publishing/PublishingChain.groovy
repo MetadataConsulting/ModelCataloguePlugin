@@ -22,11 +22,8 @@ abstract class PublishingChain {
         FinalizationChain.create(published)
     }
 
-    public static PublishingChain createDraft(CatalogueElement published, DraftContext strategy) {
-        if (published.instanceOf(DataModel)) {
-            return SimpleDraftChain.create(published as DataModel, strategy)
-        }
-        return DraftChain.create(published, strategy)
+    public static PublishingChain createDraft(DataModel published, DraftContext strategy) {
+        return DraftChain.create(published as DataModel, strategy)
     }
 
     public static PublishingChain clone(CatalogueElement toBeCloned, CloningContext context) {
