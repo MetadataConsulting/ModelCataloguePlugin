@@ -59,7 +59,7 @@ import groovy.transform.CompileStatic
             }
 
             throw new IllegalArgumentException("Unparsable enumeration JSON string $text")
-        } catch (JsonInternalException ignored) {}
+        } catch (Exception ignored) {}
 
         return from(LegacyEnumerations.stringToMap(text))
 
