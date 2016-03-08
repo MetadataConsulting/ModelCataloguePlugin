@@ -1,3 +1,12 @@
+environments {
+    development {
+        grails.serverURL = "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
+    }
+    test {
+        grails.serverURL = "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
+    }
+}
+
 
 log4j = {
     // Example of changing the log pattern for the default console

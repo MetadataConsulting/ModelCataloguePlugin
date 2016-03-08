@@ -115,7 +115,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         addDataModelIfNotPresent(el)
         int counter = 0
         while ((el.versionNumber != 3) && (counter++ < 3)) {
-            el = elementService.createDraftVersion(elementService.finalizeElement(el), DraftContext.userFriendly())
+            el = elementService.createDraftVersion(elementService.finalizeElement(el), DraftContext.userFriendly().forceNew())
             if (el.hasErrors()) {
                 throw new IllegalStateException(FriendlyErrors.printErrors("Creating draft version fails with errors", el.errors))
             }
