@@ -5,7 +5,6 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.RelationshipDirection
-import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 import spock.lang.Issue
 import spock.lang.Unroll
 
@@ -226,9 +225,10 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         elementService.finalizeElement(dataModel)
 
+        DraftContext context = DraftContext.userFriendly()
 
         int originalVersion     = md2.versionNumber
-        DataClass draft         = elementService.createDraftVersion(md2, DraftContext.userFriendly()) as DataClass
+        DataClass draft         = elementService.createDraftVersion(md2, context) as DataClass
         int draftVersion        = draft.versionNumber
         int newVersion          = md2.versionNumber
 
@@ -243,11 +243,17 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         draft.supersedes.contains(md2)
 
+        when:
+        CatalogueElement md1Draft = context.resolve(md1)
+        CatalogueElement md3Draft = context.resolve(md3)
+
+        then:
         md2.parentOf.contains(md3)
         md2.childOf.contains(md1)
         md2.parentOf.contains(md3)
         !md1.parentOf.contains(draft)
-        draft.parentOf.contains(md3)
+        draft.parentOf.contains(md3Draft)
+        draft.childOf.contains(md1Draft)
         outgoingDraftRelationships.size() == 1
         incomingDraftRelationships.size() == 1
 
@@ -391,14 +397,18 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         expect:
         mapping.errors.errorCount == 0
 
+
         when:
-        DataType d1draft = elementService.createDraftVersion(d1, DraftContext.userFriendly())
+        DraftContext context = DraftContext.userFriendly()
+        elementService.createDraftVersion(dataModel, '1.0.1', context)
+        DataType d1draft = context.resolve(d1) as DataType
+        DataType d2draft = context.resolve(d2) as DataType
 
         then:
         d1draft
         d1draft.outgoingMappings
         d1draft.outgoingMappings.size() == 1
-        d1draft.outgoingMappings[0].destination == d2
+        d1draft.outgoingMappings[0].destination == d2draft
 
     }
 
@@ -489,7 +499,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         element in d1.relatedDataElements
 
         when:
-        DataType d1draft = elementService.createDraftVersion(d1, DraftContext.typeChangingUserFriendly(type))
+        DataType d1draft = elementService.createDraftVersion(d1, DraftContext.userFriendly().changeType(d1, type))
 
         then:
         d1draft

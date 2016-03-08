@@ -1,7 +1,7 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
+import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.util.FriendlyErrors
 
 /*
@@ -30,8 +30,8 @@ class DataElement extends CatalogueElement {
     }
 
     @Override
-    void afterDraftPersisted(CatalogueElement draft) {
-        super.afterDraftPersisted(draft)
+    void afterDraftPersisted(CatalogueElement draft, PublishingContext context) {
+        super.afterDraftPersisted(draft, context)
         if (dataType) {
             (draft as DataElement).dataType = dataType
             FriendlyErrors.failFriendlySave(draft)

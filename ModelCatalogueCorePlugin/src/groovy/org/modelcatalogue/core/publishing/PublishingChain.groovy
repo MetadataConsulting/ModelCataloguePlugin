@@ -2,6 +2,7 @@ package org.modelcatalogue.core.publishing
 
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 
@@ -22,7 +23,10 @@ abstract class PublishingChain {
     }
 
     public static PublishingChain createDraft(CatalogueElement published, DraftContext strategy) {
-        DraftChain.create(published, strategy)
+        if (published.instanceOf(DataModel)) {
+            return SimpleDraftChain.create(published as DataModel, strategy)
+        }
+        return DraftChain.create(published, strategy)
     }
 
     public static PublishingChain clone(CatalogueElement toBeCloned, CloningContext context) {

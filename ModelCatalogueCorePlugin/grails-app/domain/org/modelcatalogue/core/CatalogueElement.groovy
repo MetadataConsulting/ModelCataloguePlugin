@@ -9,6 +9,7 @@ import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Published
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
+import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.DataModelAware
 import org.modelcatalogue.core.util.ExtensionsWrapper
@@ -285,15 +286,15 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     /**
      * Called before the archived element is persisted to the data store.
      */
-    void beforeDraftPersisted() {}
+    void beforeDraftPersisted(PublishingContext context) {}
 
-    void afterDraftPersisted(CatalogueElement draft) {
+    void afterDraftPersisted(CatalogueElement draft, PublishingContext context) {
         draft.ext.putAll this.ext
         for(Mapping mapping in outgoingMappings) {
-            mappingService.map(draft, mapping.destination, mapping.mapping)
+            mappingService.map(draft, context.resolve(mapping.destination), mapping.mapping)
         }
         for (Mapping mapping in incomingMappings) {
-            mappingService.map(mapping.source, draft, mapping.mapping)
+            mappingService.map(context.resolve(mapping.source), draft, mapping.mapping)
         }
     }
 

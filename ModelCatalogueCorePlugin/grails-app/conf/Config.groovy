@@ -17,7 +17,7 @@ log4j = {
 
     // less verbose builder and publishing chains for tests as well
     info 'org.modelcatalogue.core.util.builder'
-    info 'org.modelcatalogue.core.publishing'
+    debug 'org.modelcatalogue.core.publishing'
 
     warn 'org.modelcatalogue.core.xml'
     info 'org.modelcatalogue.core.RelationshipType'

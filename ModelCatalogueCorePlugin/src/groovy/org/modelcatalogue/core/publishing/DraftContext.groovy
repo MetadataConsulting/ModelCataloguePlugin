@@ -3,57 +3,33 @@ package org.modelcatalogue.core.publishing
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.RelationshipType
 
-class DraftContext {
+class DraftContext extends PublishingContext<DraftContext> {
 
     private boolean copyRelationships
     private boolean forceNew
 
     private Set<Long> elementsUnderControl
 
-    private DataModel dataModel
     private String semanticVersion
 
-    private Class<? extends CatalogueElement> newType
-
-    private Set<CopyAssociationsAndRelationships> pendingRelationshipsTasks = new LinkedHashSet<CopyAssociationsAndRelationships>()
-    private Set<String> createdRelationshipHashes = []
-
-    private DraftContext(boolean copyRelationships, Set<Long> elementsUnderControl, Class newType) {
+    private DraftContext(boolean copyRelationships, Set<Long> elementsUnderControl) {
         this.copyRelationships = copyRelationships
         this.elementsUnderControl = Collections.unmodifiableSet(elementsUnderControl)
-        this.newType = newType
-    }
-
-    static DraftContext typeChangingUserFriendly(Class<? extends CatalogueElement> newType) {
-        DraftContext context = new DraftContext(true, [] as Set, newType)
-        context.forceNew = true
-        context
-    }
-
-    static DraftContext typeChangingImportFriendly(Class<? extends CatalogueElement> newType, Set<Long> elementsUnderControl) {
-        DraftContext context = new DraftContext(false, elementsUnderControl, newType)
-        context.forceNew = true
-        context
     }
 
     static DraftContext userFriendly() {
-        new DraftContext(true, [] as Set, null)
+        new DraftContext(true, [] as Set)
     }
 
     static DraftContext importFriendly(Set<Long> elementsUnderControl) {
-        new DraftContext(false, elementsUnderControl, null)
+        new DraftContext(false, elementsUnderControl)
     }
 
     static DraftContext forceNew() {
-        DraftContext context = new DraftContext(true, [] as Set, null)
+        DraftContext context = new DraftContext(true, [] as Set)
         context.forceNew = true
         context
-    }
-
-    Class<? extends CatalogueElement> getNewType() {
-        newType
     }
 
     boolean isForceNew() {
@@ -75,20 +51,6 @@ class DraftContext {
         forceNew = false
     }
 
-    void delayRelationshipCopying(CatalogueElement draft, CatalogueElement oldVersion) {
-        pendingRelationshipsTasks << new CopyAssociationsAndRelationships(draft, oldVersion, this)
-    }
-
-    void resolvePendingRelationships() {
-        pendingRelationshipsTasks.each {
-            it.copyRelationships(dataModel, createdRelationshipHashes)
-        }
-    }
-
-    DataModel getDataModel() {
-        return dataModel
-    }
-
     DraftContext within(DataModel dataModel) {
         this.dataModel = dataModel
         return this
@@ -99,7 +61,7 @@ class DraftContext {
         return this
     }
 
-    static <E extends CatalogueElement> E preferDraft(E element) {
+    CatalogueElement findExisting(CatalogueElement element) {
         if (!element) {
             return element
         }
@@ -111,7 +73,7 @@ class DraftContext {
             return element
         }
 
-        E existingDraft =  element.class.findByLatestVersionIdAndStatusInList(element.latestVersionId, [ElementStatus.DRAFT, ElementStatus.UPDATED], [sort: 'versionNumber', order: 'desc'])
+        CatalogueElement existingDraft =  CatalogueElement.findByLatestVersionIdAndStatusInList(element.latestVersionId, [ElementStatus.DRAFT, ElementStatus.UPDATED], [sort: 'versionNumber', order: 'desc'])
 
         if (existingDraft) {
             return existingDraft
@@ -120,40 +82,6 @@ class DraftContext {
         return element
     }
 
-    static String hashForRelationship(CatalogueElement source, CatalogueElement destination, RelationshipType type) {
-        "$source.id:$type.id:$destination.id"
-    }
-
-    static String nextPatchVersion(Object patchVersion) {
-        String currentVersion = patchVersion?.toString()
-        if (!currentVersion) {
-            // null is considered to be 0.0.1
-            return '0.0.2'
-        }
-
-        def majorMinorPatch = currentVersion =~ /^(\d+)(\.(\d+))?(\.(\d+))?$/
-
-        if (majorMinorPatch) {
-            Integer major = majorMinorPatch[0][1] as Integer
-            Integer minor = majorMinorPatch[0][3] as Integer ?: 0
-            Integer patch = majorMinorPatch[0][5] as Integer ?: 0
-
-            return "${major}.${minor}.${patch + 1}"
-        }
-
-        def numberSuffix = currentVersion =~ /(.*?)(\d+)$/
-
-        if (numberSuffix) {
-            String base = numberSuffix[0][1]
-            String suffix = numberSuffix[0][2]
-
-            Integer suffixAsNumber = suffix as Integer
-
-            return base + ("${suffixAsNumber + 1}".padLeft(suffix.size(), '0'))
-        }
-
-        return "${currentVersion}-01"
-    }
 
     DataModel getDestinationDataModel(CatalogueElement catalogueElement) {
         if (!catalogueElement) {
@@ -180,6 +108,10 @@ class DraftContext {
         return semanticVersion
     }
 
+    @Override
+    boolean shouldCopyRelationshipsFor(CatalogueElement draft) {
+        return !(importFriendly && isUnderControl(draft))
+    }
 
     @Override
     public String toString() {
@@ -188,7 +120,6 @@ class DraftContext {
             ", forceNew=" + forceNew +
             ", dataModel=" + dataModel +
             ", semanticVersion='" + semanticVersion + '\'' +
-            ", newType=" + newType +
             '}';
     }
 }

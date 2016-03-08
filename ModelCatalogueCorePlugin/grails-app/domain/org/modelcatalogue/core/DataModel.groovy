@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.publishing.PublishingChain
+import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.util.Legacy
 
 class DataModel extends CatalogueElement {
@@ -97,8 +98,8 @@ class DataModel extends CatalogueElement {
     }
 
     @Override
-    void beforeDraftPersisted() {
-        super.beforeDraftPersisted()
+    void beforeDraftPersisted(PublishingContext context) {
+        super.beforeDraftPersisted(context)
         revisionNotes = null
     }
 

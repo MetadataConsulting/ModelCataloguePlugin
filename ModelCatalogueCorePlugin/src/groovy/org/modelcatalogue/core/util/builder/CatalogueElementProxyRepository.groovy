@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.util.builder
 
-import com.google.common.collect.ImmutableSet
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
 import groovy.transform.CompileDynamic
@@ -8,6 +7,7 @@ import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
+import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.springframework.util.StopWatch
@@ -342,7 +342,7 @@ class CatalogueElementProxyRepository {
                 return DraftContext.userFriendly()
             }
             if ((element.getLatestVersionId() ?: element.getId()) in elementsUnderControl) {
-                return DraftContext.typeChangingUserFriendly(proxy.domain)
+                return DraftContext.userFriendly().changeType(element, proxy.domain)
             }
             return DraftContext.userFriendly()
         }
@@ -350,7 +350,7 @@ class CatalogueElementProxyRepository {
             return DraftContext.importFriendly(elementsUnderControl)
         }
         if ((element.getLatestVersionId() ?: element.getId()) in elementsUnderControl) {
-            return DraftContext.typeChangingImportFriendly(proxy.domain, elementsUnderControl)
+            return DraftContext.importFriendly(elementsUnderControl).changeType(element, proxy.domain)
         }
         return DraftContext.importFriendly(elementsUnderControl)
     }
@@ -473,7 +473,7 @@ class CatalogueElementProxyRepository {
             throw new IllegalStateException("Destination element $destinationElement is not ready to be part of the relationship ${proxy.toString()}")
         }
 
-        String hash = DraftContext.hashForRelationship(sourceElement, destinationElement, type)
+        String hash = PublishingContext.hashForRelationship(sourceElement, destinationElement, type)
 
 
         Relationship existing = createdRelationships[hash]

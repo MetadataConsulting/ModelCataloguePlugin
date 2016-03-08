@@ -523,7 +523,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
             // when draft version is created from the UI still just create plain draft ignoring dependencies
 
-            DraftContext context = newType?.implementation ? DraftContext.typeChangingUserFriendly(newType.implementation) : DraftContext.userFriendly()
+            DraftContext context = newType?.implementation ? DraftContext.userFriendly().changeType(instance, newType.implementation) : DraftContext.userFriendly()
             if (instance.instanceOf(DataModel)) {
                 instance = elementService.createDraftVersion((DataModel) instance, semanticVersion, context) as T
             } else {
@@ -817,7 +817,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
         for (domain in dataModels) {
-            DataModel dataModel = DraftContext.preferDraft(DataModel.get(domain.id as Long)) as DataModel
+            DataModel dataModel = DraftContext.userFriendly().findExisting(DataModel.get(domain.id as Long)) as DataModel
             if (!dataModel) {
                 log.error "No data model exists for $domain"
                 continue

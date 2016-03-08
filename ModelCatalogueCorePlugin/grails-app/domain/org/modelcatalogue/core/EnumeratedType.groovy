@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.enumeration.Enumeration
 import org.modelcatalogue.core.enumeration.Enumerations
+import org.modelcatalogue.core.publishing.PublishingContext
 
 /*
 * Enumerated Types are data types that contain a list of enumerated values
@@ -97,7 +98,7 @@ class EnumeratedType extends DataType {
     }
 
     @Override
-    void beforeDraftPersisted() {
+    void beforeDraftPersisted(PublishingContext context) {
         if (!enumerations) {
             enumerations = ['default' : '']
         }

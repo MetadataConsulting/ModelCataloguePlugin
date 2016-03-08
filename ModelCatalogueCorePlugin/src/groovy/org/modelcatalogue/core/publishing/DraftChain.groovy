@@ -11,6 +11,9 @@ import org.modelcatalogue.core.util.FriendlyErrors
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
+/**
+ * Publishing chain for creating drafts. It should be needed any longer to create drafts in this cmp
+ */
 @Log4j
 class DraftChain extends PublishingChain {
 
@@ -26,7 +29,7 @@ class DraftChain extends PublishingChain {
     }
 
     protected CatalogueElement doRun(Publisher<CatalogueElement> publisher) {
-        if (!context.forceNew) {
+        if (!context.forceNew && !context.typeChangeRequested) {
             if (isDraft(published) || isUpdatingInProgress(published)) {
                 published.clearErrors()
                 return published
@@ -90,7 +93,7 @@ class DraftChain extends PublishingChain {
             return published
         }
 
-        Class<? extends CatalogueElement> type = context.newType ?: getEntityClass(published)
+        Class<? extends CatalogueElement> type = context.getNewType(published) ?: getEntityClass(published)
 
         GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(type.name) as GrailsDomainClass
 
@@ -115,14 +118,14 @@ class DraftChain extends PublishingChain {
             if (context.hasVersion()) {
                 draft.semanticVersion = context.version
             } else {
-                String nextVersion = DraftContext.nextPatchVersion(draft.semanticVersion)
+                String nextVersion = PublishingContext.nextPatchVersion(draft.semanticVersion)
                 draft.semanticVersion = nextVersion
                 context.version(nextVersion)
             }
             draft.revisionNotes = null
         }
 
-        draft.beforeDraftPersisted()
+        draft.beforeDraftPersisted(context)
 
         if (!draft.save(/*flush: true, */ deepValidate: false)) {
             return draft
@@ -135,14 +138,14 @@ class DraftChain extends PublishingChain {
 
         context.delayRelationshipCopying(draft, published)
 
-        published.afterDraftPersisted(draft)
-
         if (published.status == ElementStatus.DRAFT) {
             archiver.archive(published, true)
         }
 
         draft.status = ElementStatus.DRAFT
         draft.save(/*flush: true, */ deepValidate: false)
+
+        context.addResolution(published, draft)
 
         log.debug("... cretated draft for $published ($context)")
 
