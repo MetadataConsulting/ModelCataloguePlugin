@@ -5,7 +5,6 @@ import com.google.common.collect.Lists
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.CloningContext
-import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Published
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
@@ -317,7 +316,10 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}, status: ${status}, modelCatalogueId: ${modelCatalogueId}, dataModel: ${dataModel?.name} (${dataModel?.combinedVersion})]"
+        if (dataModel) {
+            return "$name [$combinedVersion] in $dataModel.name ($status ${getClass().getSimpleName()}:${getId()})"
+        }
+        return "$name [$combinedVersion] ($status ${getClass().getSimpleName()}:${getId()})"
     }
 
     @Override

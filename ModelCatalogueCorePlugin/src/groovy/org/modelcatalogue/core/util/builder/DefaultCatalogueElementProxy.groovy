@@ -339,7 +339,10 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
             // these are ignored and not saved to the database, need to store them in the metadata
             // the metadata get saved if not found in a resolved method
             extensions.put CatalogueElementProxyRepository.MISSING_REFERENCE_ID, modelCatalogueId
-            return repository.findByMissingReferenceId(extensions[CatalogueElementProxyRepository.MISSING_REFERENCE_ID])
+            T result = repository.findByMissingReferenceId(extensions[CatalogueElementProxyRepository.MISSING_REFERENCE_ID])
+            if (result) {
+                return result
+            }
         }
 
         if (name) {

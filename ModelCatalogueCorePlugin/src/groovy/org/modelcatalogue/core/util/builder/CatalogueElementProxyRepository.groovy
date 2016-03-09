@@ -192,8 +192,10 @@ class CatalogueElementProxyRepository {
         elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
             logDebug "[${(i + 1).toString().padLeft(elNumberOfPositions, '0')}/${elementProxiesToBeResolved.size().toString().padLeft(elNumberOfPositions, '0')}] Resolving $element"
             try {
-                created.add(element.resolve() as CatalogueElement)
+                CatalogueElement resolved = element.resolve() as CatalogueElement
+                created.add(resolved)
                 relationshipProxiesToBeResolved.addAll element.pendingRelationships
+                logDebug "${'-' * (elNumberOfPositions * 2 + 3)} Resolved as $resolved"
             } catch (e) {
                 if (anyCause(e, ReferenceNotPresentInTheCatalogueException)) {
                     logWarn "Reference ${element} not present in the catalogue"
@@ -519,8 +521,15 @@ class CatalogueElementProxyRepository {
         return anyCause(th.cause, error)
     }
 
-    def static <T extends CatalogueElement> T findByMissingReferenceId(String missingReferenceId) {
-        (T) ExtensionValue.findByNameAndExtensionValue(MISSING_REFERENCE_ID, missingReferenceId)?.element
+    @CompileDynamic
+    static <T extends CatalogueElement> T findByMissingReferenceId(String missingReferenceId) {
+        DetachedCriteria<CatalogueElement> criteria = new DetachedCriteria<CatalogueElement>(CatalogueElement).build {
+            extensions {
+                eq 'name', MISSING_REFERENCE_ID
+                eq 'extensionValue', missingReferenceId
+            }
+        }
+        getLatestFromCriteria(criteria) as T
     }
 
     void logDebug(String string) {

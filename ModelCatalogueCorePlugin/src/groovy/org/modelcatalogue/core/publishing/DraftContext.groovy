@@ -78,23 +78,6 @@ class DraftContext extends PublishingContext<DraftContext> {
     }
 
 
-    DataModel getDestinationDataModel(CatalogueElement catalogueElement) {
-        if (!catalogueElement) {
-            return null
-        }
-
-        if (catalogueElement.instanceOf(DataModel)) {
-            return null
-        }
-        if (catalogueElement.dataModel) {
-            return preferDraft(catalogueElement.dataModel)
-        }
-        if (dataModel) {
-           return preferDraft(dataModel)
-        }
-        return null
-    }
-
     boolean hasVersion() {
         return semanticVersion != null
     }
@@ -113,7 +96,7 @@ class DraftContext extends PublishingContext<DraftContext> {
         return "DraftContext{" +
             "copyRelationships=" + copyRelationships +
             ", forceNew=" + forceNew +
-            ", dataModel=" + dataModel +
+            ", dataModel='" + dataModel +  '\'' +
             ", semanticVersion='" + semanticVersion + '\'' +
             '}';
     }

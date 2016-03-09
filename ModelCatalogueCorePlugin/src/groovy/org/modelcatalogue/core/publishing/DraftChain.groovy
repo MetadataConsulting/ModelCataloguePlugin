@@ -114,7 +114,7 @@ class DraftChain extends PublishingChain {
 
         context.addResolution(element, draft)
 
-        log.debug("... created draft for $element ($context)")
+        log.debug("... created draft $draft for $element using $context")
 
         return draft as T
     }

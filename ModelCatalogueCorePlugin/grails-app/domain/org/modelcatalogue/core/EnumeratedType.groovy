@@ -89,7 +89,10 @@ class EnumeratedType extends DataType {
     }
 
     String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}, status: ${status}, modelCatalogueId: ${modelCatalogueId},  dataModel: ${dataModel?.name} (${dataModel?.combinedVersion}), enumerations: ${enumerations}]"
+        if (dataModel) {
+            return "$name [$combinedVersion] in $dataModel.name ($status  ${getClass().getSimpleName()}:${getId()}) - ${prettyPrint()}"
+        }
+        return "$name [$combinedVersion] ($status ${getClass().getSimpleName()}:${getId()}) - ${prettyPrint()}"
     }
 
 

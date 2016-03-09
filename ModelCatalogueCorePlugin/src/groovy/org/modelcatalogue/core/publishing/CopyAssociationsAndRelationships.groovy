@@ -36,10 +36,13 @@ class CopyAssociationsAndRelationships {
     }
 
     void afterDraftPersisted() {
+        log.debug("Runnig after draft hooks from '${element}' to '${draft}'...")
         element.afterDraftPersisted(draft, context)
+        log.debug("... after draft hooks ran from '${element}' to '${draft}'")
     }
 
     void copyRelationships(DataModel dataModel, Set<String> createdRelationshipHashes) {
+        log.debug("Copying relationshps from '${element}' to '${draft}'...")
         if (!context.shouldCopyRelationshipsFor(draft)) {
             return
         }
@@ -60,6 +63,7 @@ class CopyAssociationsAndRelationships {
                 }
             }
         }
+        log.debug("... relationships copied from '${element}' to '${draft}'")
     }
 
     void copyRelationshipsInternal(DataModel dataModel, RelationshipDirection direction, Set<String> createdRelationshipHashes) {

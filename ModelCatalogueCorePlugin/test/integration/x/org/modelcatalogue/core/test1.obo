@@ -1,0 +1,155 @@
+format-version: 1.2
+data-version: releases/2015-06-25
+saved-by: Peter Robinson, Sebastian Koehler, Sandra Doelken, Chris Mungall, Melissa Haendel, Nicole Vasilevsky, Monarch Initiative, et al
+auto-generated-by: OBO-Edit 2.3
+subsetdef: hposlim_core "Core clinical terminology"
+subsetdef: secondary_consequence "Consequence of a disorder in another organ system."
+default-namespace: human_phenotype
+ontology: hp
+owl-axioms: Prefix(owl:=<http://www.w3.org/2002/07/owl#>)\nPrefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)\nPrefix(xml:=<http://www.w3.org/XML/1998/namespace>)\nPrefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)\nPrefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)\n\n\nOntology(\nAnnotationAssertion(<http://www.geneontology.org/formats/oboInOwl#id> <http://purl.obolibrary.org/obo/HP_0030412> \"HP:0006771\"^^xsd:string)\nAnnotationAssertion(rdfs:comment <http://purl.obolibrary.org/obo/HP_0040081> \"\")\nAnnotationAssertion(<http://www.geneontology.org/formats/oboInOwl#hasOBONamespace> <http://purl.obolibrary.org/obo/HP_0030243> \"\")\nAnnotationAssertion(<http://www.geneontology.org/formats/oboInOwl#hasOBONamespace> <http://purl.obolibrary.org/obo/HP_0030370> \"\")\nAnnotationAssertion(<http://www.geneontology.org/formats/oboInOwl#hasExactSynonym> <http://purl.obolibrary.org/obo/HP_0000040> \"\")\nAnnotationAssertion(<http://www.geneontology.org/formats/oboInOwl#id> <http://purl.obolibrary.org/obo/HP_0030411> \"HP:0006771\"^^xsd:string)\n)
+logical-definition-view-relation: has_part
+
+[Term]
+id: HP:0000001
+name: All
+comment: Root of all terms in the Human Phenotype Ontology.
+
+[Term]
+id: HP:0000118
+name: Phenotypic abnormality
+def: "A phenotypic abnormality." [HPO:probinson]
+comment: This is the root of the phenotypic abnormality subontology of the HPO.
+synonym: "Organ abnormality" EXACT []
+is_a: HP:0000001 ! All
+
+[Term]
+id: HP:0001507
+name: Growth abnormality
+alt_id: HP:0008904
+synonym: "ABNORMAL GROWTH" EXACT []
+is_a: HP:0000118 ! Phenotypic abnormality
+
+[Term]
+id: HP:0000002
+name: Abnormality of body height
+def: "Deviation from the norm of height with respect to that which is expected according to age and gender norms." [HPO:probinson]
+is_a: HP:0001507 ! Growth abnormality
+created_by: peter
+creation_date: 2008-02-27T02:20:00Z
+
+[Term]
+id: HP:0000119
+name: Abnormality of the genitourinary system
+alt_id: HP:0008658
+alt_id: HP:0008688
+alt_id: HP:0008704
+alt_id: HP:0008713
+def: "The presence of any abnormality of the genitourinary system." [HPO:curators]
+synonym: "Genitourinary abnormality" EXACT []
+synonym: "Genitourinary disease" RELATED []
+synonym: "Genitourinary dysplasia" RELATED []
+synonym: "Genitourinary tract anomalies" EXACT []
+synonym: "Genitourinary tract malformation" EXACT []
+synonym: "Urogenital abnormalities" EXACT []
+synonym: "Urogenital anomalies" EXACT []
+xref: MeSH:D014564 "Urogenital Abnormalities"
+xref: UMLS:C1844502 "GENITOURINARY TRACT ANOMALIES"
+is_a: HP:0000118 ! Phenotypic abnormality
+property_value: HP:0040005 "The presence of any abnormality of the `genitourinary system` (FMA:280610)." xsd:string {xref="HPO:curators"}
+
+
+[Term]
+id: HP:0000079
+name: Abnormality of the urinary system
+def: "An abnormality of the urinary system." [HPO:probinson]
+synonym: "Urinary tract abnormalities" EXACT []
+synonym: "Urinary tract abnormality" EXACT []
+synonym: "Urinary tract anomalies" EXACT []
+xref: UMLS:C0158698 "URINARY TRACT ANOMALY"
+is_a: HP:0000119 ! Abnormality of the genitourinary system
+property_value: HP:0040005 "An abnormality of the `urinary system` (FMA:7159)." xsd:string {xref="HPO:probinson"}
+
+[Term]
+id: HP:0010935
+name: Abnormality of the upper urinary tract
+def: "An abnormality of the upper urinary tract." [HPO:probinson]
+comment: The upper urinary tract is a subdivision of urinary system which consists of the kidney and the ureters.
+is_a: HP:0000079 ! Abnormality of the urinary system
+property_value: HP:0040005 "An abnormality of the `upper urinary tract` (FMA:45658)." xsd:string {xref="HPO:probinson"}
+created_by: peter
+creation_date: 2011-01-16T11:37:29Z
+
+[Term]
+id: HP:0010935
+name: Abnormality of the upper urinary tract
+def: "An abnormality of the upper urinary tract." [HPO:probinson]
+comment: The upper urinary tract is a subdivision of urinary system which consists of the kidney and the ureters.
+is_a: HP:0000079 ! Abnormality of the urinary system
+property_value: HP:0040005 "An abnormality of the `upper urinary tract` (FMA:45658)." xsd:string {xref="HPO:probinson"}
+created_by: peter
+creation_date: 2011-01-16T11:37:29Z
+
+[Term]
+id: HP:0000077
+name: Abnormality of the kidney
+def: "An abnormality of the kidney." [HPO:probinson]
+comment: The kidney is a paired organ whose primary function is the production of urine.
+synonym: "Kidney disease" RELATED []
+synonym: "Renal anomalies" EXACT []
+synonym: "Renal anomaly" EXACT []
+is_a: HP:0010935 ! Abnormality of the upper urinary tract
+property_value: HP:0040005 "An abnormality of the `kidney` (FMA:7203)." xsd:string {xref="HPO:probinson"}
+
+[Term]
+id: HP:0012210
+name: Abnormal renal morphology
+alt_id: HP:0000792
+alt_id: HP:0004726
+alt_id: HP:0004735
+alt_id: HP:0008712
+def: "Any structural anomaly of the kidney." [HPO:probinson]
+synonym: "Kidney malformation" EXACT []
+synonym: "Renal malformation" EXACT []
+synonym: "Structural anomalies of the renal tract" EXACT []
+synonym: "Structural kidney abnormalities" EXACT []
+synonym: "Structural renal anomalies" EXACT []
+xref: UMLS:C0266292 "Kidney malformation"
+is_a: HP:0000077 ! Abnormality of the kidney
+property_value: HP:0040005 "Any structural anomaly of the `kidney` (FMA:7203)." xsd:string {xref="HPO:probinson"}
+created_by: peter
+creation_date: 2013-03-14T07:41:11Z
+
+
+[Term]
+id: HP:0000107
+name: Renal cyst
+alt_id: HP:0000088
+alt_id: HP:0000109
+def: "A fluid filled sac in the kidney." [Eurenomics:fschaefer]
+synonym: "Cystic kidney disease" RELATED []
+synonym: "CYSTIC KIDNEYS" RELATED [HPO:skoehler]
+synonym: "RENAL CYSTS" RELATED [HPO:skoehler]
+xref: UMLS:C0268800 "Renal cysts"
+is_a: HP:0012210 ! Abnormal renal morphology
+
+[Term]
+id: HP:0011035
+name: Abnormality of the renal cortex
+def: "An abnormality of the cortex of the kidney." [HPO:probinson]
+is_a: HP:0012210 ! Abnormal renal morphology
+property_value: HP:0040005 "An abnormality of the `cortex of the kidney` (FMA:15581)." xsd:string {xref="HPO:probinson"}
+created_by: peter
+creation_date: 2011-03-06T11:31:39Z
+
+[Term]
+id: HP:0000003
+name: Multicystic kidney dysplasia
+alt_id: HP:0004715
+def: "Multicystic dysplasia of the kidney is characterized by multiple cysts of varying size in the kidney and the absence of a normal pelvocaliceal system. The condition is associated with ureteral or ureteropelvic atresia, and the affected kidney is nonfunctional." [HPO:curators]
+comment: Multicystic kidney dysplasia is the result of abnormal fetal renal development in which the affected kidney is replaced by multiple cysts and has little or no residual function. The vast majority of multicystic kidneys are unilateral. Multicystic kidney can be diagnosed on prenatal ultrasound.
+synonym: "Multicystic dysplastic kidney" EXACT []
+synonym: "Multicystic kidneys" EXACT []
+synonym: "Multicystic renal dysplasia" EXACT []
+xref: MeSH:D021782 "Multicystic Kidney Dysplasia"
+xref: UMLS:C0345335 "Multicystic Kidney Dysplasia"
+is_a: HP:0000107 ! Renal cyst

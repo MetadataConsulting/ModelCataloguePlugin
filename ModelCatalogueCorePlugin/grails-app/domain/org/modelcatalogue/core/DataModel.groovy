@@ -102,8 +102,4 @@ class DataModel extends CatalogueElement {
     String getDataModelSemanticVersion() {
         return semanticVersion
     }
-
-    String toString() {
-        "${getClass().simpleName}[semanticVersion: ${semanticVersion}, id: ${id}, name: ${name}, status: ${status}, modelCatalogueId: ${modelCatalogueId}]"
-    }
 }

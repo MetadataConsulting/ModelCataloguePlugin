@@ -26,6 +26,7 @@ log4j = {
 
     // less verbose builder and publishing chains for tests as well
     debug 'org.modelcatalogue.core.util.builder'
+    info 'org.modelcatalogue.core.util.builder.DefaultCatalogueElementProxy'
     debug 'org.modelcatalogue.core.publishing'
 
     warn 'org.modelcatalogue.core.xml'
