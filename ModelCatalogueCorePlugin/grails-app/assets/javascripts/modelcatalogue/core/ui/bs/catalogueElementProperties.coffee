@@ -19,30 +19,6 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     {header: 'Metadata',  value: printMetadata, classes: 'col-md-4'}
   ]
 
-  containsDataElements= -> [
-    {header: 'Name', value: "relation.name", classes: 'col-md-3', href: 'relation.href()'}
-    {header: "Description", value: "relation.description" , classes: "col-md-5"}
-    {header: "Data Type", value: printDataType, classes: "col-md-3", href: 'href()'}
-    {header: 'Occurs',  value: printMetadataOccurrencesOnly, classes: 'col-md-2'}
-  ]
-
-  printDataType = (relationship) ->
-    result  = ''
-    dataType = relationship?.relation?.dataType
-    if dataType?.enumerations?.values
-      ext     = dataType?.enumerations?.values ? []
-      for e, i in ext
-        if i == 10
-          result += "..."
-          break
-        result += "#{e.key} \n"
-    if dataType?.dataClass
-      result = """<a href="#{dataType.dataClass.modelCatalogueId}"><span class="fa fa-fw fa-cubes"></span>#{dataType.dataClass.name}</a>"""
-    else if dataType
-      result = dataType?.name
-    result
-
-
   printMetadata = (relationship) ->
     result  = ''
     ext     = relationship?.ext ? {values: []}
@@ -86,7 +62,6 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'parentOf', label: 'Children', columns: localNameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'childOf', label: 'Parents', columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'isContextFor', label: 'Data Classes', columns: nameAndIdent()
-  catalogueElementPropertiesProvider.configureProperty 'contains', label: 'Data Elements', columns: containsDataElements()
   catalogueElementPropertiesProvider.configureProperty 'containedIn', label: 'Data Classes', columns: nameAndIdAndMetadata()
   catalogueElementPropertiesProvider.configureProperty 'hasAttachmentOf', label: 'Attachments', columns: attachmentColumns()
   catalogueElementPropertiesProvider.configureProperty 'hasContextOf', label: 'Conceptual Domains', columns: nameAndIdent()
@@ -199,6 +174,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataClass.hasAttachmentOf', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataClass.properties', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataClass.contains', active: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataClass.contains', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataClass.ext', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataClass.isSynonymFor', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataClass.$$relationship', hidden: true
