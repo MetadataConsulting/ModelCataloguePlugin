@@ -1,13 +1,5 @@
 angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogueElementPropertiesProvider', (catalogueElementPropertiesProvider)->
 
-
-  localNameAndIdent = -> [
-    {header: 'Name', value: "ext.get('name') || ext.get('Name') || relation.name ", classes: 'col-md-5', href: 'relation.href()', href: 'relation.href()'}
-    {header: 'Identification',  value: "relation.getElementTypeName() + ': ' + relation.id", classes: 'col-md-5', href: 'relation.href()'}
-    {header: 'Description',  value: "relation.description", classes: 'col-md-4'}
-    {header: 'Occurs',  value: printMetadataOccurrencesOnly, classes: 'col-md-4'}
-  ]
-
   nameAndIdent = -> [
     {header: 'Name', value: "relation.classifiedName ", classes: 'col-md-5', href: 'relation.href()'}
     {header: 'Identification',  value: "relation.getElementTypeName() + ': ' + relation.id", classes: 'col-md-5', href: 'relation.href()'}
@@ -25,18 +17,6 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     for row in ext.values
       result += "#{row.key}: #{row.value ? ''}\n"
     result
-
-  printMetadataOccurrencesOnly = (relationship) ->
-    result  = ''
-    ext = relationship?.ext ? {values: []}
-    otherMetadataPresen = false
-    for row in ext.values
-      if (row.key == 'Min Occurs' || row.key == 'Max Occurs')
-        result += "#{row.key}: #{row.value ? ''}\n"
-      else
-        otherMetadataPresen = true
-
-    return result
 
   computeBytes = (relationship) ->
     asset = relationship.relation
@@ -59,7 +39,6 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
 
   # global settings
   catalogueElementPropertiesProvider.configureProperty 'ext', label: 'Metadata'
-  catalogueElementPropertiesProvider.configureProperty 'parentOf', label: 'Children', columns: localNameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'childOf', label: 'Parents', columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'isContextFor', label: 'Data Classes', columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'containedIn', label: 'Data Classes', columns: nameAndIdAndMetadata()
