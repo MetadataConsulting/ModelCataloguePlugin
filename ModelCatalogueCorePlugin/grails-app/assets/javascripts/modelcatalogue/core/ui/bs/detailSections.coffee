@@ -401,7 +401,7 @@ x in ['apple', 'banana', 'cherry']
       'dataClass'
     ]
     keys: []
-    template: '/mc/core/ui/detail-sections/dataElements.html'
+    template: '/mc/core/ui/detail-sections/tableData.html'
     getListKey: -> '$$listContainerContains'
     getList: (element) ->
       return element if element.$$listContainerContains
@@ -420,6 +420,47 @@ x in ['apple', 'banana', 'cherry']
           {header: "Description", value: "relation.description" , classes: "col-md-5"}
           {header: "Data Type", value: printDataType, classes: "col-md-3", href: 'href()'}
           {header: 'Occurs',  value: printMetadataOccurrencesOnly, classes: 'col-md-2'}
+        ]
+    }
+  }
+
+  detailSectionsProvider.register {
+    title: 'Children'
+    position: 70
+    types: [
+      'dataClass'
+    ]
+    keys: []
+    template: '/mc/core/ui/detail-sections/tableData.html'
+    getListKey: -> '$$listContainerParentOf'
+    getList: (element) ->
+      return element if element.$$listContainerParentOf
+
+      element.$$listContainerParentOf =
+          base: element.parentOf.base
+          itemType: element.parentOf.itemType
+
+      element.parentOf().then (list) =>
+        element.$$listContainerParentOf = list
+      return element
+    data: {
+      columns:
+        [
+          {
+            header: 'Name',
+            value: "ext.get('name') || ext.get('Name') || relation.name ",
+            classes: 'col-md-5',
+            href: 'relation.href()',
+            href: 'relation.href()'
+          }
+          {
+            header: 'Identification',
+            value: "relation.getElementTypeName() + ': ' + relation.id",
+            classes: 'col-md-5',
+            href: 'relation.href()'
+          }
+          {header: 'Description', value: "relation.description", classes: 'col-md-4'}
+          {header: 'Occurs', value: printMetadataOccurrencesOnly, classes: 'col-md-4'}
         ]
     }
   }
