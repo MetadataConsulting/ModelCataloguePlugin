@@ -5,7 +5,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     {header: 'Name', value: "ext.get('name') || ext.get('Name') || relation.name ", classes: 'col-md-5', href: 'relation.href()', href: 'relation.href()'}
     {header: 'Identification',  value: "relation.getElementTypeName() + ': ' + relation.id", classes: 'col-md-5', href: 'relation.href()'}
     {header: 'Description',  value: "relation.description", classes: 'col-md-4'}
-    {header: 'Metadata',  value: printMetadata, classes: 'col-md-4'}
+    {header: 'Occurs',  value: printMetadataOccurrencesOnly, classes: 'col-md-4'}
   ]
 
   nameAndIdent = -> [
@@ -23,7 +23,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     {header: 'Name', value: "relation.name", classes: 'col-md-3', href: 'relation.href()'}
     {header: "Description", value: "relation.description" , classes: "col-md-5"}
     {header: "Data Type", value: printDataType, classes: "col-md-3", href: 'href()'}
-    {header: 'Metadata',  value: printMetadata, classes: 'col-md-2'}
+    {header: 'Occurs',  value: printMetadataOccurrencesOnly, classes: 'col-md-2'}
   ]
 
   printDataType = (relationship) ->
@@ -49,6 +49,18 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     for row in ext.values
       result += "#{row.key}: #{row.value ? ''}\n"
     result
+
+  printMetadataOccurrencesOnly = (relationship) ->
+    result  = ''
+    ext = relationship?.ext ? {values: []}
+    otherMetadataPresen = false
+    for row in ext.values
+      if (row.key == 'Min Occurs' || row.key == 'Max Occurs')
+        result += "#{row.key}: #{row.value ? ''}\n"
+      else
+        otherMetadataPresen = true
+
+    return result
 
   computeBytes = (relationship) ->
     asset = relationship.relation
