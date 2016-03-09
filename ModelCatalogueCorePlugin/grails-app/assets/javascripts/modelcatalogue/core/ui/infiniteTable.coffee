@@ -7,6 +7,7 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
       isSortable: '=?'
       columns: '=?'
       transform: '&?'
+      manualLoad: '&?'
 
     templateUrl: '/mc/core/ui/infiniteTable.html'
 
@@ -93,9 +94,10 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
         updateHeader(windowEl.scrollTop())
         loadMoreIfNeeded()
 
-      $scope.$watch 'scroll', (scroll) ->
-        updateHeader(scroll)
-        loadMoreIfNeeded()
+      if !angular.isDefined($scope.manualLoad) || !$scope.manualLoad
+        $scope.$watch 'scroll', (scroll) ->
+          updateHeader(scroll)
+          loadMoreIfNeeded()
 
       $scope.$watch 'list', update
       $scope.$watch 'columns', update

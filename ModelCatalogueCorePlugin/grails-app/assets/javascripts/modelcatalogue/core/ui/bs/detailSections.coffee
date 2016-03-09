@@ -190,6 +190,34 @@ x in ['apple', 'banana', 'cherry']
     else
       copy.rule = example
 
+  printDataType = (relationship) ->
+    result  = ''
+    dataType = relationship?.relation?.dataType
+    if dataType?.enumerations?.values
+      ext     = dataType?.enumerations?.values ? []
+      for e, i in ext
+        if i == 10
+          result += "..."
+          break
+        result += "#{e.key} \n"
+    if dataType?.dataClass
+      result = """<a href="#{dataType.dataClass.modelCatalogueId}"><span class="fa fa-fw fa-cubes"></span>#{dataType.dataClass.name}</a>"""
+    else if dataType
+      result = dataType?.name
+    result
+
+  printMetadataOccurrencesOnly = (relationship) ->
+    result  = ''
+    ext = relationship?.ext ? {values: []}
+    otherMetadataPresen = false
+    for row in ext.values
+      if (row.key == 'Min Occurs' || row.key == 'Max Occurs')
+        result += "#{row.key}: #{row.value ? ''}\n"
+      else
+        otherMetadataPresen = true
+
+    return result
+
   detailSectionsProvider.register {
     title: 'Description'
     position: -50
@@ -364,5 +392,35 @@ x in ['apple', 'banana', 'cherry']
     ]
     keys: []
     template: 'modelcatalogue/core/ui/detailSections/customMetadata.html'
+  }
+
+  detailSectionsProvider.register {
+    title: 'Data Elements'
+    position: 60
+    types: [
+      'dataClass'
+    ]
+    keys: []
+    template: '/mc/core/ui/detail-sections/dataElements.html'
+    getListKey: -> '$$listContainerContains'
+    getList: (element) ->
+      return element if element.$$listContainerContains
+
+      element.$$listContainerContains =
+          base: element.contains.base
+          itemType: element.contains.itemType
+
+      element.contains().then (list) =>
+        element.$$listContainerContains = list
+      return element
+    data: {
+      columns:
+        [
+          {header: 'Name', value: "relation.name", classes: 'col-md-3', href: 'relation.href()'}
+          {header: "Description", value: "relation.description" , classes: "col-md-5"}
+          {header: "Data Type", value: printDataType, classes: "col-md-3", href: 'href()'}
+          {header: 'Occurs',  value: printMetadataOccurrencesOnly, classes: 'col-md-2'}
+        ]
+    }
   }
 ]

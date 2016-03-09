@@ -97,6 +97,7 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
         return if configuration.hideIfNoData? then configuration.hideIfNoData else false
       hasData: (element) ->
         return configuration.keys.some (key) -> element.ext.get(key)?
+      data: angular.copy configuration.data
     }
 
     # assign values to the view
