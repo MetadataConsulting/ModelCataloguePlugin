@@ -4,18 +4,23 @@
       <thead>
       <tr class="inf-table-header-row">
         <th class="inf-table-header-cell" ng-repeat="column in columns" ng-class="evaluateClasses(column.classes)">
-          <a title="Show row actions" ng-if="$first" ng-click="triggerHeaderExpanded()" class="inf-cell-expand"><span
-            class="fa fa-fw"
-            ng-class="{'fa-minus-square-o': $$headerExpanded, 'fa-plus-square-o': !$$headerExpanded}"></span></a>
-          <span ng-if="!column.sort">{{column.header}}<span ng-if="!$$headerExpanded &amp;&amp; filters[column.header]"
-                                                            class="text-info" ng-click="triggerHeaderExpanded()"> [{{filters[column.header]}}]</span></span>
-                <span ng-if=" column.sort"><a class="inf-table-header-sortable" ng-click="sortBy(column)">
-                  <span class="fa fa-fw" ng-class="getSortClass(column)"></span>
-                  {{column.header}}
-                </a>
-                <span ng-if="!$$headerExpanded &amp;&amp; filters[column.header]" class="text-info"
-                      ng-click="triggerHeaderExpanded()"> [{{filters[column.header]}}]</span>
-                </span>
+          <a title="Show row actions" ng-if="$first" ng-click="triggerHeaderExpanded()" class="inf-cell-expand">
+            <span class="fa fa-fw"
+                  ng-class="{'fa-minus-square-o': $$headerExpanded, 'fa-plus-square-o': !$$headerExpanded}"></span>
+          </a>
+          <span ng-if="!column.sort">
+            {{column.header}}
+            <span ng-if="!$$headerExpanded &amp;&amp; filters[column.header]"
+                  class="text-info" ng-click="triggerHeaderExpanded()"> [{{filters[column.header]}}]</span>
+          </span>
+          <span ng-if=" column.sort">
+            <a class="inf-table-header-sortable" ng-click="sortBy(column)">
+              <span class="fa fa-fw" ng-class="getSortClass(column)"></span>
+              {{column.header}}
+            </a>
+            <span ng-if="!$$headerExpanded &amp;&amp; filters[column.header]" class="text-info"
+                  ng-click="triggerHeaderExpanded()"> [{{filters[column.header]}}]</span>
+          </span>
         </th>
       </tr>
       <tr class="actions-row active" ng-if="$$headerExpanded">
@@ -42,7 +47,8 @@
           ng-if="isNotFiltered(row)">
         <td class="inf-table-item-cell" ng-class="row.head.classes" ng-switch="row.head.type">
           <span ng-if="row.sortable" class="handle fa fa-ellipsis-v fa-fw text-muted with-move"></span>
-          <a title="Show row actions" ng-click="row.$$expanded = !row.$$expanded" class="inf-cell-expand text-nounderline">
+          <a title="Show row actions" ng-click="row.$$expanded = !row.$$expanded"
+             class="inf-cell-expand text-nounderline">
             <span class="fa fa-fw"
                   ng-class="{'fa-minus-square-o ': row.$$expanded, 'fa-plus-square-o ': !row.$$expanded}">
             </span>
@@ -55,9 +61,11 @@
         <td class="inf-table-item-cell" ng-class="cell.classes" ng-repeat="cell in row.tail" ng-switch="cell.type">
           <a ng-switch-when="link" ng-href="{{cell.href}}" class="preserve-new-lines">{{cell.value}}</a>
           <span ng-switch-when="html"><span ng-bind-html="cell.value" class="preserve-new-lines"></span></span>
-          <span ng-switch-when="plain"><span class="preserve-new-lines">{{cell.value}}</span><span ng-if="cell.shorten"
-                                                                                                   ng-click="cell.value = cell.fullValue ; cell.shorten = false"
-                                                                                                   class="fa fa-fw fa-plus-square-o"></span></span>
+          <span ng-switch-when="plain"><span class="preserve-new-lines">{{cell.value}}</span>
+            <span ng-if="cell.shorten"
+                  ng-click="cell.value = cell.fullValue ; cell.shorten = false"
+                  class="fa fa-fw fa-plus-square-o"></span>
+          </span>
         </td>
       </tr>
       <tr class="actions-row active" ng-repeat-end="" ng-if="row.$$expanded && isNotFiltered(row)">
@@ -81,34 +89,39 @@
         </td>
       </tr>
       </tbody>
-      <tfoot>
-      <tr class="active" ng-if="loading">
-        <td colspan="{{columns.length}}" class="col-md-3">
-          <div class="text-center">
-            <span class="fa fa-fw fa-refresh fa-spin"></span>
-            <span class="pull-right text-muted" ng-if="total != 0"><em>{{elements.length}} of {{total}}<span
-              ng-if="isFiltered()"> (unfiltered)</span></em></span>
-            <span class="pull-right text-muted" ng-if="total == 0"><em>Empty</em></span>
-          </div>
-        </td>
-      </tr>
-      <tr class="active inf-table-footer-action" ng-if="!loading" ng-click="footerAction.run()">
-        <td colspan="{{columns.length}}" class="col-md-3">
-          <div class="text-center">
-            <span class="fa" ng-class="getFooterCentralIconClass()"></span>
-            <span class="pull-right text-muted" ng-if="total != 0"><em>{{elements.length}} of {{total}}<span
-              ng-if="isFiltered()"> (unfiltered)</span></em></span>
-            <span class="pull-right text-muted" ng-if="total == 0"><em>Empty</em></span>
-          </div>
-        </td>
-      </tr>
-      <tr class="active" ng-if="manualLoad">
-        <td colspan="{{columns.length}}" class="col-md-3">
-          <div class="text-right">
-            <a class="btn btn-link btn-inline" ng-click="loadMore()" ng-disabled="total == elements.length">
-              Load Next
-            </a>
-          </div>
+      <tfoot class="table-footer">
+      <tr>
+        <td colspan="{{columns.length}}">
+          <table class="table">
+            <tfoot>
+            <tr class="active" ng-if="loading">
+              <td class="text-center">
+                <span class="fa fa-fw fa-refresh fa-spin"></span>
+                <span class="pull-right text-muted" ng-if="total != 0"><em>{{elements.length}} of {{total}}<span
+                  ng-if="isFiltered()"> (unfiltered)</span></em></span>
+                <span class="pull-right text-muted" ng-if="total == 0"><em>Empty</em></span>
+              </td>
+              <td class="col-md-1"></td>
+            </tr>
+            <tr class="active inf-table-footer-action cursor-pointer" ng-if="!loading" ng-click="footerAction.run()">
+              <td class="text-center">
+                <span class="fa" ng-class="getFooterCentralIconClass()"></span>
+              </td>
+              <td class="col-md-1">
+                <span class="pull-right text-muted" ng-if="total != 0"><em>{{elements.length}} of {{total}}<span
+                  ng-if="isFiltered()"> (unfiltered)</span></em></span>
+                <span class="pull-right text-muted" ng-if="total == 0"><em>Empty</em></span>
+              </td>
+            </tr>
+            <tr class="active" ng-if="manualLoad" ng-click="loadMore()"
+                ng-class="{'cursor-pointer': total != elements.length, 'cursor-not-allowed': total == elements.length}">
+              <td class="text-center">
+                <span class="fa fa-angle-double-down"></span>
+              </td>
+              <td class="col-md-1"></td>
+            </tr>
+            </tfoot>
+          </table>
         </td>
       </tr>
       </tfoot>
