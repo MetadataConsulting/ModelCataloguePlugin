@@ -9,36 +9,6 @@ metadataEditors = angular.module('mc.core.ui.bs.detailSections', ['mc.core.ui.de
 ###
 
 metadataEditors.run ['$templateCache', ($templateCache) ->
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/dataModelBasic.html', '''
-      <div class="col-md-6">
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Authors</strong></div>
-          <div class="full-width-editable col-md-6"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#authors']">{{element.ext.get('http://www.modelcatalogue.org/metadata/#authors') || 'empty'}}</small></div>
-        </div>
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Reviewers</strong></div>
-          <div class="full-width-editable col-md-6"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#reviewers']">{{element.ext.get('http://www.modelcatalogue.org/metadata/#reviewers') || 'empty'}}</small></div>
-        </div>
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Owner</strong></div>
-          <div class="full-width-editable col-md-6"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#owner']">{{element.ext.get('http://www.modelcatalogue.org/metadata/#owner') || 'empty'}}</small></div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Last Updated</strong></div>
-          <div class="col-md-6"><small>{{element.lastUpdated | date}}</small></div>
-        </div>
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Version Created</strong></div>
-          <div class="col-md-6"><small>{{element.versionCreated | date}}</small></div>
-        </div>
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Status</strong></div>
-          <div class="col-md-6"><small>{{element.status}}</small></div>
-        </div>
-      </div>
-  '''
   $templateCache.put 'modelcatalogue/core/ui/detailSections/dataClassBasic.html', '''
       <div class="col-md-6">
         <div class="row">
@@ -364,7 +334,7 @@ x in ['apple', 'banana', 'cherry']
        'http://www.modelcatalogue.org/metadata/#owner'
 
      ]
-     template: 'modelcatalogue/core/ui/detailSections/dataModelBasic.html'
+     template: '/mc/core/ui/detail-sections/dataModelBasic.html'
   }
 
   detailSectionsProvider.register {
