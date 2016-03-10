@@ -46,7 +46,7 @@ fi
 cd ..
 
 cd ModelCatalogueFormsPlugin
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "forms_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "forms_integration" ]|| [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
     set -x
     mkdir -p "$HOME/reports/forms-integration-tests-reports"
     cp -Rf target/test-reports/ "$HOME/reports/forms-integration-tests-reports" || true
@@ -54,10 +54,18 @@ fi
 cd ..
 
 cd ModelCatalogueElasticSearchPlugin
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "es_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "es_integration" ] || [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
     set -x
     mkdir -p "$HOME/reports/es-integration-tests-reports"
     cp -Rf target/test-reports/ "$HOME/reports/es-integration-tests-reports" || true
+fi
+cd ..
+
+cd ModelCatalogueGenomicsPlugin
+if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "gel_integration" ] || [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+    set -x
+    mkdir -p "$HOME/reports/gel-integration-tests-reports"
+    cp -Rf target/test-reports/ "$HOME/reports/gel-integration-tests-reports" || true
 fi
 cd ..
 
@@ -72,7 +80,7 @@ cd ..
 
 cd ModelCatalogueCorePluginTestApp
 
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "app_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "app_integration" ] || [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
     set -x
     mkdir -p "$HOME/reports/test-app-integration-tests-reports"
     cp -Rf target/test-reports/ "$HOME/reports/test-app-integration-tests-reports" || true

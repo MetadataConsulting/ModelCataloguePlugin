@@ -20,9 +20,7 @@ env:
   - TEST_SUITE=core_unit
   - TEST_SUITE=core_integration
   - TEST_SUITE=core_integration_slow
-  - TEST_SUITE=app_integration
-  - TEST_SUITE=forms_integration
-  - TEST_SUITE=es_integration
+  - TEST_SUITE=other_integration
 jdk:
   - oraclejdk8
 before_install:

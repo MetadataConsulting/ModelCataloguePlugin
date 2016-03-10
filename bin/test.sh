@@ -5,7 +5,7 @@ source ./bin/lib/test-setup.sh
 # please update sibling script /collect/reports.sh when you update this file
 
 # karma and functional tests needs to fetch the bower components
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "app_functional_a" ] || [ "$TEST_SUITE" = "app_functional_b" ] || [ "$TEST_SUITE" = "app_functional_c" ] || [ "$TEST_SUITE" = "forms_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "app_functional_a" ] || [ "$TEST_SUITE" = "app_functional_b" ] || [ "$TEST_SUITE" = "app_functional_c" ] ||  [ "$TEST_SUITE" = "" ] ; then
     ./setup-frontend.sh
 fi
 
@@ -42,13 +42,19 @@ fi
 cd ..
 
 cd ModelCatalogueFormsPlugin
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "forms_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "forms_integration" ] || [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
     ./grailsw test-app integration: --non-interactive
 fi
 cd ..
 
 cd ModelCatalogueElasticSearchPlugin
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "es_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "es_integration" ] || [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+    ./grailsw test-app integration: --non-interactive
+fi
+cd ..
+
+cd ModelCatalogueGenomicsPlugin
+if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "gel_integration" ] || [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
     ./grailsw test-app integration: --non-interactive
 fi
 cd ..
@@ -70,7 +76,7 @@ if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "functional" ] ||  [ "
     fi
 fi
 
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "app_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "app_integration" ] || [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
     ./grailsw test-app integration: --non-interactive
 fi
 
