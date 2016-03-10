@@ -122,7 +122,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         $scope.customMetadata = angular.copy($scope.copy?.ext ? {values: []})
 
         for section in $scope.detailSections
-          for key in (section.getKeys() ? [])
+          for key in (section.keys ? [])
             $scope.customMetadata.remove(key)
 
         $scope.customMetadataKeys = []

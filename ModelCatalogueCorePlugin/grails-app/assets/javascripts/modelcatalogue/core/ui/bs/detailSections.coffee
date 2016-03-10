@@ -402,17 +402,16 @@ x in ['apple', 'banana', 'cherry']
     ]
     keys: []
     template: '/mc/core/ui/detail-sections/tableData.html'
-    getListKey: -> '$$listContainerContains'
     getList: (element) ->
-      return element if element.$$listContainerContains
+      return @result if @result
 
-      element.$$listContainerContains =
+      @result =
           base: element.contains.base
           itemType: element.contains.itemType
 
       element.contains().then (list) =>
-        element.$$listContainerContains = list
-      return element
+        @result = list
+      return @result
     data: {
       columns:
         [
@@ -432,17 +431,16 @@ x in ['apple', 'banana', 'cherry']
     ]
     keys: []
     template: '/mc/core/ui/detail-sections/tableData.html'
-    getListKey: -> '$$listContainerParentOf'
     getList: (element) ->
-      return element if element.$$listContainerParentOf
+      return @result if @result
 
-      element.$$listContainerParentOf =
-          base: element.parentOf.base
-          itemType: element.parentOf.itemType
+      @result =
+        base: element.parentOf.base
+        itemType: element.parentOf.itemType
 
       element.parentOf().then (list) =>
-        element.$$listContainerParentOf = list
-      return element
+        @result = list
+      return @result
     data: {
       columns:
         [

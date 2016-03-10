@@ -26,8 +26,11 @@ angular.module('mc.core.ui.infiniteList', ['mc.core.ui.infiniteListCtrl', 'ngAni
         $scope.transform($element: item)
 
 
-      $scope.getDetailSections = (element) ->
-        detailSections.getAvailableViews(element)
+      updateDetailSections = -> $scope.detailSections = detailSections.getAvailableViews($scope.element)
+
+      $scope.watch "element", updateDetailSections
+
+      updateDetailSections()
 
     ]
   }
