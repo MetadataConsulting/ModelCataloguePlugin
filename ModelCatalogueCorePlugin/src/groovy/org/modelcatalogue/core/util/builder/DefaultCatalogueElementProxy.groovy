@@ -15,11 +15,11 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
     static final List<Class> KNOWN_DOMAIN_CLASSES = [Asset, CatalogueElement, DataModel, DataElement, DataType, EnumeratedType, ReferenceType, MeasurementUnit, DataClass, PrimitiveType]
 
-    private static final String CHANGE_NEW = "Does Not Exist Yet"
-    private static final String CHANGE_TYPE = "Type Changed"
-    private static final String CHANGE_PARAMETERS = "Parameters Changed"
-    private static final String CHANGE_EXTENSIONS = "Extensions Changed"
-    private static final String CHANGE_RELATIONSHIP = "Relationship Changed"
+    static final String CHANGE_NEW = "Does Not Exist Yet"
+    static final String CHANGE_TYPE = "Type Changed"
+    static final String CHANGE_PARAMETERS = "Parameters Changed"
+    static final String CHANGE_EXTENSIONS = "Extensions Changed"
+    static final String CHANGE_RELATIONSHIP = "Relationship Changed"
 
     Class<T> domain
 
@@ -39,7 +39,6 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
     private CatalogueElementProxy<T> replacedBy
     private T resolved
-    private String draftRequest
     private String changed
 
     DefaultCatalogueElementProxy(CatalogueElementProxyRepository repository, Class<T> domain, String id, String classification, String name, boolean underControl) {
@@ -147,33 +146,6 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
         extensions.put(key, value)
     }
 
-    void requestDraft() {
-        draftRequest = changed == null ? (changed = getChanged()) : changed
-    }
-
-    T createDraftIfRequested() {
-        if (!draftRequest || referenceNotPresentInTheCatalogue) {
-            return null
-        }
-
-        T existing = findExisting()
-
-        if (!existing) {
-            return null
-        }
-
-
-        if (existing.dataModel && classification && classification != existing.dataModel.name || !existing.dataModel && classification) {
-            log.warn "New draft requested for $this but you cannot update element $existing which does not belong to current data model ${classification}. If you need an update, please, declare the element within the dataModel closure first (or update the element outside the data model definition if it does not belong to any data model)."
-            return existing
-        }
-
-        if (existing.status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED] || getEntityClass(existing) != domain) {
-            log.info("New draft version created for $this. Reason: $draftRequest")
-            return repository.createDraftVersion(existing, this)
-        }
-        return existing
-    }
 
     private boolean isParametersChanged(T element) {
         parameters.any { String key, Object value ->
@@ -367,7 +339,10 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
             // these are ignored and not saved to the database, need to store them in the metadata
             // the metadata get saved if not found in a resolved method
             extensions.put CatalogueElementProxyRepository.MISSING_REFERENCE_ID, modelCatalogueId
-            return repository.findByMissingReferenceId(extensions[CatalogueElementProxyRepository.MISSING_REFERENCE_ID])
+            T result = repository.findByMissingReferenceId(extensions[CatalogueElementProxyRepository.MISSING_REFERENCE_ID])
+            if (result) {
+                return result
+            }
         }
 
         if (name) {

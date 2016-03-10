@@ -15,11 +15,6 @@ class ReferenceType extends DataType {
 
 
     @Override
-    protected PublishingChain prepareDraftChain(PublishingChain chain) {
-        super.prepareDraftChain(chain).add(dataClass)
-    }
-
-    @Override
     protected PublishingChain preparePublishChain(PublishingChain chain) {
         super.preparePublishChain(chain).add(this.dataClass)
     }

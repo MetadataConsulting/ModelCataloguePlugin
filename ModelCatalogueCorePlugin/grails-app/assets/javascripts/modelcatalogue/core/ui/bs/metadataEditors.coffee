@@ -5,6 +5,7 @@ metadataEditors.config ['metadataEditorsProvider', (metadataEditorsProvider)->
      title: 'Occurrence'
      types: [
        '=[containment]=>'
+       '=[hierarchy]=>'
      ]
      keys: ['Min Occurs', 'Max Occurs']
      template: 'modelcatalogue/core/ui/metadataEditors/occurence.html'

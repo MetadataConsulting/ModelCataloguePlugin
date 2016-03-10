@@ -1,18 +1,20 @@
 package org.modelcatalogue.core.publishing
 
 import grails.util.Holders
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
-import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
-@Log4j
+@Log4j @CompileStatic
 class CloningChain extends PublishingChain {
 
     private final CloningContext context
@@ -27,21 +29,21 @@ class CloningChain extends PublishingChain {
     }
 
     protected CatalogueElement doRun(Publisher<CatalogueElement> publisher) {
-        CatalogueElement existing = context.findExisting(published)
+        CatalogueElement existing = context.resolve(published)
 
-        if (existing) {
+        if (existing && existing != published) {
             return existing
         }
 
         if (published.instanceOf(DataModel)) {
-            context.addClone(published, context.destination)
+            context.addResolution(published, context.destination)
         } else {
             startUpdating()
         }
 
         for (CatalogueElement element in required) {
             // required dependencies are not cloned but referenced directly
-            context.addClone(element, element)
+            context.addResolution(element, element)
         }
 
         for (Collection<CatalogueElement> elements in queue) {
@@ -85,7 +87,7 @@ class CloningChain extends PublishingChain {
 
         Class<? extends CatalogueElement> type = getEntityClass(published)
 
-        GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(type.name) as GrailsDomainClass
+        GrailsDomainClass domainClass = getGrailsDomainClass(type)
 
         if (!domainClass) {
             throw new IllegalStateException("Cannot find domain class for ${type}")
@@ -108,26 +110,31 @@ class CloningChain extends PublishingChain {
         clone.status = ElementStatus.UPDATED
         clone.dateCreated = new Date()
 
-        clone.beforeDraftPersisted()
+        clone.beforeDraftPersisted(context)
 
         if (!clone.save(flush: true, deepValidate: false)) {
             return clone
         }
 
-        context.addClone(published, clone)
+        context.addResolution(published, clone)
 
         restoreStatus()
 
-        clone.addToIsClonedFrom(published, skipUniqueChecking: true)
+        clone.createLinkFrom(published, RelationshipType.originType, skipUniqueChecking: true as Object)
 
         context.delayRelationshipCopying(clone, published)
 
-        published.afterDraftPersisted(clone)
+        published.afterDraftPersisted(clone, context)
 
         clone.status = ElementStatus.DRAFT
         clone.latestVersionId = clone.id
 
         clone.save(flush: true, deepValidate: false)
+    }
+
+    @CompileDynamic
+    private static GrailsDomainClass getGrailsDomainClass(Class<CatalogueElement> type) {
+        Holders.applicationContext.getBean(GrailsApplication).getDomainClass(type.name) as GrailsDomainClass
     }
 
 

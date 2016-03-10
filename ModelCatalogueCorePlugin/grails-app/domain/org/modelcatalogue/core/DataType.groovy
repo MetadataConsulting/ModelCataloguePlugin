@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.PublishingChain
+import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.util.DataTypeRuleScript
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.SecuredRuleExecutor
@@ -139,8 +140,8 @@ class DataType extends CatalogueElement {
         }
     }
 
-    void afterDraftPersisted(CatalogueElement draft) {
-        super.afterDraftPersisted(draft)
+    void afterDraftPersisted(CatalogueElement draft, PublishingContext context) {
+        super.afterDraftPersisted(draft, context)
         if (draft.instanceOf(DataType)) {
             for (DataElement de in getRelatedDataElements()) {
                 if (de.status == ElementStatus.DRAFT) {
@@ -149,11 +150,6 @@ class DataType extends CatalogueElement {
                 }
             }
         }
-    }
-
-    @Override
-    protected PublishingChain prepareDraftChain(PublishingChain chain) {
-        super.prepareDraftChain(chain).add(relatedDataElements)
     }
 
     @Override

@@ -8,7 +8,7 @@ class DraftContextSpec extends Specification {
     @Unroll
     def "for version #original is the next version #suggested"() {
         expect:
-        DraftContext.nextPatchVersion(original) == suggested
+        PublishingContext.nextPatchVersion(original) == suggested
 
         where:
         original    | suggested

@@ -1,0 +1,100 @@
+<div class="col-md-12 metadata-form-item-content">
+  <div class="row" ng-if="editableForm.$visible">
+    <div class="col-md-offset-1 col-md-10 alert alert-warning">
+      The form section metadata only applies on the direct children of the form's root model and is ignored for any other nested models.
+    </div>
+  </div>
+  <div class="row" ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#title')">
+    <div class="col-md-3">
+      <strong class="small">Title</strong>
+      <i class="fa fa-question"
+         popover="
+          The value in this field will be displayed at the top of each page when a user is performing data entry, as well
+          as in the tabs and drop down list used to navigate between sections in a CRF. It does not have to be unique but
+          should be a readable value that makes sense to people entering data. An example would be 'Inclusion Criteria'.
+
+          Defaults to model's name.
+
+          Long section titles may not display well.
+
+          Can contain up to 2000  characters.
+          "
+         popover-title="Title"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9 full-width-editable">
+      <span editable-textarea="extAsMap['http://forms.modelcatalogue.org/section#title']" class="small"
+            e-maxlength="2000" e-rows="5">
+        {{element.ext.get('http://forms.modelcatalogue.org/section#title')}}
+      </span>
+    </div>
+  </div>
+  <div class="row" ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#subtitle')">
+    <div class="col-md-3">
+      <strong class="small">Subtitle</strong>
+      <i class="fa fa-question"
+         popover="
+          A sub-title shown under the section title.
+
+          HTML elements are supported for this field.
+
+          Can contain up to 2000 characters.
+          "
+         popover-title="Subtitle"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9 full-width-editable">
+      <span editable-textarea="extAsMap['http://forms.modelcatalogue.org/section#subtitle']" class="small"
+            e-maxlength="2000" e-rows="5">
+        {{element.ext.get('http://forms.modelcatalogue.org/section#subtitle')}}
+      </span>
+    </div>
+  </div>
+  <div class="row" ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#instructions')">
+    <div class="col-md-3">
+      <strong class="small">Instructions</strong>
+      <i class="fa fa-question"
+         popover="
+          Instructions at the top of the section (under the subtitle) that explains to the data entry person what to do on
+          this section of the form.
+
+          HTML elements are supported for this field.
+
+          This field should be used if there are particular data entry instructions that should be conveyed or followed
+          to users.
+
+          Can contain up to 2000 characters.
+          "
+         popover-title="Instructions"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9 full-width-editable">
+      <span editable-textarea="extAsMap['http://forms.modelcatalogue.org/section#instructions']" class="small"
+            e-maxlength="2000" e-rows="5">
+        {{element.ext.get('http://forms.modelcatalogue.org/section#instructions')}}
+      </span>
+    </div>
+  </div>
+  <div class="row" ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#pageNumber')">
+    <div class="col-md-3">
+      <strong class="small">Page Number</strong>
+      <i class="fa fa-question"
+         popover="
+          The page number on which the section begins. If using paper source documents and have a multi-page CRF,
+          put in the printed page number.
+
+          For the most part, this field is only used in studies collecting data on multi-page paper forms and then having
+          the data keyed in at a central location performing double data entry.
+
+          Can contain up to 5 characters.
+          "
+         popover-title="Page Number"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9 full-width-editable">
+      <span editable-text="extAsMap['http://forms.modelcatalogue.org/section#pageNumber']" class="small" e-maxlength="5">
+        {{element.ext.get('http://forms.modelcatalogue.org/section#pageNumber')}}
+      </span>
+    </div>
+  </div>
+</div>

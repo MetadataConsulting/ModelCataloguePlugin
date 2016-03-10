@@ -5,6 +5,7 @@ import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
+import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.util.*
 import org.modelcatalogue.core.util.lists.CustomizableJsonListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
@@ -523,7 +524,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
             // when draft version is created from the UI still just create plain draft ignoring dependencies
 
-            DraftContext context = newType?.implementation ? DraftContext.typeChangingUserFriendly(newType.implementation) : DraftContext.userFriendly()
+            DraftContext context = newType?.implementation ? DraftContext.userFriendly().changeType(instance, newType.implementation) : DraftContext.userFriendly()
             if (instance.instanceOf(DataModel)) {
                 instance = elementService.createDraftVersion((DataModel) instance, semanticVersion, context) as T
             } else {
@@ -817,13 +818,13 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
         for (domain in dataModels) {
-            DataModel dataModel = DraftContext.preferDraft(DataModel.get(domain.id as Long)) as DataModel
+            DataModel dataModel = DraftContext.userFriendly().findExisting(DataModel.get(domain.id as Long)) as DataModel
             if (!dataModel) {
                 log.error "No data model exists for $domain"
                 continue
             }
             if (!(dataModel.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
-                dataModel = elementService.createDraftVersion(dataModel, DraftContext.userFriendly())
+                dataModel = elementService.createDraftVersion(dataModel, PublishingContext.nextPatchVersion(dataModel.semanticVersion), DraftContext.userFriendly())
             }
             instance.dataModel = dataModel
             instance.save()

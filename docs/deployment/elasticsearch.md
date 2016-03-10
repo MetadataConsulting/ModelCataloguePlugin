@@ -9,13 +9,13 @@ Version 2 supports the ElasticSearch for searching catalogue elements. You can e
 Running ElasticSearch on separate server is preferred. You have to put
 the hostname and optionally the port to the configuration:
 
-```java
+```
 mc.search.elasticsearch.host = "192.168.1.123"
 // ElasticSearch bind port, defaults to 9300
 mc.search.elasticsearch.port = "9300"
 ```
 
-You can also specify the host and the port in the command line using Java properties of the same names on command-line: 
+You can also specify the host and the port in the command line using Java properties of the same names on command-line:
 
 `./grailsw run-app -Dmc.search.elasticsearch.host=192.168.1.123`
 
@@ -24,7 +24,7 @@ In Tomcat you can put these properties in `catalina.properties` as well.
 If you need additional settings such as cluster name you can configure
 the ElasticSearch server using a closure assigned to 'mc.search.elasticsearch.settings'
 
-```java
+```
 mc.search.elasticsearch.settings = {
     put 'some.value', 100
 }
@@ -37,7 +37,7 @@ The closure delegates to [Settings.Builder](https://github.com/elastic/elasticse
 
 Local instance of ElasticSearch runs in the same JVM and requires the writable data directory to be configured:
 
-```java
+```
 mc.search.elasticsearch.local = "/full/path/to/data/dir"
 ```
 

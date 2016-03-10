@@ -20,3 +20,7 @@ if [[ "$CIRCLE_NODE_TOTAL" != "" ]]; then
         2) TEST_SUITE="functional" ;;
     esac
 fi
+
+if [[ "$TRAVIS" != "" ]] ; then
+    echo -e "\nTest Results will be available at\n\nhttp://mc-travis-results.orany.cz.s3.amazonaws.com/index.html?prefix=MetadataRegistry/ModelCataloguePlugin/$TRAVIS_BUILD_NUMBER/$TRAVIS_JOB_NUMBER/home/travis/reports/\n\n"
+fi

@@ -37,19 +37,18 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
     def "creation of draft element is logged"() {
         initCatalogueService.initDefaultRelationshipTypes()
+        DataModel dataModel = new DataModel(name: "codeil", status: ElementStatus.FINALIZED, semanticVersion: "1.0.0").save(failOnError: true)
         when:
-        DataType vOne = new DataType(name: "DT4DCL").save(failOnError: true)
-        DataType type = elementService.createDraftVersion(vOne.publish(elementService), DraftContext.userFriendly()) as DataType
+        DataType vOne = new DataType(name: "DT4DCL", dataModel: dataModel, status: ElementStatus.FINALIZED).save(failOnError: true)
+        elementService.createDraftVersion(vOne.publish(elementService), DraftContext.userFriendly()) as DataType
 
         Thread.sleep(100)
 
-        Change change = Change.findByChangedId(type.id)
+        Change change = Change.findByType(ChangeType.NEW_VERSION_CREATED)
 
         then:
         change
-        change.changedId == type.id
-        change.latestVersionId == vOne.id
-        change.type == ChangeType.NEW_VERSION_CREATED
+        change.latestVersionId == dataModel.id
         change.authorId == null
         change.property == null
         change.newValue == null
