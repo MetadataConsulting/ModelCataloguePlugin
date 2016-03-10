@@ -5,10 +5,10 @@ import com.google.common.collect.Lists
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.CloningContext
-import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Published
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
+import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.DataModelAware
 import org.modelcatalogue.core.util.ExtensionsWrapper
@@ -285,15 +285,15 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     /**
      * Called before the archived element is persisted to the data store.
      */
-    void beforeDraftPersisted() {}
+    void beforeDraftPersisted(PublishingContext context) {}
 
-    void afterDraftPersisted(CatalogueElement draft) {
+    void afterDraftPersisted(CatalogueElement draft, PublishingContext context) {
         draft.ext.putAll this.ext
         for(Mapping mapping in outgoingMappings) {
-            mappingService.map(draft, mapping.destination, mapping.mapping)
+            mappingService.map(draft, context.resolve(mapping.destination), mapping.mapping)
         }
         for (Mapping mapping in incomingMappings) {
-            mappingService.map(mapping.source, draft, mapping.mapping)
+            mappingService.map(context.resolve(mapping.source), draft, mapping.mapping)
         }
     }
 
@@ -316,7 +316,10 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}, status: ${status}, modelCatalogueId: ${modelCatalogueId}, dataModel: ${dataModel?.name} (${dataModel?.combinedVersion})]"
+        if (dataModel) {
+            return "$name [$combinedVersion] in $dataModel.name ($status ${getClass().getSimpleName()}:${getId()})"
+        }
+        return "$name [$combinedVersion] ($status ${getClass().getSimpleName()}:${getId()})"
     }
 
     @Override
@@ -371,17 +374,8 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     protected PublishingChain preparePublishChain(PublishingChain chain) { chain }
 
-    @Override
-    final CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftContext strategy) {
-        prepareDraftChain(PublishingChain.createDraft(this, strategy.within(dataModel))).run(publisher)
-    }
-
     final CatalogueElement cloneElement(Publisher<CatalogueElement> publisher, CloningContext strategy) {
         preparePublishChain(PublishingChain.clone(this, strategy)).run(publisher)
-    }
-
-    protected PublishingChain prepareDraftChain(PublishingChain chain) {
-        chain.add(dataModel)
     }
 
     @Override

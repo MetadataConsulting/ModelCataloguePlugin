@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.xml
 
+import grails.util.Holders
 import groovy.xml.MarkupBuilder
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.CatalogueElement
@@ -98,6 +99,20 @@ class CatalogueXmlPrinter {
         }
 
         ret
+    }
+
+    /**
+     * Dumps the element to file for debugging purposes.
+     * @param element element to be dumped
+     * @param path path to the file
+     */
+    static void dump(CatalogueElement element, String path) {
+        File file = new File(path)
+        file.parentFile.mkdirs()
+        file.createNewFile()
+        file.withWriter {
+            new CatalogueXmlPrinter(Holders.applicationContext.getBean(DataModelService), Holders.applicationContext.getBean(DataClassService)).bind(element).writeTo(it)
+        }
     }
 
 }

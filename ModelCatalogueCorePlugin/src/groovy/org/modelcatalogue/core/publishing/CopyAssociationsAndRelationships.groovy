@@ -1,10 +1,10 @@
 package org.modelcatalogue.core.publishing
 
+import com.google.common.collect.ImmutableList
 import grails.util.Holders
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
-import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
@@ -18,46 +18,63 @@ class CopyAssociationsAndRelationships {
 
     private final CatalogueElement draft
     private final CatalogueElement element
-    private final DraftContext context
+    private final PublishingContext context
+    private final ImmutableList<RelationshipDirection> directions
+    private final boolean versionSpecificOnly
 
     private RelationshipService relationshipService
 
 
-    CopyAssociationsAndRelationships(CatalogueElement draft, CatalogueElement element, DraftContext context) {
+    CopyAssociationsAndRelationships(CatalogueElement draft, CatalogueElement element, PublishingContext context, boolean versionSpecificOnly, RelationshipDirection... directions) {
         this.draft = draft
         this.element = element
         this.context = context
+        this.directions = ImmutableList.copyOf(directions)
+        this.versionSpecificOnly = versionSpecificOnly
+
         relationshipService = Holders.applicationContext.getBean(RelationshipService)
     }
 
+    void afterDraftPersisted() {
+        log.debug("Runnig after draft hooks from '${element}' to '${draft}'...")
+        element.afterDraftPersisted(draft, context)
+        log.debug("... after draft hooks ran from '${element}' to '${draft}'")
+    }
+
     void copyRelationships(DataModel dataModel, Set<String> createdRelationshipHashes) {
-        if (context.importFriendly && context.isUnderControl(draft)) {
+        log.debug("Copying relationshps from '${element}' to '${draft}'...")
+        if (!context.shouldCopyRelationshipsFor(draft)) {
             return
         }
 
-        copyRelationshipsInternal(dataModel, RelationshipDirection.INCOMING, createdRelationshipHashes)
-        copyRelationshipsInternal(dataModel, RelationshipDirection.OUTGOING, createdRelationshipHashes)
+        for (RelationshipDirection direction in directions) {
+            copyRelationshipsInternal(dataModel, direction, createdRelationshipHashes)
+        }
 
-        Class type = context.newType ?: HibernateHelper.getEntityClass(draft)
+        Class type = context.getNewType(element) ?: HibernateHelper.getEntityClass(draft)
 
         GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(type.name) as GrailsDomainClass
 
         for (prop in domainClass.persistentProperties) {
-            if (prop.association && (prop.manyToOne || prop.oneToOne) && element.hasProperty(prop.name)) {
+            if (prop.association && (prop.manyToOne || prop.oneToOne) && element.hasProperty(prop.name) && prop.name != 'dataModel') {
                 def value = element.getProperty(prop.name)
                 if (value instanceof CatalogueElement) {
-                    draft.setProperty(prop.name, DraftContext.preferDraft(value))
+                    draft.setProperty(prop.name, context.resolve(value))
                 }
             }
         }
+        log.debug("... relationships copied from '${element}' to '${draft}'")
     }
-
 
     void copyRelationshipsInternal(DataModel dataModel, RelationshipDirection direction, Set<String> createdRelationshipHashes) {
         List<Relationship> toRemove = []
 
         relationshipService.eachRelationshipPartitioned(direction, element) { Relationship r ->
             if (r.relationshipType.system) {
+                return
+            }
+
+            if (versionSpecificOnly && !r.relationshipType.versionSpecific) {
                 return
             }
 
@@ -73,11 +90,11 @@ class CopyAssociationsAndRelationships {
             String hash
 
             if (direction == RelationshipDirection.INCOMING) {
-                otherSide = DraftContext.preferDraft(r.source)
-                hash = DraftContext.hashForRelationship(otherSide, draft, r.relationshipType)
+                otherSide = context.resolve(r.source)
+                hash = PublishingContext.hashForRelationship(otherSide, draft, r.relationshipType)
             } else {
-                otherSide = DraftContext.preferDraft(r.destination)
-                hash = DraftContext.hashForRelationship(draft, otherSide, r.relationshipType)
+                otherSide = context.resolve(r.destination)
+                hash = PublishingContext.hashForRelationship(draft, otherSide, r.relationshipType)
             }
 
             if (hash in createdRelationshipHashes) {
