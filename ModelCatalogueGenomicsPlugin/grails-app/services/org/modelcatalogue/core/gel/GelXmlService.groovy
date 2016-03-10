@@ -313,7 +313,7 @@ class GelXmlService {
 
     
         def namespace=targetModel.ext.get(XSD_STUDY_NAME)=='cancer'?'gelCAN':'gelRD'
-        def study=(targetModel.ext.get(XSD_STUDY_NAME)=='cancer')?'cancer':'rarediseases'
+        def study=(targetModel.ext.get(XSD_STUDY_NAME)=='cancer')?'cancer':'raredisease'
         def version = targetModel.ext.get(XSD_SCHEMA_VERSION)?:''
 
 
@@ -503,8 +503,7 @@ class GelXmlService {
         //take submodels with override  table names if any from relationship
         def subModels=findAllTableCandidates(currModel)
         log.debug(" all possible tables for shredder are  ${subModels.size}" )
-        
-        
+
         String exceptionMessages="";
         MultiValueMap mappedModels=subModels.collect{[it,getXSLTableName(it)]}.collectEntries( new  MultiValueMap())
         def tableNames=mappedModels.values()
