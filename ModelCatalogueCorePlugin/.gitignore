@@ -59,6 +59,7 @@ grails-app/assets/bower_components/*
 *.ipr
 **.gen.fixture.js
 **.gen.xml
+**.asscache
 /plugin.xml
 /grails-model-catalogue-core-plugin-0.0.1/**
 

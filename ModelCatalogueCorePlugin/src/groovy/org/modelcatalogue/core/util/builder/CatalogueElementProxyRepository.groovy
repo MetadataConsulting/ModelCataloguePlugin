@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.util.builder
 
-import com.google.common.collect.ImmutableSet
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
 import groovy.transform.CompileDynamic
@@ -8,11 +7,10 @@ import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
+import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.springframework.util.StopWatch
-
-import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
 @Log4j @GrailsCompileStatic
 class CatalogueElementProxyRepository {
@@ -34,7 +32,6 @@ class CatalogueElementProxyRepository {
     Set<Class> unclassifiedQueriesFor = []
 
     private Set<CatalogueElementProxy> pendingProxies = []
-
     private Set<Long> elementsUnderControl = []
 
     private boolean copyRelationships = false
@@ -92,12 +89,13 @@ class CatalogueElementProxyRepository {
         StopWatch watch =  new StopWatch('catalogue proxy repository')
         Set<CatalogueElement> created = []
 
+        watch.start('merging proxies')
+        logInfo "(1/6) merging proxies"
+
         Set<CatalogueElementProxy> elementProxiesToBeResolved     = []
         Map<String, CatalogueElementProxy> byID     = [:]
         Map<String, CatalogueElementProxy> byName   = [:]
 
-        watch.start('merging proxies')
-        logInfo "(1/6) merging proxies"
         for (CatalogueElementProxy proxy in pendingProxies) {
             if (proxy.modelCatalogueId) {
                 CatalogueElementProxy existing = byID[proxy.modelCatalogueId]
@@ -109,8 +107,8 @@ class CatalogueElementProxyRepository {
                     existing.merge(proxy)
                 }
             } else if (proxy.name) {
-                String fullName = "${proxy.domain.simpleName}:${proxy.domain in HAS_UNIQUE_NAMES ? '*' : proxy.classification}:${proxy.name}"
-                String genericName = "${CatalogueElement.simpleName}:${proxy.domain in HAS_UNIQUE_NAMES ? '*' : proxy.classification}:${proxy.name}"
+                String fullName = getFullNameForProxy(proxy)
+                String genericName = getGenericNameForProxy(proxy)
 
                 CatalogueElementProxy existing = byName[fullName]
 
@@ -140,11 +138,26 @@ class CatalogueElementProxyRepository {
             // Step 1:check something changed this must run before any other resolution happens
             watch.start('dirty checking')
             logInfo "(2/6) dirty checking"
+
+            Set<CatalogueElementProxy> draftRequiredDataModels = new LinkedHashSet<CatalogueElementProxy>()
+            DraftContext context = createDraftContext(collectElementsUnderControl(elementProxiesToBeResolved)).forceNew()
+
             for (CatalogueElementProxy element in elementProxiesToBeResolved) {
                 try {
-                    if (element.changed) {
-                        element.requestDraft()
+                    String change = element.changed
+                    if (change && change != DefaultCatalogueElementProxy.CHANGE_NEW || element.getParameter('status') == ElementStatus.DRAFT) {
+                        if (element.domain == DataModel) {
+                            draftRequiredDataModels.add(element)
+                        } else if (element.classification) {
+                            draftRequiredDataModels.add(byName[getFullNameForDataModel(element.classification)] ?: byName[getGenericNameForDataModel(element.classification)] ?: createProxy(DataModel, [name: element.classification as Object]))
+                        } else {
+                            logWarn "Cannot request draft for element without data model: $element"
+                        }
+                        if (change == DefaultCatalogueElementProxy.CHANGE_TYPE) {
+                            context.changeType(element.findExisting() as CatalogueElement, element.domain)
+                        }
                     }
+
                 } catch (e) {
                     if (anyCause(e, ReferenceNotPresentInTheCatalogueException)) {
                         logWarn "Reference ${element} not present in the catalogue"
@@ -156,34 +169,16 @@ class CatalogueElementProxyRepository {
             watch.stop()
 
             // Step 2: if something changed, create new versions. if run in one step, it generates false changes
-            watch.start('requesting drafts')
-            logInfo "(3/6) requesting drafts"
+            watch.start('creating drafts')
+            logInfo "(3/6) creating drafts"
 
-            elementProxiesToBeResolved.each {
-                if (!it.underControl) {
-                    return
+            for (CatalogueElementProxy proxy in draftRequiredDataModels) {
+                DataModel dataModel = proxy.findExisting() as DataModel
+                if (!dataModel) {
+                    logWarn "Requested to create draft for Data Model '${proxy.name}' but it does not exist yet"
+                    continue
                 }
-                try {
-                    CatalogueElement e = it.findExisting() as CatalogueElement
-
-                    if (e) {
-                        if (e.getLatestVersionId()) {
-                            elementsUnderControl << e.getLatestVersionId()
-                        } else {
-                            elementsUnderControl << e.getId()
-                        }
-                    }
-                } catch (e) {
-                    if (anyCause(e, ReferenceNotPresentInTheCatalogueException)) {
-                        logWarn "Reference ${it} not present in the catalogue"
-                    } else {
-                        throw e
-                    }
-                }
-            }
-
-            for (CatalogueElementProxy element in elementProxiesToBeResolved) {
-                element.createDraftIfRequested()
+                elementService.createDraftVersion(dataModel, proxy.getParameter('semanticVersion')?.toString() ?: PublishingContext.nextPatchVersion(dataModel.semanticVersion), context)
             }
             watch.stop()
         }
@@ -197,8 +192,10 @@ class CatalogueElementProxyRepository {
         elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
             logDebug "[${(i + 1).toString().padLeft(elNumberOfPositions, '0')}/${elementProxiesToBeResolved.size().toString().padLeft(elNumberOfPositions, '0')}] Resolving $element"
             try {
-                created.add(element.resolve() as CatalogueElement)
+                CatalogueElement resolved = element.resolve() as CatalogueElement
+                created.add(resolved)
                 relationshipProxiesToBeResolved.addAll element.pendingRelationships
+                logDebug "${'-' * (elNumberOfPositions * 2 + 3)} Resolved as $resolved"
             } catch (e) {
                 if (anyCause(e, ReferenceNotPresentInTheCatalogueException)) {
                     logWarn "Reference ${element} not present in the catalogue"
@@ -263,10 +260,10 @@ class CatalogueElementProxyRepository {
                 if (status && catalogueElement.status != status) {
                     if (status == ElementStatus.FINALIZED) {
                         elementService.finalizeElement(catalogueElement)
-                    } else if (status == ElementStatus.DRAFT) {
-                        elementService.createDraftVersion(catalogueElement, DraftContext.userFriendly())
+                        logDebug "... finalized $catalogueElement"
                     } else if (status == ElementStatus.DEPRECATED) {
                         elementService.archive(catalogueElement, true)
+                        logDebug "... deprecated $catalogueElement"
                     }
                 }
             } catch (e) {
@@ -284,6 +281,56 @@ class CatalogueElementProxyRepository {
         logInfo "Proxies resolved:\n${watch.prettyPrint()}"
 
         created
+    }
+
+    protected Set<Long> collectElementsUnderControl(Set<CatalogueElementProxy> elementProxiesToBeResolved) {
+        Set<Long> elementsUnderControl = new HashSet<Long>()
+        elementProxiesToBeResolved.each { CatalogueElementProxy it ->
+            if (!it.underControl) {
+                return
+            }
+            try {
+                CatalogueElement e = it.findExisting() as CatalogueElement
+
+                if (e) {
+                    if (e.getLatestVersionId()) {
+                        elementsUnderControl << e.getLatestVersionId()
+                    } else {
+                        elementsUnderControl << e.getId()
+                    }
+                }
+            } catch (e) {
+                if (anyCause(e, ReferenceNotPresentInTheCatalogueException)) {
+                    logWarn "Reference ${it} not present in the catalogue"
+                } else {
+                    throw e
+                }
+            }
+        }
+        return elementsUnderControl
+    }
+
+    private <T extends CatalogueElement> DraftContext createDraftContext(Set<Long> elementsUnderControl) {
+        if (copyRelationships) {
+            return DraftContext.userFriendly()
+        }
+        return DraftContext.importFriendly(elementsUnderControl)
+    }
+
+    protected static String getGenericNameForProxy(CatalogueElementProxy proxy) {
+        "${CatalogueElement.simpleName}:${proxy.domain in HAS_UNIQUE_NAMES ? '*' : proxy.classification}:${proxy.name}"
+    }
+
+    protected static String getFullNameForProxy(CatalogueElementProxy proxy) {
+        "${proxy.domain.simpleName}:${proxy.domain in HAS_UNIQUE_NAMES ? '*' : proxy.classification}:${proxy.name}"
+    }
+
+    protected static String getGenericNameForDataModel(String name) {
+        "${DataModel.simpleName}:*:${name}"
+    }
+
+    protected static String getFullNameForDataModel(String name) {
+        "${DataModel.simpleName}:*:${name}"
     }
 
 
@@ -326,29 +373,6 @@ class CatalogueElementProxyRepository {
         FriendlyErrors.withFriendlyFailure {
             element.save(/* flush: true, */ failOnError: true, deepValidate: false)
         } as T
-    }
-
-    public <T extends CatalogueElement> T createDraftVersion(T element, CatalogueElementProxy proxy) {
-        elementService.createDraftVersion(element, createDraftContext(proxy, element))
-    }
-
-    private <T extends CatalogueElement> DraftContext createDraftContext(CatalogueElementProxy proxy, T element) {
-        if (copyRelationships) {
-            if (proxy.domain == getEntityClass(element)) {
-                return DraftContext.userFriendly()
-            }
-            if ((element.getLatestVersionId() ?: element.getId()) in elementsUnderControl) {
-                return DraftContext.typeChangingUserFriendly(proxy.domain)
-            }
-            return DraftContext.userFriendly()
-        }
-        if (proxy.domain == getEntityClass(element)) {
-            return DraftContext.importFriendly(elementsUnderControl)
-        }
-        if ((element.getLatestVersionId() ?: element.getId()) in elementsUnderControl) {
-            return DraftContext.typeChangingImportFriendly(proxy.domain, elementsUnderControl)
-        }
-        return DraftContext.importFriendly(elementsUnderControl)
     }
 
     protected  <T extends CatalogueElement> T tryFind(Class<T> type, Object classificationName, Object name, Object id) {
@@ -469,7 +493,7 @@ class CatalogueElementProxyRepository {
             throw new IllegalStateException("Destination element $destinationElement is not ready to be part of the relationship ${proxy.toString()}")
         }
 
-        String hash = DraftContext.hashForRelationship(sourceElement, destinationElement, type)
+        String hash = PublishingContext.hashForRelationship(sourceElement, destinationElement, type)
 
 
         Relationship existing = createdRelationships[hash]
@@ -497,8 +521,15 @@ class CatalogueElementProxyRepository {
         return anyCause(th.cause, error)
     }
 
-    def static <T extends CatalogueElement> T findByMissingReferenceId(String missingReferenceId) {
-        (T) ExtensionValue.findByNameAndExtensionValue(MISSING_REFERENCE_ID, missingReferenceId)?.element
+    @CompileDynamic
+    static <T extends CatalogueElement> T findByMissingReferenceId(String missingReferenceId) {
+        DetachedCriteria<CatalogueElement> criteria = new DetachedCriteria<CatalogueElement>(CatalogueElement).build {
+            extensions {
+                eq 'name', MISSING_REFERENCE_ID
+                eq 'extensionValue', missingReferenceId
+            }
+        }
+        getLatestFromCriteria(criteria) as T
     }
 
     void logDebug(String string) {

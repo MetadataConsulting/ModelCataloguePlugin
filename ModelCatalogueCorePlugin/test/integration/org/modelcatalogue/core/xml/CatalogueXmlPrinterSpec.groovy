@@ -104,9 +104,16 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
         String xml = XmlUtil.serialize(printer.bind(input){
             noHref = true
         })
+
+        println "ACTUAL:"
         println xml
 
-        Diff diff = new Diff(xml.replaceAll(/[ \t]+/, " "), getClass().classLoader.getResourceAsStream("resources/xml/$sampleFile").text.replaceAll(/[ \t]+/, " "))
+        String expected = getClass().classLoader.getResourceAsStream("resources/xml/$sampleFile").text
+
+        println "EXPECTED"
+        println expected
+
+        Diff diff = new Diff(xml.replaceAll(/[ \t]+/, " "), expected.replaceAll(/[ \t]+/, " "))
         DetailedDiff detailedDiff = new DetailedDiff(diff)
 
         assert detailedDiff.similar(), detailedDiff.toString()

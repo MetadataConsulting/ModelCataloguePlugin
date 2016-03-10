@@ -15,9 +15,6 @@ import spock.lang.Unroll
 
 import javax.servlet.http.HttpServletResponse
 
-/**
- * Created by adammilward on 27/02/2014.
- */
 abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationSpec implements ResultRecorder{
 
     @Shared
@@ -358,18 +355,6 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
                 [6, 2, 2, 10, totalCount, "", "${baseLink}?max=2&offset=8"]
         ]
     }
-
-    @Deprecated final String getBadXmlError(){}
-
-    @Deprecated
-    def checkXmlCorrectListValues(GPathResult xml, total, size, offset, max, next, previous) {}
-
-    @Deprecated
-    final xmlCustomPropertyCheck(xml, item){}
-
-    @Deprecated
-    final xmlCustomPropertyCheck(inputItem, xml, outputItem){}
-
 
     def customJsonPropertyCheck(item, json){
         checkProperty(json.id , item.id, "id")
