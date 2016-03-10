@@ -17,10 +17,9 @@ env:
   - TEST_SUITE=app_functional_a
   - TEST_SUITE=app_functional_b
   - TEST_SUITE=app_functional_c
-  - TEST_SUITE=core_unit
-  - TEST_SUITE=core_integration
-  - TEST_SUITE=core_integration_slow
   - TEST_SUITE=other_integration
+  - TEST_SUITE=core
+  - TEST_SUITE=core_integration_slow
 jdk:
   - oraclejdk8
 before_install:

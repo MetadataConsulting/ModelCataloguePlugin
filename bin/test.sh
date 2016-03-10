@@ -5,7 +5,7 @@ source ./bin/lib/test-setup.sh
 # please update sibling script /collect/reports.sh when you update this file
 
 # karma and functional tests needs to fetch the bower components
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "app_functional_a" ] || [ "$TEST_SUITE" = "app_functional_b" ] || [ "$TEST_SUITE" = "app_functional_c" ] ||  [ "$TEST_SUITE" = "" ] ; then
+if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "core" ] || [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "app_functional_a" ] || [ "$TEST_SUITE" = "app_functional_b" ] || [ "$TEST_SUITE" = "app_functional_c" ] ||  [ "$TEST_SUITE" = "" ] ; then
     ./setup-frontend.sh
 fi
 
@@ -18,7 +18,7 @@ if [ -z "$TEST_SUITE" ]; then
 fi
 
 # plugin unit tests
-if [ "$TEST_SUITE" = "unit" ] || [ "$TEST_SUITE" = "core_unit" ] || [ "$TEST_SUITE" = "" ] ; then
+if [ "$TEST_SUITE" = "unit" ] || [ "$TEST_SUITE" = "core_unit" ] || [ "$TEST_SUITE" = "core" ] || [ "$TEST_SUITE" = "" ] ; then
     ./grailsw test-app unit: --non-interactive
 fi
 
@@ -31,7 +31,7 @@ fi
 
 
 # plugin integration tests
-if [ "$TEST_SUITE" = "core_integration" ] ; then
+if [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "core" ] ; then
     ./grailsw test-app integration: org.modelcatalogue.**.* --non-interactive
 fi
 
@@ -61,7 +61,7 @@ cd ..
 
 cd ModelCatalogueCorePlugin
 # karma tests, part of the integration as they needs the fixtures generated from the integration tests
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "core_integration" ]|| [ "$TEST_SUITE" = "core" ] || [ "$TEST_SUITE" = "" ] ; then
     ./node_modules/karma/bin/karma start --single-run --browsers Firefox
 fi
 cd ..

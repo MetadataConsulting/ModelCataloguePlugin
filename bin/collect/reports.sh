@@ -16,7 +16,7 @@ function copy_functional_test_results() {
 cd ModelCatalogueCorePlugin
 
 # plugin unit tests
-if [ "$TEST_SUITE" = "unit" ] || [ "$TEST_SUITE" = "core_unit" ] || [ "$TEST_SUITE" = "" ] ; then
+if [ "$TEST_SUITE" = "unit" ] || [ "$TEST_SUITE" = "core_unit" ] || [ "$TEST_SUITE" = "core" ] || [ "$TEST_SUITE" = "" ] ; then
     set -x
     mkdir -p "$HOME/reports/unit-tests-reports"
     cp -Rf target/test-reports/ "$HOME/reports/unit-tests-reports" || true
@@ -31,7 +31,7 @@ fi
 
 
 # plugin integration tests
-if [ "$TEST_SUITE" = "core_integration" ] ; then
+if [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "core" ]  ; then
     set -x
     mkdir -p "$HOME/reports/fast-integration-tests-reports"
     cp -Rf target/test-reports/ "$HOME/reports/fast-integration-tests-reports" || true
@@ -71,7 +71,7 @@ cd ..
 
 cd ModelCatalogueCorePlugin
 # karma tests, part of the integration as they needs the fixtures generated from the integration tests
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "core" ] || [ "$TEST_SUITE" = "" ] ; then
     set -x
     mkdir -p "$HOME/reports/karma-tests-reports"
     cp -Rf target/reports/ "$HOME/reports/karma-tests-reports" || true
