@@ -40,7 +40,7 @@ class DataModelToDocxExporter {
     Closure customTemplate
 
     //If there is an image to display on the front page
-    String imagePath
+    def imagePath
 
     void initVars(rootModel, dataClassService) {
         this.dataClassService = dataClassService
@@ -102,20 +102,23 @@ class DataModelToDocxExporter {
         builder.create {
             document(template: customTemplate) {
 
-                def organisation = rootModel.ext.get(Metadata.ORGANISATION)
-                def owner = rootModel.ext.get(Metadata.OWNER)
+                def thisOrganisation = rootModel.ext.get(Metadata.ORGANISATION)
+                def thisOwner = rootModel.ext.get(Metadata.OWNER)
+                def reviewers = rootModel.ext.get(Metadata.REVIEWERS)
+                def authors = rootModel.ext.get(Metadata.AUTHORS)
+
                 byte[] imageData
                 if(imagePath) imageData = new URL(imagePath).bytes
 
                 if (imagePath){
-                    paragraph(style: 'headerImage', align: 'right'){
-                        image(data: imageData, height: 1.366.inches, width: 2.646.inches, name: 'frontpageImage')
+                    paragraph(align: 'right'){
+                        image(data: imageData, height: 1.366.inches, width: 2.646.inches)
                     }
                 }
 
-                if (organisation) {
+                if (thisOrganisation) {
                     paragraph(style: 'title', align: 'center') {
-                        text organisation
+                        text thisOrganisation
                     }
                 }
 
@@ -128,14 +131,16 @@ class DataModelToDocxExporter {
                     lineBreak()
                     text SimpleDateFormat.dateInstance.format(new Date())
                 }
+
                 pageBreak()
+
                 heading1 'Document Management'
                 paragraph(style: 'document', margin: [top: 20]) {
                     text 'Document Owner: ', font:[bold:true]
-                    text owner
+                    text thisOwner
                     lineBreak()
                     text 'Authors: ', font:[bold:true]
-                    text "${rootModel.ext.get(Metadata.AUTHORS)}"
+                    if(authors) text authors
                 }
 
                 heading2 'Version Control'
@@ -161,11 +166,13 @@ class DataModelToDocxExporter {
                         cell 'Responsibility', style: 'cell.headerCell'
                         cell 'Date', style: 'cell.headerCell'
                     }
-                    rootModel.ext.get(Metadata.REVIEWERS).split(',').each { String reviewer ->
-                        row {
-                            cell "${reviewer}", style: 'cell'
-                            cell '', style: 'cell'
-                            cell '', style: 'cell'
+                    if(reviewers) {
+                        reviewers.split(',').each { String reviewer ->
+                            row {
+                                cell "${reviewer}", style: 'cell'
+                                cell '', style: 'cell'
+                                cell '', style: 'cell'
+                            }
                         }
                     }
                 }
@@ -178,7 +185,7 @@ class DataModelToDocxExporter {
                         cell 'Date', style: 'cell.headerCell'
                     }
                     row {
-                        cell owner, style: 'cell'
+                        cell thisOwner, style: 'cell'
                         cell '', style: 'cell'
                         cell '', style: 'cell'
                     }

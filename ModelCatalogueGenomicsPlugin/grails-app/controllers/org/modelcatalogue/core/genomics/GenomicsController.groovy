@@ -11,7 +11,7 @@ class GenomicsController {
     def assetService
     DataClassService dataClassService
 
-    def imagePath = "http://www.genomicsengland.co.uk/wp-content/uploads/2015/11/Genomics-England-logo-2015.png"
+    def imagePath = "https://www.genomicsengland.co.uk/wp-content/uploads/2015/11/Genomics-England-logo-2015.png"
 
     def customTemplate = {
         'document' font: [family: 'Calibri', size: 11], margin: [left: 20, right: 10]
@@ -32,6 +32,8 @@ class GenomicsController {
     def exportGelSpecification() {
 
         DataModel model = DataModel.get(params.id)
+
+        if(!model) response.status = 404;
 
         Long modelId = model.id
         def assetId= assetService.storeReportAsAsset(
