@@ -7,7 +7,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       id: '@'
       displayOnly: '=?'
 
-    templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
+    templateUrl: '/mc/core/ui/catalogueElementView.html'
 
     controller: [
      '$scope', '$filter', '$q', '$timeout', '$state', 'enhance', 'names', 'columns', 'messages', '$element', '$rootScope', 'security', 'catalogueElementProperties', '$injector', 'applicationTitle', 'catalogue', 'catalogueElementResource', 'detailSections',
