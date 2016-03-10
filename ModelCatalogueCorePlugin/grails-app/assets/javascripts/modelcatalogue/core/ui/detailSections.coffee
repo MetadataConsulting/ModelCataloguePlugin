@@ -48,7 +48,7 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
 
     return fakeOwner
 
-  views = []
+  configurations = []
 
   detailSectionsProvider = {}
 
@@ -75,48 +75,47 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
 
     # TODO should handle $$relationship
 
-    view = {
-      isAvailableFor: (owner) ->
-        return false if not owner
-        return false if not owner.ext
-        return false if not owner.ext.type == 'orderedMap'
-        for type in configuration.types
-          if type.indexOf('=>') > -1
-            continue if not catalogueProvider.isInstanceOf(owner.elementType, 'relationship')
-            return true if isMeetingRelationshipCriteria(owner, type)
-          else if catalogueProvider.isInstanceOf(owner.elementType, type)
-            return true
+    configuration.isAvailableFor = (owner) ->
+      return false if not owner
+      return false if not owner.ext
+      return false if not owner.ext.type == 'orderedMap'
+      for type in configuration.types
+        if type.indexOf('=>') > -1
+          continue if not catalogueProvider.isInstanceOf(owner.elementType, 'relationship')
+          return true if isMeetingRelationshipCriteria(owner, type)
+        else if catalogueProvider.isInstanceOf(owner.elementType, type)
+          return true
 
-        return false
-      getTemplate: -> configuration.template
-      getTitle: -> configuration.title
-      getPosition: -> configuration.position
-      getKeys: -> angular.copy configuration.keys
-      handlesKey: (key) -> key in configuration.keys
-      hideIfNoData: () ->
-        return if configuration.hideIfNoData? then configuration.hideIfNoData else false
-      hasData: (element) ->
-        return configuration.keys.some (key) -> element.ext.get(key)?
-    }
+      return false
 
-    # assign values to the view
-    view[key] = value for own key, value of configuration when angular.isFunction(value)
-
-    views.push view
-
+    configurations.push configuration
 
   detailSectionsProvider.createFakeOwner = (criteria) -> createFakeOwner(criteria)
 
   detailSectionsProvider.$get = [ '$filter', ($filter) ->
-    views = $filter('orderBy')(views, 'getPosition()')
-
-
     detailSections =
       getAvailableViews: (owner) ->
         available = []
-        for view in views when view.isAvailableFor(owner)
+        angular.forEach configurations, (configuration) ->
+          return unless configuration.isAvailableFor(owner)
+          view =
+            template:     configuration.template
+            title:        configuration.title
+            position:     configuration.position
+            hideIfNoData: configuration.hideIfNoData?
+            keys:         angular.copy configuration.keys
+            data:         angular.copy configuration.data
+            handlesKey:   (key) -> key in @keys
+            hasData:      (element) -> configuration.keys.some (key) -> element.ext.get(key)?
+
+          # assign values to the view
+          angular.forEach configuration, (value, key) ->
+            return unless angular.isFunction(value) and key isnt "isAvailableFor"
+            view[key] = value
+
           available.push(view)
-        available
+
+        return $filter('orderBy')(available, 'position')
 
       createFakeOwner: (criteria) -> createFakeOwner(criteria)
 
