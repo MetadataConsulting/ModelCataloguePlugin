@@ -14,10 +14,9 @@
           </small>
         </h3>
         <messages-panel messages="messages"></messages-panel>
-        <div class="row detail-section" ng-repeat="view in detailSections">
+        <div class="row detail-section" ng-repeat="view in detailSections" data-view-name="{{view.title}}">
           <p ng-if="view.title"
              class="text-center detail-section-title small"
-             data-view-name="{{view.title}}"
              ng-init="view.templateHidden = view.hideIfNoData && !view.hasData(element)">
                 <span class="title btn btn-link btn-sm"
                       ng-click="view.templateHidden = !view.templateHidden"

@@ -179,13 +179,13 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check detailSectionFormItemContent gone
 
         when: "Click the title"
-        click detailSectionFormItem
+        click detailSectionFormItem.find(".title")
 
         then: "Content is displayed"
         check detailSectionFormItemContent displayed
 
         cleanup:
-        click detailSectionFormItem
+        click detailSectionFormItem.find(".title")
     }
 
     def "add metadata"() {

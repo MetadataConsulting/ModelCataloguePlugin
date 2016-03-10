@@ -60,7 +60,7 @@ class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
         check detailSectionFormItemContent gone
 
         when: "Click the title"
-        click detailSectionFormItem
+        click detailSectionFormItem.find(".title")
 
         then: "Content is displayed"
         check detailSectionFormItemContent displayed
