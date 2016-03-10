@@ -1,15 +1,19 @@
-package org.modelcatalogue.core
+package x.org.modelcatalogue.core
+
+import grails.test.spock.IntegrationSpec
+import org.modelcatalogue.core.*
+import spock.lang.Stepwise
 
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
-class InitCatalogueServiceSpec extends AbstractIntegrationSpec {
+@Stepwise
+class InitCatalogueServiceSpec extends IntegrationSpec {
 
-    def setup() {
-        initCatalogue()
-    }
+    def initCatalogueService
 
     def "init default measurement units"() {
+        initCatalogueService.initCatalogue(true)
 
         when:
         MeasurementUnit dt1 = MeasurementUnit.findByName("celsius")

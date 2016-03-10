@@ -1,7 +1,8 @@
-package org.modelcatalogue.core.util
+package x.org.modelcatalogue.core.util
 
 import grails.util.Holders
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.security.User
