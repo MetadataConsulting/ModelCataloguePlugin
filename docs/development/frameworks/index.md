@@ -49,7 +49,7 @@ See [bower.json](../../../ModelCatalogueCorePlugin/bower.json) for information o
 * [Grails Spring Security Core 2.0](https://grails.org/plugin/spring-security-core) for securing the application
 * [Grails Spring Security Core UI](https://grails.org/plugin/spring-security-ui) for managing the application users
 * [Grails Database Migration](https://grails.org/plugin/database-migration) (wrapper around [Liquibase](http://www.liquibase.org/)) for database migrations
-* [Grails Executor](https://grails.org/plugin/executor)for executing asynchronous code ([additional notes](executor_service.md))
+* [Grails Executor](https://grails.org/plugin/executor) for executing asynchronous code ([additional notes](../executor_service.md))
 * [Guava](https://github.com/google/guava) for in memory caching and immutable collections
 * [RxJava](https://github.com/ReactiveX/RxJava) ([ReactiveX](http://reactivex.io/)) for easier event/stream based programming (waiting for wider adoption through codebase, currently used mostly with search indexing) ([additional notes](rxjava.md))
 * [Document Builder](https://github.com/craigburke/document-builder) for MS Word exports
