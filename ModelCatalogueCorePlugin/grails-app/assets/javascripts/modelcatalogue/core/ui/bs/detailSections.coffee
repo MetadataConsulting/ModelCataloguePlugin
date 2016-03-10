@@ -414,7 +414,7 @@ x in ['apple', 'banana', 'cherry']
           base: element.contains.base
           itemType: element.contains.itemType
 
-      element.contains().then (list) =>
+      element.contains(null, max: 5).then (list) =>
         @result = list
       return @result
     reorder: reorderInDetail('contains')
@@ -445,7 +445,7 @@ x in ['apple', 'banana', 'cherry']
         base: element.parentOf.base
         itemType: element.parentOf.itemType
 
-      element.parentOf().then (list) =>
+      element.parentOf(null, max: 5).then (list) =>
         @result = list
       return @result
     reorder: reorderInDetail('parentOf')

@@ -7,7 +7,7 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
       isSortable: '=?'
       columns: '=?'
       transform: '&?'
-      manualLoad: '&?'
+      manualLoad: '=?'
 
     templateUrl: '/mc/core/ui/infiniteTable.html'
 
@@ -78,26 +78,25 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
       checkLoadingPromise = $q.when true
 
       loadMoreIfNeeded = ->
-        checkLoadingPromise = checkLoadingPromise.then ->
-          windowBottom = $scope.scroll + windowEl.height()
-          tableBodyBottom = body.offset().top + body.height()
-          if $scope.isVisible() and windowBottom > tableBodyBottom - Math.max(600, windowEl.height())
-            unless $scope.loading
-              $q.when $scope.loadMore()
-          $q.when true
+        unless $scope.manualLoad == true
+          checkLoadingPromise = checkLoadingPromise.then ->
+            windowBottom = $scope.scroll + windowEl.height()
+            tableBodyBottom = body.offset().top + body.height()
+            if $scope.isVisible() and windowBottom > tableBodyBottom - Math.max(600, windowEl.height())
+              unless $scope.loading
+                $q.when $scope.loadMore()
+            $q.when true
 
       loadMoreIfNeeded()
-
 
       update = ->
         updateOffset()
         updateHeader(windowEl.scrollTop())
         loadMoreIfNeeded()
 
-      if !angular.isDefined($scope.manualLoad) || !$scope.manualLoad
-        $scope.$watch 'scroll', (scroll) ->
-          updateHeader(scroll)
-          loadMoreIfNeeded()
+      $scope.$watch 'scroll', (scroll) ->
+        updateHeader(scroll)
+        loadMoreIfNeeded()
 
       $scope.$watch 'list', update
       $scope.$watch 'columns', update
