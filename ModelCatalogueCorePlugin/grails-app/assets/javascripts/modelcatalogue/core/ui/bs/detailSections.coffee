@@ -332,7 +332,9 @@ x in ['apple', 'banana', 'cherry']
        'http://www.modelcatalogue.org/metadata/#authors'
        'http://www.modelcatalogue.org/metadata/#reviewers'
        'http://www.modelcatalogue.org/metadata/#owner'
-
+       'http://www.modelcatalogue.org/metadata/#reviewed'
+       'http://www.modelcatalogue.org/metadata/#approved'
+       'http://www.modelcatalogue.org/metadata/#released'
      ]
      template: '/mc/core/ui/detail-sections/dataModelBasic.html'
   }
