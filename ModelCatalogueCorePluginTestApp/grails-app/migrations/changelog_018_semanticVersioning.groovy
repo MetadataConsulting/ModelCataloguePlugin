@@ -30,20 +30,13 @@ databaseChangeLog = {
         }
     }
 
-    changeSet(author: "Vladimir Orany", id: "1432717677799-03") {
-        preConditions (onFail: 'MARK_RAN') {
-            // language=SQL
-            sqlCheck expectedResult: '0', """
-            select count(id) from data_model where semantic_version is null
-            """
-        }
-
-
+    changeSet(author: "Vladimir Orany", id: "1432717677799-03-03") {
         // language=SQL
         sql """
-          update data_model
-          set semantic_version = concat('1.0.', version_number)
-          where semantic_version is null
+          update data_model dm
+          join catalogue_element ce on dm.id = ce.id
+          set dm.semantic_version = concat('1.0.', ce.version_number)
+          where dm.semantic_version is null
         """
     }
 
