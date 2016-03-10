@@ -1,8 +1,5 @@
-package x.org.modelcatalogue.core
+package org.modelcatalogue.core
 
-import grails.test.spock.IntegrationSpec
-import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.DataType
 import spock.lang.Stepwise
 import spock.lang.Unroll
 
@@ -10,18 +7,13 @@ import spock.lang.Unroll
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
 @Unroll @Stepwise
-class InitXMLSchemaDataTypesSpec extends IntegrationSpec {
-
-    def initCatalogueService
+class InitXMLSchemaDataTypesSpec extends AbstractIntegrationSpec {
 
     def setup() {
-        initCatalogueService.initDefaultRelationshipTypes()
+        initCatalogue()
     }
 
     def "check XMLSchema classification present"() {
-        // it should be able to run twice
-        initCatalogueService.initDefaultDataTypes(true)
-        initCatalogueService.initDefaultDataTypes(true)
         expect:
         DataModel.countByName('XMLSchema') == 1
     }

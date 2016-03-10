@@ -1,8 +1,7 @@
-package x.org.modelcatalogue.core.util
+package org.modelcatalogue.core.util
 
 import grails.util.Holders
 import org.modelcatalogue.core.*
-import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.security.User
@@ -22,7 +21,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         loadMarshallers()
         initRelationshipTypes()
     }
-    
+
     def "creates new classification with given name, namespace and description"() {
         build {
             dataModel(name: 'TestSchema', namespace: 'http://www.w3.org/2001/TestSchema') {
@@ -79,7 +78,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         IllegalArgumentException e = thrown(IllegalArgumentException)
         e.message.startsWith "Cannot create element abstraction from"
     }
-    
+
     def "creates new measurement unit with given name"() {
         build {
             measurementUnit(name: 'TestUnit', symbol: 'TU') {

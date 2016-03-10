@@ -1,15 +1,18 @@
-package x.org.modelcatalogue.core.dataarchitect
+package org.modelcatalogue.core.dataarchitect
+
+import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataClass
 
 class UmljServiceISpec extends AbstractIntegrationSpec {
 
-    def umljService, initCatalogueService, catalogueBuilder
+    UmljService umljService
+    CatalogueBuilder catalogueBuilder
 
-//    @Ignore
     def "test import"() {
-        initCatalogueService.initCatalogue(true)
+        initCatalogue()
+
         def filenameXsd = "test/integration/resources/CLLDataModel0.1.umlj"
         DataModel classification = new DataModel(name: "GeL Cancer Core").save()
 
