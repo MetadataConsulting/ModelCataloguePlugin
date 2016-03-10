@@ -7,13 +7,13 @@ Model Catalogue
 
  * [Running Model Catalogue with Docker](https://github.com/MetadataRegistry/registry/)
  * [Configuration for Production](docs/deployment/production.adoc)
- * [Using Grails Console in Production](doc/development/frameworks/grails_console.md)
+ * [Using Grails Console in Production](docs/development/frameworks/grails_console.md)
 
 ## Development
  * [Running Model Catalogue in Development](docs/development/shell.md)
  * [Technology Stack](docs/development/frameworks/index.md)
  * [Migration from Version 1.x](docs/development/migration.adoc)
- * [Interacting with Model Catalogue using XML](docs/integration/xml.adoc)
+ * [Interacting with Model Catalogue using XML](docs/development/integration/xml.adoc)
  * [Common Issues](docs/development/bugs/index.md)
  * [ElasticSearch Integration](docs/deployment/elasticsearch.md)
  * [Docker Release Pipepine](docs/deployment/docker_releases.md)
