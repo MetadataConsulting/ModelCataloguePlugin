@@ -93,9 +93,6 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
   detailSectionsProvider.createFakeOwner = (criteria) -> createFakeOwner(criteria)
 
   detailSectionsProvider.$get = [ '$filter', ($filter) ->
-    views = $filter('orderBy')(views, 'getPosition()')
-
-
     detailSections =
       getAvailableViews: (owner) ->
         available = []
@@ -111,14 +108,14 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
             handlesKey:   (key) -> key in @keys
             hasData:      (element) -> configuration.keys.some (key) -> element.ext.get(key)?
 
-
           # assign values to the view
           angular.forEach configuration, (value, key) ->
             return unless angular.isFunction(value) and key isnt "isAvailableFor"
             view[key] = value
 
           available.push(view)
-        available
+
+        return $filter('orderBy')(available, 'position')
 
       createFakeOwner: (criteria) -> createFakeOwner(criteria)
 
