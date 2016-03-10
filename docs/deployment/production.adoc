@@ -1,4 +1,4 @@
-= Running Model Catalogue in Production
+= Configuration for Production
 You can create a production WAR by running `war.sh` script located at the root of the project directory. You can also
 run the catalogue in production environment for testing purposes on embedded Tomcat by running `run-war.sh` script.
 Configuration of data source, Discourse integration and OAuth 2.0 security providers such as Google, Facebook or Twitter
