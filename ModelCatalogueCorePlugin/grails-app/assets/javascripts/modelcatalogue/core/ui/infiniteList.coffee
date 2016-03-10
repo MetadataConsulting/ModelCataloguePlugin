@@ -10,6 +10,7 @@ angular.module('mc.core.ui.infiniteList', ['mc.core.ui.infiniteListCtrl', 'ngAni
     templateUrl: 'modelcatalogue/core/ui/infinitePanels.html'
 
     controller: ['$scope', '$animate', '$window', '$controller', '$element', '$attrs', 'detailSections', ($scope, $animate, $window, $controller, $element, $attrs, detailSections) ->
+      sectionsCache = {}
 
       unless $attrs.transform
         $scope.transform = (args) -> args.$element
@@ -26,12 +27,13 @@ angular.module('mc.core.ui.infiniteList', ['mc.core.ui.infiniteListCtrl', 'ngAni
         $scope.transform($element: item)
 
 
-      updateDetailSections = -> $scope.detailSections = detailSections.getAvailableViews($scope.element)
+      $scope.getDetailSections = (element) ->
+        return [] unless element
 
-      $scope.$watch "element", updateDetailSections
+        sections = sectionsCache[element.link]
 
-      updateDetailSections()
-
+        return sections if sections
+        return sectionsCache[element.link] = detailSections.getAvailableViews(element)
     ]
   }
 ]
