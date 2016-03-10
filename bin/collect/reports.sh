@@ -38,7 +38,7 @@ if [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "core" ]  ; then
 fi
 
 # slow and polluting (imports)
-if [ "$TEST_SUITE" = "core_integration_slow" ]  ; then
+if [ "$TEST_SUITE" = "core_integration_slow" ] || [ "$TEST_SUITE" = "core" ] ; then
     set -x
     mkdir -p "$HOME/reports/slow-integration-tests-reports"
     cp -Rf target/test-reports/ "$HOME/reports/slow-integration-tests-reports" || true

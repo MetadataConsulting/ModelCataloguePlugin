@@ -36,7 +36,7 @@ if [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "core" ] ; then
 fi
 
 # slow and polluting (imports)
-if [ "$TEST_SUITE" = "core_integration_slow" ]  ; then
+if [ "$TEST_SUITE" = "core_integration_slow" ] || [ "$TEST_SUITE" = "core" ] ; then
     ./grailsw test-app integration: x.org.modelcatalogue.**.* --non-interactive
 fi
 cd ..
