@@ -104,14 +104,12 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
     def "Add another data class"(){
         click create
 
-
         expect: 'the data class dialog opens'
         check modalDialog displayed
 
         when: 'the data class details are filled in'
         fill name with "Another New"
-
-
+        
         and: 'finish is clicked'
         click stepFinish
 
@@ -123,7 +121,6 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         check CatalogueContent.create('span.catalogue-element-treeview-name', text: startsWith("Another New")) displayed
-
 
         when: "click the footer action"
         click CatalogueContent.create('span.catalogue-element-treeview-name', text: startsWith("Another New"))
@@ -146,7 +143,6 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         check {
             $('span.catalogue-element-treeview-name', text: startsWith("Another New")).parent().parent().find('.badge')
         } is '1'
-
     }
 
     def "edit child data class"() {
