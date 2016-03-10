@@ -24,7 +24,6 @@ jdk:
 before_install:
   - "export DISPLAY=:99.0"
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1920x1080x24"
-  - echo "Test Results will be available at http://mc-travis-results.orany.cz.s3.amazonaws.com/index.html?prefix=MetadataRegistry/ModelCataloguePlugin/$TRAVIS_BUILD_NUMBER/$TRAVIS_JOB_NUMBER/home/travis/reports/"
 script:
   - "./catalogue test"
 after_script:
