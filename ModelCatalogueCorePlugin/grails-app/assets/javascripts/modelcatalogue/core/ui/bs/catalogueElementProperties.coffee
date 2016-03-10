@@ -80,6 +80,17 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
 
   catalogueElementPropertiesProvider.configureProperty 'instantiates', label: 'Data Elements', columns: nameAndIdAndMetadata()
 
+  catalogueElementPropertiesProvider.configureProperty 'imports', columns: [
+    {
+      header: 'Data Model',
+      value: "relation.classifiedName",
+      classes: 'col-md-5',
+      show: "relation.show()",
+      href: 'relation.href()'
+    }
+    {header: "Description", value: 'relation.description', class: 'col-md-7'}
+  ]
+
   catalogueElementPropertiesProvider.configureProperty 'history', {
     columns: [
       {header: "Version", value: 'versionNumber', class: 'col-md-1', show: true, href: 'href()'}
