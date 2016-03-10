@@ -394,6 +394,11 @@ x in ['apple', 'banana', 'cherry']
     template: 'modelcatalogue/core/ui/detailSections/customMetadata.html'
   }
 
+  reorderInDetail = (relationName) ->
+    (element, messages, $row, $current) ->
+      element[relationName].reorder($row.row.element, $current?.row?.element).catch (reason) ->
+        messages.error reason
+
   detailSectionsProvider.register {
     title: 'Data Elements'
     position: 60
@@ -412,6 +417,8 @@ x in ['apple', 'banana', 'cherry']
       element.contains().then (list) =>
         @result = list
       return @result
+    reorder: reorderInDetail('contains')
+
     data: {
       columns:
         [
@@ -441,6 +448,7 @@ x in ['apple', 'banana', 'cherry']
       element.parentOf().then (list) =>
         @result = list
       return @result
+    reorder: reorderInDetail('parentOf')
     data: {
       columns:
         [
