@@ -16,7 +16,7 @@ executorService.submit {
 }
 ```
 
-## working with objects related to request and response
+## Working with objects related to request and response
 In similar way you have to store all the information from the `request`, `params`, `headers` or `response` needed 
 inside the task closure
 
