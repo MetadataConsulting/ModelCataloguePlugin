@@ -5,36 +5,42 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 
 
-class GelJsonService {
+class GelJsonExporter {
 
-    void printPhenotypes(OutputStream out, DataClass child){
+    private final OutputStream out
+
+    GelJsonExporter(OutputStream out) {
+        this.out = out
+    }
+
+    private void printPhenotypes(DataClass child){
         out << '           "shallowPhenotypes" : [\n'
         child.parentOf.eachWithIndex { DataClass cd, index ->
             if(index!=0){out << ','}
-            printHPOterm(out, cd)
+            printHPOterm(cd)
         }
         out << "           ],\n"
     }
 
-    void printTests(OutputStream out, DataClass child) {
+    private void printTests(DataClass child) {
         out << '           "tests" : [\n'
         child.parentOf.eachWithIndex { DataClass cd, index ->
             if (index != 0) {
                 out << ','
             }
-            printTest(out, cd)
+            printTest(cd)
         }
         out << "           ]\n"
     }
 
-    void printHPOterm(OutputStream out, DataClass child){
+    private void printHPOterm(DataClass child){
         out << '                    {\n'
         out << '                        "name" : ' + JsonOutput.toJson(child.name)  + ',\n'
         out << '                        "id"   : ' + JsonOutput.toJson(child.ext.get("OBO ID")) + '\n'
         out << '                    }\n'
     }
 
-    void printTest(OutputStream out, DataClass child){
+    private void printTest(DataClass child){
 
         out << '                    {\n'
         out << '                        "name" : ' + JsonOutput.toJson(child.name)  + ',\n'
@@ -43,23 +49,23 @@ class GelJsonService {
     }
 
 
-    String getVersionId(CatalogueElement c){
+    private static String getVersionId(CatalogueElement c){
         return (c.latestVersionId)? c.latestVersionId + "." + c.versionNumber : c.id + "." + c.versionNumber
     }
 
-    void printDiseaseOntology(OutputStream out, DataClass cls){
+    void printDiseaseOntology(DataClass cls){
         out << '{\"DiseaseGroups\": [\n'
-        printRareDiseaseChild(out, cls, 0)
+        printRareDiseaseChild(cls, 0)
         out << "]\n}"
     }
 
 
-    void printRareDiseaseChild(OutputStream out, DataClass child, Integer level){
+    private void printRareDiseaseChild(DataClass child, Integer level){
         Long id = child.latestVersionId ?: child.id
         if(level==0){
             child.parentOf?.eachWithIndex { DataClass cd, index ->
                 if(index!=0){out << ','}
-                printRareDiseaseChild(out, cd, level + 1)
+                printRareDiseaseChild(cd, level + 1)
             }
         }
 
@@ -72,7 +78,7 @@ class GelJsonService {
 
             child.parentOf.eachWithIndex { DataClass cd, index ->
                 if(index!=0){out << ','}
-                printRareDiseaseChild(out, cd, level + 1)
+                printRareDiseaseChild(cd, level + 1)
             }
 
             out << "]\n"
@@ -89,7 +95,7 @@ class GelJsonService {
 
             child.parentOf.eachWithIndex { DataClass cd, index ->
                 if(index!=0){out << ','}
-                printRareDiseaseChild(out, cd, level + 1)
+                printRareDiseaseChild(cd, level + 1)
             }
 
             out << "       ]\n"
@@ -121,8 +127,8 @@ class GelJsonService {
                 }
             }
 
-            if(phenotypeModel) printPhenotypes(out, phenotypeModel) else out << '           "shallowPhenotypes" : [],\n'
-            if(testModel) printTests(out, testModel) else out << '           "tests" : []\n'
+            if(phenotypeModel) printPhenotypes(phenotypeModel) else out << '           "shallowPhenotypes" : [],\n'
+            if(testModel) printTests(testModel) else out << '           "tests" : []\n'
 
             out << "           }\n"
         }

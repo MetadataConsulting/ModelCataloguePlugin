@@ -9,7 +9,7 @@ import org.modelcatalogue.core.InitCatalogueService
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 
 
-class GelJsonServiceSpec extends IntegrationSpec {
+class GelJsonExporterSpec extends IntegrationSpec {
 
     ElementService elementService
     DataModelService dataModelService
@@ -52,7 +52,7 @@ class GelJsonServiceSpec extends IntegrationSpec {
         OutputStream out = new ByteArrayOutputStream()
         when:
         DataClass model = DataClass.findByName('rare disease group 1')
-        new GelJsonService().printDiseaseOntology(out, model)
+        new GelJsonExporter(out).printDiseaseOntology(model)
 
         String json = new String(out.toByteArray())
 
