@@ -75,9 +75,9 @@ class ReportDescriptor {
 
         if (renderType == RenderType.ASSET) {
             if (!params.params) {
-                params.params = [asset: true, name: title(model)]
+                params.params = [asset: true]
             } else {
-                params.params.putAll asset: true, name: title(model)
+                params.params.putAll asset: true
             }
         }
 
@@ -98,6 +98,4 @@ class ReportDescriptor {
         if (!title) return null
         title(model)
     }
-
-
 }

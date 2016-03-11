@@ -285,7 +285,13 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
             else if @type == 'ASSET'
               messages.prompt('Asset Name', 'Asset Name (Leave blank to use default name.)', {allowNotSet: true})
               .then (assetName) ->
-                $log.debug "export new asset with asset name '#{assetName}'"
+                if (assetName)
+                  if (url.indexOf('?') == -1)
+                    url += '?'
+                  else
+                    url += '&'
+                  url += "name=#{assetName}"
+                $log.debug "export new asset with asset name '#{assetName}' using url #{url}"
                 $window.open(url, '_blank')
             else
               $log.error "unknown type of report '#{@type}'"
