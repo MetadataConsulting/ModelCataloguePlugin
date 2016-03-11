@@ -22,13 +22,15 @@ abstract class RelationshipTypeRuleScript extends Script {
         binding.setProperty 'source', source
     }
 
-
-    boolean isSameClass() {
+    def isSameClass() {
         Class sourceClass = HibernateHelper.getEntityClass(source)
         Class destinationClass = HibernateHelper.getEntityClass(destination)
         if (sourceClass == destinationClass) {
             return true
         }
-        return DataType.isAssignableFrom(sourceClass) &&  DataType.isAssignableFrom(destinationClass)
+        if (DataType.isAssignableFrom(sourceClass) &&  DataType.isAssignableFrom(destinationClass)) {
+            return true
+        }
+        return ["relationshipType.containment.not.same.type", "The destination must be of the same type as the source!"]
     }
 }
