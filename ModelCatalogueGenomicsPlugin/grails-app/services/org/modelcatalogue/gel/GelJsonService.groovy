@@ -1,4 +1,4 @@
-package modelcataloguegenomicsplugin
+package org.modelcatalogue.gel
 
 import groovy.json.JsonOutput
 import org.modelcatalogue.core.CatalogueElement

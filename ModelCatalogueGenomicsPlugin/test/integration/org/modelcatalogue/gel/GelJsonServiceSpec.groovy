@@ -1,4 +1,4 @@
-package modelcataloguegenomicsplugin
+package org.modelcatalogue.gel
 
 import grails.test.spock.IntegrationSpec
 import groovy.json.JsonOutput
