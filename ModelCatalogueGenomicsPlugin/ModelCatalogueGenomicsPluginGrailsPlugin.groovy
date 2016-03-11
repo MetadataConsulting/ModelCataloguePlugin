@@ -59,6 +59,7 @@ Genomics England customisation plugin for Model Catalogue
         reportsRegistry.register {
             creates link
             title { "GEL Data Specification Report" }
+            defaultName { "${it.name} report as MS Word Document" }
             type DataModel
             link controller: 'genomics', action: 'exportGelSpecification', id: true
         }
@@ -66,6 +67,7 @@ Genomics England customisation plugin for Model Catalogue
         reportsRegistry.register {
             creates link
             title { "Rare Diseases HPO And Clinical Tests Json" }
+            defaultName { "${it.name} report as Json" }
             type DataClass
             link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTests', id: true
         }
