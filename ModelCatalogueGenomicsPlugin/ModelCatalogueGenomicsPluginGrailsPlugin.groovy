@@ -57,7 +57,7 @@ Genomics England customisation plugin for Model Catalogue
         ReportsRegistry reportsRegistry = ctx.getBean(ReportsRegistry)
 
         reportsRegistry.register {
-            creates link
+            creates asset
             title { "GEL Data Specification Report" }
             defaultName { "${it.name} report as MS Word Document" }
             type DataModel
@@ -65,7 +65,7 @@ Genomics England customisation plugin for Model Catalogue
         }
 
         reportsRegistry.register {
-            creates link
+            creates asset
             title { "Rare Diseases HPO And Clinical Tests Json" }
             defaultName { "${it.name} report as Json" }
             type DataClass
