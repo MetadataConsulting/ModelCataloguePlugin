@@ -1,14 +1,12 @@
 package org.modelcatalogue.core.export.inventory
 
 import grails.test.spock.IntegrationSpec
-import org.modelcatalogue.core.util.test.TestDataHelper
-
-import static org.modelcatalogue.core.util.test.FileOpener.open
-
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
+
+import static org.modelcatalogue.core.util.test.FileOpener.open
 
 class DataClassToXlsxExporterSpec extends IntegrationSpec {
 
