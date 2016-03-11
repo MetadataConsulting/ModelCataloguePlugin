@@ -5,6 +5,7 @@ import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
+import org.modelcatalogue.gel.GelJsonService
 
 /**
  * Controller for GEL specific reports.
@@ -13,7 +14,6 @@ class GenomicsController {
 
     def assetService
     DataClassService dataClassService
-    def gelJsonService
 
     def exportRareDiseaseHPOAndClinicalTests() {
         DataClass model = DataClass.get(params.id)
@@ -25,7 +25,7 @@ class GenomicsController {
             originalFileName: "${model.name}-${model.status}-${model.version}.json",
             contentType: "application/json",
         ) {
-            gelJsonService.printDiseaseOntology(it, DataClass.get(classId))
+            new GelJsonService().printDiseaseOntology(it, DataClass.get(classId))
         }
 
         response.setHeader("X-Asset-ID",assetId.toString())
