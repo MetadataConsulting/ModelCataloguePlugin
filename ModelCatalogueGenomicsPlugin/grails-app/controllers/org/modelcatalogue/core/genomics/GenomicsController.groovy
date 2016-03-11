@@ -33,7 +33,10 @@ class GenomicsController {
 
         DataModel model = DataModel.get(params.id)
 
-        if(!model) response.status = 404;
+        if(!model) {
+            response.status = 404
+            return
+        }
 
         Long modelId = model.id
         def assetId= assetService.storeReportAsAsset(
