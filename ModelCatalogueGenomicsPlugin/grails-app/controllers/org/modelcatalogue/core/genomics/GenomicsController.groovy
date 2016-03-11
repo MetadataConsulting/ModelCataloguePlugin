@@ -1,8 +1,12 @@
 package org.modelcatalogue.core.genomics
 
+import org.modelcatalogue.core.DataClass
+
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
+import org.modelcatalogue.gel.GelJsonExporter
+
 /**
  * Controller for GEL specific reports.
  */
@@ -10,6 +14,26 @@ class GenomicsController {
 
     def assetService
     DataClassService dataClassService
+
+    def exportRareDiseaseHPOAndClinicalTests() {
+        DataClass model = DataClass.get(params.id)
+
+        Long classId = model.getId()
+
+        Long assetId = assetService.storeReportAsAsset(model.dataModel,
+            name: "${model.name} report as Json",
+            originalFileName: "${model.name}-${model.status}-${model.version}.json",
+            contentType: "application/json",
+        ) {
+            new GelJsonExporter(it).printDiseaseOntology(DataClass.get(classId))
+        }
+
+        response.setHeader("X-Asset-ID",assetId.toString())
+        redirect controller: 'asset', id: assetId, action: 'show'
+    }
+
+
+
 
     def imagePath = "https://www.genomicsengland.co.uk/wp-content/uploads/2015/11/Genomics-England-logo-2015.png"
 
