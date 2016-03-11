@@ -92,6 +92,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         sort "name"
 		name index :'CtlgElement_name_idx'
 		latestVersionId index :'CtlgElement_latestVersionId_idx'
+        modelCatalogueId index :'CtlgElement_modelCatalogueId_idx'
         description type: "text"
         extensions lazy: false, sort: 'orderIndex'
         dataModel lazy: false
