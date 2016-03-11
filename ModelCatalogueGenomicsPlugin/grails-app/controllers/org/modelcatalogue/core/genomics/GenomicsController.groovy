@@ -1,15 +1,11 @@
 package org.modelcatalogue.core.genomics
 
-import groovy.util.logging.Log4j
-import org.modelcatalogue.core.AbstractCatalogueElementController
-import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.DataClass
-import org.modelcatalogue.core.api.ElementStatus
-import org.springframework.http.HttpStatus
 
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
+
 /**
  * Controller for GEL specific reports.
  */
