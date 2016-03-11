@@ -1,4 +1,5 @@
 import org.modelcatalogue.core.DataClass
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.reports.ReportsRegistry
 
 class ModelCatalogueGenomicsPluginGrailsPlugin {
@@ -55,13 +56,11 @@ Genomics England customisation plugin for Model Catalogue
         // TODO Implement post initialization spring config (optional)
         ReportsRegistry reportsRegistry = ctx.getBean(ReportsRegistry)
 
-
-        // sample report
         reportsRegistry.register {
             creates link
-            title { "Rare Diseases Report" }
-            type DataClass
-            link controller: 'genomics', action: 'exportRareDiseases', id: true
+            title { "GEL Data Specification Report" }
+            type DataModel
+            link controller: 'genomics', action: 'exportGelSpecification', id: true
         }
 
         reportsRegistry.register {
