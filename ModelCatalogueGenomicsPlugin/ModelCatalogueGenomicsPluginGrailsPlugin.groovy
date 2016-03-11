@@ -63,6 +63,13 @@ Genomics England customisation plugin for Model Catalogue
             link controller: 'genomics', action: 'exportGelSpecification', id: true
         }
 
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases HPO And Clinical Tests Json" }
+            type DataClass
+            link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTests', id: true
+        }
+
 
     }
 
