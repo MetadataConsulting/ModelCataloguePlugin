@@ -21,7 +21,10 @@ ModelCatalogueCorePluginTestApp/test/integration/resources/rare_diseases_combine
 .default-mc-config-location
 .docker-ip
 
-### OsX
+# OsX
 .DS_Store
 .AppleDouble
 .LSOverride
+
+# Grails asset plugin cache
+*.asscache
