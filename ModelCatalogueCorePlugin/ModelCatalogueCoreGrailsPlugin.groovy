@@ -3,17 +3,17 @@ import grails.util.Environment
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.audit.AuditJsonMarshallingCustomizer
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
-import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
+import org.modelcatalogue.core.util.js.ApiRootFrontendConfigurationProvider
+import org.modelcatalogue.core.util.js.FrontendConfigurationProviderRegistry
+import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.marshalling.*
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
-import org.modelcatalogue.core.audit.AuditJsonMarshallingCustomizer
-import org.modelcatalogue.core.util.js.FrontendConfigurationProviderRegistry
-import org.modelcatalogue.core.util.js.ApiRootFrontendConfigurationProvider
-import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.xml.render.RelationshipsXmlRenderer
 
 class ModelCatalogueCoreGrailsPlugin {
@@ -295,28 +295,28 @@ Model catalogue core plugin (metadata registry)
         }
 
         reportsRegistry.register {
-            creates link
+            creates asset
             title { "Inventory Report Spreadsheet"}
             type DataModel
             link controller: 'dataModel', action: 'inventorySpreadsheet', id: true
         }
 
 		reportsRegistry.register {
-			creates link
+			creates asset
 			title { "Inventory Report Document" }
 			type DataClass
 			link controller: 'dataClass', action: 'inventoryDoc', id: true
 		}
 
 		reportsRegistry.register {
-			creates link
+			creates asset
 			title { "Inventory Report Spreadsheet" }
 			type DataClass
 			link controller: 'dataClass', action: 'inventorySpreadsheet', id: true
 		}
 
 		reportsRegistry.register {
-			creates link
+			creates asset
 			title { "Changelog Document" }
 			type DataClass
 			link controller: 'dataClass', action: 'changelogDoc', id: true
@@ -350,9 +350,6 @@ Model catalogue core plugin (metadata registry)
 //                [controller: webRequest.controllerName, action: webRequest.actionName, params: params]
 //            }
 //        }
-
-
-
     }
 
     def onChange = { event ->
