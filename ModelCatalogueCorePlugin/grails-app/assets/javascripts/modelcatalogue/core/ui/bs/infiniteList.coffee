@@ -9,7 +9,7 @@ angular.module('mc.core.ui.bs.infiniteList', ['mc.core.ui.infiniteList', 'ngSani
             </div>
             <div class="panel-body">
               <form editable-form ng-class="{ 'shorten-detail': !element.$$full, 'full-detail': element.$$full }">
-                <div class="row detail-section" ng-repeat="view in detailSections" ng-class="{'shorten-detail-section': view.position <= 0, 'full-detail-section': view.position > 0}">
+                <div class="row detail-section" ng-repeat="view in getDetailSections(element)" ng-class="{'shorten-detail-section': view.position <= 0, 'full-detail-section': view.position > 0}">
                     <p ng-if="view.title" class="text-center detail-section-title small"><span class="title">{{view.title}}</span></p>
                     <ng-include src="view.template"></ng-include>
                 </div>
