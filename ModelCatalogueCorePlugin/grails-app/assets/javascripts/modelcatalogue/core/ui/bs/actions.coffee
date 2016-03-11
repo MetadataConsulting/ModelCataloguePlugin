@@ -275,15 +275,17 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       for report in reports
         {
           label:  report.title
+          defaultName: report.defaultName
           url:    report.url
           type:   report.type
           watches: 'element'
           action: ->
             url = @url
+            defaultValue = if @defaultName then @defaultName else ''
             if @type == 'LINK'
               $window.open(url, '_blank')
             else if @type == 'ASSET'
-              messages.prompt('Asset Name', 'Asset Name (Leave blank to use default name.)', {allowNotSet: true})
+              messages.prompt('Asset Name', 'Asset Name', {allowNotSet: true, value: defaultValue})
               .then (assetName) ->
                 if (assetName)
                   if (url.indexOf('?') == -1)
