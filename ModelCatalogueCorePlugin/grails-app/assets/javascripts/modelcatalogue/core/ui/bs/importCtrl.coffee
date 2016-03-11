@@ -56,6 +56,6 @@ angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'ngFileUpload'])
         $modalInstance.close()
       )
 
-    $scope.purlPattern = "http://purl.obolibrary.org/obo/${id.replace(':', '_')}"
+    $scope.purlPattern = "http://purl.obolibrary.org/obo/${id.replace('%3A', '_')}"
 ]
 

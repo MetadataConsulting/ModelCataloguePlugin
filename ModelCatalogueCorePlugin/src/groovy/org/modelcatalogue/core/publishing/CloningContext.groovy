@@ -4,21 +4,15 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
-import org.modelcatalogue.core.util.HibernateHelper
+import org.modelcatalogue.core.util.RelationshipDirection
 
-class CloningContext {
+class CloningContext extends PublishingContext<CloningContext> {
 
-    private final DataModel dataModel
     private final DataModel destinationDataModel
-
-    private final Set<CloningCopyAssociationsAndRelationshipsTask> pendingRelationshipsTasks = new LinkedHashSet<CloningCopyAssociationsAndRelationshipsTask>()
-    private final Set<String> createdRelationshipHashes = []
     private final Set<Long> imports = []
 
-    private final Map<Long, Long> clones = [:]
-
     CloningContext(DataModel source, DataModel destination) {
-        this.dataModel = source
+        super(source)
         this.destinationDataModel = destination
     }
 
@@ -30,38 +24,19 @@ class CloningContext {
         return destinationDataModel
     }
 
-    boolean isCloning() {
-        destinationDataModel && destinationDataModel != dataModel
-    }
-
-    void delayRelationshipCopying(CatalogueElement draft, CatalogueElement oldVersion) {
-        pendingRelationshipsTasks << new CloningCopyAssociationsAndRelationshipsTask(draft, oldVersion, this)
-    }
-
     void resolvePendingRelationships() {
-        pendingRelationshipsTasks.each {
-            it.copyRelationships(dataModel, createdRelationshipHashes)
-        }
+        super.resolvePendingRelationships()
         for (Long importId in imports) {
             destinationDataModel.addToImports DataModel.get(importId)
         }
     }
 
-    DataModel getDataModel() {
-        return dataModel
+    protected CopyAssociationsAndRelationships createCopyTask(CatalogueElement draft, CatalogueElement oldVersion) {
+        new CopyAssociationsAndRelationships(draft, oldVersion, this, true, RelationshipDirection.OUTGOING)
     }
 
-    public <E extends CatalogueElement> E findExisting(E published) {
-        if (!published) {
-            return published
-        }
-
+    public CatalogueElement findExisting(CatalogueElement published) {
         Long publishedId = published.getId()
-        Long cloneId = clones[publishedId]
-
-        if (cloneId) {
-            return (E) HibernateHelper.getEntityClass(published).get(cloneId)
-        }
 
         List<Relationship> existing = Relationship.where {
             source.id == publishedId && relationshipType == RelationshipType.originType && destination.dataModel == destinationDataModel
@@ -71,21 +46,9 @@ class CloningContext {
             return null
         }
 
-        E clone = (E) existing.first().destination
-        addClone(published, clone)
+        CatalogueElement clone = existing.first().destination
+        addResolution(published, clone)
         return clone
-    }
-
-    public <E extends CatalogueElement> E preferClone(E published) {
-        E existing = findExisting(published)
-        if (existing) {
-            return existing
-        }
-        published
-    }
-
-    public <E extends CatalogueElement> void addClone(E original, E clone) {
-        clones[original.getId()] = clone.getId()
     }
 
     public void addImport(DataModel dataModel) {

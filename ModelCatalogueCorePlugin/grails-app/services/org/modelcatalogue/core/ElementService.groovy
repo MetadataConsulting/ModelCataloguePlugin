@@ -4,16 +4,19 @@ import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import grails.gorm.DetachedCriteria
 import grails.util.Environment
+import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.enumeration.Enumerations
-import org.modelcatalogue.core.enumeration.LegacyEnumerations
 import org.modelcatalogue.core.publishing.CloningContext
+import org.modelcatalogue.core.publishing.DraftChain
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Publisher
+import org.modelcatalogue.core.publishing.PublishingChain
+import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Legacy
 import org.springframework.transaction.TransactionStatus
@@ -60,7 +63,7 @@ class ElementService implements Publisher<CatalogueElement> {
 
         Closure<DataModel> code = { TransactionStatus status = null ->
             return (DataModel) auditService.logNewVersionCreated(dataModel) {
-                DataModel draft = (DataModel) dataModel.createDraftVersion(this, context)
+                DataModel draft = PublishingChain.createDraft(dataModel, context.within(dataModel)).run(this) as DataModel
                 if (draft.hasErrors()) {
                     status?.setRollbackOnly()
                     return dataModel
@@ -85,26 +88,34 @@ class ElementService implements Publisher<CatalogueElement> {
      */
 
     public <E extends CatalogueElement> E createDraftVersion(E element, DraftContext context) {
-        Closure<E> code = { TransactionStatus status = null ->
-            return (E) auditService.logNewVersionCreated(element) {
-                E draft = element.createDraftVersion(this, context) as E
-                if (draft.hasErrors()) {
-                    status?.setRollbackOnly()
-                    return element
-                }
-                context.resolvePendingRelationships()
-
-                // TODO: better target the changes
-                VERSION_COUNT_CACHE.invalidateAll()
-
-                return draft
-            }
+        if (!element) {
+            return element
         }
-        if (context.importFriendly) {
-            return code()
-        } else {
-            return (E) CatalogueElement.withTransaction(code)
+
+        if (element.instanceOf(DataModel)) {
+            DataModel dataModel = element as DataModel
+            return createDraftVersion(dataModel, PublishingContext.nextPatchVersion(dataModel.semanticVersion), context) as E
         }
+
+        if (!element.dataModel) {
+            log.warn "draft requested for $element but it does not have any Data Model assigned. New Data Model will be created and assigned"
+            DataModel dataModel = new DataModel(status: ElementStatus.FINALIZED, name: "$element.name Data Model", description: "This data model was automatically created for ${GrailsNameUtils.getNaturalName(element.getClass().simpleName)} $element.name when creating draft was requested on that element ${GrailsNameUtils.getNaturalName(element.getClass().simpleName)}.")
+            FriendlyErrors.failFriendlySave(dataModel)
+            element.dataModel = dataModel
+            FriendlyErrors.failFriendlySave(element)
+            createDraftVersion(dataModel, PublishingContext.nextPatchVersion(dataModel.semanticVersion), context)
+            return context.resolve(element) as E
+        }
+
+        DataModel draftDataModel = createDraftVersion(element.dataModel, context.version ?: PublishingContext.nextPatchVersion(element.dataModel.semanticVersion), context)
+
+        E draft = context.resolve(element) as E
+
+        if (!draft) {
+            throw new IllegalStateException("Data model $draftDataModel created without the draft version of $element")
+        }
+
+        return draft
     }
 
     public <E extends CatalogueElement> E cloneElement(E element, CloningContext context) {

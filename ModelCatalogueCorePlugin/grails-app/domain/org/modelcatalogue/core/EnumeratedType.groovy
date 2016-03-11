@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.enumeration.Enumeration
 import org.modelcatalogue.core.enumeration.Enumerations
+import org.modelcatalogue.core.publishing.PublishingContext
 
 /*
 * Enumerated Types are data types that contain a list of enumerated values
@@ -88,7 +89,10 @@ class EnumeratedType extends DataType {
     }
 
     String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}, status: ${status}, modelCatalogueId: ${modelCatalogueId},  dataModel: ${dataModel?.name} (${dataModel?.combinedVersion}), enumerations: ${enumerations}]"
+        if (dataModel) {
+            return "$name [$combinedVersion] in $dataModel.name ($status  ${getClass().getSimpleName()}:${getId()}) - ${prettyPrint()}"
+        }
+        return "$name [$combinedVersion] ($status ${getClass().getSimpleName()}:${getId()}) - ${prettyPrint()}"
     }
 
 
@@ -97,7 +101,7 @@ class EnumeratedType extends DataType {
     }
 
     @Override
-    void beforeDraftPersisted() {
+    void beforeDraftPersisted(PublishingContext context) {
         if (!enumerations) {
             enumerations = ['default' : '']
         }

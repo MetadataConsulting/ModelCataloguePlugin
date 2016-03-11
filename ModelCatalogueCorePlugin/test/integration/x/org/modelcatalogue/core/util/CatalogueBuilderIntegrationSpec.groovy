@@ -22,7 +22,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         loadMarshallers()
         initRelationshipTypes()
     }
-    
+
     def "creates new classification with given name, namespace and description"() {
         build {
             dataModel(name: 'TestSchema', namespace: 'http://www.w3.org/2001/TestSchema') {
@@ -64,9 +64,12 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
             }
         }
 
+        DataModel updated = DataModel.findByName('NotUniqueName')
+
         expect:
-        created.first() == c
-        created.first().name == 'NotUniqueName'
+        updated
+        updated.status == ElementStatus.DRAFT
+        updated.latestVersionId == c.id
     }
 
     def "complain if classification name is missing"() {
@@ -79,7 +82,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         IllegalArgumentException e = thrown(IllegalArgumentException)
         e.message.startsWith "Cannot create element abstraction from"
     }
-    
+
     def "creates new measurement unit with given name"() {
         build {
             measurementUnit(name: 'TestUnit', symbol: 'TU') {
@@ -578,10 +581,12 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
     def "adds metadata to nested relationship like child model"() {
         build {
-            dataClass(name: "Parent 007") {
-                dataClass(name: "Child 008") {
-                    relationship {
-                        ext "Min. Occurs", "1"
+            dataModel(name: "AMTNRLC") {
+                dataClass(name: "Parent 007") {
+                    dataClass(name: "Child 008") {
+                        relationship {
+                            ext "Min. Occurs", "1"
+                        }
                     }
                 }
             }
@@ -606,10 +611,12 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
         when:
         build {
-            dataClass(name: "Parent 007") {
-                dataClass(name: "Child 008") {
-                    relationship {
-                        ext "Min. Occurs", "0"
+            dataModel(name: "AMTNRLC") {
+                dataClass(name: "Parent 007") {
+                    dataClass(name: "Child 008") {
+                        relationship {
+                            ext "Min. Occurs", "0"
+                        }
                     }
                 }
             }
@@ -633,17 +640,23 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
             }
         }
 
-        elementService.finalizeElement(DataClass.findByName('MHR ROOT'))
+        DataModel dataModel = elementService.finalizeElement(DataModel.findByName('MHR MODEL'))
 
         DataClass l1Finalized = DataClass.findByName('MHR L1')
+        DataClass l3Finalized = DataClass.findByName('MHR L3')
 
         expect:
         l1Finalized
         l1Finalized.status == ElementStatus.FINALIZED
         l1Finalized.parentOf.size() == 1
 
+        l3Finalized
+        l3Finalized.childOf.size() == 1
+
         when:
-        DataClass l1Draft = elementService.createDraftVersion(l1Finalized, DraftContext.userFriendly())
+        DraftContext context = DraftContext.userFriendly()
+        elementService.createDraftVersion(dataModel, '1.0.0', context)
+        DataClass l1Draft = context.resolve(l1Finalized) as DataClass
 
         then:
         l1Draft
@@ -651,14 +664,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         l1Draft.parentOf.size() == 1
 
         when:
-        DataClass l3Finalized = DataClass.findByName('MHR L3')
-
-        then:
-        l3Finalized
-        l3Finalized.childOf.size() == 1
-
-        when:
-        DataClass l3Draft = elementService.createDraftVersion(l3Finalized, DraftContext.userFriendly())
+        DataClass l3Draft = context.resolve(l3Finalized)
 
         then:
         l3Draft

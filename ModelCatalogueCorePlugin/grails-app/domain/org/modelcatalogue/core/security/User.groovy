@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.security
 
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.publishing.PublishingContext
 
 class User extends CatalogueElement {
 
@@ -62,8 +62,8 @@ class User extends CatalogueElement {
     }
 
     @Override
-    void beforeDraftPersisted() {
-        super.beforeDraftPersisted()
+    void beforeDraftPersisted(PublishingContext context) {
+        super.beforeDraftPersisted(context)
         String randomUsername = username
         while (User.countByUsername(randomUsername)) {
             randomUsername = "${username[0..(username.indexOf('(') - 1)]} (${UUID.randomUUID().toString()})"

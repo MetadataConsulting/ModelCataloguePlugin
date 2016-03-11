@@ -9,125 +9,6 @@ metadataEditors = angular.module('mc.core.ui.bs.detailSections', ['mc.core.ui.de
 ###
 
 metadataEditors.run ['$templateCache', ($templateCache) ->
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/dataModelBasic.html', '''
-      <div class="col-md-6">
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Authors</strong></div>
-          <div class="full-width-editable col-md-6"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#authors']">{{element.ext.get('http://www.modelcatalogue.org/metadata/#authors') || 'empty'}}</small></div>
-        </div>
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Reviewers</strong></div>
-          <div class="full-width-editable col-md-6"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#reviewers']">{{element.ext.get('http://www.modelcatalogue.org/metadata/#reviewers') || 'empty'}}</small></div>
-        </div>
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Owner</strong></div>
-          <div class="full-width-editable col-md-6"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#owner']">{{element.ext.get('http://www.modelcatalogue.org/metadata/#owner') || 'empty'}}</small></div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Last Updated</strong></div>
-          <div class="col-md-6"><small>{{element.lastUpdated | date}}</small></div>
-        </div>
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Version Created</strong></div>
-          <div class="col-md-6"><small>{{element.versionCreated | date}}</small></div>
-        </div>
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Status</strong></div>
-          <div class="col-md-6"><small>{{element.status}}</small></div>
-        </div>
-      </div>
-  '''
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/dataClassBasic.html', '''
-      <div class="col-md-6">
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Last Updated</strong></div>
-          <div class="col-md-6"><small>{{element.lastUpdated | date}}</small></div>
-        </div>
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Version Created</strong></div>
-          <div class="col-md-6"><small>{{element.versionCreated | date}}</small></div>
-        </div>
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Status</strong></div>
-          <div class="col-md-6"><small>{{element.status}}</small></div>
-        </div>
-      </div>
-  '''
-
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/dataElementBasic.html', '''
-      <div class="col-md-12">
-        <div class="row">
-          <div class="col-md-3"><strong class="small">Last Updated</strong></div>
-          <div class="col-md-3"><small>{{element.lastUpdated | date}}</small></div>
-          <div class="col-md-3"><strong class="small">Status</strong></div>
-          <div class="col-md-3"><small>{{element.status}}</small></div>
-        </div>
-        <div class="row">
-          <div class="col-md-3"><strong class="small">Version Created</strong></div>
-          <div class="col-md-3"><small>{{element.versionCreated | date}}</small></div>
-        </div>
-        <div class="row">
-        </div>
-      </div>
-  '''
-
-
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/assetBasic.html', '''
-      <div class="col-md-6">
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Original File Name</strong></div>
-          <div class="col-md-6"><small>{{element.fileName || 'none'}}</small></div>
-        </div>
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Content Type</strong></div>
-          <div class="col-md-6"><small>{{element.contentType || 'unknown'}}</small></div>
-        </div>
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Size</strong></div>
-          <div class="col-md-6"><small>{{view.toHumanReadableSize(element.size || 0)}}</small></div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Last Updated</strong></div>
-          <div class="col-md-6"><small>{{element.lastUpdated | date}}</small></div>
-        </div>
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Version Created</strong></div>
-          <div class="col-md-6"><small>{{element.versionCreated | date}}</small></div>
-        </div>
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Status</strong></div>
-          <div class="col-md-6"><small>{{element.status}}</small></div>
-        </div>
-      </div>
-  '''
-
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/measurementUnitBasic.html', '''
-      <div class="col-md-6">
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Symbol</strong></div>
-          <div class="full-width-editable col-md-6"><small editable-text="copy.symbol">{{element.symbol || 'empty'}}</small></div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Last Updated</strong></div>
-          <div class="col-md-6"><small>{{element.lastUpdated | date}}</small></div>
-        </div>
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Version Created</strong></div>
-          <div class="col-md-6"><small>{{element.versionCreated | date}}</small></div>
-        </div>
-        <div class="row">
-          <div class="col-md-6"><strong class="small">Status</strong></div>
-          <div class="col-md-6"><small>{{element.status}}</small></div>
-        </div>
-      </div>
-  '''
-
   $templateCache.put 'modelcatalogue/core/ui/detailSections/organization.html', '''
       <div class="col-md-3">
           <strong class="small">Organization</strong>
@@ -309,6 +190,34 @@ x in ['apple', 'banana', 'cherry']
     else
       copy.rule = example
 
+  printDataType = (relationship) ->
+    result  = ''
+    dataType = relationship?.relation?.dataType
+    if dataType?.enumerations?.values
+      ext     = dataType?.enumerations?.values ? []
+      for e, i in ext
+        if i == 10
+          result += "..."
+          break
+        result += "#{e.key} \n"
+    if dataType?.dataClass
+      result = """<a href="#{dataType.dataClass.modelCatalogueId}"><span class="fa fa-fw fa-cubes"></span>#{dataType.dataClass.name}</a>"""
+    else if dataType
+      result = dataType?.name
+    result
+
+  printMetadataOccurrencesOnly = (relationship) ->
+    result  = ''
+    ext = relationship?.ext ? {values: []}
+    otherMetadataPresen = false
+    for row in ext.values
+      if (row.key == 'Min Occurs' || row.key == 'Max Occurs')
+        result += "#{row.key}: #{row.value ? ''}\n"
+      else
+        otherMetadataPresen = true
+
+    return result
+
   detailSectionsProvider.register {
     title: 'Description'
     position: -50
@@ -353,78 +262,68 @@ x in ['apple', 'banana', 'cherry']
   }
 
   detailSectionsProvider.register {
-     title: 'Basic'
-     position: -10
-     types: [
-       'dataModel'
-     ]
-     keys: [
-       'http://www.modelcatalogue.org/metadata/#authors'
-       'http://www.modelcatalogue.org/metadata/#reviewers'
-       'http://www.modelcatalogue.org/metadata/#owner'
-
-     ]
-     template: 'modelcatalogue/core/ui/detailSections/dataModelBasic.html'
-  }
-
-  detailSectionsProvider.register {
-     title: 'Basic'
-     position: -10
-     types: [
-       'measurementUnit'
-     ]
-     keys: []
-     template: 'modelcatalogue/core/ui/detailSections/measurementUnitBasic.html'
-  }
-
-
-  detailSectionsProvider.register {
-     title: 'Basic'
-     position: -10
-     types: [
-       'asset'
-     ]
-     keys: []
-     template: 'modelcatalogue/core/ui/detailSections/assetBasic.html'
-     toHumanReadableSize: (size) ->
-        GIGA = 1024 * 1024 * 1024
-        MEGA = 1024 * 1024
-        KILO = 1024
-        return "#{(size / GIGA).toFixed(2)} GB" if size > GIGA
-        return "#{(size / MEGA).toFixed(2)} MB" if size > MEGA
-        return "#{(size / KILO).toFixed(2)} kB" if size > KILO
-        return "#{size} B"
-
-  }
-
-  detailSectionsProvider.register {
-     title: 'Basic'
-     position: -10
-     types: [
-       'dataClass'
-     ]
-     keys: []
-     template: 'modelcatalogue/core/ui/detailSections/dataClassBasic.html'
-  }
-
-  detailSectionsProvider.register {
-     title: 'Basic'
-     position: -10
-     types: [
-       'dataElement'
-     ]
-     keys: []
-     template: 'modelcatalogue/core/ui/detailSections/dataElementBasic.html'
-  }
-
-  detailSectionsProvider.register {
     title: 'Model Catalogue ID'
-    position: 0
+    position: -10
     types: [
       'catalogueElement'
     ]
     keys: []
     template: 'modelcatalogue/core/ui/detailSections/modelCatalogueId.html'
+  }
+
+  detailSectionsProvider.register {
+    title: 'Basic'
+    position: 0
+    types: [
+      'dataModel'
+    ]
+    keys: [
+      'http://www.modelcatalogue.org/metadata/#authors'
+      'http://www.modelcatalogue.org/metadata/#reviewers'
+      'http://www.modelcatalogue.org/metadata/#owner'
+
+    ]
+    template: '/mc/core/ui/detail-sections/dataModelBasic.html'
+  }
+
+  detailSectionsProvider.register {
+    title: 'Basic'
+    position: 0
+    types: [
+      'measurementUnit'
+    ]
+    keys: []
+    template: '/mc/core/ui/detail-sections/measurementUnitBasic.html'
+  }
+
+  detailSectionsProvider.register {
+    title: 'Basic'
+    position: 0
+    types: [
+      'asset'
+    ]
+    keys: []
+    template: '/mc/core/ui/detail-sections/assetBasic.html'
+    toHumanReadableSize: (size) ->
+      GIGA = 1024 * 1024 * 1024
+      MEGA = 1024 * 1024
+      KILO = 1024
+      return "#{(size / GIGA).toFixed(2)} GB" if size > GIGA
+      return "#{(size / MEGA).toFixed(2)} MB" if size > MEGA
+      return "#{(size / KILO).toFixed(2)} kB" if size > KILO
+      return "#{size} B"
+
+  }
+
+  detailSectionsProvider.register {
+    title: 'Basic'
+    position: 0
+    types: [
+      'dataClass'
+      'dataElement'
+    ]
+    keys: []
+    template: '/mc/core/ui/detail-sections/basic.html'
   }
 
   detailSectionsProvider.register {
@@ -489,10 +388,86 @@ x in ['apple', 'banana', 'cherry']
       'mesurementUnit'
       'dataElement'
       'dataType'
-      # data class has various metadata editors which need to be migrated first
-      # 'dataClass'
+      'dataClass'
     ]
     keys: []
     template: 'modelcatalogue/core/ui/detailSections/customMetadata.html'
+  }
+
+  reorderInDetail = (relationName) ->
+    (element, messages, $row, $current) ->
+      element[relationName].reorder($row.row.element, $current?.row?.element).catch (reason) ->
+        messages.error reason
+
+  detailSectionsProvider.register {
+    title: 'Data Elements'
+    position: 60
+    types: [
+      'dataClass'
+    ]
+    keys: []
+    template: '/mc/core/ui/detail-sections/tableData.html'
+    getList: (element) ->
+      return @result if @result
+
+      @result =
+          base: element.contains.base
+          itemType: element.contains.itemType
+
+      element.contains(null, max: 5).then (list) =>
+        @result = list
+      return @result
+    reorder: reorderInDetail('contains')
+
+    data: {
+      columns:
+        [
+          {header: 'Name', value: "relation.name", classes: 'col-md-3', href: 'relation.href()'}
+          {header: "Description", value: "relation.description" , classes: "col-md-5"}
+          {header: "Data Type", value: printDataType, classes: "col-md-3", href: 'href()'}
+          {header: 'Occurs',  value: printMetadataOccurrencesOnly, classes: 'col-md-2'}
+        ]
+    }
+  }
+
+  detailSectionsProvider.register {
+    title: 'Children'
+    position: 70
+    types: [
+      'dataClass'
+    ]
+    keys: []
+    template: '/mc/core/ui/detail-sections/tableData.html'
+    getList: (element) ->
+      return @result if @result
+
+      @result =
+        base: element.parentOf.base
+        itemType: element.parentOf.itemType
+
+      element.parentOf(null, max: 5).then (list) =>
+        @result = list
+      return @result
+    reorder: reorderInDetail('parentOf')
+    data: {
+      columns:
+        [
+          {
+            header: 'Name',
+            value: "ext.get('name') || ext.get('Name') || relation.name ",
+            classes: 'col-md-5',
+            href: 'relation.href()',
+            href: 'relation.href()'
+          }
+          {
+            header: 'Identification',
+            value: "relation.getElementTypeName() + ': ' + relation.id",
+            classes: 'col-md-5',
+            href: 'relation.href()'
+          }
+          {header: 'Description', value: "relation.description", classes: 'col-md-4'}
+          {header: 'Occurs', value: printMetadataOccurrencesOnly, classes: 'col-md-4'}
+        ]
+    }
   }
 ]

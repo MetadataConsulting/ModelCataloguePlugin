@@ -1,3 +1,12 @@
+environments {
+    development {
+        grails.serverURL = "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
+    }
+    test {
+        grails.serverURL = "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
+    }
+}
+
 
 log4j = {
     // Example of changing the log pattern for the default console
@@ -16,8 +25,9 @@ log4j = {
     debug 'org.modelcatalogue.core.util.docx'
 
     // less verbose builder and publishing chains for tests as well
-    info 'org.modelcatalogue.core.util.builder'
-    info 'org.modelcatalogue.core.publishing'
+    debug 'org.modelcatalogue.core.util.builder'
+    info 'org.modelcatalogue.core.util.builder.DefaultCatalogueElementProxy'
+    debug 'org.modelcatalogue.core.publishing'
 
     warn 'org.modelcatalogue.core.xml'
     info 'org.modelcatalogue.core.RelationshipType'
