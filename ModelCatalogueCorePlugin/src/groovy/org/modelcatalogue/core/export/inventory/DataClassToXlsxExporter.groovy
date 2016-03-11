@@ -14,6 +14,7 @@ import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.api.ElementStatus
 
 @Log4j
 class DataClassToXlsxExporter {
@@ -52,7 +53,7 @@ class DataClassToXlsxExporter {
         }
 
         log.info "Exported Data Class ${dataClass.name} (${dataClass.combinedVersion}) to inventory spreadsheet."
-        
+
     }
 
     public static void buildDataClassDetailSheet(Workbook workbook, Map<Long, DataClass> processedDataClasss, DataClass dataClass) {
@@ -123,19 +124,21 @@ class DataClassToXlsxExporter {
                 }
             }
             for(DataClass parent in dataClass.childOf) {
-                row {
-                    cell {
-                        value 'Parent'
-                        style 'property-title'
-                        colspan 2
-                    }
-                    cell {
-                        value "${parent.name} (${parent.combinedVersion})"
-                        style 'property-value'
-                        if (parent.getId() in processedDataClasss.keySet()) {
-                            link to name getReferenceName(parent)
+                if (parent.status != ElementStatus.DEPRECATED) {
+                    row {
+                        cell {
+                            value 'Parent'
+                            style 'property-title'
+                            colspan 2
                         }
-                        colspan 2
+                        cell {
+                            value "${parent.name} (${parent.combinedVersion})"
+                            style 'property-value'
+                            if (parent.getId() in processedDataClasss.keySet()) {
+                                link to name getReferenceName(parent)
+                            }
+                            colspan 2
+                        }
                     }
                 }
             }
