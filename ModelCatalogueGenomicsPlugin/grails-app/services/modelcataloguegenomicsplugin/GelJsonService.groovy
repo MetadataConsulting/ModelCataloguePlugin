@@ -1,6 +1,6 @@
 package modelcataloguegenomicsplugin
 
-
+import groovy.json.JsonOutput
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 
@@ -29,16 +29,16 @@ class GelJsonService {
 
     void printHPOterm(OutputStream out, DataClass child){
         out << '                    {\n'
-        out << '                        "name" : "' + child.name  + '",\n'
-        out << '                        "id"   : "' + child.ext.get("OBO ID") + '"\n'
+        out << '                        "name" : ' + JsonOutput.toJson(child.name)  + ',\n'
+        out << '                        "id"   : ' + JsonOutput.toJson(child.ext.get("OBO ID")) + '\n'
         out << '                    }\n'
     }
 
     void printTest(OutputStream out, DataClass child){
 
         out << '                    {\n'
-        out << '                        "name" : "' + child.name  + '",\n'
-        out << '                        "id"   : "' + getVersionId(child) + '"\n'
+        out << '                        "name" : ' + JsonOutput.toJson(child.name)  + ',\n'
+        out << '                        "id"   : ' + JsonOutput.toJson(getVersionId(child)) + '\n'
         out << '                    }\n'
     }
 
@@ -67,7 +67,7 @@ class GelJsonService {
 
             out << '{ \n'
             out << '   "id" : "' + id  + '",\n'
-            out << '   "name" : "' + child.name+ '",'
+            out << '   "name" : ' + JsonOutput.toJson(child.name) + ','
             out << '   "subGroups" : ['
 
             child.parentOf.eachWithIndex { DataClass cd, index ->
@@ -84,7 +84,7 @@ class GelJsonService {
             out << '{      \n'
             out << '       "id" : "' + id +'",\n'
 
-            out << '       "name" : "' + child.name+ '",'
+            out << '       "name" : ' + JsonOutput.toJson(child.name) + ','
             out << '       "specificDisorders" : ['
 
             child.parentOf.eachWithIndex { DataClass cd, index ->
@@ -101,7 +101,7 @@ class GelJsonService {
 
             out << '           { \n'
             out << '           "id" : "' + id  +'",\n'
-            out << '            "name" : "' + child.name+ '",\n'
+            out << '            "name" : ' + JsonOutput.toJson(child.name) + ',\n'
             out << '                "eligibilityQuestion": {\n'
             out << '                        "date":"' + child.lastUpdated.format("yyyy-MM-dd") + '",\n'
             out << '                        "version": "' +child.versionNumber +'"\n'

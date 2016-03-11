@@ -24,8 +24,8 @@ class GelJsonServiceSpec extends IntegrationSpec {
 
             dataModel(name: 'testDataModel1') {
                 dataClass(name: 'rare disease group 1') {
-                    dataClass(name: 'rare disease subgroup 1.1') {
-                        dataClass(name: 'rare disease disorder 1.1.1') {
+                    dataClass(name: 'rare disease \' subgroup 1.1') {
+                        dataClass(name: 'rare disease " disorder 1.1.1') {
                             dataClass(name: 'rare disease disorder 1.1.1 eligibility',lastUpdated: new Date())
                             dataClass(name: 'rare disease disorder 1.1.1 phenotypes',lastUpdated: new Date()) {
                                 dataClass(name: 'test hpo terms 1')
@@ -56,6 +56,8 @@ class GelJsonServiceSpec extends IntegrationSpec {
 
         String json = new String(out.toByteArray())
 
+        println json
+
         def response = JsonOutput.prettyPrint(json)
         def expected = JsonOutput.prettyPrint(expectedJSON)
 
@@ -71,11 +73,11 @@ class GelJsonServiceSpec extends IntegrationSpec {
                "DiseaseGroups":[
                   {
                      "id":"3",
-                     "name":"rare disease subgroup 1.1",
+                     "name":"rare disease ' subgroup 1.1",
                      "subGroups":[
                         {
                            "id":"4",
-                           "name":"rare disease disorder 1.1.1",
+                           "name":"rare disease \\" disorder 1.1.1",
                            "specificDisorders":[
                               {
                                  "id":"5",
