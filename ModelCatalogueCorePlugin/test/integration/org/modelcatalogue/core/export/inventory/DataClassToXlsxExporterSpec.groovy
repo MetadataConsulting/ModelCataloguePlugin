@@ -15,7 +15,8 @@ class DataClassToXlsxExporterSpec extends IntegrationSpec {
     DataClassService dataClassService
     InitCatalogueService initCatalogueService
 
-    @Rule TemporaryFolder temporaryFolder
+    @Rule
+    TemporaryFolder temporaryFolder
 
     def setup() {
         initCatalogueService.initDefaultRelationshipTypes()
@@ -25,10 +26,8 @@ class DataClassToXlsxExporterSpec extends IntegrationSpec {
         when:
         File file = temporaryFolder.newFile("${System.currentTimeMillis()}.xlsx")
         DataClass model = buildTestModel()
-
-
+        
         new DataClassToXlsxExporter(model, dataClassService).export(file.newOutputStream())
-
 
         open file
 
@@ -36,8 +35,6 @@ class DataClassToXlsxExporterSpec extends IntegrationSpec {
         noExceptionThrown()
 
     }
-
-
 
     private DataClass buildTestModel() {
         DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
@@ -57,7 +54,7 @@ class DataClassToXlsxExporterSpec extends IntegrationSpec {
             dataModel(name: 'C4CTXE') {
                 description "This is a data model for testing DataClassToXlsxExporter"
 
-                dataClass (name: 'C4CTXE Root') {
+                dataClass(name: 'C4CTXE Root') {
                     for (int i in 1..10) {
                         dataClass name: "C4CTXE Model $i", {
                             description "This is a description for Model $i"
@@ -88,9 +85,6 @@ class DataClassToXlsxExporterSpec extends IntegrationSpec {
             }
         }
 
-
         return DataClass.findByName('C4CTXE Root')
-
     }
-
 }
