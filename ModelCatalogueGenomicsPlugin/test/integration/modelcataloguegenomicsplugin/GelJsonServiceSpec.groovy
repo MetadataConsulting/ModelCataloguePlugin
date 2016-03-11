@@ -1,13 +1,15 @@
 package modelcataloguegenomicsplugin
 
 import grails.test.spock.IntegrationSpec
+import groovy.json.JsonBuilder
+import groovy.json.JsonSlurper
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.InitCatalogueService
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 
-//@TestFor(GelJsonService)
+
 class GelJsonServiceSpec extends IntegrationSpec {
 
     ElementService elementService
@@ -53,54 +55,83 @@ class GelJsonServiceSpec extends IntegrationSpec {
         DataClass model = DataClass.findByName('rare disease group 1')
         def json = new GelJsonService().printDiseaseOntology(model)
 
-        then:
-        println json
-        json == expected
+        def response = prettyPrint(json)
+        def expected = prettyPrint(expectedJSON)
 
+        then:
+        noExceptionThrown()
+        response == expected
     }
 
-    def today = new Date().format("yyyy-MM-dd")
-    def expected = "{\"DiseaseGroups\": [\n" +
-        "{ \n" +
-        "   \"id\" : \"3\",\n" +
-        "   \"name\" : \"rare disease subgroup 1.1\",   \"subGroups\" : [{      \n" +
-        "       \"id\" : \"4\",\n" +
-        "       \"name\" : \"rare disease disorder 1.1.1\",       \"specificDisorders\" : [           { \n" +
-        "           \"id\" : \"5\",\n" +
-        "            \"name\" : \"rare disease disorder 1.1.1 eligibility\",\n" +
-        "                \"eligibilityQuestion\": {\n" +
-        "                        \"date\":\"" + today + "\",\n" +
-        "                        \"version\": \"1\"\n" +
-        "                   },\n" +
-        "           \"shallowPhenotypes\" : [],\n" +
-        "           \"tests\" : []\n" +
-        "           }\n" +
-        ",           { \n" +
-        "           \"id\" : \"6\",\n" +
-        "            \"name\" : \"rare disease disorder 1.1.1 phenotypes\",\n" +
-        "                \"eligibilityQuestion\": {\n" +
-        "                        \"date\":\"" + today + "\",\n" +
-        "                        \"version\": \"1\"\n" +
-        "                   },\n" +
-        "           \"shallowPhenotypes\" : [],\n" +
-        "           \"tests\" : [\n" +
-        "           ]\n" +
-        "           }\n" +
-        ",           { \n" +
-        "           \"id\" : \"11\",\n" +
-        "            \"name\" : \"rare disease disorder 1.1.1 clinical tests\",\n" +
-        "                \"eligibilityQuestion\": {\n" +
-        "                        \"date\":\""+ today + "\",\n" +
-        "                        \"version\": \"1\"\n" +
-        "                   },\n" +
-        "           \"shallowPhenotypes\" : [],\n" +
-        "           \"tests\" : [\n" +
-        "           ]\n" +
-        "           }\n" +
-        "       ]\n" +
-        "       }\n" +
-        "]\n" +
-        "        }]\n" +
-        "}"
+    private static String getExpectedJSON() {
+        def today = new Date().format("yyyy-MM-dd")
+        return """
+            {
+               "DiseaseGroups":[
+                  {
+                     "id":"3",
+                     "name":"rare disease subgroup 1.1",
+                     "subGroups":[
+                        {
+                           "id":"4",
+                           "name":"rare disease disorder 1.1.1",
+                           "specificDisorders":[
+                              {
+                                 "id":"5",
+                                 "name":"rare disease disorder 1.1.1 eligibility",
+                                 "eligibilityQuestion":{
+                                    "date":"$today",
+                                    "version":"1"
+                                 },
+                                 "shallowPhenotypes":[
+
+                                 ],
+                                 "tests":[
+
+                                 ]
+                              },
+                              {
+                                 "id":"6",
+                                 "name":"rare disease disorder 1.1.1 phenotypes",
+                                 "eligibilityQuestion":{
+                                    "date":"$today",
+                                    "version":"1"
+                                 },
+                                 "shallowPhenotypes":[
+
+                                 ],
+                                 "tests":[
+
+                                 ]
+                              },
+                              {
+                                 "id":"11",
+                                 "name":"rare disease disorder 1.1.1 clinical tests",
+                                 "eligibilityQuestion":{
+                                    "date":"$today",
+                                    "version":"1"
+                                 },
+                                 "shallowPhenotypes":[
+
+                                 ],
+                                 "tests":[
+
+                                 ]
+                              }
+                           ]
+                        }
+                     ]
+                  }
+               ]
+            }
+        """
+    }
+
+    private static String prettyPrint(String jsonString) {
+        def json = new JsonSlurper().parseText(jsonString)
+        JsonBuilder builder = new JsonBuilder()
+        builder json
+        builder.toPrettyString()
+    }
 
 }
