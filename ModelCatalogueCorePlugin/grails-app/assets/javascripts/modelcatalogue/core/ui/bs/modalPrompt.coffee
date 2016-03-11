@@ -17,7 +17,7 @@ angular.module('mc.core.ui.bs.modalPrompt', ['mc.util.messages']).config ['messa
             </form>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-primary" ng-click="$close(value)" ng-disabled="!value">OK</button>
+            <button class="btn btn-primary" ng-click="$close(value)" ng-disabled="! ''' + (!!args?.allowNotSet)  + ''' && !value">OK</button>
             <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
         </div>
         '''
