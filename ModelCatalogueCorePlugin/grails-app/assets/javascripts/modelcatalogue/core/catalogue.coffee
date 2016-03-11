@@ -104,11 +104,6 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
 
     catalogue.isInstanceOf = (type, supertype) -> catalogueProvider.isInstanceOf(type, supertype)
 
-    catalogue.getStatistics = (dataModelId) ->
-      params = {}
-      params.dataModel = dataModelId if dataModelId and dataModelId isnt 'catalogue'
-      rest method: 'GET', url: "#{modelCatalogueApiRoot}/dashboard", params: params
-
     ###
     # Tests if the element is contained in particular list.
     # * list - required - object which should be enhanced by listEnhancer or listReferenceEnhancer.

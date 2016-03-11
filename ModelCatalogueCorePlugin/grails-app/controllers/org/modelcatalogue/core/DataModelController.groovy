@@ -79,9 +79,7 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
             return
         }
 
-        DataModelFilter filter = DataModelFilter.create(ImmutableSet.<DataModel>of(dataModel), ImmutableSet.<DataModel>of())
-
-        Map<String, Integer> stats = dataModelService.getStatistics(filter)
+        Map<String, Integer> stats = dataModelService.getStatistics(dataModel)
 
         ListWithTotalAndType<DataClass> dataClasses = dataClassService.getTopLevelDataClasses(filter, [toplevel: true])
 
