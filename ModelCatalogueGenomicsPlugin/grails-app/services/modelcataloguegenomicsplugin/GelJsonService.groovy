@@ -1,127 +1,111 @@
 package modelcataloguegenomicsplugin
 
 
-import grails.transaction.Transactional
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 
 
-//@Transactional
 class GelJsonService {
 
-    def printPhenotypes(DataClass child){
-        def jsonString = ''
-        jsonString<<='           "shallowPhenotypes" : [\n'
+    void printPhenotypes(OutputStream out, DataClass child){
+        out << '           "shallowPhenotypes" : [\n'
         child.parentOf.eachWithIndex { DataClass cd, index ->
-            if(index!=0){jsonString<<=','}
-            jsonString<<=printHPOterm(cd)
+            if(index!=0){out << ','}
+            printHPOterm(out, cd)
         }
-        jsonString<<="           ],\n"
-        return jsonString
+        out << "           ],\n"
     }
 
-    def printTests(DataClass child) {
-        def jsonString = ''
-        jsonString<<='           "tests" : [\n'
+    void printTests(OutputStream out, DataClass child) {
+        out << '           "tests" : [\n'
         child.parentOf.eachWithIndex { DataClass cd, index ->
             if (index != 0) {
-                jsonString <<= ','
+                out << ','
             }
-            jsonString <<= printTest(cd)
+            printTest(out, cd)
         }
-        jsonString<<="           ]\n"
-        return jsonString
+        out << "           ]\n"
     }
 
-    def printHPOterm(DataClass child){
-        def jsonString = ''
-        jsonString<<='                    {\n'
-        jsonString<<='                        "name" : "' + child.name  + '",\n'
-        jsonString<<='                        "id"   : "' + child.ext.get("OBO ID") + '"\n'
-        jsonString<<='                    }\n'
-        return jsonString.toString()
-
+    void printHPOterm(OutputStream out, DataClass child){
+        out << '                    {\n'
+        out << '                        "name" : "' + child.name  + '",\n'
+        out << '                        "id"   : "' + child.ext.get("OBO ID") + '"\n'
+        out << '                    }\n'
     }
 
-    def printTest(DataClass child){
-        def jsonString = ''
-        jsonString<<='                    {\n'
-        jsonString<<='                        "name" : "' + child.name  + '",\n'
-        jsonString<<='                        "id"   : "' + getVersionId(child) + '"\n'
-        jsonString<<='                    }\n'
-        return jsonString.toString()
+    void printTest(OutputStream out, DataClass child){
+
+        out << '                    {\n'
+        out << '                        "name" : "' + child.name  + '",\n'
+        out << '                        "id"   : "' + getVersionId(child) + '"\n'
+        out << '                    }\n'
     }
 
 
-    def getVersionId(CatalogueElement c){
-        String id = (c.latestVersionId)? c.latestVersionId + "." + c.versionNumber : c.id + "." + c.versionNumber
-        return id
+    String getVersionId(CatalogueElement c){
+        return (c.latestVersionId)? c.latestVersionId + "." + c.versionNumber : c.id + "." + c.versionNumber
     }
 
-    def printDiseaseOntology(DataClass cls){
-
-        def jsonStringBuffer = new StringBuffer(10*1024);
-
-        jsonStringBuffer<<='{\"DiseaseGroups\": [\n'
-        jsonStringBuffer<<=printRareDiseaseChild(cls, 0)
-        jsonStringBuffer<<="]\n}"
-        return jsonStringBuffer.toString();
+    void printDiseaseOntology(OutputStream out, DataClass cls){
+        out << '{\"DiseaseGroups\": [\n'
+        printRareDiseaseChild(out, cls, 0)
+        out << "]\n}"
     }
 
 
-    def printRareDiseaseChild(DataClass child, Integer level){
-        def jsonString = ''
-        def id = child.latestVersionId ?: child.id
+    void printRareDiseaseChild(OutputStream out, DataClass child, Integer level){
+        Long id = child.latestVersionId ?: child.id
         if(level==0){
             child.parentOf?.eachWithIndex { DataClass cd, index ->
-                if(index!=0){jsonString<<=','}
-                jsonString<<=printRareDiseaseChild(cd, level + 1)
+                if(index!=0){out << ','}
+                printRareDiseaseChild(out, cd, level + 1)
             }
         }
 
         if (level == 1) {
 
-            jsonString<<='{ \n'
-            jsonString<<='   "id" : "' + id  + '",\n'
-            jsonString<<='   "name" : "' + child.name+ '",'
-            jsonString<<='   "subGroups" : ['
+            out << '{ \n'
+            out << '   "id" : "' + id  + '",\n'
+            out << '   "name" : "' + child.name+ '",'
+            out << '   "subGroups" : ['
 
             child.parentOf.eachWithIndex { DataClass cd, index ->
-                if(index!=0){jsonString<<=','}
-                jsonString<<=printRareDiseaseChild(cd, level + 1)
+                if(index!=0){out << ','}
+                printRareDiseaseChild(out, cd, level + 1)
             }
 
-            jsonString<<="]\n"
-            jsonString<<='        }'
+            out << "]\n"
+            out << '        }'
         }
 
         if (level == 2) {
 
-            jsonString<<='{      \n'
-            jsonString<<='       "id" : "' + id +'",\n'
+            out << '{      \n'
+            out << '       "id" : "' + id +'",\n'
 
-            jsonString<<='       "name" : "' + child.name+ '",'
-            jsonString<<='       "specificDisorders" : ['
+            out << '       "name" : "' + child.name+ '",'
+            out << '       "specificDisorders" : ['
 
             child.parentOf.eachWithIndex { DataClass cd, index ->
-                if(index!=0){jsonString<<=','}
-                jsonString<<=printRareDiseaseChild(cd, level + 1)
+                if(index!=0){out << ','}
+                printRareDiseaseChild(out, cd, level + 1)
             }
 
-            jsonString<<="       ]\n"
-            jsonString<<="       }\n"
+            out << "       ]\n"
+            out << "       }\n"
         }
 
         if (level == 3) {
             println("creating model for " + child.name)
 
-            jsonString<<='           { \n'
-            jsonString<<='           "id" : "' + id  +'",\n'
-            jsonString<<='            "name" : "' + child.name+ '",\n'
-            jsonString<<='                "eligibilityQuestion": {\n'
-            jsonString<<='                        "date":"' + child.lastUpdated.format("yyyy-MM-dd") + '",\n'
-            jsonString<<='                        "version": "' +child.versionNumber +'"\n'
-            jsonString<<='                   },\n'
+            out << '           { \n'
+            out << '           "id" : "' + id  +'",\n'
+            out << '            "name" : "' + child.name+ '",\n'
+            out << '                "eligibilityQuestion": {\n'
+            out << '                        "date":"' + child.lastUpdated.format("yyyy-MM-dd") + '",\n'
+            out << '                        "version": "' +child.versionNumber +'"\n'
+            out << '                   },\n'
 
 
             def phenotypeModel, testModel
@@ -137,15 +121,11 @@ class GelJsonService {
                 }
             }
 
-            if(phenotypeModel)jsonString<<= printPhenotypes(phenotypeModel) else jsonString<<='           "shallowPhenotypes" : [],\n'
-            if(testModel)jsonString<<= printTests(testModel) else jsonString<<='           "tests" : []\n'
+            if(phenotypeModel) printPhenotypes(out, phenotypeModel) else out << '           "shallowPhenotypes" : [],\n'
+            if(testModel) printTests(out, testModel) else out << '           "tests" : []\n'
 
-            jsonString<<="           }\n"
+            out << "           }\n"
         }
-
-
-        return jsonString.toString()
-
     }
 
 }

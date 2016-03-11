@@ -50,10 +50,12 @@ class GelJsonServiceSpec extends IntegrationSpec {
 
 
     def "export model to json"(){
-
+        OutputStream out = new ByteArrayOutputStream()
         when:
         DataClass model = DataClass.findByName('rare disease group 1')
-        def json = new GelJsonService().printDiseaseOntology(model)
+        new GelJsonService().printDiseaseOntology(out, model)
+
+        String json = new String(out.toByteArray())
 
         def response = prettyPrint(json)
         def expected = prettyPrint(expectedJSON)

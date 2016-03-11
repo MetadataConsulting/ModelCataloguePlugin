@@ -25,7 +25,7 @@ class GenomicsController {
             originalFileName: "${model.name}-${model.status}-${model.version}.json",
             contentType: "application/json",
         ) {
-            it << gelJsonService.printDiseaseOntology(DataClass.get(classId))
+            gelJsonService.printDiseaseOntology(it, DataClass.get(classId))
         }
 
         response.setHeader("X-Asset-ID",assetId.toString())
