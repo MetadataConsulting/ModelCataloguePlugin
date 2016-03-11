@@ -1,8 +1,7 @@
 package modelcataloguegenomicsplugin
 
 import grails.test.spock.IntegrationSpec
-import groovy.json.JsonBuilder
-import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
@@ -57,8 +56,8 @@ class GelJsonServiceSpec extends IntegrationSpec {
 
         String json = new String(out.toByteArray())
 
-        def response = prettyPrint(json)
-        def expected = prettyPrint(expectedJSON)
+        def response = JsonOutput.prettyPrint(json)
+        def expected = JsonOutput.prettyPrint(expectedJSON)
 
         then:
         noExceptionThrown()
@@ -127,13 +126,6 @@ class GelJsonServiceSpec extends IntegrationSpec {
                ]
             }
         """
-    }
-
-    private static String prettyPrint(String jsonString) {
-        def json = new JsonSlurper().parseText(jsonString)
-        JsonBuilder builder = new JsonBuilder()
-        builder json
-        builder.toPrettyString()
     }
 
 }
