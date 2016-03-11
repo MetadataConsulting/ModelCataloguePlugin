@@ -31,22 +31,40 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     DataModelNavigator select(String dataModelName) {
-        go "#/dataModels?type=catalogue&q=${URLEncoder.encode(dataModelName, 'UTF-8')}"
 
-        waitFor {
-            title == 'Data Models'
+        for (int i = 0; i < 10; i++) {
+            go "#/dataModels?type=catalogue&q=${URLEncoder.encode(dataModelName, 'UTF-8')}"
+
+            waitFor {
+                title == 'Data Models'
+            }
+
+            try {
+                waitFor {
+                    $("h3.panel-title", title: dataModelName).displayed
+                }
+                break
+            } catch (e) {
+                if (i == 9) {
+                    throw e
+                }
+            }
         }
 
-        waitFor {
-            $("h3.panel-title", title: dataModelName).displayed
-        }
 
-        noStale({$("h3.panel-title", title: dataModelName)}) {
-            it.find('a.full-width-link').click()
-        }
+        for (int i = 0; i < 10; i++) {
+            try {
+                noStale({$("h3.panel-title", title: dataModelName)}) {
+                    it.find('a.full-width-link').click()
+                }
+                check rightSideTitle contains dataModelName
+                break
+            } catch (e) {
+                if (i == 9) {
+                    throw e
+                }
+            }
 
-        waitFor {
-            title == "Activity of $dataModelName".toString()
         }
 
         return new DataModelNavigator(this)

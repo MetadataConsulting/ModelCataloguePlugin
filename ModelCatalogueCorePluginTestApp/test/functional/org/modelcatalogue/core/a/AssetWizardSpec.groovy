@@ -22,6 +22,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
     public static final CatalogueAction importMc = CatalogueAction.runFirst('navigation-right', 'curator-menu', 'import-mc')
     public static final CatalogueAction refreshAsset = CatalogueAction.runFirst('item-detail', 'refresh-asset')
     public static final CatalogueContent dataModelsProperty = CatalogueContent.create('td', 'data-value-for': 'Data Models')
+    public static final CatalogueAction downloadButton = CatalogueAction.runFirst('item-detail', 'download-asset')
     public static final CatalogueAction importExcel = CatalogueAction.runFirst('navigation-right', 'curator-menu', 'import-excel')
     public static final CatalogueAction export = CatalogueAction.runFirst('item', 'export')
     public static final String asset = 'asset'
@@ -112,7 +113,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check 'h3' contains 'Import for MET-523.mc'
 
         when:
-        waitUntilFinalized('Import for MET-523.mc')
+        waitUntilFinalized()
 
         then:
         check 'h3' contains 'Import for MET-523.mc MET-523 0.0.1'
@@ -133,7 +134,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
 
         when:
-        waitUntilFinalized('Import for MET-522.xlsx')
+        waitUntilFinalized()
 
         select 'MET-522'
 
@@ -141,7 +142,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check rightSideTitle is 'MET-522 0.0.1'
 
         when:
-        select('MET-522')/ 'MET-522' / 'Data Classes' / 'MET-522.M1'
+        select('MET-522') / 'MET-522' / 'Data Classes' / 'MET-522.M1'
 
         then:
         check rightSideTitle is 'MET-522.M1 MET-522 0.0.1'
@@ -155,7 +156,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check rightSideTitle contains 'Data Elements to Excel.xlsx'
 
         when:
-        waitUntilFinalized('Data Elements to Excel.xlsx')
+        waitUntilFinalized()
 
         StringWriter sw = new StringWriter()
         CatalogueBuilder builder = new XmlCatalogueBuilder(sw)
@@ -168,12 +169,14 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         noExceptionThrown()
     }
 
-    void waitUntilFinalized(String expectedName) {
+    void waitUntilFinalized() {
         int counter = 0
-        while ($(status).hasClass('label-info') && counter++ < 100) {
+        while (!$(downloadButton.toSelector()).displayed && counter++ < 100) {
             // ! + gone does not implicitly require the element
             if ($(refreshAsset.toSelector()).displayed) {
-                click refreshAsset
+                try {
+                    click refreshAsset
+                } catch (ignored) {}
             }
             Thread.sleep(1000)
         }
