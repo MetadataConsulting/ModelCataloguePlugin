@@ -5,8 +5,7 @@ describe "mc.core.ui.propertiesPane", ->
   beforeEach module 'mc.core.modelCatalogueApiRoot'
   beforeEach module 'mc.core.catalogueElementEnhancer'
 
-  it "element get compiled",  inject ($compile, $rootScope, enhance, $httpBackend) ->
-    $httpBackend.when('GET', '/api/modelCatalogue/core/dashboard').respond(fixtures.dashboard.index)
+  it "element get compiled",  inject ($compile, $rootScope, enhance) ->
 
     $rootScope.paneProperties = [
       {label: 'ID', value: 'id'}

@@ -24,13 +24,13 @@ function print_command() {
 function print_usage_for_folder(){
     local ORIGINAL_DIRECTORY=$(pwd)
     cd "$1"
-    echo "Usage:"
+    echo "Usage: (run './catalogue <command> --help' to get help for specific command)"
     for f in * ; do
         if [ "$f" == "lib" ] ; then
             continue
         elif [ -d "$f" ]; then
             print_command $(pwd) "$f"
-        elif [ "$f" == *.sh ]; then
+        elif [[ "$f" == *.sh ]]; then
             local COMMAND_NAME="${f/.sh/}"
             print_command $(pwd) "$COMMAND_NAME"
         fi

@@ -27,13 +27,13 @@ class DataModelService {
         this.legacyDataModels = grailsApplication.config.mc.legacy.dataModels
     }
 
-    public Map<String, Integer> getStatistics(DataModel dataModel) {
-        ImmutableMap.Builder<String, Integer> builder = ImmutableMap.builder()
+    public Map<String, Integer> getStatistics(DataModelFilter filter) {
+        def model = [:]
 
         List<Class> displayed = [DataModel, DataClass, DataElement, DataType, MeasurementUnit, Asset]
 
         for (Class type in displayed) {
-            DetachedCriteria<DataModel> criteria = new DetachedCriteria<DataModel>(DataModel)
+            DetachedCriteria criteria = classified(type, filter)
             criteria.projections {
                 property 'status'
                 property 'id'
@@ -54,21 +54,20 @@ class DataModelService {
                 else if (status == ElementStatus.PENDING) pending++
             }
 
-            builder.put "draft${type.simpleName}Count", draft
-            builder.put "finalized${type.simpleName}Count", finalized
-            builder.put "pending${type.simpleName}Count", pending
-            builder.put "deprecated${type.simpleName}Count", deprecated
-            builder.put "total${type.simpleName}Count", draft + finalized + pending + deprecated
+            model["draft${type.simpleName}Count"]       = draft
+            model["finalized${type.simpleName}Count"]   = finalized
+            model["pending${type.simpleName}Count"]     = pending
+            model["deprecated${type.simpleName}Count"]  = deprecated
+            model["total${type.simpleName}Count"]       = draft + finalized + pending + deprecated
         }
 
-        builder.putAll([
-            activeBatchCount:Batch.countByArchived(false),
-            archivedBatchCount:Batch.countByArchived(true),
-            relationshipTypeCount:RelationshipType.count(),
-            transformationsCount:CsvTransformation.count()
+        model.putAll([
+                activeBatchCount:Batch.countByArchived(false),
+                archivedBatchCount:Batch.countByArchived(true),
+                relationshipTypeCount:RelationshipType.count(),
+                transformationsCount:CsvTransformation.count()
         ])
-
-        builder.build()
+        model
     }
 
     public <T> ListWrapper<T> classified(ListWrapper<T> list, DataModelFilter modelFilter = dataModelFilter) {

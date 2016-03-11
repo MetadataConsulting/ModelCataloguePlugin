@@ -15,7 +15,7 @@ class FileOpener {
             if (Desktop.desktopSupported && Desktop.desktop.isSupported(Desktop.Action.OPEN)) {
                 Desktop.desktop.open(file)
                 println file
-                Thread.sleep(60000)
+                Thread.sleep(10000)
             }
         } catch(ignored) {
             ignored.printStackTrace()
