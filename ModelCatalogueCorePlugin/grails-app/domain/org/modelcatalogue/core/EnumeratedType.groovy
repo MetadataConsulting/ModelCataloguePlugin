@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import com.google.common.collect.ImmutableMap
 import org.modelcatalogue.core.enumeration.Enumeration
 import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.publishing.PublishingContext
@@ -50,7 +51,7 @@ class EnumeratedType extends DataType {
      * @return the map containing the enum values
      */
     Map<String, String> getEnumerations() {
-        Enumerations.from(enumAsString)
+        ImmutableMap.copyOf(Enumerations.from(enumAsString))
     }
 
     Enumerations getEnumerationsObject(){
