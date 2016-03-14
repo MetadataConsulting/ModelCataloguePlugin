@@ -25,11 +25,13 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
             initCatalogueService.initDefaultRelationshipTypes()
         }
         relationshipTypeService.clearCache()
+        RelationshipType.clearCache()
     }
 
     void initCatalogue(){
         initCatalogueService.initCatalogue(true)
         relationshipTypeService.clearCache()
+        RelationshipType.clearCache()
     }
 
     void loadFixtures(){
@@ -38,6 +40,7 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
             fixtures = fixtureLoader.load("assets/*", "batches/*", "dataTypes/*", "enumeratedTypes/*", "measurementUnits/*", "models/*", "relationshipTypes/*", "classifications/*").load("actions/*", "users/*", "referenceTypes/*", "primitiveTypes/*").load("dataElements/*").load("extensions/*", "mappings/*").load("csvTransformations/*")
         }
         relationshipTypeService.clearCache()
+        RelationshipType.clearCache()
     }
 
     public <T> T notNull(T item) {

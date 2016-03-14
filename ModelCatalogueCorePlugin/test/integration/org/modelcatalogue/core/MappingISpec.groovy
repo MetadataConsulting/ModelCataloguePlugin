@@ -12,8 +12,8 @@ class MappingISpec extends AbstractIntegrationSpec {
 
     def setup(){
         loadFixtures()
-        dt1 = notNull DataType.findByName("test5")
-        dt2 = notNull DataType.findByName("test6")
+        dt1 = notNull DataType.findOrCreateByName("test5").save(failOnError: true)
+        dt2 = notNull DataType.findOrCreateByName("test6").save(failOnError: true)
     }
 
 
@@ -23,18 +23,18 @@ class MappingISpec extends AbstractIntegrationSpec {
 
         when:
 
-        Mapping type = new Mapping(args)
-        type.save()
+        Mapping mapping = new Mapping(args)
+        mapping.save()
 
 
         then:
 
-        (type.errors.errorCount == 0) == validates
+        (mapping.errors.errorCount == 0) == validates
         Mapping.count() == size + initialCount
 
         when:
 
-        type.delete()
+        mapping.delete()
 
         then:
 
@@ -44,8 +44,8 @@ class MappingISpec extends AbstractIntegrationSpec {
         validates | size | args
         false     | 0    | [:]
         false     | 0    | [name: "x" * 256]
-        false     | 0    | [ name: "String", source: notNull(DataType.findByName("test5")), destination: notNull(DataType.findByName("test6")), mapping: "foo" ]
-        true      | 1    | [ name: "String1", source: notNull(DataType.findByName("test5")), destination: notNull(DataType.findByName("test6")), mapping: "x * 2" ]
+        false     | 0    | [ name: "String", source: notNull(DataType.findOrCreateByName("test5").save(failOnError: true)), destination: notNull(DataType.findOrCreateByName("test6").save(failOnError: true)), mapping: "foo" ]
+        true      | 1    | [ name: "String1", source: notNull(DataType.findOrCreateByName("test5").save(failOnError: true)), destination: notNull(DataType.findOrCreateByName("test6").save(failOnError: true)), mapping: "x * 2" ]
 
 
 
