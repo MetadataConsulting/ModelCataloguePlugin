@@ -148,22 +148,21 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check rightSideTitle is 'MET-522.M1 MET-522 0.0.1'
 
         when:
-        click export
+        withNewWindow({
+            click export
+            click { $('span', text: 'Export All Elements of MET-522.M1 to Excel XSLX').parent('a') }
+            click modalPrimaryButton
+        }, {
+            check rightSideTitle contains 'Data Elements to Excel.xlsx'
+            waitUntilFinalized()
 
-        click { $('span', text: 'Export All Elements of MET-522.M1 to Excel XSLX').parent('a') }
+            StringWriter sw = new StringWriter()
+            CatalogueBuilder builder = new XmlCatalogueBuilder(sw)
+            ExcelLoader parser = new ExcelLoader(builder)
+            parser.importData(HeadersMap.create(), new ByteArrayInputStream(downloadBytes("api/modelCatalogue/core/asset/${currentId}/download")))
 
-        then:
-        check rightSideTitle contains 'Data Elements to Excel.xlsx'
-
-        when:
-        waitUntilFinalized()
-
-        StringWriter sw = new StringWriter()
-        CatalogueBuilder builder = new XmlCatalogueBuilder(sw)
-        ExcelLoader parser = new ExcelLoader(builder)
-        parser.importData(HeadersMap.create(), new ByteArrayInputStream(downloadBytes("api/modelCatalogue/core/asset/${currentId}/download")))
-
-        sw.toString().count('<dataElement') == 15
+            assert sw.toString().count('<dataElement') == 5
+        })
 
         then:
         noExceptionThrown()

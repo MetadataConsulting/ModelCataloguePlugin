@@ -31,6 +31,11 @@ class ReportDescriptor {
     Closure<String> title = { '' }
 
     /**
+     * Default name to be used for asset generation.
+     */
+    Closure<String> defaultName = { '' }
+
+    /**
      * List of conditions which all needs to be met to apply make this report available to given endpoint.
      */
     List<Closure> conditions = []
@@ -75,9 +80,9 @@ class ReportDescriptor {
 
         if (renderType == RenderType.ASSET) {
             if (!params.params) {
-                params.params = [asset: true, name: title(model)]
+                params.params = [asset: true]
             } else {
-                params.params.putAll asset: true, name: title(model)
+                params.params.putAll asset: true
             }
         }
 
@@ -99,5 +104,8 @@ class ReportDescriptor {
         title(model)
     }
 
-
+    String getDefaultName(Object model) {
+        if (!defaultName) return null
+        defaultName(model)
+    }
 }
