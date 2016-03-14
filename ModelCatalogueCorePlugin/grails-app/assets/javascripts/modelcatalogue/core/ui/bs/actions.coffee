@@ -291,11 +291,9 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
               .then (result) ->
                 $log.debug result.exportDepth
                 if (result.assetName)
-                  if (url.indexOf('?') == -1)
-                    url += '?'
-                  else
-                    url += '&'
-                  url += "name=#{result.assetName}"
+                  url = URI(url).setQuery({name: result.assetName})
+                if (result.exportDepth)
+                  url = URI(url).setQuery({exportDepth: result.exportDepth})
                 $log.debug "export new asset with asset name '#{result.assetName}' using url #{url}"
                 $window.open(url, '_blank')
             else
