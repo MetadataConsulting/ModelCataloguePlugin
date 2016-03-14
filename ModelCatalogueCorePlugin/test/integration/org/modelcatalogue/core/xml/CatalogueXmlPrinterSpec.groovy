@@ -22,16 +22,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
         XMLUnit.ignoreWhitespace = true
 
         initCatalogue()
-
-        if (!RelationshipType.findByName('derivedFrom')) {
-            new RelationshipType(
-                    name: 'derivedFrom',
-                    sourceClass: MeasurementUnit,
-                    sourceToDestination: 'is derived from',
-                    destinationClass: MeasurementUnit,
-                    destinationToSource: 'derives'
-            ).save(failOnError: true)
-        }
+        initCatalogue()
 
         printer = new CatalogueXmlPrinter(dataModelService, dataClassService)
     }
@@ -232,7 +223,6 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
                 description "The newton (symbol: N) is the International System of Units (SI) derived unit of force."
                 ext "From", "SI"
                 rel 'relatedTo' to 'SI', 'kilogram'
-                rel 'derivedFrom' to 'SI', 'meter'
             }
         }
     }

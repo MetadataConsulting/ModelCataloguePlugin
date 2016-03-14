@@ -21,23 +21,23 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
 
 
     void initRelationshipTypes(){
-        relationshipTypeService.clearCache()
         TestDataHelper.initFreshDb(sessionFactory, 'reltypes.sql') {
             initCatalogueService.initDefaultRelationshipTypes()
         }
+        relationshipTypeService.clearCache()
     }
 
     void initCatalogue(){
-        relationshipTypeService.clearCache()
         initCatalogueService.initCatalogue(true)
+        relationshipTypeService.clearCache()
     }
 
     void loadFixtures(){
-        relationshipTypeService.clearCache()
         TestDataHelper.initFreshDb(sessionFactory, 'testdata.sql') {
             initCatalogueService.initDefaultRelationshipTypes()
             fixtures = fixtureLoader.load("assets/*", "batches/*", "dataTypes/*", "enumeratedTypes/*", "measurementUnits/*", "models/*", "relationshipTypes/*", "classifications/*").load("actions/*", "users/*", "referenceTypes/*", "primitiveTypes/*").load("dataElements/*").load("extensions/*", "mappings/*").load("csvTransformations/*")
         }
+        relationshipTypeService.clearCache()
     }
 
     public <T> T notNull(T item) {
