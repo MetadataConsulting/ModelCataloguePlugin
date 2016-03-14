@@ -1,4 +1,4 @@
-package org.modelcatalogue.core
+package org.modelcatalogue.testapp
 
 import grails.test.spock.IntegrationSpec
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
@@ -15,6 +15,7 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
     def relationshipTypeService
 
     void loadMarshallers() {
+        relationshipTypeService.clearCache()
         def springContext = WebApplicationContextUtils.getWebApplicationContext( ServletContextHolder.servletContext )
         springContext.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
     }

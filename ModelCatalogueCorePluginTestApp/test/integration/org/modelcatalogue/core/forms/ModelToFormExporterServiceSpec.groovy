@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.forms
 
+import org.modelcatalogue.testapp.AbstractIntegrationSpec
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.crf.model.DataType
 import org.modelcatalogue.crf.model.GridGroup
@@ -9,15 +10,12 @@ import org.modelcatalogue.crf.model.ResponseLayout
 import org.modelcatalogue.crf.model.ResponseType
 import org.modelcatalogue.crf.model.Section
 
-import static org.modelcatalogue.core.forms.ModelToFormExporterService.*
-
-import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.crf.model.CaseReportForm
 import org.springframework.validation.Errors
 
-class ModelToFormExporterServiceSpec extends IntegrationSpec {
+class ModelToFormExporterServiceSpec extends AbstractIntegrationSpec {
 
     public static final String TEST_FORM_REVISION_NOTES = "This is a test revision"
     public static final String TEST_FORM_VERSION_DESCRIPTION = "This is a test version"
@@ -55,9 +53,9 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
         given:
         DataClass formModel = build {
             dataClass(name: TEST_FORM_NAME) {
-                ext EXT_FORM_REVISION_NOTES, TEST_FORM_REVISION_NOTES
-                ext EXT_FORM_VERSION_DESCRIPTION, TEST_FORM_VERSION_DESCRIPTION
-                ext EXT_FORM_VERSION, TEST_FORM_VERSION
+                ext ModelToFormExporterService.EXT_FORM_REVISION_NOTES, TEST_FORM_REVISION_NOTES
+                ext ModelToFormExporterService.EXT_FORM_VERSION_DESCRIPTION, TEST_FORM_VERSION_DESCRIPTION
+                ext ModelToFormExporterService.EXT_FORM_VERSION, TEST_FORM_VERSION
 
                 dataElement(name: 'Test Element')
             }
@@ -86,15 +84,15 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
         given:
         DataClass formModel = build {
             dataClass(name: TEST_FORM_NAME) {
-                ext EXT_FORM_REVISION_NOTES, TEST_FORM_REVISION_NOTES
-                ext EXT_FORM_VERSION_DESCRIPTION, TEST_FORM_VERSION_DESCRIPTION
-                ext EXT_FORM_VERSION, TEST_FORM_VERSION
+                ext ModelToFormExporterService.EXT_FORM_REVISION_NOTES, TEST_FORM_REVISION_NOTES
+                ext ModelToFormExporterService.EXT_FORM_VERSION_DESCRIPTION, TEST_FORM_VERSION_DESCRIPTION
+                ext ModelToFormExporterService.EXT_FORM_VERSION, TEST_FORM_VERSION
 
                 dataClass(name: TEST_SECTION_NAME_1) {
-                    ext EXT_SECTION_SUBTITLE, TEST_SECTION_SUBTITLE_1
-                    ext EXT_SECTION_INSTRUCTIONS, TEST_SECTION_INSTRUCTIONS_1
+                    ext ModelToFormExporterService.EXT_SECTION_SUBTITLE, TEST_SECTION_SUBTITLE_1
+                    ext ModelToFormExporterService.EXT_SECTION_INSTRUCTIONS, TEST_SECTION_INSTRUCTIONS_1
                     relationship {
-                        ext EXT_SECTION_PAGE_NUMBER, TEST_SECTION_PAGE_NUMBER_1
+                        ext ModelToFormExporterService.EXT_SECTION_PAGE_NUMBER, TEST_SECTION_PAGE_NUMBER_1
                     }
                 }
                 dataClass(name: TEST_SECTION_NAME_2)
@@ -123,19 +121,19 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
         given:
         DataClass formModel = build {
             dataClass(name: TEST_FORM_NAME) {
-                ext EXT_FORM_REVISION_NOTES, TEST_FORM_REVISION_NOTES
-                ext EXT_FORM_VERSION_DESCRIPTION, TEST_FORM_VERSION_DESCRIPTION
-                ext EXT_FORM_VERSION, TEST_FORM_VERSION
+                ext ModelToFormExporterService.EXT_FORM_REVISION_NOTES, TEST_FORM_REVISION_NOTES
+                ext ModelToFormExporterService.EXT_FORM_VERSION_DESCRIPTION, TEST_FORM_VERSION_DESCRIPTION
+                ext ModelToFormExporterService.EXT_FORM_VERSION, TEST_FORM_VERSION
 
                 dataClass(name: TEST_SECTION_NAME_1) {
-                    ext EXT_SECTION_SUBTITLE, TEST_SECTION_SUBTITLE_1
-                    ext EXT_SECTION_INSTRUCTIONS, TEST_SECTION_INSTRUCTIONS_1
-                    ext EXT_SECTION_PAGE_NUMBER, TEST_SECTION_PAGE_NUMBER_1
+                    ext ModelToFormExporterService.EXT_SECTION_SUBTITLE, TEST_SECTION_SUBTITLE_1
+                    ext ModelToFormExporterService.EXT_SECTION_INSTRUCTIONS, TEST_SECTION_INSTRUCTIONS_1
+                    ext ModelToFormExporterService.EXT_SECTION_PAGE_NUMBER, TEST_SECTION_PAGE_NUMBER_1
 
                     dataClass(name: TEST_GRID_MODEL_NAME) {
-                        ext EXT_GROUP_GRID, 'true'
-                        ext EXT_GROUP_REPEAT_NUM, TEST_GRID_REPEAT_NUM
-                        ext EXT_GROUP_REPEAT_MAX, TEST_GRID_REPEAT_MAX
+                        ext ModelToFormExporterService.EXT_GROUP_GRID, 'true'
+                        ext ModelToFormExporterService.EXT_GROUP_REPEAT_NUM, TEST_GRID_REPEAT_NUM
+                        ext ModelToFormExporterService.EXT_GROUP_REPEAT_MAX, TEST_GRID_REPEAT_MAX
                     }
                 }
             }
@@ -162,22 +160,22 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
         given:
         DataClass formModel = build {
             dataClass(name: TEST_FORM_NAME) {
-                ext EXT_FORM_REVISION_NOTES, TEST_FORM_REVISION_NOTES
-                ext EXT_FORM_VERSION_DESCRIPTION, TEST_FORM_VERSION_DESCRIPTION
-                ext EXT_FORM_VERSION, TEST_FORM_VERSION
+                ext ModelToFormExporterService.EXT_FORM_REVISION_NOTES, TEST_FORM_REVISION_NOTES
+                ext ModelToFormExporterService.EXT_FORM_VERSION_DESCRIPTION, TEST_FORM_VERSION_DESCRIPTION
+                ext ModelToFormExporterService.EXT_FORM_VERSION, TEST_FORM_VERSION
 
                 dataClass(name: TEST_SECTION_NAME_1) {
-                    ext EXT_SECTION_SUBTITLE, TEST_SECTION_SUBTITLE_1
-                    ext EXT_SECTION_INSTRUCTIONS, TEST_SECTION_INSTRUCTIONS_1
-                    ext EXT_SECTION_PAGE_NUMBER, TEST_SECTION_PAGE_NUMBER_1
+                    ext ModelToFormExporterService.EXT_SECTION_SUBTITLE, TEST_SECTION_SUBTITLE_1
+                    ext ModelToFormExporterService.EXT_SECTION_INSTRUCTIONS, TEST_SECTION_INSTRUCTIONS_1
+                    ext ModelToFormExporterService.EXT_SECTION_PAGE_NUMBER, TEST_SECTION_PAGE_NUMBER_1
 
                     dataElement(name: ITEM_FILE_NAME) {
                         dataType(name: 'File')
 
                         relationship {
-                            ext EXT_NAME_LC, ITEM_FILE_NAME_OVERRIDEN
-                            ext EXT_ITEM_QUESTION, ITEM_FILE_QUESTION
-                            ext EXT_ITEM_QUESTION_NUMBER, ITEM_FILE_QUTESTION_NUMBER
+                            ext ModelToFormExporterService.EXT_NAME_LC, ITEM_FILE_NAME_OVERRIDEN
+                            ext ModelToFormExporterService.EXT_ITEM_QUESTION, ITEM_FILE_QUESTION
+                            ext ModelToFormExporterService.EXT_ITEM_QUESTION_NUMBER, ITEM_FILE_QUTESTION_NUMBER
                         }
                     }
 
@@ -185,30 +183,30 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
                         dataType name: 'Gender', enumerations: [F: 'Female', M: 'Male']
 
                         relationship {
-                            ext EXT_ITEM_RESPONSE_TYPE, RESPONSE_TYPE_RADIO
-                            ext EXT_ITEM_LAYOUT, 'horizontal'
-                            ext EXT_MIN_OCCURS, '1'
+                            ext ModelToFormExporterService.EXT_ITEM_RESPONSE_TYPE, ModelToFormExporterService.RESPONSE_TYPE_RADIO
+                            ext ModelToFormExporterService.EXT_ITEM_LAYOUT, 'horizontal'
+                            ext ModelToFormExporterService.EXT_MIN_OCCURS, '1'
                         }
                     }
 
                     dataElement(name: ITEM_SINGLE_SELECT_NAME) {
                         dataType(name: 'Multi Type', enumerations: [A: 'Alpha', B: 'Beta', O: 'Omega']) {
-                            ext EXT_ITEM_INSTRUCTIONS, '''
+                            ext ModelToFormExporterService.EXT_ITEM_INSTRUCTIONS, '''
                                 <span data-id="Form 12" data-type="Multi Type"> </span> Multi Type
                             '''
                         }
 
                         relationship {
-                            ext EXT_ITEM_DEFAULT_VALUE, ITEM_SINGLE_SELECT_DEFAULT_VALUE
+                            ext ModelToFormExporterService.EXT_ITEM_DEFAULT_VALUE, ITEM_SINGLE_SELECT_DEFAULT_VALUE
                         }
                     }
 
                     dataElement(name: ITEM_TEXT_NAME) {
-                        ext EXT_ITEM_PHI, 'true'
+                        ext ModelToFormExporterService.EXT_ITEM_PHI, 'true'
 
                         dataType(name: 'double') {
-                            ext EXT_ITEM_LENGTH, '10'
-                            ext EXT_ITEM_DIGITS, '2'
+                            ext ModelToFormExporterService.EXT_ITEM_LENGTH, '10'
+                            ext ModelToFormExporterService.EXT_ITEM_DIGITS, '2'
                             measurementUnit(name: 'Nano Coins', symbol: 'NC')
                         }
                     }

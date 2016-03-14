@@ -1,9 +1,19 @@
 package uk.co.brc.modelcatalogue
 
-import grails.test.spock.IntegrationSpec
-import org.modelcatalogue.core.*
+import org.modelcatalogue.core.DataClass
+import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.DataType
+import org.modelcatalogue.testapp.AbstractIntegrationSpec
 
-class ImportServiceSpec extends IntegrationSpec {
+class ImportServiceSpec extends AbstractIntegrationSpec {
+
+    def importService
+
+    def setup() {
+        initCatalogue()
+        importService.importData()
+    }
 
 
     def
