@@ -8,9 +8,11 @@ angular.module('mc.core.ui.bs.modalExport', ['mc.util.messages']).config ['messa
             $scope.title = title
             $scope.body = args.body
             $scope.type = args.type ? 'text'
-            $scope.value = args.value
             $scope.hasExportDepth = args.hasExportDepth
-            $scope.exportDepth = if args.hasExportDepth then 3 else null
+            $scope.result = {
+              value: args.value,
+              exportDepth: if args.hasExportDepth then 3 else null
+            }
         ]
       }
 
