@@ -20,13 +20,13 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
 		super(DataModel, false)
 	}
 
-    def inventorySpreadsheet() {
+    def inventorySpreadsheet(String name) {
         DataModel dataModel = DataModel.get(params.id)
 
         def dataModelId = dataModel.id
         def assetId = assetService.storeReportAsAsset(
                 dataModel,
-                name: "${dataModel.name} report as MS Excel Document",
+                name: name ? name : "${dataModel.name} report as MS Excel Document",
                 originalFileName: "${dataModel.name}-${dataModel.status}-${dataModel.version}.xlsx",
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream outputStream ->

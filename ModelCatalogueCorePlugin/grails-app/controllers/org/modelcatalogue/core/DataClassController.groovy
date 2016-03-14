@@ -91,13 +91,13 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
         )
     }
 
-    def inventoryDoc() {
+    def inventoryDoc(String name) {
         DataClass model = DataClass.get(params.id)
 
         Long modelId = model.id
         def assetId= assetService.storeReportAsAsset(
                 model.dataModel,
-                name: "${model.name} report as MS Word Document",
+                name: name ? name : "${model.name} report as MS Word Document",
                 originalFileName: "${model.name}-${model.status}-${model.version}.docx",
                 contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )  { OutputStream out ->
@@ -108,15 +108,13 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
         redirect controller: 'asset', id: assetId, action: 'show'
     }
 
-
-
-    def inventorySpreadsheet() {
+    def inventorySpreadsheet(String name) {
         DataClass model = DataClass.get(params.id)
 
         Long modelId = model.id
         def assetId= assetService.storeReportAsAsset(
                 model.dataModel,
-                name: "${model.name} report as MS Excel Document",
+                name: name ? name : "${model.name} report as MS Excel Document",
                 originalFileName: "${model.name}-${model.status}-${model.version}.xlsx",
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )  { OutputStream out ->
@@ -127,14 +125,13 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
         redirect controller: 'asset', id: assetId, action: 'show'
     }
 
-
-    def changelogDoc() {
+    def changelogDoc(String name) {
         DataClass model = DataClass.get(params.id)
 
         Long modelId = model.id
         def assetId = assetService.storeReportAsAsset(
                 model.dataModel,
-                name: "${model.name} changelog as MS Word Document",
+                name: name ? name : "${model.name} changelog as MS Word Document",
                 originalFileName: "${model.name}-${model.status}-${model.version}-changelog.docx",
                 contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ) { OutputStream out ->
@@ -144,5 +141,4 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
         response.setHeader("X-Asset-ID",assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
     }
-
 }

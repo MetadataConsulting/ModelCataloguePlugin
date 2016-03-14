@@ -59,6 +59,7 @@ Forms generator plugin for Model Catalogue
             creates asset
             type DataClass
             title { "Export as Case Report From" }
+            defaultName { "$it.name Case Report Form" }
             link controller: 'formGenerator', action: 'generateForm', id: true
         }
 

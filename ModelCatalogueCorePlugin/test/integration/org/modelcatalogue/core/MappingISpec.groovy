@@ -11,30 +11,39 @@ class MappingISpec extends AbstractIntegrationSpec {
     MappingService mappingService
 
     def setup(){
-        loadFixtures()
-        dt1 = notNull DataType.findByName("test5")
-        dt2 = notNull DataType.findByName("test6")
+        initRelationshipTypes()
+        dt1 = new DataType(name: 'test5').save(failOnError: true)
+        dt2 = new DataType(name: 'test6').save(failOnError: true)
     }
 
 
     @Unroll
-    def "create a new data type from #args validates to #validates" (){
+    def "create a new mapping from #args validates to #validates" (){
         int initialCount = Mapping.count()
 
         when:
 
-        Mapping type = new Mapping(args)
-        type.save()
+        if (args.source) {
+            args.source = new DataType(args.source).save(failOnError: true)
+        }
+
+        if (args.destination) {
+            args.destination = new DataType(args.destination).save(failOnError: true)
+        }
+
+
+        Mapping mapping = new Mapping(args)
+        mapping.save()
 
 
         then:
 
-        (type.errors.errorCount == 0) == validates
+        (mapping.errors.errorCount == 0) == validates
         Mapping.count() == size + initialCount
 
         when:
 
-        type.delete()
+        mapping.delete()
 
         then:
 
@@ -44,8 +53,8 @@ class MappingISpec extends AbstractIntegrationSpec {
         validates | size | args
         false     | 0    | [:]
         false     | 0    | [name: "x" * 256]
-        false     | 0    | [ name: "String", source: notNull(DataType.findByName("test5")), destination: notNull(DataType.findByName("test6")), mapping: "foo" ]
-        true      | 1    | [ name: "String1", source: notNull(DataType.findByName("test5")), destination: notNull(DataType.findByName("test6")), mapping: "x * 2" ]
+        false     | 0    | [ name: "String", source: [name: 'test5a'], destination: [name: 'test5b'], mapping: "foo" ]
+        true      | 1    | [ name: "String1", source: [name: 'test5c'], destination: [name: 'test5d'], mapping: "x * 2" ]
 
 
 

@@ -47,7 +47,7 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
         expect:
         modelReports.size()                 >= 1
         modelReports[0].getTitle(model)     == 'Inventory Report Document'
-        modelReports[0].getLink(model)?.endsWith("/api/modelCatalogue/core/dataClass/1/inventoryDoc")
+        modelReports[0].getLink(model)?.endsWith("/api/modelCatalogue/core/dataClass/1/inventoryDoc?asset=true")
 
         when:
         def models = new Elements(itemType: DataClass)
@@ -56,7 +56,7 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
         then:
         wrapperReports.size()               >= 2
         wrapperReports[1].getTitle(models)  == 'WRAPPER'
-        wrapperReports[1].getLink(models)?.endsWith('/foo/bar?format=xml&asset=true&name=WRAPPER')
+        wrapperReports[1].getLink(models)?.endsWith('/foo/bar?format=xml&asset=true')
 
     }
 
@@ -81,7 +81,7 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
         relationshipsReports.size()                           >= 2
         relationshipsReports[1].getTitle(new Relationships()) == 'Export Relationships TEST'
         relationshipsReports[1].renderType                    == ReportDescriptor.RenderType.ASSET
-        relationshipsReports[1].getLink(new Relationships(list: new SimpleListWrapper<Relationship>(itemType: Relationship)))  == '?format=xlsx&report=&asset=true&name=Export+Relationships+TEST'
+        relationshipsReports[1].getLink(new Relationships(list: new SimpleListWrapper<Relationship>(itemType: Relationship)))  == '?format=xlsx&report=&asset=true'
 
 
 
