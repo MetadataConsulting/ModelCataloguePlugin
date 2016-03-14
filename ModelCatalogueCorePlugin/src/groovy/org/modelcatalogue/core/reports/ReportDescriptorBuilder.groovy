@@ -25,6 +25,14 @@ class ReportDescriptorBuilder {
         descriptor.defaultName = defaultName ; this
     }
 
+    ReportDescriptorBuilder hasExportDepth(Boolean hasExportDepth) {
+        descriptor.hasExportDepth = { hasExportDepth } ; this
+    }
+
+    ReportDescriptorBuilder hasExportDepth(Closure hasExportDepth) {
+        descriptor.hasExportDepth = hasExportDepth ; this
+    }
+
     ReportDescriptorBuilder type(Class... types) {
         descriptor.conditions << { types.any { type -> type.isAssignableFrom(it.class) }} ; this
     }
