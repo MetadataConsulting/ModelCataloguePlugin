@@ -299,6 +299,7 @@ Model catalogue core plugin (metadata registry)
             creates asset
             title { "Inventory Report Spreadsheet" }
             defaultName { "${it.name} report as MS Excel Document" }
+            hasExportDepth true
             type DataModel
             link controller: 'dataModel', action: 'inventorySpreadsheet', id: true
         }
@@ -307,6 +308,7 @@ Model catalogue core plugin (metadata registry)
             creates asset
             title { "Inventory Report Document" }
             defaultName { "${it.name} report as MS Word Document" }
+            hasExportDepth true
             type DataClass
             link controller: 'dataClass', action: 'inventoryDoc', id: true
         }
@@ -323,6 +325,7 @@ Model catalogue core plugin (metadata registry)
             creates asset
             title { "Changelog Document" }
             defaultName { "${it.name} changelog as MS Word Document" }
+            hasExportDepth true
             type DataClass
             link controller: 'dataClass', action: 'changelogDoc', id: true
         }

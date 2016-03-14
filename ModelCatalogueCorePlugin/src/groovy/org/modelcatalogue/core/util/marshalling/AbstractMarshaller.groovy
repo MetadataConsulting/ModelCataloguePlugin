@@ -40,11 +40,13 @@ abstract class AbstractMarshaller {
             if (modelCatalogueSecurityService.userLoggedIn) {
                 // for users logged in render all links
                 reports << [title: descriptor.getTitle(el) ?: "Generic Report", defaultName: descriptor.getDefaultName(el),
-                            url: descriptor.getLink(el), type: descriptor.renderType.toString()]
+                            hasExportDepth: descriptor.getHasExportDepth(el), url: descriptor.getLink(el),
+                            type: descriptor.renderType.toString()]
             } else if (descriptor.renderType != ReportDescriptor.RenderType.ASSET) {
                 // for users not logged in only let non-asset reports to render
                 reports << [title: descriptor.getTitle(el) ?: "Generic Report", defaultName: descriptor.getDefaultName(el),
-                            url: descriptor.getLink(el), type: descriptor.renderType.toString()]
+                            hasExportDepth: descriptor.getHasExportDepth(el), url: descriptor.getLink(el),
+                            type: descriptor.renderType.toString()]
             }
         }
 
