@@ -287,45 +287,45 @@ Model catalogue core plugin (metadata registry)
         reportsRegistry.register {
             creates asset
             title { "Export All Elements of ${it.name} to Excel XSLX" }
-            defaultName {"Export All Elements of ${it.name} to Excel XSLX"}
+            defaultName { "Export All Elements of ${it.name} to Excel XSLX" }
             type DataClass
             when { DataClass dataClass ->
                 dataClass.countContains() > 0
             }
-            link controller: 'dataArchitect', action: 'getSubModelElements', params: [format: 'xlsx', report:'NHIC'], id: true
+            link controller: 'dataArchitect', action: 'getSubModelElements', params: [format: 'xlsx', report: 'NHIC'], id: true
         }
 
         reportsRegistry.register {
             creates asset
-            title { "Inventory Report Spreadsheet"}
-            defaultName {"${it.name} report as MS Excel Document"}
+            title { "Inventory Report Spreadsheet" }
+            defaultName { "${it.name} report as MS Excel Document" }
             type DataModel
             link controller: 'dataModel', action: 'inventorySpreadsheet', id: true
         }
 
-		reportsRegistry.register {
-			creates asset
-			title { "Inventory Report Document" }
-            defaultName {"${it.name} report as MS Word Document"}
-			type DataClass
-			link controller: 'dataClass', action: 'inventoryDoc', id: true
-		}
+        reportsRegistry.register {
+            creates asset
+            title { "Inventory Report Document" }
+            defaultName { "${it.name} report as MS Word Document" }
+            type DataClass
+            link controller: 'dataClass', action: 'inventoryDoc', id: true
+        }
 
-		reportsRegistry.register {
-			creates asset
-			title { "Inventory Report Spreadsheet" }
-            defaultName {"${it.name} report as MS Excel Document"}
-			type DataClass
-			link controller: 'dataClass', action: 'inventorySpreadsheet', id: true
-		}
+        reportsRegistry.register {
+            creates asset
+            title { "Inventory Report Spreadsheet" }
+            defaultName { "${it.name} report as MS Excel Document" }
+            type DataClass
+            link controller: 'dataClass', action: 'inventorySpreadsheet', id: true
+        }
 
-		reportsRegistry.register {
-			creates asset
-			title { "Changelog Document" }
-            defaultName {"${it.name} changelog as MS Word Document"}
-			type DataClass
-			link controller: 'dataClass', action: 'changelogDoc', id: true
-		}
+        reportsRegistry.register {
+            creates asset
+            title { "Changelog Document" }
+            defaultName { "${it.name} changelog as MS Word Document" }
+            type DataClass
+            link controller: 'dataClass', action: 'changelogDoc', id: true
+        }
 
         reportsRegistry.register {
             creates link
