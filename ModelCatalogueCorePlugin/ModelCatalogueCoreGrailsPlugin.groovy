@@ -317,6 +317,7 @@ Model catalogue core plugin (metadata registry)
             creates asset
             title { "Inventory Report Spreadsheet" }
             defaultName { "${it.name} report as MS Excel Document" }
+            hasExportDepth true
             type DataClass
             link controller: 'dataClass', action: 'inventorySpreadsheet', id: true
         }
