@@ -71,8 +71,6 @@ Genomics England customisation plugin for Model Catalogue
             type DataClass
             link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTests', id: true
         }
-
-
     }
 
     def onChange = { event ->
