@@ -15,6 +15,7 @@ class DataModelToXlsxExporter {
 
     DataClassService dataClassService
     DataModel dataModel
+    Integer exportDepth = 3
 
     Map<Long, DataClass> processedDataClasses = [:]
 
@@ -145,7 +146,7 @@ class DataModelToXlsxExporter {
                 return
             }
 
-            if (level > 3) {
+            if (level > exportDepth) {
                 processedDataClasses.put(dataClass.id, dataClass)
                 return
             }

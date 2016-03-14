@@ -91,7 +91,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
         )
     }
 
-    def inventoryDoc(String name) {
+    def inventoryDoc(String name, Integer exportDepth) {
         DataClass model = DataClass.get(params.id)
 
         Long modelId = model.id
@@ -101,14 +101,14 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
                 originalFileName: "${model.name}-${model.status}-${model.version}.docx",
                 contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )  { OutputStream out ->
-            new DataClassToDocxExporter(DataClass.get(modelId), dataClassService).export(out)
+            new DataClassToDocxExporter(DataClass.get(modelId), dataClassService, exportDepth).export(out)
         }
 
         response.setHeader("X-Asset-ID",assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
     }
 
-    def inventorySpreadsheet(String name) {
+    def inventorySpreadsheet(String name, Integer exportDepth) {
         DataClass model = DataClass.get(params.id)
 
         Long modelId = model.id
@@ -118,7 +118,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
                 originalFileName: "${model.name}-${model.status}-${model.version}.xlsx",
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )  { OutputStream out ->
-            new DataClassToXlsxExporter(DataClass.get(modelId), dataClassService).export(out)
+            new DataClassToXlsxExporter(DataClass.get(modelId), dataClassService, exportDepth).export(out)
         }
 
         response.setHeader("X-Asset-ID",assetId.toString())

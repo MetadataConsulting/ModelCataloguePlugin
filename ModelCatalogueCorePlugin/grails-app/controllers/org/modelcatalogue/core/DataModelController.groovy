@@ -20,7 +20,7 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
 		super(DataModel, false)
 	}
 
-    def inventorySpreadsheet(String name) {
+    def inventorySpreadsheet(String name, Integer exportDepth) {
         DataModel dataModel = DataModel.get(params.id)
 
         def dataModelId = dataModel.id
@@ -31,7 +31,8 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream outputStream ->
             // reload domain class as this is called in separate thread
-            def exporter = new DataModelToXlsxExporter(dataClassService: dataClassService, dataModel: DataModel.get(dataModelId))
+            def exporter = new DataModelToXlsxExporter(dataClassService: dataClassService,
+                dataModel: DataModel.get(dataModelId), exportDepth: exportDepth)
             exporter.export(outputStream)
         }
 
