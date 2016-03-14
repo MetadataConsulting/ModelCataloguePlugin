@@ -5,13 +5,13 @@ import org.modelcatalogue.core.DataClass
 
 class UmljServiceISpec extends AbstractIntegrationSpec {
 
-    def umljService, initCatalogueService, catalogueBuilder
+    def umljService
+    def catalogueBuilder
 
-//    @Ignore
     def "test import"() {
-        initCatalogueService.initCatalogue(true)
+        initCatalogue()
         def filenameXsd = "test/integration/resources/CLLDataModel0.1.umlj"
-        DataModel classification = new DataModel(name: "GeL Cancer Core").save()
+        DataModel classification = new DataModel(name: "GeL Cancer Core ${System.currentTimeMillis()}").save(failOnError: true)
 
         when:
         InputStream inputStream = new FileInputStream(filenameXsd)

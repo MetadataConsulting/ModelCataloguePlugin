@@ -1,4 +1,4 @@
-package x.org.modelcatalogue.core.util
+package org.modelcatalogue.core.util
 
 import grails.util.Holders
 import org.modelcatalogue.core.*
