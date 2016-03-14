@@ -232,7 +232,7 @@ class CatalogueXmlLoader {
     private void handleDataType(NodeChild element) {
         Map<String, Object> parameters = parameters(element)
 
-        if (element.enumerations) {
+        if (parameters.enumerations) {
             Enumerations enumerations = Enumerations.create()
             element.enumerations.children().each {
                 String idText = it.@id.text()
