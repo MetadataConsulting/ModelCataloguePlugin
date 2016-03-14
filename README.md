@@ -17,7 +17,7 @@ Model Catalogue
  * [Common Issues](docs/development/bugs/index.md)
  * [ElasticSearch Integration](docs/deployment/elasticsearch.md)
  * [Docker Release Pipepine](docs/deployment/docker_releases.md)
-
+ * [Exporting from Model Catalogue](docs/development/recipes/exports.md)
 
 ## Testing
  * [Writing Geb Specifications using Stale-Safe DSL](docs/development/frameworks/geb.md)
