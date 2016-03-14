@@ -276,24 +276,27 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
         {
           label:  report.title
           defaultName: report.defaultName
+          hasExportDepth: report.hasExportDepth
           url:    report.url
           type:   report.type
           watches: 'element'
           action: ->
             url = @url
             defaultValue = if @defaultName then @defaultName else ''
+            hasExportDepth = if @hasExportDepth then @hasExportDepth else false
             if @type == 'LINK'
               $window.open(url, '_blank')
             else if @type == 'ASSET'
-              messages.prompt('Asset Name', 'Asset Name', {allowNotSet: true, value: defaultValue})
-              .then (assetName) ->
-                if (assetName)
+              messages.prompt('Asset Name', 'Asset Name', {type: 'export', value: defaultValue, hasExportDepth: hasExportDepth})
+              .then (result) ->
+                $log.debug result.exportDepth
+                if (result.assetName)
                   if (url.indexOf('?') == -1)
                     url += '?'
                   else
                     url += '&'
-                  url += "name=#{assetName}"
-                $log.debug "export new asset with asset name '#{assetName}' using url #{url}"
+                  url += "name=#{result.assetName}"
+                $log.debug "export new asset with asset name '#{result.assetName}' using url #{url}"
                 $window.open(url, '_blank')
             else
               $log.error "unknown type of report '#{@type}'"
