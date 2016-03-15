@@ -31,10 +31,13 @@
             ng-click="select(element)">
         <span ng-class="element.getIcon()" class="text-muted"></span>
         {{element.$$localName || element.name}}
+        {{metadataOccurrencesToAsterisk(element)}}
         <small class="text-muted" ng-if="element.$$localName">{{element.name}}</small>
         <small class="text-muted">
           <span ng-if="element.latestVersionId"
-                class="catalogue-element-treeview-version-number">{{element.getDataModelWithVersion()}}</span>
+                class="catalogue-element-treeview-version-number">
+            {{element.getDataModelWithVersion()}}
+          </span>
         </small>
       </span>
       <small class="text-muted" ng-if="element.$$href">
