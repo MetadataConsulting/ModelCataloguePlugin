@@ -125,7 +125,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
         redirect controller: 'asset', id: assetId, action: 'show'
     }
 
-    def changelogDoc(String name) {
+    def changelogDoc(String name, Integer exportDepth) {
         DataClass model = DataClass.get(params.id)
 
         Long modelId = model.id
@@ -135,7 +135,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
                 originalFileName: "${model.name}-${model.status}-${model.version}-changelog.docx",
                 contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ) { OutputStream out ->
-            new ChangelogGenerator(auditService, dataClassService).generateChangelog(DataClass.get(modelId), out)
+            new ChangelogGenerator(auditService, dataClassService, exportDepth).generateChangelog(DataClass.get(modelId), out)
         }
 
         response.setHeader("X-Asset-ID",assetId.toString())
