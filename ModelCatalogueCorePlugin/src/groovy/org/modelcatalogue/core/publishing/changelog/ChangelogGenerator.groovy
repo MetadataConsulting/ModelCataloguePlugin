@@ -7,7 +7,10 @@ import grails.util.GrailsNameUtils
 import grails.util.Holders
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
-import org.modelcatalogue.core.*
+import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.DataClass
+import org.modelcatalogue.core.DataClassService
+import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.audit.Change
 import org.modelcatalogue.core.audit.ChangeType
@@ -15,7 +18,6 @@ import org.modelcatalogue.core.audit.LoggingAuditor
 import org.modelcatalogue.core.comments.Comment
 import org.modelcatalogue.core.comments.CommentsService
 import org.modelcatalogue.core.enumeration.Enumerations
-import org.modelcatalogue.core.enumeration.LegacyEnumerations
 import org.modelcatalogue.core.util.delayable.Delayable
 import org.modelcatalogue.core.util.docx.ModelCatalogueWordDocumentBuilder
 
@@ -29,10 +31,11 @@ class ChangelogGenerator {
     private final AuditService auditService
     private final DataClassService dataClassService
     private final CommentsService commentsService
+    private final Integer exportDepth
 
     private final Map<Long, List<Comment>> commentsCache = [:]
 
-    ChangelogGenerator(AuditService auditService, DataClassService dataClassService) {
+    ChangelogGenerator(AuditService auditService, DataClassService dataClassService, Integer exportDepth = 3) {
         this.auditService = auditService
         this.dataClassService = dataClassService
         try {
@@ -41,6 +44,7 @@ class ChangelogGenerator {
             commentsService = null
             log.info "Comments are not enabled for this catalogue."
         }
+        this.exportDepth = exportDepth
     }
 
     void generateChangelog(DataClass dataClass, OutputStream outputStream) {
@@ -95,7 +99,7 @@ class ChangelogGenerator {
 
                 heading1 'Data Classes'
 
-                Collection<DataClass> classes = getInnerClasses(dataClass)
+                Collection<DataClass> classes = dataClassService.getInnerClasses(dataClass, exportDepth).items
                 int counter = 1
                 int size = classes.size()
                 for (DataClass child in classes) {
@@ -498,10 +502,6 @@ class ChangelogGenerator {
                 inList 'type', types.toList()
             }
         }.items
-    }
-
-    private Collection<DataClass> getInnerClasses(DataClass dataClass) {
-        dataClassService.getInnerClasses(dataClass).items
     }
 
     private static String valueForPrint(String propertyName, String storedValue) {

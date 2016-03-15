@@ -124,9 +124,9 @@ class DataClassService {
         """, [type: hierarchy, status: status]
     }
 
-    ListWithTotalAndType<DataClass> getInnerClasses(DataClass dataClass) {
+    ListWithTotalAndType<DataClass> getInnerClasses(DataClass dataClass, Integer maxLevel = 3) {
         Lists.lazy([:], DataClass) {
-            collectChildren(3, dataClass, new TreeMap<String, DataClass>()).values().toList()
+            collectChildren(maxLevel, dataClass, new TreeMap<String, DataClass>()).values().toList()
         }
     }
 
