@@ -65,9 +65,16 @@ Genomics England customisation plugin for Model Catalogue
 
         reportsRegistry.register {
             creates link
-            title { "Rare Diseases HPO And Clinical Tests Json" }
+            title { "Rare Diseases HPO And Clinical Tests JSON" }
             type DataClass
-            link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTests', id: true
+            link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsJson', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases HPO And Clinical Tests CSV" }
+            type DataClass
+            link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsCsv', id: true
         }
 
 

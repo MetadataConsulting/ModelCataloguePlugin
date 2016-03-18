@@ -5,6 +5,7 @@ import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
+import org.modelcatalogue.gel.GelCsvExporter
 import org.modelcatalogue.gel.GelJsonExporter
 
 /**
@@ -15,7 +16,9 @@ class GenomicsController {
     def assetService
     DataClassService dataClassService
 
-    def exportRareDiseaseHPOAndClinicalTests() {
+    static final DOC_IMAGE_PATH = "https://www.genomicsengland.co.uk/wp-content/uploads/2015/11/Genomics-England-logo-2015.png"
+
+    def exportRareDiseaseHPOAndClinicalTestsAsJson() {
         DataClass model = DataClass.get(params.id)
 
         Long classId = model.getId()
@@ -32,10 +35,22 @@ class GenomicsController {
         redirect controller: 'asset', id: assetId, action: 'show'
     }
 
+    def exportRareDiseaseHPOAndClinicalTestsAsCsv() {
+        DataClass dClass = DataClass.get(params.id)
 
+        Long classId = dClass.getId()
 
+        Long assetId = assetService.storeReportAsAsset(dClass.dataModel,
+            name: "${dClass.name} report as CSV",
+            originalFileName: "${dClass.name}-${dClass.status}-${dClass.version}.csv",
+            contentType: "text/csv",
+        ) {
+            new GelCsvExporter(it).printDiseaseOntology(DataClass.get(classId))
+        }
 
-    def imagePath = "https://www.genomicsengland.co.uk/wp-content/uploads/2015/11/Genomics-England-logo-2015.png"
+        response.setHeader("X-Asset-ID",assetId.toString())
+        redirect controller: 'asset', id: assetId, action: 'show'
+    }
 
     def customTemplate = {
         'document' font: [family: 'Calibri', size: 11], margin: [left: 20, right: 10]
@@ -69,7 +84,7 @@ class GenomicsController {
             originalFileName: "${model.name}-${model.status}-${model.version}.docx",
             contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )  { OutputStream out ->
-            new DataModelToDocxExporter(DataModel.get(modelId), dataClassService, customTemplate, imagePath).export(out)
+            new DataModelToDocxExporter(DataModel.get(modelId), dataClassService, customTemplate, DOC_IMAGE_PATH).export(out)
         }
 
         response.setHeader("X-Asset-ID",assetId.toString())
