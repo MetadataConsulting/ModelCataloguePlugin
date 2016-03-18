@@ -25,12 +25,12 @@ class ReportDescriptorBuilder {
         descriptor.defaultName = defaultName ; this
     }
 
-    ReportDescriptorBuilder hasExportDepth(Boolean hasExportDepth) {
-        descriptor.hasExportDepth = { hasExportDepth } ; this
+    ReportDescriptorBuilder depth(Integer depth) {
+        descriptor.depth = { depth } ; this
     }
 
-    ReportDescriptorBuilder hasExportDepth(Closure hasExportDepth) {
-        descriptor.hasExportDepth = hasExportDepth ; this
+    ReportDescriptorBuilder depth(Closure depth) {
+        descriptor.depth = depth ; this
     }
 
     ReportDescriptorBuilder type(Class... types) {

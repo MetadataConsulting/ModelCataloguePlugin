@@ -7,9 +7,9 @@
       <label for="value">{{body}}</label>
       <input type="{{type}}" id="value" ng-model="result.value" class="form-control">
     </div>
-    <div class="form-group" ng-if="hasExportDepth">
-      <label for="export-depth">Export Depth</label>
-      <input type="number" min="0" id="export-depth" ng-model="result.exportDepth" class="form-control">
+    <div class="form-group" ng-if="depth">
+      <label for="depth">Export Depth</label>
+      <input type="number" min="0" id="depth" ng-model="result.depth" class="form-control">
     </div>
     <fake-submit-button/>
   </form>

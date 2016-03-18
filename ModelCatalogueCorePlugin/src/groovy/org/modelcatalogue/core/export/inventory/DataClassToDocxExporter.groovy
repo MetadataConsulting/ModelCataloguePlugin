@@ -29,17 +29,17 @@ class DataClassToDocxExporter {
 
     final DataClassService dataClassService
     final Long dataClassId
-    final Integer exportDepth
+    final Integer depth
     final Set<DataType> usedDataTypes = new TreeSet<DataType>([compare: { DataType a, DataType b ->
         a?.name <=> b?.name
     }] as Comparator<DataType>)
     final Set<Long> processedModels = new HashSet<Long>()
 
 
-    DataClassToDocxExporter(DataClass model, DataClassService dataClassService, Integer exportDepth = 3) {
+    DataClassToDocxExporter(DataClass model, DataClassService dataClassService, Integer depth = 3) {
         this.dataClassId = model.getId()
         this.dataClassService = dataClassService
-        this.exportDepth = exportDepth
+        this.depth = depth
     }
 
     void export(OutputStream outputStream) {
@@ -197,7 +197,7 @@ class DataClassToDocxExporter {
 
 
     private void printModel(DocumentBuilder builder, DataClass model, int level) {
-        if (level > exportDepth) {
+        if (level > depth) {
             return
         }
 
