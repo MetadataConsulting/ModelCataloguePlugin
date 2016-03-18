@@ -6,12 +6,12 @@ angular.module('mc.core.ui.bs.modalExport', ['mc.util.messages']).config ['messa
         templateUrl: '/mc/core/ui/modals/modalExport.html'
         controller: ['$scope', ($scope) ->
             $scope.title = title
-            $scope.body = args.body
-            $scope.type = args.type ? 'text'
             $scope.depth = args.depth
+            $scope.includeMetadata = args.includeMetadata
             $scope.result = {
-              value: args.value,
-              depth: args.depth
+              assetName: args.assetName,
+              depth: args.depth,
+              includeMetadata: args.includeMetadata
             }
         ]
       }

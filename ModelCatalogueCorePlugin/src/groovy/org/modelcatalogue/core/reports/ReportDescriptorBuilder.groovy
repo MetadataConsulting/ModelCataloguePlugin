@@ -33,6 +33,14 @@ class ReportDescriptorBuilder {
         descriptor.depth = depth ; this
     }
 
+    ReportDescriptorBuilder includeMetadata(Boolean includeMetadata) {
+        descriptor.includeMetadata = { includeMetadata } ; this
+    }
+
+    ReportDescriptorBuilder includeMetadata(Closure includeMetadata) {
+        descriptor.includeMetadata = includeMetadata ; this
+    }
+
     ReportDescriptorBuilder type(Class... types) {
         descriptor.conditions << { types.any { type -> type.isAssignableFrom(it.class) }} ; this
     }

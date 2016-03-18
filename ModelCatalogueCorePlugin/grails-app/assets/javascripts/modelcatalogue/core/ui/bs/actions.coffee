@@ -277,24 +277,30 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
           label:  report.title
           defaultName: report.defaultName
           depth: report.depth
+          includeMetadata: report.includeMetadata
           url:    report.url
           type:   report.type
           watches: 'element'
           action: ->
             url = @url
             defaultValue = if @defaultName then @defaultName else ''
-            depth = if @depth then @depth else false
+            depth = @depth
+            includeMetadata = @includeMetadata
             if @type == 'LINK'
               $window.open(url, '_blank')
             else if @type == 'ASSET'
-              messages.prompt('Asset Name', 'Asset Name', {type: 'export', value: defaultValue, depth: depth})
+              messages.prompt('Export Settings', '', {type: 'export', assetName: defaultValue, depth: depth, includeMetadata: includeMetadata})
               .then (result) ->
-                $log.debug result.depth
-                if (result.assetName)
+                if (result.assetName?)
+                  $log.debug "exporting with name: #{result.assetName}"
                   url = URI(url).setQuery({name: result.assetName})
-                if (result.depth)
+                if (result.depth?)
+                  $log.debug "exporting with depth: #{result.depth}"
                   url = URI(url).setQuery({depth: result.depth})
-                $log.debug "export new asset with asset name '#{result.assetName}' using url #{url}"
+                if (result.includeMetadata?)
+                  $log.debug "exporting with includeMetadata: #{result.includeMetadata}"
+                  url = URI(url).setQuery({includeMetadata: result.includeMetadata})
+                $log.debug "export new asset using url #{url}"
                 $window.open(url, '_blank')
             else
               $log.error "unknown type of report '#{@type}'"
