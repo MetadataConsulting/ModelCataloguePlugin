@@ -91,7 +91,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
         )
     }
 
-    def inventoryDoc(String name, Integer exportDepth) {
+    def inventoryDoc(String name, Integer depth) {
         DataClass model = DataClass.get(params.id)
 
         Long modelId = model.id
@@ -101,14 +101,14 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
                 originalFileName: "${model.name}-${model.status}-${model.version}.docx",
                 contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )  { OutputStream out ->
-            new DataClassToDocxExporter(DataClass.get(modelId), dataClassService, exportDepth).export(out)
+            new DataClassToDocxExporter(DataClass.get(modelId), dataClassService, depth).export(out)
         }
 
         response.setHeader("X-Asset-ID",assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
     }
 
-    def inventorySpreadsheet(String name, Integer exportDepth) {
+    def inventorySpreadsheet(String name, Integer depth) {
         DataClass model = DataClass.get(params.id)
 
         Long modelId = model.id
@@ -118,14 +118,14 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
                 originalFileName: "${model.name}-${model.status}-${model.version}.xlsx",
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )  { OutputStream out ->
-            new DataClassToXlsxExporter(DataClass.get(modelId), dataClassService, exportDepth).export(out)
+            new DataClassToXlsxExporter(DataClass.get(modelId), dataClassService, depth).export(out)
         }
 
         response.setHeader("X-Asset-ID",assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
     }
 
-    def changelogDoc(String name, Integer exportDepth) {
+    def changelogDoc(String name, Integer depth) {
         DataClass model = DataClass.get(params.id)
 
         Long modelId = model.id
@@ -135,7 +135,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
                 originalFileName: "${model.name}-${model.status}-${model.version}-changelog.docx",
                 contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ) { OutputStream out ->
-            new ChangelogGenerator(auditService, dataClassService, exportDepth).generateChangelog(DataClass.get(modelId), out)
+            new ChangelogGenerator(auditService, dataClassService, depth).generateChangelog(DataClass.get(modelId), out)
         }
 
         response.setHeader("X-Asset-ID",assetId.toString())

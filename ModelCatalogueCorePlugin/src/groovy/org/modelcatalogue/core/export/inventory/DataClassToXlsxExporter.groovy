@@ -24,14 +24,14 @@ class DataClassToXlsxExporter {
 
     final DataClassService dataClassService
     final Long dataClassId
-    final Integer exportDepth
+    final Integer depth
 
     final Map<Long, DataClass> processedDataClasss = [:]
 
-    DataClassToXlsxExporter(DataClass dataClass, DataClassService dataClassService, Integer exportDepth = 3) {
+    DataClassToXlsxExporter(DataClass dataClass, DataClassService dataClassService, Integer depth = 3) {
         this.dataClassId = dataClass.getId()
         this.dataClassService = dataClassService
-        this.exportDepth = exportDepth
+        this.depth = depth
     }
 
     void export(OutputStream outputStream) {
@@ -540,7 +540,7 @@ class DataClassToXlsxExporter {
             }
         }
 
-        if (level > exportDepth) {
+        if (level > depth) {
             processedDataClasss.put(dataClass.getId(), dataClass)
             return
         }

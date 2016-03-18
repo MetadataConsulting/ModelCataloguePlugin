@@ -276,24 +276,24 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
         {
           label:  report.title
           defaultName: report.defaultName
-          hasExportDepth: report.hasExportDepth
+          depth: report.depth
           url:    report.url
           type:   report.type
           watches: 'element'
           action: ->
             url = @url
             defaultValue = if @defaultName then @defaultName else ''
-            hasExportDepth = if @hasExportDepth then @hasExportDepth else false
+            depth = if @depth then @depth else false
             if @type == 'LINK'
               $window.open(url, '_blank')
             else if @type == 'ASSET'
-              messages.prompt('Asset Name', 'Asset Name', {type: 'export', value: defaultValue, hasExportDepth: hasExportDepth})
+              messages.prompt('Asset Name', 'Asset Name', {type: 'export', value: defaultValue, depth: depth})
               .then (result) ->
-                $log.debug result.exportDepth
+                $log.debug result.depth
                 if (result.assetName)
                   url = URI(url).setQuery({name: result.assetName})
-                if (result.exportDepth)
-                  url = URI(url).setQuery({exportDepth: result.exportDepth})
+                if (result.depth)
+                  url = URI(url).setQuery({depth: result.depth})
                 $log.debug "export new asset with asset name '#{result.assetName}' using url #{url}"
                 $window.open(url, '_blank')
             else

@@ -31,11 +31,11 @@ class ChangelogGenerator {
     private final AuditService auditService
     private final DataClassService dataClassService
     private final CommentsService commentsService
-    private final Integer exportDepth
+    private final Integer depth
 
     private final Map<Long, List<Comment>> commentsCache = [:]
 
-    ChangelogGenerator(AuditService auditService, DataClassService dataClassService, Integer exportDepth = 3) {
+    ChangelogGenerator(AuditService auditService, DataClassService dataClassService, Integer depth = 3) {
         this.auditService = auditService
         this.dataClassService = dataClassService
         try {
@@ -44,7 +44,7 @@ class ChangelogGenerator {
             commentsService = null
             log.info "Comments are not enabled for this catalogue."
         }
-        this.exportDepth = exportDepth
+        this.depth = depth
     }
 
     void generateChangelog(DataClass dataClass, OutputStream outputStream) {
@@ -99,7 +99,7 @@ class ChangelogGenerator {
 
                 heading1 'Data Classes'
 
-                Collection<DataClass> classes = dataClassService.getInnerClasses(dataClass, exportDepth).items
+                Collection<DataClass> classes = dataClassService.getInnerClasses(dataClass, depth).items
                 int counter = 1
                 int size = classes.size()
                 for (DataClass child in classes) {
