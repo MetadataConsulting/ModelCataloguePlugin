@@ -26,7 +26,7 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
     DataModelService dataModelService
     ElementService elementService
 
-    @Rule TemporaryFolder tmp
+    @Rule TemporaryFolder tmp = new TemporaryFolder()
 
     def setup() {
         initCatalogueService.initDefaultRelationshipTypes()

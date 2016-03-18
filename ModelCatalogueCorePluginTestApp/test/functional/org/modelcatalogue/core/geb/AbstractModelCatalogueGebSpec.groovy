@@ -33,13 +33,12 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     DataModelNavigator select(String dataModelName) {
 
         for (int i = 0; i < 10; i++) {
-            go "#/dataModels?type=catalogue&q=${URLEncoder.encode(dataModelName, 'UTF-8')}"
-
-            waitFor {
-                title == 'Data Models'
-            }
-
             try {
+                go "#/dataModels?type=catalogue&q=${URLEncoder.encode(dataModelName, 'UTF-8')}"
+
+                waitFor {
+                    title == 'Data Models'
+                }
                 waitFor {
                     $("h3.panel-title", title: dataModelName).displayed
                 }

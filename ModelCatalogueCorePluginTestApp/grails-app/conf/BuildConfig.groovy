@@ -111,6 +111,9 @@ grails.project.dependency.resolution = {
 
         test ":geb:0.12.2"
 
+        test ':build-test-data:2.1.2'
+        test ':fixtures:1.3'
+
         // Uncomment these (or add new ones) to enable additional resources capabilities
         //runtime ":zipped-resources:1.0.1"
         //runtime ":cached-resources:1.1"

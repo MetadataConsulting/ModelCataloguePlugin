@@ -24,7 +24,7 @@ class DataClassToDocxExporterSpec extends IntegrationSpec {
         initCatalogueService.initDefaultRelationshipTypes()
     }
 
-    @Rule TemporaryFolder temporaryFolder
+    @Rule TemporaryFolder temporaryFolder = new TemporaryFolder()
 
     def "export model to docx"() {
         when:

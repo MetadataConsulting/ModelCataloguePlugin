@@ -41,12 +41,14 @@ if [ "$TEST_SUITE" = "core_integration_slow" ] || [ "$TEST_SUITE" = "core" ] ; t
 fi
 cd ..
 
-cd ModelCatalogueFormsPlugin
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "forms_integration" ] || [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
-    ./grailsw test-app integration: --non-interactive
-fi
-cd ..
+# moved to test app
+#cd ModelCatalogueFormsPlugin
+#if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "forms_integration" ] || [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+#    ./grailsw test-app integration: --non-interactive
+#fi
+#cd ..
 
+# moved to test app
 cd ModelCatalogueElasticSearchPlugin
 if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "es_integration" ] || [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
     ./grailsw test-app integration: --non-interactive

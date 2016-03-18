@@ -1,4 +1,4 @@
-package org.modelcatalogue.core
+package org.modelcatalogue.testapp
 
 import grails.test.spock.IntegrationSpec
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
@@ -15,32 +15,30 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
     def relationshipTypeService
 
     void loadMarshallers() {
+        relationshipTypeService.clearCache()
         def springContext = WebApplicationContextUtils.getWebApplicationContext( ServletContextHolder.servletContext )
         springContext.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
     }
 
 
     void initRelationshipTypes(){
+        relationshipTypeService.clearCache()
         TestDataHelper.initFreshDb(sessionFactory, 'reltypes.sql') {
             initCatalogueService.initDefaultRelationshipTypes()
         }
-        relationshipTypeService.clearCache()
-        RelationshipType.clearCache()
     }
 
     void initCatalogue(){
-        initCatalogueService.initCatalogue(true)
         relationshipTypeService.clearCache()
-        RelationshipType.clearCache()
+        initCatalogueService.initCatalogue(true)
     }
 
     void loadFixtures(){
+        relationshipTypeService.clearCache()
         TestDataHelper.initFreshDb(sessionFactory, 'testdata.sql') {
             initCatalogueService.initDefaultRelationshipTypes()
             fixtures = fixtureLoader.load("assets/*", "batches/*", "dataTypes/*", "enumeratedTypes/*", "measurementUnits/*", "models/*", "relationshipTypes/*", "classifications/*").load("actions/*", "users/*", "referenceTypes/*", "primitiveTypes/*").load("dataElements/*").load("extensions/*", "mappings/*").load("csvTransformations/*")
         }
-        relationshipTypeService.clearCache()
-        RelationshipType.clearCache()
     }
 
     public <T> T notNull(T item) {

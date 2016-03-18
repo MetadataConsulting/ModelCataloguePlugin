@@ -14,7 +14,7 @@ class DataModelToXlsxExporterSpec extends IntegrationSpec {
     DataClassService dataClassService
     InitCatalogueService initCatalogueService
 
-    @Rule TemporaryFolder temporaryFolder
+    @Rule TemporaryFolder temporaryFolder = new TemporaryFolder()
 
     def setup() {
         initCatalogueService.initDefaultRelationshipTypes()
