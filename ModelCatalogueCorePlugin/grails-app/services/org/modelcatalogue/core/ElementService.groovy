@@ -164,14 +164,12 @@ class ElementService implements Publisher<CatalogueElement> {
                     eq 'id', urlId
                 }
                 if (version) {
-                        dataModel {
                             or {
                                 eq 'semanticVersion', version
                                 if (versionNumberFound) {
                                     eq 'versionNumber', versionNumberFound
                                 }
                             }
-                        }
                 }
             })
 
