@@ -36,6 +36,11 @@ class ReportDescriptor {
     Closure<String> defaultName = { '' }
 
     /**
+     * Default export depth for given report. Do not allow setting of export depth if set to null
+     */
+    Closure<Integer> depth = { null }
+
+    /**
      * List of conditions which all needs to be met to apply make this report available to given endpoint.
      */
     List<Closure> conditions = []
@@ -107,5 +112,10 @@ class ReportDescriptor {
     String getDefaultName(Object model) {
         if (!defaultName) return null
         defaultName(model)
+    }
+
+    Boolean getDepth(Object model) {
+        if (!depth) return null
+        depth(model)
     }
 }

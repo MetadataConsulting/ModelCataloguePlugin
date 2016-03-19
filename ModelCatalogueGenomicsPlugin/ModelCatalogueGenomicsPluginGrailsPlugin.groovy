@@ -60,6 +60,7 @@ Genomics England customisation plugin for Model Catalogue
             creates asset
             title { "GEL Data Specification Report" }
             defaultName { "${it.name} report as MS Word Document" }
+            depth 3
             type DataModel
             link controller: 'genomics', action: 'exportGelSpecification', id: true
         }
@@ -78,8 +79,6 @@ Genomics England customisation plugin for Model Catalogue
             type DataClass
             link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsCsv', id: true
         }
-
-
     }
 
     def onChange = { event ->
