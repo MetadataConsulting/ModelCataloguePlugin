@@ -62,7 +62,6 @@ Forms generator plugin for Model Catalogue
             defaultName { "$it.name Case Report Form" }
             link controller: 'formGenerator', action: 'generateForm', id: true
         }
-
     }
 
     def onChange = { event ->

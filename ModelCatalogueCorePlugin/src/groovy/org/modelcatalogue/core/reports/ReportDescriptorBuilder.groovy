@@ -25,6 +25,14 @@ class ReportDescriptorBuilder {
         descriptor.defaultName = defaultName ; this
     }
 
+    ReportDescriptorBuilder depth(Integer depth) {
+        descriptor.depth = { depth } ; this
+    }
+
+    ReportDescriptorBuilder depth(Closure depth) {
+        descriptor.depth = depth ; this
+    }
+
     ReportDescriptorBuilder type(Class... types) {
         descriptor.conditions << { types.any { type -> type.isAssignableFrom(it.class) }} ; this
     }
