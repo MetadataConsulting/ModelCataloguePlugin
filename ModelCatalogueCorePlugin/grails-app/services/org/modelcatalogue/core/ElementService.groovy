@@ -173,7 +173,7 @@ class ElementService implements Publisher<CatalogueElement> {
                 }
             })
 
-            if (result && result.getDefaultModelCatalogueId(version == null) == Legacy.fixModelCatalogueId(theId).toString()) {
+            if (result && result.getDefaultModelCatalogueId(version == null).contains(Legacy.fixModelCatalogueId(theId).toString())) {
                 return result
             }
 

@@ -775,13 +775,29 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         final String orphanModelCatalogueId = "http://www.example.com/types/FBMCIITII_Orphan_Data_Type"
         final String dataTypeName = "FBMCIITII Data Type"
         final String modelCatalogueId = "http://www.example.com/types/FBMCIITII"
+        final dmNAme = "testDM2"
 
         catalogueBuilder.build {
             dataModel name: dataModelName, semanticVersion: dataModelSemVer, {
                 dataType name: dataTypeName, id: modelCatalogueId
             }
+            dataModel name: "testDM2"
             dataType name: orphanDataTypeName, id: orphanModelCatalogueId
         }
+
+        DataModel dm = DataModel.findByName(dmNAme)
+        elementService.finalizeDataModel(dm, "0.0.1", "new model")
+        DataModel dm2 = elementService.createDraftVersion(dm, DraftContext.userFriendly())
+        def modelCatalogueID = "ModelCatalogueCorePluginTestApp/catalogue/dataModel/123@0.0.2"
+
+        when:
+        CatalogueElement datamodel2 = elementService.findByModelCatalogueId(CatalogueElement, modelCatalogueID)
+
+
+        then:
+
+        datamodel2.id == dm2.id
+
 
         when:
         CatalogueElement dataType = elementService.findByModelCatalogueId(CatalogueElement, modelCatalogueId)
