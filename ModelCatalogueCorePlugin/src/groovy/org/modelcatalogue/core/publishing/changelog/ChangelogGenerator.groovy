@@ -32,10 +32,12 @@ class ChangelogGenerator {
     private final DataClassService dataClassService
     private final CommentsService commentsService
     private final Integer depth
+    private final Boolean includeMetadata
 
     private final Map<Long, List<Comment>> commentsCache = [:]
 
-    ChangelogGenerator(AuditService auditService, DataClassService dataClassService, Integer depth = 3) {
+    ChangelogGenerator(AuditService auditService, DataClassService dataClassService, Integer depth = 3,
+                       Boolean includeMetadata = true) {
         this.auditService = auditService
         this.dataClassService = dataClassService
         try {
@@ -45,6 +47,7 @@ class ChangelogGenerator {
             log.info "Comments are not enabled for this catalogue."
         }
         this.depth = depth
+        this.includeMetadata = includeMetadata
     }
 
     void generateChangelog(DataClass dataClass, OutputStream outputStream) {
@@ -131,7 +134,13 @@ class ChangelogGenerator {
             return "${GrailsNameUtils.getNaturalName(element.class.name)} has been deprecated "
         }
 
-        List<Change> changedProperties = getChanges(element, ChangeType.PROPERTY_CHANGED, ChangeType.METADATA_CREATED, ChangeType.METADATA_DELETED, ChangeType.METADATA_UPDATED)
+        List<Change> changedProperties
+        if (includeMetadata) {
+            changedProperties = getChanges(element, ChangeType.PROPERTY_CHANGED, ChangeType.METADATA_CREATED,
+                ChangeType.METADATA_DELETED, ChangeType.METADATA_UPDATED)
+        } else {
+            changedProperties = getChanges(element, ChangeType.PROPERTY_CHANGED)
+        }
 
         if (changedProperties) {
             Set<String> changedPropertiesLabels = new TreeSet<String>()
@@ -212,8 +221,13 @@ class ChangelogGenerator {
                 }
             }
 
-
-            List<Change> changedProperties = getChanges(element, ChangeType.PROPERTY_CHANGED, ChangeType.METADATA_CREATED, ChangeType.METADATA_DELETED, ChangeType.METADATA_UPDATED)
+            List<Change> changedProperties
+            if (includeMetadata) {
+                changedProperties = getChanges(element, ChangeType.PROPERTY_CHANGED, ChangeType.METADATA_CREATED,
+                    ChangeType.METADATA_DELETED, ChangeType.METADATA_UPDATED)
+            } else {
+                changedProperties = getChanges(element, ChangeType.PROPERTY_CHANGED)
+            }
 
             if (changedProperties) {
                 requestRun()

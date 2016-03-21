@@ -4,18 +4,22 @@
 <div class="modal-body">
   <form role="form" ng-submit="$close(result)">
     <div class="form-group">
-      <label for="value">{{body}}</label>
-      <input type="{{type}}" id="value" ng-model="result.value" class="form-control">
+      <label for="value">Asset Name</label>
+      <input type="text" id="value" ng-model="result.assetName" class="form-control">
     </div>
-    <div class="form-group" ng-if="depth">
+    <div class="form-group" ng-if="depth != undefined && depth != null">
       <label for="depth">Export Depth</label>
       <input type="number" min="0" id="depth" ng-model="result.depth" class="form-control">
+    </div>
+    <div class="form-group" ng-if="includeMetadata != undefined && includeMetadata != null">
+      <label for="includeMetadata">Export Metadata</label>
+      <input type="checkbox" id="includeMetadata" ng-model="result.includeMetadata" class="form-control">
     </div>
     <fake-submit-button/>
   </form>
 </div>
 <div class="modal-footer">
-  <button class="btn btn-primary" ng-click="$close(result)" ng-disabled="!result.value">
+  <button class="btn btn-primary" ng-click="$close(result)" ng-disabled="!result.assetName">
     OK
   </button>
   <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
