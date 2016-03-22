@@ -23,14 +23,14 @@ class GelCsvExporter {
         currentLine = ""
     }
 
-    void printDiseaseOntology(DataClass cls){
+    void printDiseaseOntology(DataClass cls) {
         printRareDiseaseChild(cls, '', 0)
     }
 
-    private void printRareDiseaseChild(DataClass child, String prefix, Integer level){
+    private void printRareDiseaseChild(DataClass child, String prefix, Integer level) {
         Long id = child.latestVersionId ?: child.id
 
-        if(level==0){
+        if (level == 0) {
             out << headersLine
             child.parentOf?.eachWithIndex { DataClass cd, index ->
                 out << '\n'
@@ -40,9 +40,9 @@ class GelCsvExporter {
 
         if (level == 1) {
 
-            def nextPrefix = id + "," + child.name.replace(',',' - ') + ","
+            def nextPrefix = id + "," + child.name.replace(',', ' - ') + ","
 
-            if(child.parentOf.size() > 0 ) {
+            if (child.parentOf.size() > 0) {
 
                 child.parentOf.eachWithIndex { DataClass cd, index ->
                     if (index != 0) {
@@ -60,9 +60,9 @@ class GelCsvExporter {
 
         if (level == 2) {
 
-            def nextPrefix = prefix + id + "," + child.name.replace(',',' - ') + ","
+            def nextPrefix = prefix + id + "," + child.name.replace(',', ' - ') + ","
 
-            if(child.parentOf.size() > 0 ) {
+            if (child.parentOf.size() > 0) {
 
                 child.parentOf.eachWithIndex { DataClass cd, index ->
                     if (index != 0) {
@@ -79,10 +79,11 @@ class GelCsvExporter {
         }
 
         if (level == 3) {
+            println("creating model for " + child.name)
 
-            currentLine += prefix + id + "," + child.name.replace(',',' - ') + "," + child.lastUpdated.format("yyyy-MM-dd") + "," + child.versionNumber + ","
+            currentLine += prefix + id + "," + child.name.replace(',', ' - ') + "," + child.lastUpdated.format("yyyy-MM-dd") + "," + child.versionNumber + ","
 
-            if(child.parentOf.size() > 0 ) {
+            if (child.parentOf.size() > 0) {
 
                 def phenotypeModel, testModel
 
@@ -100,18 +101,16 @@ class GelCsvExporter {
                 String finalPrefix = new String(currentLine)
                 if (phenotypeModel) printPhenotypes(finalPrefix, phenotypeModel)
                 if (testModel) printTests(finalPrefix, testModel)
-
-            } else {
-                printTrailingCommas()
             }
+            printTrailingCommas()
         }
     }
 
-    private void printPhenotypes(String prefix, DataClass child){
+    private void printPhenotypes(String prefix, DataClass child) {
         child.parentOf.eachWithIndex { DataClass cd, index ->
-            if(index!=0){
+            if (index != 0) {
                 out << '\n'
-                currentLine += prefix + cd.name.replace(',',' - ') + "," + cd.ext.get("OBO ID")
+                currentLine += prefix + cd.name.replace(',', ' - ') + "," + cd.ext.get("OBO ID")
             }
             printTrailingCommas()
         }
@@ -122,22 +121,22 @@ class GelCsvExporter {
             if (index != 0) {
                 out << '\n'
                 currentLine += prefix
-                currentLine += ",," // not a phenoytype
-                currentLine += cd.name.replace(',',' - ') + "," + getVersionId(cd)
+                currentLine += ",," // not a phenotype
+                currentLine += cd.name.replace(',', ' - ') + "," + getVersionId(cd)
             }
             printTrailingCommas()
         }
     }
 
-    private static String getVersionId(CatalogueElement c){
-        return (c.latestVersionId)? c.latestVersionId + "." + c.versionNumber : c.id + "." + c.versionNumber
+    private static String getVersionId(CatalogueElement c) {
+        return (c.latestVersionId) ? c.latestVersionId + "." + c.versionNumber : c.id + "." + c.versionNumber
     }
 
-    private void printTrailingCommas(){
+    private void printTrailingCommas() {
         int columnsLeftUnfilled = headersLine.split(',').length - currentLine.count(',')
 
         try {
-            1.upto(columnsLeftUnfilled,{
+            1.upto(columnsLeftUnfilled, {
                 currentLine += ','
             })
         } catch (GroovyRuntimeException e) {

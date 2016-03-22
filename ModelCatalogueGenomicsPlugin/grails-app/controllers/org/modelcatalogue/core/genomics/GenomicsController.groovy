@@ -4,6 +4,7 @@ import org.modelcatalogue.core.DataClass
 
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
 import org.modelcatalogue.gel.GelCsvExporter
 import org.modelcatalogue.gel.GelJsonExporter
@@ -14,38 +15,44 @@ import org.modelcatalogue.gel.GelJsonExporter
 class GenomicsController {
 
     def assetService
+    def elementService
     DataClassService dataClassService
 
     static final DOC_IMAGE_PATH = "https://www.genomicsengland.co.uk/wp-content/uploads/2015/11/Genomics-England-logo-2015.png"
 
+    static final Long RARE_DISEASE_CONDITIONS_AND_PHENOTYPES_ID = 11144
+
     def exportRareDiseaseHPOAndClinicalTestsAsJson() {
-        DataClass model = DataClass.get(params.id)
 
-        Long classId = model.getId()
+        DataClass dClass = DataClass.get(RARE_DISEASE_CONDITIONS_AND_PHENOTYPES_ID)
 
-        Long assetId = assetService.storeReportAsAsset(model.dataModel,
-            name: "${model.name} report as Json",
-            originalFileName: "${model.name}-${model.status}-${model.version}.json",
+        DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dClass.getDefaultModelCatalogueId(true))
+
+        Long assetId = assetService.storeReportAsAsset(latestVersion.dataModel,
+            name: "${latestVersion.name} report as Json",
+            originalFileName: "${latestVersion.name}-${latestVersion.status}-${latestVersion.version}.json",
             contentType: "application/json",
         ) {
-            new GelJsonExporter(it).printDiseaseOntology(DataClass.get(classId))
+            new GelJsonExporter(it).printDiseaseOntology(latestVersion)
         }
 
         response.setHeader("X-Asset-ID",assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
     }
 
+
     def exportRareDiseaseHPOAndClinicalTestsAsCsv() {
-        DataClass dClass = DataClass.get(params.id)
 
-        Long classId = dClass.getId()
+        DataClass dClass = DataClass.get(RARE_DISEASE_CONDITIONS_AND_PHENOTYPES_ID)
 
-        Long assetId = assetService.storeReportAsAsset(dClass.dataModel,
-            name: "${dClass.name} report as CSV",
-            originalFileName: "${dClass.name}-${dClass.status}-${dClass.version}.csv",
+        DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dClass.getDefaultModelCatalogueId(true))
+
+        Long assetId = assetService.storeReportAsAsset(latestVersion.dataModel,
+            name: "${latestVersion.name} report as CSV",
+            originalFileName: "${latestVersion.name}-${latestVersion.status}-${latestVersion.version}.csv",
             contentType: "text/csv",
         ) {
-            new GelCsvExporter(it).printDiseaseOntology(DataClass.get(classId))
+            new GelCsvExporter(it).printDiseaseOntology(latestVersion)
         }
 
         response.setHeader("X-Asset-ID",assetId.toString())
