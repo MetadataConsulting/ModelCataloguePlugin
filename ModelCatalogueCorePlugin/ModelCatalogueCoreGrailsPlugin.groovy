@@ -327,6 +327,7 @@ Model catalogue core plugin (metadata registry)
             title { "Changelog Document" }
             defaultName { "${it.name} changelog as MS Word Document" }
             depth 3
+            includeMetadata true
             type DataClass
             link controller: 'dataClass', action: 'changelogDoc', id: true
         }
