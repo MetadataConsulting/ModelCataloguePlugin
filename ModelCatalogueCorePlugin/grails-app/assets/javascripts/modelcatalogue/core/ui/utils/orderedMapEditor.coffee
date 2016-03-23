@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.orderedMapEditor', ['mc.core.ui.metadataEditors']).directive 'orderedMapEditor',  [-> {
+angular.module('mc.core.ui.utils').directive 'orderedMapEditor',  [-> {
     restrict: 'E'
     replace: true
     scope:
@@ -7,12 +7,12 @@ angular.module('mc.core.ui.orderedMapEditor', ['mc.core.ui.metadataEditors']).di
       valueTitle:         '@?'
       keyPlaceholder:     '@?'
       valuePlaceholder:   '@?'
-    templateUrl: 'modelcatalogue/core/ui/orderedMapEditor.html'
+    templateUrl: '/mc/core/ui/utils/orderedMapEditor.html'
 
     controller: ['$scope', 'enhance', '$log', ($scope, enhance, $log) ->
       isOrderedMap = (object)->
         enhance.isEnhancedBy(object, 'orderedMap')
-      
+
       # default values
       $scope.lastAddedRow = 0
 
