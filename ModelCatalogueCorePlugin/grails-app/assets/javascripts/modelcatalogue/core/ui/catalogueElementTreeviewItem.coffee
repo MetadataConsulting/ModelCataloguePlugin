@@ -198,7 +198,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
               min = row.value
             else if (row.key == 'Max Occurs')
               max = row.value
-          return "[#{min}..#{max}]"
+          return "#{min}..#{max}"
         else
           return ""
 

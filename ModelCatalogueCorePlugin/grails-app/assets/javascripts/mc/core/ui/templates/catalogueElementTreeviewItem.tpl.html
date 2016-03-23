@@ -31,7 +31,9 @@
             ng-click="select(element)">
         <span ng-class="element.getIcon()" class="text-muted"></span>
         {{element.$$localName || element.name}}
-        {{metadataOccurrencesToAsterisk(element)}}
+        <span class="text-muted">
+          {{metadataOccurrencesToAsterisk(element)}}
+        </span>
         <small class="text-muted" ng-if="element.$$localName">{{element.name}}</small>
         <small class="text-muted">
           <span ng-if="element.latestVersionId"
