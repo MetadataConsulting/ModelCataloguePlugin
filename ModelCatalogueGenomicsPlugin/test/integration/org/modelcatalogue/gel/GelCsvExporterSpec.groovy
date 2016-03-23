@@ -62,20 +62,22 @@ class GelCsvExporterSpec extends IntegrationSpec {
 
         then:
         noExceptionThrown()
-        csv == expectedCSV
+        csv ==~ expectedCSV
     }
 
-    private static String getExpectedCSV() {
-        return """id,name,subGroup_id,subGroup_name,subGroup_specificDisorder_id,subGroup_specificDisorder_name,subGroup_specificDisorder_eligibilityQuestion_date,subGroup_specificDisorder_eligibilityQuestion_version,subGroup_specificDisorder_shallowPhenotype_name,subGroup_specificDisorder_shallowPhenotype_id,subGroup_specificDisorder_test_name,subGroup_specificDisorder_test_id
-3,rare disease ' subgroup 1.1,4,rare disease disorder 1.1.1 Eligibility,,,,,,,,,
-3,rare disease ' subgroup 1.1,5,rare disease disorder 1.1.1 Phenotypes,6,test hpo terms 1,2016-03-22,1,,,,,
-3,rare disease ' subgroup 1.1,5,rare disease disorder 1.1.1 Phenotypes,7,test hpo terms 2,2016-03-22,1,,,,,
-3,rare disease ' subgroup 1.1,5,rare disease disorder 1.1.1 Phenotypes,8,test hpo terms 3,2016-03-22,1,,,,,
-3,rare disease ' subgroup 1.1,5,rare disease disorder 1.1.1 Phenotypes,9,test hpo terms 4,2016-03-22,1,,,,,
-3,rare disease ' subgroup 1.1,10,rare disease disorder 1.1.1 clinical Tests,11,clinical test1,2016-03-22,1,,,,,
-3,rare disease ' subgroup 1.1,10,rare disease disorder 1.1.1 clinical Tests,12,clinical test2,2016-03-22,1,,,,,
-3,rare disease ' subgroup 1.1,10,rare disease disorder 1.1.1 clinical Tests,13,clinical test3,2016-03-22,1,,,,,
-3,rare disease ' subgroup 1.1,10,rare disease disorder 1.1.1 clinical Tests,14,clinical test4,2016-03-22,1,,,,,"""
+    private static getExpectedCSV() {
+        def today = new Date().format("yyyy-MM-dd")
+        def pattern = /id,name,subGroup_id,subGroup_name,subGroup_specificDisorder_id,subGroup_specificDisorder_name,subGroup_specificDisorder_eligibilityQuestion_date,subGroup_specificDisorder_eligibilityQuestion_version,subGroup_specificDisorder_shallowPhenotype_name,subGroup_specificDisorder_shallowPhenotype_id,subGroup_specificDisorder_test_name,subGroup_specificDisorder_test_id
+.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 Eligibility,,,,,,,,,
+.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 Phenotypes,.*,test hpo terms 1,$today,1,,,,,
+.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 Phenotypes,.*,test hpo terms 2,$today,1,,,,,
+.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 Phenotypes,.*,test hpo terms 3,$today,1,,,,,
+.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 Phenotypes,.*,test hpo terms 4,$today,1,,,,,
+.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 clinical Tests,.*,clinical test1,$today,1,,,,,
+.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 clinical Tests,.*,clinical test2,$today,1,,,,,
+.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 clinical Tests,.*,clinical test3,$today,1,,,,,
+.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 clinical Tests,.*,clinical test4,$today,1,,,,,/
+        return pattern
     }
 
 }
