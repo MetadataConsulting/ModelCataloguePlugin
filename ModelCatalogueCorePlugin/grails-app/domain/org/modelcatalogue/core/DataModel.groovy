@@ -65,6 +65,10 @@ class DataModel extends CatalogueElement {
         DataElement.findAllByDataModel(this)
     }
 
+    List<DataType> getDataTypes() {
+        DataType.findAllByDataModel(this)
+    }
+
     void checkNewSemanticVersion(String newSemanticVersion) {
         if (!newSemanticVersion) {
             errors.rejectValue('semanticVersion', 'dataModel.semanticVersion.null', 'Semantic version must be specified!')
@@ -124,7 +128,14 @@ class DataModel extends CatalogueElement {
         def wrongDataElements = getDataElements().findAll { !it.dataType }
         if (wrongDataElements.size() > 0) {
             errors.reject("dataModel.dataElements.dataType.null",
-                "All data elements must have data types! (See ${wrongDataElements.collect { it.name }}.)".toString())
+                "All data elements must have data types! (See ${wrongDataElements.collect { it.name }}.)")
+        }
+
+        // check all data types doesn't contains dash, uderscore or space
+        def wrongDataTypes = getDataTypes().findAll { !(it.name ==~ /[^_ -]+/)}
+        if (wrongDataTypes.size() > 0) {
+            errors.reject("dataModel.dataTypes.camelCase",
+                "All data types names must not contain space, dash and underscore characters: '-', '_', ' ')! (See ${wrongDataTypes.collect { it.name }}.)")
         }
     }
 
