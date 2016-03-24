@@ -468,6 +468,15 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         FriendlyErrors.failFriendlySaveWithoutFlush(old)
     }
 
+    /**
+     * Checks whether a certain extension presents in this catalogue element.
+     * @param shortName Short name of the extension. It is prefixed with <i>http://www.modelcatalogue.org/metadata/#</i>.
+     */
+    void checkExtensionPresence(String shortName) {
+        if (!ext.get("http://www.modelcatalogue.org/metadata/#$shortName")) {
+            errors.rejectValue("ext", "catalogElement.ext.$shortName", "${shortName.capitalize()} must be specified!")
+        }
+    }
 
     // -- API
 

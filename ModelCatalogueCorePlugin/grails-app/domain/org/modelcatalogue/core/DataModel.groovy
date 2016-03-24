@@ -88,6 +88,36 @@ class DataModel extends CatalogueElement {
         }
     }
 
+    /**
+     * Checks whether {@link DataModel} can be finalized or not. When it is not eligible for finalization, it reject
+     * values to errors of given class as a side effect.
+     * Eligibility means:
+     * <ul>
+     *     <li>Semantic version needs to be unique and needs to be set.</li>
+     *     <li>Revision notes needs to be filled.</li>
+     *     <li>Metadata needs to be set (authors,reviewers, owner, reviewed, approved, namespace, organization).</li>
+     * </ul>
+     */
+    void checkFinalizeEligibility() {
+        // check semantic version
+        checkPublishSemanticVersion(semanticVersion)
+
+        // check revision notes
+        if (!revisionNotes) {
+            errors.rejectValue('revisionNotes', 'finalize.revisionNotes.null', 'Please, provide the revision notes')
+        }
+
+        // check basic metadata
+        ["authors", "reviewers", "owner" , "reviewed" , "approved"].each {
+            checkExtensionPresence(it)
+        }
+
+        // check namespace and organization
+        ["namespace", "organization"].each {
+            checkExtensionPresence(it)
+        }
+    }
+
     private void rejectSemanticVersion() {
         errors.rejectValue('semanticVersion', 'dataModel.semanticVersion.alreadyExist', 'Semantic version already exists for current data model!')
     }
