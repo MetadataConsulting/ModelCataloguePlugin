@@ -93,6 +93,10 @@ angular.module('mc.core.ui.utils').directive 'orderedMapEditor',  [-> {
             newObject[key] = value
             $scope.object.updateFrom(newObject)
 
+        # remove empty key - present when new map is created
+        if (createdValues > 0 || updatedValues > 0)
+          $scope.object.remove('')
+
         # success message
         messages.info "Import was successful, #{createdValues} enumerations was created and #{updatedValues} enumerations was updated."
         # clear import text
