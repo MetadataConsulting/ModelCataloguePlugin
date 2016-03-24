@@ -48,4 +48,24 @@
     </tr>
     </tbody>
   </table>
+  <div class="row">
+    <div class="col-md-3">
+      <button type="button" class="btn btn-sm btn-default" ng-click="showImportExcel = !showImportExcel">
+        Import from Excel (Copy & Paste)
+      </button>
+    </div>
+    <div class="col-md-9">
+      <div ng-show="showImportExcel">
+        <div class="form-group">
+          <textarea name="import-excel" id="import-excel" class="form-control input-xs" cols="1000" rows="20"
+                    ng-model="importExcelText"
+                    placeholder="Copy and paste enumerations from excel. First column should be Value and the second column should be Description.">
+          </textarea>
+        </div>
+        <button type="button" class="btn btn-sm btn-primary" ng-click="importExcelText = importExcel(importExcelText)">
+          Import
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

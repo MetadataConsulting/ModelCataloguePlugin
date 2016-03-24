@@ -9,7 +9,7 @@ angular.module('mc.core.ui.utils').directive 'orderedMapEditor',  [-> {
       valuePlaceholder:   '@?'
     templateUrl: '/mc/core/ui/utils/orderedMapEditor.html'
 
-    controller: ['$scope', 'enhance', '$log', ($scope, enhance, $log) ->
+    controller: ['$scope', 'enhance', '$log', 'messages', ($scope, enhance, $log, messages) ->
       isOrderedMap = (object)->
         enhance.isEnhancedBy(object, 'orderedMap')
 
@@ -71,9 +71,35 @@ angular.module('mc.core.ui.utils').directive 'orderedMapEditor',  [-> {
       $scope.addNewRowOnTab = ($event, index, last)->
         $scope.addProperty(index, {key: '', value: ''}) if $event.keyCode == 9 and last
 
+      $scope.importExcel = (importText) ->
+        unless importText?.length > 0
+          messages.error "No excel content to be imported."
+          return importText
+
+        updatedValues = 0
+        createdValues = 0
+        for line in importText.split('\n')
+          tokens = line.split('\t')
+          if tokens.length > 0
+            value = ''
+            if tokens.length > 1
+              value = tokens[1]
+            key = tokens[0]
+            if $scope.object.get(key)
+              updatedValues++
+            else
+              createdValues++
+            newObject = {}
+            newObject[key] = value
+            $scope.object.updateFrom(newObject)
+
+        # success message
+        messages.info "Import was successful, #{createdValues} enumerations was created and #{updatedValues} enumerations was updated."
+        # clear import text
+        return ''
+
       $scope.$watch 'object', (newObject) ->
         onObjectChanged(newObject)
     ]
-
   }
 ]
