@@ -61,6 +61,10 @@ class DataModel extends CatalogueElement {
         CatalogueElement.countByDataModel(this)
     }
 
+    List<DataElement> getDataElements() {
+        DataElement.findAllByDataModel(this)
+    }
+
     void checkNewSemanticVersion(String newSemanticVersion) {
         if (!newSemanticVersion) {
             errors.rejectValue('semanticVersion', 'dataModel.semanticVersion.null', 'Semantic version must be specified!')
@@ -114,6 +118,13 @@ class DataModel extends CatalogueElement {
         // check namespace and organization
         ["namespace", "organization"].each {
             checkExtensionPresence(it)
+        }
+
+        // check all data element have type
+        def wrongDataElements = getDataElements().findAll { !it.dataType }
+        if (wrongDataElements.size() > 0) {
+            errors.reject("dataModel.dataElements.dataType.null",
+                "All data elements must have data types! (See ${wrongDataElements.collect { it.name }}.)".toString())
         }
     }
 
