@@ -103,9 +103,8 @@ class DataModel extends CatalogueElement {
         checkPublishSemanticVersion(semanticVersion)
 
         // check revision notes
-        if (!revisionNotes) {
+        if (!revisionNotes)
             errors.rejectValue('revisionNotes', 'finalize.revisionNotes.null', 'Please, provide the revision notes')
-        }
 
         // check basic metadata
         ["authors", "reviewers", "owner" , "reviewed" , "approved"].each {
