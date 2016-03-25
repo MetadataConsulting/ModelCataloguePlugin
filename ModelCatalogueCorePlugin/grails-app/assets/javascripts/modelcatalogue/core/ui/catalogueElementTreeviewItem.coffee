@@ -97,7 +97,15 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
                 if key.indexOf('$') == 0
                   objectToExtend[key] = prop
 
-          newChildren.push(angular.extend(objectToExtend, it, {$$relationship: (if item.relation then item else undefined), $$metadata: item.ext, $$archived: item.archived, $$localName: getLocalName(item) }))
+          newChildren.push(
+            angular.extend(objectToExtend, it,
+              {
+                $$relationship: (if item.relation then item else undefined),
+                $$metadata: item.ext,
+                $$archived: item.archived,
+                $$localName: getLocalName(item)
+              })
+          )
 
         $scope.element.$$children = newChildren
         $scope.element.$$collapsed  = false
@@ -179,6 +187,20 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
       $scope.select = (element) ->
         $scope.collapseOrExpand()
         $scope.treeview.select(element)
+
+      $scope.metadataOccurrencesToAsterisk = (element) ->
+        # only Data Element with some metadata and defined relationship
+        if element.$$metadata?.values? && element.getElementTypeName() == 'Data Element' && element.$$relationship
+          min = '0'
+          max = '*'
+          for row in element.$$metadata.values
+            if (row.key == 'Min Occurs')
+              min = row.value
+            else if (row.key == 'Max Occurs')
+              max = row.value
+          return "#{min}..#{max}"
+        else
+          return ""
 
       reloadChildrenOnChange = (_, result, url) ->
         if result.link == $scope.element.link
