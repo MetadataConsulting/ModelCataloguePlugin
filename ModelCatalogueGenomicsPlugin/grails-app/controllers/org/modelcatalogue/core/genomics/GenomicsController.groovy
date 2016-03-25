@@ -22,8 +22,7 @@ class GenomicsController {
     DataClassService dataClassService
 
 
-    static final DOC_IMAGE_PATH = "https://www.genomicsengland.co.uk/wp-content/uploads/2015/11/Genomics-England-logo-2015.png"
-    static String imagePath = "https://www.genomicsengland.co.uk/wp-content/uploads/2015/11/Genomics-England-logo-2015.png"
+    static final String DOC_IMAGE_PATH = "https://www.genomicsengland.co.uk/wp-content/uploads/2015/11/Genomics-England-logo-2015.png"
 
     static final Long RARE_DISEASE_CONDITIONS_AND_PHENOTYPES_ID = 11144
 
@@ -130,7 +129,7 @@ class GenomicsController {
             originalFileName: "${documentName}-${model.status}-${model.version}.docx",
             contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ) { OutputStream out ->
-            new RareDiseasesDocExporter(DataClass.get(classId), standardTemplate, imagePath, eligibilityMode).export(out)
+            new RareDiseasesDocExporter(DataClass.get(classId), standardTemplate, DOC_IMAGE_PATH, eligibilityMode).export(out)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())

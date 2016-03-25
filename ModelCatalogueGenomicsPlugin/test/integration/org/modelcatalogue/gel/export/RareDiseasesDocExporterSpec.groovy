@@ -9,7 +9,6 @@ import org.modelcatalogue.core.util.builder.ContextItem
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 
 import static org.modelcatalogue.core.genomics.GenomicsController.*
-import static org.modelcatalogue.core.util.test.FileOpener.open
 import static RareDiseasesDocExporter.standardTemplate
 import static org.modelcatalogue.core.util.test.FileOpener.open
 
@@ -36,7 +35,7 @@ class RareDiseasesDocExporterSpec extends IntegrationSpec {
         buildTestModel(true)
         DataClass dataClass = DataClass.findByName('Dataclass Top Level 1 Root')
 
-        new RareDiseasesDocExporter(dataClass, standardTemplate, imagePath, eligibilityMode ).export(file.newOutputStream())
+        new RareDiseasesDocExporter(dataClass, standardTemplate, DOC_IMAGE_PATH, eligibilityMode ).export(file.newOutputStream())
 
         open file
 
@@ -54,7 +53,7 @@ class RareDiseasesDocExporterSpec extends IntegrationSpec {
         buildTestModel(true)
         DataClass dataClass = DataClass.findByName('Dataclass Top Level 1 Root')
 
-        new RareDiseasesDocExporter(dataClass, standardTemplate, imagePath, eligibilityMode).export(file.newOutputStream())
+        new RareDiseasesDocExporter(dataClass, standardTemplate, DOC_IMAGE_PATH, eligibilityMode).export(file.newOutputStream())
 
         open file
 
@@ -70,7 +69,7 @@ class RareDiseasesDocExporterSpec extends IntegrationSpec {
         buildTestModel(false)
         DataClass dataClass = DataClass.findByName('Dataclass Top Level 1 Root')
 
-        new RareDiseasesDocExporter(dataClass, standardTemplate, imagePath, eligibilityMode).export(file.newOutputStream())
+        new RareDiseasesDocExporter(dataClass, standardTemplate, DOC_IMAGE_PATH, eligibilityMode).export(file.newOutputStream())
 
         open file
 
