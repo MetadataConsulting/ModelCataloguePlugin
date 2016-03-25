@@ -138,13 +138,22 @@ class DataModel extends CatalogueElement {
                 "All data types names must not contain space, dash and underscore characters: '-', '_', ' ')! (See ${wrongDataTypes.collect { it.name }}.)")
         }
 
-        // check data elements has unique name
+        // check data elements have unique names
         def dataElements = getDataElements()
         def dataElementsUnique = dataElements.unique(false) { a, b -> a.name <=> b.name }
         if (dataElements.size() != dataElementsUnique.size()) {
             errors.reject("dataModel.dataElements.unique",
-                "All data elements names must be unique, there are duplicate etries. (See " +
+                "All data elements names must be unique, there are duplicate entries. (See " +
                     "${(dataElements - dataElementsUnique).collect { it.name }.unique()}.)")
+        }
+
+        // check data types have unique names
+        def dataTypes = getDataTypes()
+        def dataTypesUnique = dataTypes.unique(false) { a, b -> a.name <=> b.name }
+        if (dataTypes.size() != dataTypesUnique.size()) {
+            errors.reject("dataModel.dataTypes.unique",
+                "All data type names must be unique, there are duplicate entries. (See " +
+                    "${(dataTypes - dataTypesUnique).collect { it.name }.unique()}.)")
         }
     }
 
