@@ -131,11 +131,20 @@ class DataModel extends CatalogueElement {
                 "All data elements must have data types! (See ${wrongDataElements.collect { it.name }}.)")
         }
 
-        // check all data types doesn't contains dash, uderscore or space
+        // check all data types doesn't contains dash, underscore or space
         def wrongDataTypes = getDataTypes().findAll { !(it.name ==~ /[^_ -]+/)}
         if (wrongDataTypes.size() > 0) {
             errors.reject("dataModel.dataTypes.camelCase",
                 "All data types names must not contain space, dash and underscore characters: '-', '_', ' ')! (See ${wrongDataTypes.collect { it.name }}.)")
+        }
+
+        // check data elements has unique name
+        def dataElements = getDataElements()
+        def dataElementsUnique = dataElements.unique(false) { a, b -> a.name <=> b.name }
+        if (dataElements.size() != dataElementsUnique.size()) {
+            errors.reject("dataModel.dataElements.unique",
+                "All data elements names must be unique, there are duplicate etries. (See " +
+                    "${(dataElements - dataElementsUnique).collect { it.name }.unique()}.)")
         }
     }
 
