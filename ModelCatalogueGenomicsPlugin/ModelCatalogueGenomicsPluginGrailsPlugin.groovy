@@ -66,7 +66,21 @@ Genomics England customisation plugin for Model Catalogue
         }
 
         reportsRegistry.register {
-            creates asset
+            creates link
+            title { "Eligibility Criteria Report" }
+            type DataClass
+            link controller: 'genomics', action: 'exportRareDiseaseEligibilityDoc', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Phenotypes and Clinical Tests Report" }
+            type DataClass
+            link controller: 'genomics', action: 'exportRareDiseasePhenotypesAndClinicalTestsDoc', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
             title { "Rare Diseases HPO And Clinical Tests Json" }
             defaultName { "${it.name} report as Json" }
             type DataClass
