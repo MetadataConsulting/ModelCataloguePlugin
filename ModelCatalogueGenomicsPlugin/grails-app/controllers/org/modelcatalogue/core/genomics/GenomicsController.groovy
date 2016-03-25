@@ -8,6 +8,9 @@ import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
 import org.modelcatalogue.gel.GelCsvExporter
 import org.modelcatalogue.gel.GelJsonExporter
+import org.modelcatalogue.gel.export.RareDiseasesDocExporter
+
+import static RareDiseasesDocExporter.getStandardTemplate
 
 /**
  * Controller for GEL specific reports.
@@ -18,7 +21,9 @@ class GenomicsController {
     def elementService
     DataClassService dataClassService
 
+
     static final DOC_IMAGE_PATH = "https://www.genomicsengland.co.uk/wp-content/uploads/2015/11/Genomics-England-logo-2015.png"
+    static String imagePath = "https://www.genomicsengland.co.uk/wp-content/uploads/2015/11/Genomics-England-logo-2015.png"
 
     static final Long RARE_DISEASE_CONDITIONS_AND_PHENOTYPES_ID = 11144
 
@@ -59,7 +64,7 @@ class GenomicsController {
         redirect controller: 'asset', id: assetId, action: 'show'
     }
 
-    def customTemplate = {
+    static Closure customTemplate = {
         'document' font: [family: 'Calibri', size: 11], margin: [left: 20, right: 10]
         'paragraph.title' font: [color: '#1F497D', size: 32.pt, bold:true], margin: [top: 150.pt, bottom: 10.pt]
         'paragraph.subtitle' font: [color: '#1F497D', size: 36.pt], margin: [top: 0.pt]
@@ -74,6 +79,65 @@ class GenomicsController {
         'table.row.cell' font: [size: 10.pt]
         'paragraph.headerImage' height: 1.366.inches, width: 2.646.inches
     }
+
+
+    def exportRareDiseaseHPOAndClinicalTests() {
+        DataClass model = DataClass.get(params.id)
+
+        if(!model) {
+            response.status = 404
+            return
+        }
+
+        Long classId = model.getId()
+
+        Long assetId = assetService.storeReportAsAsset(model.dataModel,
+            name: "${model.name} report as Json",
+            originalFileName: "${model.name}-${model.status}-${model.version}.json",
+            contentType: "application/json",
+        ) {
+            new GelJsonExporter(it).printDiseaseOntology(DataClass.get(classId))
+        }
+
+        response.setHeader("X-Asset-ID",assetId.toString())
+        redirect controller: 'asset', id: assetId, action: 'show'
+    }
+
+
+    def exportRareDiseaseEligibilityDoc() {
+        exportEligibilityOrPhenotypesAndTests(true)
+    }
+
+    def exportRareDiseasePhenotypesAndClinicalTestsDoc() {
+        exportEligibilityOrPhenotypesAndTests(false)
+    }
+
+
+    private void exportEligibilityOrPhenotypesAndTests(boolean eligibilityMode) {
+        DataClass model = DataClass.get(params.id)
+
+        if (!model) {
+            response.status = 404
+            return
+        }
+
+        String documentName = RareDiseasesDocExporter.documentName(eligibilityMode)
+
+        Long classId = model.id
+        def assetId = assetService.storeReportAsAsset(
+            model.dataModel,
+            name: "${documentName} report as MS Word Document",
+            originalFileName: "${documentName}-${model.status}-${model.version}.docx",
+            contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        ) { OutputStream out ->
+            new RareDiseasesDocExporter(DataClass.get(classId), standardTemplate, imagePath, eligibilityMode).export(out)
+        }
+
+        response.setHeader("X-Asset-ID", assetId.toString())
+        redirect controller: 'asset', id: assetId, action: 'show'
+    }
+
+
 
     def exportGelSpecification() {
 
