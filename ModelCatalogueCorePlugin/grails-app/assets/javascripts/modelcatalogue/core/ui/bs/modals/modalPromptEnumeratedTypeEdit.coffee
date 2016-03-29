@@ -55,7 +55,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
                 <input ng-model="subtype" type="radio" name="subtype" id="pickReferenceType" value="subset"> Subset
               </label>
               <div collapse="subtype != 'enumeratedType'">
-                <ordered-map-editor object="copy.enumerations" title="Enumerations" key-placeholder="Value" value-placeholder="Description"></ordered-map-editor>
+                <ordered-map-editor object="copy.enumerations" title="Enumerations" key-placeholder="Value or copy & paste from excel" value-placeholder="Description"></ordered-map-editor>
               </div>
               <div collapse="subtype != 'referenceType'">
                 <div class="form-group">
