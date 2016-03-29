@@ -24,6 +24,7 @@
       <td><span class="handle fa fa-ellipsis-v fa-fw text-muted with-move"></span></td>
       <th class="soe-table-property-key col-md-5 col-sm-5">
         <input type="text" ng-model="property.key" class="form-control"
+               ng-paste="pasteExcel($event)"
                placeholder="{{valuePlaceholder ? keyPlaceholder : 'Key'}}" autofocus="autofocus"
                focus-me="lastAddedRow == $index &amp;&amp; $index != 0">
       </th>
@@ -49,15 +50,24 @@
     </tbody>
   </table>
   <div class="row">
-    <div class="col-md-3">
-      <button type="button" class="btn btn-sm btn-default" ng-click="showImportExcel = !showImportExcel">
-        Import from Excel (Copy & Paste)
-      </button>
+    <div class="col-md-12">
+      <div class="alert alert-info">
+        <strong>Excel copy & paste.</strong>
+        You can copy & paste enumerations from excel (click on <i class="glyphicon glyphicon-plus"></i> and paste excel
+        content). First column should be Value and the second column should be Description. If for any reason copy &
+        paste doesn't work, please use
+        <button type="button" class="btn btn-sm btn-default" ng-click="showImportExcel = !showImportExcel">
+          Paste from Text Area
+        </button>
+        functionality.
+      </div>
     </div>
-    <div class="col-md-9">
+  </div>
+  <div class="row">
+    <div class="col-md-12">
       <div ng-show="showImportExcel">
         <div class="form-group">
-          <textarea name="import-excel" id="import-excel" class="form-control input-xs" cols="1000" rows="20"
+          <textarea name="import-excel" id="import-excel" class="form-control input-xs" cols="1000" rows="10"
                     ng-model="importExcelText"
                     placeholder="Copy and paste enumerations from excel. First column should be Value and the second column should be Description.">
           </textarea>

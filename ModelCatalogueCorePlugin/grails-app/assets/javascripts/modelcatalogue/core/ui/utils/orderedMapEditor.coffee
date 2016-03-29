@@ -78,8 +78,8 @@ angular.module('mc.core.ui.utils').directive 'orderedMapEditor',  [-> {
 
         updatedValues = 0
         createdValues = 0
-        for line in importText.split('\n')
-          tokens = line.split('\t')
+        for line in importText.split(/\r\n|\n\r|\n|\r/g)
+          tokens = line.split("\t")
           if tokens.length > 0
             value = ''
             if tokens.length > 1
@@ -101,6 +101,16 @@ angular.module('mc.core.ui.utils').directive 'orderedMapEditor',  [-> {
         messages.info "Import was successful, #{createdValues} enumerations was created and #{updatedValues} enumerations was updated."
         # clear import text
         return ''
+
+      $scope.pasteExcel = (event) ->
+        if event.clipboardData? && event.clipboardData.getData? # Standard
+          data = event.clipboardData.getData "text/plain"
+        else if event.originalEvent? && event.originalEvent.clipboardData? && event.originalEvent.clipboardData.getData? # jQuery
+          data = event.originalEvent.clipboardData.getData "text/plain"
+        else if window.clipboardData? && window.clipboardData.getData? # Internet Explorer
+          data = window.clipboardData.getData "Text"
+
+        $scope.importExcel(data)
 
       $scope.$watch 'object', (newObject) ->
         onObjectChanged(newObject)
