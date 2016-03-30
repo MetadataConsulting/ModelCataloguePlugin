@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.orderedMapEditor', ['mc.core.ui.metadataEditors']).directive 'orderedMapEditor',  [-> {
+angular.module('mc.core.ui.utils').directive 'orderedMapEditor',  [-> {
     restrict: 'E'
     replace: true
     scope:
@@ -7,12 +7,12 @@ angular.module('mc.core.ui.orderedMapEditor', ['mc.core.ui.metadataEditors']).di
       valueTitle:         '@?'
       keyPlaceholder:     '@?'
       valuePlaceholder:   '@?'
-    templateUrl: 'modelcatalogue/core/ui/orderedMapEditor.html'
+    templateUrl: '/mc/core/ui/utils/orderedMapEditor.html'
 
-    controller: ['$scope', 'enhance', '$log', ($scope, enhance, $log) ->
+    controller: ['$scope', 'enhance', '$log', 'messages', ($scope, enhance, $log, messages) ->
       isOrderedMap = (object)->
         enhance.isEnhancedBy(object, 'orderedMap')
-      
+
       # default values
       $scope.lastAddedRow = 0
 
@@ -71,9 +71,49 @@ angular.module('mc.core.ui.orderedMapEditor', ['mc.core.ui.metadataEditors']).di
       $scope.addNewRowOnTab = ($event, index, last)->
         $scope.addProperty(index, {key: '', value: ''}) if $event.keyCode == 9 and last
 
+      $scope.importExcel = (importText) ->
+        unless importText?.length > 0
+          messages.error "No excel content to be imported."
+          return importText
+
+        updatedValues = 0
+        createdValues = 0
+        for line in importText.split(/\r\n|\n\r|\n|\r/g)
+          tokens = line.split("\t")
+          if tokens.length > 0
+            value = ''
+            if tokens.length > 1
+              value = tokens[1]
+            key = tokens[0]
+            if $scope.object.get(key)
+              updatedValues++
+            else
+              createdValues++
+            newObject = {}
+            newObject[key] = value
+            $scope.object.updateFrom(newObject)
+
+        # remove empty key - present when new map is created
+        if (createdValues > 0 || updatedValues > 0)
+          $scope.object.remove('')
+
+        # success message
+        messages.info "Import was successful, #{createdValues} enumerations was created and #{updatedValues} enumerations was updated."
+        # clear import text
+        return ''
+
+      $scope.pasteExcel = (event) ->
+        if event.clipboardData? && event.clipboardData.getData? # Standard
+          data = event.clipboardData.getData "text/plain"
+        else if event.originalEvent? && event.originalEvent.clipboardData? && event.originalEvent.clipboardData.getData? # jQuery
+          data = event.originalEvent.clipboardData.getData "text/plain"
+        else if window.clipboardData? && window.clipboardData.getData? # Internet Explorer
+          data = window.clipboardData.getData "Text"
+
+        $scope.importExcel(data)
+
       $scope.$watch 'object', (newObject) ->
         onObjectChanged(newObject)
     ]
-
   }
 ]
