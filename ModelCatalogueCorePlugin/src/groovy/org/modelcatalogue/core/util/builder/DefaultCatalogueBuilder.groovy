@@ -231,6 +231,12 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
             if (outerDataType.name == dataType.name) {
                 dataType.merge(outerDataType)
             } else {
+                if(outerDataType.domain!=dataType.domain) {
+                    if(outerDataType instanceof DefaultCatalogueElementProxy) {
+                        DefaultCatalogueElementProxy proxy = (DefaultCatalogueElementProxy) outerDataType;
+                        proxy.domain = dataType.domain
+                    }
+                }
                 basedOn dataType, relConf
             }
         }

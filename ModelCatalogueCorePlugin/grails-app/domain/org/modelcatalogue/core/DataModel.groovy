@@ -47,12 +47,6 @@ class DataModel extends CatalogueElement {
         super.setModelCatalogueId(Legacy.fixModelCatalogueId(mcID))
     }
 
-    @Override
-    String getDefaultModelCatalogueId(boolean withoutVersion = false) {
-        // TODO: remove when the class is renamed
-        return Legacy.fixModelCatalogueId(super.getDefaultModelCatalogueId(withoutVersion))
-    }
-
     List<CatalogueElement> getDeclares() {
         CatalogueElement.findAllByDataModel(this)
     }
