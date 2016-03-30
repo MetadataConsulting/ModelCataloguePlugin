@@ -774,54 +774,67 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         final String orphanDataTypeName = "FBMCIITII Orpan Data Type"
         final String orphanModelCatalogueId = "http://www.example.com/types/FBMCIITII_Orphan_Data_Type"
         final String dataTypeName = "FBMCIITII Data Type"
-        final String modelCatalogueId = "http://www.example.com/types/FBMCIITII"
-        final dmNAme = "testDM2"
+        final String dataTypeModelCatalogueId = "http://www.example.com/types/FBMCIITII"
+        final String anotherDataModelName = "testDM2"
 
         catalogueBuilder.build {
             dataModel name: dataModelName, semanticVersion: dataModelSemVer, {
-                dataType name: dataTypeName, id: modelCatalogueId
+                dataType name: dataTypeName, id: dataTypeModelCatalogueId
             }
-            dataModel name: "testDM2"
+            dataModel name: anotherDataModelName
             dataType name: orphanDataTypeName, id: orphanModelCatalogueId
         }
 
-        DataModel dm = DataModel.findByName(dmNAme)
-        elementService.finalizeDataModel(dm, "0.0.1", "new model")
-        DataModel dm2 = elementService.createDraftVersion(dm, DraftContext.userFriendly())
-        def modelCatalogueID = "ModelCatalogueCorePluginTestApp/catalogue/dataModel/123@0.0.2"
+        DataModel anotherDataModel = DataModel.findByName(anotherDataModelName)
+        elementService.finalizeDataModel(anotherDataModel, "0.0.1", "new model")
+        DataModel anotherDataModelDraft = elementService.createDraftVersion(anotherDataModel, '0.0.2', DraftContext.userFriendly())
+
+        final String dataModelModelCatalogueId = "ModelCatalogueCorePluginTestApp/catalogue/dataModel/$anotherDataModelDraft.latestVersionId@0.0.2"
 
         when:
-        CatalogueElement datamodel2 = elementService.findByModelCatalogueId(CatalogueElement, modelCatalogueID)
+        CatalogueElement anotherDataModelFound = elementService.findByModelCatalogueId(CatalogueElement, dataModelModelCatalogueId)
 
 
         then:
 
-        datamodel2.id == dm2.id
+        anotherDataModelFound.id == anotherDataModelDraft.id
 
 
         when:
-        CatalogueElement dataType = elementService.findByModelCatalogueId(CatalogueElement, modelCatalogueId)
+        DataModel dataModel = DataModel.findByName(dataModelName)
+        DataType dataTypeV1 = DataType.findByName(dataTypeName)
+        elementService.finalizeDataModel(dataModel, "0.0.1", "new model")
+        DataModel dataModelV2 = elementService.createDraftVersion(dataModel, '0.0.2', DraftContext.userFriendly())
+
+        CatalogueElement dataType = elementService.findByModelCatalogueId(CatalogueElement, dataTypeModelCatalogueId)
+
+        elementService.finalizeDataModel(dataModelV2, "0.0.2", "new model")
+        elementService.createDraftVersion(dataModelV2, '0.0.3', DraftContext.userFriendly())
 
         then:
+        dataTypeV1
+        dataTypeV1 != dataType
+
         dataType
         dataType.dataModel
         dataType.dataModel.semanticVersion
-        dataType.dataModel.semanticVersion == dataModelSemVer
+        dataType.dataModel.semanticVersion == '0.0.2'
         dataType.name == dataTypeName
 
         when:
-        CatalogueElement withoutVersion = elementService.findByModelCatalogueId(CatalogueElement, dataType.getDefaultModelCatalogueId(false))
-
-        then:
-        withoutVersion
-        withoutVersion == dataType
-
-        when:
-        CatalogueElement withVersion = elementService.findByModelCatalogueId(CatalogueElement, dataType.getDefaultModelCatalogueId(true))
+        CatalogueElement withVersion = elementService.findByModelCatalogueId(CatalogueElement, dataType.getDefaultModelCatalogueId(false))
 
         then:
         withVersion
         withVersion == dataType
+
+        when:
+        CatalogueElement withoutVersion = elementService.findByModelCatalogueId(CatalogueElement, dataType.getDefaultModelCatalogueId(true))
+
+        then:
+        withoutVersion
+        withoutVersion.dataModel
+        withoutVersion.dataModel.semanticVersion == '0.0.3'
 
         when:
         CatalogueElement legacy = elementService.findByModelCatalogueId(CatalogueElement, dataType.getLegacyModelCatalogueId(false))

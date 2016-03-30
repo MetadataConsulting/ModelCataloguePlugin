@@ -164,15 +164,37 @@ class ElementService implements Publisher<CatalogueElement> {
                     eq 'id', urlId
                 }
                 if (version) {
-                            or {
-                                eq 'semanticVersion', version
-                                if (versionNumberFound) {
-                                    eq 'versionNumber', versionNumberFound
-                                }
+                    dataModel {
+                        or {
+                            eq 'semanticVersion', version
+                            if (versionNumberFound) {
+                                eq 'versionNumber', versionNumberFound
                             }
+                        }
+                    }
                 }
             })
 
+            if (result && result.getDefaultModelCatalogueId(version == null).contains(Legacy.fixModelCatalogueId(theId).toString())) {
+                return result
+            }
+
+            result = getLatestFromCriteria(new DetachedCriteria<CatalogueElement>(resource).build {
+                or {
+                    eq 'latestVersionId', urlId
+                    eq 'id', urlId
+                }
+                if (version) {
+                    or {
+                        eq 'semanticVersion', version
+                        if (versionNumberFound) {
+                            eq 'versionNumber', versionNumberFound
+                        }
+                    }
+                }
+            })
+
+            
             if (result && result.getDefaultModelCatalogueId(version == null).contains(Legacy.fixModelCatalogueId(theId).toString())) {
                 return result
             }

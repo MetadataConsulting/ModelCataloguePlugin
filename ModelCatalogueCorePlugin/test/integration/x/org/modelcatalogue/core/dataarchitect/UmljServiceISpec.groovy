@@ -2,13 +2,11 @@ package x.org.modelcatalogue.core.dataarchitect
 import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataClass
-import spock.lang.Ignore
 
 class UmljServiceISpec extends AbstractIntegrationSpec {
 
     def umljService, initCatalogueService, catalogueBuilder
 
-    @Ignore
     def "test import"() {
         initCatalogueService.initCatalogue(true)
         def filenameXsd = "test/integration/resources/CLLDataModel0.1.umlj"
