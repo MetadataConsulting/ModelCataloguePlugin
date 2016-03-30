@@ -14,7 +14,7 @@ is required.
 
 This is a number used to identify a PATIENT uniquely within a Health Care Provider. It may be different from the PATIENT's casenote number and may be assigned automatically by the computer system.","
 ",LOCAL PATIENT IDENTIFIER,"orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",XXXXXXX0020,2,2,3,1,hard,When Patient demographics entered.,GC 124,NEO4J,from source
-TEST_3,MAIN,PATIENT IDENTITY DETAILS,NHS NUMBER STATUS INDICATOR CODE,The NHS NUMBER STATUS  INDICATOR CODE indicates the verification status of the NHS number provided.,"01 : Number present and verified
+TEST_3,MAIN,PATIENT IDENTITY DETAILS,nhsNumberStatusIndicatorCode,The NHS NUMBER STATUS  INDICATOR CODE indicates the verification status of the NHS number provided.,"01 : Number present and verified
 02 : Number present but not traced
 03 : Trace required
 04 : Trace attempted - No match or multiple match found
@@ -55,7 +55,7 @@ TEST_11,MAIN,DEMOGRAPHICS,PATIENT USUAL ADDRESS (AT DIAGNOSIS),PATIENT USUAL ADD
 ",PATIENT USUAL ADDRESS (AT DIAGNOSIS),"orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",XXXXXXX0070,2,2,1,1,1,When Patient demographics entered.,GC 133,NEO4J,from source
 TEST_12,MAIN,DEMOGRAPHICS,POSTCODE OF USUAL ADDRESS (AT DIAGNOSIS),POSTCODE OF USUAL ADDRESS (AT DIAGNOSIS) is the POSTCODE OF USUAL ADDRESS of the PATIENT at the time of PATIENT DIAGNOSIS.,"see POSTCODE
 ",POSTCODE OF USUAL ADDRESS (AT DIAGNOSIS),"orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",XXXXXXX0080,2,2,3,1,1,When Patient demographics entered.,GC 134,NEO4J,from source
-TEST_13,MAIN,DEMOGRAPHICS,PERSON GENDER CODE (CURRENT),A PERSON's gender currently.,"0 : Not Known
+TEST_13,MAIN,DEMOGRAPHICS,personGenderCode(current),A PERSON's gender currently.,"0 : Not Known
 1 : Male
 2 : Female
 9 : Not Specified
@@ -69,7 +69,7 @@ TEST_15,MAIN,DEMOGRAPHICS,GENERAL MEDICAL PRACTICE CODE (PATIENT REGISTRATION),"
 ",GENERAL MEDICAL PRACTICE CODE (PATIENT REGISTRATION),"orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",XXXXXXX0120,1,1,1,1,1,When Patient demographics entered. Address shown. Code available in JCIS tables.,GC 137,NEO4J,from source
 TEST_16,MAIN,DEMOGRAPHICS,PERSON FAMILY NAME (AT BIRTH),The PATIENT's surname at birth. ,"
 ",PERSON FAMILY NAME (AT BIRTH),"orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",XXXXXXX0140,2,2,1,1,1,When Patient demographics entered. The HISS field is MaidenName (ie not strictly Surname at birth).,GC 138,NEO4J,from source
-TEST_17,MAIN,DEMOGRAPHICS,ETHNIC CATEGORY,"The ethnicity of a PERSON, as specified by the PERSON.. The 16+1 ethnic data categories defined in the 2001 census is the national mandatory standard for the collection and analysis of ethnicity.
+TEST_17,MAIN,DEMOGRAPHICS,ethnicCategory,"The ethnicity of a PERSON, as specified by the PERSON.. The 16+1 ethnic data categories defined in the 2001 census is the national mandatory standard for the collection and analysis of ethnicity.
 (The Office for National Statistics has developed a further breakdown of the group from that given, which may be used locally.)","White
 A  : (White) British
 B  : (White) Irish
@@ -94,7 +94,7 @@ S : Any other ethnic group
 Z : Not stated
 99 : Not Known
 ",ETHNIC CATEGORY,"orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",XXXXXXX0150,1,1,1,1,1,Imported from HISS but not displayed.,GC 139,NEO4J,from source
-TEST_18,MAIN,REFERRALS,SOURCE OF REFERRAL FOR OUT-PATIENTS,"This identifies the source of referral of each Consultant Out-Patient Episode.
+TEST_18,MAIN,REFERRALS,sourceOfReferralForOutPatients,"This identifies the source of referral of each Consultant Out-Patient Episode.
 (See User Guide for further details)","Initiated by the CONSULTANT responsible for the Consultant Out-Patient Episode
 01 : following an emergency admission
 02 : following a Domiciliary Consultation
@@ -137,7 +137,7 @@ eg Initial visit or Radiological visit used as first seen in wait time table.   
 TEST_25,MAIN,REFERRALS,ORGANISATION SITE CODE (PROVIDER FIRST TESTCER SPECIALIST),The  ORGANISATION SITE CODE of the ORGANISATION acting as Health Care Provider where the PATIENT is first seen by an appropriate TESTcer specialist on the DATE FIRST SEEN (TESTCER SPECIALIST).,"see ORGANISATION SITE CODE
 ",SITE CODE (OF PROVIDER FIRST TESTCER SPECIALIST),Name shown. Code available in JCIS tables.,XXXXXXX1400,2,2,2,3,2,"Visit
 eg Initial visit or Radiological visit used as first seen in wait time table.   ",GC 147,NEO4J,from source
-TEST_26,MAIN,REFERRALS,TESTCER OR SYMPTOMATIC BREAST REFERRAL PATIENT STATUS,"TESTCER OR SYMPTOMATIC BREAST REFERRAL PATIENT STATUS is recorded to enable tracking of the status of REFERRAL REQUESTS for PATIENTS referred with a suspected TESTcer, or referred with breast symptoms with TESTcer not originally suspected.
+TEST_26,MAIN,REFERRALS,testcerOrSymptomaticBreastReferralPatientStatus,"TESTCER OR SYMPTOMATIC BREAST REFERRAL PATIENT STATUS is recorded to enable tracking of the status of REFERRAL REQUESTS for PATIENTS referred with a suspected TESTcer, or referred with breast symptoms with TESTcer not originally suspected.
 For COSD this TEST be used for all patients regardless of referral route.","14 : Suspected primary TESTcer
 09 : Under investigation following symptomatic referral, TESTcer not suspected (breast referrals only) (see note 1)
 03 : No new TESTcer diagnosis identified by the Healthcare Provider
@@ -175,7 +175,7 @@ IMAGING CODE (NICIP) is the National Interim Clinical Imaging Procedure Code Set
 ","
 ",IMAGING CODE (NICIP),"orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",XXXXXXX1610,TBA,TBA,TBA,TBA,7,"See also alternative  mandatory item for non-imported radiology activities
 Ie  (TESTCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING)) ",GC 152,NEO4J,from source
-TEST_31,MAIN,IMAGING,TESTCER IMAGING MODALITY*,"*IMAGING CODE (NICIP)
+TEST_31,MAIN,IMAGING,testcerImagingModality*,"*IMAGING CODE (NICIP)
 and/or
  (TESTCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING))
 is required.
@@ -209,7 +209,7 @@ Multiple sites CZ002
 [Usage for UGI CT sTEST (recorded 4 times on Live patients) - is misleading usage of backend table as front end desXXXXXXXiption is 'Primary tumour location' on CT sTEST.Findings tab].
 
 (Findings site is recordable).",GC 154,NEO4J,from source
-TEST_33,MAIN,IMAGING,ANATOMICAL SIDE (IMAGING)*,"*IMAGING CODE (NICIP)
+TEST_33,MAIN,IMAGING,anatomicalSide(imaging)*,"*IMAGING CODE (NICIP)
 and/or
  (TESTCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING))
 is required.
@@ -221,7 +221,7 @@ B : Bilateral
 8 : Not applicable
 9 : Not Known
 ",ANATOMICAL SIDE (IMAGING),"orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",XXXXXXX3000,MAY BE REMOVED,MAY BE REMOVED,MAY BE REMOVED,MAY BE REMOVED,MAY BE REMOVED,,,NEO4J,
-TEST_GENDER,MAIN,IMAGING,GENDER2,gender test stuff,"0 : Not Known
+TEST_GENDER,MAIN,IMAGING,gender2,gender test stuff,"0 : Not Known
 1 : Male
 2 : Female
 9 : Not Specified
