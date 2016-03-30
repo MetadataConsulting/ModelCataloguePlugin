@@ -57,6 +57,13 @@ Genomics England customisation plugin for Model Catalogue
         ReportsRegistry reportsRegistry = ctx.getBean(ReportsRegistry)
 
         reportsRegistry.register {
+            creates link
+            title { "Rare Disease Disorder List CSV" }
+            type DataClass
+            link controller: 'genomics', action: 'exportRareDiseaseDisorderListCsv', id: true
+        }
+
+        reportsRegistry.register {
             creates asset
             title { "GEL Data Specification Report" }
             defaultName { "${it.name} report as MS Word Document" }
@@ -80,7 +87,7 @@ Genomics England customisation plugin for Model Catalogue
         }
 
         reportsRegistry.register {
-            creates asset
+            creates link
             title { "Rare Diseases HPO And Clinical Tests JSON" }
             defaultName { "${it.name} report as Json" }
             type DataClass

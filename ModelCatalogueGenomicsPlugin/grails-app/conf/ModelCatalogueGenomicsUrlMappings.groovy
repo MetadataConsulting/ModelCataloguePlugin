@@ -9,6 +9,7 @@ class ModelCatalogueGenomicsUrlMappings {
         "/api/modelCatalogue/core/genomics/exportRareDiseaseHPOAndClinicalTests/$id" (controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTests', method: HttpMethod.GET)
         "/api/modelCatalogue/core/genomics/exportRareDiseaseEligibilityDoc/$id"(controller: 'genomics', action: 'exportRareDiseaseEligibilityDoc', method: HttpMethod.GET)
         "/api/modelCatalogue/core/genomics/exportRareDiseasePhenotypesAndClinicalTestsDoc/$id"(controller: 'genomics', action: 'exportRareDiseasePhenotypesAndClinicalTestsDoc', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/genomics/exportRareDiseaseDisorderListCsv/$id"(controller: 'genomics', action: 'exportRareDiseaseDisorderListAsCsv', method: HttpMethod.GET)
     }
 
 }
