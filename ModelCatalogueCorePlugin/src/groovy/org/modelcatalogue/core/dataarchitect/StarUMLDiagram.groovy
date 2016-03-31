@@ -14,7 +14,7 @@ class StarUMLDiagram {
     StarUMLDiagram(json) {
 
         // We'll also add each class to a list of classes
-        json = json
+        this.json = json
         allClasses = new HashMap<String, Object>()
         allDataTypes = new HashMap<String, Object>()
         allEnumerations = new HashMap<String, Object>()
