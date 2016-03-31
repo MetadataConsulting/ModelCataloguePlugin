@@ -79,7 +79,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         expect:
         author != draft
         author.id != draft.id
-        author.versionCreated != author.dateCreated
+        author.versionCreated != draft.versionCreated
         originalVersion == newVersion
         draftVersion    == originalVersion + 1
 
