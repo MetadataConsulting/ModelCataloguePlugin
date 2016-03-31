@@ -38,10 +38,10 @@
       </td>
       <td class="soe-table-property-actions col-md-2 col-sm-2">
         <p>
-          <a class="btn btn-link btn-sm soe-add-row" ng-click="addProperty($index)">
+          <a class="btn btn-link btn-sm soe-add-row" ng-click="addProperty($index)" data-for-property="{{property.key}}">
             <span class="glyphicon glyphicon-plus"></span>
           </a>
-          <a class="btn btn-link btn-sm soe-remove-row" ng-click="removeProperty($index)">
+          <a class="btn btn-link btn-sm soe-remove-row" ng-click="removeProperty($index)" data-for-property="{{property.key}}">
             <span class="glyphicon glyphicon-minus"></span>
           </a>
         </p>
