@@ -7,18 +7,17 @@ class UmljServiceISpec extends AbstractIntegrationSpec {
 
     def umljService, initCatalogueService, catalogueBuilder
 
-//    @Ignore
     def "test import"() {
         initCatalogueService.initCatalogue(true)
         def filenameXsd = "test/integration/resources/CLLDataModel0.1.umlj"
-        DataModel classification = new DataModel(name: "GeL Cancer Core").save()
+        DataModel classification = new DataModel(name: "GeL Cancer CLL").save()
 
         when:
         InputStream inputStream = new FileInputStream(filenameXsd)
         umljService.importUmlDiagram(catalogueBuilder, inputStream, "rare_diseases_combined", classification)
 
         def patient = DataClass.findByName("Patient")
-        def patientData = patient.contains
+        def patientData = patient?.contains
         def de4 = patientData[4]
 
         then:

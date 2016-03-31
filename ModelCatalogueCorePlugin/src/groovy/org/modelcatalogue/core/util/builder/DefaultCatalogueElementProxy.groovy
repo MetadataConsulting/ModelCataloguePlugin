@@ -127,6 +127,10 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
             name = value?.toString()
         }
 
+        if(key=='domain'){
+            domain = value
+        }
+
         if (key == 'dataModel' || key == 'classification') {
             if (value instanceof String) {
                 classification = value

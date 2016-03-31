@@ -318,7 +318,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     String toString() {
         if (dataModel) {
-            return "$name [$combinedVersion] in $dataModel.name ($status ${getClass().getSimpleName()}:${getId()})"
+            return "$name [$combinedVersion] ($status ${getClass().getSimpleName()}:${getId()}) in $dataModel"
         }
         return "$name [$combinedVersion] ($status ${getClass().getSimpleName()}:${getId()})"
     }
