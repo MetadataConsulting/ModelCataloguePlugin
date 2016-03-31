@@ -52,7 +52,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
                 <input ng-model="subtype" type="radio" name="subtype" id="pickReferenceType" value="referenceType"> Reference
               </label>
               <label class="radio-inline">
-                <input ng-model="subtype" type="radio" name="subtype" id="pickReferenceType" value="subset"> Subset
+                <input ng-model="subtype" type="radio" name="subtype" id="pickSubsetType" value="subset"> Subset
               </label>
               <div collapse="subtype != 'enumeratedType'">
                 <ordered-map-editor object="copy.enumerations" title="Enumerations" key-placeholder="Value or copy & paste from excel" value-placeholder="Description"></ordered-map-editor>
@@ -79,7 +79,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
                     <div class="alert alert-warning" ng-if="copy.selectedEnumerations.values.length == 0">If no enumeration value selected, all values will be used</div>
                     <div class="checkbox" ng-repeat="value in copy.baseEnumeration.enumerations.values">
                       <label>
-                        <input type="checkbox" value="{{value}}" ng-checked="copy.selectedEnumerations.values.indexOf(value) > -1" ng-click="toggleSelection(copy.selectedEnumerations.values, value)">
+                        <input type="checkbox" value="{{value}}" id="{{'subtype-enum-' + value.id}}" ng-checked="copy.selectedEnumerations.values.indexOf(value) > -1" ng-click="toggleSelection(copy.selectedEnumerations.values, value)">
                         {{value.key}}: {{value.value}}
                       </label>
                     </div>

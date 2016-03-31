@@ -251,7 +251,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         this.@modelCatalogueId != null
     }
 
-    Integer countVersions() {
+    final Integer countVersions() {
         elementService.countVersions(this)
     }
 
@@ -409,7 +409,6 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
                 for (String propertyName in inheritedAssociationsNames) {
                     if (self.isDirty(propertyName) && it.getProperty(propertyName) == self.getValueToBeInherited(it, propertyName, rel.ext, true)) {
-                        log.debug "propagating '$propertyName' of $this to $it"
                         it.setProperty(propertyName, self.getValueToBeInherited(it, propertyName, rel.ext, false))
                         changed = true
                     }
@@ -417,7 +416,6 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
                 if (changed) {
                     FriendlyErrors.failFriendlySaveWithoutFlush(it)
-                    log.debug "propagated changes of $this to $it"
                 }
             }
 

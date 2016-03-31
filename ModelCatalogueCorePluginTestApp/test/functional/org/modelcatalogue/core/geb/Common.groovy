@@ -44,6 +44,9 @@ class Common {
     static final Keywords first = Keywords.FIRST
     static final Keywords once = Keywords.ONCE
 
+    static final ScrollDirection up = ScrollDirection.UP
+    static final ScrollDirection down = ScrollDirection.DOWN
+
     static final CatalogueAction inlineEdit = CatalogueAction.runFirst('item-detail', 'inline-edit')
     static final CatalogueAction inlineEditSubmit = CatalogueAction.runFirst('item-detail', 'inline-edit-submit')
 }

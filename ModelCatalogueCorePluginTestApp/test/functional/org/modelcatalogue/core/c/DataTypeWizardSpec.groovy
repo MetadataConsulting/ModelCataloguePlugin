@@ -270,6 +270,9 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         fillMetadata foo: 'bar'
+
+        scroll up
+
         click inlineEditSubmit
 
         then:

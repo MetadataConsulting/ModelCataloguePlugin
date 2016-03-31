@@ -106,6 +106,13 @@ _Refreshing browser_
 refresh browser
 ```
 
+_Scrolling Window_
+
+```
+scroll up       // scroll up by 250 px
+scroll down     // scroll down by 250 px
+```
+
 _Add import to the data model and than continue selecting the items in the tree view_
 
 ```
