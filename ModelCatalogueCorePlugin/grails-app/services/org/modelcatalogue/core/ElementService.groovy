@@ -274,11 +274,8 @@ class ElementService implements Publisher<CatalogueElement> {
     }
 
     public DataModel finalizeDataModel(DataModel draft, String version, String revisionNotes) {
-        draft.semanticVersion = version
-        draft.revisionNotes = revisionNotes
-
         // check eligibility for finalization
-        draft.checkFinalizeEligibility()
+        draft.checkFinalizeEligibility(version, revisionNotes)
 
         if (draft.hasErrors()) {
             return draft
@@ -294,7 +291,7 @@ class ElementService implements Publisher<CatalogueElement> {
                 finalized.semanticVersion = version
                 finalized.revisionNotes = revisionNotes
 
-                finalized
+                finalized.save(deepValidate: false)
             }
         }
     }

@@ -105,8 +105,10 @@ class DataModel extends CatalogueElement {
      *     <li>Revision notes needs to be filled.</li>
      *     <li>Metadata needs to be set (authors,reviewers, owner, reviewed, approved, namespace, organization).</li>
      * </ul>
+     * @param semanticVersion Version to be used for finalized data model.
+     * @param revisionNotes Revision notes to be used for finalized data model.
      */
-    void checkFinalizeEligibility() {
+    void checkFinalizeEligibility(String semanticVersion, String revisionNotes) {
         // check semantic version
         checkPublishSemanticVersion(semanticVersion)
 
