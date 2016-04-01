@@ -59,7 +59,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check nameFilter
 
         when: "we filter by anatomical side"
-        fill nameFilter with 'anatomical side'
+        fill nameFilter with 'anatomicalside'
 
         then: "only one row will be shown"
         check tableRows test { it.size() == 1 }
