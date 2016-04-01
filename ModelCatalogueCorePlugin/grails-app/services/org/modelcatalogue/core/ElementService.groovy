@@ -296,6 +296,9 @@ class ElementService implements Publisher<CatalogueElement> {
         }
     }
 
+    /**
+     * @deprecated finalization should only happen on the data model level
+     */
     public <E extends CatalogueElement> E finalizeElement(E draft) {
         return (E) CatalogueElement.withTransaction { TransactionStatus status ->
             auditService.logElementFinalized(draft) {
