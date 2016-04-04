@@ -677,10 +677,10 @@ class ElasticSearchService implements SearchCatalogue {
         if (params.dataModel) {
             DataModel dataModel = DataModel.get(params.long('dataModel'))
             if (dataModel) {
-                return DataModelFilter.includes(dataModel)
+                return DataModelFilter.includes(dataModel).withImports()
             }
         }
-        dataModelService.dataModelFilter
+        dataModelService.dataModelFilter.withImports()
     }
 
     List<String> collectTypes(Class<?> resource) {
