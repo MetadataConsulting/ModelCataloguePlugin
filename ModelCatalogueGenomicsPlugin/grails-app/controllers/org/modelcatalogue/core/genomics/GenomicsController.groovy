@@ -21,7 +21,7 @@ class GenomicsController {
     def elementService
     DataClassService dataClassService
 
-
+    static final String RD_HPO_CSV_FILENAME = "RD Phenotypes and Clinical Tests.csv"
     static final String DOC_IMAGE_PATH = "https://www.genomicsengland.co.uk/wp-content/uploads/2015/11/Genomics-England-logo-2015.png"
 
     static final Long RARE_DISEASE_CONDITIONS_AND_PHENOTYPES_ID = 11144
@@ -53,7 +53,7 @@ class GenomicsController {
 
         Long assetId = assetService.storeReportAsAsset(latestVersion.dataModel,
             name: "${latestVersion.name} report as CSV",
-            originalFileName: "${latestVersion.name}-${latestVersion.status}-${latestVersion.version}.csv",
+            originalFileName: "$RD_HPO_CSV_FILENAME",
             contentType: "text/csv",
         ) {
             new GelCsvExporter(it).printDiseaseOntology(latestVersion)
