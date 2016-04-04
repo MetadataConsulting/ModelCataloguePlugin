@@ -67,16 +67,16 @@ class GelCsvExporterSpec extends IntegrationSpec {
 
     private static getExpectedCSV() {
         def today = new Date().format("yyyy-MM-dd")
-        def pattern = /id,name,subGroup_id,subGroup_name,subGroup_specificDisorder_id,subGroup_specificDisorder_name,subGroup_specificDisorder_eligibilityQuestion_date,subGroup_specificDisorder_eligibilityQuestion_version,subGroup_specificDisorder_shallowPhenotype_name,subGroup_specificDisorder_shallowPhenotype_id,subGroup_specificDisorder_test_name,subGroup_specificDisorder_test_id
-.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 Eligibility,,,,,,,,,
-.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 Phenotypes,.*,test hpo terms 1,$today,1,,,,,
-.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 Phenotypes,.*,test hpo terms 2,$today,1,,,,,
-.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 Phenotypes,.*,test hpo terms 3,$today,1,,,,,
-.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 Phenotypes,.*,test hpo terms 4,$today,1,,,,,
-.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 clinical Tests,.*,clinical test1,$today,1,,,,,
-.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 clinical Tests,.*,clinical test2,$today,1,,,,,
-.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 clinical Tests,.*,clinical test3,$today,1,,,,,
-.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 clinical Tests,.*,clinical test4,$today,1,,,,,/
+        def pattern = /id,Level 2 Disease Group,id,Level 3 Disease Subgroup,id,Level 4 Specific Disorder,Last Updated,Phenoytpe,Phenotype ID,Test,Test ID
+.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 Eligibility,,,,,,,,
+.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 Phenotypes,.*,test hpo terms 1,$today,,,,,
+.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 Phenotypes,.*,test hpo terms 2,$today,,,,,
+.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 Phenotypes,.*,test hpo terms 3,$today,,,,,
+.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 Phenotypes,.*,test hpo terms 4,$today,,,,,
+.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 clinical Tests,.*,clinical test1,$today,,,,,
+.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 clinical Tests,.*,clinical test2,$today,,,,,
+.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 clinical Tests,.*,clinical test3,$today,,,,,
+.*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 clinical Tests,.*,clinical test4,$today,,,,,/
         return pattern
     }
 
