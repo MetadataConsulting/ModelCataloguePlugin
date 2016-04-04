@@ -15,7 +15,7 @@ class GelCsvExporter {
     private String currentLine
 
     private final def headersLine =
-        "id,Level 2 Disease Group,id,Level 3 Disease Subgroup,id,Level 4 Specific Disorder,Last Updated,Phenoytpe,Phenotype ID,Test,Test ID"
+        "id,Level 2 Disease Group,id,Level 3 Disease Subgroup,id,Level 4 Specific Disorder,Last Updated,Phenotype,Phenotype ID,Test,Test ID"
 
     GelCsvExporter(OutputStream out) {
         this.out = out
