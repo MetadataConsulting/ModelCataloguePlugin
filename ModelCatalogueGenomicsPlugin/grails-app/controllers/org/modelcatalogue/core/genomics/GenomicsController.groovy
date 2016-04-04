@@ -24,11 +24,9 @@ class GenomicsController {
     static final String RD_HPO_CSV_FILENAME = "RD Phenotypes and Clinical Tests.csv"
     static final String DOC_IMAGE_PATH = "https://www.genomicsengland.co.uk/wp-content/uploads/2015/11/Genomics-England-logo-2015.png"
 
-    static final Long RARE_DISEASE_CONDITIONS_AND_PHENOTYPES_ID = 11144
-
     def exportRareDiseaseHPOAndClinicalTestsAsJson() {
 
-        DataClass dClass = DataClass.get(RARE_DISEASE_CONDITIONS_AND_PHENOTYPES_ID)
+        DataClass dClass = DataClass.get(params.id)
 
         DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dClass.getDefaultModelCatalogueId(true))
 
@@ -47,7 +45,7 @@ class GenomicsController {
 
     def exportRareDiseaseHPOAndClinicalTestsAsCsv() {
 
-        DataClass dClass = DataClass.get(RARE_DISEASE_CONDITIONS_AND_PHENOTYPES_ID)
+        DataClass dClass = DataClass.get(params.id)
 
         DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dClass.getDefaultModelCatalogueId(true))
 
