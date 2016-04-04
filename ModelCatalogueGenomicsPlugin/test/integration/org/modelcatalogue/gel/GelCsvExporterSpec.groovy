@@ -67,7 +67,7 @@ class GelCsvExporterSpec extends IntegrationSpec {
 
     private static getExpectedCSV() {
         def today = new Date().format("yyyy-MM-dd")
-        def pattern = /id,Level 2 Disease Group,id,Level 3 Disease Subgroup,id,Level 4 Specific Disorder,Last Updated,Phenoytpe,Phenotype ID,Test,Test ID
+        def pattern = /id,Level 2 Disease Group,id,Level 3 Disease Subgroup,id,Level 4 Specific Disorder,Last Updated,Phenotype,Phenotype ID,Test,Test ID
 .*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 Eligibility,,,,,,,,
 .*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 Phenotypes,.*,test hpo terms 1,$today,,,,,
 .*,rare disease ' subgroup 1.1,.*,rare disease disorder 1.1.1 Phenotypes,.*,test hpo terms 2,$today,,,,,
