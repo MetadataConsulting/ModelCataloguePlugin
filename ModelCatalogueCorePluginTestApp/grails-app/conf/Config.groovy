@@ -1,3 +1,5 @@
+import grails.util.Metadata
+
 // locations to search for config files that get merged into the main config;
 // config files can be ConfigSlurper scripts, Java properties files, or classes
 // in the classpath in ConfigSlurper format
@@ -123,6 +125,7 @@ environments {
                          "mail.smtp.socketFactory.fallback":"false"]
             }
         }
+        mc.search.elasticsearch.local="${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/es"
     }
     local {
         grails.logging.jul.usebridge = true
@@ -150,6 +153,7 @@ environments {
 
         grails.plugin.console.enabled = true
         grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
+        mc.search.elasticsearch.local="${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/es"
     }
     production {
         grails.logging.jul.usebridge = false
