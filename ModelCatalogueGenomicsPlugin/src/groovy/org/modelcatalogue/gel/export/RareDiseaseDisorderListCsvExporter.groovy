@@ -9,7 +9,7 @@ import org.modelcatalogue.core.DataClass
  */
 class RareDiseaseDisorderListCsvExporter {
 
-    private final def headerline = "id,diseaseGroup,diseaseSubgroup,diseaseName"
+    private final def headerline = "id,Level 2 DiseaseGroup,id,Level 3 Disease Subgroup,id,Level 4 Specific Disorder"
     private final OutputStream out
 
     RareDiseaseDisorderListCsvExporter(OutputStream out) {
@@ -39,18 +39,19 @@ class RareDiseaseDisorderListCsvExporter {
             case 1:     //ignore top Rare Diseases level
                 break
 
-            case 2:     // add disease group description
-                groupDescriptions.put(level, modelName)
+            case 2:     // add disease group id,description
+                String groupDescription = "${model.combinedVersion},${modelName}"
+                groupDescriptions.put(level, groupDescription)
                 break
 
-            case 3: // add disease sub-group description
-                String groupDescription = "${groupDescriptions.get(level - 1)},${modelName}"
+            case 3: // add disease sub-group id,description
+                String groupDescription = "${groupDescriptions.get(level - 1)},${model.combinedVersion},${modelName}"
                 groupDescriptions.put(level, groupDescription)
                 break
 
             case 4: // generate line and add to list
-                line << model.id
                 line << groupDescriptions.get(level - 1)
+                line << model.combinedVersion
                 line << modelName
                 lines << line.join(',')
                 return  //don't go deeper
