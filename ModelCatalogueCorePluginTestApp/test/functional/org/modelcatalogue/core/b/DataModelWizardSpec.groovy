@@ -70,6 +70,19 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "finalize element"() {
         check backdrop gone
+
+        setup: "fill required data for finalization"
+        click inlineEdit
+        fill 'metadata-authors' with 'Neville Chamberlain'
+        fill 'metadata-reviewers' with 'Édouard Daladier'
+        fill 'metadata-owner' with 'Jan Hus'
+        fill 'metadata-reviewed' with '2016-03-29'
+        fill 'metadata-approved' with '2016-03-29'
+        fill 'metadata-namespace' with 'Namespace'
+        fill 'metadata-organization' with 'Organization'
+        click inlineEditSubmit
+        check "input[name='name']" gone
+
         when: "finalize is clicked"
         click finalize
 

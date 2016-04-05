@@ -293,13 +293,9 @@ class ElementService implements Publisher<CatalogueElement> {
         }
     }
 
-
     public DataModel finalizeDataModel(DataModel draft, String version, String revisionNotes) {
-        draft.checkPublishSemanticVersion(version)
-
-        if (!revisionNotes) {
-            draft.errors.rejectValue('revisionNotes', 'finalize.revisionNotes.null', 'Please, provide the revision notes')
-        }
+        // check eligibility for finalization
+        draft.checkFinalizeEligibility(version, revisionNotes)
 
         if (draft.hasErrors()) {
             return draft
@@ -315,11 +311,14 @@ class ElementService implements Publisher<CatalogueElement> {
                 finalized.semanticVersion = version
                 finalized.revisionNotes = revisionNotes
 
-                finalized
+                finalized.save(deepValidate: false)
             }
         }
     }
 
+    /**
+     * @deprecated finalization should only happen on the data model level
+     */
     public <E extends CatalogueElement> E finalizeElement(E draft) {
         return (E) CatalogueElement.withTransaction { TransactionStatus status ->
             auditService.logElementFinalized(draft) {
