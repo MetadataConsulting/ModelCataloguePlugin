@@ -1,6 +1,7 @@
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.reports.ReportsRegistry
+import org.modelcatalogue.core.util.Metadata
 
 class ModelCatalogueGenomicsPluginGrailsPlugin {
     // the plugin version
@@ -91,6 +92,9 @@ Genomics England customisation plugin for Model Catalogue
             title { "Rare Diseases HPO And Clinical Tests JSON" }
             defaultName { "${it.name} report as Json" }
             type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
             link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsJson', id: true
         }
 
@@ -98,6 +102,9 @@ Genomics England customisation plugin for Model Catalogue
             creates link
             title { "Rare Diseases HPO And Clinical Tests CSV" }
             type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
             link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsCsv', id: true
         }
     }

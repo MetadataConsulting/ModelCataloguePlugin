@@ -14,9 +14,8 @@ class GelCsvExporter {
 
     private String currentLine
 
-    private final def headersLine = "id,name,subGroup_id,subGroup_name,subGroup_specificDisorder_id,subGroup_specificDisorder_name,subGroup_specificDisorder_eligibilityQuestion_date," +
-        "subGroup_specificDisorder_eligibilityQuestion_version,subGroup_specificDisorder_shallowPhenotype_name," +
-        "subGroup_specificDisorder_shallowPhenotype_id,subGroup_specificDisorder_test_name,subGroup_specificDisorder_test_id"
+    private final def headersLine =
+        "id,Level 2 Disease Group,id,Level 3 Disease Subgroup,id,Level 4 Specific Disorder,Last Updated,Phenotype,Phenotype ID,Test,Test ID"
 
     GelCsvExporter(OutputStream out) {
         this.out = out
@@ -28,7 +27,7 @@ class GelCsvExporter {
     }
 
     private void printRareDiseaseChild(DataClass child, String prefix, Integer level) {
-        Long id = child.latestVersionId ?: child.id
+        def id = child.combinedVersion
 
         if (level == 0) {
             out << headersLine
@@ -81,7 +80,7 @@ class GelCsvExporter {
         if (level == 3) {
             println("creating model for " + child.name)
 
-            currentLine += prefix + id + "," + child.name.replace(',', ' - ') + "," + child.lastUpdated.format("yyyy-MM-dd") + "," + child.versionNumber + ","
+            currentLine += prefix + id + "," + child.name.replace(',', ' - ') + "," + child.lastUpdated.format("yyyy-MM-dd") + ","
 
             if (child.parentOf.size() > 0) {
 

@@ -10,6 +10,7 @@ import org.modelcatalogue.gel.GelCsvExporter
 import org.modelcatalogue.gel.GelJsonExporter
 import org.modelcatalogue.gel.export.RareDiseaseDisorderListCsvExporter
 import org.modelcatalogue.gel.export.RareDiseasesDocExporter
+import org.springframework.http.HttpStatus
 
 import static RareDiseasesDocExporter.getStandardTemplate
 
@@ -22,10 +23,8 @@ class GenomicsController {
     def elementService
     DataClassService dataClassService
 
-
+    static final String RD_HPO_CSV_FILENAME = "RD Phenotypes and Clinical Tests.csv"
     static final String DOC_IMAGE_PATH = "https://www.genomicsengland.co.uk/wp-content/uploads/2015/11/Genomics-England-logo-2015.png"
-
-    static final Long RARE_DISEASE_CONDITIONS_AND_PHENOTYPES_ID = 11144
 
     static Closure customTemplate = {
         'document' font: [family: 'Calibri', size: 11], margin: [left: 20, right: 10]
@@ -45,7 +44,12 @@ class GenomicsController {
 
     def exportRareDiseaseHPOAndClinicalTestsAsJson() {
 
-        DataClass dClass = DataClass.get(RARE_DISEASE_CONDITIONS_AND_PHENOTYPES_ID)
+        DataClass dClass = DataClass.get(params.id)
+
+        if (dClass) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
 
         DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dClass.getDefaultModelCatalogueId(true))
 
@@ -64,13 +68,18 @@ class GenomicsController {
 
     def exportRareDiseaseHPOAndClinicalTestsAsCsv() {
 
-        DataClass dClass = DataClass.get(RARE_DISEASE_CONDITIONS_AND_PHENOTYPES_ID)
+        DataClass dClass = DataClass.get(params.id)
+
+        if (dClass) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
 
         DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dClass.getDefaultModelCatalogueId(true))
 
         Long assetId = assetService.storeReportAsAsset(latestVersion.dataModel,
             name: "${latestVersion.name} report as CSV",
-            originalFileName: "${latestVersion.name}-${latestVersion.status}-${latestVersion.version}.csv",
+            originalFileName: "$RD_HPO_CSV_FILENAME",
             contentType: "text/csv",
         ) {
             new GelCsvExporter(it).printDiseaseOntology(latestVersion)
@@ -81,7 +90,12 @@ class GenomicsController {
     }
 
     def exportRareDiseaseDisorderListAsCsv() {
-        DataClass dClass = DataClass.get(RARE_DISEASE_CONDITIONS_AND_PHENOTYPES_ID)
+        DataClass dClass = DataClass.get(params.id)
+
+        if (dClass) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
 
         DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dClass.getDefaultModelCatalogueId(true))
         String name = "Rare Disease Disorder List"
