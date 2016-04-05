@@ -10,6 +10,7 @@ import org.modelcatalogue.gel.GelCsvExporter
 import org.modelcatalogue.gel.GelJsonExporter
 import org.modelcatalogue.gel.export.RareDiseaseDisorderListCsvExporter
 import org.modelcatalogue.gel.export.RareDiseasesDocExporter
+import org.springframework.http.HttpStatus
 
 import static RareDiseasesDocExporter.getStandardTemplate
 
@@ -45,6 +46,11 @@ class GenomicsController {
 
         DataClass dClass = DataClass.get(params.id)
 
+        if (dClass) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
         DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dClass.getDefaultModelCatalogueId(true))
 
         Long assetId = assetService.storeReportAsAsset(latestVersion.dataModel,
@@ -64,6 +70,11 @@ class GenomicsController {
 
         DataClass dClass = DataClass.get(params.id)
 
+        if (dClass) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
         DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dClass.getDefaultModelCatalogueId(true))
 
         Long assetId = assetService.storeReportAsAsset(latestVersion.dataModel,
@@ -80,6 +91,11 @@ class GenomicsController {
 
     def exportRareDiseaseDisorderListAsCsv() {
         DataClass dClass = DataClass.get(params.id)
+
+        if (dClass) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
 
         DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dClass.getDefaultModelCatalogueId(true))
         String name = "Rare Disease Disorder List"
