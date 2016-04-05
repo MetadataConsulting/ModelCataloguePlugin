@@ -56,7 +56,6 @@ class ElasticSearchService implements SearchCatalogue {
             full_version: 90,
             latest_id: 80,
             entity_id : 70,
-            'ext.extension_value.value' : 10,
             description: 1
     ]
 
@@ -206,6 +205,7 @@ class ElasticSearchService implements SearchCatalogue {
             }
 
             boolQuery.should(QueryBuilders.prefixQuery('name', search).boost(200))
+            boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.termQuery('ext.value', search)).boost(10))
 
             qb = boolQuery
         } else if (RelationshipType.isAssignableFrom(resource)) {
