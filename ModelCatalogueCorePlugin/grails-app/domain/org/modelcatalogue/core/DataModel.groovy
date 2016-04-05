@@ -32,8 +32,8 @@ class DataModel extends CatalogueElement {
     static transients = ['namespace']
 
     static relationships = [
-            outgoing: [classificationFilter: 'usedAsFilterBy', 'import': 'imports'],
-            incoming: ['import': 'importedBy']
+        outgoing: [classificationFilter: 'usedAsFilterBy', 'import': 'imports'],
+        incoming: ['import': 'importedBy']
     ]
 
     @Override
@@ -111,7 +111,7 @@ class DataModel extends CatalogueElement {
             errors.rejectValue('revisionNotes', 'finalize.revisionNotes.null', 'Please, provide the revision notes')
 
         // check basic metadata
-        ["authors", "reviewers", "owner" , "reviewed" , "approved"].each {
+        ["authors", "reviewers", "owner", "reviewed", "approved"].each {
             checkExtensionPresence(it)
         }
 
@@ -128,7 +128,7 @@ class DataModel extends CatalogueElement {
         }
 
         // check all data types doesn't contains dash, underscore or space
-        def wrongDataTypes = getDataTypes().findAll { !(it.name ==~ /[^_ -]+/)}
+        def wrongDataTypes = getDataTypes().findAll { !(it.name ==~ /[^_ -]+/) }
         if (wrongDataTypes.size() > 0) {
             errors.reject("dataModel.dataTypes.camelCase",
                 "All data types names must not contain space, dash and underscore characters: '-', '_', ' ')! (See ${wrongDataTypes.collect { it.name }}.)")
@@ -163,8 +163,4 @@ class DataModel extends CatalogueElement {
         revisionNotes = null
     }
 
-    @Override
-    String getDataModelSemanticVersion() {
-        return semanticVersion
-    }
 }

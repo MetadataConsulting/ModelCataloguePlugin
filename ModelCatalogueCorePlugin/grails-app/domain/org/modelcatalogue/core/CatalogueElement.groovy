@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import com.google.common.base.Function
 import com.google.common.collect.Lists
 import grails.util.GrailsNameUtils
+import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.Published
@@ -241,12 +242,6 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         auditService.logElementDeleted(this)
     }
 
-    void setModelCatalogueId(String mcID) {
-        if (mcID != getDefaultModelCatalogueId(false)) {
-            modelCatalogueId = mcID
-        }
-    }
-
     boolean hasModelCatalogueId() {
         this.@modelCatalogueId != null
     }
@@ -316,11 +311,36 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         this.ext.putAll(ext)
     }
 
-    String toString() {
-        if (dataModel) {
-            return "$name [$combinedVersion] ($status ${getClass().getSimpleName()}:${getId()}) in $dataModel"
+    final String toString() {
+        DataModel dataModel = getDataModelId() ? DataModel.get(getDataModelId()) : null
+
+        StringBuilder builder = new StringBuilder()
+
+        builder << name << " ["
+
+        if (getLatestVersionId()) {
+            builder << getLatestVersionId()
+        } else {
+            builder << getId()
         }
-        return "$name [$combinedVersion] ($status ${getClass().getSimpleName()}:${getId()})"
+
+        builder << '@'
+
+        if (dataModel) {
+            builder << dataModel.getSemanticVersion()
+        } else if (HibernateProxyHelper.getClassWithoutInitializingProxy(this) == DataModel) {
+            builder << getProperty('semanticVersion')
+        } else {
+            builder << "0.0.${getVersionNumber()}"
+        }
+
+        builder << "] (" << getStatus() << ":" << getClass().getSimpleName() << ":" << getId() << ')'
+
+        if (dataModel) {
+            builder << ' in ' << dataModel.getName() << '@' <<  dataModel.getSemanticVersion()
+        }
+
+        builder.toString()
     }
 
     @Override
@@ -394,6 +414,10 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     void afterInsert() {
         auditService.logElementCreated(this)
+    }
+
+    void beforeInsert() {
+        removeModelCatalogueIdIfDefault()
     }
 
     void beforeUpdate() {
@@ -573,6 +597,9 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     List<String> getInheritedAssociationsNames() { Collections.emptyList() }
 
     String getDataModelSemanticVersion() {
+        if (HibernateProxyHelper.getClassWithoutInitializingProxy(this) == DataModel) {
+            return getProperty('semanticVersion')
+        }
         return getDataModel()?.semanticVersion
     }
 }

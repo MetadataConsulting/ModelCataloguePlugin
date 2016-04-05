@@ -89,11 +89,6 @@ class EnumeratedType extends DataType {
         return true
     }
 
-    String toString() {
-        "${super.toString()} - ${prettyPrint().replace('\n', ', ')}"
-    }
-
-
     String prettyPrint() {
         enumerations.collect { key, value -> "$key: $value" }.join('\n')
     }
