@@ -242,7 +242,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     void setModelCatalogueId(String mcID) {
-        if (mcID != defaultModelCatalogueId) {
+        if (mcID != getDefaultModelCatalogueId(false)) {
             modelCatalogueId = mcID
         }
     }
@@ -251,7 +251,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         this.@modelCatalogueId != null
     }
 
-    Integer countVersions() {
+    final Integer countVersions() {
         elementService.countVersions(this)
     }
 
@@ -318,7 +318,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     String toString() {
         if (dataModel) {
-            return "$name [$combinedVersion] in $dataModel.name ($status ${getClass().getSimpleName()}:${getId()})"
+            return "$name [$combinedVersion] ($status ${getClass().getSimpleName()}:${getId()}) in $dataModel"
         }
         return "$name [$combinedVersion] ($status ${getClass().getSimpleName()}:${getId()})"
     }
@@ -522,7 +522,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     String getCombinedVersion() {
-        "${getLatestVersionId() ?: getId() ?: '<id not assigned yet>'}@${dataModelSemanticVersion ?: "0.0.${versionNumber}"}"
+        "${getLatestVersionId() ?: getId() ?: '<id not assigned yet>'}@${getDataModelSemanticVersion() ?: "0.0.${getVersionNumber()}"}"
     }
 
     final void addInheritedAssociations(CatalogueElement child, Map<String, String> metadata) {
@@ -565,6 +565,6 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     List<String> getInheritedAssociationsNames() { Collections.emptyList() }
 
     String getDataModelSemanticVersion() {
-        return dataModel?.semanticVersion
+        return getDataModel()?.semanticVersion
     }
 }

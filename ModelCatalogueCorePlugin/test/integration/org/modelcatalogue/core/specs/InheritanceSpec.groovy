@@ -42,6 +42,7 @@ class InheritanceSpec extends IntegrationSpec  {
     public static final String TEST_DATA_TYPE_2_NAME = 'Test Data Type 2'
     public static final String TEST_ENUM_TYPE_1_NAME = 'Test Enum Type 1'
     public static final String TEST_ENUM_TYPE_2_NAME = 'Test Enum Type 2'
+    public static final String TEST_ENUM_TYPE_3_NAME = 'Test Enum Type 3'
     public static final String TEST_DATA_MODEL_1_NAME = 'Test Data Model 1'
     public static final String TEST_DATA_MODEL_2_NAME = 'Test Data Model 2'
 
@@ -62,6 +63,7 @@ class InheritanceSpec extends IntegrationSpec  {
     DataType dataType2
     EnumeratedType enumeratedType1
     EnumeratedType enumeratedType2
+    EnumeratedType enumeratedType3
     DataModel dataModel1
     DataModel dataModel2
     Relationship baseClass
@@ -96,6 +98,7 @@ class InheritanceSpec extends IntegrationSpec  {
                 ]
 
                 dataType name: TEST_ENUM_TYPE_2_NAME, enumerations: [:]
+                dataType name: TEST_ENUM_TYPE_3_NAME, enumerations: [:]
             }
 
             dataModel name: TEST_DATA_MODEL_2_NAME, {
@@ -121,6 +124,7 @@ class InheritanceSpec extends IntegrationSpec  {
         dataModel2 = DataModel.findByName(TEST_DATA_MODEL_2_NAME)
         enumeratedType1 = EnumeratedType.findByName(TEST_ENUM_TYPE_1_NAME)
         enumeratedType2 = EnumeratedType.findByName(TEST_ENUM_TYPE_2_NAME)
+        enumeratedType3 = EnumeratedType.findByName(TEST_ENUM_TYPE_3_NAME)
 
         assertNothingInherited()
     }
@@ -495,6 +499,7 @@ class InheritanceSpec extends IntegrationSpec  {
     def "propagate changes in parent enumeration of subset "() {
         when: "the child enumerated type is declared as subset"
         enumeratedType2.addToIsBasedOn enumeratedType1, metadata: [(EnumeratedType.SUBSET_METADATA_KEY): '1,2']
+        enumeratedType3.addToIsBasedOn enumeratedType2, metadata: [(EnumeratedType.SUBSET_METADATA_KEY): '2']
 
 
         then: "it obtains the listed enumerations from the parent"
@@ -502,8 +507,12 @@ class InheritanceSpec extends IntegrationSpec  {
         enumeratedType2.enumerations.one == '1'
         enumeratedType2.enumerations.two == '2'
 
+        enumeratedType3.enumerations.size() == 1
+        enumeratedType3.enumerations.two == '2'
+
         and: "the subtype is marked as subtype"
         enumeratedType2.ext[EnumeratedType.SUBSET_METADATA_KEY] == '1,2'
+        enumeratedType3.ext[EnumeratedType.SUBSET_METADATA_KEY] == '2'
 
         when : "the description for value has changed"
         Enumerations enum1 = enumeratedType1.enumerationsObject
@@ -545,11 +554,29 @@ class InheritanceSpec extends IntegrationSpec  {
         and: "the enumerated value added was not removed"
         enumeratedType2.enumerations.six == '6'
 
+        when: "the enumerated value is removed from the top most parent"
+
+        enum1 = enumeratedType1.enumerationsObject
+        enum1.removeEnumerationById(2)
+        enumeratedType1.enumAsString = enum1.toJsonString()
+
+        FriendlyErrors.failFriendlySave(enumeratedType1)
+
+        EnumeratedType.withSession {
+            it.flush()
+        }
+
+        then: "the item is removed from all children"
+        !enumeratedType1.enumerations.two
+        !enumeratedType2.enumerations.two
+        !enumeratedType3.enumerations.two
+
         when: "the parent is removed"
         enumeratedType2.removeFromIsBasedOn enumeratedType1
 
         then: "there are no longer any enumerations"
         enumeratedType2.enumerations.size() == 0
+        enumeratedType3.enumerations.size() == 0
 
         and: "the enum is no longer marked as subtype"
         enumeratedType2.ext[EnumeratedType.SUBSET_METADATA_KEY] == null

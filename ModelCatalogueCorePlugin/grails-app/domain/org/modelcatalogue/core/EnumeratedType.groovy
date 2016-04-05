@@ -90,10 +90,7 @@ class EnumeratedType extends DataType {
     }
 
     String toString() {
-        if (dataModel) {
-            return "$name [$combinedVersion] in $dataModel.name ($status  ${getClass().getSimpleName()}:${getId()}) - ${prettyPrint()}"
-        }
-        return "$name [$combinedVersion] ($status ${getClass().getSimpleName()}:${getId()}) - ${prettyPrint()}"
+        "${super.toString()} - ${prettyPrint().replace('\n', ', ')}"
     }
 
 
