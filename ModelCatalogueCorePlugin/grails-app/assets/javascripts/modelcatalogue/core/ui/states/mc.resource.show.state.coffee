@@ -14,14 +14,17 @@ angular.module('mc.core.ui.states.mc.resource.show', ['mc.core.ui.states.control
 
       resolve:
         element: [
-          '$stateParams','catalogueElementResource', 'lastSelectedElementHolder', 'names',
-          ($stateParams , catalogueElementResource ,  lastSelectedElementHolder ,  names) ->
+          '$stateParams','catalogueElementResource', 'lastSelectedElementHolder', '$rootScope', '$http', 'names',
+          ($stateParams , catalogueElementResource ,  lastSelectedElementHolder ,  $rootScope ,  $http ,  names) ->
             if lastSelectedElementHolder.element \
               and "#{lastSelectedElementHolder.element.id}" == "#{$stateParams.id}" \
               and $stateParams.resource == names.getPropertyNameFromType(lastSelectedElementHolder.element.elementType)
                 return lastSelectedElementHolder.element
 
-            catalogueElementResource($stateParams.resource).get($stateParams.id)
+            catalogueElementResource($stateParams.resource).get($stateParams.id).then (result) ->
+              $http.get("#{catalogueElementResource($stateParams.resource).getIndexPath()}/#{$stateParams.id}/path").then (response) ->
+                $rootScope.$broadcast('expandTreeview', response.data)
+              return result
         ]
     }
 

@@ -109,6 +109,10 @@ class CatalogueElementTreeview
       $scope.$eventToObservable('catalogueElementUpdated').debounce(DEBOUNCE_TIME).subscribe refreshList
       $scope.$eventToObservable('catalogueElementDeleted').debounce(DEBOUNCE_TIME).subscribe refreshList
       $scope.$eventToObservable('newVersionCreated').debounce(DEBOUNCE_TIME).subscribe refreshList
+      $scope.$eventToObservable('expandTreeview').debounce(DEBOUNCE_TIME).subscribe (args) ->
+        path = args[1]
+        # TODO: expand tree
+
 
       $element.find('.catalogue-element-treeview-root-list-root').on 'scroll', loadMoreIfNeeded
 
