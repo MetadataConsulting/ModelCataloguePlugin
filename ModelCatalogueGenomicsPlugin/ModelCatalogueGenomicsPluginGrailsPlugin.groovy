@@ -61,7 +61,7 @@ Genomics England customisation plugin for Model Catalogue
             creates link
             title { "Rare Disease Disorder List CSV" }
             type DataClass
-            link controller: 'genomics', action: 'exportRareDiseaseDisorderListCsv', id: true
+            link controller: 'genomics', action: 'exportRareDiseaseDisorderListAsCsv', id: true
         }
 
         reportsRegistry.register {
@@ -106,6 +106,16 @@ Genomics England customisation plugin for Model Catalogue
                 dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
             }
             link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsCsv', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Cancer Types JSON" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportCancerTypesAsJson', id: true
         }
     }
 

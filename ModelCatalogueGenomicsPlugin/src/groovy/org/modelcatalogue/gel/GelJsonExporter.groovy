@@ -61,6 +61,8 @@ class GelJsonExporter {
 
 
     private void printRareDiseaseChild(DataClass child, Integer level){
+        if(level > 3) return            //significantly speeds up export
+
         Long id = child.latestVersionId ?: child.id
         if(level==0){
             child.parentOf?.eachWithIndex { DataClass cd, index ->

@@ -1,13 +1,12 @@
 package org.modelcatalogue.core.genomics
 
 import org.modelcatalogue.core.DataClass
-
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
 import org.modelcatalogue.gel.GelCsvExporter
 import org.modelcatalogue.gel.GelJsonExporter
+import org.modelcatalogue.gel.export.CancerTypesExporter
 import org.modelcatalogue.gel.export.RareDiseaseDisorderListCsvExporter
 import org.modelcatalogue.gel.export.RareDiseasesDocExporter
 import org.springframework.http.HttpStatus
@@ -146,23 +145,24 @@ class GenomicsController {
 
 
     private void exportEligibilityOrPhenotypesAndTests(boolean eligibilityMode) {
-        DataClass model = DataClass.get(params.id)
+        DataClass dClass = DataClass.get(params.id)
 
-        if (!model) {
+        DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dClass.getDefaultModelCatalogueId(true))
+
+        if (!dClass) {
             response.status = 404
             return
         }
 
         String documentName = RareDiseasesDocExporter.documentName(eligibilityMode)
 
-        Long classId = model.id
         def assetId = assetService.storeReportAsAsset(
-            model.dataModel,
+            dClass.dataModel,
             name: "${documentName} report as MS Word Document",
-            originalFileName: "${documentName}-${model.status}-${model.version}.docx",
+            originalFileName: "${documentName}-${latestVersion.status}-${latestVersion.version}.docx",
             contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ) { OutputStream out ->
-            new RareDiseasesDocExporter(DataClass.get(classId), standardTemplate, DOC_IMAGE_PATH, eligibilityMode).export(out)
+            new RareDiseasesDocExporter(latestVersion, standardTemplate, DOC_IMAGE_PATH, eligibilityMode).export(out)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())
@@ -188,6 +188,23 @@ class GenomicsController {
             contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )  { OutputStream out ->
             new DataModelToDocxExporter(DataModel.get(modelId), dataClassService, customTemplate, DOC_IMAGE_PATH).export(out)
+        }
+
+        response.setHeader("X-Asset-ID",assetId.toString())
+        redirect controller: 'asset', id: assetId, action: 'show'
+    }
+
+    def exportCancerTypesAsJson() {
+        DataClass dClass = DataClass.get(params.id)
+
+        DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dClass.getDefaultModelCatalogueId(true))
+
+        Long assetId = assetService.storeReportAsAsset(latestVersion.dataModel,
+            name: "${latestVersion.name} report as Json",
+            originalFileName: "${latestVersion.name}-${latestVersion.status}-${latestVersion.version}.json",
+            contentType: "application/json",
+        ) {
+            new CancerTypesExporter(it).exportCancerTypesAsJson(latestVersion)
         }
 
         response.setHeader("X-Asset-ID",assetId.toString())
