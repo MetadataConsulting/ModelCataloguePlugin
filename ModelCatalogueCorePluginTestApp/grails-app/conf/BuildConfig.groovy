@@ -77,6 +77,9 @@ grails.project.dependency.resolution = {
         test "org.gebish:geb-spock:0.9.3"
         test "org.seleniumhq.selenium:selenium-support:${webDriverVersion}"
         test "org.seleniumhq.selenium:selenium-firefox-driver:${webDriverVersion}"
+        test "org.seleniumhq.selenium:selenium-chrome-driver:${webDriverVersion}"
+        test "org.seleniumhq.selenium:selenium-remote-driver:${webDriverVersion}"
+
 
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
     }
