@@ -46,7 +46,7 @@ class NavigatorCondition {
 
 
     boolean isGone() {
-        spec.waitFor {
+        spec.noStale(NUM_OF_RETRIES, true, navigator) {
             !navigator().displayed
         }
     }
