@@ -7,8 +7,8 @@ if [[ -z "$1" ]]; then
     exit 1
 fi
 
-ES_VERSION="2.0.0"
-KIBANA_VERSION="4.2.0"
+ES_VERSION="2.1.2"
+KIBANA_VERSION="4.3.1"
 ES_PORT="9200"
 
 if [ "$1" = "start" ] ; then

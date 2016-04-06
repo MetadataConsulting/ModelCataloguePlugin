@@ -25,7 +25,7 @@ class DataTypeDocumentSerializer extends CatalogueElementDocumentSerializer<Data
         }
 
         if (dataType.instanceOf(EnumeratedType) && dataType.enumerations) {
-            safePut(builder, 'enumerated_value', getExtensions(dataType.enumerations))
+            safePut(builder, 'enumerated_value', dataType.enumerationsObject.toJsonMap())
         }
     }
 }

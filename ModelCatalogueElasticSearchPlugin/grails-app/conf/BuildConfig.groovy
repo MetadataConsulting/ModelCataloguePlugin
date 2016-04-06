@@ -43,7 +43,7 @@ grails.project.dependency.resolution = {
 //            excludes 'groovy-all'
 //        }
 
-        compile group: 'org.elasticsearch', name: 'elasticsearch', version: '2.0.0'
+        compile group: 'org.elasticsearch', name: 'elasticsearch', version: '2.1.2'
         compile 'com.vividsolutions:jts:1.13'
     }
 

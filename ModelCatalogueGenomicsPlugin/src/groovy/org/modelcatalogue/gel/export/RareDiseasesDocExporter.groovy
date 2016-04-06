@@ -30,6 +30,7 @@ class RareDiseasesDocExporter {
     public static final String PHENOTYPE_TITLE_TEXT = "Phenotypes and Clinical Tests"
     public static final String PHENOTYPE_SIDEBAR = "Phenotypes"
     public static final String CLINICAL_TESTS_SIDEBAR = "Clinical Tests"
+    public static final String TABLE_ENTRIES_TEXT = "Entries ordered left to right in table-->"
 
     DataClass rootModel
     private final Set<Long> processedModels = new HashSet<Long>()
@@ -51,8 +52,8 @@ class RareDiseasesDocExporter {
         'heading1' font: [size: 18, bold: true]
         'heading2' font: [size: 16, family: 'Calibri Light', bold: true, color: '#3275B3']
         'heading3' font: [size: 14, family: 'Calibri Light', bold: true, color: '#3275B3']
-        'heading4' font: [size: 11, family: 'Calibri Light', color: '#224E76']
-        'heading5' font: [size: 12, family: 'Calibri Light', color: '#3275B3', italic: true]
+        'heading4' font: [size: 12, family: 'Candara', color: '#124e77']
+        'heading5' font: [size: 12, family: 'Century Gothic', color: '#000000', italic: true]
         'heading6' font: [size: 11, family: 'Calibri Light', color: '#3275B3']
         'table.row.cell.headerCell' font: [color: '#FFFFFF', size: 12.pt, bold: true], background: '#1F497D'
         'table.row.cell' font: [size: 10.pt]
@@ -262,8 +263,6 @@ class RareDiseasesDocExporter {
         }
 
         log.debug "level $level model name $model.name"
-        log.debug "model description $model.description"
-
 
         for (DataClass child in model.parentOf) {
             processedModels << model.getId()
@@ -346,7 +345,8 @@ class RareDiseasesDocExporter {
 
                     model.parentOf.each { DataClass child ->
                         if (child.name) {
-                            text CELL_TEXT_SECOND_BOLD, "\n$child.name\n"
+                            String childName = child.name + " (${child.getLatestVersionId() ?: child.getId()}.${child.getVersionNumber() ?: 1})"
+                            text CELL_TEXT_SECOND_BOLD, "\n$childName\n"
                         }
                         if (child.description) {
                             text CELL_TEXT_SECOND, "$child.description\n\n"
@@ -391,6 +391,8 @@ class RareDiseasesDocExporter {
             row {
                 cell(background: '#BED6ED') {
                     text phenotypeMode ? PHENOTYPE_SIDEBAR : CLINICAL_TESTS_SIDEBAR
+                    text EMPTY_STRING + "\n\n"
+                    text TABLE_ENTRIES_TEXT, font: [size: 8, family: 'Calibri Light', color: '#000000']
                 }
                 cell {
                     table(padding: 1, border: [size: 1, color: '#D2D2D2']) {
