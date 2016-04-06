@@ -42,4 +42,9 @@ class DataElement extends CatalogueElement {
     List<String> getInheritedAssociationsNames() {
         ['dataType']
     }
+
+    @Override
+    Long getFirstParentId() {
+        return getContainedIn().find { it.getDataModelId() == getDataModelId() }?.getId() ?: super.getFirstParentId()
+    }
 }

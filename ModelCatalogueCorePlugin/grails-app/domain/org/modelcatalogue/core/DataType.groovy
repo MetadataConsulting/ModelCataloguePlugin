@@ -155,4 +155,9 @@ class DataType extends CatalogueElement {
     protected String getModelCatalogueResourceName() {
         'dataType'
     }
+
+    @Override
+    Long getFirstParentId() {
+        return getRelatedDataElements().find { it.getDataModelId() == getDataModelId() }?.getId() ?: super.getFirstParentId()
+    }
 }

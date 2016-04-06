@@ -602,4 +602,11 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         }
         return getDataModel()?.semanticVersion
     }
+
+    Long getFirstParentId() {
+        if (getDataModel()) {
+            return getDataModel().getId()
+        }
+        return null
+    }
 }
