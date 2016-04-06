@@ -29,14 +29,14 @@ class PathFinderSpec extends AbstractIntegrationSpec {
         when:
         PathFinder finder = new PathFinder()
 
-        List<Long> path = finder.findPath(dataElement)
+        List<String> path = finder.findPath(dataElement)
 
         then:
         path.size() == 4
-        path[0] == dataModel.getId()
-        path[1] == DataClass.findByName(COMPLEX_MODEL_ROOT_DATA_CLASS_NAME)?.getId()
-        path[2] == DataClass.findByName('C4CTDE Model 2')?.getId()
-        path[3] == DataClass.findByName('C4CTDE Model 2 Child Model 2')?.getId()
+        path[0] == dataModel.link
+        path[1] == DataClass.findByName(COMPLEX_MODEL_ROOT_DATA_CLASS_NAME)?.link
+        path[2] == DataClass.findByName('C4CTDE Model 2')?.link
+        path[3] == DataClass.findByName('C4CTDE Model 2 Child Model 2')?.link
     }
 
 }

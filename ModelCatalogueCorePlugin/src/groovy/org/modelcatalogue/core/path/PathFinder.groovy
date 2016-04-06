@@ -3,11 +3,12 @@ package org.modelcatalogue.core.path
 import org.modelcatalogue.core.CatalogueElement
 
 class PathFinder {
-    List<Long> findPath(CatalogueElement element, List<Long> ret = []) {
+    List<String> findPath(CatalogueElement element, List<String> ret = []) {
         Long parentId = element.getFirstParentId()
         if (parentId) {
-            ret.add(0, parentId)
-            return findPath(CatalogueElement.get(parentId), ret)
+            CatalogueElement parent = CatalogueElement.get(parentId)
+            ret.add(0, parent.link)
+            return findPath(parent, ret)
         }
         return ret
     }
