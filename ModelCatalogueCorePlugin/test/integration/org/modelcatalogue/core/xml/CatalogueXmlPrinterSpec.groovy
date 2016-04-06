@@ -22,7 +22,6 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
         XMLUnit.ignoreWhitespace = true
 
         initCatalogue()
-        initCatalogue()
 
         printer = new CatalogueXmlPrinter(dataModelService, dataClassService)
     }

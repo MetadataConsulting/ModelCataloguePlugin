@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import com.google.common.base.Function
 import com.google.common.collect.Lists
 import grails.util.GrailsNameUtils
+import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.Published
@@ -241,17 +242,11 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         auditService.logElementDeleted(this)
     }
 
-    void setModelCatalogueId(String mcID) {
-        if (mcID != defaultModelCatalogueId) {
-            modelCatalogueId = mcID
-        }
-    }
-
     boolean hasModelCatalogueId() {
         this.@modelCatalogueId != null
     }
 
-    Integer countVersions() {
+    final Integer countVersions() {
         elementService.countVersions(this)
     }
 
@@ -316,11 +311,36 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         this.ext.putAll(ext)
     }
 
-    String toString() {
-        if (dataModel) {
-            return "$name [$combinedVersion] in $dataModel.name ($status ${getClass().getSimpleName()}:${getId()})"
+    final String toString() {
+        DataModel dataModel = getDataModelId() ? DataModel.get(getDataModelId()) : null
+
+        StringBuilder builder = new StringBuilder()
+
+        builder << name << " ["
+
+        if (getLatestVersionId()) {
+            builder << getLatestVersionId()
+        } else {
+            builder << getId()
         }
-        return "$name [$combinedVersion] ($status ${getClass().getSimpleName()}:${getId()})"
+
+        builder << '@'
+
+        if (dataModel) {
+            builder << dataModel.getSemanticVersion()
+        } else if (HibernateProxyHelper.getClassWithoutInitializingProxy(this) == DataModel) {
+            builder << getProperty('semanticVersion')
+        } else {
+            builder << "0.0.${getVersionNumber()}"
+        }
+
+        builder << "] (" << getStatus() << ":" << getClass().getSimpleName() << ":" << getId() << ')'
+
+        if (dataModel) {
+            builder << ' in ' << dataModel.getName() << '@' <<  dataModel.getSemanticVersion()
+        }
+
+        builder.toString()
     }
 
     @Override
@@ -396,6 +416,10 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         auditService.logElementCreated(this)
     }
 
+    void beforeInsert() {
+        removeModelCatalogueIdIfDefault()
+    }
+
     void beforeUpdate() {
         removeModelCatalogueIdIfDefault()
         auditService.logElementUpdated(this)
@@ -468,6 +492,14 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         FriendlyErrors.failFriendlySaveWithoutFlush(old)
     }
 
+    /**
+     * Checks whether a certain extension presents in this catalogue element.
+     * @param shortName Short name of the extension. It is prefixed with <i>http://www.modelcatalogue.org/metadata/#</i>.
+     */
+    void checkExtensionPresence(String shortName) {
+        if (!ext.get("http://www.modelcatalogue.org/metadata/#$shortName"))
+            errors.rejectValue("ext", "catalogElement.ext.$shortName", "${shortName.capitalize()} must be specified!")
+    }
 
     // -- API
 
@@ -522,7 +554,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     String getCombinedVersion() {
-        "${getLatestVersionId() ?: getId() ?: '<id not assigned yet>'}@${dataModelSemanticVersion ?: "0.0.${versionNumber}"}"
+        "${getLatestVersionId() ?: getId() ?: '<id not assigned yet>'}@${getDataModelSemanticVersion() ?: "0.0.${getVersionNumber()}"}"
     }
 
     final void addInheritedAssociations(CatalogueElement child, Map<String, String> metadata) {
@@ -565,6 +597,9 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     List<String> getInheritedAssociationsNames() { Collections.emptyList() }
 
     String getDataModelSemanticVersion() {
-        return dataModel?.semanticVersion
+        if (HibernateProxyHelper.getClassWithoutInitializingProxy(this) == DataModel) {
+            return getProperty('semanticVersion')
+        }
+        return getDataModel()?.semanticVersion
     }
 }

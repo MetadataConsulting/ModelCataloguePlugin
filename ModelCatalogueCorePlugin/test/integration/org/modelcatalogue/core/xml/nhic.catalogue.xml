@@ -1,0 +1,882 @@
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.0/metadataregistry.xsd">
+    <dataModel name="NHIC" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataModel/72" semanticVersion="0.0.1">
+        <description>NHIC conceptual domain i.e. value domains used the NHIC project</description>
+        <dataClass name="NHIC Datasets" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataClass/73">
+            <dataClass name="Ovarian Cancer" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataClass/74">
+                <dataClass name="CUH" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataClass/75">
+                    <dataClass name="Round 1" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataClass/76">
+                        <dataClass name="MAIN" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataClass/77">
+                            <dataClass name="PATIENT IDENTITY DETAILS" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataClass/78">
+                                <dataElement name="NHS NUMBER*" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/80">
+                                    <description>
+                                        *For linkage purposes NHS NUMBER
+                                        and/or
+                                        LOCAL PATIENT IDENTIFIER
+                                        is required.
+
+                                        The NHS NUMBER, the primary identifier of a PERSON, is a unique identifier for aPATIENTwithin the NHS in England and Wales. This will not vary by any ORGANISATION of which a PERSON is a PATIENT.</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_1</extension>
+                                        <extension key="Link_to_existing definition:">NHS NUMBER</extension>
+                                        <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX0010</extension>
+                                        <extension key="A">2</extension>
+                                        <extension key="B">2</extension>
+                                        <extension key="C">3</extension>
+                                        <extension key="D">1</extension>
+                                        <extension key="E" />
+                                        <extension key="F">When Patient demographics entered.</extension>
+                                        <extension key="G">GC 123</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataType/79" />
+                                </dataElement>
+                                <dataElement name="LOCAL PATIENT IDENTIFIER*" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/81">
+                                    <description>*For linkage purposes NHS NUMBER
+                                        and/or
+                                        LOCAL PATIENT IDENTIFIER
+                                        is required.
+
+                                        This is a number used to identify a PATIENT uniquely within a Health Care Provider. It may be different from the PATIENT's casenote number and may be assigned automatically by the computer system.</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_2</extension>
+                                        <extension key="Link_to_existing definition:">LOCAL PATIENT IDENTIFIER</extension>
+                                        <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX0020</extension>
+                                        <extension key="A">2</extension>
+                                        <extension key="B">2</extension>
+                                        <extension key="C">3</extension>
+                                        <extension key="D">1</extension>
+                                        <extension key="E">hard</extension>
+                                        <extension key="F">When Patient demographics entered.</extension>
+                                        <extension key="G">GC 124</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                                <dataElement name="NHS NUMBER STATUS INDICATOR CODE" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/83">
+                                    <description>The NHS NUMBER STATUS  INDICATOR CODE indicates the verification status of the NHS number provided.</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_3</extension>
+                                        <extension key="Link_to_existing definition:">NHS NUMBER STATUS INDICATOR CODE</extension>
+                                        <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX1350</extension>
+                                        <extension key="A">2</extension>
+                                        <extension key="B">2</extension>
+                                        <extension key="C">1</extension>
+                                        <extension key="D">1</extension>
+                                        <extension key="E">1</extension>
+                                        <extension key="F">When Patient demographics entered.</extension>
+                                        <extension key="G">GC 125</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="NHS NUMBER STATUS INDICATOR CODE" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataType/82">
+                                        <enumerations>
+                                            <enumeration value="08" id="1">Trace postponed (baby under six weeks old)</enumeration>
+                                            <enumeration value="04" id="2">Trace attempted - No match or multiple match found</enumeration>
+                                            <enumeration value="05" id="3">Trace needs to be resolved - (NHS Number or patient detail conflict)</enumeration>
+                                            <enumeration value="06" id="4">Trace in progress</enumeration>
+                                            <enumeration value="07" id="5">Number not present and trace not required</enumeration>
+                                            <enumeration value="01" id="6">Number present and verified</enumeration>
+                                            <enumeration value="02" id="7">Number present but not traced</enumeration>
+                                            <enumeration value="03" id="8">Trace required</enumeration>
+                                        </enumerations>
+                                    </dataType>
+                                </dataElement>
+                                <dataElement name="PERSON BIRTH DATE" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/84">
+                                    <description>The date on which a PERSON was born or is officially deemed to have been born.</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_4</extension>
+                                        <extension key="Link_to_existing definition:">PERSON BIRTH DATE</extension>
+                                        <extension key="Notes_from_GD_JCIS" />
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX0100</extension>
+                                        <extension key="A">2</extension>
+                                        <extension key="B">2</extension>
+                                        <extension key="C">1</extension>
+                                        <extension key="D">1</extension>
+                                        <extension key="E">1</extension>
+                                        <extension key="F">When Patient demographics entered.</extension>
+                                        <extension key="G">GC 126</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                                <dataElement name="ORGANISATION CODE (CODE OF PROVIDER)" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/85">
+                                    <description>ORGANISATION CODE (CODE OF PROVIDER) is the ORGANISATION CODE of the ORGANISATION acting as a Health Care Provider.
+                                        (an6 not applicable to COSD)</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_5</extension>
+                                        <extension key="Link_to_existing definition:">ORGANISATION CODE (CODE OF PROVIDER)</extension>
+                                        <extension key="Notes_from_GD_JCIS" />
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX0030</extension>
+                                        <extension key="A">2</extension>
+                                        <extension key="B">1</extension>
+                                        <extension key="C">1</extension>
+                                        <extension key="D">1</extension>
+                                        <extension key="E">1</extension>
+                                        <extension key="F">When referral details entered.</extension>
+                                        <extension key="G">GC 127</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                            </dataClass>
+                            <dataClass name="DIAGNOSTIC DETAILS" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataClass/86">
+                                <dataElement name="PRIMARY DIAGNOSIS (ICD)" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/87">
+                                    <description>See DIAGNOSTIC CODING for details on coding and PRIMARY DIAGNOSES for the standardised definition of primary diagnosis.</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_6</extension>
+                                        <extension key="Link_to_existing definition:">PRIMARY DIAGNOSIS (ICD)</extension>
+                                        <extension key="Notes_from_GD_JCIS" />
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX0370</extension>
+                                        <extension key="A">1</extension>
+                                        <extension key="B">1</extension>
+                                        <extension key="C">1</extension>
+                                        <extension key="D">1</extension>
+                                        <extension key="E">1</extension>
+                                        <extension key="F">MDT Meeting</extension>
+                                        <extension key="G">GC 128</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                                <dataElement name="DATE OF DIAGNOSIS (CLINICALLY AGREED)*" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/88">
+                                    <description>*For linkage purposes DATE OF DIAGNOSIS ((CLINICALLY AGREED)
+                                        or
+                                        DATE OF RECURRENCE (CLINICALLY AGREED)
+                                        is required as mandatory.
+
+                                        Record the date  where TESTcer was confirmed or diagnosis agreed (This will normally be  the date of the authorised  pathology report which confirms the TESTcer or if this is not available at the time it will be the date of the Multidisciplinary Team Meeting when the diagnosis was agreed)
+                                        (This is may not be the same as Date of Diagnosis which is used for TESTcer Registration.)  </description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_7</extension>
+                                        <extension key="Link_to_existing definition:">DATE OF DIAGNOSIS (TESTCER CLINICALLY AGREED)</extension>
+                                        <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX2030</extension>
+                                        <extension key="A">2</extension>
+                                        <extension key="B">2</extension>
+                                        <extension key="C">1</extension>
+                                        <extension key="D">1</extension>
+                                        <extension key="E">1</extension>
+                                        <extension key="F">MDT Meeting - From MDT against which definitive diagnosis recorded, or final pre-treatment diagnosis recorded.</extension>
+                                        <extension key="G">GC 129</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                                <dataElement name="DATE OF RECURRENCE (CLINICALLY AGREED)*" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/89">
+                                    <description>*For linkage purposes DATE OF DIAGNOSIS ((CLINICALLY AGREED)
+                                        or
+                                        DATE OF RECURRENCE (CLINICALLY AGREED)
+                                        is required as mandatory.
+
+                                        (Recurrences only.)
+                                        Record the date where TESTcer recurrence was confirmed or diagnosis of recurrence was agreed (This will normally be the  date of the authorised  pathology report which confirms the recurrence or if this is not available at the time it will be the date of the Multidisciplinary Team Meeting when the diagnosis of recurrence was agreed)
+                                        (This is may not be the same as Date of Recurrence which is used for TESTcer Registration.)  </description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_8</extension>
+                                        <extension key="Link_to_existing definition:">DATE OF RECURRENCE (TESTCER CLINICALLY AGREED)</extension>
+                                        <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX0440</extension>
+                                        <extension key="A">2</extension>
+                                        <extension key="B">2</extension>
+                                        <extension key="C">1</extension>
+                                        <extension key="D">3</extension>
+                                        <extension key="E">hard</extension>
+                                        <extension key="F">MDT Meeting - From MDT against which definitive diagnosis recorded, or final pre-treatment diagnosis recorded. Recurrence radio button needs to be selected on MDT meeting / Diagnosis / Diagnosis tab or MDT D&amp;S tab</extension>
+                                        <extension key="G">GC 130</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                            </dataClass>
+                            <dataClass name="DEMOGRAPHICS" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataClass/90">
+                                <dataElement name="PERSON FAMILY NAME" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/91">
+                                    <description>That part of a PERSON's name which is used to describe family, clan, tribal group, or marital association.</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_9</extension>
+                                        <extension key="Link_to_existing definition:">PERSON FAMILY NAME</extension>
+                                        <extension key="Notes_from_GD_JCIS" />
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX0050</extension>
+                                        <extension key="A">2</extension>
+                                        <extension key="B">2</extension>
+                                        <extension key="C">1</extension>
+                                        <extension key="D">1</extension>
+                                        <extension key="E">1</extension>
+                                        <extension key="F">When Patient demographics entered.</extension>
+                                        <extension key="G">GC 131</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                                <dataElement name="PERSON GIVEN NAME" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/92">
+                                    <description>The forename(s) or given name(s) of a PERSON.</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_10</extension>
+                                        <extension key="Link_to_existing definition:">PERSON GIVEN NAME</extension>
+                                        <extension key="Notes_from_GD_JCIS" />
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX0060</extension>
+                                        <extension key="A">2</extension>
+                                        <extension key="B">2</extension>
+                                        <extension key="C">1</extension>
+                                        <extension key="D">1</extension>
+                                        <extension key="E">1</extension>
+                                        <extension key="F">When Patient demographics entered.</extension>
+                                        <extension key="G">GC 132</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                                <dataElement name="PATIENT USUAL ADDRESS (AT DIAGNOSIS)" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/93">
+                                    <description>PATIENT USUAL ADDRESS (AT DIAGNOSIS) is the PATIENT USUAL ADDRESS of the PATIENT at the time of PATIENT DIAGNOSIS.</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_11</extension>
+                                        <extension key="Link_to_existing definition:">PATIENT USUAL ADDRESS (AT DIAGNOSIS)</extension>
+                                        <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX0070</extension>
+                                        <extension key="A">2</extension>
+                                        <extension key="B">2</extension>
+                                        <extension key="C">1</extension>
+                                        <extension key="D">1</extension>
+                                        <extension key="E">1</extension>
+                                        <extension key="F">When Patient demographics entered.</extension>
+                                        <extension key="G">GC 133</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                                <dataElement name="POSTCODE OF USUAL ADDRESS (AT DIAGNOSIS)" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/94">
+                                    <description>POSTCODE OF USUAL ADDRESS (AT DIAGNOSIS) is the POSTCODE OF USUAL ADDRESS of the PATIENT at the time of PATIENT DIAGNOSIS.</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_12</extension>
+                                        <extension key="Link_to_existing definition:">POSTCODE OF USUAL ADDRESS (AT DIAGNOSIS)</extension>
+                                        <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX0080</extension>
+                                        <extension key="A">2</extension>
+                                        <extension key="B">2</extension>
+                                        <extension key="C">3</extension>
+                                        <extension key="D">1</extension>
+                                        <extension key="E">1</extension>
+                                        <extension key="F">When Patient demographics entered.</extension>
+                                        <extension key="G">GC 134</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                                <dataElement name="PERSON GENDER CODE (CURRENT)" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/96">
+                                    <description>A PERSON's gender currently.</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_13</extension>
+                                        <extension key="Link_to_existing definition:">PERSON GENDER CODE CURRENT</extension>
+                                        <extension key="Notes_from_GD_JCIS" />
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX0090</extension>
+                                        <extension key="A">1</extension>
+                                        <extension key="B">1</extension>
+                                        <extension key="C">1</extension>
+                                        <extension key="D">1</extension>
+                                        <extension key="E">1</extension>
+                                        <extension key="F">When Patient demographics entered.</extension>
+                                        <extension key="G">GC 135</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="PERSON GENDER CODE (CURRENT)" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataType/95">
+                                        <enumerations>
+                                            <enumeration value="2" id="1">Female</enumeration>
+                                            <enumeration value="1" id="2">Male</enumeration>
+                                            <enumeration value="0" id="3">Not Known</enumeration>
+                                            <enumeration value="9" id="4">Not Specified</enumeration>
+                                        </enumerations>
+                                    </dataType>
+                                </dataElement>
+                                <dataElement name="GENERAL MEDICAL PRACTITIONER (SPECIFIED)" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/97">
+                                    <description>GENERAL MEDICAL PRACTITIONER (SPECIFIED) is the code of the GENERAL MEDICAL PRACTITIONER specified by the PATIENT.
+
+                                        This GENERAL MEDICAL PRACTITIONER works within the General Medical Practitioner Practice with which the PATIENT is registered.</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_14</extension>
+                                        <extension key="Link_to_existing definition:">GENERAL MEDICAL PRACTITIONER (SPECIFIED)</extension>
+                                        <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX0110</extension>
+                                        <extension key="A">2</extension>
+                                        <extension key="B">2</extension>
+                                        <extension key="C">1</extension>
+                                        <extension key="D">1</extension>
+                                        <extension key="E">1</extension>
+                                        <extension key="F">When Patient demographics entered. Name shown. Code available in JCIS tables.</extension>
+                                        <extension key="G">GC 136</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                                <dataElement name="GENERAL MEDICAL PRACTICE CODE (PATIENT REGISTRATION)" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/98">
+                                    <description>The GENERAL MEDICAL PRACTICE CODE (PATIENT REGISTRATION) is an ORGANISATION CODE. This is the code of the GP Practice that the PATIENT is registered with.
+                                    </description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_15</extension>
+                                        <extension key="Link_to_existing definition:">GENERAL MEDICAL PRACTICE CODE (PATIENT REGISTRATION)</extension>
+                                        <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX0120</extension>
+                                        <extension key="A">1</extension>
+                                        <extension key="B">1</extension>
+                                        <extension key="C">1</extension>
+                                        <extension key="D">1</extension>
+                                        <extension key="E">1</extension>
+                                        <extension key="F">When Patient demographics entered. Address shown. Code available in JCIS tables.</extension>
+                                        <extension key="G">GC 137</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                                <dataElement name="PERSON FAMILY NAME (AT BIRTH)" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/99">
+                                    <description>The PATIENT's surname at birth. </description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_16</extension>
+                                        <extension key="Link_to_existing definition:">PERSON FAMILY NAME (AT BIRTH)</extension>
+                                        <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX0140</extension>
+                                        <extension key="A">2</extension>
+                                        <extension key="B">2</extension>
+                                        <extension key="C">1</extension>
+                                        <extension key="D">1</extension>
+                                        <extension key="E">1</extension>
+                                        <extension key="F">When Patient demographics entered. The HISS field is MaidenName (ie not strictly Surname at birth).</extension>
+                                        <extension key="G">GC 138</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                                <dataElement name="ETHNIC CATEGORY" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/101">
+                                    <description>The ethnicity of a PERSON, as specified by the PERSON.. The 16+1 ethnic data categories defined in the 2001 census is the national mandatory standard for the collection and analysis of ethnicity.
+                                        (The Office for National Statistics has developed a further breakdown of the group from that given, which may be used locally.)</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_17</extension>
+                                        <extension key="Link_to_existing definition:">ETHNIC CATEGORY</extension>
+                                        <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX0150</extension>
+                                        <extension key="A">1</extension>
+                                        <extension key="B">1</extension>
+                                        <extension key="C">1</extension>
+                                        <extension key="D">1</extension>
+                                        <extension key="E">1</extension>
+                                        <extension key="F">Imported from HISS but not displayed.</extension>
+                                        <extension key="G">GC 139</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="ETHNIC CATEGORY" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataType/100">
+                                        <enumerations>
+                                            <enumeration value="D" id="1">White and Black Caribbean</enumeration>
+                                            <enumeration value="E" id="2">White and Black AfriTEST</enumeration>
+                                            <enumeration value="F" id="3">White and Asian</enumeration>
+                                            <enumeration value="G" id="4">Any other mixed background</enumeration>
+                                            <enumeration value="A" id="5">(White) British</enumeration>
+                                            <enumeration value="B" id="6">(White) Irish</enumeration>
+                                            <enumeration value="C" id="7">Any other White background</enumeration>
+                                            <enumeration value="L" id="8">Any other Asian background</enumeration>
+                                            <enumeration value="M" id="9">Caribbean</enumeration>
+                                            <enumeration value="N" id="10">AfriTEST</enumeration>
+                                            <enumeration value="H" id="11">Indian</enumeration>
+                                            <enumeration value="J" id="12">Pakistani</enumeration>
+                                            <enumeration value="K" id="13">Bangladeshi</enumeration>
+                                            <enumeration value="P" id="14">Any other Black background</enumeration>
+                                            <enumeration value="S" id="15">Any other ethnic group</enumeration>
+                                            <enumeration value="R" id="16">Chinese</enumeration>
+                                            <enumeration value="99" id="17">Not Known</enumeration>
+                                            <enumeration value="Z" id="18">Not stated</enumeration>
+                                        </enumerations>
+                                    </dataType>
+                                </dataElement>
+                            </dataClass>
+                            <dataClass name="REFERRALS" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataClass/102">
+                                <dataElement name="SOURCE OF REFERRAL FOR OUT-PATIENTS" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/104">
+                                    <description>This identifies the source of referral of each Consultant Out-Patient Episode.
+                                        (See User Guide for further details)</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_18</extension>
+                                        <extension key="Link_to_existing definition:">SOURCE OF REFERRAL FOR OUT-PATIENTS</extension>
+                                        <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX1600</extension>
+                                        <extension key="A">1</extension>
+                                        <extension key="B">1</extension>
+                                        <extension key="C">1</extension>
+                                        <extension key="D">1</extension>
+                                        <extension key="E">1</extension>
+                                        <extension key="F">When referral details entered.</extension>
+                                        <extension key="G">GC 140</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="SOURCE OF REFERRAL FOR OUT-PATIENTS" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataType/103">
+                                        <enumerations>
+                                            <enumeration value="97" id="1">other - not initiated by the CONSULTANT responsible for the Consultant Out-Patient Episode</enumeration>
+                                            <enumeration value="93" id="2">referral from a Community Dental Service</enumeration>
+                                            <enumeration value="92" id="3">referral from a GENERAL DENTAL PRACTITIONER</enumeration>
+                                            <enumeration value="17" id="4">referral from a National SXXXXXXXeening Programme</enumeration>
+                                            <enumeration value="04" id="5">referral from an Accident And Emergency Department (including Minor Injuries Units and Walk In Centres)</enumeration>
+                                            <enumeration value="05" id="6">referral from a CONSULTANT, other than in an Accident And Emergency Department</enumeration>
+                                            <enumeration value="15" id="7">referral from an OPTOMETRIST</enumeration>
+                                            <enumeration value="06" id="8">self-referral</enumeration>
+                                            <enumeration value="16" id="9">referral from an Orthoptist</enumeration>
+                                            <enumeration value="07" id="10">referral from a Prosthetist</enumeration>
+                                            <enumeration value="13" id="11">referral from a Specialist NURSE (Secondary Care)</enumeration>
+                                            <enumeration value="14" id="12">referral from an Allied Health Professional</enumeration>
+                                            <enumeration value="01" id="13">following an emergency admission</enumeration>
+                                            <enumeration value="02" id="14">following a Domiciliary Consultation</enumeration>
+                                            <enumeration value="11" id="15">other - initiated by the CONSULTANT responsible for the Consultant Out-Patient Episode</enumeration>
+                                            <enumeration value="03" id="16">referral from a GENERAL MEDICAL PRACTITIONER</enumeration>
+                                            <enumeration value="12" id="17">referral from a GENERAL PRACTITIONER with a Special Interest (GPwSI) or dentist with a Special Interest (DwSI)</enumeration>
+                                            <enumeration value="10" id="18">following an Accident And Emergency Attendance (including Minor Injuries Units and Walk In Centres)</enumeration>
+                                        </enumerations>
+                                    </dataType>
+                                </dataElement>
+                                <dataElement name="REFERRAL TO TREATMENT PERIOD START DATE" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/105">
+                                    <description>The start date of a REFERRAL TO TREATMENT PERIOD. Date that the initial referral to Secondary care was received for this diagnosis. This may be different from TESTCER REFERRAL TO TREATMENT PERIOD START DATE if initial referral was not to the TESTcer services teams.</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_19</extension>
+                                        <extension key="Link_to_existing definition:">REFERRAL TO TREATMENT PERIOD START DATE</extension>
+                                        <extension key="Notes_from_GD_JCIS" />
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX1580</extension>
+                                        <extension key="A">2</extension>
+                                        <extension key="B">2</extension>
+                                        <extension key="C">2</extension>
+                                        <extension key="D">1</extension>
+                                        <extension key="E">2</extension>
+                                        <extension key="F">When referral details entered.</extension>
+                                        <extension key="G">GC 141</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                                <dataElement name="DATE FIRST SEEN" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/106">
+                                    <description>This is the date that the PATIENT is first seen in the Trust that receives the first referral.</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_20</extension>
+                                        <extension key="Link_to_existing definition:">DATE FIRST SEEN</extension>
+                                        <extension key="Notes_from_GD_JCIS" />
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX0230</extension>
+                                        <extension key="A">2</extension>
+                                        <extension key="B">2</extension>
+                                        <extension key="C">2</extension>
+                                        <extension key="D">1</extension>
+                                        <extension key="E">2</extension>
+                                        <extension key="F">When referral details entered.</extension>
+                                        <extension key="G">GC 142</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                                <dataElement name="CONSULTANT CODE" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/107">
+                                    <description>A code uniquely identifying a CONSULTANT. (Referred to CONSULTANT CODE).</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_21</extension>
+                                        <extension key="Link_to_existing definition:">CONSULTANT CODE</extension>
+                                        <extension key="Notes_from_GD_JCIS">Imported activities do not have this field completed, but it TEST be derived from the Clinic code, which is imported. Check with VT.</extension>
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX0210</extension>
+                                        <extension key="A">2</extension>
+                                        <extension key="B">2</extension>
+                                        <extension key="C">4</extension>
+                                        <extension key="D">4</extension>
+                                        <extension key="E">2 - Backlog of consultant codes will need to be entered</extension>
+                                        <extension key="F">Visit
+                                            eg Initial visit or Radiological visit used as first seen in wait time table.</extension>
+                                        <extension key="G">GC 143</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                                <dataElement name="CARE PROFESSIONAL MAIN SPECIALTY CODE" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/108">
+                                    <description>A unique code identifying each MAIN SPECIALTY designated by Royal Colleges. This is the same as the OCCUPATION CODES desXXXXXXXibing specialties. (TEST be derived from consultant code).</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_22</extension>
+                                        <extension key="Link_to_existing definition:">CARE PROFESSIONAL MAIN SPECIALTY CODE</extension>
+                                        <extension key="Notes_from_GD_JCIS">NOT SHOWN ON JCIS
+                                            (A field is available in Consultants table, but often empty)</extension>
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX0220</extension>
+                                        <extension key="A">4</extension>
+                                        <extension key="B">4</extension>
+                                        <extension key="C">4</extension>
+                                        <extension key="D">4</extension>
+                                        <extension key="E">3</extension>
+                                        <extension key="F">NOT SHOWN ON JCIS
+                                            (A field is available in Consultants table, but often empty)</extension>
+                                        <extension key="G">GC 144</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                                <dataElement name="ORGANISATION SITE CODE (PROVIDER FIRST SEEN)" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/109">
+                                    <description>The  ORGANISATION SITE CODE of the Health Care Provider at the first contact with the PATIENT.</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_23</extension>
+                                        <extension key="Link_to_existing definition:">SITE CODE (OF PROVIDER FIRST SEEN)</extension>
+                                        <extension key="Notes_from_GD_JCIS">Name shown. Code available in JCIS tables.</extension>
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX1410</extension>
+                                        <extension key="A">2</extension>
+                                        <extension key="B">2</extension>
+                                        <extension key="C">2</extension>
+                                        <extension key="D">3</extension>
+                                        <extension key="E">2</extension>
+                                        <extension key="F">Visit
+                                            eg Initial visit or Radiological visit used as first seen in wait time table.</extension>
+                                        <extension key="G">GC 145</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                                <dataElement name="DATE FIRST SEEN (TESTCER SPECIALIST)" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/110">
+                                    <description>This is the date that the PATIENT is first seen by the appropriate specialist for TESTcer care within a TESTcer Care Spell. This is the PERSON or PERSONS who are most able to progress the diagnosis of the primary tumour. </description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_24</extension>
+                                        <extension key="Link_to_existing definition:">DATE FIRST SEEN (TESTCER SPECIALIST)</extension>
+                                        <extension key="Notes_from_GD_JCIS">How TEST this be pinned down?</extension>
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX1360</extension>
+                                        <extension key="A">2</extension>
+                                        <extension key="B">2</extension>
+                                        <extension key="C">2</extension>
+                                        <extension key="D">3</extension>
+                                        <extension key="E">2</extension>
+                                        <extension key="F">Visit
+                                            eg Initial visit or Radiological visit used as first seen in wait time table.</extension>
+                                        <extension key="G">GC 146</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                                <dataElement name="ORGANISATION SITE CODE (PROVIDER FIRST TESTCER SPECIALIST)" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/111">
+                                    <description>The  ORGANISATION SITE CODE of the ORGANISATION acting as Health Care Provider where the PATIENT is first seen by an appropriate TESTcer specialist on the DATE FIRST SEEN (TESTCER SPECIALIST).</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_25</extension>
+                                        <extension key="Link_to_existing definition:">SITE CODE (OF PROVIDER FIRST TESTCER SPECIALIST)</extension>
+                                        <extension key="Notes_from_GD_JCIS">Name shown. Code available in JCIS tables.</extension>
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX1400</extension>
+                                        <extension key="A">2</extension>
+                                        <extension key="B">2</extension>
+                                        <extension key="C">2</extension>
+                                        <extension key="D">3</extension>
+                                        <extension key="E">2</extension>
+                                        <extension key="F">Visit
+                                            eg Initial visit or Radiological visit used as first seen in wait time table.</extension>
+                                        <extension key="G">GC 147</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                                <dataElement name="TESTCER OR SYMPTOMATIC BREAST REFERRAL PATIENT STATUS" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/113">
+                                    <description>TESTCER OR SYMPTOMATIC BREAST REFERRAL PATIENT STATUS is recorded to enable tracking of the status of REFERRAL REQUESTS for PATIENTS referred with a suspected TESTcer, or referred with breast symptoms with TESTcer not originally suspected.
+                                        For COSD this TEST be used for all patients regardless of referral route.</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_26</extension>
+                                        <extension key="Link_to_existing definition:">TESTCER OR SYMPTOMATIC BREAST REFERRAL PATIENT STATUS</extension>
+                                        <extension key="Notes_from_GD_JCIS" />
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX0270</extension>
+                                        <extension key="A">TBA</extension>
+                                        <extension key="B">TBA</extension>
+                                        <extension key="C">TBA</extension>
+                                        <extension key="D">TBA</extension>
+                                        <extension key="E">3</extension>
+                                        <extension key="F">When referral details entered.</extension>
+                                        <extension key="G">GC 148</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="TESTCER OR SYMPTOMATIC BREAST REFERRAL PATIENT STATUS" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataType/112">
+                                        <enumerations>
+                                            <enumeration value="21" id="1">Subsequent treatment commenced (English NHS only)</enumeration>
+                                            <enumeration value="20" id="2">Diagnosis of recurrent TESTcer confirmed - subsequent English NHS treatment planned</enumeration>
+                                            <enumeration value="10" id="3">Diagnosis of new TESTcer confirmed - first treatment not yet planned</enumeration>
+                                            <enumeration value="08" id="4">First treatment commenced (English NHS only)</enumeration>
+                                            <enumeration value="09" id="5">Under investigation following symptomatic referral, TESTcer not suspected (breast referrals only) (see note 1)</enumeration>
+                                            <enumeration value="19" id="6">Diagnosis of recurrent TESTcer confirmed - subsequent treatment not yet planned</enumeration>
+                                            <enumeration value="17" id="7">Diagnosis of recurrent TESTcer confirmed - English NHS first treatment planned</enumeration>
+                                            <enumeration value="18" id="8">Diagnosis of recurrent TESTcer confirmed - no English NHS treatment planned</enumeration>
+                                            <enumeration value="15" id="9">Suspected recurrent TESTcer</enumeration>
+                                            <enumeration value="16" id="10">Diagnosis of recurrent TESTcer confirmed - first treatment not yet planned</enumeration>
+                                            <enumeration value="07" id="11">Diagnosis of TESTcer confirmed - no English NHS treatment planned</enumeration>
+                                            <enumeration value="13" id="12">Diagnosis of new TESTcer confirmed - subsequent English NHS treatment planned</enumeration>
+                                            <enumeration value="14" id="13">Suspected primary TESTcer</enumeration>
+                                            <enumeration value="11" id="14">Diagnosis of new TESTcer confirmed - English NHS first treatment planned</enumeration>
+                                            <enumeration value="12" id="15">Diagnosis of new TESTcer confirmed - subsequent treatment not yet planned</enumeration>
+                                            <enumeration value="03" id="16">No new TESTcer diagnosis identified by the Healthcare Provider</enumeration>
+                                        </enumerations>
+                                    </dataType>
+                                </dataElement>
+                                <dataElement name="TESTCER SYMPTOMS FIRST NOTED DATE" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/114">
+                                    <description>Record the time when the symptoms were first noted related to this diagnosis as agreed between the consultant and the patient.   Depending on the length of time this should normally include at least month and year. Day should also be included if known. If symptoms have been present for a long time then it may only be possible to record the year. This will normally be recorded by the consultant first seeing the patient in secondary care.
+
+                                        In these circumstances the Format/Length will be:
+                                        DATE (including year, month and day) - CCYY-MM-DD
+                                        YEAR AND MONTH - YYYY-MM
+                                        Year only - YYYY.</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_27</extension>
+                                        <extension key="Link_to_existing definition:">TESTCER SYMPTOMS FIRST NOTED DATE</extension>
+                                        <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX2000</extension>
+                                        <extension key="A">TBA</extension>
+                                        <extension key="B">TBA</extension>
+                                        <extension key="C">TBA</extension>
+                                        <extension key="D">TBA</extension>
+                                        <extension key="E">4</extension>
+                                        <extension key="F">Calculated from date of visit / duration of symptoms</extension>
+                                        <extension key="G">GC 149</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                            </dataClass>
+                            <dataClass name="IMAGING" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataClass/115">
+                                <dataElement name="SITE CODE (OF IMAGING)" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/116">
+                                    <description>This is the ORGANISATION SITE CODE of the Organisation  where the imaging took place.</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_28</extension>
+                                        <extension key="Link_to_existing definition:">SITE CODE (OF IMAGING)</extension>
+                                        <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX0310</extension>
+                                        <extension key="A">1</extension>
+                                        <extension key="B">1</extension>
+                                        <extension key="C">1</extension>
+                                        <extension key="D">2</extension>
+                                        <extension key="E">5</extension>
+                                        <extension key="F">Name shown. Code available in JCIS tables.</extension>
+                                        <extension key="G">GC 150</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                                <dataElement name="PROCEDURE DATE (TESTCER IMAGING)" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/117">
+                                    <description>The DATE the TESTcer Imaging was carried out.</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_29</extension>
+                                        <extension key="Link_to_existing definition:">PROCEDURE DATE (TESTCER IMAGING)</extension>
+                                        <extension key="Notes_from_GD_JCIS" />
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX0320</extension>
+                                        <extension key="A">1</extension>
+                                        <extension key="B">2</extension>
+                                        <extension key="C">2</extension>
+                                        <extension key="D">2</extension>
+                                        <extension key="E">6</extension>
+                                        <extension key="F" />
+                                        <extension key="G">GC 151</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                                <dataElement name="IMAGING CODE (NICIP)*" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/118">
+                                    <description>*IMAGING CODE (NICIP)
+                                        and/or
+                                        (TESTCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING))
+                                        is required.
+
+                                        IMAGING CODE (NICIP) is the National Interim Clinical Imaging Procedure Code Set code which is used to identify both the test modality and body site of the test.
+                                    </description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_30</extension>
+                                        <extension key="Link_to_existing definition:">IMAGING CODE (NICIP)</extension>
+                                        <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX1610</extension>
+                                        <extension key="A">TBA</extension>
+                                        <extension key="B">TBA</extension>
+                                        <extension key="C">TBA</extension>
+                                        <extension key="D">TBA</extension>
+                                        <extension key="E">7</extension>
+                                        <extension key="F">See also alternative  mandatory item for non-imported radiology activities
+                                            Ie  (TESTCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING))</extension>
+                                        <extension key="G">GC 152</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                                <dataElement name="TESTCER IMAGING MODALITY*" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/120">
+                                    <description>*IMAGING CODE (NICIP)
+                                        and/or
+                                        (TESTCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING))
+                                        is required.
+
+                                        The type of imaging procedure used during an Imaging or Radiodiagnostic Event for a TESTcer Care Spell.
+                                        NB: PET STEST also includes PET-CT STEST.
+                                    </description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_31</extension>
+                                        <extension key="Link_to_existing definition:">TESTCER IMAGING MODALITY</extension>
+                                        <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX0330</extension>
+                                        <extension key="A">2</extension>
+                                        <extension key="B">2</extension>
+                                        <extension key="C">3</extension>
+                                        <extension key="D">3</extension>
+                                        <extension key="E">8</extension>
+                                        <extension key="F">Radiology - see title of activity</extension>
+                                        <extension key="G">GC 153</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="TEST2 IMAGING MODALITY*" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataType/119">
+                                        <enumerations>
+                                            <enumeration value="C01X" id="1">Standard Radiography</enumeration>
+                                            <enumeration value="C06X" id="2">Nuclear Medicine imaging</enumeration>
+                                            <enumeration value="CXXX" id="3">Other</enumeration>
+                                            <enumeration value="C02X" id="4">CT STEST</enumeration>
+                                            <enumeration value="C09X" id="5">Intervention radiography.</enumeration>
+                                            <enumeration value="C08U" id="6">Urography (IV and retrograde)</enumeration>
+                                            <enumeration value="C08B" id="7">Barium</enumeration>
+                                            <enumeration value="C08A" id="8">Angiography</enumeration>
+                                            <enumeration value="C04X" id="9">PET STEST</enumeration>
+                                            <enumeration value="C02C" id="10">Virtual colonoscopy</enumeration>
+                                            <enumeration value="C03X" id="11">MRI STEST</enumeration>
+                                            <enumeration value="C01M" id="12">Mammogram</enumeration>
+                                            <enumeration value="C05X" id="13">Ultrasound STEST</enumeration>
+                                        </enumerations>
+                                    </dataType>
+                                </dataElement>
+                                <dataElement name="IMAGING ANATOMICAL SITE*" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/121">
+                                    <description>*IMAGING CODE (NICIP)
+                                        and/or
+                                        (TESTCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING))
+                                        is required.
+
+                                        A classification of the part of the body that is the subject of an Imaging Or Radiodiagnostic Event.</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_32</extension>
+                                        <extension key="Link_to_existing definition:">IMAGING ANATOMICAL SITE</extension>
+                                        <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX0340</extension>
+                                        <extension key="A">4</extension>
+                                        <extension key="B">4</extension>
+                                        <extension key="C">4</extension>
+                                        <extension key="D">4</extension>
+                                        <extension key="E">9</extension>
+                                        <extension key="F">Typically not recorded.  Unless the ATM makes it clear what the site is, the site of imaging is not recorded. Exceptions are mammogram (site recorded as breast);BRT ultrasound - user has to record site.
+                                            [Usage for UGI CT sTEST (recorded 4 times on Live patients) - is misleading usage of backend table as front end desXXXXXXXiption is 'Primary tumour location' on CT sTEST.Findings tab].
+
+                                            (Findings site is recordable).</extension>
+                                        <extension key="G">GC 154</extension>
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2">from source</extension>
+                                    </extensions>
+                                    <dataType name="String" />
+                                </dataElement>
+                                <dataElement name="ANATOMICAL SIDE (IMAGING)*" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/123">
+                                    <description>*IMAGING CODE (NICIP)
+                                        and/or
+                                        (TESTCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING))
+                                        is required.
+
+                                        The side of the body that is the subject of an Imaging or Radiodiagnostic Event.</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_33</extension>
+                                        <extension key="Link_to_existing definition:">ANATOMICAL SIDE (IMAGING)</extension>
+                                        <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                                        <extension key="[Optional]_Local_Identifier">XXXXXXX3000</extension>
+                                        <extension key="A">MAY BE REMOVED</extension>
+                                        <extension key="B">MAY BE REMOVED</extension>
+                                        <extension key="C">MAY BE REMOVED</extension>
+                                        <extension key="D">MAY BE REMOVED</extension>
+                                        <extension key="E">MAY BE REMOVED</extension>
+                                        <extension key="F" />
+                                        <extension key="G" />
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2" />
+                                    </extensions>
+                                    <dataType name="ANATOMICAL SIDE (IMAGING)*" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataType/122">
+                                        <enumerations>
+                                            <enumeration value="B" id="1">Bilateral</enumeration>
+                                            <enumeration value="R" id="2">Right</enumeration>
+                                            <enumeration value="L" id="3">Left</enumeration>
+                                            <enumeration value="M" id="4">Midline</enumeration>
+                                            <enumeration value="9" id="5">Not Known</enumeration>
+                                            <enumeration value="8" id="6">Not applicable</enumeration>
+                                        </enumerations>
+                                    </dataType>
+                                </dataElement>
+                                <dataElement name="GENDER2" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataElement/125">
+                                    <description>gender test stuff</description>
+                                    <extensions>
+                                        <extension key="NHIC_Identifier:">TEST_GENDER</extension>
+                                        <extension key="Link_to_existing definition:">GENDER2</extension>
+                                        <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                                        <extension key="[Optional]_Local_Identifier">asd</extension>
+                                        <extension key="A">MAY BE REMOVED</extension>
+                                        <extension key="B">MAY BE REMOVED</extension>
+                                        <extension key="C">MAY BE REMOVED</extension>
+                                        <extension key="D">MAY BE REMOVED</extension>
+                                        <extension key="E">MAY BE REMOVED</extension>
+                                        <extension key="F" />
+                                        <extension key="G" />
+                                        <extension key="H">NEO4J</extension>
+                                        <extension key="E2" />
+                                    </extensions>
+                                    <dataType name="GENDER2" id="http://localhost:8090/ModelCatalogueCorePluginTestApp/catalogue/dataType/124">
+                                        <enumerations>
+                                            <enumeration value="2" id="1">Female</enumeration>
+                                            <enumeration value="1" id="2">Male</enumeration>
+                                            <enumeration value="0" id="3">Not Known</enumeration>
+                                            <enumeration value="9" id="4">Not Specified</enumeration>
+                                        </enumerations>
+                                    </dataType>
+                                </dataElement>
+                            </dataClass>
+                        </dataClass>
+                    </dataClass>
+                </dataClass>
+            </dataClass>
+        </dataClass>
+    </dataModel><!-- Relationship types are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored! For non-admin users, the types are always imported as system ones and they need to be approved by the catalogue admin first. -->
+    <relationshipTypes>
+        <relationshipType name="containment" source="org.modelcatalogue.core.DataClass" destination="org.modelcatalogue.core.DataElement" versionSpecific="true">
+            <sourceToDestination label="contains">Model can contain multiple data elements. Contained data elements are finalized when the model is finalized.</sourceToDestination>
+            <destinationToSource label="contained in">Data element can be contained in multiple models. When new draft of the data element is created then drafts for all containing models are created as well.</destinationToSource>
+            <rule>String minOccursString = ext['Min Occurs']
+                String maxOccursString = ext['Max Occurs']
+
+                Integer minOccurs = minOccursString in ['unbounded', 'null', '*', null] ? 0 : (minOccursString as Integer)
+                Integer maxOccurs = maxOccursString in ['unbounded', 'null', '*', null] ? Integer.MAX_VALUE : (maxOccursString as Integer)
+
+                if (minOccurs &lt; 0) {
+                return ["relationshipType.containment.min.occurs.less.than.zero", "'Max Occurs' has to be greater than zero"]
+                }
+                if (maxOccurs &lt; minOccurs) {
+                return ["relationshipType.containment.min.occurs.greater.than.max.occurs", "The metadata 'Min Occurs' cannot be greater than 'Min Occurs'"]
+                }
+                if (maxOccurs &lt; 1) {
+                return ["relationshipType.containment.max.occurs.zero", "The metadata 'Max Occurs' must be greater than zero"]
+                }
+
+                return true</rule>
+        </relationshipType>
+        <relationshipType name="declaration" source="org.modelcatalogue.core.DataModel" destination="org.modelcatalogue.core.CatalogueElement" system="true" versionSpecific="true">
+            <sourceToDestination label="declares">Data models can declare multiple elements. Based on this relationship you can narrow the elements shown in the catalogue using the data model filter in the bottom left corner. When data model is finalized all defined elements are finalized as well.</sourceToDestination>
+            <destinationToSource label="declared within">Any element can be declared within multiple data models. When new draft of the element is created then drafts for data models are created as well.</destinationToSource>
+        </relationshipType>
+        <relationshipType name="hierarchy" source="org.modelcatalogue.core.DataClass" destination="org.modelcatalogue.core.DataClass" versionSpecific="true">
+            <sourceToDestination label="parent of">Model can contain (be parent of) multiple models. Child models are finalized when parent model is finalized,</sourceToDestination>
+            <destinationToSource label="child of">Model can be contained (be child model) in multiple models. When draft is created for child model drafts for parent models are created as well.</destinationToSource>
+        </relationshipType>
+    </relationshipTypes>
+</catalogue>

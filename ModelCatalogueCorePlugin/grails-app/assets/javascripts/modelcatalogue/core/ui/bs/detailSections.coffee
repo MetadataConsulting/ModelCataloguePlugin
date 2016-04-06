@@ -13,11 +13,11 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       <div class="col-md-3">
           <strong class="small">Organization</strong>
       </div>
-      <div class="full-width-editable col-md-9"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#organization']">{{element.ext.get('http://www.modelcatalogue.org/metadata/#organization') || 'empty'}}</small></div>
+      <div class="full-width-editable col-md-9"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#organization']" e-name="metadata-organization">{{element.ext.get('http://www.modelcatalogue.org/metadata/#organization') || 'empty'}}</small></div>
       <div class="col-md-3">
           <strong class="small">Namespace</strong>
       </div>
-      <div class="full-width-editable col-md-9"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#namespace']">{{element.ext.get('http://www.modelcatalogue.org/metadata/#namespace') || 'empty'}}</small></div>
+      <div class="full-width-editable col-md-9"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#namespace']" e-name="metadata-namespace">{{element.ext.get('http://www.modelcatalogue.org/metadata/#namespace') || 'empty'}}</small></div>
   '''
 
   $templateCache.put 'modelcatalogue/core/ui/detailSections/modelCatalogueId.html', '''
@@ -40,19 +40,6 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
           <ordered-map-editor object="customMetadata"></ordered-map-editor>
       </div>
   '''
-
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/enumerations.html', '''
-      <div class="col-md-12" ng-if="!editableForm.$visible &amp;&amp; element.enumerations.values"><strong class="small">Enumerations</strong></div>
-      <div class="col-md-3" ng-repeat-start="value in (editableForm.$visible ? [] : element.enumerations.values)">
-          <strong class="small">{{value.key}}</strong>
-      </div>
-      <div class="col-md-9 preserve-new-lines" ng-repeat-end><small>{{value.value}}</small></div>
-      <div class="custom-metadata col-md-12" ng-if="editableForm.$visible">
-          <div ng-if="copy.ext.get('http://www.modelcatalogue.org/metadata/enumerateType#subset')" class="alert alert-warning">Following values are inherited and will be overriden when the base enumeration changes: {{copy.ext.get('http://www.modelcatalogue.org/metadata/enumerateType#subset')}}</div>
-          <ordered-map-editor object="copy.enumerations" title="Enumerations" key-placeholder="Value" value-placeholder="Description"></ordered-map-editor>
-      </div>
-  '''
-
 
   $templateCache.put 'modelcatalogue/core/ui/detailSections/revisionNotes.html', '''
       <div class="col-md-3">
@@ -235,7 +222,7 @@ x in ['apple', 'banana', 'cherry']
       'enumeratedType'
     ]
     keys: ['http://www.modelcatalogue.org/metadata/enumerateType#subset']
-    template: 'modelcatalogue/core/ui/detailSections/enumerations.html'
+    template: '/mc/core/ui/detail-sections/enumerations.html'
   }
 
   detailSectionsProvider.register {

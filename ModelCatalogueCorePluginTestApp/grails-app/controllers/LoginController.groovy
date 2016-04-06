@@ -40,6 +40,16 @@ class LoginController {
      * Show the login page.
      */
     def auth = {
+        // This solves the problem with infinite redirect loop when accessing main url witout trailing slash.
+        // This is super dirty hack which actually redirects this request to trailing slash - ajax login.
+        if (SpringSecurityUtils.getSavedRequest(session)?.redirectUrl
+            && !grailsApplication.config.grails.serverURL?.endsWith('/')
+            && SpringSecurityUtils.getSavedRequest(session).redirectUrl == grailsApplication.config.grails.serverURL
+        ) {
+            redirect uri: "${SpringSecurityUtils.getSavedRequest(session).redirectUrl}/"
+            return
+        }
+
         def config = SpringSecurityUtils.securityConfig
 
         if (springSecurityService.isLoggedIn()) {

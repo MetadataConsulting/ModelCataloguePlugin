@@ -33,8 +33,8 @@ class ImportServiceSpec extends AbstractIntegrationSpec {
         def core = models.find { it.name == "MAIN" }
         def patientIdentity = models.find { it.name == "PATIENT IDENTITY DETAILS" }
         def NHICConceptualDomain = DataModel.findByName("NHIC")
-        def indicatorCode = dataTypes.find { it.name == "NHS NUMBER STATUS INDICATOR CODE" }
-        def dataElement = dataElements.find { it.name == "NHS NUMBER STATUS INDICATOR CODE" }
+        def indicatorCode = dataTypes.find { it.name == "nhsNumberStatusIndicatorCode" }
+        def dataElement = dataElements.find { it.name == "nhsNumberStatusIndicatorCode" }
 
         then:
         core.id

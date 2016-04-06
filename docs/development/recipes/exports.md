@@ -141,6 +141,13 @@ def doWithApplicationContext = { ctx ->
         title "GEL Data Specification Report"
         // or title { "$it.name Specification Report" }
 
+        // Value to be displayed in export modal for depth of export. Uses
+        // default value for export when set to null (or omitted).
+        depth 3
+
+        // Default name for export file.
+        defaultName { "${it.name} report as MS Excel Document" }
+
         // for which type this report applies
         type DataModel
         // or testing the item type in case of list exports
@@ -166,4 +173,3 @@ def doWithApplicationContext = { ctx ->
 ```
 
 See [ReportDescriptorBuilder](../../../ModelCatalogueCorePlugin/src/groovy/org/modelcatalogue/core/reports/ReportDescriptorBuilder.groovy) for full DSL definition.
-

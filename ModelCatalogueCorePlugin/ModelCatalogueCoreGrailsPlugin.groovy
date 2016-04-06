@@ -3,17 +3,17 @@ import grails.util.Environment
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.audit.AuditJsonMarshallingCustomizer
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
-import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
+import org.modelcatalogue.core.util.js.ApiRootFrontendConfigurationProvider
+import org.modelcatalogue.core.util.js.FrontendConfigurationProviderRegistry
+import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.marshalling.*
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
-import org.modelcatalogue.core.audit.AuditJsonMarshallingCustomizer
-import org.modelcatalogue.core.util.js.FrontendConfigurationProviderRegistry
-import org.modelcatalogue.core.util.js.ApiRootFrontendConfigurationProvider
-import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.xml.render.RelationshipsXmlRenderer
 
 class ModelCatalogueCoreGrailsPlugin {
@@ -287,40 +287,50 @@ Model catalogue core plugin (metadata registry)
         reportsRegistry.register {
             creates asset
             title { "Export All Elements of ${it.name} to Excel XSLX" }
+            defaultName { "Export All Elements of ${it.name} to Excel XSLX" }
             type DataClass
             when { DataClass dataClass ->
                 dataClass.countContains() > 0
             }
-            link controller: 'dataArchitect', action: 'getSubModelElements', params: [format: 'xlsx', report:'NHIC'], id: true
+            link controller: 'dataArchitect', action: 'getSubModelElements', params: [format: 'xlsx', report: 'NHIC'], id: true
         }
 
         reportsRegistry.register {
-            creates link
-            title { "Inventory Report Spreadsheet"}
+            creates asset
+            title { "Inventory Report Spreadsheet" }
+            defaultName { "${it.name} report as MS Excel Document" }
+            depth 3
             type DataModel
             link controller: 'dataModel', action: 'inventorySpreadsheet', id: true
         }
 
-		reportsRegistry.register {
-			creates link
-			title { "Inventory Report Document" }
-			type DataClass
-			link controller: 'dataClass', action: 'inventoryDoc', id: true
-		}
+        reportsRegistry.register {
+            creates asset
+            title { "Inventory Report Document" }
+            defaultName { "${it.name} report as MS Word Document" }
+            depth 3
+            type DataClass
+            link controller: 'dataClass', action: 'inventoryDoc', id: true
+        }
 
-		reportsRegistry.register {
-			creates link
-			title { "Inventory Report Spreadsheet" }
-			type DataClass
-			link controller: 'dataClass', action: 'inventorySpreadsheet', id: true
-		}
+        reportsRegistry.register {
+            creates asset
+            title { "Inventory Report Spreadsheet" }
+            defaultName { "${it.name} report as MS Excel Document" }
+            depth 3
+            type DataClass
+            link controller: 'dataClass', action: 'inventorySpreadsheet', id: true
+        }
 
-		reportsRegistry.register {
-			creates link
-			title { "Changelog Document" }
-			type DataClass
-			link controller: 'dataClass', action: 'changelogDoc', id: true
-		}
+        reportsRegistry.register {
+            creates asset
+            title { "Changelog Document" }
+            defaultName { "${it.name} changelog as MS Word Document" }
+            depth 3
+            includeMetadata true
+            type DataClass
+            link controller: 'dataClass', action: 'changelogDoc', id: true
+        }
 
         reportsRegistry.register {
             creates link
@@ -350,9 +360,6 @@ Model catalogue core plugin (metadata registry)
 //                [controller: webRequest.controllerName, action: webRequest.actionName, params: params]
 //            }
 //        }
-
-
-
     }
 
     def onChange = { event ->

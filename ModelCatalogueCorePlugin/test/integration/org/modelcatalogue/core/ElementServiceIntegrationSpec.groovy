@@ -79,7 +79,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         expect:
         author != draft
         author.id != draft.id
-        author.versionCreated != author.dateCreated
+        author.versionCreated != draft.versionCreated
         originalVersion == newVersion
         draftVersion    == originalVersion + 1
 
@@ -774,38 +774,81 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         final String orphanDataTypeName = "FBMCIITII Orpan Data Type"
         final String orphanModelCatalogueId = "http://www.example.com/types/FBMCIITII_Orphan_Data_Type"
         final String dataTypeName = "FBMCIITII Data Type"
-        final String modelCatalogueId = "http://www.example.com/types/FBMCIITII"
+        final String dataTypeModelCatalogueId = "http://www.example.com/types/FBMCIITII"
+        final String anotherDataModelName = "testDM2"
 
         catalogueBuilder.build {
             dataModel name: dataModelName, semanticVersion: dataModelSemVer, {
-                dataType name: dataTypeName, id: modelCatalogueId
+                dataType name: dataTypeName, id: dataTypeModelCatalogueId
             }
+            dataModel name: anotherDataModelName
             dataType name: orphanDataTypeName, id: orphanModelCatalogueId
         }
 
+        DataModel anotherDataModel = DataModel.findByName(anotherDataModelName)
+        elementService.finalizeDataModel(anotherDataModel, "0.0.1", "new model", true)
+
+
+        expect:
+        anotherDataModel.errors.errorCount == 0
+
         when:
-        CatalogueElement dataType = elementService.findByModelCatalogueId(CatalogueElement, modelCatalogueId)
+        DataModel anotherDataModelDraft = elementService.createDraftVersion(anotherDataModel, '0.0.2', DraftContext.userFriendly())
+
+        final String dataModelModelCatalogueId = "ModelCatalogueCorePluginTestApp/catalogue/dataModel/$anotherDataModelDraft.latestVersionId@0.0.2"
+
+        CatalogueElement anotherDataModelFound = elementService.findByModelCatalogueId(CatalogueElement, dataModelModelCatalogueId)
+
 
         then:
+
+        anotherDataModelFound.id == anotherDataModelDraft.id
+
+
+        when:
+        DataModel dataModel = DataModel.findByName(dataModelName)
+        DataType dataTypeV1 = DataType.findByName(dataTypeName)
+        elementService.finalizeDataModel(dataModel, "0.0.1", "new model", true)
+
+        then:
+        dataModel.errors.errorCount == 0
+
+        when:
+        DataModel dataModelV2 = elementService.createDraftVersion(dataModel, '0.0.2', DraftContext.userFriendly())
+
+        CatalogueElement dataType = elementService.findByModelCatalogueId(CatalogueElement, dataTypeModelCatalogueId)
+
+        elementService.finalizeDataModel(dataModelV2, "0.0.2", "new model", true)
+        then:
+        dataModelV2.errors.errorCount == 0
+
+        when:
+        elementService.createDraftVersion(dataModelV2, '0.0.3', DraftContext.userFriendly())
+
+        then:
+        dataTypeV1
+        dataTypeV1 != dataType
+
         dataType
         dataType.dataModel
         dataType.dataModel.semanticVersion
-        dataType.dataModel.semanticVersion == dataModelSemVer
+        dataType.dataModel.semanticVersion == '0.0.2'
         dataType.name == dataTypeName
 
         when:
-        CatalogueElement withoutVersion = elementService.findByModelCatalogueId(CatalogueElement, dataType.getDefaultModelCatalogueId(false))
-
-        then:
-        withoutVersion
-        withoutVersion == dataType
-
-        when:
-        CatalogueElement withVersion = elementService.findByModelCatalogueId(CatalogueElement, dataType.getDefaultModelCatalogueId(true))
+        CatalogueElement withVersion = elementService.findByModelCatalogueId(CatalogueElement, dataType.getDefaultModelCatalogueId(false))
 
         then:
         withVersion
         withVersion == dataType
+
+        when:
+        CatalogueElement withoutVersion = elementService.findByModelCatalogueId(CatalogueElement, dataType.getDefaultModelCatalogueId(true))
+
+        then:
+        withoutVersion
+        withoutVersion.dataModel
+        withoutVersion.dataModel.semanticVersion == '0.0.3'
 
         when:
         CatalogueElement legacy = elementService.findByModelCatalogueId(CatalogueElement, dataType.getLegacyModelCatalogueId(false))

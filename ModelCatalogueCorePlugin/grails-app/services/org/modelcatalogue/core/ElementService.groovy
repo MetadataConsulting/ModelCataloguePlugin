@@ -164,18 +164,38 @@ class ElementService implements Publisher<CatalogueElement> {
                     eq 'id', urlId
                 }
                 if (version) {
-                        dataModel {
-                            or {
-                                eq 'semanticVersion', version
-                                if (versionNumberFound) {
-                                    eq 'versionNumber', versionNumberFound
-                                }
+                    dataModel {
+                        or {
+                            eq 'semanticVersion', version
+                            if (versionNumberFound) {
+                                eq 'versionNumber', versionNumberFound
                             }
                         }
+                    }
                 }
             })
 
-            if (result && result.getDefaultModelCatalogueId(version == null) == Legacy.fixModelCatalogueId(theId).toString()) {
+            if (result && result.getDefaultModelCatalogueId(version == null).contains(Legacy.fixModelCatalogueId(theId).toString())) {
+                return result
+            }
+
+            result = getLatestFromCriteria(new DetachedCriteria<CatalogueElement>(resource).build {
+                or {
+                    eq 'latestVersionId', urlId
+                    eq 'id', urlId
+                }
+                if (version) {
+                    or {
+                        eq 'semanticVersion', version
+                        if (versionNumberFound) {
+                            eq 'versionNumber', versionNumberFound
+                        }
+                    }
+                }
+            })
+
+
+            if (result && result.getDefaultModelCatalogueId(version == null).contains(Legacy.fixModelCatalogueId(theId).toString())) {
                 return result
             }
 
@@ -273,12 +293,17 @@ class ElementService implements Publisher<CatalogueElement> {
         }
     }
 
-
     public DataModel finalizeDataModel(DataModel draft, String version, String revisionNotes) {
-        draft.checkPublishSemanticVersion(version)
+        return finalizeDataModel(draft, version, revisionNotes, false)
+    }
 
-        if (!revisionNotes) {
-            draft.errors.rejectValue('revisionNotes', 'finalize.revisionNotes.null', 'Please, provide the revision notes')
+    /**
+     * @deprecated skipping the eligibility is only available for tests
+     */
+    public DataModel finalizeDataModel(DataModel draft, String version, String revisionNotes, boolean skipEligibility) {
+        // check eligibility for finalization
+        if (!skipEligibility) {
+            draft.checkFinalizeEligibility(version, revisionNotes)
         }
 
         if (draft.hasErrors()) {
@@ -295,11 +320,14 @@ class ElementService implements Publisher<CatalogueElement> {
                 finalized.semanticVersion = version
                 finalized.revisionNotes = revisionNotes
 
-                finalized
+                finalized.save(deepValidate: false)
             }
         }
     }
 
+    /**
+     * @deprecated finalization should only happen on the data model level
+     */
     public <E extends CatalogueElement> E finalizeElement(E draft) {
         return (E) CatalogueElement.withTransaction { TransactionStatus status ->
             auditService.logElementFinalized(draft) {

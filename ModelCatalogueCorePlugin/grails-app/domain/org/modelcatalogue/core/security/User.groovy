@@ -43,7 +43,8 @@ class User extends CatalogueElement {
         UserRole.findAllByUser(this).collect { it.role } as Set
     }
 
-    def beforeInsert() {
+    void beforeInsert() {
+        super.beforeInsert()
         encodePassword()
         if (!getName()) {
             setName(getUsername())
