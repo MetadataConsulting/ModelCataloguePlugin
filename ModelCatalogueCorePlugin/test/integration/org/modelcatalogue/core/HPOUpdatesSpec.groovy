@@ -1,4 +1,4 @@
-package x.org.modelcatalogue.core
+package org.modelcatalogue.core
 
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.builder.api.CatalogueBuilder
@@ -7,6 +7,7 @@ import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.util.test.TestDataHelper
 import org.modelcatalogue.integration.obo.OboLoader
 import spock.lang.Shared
 import spock.lang.Unroll
