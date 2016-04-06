@@ -8,54 +8,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 
       dialog = $modal.open {
         size: 'lg'
         windowClass: 'new-relationship-modal-prompt'
-        template: '''
-        <div class="modal-body">
-            <form role="form" ng-submit="createRelation()">
-              <h4>{{element.name}}</h4>
-              <messages-panel messages="messages"></messages-panel>
-              <div class="form-group">
-                <select id="type" ng-model="relationshipTypeInfo" class="form-control" ng-options="rt as rt.value for rt in relationshipTypes" ng-change="updateInfo(relationshipTypeInfo)">
-                  <option value="">-- choose relation --</option>
-                </select>
-                <p class="help-block" ng-if="relationshipTypeInfo.description">{{relationshipTypeInfo.description}}</p>
-              </div>
-              <div class="panel panel-default" ng-repeat="destination in destinations">
-                <div class="panel-heading">
-                  <span class="fa fa-remove text-muted with-pointer pull-right" ng-click="removeDestination($index)" ng-if="!$first"></span>
-                  <h3 class="panel-title">Destination </h3>
-                </div>
-                <div class="panel-body">
-                  <messages-panel messages="destination.messages"></messages-panel>
-                  <div class="form-group">
-                    <input id="element" type="text" class="form-control" ng-model="destination.relation" global="'allow'" catalogue-element-picker resource="relationType" typeahead-on-select="destination.updateRelation(destination.relation)" ng-disabled="!relationshipTypeInfo.type">
-                  </div>
-                  <!--
-                  <div class="form-group">
-                    <label for="classification" ng-click="destination.classificationExpanded = ! destination.classificationExpanded">Data Model <span class="fa fa-fw" ng-class="{'fa-toggle-up': destination.classificationExpanded, 'fa-toggle-down': !destination.classificationExpanded}"></span></label>
-                    <div collapse="!destination.classificationExpanded">
-                      <input id="classification" ng-model="destination.classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="destination.updateClassification(destination.classification)">
-                      <p class="help-block">Select a data model only if the relationship applies for given classification only. This usually happens when you are reusing catalogue elements form some standard data model</p>
-                    </div>
-                  </div>
-                  -->
-                  <div class="form-group">
-                    <label ng-click="destination.metadataExpanded = ! destination.metadataExpanded" class="expand-metadata"">Metadata <span class="fa fa-fw" ng-class="{'fa-toggle-up': destination.metadataExpanded, 'fa-toggle-down': !destination.metadataExpanded}"></label>
-                    <div collapse="!destination.metadataExpanded">
-                      <p class="help-block metadata-help-block">Metadata specific to this relationship. For example <code>contains</code> and <code>parent of</code> relationship types supports <code>Name</code> metadata as an alias of nested model or data element.</p>
-                      <metadata-editor owner="destination.metadataOwner" object="destination.metadata"></metadata-editor>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <a class="btn btn-success btn-block" ng-click="addDestination()"><span class="fa fa-fw fa-plus"></span> Add Another</a>
-              <fake-submit-button/>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-primary" ng-click="createRelation()" type="submit"><span class="glyphicon glyphicon-link"></span> Create Relationship</button>
-            <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
-        </div>
-        '''
+        templateUrl: '/mc/core/ui/modals/modalNewRelationship.html'
         controller: ['$scope', 'messages', '$modalInstance', '$controller', '$stateParams', 'catalogueElementResource', ($scope, messages, $modalInstance, $controller, $stateParams, catalogueElementResource) ->
 
           if not args.currentDataModel and $stateParams.dataModelId and $stateParams.dataModelId != 'catalogue'
