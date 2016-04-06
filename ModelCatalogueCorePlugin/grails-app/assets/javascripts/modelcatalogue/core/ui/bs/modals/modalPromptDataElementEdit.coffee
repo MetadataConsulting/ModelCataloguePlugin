@@ -38,6 +38,9 @@ angular.module('mc.core.ui.bs.modalPromptDataElementEdit', ['mc.util.messages'])
               <div class="form-group">
                 <label for="dataType" class="">Data Type</label>
                 <input type="text" id="dataType" placeholder="Data Type" ng-model="copy.dataType" catalogue-element-picker="dataType" global="'allow'" label="el.name">
+                <p class="help-block">
+                  Creates new data type when no one is selected from advanced search (new data type name must be provided).
+                </p>
               </div>
               <fake-submit-button/>
             </form>
