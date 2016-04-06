@@ -5,10 +5,8 @@ import groovy.json.JsonSlurper
 /**
  * James Welch, A.Milward
  */
-import groovy.json.internal.LazyMap
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.builder.api.CatalogueBuilder
-import org.modelcatalogue.core.enumeration.LegacyEnumerations
 
 class UmljService {
 
@@ -27,10 +25,10 @@ class UmljService {
 
     protected void generateCatalogueElements(CatalogueBuilder builder, StarUMLDiagram umlFile, DataModel clsf) {
         builder.build {
-            classification(name: clsf.name) {
+            dataModel(name: clsf.name) {
                 globalSearchFor dataType
-                model(name: clsf.name){
-                    umlFile.topLevelClasses.each { String id, LazyMap cls ->
+                dataClass(name: clsf.name){
+                    umlFile.topLevelClasses.each { String id, Map cls ->
                         createClasses(builder, cls, umlFile)
                     }
                 }
@@ -40,7 +38,7 @@ class UmljService {
     }
 
 
-    static createDataType(CatalogueBuilder builder, LazyMap att, StarUMLDiagram umlFile) {
+    static createDataType(CatalogueBuilder builder, Map att, StarUMLDiagram umlFile) {
 
             if (!(att.type instanceof String) && att.type?.$ref && umlFile.allDataTypes.get(att?.type?.$ref)) {
                 // Find highest supertype
@@ -71,7 +69,7 @@ class UmljService {
 
 
 
-    protected createClasses(CatalogueBuilder builder, LazyMap cls, StarUMLDiagram umlFile, ArrayList<Object> carried_forward_atts = new ArrayList<Object>(), ArrayList<Object> carried_forward_comps = new ArrayList<Object>()) {
+    protected createClasses(CatalogueBuilder builder, Map cls, StarUMLDiagram umlFile, ArrayList<Object> carried_forward_atts = new ArrayList<Object>(), ArrayList<Object> carried_forward_comps = new ArrayList<Object>()) {
 
         println("Outputting model: " + cls.name)
 
@@ -79,7 +77,7 @@ class UmljService {
         def cfc = getComponents(cls, carried_forward_comps, umlFile)
         def subtypes = getSubTypes(cls, umlFile)
         if (!cls.isAbstract) {
-            builder.model(name: cls.name.replaceAll("_", " "), description: cls.documentation) {
+            builder.dataClass(name: cls.name.replaceAll("_", " "), description: cls.documentation) {
                     // first output the attributes for this class
                     cfa.each { att ->
                        def multiplicity = getMultiplicity(att)

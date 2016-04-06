@@ -17,6 +17,29 @@ class ReportDescriptorBuilder {
         descriptor.title = title  ; this
     }
 
+    ReportDescriptorBuilder defaultName(String defaultName) {
+        descriptor.defaultName = { defaultName } ; this
+    }
+
+    ReportDescriptorBuilder defaultName(Closure defaultName) {
+        descriptor.defaultName = defaultName ; this
+    }
+
+    ReportDescriptorBuilder depth(Integer depth) {
+        descriptor.depth = { depth } ; this
+    }
+
+    ReportDescriptorBuilder depth(Closure depth) {
+        descriptor.depth = depth ; this
+    }
+
+    ReportDescriptorBuilder includeMetadata(Boolean includeMetadata) {
+        descriptor.includeMetadata = { includeMetadata } ; this
+    }
+
+    ReportDescriptorBuilder includeMetadata(Closure includeMetadata) {
+        descriptor.includeMetadata = includeMetadata ; this
+    }
 
     ReportDescriptorBuilder type(Class... types) {
         descriptor.conditions << { types.any { type -> type.isAssignableFrom(it.class) }} ; this

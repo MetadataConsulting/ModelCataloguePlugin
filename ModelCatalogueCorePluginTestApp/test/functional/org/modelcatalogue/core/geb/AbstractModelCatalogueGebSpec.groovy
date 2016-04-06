@@ -4,6 +4,7 @@ import geb.Browser
 import geb.navigator.Navigator
 import geb.spock.GebReportingSpec
 import geb.waiting.WaitTimeoutException
+import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.StaleElementReferenceException
 import org.openqa.selenium.logging.LogEntries
 import org.openqa.selenium.logging.LogEntry
@@ -393,6 +394,10 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
     void refresh(Browser browser) {
         browser.driver.navigate().refresh()
+    }
+
+    void scroll(ScrollDirection direction) {
+        direction.scroll(driver as JavascriptExecutor)
     }
 
 

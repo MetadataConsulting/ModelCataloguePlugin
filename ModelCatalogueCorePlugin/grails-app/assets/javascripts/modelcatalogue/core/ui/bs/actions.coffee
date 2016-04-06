@@ -20,7 +20,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     resource = $scope.resource
     if not resource and $state.current.name == 'mc.resource.list'
       resource = $state.params.resource
-    
+
     return undefined if not security.hasRole('CURATOR')
     return undefined if not resource
     return undefined if resource == 'batch'
@@ -241,7 +241,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
   actionsProvider.registerActionInRoles 'export', [actionsProvider.ROLE_LIST_ACTION, actionsProvider.ROLE_ITEM_ACTION, actionsProvider.ROLE_NAVIGATION, actionsProvider.ROLE_LIST_HEADER_ACTION], ['$scope', 'security', ($scope, security)->
-    return undefined unless security.hasRole('VIEWER')
+    return undefined unless security.hasRole('CURATOR')
     return undefined unless $scope.list or $scope.element
     if $scope.list
       return undefined if $scope.resource == 'import'
@@ -270,58 +270,82 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  generateReports = ($scope, $window, enhance, rest) ->
+  generateReports = ($scope, $window, enhance, rest, $log, messages) ->
     (reports = []) ->
       for report in reports
         {
           label:  report.title
+          defaultName: report.defaultName
+          depth: report.depth
+          includeMetadata: report.includeMetadata
           url:    report.url
           type:   report.type
           watches: 'element'
           action: ->
+            url = @url
+            defaultValue = if @defaultName then @defaultName else ''
+            depth = @depth
+            includeMetadata = @includeMetadata
             if @type == 'LINK'
-              $window.open(@url, '_blank')
-            else enhance(rest(method: 'GET', url: @url)).then (result) ->
-              result.show()
+              $window.open(url, '_blank')
+            else if @type == 'ASSET'
+              messages.prompt('Export Settings', '', {type: 'export', assetName: defaultValue, depth: depth, includeMetadata: includeMetadata})
+              .then (result) ->
+                if (result.assetName?)
+                  $log.debug "exporting with name: #{result.assetName}"
+                  url = URI(url).setQuery({name: result.assetName})
+                if (result.depth?)
+                  $log.debug "exporting with depth: #{result.depth}"
+                  url = URI(url).setQuery({depth: result.depth})
+                if (result.includeMetadata?)
+                  $log.debug "exporting with includeMetadata: #{result.includeMetadata}"
+                  url = URI(url).setQuery({includeMetadata: result.includeMetadata})
+                $log.debug "export new asset using url #{url}"
+                $window.open(url, '_blank')
+            else
+              $log.error "unknown type of report '#{@type}'"
             return true
         }
 
-  actionsProvider.registerChildActionInRoles 'export', 'catalogue-element-export-specific-reports',[actionsProvider.ROLE_ITEM_ACTION], ['$scope', '$window', 'enhance', 'rest', ($scope, $window, enhance, rest) ->
-    return undefined if not $scope.element
+  actionsProvider.registerChildActionInRoles('export', 'catalogue-element-export-specific-reports', [actionsProvider.ROLE_ITEM_ACTION],
+    ['$scope', '$window', 'enhance', 'rest', '$log', 'messages', ($scope, $window, enhance, rest, $log, messages) ->
+      return undefined if not $scope.element
 
-    {
-    position:   1000
-    label:      "#{$scope.element.name} Reports"
-    disabled:   not $scope.element?.availableReports?.length
-    watches:    'element.availableReports'
-    generator:  (action) ->
-      action.createActionsFrom 'element.availableReports', generateReports($scope, $window, enhance, rest)
-    }
-  ]
+      {
+      position:   1000
+      label:      "#{$scope.element.name} Reports"
+      disabled:   not $scope.element?.availableReports?.length
+      watches:    'element.availableReports'
+      generator:  (action) ->
+        action.createActionsFrom 'element.availableReports', generateReports($scope, $window, enhance, rest, $log, messages)
+      }
+    ])
 
-  actionsProvider.registerChildAction 'export', 'generic-reports', ['$scope', '$window', 'enhance', 'rest', ($scope, $window, enhance, rest) ->
-    {
-    position:   2000
-    label:      "Other Reports"
-    disabled:   not $scope.reports?.length
-    watches:   'reports'
-    generator: (action) ->
-      action.createActionsFrom 'reports', generateReports($scope, $window, enhance, rest)
-    }
-  ]
+  actionsProvider.registerChildAction('export', 'generic-reports',
+    ['$scope', '$window', 'enhance', 'rest', '$log', 'messages', ($scope, $window, enhance, rest, $log, messages) ->
+      {
+      position:   2000
+      label:      "Other Reports"
+      disabled:   not $scope.reports?.length
+      watches:   'reports'
+      generator: (action) ->
+        action.createActionsFrom 'reports', generateReports($scope, $window, enhance, rest, $log, messages)
+      }
+    ])
 
-  actionsProvider.registerChildAction 'export', 'list-exports-current', actionsProvider.ROLE_LIST_ACTION, ['$scope', '$window', 'enhance', 'rest', ($scope, $window, enhance, rest) ->
-    return undefined if not $scope.list?
+  actionsProvider.registerChildAction('export', 'list-exports-current', actionsProvider.ROLE_LIST_ACTION,
+    ['$scope', '$window', 'enhance', 'rest', '$log', 'messages', ($scope, $window, enhance, rest, $log, messages) ->
+      return undefined if not $scope.list?
 
-    {
-    position:   5000
-    label:      "Current Reports"
-    disabled:   not $scope.list.availableReports?.length
-    watches:    'list.availableReports'
-    generator:  (action) ->
-      action.createActionsFrom 'list.availableReports', generateReports($scope, $window, enhance, rest)
-    }
-  ]
+      {
+      position:   5000
+      label:      "Current Reports"
+      disabled:   not $scope.list.availableReports?.length
+      watches:    'list.availableReports'
+      generator:  (action) ->
+        action.createActionsFrom 'list.availableReports', generateReports($scope, $window, enhance, rest, $log, messages)
+      }
+    ])
 
   actionsProvider.registerActionInRole 'switch-archived-batches', actionsProvider.ROLE_LIST_ACTION, ['$state', '$scope', '$stateParams', ($state, $scope, $stateParams) ->
     return undefined unless $state.current.name == 'mc.resource.list' and $scope.list and $stateParams.resource == 'batch'

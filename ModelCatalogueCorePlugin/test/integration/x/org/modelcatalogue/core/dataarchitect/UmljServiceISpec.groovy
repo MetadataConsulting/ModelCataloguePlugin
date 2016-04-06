@@ -18,11 +18,21 @@ class UmljServiceISpec extends AbstractIntegrationSpec {
         umljService.importUmlDiagram(catalogueBuilder, inputStream, "rare_diseases_combined", classification)
 
         def patient = DataClass.findByName("Patient")
-        def patientData = patient.contains
-        def de4 = patientData[4]
 
         then:
         patient
+
+        when:
+        def patientData = patient.contains
+
+        then:
+        patientData
+        patientData.size() >= 5
+
+        when:
+        def de4 = patientData[4]
+
+        then:
         de4
 
     }

@@ -19,6 +19,13 @@ class ImportService {
                 new File("${basePath}" + "/WEB-INF/bootstrap-data/CAN_CUH.csv").toCsvReader([charset: 'UTF-8', skipLines: 1]).eachLine { tokens ->
                     globalSearchFor dataType
 
+                    ext "http://www.modelcatalogue.org/metadata/#authors", "Matous Kucera"
+                    ext "http://www.modelcatalogue.org/metadata/#reviewers", "Adam Milward"
+                    ext "http://www.modelcatalogue.org/metadata/#owner", "Vladimir Orany"
+                    ext "http://www.modelcatalogue.org/metadata/#reviewed", "2016-03-30T11:46:30Z"
+                    ext "http://www.modelcatalogue.org/metadata/#approved", "2016-03-30T11:46:30Z"
+                    ext "http://www.modelcatalogue.org/metadata/#namespace", "Global Namespace"
+                    ext "http://www.modelcatalogue.org/metadata/#organization", "Metadata Consulting"
                     description("NHIC conceptual domain i.e. value domains used the NHIC project")
                     dataClass(name:"NHIC Datasets"){
                         dataClass(name:"Ovarian Cancer"){

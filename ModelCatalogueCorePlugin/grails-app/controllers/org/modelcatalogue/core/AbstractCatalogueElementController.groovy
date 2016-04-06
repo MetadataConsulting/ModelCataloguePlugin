@@ -556,6 +556,9 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             modelCatalogueSecurityService.currentUser?.createLinkTo(instance, RelationshipType.favouriteType)
         }
 
+
+        instance.save flush:true
+
         respond instance, [status: OK]
     }
 

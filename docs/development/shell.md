@@ -11,7 +11,7 @@ Examples:
 ./catalogue run dev
 ./catalogue run prod
 ./catalogue test all
-./catalogue clean
+./catalogue clean all
 ```
 
 Run `./catalogue` to get the list of commands available.

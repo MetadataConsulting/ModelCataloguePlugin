@@ -43,11 +43,12 @@ class HPOUpdatesSpec extends AbstractIntegrationSpec  {
         hpo.countDeclares() == 12
 
         when:
-        hpo = elementService.finalizeDataModel(hpo, hpo.semanticVersion, "Imported from HBO")
+        hpo = elementService.finalizeElement(hpo)
 
         then:
         noExceptionThrown()
         hpo
+        hpo.errors.errorCount == 0
         hpo.status == ElementStatus.FINALIZED
         hpo.countDeclares() == 12
 

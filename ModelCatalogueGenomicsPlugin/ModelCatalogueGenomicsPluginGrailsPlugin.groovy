@@ -1,6 +1,7 @@
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.reports.ReportsRegistry
+import org.modelcatalogue.core.util.Metadata
 
 class ModelCatalogueGenomicsPluginGrailsPlugin {
     // the plugin version
@@ -58,19 +59,54 @@ Genomics England customisation plugin for Model Catalogue
 
         reportsRegistry.register {
             creates link
+            title { "Rare Disease Disorder List CSV" }
+            type DataClass
+            link controller: 'genomics', action: 'exportRareDiseaseDisorderListCsv', id: true
+        }
+
+        reportsRegistry.register {
+            creates asset
             title { "GEL Data Specification Report" }
+            defaultName { "${it.name} report as MS Word Document" }
+            depth 3
             type DataModel
             link controller: 'genomics', action: 'exportGelSpecification', id: true
         }
 
         reportsRegistry.register {
             creates link
-            title { "Rare Diseases HPO And Clinical Tests Json" }
+            title { "Eligibility Criteria Report" }
             type DataClass
-            link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTests', id: true
+            link controller: 'genomics', action: 'exportRareDiseaseEligibilityDoc', id: true
         }
 
+        reportsRegistry.register {
+            creates link
+            title { "Phenotypes and Clinical Tests Report" }
+            type DataClass
+            link controller: 'genomics', action: 'exportRareDiseasePhenotypesAndClinicalTestsDoc', id: true
+        }
 
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases HPO And Clinical Tests JSON" }
+            defaultName { "${it.name} report as Json" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsJson', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases HPO And Clinical Tests CSV" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsCsv', id: true
+        }
     }
 
     def onChange = { event ->

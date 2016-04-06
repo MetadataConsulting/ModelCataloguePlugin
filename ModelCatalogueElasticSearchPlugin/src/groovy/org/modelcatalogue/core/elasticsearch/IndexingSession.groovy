@@ -3,9 +3,13 @@ package org.modelcatalogue.core.elasticsearch
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.google.common.collect.ImmutableMap
+import org.elasticsearch.indices.IndexAlreadyExistsException
+import org.elasticsearch.transport.RemoteTransportException
 import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.util.HibernateHelper
 import rx.Observable
+
+import javax.management.InstanceAlreadyExistsException
 
 import static rx.Observable.just
 
@@ -24,8 +28,13 @@ class IndexingSession {
         if (!o) {
             return new Document('','',ImmutableMap.of())
         }
-        documentCache.get("${HibernateHelper.getEntityClass(o)}:${o.getId()}") {
-            createDocument(o)
+
+        try {
+            return documentCache.get("${HibernateHelper.getEntityClass(o)}:${o.getId()}") {
+                createDocument(o)
+            }
+        } catch (IllegalStateException ignored) {
+            return createDocument(o)
         }
     }
 
@@ -33,9 +42,21 @@ class IndexingSession {
         if (!o) {
             return just(false)
         }
-        indexingCache.get("${HibernateHelper.getEntityClass(o)}:${o.getId()}") {
-            index().cache()
+        try {
+            return indexingCache.get("${HibernateHelper.getEntityClass(o)}:${o.getId()}") {
+                index().cache()
+            }
+        } catch (IllegalStateException ignored) {
+            try {
+                return index().cache()
+            } catch(RemoteTransportException rte) {
+                if (rte.cause instanceof  InstanceAlreadyExistsException) {
+                    return just(true)
+                }
+                throw rte
+            }
         }
+
     }
 
     private Document createDocument(Object object) {

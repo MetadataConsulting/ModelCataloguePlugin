@@ -50,7 +50,7 @@ grails.project.dependency.resolution = {
 
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // runtime 'mysql:mysql-connector-java:5.1.27'
-        compile 'com.google.guava:guava:18.0'
+        compile 'com.google.guava:guava:19.0'
         compile 'io.reactivex:rxjava:1.0.15'
 
         // does not work in tests

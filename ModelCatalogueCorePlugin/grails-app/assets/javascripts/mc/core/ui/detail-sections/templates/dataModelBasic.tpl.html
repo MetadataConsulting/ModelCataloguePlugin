@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-md-6"><strong class="small">Authors</strong></div>
     <div class="full-width-editable col-md-6">
-      <small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#authors']">
+      <small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#authors']" e-name="metadata-authors">
         {{element.ext.get('http://www.modelcatalogue.org/metadata/#authors') || 'empty'}}
       </small>
     </div>
@@ -10,7 +10,7 @@
   <div class="row">
     <div class="col-md-6"><strong class="small">Reviewers</strong></div>
     <div class="full-width-editable col-md-6">
-      <small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#reviewers']">
+      <small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#reviewers']" e-name="metadata-reviewers">
         {{element.ext.get('http://www.modelcatalogue.org/metadata/#reviewers') || 'empty'}}
       </small>
     </div>
@@ -18,7 +18,7 @@
   <div class="row">
     <div class="col-md-6"><strong class="small">Owner</strong></div>
     <div class="full-width-editable col-md-6">
-      <small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#owner']">
+      <small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#owner']" e-name="metadata-owner">
         {{element.ext.get('http://www.modelcatalogue.org/metadata/#owner') || 'empty'}}
       </small>
     </div>
@@ -26,7 +26,7 @@
   <div class="row">
     <div class="col-md-6"><strong class="small">Reviewed</strong></div>
     <div class="col-md-6">
-      <small editable-date="extAsMap['http://www.modelcatalogue.org/metadata/#reviewed']">
+      <small editable-date="extAsMap['http://www.modelcatalogue.org/metadata/#reviewed']" e-name="metadata-reviewed">
         {{(element.ext.get('http://www.modelcatalogue.org/metadata/#reviewed') | date) || 'empty'}}
       </small>
     </div>
@@ -34,7 +34,7 @@
   <div class="row">
     <div class="col-md-6"><strong class="small">Approved</strong></div>
     <div class="col-md-6">
-      <small editable-date="extAsMap['http://www.modelcatalogue.org/metadata/#approved']">
+      <small editable-date="extAsMap['http://www.modelcatalogue.org/metadata/#approved']" e-name="metadata-approved">
         {{(element.ext.get('http://www.modelcatalogue.org/metadata/#approved') | date) || 'empty'}}
       </small>
     </div>
@@ -42,7 +42,7 @@
   <div class="row">
     <div class="col-md-6"><strong class="small">Released</strong></div>
     <div class="col-md-6">
-      <small editable-date="extAsMap['http://www.modelcatalogue.org/metadata/#released']">
+      <small editable-date="extAsMap['http://www.modelcatalogue.org/metadata/#released']" e-name="metadata-released">
         {{(element.ext.get('http://www.modelcatalogue.org/metadata/#released') | date) || 'empty'}}
       </small>
     </div>

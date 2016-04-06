@@ -32,6 +32,8 @@ log4j = {
     warn 'org.modelcatalogue.core.xml'
     info 'org.modelcatalogue.core.RelationshipType'
 
+    debug 'grails.app.domain'
+
 //    trace 'org.hibernate.type'
 //    trace 'org.hibernate.stat'
 //    debug 'org.hibernate.SQL'

@@ -242,7 +242,7 @@ class CatalogueXmlLoader {
                     enumerations.put(it.@value.text(), it.text())
                 }
             }
-            parameters.enumerations = enumerations
+            if(enumerations) parameters.enumerations = enumerations
         }
 
         builder.dataType(parameters) {
