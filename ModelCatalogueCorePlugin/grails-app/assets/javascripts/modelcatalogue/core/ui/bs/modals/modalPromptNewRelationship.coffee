@@ -84,7 +84,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 
               for destination in $scope.destinations
                 $scope.messages.clearAllMessages()
                 if not destination.relation
-                  destination.messages.error 'Missing Destination', 'Please select the destination from the existing elements'
+                  destination.messages.error 'Missing Destination', 'Please select the destination from the existing elements or type new destination name.'
                   wasError = true
 
               return if wasError

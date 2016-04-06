@@ -22,6 +22,9 @@
                  catalogue-element-picker resource="relationType"
                  typeahead-on-select="destination.updateRelation(destination.relation)"
                  ng-disabled="!relationshipTypeInfo.type">
+          <p class="help-block">
+            Creates new destination when nothing is selected from advanced search (new destination name must be provided).
+          </p>
         </div>
         <div class="form-group">
           <label ng-click="destination.metadataExpanded = ! destination.metadataExpanded" class="expand-metadata">
