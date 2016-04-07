@@ -21,6 +21,7 @@ class BootStrap {
     def mappingService
     CatalogueBuilder catalogueBuilder
     def sessionFactory
+    def modelCatalogueSearchService
 
     def init = { servletContext ->
         ExtensionModulesLoader.addExtensionModules()
@@ -31,6 +32,7 @@ class BootStrap {
                 initSecurity()
                 setupStuff()
             }
+            modelCatalogueSearchService.reindex()
         } else {
             initCatalogueService.initDefaultRelationshipTypes()
             initSecurity()

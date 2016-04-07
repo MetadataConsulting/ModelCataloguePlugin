@@ -17,6 +17,7 @@ class InitCatalogueService {
     def dataModelService
     def elementService
     def sessionFactory
+    def modelCatalogueSearchService
 
     def initCatalogue(boolean test = false){
         Closure init = {
@@ -25,6 +26,8 @@ class InitCatalogueService {
         }
         if (test) {
             TestDataHelper.initFreshDb(sessionFactory, 'initCatalogue.sql', init)
+            modelCatalogueSearchService.reindex()
+
         } else {
             init()
         }
