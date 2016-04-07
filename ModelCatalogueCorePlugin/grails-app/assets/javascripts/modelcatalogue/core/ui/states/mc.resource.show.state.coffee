@@ -23,7 +23,16 @@ angular.module('mc.core.ui.states.mc.resource.show', ['mc.core.ui.states.control
 
             catalogueElementResource($stateParams.resource).get($stateParams.id).then (result) ->
               $http.get("#{catalogueElementResource($stateParams.resource).getIndexPath()}/#{$stateParams.id}/path").then (response) ->
-                $rootScope.$broadcast('expandTreeview', response.data)
+                path = response.data
+
+                return if not path
+                return if path.length <= 1
+
+                # need to add list node
+
+                path.splice(1, 0, path[1].substring(0, path[1].lastIndexOf('/')) + '/all')
+
+                $rootScope.$broadcast('expandTreeview', path)
               return result
         ]
     }

@@ -35,6 +35,7 @@ class CatalogueElementTreeview
     $scope.id       = null  if !$scope.id
     $scope.repeat   = false if !$scope.repeat
     $scope.list    ?= listEnhancer.createEmptyList()
+    $scope.path     = {segments: []}
 
     nextFun = -> {then: (callback) -> callback($scope.list)}
 
@@ -110,9 +111,7 @@ class CatalogueElementTreeview
       $scope.$eventToObservable('catalogueElementDeleted').debounce(DEBOUNCE_TIME).subscribe refreshList
       $scope.$eventToObservable('newVersionCreated').debounce(DEBOUNCE_TIME).subscribe refreshList
       $scope.$eventToObservable('expandTreeview').debounce(DEBOUNCE_TIME).subscribe (args) ->
-        path = args[1]
-        # TODO: expand tree
-
+        $scope.path.segments = args[1]
 
       $element.find('.catalogue-element-treeview-root-list-root').on 'scroll', loadMoreIfNeeded
 
