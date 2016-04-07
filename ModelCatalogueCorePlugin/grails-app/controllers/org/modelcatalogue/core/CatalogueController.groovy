@@ -5,6 +5,10 @@ import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 import org.springframework.http.HttpStatus
+import javax.xml.transform.TransformerFactory
+import javax.xml.transform.stream.StreamResult
+import javax.xml.transform.stream.StreamSource
+
 
 class CatalogueController {
 
@@ -25,6 +29,27 @@ class CatalogueController {
             response.setHeader("Content-disposition", "attachment; filename=\"${element.name.replaceAll(/\s+/, '_')}.xml\"")
             CatalogueXmlPrinter printer = new CatalogueXmlPrinter(dataModelService, dataClassService)
             printer.bind(element).writeTo(response.writer)
+            return
+        }
+
+        if (params.format == 'xsd') {
+            response.contentType = 'application/xml'
+            response.setHeader("Content-disposition", "attachment; filename=\"${element.name.replaceAll(/\s+/, '_')}.xml\"")
+            CatalogueXmlPrinter printer = new CatalogueXmlPrinter(dataModelService, dataClassService)
+            printer.dump(element, "data/${element.name}.xml")
+            def transformer = TransformerFactory.newInstance().newTransformer(new StreamSource(new File("data/ModelCat2Schema.xsl")))
+            def xml= new File("data/${element.name}.xml").getText()
+            PipedInputStream input = new PipedInputStream()
+            StringWriter outWriter = new StringWriter();
+            try{
+               transformer.transform(new StreamSource(new StringReader(xml)), new StreamResult(outWriter))
+            }
+            catch( Throwable e){
+                log.debug("XSL Transformatin problem:" + e.message())
+            }finally{
+                outWriter.close()
+            }
+            response.writer.write(outWriter.toString())
             return
         }
 
