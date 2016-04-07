@@ -91,9 +91,8 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 
 
               promises = []
 
+              promise = $q.when {}
               for destination in $scope.destinations
-                promise = $q.when {}
-
                 # create new model catalog if requested
                 if angular.isString(destination.relation)
                   # create new catalog element
