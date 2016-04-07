@@ -14,6 +14,6 @@ class Metadata {
      * The HPO and clinical tests report exporters only work for and should only be available to the relevant data class(es), discerned by this metadata field
      */
     public static final def HPO_REPORT_AVAILABLE = "rare-disease-hpo-clinical-tests-report"
-    public static final def CANCER_TYPES_AVAILABLE = "cancer-types-export"
+    public static final def CANCER_TYPES_AVAILABLE = "http://www.modelcatalogue.org/metadata/genomics/#cancer-types-export"
 
 }

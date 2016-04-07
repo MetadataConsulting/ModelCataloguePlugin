@@ -117,6 +117,16 @@ Genomics England customisation plugin for Model Catalogue
             }
             link controller: 'genomics', action: 'exportCancerTypesAsJson', id: true
         }
+
+        reportsRegistry.register {
+            creates link
+            title { "Cancer Types CSV" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportCancerTypesAsCsv', id: true
+        }
     }
 
     def onChange = { event ->

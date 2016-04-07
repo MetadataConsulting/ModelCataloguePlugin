@@ -6,7 +6,8 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
 import org.modelcatalogue.gel.GelCsvExporter
 import org.modelcatalogue.gel.GelJsonExporter
-import org.modelcatalogue.gel.export.CancerTypesExporter
+import org.modelcatalogue.gel.export.CancerTypesCsvExporter
+import org.modelcatalogue.gel.export.CancerTypesJsonExporter
 import org.modelcatalogue.gel.export.RareDiseaseDisorderListCsvExporter
 import org.modelcatalogue.gel.export.RareDiseasesDocExporter
 import org.springframework.http.HttpStatus
@@ -145,24 +146,23 @@ class GenomicsController {
 
 
     private void exportEligibilityOrPhenotypesAndTests(boolean eligibilityMode) {
-        DataClass dClass = DataClass.get(params.id)
+        DataClass model = DataClass.get(params.id)
 
-        DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dClass.getDefaultModelCatalogueId(true))
-
-        if (!dClass) {
+        if (!model) {
             response.status = 404
             return
         }
 
         String documentName = RareDiseasesDocExporter.documentName(eligibilityMode)
 
+        Long classId = model.id
         def assetId = assetService.storeReportAsAsset(
-            dClass.dataModel,
+            model.dataModel,
             name: "${documentName} report as MS Word Document",
-            originalFileName: "${documentName}-${latestVersion.status}-${latestVersion.version}.docx",
+            originalFileName: "${documentName}-${model.status}-${model.version}.docx",
             contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ) { OutputStream out ->
-            new RareDiseasesDocExporter(latestVersion, standardTemplate, DOC_IMAGE_PATH, eligibilityMode).export(out)
+            new RareDiseasesDocExporter(DataClass.get(classId), standardTemplate, DOC_IMAGE_PATH, eligibilityMode).export(out)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())
@@ -194,17 +194,41 @@ class GenomicsController {
         redirect controller: 'asset', id: assetId, action: 'show'
     }
 
+
     def exportCancerTypesAsJson() {
-        DataClass dClass = DataClass.get(params.id)
+        DataClass model = DataClass.get(params.id)
 
-        DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dClass.getDefaultModelCatalogueId(true))
+        if(!model) {
+            response.status = 404
+            return
+        }
 
-        Long assetId = assetService.storeReportAsAsset(latestVersion.dataModel,
-            name: "${latestVersion.name} report as Json",
-            originalFileName: "${latestVersion.name}-${latestVersion.status}-${latestVersion.version}.json",
+        Long assetId = assetService.storeReportAsAsset(model.dataModel,
+            name: "${model.name} report as Json",
+            originalFileName: "${model.name}-${model.status}-${model.version}.json",
             contentType: "application/json",
         ) {
-            new CancerTypesExporter(it).exportCancerTypesAsJson(latestVersion)
+            new CancerTypesJsonExporter(it).exportCancerTypesAsJson(model)
+        }
+
+        response.setHeader("X-Asset-ID",assetId.toString())
+        redirect controller: 'asset', id: assetId, action: 'show'
+    }
+
+    def exportCancerTypesAsCsv() {
+        DataClass model = DataClass.get(params.id)
+
+        if(!model) {
+            response.status = 404
+            return
+        }
+
+        Long assetId = assetService.storeReportAsAsset(model.dataModel,
+            name: "${model.name} report as csv",
+            originalFileName: "${model.name}-${model.status}-${model.version}.csv",
+            contentType: "text/csv",
+        ) {
+            new CancerTypesCsvExporter(it).exportCancerTypesAsCsv(model)
         }
 
         response.setHeader("X-Asset-ID",assetId.toString())

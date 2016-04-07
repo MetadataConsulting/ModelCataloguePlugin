@@ -3,7 +3,6 @@ package org.modelcatalogue.gel.export
 import groovy.json.JsonBuilder
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
 
 /**
@@ -11,12 +10,12 @@ import org.modelcatalogue.core.DataElement
  *
  */
 @Log4j
-class CancerTypesExporter {
+class CancerTypesJsonExporter {
 
     public static final int LEVEL1 = 1
     private final OutputStream out
 
-    CancerTypesExporter(OutputStream out) {
+    CancerTypesJsonExporter(OutputStream out) {
         this.out = out
     }
 
