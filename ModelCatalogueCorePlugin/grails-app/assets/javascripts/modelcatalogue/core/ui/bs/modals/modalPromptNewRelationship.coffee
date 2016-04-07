@@ -1,5 +1,5 @@
 angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 'mc.core.ui.bs.watchAndAskForImportOrCloneCtrl']).config ['messagesProvider', (messagesProvider)->
-  messagesProvider.setPromptFactory 'create-new-relationship', [ '$log', '$modal', '$q', 'messages', 'catalogueElementResource', 'enhance', ($log, $modal, $q, messages, catalogueElementResource, enhance) ->
+  messagesProvider.setPromptFactory 'create-new-relationship', [ '$log', '$modal', '$timeout', '$q', 'messages', 'catalogueElementResource', 'enhance', ($log, $modal, $timeout, $q, messages, catalogueElementResource, enhance) ->
     (title, body, args) ->
       if not args?.element?
         messages.error('Cannot create relationship dialog.', 'The element to be connected to is missing.')
@@ -91,8 +91,10 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 
 
               promises = []
 
-              angular.forEach $scope.destinations, (destination) ->
-                promise = $q.when destination
+              THRESHOLD = 300
+
+              angular.forEach $scope.destinations, (destination, i) ->
+                promise = $timeout((->destination), i * THRESHOLD)
                 # create new model catalog if requested
                 if angular.isString(destination.relation)
                   # create new catalog element
@@ -107,7 +109,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 
                       return catalogueElementResource($scope.relationType).save({name: destination.relation, dataModel: args.currentDataModel})
                         .then (catalogueElement) ->
                           destination.relation = catalogueElement
-                          return destination
+                          return $timeout(( -> destination), THRESHOLD)
                         .catch (response) ->
                           destination.messages.error "Unexpected error while saving new catalogue element [#{destination.relation}]."
                           return $q.reject response
