@@ -26,8 +26,6 @@ class InitCatalogueService {
         }
         if (test) {
             TestDataHelper.initFreshDb(sessionFactory, 'initCatalogue.sql', init)
-            modelCatalogueSearchService.reindex()
-
         } else {
             init()
         }

@@ -32,7 +32,7 @@ class BootStrap {
                 initSecurity()
                 setupStuff()
             }
-            modelCatalogueSearchService.reindex()
+            modelCatalogueSearchService.reindex().toBlocking().first()
         } else {
             initCatalogueService.initDefaultRelationshipTypes()
             initSecurity()
