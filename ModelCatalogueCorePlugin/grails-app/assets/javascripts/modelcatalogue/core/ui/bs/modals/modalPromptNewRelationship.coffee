@@ -97,32 +97,37 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 
                 # create new model catalog if requested
                 if angular.isString(destination.relation)
                   # create new catalog element
-                  promise = promise.then ->
-                    # check if relationType is unknown
-                    if ($scope.relationType == 'org.modelcatalogue.core.CatalogueElement')
-                      destination.messages.error "cannot create new catalog element [#{destination.relation}] as the " +
-                          "type is unknown [#{$scope.relationType}]"
-                      return $q.reject false
-                    else
-                      $log.info "creating new catalog element (#{$scope.relationType}) #{destination.relation}"
-                      return catalogueElementResource($scope.relationType).save({name: destination.relation, dataModel: args.currentDataModel})
-                        .then (catalogElement) ->
-                          return destination.relation = catalogElement
-                        .catch (response) ->
-                          return $q.reject response
+                  promise = ((destination) ->
+                    return promise.then ->
+                      # check if relationType is unknown
+                      if ($scope.relationType == 'org.modelcatalogue.core.CatalogueElement')
+                        destination.messages.error "cannot create new catalog element [#{destination.relation}] as the " +
+                            "type is unknown [#{$scope.relationType}]"
+                        return $q.reject false
+                      else
+                        $log.info "creating new catalog element (#{$scope.relationType}) #{destination.relation}"
+                        return catalogueElementResource($scope.relationType).save({name: destination.relation, dataModel: args.currentDataModel})
+                          .then (catalogElement) ->
+                            return catalogElement
+                          .catch (response) ->
+                            destination.messages.error "Unexpected error while saving new catalogue element [#{destination.relation}]."
+                            return $q.reject response
+                  )(destination)
 
-                promise = promise.then ->
-                  # this is ignored by binding and handled separately
-                  destination.relation.metadata = destination.metadata
-                  destination.relation.__classification = destination.classification
-                  args.element["#{$scope.direction}Relationships"].add($scope.relationshipType.name, destination.relation).then (result) ->
-                    destination.created = true
-                    messages.success('Relationship Created', "You have added new relationship #{$scope.element.name} #{$scope.relationshipTypeInfo.value} #{destination.relation.name} in the catalogue.")
-                    result
-                  , (response) ->
-                    for err in response.data.errors
-                      destination.messages.error err.message
-                    $q.reject response
+                promise = ((destination) ->
+                  promise.then (catalogElement) ->
+                    # this is ignored by binding and handled separately
+                    destination.relation.metadata = destination.metadata
+                    destination.relation.__classification = destination.classification
+                    args.element["#{$scope.direction}Relationships"].add($scope.relationshipType.name, catalogElement).then (result) ->
+                      destination.created = true
+                      messages.success('Relationship Created', "You have added new relationship #{$scope.element.name} #{$scope.relationshipTypeInfo.value} #{catalogElement.name} in the catalogue.")
+                      result
+                    , (response) ->
+                      for err in response.data.errors
+                        destination.messages.error err.message
+                      $q.reject response
+                )(destination)
 
                 promises.push promise
 
