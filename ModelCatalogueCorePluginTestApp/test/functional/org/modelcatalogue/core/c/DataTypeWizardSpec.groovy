@@ -2,7 +2,6 @@ package org.modelcatalogue.core.c
 
 import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
-import spock.lang.Ignore
 
 import static org.modelcatalogue.core.geb.Common.*
 
@@ -78,7 +77,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     def "create reference"() {
         select('Test 1') / 'Test 1'
 
-        addDataModelImport 'SI', 'XMLSchema', 'NHIC'
+        addDataModelImport 'XMLSchema', 'NHIC'
 
         selectInTree 'Data Types'
 
@@ -92,13 +91,16 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         when:
         fill name with 'New Reference Type'
 
+
         click pickReferenceType
 
-        fill 'input#dataClass' with 'DEMOGRAPHICS' and prefer first existing item
+        fill 'dataClass' with 'DEMOGRAPHICS' and prefer first existing item
+        fill description with "Test Reference Unit"
 
         click save
 
         then:
+        check modalDialog gone
         check { infTableCell(1, 1, text: 'New Reference Type') } displayed
         check { infTableCell(1, 2, text: 'DEMOGRAPHICS') } displayed
     }
@@ -117,11 +119,13 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click pickPrimitiveType
 
 
-        fill 'input#measurementUnit' with 'new unit'
+        fill 'measurementUnit' with 'new unit'
+        fill description with "Test Primitive Unit"
 
         click save
 
         then:
+        check modalDialog gone
         check { infTableCell(1, 1, text: 'New Primitive Type') } displayed
         check { infTableCell(1, 2, text: 'new unit') } displayed
     }
@@ -147,6 +151,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click save
 
         then:
+        check modalDialog gone
         check backdrop gone
         check { infTableCell(1, 1, text: 'Enumeration 1') } displayed
     }
@@ -174,6 +179,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click save
 
         then:
+        check modalDialog gone
         check backdrop gone
         check { infTableCell(1, 1, text: 'Enumeration 2') } displayed
     }
@@ -200,6 +206,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click save
 
         then:
+        check modalDialog gone
         check backdrop gone
         check { infTableCell(1, 1, text: 'Enumeration 3') } displayed
         check { infTableCell(1, 2) } contains '01: one'
@@ -237,6 +244,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click save
 
         then:
+        check modalDialog gone
         check backdrop gone
         check { infTableCell(1, 1, text: 'New Data Type')} displayed
     }

@@ -71,7 +71,7 @@ grails.project.dependency.resolution = {
         runtime "org.apache.httpcomponents:httpclient:4.3.1"
 
         // Selenium WebDriver, for use in Geb
-        def webDriverVersion =  System.getenv('WEB_DRIVER_VERSION') ?: "2.48.2"
+        def webDriverVersion =  System.getenv('WEB_DRIVER_VERSION') ?: "2.53.0"
 
         // Testing modules
         test "org.gebish:geb-spock:0.9.3"
@@ -80,10 +80,6 @@ grails.project.dependency.resolution = {
         test "org.seleniumhq.selenium:selenium-chrome-driver:${webDriverVersion}"
         test "org.seleniumhq.selenium:selenium-remote-driver:${webDriverVersion}"
 
-        // Required because of bug in 2.37.0 of WebDriver:
-        test("org.seleniumhq.selenium:selenium-htmlunit-driver:${webDriverVersion}") {
-            exclude 'xml-apis'
-        }
 
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
     }
