@@ -17,6 +17,7 @@ class InitCatalogueService {
     def dataModelService
     def elementService
     def sessionFactory
+    def modelCatalogueSearchService
 
     def initCatalogue(boolean test = false){
         Closure init = {
