@@ -91,7 +91,7 @@ angular.module('mc.core.ui.utils').directive 'orderedMapEditor',  [-> {
               createdValues++
             newObject = {}
             newObject[key] = value
-            $scope.object.updateFrom(newObject)
+            $scope.object.updateFrom(newObject, true)
 
         # remove empty key - present when new map is created
         if (createdValues > 0 || updatedValues > 0)

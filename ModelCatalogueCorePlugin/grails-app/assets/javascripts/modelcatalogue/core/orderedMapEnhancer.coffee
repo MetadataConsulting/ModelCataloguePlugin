@@ -7,7 +7,7 @@ angular.module('mc.core.orderedMapEnhancer', ['mc.util.enhance']).config ['enhan
         map.values = []
 
       orderedMap.get = (key) -> @access(key).get()
-      orderedMap.access = (key) ->
+      orderedMap.access = (key, allowEmpty = false) ->
         self = @
         set = (newValue) ->
           ensureValuesAreArray(self)
@@ -16,7 +16,7 @@ angular.module('mc.core.orderedMapEnhancer', ['mc.util.enhance']).config ['enhan
               value.value = newValue
               return newValue
           # only push if the value is defined
-          self.values.push(key: key, value: newValue) if newValue or not key
+          self.values.push(key: key, value: newValue) if allowEmpty or newValue or not key
           return newValue
         get =  ->
           ensureValuesAreArray(self)
@@ -85,16 +85,16 @@ angular.module('mc.core.orderedMapEnhancer', ['mc.util.enhance']).config ['enhan
 
         return ret
 
-      orderedMap.updateFrom = (map) ->
+      orderedMap.updateFrom = (map, allowEmpty = false) ->
         return orderedMap if not map
 
         if condition(map)
           for value in map.values
-            @access(value.key).set(value.value)
+            @access(value.key, allowEmpty).set(value.value)
           return orderedMap
 
         for key, value of map
-          @access(key).set(value)
+          @access(key, allowEmpty).set(value)
 
         return orderedMap
 
