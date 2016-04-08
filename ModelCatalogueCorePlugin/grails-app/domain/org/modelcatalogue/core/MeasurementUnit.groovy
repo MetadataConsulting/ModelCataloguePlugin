@@ -30,6 +30,11 @@ class MeasurementUnit extends CatalogueElement {
         return PrimitiveType.countByMeasurementUnit(this)
     }
 
+    @Override
+    Long getFirstParentId() {
+        return getPrimitiveTypes().find { it.getDataModelId() == getDataModelId() }?.getId() ?: super.getFirstParentId()
+    }
+
 
 
 }

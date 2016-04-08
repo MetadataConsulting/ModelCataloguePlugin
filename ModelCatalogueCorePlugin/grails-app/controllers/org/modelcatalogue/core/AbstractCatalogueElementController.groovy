@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import grails.transaction.Transactional
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.path.PathFinder
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.PublishingContext
@@ -797,6 +798,17 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         respond Lists.fromCriteria(customParams, type, "/${name}/${params.id}/history") {
             eq 'latestVersionId', latestVersionId
         }
+    }
+
+
+    def path() {
+        CatalogueElement element = queryForResource(params.id)
+        if (!element) {
+            notFound()
+            return
+        }
+
+        respond new PathFinder().findPath(element)
     }
 
     protected String getHistoryOrderDirection() {

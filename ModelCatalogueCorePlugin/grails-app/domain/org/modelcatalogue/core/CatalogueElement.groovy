@@ -66,7 +66,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     Set<Mapping> outgoingMappings = []
     Set<Mapping> incomingMappings = []
 
-    static transients = ['relations', 'info', 'archived', 'relations', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext', 'combinedVersion', 'inheritedAssociationsNames', 'modelCatalogueResourceName', 'dataModelSemanticVersion', 'legacyModelCatalogueId']
+    static transients = ['relations', 'info', 'archived', 'relations', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext', 'combinedVersion', 'inheritedAssociationsNames', 'modelCatalogueResourceName', 'dataModelSemanticVersion', 'legacyModelCatalogueId', 'link']
 
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping, extensions: ExtensionValue]
 
@@ -601,5 +601,16 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
             return getProperty('semanticVersion')
         }
         return getDataModel()?.semanticVersion
+    }
+
+    String getLink() {
+        "/${GrailsNameUtils.getPropertyName(getClass())}/${getId()}".toString()
+    }
+
+    Long getFirstParentId() {
+        if (getDataModel()) {
+            return getDataModel().getId()
+        }
+        return null
     }
 }

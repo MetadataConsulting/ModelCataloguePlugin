@@ -53,7 +53,7 @@
     </span>
   </div>
   <ul ng-if="element.$$children" ng-hide="element.$$collapsed" class="catalogue-element-treeview-list">
-    <catalogue-element-treeview-item element="child" descend="nextDescend" repeat="repeat" treeview="treeview"
+    <catalogue-element-treeview-item extra-parameters="{'path': path}" element="child" descend="nextDescend" repeat="repeat" treeview="treeview"
                                      ng-repeat="child in element.$$children track by $index"></catalogue-element-treeview-item>
     <li ng-if="element.$$numberOfChildren > element.$$children.length" class="catalogue-element-treeview-item">
       <span class="catalogue-element-treeview-labels" ng-click="element.$$showMore()">
