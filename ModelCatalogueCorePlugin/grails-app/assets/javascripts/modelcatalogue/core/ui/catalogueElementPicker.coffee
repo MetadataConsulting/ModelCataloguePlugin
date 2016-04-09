@@ -66,8 +66,6 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
         $scope.$eval onSelect, {$item: element, $model: element, $label: element.classifiedName} if onSelect
 
     $scope.customCepOnSelect = ($item, $model, $label, typeaheadOnSelect) ->
-      console.log($item, $model, $label)
-
       if $item and $item.more and angular.isFunction($item.openSearchMore)
         $item.openSearchMore()
         $scope.$evalAsync ->
