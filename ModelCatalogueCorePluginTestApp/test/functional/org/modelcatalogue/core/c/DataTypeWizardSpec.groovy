@@ -52,28 +52,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check rightSideTitle is 'Data Types'
     }
 
-    def "filter by name in header"() {
-        check backdrop gone
-
-        when: "the header is expanded"
-        click expandTableHeader
-
-        then: "the name filter is displayed"
-        check nameFilter
-
-        when: "we filter by anatomical side"
-        fill nameFilter with 'anatomicalside'
-
-        then: "only one row will be shown"
-        check tableRows test { it.size() == 1 }
-
-        when: "the filter is reset"
-        fill nameFilter with ''
-
-        then: "we see many rows again"
-        check tableRows test { it.size() >= 1 }
-    }
-
     def "create reference"() {
         select('Test 1') / 'Test 1'
 
