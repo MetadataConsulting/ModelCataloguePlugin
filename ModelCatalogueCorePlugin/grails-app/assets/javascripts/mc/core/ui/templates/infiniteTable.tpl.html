@@ -113,8 +113,7 @@
                 <span class="pull-right text-muted" ng-if="total == 0"><em>Empty</em></span>
               </td>
             </tr>
-            <tr class="active" ng-if="manualLoad && total != 0" ng-click="loadMore()"
-                ng-class="{'cursor-pointer': total != elements.length, 'cursor-not-allowed': total == elements.length}">
+            <tr class="active cursor-pointer" ng-if="manualLoad &amp;&amp; total != elements.length &amp;&amp; elements.length > 0" ng-click="loadMore()">
               <td class="text-center">
                 <span class="fa fa-angle-double-down"></span>
               </td>
