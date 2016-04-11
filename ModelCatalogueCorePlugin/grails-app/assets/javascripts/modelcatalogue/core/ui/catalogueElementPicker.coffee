@@ -26,7 +26,7 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
       if statusAttr
         params.status = statusAttr
 
-      if $state.params.dataModelId and $state.params.dataModelId != 'catalogue'
+      if not globalAttr and $state.params.dataModelId and $state.params.dataModelId != 'catalogue'
         params.dataModel = $state.params.dataModelId
 
       if (value)
