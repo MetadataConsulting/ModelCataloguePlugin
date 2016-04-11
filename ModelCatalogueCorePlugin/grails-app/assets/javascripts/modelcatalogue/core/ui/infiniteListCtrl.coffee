@@ -127,31 +127,6 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
 
   footerActions = actions.getActions($scope, actions.ROLE_LIST_FOOTER_ACTION)
 
-
-  $scope.isNotFiltered = (row) ->
-    for column, i in $scope.columns
-      filter = $scope.filters[column.header]
-      continue if not filter
-      if i == 0
-        return false if row.head.value?.toLowerCase().indexOf(filter.toLowerCase()) == -1
-      else
-        return false if row.tail[i - 1].value?.toLowerCase().indexOf(filter.toLowerCase()) == -1
-    return true
-
-  $scope.isFiltered = ->
-    for column in $scope.columns
-      filter = $scope.filters[column.header]
-      continue if not filter
-      return true
-    return false
-
-  $scope.initFilters = (columns) ->
-    $scope.filters ?= {}
-    for column in columns
-      $scope.filters[column.header] = ''
-
-  $scope.initFilters($scope.columns ? [])
-
   $scope.footerAction = if footerActions then footerActions[0]
 
   $scope.getFooterCentralIconClass = ->

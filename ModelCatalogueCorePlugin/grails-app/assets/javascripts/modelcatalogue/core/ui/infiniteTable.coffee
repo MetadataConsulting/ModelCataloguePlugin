@@ -47,16 +47,6 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
         return "fa-sort-#{$scope.list.order}"
 
 
-      $scope.$$headerExpanded = false
-      $scope.triggerHeaderExpanded = ->
-        $scope.$$headerExpanded = !$scope.$$headerExpanded
-        if header.css('position') == 'fixed'
-          header.find('.contextual-actions button.dropdown-toggle').parent().removeClass('dropup')
-        else
-          header.find('.contextual-actions button.dropdown-toggle').parent().addClass('dropup')
-
-        return false
-
       updateHeader = (scroll) ->
         header.css(width: body.width())
         if not initialOffset
@@ -102,7 +92,6 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
       $scope.$watch 'columns', update
       $scope.$watch 'loading', (loading) ->
         loadMoreIfNeeded() unless loading
-      $scope.$watch 'filters', (-> loadMoreIfNeeded()), true
 
       windowEl.on 'resize', ->
         updateHeader(windowEl.scrollTop())
@@ -123,7 +112,6 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
         counter = tableRowIndex
 
         for row, i in $scope.rows
-          continue unless $scope.isNotFiltered(row)
           counter++ if i == originalRowAndIndex.index
           counter--
           counter-- if row.$$expanded
