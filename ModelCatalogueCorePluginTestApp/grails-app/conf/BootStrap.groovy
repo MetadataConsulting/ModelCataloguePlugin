@@ -20,17 +20,14 @@ class BootStrap {
     def actionService
     def mappingService
     CatalogueBuilder catalogueBuilder
-    def sessionFactory
 
     def init = { servletContext ->
         ExtensionModulesLoader.addExtensionModules()
 
         if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST]) {
-            TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
-                initCatalogueService.initCatalogue(true)
-                initSecurity()
-                setupStuff()
-            }
+            initCatalogueService.initCatalogue(true)
+            initSecurity()
+            setupStuff()
         } else {
             initCatalogueService.initDefaultRelationshipTypes()
             initSecurity()
