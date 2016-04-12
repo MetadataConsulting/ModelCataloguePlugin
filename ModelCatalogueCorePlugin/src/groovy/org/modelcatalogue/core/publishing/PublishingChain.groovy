@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.publishing
 
 import groovy.util.logging.Log4j
+import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
@@ -18,7 +19,14 @@ abstract class PublishingChain {
 
     protected ElementStatus initialStatus
 
+    public static PublishingChain finalize(DataModel published) {
+        FinalizationChain.create(published)
+    }
+
     public static PublishingChain finalize(CatalogueElement published) {
+        if (HibernateProxyHelper.getClassWithoutInitializingProxy(published) == DataModel) {
+            return FinalizationChain.create(published as DataModel)
+        }
         LegacyFinalizationChain.create(published)
     }
 

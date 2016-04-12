@@ -395,6 +395,8 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     protected PublishingChain preparePublishChain(PublishingChain chain) { chain }
 
+    List<CatalogueElement> collectExternalDependencies() { Collections.emptyList() }
+
     final CatalogueElement cloneElement(Publisher<CatalogueElement> publisher, CloningContext strategy) {
         preparePublishChain(PublishingChain.clone(this, strategy)).run(publisher)
     }

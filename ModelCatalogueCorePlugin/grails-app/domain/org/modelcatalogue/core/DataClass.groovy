@@ -18,6 +18,13 @@ class DataClass extends CatalogueElement {
                 .add(this.parentOf)
     }
 
+    List<CatalogueElement> collectExternalDependencies() {
+        List<CatalogueElement> ret = []
+        ret.addAll this.contains.findAll { it.dataModel != dataModel }
+        ret.addAll this.parentOf.findAll { it.dataModel != dataModel }
+        ret
+    }
+
     @Override
     void setModelCatalogueId(String mcID) {
         super.setModelCatalogueId(Legacy.fixModelCatalogueId(mcID))

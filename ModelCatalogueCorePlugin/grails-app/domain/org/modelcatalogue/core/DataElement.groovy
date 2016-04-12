@@ -29,6 +29,13 @@ class DataElement extends CatalogueElement {
         super.preparePublishChain(chain).add(this.dataType)
     }
 
+    List<CatalogueElement> collectExternalDependencies() {
+        if (dataType?.dataModel != dataModel) {
+            return [dataType]
+        }
+        return super.collectExternalDependencies()
+    }
+
     @Override
     void afterDraftPersisted(CatalogueElement draft, PublishingContext context) {
         super.afterDraftPersisted(draft, context)

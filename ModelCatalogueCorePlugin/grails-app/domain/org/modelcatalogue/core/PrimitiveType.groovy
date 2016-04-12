@@ -12,4 +12,11 @@ class PrimitiveType extends DataType {
 
     List<String> getInheritedAssociationsNames() { ['measurementUnit'] }
 
+    List<CatalogueElement> collectExternalDependencies() {
+        if (measurementUnit?.dataModel != dataModel) {
+            return [measurementUnit]
+        }
+        return super.collectExternalDependencies()
+    }
+
 }
