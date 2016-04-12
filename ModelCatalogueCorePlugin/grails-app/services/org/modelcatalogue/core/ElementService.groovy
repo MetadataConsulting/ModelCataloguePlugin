@@ -194,7 +194,7 @@ class ElementService implements Publisher<CatalogueElement> {
                 }
             })
 
-            
+
             if (result && result.getDefaultModelCatalogueId(version == null).contains(Legacy.fixModelCatalogueId(theId).toString())) {
                 return result
             }
@@ -294,8 +294,17 @@ class ElementService implements Publisher<CatalogueElement> {
     }
 
     public DataModel finalizeDataModel(DataModel draft, String version, String revisionNotes) {
+        return finalizeDataModel(draft, version, revisionNotes, false)
+    }
+
+    /**
+     * @deprecated skipping the eligibility is only available for tests
+     */
+    public DataModel finalizeDataModel(DataModel draft, String version, String revisionNotes, boolean skipEligibility) {
         // check eligibility for finalization
-        draft.checkFinalizeEligibility(version, revisionNotes)
+        if (!skipEligibility) {
+            draft.checkFinalizeEligibility(version, revisionNotes)
+        }
 
         if (draft.hasErrors()) {
             return draft

@@ -53,11 +53,7 @@ angular.module('mc.core.ui.states.controllers.DataModelsCtrl', ['ui.router', 'mc
     $scope.$watch 'q', (q) ->
       $state.go '.', {q: q}
 
-    $scope.$on 'actionPerformed', ->
-      unless $scope.type
-        $timeout $state.reload, 100
-
     $scope.$on 'newVersionCreated', ->
-      $state.go '.', type: undefined 
+      $state.go '.', type: undefined
 
 ])

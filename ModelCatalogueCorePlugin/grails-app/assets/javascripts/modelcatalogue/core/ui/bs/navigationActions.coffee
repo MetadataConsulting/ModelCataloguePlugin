@@ -22,8 +22,8 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
         return undefined unless messages.hasPromptFactory('create-' + resource) or messages.hasPromptFactory('edit-' + resource)
         return undefined unless dataModel
         return undefined unless dataModel.status == 'DRAFT'
-        return undefined if not angular.isFunction($scope.element.isInstanceOf)
-        return undefined if not $scope.element.isInstanceOf('dataModel')
+        return undefined unless angular.isFunction($scope.element.isInstanceOf)
+        return undefined unless $scope.element.isInstanceOf('dataModel') or resource is 'dataClass' and $scope.element.isInstanceOf('dataClass')
 
 
         {
@@ -32,7 +32,11 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
           type:       'success'
           position:   5000 + index
           action:     ->
-            args      = {create: (resource), currentDataModel: dataModel }
+            args =
+              create: resource
+              currentDataModel: dataModel
+
+            args.parent = $scope.element if resource is 'dataClass' and $scope.element.isInstanceOf('dataClass')
             args.type = if messages.hasPromptFactory('create-' + resource) then "create-#{resource}" else "edit-#{resource}"
 
             security.requireRole('CURATOR')

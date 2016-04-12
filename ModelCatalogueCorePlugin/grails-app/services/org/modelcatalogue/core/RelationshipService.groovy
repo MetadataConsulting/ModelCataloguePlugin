@@ -108,7 +108,7 @@ class RelationshipService {
 
             if (relationshipInstance) {
 
-                if (relationshipDefinition.metadata) {
+                if (relationshipDefinition.metadataSet) {
                     if (relationshipInstance.ext != relationshipDefinition.metadata) {
                         relationshipInstance.ext = relationshipDefinition.metadata
                         if (relationshipDefinition.relationshipType == RelationshipType.baseType) {

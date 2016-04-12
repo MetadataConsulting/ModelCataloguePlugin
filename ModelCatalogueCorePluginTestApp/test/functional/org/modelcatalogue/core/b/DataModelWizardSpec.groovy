@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.b
 
 import org.modelcatalogue.core.geb.CatalogueAction
+import org.modelcatalogue.core.geb.CatalogueContent
 import spock.lang.Ignore
 
 import static org.modelcatalogue.core.geb.Common.*
@@ -18,6 +19,8 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
     static final String stepImports = "#step-imports"
     static final String stepFinish = "#step-finish"
     static final String exitButton = "#exit-wizard"
+    public static final CatalogueContent metadataReviewed = CatalogueContent.create('*[name=metadata-reviewed] input')
+    public static final CatalogueContent metadataApproved = CatalogueContent.create('*[name=metadata-approved] input')
     public static final CatalogueAction modalFinalize = CatalogueAction.runLast('modal', 'modal-finalize-data-modal')
     public static final CatalogueAction modalCreateNewVersion = CatalogueAction.runLast('modal', 'modal-create-new-version')
 
@@ -76,8 +79,8 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         fill 'metadata-authors' with 'Neville Chamberlain'
         fill 'metadata-reviewers' with 'Édouard Daladier'
         fill 'metadata-owner' with 'Jan Hus'
-        fill 'metadata-reviewed' with '2016-03-29'
-        fill 'metadata-approved' with '2016-03-29'
+        fill metadataReviewed with '29/04/2016'
+        fill metadataApproved with '29/04/2016'
         fill 'metadata-namespace' with 'Namespace'
         fill 'metadata-organization' with 'Organization'
         click inlineEditSubmit

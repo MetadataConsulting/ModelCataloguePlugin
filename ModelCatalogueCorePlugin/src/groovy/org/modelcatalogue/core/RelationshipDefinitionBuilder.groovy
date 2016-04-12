@@ -14,6 +14,11 @@ class RelationshipDefinitionBuilder {
     }
 
     RelationshipDefinitionBuilder withMetadata(Map<String, String> metadata) {
+        if (metadata == null) {
+            definition.metadata = Collections.emptyMap()
+            return this
+        }
+        definition.metadataSet = true
         definition.metadata = metadata
         this
     }
@@ -68,6 +73,9 @@ class RelationshipDefinitionBuilder {
                 throw new IllegalArgumentException("Cannot set $key using the parameter map. Set the value directly when creating the builder")
             } else if (definition.hasProperty(key)) {
                 definition.setProperty(key, value)
+                if (key == 'metadata') {
+                    definition.metadataSet = true
+                }
             } else {
                 if (key == 'classification') {
                     definition.dataModel = value as DataModel

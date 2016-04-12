@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Legacy
@@ -52,4 +51,8 @@ class DataClass extends CatalogueElement {
     }
 
 
+    @Override
+    Long getFirstParentId() {
+        return getChildOf().find { it.getDataModelId() == getDataModelId() }?.getId() ?: super.getFirstParentId()
+    }
 }

@@ -786,12 +786,17 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         }
 
         DataModel anotherDataModel = DataModel.findByName(anotherDataModelName)
-        elementService.finalizeDataModel(anotherDataModel, "0.0.1", "new model")
+        elementService.finalizeDataModel(anotherDataModel, "0.0.1", "new model", true)
+
+
+        expect:
+        anotherDataModel.errors.errorCount == 0
+
+        when:
         DataModel anotherDataModelDraft = elementService.createDraftVersion(anotherDataModel, '0.0.2', DraftContext.userFriendly())
 
         final String dataModelModelCatalogueId = "ModelCatalogueCorePluginTestApp/catalogue/dataModel/$anotherDataModelDraft.latestVersionId@0.0.2"
 
-        when:
         CatalogueElement anotherDataModelFound = elementService.findByModelCatalogueId(CatalogueElement, dataModelModelCatalogueId)
 
 
@@ -803,12 +808,21 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         when:
         DataModel dataModel = DataModel.findByName(dataModelName)
         DataType dataTypeV1 = DataType.findByName(dataTypeName)
-        elementService.finalizeDataModel(dataModel, "0.0.1", "new model")
+        elementService.finalizeDataModel(dataModel, "0.0.1", "new model", true)
+
+        then:
+        dataModel.errors.errorCount == 0
+
+        when:
         DataModel dataModelV2 = elementService.createDraftVersion(dataModel, '0.0.2', DraftContext.userFriendly())
 
         CatalogueElement dataType = elementService.findByModelCatalogueId(CatalogueElement, dataTypeModelCatalogueId)
 
-        elementService.finalizeDataModel(dataModelV2, "0.0.2", "new model")
+        elementService.finalizeDataModel(dataModelV2, "0.0.2", "new model", true)
+        then:
+        dataModelV2.errors.errorCount == 0
+
+        when:
         elementService.createDraftVersion(dataModelV2, '0.0.3', DraftContext.userFriendly())
 
         then:

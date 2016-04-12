@@ -1,12 +1,13 @@
 package org.modelcatalogue.core.genomics
 
 import org.modelcatalogue.core.DataClass
-
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
 import org.modelcatalogue.gel.RareDiseaseCsvExporter
 import org.modelcatalogue.gel.GelJsonExporter
+import org.modelcatalogue.gel.export.CancerTypesCsvExporter
+import org.modelcatalogue.gel.export.CancerTypesJsonExporter
 import org.modelcatalogue.gel.export.RareDiseaseDisorderListCsvExporter
 import org.modelcatalogue.gel.export.RareDiseasesDocExporter
 import org.springframework.http.HttpStatus
@@ -194,6 +195,47 @@ class GenomicsController {
             contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )  { OutputStream out ->
             new DataModelToDocxExporter(DataModel.get(modelId), dataClassService, customTemplate, DOC_IMAGE_PATH).export(out)
+        }
+
+        response.setHeader("X-Asset-ID",assetId.toString())
+        redirect controller: 'asset', id: assetId, action: 'show'
+    }
+
+
+    def exportCancerTypesAsJson() {
+        DataClass model = DataClass.get(params.id)
+
+        if(!model) {
+            response.status = 404
+            return
+        }
+
+        Long assetId = assetService.storeReportAsAsset(model.dataModel,
+            name: "${model.name} report as Json",
+            originalFileName: "${model.name}-${model.status}-${model.version}.json",
+            contentType: "application/json",
+        ) {
+            new CancerTypesJsonExporter(it).exportCancerTypesAsJson(model)
+        }
+
+        response.setHeader("X-Asset-ID",assetId.toString())
+        redirect controller: 'asset', id: assetId, action: 'show'
+    }
+
+    def exportCancerTypesAsCsv() {
+        DataClass model = DataClass.get(params.id)
+
+        if(!model) {
+            response.status = 404
+            return
+        }
+
+        Long assetId = assetService.storeReportAsAsset(model.dataModel,
+            name: "${model.name} report as csv",
+            originalFileName: "${model.name}-${model.status}-${model.version}.csv",
+            contentType: "text/csv",
+        ) {
+            new CancerTypesCsvExporter(it).exportCancerTypesAsCsv(model)
         }
 
         response.setHeader("X-Asset-ID",assetId.toString())

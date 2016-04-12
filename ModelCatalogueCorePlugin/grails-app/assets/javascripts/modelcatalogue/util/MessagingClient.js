@@ -21,6 +21,8 @@
 
             if (!StompClient) {
                 StompClient = Stomp.over(new SockJS(SockJSURL))
+                // comment out following line for debugging
+                StompClient.debug = function(){}
             }
 
             StompClient.connect(headers, function () {}, function (err) {

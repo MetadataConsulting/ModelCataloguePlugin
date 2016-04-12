@@ -2,6 +2,7 @@ package org.modelcatalogue.core.elasticsearch
 
 import com.google.common.collect.ImmutableMap
 import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.DataType
 
 class DataElementDocumentSerializer extends CatalogueElementDocumentSerializer<DataElement> {
 
@@ -9,8 +10,8 @@ class DataElementDocumentSerializer extends CatalogueElementDocumentSerializer<D
     ImmutableMap.Builder<String, Object> buildDocument(IndexingSession session, DataElement element, ImmutableMap.Builder<String, Object> builder) {
         super.buildDocument(session, element, builder)
 
-        if (element.dataType) {
-            safePut(builder, 'data_type', session.getDocument(element.dataType).payload)
+        if (element.getDataTypeId()) {
+            safePut(builder, 'data_type', session.getDocument(DataType.get(element.getDataTypeId())).payload)
         }
 
         return builder

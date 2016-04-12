@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import grails.transaction.Transactional
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.path.PathFinder
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.PublishingContext
@@ -799,6 +800,17 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
     }
 
+
+    def path() {
+        CatalogueElement element = queryForResource(params.id)
+        if (!element) {
+            notFound()
+            return
+        }
+
+        respond new PathFinder().findPath(element)
+    }
+
     protected String getHistoryOrderDirection() {
         'desc'
     }
@@ -827,7 +839,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 continue
             }
             if (!(dataModel.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
-                dataModel = elementService.createDraftVersion(dataModel, PublishingContext.nextPatchVersion(dataModel.semanticVersion), DraftContext.userFriendly())
+                instance.errors.reject 'catalogue.element.data.model.must.be.draft', "'$instance.name' has to be declared within draft data model."
+                return
             }
             instance.dataModel = dataModel
             instance.save()

@@ -100,9 +100,9 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     boolean selectCepItemIfExists(long waitTime = 3) {
         try {
             waitFor(waitTime) {
-                $('.cep-item, .item-found').displayed
+                $('.cep-item:not(.show-more-cep-item), .item-found').displayed
             }
-            $('.cep-item, .item-found').first().click()
+            $('.cep-item:not(.show-more-cep-item), .item-found').first().click()
             return true
         } catch (ignored) {
             return false

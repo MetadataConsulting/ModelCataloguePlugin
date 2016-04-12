@@ -56,7 +56,6 @@ class ElasticSearchService implements SearchCatalogue {
             full_version: 90,
             latest_id: 80,
             entity_id : 70,
-            'ext.extension_value.value' : 10,
             description: 1
     ]
 
@@ -193,7 +192,7 @@ class ElasticSearchService implements SearchCatalogue {
         List<String> indicies
 
         if (CatalogueElement.isAssignableFrom(resource)) {
-            indicies = collectDataModelIndicies(params)
+            indicies = resource == DataModel ? [DATA_MODEL_INDEX] : collectDataModelIndicies(params)
 
             BoolQueryBuilder boolQuery = QueryBuilders.boolQuery().minimumNumberShouldMatch(1)
 
@@ -206,6 +205,7 @@ class ElasticSearchService implements SearchCatalogue {
             }
 
             boolQuery.should(QueryBuilders.prefixQuery('name', search).boost(200))
+            boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.termQuery('ext.value', search)).boost(10))
 
             qb = boolQuery
         } else if (RelationshipType.isAssignableFrom(resource)) {
@@ -677,10 +677,10 @@ class ElasticSearchService implements SearchCatalogue {
         if (params.dataModel) {
             DataModel dataModel = DataModel.get(params.long('dataModel'))
             if (dataModel) {
-                return DataModelFilter.includes(dataModel)
+                return DataModelFilter.includes(dataModel).withImports()
             }
         }
-        dataModelService.dataModelFilter
+        dataModelService.dataModelFilter.withImports()
     }
 
     List<String> collectTypes(Class<?> resource) {

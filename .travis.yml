@@ -41,4 +41,4 @@ deploy:
     - "conf/docker/mc-config.groovy"
   on:
     tags: true
-    condition: $TEST_SUITE = app_integration
+    condition: $TEST_SUITE = other_integration

@@ -10,6 +10,14 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
             messages.error err.message
 
 
+  getIsSourceFinalized = (relationship) ->
+    unless relationship
+      return false
+    if relationship.direction == "sourceToDestination"
+      return relationship.element.status is 'FINALIZED'
+    return relationship.relation.status is 'FINALIZED'
+
+
   actionsProvider.registerActionInRoles 'catalogue-element',[actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'security', 'names', 'catalogue', ($scope, security, name, catalogue)->
     return undefined if not security.hasRole('CURATOR')
     return undefined unless $scope.element
@@ -244,8 +252,13 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       label:      ''
       icon:       'glyphicon glyphicon-remove'
       type:       'danger'
-      watches:    'element.inherited'
-      disabled:   $scope.element.inherited
+      watches:    [
+        'element.inherited'
+        'element.element.status'
+        'element.relation.status'
+        'element.type.versionSpecific'
+      ]
+      disabled:   $scope.element.inherited or ($scope.element.type.versionSpecific and getIsSourceFinalized($scope.element))
       action:     ->
         rel   = $scope.element
         deferred = $q.defer()
@@ -319,8 +332,13 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     label:      ''
     icon:       'glyphicon glyphicon-edit'
     type:       'primary'
-    watches:    'element.inherited'
-    disabled:   $scope.element.inherited
+    watches:    [
+      'element.inherited'
+      'element.element.status'
+      'element.relation.status'
+      'element.type.versionSpecific'
+    ]
+    disabled:   $scope.element.inherited or ($scope.element.type.versionSpecific and getIsSourceFinalized($scope.element))
     action:     ->
       rel   = getRelationship()
       rel.element.refresh().then (element) ->

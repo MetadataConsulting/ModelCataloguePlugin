@@ -49,6 +49,7 @@ class RelationshipDefinition {
     boolean ignoreRules
     boolean skipUniqueChecking
     boolean otherSide
+    boolean metadataSet
 
     Relationship createRelationship() {
         new Relationship(

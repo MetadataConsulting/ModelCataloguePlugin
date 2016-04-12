@@ -5,23 +5,34 @@ import org.modelcatalogue.core.DataClass
 
 class UmljServiceISpec extends AbstractIntegrationSpec {
 
-    def umljService, initCatalogueService, catalogueBuilder
+    def umljService
+    def catalogueBuilder
 
     def "test import"() {
-        initCatalogueService.initCatalogue(true)
+        initCatalogue()
         def filenameXsd = "test/integration/resources/CLLDataModel0.1.umlj"
-        DataModel classification = new DataModel(name: "GeL Cancer CLL").save()
+        DataModel classification = new DataModel(name: "GeL Cancer Core ${System.currentTimeMillis()}").save(failOnError: true)
 
         when:
         InputStream inputStream = new FileInputStream(filenameXsd)
         umljService.importUmlDiagram(catalogueBuilder, inputStream, "rare_diseases_combined", classification)
 
         def patient = DataClass.findByName("Patient")
-        def patientData = patient?.contains
-        def de4 = patientData[4]
 
         then:
         patient
+
+        when:
+        def patientData = patient.contains
+
+        then:
+        patientData
+        patientData.size() >= 5
+
+        when:
+        def de4 = patientData[4]
+
+        then:
         de4
 
     }
