@@ -26,6 +26,10 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     return undefined if resource == 'batch'
     return undefined if not messages.hasPromptFactory('create-' + resource) and not messages.hasPromptFactory('edit-' + resource)
 
+    dataModel = anyParentDataModel($scope)
+
+    return undefined if dataModel and dataModel.status isnt 'DRAFT'
+
     {
     position:   100
     label:      "New #{names.getNaturalName(resource)}"

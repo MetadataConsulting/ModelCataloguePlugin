@@ -1,12 +1,5 @@
 angular.module('mc.core.ui.bs.withClassificationCtrlMixin', ['mc.util.security']).controller 'withClassificationCtrlMixin', ['$scope', 'security', 'catalogue',  ($scope, security, catalogue) ->
   createdMessages = []
-  dataModelsChanged = (newDataModels) ->
-    newDataModels = newDataModels ? []
-    msg.remove() for msg in createdMessages
-    createdMessages = []
-    noDrafts = (dataModel.name for dataModel in newDataModels when dataModel.status isnt 'DRAFT')
-    if noDrafts.length > 0 and $scope.messages
-      createdMessages.push $scope.messages.warning "Draft versions of #{noDrafts.join(', ')} data model#{if noDrafts.length == 1 then '' else 's'} will be used"
 
   $scope.hasDataModels = ->
     $scope.pending.dataModel or (angular.isArray($scope.copy.dataModels) && $scope.copy.dataModels.length > 0)
@@ -34,8 +27,6 @@ angular.module('mc.core.ui.bs.withClassificationCtrlMixin', ['mc.util.security']
     $scope.copy.dataModels.push(dataModel)
     $scope.pending.dataModel = null if $scope.pending
 
-
-  $scope.$watchCollection 'copy.dataModels', dataModelsChanged
 
   $scope.hideDataModels = ->
     $scope.currentDataModel?
