@@ -7,16 +7,16 @@ import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.HibernateHelper
 import org.springframework.validation.ObjectError
 
-@Log4j
-class FinalizationChain extends PublishingChain {
+@Log4j @Deprecated
+class LegacyFinalizationChain extends PublishingChain {
 
 
-    private FinalizationChain(CatalogueElement published) {
+    private LegacyFinalizationChain(CatalogueElement published) {
         super(published)
     }
 
-    static FinalizationChain create(CatalogueElement published) {
-        return new FinalizationChain(published)
+    static LegacyFinalizationChain create(CatalogueElement published) {
+        return new LegacyFinalizationChain(published)
     }
 
     protected CatalogueElement doRun(Publisher<CatalogueElement> publisher) {

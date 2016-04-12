@@ -19,7 +19,7 @@ abstract class PublishingChain {
     protected ElementStatus initialStatus
 
     public static PublishingChain finalize(CatalogueElement published) {
-        FinalizationChain.create(published)
+        LegacyFinalizationChain.create(published)
     }
 
     public static PublishingChain createDraft(DataModel published, DraftContext strategy) {
