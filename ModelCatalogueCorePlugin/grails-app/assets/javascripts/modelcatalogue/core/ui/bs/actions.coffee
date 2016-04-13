@@ -705,16 +705,17 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerActionInRole 'import-data-models-screen', 'data-models', [ ->
-
-    {
-      position:   10000
-      label:      'Import'
-      icon:       'fa fa-fw fa-upload'
-      type:       'primary'
-      abstract:     true
-      expandToLeft: true
-    }
+  actionsProvider.registerActionInRole 'import-data-models-screen', 'data-models', [
+    'security',
+    (security) ->
+      return undefined unless security.hasRole('CURATOR')
+      {
+        position:   10000
+        label:      'Import'
+        icon:       'fa fa-fw fa-upload'
+        type:       'primary'
+        abstract:     true
+        expandToLeft: true
+      }
   ]
-
 ]
