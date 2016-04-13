@@ -100,6 +100,17 @@ Genomics England customisation plugin for Model Catalogue
 
         reportsRegistry.register {
             creates link
+            title { "Rare Diseases Eligibility Criteria JSON" }
+            defaultName { "${it.name} report as Json" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseaseHPOEligibilityCriteriaAsJson', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
             title { "Rare Diseases HPO And Clinical Tests CSV" }
             type DataClass
             when { DataClass dataClass ->
