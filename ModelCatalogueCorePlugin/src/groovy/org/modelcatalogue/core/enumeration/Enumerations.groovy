@@ -182,7 +182,7 @@ import groovy.transform.CompileStatic
 
     @Override
     String put(String key, String value) {
-        put(genid, key, value)
+        put(genid, key, value ?: '')
     }
 
     @Override
