@@ -5,15 +5,8 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace']).contro
     $scope.$blockScrolling = Infinity
     $scope.Document = "XML"
 
-    transformResponse = (data) ->
-      console.log("transformResponse", data)
-      $scope.content = data
-
     if $scope.element
       applicationTitle "Xml Editor for #{element.getLabel()}"
-      $http.get("#{$scope.element.internalModelCatalogueId}?format=xsd", responseType: "text",
-        transformResponse: transformResponse).then (resp)->
-          console.log resp
+      $http.get("#{$scope.element.internalModelCatalogueId}?format=xml").then (resp)->
+        $scope.content = resp.data
 ])
-
-
