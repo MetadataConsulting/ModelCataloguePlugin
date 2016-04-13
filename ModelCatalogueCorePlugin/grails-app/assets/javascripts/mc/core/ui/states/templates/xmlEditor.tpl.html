@@ -1,8 +1,65 @@
-<div ui-ace="{
-       useWrapMode : true,
-       showGutter: true,
-       theme:'xcode',
-       mode: 'xml',
-       folding: 'beginandend'
-     }"
-     data-ng-model="content"></div>
+<div class="row">
+  <div class="col-md-6">
+    <div class="row">
+      <div class="col-md-12">
+        <h4>
+          Source Xml
+        </h4>
+      </div>
+    </div>
+    <div class="row"
+         data-ng-model="content"
+         ng-readonly="true"
+         ui-ace="{
+           useWrapMode : true,
+           showGutter: true,
+           theme:'xcode',
+           mode: 'xml',
+           showPrintMargin: false,
+           folding: 'beginandend'
+         }"></div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="row">
+      <div class="col-md-12">
+        <h4>
+          Xsl Transformation
+        </h4>
+      </div>
+    </div>
+    <div class="row"
+         data-ng-model="xslt"
+         ui-ace="{
+           useWrapMode : true,
+           showGutter: true,
+           theme:'xcode',
+           mode: 'xml',
+           showPrintMargin: false,
+           folding: 'beginandend'
+         }"></div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="row">
+      <div class="col-md-12">
+        <h4>
+          Result Xml
+        </h4>
+      </div>
+    </div>
+    <div class="row"
+         data-ng-model="result"
+         ng-readonly="true"
+         ui-ace="{
+           useWrapMode : true,
+           showGutter: true,
+           theme:'xcode',
+           mode: 'xml',
+           showPrintMargin: false,
+           folding: 'beginandend'
+         }"></div>
+  </div>
+</div>
