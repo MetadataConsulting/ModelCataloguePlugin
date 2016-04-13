@@ -2,17 +2,13 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'angula
 .controller('mc.core.ui.states.controllers.XmlEditorCtrl', [
   '$scope', '$stateParams', '$state', 'element', 'applicationTitle', '$http', 'catalogue', 'security', 'fileDownloadService'
   ($scope, $stateParams, $state, element, applicationTitle, $http, catalogue, security, fileDownloadService) ->
-    $scope.element = element
-    $scope.$blockScrolling = Infinity
-    $scope.Document = "XML"
+    applicationTitle "Xml Editor for #{element.getLabel()}"
 
-    if $scope.element
-      applicationTitle "Xml Editor for #{element.getLabel()}"
-      $http.get("#{$scope.element.internalModelCatalogueId}?format=xml").then (resp)->
-        $scope.content = resp.data
+    $http.get("#{element.internalModelCatalogueId}?format=xml").then (resp)->
+      $scope.xml = resp.data
 
-      $http.get("#{security.contextPath}#{catalogue.getDefaultXslt($scope.element.elementType) ? catalogue.getDefaultXslt('catalogueElement')}").then (resp)->
-        $scope.xslt = resp.data
+    $http.get("#{security.contextPath}#{catalogue.getDefaultXslt(element.elementType) ? catalogue.getDefaultXslt('catalogueElement')}").then (resp)->
+      $scope.xslt = resp.data
 
     $scope.xsd = "<catalogue><dataClass></dataClass></catalogue>"
 
