@@ -14,7 +14,6 @@
 #= require_full_tree .
 #= require mc/index
 
-
 if !String.prototype.startsWith
   String.prototype.startsWith = (searchString, position) ->
     position = position || 0;
