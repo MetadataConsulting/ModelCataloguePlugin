@@ -1,12 +1,10 @@
 package org.modelcatalogue.gel
 
 import groovy.util.logging.Log4j
-import org.apache.commons.lang.CharSet
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.util.Metadata
 
-import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 
 /**
@@ -52,7 +50,7 @@ class RareDiseaseCsvExporter {
         if (level == 0) {
             out << headersLine
             child.parentOf?.eachWithIndex { DataClass cd, index ->
-                out << '\n'
+//                out << '\n'
                 printRareDiseaseChild(cd, '', level + 1)
             }
         }
@@ -143,7 +141,7 @@ class RareDiseaseCsvExporter {
 
                 }
             }
-            printTrailingCommas()
+//            printTrailingCommas()
         }
     }
 
@@ -171,7 +169,7 @@ class RareDiseaseCsvExporter {
                 if (cd?.name?.trim()) {
                     out << '\n'
                     if (index != 0) currentLine += prefix
-                    currentLine += "${cd.name.replace(',', ' - ')},${cd.ext.get(Metadata.OBD_ID)}"
+                    currentLine += "${cd.name.replace(',', ' - ')},${cd.ext.get(Metadata.OBO_ID)}"
                     printTrailingCommas()
                 }
             } catch (Exception e) {
@@ -196,7 +194,7 @@ class RareDiseaseCsvExporter {
         }
     }
 
-    private static String getVersionId(CatalogueElement c) {
+    public static String getVersionId(CatalogueElement c) {
         return (c.latestVersionId) ? c.latestVersionId + "." + c.versionNumber : c.id + "." + c.versionNumber
     }
 
