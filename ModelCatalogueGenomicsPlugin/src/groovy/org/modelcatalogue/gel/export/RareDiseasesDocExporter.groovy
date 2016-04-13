@@ -30,7 +30,7 @@ class RareDiseasesDocExporter {
     public static final String PHENOTYPE_TITLE_TEXT = "Phenotypes and Clinical Tests"
     public static final String PHENOTYPE_SIDEBAR = "Phenotypes"
     public static final String CLINICAL_TESTS_SIDEBAR = "Clinical Tests"
-    public static final String TABLE_ENTRIES_TEXT = "Entries ordered left to right in table-->"
+    public static final String TABLE_ENTRIES_TEXT = "Entries ordered left to right in table"
 
     DataClass rootModel
     private final Set<Long> processedModels = new HashSet<Long>()
@@ -392,9 +392,9 @@ class RareDiseasesDocExporter {
                 cell(background: '#BED6ED') {
                     text phenotypeMode ? PHENOTYPE_SIDEBAR : CLINICAL_TESTS_SIDEBAR
                     text EMPTY_STRING + "\n\n"
-                    text TABLE_ENTRIES_TEXT, font: [size: 8, family: 'Calibri Light', color: '#000000']
                 }
                 cell {
+                    text TABLE_ENTRIES_TEXT, font: [size: 8, family: 'Calibri Light', color: '#000000']
                     table(padding: 1, border: [size: 1, color: '#D2D2D2']) {
                         //inner table should be up to 3 cols wide
                         1.upto(maxRows, {
