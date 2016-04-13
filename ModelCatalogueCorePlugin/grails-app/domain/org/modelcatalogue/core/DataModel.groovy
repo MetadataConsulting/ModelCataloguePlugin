@@ -103,6 +103,9 @@ class DataModel extends CatalogueElement {
      * @param revisionNotes Revision notes to be used for finalized data model.
      */
     void checkFinalizeEligibility(String semanticVersion, String revisionNotes) {
+        // initialize error object
+        validate()
+        
         // check semantic version
         checkPublishSemanticVersion(semanticVersion)
 
