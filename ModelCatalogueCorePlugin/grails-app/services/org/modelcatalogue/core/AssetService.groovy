@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
@@ -8,7 +9,7 @@ import org.apache.commons.io.output.CountingOutputStream
 import org.codehaus.groovy.runtime.InvokerInvocationException
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.audit.AuditService
-import org.modelcatalogue.core.publishing.DraftContext
+import org.modelcatalogue.core.publishing.CloningContext
 import org.springframework.util.DigestUtils
 import org.springframework.web.multipart.MultipartFile
 
@@ -61,30 +62,37 @@ class AssetService {
             return asset
         }
 
+        Asset existing
         if (id) {
-            Asset existing = Asset.get(id)
+            existing = Asset.get(id)
 
             if (!existing) {
                 return null
             }
 
-            existing = elementService.createDraftVersion(existing, DraftContext.userFriendly().forceNew()) as Asset
+            Asset clone = elementService.cloneElement(existing, CloningContext.create(existing.dataModel, existing.dataModel))
 
-            if (existing.hasErrors()) {
-                return existing
+            if (clone.hasErrors()) {
+                return clone
             }
 
 
-            existing.name              = asset.name
-            existing.description       = asset.description
-            existing.contentType       = asset.contentType
-            existing.originalFileName  = asset.originalFileName
+            clone.name              = asset.name
+            clone.description       = asset.description
+            clone.contentType       = asset.contentType
+            clone.originalFileName  = asset.originalFileName
 
-            asset = existing
+            clone.latestVersionId   = existing.latestVersionId ?: existing.id
+
+            asset = clone
         }
 
         asset.save(flush: true)
 
+        if (existing) {
+            addToSupersedes(existing, asset)
+            elementService.archive(existing, true)
+        }
 
         try {
             storeAssetFromFile(file, asset)
@@ -94,6 +102,11 @@ class AssetService {
         }
 
         return asset
+    }
+
+    @CompileDynamic
+    protected void addToSupersedes(Asset existing, Asset asset) {
+        asset.addToSupersedes(existing, skipUniqueChecking: true)
     }
 
     void storeAssetFromFile(MultipartFile file, Asset asset) {
