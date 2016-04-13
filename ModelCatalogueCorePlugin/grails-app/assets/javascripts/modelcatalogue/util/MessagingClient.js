@@ -5,7 +5,7 @@
 
     angular.module("mc.util.MessagingClient", ['mc.util.Stomp']).provider("MessagingClient", MessagingClientProvider);
 
-    function MessagingClient(Stomp, SockJS, SockJSURL, $q, $interval) {
+    function MessagingClient(Stomp, SockJS, SockJSURL, $q, $interval, $log) {
         var subscriptions = {}, StompClient;
 
         this.isConnected = function () {
@@ -20,9 +20,11 @@
             }
 
             if (!StompClient) {
-                StompClient = Stomp.over(new SockJS(SockJSURL))
-                // comment out following line for debugging
-                StompClient.debug = function(){}
+                StompClient = Stomp.over(new SockJS(SockJSURL));
+                StompClient.debug = function(message){
+                    // uncomment to show stomp debug messages
+                    // $log.debug(message);
+                }
             }
 
             StompClient.connect(headers, function () {}, function (err) {
@@ -112,8 +114,8 @@
         return this;
     }
 
-    function MessagingClientFactory(Stomp, SockJS, SockJSURL, $q, $interval) {
-        return new MessagingClient(Stomp, SockJS, SockJSURL, $q, $interval);
+    function MessagingClientFactory(Stomp, SockJS, SockJSURL, $q, $interval, $log) {
+        return new MessagingClient(Stomp, SockJS, SockJSURL, $q, $interval, $log);
     }
 
     function MessagingClientProvider() {

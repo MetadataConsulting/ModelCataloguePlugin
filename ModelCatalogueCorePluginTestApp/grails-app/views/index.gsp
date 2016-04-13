@@ -91,7 +91,8 @@
     <script type="text/javascript">
         ${configurationProvider.frontendConfiguration}
         var demoConfig = angular.module('demo.config', ['mc.core.modelCatalogueApiRoot', 'mc.util.security']);
-        demoConfig.config(['securityProvider', function (securityProvider) {
+        demoConfig.config(['$logProvider', 'securityProvider', function ($logProvider, securityProvider) {
+            $logProvider.debugEnabled(${Environment.current == Environment.DEVELOPMENT ? 'true' : 'false'});
             securityProvider.springSecurity({
                 oauthProviders: ${oauthService.services.keySet().collect{"'$it'"}},
                 contextPath:      '${grailsApplication.config.grails.app.context ?: request.contextPath ?: ''}',
