@@ -280,7 +280,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       return undefined unless $scope.element and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('dataClass')
       {
         position: 100010
-        label: 'XML Edit'
+        label: 'Edit Xml Schema'
         action: ->
           $state.go('mc.resource.xml-editor', {resource: 'dataClass', id: $scope.element.id})
       }
