@@ -73,7 +73,7 @@ class HPOUpdatesSpec extends AbstractIntegrationSpec  {
         something
         something in renalCyst.parentOf
         obsoleteContainer
-        obsoleteContainer.status == ElementStatus.DEPRECATED
+        obsoleteContainer.status == ElementStatus.DRAFT
         obsoleteContainer.countParentOf() == 3
         somethingObsolete
         somethingObsolete.status == ElementStatus.DEPRECATED

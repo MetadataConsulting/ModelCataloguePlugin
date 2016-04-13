@@ -212,7 +212,7 @@ class OboLoader {
                 }
 
                 if (needsDeprecated) {
-                    dataClass name: DEPRECATED_DATA_CLASS_NAME, status: deprecated
+                    dataClass name: DEPRECATED_DATA_CLASS_NAME
                 }
             }
             // TODO: find better way how to do this
