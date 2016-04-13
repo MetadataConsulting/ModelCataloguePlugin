@@ -20,7 +20,7 @@ class AbstractCancerTypesExporterSpec extends IntegrationSpec{
     public static final String SOME_CANCER_TYPE2 = 'Some other Cancer Type 2'
     public static final String SOME_CANCER_SUBTYPE_21 = 'some other cancer subtypes 2.1'
     public static final String SOME_CANCER_SUBTYPE_22 = 'some other cancer subtypes 2.2'
-    public static final String SOME_CANCER_PRESENTATION_2 = 'Cancer presentations 2'
+    public static final String SOME_CANCER_PRESENTATION_21 = 'Cancer presentations 21'
     public static final String SOME_CANCER_PRESENTATION_22 = 'Cancer presentations 22'
     protected Long cancer_type_1_adult_glioma_id
     protected Long cancer_type_2_some_cancer_id
@@ -69,8 +69,8 @@ class AbstractCancerTypesExporterSpec extends IntegrationSpec{
                             description "some cancer description subtype22"
                             dataType name: "Data Element22"
                         }
-                        dataElement(name: SOME_CANCER_PRESENTATION_2) {
-                            description "some cancer presentation description2"
+                        dataElement(name: SOME_CANCER_PRESENTATION_21) {
+                            description "some cancer presentation description21"
                             dataType name: "Data Element23"
                         }
                         dataElement(name: SOME_CANCER_PRESENTATION_22) {
@@ -96,7 +96,7 @@ class AbstractCancerTypesExporterSpec extends IntegrationSpec{
 
         cancer_type_2_some_cancer_subType21_combined_id = DataElement.findByName(SOME_CANCER_SUBTYPE_21).getCombinedVersion()
         cancer_type_2_some_cancer_subType22_combined_id = DataElement.findByName(SOME_CANCER_SUBTYPE_22).getCombinedVersion()
-        cancer_type_2_some_cancer_presentation2_combined_id = DataElement.findByName(SOME_CANCER_PRESENTATION_2).getCombinedVersion()
+        cancer_type_2_some_cancer_presentation2_combined_id = DataElement.findByName(SOME_CANCER_PRESENTATION_21).getCombinedVersion()
         cancer_type_2_some_cancer_presentation22_combined_id = DataElement.findByName(SOME_CANCER_PRESENTATION_22).getCombinedVersion()
     }
 
