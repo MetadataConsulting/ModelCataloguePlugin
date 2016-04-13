@@ -1,13 +1,13 @@
-angular.module('mc.core.ui.states.mc.resource.xmleditor', ['ui.ace']).config([
+angular.module('mc.core.ui.states.mc.resource.xml-editor', ['ui.ace']).config([
   '$stateProvider',
   ($stateProvider) ->
-    $stateProvider.state 'mc.resource.xmleditor', {
-      url: '/xmledit-{id:\\d+}?'
+    $stateProvider.state 'mc.resource.xml-editor', {
+      url: '/xml-edit-{id:\\d+}?'
 
       views:
         "":
           templateUrl: '/mc/core/ui/states/xmlEditor.html'
-          controller: 'mc.core.ui.states.controllers.XMLEditorCtrl'
+          controller: 'mc.core.ui.states.controllers.XmlEditorCtrl'
 
       'navbar-left@':
         template: '<contextual-menu role="item"></contextual-menu>'

@@ -282,7 +282,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
         position: 100010
         label: 'XML Edit'
         action: ->
-          $state.go('mc.resource.xmleditor', {resource: 'dataClass', id: $scope.element.id})
+          $state.go('mc.resource.xml-editor', {resource: 'dataClass', id: $scope.element.id})
       }
   ]
 

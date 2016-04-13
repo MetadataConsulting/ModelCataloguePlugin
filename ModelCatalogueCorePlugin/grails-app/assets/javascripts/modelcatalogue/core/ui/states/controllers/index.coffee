@@ -21,5 +21,5 @@ angular.module('mc.core.ui.states.controllers', [
   'mc.core.ui.states.controllers.DataModelCtrl'
   'mc.core.ui.states.controllers.PanelsCtrl'
   'mc.core.ui.states.controllers.DataModelsCtrl'
-  'mc.core.ui.states.controllers.XMLEditorCtrl'
+  'mc.core.ui.states.controllers.XmlEditorCtrl'
 ])
