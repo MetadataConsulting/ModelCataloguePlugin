@@ -63,7 +63,7 @@ class RareDiseaseCsvExporter {
 
                 child.parentOf.eachWithIndex { DataClass cd, index ->
                     if (index != 0) {
-                        out << '\n'
+//                        out << '\n'
                     }
                     printRareDiseaseChild(cd, nextPrefix, level + 1)
                 }
@@ -83,7 +83,7 @@ class RareDiseaseCsvExporter {
 
                 child.parentOf.eachWithIndex { DataClass cd, index ->
                     if (index != 0) {
-                        out << '\n'
+//                        out << '\n'
                     }
                     printRareDiseaseChild(cd, nextPrefix, level + 1)
                 }
@@ -151,8 +151,8 @@ class RareDiseaseCsvExporter {
                 if (cd?.name?.trim()) {
                     out << '\n'
                     def description = null
-                    if (cd.description?.trim()) description = new String(StandardCharsets.UTF_8.encode(cd.description).array()).replace('•', '>').replaceAll("(?m)^\\-", '>')
-//                    if (cd.description?.trim()) description = cd.description.replace('•', '>').replaceAll("(?m)^\\-", '>')
+//                    if (cd.description?.trim()) description = new String(StandardCharsets.UTF_8.encode(cd.description).array()).replace('•', '>').replaceAll("(?m)^\\-", '>')
+                    if (cd.description?.trim()) description = cd.description.replace('•', '>').replaceAll("(?m)^\\-", '>')
                     if (index != 0) currentLine += prefix
                     currentLine += "${cd.name.replace(',', ' - ')},$cd.combinedVersion,${description ? "\"${description.replace('\"', '\"\"')}\"" : ""}"
                     printTrailingCommas()
