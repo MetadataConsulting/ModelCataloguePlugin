@@ -10,6 +10,7 @@
 #= require angular-diff-match-patch.js
 #= require angular-xeditable/dist/js/xeditable
 #= require angular-ui-ace/ui-ace
+#= require angular-download-service/angular-download-service
 #= require_self
 #= require_full_tree .
 #= require mc/index
@@ -26,6 +27,7 @@ modules = [
   'ngAnimate'
   'xeditable'
   'ui.ace'
+  'angular.download.service'
 ]
 
 modelcatalogue =

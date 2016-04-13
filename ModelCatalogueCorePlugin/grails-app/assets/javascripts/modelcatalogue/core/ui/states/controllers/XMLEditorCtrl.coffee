@@ -1,6 +1,7 @@
-angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace']).controller('mc.core.ui.states.controllers.XmlEditorCtrl', [
-  '$scope', '$stateParams', '$state', 'element', 'applicationTitle', '$http', 'catalogue', 'security'
-  ($scope, $stateParams, $state, element, applicationTitle, $http, catalogue, security) ->
+angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'angular.download.service'])
+.controller('mc.core.ui.states.controllers.XmlEditorCtrl', [
+  '$scope', '$stateParams', '$state', 'element', 'applicationTitle', '$http', 'catalogue', 'security', 'fileDownloadService'
+  ($scope, $stateParams, $state, element, applicationTitle, $http, catalogue, security, fileDownloadService) ->
     $scope.element = element
     $scope.$blockScrolling = Infinity
     $scope.Document = "XML"
@@ -12,4 +13,10 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace']).contro
 
       $http.get("#{security.contextPath}#{catalogue.getDefaultXslt($scope.element.elementType) ? catalogue.getDefaultXslt('catalogueElement')}").then (resp)->
         $scope.xslt = resp.data
+
+    $scope.xsd = "<catalogue><dataClass></dataClass></catalogue>"
+
+    $scope.download = (name, text, mimeType = 'text/xml;charset=utf-8') ->
+      fileDownloadService.setMimeType(mimeType)
+      fileDownloadService.downloadFile(name, text)
 ])
