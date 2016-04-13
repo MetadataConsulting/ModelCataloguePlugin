@@ -10,6 +10,7 @@ import org.modelcatalogue.gel.export.CancerTypesCsvExporter
 import org.modelcatalogue.gel.export.CancerTypesJsonExporter
 import org.modelcatalogue.gel.export.RareDiseaseDisorderListCsvExporter
 import org.modelcatalogue.gel.export.RareDiseasesDocExporter
+import org.modelcatalogue.gel.export.RareDiseasesJsonExporter
 import org.springframework.http.HttpStatus
 
 import static RareDiseasesDocExporter.getStandardTemplate
@@ -24,6 +25,9 @@ class GenomicsController {
     DataClassService dataClassService
 
     static final String RD_HPO_CSV_FILENAME = "RD Phenotypes and Clinical Tests.csv"
+    static final String RD_ELIGIBILITY_CRITERIA_JSON = "RD Eligibility Criteria.json"
+    static final String RD_PHENOTYPE_AND_CLINICAL_TESTS_JSON = "RD Phenotype and Clinical tests.json"
+
     static final String DOC_IMAGE_PATH = "https://www.genomicsengland.co.uk/wp-content/uploads/2015/11/Genomics-England-logo-2015.png"
 
     static Closure customTemplate = {
@@ -44,33 +48,51 @@ class GenomicsController {
 
     def exportRareDiseaseHPOAndClinicalTestsAsJson() {
 
-        DataClass dClass = DataClass.get(params.id)
+        DataClass dataClass = DataClass.get(params.id)
 
-        if (dClass) {
+        if (!dataClass) {
             respond status: HttpStatus.NOT_FOUND
             return
         }
 
-        DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dClass.getDefaultModelCatalogueId(true))
-
-        Long assetId = assetService.storeReportAsAsset(latestVersion.dataModel,
-            name: "${latestVersion.name} report as Json",
-            originalFileName: "${latestVersion.name}-${latestVersion.status}-${latestVersion.version}.json",
+        Long assetId = assetService.storeReportAsAsset(dataClass.dataModel,
+            name: "${dataClass.name} report as Json",
+            originalFileName: "$RD_PHENOTYPE_AND_CLINICAL_TESTS_JSON",
             contentType: "application/json",
         ) {
-            new GelJsonExporter(it).printDiseaseOntology(latestVersion)
+            new GelJsonExporter(it).printDiseaseOntology(dataClass)
         }
 
         response.setHeader("X-Asset-ID",assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
     }
 
+    def exportRareDiseaseHPOEligibilityCriteriaAsJson() {
+
+        DataClass dataClass = DataClass.get(params.id)
+
+        if (!dataClass) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        Long assetId = assetService.storeReportAsAsset(dataClass.dataModel,
+            name: "${dataClass.name} report as Json",
+            originalFileName: "$RD_ELIGIBILITY_CRITERIA_JSON",
+            contentType: "application/json",
+        ) {
+            new RareDiseasesJsonExporter(it).exportEligibilityCriteriaAsJson(dataClass)
+        }
+
+        response.setHeader("X-Asset-ID",assetId.toString())
+        redirect controller: 'asset', id: assetId, action: 'show'
+    }
 
     def exportRareDiseaseHPOAndClinicalTestsAsCsv() {
 
         DataClass dClass = DataClass.get(params.id)
 
-        if (dClass) {
+        if (!dClass) {
             respond status: HttpStatus.NOT_FOUND
             return
         }
@@ -92,7 +114,7 @@ class GenomicsController {
     def exportRareDiseaseDisorderListAsCsv() {
         DataClass dClass = DataClass.get(params.id)
 
-        if (dClass) {
+        if (!dClass) {
             respond status: HttpStatus.NOT_FOUND
             return
         }

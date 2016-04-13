@@ -1,138 +1,145 @@
 package org.modelcatalogue.gel
 
-import groovy.json.JsonOutput
+import groovy.json.JsonBuilder
+import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 
-
+@Log4j
 class GelJsonExporter {
 
+    public static final int LEVEL1 = 1
     private final OutputStream out
+    Integer modelCount = 0;
 
     GelJsonExporter(OutputStream out) {
         this.out = out
     }
 
-    private void printPhenotypes(DataClass child){
-        out << '           "shallowPhenotypes" : [\n'
-        child.parentOf.eachWithIndex { DataClass cd, index ->
-            if(index!=0){out << ','}
-            printHPOterm(cd)
-        }
-        out << "           ],\n"
-    }
+    void printDiseaseOntology(CatalogueElement model) {
+        int depth = 4
+        int level = 1
+        def graphList = []
+        def builder = new JsonBuilder()
+        def exclusions = ['Eligibility', 'Guidance']
 
-    private void printTests(DataClass child) {
-        out << '           "tests" : [\n'
-        child.parentOf.eachWithIndex { DataClass cd, index ->
-            if (index != 0) {
-                out << ','
-            }
-            printTest(cd)
-        }
-        out << "           ]\n"
-    }
+        log.info "Exporting Rare Disease HPO Phenotypes as json ${model.name} (${model.combinedVersion})"
 
-    private void printHPOterm(DataClass child){
-        out << '                    {\n'
-        out << '                        "name" : ' + JsonOutput.toJson(child.name)  + ',\n'
-        out << '                        "id"   : ' + JsonOutput.toJson(child.ext.get("OBO ID")) + '\n'
-        out << '                    }\n'
-    }
+        //define the json tagnames to use for each level in the model
+        def levelTag1 = [tag1: 'DiseaseGroups']
+        def levelTag2 = [tag1: 'id', tag2: 'name', tag3: 'subGroups']
+        def levelTag3 = [tag1: 'id', tag2: 'name', tag3: 'specificDisorders']
+        def levelTag4 = [tag1: 'id', tag2: 'name', tag3: 'eligibilityQuestion']
+        def levelTag5 = [tag1: 'id', tag2: 'name', tag3: 'shallowPhenotypes']
+        def levelTag6 = [tag1: 'id', tag2: 'name']
+        def levelMetaData = [1: levelTag1, 2: levelTag2, 3: levelTag3, 4: levelTag4, 5: levelTag5, 6: levelTag6]
 
-    private void printTest(DataClass child){
+        descendModels(model, level, graphList, depth, levelMetaData, exclusions)
+        builder "${levelMetaData.get(LEVEL1).tag1}": graphList
+        out << builder.toPrettyString()
 
-        out << '                    {\n'
-        out << '                        "name" : ' + JsonOutput.toJson(child.name)  + ',\n'
-        out << '                        "id"   : ' + JsonOutput.toJson(getVersionId(child)) + '\n'
-        out << '                    }\n'
+        log.info "Rare Disease HPO Phenotypes exported as json ${model.name} (${model.combinedVersion}) ."
     }
 
 
-    private static String getVersionId(CatalogueElement c){
-        return (c.latestVersionId)? c.latestVersionId + "." + c.versionNumber : c.id + "." + c.versionNumber
-    }
+    def descendModels(CatalogueElement model, level, graphList, depth, Map levelMetaData, exclusions) {
+        if (level > depth) return
+        //TODO - comment out for prod
+//        if (modelCount > 2) return
 
-    void printDiseaseOntology(DataClass cls){
-        out << '{\"DiseaseGroups\": [\n'
-        printRareDiseaseChild(cls, 0)
-        out << "]\n}"
-    }
+        log.debug "descendModels level=$level graghList=$graphList model=$model"
 
+        def modelList = []
+        def map = [:]
 
-    private void printRareDiseaseChild(DataClass child, Integer level){
-        if(level > 3) return            //significantly speeds up export
-
-        Long id = child.latestVersionId ?: child.id
-        if(level==0){
-            child.parentOf?.eachWithIndex { DataClass cd, index ->
-                if(index!=0){out << ','}
-                printRareDiseaseChild(cd, level + 1)
-            }
-        }
 
         if (level == 1) {
-
-            out << '{ \n'
-            out << '   "id" : "' + id  + '",\n'
-            out << '   "name" : ' + JsonOutput.toJson(child.name) + ','
-            out << '   "subGroups" : ['
-
-            child.parentOf.eachWithIndex { DataClass cd, index ->
-                if(index!=0){out << ','}
-                printRareDiseaseChild(cd, level + 1)
-            }
-
-            out << "]\n"
-            out << '        }'
+            modelList = graphList
         }
-
         if (level == 2) {
+            modelCount = modelCount + 1
+            // resolves to something concrete like - higherMap.put('id', "$model.id")
+            map.put(levelMetaData.get(level).tag1, model.combinedVersion)
+            map.put(levelMetaData.get(level).tag2, model.name)
+            map.put(levelMetaData.get(level).tag3, modelList)
 
-            out << '{      \n'
-            out << '       "id" : "' + id +'",\n'
+            graphList << map
+        }
+        if (level == 3) {
+            map.put(levelMetaData.get(level).tag1, model.combinedVersion)
+            map.put(levelMetaData.get(level).tag2, model.name)
+            map.put(levelMetaData.get(level).tag3, modelList)
 
-            out << '       "name" : ' + JsonOutput.toJson(child.name) + ','
-            out << '       "specificDisorders" : ['
+            graphList << map
+        }
+        if (level == 4) {
+            map.put(levelMetaData.get(level).tag1, model.combinedVersion)
+            map.put(levelMetaData.get(level).tag2, model.name)
 
-            child.parentOf.eachWithIndex { DataClass cd, index ->
-                if(index!=0){out << ','}
-                printRareDiseaseChild(cd, level + 1)
-            }
+            def miniMap = [:]
+            miniMap.put('date',model.lastUpdated.format("yyyy-MM-dd"))
+            miniMap.put('version',"$model.versionNumber")
+            map.put(levelMetaData.get(level).tag3, miniMap)
 
-            out << "       ]\n"
-            out << "       }\n"
+            addPhenotypesAndTests(model, levelMetaData, map, modelList)
+
+            graphList << map
+            return
         }
 
-        if (level == 3) {
-            println("creating model for " + child.name)
+        model.parentOf?.eachWithIndex { CatalogueElement child, i ->
+            descendModels(child, level + 1, modelList, depth, levelMetaData, exclusions)
+        }
 
-            out << '           { \n'
-            out << '           "id" : "' + id  +'",\n'
-            out << '            "name" : ' + JsonOutput.toJson(child.name) + ',\n'
-            out << '                "eligibilityQuestion": {\n'
-            out << '                        "date":"' + child.lastUpdated.format("yyyy-MM-dd") + '",\n'
-            out << '                        "version": "' +child.versionNumber +'"\n'
-            out << '                   },\n'
+    }
 
+    private void addPhenotypesAndTests(CatalogueElement model, Map levelMetaData, LinkedHashMap map, ArrayList modelList) {
+        def phenotypeModel, testModel
 
-            def phenotypeModel, testModel
+        model.parentOf.each { DataClass dataClass ->
 
-            child.parentOf.each { DataClass cd ->
-
-                if (cd.name.matches("(?i:.*Phenotypes.*)") && !cd.name.matches("(?i:.*Eligibility.*)") && !cd.name.matches("(?i:.*Test.*)") && !cd.name.matches("(?i:.*Guidance.*)")) {
-                    phenotypeModel = cd
-                }
-
-                if(!cd.name.matches("(?i:.*Phenotypes.*)") && !cd.name.matches("(?i:.*Eligibility.*)") && cd.name.matches("(?i:.*Test.*)") && !cd.name.matches("(?i:.*Guidance.*)")) {
-                    testModel = cd
-                }
+            if (dataClass.name.matches("(?i:.*Phenotypes.*)") && !dataClass.name.matches("(?i:.*Eligibility.*)") && !dataClass.name.matches("(?i:.*Test.*)") && !dataClass.name.matches("(?i:.*Guidance.*)")) {
+                phenotypeModel = dataClass
             }
+            if (!dataClass.name.matches("(?i:.*Phenotypes.*)") && !dataClass.name.matches("(?i:.*Eligibility.*)") && dataClass.name.matches("(?i:.*Test.*)") && !dataClass.name.matches("(?i:.*Guidance.*)")) {
+                testModel = dataClass
+            }
+        }
 
-            if(phenotypeModel) printPhenotypes(phenotypeModel) else out << '           "shallowPhenotypes" : [],\n'
-            if(testModel) printTests(testModel) else out << '           "tests" : []\n'
+        if (phenotypeModel) {
+            addPhenotypeDetail(phenotypeModel, levelMetaData, map, true)
+        } else {
+            map.put("shallowPhenotypes", [])
+        }
+        if (testModel) {
+            addPhenotypeDetail(testModel, levelMetaData, map, false)
+        } else {
+            map.put("tests", [])
+        }
+    }
 
-            out << "           }\n"
+
+    private void addPhenotypeDetail(DataClass model, Map levelMetaData, Map higherMap, boolean isPhenotype) {
+        def list = []
+
+        if (isPhenotype) {
+            higherMap.put("shallowPhenotypes", list)
+        } else {
+            higherMap.put("tests", list)
+        }
+
+        model.parentOf.each { DataClass child ->
+            def map = [:]
+            map.put(levelMetaData.get(6).tag2, child.name)
+
+            def id
+            if (isPhenotype) {
+                id = child.ext.get("OBO ID") ?: ""
+            } else { // tests
+                id = child.combinedVersion
+            }
+            map.put(levelMetaData.get(6).tag1, id)
+            list << map
         }
     }
 
