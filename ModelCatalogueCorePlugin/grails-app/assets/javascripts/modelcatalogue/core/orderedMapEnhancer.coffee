@@ -53,7 +53,7 @@ angular.module('mc.core.orderedMapEnhancer', ['mc.util.enhance']).config ['enhan
 
       orderedMap.clearIfOnlyContainsPlaceholder = ->
         ensureValuesAreArray(@)
-        if @values.length == 1 and not @values[0].value
+        if @values.length == 1 and not @values[0].value == null and @values[0].hasOwnProperty('key')
           @values = []
 
       orderedMap.addPlaceholderIfEmpty = ->
