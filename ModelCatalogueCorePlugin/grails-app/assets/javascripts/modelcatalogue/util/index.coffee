@@ -9,6 +9,8 @@ angular.module 'mc.util', [
   'mc.util.recursiveCompile'
   'mc.util.MessagingClient'
   'mc.util.Stomp'
+  'mc.util.Saxon'
+  'mc.util.vkBeautify'
   'mc.util.stringToBoolean'
   'mc.util.stringToNumber'
 ]

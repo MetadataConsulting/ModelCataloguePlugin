@@ -1,4 +1,6 @@
 #= require ace-builds/src-min-noconflict/ace
+#= require saxonce/Saxonce.nocache
+#= require vk-beautify/dist/vkbeautify.0.99.00.beta
 #= require ng-file-upload/ng-file-upload
 #= require angular-i18n/angular-locale_en-gb
 #= require angular-http-auth/src/http-auth-interceptor

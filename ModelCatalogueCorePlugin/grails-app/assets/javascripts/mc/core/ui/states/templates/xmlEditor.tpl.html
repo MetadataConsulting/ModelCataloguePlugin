@@ -11,12 +11,13 @@
          data-ng-model="xml"
          ng-readonly="true"
          ui-ace="{
-           useWrapMode : true,
+           useWrapMode : false,
            showGutter: true,
            theme:'xcode',
            mode: 'xml',
            showPrintMargin: false,
-           folding: 'beginandend'
+           folding: 'beginandend',
+           readOnly: true
          }"></div>
   </div>
 
@@ -31,7 +32,7 @@
     <div class="row"
          data-ng-model="xslt"
          ui-ace="{
-           useWrapMode : true,
+           useWrapMode : false,
            showGutter: true,
            theme:'xcode',
            mode: 'xml',
@@ -59,12 +60,13 @@
          data-ng-model="xsd"
          ng-readonly="true"
          ui-ace="{
-           useWrapMode : true,
+           useWrapMode : false,
            showGutter: true,
            theme:'xcode',
            mode: 'xml',
            showPrintMargin: false,
-           folding: 'beginandend'
+           folding: 'beginandend',
+           readOnly: true
          }"></div>
   </div>
 </div>
