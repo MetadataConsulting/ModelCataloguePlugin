@@ -11,7 +11,7 @@ angular.module('mc.core.ui.bs.modalPromptForCatalogueElement', ['mc.util.message
             <form role="form" ng-submit="close(value)">
             <div class="form-group">
                 <label for="value">''' + body + '''</label>
-                <input id="value" ng-model="value" class="form-control" status="''' + (args.status ? '') + '''" global="''' + (args.global ? false) + '''" catalogue-element-picker="''' + (args.resource ? 'catalogueElement') + '''" focus-me="true">
+                <input id="value" ng-model="value" class="form-control" status="''' + (args.status ? '') + '''" content-type="''' + (args.contentType ? '') + '''" global="''' + (args.global ? false) + '''" catalogue-element-picker="''' + (args.resource ? 'catalogueElement') + '''" focus-me="true">
             </div>
             <fake-submit-button/>
             </form>

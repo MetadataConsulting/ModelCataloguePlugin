@@ -6,11 +6,12 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.path.PathFinder
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
-import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.util.*
 import org.modelcatalogue.core.util.lists.CustomizableJsonListWithTotalAndType
+import org.modelcatalogue.core.util.lists.DetachedListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeWrapper
+import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.lists.Mappings
 import org.modelcatalogue.core.util.lists.Relationships
@@ -420,22 +421,47 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     protected ListWithTotalAndType<T> getAllEffectiveItems(Integer max) {
         if (params.status?.toLowerCase() == 'active') {
             if (modelCatalogueSecurityService.hasRole('CURATOR')){
-                return dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+                return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
                     'in' 'status', [ElementStatus.FINALIZED, ElementStatus.DRAFT]
-                }, overridableDataModelFilter)
+                }), overridableDataModelFilter)
             }
-            return dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+            return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
                 'eq' 'status', ElementStatus.FINALIZED
-            }, overridableDataModelFilter)
+            }), overridableDataModelFilter)
         }
 
         if (params.status) {
-            return dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+            return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
                 'in' 'status', ElementService.getStatusFromParams(params)
-            }, overridableDataModelFilter)
+            }), overridableDataModelFilter)
         }
 
-        return dataModelService.classified(Lists.all(params, resource, "/${resourceName}/"), overridableDataModelFilter)
+        return dataModelService.classified(withAdditionalIndexCriteria(Lists.all(params, resource, "/${resourceName}/")), overridableDataModelFilter)
+    }
+
+    private <T> ListWrapper<T> withAdditionalIndexCriteria(ListWrapper<T> list) {
+        if (!hasAdditionalIndexCriteria()) {
+            return list
+        }
+
+        if (!(list instanceof ListWithTotalAndTypeWrapper)) {
+            throw new IllegalArgumentException("Cannot add additional criteria list $list. Only ListWithTotalAndTypeWrapper is currently supported")
+        }
+        if (!(list.list instanceof DetachedListWithTotalAndType)) {
+            throw new IllegalArgumentException("Cannot add additional criteria list $list. Only DetachedListWithTotalAndType is currently supported")
+        }
+
+        list.list.criteria.with buildAdditionalIndexCriteria()
+
+        return list
+    }
+
+    protected boolean hasAdditionalIndexCriteria() {
+        return false
+    }
+
+    protected Closure buildAdditionalIndexCriteria() {
+        return {}
     }
 
     /**

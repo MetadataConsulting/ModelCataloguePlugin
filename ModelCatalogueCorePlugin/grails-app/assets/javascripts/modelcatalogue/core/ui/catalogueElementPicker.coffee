@@ -17,7 +17,7 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
 
 
   controller: ['$scope', '$q', '$parse', '$state', '$attrs',  ($scope, $q, $parse, $state, $attrs) ->
-    $scope.searchForElement = (query, ngModel, pickerValue, resourceAttr, statusAttr, globalAttr, onSelect) ->
+    $scope.searchForElement = (query, ngModel, pickerValue, resourceAttr, statusAttr, globalAttr, contentTypeAttr, onSelect) ->
       searchFun     = null
       resource      = if resourceAttr then $scope.$eval(resourceAttr) ? $scope.$parent.$eval(resourceAttr) else undefined
       value         = if pickerValue then pickerValue else resource
@@ -28,6 +28,9 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
 
       if not globalAttr and $state.params.dataModelId and $state.params.dataModelId != 'catalogue'
         params.dataModel = $state.params.dataModelId
+
+      if contentTypeAttr
+        params.contentType = contentTypeAttr
 
       if (value)
         searchFun = (query) -> catalogueElementResource(value).search(query, params)
@@ -44,7 +47,7 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
           more: true
           description: "View all items, search globally or add more imports. Press 'Esc' to dismiss."
           openSearchMore: ->
-            $scope.searchForMore(ngModel, pickerValue, resourceAttr, statusAttr, globalAttr, onSelect)
+            $scope.searchForMore(ngModel, pickerValue, resourceAttr, statusAttr, globalAttr, contentTypeAttr, onSelect)
         })
         deferred.resolve(list)
       deferred.promise
@@ -54,14 +57,14 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
       return '' + customLabel    if customLabel
       return '' + el.getLabel()  if angular.isFunction(el.getLabel)
       return '' + el
-    $scope.searchForMore = (ngModel, pickerValue, resourceAttr, statusAttr, globalAttr, onSelect)->
+    $scope.searchForMore = (ngModel, pickerValue, resourceAttr, statusAttr, globalAttr, contentTypeAttr, onSelect)->
       unless ngModel
         throw "ng-model for catalogue-element-picker is missing cannot search for more elements"
 
       resource      = if resourceAttr then $scope.$eval(resourceAttr) ? $scope.$parent.$eval(resourceAttr) else undefined
       value         = if pickerValue then pickerValue else resource
 
-      messages.prompt(null, null, {type: 'search-catalogue-element', resource: value, status: statusAttr, currentDataModel: $scope.currentDataModel, global: globalAttr}).then (element) ->
+      messages.prompt(null, null, {type: 'search-catalogue-element', resource: value, status: statusAttr, currentDataModel: $scope.currentDataModel, contentType: contentTypeAttr, global: globalAttr}).then (element) ->
         $parse(ngModel).assign($scope, element)
         $scope.$eval onSelect, {$item: element, $model: element, $label: element.classifiedName} if onSelect
 
@@ -81,11 +84,11 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
       stringified = JSON.stringify(string)
       stringified.substring(1,stringified.length - 1).replace(/&/, "&amp;").replace(/"/g, "&quot;")
 
-    icon  = """<span class="input-group-addon search-for-more-icon" ng-click="searchForMore(&quot;""" + escape(attrs.ngModel ? '') + "&quot;, &quot;" + escape(attrs.catalogueElementPicker ? '') + "&quot;, &quot;" + escape(attrs.resource ? '') + "&quot;, &quot;" + escape(attrs.status ? '') + """&quot;, """ + attrs.global + """ ,&quot;""" + escape(attrs.typeaheadOnSelect ? '')  + """&quot;)" title="Search more ..."><catalogue-element-icon type="'#{attrs.catalogueElementPicker ? ''}' ? '#{attrs.catalogueElementPicker ? ''}' : #{attrs.resource ? 'null'}"></catalogue-element-icon></span>"""
+    icon  = """<span class="input-group-addon search-for-more-icon" ng-click="searchForMore(&quot;""" + escape(attrs.ngModel ? '') + "&quot;, &quot;" + escape(attrs.catalogueElementPicker ? '') + "&quot;, &quot;" + escape(attrs.resource ? '') + "&quot;, &quot;" + escape(attrs.status ? '') + """&quot;, """ + attrs.global + """ ,&quot;""" + escape(attrs.contentType ? '') + """&quot;, &quot;""" + escape(attrs.typeaheadOnSelect ? '')  + """&quot;)" title="Search more ..."><catalogue-element-icon type="'#{attrs.catalogueElementPicker ? ''}' ? '#{attrs.catalogueElementPicker ? ''}' : #{attrs.resource ? 'null'}"></catalogue-element-icon></span>"""
     label = if attrs.label then attrs.label else 'null'
 
     element.attr('typeahead-on-select', 'customCepOnSelect($item, $model, $label, "' + escape(attrs.typeaheadOnSelect ? '') + '")')
-    element.attr('typeahead', "el as label(el, #{label}) for el in searchForElement($viewValue, \"" + escape(attrs.ngModel ? '') + "\", \"" + escape(attrs.catalogueElementPicker ? '') + "\",\"" + escape(attrs.resource ? '') + "\", \"" + escape(attrs.status ? '') + "\", " + attrs.global + " ,\"" + escape(attrs.typeaheadOnSelect ? '')  + "\")" )
+    element.attr('typeahead', "el as label(el, #{label}) for el in searchForElement($viewValue, \"" + escape(attrs.ngModel ? '') + "\", \"" + escape(attrs.catalogueElementPicker ? '') + "\",\"" + escape(attrs.resource ? '') + "\", \"" + escape(attrs.status ? '') + "\", " + attrs.global + " , \"" + escape(attrs.contentType ? '') + "\", \"" + escape(attrs.typeaheadOnSelect ? '')  + "\")" )
     element.attr('autocomplete', "off")
     element.attr('typeahead-wait-ms', "50") unless element.attr('typeahead-wait-ms')
     element.attr('typeahead-template-url', 'modelcatalogue/core/ui/catalogueElementPickerTypeahead.html')

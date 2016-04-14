@@ -5,26 +5,30 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'angula
 
     applicationTitle "Xml Editor for #{element.getLabel()}"
 
-    xmlPromise = $http.get("#{element.internalModelCatalogueId}?format=xml").then (resp) ->
+    $http.get("#{element.internalModelCatalogueId}?format=xml").then (resp) ->
       $scope.xml = resp.data
 
-    xsltPromise = $http.get("#{security.contextPath}#{catalogue.getDefaultXslt(element.elementType) ? catalogue.getDefaultXslt('catalogueElement')}").then (resp) ->
+    $http.get("#{security.contextPath}#{catalogue.getDefaultXslt(element.elementType) ? catalogue.getDefaultXslt('catalogueElement')}").then (resp) ->
       $scope.xslt = resp.data
 
     $scope.download = (name, text, mimeType = 'text/xml;charset=utf-8') ->
       fileDownloadService.setMimeType(mimeType)
       fileDownloadService.downloadFile(name, text)
 
-    $scope.$watchGroup ['xml', 'xslt'], (newValues) ->
+    transform = (newValues) ->
       xml = newValues[0]
       xslt = newValues[1]
 
-      if xml and xslt
-        xsltTransformer.transformXml(xml, xslt)
-        .then (result) ->
-          $scope.xsd = result
-        .catch (error) ->
-          $scope.xsd = error.message
+      return unless xml and xslt
+
+      xsltTransformer.transformXml(xml, xslt)
+      .then (result) ->
+        $scope.xsd = result
+      .catch (error) ->
+        $scope.xsd = error.message
+
+    $scope.$watchGroup ['xml', 'xslt'], transform
+    transform [$scope.xml, $scope.xslt]
 
 ])
 .config(['actionsProvider', (actionsProvider) ->
@@ -38,7 +42,10 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'angula
       label: 'Load XSLT'
       icon: 'fa fa-file-code-o'
       action: ->
-        messages.prompt "Select Stylesheet", "Select stylesheet to be loaded", type: 'catalogue-element', resource: 'asset'
+        messages
+        .prompt("Select Stylesheet", "Select stylesheet to be loaded", type: 'catalogue-element', resource: 'asset', contentType: 'text/xml')
+        .then (asset) -> asset.execute('content')
+        .then (resp) -> $scope.xslt = resp
     }
   ])
 
