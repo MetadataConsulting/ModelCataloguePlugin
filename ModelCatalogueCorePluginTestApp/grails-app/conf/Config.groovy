@@ -267,6 +267,7 @@ def assetExcludes = [
         "font-awesome/**/*.*",
         "jquery/**/*.*",
         "angular/**/*.*",
+        "ace-builds/**/*.*",
         "rxjs/**/*.*",
         "angular-animate/**/*.*",
         "angular-rx/**/*.*",
@@ -299,6 +300,8 @@ def assetExcludes = [
         "**/python3/*.*",
 ]
 
+
+
 grails.assets.excludes = assetExcludes
 
 grails.assets.plugin.famfamfam.excludes = ['**/*.*']
@@ -306,6 +309,16 @@ grails.assets.plugin.famfamfam.excludes = ['**/*.*']
 grails.assets.plugin."model-catalogue-core-plugin".excludes = assetExcludes
 grails.assets.plugin."model-catalogue-core".excludes = assetExcludes
 grails.assets.plugin.ModelCatalogueCore.excludes = assetExcludes
+grails.assets.plugin.ModelCatalogueCorePlugin.excludes = assetExcludes
+
+def assetIncludes = [
+    "saxonce/**/*.cache.html"
+]
+
+grails.assets.plugin."model-catalogue-core-plugin".includes = assetIncludes
+grails.assets.plugin."model-catalogue-core".includes = assetIncludes
+grails.assets.plugin.ModelCatalogueCore.includes = assetIncludes
+grails.assets.plugin.ModelCatalogueCorePlugin.includes = assetIncludes
 
 
 grails.plugin.springsecurity.useBasicAuth = true

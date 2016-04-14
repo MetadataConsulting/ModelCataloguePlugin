@@ -13,6 +13,8 @@ cd ModelCatalogueCorePluginTestApp
 
 if [[ "$1" == "debug" ]]; then
     ./grailsw run-app --debug-fork
+elif [[ "$1" == "war" ]]; then
+    ./grailsw dev run-war
 else
     ./grailsw run-app
 fi
