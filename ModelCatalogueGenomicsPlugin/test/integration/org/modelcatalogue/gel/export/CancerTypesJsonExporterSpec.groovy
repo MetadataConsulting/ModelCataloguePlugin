@@ -97,8 +97,8 @@ class CancerTypesJsonExporterSpec extends AbstractCancerTypesExporterSpec {
                         "type": "Some other Cancer Type 2",
                         "presentations": [
                             {
-                                "presentation": "Cancer presentations 2",
-                                "description": "some cancer presentation description2"
+                                "presentation": "Cancer presentations 21",
+                                "description": "some cancer presentation description21"
                             },                            {
                                 "presentation": "Cancer presentations 22",
                                 "description": "some cancer presentation description22"
