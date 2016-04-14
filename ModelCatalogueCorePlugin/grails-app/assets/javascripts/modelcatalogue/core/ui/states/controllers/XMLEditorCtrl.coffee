@@ -44,7 +44,7 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'angula
       icon: 'fa fa-file-code-o'
       action: ->
         messages
-        .prompt("Select Stylesheet", "Select stylesheet to be loaded", type: 'catalogue-element', resource: 'asset', contentType: 'text/xml')
+        .prompt("Select Stylesheet", "Select stylesheet to be loaded", type: 'catalogue-element', resource: 'asset', contentType: 'text/xsl')
         .then (asset) -> asset.execute('content')
         .then (resp) -> $scope.xslt = resp
     }

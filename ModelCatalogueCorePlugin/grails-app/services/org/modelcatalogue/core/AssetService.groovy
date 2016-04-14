@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import com.google.common.collect.ImmutableMap
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.stc.ClosureParams
@@ -31,6 +32,8 @@ class AssetService {
     private static final long MEGA = 1024 * 1024
     private static final long KILO = 1024
 
+    private static final ImmutableMap<String, String> EXTENSIONS_TO_CONTENT_TYPE = ImmutableMap.of('xsl', 'text/xsl')
+
     static String toBytes(Long value) {
         if (!value) return "0 B"
 
@@ -52,7 +55,7 @@ class AssetService {
 
         asset.name              = name ?: file.originalFilename
         asset.description       = description
-        asset.contentType       = file.contentType
+        asset.contentType       = getOverridableContentType(file)
         asset.size              = file.size
         asset.originalFileName  = file.originalFilename
 
@@ -104,8 +107,17 @@ class AssetService {
         return asset
     }
 
+    private static String getOverridableContentType(MultipartFile multipartFile) {
+        for (Map.Entry<String, String> entry in EXTENSIONS_TO_CONTENT_TYPE) {
+            if (multipartFile.originalFilename?.endsWith(entry.key)) {
+                return entry.value
+            }
+        }
+        return multipartFile.contentType
+    }
+
     @CompileDynamic
-    protected void addToSupersedes(Asset existing, Asset asset) {
+    protected static void addToSupersedes(Asset existing, Asset asset) {
         asset.addToSupersedes(existing, skipUniqueChecking: true)
     }
 

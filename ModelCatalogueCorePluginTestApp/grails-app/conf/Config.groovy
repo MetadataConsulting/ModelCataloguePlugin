@@ -22,6 +22,7 @@ grails.mime.types = [ // the first one is the default format
                       multipartForm: 'multipart/form-data',
                       rss          : 'application/rss+xml',
                       text         : 'text/plain',
+                      xsl          : 'text/xsl',
                       hal          : ['application/hal+json', 'application/hal+xml'],
 //                      xml          : ['text/xml', 'application/xml'],
                       xlsx         : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
