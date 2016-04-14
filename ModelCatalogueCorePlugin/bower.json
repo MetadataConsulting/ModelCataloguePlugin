@@ -41,7 +41,7 @@
     "urijs": "~1.17.1",
     "angular-ui-ace": "~0.2.3",
     "angular-download-service": "0.1.0",
-    "vk-beautify": "git@github.com:rt/vkbeautify-wrapper.git"
+    "vk-beautify": "https://github.com/rt/vkbeautify-wrapper.git"
   },
   "resolutions": {
     "angular": "1.4.10"
