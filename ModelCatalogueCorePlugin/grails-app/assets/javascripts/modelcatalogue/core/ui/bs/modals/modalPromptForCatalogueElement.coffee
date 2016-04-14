@@ -17,12 +17,15 @@ angular.module('mc.core.ui.bs.modalPromptForCatalogueElement', ['mc.util.message
             </form>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-primary" ng-click="close(value)" ng-disabled="!isElementSelected(value)">OK</button>
+              <button class="btn btn-primary" ng-click="close(value)" ng-disabled="!isElementSelected(value)">OK</button>
             <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
         </div>
         '''
         controller: ['$scope', 'catalogue', '$modalInstance', ($scope, catalogue, $modalInstance) ->
+          $scope.value = args.value
           $scope.isElementSelected = (value) ->
+            if args.allowString and value and angular.isString(value)
+              return true
             catalogue.isInstanceOf(value?.elementType ? 'noType', 'catalogueElement')
 
           $scope.close = (value) ->
