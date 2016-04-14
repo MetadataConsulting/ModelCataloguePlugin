@@ -209,6 +209,19 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
                 updateFrom(@, enhance(element), true)
                 $rootScope.$broadcast 'catalogueElementUpdated', @
 
+          self.focus = ->
+            self.execute('path').then (response) ->
+              path = response
+
+              return if not path
+              return if path.length <= 1
+
+              # need to add list node
+
+              path.splice(1, 0, path[1].substring(0, path[1].lastIndexOf('/')) + '/all')
+
+              $rootScope.$broadcast('expandTreeview', path)
+
 
       # wrap original element
       enhanced = new CatalogueElement(element)

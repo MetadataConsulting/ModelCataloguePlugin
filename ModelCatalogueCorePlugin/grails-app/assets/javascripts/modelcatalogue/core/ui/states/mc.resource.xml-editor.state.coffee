@@ -17,7 +17,9 @@ angular.module('mc.core.ui.states.mc.resource.xml-editor', ['ui.ace']).config([
         element: [
           '$stateParams', 'catalogueElementResource', 'lastSelectedElementHolder', 'names',
           ($stateParams, catalogueElementResource, lastSelectedElementHolder, names) ->
-            catalogueElementResource($stateParams.resource).get($stateParams.id)
+            promise = catalogueElementResource($stateParams.resource).get($stateParams.id)
+            promise.then (element) -> element.focus()
+            return promise
         ]
     }
 ])
