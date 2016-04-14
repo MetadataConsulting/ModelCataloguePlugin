@@ -1,13 +1,7 @@
-package org.modelcatalogue.gel
+package org.modelcatalogue.gel.export
 
-import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.DataClass
-import org.modelcatalogue.core.DataModelService
-import org.modelcatalogue.core.ElementService
-import org.modelcatalogue.core.InitCatalogueService
-import org.modelcatalogue.core.util.Metadata
-import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
-import org.modelcatalogue.gel.export.AbstractRareDiseasesExporterSpec
+import org.modelcatalogue.gel.RareDiseaseCsvExporter
 
 /**
  * Test for RD reports class using test model with similar format to expected data.
