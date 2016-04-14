@@ -1,32 +1,7 @@
 <div class="row">
-  <div class="col-md-6">
+  <div class="col-md-12">
     <div class="row">
       <div class="col-md-12">
-        <h4>
-          Source Xml
-        </h4>
-      </div>
-    </div>
-    <div class="row"
-         data-ng-model="xml"
-         ng-readonly="true"
-         ui-ace="{
-           useWrapMode : false,
-           showGutter: true,
-           theme:'xcode',
-           mode: 'xml',
-           showPrintMargin: false,
-           folding: 'beginandend',
-           readOnly: true
-         }"></div>
-  </div>
-
-  <div class="col-md-6">
-    <div class="row">
-      <div class="col-md-12">
-        <div class="catalogue-element-detail-actions">
-          <contextual-actions icon-only="true" role="xmleditor-xslt" size="xs" no-colors="true"></contextual-actions>
-        </div>
         <h4>
           Xsl Transformation
         </h4>
@@ -47,12 +22,37 @@
 </div>
 
 <div class="row">
-  <div class="col-md-12">
+  <div class="col-md-6">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="catalogue-element-detail-actions">
+          <contextual-actions icon-only="true" role="xmleditor-xslt" size="xs" no-colors="true"></contextual-actions>
+        </div>
+        <h4>
+          Source Xml
+        </h4>
+      </div>
+    </div>
+    <div class="row"
+         data-ng-model="xml"
+         ng-readonly="true"
+         ui-ace="{
+           useWrapMode : false,
+           showGutter: true,
+           theme:'xcode',
+           mode: 'xml',
+           showPrintMargin: false,
+           folding: 'beginandend',
+           readOnly: true
+         }"></div>
+  </div>
+
+  <div class="col-md-6">
     <div class="catalogue-element-detail-actions">
       <contextual-actions icon-only="true" role="xmleditor-xsd" size="xs" no-colors="true"></contextual-actions>
     </div>
     <h4>
-      Result Xml
+      Result Xsd
     </h4>
     <div class="row"
          data-ng-model="xsd"
