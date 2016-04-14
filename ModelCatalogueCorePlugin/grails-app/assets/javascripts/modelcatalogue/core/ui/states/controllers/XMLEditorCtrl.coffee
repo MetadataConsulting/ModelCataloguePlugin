@@ -1,7 +1,7 @@
 angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'angular.download.service', 'mc.util.xsltTransformer'])
 .controller('mc.core.ui.states.controllers.XmlEditorCtrl', [
-  '$scope', '$stateParams', '$state', '$timeout', 'element', 'applicationTitle', '$http', 'catalogue', 'security', 'fileDownloadService', 'xsltTransformer',
-  ($scope, $stateParams, $state, $timeout, element, applicationTitle, $http, catalogue, security, fileDownloadService, xsltTransformer) ->
+  '$log', '$scope', '$stateParams', '$state', '$timeout', 'element', 'applicationTitle', '$http', 'catalogue', 'security', 'fileDownloadService', 'xsltTransformer',
+  ($log, $scope, $stateParams, $state, $timeout, element, applicationTitle, $http, catalogue, security, fileDownloadService, xsltTransformer) ->
 
     applicationTitle "Xml Editor for #{element.getLabel()}"
     $scope.element = element
@@ -12,7 +12,7 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'angula
       xslt = newValues[1]
 
       return unless xml and xslt
-
+      $log.debug("transformation started", {xml: xml, xslt: xslt})
 
       $timeout( ->
         $scope.transformationInProgress = true
@@ -21,8 +21,10 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'angula
       xsltTransformer.transformXml(xml, xslt)
       .then (result) ->
         $scope.xsd = result
+        $log.debug("transformation succeeded with result", result)
       .catch (error) ->
         $scope.xsd = error.message
+        $log.debug("transformation failed with error", error)
       .finally () ->
         $timeout( ->
           $scope.transformationInProgress = false
@@ -31,11 +33,9 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'angula
 
     $http.get("#{element.internalModelCatalogueId}?format=xml").then (resp) ->
       $scope.xml = resp.data
-      transform [$scope.xml, $scope.xslt]
 
     $http.get("#{security.contextPath}#{catalogue.getDefaultXslt(element.elementType) ? catalogue.getDefaultXslt('catalogueElement')}").then (resp) ->
       $scope.xslt = resp.data
-      transform [$scope.xml, $scope.xslt]
 
     $scope.download = (name, text, mimeType = 'text/xml;charset=utf-8') ->
       fileDownloadService.setMimeType(mimeType)

@@ -7,6 +7,11 @@
             SaxonPromise = $q(function(resolve){
                 $window.onSaxonLoad = function() {
                     resolve($window.Saxon);
+                };
+
+                // if document was already loaded
+                if ($window.document.readyState === 'complete') {
+                    resolve($window.Saxon);
                 }
             });
 
@@ -41,7 +46,6 @@
                         });
 
                         processor.transformToDocument(Saxon.parseXML(sourceText));
-
                     });
                 });
             }
