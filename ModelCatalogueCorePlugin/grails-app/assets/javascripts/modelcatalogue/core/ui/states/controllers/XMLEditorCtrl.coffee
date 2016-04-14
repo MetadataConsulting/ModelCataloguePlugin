@@ -1,10 +1,11 @@
 angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'angular.download.service', 'mc.util.xsltTransformer'])
 .controller('mc.core.ui.states.controllers.XmlEditorCtrl', [
-  '$scope', '$stateParams', '$state', 'element', 'applicationTitle', '$http', 'catalogue', 'security', 'fileDownloadService', 'xsltTransformer',
-  ($scope, $stateParams, $state, element, applicationTitle, $http, catalogue, security, fileDownloadService, xsltTransformer) ->
+  '$scope', '$stateParams', '$state', '$timeout', 'element', 'applicationTitle', '$http', 'catalogue', 'security', 'fileDownloadService', 'xsltTransformer',
+  ($scope, $stateParams, $state, $timeout, element, applicationTitle, $http, catalogue, security, fileDownloadService, xsltTransformer) ->
 
     applicationTitle "Xml Editor for #{element.getLabel()}"
     $scope.element = element
+    $scope.transformationInProgress = false
 
     $http.get("#{element.internalModelCatalogueId}?format=xml").then (resp) ->
       $scope.xml = resp.data
@@ -22,11 +23,21 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'angula
 
       return unless xml and xslt
 
+
+      $timeout( ->
+        $scope.transformationInProgress = true
+      , 500
+      )
       xsltTransformer.transformXml(xml, xslt)
       .then (result) ->
         $scope.xsd = result
       .catch (error) ->
         $scope.xsd = error.message
+      .finally () ->
+        $timeout( ->
+          $scope.transformationInProgress = false
+        , 500
+        )
 
     $scope.$watchGroup ['xml', 'xslt'], transform
     transform [$scope.xml, $scope.xslt]
