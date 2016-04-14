@@ -194,10 +194,18 @@ class ElasticSearchService implements SearchCatalogue {
         if (CatalogueElement.isAssignableFrom(resource)) {
             indicies = resource == DataModel ? [DATA_MODEL_INDEX] : collectDataModelIndicies(params)
 
-            BoolQueryBuilder boolQuery = QueryBuilders.boolQuery().minimumNumberShouldMatch(1)
+            BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
+
+            if (search != '*') {
+                boolQuery.minimumNumberShouldMatch(1)
+            }
 
             if (params.status) {
                 boolQuery.must(QueryBuilders.termsQuery('status', ElementService.getStatusFromParams(params)*.toString()))
+            }
+
+            if (params.contentType) {
+                boolQuery.must(QueryBuilders.termsQuery('content_type', params.contentType))
             }
 
             CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->

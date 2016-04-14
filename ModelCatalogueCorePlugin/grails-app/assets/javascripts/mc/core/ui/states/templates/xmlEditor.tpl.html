@@ -24,6 +24,9 @@
   <div class="col-md-6">
     <div class="row">
       <div class="col-md-12">
+        <div class="catalogue-element-detail-actions">
+          <contextual-actions icon-only="true" role="xmleditor-xslt" size="xs" no-colors="true"></contextual-actions>
+        </div>
         <h4>
           Xsl Transformation
         </h4>
@@ -45,18 +48,12 @@
 
 <div class="row">
   <div class="col-md-12">
-    <div class="row">
-      <div class="col-md-8">
-        <h4>
-          Result Xml
-        </h4>
-      </div>
-      <div class="col-md-4">
-        <button class="btn btn-xs btn-default pull-right" ng-click="download('Result.xsd', xsd)">
-          <i class="glyphicon glyphicon-download-alt"></i>
-        </button>
-      </div>
+    <div class="catalogue-element-detail-actions">
+      <contextual-actions icon-only="true" role="xmleditor-xsd" size="xs" no-colors="true"></contextual-actions>
     </div>
+    <h4>
+      Result Xml
+    </h4>
     <div class="row"
          data-ng-model="xsd"
          ng-readonly="true"

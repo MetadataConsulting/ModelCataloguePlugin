@@ -27,3 +27,29 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'angula
           $scope.xsd = error.message
 
 ])
+.config(['actionsProvider', (actionsProvider) ->
+  XML_EDITOR_XSLT_ROLE = 'xmleditor-xslt'
+  XML_EDITOR_XSD_ROLE = 'xmleditor-xsd'
+
+
+  actionsProvider.registerActionInRole('load-xslt', XML_EDITOR_XSLT_ROLE, [ '$scope','messages', ($scope, messages) ->
+
+    {
+      label: 'Load XSLT'
+      icon: 'fa fa-file-code-o'
+      action: ->
+        messages.prompt "Select Stylesheet", "Select stylesheet to be loaded", type: 'catalogue-element', resource: 'asset'
+    }
+  ])
+
+  actionsProvider.registerActionInRole('load-xslt', XML_EDITOR_XSD_ROLE, [ '$scope', ($scope) ->
+
+    {
+      label: 'Download Result'
+      icon: 'fa fa-download'
+      action: ->
+        $scope.download('Result.xsd', $scope.xsd)
+    }
+  ])
+
+])
