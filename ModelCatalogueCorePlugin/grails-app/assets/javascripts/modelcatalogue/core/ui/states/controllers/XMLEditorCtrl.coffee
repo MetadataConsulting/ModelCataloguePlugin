@@ -4,6 +4,7 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'angula
   ($scope, $stateParams, $state, element, applicationTitle, $http, catalogue, security, fileDownloadService, xsltTransformer) ->
 
     applicationTitle "Xml Editor for #{element.getLabel()}"
+    $scope.element = element
 
     $http.get("#{element.internalModelCatalogueId}?format=xml").then (resp) ->
       $scope.xml = resp.data
