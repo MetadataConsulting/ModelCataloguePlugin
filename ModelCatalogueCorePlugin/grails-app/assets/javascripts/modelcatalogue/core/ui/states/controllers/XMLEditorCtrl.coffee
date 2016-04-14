@@ -7,16 +7,6 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'angula
     $scope.element = element
     $scope.transformationInProgress = false
 
-    $http.get("#{element.internalModelCatalogueId}?format=xml").then (resp) ->
-      $scope.xml = resp.data
-
-    $http.get("#{security.contextPath}#{catalogue.getDefaultXslt(element.elementType) ? catalogue.getDefaultXslt('catalogueElement')}").then (resp) ->
-      $scope.xslt = resp.data
-
-    $scope.download = (name, text, mimeType = 'text/xml;charset=utf-8') ->
-      fileDownloadService.setMimeType(mimeType)
-      fileDownloadService.downloadFile(name, text)
-
     transform = (newValues) ->
       xml = newValues[0]
       xslt = newValues[1]
@@ -39,8 +29,20 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'angula
         , 500
         )
 
+    $http.get("#{element.internalModelCatalogueId}?format=xml").then (resp) ->
+      $scope.xml = resp.data
+      transform [$scope.xml, $scope.xslt]
+
+    $http.get("#{security.contextPath}#{catalogue.getDefaultXslt(element.elementType) ? catalogue.getDefaultXslt('catalogueElement')}").then (resp) ->
+      $scope.xslt = resp.data
+      transform [$scope.xml, $scope.xslt]
+
+    $scope.download = (name, text, mimeType = 'text/xml;charset=utf-8') ->
+      fileDownloadService.setMimeType(mimeType)
+      fileDownloadService.downloadFile(name, text)
+
+
     $scope.$watchGroup ['xml', 'xslt'], transform
-    transform [$scope.xml, $scope.xslt]
 
 ])
 .config(['actionsProvider', (actionsProvider) ->
