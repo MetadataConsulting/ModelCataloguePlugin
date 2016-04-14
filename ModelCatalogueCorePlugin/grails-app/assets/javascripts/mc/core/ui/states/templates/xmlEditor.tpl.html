@@ -6,7 +6,7 @@
           <contextual-actions icon-only="true" role="xmleditor-xslt" size="xs" no-colors="true"></contextual-actions>
         </div>
         <h4>
-          Xsl Transformation
+          Stylesheet Transformation
         </h4>
       </div>
     </div>
@@ -29,7 +29,7 @@
     <div class="row">
       <div class="col-md-12">
         <h4>
-          Source Xml <small>({{element.classifiedName}})</small>
+          Source <small>{{element.classifiedName}}</small>
         </h4>
       </div>
     </div>
@@ -39,7 +39,7 @@
          ui-ace="{
            useWrapMode : false,
            showGutter: true,
-           theme:'xcode',
+           theme:'katzenmilch',
            mode: 'xml',
            showPrintMargin: false,
            folding: 'beginandend',
@@ -52,7 +52,7 @@
       <contextual-actions icon-only="true" role="xmleditor-xsd" size="xs" no-colors="true"></contextual-actions>
     </div>
     <h4>
-      Result Xsd
+      Result
     </h4>
     <div class="row"
          data-ng-model="xsd"
@@ -60,7 +60,7 @@
          ui-ace="{
            useWrapMode : false,
            showGutter: true,
-           theme:'xcode',
+           theme:'katzenmilch',
            mode: 'xml',
            showPrintMargin: false,
            folding: 'beginandend',
