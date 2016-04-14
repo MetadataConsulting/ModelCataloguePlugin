@@ -71,7 +71,7 @@ class CancerTypesJsonExporter {
                 return
             case 3:
                 map.put(subTag, model.name)
-                map.put(DESCRIPTION_TAG, model.description)
+                map.put(DESCRIPTION_TAG, model.description ?: '')
 
                 graphList << map
                 return
