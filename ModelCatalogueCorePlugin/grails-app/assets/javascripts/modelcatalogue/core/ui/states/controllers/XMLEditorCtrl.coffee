@@ -1,7 +1,7 @@
 angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'angular.download.service', 'mc.util.xsltTransformer'])
 .controller('mc.core.ui.states.controllers.XmlEditorCtrl', [
-  '$scope', '$stateParams', '$state', 'element', 'applicationTitle', '$http', 'catalogue', 'security', 'fileDownloadService', 'xsltTransformer', '$q',
-  ($scope, $stateParams, $state, element, applicationTitle, $http, catalogue, security, fileDownloadService, xsltTransformer, $q) ->
+  '$scope', '$stateParams', '$state', 'element', 'applicationTitle', '$http', 'catalogue', 'security', 'fileDownloadService', 'xsltTransformer',
+  ($scope, $stateParams, $state, element, applicationTitle, $http, catalogue, security, fileDownloadService, xsltTransformer) ->
 
     applicationTitle "Xml Editor for #{element.getLabel()}"
 
