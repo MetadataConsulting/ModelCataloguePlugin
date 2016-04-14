@@ -1,5 +1,5 @@
 format-version: 1.2
-data-version: releases/2015-06-26
+data-version: releases/2015-06-27
 saved-by: Peter Robinson, Sebastian Koehler, Sandra Doelken, Chris Mungall, Melissa Haendel, Nicole Vasilevsky, Monarch Initiative, et al
 auto-generated-by: OBO-Edit 2.3
 subsetdef: hposlim_core "Core clinical terminology"
@@ -141,6 +141,7 @@ is_a: HP:0012210 ! Abnormal renal morphology
 property_value: HP:0040005 "An abnormality of the `cortex of the kidney` (FMA:15581)." xsd:string {xref="HPO:probinson"}
 created_by: peter
 creation_date: 2011-03-06T11:31:39Z
+is_obsolete: true
 
 [Term]
 id: HP:0000003
@@ -173,6 +174,20 @@ is_a: HP:0000107 ! Renal cyst
 [Term]
 id: HP:00010001
 name: Something Different Obsolete
+alt_id: HP:0004716
+def: "Multicystic dysplasia of the kidney is characterized by multiple cysts of varying size in the kidney and the absence of a normal pelvocaliceal system. The condition is associated with ureteral or ureteropelvic atresia, and the affected kidney is nonfunctional." [HPO:curators]
+comment: Multicystic kidney dysplasia is the result of abnormal fetal renal development in which the affected kidney is replaced by multiple cysts and has little or no residual function. The vast majority of multicystic kidneys are unilateral. Multicystic kidney can be diagnosed on prenatal ultrasound.
+synonym: "Multicystic dysplastic kidney" EXACT []
+synonym: "Multicystic kidneys" EXACT []
+synonym: "Multicystic renal dysplasia" EXACT []
+xref: MeSH:D021782 "Multicystic Kidney Dysplasia"
+xref: UMLS:C0345335 "Multicystic Kidney Dysplasia"
+is_a: HP:0000107 ! Renal cyst
+is_obsolete: true
+
+[Term]
+id: HP:00010002
+name: Something Different Obsolete 3
 alt_id: HP:0004716
 def: "Multicystic dysplasia of the kidney is characterized by multiple cysts of varying size in the kidney and the absence of a normal pelvocaliceal system. The condition is associated with ureteral or ureteropelvic atresia, and the affected kidney is nonfunctional." [HPO:curators]
 comment: Multicystic kidney dysplasia is the result of abnormal fetal renal development in which the affected kidney is replaced by multiple cysts and has little or no residual function. The vast majority of multicystic kidneys are unilateral. Multicystic kidney can be diagnosed on prenatal ultrasound.

@@ -13,12 +13,12 @@ import org.obolibrary.oboformat.model.OBODoc
 @Log4j
 class OboLoader {
 
-    private static final String DEPRECATED_DATA_CLASS_NAME = 'Obsolete'
 
     final CatalogueBuilder builder
 
     private SimpleTemplateEngine engine = new SimpleTemplateEngine()
 
+    static final String DEPRECATED_DATA_CLASS_NAME = 'Obsolete'
     static final String OBO_ID = 'OBO ID'
     static final String ALTERNATIVE_IDS = 'Alternative IDs'
 
@@ -212,7 +212,7 @@ class OboLoader {
                 }
 
                 if (needsDeprecated) {
-                    dataClass name: DEPRECATED_DATA_CLASS_NAME, status: deprecated
+                    dataClass name: DEPRECATED_DATA_CLASS_NAME
                 }
             }
             // TODO: find better way how to do this
