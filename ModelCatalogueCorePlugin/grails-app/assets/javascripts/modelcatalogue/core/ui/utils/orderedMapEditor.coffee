@@ -9,7 +9,7 @@ angular.module('mc.core.ui.utils').directive 'orderedMapEditor',  [-> {
       valuePlaceholder:   '@?'
     templateUrl: '/mc/core/ui/utils/orderedMapEditor.html'
 
-    controller: ['$scope', 'enhance', '$log', 'messages', ($scope, enhance, $log, messages) ->
+    controller: ['$scope', 'enhance', '$log', 'messages', '$timeout',  ($scope, enhance, $log, messages, $timeout) ->
       isOrderedMap = (object)->
         enhance.isEnhancedBy(object, 'orderedMap')
 
@@ -62,10 +62,10 @@ angular.module('mc.core.ui.utils').directive 'orderedMapEditor',  [-> {
               propertyIndex = i
               break
 
-          $scope.$apply (scope)->
+          $timeout ->
             value = $scope.object.values[propertyIndex]
-            scope.object.values.splice(propertyIndex, 1)
-            scope.object.values.splice(newIndex, 0, value)
+            $scope.object.values.splice(propertyIndex, 1)
+            $scope.object.values.splice(newIndex, 0, value)
       }
 
       $scope.addNewRowOnTab = ($event, index, last)->

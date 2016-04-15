@@ -10,10 +10,10 @@ angular.module('mc.core.ui.metadataEditor', ['mc.core.ui.metadataEditors']).dire
       owner:              '=?' # required for metadata editors
     templateUrl: 'modelcatalogue/core/ui/metadataEditor.html'
 
-    controller: ['$scope', 'enhance', '$log', 'metadataEditors', ($scope, enhance, $log, metadataEditors) ->
+    controller: ['$scope', 'enhance', '$log', 'metadataEditors', '$timeout', ($scope, enhance, $log, metadataEditors, $timeout) ->
       isOrderedMap = (object)->
         enhance.isEnhancedBy(object, 'orderedMap')
-      
+
       # default values
       $scope.lastAddedRow = 0
       $scope.availableEditors = []
@@ -84,10 +84,10 @@ angular.module('mc.core.ui.metadataEditor', ['mc.core.ui.metadataEditors']).dire
               propertyIndex = i
               break
 
-          $scope.$apply (scope)->
+          $timeout ->
             value = $scope.object.values[propertyIndex]
-            scope.object.values.splice(propertyIndex, 1)
-            scope.object.values.splice(newIndex, 0, value)
+            $scope.object.values.splice(propertyIndex, 1)
+            $scope.object.values.splice(newIndex, 0, value)
       }
 
       $scope.addNewRowOnTab = ($event, index, last)->
