@@ -83,8 +83,6 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'ngFile
               url: "#{modelCatalogueApiRoot}/asset/upload"
               params: {id: id, name: name, dataModel: $scope.currentDataModel?.id}
               data: {asset: new File([new Blob([$scope.xslt], {type: 'text/xsl'})], "#{name}.xsl")}
-#              file: new File([new Blob([$scope.xslt], {type: 'text/xsl'})], "#{name}.xsl")
-#              fileFormDataName: 'asset'
             }).progress((evt) ->
               $scope.progress = parseInt(100.0 * evt.loaded / evt.total)
             ).success((result) ->
