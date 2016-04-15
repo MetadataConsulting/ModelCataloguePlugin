@@ -119,11 +119,11 @@
 
         }]);
 
-        demoConfig.run(function(editableOptions, editableThemes) {
+        demoConfig.run(['editableOptions', 'editableThemes', function(editableOptions, editableThemes) {
             editableThemes.bs3.inputClass = 'input-xs';
             editableThemes.bs3.buttonsClass = 'btn-sm';
             editableOptions.theme = 'bs3';
-        });
+        }]);
 
         modelcatalogue.registerModule('demo.config');
 
@@ -132,19 +132,19 @@
         modelcatalogue.welcome.info = "${grailsApplication.config.mc.welcome.info.encodeAsJSON()}";
 
         // create an app module based on registered modules
-        angular.module('metadataCurator', window.modelcatalogue.getModules()).run(function($state){
+        angular.module('metadataCurator', window.modelcatalogue.getModules()).run(['$state', function($state){
             // workaround https://github.com/angular-ui/ui-router/issues/2051
-        })
+        }])
     </script>
     <g:if test="${Environment.current in [Environment.DEVELOPMENT, Environment.TEST, Environment.CUSTOM]}">
         <script type="text/javascript">
-            angular.module('demo.config').factory('$exceptionHandler', function($log, $window) {
+            angular.module('demo.config').factory('$exceptionHandler', ['$log', '$window', function($log, $window) {
                 return function(exception, cause) {
                     $log.error(exception, cause);
                     window.printErrorInPre($window.location.href);
                     window.printErrorInPre(exception.stack);
                 };
-            });
+            }]);
 
         </script>
     </g:if>
@@ -152,7 +152,7 @@
 </head>
 
 <body>
-<div id="metadataCurator" ng-app="metadataCurator" >
+<div id="metadataCurator" ng-app="metadataCurator" ng-strict-di>
             <div class="navbar navbar-default navbar-fixed-top" role="navigation">
             <div class="container-fluid">
                 <div class="navbar-header">

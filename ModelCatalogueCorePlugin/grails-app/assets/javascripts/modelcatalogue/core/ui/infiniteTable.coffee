@@ -25,7 +25,7 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
       windowEl = angular.element($window)
       handler = ($scope) -> $scope.scroll = windowEl.scrollTop()
       windowEl.on 'scroll', ->
-        $scope.$apply (scope) -> handler(scope)
+        $timeout -> handler($scope)
 
       handler($scope)
 
@@ -139,13 +139,13 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
 
           return if original.index is rowAndIndex.index
 
-          $scope.$apply (scope) ->
-            $q.when(scope.reorder($row: original, $current: rowAndIndex))
+          $timeout ->
+            $q.when($scope.reorder($row: original, $current: rowAndIndex))
             .then ->
               insertIndex = if original.index < rowAndIndex.index then rowAndIndex.index else rowAndIndex.index + 1
 
-              scope.rows.splice(original.index, 1)
-              scope.rows.splice(insertIndex, 0, original.row)
+              $scope.rows.splice(original.index, 1)
+              $scope.rows.splice(insertIndex, 0, original.row)
 
       windowEl.resize -> update
 
