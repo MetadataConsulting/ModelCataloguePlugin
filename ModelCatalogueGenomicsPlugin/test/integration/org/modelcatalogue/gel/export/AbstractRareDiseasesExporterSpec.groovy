@@ -82,7 +82,9 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
 
                                             if (createPhenotypes) {
                                                 for (int k in 1..15) {
-                                                    dataClass name: "Phenotype ($k) name $i $j"
+                                                    dataClass name: "Phenotype ($k) name $i $j", {
+                                                        ext "OBO ID", "HP:" + (i + j + k)
+                                                    }
                                                 }
                                             }
                                         }
@@ -108,16 +110,6 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
                 ext Metadata.AUTHORS, 'Author One, Author Two, Author Three'
                 ext Metadata.REVIEWERS, 'Reviewer One, Reviewer Two, Reviewer Three'
 
-            }
-        }
-
-        for (int i in 1..2){
-            for (int j in 1..2){
-                if (createPhenotypes) {
-                    for (int k in 1..15) {
-                        DataClass.findByName("Phenotype ($k) name $i $j").addExtension("OBO ID", "HP:" + (i + j + k))
-                    }
-                }
             }
         }
 
