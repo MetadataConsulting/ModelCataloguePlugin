@@ -21,7 +21,7 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'ngFile
       xsltTransformer.transformXml(xml, xslt)
       .then (result) ->
         $scope.xsd = result
-        $log.debug("transformation succeeded with result", result)
+        $log.debug("transformation succeeded with result", {xsd: result})
       .catch (error) ->
         $scope.xsd = error.message
         $log.debug("transformation failed with error", error)
