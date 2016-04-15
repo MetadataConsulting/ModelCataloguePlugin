@@ -97,6 +97,8 @@ grails.project.dependency.resolution = {
         compile ":coffee-asset-pipeline:2.7.2"
         compile ":less-asset-pipeline:2.7.2"
         compile "org.grails.plugins:angular-annotate-asset-pipeline:2.4.0"
+        compile "org.grails.plugins:babel-asset-pipeline:1.4.5"
+
         runtime ":angular-template-asset-pipeline:2.3.0"
 //        runtime ":hibernate4:4.3.5.5"
         runtime  ":hibernate:3.6.10.18"
