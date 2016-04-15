@@ -1,22 +1,34 @@
 (function(window){
-    angular.module("mc.util.xsltTransformer", []).factory('xsltTransformer', function($q, $window, vkbeautify) {
+    var Saxon;
+
+    window.onSaxonLoad = function() {
+        Saxon = window.Saxon
+    };
+
+    angular.module("mc.util.xsltTransformer", []).factory('xsltTransformer', function($q, $log, $window, vkbeautify) {
 
         function XsltTransformer() {
             var SaxonPromise;
 
             SaxonPromise = $q(function(resolve){
+                if (Saxon) {
+                    $log.debug('Saxon resolved from local variable');
+                    return resolve(Saxon)
+                }
+
+                if ($window.Saxon) {
+                    $log.debug('Saxon resolved from Window variable');
+                    return $window.Saxon
+                }
+
                 $window.onSaxonLoad = function() {
+                    $log.debug('Saxon resolved with another onSaxonLoad callback');
                     resolve($window.Saxon);
                 };
-
-                // if document was already loaded
-                if ($window.document.readyState === 'complete') {
-                    resolve($window.Saxon);
-                }
             });
 
             /**
-             * Transforms the {@link sourceText} XML using the stylesheet provided by stylesheetText.
+             * Transforms the sourceText XML using the stylesheet provided by stylesheetText.
              *
              * If you need additional configuration of the Saxon's XSLT20Processor use xsltProcessorConfigurer.
              *
