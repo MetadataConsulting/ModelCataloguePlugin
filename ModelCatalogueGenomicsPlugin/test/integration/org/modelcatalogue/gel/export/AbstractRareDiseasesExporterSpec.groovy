@@ -38,7 +38,7 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
     DataModel buildTestModel(boolean createPhenotypes) {
         DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
 
-        return builder.build {
+        DataModel testModel = builder.build {
             dataModel(name: 'Test Data Model') {
                 description "This is a data model for testing Eligibility OR Phenotype and Clinicals tests exports"
 
@@ -83,9 +83,7 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
                                             if (createPhenotypes) {
                                                 for (int k in 1..15) {
                                                     dataClass name: "Phenotype ($k) name $i $j", {
-                                                        //sets a value for OBO ID in the extension map - there must be a clearer way to do this
-                                                        ContextItem contextElement = context.getContextElement(DataClass, 0)
-                                                        contextElement.element.setExtension("OBO ID", "HP:" + (i + j + k))
+                                                        ext "OBO ID", "HP:" + (i + j + k)
                                                     }
                                                 }
                                             }
@@ -114,6 +112,8 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
 
             }
         }
+
+        return testModel
 
     }
 
