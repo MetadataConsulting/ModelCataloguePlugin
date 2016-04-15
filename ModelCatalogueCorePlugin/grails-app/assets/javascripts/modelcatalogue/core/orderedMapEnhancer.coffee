@@ -44,7 +44,7 @@ angular.module('mc.core.orderedMapEnhancer', ['mc.util.enhance']).config ['enhan
 
         getterSetter.asInt = (newValue) ->
           if arguments.length
-            set(if newValue then  parseInt(newValue, 10) else undefined)
+            set(if newValue? then  parseInt(newValue, 10) else undefined)
           else
             parseInt(get(), 10)
 
