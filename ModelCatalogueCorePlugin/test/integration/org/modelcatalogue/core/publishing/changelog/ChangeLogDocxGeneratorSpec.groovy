@@ -19,7 +19,7 @@ import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 
 import java.awt.Desktop
 
-class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
+class ChangeLogDocxGeneratorSpec extends AbstractIntegrationSpec {
 
     AuditService auditService
     DataClassService dataClassService
