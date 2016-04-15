@@ -26,7 +26,7 @@ import java.text.SimpleDateFormat
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
 @Log4j
-class ChangelogGenerator {
+class ChangeLogDocxGenerator {
 
     private final AuditService auditService
     private final DataClassService dataClassService
@@ -36,8 +36,8 @@ class ChangelogGenerator {
 
     private final Map<Long, List<Comment>> commentsCache = [:]
 
-    ChangelogGenerator(AuditService auditService, DataClassService dataClassService, Integer depth = 3,
-                       Boolean includeMetadata = true) {
+    ChangeLogDocxGenerator(AuditService auditService, DataClassService dataClassService, Integer depth = 3,
+                           Boolean includeMetadata = true) {
         this.auditService = auditService
         this.dataClassService = dataClassService
         try {

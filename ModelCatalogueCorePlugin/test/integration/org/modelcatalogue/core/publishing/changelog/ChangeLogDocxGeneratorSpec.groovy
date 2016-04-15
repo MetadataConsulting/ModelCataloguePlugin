@@ -17,9 +17,7 @@ import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 
-import java.awt.Desktop
-
-class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
+class ChangeLogDocxGeneratorSpec extends AbstractIntegrationSpec {
 
     AuditService auditService
     DataClassService dataClassService
@@ -38,7 +36,7 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
         when:
         File file = tmp.newFile('changelog.docx')
 
-        ChangelogGenerator generator = new ChangelogGenerator(auditService, dataClassService)
+        ChangeLogDocxGenerator generator = new ChangeLogDocxGenerator(auditService, dataClassService)
 
         generator.generateChangelog(draft, file.newOutputStream())
 
@@ -65,7 +63,7 @@ class ChangelogGeneratorSpec extends AbstractIntegrationSpec {
 
         builder.build {
             dataModel(name: 'C4C') {
-                description "This is a data model for testing ChangelogGenerator"
+                description "This is a data model for testing ChangeLogDocxGenerator"
 
                 ext 'foo', 'bar'
                 ext 'one', '1'

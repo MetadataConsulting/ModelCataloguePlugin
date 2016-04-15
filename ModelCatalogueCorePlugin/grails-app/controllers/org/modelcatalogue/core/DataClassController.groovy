@@ -3,7 +3,7 @@ package org.modelcatalogue.core
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.export.inventory.DataClassToDocxExporter
 import org.modelcatalogue.core.export.inventory.DataClassToXlsxExporter
-import org.modelcatalogue.core.publishing.changelog.ChangelogGenerator
+import org.modelcatalogue.core.publishing.changelog.ChangeLogDocxGenerator
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
@@ -135,7 +135,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
                 originalFileName: "${model.name}-${model.status}-${model.version}-changelog.docx",
                 contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ) { OutputStream out ->
-            new ChangelogGenerator(auditService, dataClassService, depth, includeMetadata)
+            new ChangeLogDocxGenerator(auditService, dataClassService, depth, includeMetadata)
                 .generateChangelog(DataClass.get(modelId), out)
         }
 
