@@ -9,6 +9,8 @@ import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
 import org.modelcatalogue.integration.excel.ExcelLoader
 import org.modelcatalogue.integration.excel.HeadersMap
+import spock.lang.Ignore
+import spock.lang.Issue
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.*
@@ -146,7 +148,14 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         check rightSideTitle is 'MET-522.M1 MET-522 0.0.1'
+    }
 
+    /**
+     * This test is currently ignored as it is very unreliable. It's better to have reliable tests than cover every
+     * bit of the application.
+     */
+    @Issue('MET-1050')
+    @Ignore def "export to excel"() {
         when:
         withNewWindow({
             click export
