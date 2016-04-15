@@ -261,6 +261,8 @@ grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'org.modelcatal
 grails.plugin.springsecurity.authority.className = 'org.modelcatalogue.core.security.Role'
 grails.plugin.springsecurity.requestMap.className = 'org.modelcatalogue.core.testapp.Requestmap'
 grails.plugin.springsecurity.securityConfigType = 'Requestmap'
+
+// this doesn't work properly, only reliable way is to his in setup-frontend.sh script
 def assetExcludes = [
         "bootstrap/**/*.*",
         "jquery-ui/**/*.*",
@@ -279,6 +281,8 @@ def assetExcludes = [
         "angular-sanitize/**/*.*",
         "jasmine/**/*.*",
         "**/*/GruntFile",
+        "**/*/gulpfile.babel.js",
+        "**/*/karma.conf.js",
         "**/*/Gruntfile",
         "**/*/Gruntfile.coffee",
         "**/*/LICENSE",
