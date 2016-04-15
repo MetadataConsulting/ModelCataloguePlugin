@@ -29,12 +29,18 @@ angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'ngFileUpload'])
       $scope.uploading = true
       # TODO: rename conceptualDomain to classification and let user pick from existing classification
       $scope.upload = Upload.upload({
-        params: {id: $scope.copy.id, name: $scope.copy.name, conceptualDomain: $scope.copy.conceptualDomain, createModelsForElements: $scope.copy.createModelsForElements, idpattern: $scope.copy.idpattern}
-        url:                "#{modelCatalogueApiRoot}/dataArchitect/imports/upload"
-        file:               $scope.copy.file
-        fields:
+        url: "#{modelCatalogueApiRoot}/dataArchitect/imports/upload"
+        params: {
+          id: $scope.copy.id,
+          name: $scope.copy.name,
+          conceptualDomain: $scope.copy.conceptualDomain,
+          createModelsForElements: $scope.copy.createModelsForElements,
+          idpattern: $scope.copy.idpattern
+        }
+        data: {
+          file: $scope.copy.file
           headersMap: $scope.headersMap
-        fileFormDataName:   'file'
+        }
       }).progress((evt) ->
         $scope.progress = parseInt(100.0 * evt.loaded / evt.total)
       ).success((result) ->

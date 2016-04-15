@@ -91,10 +91,14 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'ngFil
             if $scope.copy.file
               $scope.uploading = true
               $scope.upload = Upload.upload({
-                params: {id: $scope.copy.id, name: $scope.copy.name, description: $scope.copy.description, dataModel: $scope.currentDataModel?.id}
-                url:                "#{modelCatalogueApiRoot}/asset/upload"
-                file:               $scope.copy.file
-                fileFormDataName:   'asset'
+                url: "#{modelCatalogueApiRoot}/asset/upload"
+                params: {
+                  id: $scope.copy.id,
+                  name: $scope.copy.name,
+                  description: $scope.copy.description,
+                  dataModel: $scope.currentDataModel?.id
+                } 
+                data: {asset: $scope.copy.file}
               }).progress((evt) ->
                 $scope.progress = parseInt(100.0 * evt.loaded / evt.total)
               ).success((result) ->
