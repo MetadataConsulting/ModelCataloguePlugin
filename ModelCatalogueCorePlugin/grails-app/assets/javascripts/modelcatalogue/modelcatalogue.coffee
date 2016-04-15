@@ -1,4 +1,6 @@
 #= require vk-beautify/dist/vkbeautify.0.99.00.beta
+#= require blob-polyfill/Blob
+#= require file-saver.js/FileSaver
 #= require ng-file-upload/ng-file-upload
 #= require angular-i18n/angular-locale_en-gb
 #= require angular-http-auth/src/http-auth-interceptor
@@ -10,7 +12,7 @@
 #= require angular-diff-match-patch.js
 #= require angular-xeditable/dist/js/xeditable
 #= require angular-ui-ace/ui-ace
-#= require angular-download-service/angular-download-service
+#= require angular-file-saver/dist/angular-file-saver
 #= require_self
 #= require_full_tree .
 #= require mc/index
@@ -27,7 +29,7 @@ modules = [
   'ngAnimate'
   'xeditable'
   'ui.ace'
-  'angular.download.service'
+  'ngFileSaver'
 ]
 
 modelcatalogue =

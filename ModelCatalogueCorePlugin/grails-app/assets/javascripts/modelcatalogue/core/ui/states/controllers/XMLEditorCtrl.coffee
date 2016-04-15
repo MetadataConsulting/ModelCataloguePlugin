@@ -1,7 +1,7 @@
-angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'angular.download.service', 'mc.util.xsltTransformer'])
+angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'ngFileSaver', 'mc.util.xsltTransformer'])
 .controller('mc.core.ui.states.controllers.XmlEditorCtrl', [
-  '$log', '$scope', '$stateParams', '$state', '$timeout', 'element', 'applicationTitle', '$http', 'catalogue', 'security', 'fileDownloadService', 'xsltTransformer',
-  ($log, $scope, $stateParams, $state, $timeout, element, applicationTitle, $http, catalogue, security, fileDownloadService, xsltTransformer) ->
+  '$log', '$scope', '$stateParams', '$state', '$timeout', 'element', 'applicationTitle', '$http', 'catalogue', 'security', 'FileSaver', 'Blob', 'xsltTransformer',
+  ($log, $scope, $stateParams, $state, $timeout, element, applicationTitle, $http, catalogue, security, FileSaver, Blob, xsltTransformer) ->
 
     applicationTitle "Xml Editor for #{element.getLabel()}"
     $scope.element = element
@@ -38,9 +38,7 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'angula
       $scope.xslt = resp.data
 
     $scope.download = (name, text, mimeType = 'text/xml;charset=utf-8') ->
-      fileDownloadService.setMimeType(mimeType)
-      fileDownloadService.downloadFile(name, text)
-
+      FileSaver.saveAs(new Blob([text], type: mimeType), name)
 
     $scope.$watchGroup ['xml', 'xslt'], transform
 
