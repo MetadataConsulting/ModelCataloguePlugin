@@ -42,6 +42,7 @@ module.exports = function(config) {
 
             // App under test
             'grails-app/assets/javascripts/modelcatalogue/modelcatalogue.coffee',
+            'grails-app/assets/javascripts/**/*.es6',
             'grails-app/assets/javascripts/**/*.coffee',
             'grails-app/assets/javascripts/**/*.js',
             'grails-app/assets/javascripts/**/*.tpl.html',
@@ -50,6 +51,7 @@ module.exports = function(config) {
             'grails-app/assets/bower_components/angular-mocks/angular-mocks.js',
 
             // Tests
+            'test/js/**/*.!(fixture.)es6',
             'test/js/**/*.!(fixture.)js',
             'test/js/**/*.!(fixture.)coffee'
         ],
@@ -63,12 +65,14 @@ module.exports = function(config) {
             'karma-firefox-launcher',
             'karma-junit-reporter',
             'karma-coffee-preprocessor',
-            'karma-ng-html2js-preprocessor'
+            'karma-ng-html2js-preprocessor',
+            'karma-babel-preprocessor'
         ],
 
         preprocessors: {
             '**/*.coffee': ['coffee'],
-            '**/*.html': ['ng-html2js']
+            '**/*.html': ['ng-html2js'],
+            '**/*.es6': ['babel']
         },
 
         coffeePreprocessor: {
@@ -97,6 +101,18 @@ module.exports = function(config) {
             //   with all provided suffixes and prefixes
             moduleName: function(htmlPath) {
                 return htmlPath.substring(1, htmlPath.lastIndexOf('/')).replace(/\//g,'.');
+            }
+        },
+        babelPreprocessor: {
+            options: {
+                presets: ['es2015'],
+                sourceMap: 'inline'
+            },
+            filename: function (file) {
+                return file.originalPath.replace(/\.es6$/, '.es5.js');
+            },
+            sourceFileName: function (file) {
+                return file.originalPath;
             }
         }
     });

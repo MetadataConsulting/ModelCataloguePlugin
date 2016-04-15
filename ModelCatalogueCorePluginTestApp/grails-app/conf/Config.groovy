@@ -306,6 +306,7 @@ grails.assets.plugin."model-catalogue-core-plugin".excludes = assetExcludes
 grails.assets.plugin."model-catalogue-core".excludes = assetExcludes
 grails.assets.plugin.ModelCatalogueCore.excludes = assetExcludes
 
+grails.assets.babel.enabled = true
 
 grails.plugin.springsecurity.useBasicAuth = true
 grails.plugin.springsecurity.basic.realmName = "Model Catalogue"

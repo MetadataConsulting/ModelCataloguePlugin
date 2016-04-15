@@ -17,6 +17,8 @@ ModelCatalogueCorePluginTestApp/test/integration/resources/rare_diseases_combine
 **/*.class
 **/*.gen.fixture.js
 **/build/**/*
+**/node_modules/**
+**/bower_components/**
 
 .default-mc-config-location
 .docker-ip
