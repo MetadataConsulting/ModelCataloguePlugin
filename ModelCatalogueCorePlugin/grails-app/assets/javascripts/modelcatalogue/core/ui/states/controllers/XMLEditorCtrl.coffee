@@ -49,8 +49,8 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'angula
   XML_EDITOR_XSLT_ROLE = 'xmleditor-xslt'
   XML_EDITOR_XSD_ROLE = 'xmleditor-xsd'
 
-  actionsProvider.registerActionInRole('load-xslt', XML_EDITOR_XSLT_ROLE,
-    [ '$log', '$scope','messages', ($log, $scope, messages) ->
+  actionsProvider.registerActionInRole('load-xslt', XML_EDITOR_XSLT_ROLE, [
+    '$log', '$scope','messages', ($log, $scope, messages) ->
       {
         label: 'Load XSLT'
         icon: 'fa fa-file-code-o'
@@ -66,8 +66,8 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'angula
       }
   ])
 
-  actionsProvider.registerActionInRole('save-xslt', XML_EDITOR_XSLT_ROLE,
-    [ '$log', '$scope','messages', 'Upload', 'modelCatalogueApiRoot', 'enhance', ($log, $scope, messages, Upload, modelCatalogueApiRoot, enhance) ->
+  actionsProvider.registerActionInRole('save-xslt', XML_EDITOR_XSLT_ROLE, [
+    '$log', '$scope','messages', 'Upload', 'modelCatalogueApiRoot', 'enhance', ($log, $scope, messages, Upload, modelCatalogueApiRoot, enhance) ->
       {
         label: 'Save Stylesheet'
         icon: 'fa fa-save'
