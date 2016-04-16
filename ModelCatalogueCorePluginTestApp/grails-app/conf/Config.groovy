@@ -22,6 +22,7 @@ grails.mime.types = [ // the first one is the default format
                       multipartForm: 'multipart/form-data',
                       rss          : 'application/rss+xml',
                       text         : 'text/plain',
+                      xsl          : 'text/xsl',
                       hal          : ['application/hal+json', 'application/hal+xml'],
 //                      xml          : ['text/xml', 'application/xml'],
                       xlsx         : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -260,12 +261,15 @@ grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'org.modelcatal
 grails.plugin.springsecurity.authority.className = 'org.modelcatalogue.core.security.Role'
 grails.plugin.springsecurity.requestMap.className = 'org.modelcatalogue.core.testapp.Requestmap'
 grails.plugin.springsecurity.securityConfigType = 'Requestmap'
+
+// this doesn't work properly, only reliable way is to his in setup-frontend.sh script
 def assetExcludes = [
         "bootstrap/**/*.*",
         "jquery-ui/**/*.*",
         "font-awesome/**/*.*",
         "jquery/**/*.*",
         "angular/**/*.*",
+        "ace-builds/**/*.*",
         "rxjs/**/*.*",
         "angular-animate/**/*.*",
         "angular-rx/**/*.*",
@@ -277,6 +281,8 @@ def assetExcludes = [
         "angular-sanitize/**/*.*",
         "jasmine/**/*.*",
         "**/*/GruntFile",
+        "**/*/gulpfile.babel.js",
+        "**/*/karma.conf.js",
         "**/*/Gruntfile",
         "**/*/Gruntfile.coffee",
         "**/*/LICENSE",
@@ -298,6 +304,8 @@ def assetExcludes = [
         "**/python3/*.*",
 ]
 
+
+
 grails.assets.excludes = assetExcludes
 
 grails.assets.plugin.famfamfam.excludes = ['**/*.*']
@@ -305,6 +313,16 @@ grails.assets.plugin.famfamfam.excludes = ['**/*.*']
 grails.assets.plugin."model-catalogue-core-plugin".excludes = assetExcludes
 grails.assets.plugin."model-catalogue-core".excludes = assetExcludes
 grails.assets.plugin.ModelCatalogueCore.excludes = assetExcludes
+grails.assets.plugin.ModelCatalogueCorePlugin.excludes = assetExcludes
+
+def assetIncludes = [
+    "saxonce/**/*.cache.html"
+]
+
+grails.assets.plugin."model-catalogue-core-plugin".includes = assetIncludes
+grails.assets.plugin."model-catalogue-core".includes = assetIncludes
+grails.assets.plugin.ModelCatalogueCore.includes = assetIncludes
+grails.assets.plugin.ModelCatalogueCorePlugin.includes = assetIncludes
 
 grails.assets.babel.enabled = true
 

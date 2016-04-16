@@ -140,6 +140,7 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
         and rejected if the user cancels the input. The type is optional type of input which doesn't have to be
         supported by all the implementations.
       ###
+      
       messages.prompt = (title, body, args) ->
         return prompt(title, body, args) if not args?.type?
         customPrompt = promptByTypes[args.type]

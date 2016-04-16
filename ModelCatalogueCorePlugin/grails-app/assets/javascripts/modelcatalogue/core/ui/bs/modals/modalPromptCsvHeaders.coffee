@@ -39,10 +39,9 @@ angular.module('mc.core.ui.bs.modalPromptCsvHeaders', ['mc.util.messages', 'ngFi
 
             $scope.uploading = true
             $scope.upload = Upload.upload({
+              url: "#{modelCatalogueApiRoot}/#{url}"
               params: {separator: $scope.separator}
-              url:                "#{modelCatalogueApiRoot}/#{url}"
-              file:               $files[0]
-              fileFormDataName:   'csv'
+              data: {csv: $files[0]}
             }).progress((evt) ->
               $scope.progress = parseInt(100.0 * evt.loaded / evt.total)
             ).success((result) ->

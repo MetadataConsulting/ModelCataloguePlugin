@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import com.google.common.collect.ImmutableMap
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
@@ -8,7 +10,7 @@ import org.apache.commons.io.output.CountingOutputStream
 import org.codehaus.groovy.runtime.InvokerInvocationException
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.audit.AuditService
-import org.modelcatalogue.core.publishing.DraftContext
+import org.modelcatalogue.core.publishing.CloningContext
 import org.springframework.util.DigestUtils
 import org.springframework.web.multipart.MultipartFile
 
@@ -29,6 +31,8 @@ class AssetService {
     private static final long GIGA = 1024 * 1024 * 1024
     private static final long MEGA = 1024 * 1024
     private static final long KILO = 1024
+
+    private static final ImmutableMap<String, String> EXTENSIONS_TO_CONTENT_TYPE = ImmutableMap.of('xsl', 'text/xsl')
 
     static String toBytes(Long value) {
         if (!value) return "0 B"
@@ -51,7 +55,7 @@ class AssetService {
 
         asset.name              = name ?: file.originalFilename
         asset.description       = description
-        asset.contentType       = file.contentType
+        asset.contentType       = getOverridableContentType(file)
         asset.size              = file.size
         asset.originalFileName  = file.originalFilename
 
@@ -61,30 +65,37 @@ class AssetService {
             return asset
         }
 
+        Asset existing
         if (id) {
-            Asset existing = Asset.get(id)
+            existing = Asset.get(id)
 
             if (!existing) {
                 return null
             }
 
-            existing = elementService.createDraftVersion(existing, DraftContext.userFriendly().forceNew()) as Asset
+            Asset clone = elementService.cloneElement(existing, CloningContext.create(existing.dataModel, existing.dataModel))
 
-            if (existing.hasErrors()) {
-                return existing
+            if (clone.hasErrors()) {
+                return clone
             }
 
 
-            existing.name              = asset.name
-            existing.description       = asset.description
-            existing.contentType       = asset.contentType
-            existing.originalFileName  = asset.originalFileName
+            clone.name              = asset.name
+            clone.description       = asset.description
+            clone.contentType       = asset.contentType
+            clone.originalFileName  = asset.originalFileName
 
-            asset = existing
+            clone.latestVersionId   = existing.latestVersionId ?: existing.id
+
+            asset = clone
         }
 
         asset.save(flush: true)
 
+        if (existing) {
+            addToSupersedes(existing, asset)
+            elementService.archive(existing, true)
+        }
 
         try {
             storeAssetFromFile(file, asset)
@@ -94,6 +105,20 @@ class AssetService {
         }
 
         return asset
+    }
+
+    private static String getOverridableContentType(MultipartFile multipartFile) {
+        for (Map.Entry<String, String> entry in EXTENSIONS_TO_CONTENT_TYPE) {
+            if (multipartFile.originalFilename?.endsWith(entry.key)) {
+                return entry.value
+            }
+        }
+        return multipartFile.contentType
+    }
+
+    @CompileDynamic
+    protected static void addToSupersedes(Asset existing, Asset asset) {
+        asset.addToSupersedes(existing, skipUniqueChecking: true)
     }
 
     void storeAssetFromFile(MultipartFile file, Asset asset) {

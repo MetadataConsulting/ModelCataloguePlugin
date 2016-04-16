@@ -37,6 +37,12 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
   catalogueProvider.setDefaultSort = (type, sort) ->
     writeMetadata type, 'sort', sort
 
+  catalogueProvider.getDefaultXslt = (type) ->
+    readMetadata type, 'xslt'
+
+  catalogueProvider.setDefaultXslt = (type, xslt) ->
+    writeMetadata type, 'xslt', xslt
+
   catalogueProvider.setIcon = (type, icon) ->
     writeMetadata type, 'icon', icon
 
@@ -98,6 +104,9 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
 
     catalogue.getPlural = (type) ->
       catalogueProvider.getPlural(type)
+
+    catalogue.getDefaultXslt = (type) ->
+      catalogueProvider.getDefaultXslt(type)
 
     catalogue.getDeprecationWarning = (type) ->
       catalogueProvider.getDeprecationWarning(type) ? ->

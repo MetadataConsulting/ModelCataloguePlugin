@@ -1,0 +1,74 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="catalogue-element-detail-actions">
+          <contextual-actions icon-only="true" role="xmleditor-xslt" size="xs" no-colors="true"></contextual-actions>
+        </div>
+        <h4>
+          Stylesheet Transformation <small>{{xsltAsset.classifiedName}}</small>
+        </h4>
+      </div>
+    </div>
+    <div class="row"
+         id="xml-editor-stylesheet"
+         data-ng-model="xslt"
+         data-ng-model-options="{debounce: 500}"
+         ui-ace="{
+           useWrapMode : false,
+           showGutter: true,
+           theme:'xcode',
+           mode: 'xml',
+           showPrintMargin: false,
+           folding: 'beginandend'
+         }"></div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="row">
+      <div class="col-md-12">
+        <h4>
+          Source <small>{{element.classifiedName}}</small>
+        </h4>
+      </div>
+    </div>
+    <div class="row"
+         id="xml-editor-source"
+         data-ng-model="xml"
+         ng-readonly="true"
+         ui-ace="{
+           useWrapMode : false,
+           showGutter: true,
+           theme:'katzenmilch',
+           mode: 'xml',
+           showPrintMargin: false,
+           folding: 'beginandend',
+           readOnly: true
+         }"></div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="catalogue-element-detail-actions">
+      <contextual-actions icon-only="true" role="xmleditor-xsd" size="xs" no-colors="true"></contextual-actions>
+    </div>
+    <h4>
+      Result
+      <span ng-show="transformationInProgress" class="fa fa-fw fa-spin fa-spinner"></span>
+    </h4>
+    <div class="row"
+         id="xml-editor-result"
+         data-ng-model="xsd"
+         ng-readonly="true"
+         ui-ace="{
+           useWrapMode : false,
+           showGutter: true,
+           theme:'katzenmilch',
+           mode: 'xml',
+           showPrintMargin: false,
+           folding: 'beginandend',
+           readOnly: true
+         }"></div>
+  </div>
+</div>

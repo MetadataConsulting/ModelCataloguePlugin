@@ -92,6 +92,7 @@ module.config ['messagesProvider', (messagesProvider)->
           listOrSearch = (query, callback) ->
             params = {}
             params.status = args.status if args.status
+            params.contentType = args.contentType if args.contentType
 
             if not $scope.global and $state.params.dataModelId and $state.params.dataModelId != 'catalogue'
               params.dataModel = $state.params.dataModelId

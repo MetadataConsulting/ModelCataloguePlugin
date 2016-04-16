@@ -274,6 +274,18 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
+  actionsProvider.registerChildAction 'export', 'edit-XML', ['security', '$state', '$window', 'modelCatalogueApiRoot',
+    '$scope', (security, $state, $window, modelCatalogueApiRoot, $scope) ->
+      return undefined if not security.hasRole('CURATOR')
+      return undefined unless $scope.element and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('dataClass')
+      {
+        position: 100010
+        label: 'Edit Xml Schema'
+        action: ->
+          $state.go('mc.resource.xml-editor', {resource: 'dataClass', id: $scope.element.id})
+      }
+  ]
+
   generateReports = ($scope, $window, enhance, rest, $log, messages) ->
     (reports = []) ->
       for report in reports

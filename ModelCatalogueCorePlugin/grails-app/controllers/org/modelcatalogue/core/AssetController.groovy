@@ -14,6 +14,19 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
         super(Asset, false)
     }
 
+    protected boolean hasAdditionalIndexCriteria() {
+        params.contentType
+    }
+
+    protected Closure buildAdditionalIndexCriteria() {
+        if (!hasAdditionalIndexCriteria()) {
+            return super.buildAdditionalIndexCriteria()
+        }
+        return {
+            eq 'contentType', params.contentType
+        }
+    }
+
     def upload() {
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
             notAuthorized()

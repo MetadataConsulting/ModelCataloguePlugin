@@ -46,9 +46,8 @@ angular.module('mc.core.ui.bs.modalPromptXmlValidate', ['mc.util.messages']).con
             $scope.messages.clearAllMessages()
             $scope.uploading = true
             $scope.upload = Upload.upload({
-              url:                "#{modelCatalogueApiRoot}/asset/#{args.asset.id}/validateXml"
-              file:               $scope.copy.file
-              fileFormDataName:   'xml'
+              url: "#{modelCatalogueApiRoot}/asset/#{args.asset.id}/validateXml"
+              data: {xml: $scope.copy.file}
             }).progress((evt) ->
               $scope.progress = parseInt(100.0 * evt.loaded / evt.total)
             ).success((result) ->

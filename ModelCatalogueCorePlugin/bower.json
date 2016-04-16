@@ -27,7 +27,7 @@
     "angular-cookies": "~1.4.10",
     "jasmine": "~2.3.4",
     "angular-ui-router": "0.2.17",
-    "ng-file-upload": "~7.0.0",
+    "ng-file-upload": "~12.0.4",
     "ng-file-upload-shim": "~7.0.0",
     "angular-loading-bar": "~0.8.0",
     "angular-http-auth": "~1.2.1",
@@ -38,7 +38,10 @@
     "angular-xeditable": "0.1.11",
     "rxjs": "~4.0.8",
     "angular-rx": "~1.1.3",
-    "urijs": "~1.17.1"
+    "urijs": "~1.17.1",
+    "angular-ui-ace": "~0.2.3",
+    "angular-file-saver": "1.1.1",
+    "vk-beautify": "https://github.com/rt/vkbeautify-wrapper.git"
   },
   "resolutions": {
     "angular": "1.4.10"
