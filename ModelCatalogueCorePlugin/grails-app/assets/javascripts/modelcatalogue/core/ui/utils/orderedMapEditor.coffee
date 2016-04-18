@@ -76,6 +76,7 @@ angular.module('mc.core.ui.utils').directive 'orderedMapEditor',  [-> {
           messages.error "No excel content to be imported."
           return importText
 
+        $log.debug("excel import with content #{importText}")
         updatedValues = 0
         createdValues = 0
         for line in importText.split(/\r\n|\n\r|\n|\r/g)
@@ -110,7 +111,11 @@ angular.module('mc.core.ui.utils').directive 'orderedMapEditor',  [-> {
         else if window.clipboardData? && window.clipboardData.getData? # Internet Explorer
           data = window.clipboardData.getData "Text"
 
+        # do the import
         $scope.importExcel(data)
+
+        # do not trigger the default paste event
+        event.preventDefault()
 
       $scope.$watch 'object', (newObject) ->
         onObjectChanged(newObject)
