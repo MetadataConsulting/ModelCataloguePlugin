@@ -142,7 +142,7 @@ class Delayable<T>  {
             closure this
         } catch(Exception e) {
             reset(true)
-            return
+            throw e
         }
         runIfRequested()
     }

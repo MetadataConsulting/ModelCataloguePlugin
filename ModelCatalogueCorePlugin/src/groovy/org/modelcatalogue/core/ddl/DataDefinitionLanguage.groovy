@@ -35,8 +35,14 @@ class DataDefinitionLanguage {
         return new CreateDraftDefinition(this)
     }
 
-    void finalize(String name) {
-        Holders.applicationContext.getBean(ElementService).finalizeElement(find(CatalogueElement, name))
+    void finalize(String name, String version = null, String revisionNotes = null) {
+        DataModel dataModel = find(DataModel, name)
+
+        if (!dataModel) {
+            throw new IllegalArgumentException("No data model called $name exist!")
+        }
+
+        Holders.applicationContext.getBean(ElementService).finalizeDataModel(dataModel, version ?: dataModel.semanticVersion, revisionNotes ?: 'TEST', true)
     }
 
     void deprecate(String name) {
