@@ -413,15 +413,15 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
 
           $scope.prefillFrom = ->
             dataClassPromise = messages.prompt('Clone Data Class', 'Please, select from which Data Class should be the properties cloned', type: 'catalogue-element', resource: 'dataClass')
+            dataClassPromise = dataClassPromise.then (dataClass) ->
+              return dataClass.refresh() if dataClass.minimal
+              return dataClass
             dataClassPromise.then (dataClass) ->
               promises = []
               $scope.dataClass.name         = dataClass.name
               $scope.dataClass.description  = dataClass.description
 
               $scope.metadata               = angular.copy dataClass.ext
-
-              angular.forEach dataClass.dataModels, (dataModel) ->
-                $scope.dataModels.push {element: dataModel, name: dataModel.name}
 
               push = (container, property) ->
                 (result) ->
