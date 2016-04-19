@@ -67,10 +67,10 @@
     <br/>
     <form role="form">
       <div class="form-group">
-        <label for="name" class="">Parent Data Class</label>
+        <label for="parent-data-class" class="">Parent Data Class</label>
         <elements-as-tags elements="parents"></elements-as-tags>
         <div class="input-group">
-          <input type="text" class="form-control" id="name" placeholder="Name" ng-model="parent.element" focus-me="step=='parents'" catalogue-element-picker="dataClass" status='draft' typeahead-on-select="push('parents', 'parent')">
+          <input type="text" class="form-control" id="parent-data-class" placeholder="Name" ng-model="parent.element" focus-me="step=='parents'" catalogue-element-picker="dataClass" status='draft' typeahead-on-select="push('parents', 'parent')">
                     <span class="input-group-btn">
                       <button class="btn btn-success" ng-click="push('parents', 'parent')" ng-disabled="isEmpty(parent.element)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
@@ -84,10 +84,10 @@
     <br/>
     <form role="form">
       <div class="form-group">
-        <label for="name" class="">Child Data Class</label>
+        <label for="child-data-class" class="">Child Data Class</label>
         <elements-as-tags elements="children"></elements-as-tags>
         <div class="input-group">
-          <input type="text" class="form-control" id="name" placeholder="Name" ng-model="child.element" focus-me="step=='children'" catalogue-element-picker="dataClass" global="'allow'" typeahead-on-select="pushWithDataModelCheck('children', 'child')">
+          <input type="text" class="form-control" id="child-data-class" placeholder="Name" ng-model="child.element" focus-me="step=='children'" catalogue-element-picker="dataClass" typeahead-on-select="pushWithDataModelCheck('children', 'child')">
                     <span class="input-group-btn">
                       <button class="btn btn-success" ng-click="pushWithDataModelCheck('children', 'child')" ng-disabled="isEmpty(child.element)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
@@ -106,10 +106,10 @@
     <br/>
     <form role="form">
       <div class="form-group">
-        <label for="name" class="">Data Element</label>
+        <label for="data-element" class="">Data Element</label>
         <elements-as-tags elements="dataElements"></elements-as-tags>
         <div class="input-group">
-          <input type="text" class="form-control" id="name" placeholder="Name" ng-model="dataElement.element" focus-me="step=='elements'" catalogue-element-picker="dataElement" global="'allow'" typeahead-on-select="pushWithDataModelCheck('dataElements', 'dataElement')">
+          <input type="text" class="form-control" id="data-element" placeholder="Name" ng-model="dataElement.element" focus-me="step=='elements'" catalogue-element-picker="dataElement" typeahead-on-select="pushWithDataModelCheck('dataElements', 'dataElement')">
                     <span class="input-group-btn">
                       <button class="btn btn-success" ng-click="pushWithDataModelCheck('dataElements', 'dataElement')" ng-disabled="isEmpty(dataElement.element)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
@@ -128,10 +128,10 @@
     <br/>
     <form role="form">
       <div class="form-group">
-        <label for="name" class="">Data Models</label>
+        <label for="data-model" class="">Data Models</label>
         <elements-as-tags elements="dataModels"></elements-as-tags>
         <div class="input-group">
-          <input type="text" class="form-control" id="name" placeholder="Name" ng-model="dataModel.element" focus-me="step=='dataModels'" catalogue-element-picker="dataModel"  typeahead-on-select="push('dataModels', 'dataModel')" status="draft">
+          <input type="text" class="form-control" id="data-model" placeholder="Name" ng-model="dataModel.element" focus-me="step=='dataModels'" catalogue-element-picker="dataModel"  typeahead-on-select="push('dataModels', 'dataModel')" status="draft">
                     <span class="input-group-btn">
                       <button class="btn btn-success" ng-click="push('dataModels', 'dataModel')" ng-disabled="isEmpty(dataModel.element)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
