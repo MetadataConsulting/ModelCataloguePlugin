@@ -73,6 +73,7 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
         $item.openSearchMore()
         $scope.$evalAsync ->
           $parse($attrs.ngModel).assign($scope, undefined)
+        return
 
       if typeaheadOnSelect
         $scope.$eval typeaheadOnSelect, $item: $item, $model: $model, $label: $label

@@ -18,7 +18,7 @@
       <div class="panel-body">
         <messages-panel messages="destination.messages"></messages-panel>
         <div class="form-group">
-          <input id="element" type="text" class="form-control" ng-model="destination.relation" global="'allow'"
+          <input id="element" type="text" class="form-control" ng-model="destination.relation"
                  catalogue-element-picker resource="relationType"
                  typeahead-on-select="destination.updateRelation(destination.relation)"
                  ng-disabled="!relationshipTypeInfo.type">

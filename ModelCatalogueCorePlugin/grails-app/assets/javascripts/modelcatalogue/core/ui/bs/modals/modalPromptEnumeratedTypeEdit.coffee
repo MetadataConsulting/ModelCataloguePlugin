@@ -60,7 +60,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
               <div collapse="subtype != 'referenceType'">
                 <div class="form-group">
                   <label for="dataClass" class="">Data Class</label>
-                  <input type="text" id="dataClass" placeholder="Data Class" ng-model="copy.dataClass" global="'allow'" catalogue-element-picker="dataClass" label="el.name">
+                  <input type="text" id="dataClass" placeholder="Data Class" ng-model="copy.dataClass" catalogue-element-picker="dataClass" label="el.name">
                 </div>
               </div>
               <div collapse="subtype != 'primitiveType'">
