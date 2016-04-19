@@ -20,7 +20,8 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
     private static final String xmlEditorSource = '#xml-editor-source'
     private static final String xmlEditorResult = '#xml-editor-result'
     private static final CatalogueContent detailSectionDataElement = CatalogueContent.create('data-view-name': 'Children')
-    static final CatalogueAction exportXml = CatalogueAction.runLast('item', 'export', 'edit-XML')
+    private static final CatalogueAction exportXml = CatalogueAction.runLast('item', 'export', 'edit-XML')
+    private static final CatalogueContent resultContentLines = CatalogueContent.create(xmlEditorResult).find('.ace_content .ace_line')
 
     def "go to login"() {
         login admin
@@ -76,7 +77,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         click '.list-group-item.item-found'
 
         and: 'create child from scratch and leave it filled in'
-        fill name with 'This should create new child data class'
+        fill 'child-data-class' with 'This should create new child data class'
 
         and: 'elements step is clicked'
         click stepElements
@@ -88,7 +89,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         fillMetadata 'Min Occurs': '2', 'Max Occurs': '25'
 
         and: 'the element is selected'
-        fill name with 'nhs'
+        fill 'data-element' with 'nhs'
         selectCepItemIfExists()
 
         and: 'finish is clicked'
@@ -176,6 +177,6 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         check xmlEditorResult displayed
 
         and: "result has some xsl generated"
-        assert $(xmlEditorResult).find('.ace_content .ace_line').size() > 1
+        check resultContentLines test { it.size() > 1 }
     }
 }
