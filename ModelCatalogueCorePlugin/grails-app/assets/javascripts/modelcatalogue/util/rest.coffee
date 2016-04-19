@@ -1,4 +1,4 @@
-angular.module('mc.util.rest', ['mc.util.messages']).factory 'rest',  [ '$q', '$http', '$rootScope', '$timeout', ($q, $http, $rootScope, $timeout) ->
+angular.module('mc.util.rest', ['mc.util.messages']).factory 'rest', ($q, $http, $rootScope, $timeout) ->
 
   rest = (config) ->
     deferred = $q.defer()
@@ -44,4 +44,4 @@ angular.module('mc.util.rest', ['mc.util.messages']).factory 'rest',  [ '$q', '$
     deferred.promise
 
   rest
-]
+
