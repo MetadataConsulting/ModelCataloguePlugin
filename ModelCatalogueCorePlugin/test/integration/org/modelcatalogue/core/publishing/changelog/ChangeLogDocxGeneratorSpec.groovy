@@ -1,12 +1,13 @@
 package org.modelcatalogue.core.publishing.changelog
 
+import org.modelcatalogue.core.api.ElementStatus
+
 import static org.modelcatalogue.core.util.test.FileOpener.open
 
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.DataClass
-import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.ElementService
@@ -14,7 +15,6 @@ import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.ddl.DataDefinitionLanguage
 import org.modelcatalogue.core.publishing.DraftContext
-import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 
 class ChangeLogDocxGeneratorSpec extends AbstractIntegrationSpec {
@@ -49,20 +49,16 @@ class ChangeLogDocxGeneratorSpec extends AbstractIntegrationSpec {
     private DataClass buildTestDataClass() {
         DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
 
-        Random random = new Random()
-
-
-        DataModel vdDataModel = new DataModel(name: "Data Model ${System.currentTimeMillis()}").save(failOnError: true)
-        for (int i in 1..3) {
-            DataType domain = new DataType(name: "Test Data Type ${i}", dataModel: vdDataModel).save(failOnError: true)
-        }
-
-        List<DataType> types = dataModelService.classified(DataType, DataModelFilter.includes(vdDataModel)).list()
-
-
+        final String typesDataModelName = "Data Model ${System.currentTimeMillis()}"
 
         builder.build {
-            dataModel(name: 'C4C') {
+            dataModel(name: typesDataModelName, status: finalized) {
+                for (int i in 1..3) {
+                    dataType name: "Test Data Type ${i}"
+                }
+            }
+
+            dataModel(name: 'C4C', status: finalized) {
                 description "This is a data model for testing ChangeLogDocxGenerator"
 
                 ext 'foo', 'bar'
@@ -78,11 +74,7 @@ class ChangeLogDocxGeneratorSpec extends AbstractIntegrationSpec {
                             for (int j in 1..3) {
                                 dataElement name: "Data Class $i Data Element $j", {
                                     description "This is a description for Data Class $i Data Element $j"
-                                    DataType type = types[random.nextInt(types.size())]
-                                    while (!type.dataModel) {
-                                        type = types[random.nextInt(types.size())]
-                                    }
-                                    dataType name: type.name, dataModel: type.dataModel.name
+                                    dataType name: "Test Data Type ${i}", dataModel: typesDataModelName
 
                                     relationship {
                                         ext 'Min Occurs': '0', 'Max Occurs': "$j"
@@ -96,11 +88,7 @@ class ChangeLogDocxGeneratorSpec extends AbstractIntegrationSpec {
                                     for (int k in 1..3) {
                                         dataElement name: "Data Class $i Inner Data Class $j Data Element $k", {
                                             description "This is a description for Data Class $i Inner Data Class $j Data Element $k"
-                                            DataType type = types[random.nextInt(types.size())]
-                                            while (!type.dataModel) {
-                                                type = types[random.nextInt(types.size())]
-                                            }
-                                            dataType name: type.name, dataModel: type.dataModel.name
+                                            dataType name: "Test Data Type ${i}", dataModel: typesDataModelName
                                         }
                                     }
                                 }
@@ -111,12 +99,14 @@ class ChangeLogDocxGeneratorSpec extends AbstractIntegrationSpec {
             }
         }
 
-        return makeChanges(elementService.finalizeElement(DataClass.findByName('Root Data Class')))
+        return makeChanges(DataClass.findByName('Root Data Class'))
 
     }
 
     private DataClass makeChanges(DataClass finalized) {
-        DataClass model = elementService.createDraftVersion(finalized, DraftContext.userFriendly())
+        elementService.createDraftVersion(finalized.dataModel, "1.0.2", DraftContext.userFriendly())
+
+        DataClass model = DataClass.findByNameAndStatus('Root Data Class', ElementStatus.DRAFT)
 
         // update description of C4C to
         DataDefinitionLanguage.with('C4C') {
