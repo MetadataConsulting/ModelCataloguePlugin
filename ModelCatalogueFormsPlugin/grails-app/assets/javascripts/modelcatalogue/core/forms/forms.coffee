@@ -30,6 +30,7 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
     ]
     keys: [
       "http://forms.modelcatalogue.org/section#exclude"
+      "http://forms.modelcatalogue.org/section#excludeDataElements"
       "http://forms.modelcatalogue.org/section#title"
       "http://forms.modelcatalogue.org/section#subtitle"
       "http://forms.modelcatalogue.org/section#instructions"

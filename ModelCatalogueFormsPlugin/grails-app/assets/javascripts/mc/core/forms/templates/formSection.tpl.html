@@ -25,6 +25,24 @@
       </span>
     </div>
   </div>
+  <div class="row" ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#excludeDataElements')"
+       ng-init="excludeDataElements = {'value': (element.ext.get('http://forms.modelcatalogue.org/section#excludeDataElements') ? (element.ext.get('http://forms.modelcatalogue.org/section#excludeDataElements') == 'false' ? false : true) : false)}">
+    <div class="col-md-3">
+      <strong class="small">Exclude Data Elements</strong>
+      <i class="fa fa-question"
+         popover="
+          Specifies if direct child data elements should be excluded from the result CRF.
+          "
+         popover-title="excludeDataElements"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9 full-width-editable">
+      <span editable-checkbox="extAsMap['http://forms.modelcatalogue.org/section#excludeDataElements']" class="small"
+            e-string-to-boolean e-ng-change="excludeDataElements.value = !excludeDataElements.value">
+        {{ element.ext.get('http://forms.modelcatalogue.org/section#excludeDataElements') ? (element.ext.get('http://forms.modelcatalogue.org/section#excludeDataElements') == "false" ? "No": "Yes") : "" }}
+      </span>
+    </div>
+  </div>
   <div class="row" ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#title')">
     <div class="col-md-3">
       <strong class="small">Title</strong>
