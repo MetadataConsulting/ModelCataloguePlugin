@@ -1,6 +1,16 @@
 <form class="form">
   <div class="checkbox">
     <label>
+      <input type="checkbox" ng-model="object.access('http://forms.modelcatalogue.org/item#exclude')"
+             ng-model-options="{ getterSetter: true }">
+      Exclude
+    </label>
+    <p class="help-block">
+      Specifies if this data element should be excluded from the result CRF.
+    </p>
+  </div>
+  <div class="checkbox">
+    <label>
       <input type="checkbox" ng-model="object.access('http://forms.modelcatalogue.org/item#phi')"
              ng-model-options="{ getterSetter: true }">
       Protected Health Information
