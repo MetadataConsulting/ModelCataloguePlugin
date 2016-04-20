@@ -33,7 +33,7 @@
          popover="
           Specifies if direct child data elements should be excluded from the result CRF.
           "
-         popover-title="excludeDataElements"
+         popover-title="Exclude Data Elements"
          popover-trigger="mouseenter"></i>
     </div>
     <div class="col-md-9 full-width-editable">
@@ -42,6 +42,26 @@
             e-ng-disabled="exclude.value"
             e-string-to-boolean e-ng-change="excludeDataElements.value = !excludeDataElements.value">
         {{ element.ext.get('http://forms.modelcatalogue.org/section#excludeDataElements') ? (element.ext.get('http://forms.modelcatalogue.org/section#excludeDataElements') == "false" ? "No": "Yes") : "" }}
+      </span>
+    </div>
+  </div>
+  <div class="row" ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#merge')"
+       ng-init="merge = {'value': (element.ext.get('http://forms.modelcatalogue.org/section#merge') ? (element.ext.get('http://forms.modelcatalogue.org/section#merge') == 'false' ? false : true) : false)}">
+    <div class="col-md-3">
+      <strong class="small">Merge to Single Section</strong>
+      <i class="fa fa-question"
+         popover="
+          There will be one form section for this data class and its direct children data classes.
+          "
+         popover-title="Merge to Single Section"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9 full-width-editable">
+      <span editable-checkbox="extAsMap['http://forms.modelcatalogue.org/section#merge']"
+            class="small"
+            e-ng-disabled="exclude.value"
+            e-string-to-boolean e-ng-change="merge.value = !merge.value">
+        {{ element.ext.get('http://forms.modelcatalogue.org/section#merge') ? (element.ext.get('http://forms.modelcatalogue.org/section#merge') == "false" ? "No": "Yes") : "" }}
       </span>
     </div>
   </div>
