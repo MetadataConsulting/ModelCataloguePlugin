@@ -2,7 +2,7 @@
   <div class="checkbox">
     <label>
       <input type="checkbox" ng-model="object.access('http://forms.modelcatalogue.org/item#exclude')"
-             ng-model-options="{ getterSetter: true }">
+             ng-model-options="{ getterSetter: true }" string-to-boolean>
       Exclude
     </label>
     <p class="help-block">
@@ -12,7 +12,7 @@
   <div class="checkbox">
     <label>
       <input type="checkbox" ng-model="object.access('http://forms.modelcatalogue.org/item#phi')"
-             ng-model-options="{ getterSetter: true }">
+             ng-model-options="{ getterSetter: true }" string-to-boolean>
       Protected Health Information
     </label>
     <p class="help-block">
@@ -108,7 +108,7 @@
   <div class="checkbox">
     <label>
       <input type="checkbox" ng-model="object.access('http://forms.modelcatalogue.org/item#required')"
-             ng-model-options="{ getterSetter: true }">
+             ng-model-options="{ getterSetter: true }" string-to-boolean>
       Required
     </label>
     <p class="help-block">
