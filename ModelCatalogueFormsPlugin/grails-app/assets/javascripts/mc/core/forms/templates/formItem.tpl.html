@@ -1,4 +1,21 @@
 <div class="col-md-12 metadata-form-item-content">
+  <div class="row" ng-if="view.handlesKey('http://forms.modelcatalogue.org/item#exclude')">
+    <div class="col-md-3">
+      <strong class="small">Exlcude</strong>
+      <i class="fa fa-question"
+         popover="
+          Specifies if this data element should be excluded from the result CRF.
+          "
+         popover-title="Exclude"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9">
+      <span editable-checkbox="extAsMap['http://forms.modelcatalogue.org/item#exclude']" class="small"
+            e-string-to-boolean>
+        {{ element.ext.get('http://forms.modelcatalogue.org/item#exclude') ? (element.ext.get('http://forms.modelcatalogue.org/item#exclude') == "false" ? "No": "Yes") : "" }}
+      </span>
+    </div>
+  </div>
   <div class="row" ng-if="view.handlesKey('http://forms.modelcatalogue.org/item#phi')">
     <div class="col-md-3">
       <strong class="small">Protected Health Information</strong>

@@ -92,6 +92,7 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
       'dataElement'
     ]
     keys: [
+      "http://forms.modelcatalogue.org/item#exclude"
       "http://forms.modelcatalogue.org/item#question"
       "http://forms.modelcatalogue.org/item#defaultValue"
       "http://forms.modelcatalogue.org/item#phi"
