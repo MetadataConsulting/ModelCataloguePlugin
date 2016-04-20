@@ -12,6 +12,7 @@
   <div class="checkbox">
     <label>
       <input type="checkbox" ng-model="object.access('http://forms.modelcatalogue.org/item#phi')"
+             ng-disabled="object.access('http://forms.modelcatalogue.org/item#exclude').asBoolean()"
              ng-model-options="{ getterSetter: true }" string-to-boolean>
       Protected Health Information
     </label>
@@ -33,6 +34,7 @@
     <label for="item-question" class="control-label">Question (Left Item Text)</label>
     <input maxlength="2000" type="text" class="form-control" id="item-question"
            ng-model="object.access('http://forms.modelcatalogue.org/item#question')"
+           ng-disabled="object.access('http://forms.modelcatalogue.org/item#exclude').asBoolean()"
            ng-model-options="{ getterSetter: true }">
     <p class="help-block">
       Descriptive text that appears to the left of the input on the CRF. Often phrased in the form of a question, or
@@ -57,6 +59,7 @@
     <label for="item-description" class="control-label">Description Label</label>
     <textarea maxlength="4000" rows="5" class="form-control" id="item-description"
               ng-model="object.access('http://forms.modelcatalogue.org/item#description')"
+              ng-disabled="object.access('http://forms.modelcatalogue.org/item#exclude').asBoolean()"
               ng-model-options="{ getterSetter: true }"></textarea>
     <p class="help-block">
       The description or definition of the item. Should give an explanation of the data element and the value(s) it
@@ -73,6 +76,7 @@
     <label for="item-default-value" class="control-label">Default Value</label>
     <input maxlength="4000" type="text" class="form-control" id="item-default-value"
            ng-model="object.access('http://forms.modelcatalogue.org/item#defaultValue')"
+           ng-disabled="object.access('http://forms.modelcatalogue.org/item#exclude').asBoolean()"
            ng-model-options="{ getterSetter: true }">
     <p class="help-block">
       This field allows the user to specify a default value that will appear in the CRF section the first time the user
@@ -87,6 +91,7 @@
     <label for="item-instructions" class="control-label">Instructions (Right Item Text)</label>
     <textarea maxlength="2000" rows="5" class="form-control" id="item-instructions"
               ng-model="object.access('http://forms.modelcatalogue.org/item#instructions')"
+              ng-disabled="object.access('http://forms.modelcatalogue.org/item#exclude').asBoolean()"
               ng-model-options="{ getterSetter: true }"></textarea>
     <p class="help-block">
       Descriptive text that appears to the right of the form input on the CRF, and to the right of any UNITS that are
@@ -108,6 +113,7 @@
   <div class="checkbox">
     <label>
       <input type="checkbox" ng-model="object.access('http://forms.modelcatalogue.org/item#required')"
+             ng-disabled="object.access('http://forms.modelcatalogue.org/item#exclude').asBoolean()"
              ng-model-options="{ getterSetter: true }" string-to-boolean>
       Required
     </label>
@@ -123,6 +129,7 @@
   <div class="checkbox">
     <label>
       <input type="checkbox" ng-model="object.access('http://forms.modelcatalogue.org/item#layout')"
+             ng-disabled="object.access('http://forms.modelcatalogue.org/item#exclude').asBoolean()"
              ng-model-options="{ getterSetter: true }" ng-true-value="'horizontal'" ng-false-value="''">
       Horizontal (for checkbox or radio)
     </label>
@@ -139,6 +146,7 @@
     <label for="item-column-number" class="control-label">Column Number</label>
     <input type="number" min="1" max="3" class="form-control" id="item-column-number"
            ng-model="object.access('http://forms.modelcatalogue.org/item#columnNumber').asInt"
+           ng-disabled="object.access('http://forms.modelcatalogue.org/item#exclude').asBoolean()"
            ng-model-options="{ getterSetter: true }">
     <p class="help-block">
       Assigns items to an item group.<br/>
@@ -154,6 +162,7 @@
     <label for="item-question-number" class="control-label">Question Number</label>
     <input maxlength="20" type="text" class="form-control" id="item-question-number"
            ng-model="object.access('http://forms.modelcatalogue.org/item#questionNumber')"
+           ng-disabled="object.access('http://forms.modelcatalogue.org/item#exclude').asBoolean()"
            ng-model-options="{ getterSetter: true }">
     <p class="help-block">
       This field is used to specify an identifier for each item or question in the Items worksheet. It appears to the
@@ -167,6 +176,7 @@
     <select id="item-data-type" class="form-control"
             ng-options="key for (key, value) in {'String':'string', 'Integer': 'int', 'Real':'real', 'Date':'date', 'Partial Date': 'pdate'}"
             ng-model="object.access('http://forms.modelcatalogue.org/item#dataType')"
+            ng-disabled="object.access('http://forms.modelcatalogue.org/item#exclude').asBoolean()"
             ng-model-options="{ getterSetter: true }"></select>
     <p class="help-block">
       Data type of the item. If you want to use data type <code>file</code> select the <code>File</code> response
@@ -181,6 +191,7 @@
     <select id="item-response-type" class="form-control"
             ng-options="key for (key, value) in {'Text':'text', 'Textarea': 'textarea', 'Single Select':'singleselect', 'Radio':'radio', 'Multi Select': 'multiselect', 'Checkbox': 'checkbox', 'File': 'file'}"
             ng-model="object.access('http://forms.modelcatalogue.org/item#responseType')"
+            ng-disabled="object.access('http://forms.modelcatalogue.org/item#exclude').asBoolean()"
             ng-model-options="{ getterSetter: true }"></select>
     <p class="help-block">
       Response type of the item. If any metadata related to the item doesn't make sense for given context (e.g. default
@@ -196,6 +207,7 @@
     <label for="item-units" class="control-label">Units</label>
     <input maxlength="64" type="text" class="form-control" id="item-units"
            ng-model="object.access('http://forms.modelcatalogue.org/item#units')"
+           ng-disabled="object.access('http://forms.modelcatalogue.org/item#exclude').asBoolean()"
            ng-model-options="{ getterSetter: true }">
     <p class="help-block">
       Used to define the type of values being collected. It appears to the right of the input field on the CRF. Defaults
@@ -218,6 +230,7 @@
     <label for="item-length" class="control-label">Max Length (String) or Number of All Digits (Numbers)</label>
     <input type="number" min="1" max="2000" class="form-control" id="item-length"
            ng-model="object.access('http://forms.modelcatalogue.org/item#length').asInt"
+           ng-disabled="object.access('http://forms.modelcatalogue.org/item#exclude').asBoolean()"
            ng-model-options="{ getterSetter: true }">
     <p class="help-block">
       Maximal length of string (up to 2000) or number of digits of the number (up to 26).
@@ -227,6 +240,7 @@
     <label for="item-digits" class="control-label">Number of Decimal Digits</label>
     <input type="number" min="0" max="20" class="form-control" id="item-digits"
            ng-model="object.access('http://forms.modelcatalogue.org/item#digits').asInt"
+           ng-disabled="object.access('http://forms.modelcatalogue.org/item#exclude').asBoolean()"
            ng-model-options="{ getterSetter: true }">
     <p class="help-block">
       Number of digits after decimal point. Max 20.
@@ -236,6 +250,7 @@
     <label for="item-regexp" class="control-label">Regular Expression</label>
     <input maxlength="1000" type="text" class="form-control" id="item-regexp"
            ng-model="object.access('http://forms.modelcatalogue.org/item#regexp')"
+           ng-disabled="object.access('http://forms.modelcatalogue.org/item#exclude').asBoolean()"
            ng-model-options="{ getterSetter: true }">
     <p class="help-block">
       Regular expresion the value has match. Defaults to regular expression set for the data type if it is in the format
@@ -246,6 +261,7 @@
     <label for="item-regexp-message" class="control-label">Regular Expression Error Message</label>
     <input maxlength="1000" type="text" class="form-control" id="item-regexp-message"
            ng-model="object.access('http://forms.modelcatalogue.org/item#regexpErrorMessage')"
+           ng-disabled="object.access('http://forms.modelcatalogue.org/item#exclude').asBoolean()"
            ng-model-options="{ getterSetter: true }">
     <p class="help-block">
       Message shown if the validation fails. Defaults to "Value must match /regexpDef/"
