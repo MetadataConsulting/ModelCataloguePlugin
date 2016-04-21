@@ -21,6 +21,7 @@ class ModelToFormExporterService {
     static final String EXT_FORM_VERSION = "http://forms.modelcatalogue.org/form#version"
     static final String EXT_FORM_VERSION_DESCRIPTION = "http://forms.modelcatalogue.org/form#versionDescription"
     static final String EXT_FORM_REVISION_NOTES = "http://forms.modelcatalogue.org/form#revisionNotes"
+    static final String EXT_SECTION_EXCLUDE = "http://forms.modelcatalogue.org/section#exclude"
     static final String EXT_SECTION_TITLE = "http://forms.modelcatalogue.org/section#title"
     static final String EXT_SECTION_SUBTITLE = "http://forms.modelcatalogue.org/section#subtitle"
     static final String EXT_SECTION_INSTRUCTIONS = "http://forms.modelcatalogue.org/section#instructions"
@@ -77,6 +78,7 @@ class ModelToFormExporterService {
         String formName = formModel.ext[EXT_FORM_NAME] ?: formModel.name
         MutableInt itemNumber = new MutableInt(1)
         CaseReportForm.build(formName) {
+            def caseReportForm = delegate
             version formModel.ext[EXT_FORM_VERSION] ?: formModel.versionNumber.toString()
             versionDescription formModel.ext[EXT_FORM_VERSION_DESCRIPTION] ?: formModel.description ?: "Generated from ${alphaNumNoSpaces(formModel.name)}"
             revisionNotes formModel.ext[EXT_FORM_REVISION_NOTES] ?: "Generated from ${alphaNumNoSpaces(formModel.name)}"
@@ -84,13 +86,15 @@ class ModelToFormExporterService {
             if (formModel.countParentOf()) {
                 processed << formModel.getId()
                 for (Relationship sectionRel in formModel.parentOfRelationships) {
-                    handleSectionModel(itemNumber, processed, formName, delegate as CaseReportForm, sectionRel)
+                    handleSectionModel(itemNumber, processed, formName, caseReportForm, sectionRel)
                 }
-            } else {
-                handleSectionModel(itemNumber, processed, '', delegate as CaseReportForm, new Relationship(destination: formModel), true)
+            }
+
+            // at least one section is mandatory (this may happen when data class has no childs or all childs are excluded)
+            if (caseReportForm.sections.isEmpty()) {
+                handleSectionModel(itemNumber, [] as Set<Long>, '', caseReportForm, new Relationship(destination: formModel), true)
             }
         }
-
     }
 
     private void handleSectionModel(MutableInt itemNumber, Set<Long> processed, String prefix, CaseReportForm form,
@@ -104,8 +108,12 @@ class ModelToFormExporterService {
         processed << sectionModel.getId()
 
         String sectionName = fromDestination(sectionRel, EXT_NAME_CAP, fromDestination(sectionRel, EXT_NAME_LC, sectionModel.name))
-
         log.info "Creating section $sectionName for model $sectionModel"
+
+        if(fromDestination(sectionRel, EXT_SECTION_EXCLUDE) == 'true') {
+            log.info "Section $sectionName is excluded from the processing"
+            return
+        }
 
         if (dataElementsOnly && sectionModel.countContains() || !dataElementsOnly) {
             form.section(alphaNumNoSpaces(sectionName)) {
@@ -138,9 +146,14 @@ class ModelToFormExporterService {
 
             processed << itemsWithHeaderOrGridRel.getId()
 
-
-            log.info "Creating group or section for model $itemsWithHeaderOrGrid"
             String itemsWithHeaderOrGridName = fromDestination(itemsWithHeaderOrGridRel, EXT_NAME_CAP, fromDestination(itemsWithHeaderOrGridRel, EXT_NAME_LC, itemsWithHeaderOrGrid.name))
+            log.info "Creating group or section for model $itemsWithHeaderOrGrid"
+
+            if(fromDestination(itemsWithHeaderOrGridRel, EXT_SECTION_EXCLUDE) == 'true') {
+                log.info "Group or section for model $itemsWithHeaderOrGrid is excluded from the processing"
+                continue
+            }
+
             if (fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_GRID) == 'true') {
 
                 section.grid(alphaNumNoSpaces(itemsWithHeaderOrGridName)) { GridGroup grid ->
