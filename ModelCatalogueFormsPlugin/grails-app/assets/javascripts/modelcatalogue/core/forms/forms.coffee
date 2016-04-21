@@ -1,6 +1,7 @@
 window.modelcatalogue.registerModule 'mc.core.forms'
 
-forms = angular.module('mc.core.forms', ['mc.core.ui.metadataEditors', 'mc.core.ui.detailSections'])
+angular.module('mc.core.forms.metadataEditors', [])
+forms = angular.module('mc.core.forms', ['mc.core.ui.metadataEditors', 'mc.core.ui.detailSections', 'mc.core.forms.metadataEditors'])
 
 # TODO: inline help
 
@@ -26,7 +27,6 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
     position: 50
     types: [
       'dataClass'
-      '=[hierarchy]=>'
     ]
     keys: [
       "http://forms.modelcatalogue.org/section#exclude"
@@ -40,13 +40,30 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
     hideIfNoData: true
     template: '/mc/core/forms/formSection.html'
   }
+  metadataEditorsProvider.register {
+    title: 'Form (Section)'
+    position: 50
+    types: [
+      '=[hierarchy]=>'
+    ]
+    keys: [
+      "http://forms.modelcatalogue.org/section#exclude"
+      "http://forms.modelcatalogue.org/section#excludeDataElements"
+      "http://forms.modelcatalogue.org/section#merge"
+      "http://forms.modelcatalogue.org/section#title"
+      "http://forms.modelcatalogue.org/section#subtitle"
+      "http://forms.modelcatalogue.org/section#instructions"
+      "http://forms.modelcatalogue.org/section#pageNumber"
+    ]
+    hideIfNoData: true
+    template: '/mc/core/forms/metadataEditors/formSection.html'
+  }
 
   detailSectionsProvider.register {
     title: 'Form (Grid)'
     position: 50
     types: [
       'dataClass'
-      '=[hierarchy]=>'
     ]
     keys: [
       "http://forms.modelcatalogue.org/group#grid"
@@ -56,6 +73,21 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
     ]
     hideIfNoData: true
     template: '/mc/core/forms/formGrid.html'
+  }
+  metadataEditorsProvider.register {
+    title: 'Form (Grid)'
+    position: 50
+    types: [
+      '=[hierarchy]=>'
+    ]
+    keys: [
+      "http://forms.modelcatalogue.org/group#grid"
+      "http://forms.modelcatalogue.org/group#header"
+      "http://forms.modelcatalogue.org/group#repeatNum"
+      "http://forms.modelcatalogue.org/group#repeatMax"
+    ]
+    hideIfNoData: true
+    template: '/mc/core/forms/metadataEditors/formGrid.html'
   }
 
   metadataEditorsProvider.register {
@@ -83,7 +115,7 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
       "http://forms.modelcatalogue.org/item#regexpErrorMessage"
       "http://forms.modelcatalogue.org/item#dataType"
     ]
-    template: '/mc/core/forms/formItemDataElement.html'
+    template: '/mc/core/forms/metadataEditors/formItemDataElement.html'
   }
 
   detailSectionsProvider.register {
