@@ -31,16 +31,6 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       <div class="full-width-editable col-md-9" ng-if="element.modelCatalogueId &amp;&amp; element.modelCatalogueId != element.internalModelCatalogueId"><a class="small" ng-href="{{element.modelCatalogueId}}" editable-text="copy.modelCatalogueId">{{element.modelCatalogueId}}</a></div>
   '''
 
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/customMetadata.html', '''
-      <div class="col-md-3" ng-repeat-start="value in (editableForm.$visible ? [] : customMetadata.values)">
-          <strong class="small">{{value.key}}</strong>
-      </div>
-      <div class="col-md-9 preserve-new-lines" ng-repeat-end><small>{{value.value}}</small></div>
-      <div class="custom-metadata col-md-12" ng-if="editableForm.$visible">
-          <ordered-map-editor object="customMetadata"></ordered-map-editor>
-      </div>
-  '''
-
   $templateCache.put 'modelcatalogue/core/ui/detailSections/revisionNotes.html', '''
       <div class="col-md-3">
           <strong class="small">Revision Notes</strong>
@@ -380,7 +370,7 @@ x in ['apple', 'banana', 'cherry']
       'dataClass'
     ]
     keys: []
-    template: 'modelcatalogue/core/ui/detailSections/customMetadata.html'
+    template: '/mc/core/ui/detail-sections/customMetadata.html'
   }
 
   reorderInDetail = (relationName) ->
