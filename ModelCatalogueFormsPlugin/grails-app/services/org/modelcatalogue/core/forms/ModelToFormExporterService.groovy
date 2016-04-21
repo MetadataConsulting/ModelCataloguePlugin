@@ -22,6 +22,7 @@ class ModelToFormExporterService {
     static final String EXT_FORM_VERSION_DESCRIPTION = "http://forms.modelcatalogue.org/form#versionDescription"
     static final String EXT_FORM_REVISION_NOTES = "http://forms.modelcatalogue.org/form#revisionNotes"
     static final String EXT_SECTION_EXCLUDE = "http://forms.modelcatalogue.org/section#exclude"
+    static final String EXT_SECTION_EXCLUDE_DATA_ELEMENTS = "http://forms.modelcatalogue.org/section#excludeDataElements"
     static final String EXT_SECTION_TITLE = "http://forms.modelcatalogue.org/section#title"
     static final String EXT_SECTION_SUBTITLE = "http://forms.modelcatalogue.org/section#subtitle"
     static final String EXT_SECTION_INSTRUCTIONS = "http://forms.modelcatalogue.org/section#instructions"
@@ -122,7 +123,7 @@ class ModelToFormExporterService {
                 instructions fromDestination(sectionRel, EXT_SECTION_INSTRUCTIONS, sectionModel.description)
                 pageNumber fromDestination(sectionRel, EXT_SECTION_PAGE_NUMBER)
 
-                generateItems(itemNumber, prefix, delegate as ItemContainer, sectionModel, null, null)
+                generateItems(itemNumber, prefix, delegate as ItemContainer, sectionRel, null, null)
 
                 if (dataElementsOnly) {
                     return
@@ -135,8 +136,6 @@ class ModelToFormExporterService {
 
     private void handleGroupOrVirtualSection(MutableInt itemNumber, Set<Long> processed, String prefix, Section section,
                                              List<Relationship> relationships, boolean nameAsHeader) {
-
-
         for (Relationship itemsWithHeaderOrGridRel in relationships) {
             DataClass itemsWithHeaderOrGrid = itemsWithHeaderOrGridRel.destination as DataClass
 
@@ -159,7 +158,7 @@ class ModelToFormExporterService {
                 section.grid(alphaNumNoSpaces(itemsWithHeaderOrGridName)) { GridGroup grid ->
                     header fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_HEADER, itemsWithHeaderOrGridName)
 
-                    generateItems(itemNumber, prefix, grid, itemsWithHeaderOrGrid)
+                    generateItems(itemNumber, prefix, grid, itemsWithHeaderOrGridRel)
 
                     Integer repeatNum = safeInteger(fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_REPEAT_NUM), EXT_GROUP_REPEAT_NUM, itemsWithHeaderOrGridRel.destination)
                     if (repeatNum) {
@@ -173,9 +172,9 @@ class ModelToFormExporterService {
                 }
             } else {
                 if (nameAsHeader) {
-                    generateItems(itemNumber, prefix, section, itemsWithHeaderOrGrid, itemsWithHeaderOrGridName)
+                    generateItems(itemNumber, prefix, section, itemsWithHeaderOrGridRel, itemsWithHeaderOrGridName)
                 } else {
-                    generateItems(itemNumber, prefix, section, itemsWithHeaderOrGrid, null, itemsWithHeaderOrGridName)
+                    generateItems(itemNumber, prefix, section, itemsWithHeaderOrGridRel, null, itemsWithHeaderOrGridName)
                 }
             }
             handleGroupOrVirtualSection(itemNumber, processed, prefix, section, itemsWithHeaderOrGrid.parentOfRelationships, false)
@@ -196,9 +195,15 @@ class ModelToFormExporterService {
         label?.replaceAll(/[^\pL\pN_]/, '_')
     }
 
-    private void generateItems(MutableInt itemNumber, String prefix, ItemContainer container, DataClass model,
+    private void generateItems(MutableInt itemNumber, String prefix, ItemContainer container, Relationship relationship,
                                String aHeader = null, String aSubheader = null) {
+        DataClass model = relationship.destination as DataClass
         boolean first = true
+
+        if(fromDestination(relationship, EXT_SECTION_EXCLUDE_DATA_ELEMENTS) == 'true') {
+            log.info "Items for for model $model are excluded from the processing"
+            return
+        }
 
         for (Relationship rel in model.containsRelationships) {
             DataElement dataElement = rel.destination as DataElement
