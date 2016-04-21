@@ -31,6 +31,7 @@ class ModelToFormExporterService {
     static final String EXT_GROUP_HEADER = "http://forms.modelcatalogue.org/group#header"
     static final String EXT_GROUP_REPEAT_NUM = "http://forms.modelcatalogue.org/group#repeatNum"
     static final String EXT_GROUP_REPEAT_MAX = "http://forms.modelcatalogue.org/group#repeatMax"
+    static final String EXT_ITEM_EXCLUDE = "http://forms.modelcatalogue.org/item#exclude"
     static final String EXT_ITEM_RESPONSE_TYPE = "http://forms.modelcatalogue.org/item#responseType"
     static final String EXT_ITEM_PHI = "http://forms.modelcatalogue.org/item#phi"
     static final String EXT_ITEM_DESCRIPTION = "http://forms.modelcatalogue.org/item#description"
@@ -201,7 +202,7 @@ class ModelToFormExporterService {
         boolean first = true
 
         if(fromDestination(relationship, EXT_SECTION_EXCLUDE_DATA_ELEMENTS) == 'true') {
-            log.info "Items for for model $model are excluded from the processing"
+            log.info "Items for model $model are excluded from the processing"
             return
         }
 
@@ -210,6 +211,11 @@ class ModelToFormExporterService {
             DataType dataType = dataElement.dataType
 
             log.info "Generating items from data element $dataElement"
+
+            if(fromDestination(rel, EXT_ITEM_EXCLUDE) == 'true') {
+                log.info "Items for data element $dataElement are excluded from the processing"
+                continue
+            }
 
             List<CatalogueElement> candidates = [dataElement, dataType].grep()
 
