@@ -1,7 +1,8 @@
 window.modelcatalogue.registerModule 'mc.core.forms'
 
 angular.module('mc.core.forms.metadataEditors', [])
-forms = angular.module('mc.core.forms', ['mc.core.ui.metadataEditors', 'mc.core.ui.detailSections', 'mc.core.forms.metadataEditors'])
+forms = angular.module('mc.core.forms', ['mc.core.ui.metadataEditors', 'mc.core.forms.actions',
+  'mc.core.ui.detailSections', 'mc.core.forms.metadataEditors'])
 
 # TODO: inline help
 
