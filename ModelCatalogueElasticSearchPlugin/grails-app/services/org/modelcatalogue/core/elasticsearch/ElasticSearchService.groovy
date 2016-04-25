@@ -17,6 +17,7 @@ import org.elasticsearch.common.transport.InetSocketTransportAddress
 import org.elasticsearch.index.query.BoolQueryBuilder
 import org.elasticsearch.index.query.QueryBuilder
 import org.elasticsearch.index.query.QueryBuilders
+import org.elasticsearch.indices.IndexAlreadyExistsException
 import org.elasticsearch.node.Node
 import org.elasticsearch.node.NodeBuilder
 import org.modelcatalogue.core.*
@@ -502,7 +503,7 @@ class ElasticSearchService implements SearchCatalogue {
                 Number total = criteria.count()
 
 
-                for (int page = 0 ; page * EMIT_RELATIONSHIPS_PAGE < total ; page++) {
+                for (int page = 0 ; page * EMIT_RELATIONSHIPS_PAGE < total.intValue() ; page++) {
                     criteria.list(max: EMIT_RELATIONSHIPS_PAGE, offset: page * EMIT_RELATIONSHIPS_PAGE).each {
                         subject.onNext(session.getDocument(it))
                     }
@@ -533,7 +534,7 @@ class ElasticSearchService implements SearchCatalogue {
 
                 log.info "Emitting $total items for $element"
 
-                for (int page = 0 ; page * EMIT_RELATIONSHIPS_PAGE < total ; page++) {
+                for (int page = 0 ; page * EMIT_RELATIONSHIPS_PAGE < total.intValue() ; page++) {
                     criteria.list(max: EMIT_RELATIONSHIPS_PAGE, offset: page * EMIT_RELATIONSHIPS_PAGE).each {
                         subject.onNext(it)
                     }
@@ -597,9 +598,9 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     private Observable<String> ensureIndexExists(Observable<String> indices, Iterable<Class> supportedTypes) {
-        return indexExists(indices).flatMap { response ->
+        return indexExists(indices).map { response ->
             if (response.exists) {
-                return just(response.index)
+                return response.index
             }
             CreateIndexRequestBuilder request = client.admin()
                     .indices()
@@ -608,9 +609,11 @@ class ElasticSearchService implements SearchCatalogue {
             for (Class type in supportedTypes) {
                 request.addMapping(getTypeName(type), getMapping(type))
             }
-            return from(request.execute()).doOnError {
-                log.error "Error creating index", it
-            } .map {
+
+            try {
+                request.execute().get()
+                return response.index
+            } catch (IndexAlreadyExistsException ignored) {
                 return response.index
             }
         }
