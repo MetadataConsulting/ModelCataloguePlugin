@@ -13,6 +13,8 @@ import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.audit.Change
 import org.modelcatalogue.core.audit.ChangeType
 import org.modelcatalogue.core.comments.Comment
+import org.modelcatalogue.core.export.inventory.DocxSpecificationDataHelper
+import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.delayable.Delayable
 import org.modelcatalogue.core.util.docx.ModelCatalogueWordDocumentBuilder
 
@@ -21,9 +23,39 @@ import java.text.SimpleDateFormat
 @Log4j
 class ChangeLogDocxGenerator extends AbstractChangeLogGenerator{
 
+    def customTemplate
+    String imagePath
 
-    ChangeLogDocxGenerator(AuditService auditService, DataClassService dataClassService, Integer depth = 3, Boolean includeMetadata = true) {
+    DocxSpecificationDataHelper docHelper
+
+    final def defaultTemplate = {
+        'document' font: [family: 'Calibri'], margin: [left: 30, right: 30]
+        'paragraph.title' font: [color: '#13D4CA', size: 26.pt], margin: [top: 200.pt]
+        'paragraph.subtitle' font: [color: '#13D4CA', size: 18.pt]
+        'paragraph.description' font: [color: '#13D4CA', size: 16.pt, italic: true], margin: [left: 30, right: 30]
+        'heading1' font: [size: 20, bold: true]
+        'heading2' font: [size: 18, bold: true]
+        'heading3' font: [size: 16, bold: true, italic: true]
+        'heading4' font: [size: 14, italic: true]
+        'heading5' font: [size: 13]
+        'heading6' font: [size: 12, bold: true]
+        'paragraph.heading1' font: [size: 20, bold: true]
+        'paragraph.heading2' font: [size: 18, bold: true]
+        'paragraph.heading3' font: [size: 16, bold: true]
+        'paragraph.heading4' font: [size: 16]
+        'paragraph.heading5' font: [size: 15]
+        'paragraph.heading6' font: [size: 14]
+        'cell.headerCell' font: [color: '#29BDCA', size: 12.pt, bold: true], background: '#F2F2F2'
+        'cell' font: [size: 10.pt]
+
+    }
+
+    ChangeLogDocxGenerator(AuditService auditService, DataClassService dataClassService, Integer depth = 3, Boolean includeMetadata = true, def customTemplate,
+                           String imagePath) {
         super(auditService, dataClassService, depth, includeMetadata)
+        this.customTemplate=customTemplate
+        this.imagePath=imagePath
+        docHelper = new DocxSpecificationDataHelper()
     }
 
     @Override
@@ -31,45 +63,54 @@ class ChangeLogDocxGenerator extends AbstractChangeLogGenerator{
         log.info "Generating changelog for data class $dataClass.name ($dataClass.combinedVersion)"
         DocumentBuilder builder = new ModelCatalogueWordDocumentBuilder(outputStream)
 
-        def customTemplate = {
-            'document' font: [family: 'Calibri'], margin: [left: 30, right: 30]
-            'paragraph.title' font: [color: '#13D4CA', size: 26.pt], margin: [top: 200.pt]
-            'paragraph.subtitle' font: [color: '#13D4CA', size: 18.pt]
-            'paragraph.description' font: [color: '#13D4CA', size: 16.pt, italic: true], margin: [left: 30, right: 30]
-            'heading1' font: [size: 20, bold: true]
-            'heading2' font: [size: 18, bold: true]
-            'heading3' font: [size: 16, bold: true, italic: true]
-            'heading4' font: [size: 14, italic: true]
-            'heading5' font: [size: 13]
-            'heading6' font: [size: 12, bold: true]
-            'paragraph.heading1' font: [size: 20, bold: true]
-            'paragraph.heading2' font: [size: 18, bold: true]
-            'paragraph.heading3' font: [size: 16, bold: true]
-            'paragraph.heading4' font: [size: 16]
-            'paragraph.heading5' font: [size: 15]
-            'paragraph.heading6' font: [size: 14]
-            'cell.headerCell' font: [color: '#29BDCA', size: 12.pt, bold: true], background: '#F2F2F2'
-            'cell' font: [size: 10.pt]
-
-        }
-
         Delayable<DocumentBuilder> delayable = new Delayable<>(builder)
+
+        if(!customTemplate) customTemplate = defaultTemplate
 
         builder.create {
             document(template: customTemplate) {
-                paragraph "Changelog for ${dataClass.name}", style: 'title',  align: 'center'
-                paragraph(style: 'subtitle', align: 'center') {
-                    text "${dataClass.combinedVersion}"
-                    lineBreak()
-                    text "${dataClass.status}"
-                    lineBreak()
-                    text SimpleDateFormat.dateInstance.format(new Date())
-                }
-                if (dataClass.description) {
-                    paragraph(style: 'description', margin: [left: 50, right: 50]) {
-                        text dataClass.description
+
+                def rootModel = dataClass.dataModel
+
+                def thisOrganisation = rootModel.ext.get(Metadata.ORGANISATION)
+
+                byte[] imageData
+                if(imagePath) imageData = new URL(imagePath).bytes
+
+                if (thisOrganisation && imagePath) {
+                    paragraph(align: 'right') {
+                        image(data: imageData, height: 1.366.inches, width: 2.646.inches)
+                    }
+
+                    paragraph(style: 'title', align: 'center') {
+                        text thisOrganisation
+                    }
+
+                    paragraph(style: 'subtitle', align: 'center') {
+                        text "${rootModel.name}"
+                    }
+
+                    paragraph(style: 'document', margin: [top: 120]) {
+                        text "Version ${rootModel.versionNumber} ${rootModel.status}"
+                        lineBreak()
+                        text SimpleDateFormat.dateInstance.format(new Date())
+                    }
+                } else {
+                    paragraph "Changelog for ${dataClass.name}", style: 'title',  align: 'center'
+                    paragraph(style: 'subtitle', align: 'center') {
+                        text "${dataClass.combinedVersion}"
+                        lineBreak()
+                        text "${dataClass.status}"
+                        lineBreak()
+                        text SimpleDateFormat.dateInstance.format(new Date())
+                    }
+                    if (dataClass.description) {
+                        paragraph(style: 'description', margin: [left: 50, right: 50]) {
+                            text dataClass.description
+                        }
                     }
                 }
+
                 pageBreak()
 
                 delayable.whilePaused {
@@ -85,6 +126,7 @@ class ChangeLogDocxGenerator extends AbstractChangeLogGenerator{
                 for (DataClass child in classes) {
                     log.info "[${counter++}/${size}] Processing changes from Data Class $child.name"
                     delayable.whilePaused {
+                        docHelper.printModel(builder, child, depth - 1)
                         printPropertiesChanges(delayable, child)
                         printClassStructuralChanges(delayable, child)
                     }
