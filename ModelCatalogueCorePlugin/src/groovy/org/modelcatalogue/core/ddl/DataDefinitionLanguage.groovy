@@ -27,6 +27,10 @@ class DataDefinitionLanguage {
         return new UpdateDefinition(this, propertyOrExtName)
     }
 
+    RemoveExtensionAction remove(String extName) {
+        return new RemoveExtensionAction(this, extName)
+    }
+
     public <T extends CatalogueElement> CreateDefinition<T> create(Class<T> domain) {
         return new CreateDefinition<T>(this, domain)
     }
