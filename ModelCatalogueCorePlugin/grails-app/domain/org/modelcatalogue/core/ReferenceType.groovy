@@ -11,6 +11,10 @@ class ReferenceType extends DataType {
         dataClass nullable: true, fetch: 'join'
     }
 
+    static mapping = {
+        dataClass lazy: false
+    }
+
     static fetchMode = [dataClass: 'eager']
 
 

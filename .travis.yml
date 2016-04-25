@@ -2,43 +2,45 @@ language: groovy
 sudo: false
 cache:
   directories:
-    - node_modules
-    - ModelCatalogueCorePlugin/target/work/plugins
-    - ModelCatalogueCorePluginTestApp/target/work/plugins
-    - $HOME/.m2
-    - $HOME/.grails/ivy-cache
-    - $HOME/.grails/wrapper
+  - node_modules
+  - ModelCatalogueCorePlugin/target/work/plugins
+  - ModelCatalogueCorePluginTestApp/target/work/plugins
+  - $HOME/.m2
+  - $HOME/.grails/ivy-cache
+  - $HOME/.grails/wrapper
 addons:
-  s3_region: us-east-1 # should be default but just to be sure
+  s3_region: us-east-1
   artifacts:
     paths:
-      - $HOME/reports
+    - $HOME/reports
 env:
-  - TEST_SUITE=app_functional_a
-  - TEST_SUITE=app_functional_b
-  - TEST_SUITE=app_functional_c
-  - TEST_SUITE=other_integration
-  - TEST_SUITE=core
+- TEST_SUITE=app_functional_a
+- TEST_SUITE=app_functional_b
+- TEST_SUITE=app_functional_c
+- TEST_SUITE=other_integration
+- TEST_SUITE=core
 jdk:
-  - oraclejdk8
+- oraclejdk8
 before_install:
-  - "export DISPLAY=:99.0"
-  - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1920x1080x24"
+- export DISPLAY=:99.0
+- /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile
+  --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1920x1080x24
 script:
-  - "./catalogue test"
+- ./catalogue test
 after_script:
-  - "./catalogue collect reports"
-
-# deployment
-before_deploy: "./war.sh"
-after_deploy: "./catalogue docker notify"
+- ./catalogue collect reports
+before_deploy: ./war.sh
+after_deploy: ./catalogue docker notify
 deploy:
   provider: releases
   api_key:
     secure: OwYHBvi8Mpb/VstwqmfPh+pvnA3xLx8ZSqtZSOTlCh6uzlP1To8Hv/mKAVjXSRrFrSL1udUais3K3yu29eX+AGAVpzZ+QYerSAY4oQWoNolBrE4O2Q6fINXk9jELJXdQU/xYiylt8WX3bYOKFsotXt2Bv3zyzsoUgaAHkk+Mp+8=
   file:
-    - "build/mc.war"
-    - "conf/docker/mc-config.groovy"
+  - build/mc.war
+  - conf/docker/mc-config.groovy
   on:
     tags: true
     condition: $TEST_SUITE = other_integration
+notifications:
+  slack:
+    secure: T234ojDb39JTjjtaNYICpTu3V0HNSwHb2LWq9cMrvDmoHjzKOOeudpel3ev1Am5/bI0WNKqQYBcIpgxJ6578425JDk0XmFR+AKJqMQdhTB9vDIvRI0p/vhoC6QbNF+Kdo6sXuOPAtqlU1L2CM/occnxbbI7mcxkjBADohmAlpbY=
