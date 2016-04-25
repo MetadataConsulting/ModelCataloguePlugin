@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.export.inventory
 
 import com.craigburke.document.core.builder.DocumentBuilder
+import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
@@ -9,8 +10,9 @@ import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.Relationship
 
 /**
- * Created by dexterawoyemi on 21/04/2016.
+ * Prints the tables for element data specification using the DocumentBuilder library
  */
+@Log4j
 class DocxSpecificationDataHelper {
 
     final Set<Long> processedDataClasses = new HashSet<Long>()
@@ -18,12 +20,8 @@ class DocxSpecificationDataHelper {
     private static final Map<String, Object> HEADER_CELL = [background: '#F2F2F2']
     private static
     final Map<String, Object> HEADER_CELL_TEXT = [font: [color: '#29BDCA', size: 12, bold: true, family: 'Times New Roman']]
-    private static final Map<String, Object> ENUM_HEADER_CELL_TEXT = [font: [size: 12, bold: true]]
     private static final Map<String, Object> CELL_TEXT = [font: [size: 10, family: 'Calibri']]
     private static final Map<String, Object> CELL_TEXT_FIRST = [font: [size: 10, family: 'Calibri', bold: true]]
-    private static final Map<String, Object> DOMAIN_NAME = [font: [color: '#29BDCA', size: 14, bold: true]]
-    private static
-    final Map<String, Object> DOMAIN_CLASSIFICATION_NAME = [font: [color: '#999999', size: 12, bold: true]]
 
     final Set<DataType> usedDataTypes = new TreeSet<DataType>([compare: { DataType a, DataType b ->
         a?.name <=> b?.name
