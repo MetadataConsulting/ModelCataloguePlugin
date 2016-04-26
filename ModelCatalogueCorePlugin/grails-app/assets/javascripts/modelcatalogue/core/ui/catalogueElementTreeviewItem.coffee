@@ -71,7 +71,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
 
       loadMoreIfNeeded = ->
         return if not $scope.node.numberOfChildren > $scope.node.children?.length
-        return if $scope.element.$$showingMore
+        return if $scope.node.showingMore
         showMore = angular.element('.show-more-' + $scope.nodeid)
         return if showMore.hasClass '.hide'
         return if showMore.offset()?.top < 0
@@ -82,14 +82,14 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
       createShowMore  = (list) ->
         # function to load more items to existing $$children helper property
         ->
-          $scope.element.$$showingMore = true
+          $scope.node.showingMore = true
           list.next($scope.extraParameters).then (nextList) ->
             for item in nextList.list
               it = if item.relation then item.relation else item
               $scope.node.children.push(angular.extend(it, {$$relationship: (if item.relation then item else undefined), $$metadata: item.ext, $$archived: item.archived, $$localName: getLocalName(item) }))
             $scope.element.$$showMore = createShowMore(nextList)
             loadMoreIfNeeded()
-            $scope.element.$$showingMore = false
+            $scope.node.showingMore = false
 
       loadNewChildren = (firstList) ->
         $scope.node.numberOfChildren = firstList.total
@@ -155,10 +155,10 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
         element.$$resetHelperProperties = ->
           if @[$scope.currentDescend]
             $scope.node.numberOfChildren = $scope.element[$scope.currentDescend].total
-            @$$loadingChildren = false
+            $scope.node.loadingChildren = false
           else
             $scope.node.numberOfChildren = 0
-            @$$loadingChildren = false
+            $scope.node.loadingChildren = false
 
           $scope.node.children ?= []
           $scope.node.collapsed  ?= true
@@ -181,16 +181,16 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
           $scope.node.numberOfChildren = $scope.descendFun.total
 
           # first load
-          $scope.element.$$loadingChildren = true
+          $scope.node.loadingChildren = true
           $scope.descendFun(null, $scope.extraParameters).then(loadNewChildren).then ->
-            $scope.element.$$loadingChildren = false
+            $scope.node.loadingChildren = false
 
         if $scope.extraParameters?.prefetch or startsWithSegment($scope.element, $scope.extraParameters?.path?.segments)
           $scope.element.$$loadChildren()
 
       $scope.collapseOrExpand = ->
         return if $scope.extraParameters?.prefetch
-        return if $scope.element.$$loadingChildren
+        return if $scope.node.loadingChildren
         unless $scope.node.collapsed
           $scope.node.collapsed = true
           return

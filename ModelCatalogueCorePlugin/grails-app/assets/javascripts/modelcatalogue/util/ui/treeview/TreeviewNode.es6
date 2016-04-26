@@ -1,9 +1,7 @@
 (function(window, angular){
     const symbols = {
-        // collapsed: Symbol('collapsed'),
         item: Symbol('item'),
         id: Symbol('id'),
-        loadingChildren: Symbol('loadingChildren'),
         showingMore: Symbol('showingMore'),
         children: Symbol('children'),
         active: Symbol('active')
@@ -17,10 +15,10 @@
         constructor(id, item) {
             this.collapsed = true;
             this.numberOfChildren = 2147483647; // integer max number
+            this.loadingChildren = false;
             this[symbols.item] = item;
             this[symbols.id] = id;
             this[symbols.active] = false;
-            this[symbols.loadingChildren] = false;
             this[symbols.children] = []
         }
 
@@ -34,10 +32,6 @@
 
         get id() {
             return this[symbols.id];
-        }
-
-        get loadingChildren() {
-            return this[symbols.loadingChildren];
         }
 
         get active() {
