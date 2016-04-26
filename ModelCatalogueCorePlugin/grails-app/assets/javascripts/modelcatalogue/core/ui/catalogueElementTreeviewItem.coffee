@@ -110,7 +110,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
             node = TreeviewNodeFactory.get($scope.treeview.getNodeId(id))
 
             if node?.collapsed
-              cachedChild.$$resetHelperProperties() if angular.isFunction(cachedChild.$$resetHelperProperties)
+              node.reset() if angular.isFunction(node.reset)
             else
               cachedChild.$$loadChildren() if angular.isFunction(cachedChild.$$loadChildren)
 
@@ -152,8 +152,8 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
         if angular.isFunction(element.href)
           $scope.node.href = element.href()
 
-        element.$$resetHelperProperties = ->
-          if @[$scope.currentDescend]
+        $scope.node.reset = ->
+          if $scope.node.item[$scope.currentDescend]
             $scope.node.numberOfChildren = $scope.element[$scope.currentDescend].total
             $scope.node.loadingChildren = false
           else
@@ -165,7 +165,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
           $scope.node.showMore   ?= ->
           $scope.node.active     ?= false
 
-        element.$$resetHelperProperties()
+        $scope.node.reset()
 
         if $scope.node.numberOfChildren > $scope.node.children.length and $scope.node.showMore and not $scope.node.collapsed
           loadMoreIfNeeded()

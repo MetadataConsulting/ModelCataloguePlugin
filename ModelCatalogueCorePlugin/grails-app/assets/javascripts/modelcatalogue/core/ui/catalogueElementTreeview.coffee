@@ -53,7 +53,7 @@ class CatalogueElementTreeview
         delete cachedChild.$$relationship
         node = TreeviewNodeFactory.get(treeview.getNodeId(item.link))
         if node?.collapsed
-          cachedChild.$$resetHelperProperties() if angular.isFunction(cachedChild.$$resetHelperProperties)
+          node.reset() if angular.isFunction(node.reset)
         else
           cachedChild.$$loadChildren() if angular.isFunction(cachedChild.$$loadChildren)
         $scope.list.$$children.push(angular.extend(cachedChild, item))
