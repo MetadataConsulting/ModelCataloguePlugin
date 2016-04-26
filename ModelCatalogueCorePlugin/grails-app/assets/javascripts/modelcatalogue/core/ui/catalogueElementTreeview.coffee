@@ -48,25 +48,15 @@ class CatalogueElementTreeview
       return if not list.list
       list.$$children = []
       for item in list.list
-        cachedChild  = if list.$$cachedChildren then list.$$cachedChildren[item.link]
-        cachedChild ?= {}
-        delete cachedChild.$$relationship
         node = TreeviewNodeFactory.get(treeview.getNodeId(item.link))
         if node?.collapsed
           node.reset() if angular.isFunction(node.reset)
         else
           node.loadChildren() if angular.isFunction(node?.loadChildren)
-        $scope.list.$$children.push(angular.extend(cachedChild, item))
+        $scope.list.$$children.push(angular.extend(node?.item ? {}, item))
 
-    onListChange = (list, oldList) ->
+    onListChange = (list) ->
       return if not list
-
-      if oldList
-        list.$$cachedChildren = oldList.$$cachedChildren ? {}
-
-        for child in oldList.$$children
-          delete child.$$relationship
-          list.$$cachedChildren[child.link] = child
 
       $scope.$$showingMore = false
 

@@ -93,9 +93,6 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
 
       loadNewChildren = (firstList) ->
         $scope.node.numberOfChildren = firstList.total
-        $scope.element.$$cachedChildren = {}
-        for child in $scope.node.children ? []
-          $scope.element.$$cachedChildren[child.link] = child # beware of id, it's 'all' for containers
 
         newChildren = []
         for item in (firstList.list ? [])
@@ -106,7 +103,6 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
 
 
           if id
-            cachedChild = $scope.element.$$cachedChildren[id] ? {}
             node = TreeviewNodeFactory.get($scope.treeview.getNodeId(id))
 
             if node?.collapsed
@@ -114,10 +110,10 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
             else
               node.loadChildren() if angular.isFunction(node?.loadChildren)
 
-            if cachedChild.id == it.id
-              objectToExtend = cachedChild
-            else
-              for key, prop of cachedChild
+            if node?.item.id == it.id
+              objectToExtend = node.item
+            else if node?.item
+              for key, prop of node.item
                 if key.indexOf('$') == 0
                   objectToExtend[key] = prop
 
