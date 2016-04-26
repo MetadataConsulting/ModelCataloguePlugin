@@ -3,7 +3,11 @@
         collapsed: Symbol('collapsed'),
         item: Symbol('item'),
         id: Symbol('id'),
-        onCollapse: Symbol('onCollapse')
+        numberOfChildren: Symbol('numberOfChildren'),
+        loadingChildren: Symbol('loadingChildren'),
+        showingMore: Symbol('showingMore'),
+        children: Symbol('children'),
+        active: Symbol('active')
     };
 
     const cache = {}; // or new WeakMap() if memory problems occur;
@@ -13,9 +17,12 @@
 
         constructor(id, item) {
             this[symbols.collapsed] = true;
-            this[symbols.onCollapse] = function() {};
             this[symbols.item] = item;
             this[symbols.id] = id;
+            this[symbols.active] = false;
+            this[symbols.loadingChildren] = false;
+            this[symbols.numberOfChildren] = 0;
+            this[symbols.children] = []
         }
 
         get collapsed() {
@@ -34,9 +41,21 @@
             return this[symbols.id];
         }
 
+        get numberOfChildren() {
+            return this[symbols.numberOfChildren];
+        }
+
+        get loadingChildren() {
+            return this[symbols.loadingChildren];
+        }
+
+        get active() {
+            return this[symbols.active];
+        }
+
+
         toggleCollapse() {
             this[symbols.collapsed] = !this[symbols.collapsed];
-            this[symbols.onCollapse](this)
         }
 
     }
