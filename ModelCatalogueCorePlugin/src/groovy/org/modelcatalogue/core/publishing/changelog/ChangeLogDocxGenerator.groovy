@@ -28,7 +28,7 @@ class ChangeLogDocxGenerator extends AbstractChangeLogGenerator{
 
     DocxSpecificationDataHelper docHelper
 
-    final def defaultTemplate = {
+    final static Closure defaultTemplate = {
         'document' font: [family: 'Calibri'], margin: [left: 30, right: 30]
         'paragraph.title' font: [color: '#13D4CA', size: 26.pt], margin: [top: 200.pt]
         'paragraph.subtitle' font: [color: '#13D4CA', size: 18.pt]
@@ -50,8 +50,7 @@ class ChangeLogDocxGenerator extends AbstractChangeLogGenerator{
 
     }
 
-    ChangeLogDocxGenerator(AuditService auditService, DataClassService dataClassService, Integer depth = 3, Boolean includeMetadata = true, def customTemplate,
-                           String imagePath) {
+    ChangeLogDocxGenerator(AuditService auditService, DataClassService dataClassService, Integer depth = 3, Boolean includeMetadata = true, Closure customTemplate = defaultTemplate, String imagePath = null) {
         super(auditService, dataClassService, depth, includeMetadata)
         this.customTemplate=customTemplate
         this.imagePath=imagePath
