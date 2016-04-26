@@ -4,7 +4,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 .config(['$tooltipProvider', ($tooltipProvider) ->
   $tooltipProvider.setTriggers mouseover: 'mouseout'
 ])
-.directive 'catalogueElementTreeviewItem',  [ 'recursiveCompile', (recursiveCompile) -> {
+.directive 'catalogueElementTreeviewItem',  (recursiveCompile) -> {
     restrict: 'E'
     replace: true
     scope:
@@ -18,7 +18,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
     compile: recursiveCompile.compile
 
-    controller: ['$scope', '$rootScope', '$element', 'catalogue', ($scope, $rootScope, $element, catalogue) ->
+    controller: ($scope, $rootScope, $element, catalogue) ->
       $scope.nodeid = nodeid++
       $scope.path = {segments: []}
 
@@ -220,6 +220,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
         if result.link == $scope.element.link
           $scope.element.updateFrom result
           $scope.element.$$loadChildren()
+          return
         if catalogue.isContentCandidate($scope.element[$scope.currentDescend], result, owner: $scope.element, url: url)
           $scope.element.$$loadChildren()
 
@@ -254,6 +255,4 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
         if startsWithSegment($scope.element, segments)
           $scope.element.$$loadChildren()
           $scope.path.segments = segments.slice(1) if segments.length > 1
-    ]
   }
-]

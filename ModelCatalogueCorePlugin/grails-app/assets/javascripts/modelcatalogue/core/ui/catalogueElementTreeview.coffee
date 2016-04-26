@@ -101,6 +101,15 @@ class CatalogueElementTreeview
       $scope.$watch 'list', onListChange
 
       refreshList = ->
+        args = arguments[0]
+        if $scope.element || $scope.list.total == 1
+          element = $scope.element || $scope.list.list[0]
+          if args.length >= 2 and args[0].hasOwnProperty('name') and args[0].name == 'catalogueElementUpdated'
+            other = args[2]
+            if element?.link != other?.link
+              return
+
+
         $scope.list.reload(status: $stateParams.status, toplevel: true).then (newList) ->
           $scope.list = newList
 
