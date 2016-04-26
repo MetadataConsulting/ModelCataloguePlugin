@@ -55,7 +55,7 @@ class CatalogueElementTreeview
         if node?.collapsed
           node.reset() if angular.isFunction(node.reset)
         else
-          cachedChild.$$loadChildren() if angular.isFunction(cachedChild.$$loadChildren)
+          node.loadChildren() if angular.isFunction(node?.loadChildren)
         $scope.list.$$children.push(angular.extend(cachedChild, item))
 
     onListChange = (list, oldList) ->

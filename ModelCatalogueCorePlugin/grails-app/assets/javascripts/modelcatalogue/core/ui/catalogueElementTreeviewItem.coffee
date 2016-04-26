@@ -112,7 +112,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
             if node?.collapsed
               node.reset() if angular.isFunction(node.reset)
             else
-              cachedChild.$$loadChildren() if angular.isFunction(cachedChild.$$loadChildren)
+              node.loadChildren() if angular.isFunction(node?.loadChildren)
 
             if cachedChild.id == it.id
               objectToExtend = cachedChild
@@ -171,7 +171,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
           loadMoreIfNeeded()
           $element.closest('.catalogue-element-treeview-list-root').on 'scroll', loadMoreIfNeeded
 
-        $scope.element.$$loadChildren = ->
+        $scope.node.loadChildren = ->
 
           unless angular.isFunction($scope.descendFun)
             $scope.node.children = []
@@ -186,7 +186,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
             $scope.node.loadingChildren = false
 
         if $scope.extraParameters?.prefetch or startsWithSegment($scope.element, $scope.extraParameters?.path?.segments)
-          $scope.element.$$loadChildren()
+          $scope.node.loadChildren()
 
       $scope.collapseOrExpand = ->
         return if $scope.extraParameters?.prefetch
@@ -199,7 +199,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
           $scope.node.collapsed = false
           return
 
-        $scope.element.$$loadChildren()
+        $scope.node.loadChildren()
 
 
       $scope.$watch 'element', onElementUpdate
@@ -230,10 +230,10 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
       reloadChildrenOnChange = (_, result, url) ->
         if result.link == $scope.element.link
           $scope.element.updateFrom result
-          $scope.element.$$loadChildren()
+          $scope.node.loadChildren()
           return
         if catalogue.isContentCandidate($scope.element[$scope.currentDescend], result, owner: $scope.element, url: url)
-          $scope.element.$$loadChildren()
+          $scope.node.loadChildren()
 
       $scope.$on 'catalogueElementDeleted', (event, element) ->
         indexesToRemove = []
@@ -264,6 +264,6 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
 
       $scope.$watch 'extraParameters.path.segments', (segments) ->
         if startsWithSegment($scope.element, segments)
-          $scope.element.$$loadChildren()
+          $scope.node.loadChildren()
           $scope.path.segments = segments.slice(1) if segments.length > 1
   }
