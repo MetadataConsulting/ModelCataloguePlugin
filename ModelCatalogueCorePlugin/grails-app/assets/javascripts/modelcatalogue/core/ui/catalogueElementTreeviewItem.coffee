@@ -150,7 +150,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
         $scope.descendFun = $scope.element[$scope.currentDescend]
 
         if angular.isFunction(element.href)
-          element.$$href = element.href()
+          $scope.node.href = element.href()
 
         element.$$resetHelperProperties = ->
           if @[$scope.currentDescend]
