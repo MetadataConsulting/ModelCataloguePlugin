@@ -23,6 +23,7 @@ class ModelToFormExporterService {
     static final String EXT_FORM_REVISION_NOTES = "http://forms.modelcatalogue.org/form#revisionNotes"
     static final String EXT_SECTION_EXCLUDE = "http://forms.modelcatalogue.org/section#exclude"
     static final String EXT_SECTION_EXCLUDE_DATA_ELEMENTS = "http://forms.modelcatalogue.org/section#excludeDataElements"
+    static final String EXT_SECTION_MERGE = "http://forms.modelcatalogue.org/section#merge"
     static final String EXT_SECTION_TITLE = "http://forms.modelcatalogue.org/section#title"
     static final String EXT_SECTION_SUBTITLE = "http://forms.modelcatalogue.org/section#subtitle"
     static final String EXT_SECTION_INSTRUCTIONS = "http://forms.modelcatalogue.org/section#instructions"
@@ -172,10 +173,15 @@ class ModelToFormExporterService {
                     }
                 }
             } else {
-                if (nameAsHeader) {
-                    generateItems(itemNumber, prefix, section, itemsWithHeaderOrGridRel, itemsWithHeaderOrGridName)
+                if (fromDestination(itemsWithHeaderOrGridRel, EXT_SECTION_MERGE) != "true") {
+                    if (nameAsHeader) {
+                        generateItems(itemNumber, prefix, section, itemsWithHeaderOrGridRel, itemsWithHeaderOrGridName)
+                    } else {
+                        generateItems(itemNumber, prefix, section, itemsWithHeaderOrGridRel, null, itemsWithHeaderOrGridName)
+                    }
                 } else {
-                    generateItems(itemNumber, prefix, section, itemsWithHeaderOrGridRel, null, itemsWithHeaderOrGridName)
+                    // if merge, do not include header
+                    generateItems(itemNumber, prefix, section, itemsWithHeaderOrGridRel)
                 }
             }
             handleGroupOrVirtualSection(itemNumber, processed, prefix, section, itemsWithHeaderOrGrid.parentOfRelationships, false)
