@@ -140,7 +140,7 @@ class ModelToFormExporterService {
         for (Relationship itemsWithHeaderOrGridRel in relationships) {
             DataClass itemsWithHeaderOrGrid = itemsWithHeaderOrGridRel.destination as DataClass
 
-            if (itemsWithHeaderOrGridRel.getId() in processed) {
+            if (itemsWithHeaderOrGrid.getId() in processed) {
                 return
             }
 
