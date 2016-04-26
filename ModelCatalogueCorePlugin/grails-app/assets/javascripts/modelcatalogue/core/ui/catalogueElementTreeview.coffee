@@ -1,6 +1,8 @@
 class CatalogueElementTreeview
-  constructor: ($scope, enhance, $stateParams, $rootScope, $element, $attrs, rx) ->
+  constructor: ($scope, enhance, $stateParams, $rootScope, $element, $attrs, rx, TreeviewNodeFactory) ->
+    "ngInject"
     selected = undefined
+    treeview = @
 
     @id = $scope.id
 
@@ -10,6 +12,8 @@ class CatalogueElementTreeview
       selected = element
       element.$$active = true
       $scope.onSelect({$element: element}) if angular.isFunction($scope.onSelect)
+
+    @getNodeId = (link) -> "#{@id}:#{link}"
 
 
 
@@ -47,7 +51,8 @@ class CatalogueElementTreeview
         cachedChild  = if list.$$cachedChildren then list.$$cachedChildren[item.link]
         cachedChild ?= {}
         delete cachedChild.$$relationship
-        if cachedChild.$$collapsed
+        node = TreeviewNodeFactory.get(treeview.getNodeId(item.link))
+        if node?.collapsed
           cachedChild.$$resetHelperProperties() if angular.isFunction(cachedChild.$$resetHelperProperties)
         else
           cachedChild.$$loadChildren() if angular.isFunction(cachedChild.$$loadChildren)
@@ -141,6 +146,6 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
 
     controllerAs: 'treeview'
 
-    controller: ['$scope', 'enhance', '$stateParams', '$rootScope', '$element', '$attrs', 'rx', CatalogueElementTreeview]
+    controller: CatalogueElementTreeview
   }
 ]

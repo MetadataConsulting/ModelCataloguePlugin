@@ -14,10 +14,10 @@
       <a ng-if="currentDescend &amp;&amp; element.elementType" class="catalogue-element-treeview-icon  btn btn-link"
          ng-click="select(element)">
         <span class="fa fa-fw fa-caret-right text-muted"
-              ng-if="!extraParameters.prefetch &amp;&amp; element.$$collapsed &amp;&amp; element.$$numberOfChildren &amp;&amp; !element.$$loadingChildren">
+              ng-if="!extraParameters.prefetch &amp;&amp; node.collapsed &amp;&amp; element.$$numberOfChildren &amp;&amp; !element.$$loadingChildren">
         </span>
         <span class="fa fa-fw fa-caret-down text-muted"
-              ng-if="!extraParameters.prefetch &amp;&amp;!element.$$collapsed &amp;&amp; element.$$numberOfChildren &amp;&amp; !element.$$loadingChildren">
+              ng-if="!extraParameters.prefetch &amp;&amp;!node.collapsed &amp;&amp; element.$$numberOfChildren &amp;&amp; !element.$$loadingChildren">
         </span>
         <span class="fa fa-fw fa-refresh text-muted" ng-if="element.$$loadingChildren"></span>
         <span class="fa fa-fw text-muted" ng-if="extraParameters.prefetch"></span>
@@ -52,7 +52,7 @@
       </small>
     </span>
   </div>
-  <ul ng-if="node.children" ng-hide="element.$$collapsed" class="catalogue-element-treeview-list">
+  <ul ng-if="node.children" ng-hide="node.collapsed" class="catalogue-element-treeview-list">
     <catalogue-element-treeview-item extra-parameters="{'path': path}" element="child" descend="nextDescend" repeat="repeat" treeview="treeview"
                                      ng-repeat="child in node.children track by $index"></catalogue-element-treeview-item>
     <li ng-if="element.$$numberOfChildren > node.children.length" class="catalogue-element-treeview-item">

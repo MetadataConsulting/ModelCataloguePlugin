@@ -1,6 +1,6 @@
 (function(window, angular){
     const symbols = {
-        collapsed: Symbol('collapsed'),
+        // collapsed: Symbol('collapsed'),
         item: Symbol('item'),
         id: Symbol('id'),
         numberOfChildren: Symbol('numberOfChildren'),
@@ -16,7 +16,7 @@
     class TreeviewNode {
 
         constructor(id, item) {
-            this[symbols.collapsed] = true;
+            this.collapsed = true;
             this[symbols.item] = item;
             this[symbols.id] = id;
             this[symbols.active] = false;
@@ -25,12 +25,8 @@
             this[symbols.children] = []
         }
 
-        get collapsed() {
-            return this[symbols.collapsed];
-        }
-
         get expanded() {
-            return !this[symbols.collapsed];
+            return !this.collapsed;
         }
 
         get item() {
@@ -55,7 +51,7 @@
 
 
         toggleCollapse() {
-            this[symbols.collapsed] = !this[symbols.collapsed];
+            this.collapsed = !this.collapsed;
         }
 
     }
@@ -68,6 +64,10 @@
                 return cached;
             }
             return cache[id] = new TreeviewNode(id, item);
+        }
+
+        static get(id) {
+            return cache[id]
         }
     }
 

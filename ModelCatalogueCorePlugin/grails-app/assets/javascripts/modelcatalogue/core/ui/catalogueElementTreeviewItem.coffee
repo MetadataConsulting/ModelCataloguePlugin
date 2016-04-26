@@ -107,8 +107,9 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
 
           if id
             cachedChild = $scope.element.$$cachedChildren[id] ? {}
+            node = TreeviewNodeFactory.get($scope.treeview.getNodeId(id))
 
-            if cachedChild.$$collapsed
+            if node?.collapsed
               cachedChild.$$resetHelperProperties() if angular.isFunction(cachedChild.$$resetHelperProperties)
             else
               cachedChild.$$loadChildren() if angular.isFunction(cachedChild.$$loadChildren)
@@ -131,7 +132,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
           )
 
         $scope.node.children = newChildren
-        $scope.element.$$collapsed  = false
+        $scope.node.collapsed  = false
         root = $element.closest('.catalogue-element-treeview-list-root')
         if $scope.element.$$numberOfChildren > $scope.node.children.length
           $scope.element.$$showMore = createShowMore(firstList)
@@ -144,7 +145,8 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
       onElementUpdate = (element) ->
         handleDescendPaths()
 
-        $scope.node = TreeviewNodeFactory.create("#{$scope.treeview.id}:#{$scope.element.link}", $scope.element)
+        $scope.node = TreeviewNodeFactory.create($scope.treeview.getNodeId(element.link), element)
+
         $scope.descendFun = $scope.element[$scope.currentDescend]
 
         if angular.isFunction(element.href)
@@ -159,13 +161,13 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
             @$$loadingChildren = false
 
           $scope.node.children ?= []
-          @$$collapsed  ?= true
+          $scope.node.collapsed  ?= true
           @$$showMore   ?= ->
           @$$active     ?= false
 
         element.$$resetHelperProperties()
 
-        if $scope.element.$$numberOfChildren > $scope.node.children.length and $scope.element.$$showMore and not $scope.element.$$collapsed
+        if $scope.element.$$numberOfChildren > $scope.node.children.length and $scope.element.$$showMore and not $scope.node.collapsed
           loadMoreIfNeeded()
           $element.closest('.catalogue-element-treeview-list-root').on 'scroll', loadMoreIfNeeded
 
@@ -189,12 +191,12 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
       $scope.collapseOrExpand = ->
         return if $scope.extraParameters?.prefetch
         return if $scope.element.$$loadingChildren
-        unless $scope.element.$$collapsed
-          $scope.element.$$collapsed = true
+        unless $scope.node.collapsed
+          $scope.node.collapsed = true
           return
 
         unless $scope.node.children.length == 0 and $scope.element.$$numberOfChildren > 0
-          $scope.element.$$collapsed = false
+          $scope.node.collapsed = false
           return
 
         $scope.element.$$loadChildren()
