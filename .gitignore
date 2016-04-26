@@ -13,6 +13,7 @@ ModelCatalogueCorePluginTestApp/test/integration/resources/rare_diseases_combine
 **/storage/**/*
 **/out/**/*
 **/target/**/*
+**/.slcache/**/*
 **/target-eclipse/**/*
 **/*.class
 **/*.gen.fixture.js
