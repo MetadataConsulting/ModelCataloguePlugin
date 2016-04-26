@@ -76,8 +76,8 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
         return if showMore.hasClass '.hide'
         return if showMore.offset()?.top < 0
         root = $element.closest('.catalogue-element-treeview-list-root')
-        if showMore.offset()?.top < root.offset()?.top + 3 * root.height() and angular.isFunction($scope.element.$$showMore)
-          $scope.element.$$showMore()
+        if showMore.offset()?.top < root.offset()?.top + 3 * root.height() and angular.isFunction($scope.node.showMore)
+          $scope.node.showMore()
 
       createShowMore  = (list) ->
         # function to load more items to existing $$children helper property
@@ -87,7 +87,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
             for item in nextList.list
               it = if item.relation then item.relation else item
               $scope.node.children.push(angular.extend(it, {$$relationship: (if item.relation then item else undefined), $$metadata: item.ext, $$archived: item.archived, $$localName: getLocalName(item) }))
-            $scope.element.$$showMore = createShowMore(nextList)
+            $scope.node.showMore = createShowMore(nextList)
             loadMoreIfNeeded()
             $scope.node.showingMore = false
 
@@ -135,11 +135,11 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
         $scope.node.collapsed  = false
         root = $element.closest('.catalogue-element-treeview-list-root')
         if $scope.node.numberOfChildren > $scope.node.children.length
-          $scope.element.$$showMore = createShowMore(firstList)
+          $scope.node.showMore = createShowMore(firstList)
           loadMoreIfNeeded()
           root.on 'scroll', loadMoreIfNeeded
         else
-          $scope.element.$$showMore = ->
+          $scope.node.showMore = ->
           root.off 'scroll', loadMoreIfNeeded
 
       onElementUpdate = (element) ->
@@ -162,12 +162,12 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
 
           $scope.node.children ?= []
           $scope.node.collapsed  ?= true
-          @$$showMore   ?= ->
+          $scope.node.showMore   ?= ->
           $scope.node.active     ?= false
 
         element.$$resetHelperProperties()
 
-        if $scope.node.numberOfChildren > $scope.node.children.length and $scope.element.$$showMore and not $scope.node.collapsed
+        if $scope.node.numberOfChildren > $scope.node.children.length and $scope.node.showMore and not $scope.node.collapsed
           loadMoreIfNeeded()
           $element.closest('.catalogue-element-treeview-list-root').on 'scroll', loadMoreIfNeeded
 
