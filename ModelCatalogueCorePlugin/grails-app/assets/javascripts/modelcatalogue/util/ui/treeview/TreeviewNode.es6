@@ -3,7 +3,6 @@
         // collapsed: Symbol('collapsed'),
         item: Symbol('item'),
         id: Symbol('id'),
-        numberOfChildren: Symbol('numberOfChildren'),
         loadingChildren: Symbol('loadingChildren'),
         showingMore: Symbol('showingMore'),
         children: Symbol('children'),
@@ -17,11 +16,11 @@
 
         constructor(id, item) {
             this.collapsed = true;
+            this.numberOfChildren = 2147483647; // integer max number
             this[symbols.item] = item;
             this[symbols.id] = id;
             this[symbols.active] = false;
             this[symbols.loadingChildren] = false;
-            this[symbols.numberOfChildren] = 0;
             this[symbols.children] = []
         }
 
@@ -35,10 +34,6 @@
 
         get id() {
             return this[symbols.id];
-        }
-
-        get numberOfChildren() {
-            return this[symbols.numberOfChildren];
         }
 
         get loadingChildren() {
