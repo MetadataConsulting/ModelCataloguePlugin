@@ -6,12 +6,12 @@ class CatalogueElementTreeview
 
     @id = $scope.id
 
-    @select = (element) ->
-      if selected and selected isnt element
-        selected.$$active = false
-      selected = element
-      element.$$active = true
-      $scope.onSelect({$element: element}) if angular.isFunction($scope.onSelect)
+    @select = (node) ->
+      if selected and selected isnt node
+        selected.active = false
+      selected = node
+      node.active = true
+      $scope.onSelect({$element: node.item}) if angular.isFunction($scope.onSelect)
 
     @getNodeId = (link) -> "#{@id}:#{link}"
 

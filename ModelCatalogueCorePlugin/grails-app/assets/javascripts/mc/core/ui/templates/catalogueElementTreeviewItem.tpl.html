@@ -1,6 +1,6 @@
 <li class="catalogue-element-treeview-item">
   <div class="catalogue-element-treeview-text-content"
-       ng-class="{'active': element.$$active, 'archived': element.$$archived}">
+       ng-class="{'active': node.active, 'archived': element.$$archived}">
     <span class="badge pull-right" ng-if="currentDescend &amp;&amp; node.numberOfChildren"><span
       ng-if="node.numberOfChildren != 2147483647">{{node.numberOfChildren}}</span><span
       ng-if="node.numberOfChildren == 2147483647" class="fa fa-question fa-inverse"></span></span>
@@ -12,7 +12,7 @@
         No Data
       </span>
       <a ng-if="currentDescend &amp;&amp; element.elementType" class="catalogue-element-treeview-icon  btn btn-link"
-         ng-click="select(element)">
+         ng-click="select(node)">
         <span class="fa fa-fw fa-caret-right text-muted"
               ng-if="!extraParameters.prefetch &amp;&amp; node.collapsed &amp;&amp; node.numberOfChildren &amp;&amp; !node.loadingChildren">
         </span>
@@ -28,7 +28,7 @@
       </a>
       <span class="catalogue-element-treeview-name"
             ng-class="{'text-warning': element.status == 'DRAFT', 'text-info': element.status == 'PENDING', 'text-danger': (element.status == 'DEPRECATED' || element.undone)}"
-            ng-click="select(element)">
+            ng-click="select(node)">
         <span ng-class="element.getIcon()" class="text-muted"></span>
         {{element.$$localName || element.name}}
         <span class="text-muted">

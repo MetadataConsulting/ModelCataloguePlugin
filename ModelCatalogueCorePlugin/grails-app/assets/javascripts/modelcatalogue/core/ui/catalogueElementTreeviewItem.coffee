@@ -163,7 +163,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
           $scope.node.children ?= []
           $scope.node.collapsed  ?= true
           @$$showMore   ?= ->
-          @$$active     ?= false
+          $scope.node.active     ?= false
 
         element.$$resetHelperProperties()
 

@@ -1,10 +1,7 @@
 (function(window, angular){
     const symbols = {
         item: Symbol('item'),
-        id: Symbol('id'),
-        showingMore: Symbol('showingMore'),
-        children: Symbol('children'),
-        active: Symbol('active')
+        id: Symbol('id')
     };
 
     const cache = {}; // or new WeakMap() if memory problems occur;
@@ -18,8 +15,8 @@
             this.loadingChildren = false;
             this[symbols.item] = item;
             this[symbols.id] = id;
-            this[symbols.active] = false;
-            this[symbols.children] = []
+            this.active = false;
+            this.children = [];
         }
 
         get expanded() {
@@ -33,11 +30,6 @@
         get id() {
             return this[symbols.id];
         }
-
-        get active() {
-            return this[symbols.active];
-        }
-
 
         toggleCollapse() {
             this.collapsed = !this.collapsed;
