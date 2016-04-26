@@ -41,35 +41,36 @@ describe "mc.core.catalogueElementEnhancer", ->
     expect(angular.equals(toParams, {resource: 'dataType', id: "#{enhanced.id}"})).toBeTruthy()
     expect(self).toEqual(enhanced)
 
-  it "returns expected results for getLabel()", inject (enhance) ->
-    dataClass   = enhance angular.copy(fixtures.dataClass.showOne)
-    element = enhance angular.copy(fixtures.dataType.showOne)
+  if window.fixtures
+    it "returns expected results for getLabel()", inject (enhance) ->
+      dataClass   = enhance angular.copy(fixtures.dataClass.showOne)
+      element = enhance angular.copy(fixtures.dataType.showOne)
 
-    expect(dataClass.getLabel()).toBe("mTest3")
-    expect(element.getLabel()).toBe("boolean")
+      expect(dataClass.getLabel()).toBe("mTest3")
+      expect(element.getLabel()).toBe("boolean")
 
-  it "returns expected results for instance of", inject (enhance) ->
-    dataType  = enhance angular.copy(fixtures.dataType.showOne)
-    dataClass   = enhance angular.copy(fixtures.dataClass.showOne)
+    it "returns expected results for instance of", inject (enhance) ->
+      dataType  = enhance angular.copy(fixtures.dataType.showOne)
+      dataClass   = enhance angular.copy(fixtures.dataClass.showOne)
 
-    expect(dataType.isInstanceOf).toBeFunction()
-    expect(dataClass.isInstanceOf).toBeFunction()
+      expect(dataType.isInstanceOf).toBeFunction()
+      expect(dataClass.isInstanceOf).toBeFunction()
 
-    describe "test data type and model", ->
-      it "test data type is DataType", ->
-        expect(dataType.isInstanceOf('org.modelcatalogue.core.DataType')).toBeTruthy()
-      it "test data type is CatalogueElement", ->
-        expect(dataType.isInstanceOf('org.modelcatalogue.core.CatalogueElement')).toBeTruthy()
-      it "test data type isn't Model", ->
-        expect(dataType.isInstanceOf('org.modelcatalogue.core.Model')).toBeFalsy()
+      describe "test data type and model", ->
+        it "test data type is DataType", ->
+          expect(dataType.isInstanceOf('org.modelcatalogue.core.DataType')).toBeTruthy()
+        it "test data type is CatalogueElement", ->
+          expect(dataType.isInstanceOf('org.modelcatalogue.core.CatalogueElement')).toBeTruthy()
+        it "test data type isn't Model", ->
+          expect(dataType.isInstanceOf('org.modelcatalogue.core.Model')).toBeFalsy()
 
-      it "test model isn't DataType", ->
-        expect(dataClass.isInstanceOf('org.modelcatalogue.core.DataType')).toBeFalsy()
-      it "test model isn't MeasurementUnit", ->
-        expect(dataClass.isInstanceOf('org.modelcatalogue.core.MeasurementUnit')).toBeFalsy()
-      it "test model is CatalogueElement", ->
-        expect(dataClass.isInstanceOf('org.modelcatalogue.core.CatalogueElement')).toBeTruthy()
-      it "test model is Model", ->
-        expect(dataClass.isInstanceOf('org.modelcatalogue.core.DataClass')).toBeTruthy()
+        it "test model isn't DataType", ->
+          expect(dataClass.isInstanceOf('org.modelcatalogue.core.DataType')).toBeFalsy()
+        it "test model isn't MeasurementUnit", ->
+          expect(dataClass.isInstanceOf('org.modelcatalogue.core.MeasurementUnit')).toBeFalsy()
+        it "test model is CatalogueElement", ->
+          expect(dataClass.isInstanceOf('org.modelcatalogue.core.CatalogueElement')).toBeTruthy()
+        it "test model is Model", ->
+          expect(dataClass.isInstanceOf('org.modelcatalogue.core.DataClass')).toBeTruthy()
 
 
