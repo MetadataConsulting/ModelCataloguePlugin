@@ -13,6 +13,7 @@ describe "mc.core.ui.catalogueElementTreeviewItem", ->
     $rootScope.descend = ['outgoingRelationships']
     $rootScope.treeview =
       select: -> # do nothing
+      getNodeId: (link) -> link
 
     element = $compile('''
       <catalogue-element-treeview-item element="element" descend="descend" treeview="treeview"></catalogue-element-treeview-item>
