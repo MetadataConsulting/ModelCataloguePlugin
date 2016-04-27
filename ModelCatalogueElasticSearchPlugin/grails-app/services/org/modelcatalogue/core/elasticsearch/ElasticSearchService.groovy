@@ -31,7 +31,7 @@ import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 import java.util.concurrent.ExecutorService
 
-import static org.modelcatalogue.core.util.HibernateHelper.*
+import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 import static rx.Observable.from
 import static rx.Observable.just
 
