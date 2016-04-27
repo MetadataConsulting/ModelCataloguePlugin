@@ -1,5 +1,5 @@
 angular.module('mc.core.ui.bs.modalPromptNewMapping', ['mc.util.messages']).config ['messagesProvider', 'catalogueProvider', (messagesProvider, catalogueProvider)->
-  messagesProvider.setPromptFactory 'new-mapping', [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
+  messagesProvider.setPromptFactory 'new-mapping', [ '$uibModal', '$q', 'messages', ($uibModal, $q, messages) ->
     (title, body, args) ->
       if not args?.element?
         messages.error('Cannot create mapping dialog.', 'The element to be mapped is missing.')
@@ -10,7 +10,7 @@ angular.module('mc.core.ui.bs.modalPromptNewMapping', ['mc.util.messages']).conf
       elementType = 'dataType' if catalogueProvider.isInstanceOf(elementType, 'dataType')
 
 
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'new-relationship-modal-prompt'
         template: '''
          <div class="modal-header">
@@ -36,7 +36,7 @@ angular.module('mc.core.ui.bs.modalPromptNewMapping', ['mc.util.messages']).conf
             <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
         </div>
         '''
-        controller: ['$scope', 'messages', '$modalInstance', ($scope, messages, $modalInstance) ->
+        controller: ['$scope', 'messages', '$uibModalInstance', ($scope, messages, $uibModalInstance) ->
           $scope.update = args.update
           $scope.messages = messages.createNewMessages()
           $scope.copy = if args.mapping then angular.copy(args.mapping) else {}
@@ -80,7 +80,7 @@ angular.module('mc.core.ui.bs.modalPromptNewMapping', ['mc.util.messages']).conf
                 messages.success('Mapping Updated', "You have updated mapping from #{args.element.name} to #{$scope.copy.destination.name}.")
               else
                 messages.success('Mapping Created', "You have added new mapping from #{args.element.name} to #{$scope.copy.destination.name}.")
-              $modalInstance.close(result)
+              $uibModalInstance.close(result)
             , (response) ->
               if response.data.errors
                 for err in response.data.errors

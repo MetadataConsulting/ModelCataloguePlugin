@@ -1,8 +1,8 @@
 module = angular.module('mc.core.ui.bs.modalSearchForActions', ['mc.util.messages', 'mc.util.ui.focusMe'])
 module.config ['messagesProvider', (messagesProvider)->
-  messagesProvider.setPromptFactory 'search-action',  [ '$modal', 'names',  ($modal) ->
+  messagesProvider.setPromptFactory 'search-action',  [ '$uibModal', 'names',  ($uibModal) ->
     ->
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         size: 'lg'
         template: """
         <div class="modal-body" ng-keydown="keydown($event)">
@@ -31,7 +31,7 @@ module.config ['messagesProvider', (messagesProvider)->
         </div>
         """
 
-        controller: ['$scope', 'actions', '$modalInstance', '$filter', ($scope, actions, $modalInstance, $filter) ->
+        controller: ['$scope', 'actions', '$uibModalInstance', '$filter', ($scope, actions, $uibModalInstance, $filter) ->
           $scope.selected = -1
           $scope.actions = actions.getActions($scope, actions.ROLE_GLOBAL_ACTION)
 
@@ -39,7 +39,7 @@ module.config ['messagesProvider', (messagesProvider)->
             action.icon ? 'fa-flash'
 
           $scope.performAction = (action) ->
-            $modalInstance.close(action.run())
+            $uibModalInstance.close(action.run())
 
           queryFilter = (value) ->
             return true if not $scope.query

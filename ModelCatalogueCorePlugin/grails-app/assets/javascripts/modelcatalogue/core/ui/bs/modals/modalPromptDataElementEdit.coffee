@@ -1,5 +1,5 @@
 angular.module('mc.core.ui.bs.modalPromptDataElementEdit', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
-  factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
+  factory = [ '$uibModal', '$q', 'messages', ($uibModal, $q, messages) ->
     (title, body, args) ->
 
       if not args?.element? and not args?.create?
@@ -9,7 +9,7 @@ angular.module('mc.core.ui.bs.modalPromptDataElementEdit', ['mc.util.messages'])
       if not title
         title = "Create Data Element"
 
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'basic-edit-modal-prompt'
         size: 'lg'
         resolve:

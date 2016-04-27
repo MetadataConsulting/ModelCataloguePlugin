@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'ngFileUpload']).controller 'importCtrl', ['$scope', 'messages', 'names', 'modelCatalogueDataArchitect', '$modalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', 'catalogue', 'args', ($scope, messages, names, modelCatalogueDataArchitect, $modalInstance, Upload, modelCatalogueApiRoot, enhance, catalogue, args) ->
+angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'ngFileUpload']).controller 'importCtrl', ['$scope', 'messages', 'names', 'modelCatalogueDataArchitect', '$uibModalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', 'catalogue', 'args', ($scope, messages, names, modelCatalogueDataArchitect, $uibModalInstance, Upload, modelCatalogueApiRoot, enhance, catalogue, args) ->
     $scope.copy     = angular.copy(args.element ? {})
     $scope.original = args.element ? {}
     $scope.messages = messages.createNewMessages()
@@ -11,7 +11,7 @@ angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'ngFileUpload'])
       if $scope.upload
         $scope.upload.abort()
 
-      $modalInstance.dismiss('Upload Canceled')
+      $uibModalInstance.dismiss('Upload Canceled')
 
     $scope.onFileSelect = ($files) ->
       $scope.copy.file = $files[0]
@@ -51,7 +51,7 @@ angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'ngFileUpload'])
             $scope.messages.error err.message
         else
           messages.success('Created ' + result.getElementTypeName(), "You have created #{result.getElementTypeName()} #{result.name}.")
-          $modalInstance.close(result)
+          $uibModalInstance.close(result)
           if catalogue.isInstanceOf result.elementType, 'asset'
             result.show()
       ).error((data) ->
@@ -59,7 +59,7 @@ angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'ngFileUpload'])
           $scope.messages.error err.message
         $scope.uploading = false
         $scope.progress  = 0
-        $modalInstance.close()
+        $uibModalInstance.close()
       )
 
     $scope.purlPattern = "http://purl.obolibrary.org/obo/${id.replace('%3A', '_')}"

@@ -1,7 +1,7 @@
 angular.module('mc.core.ui.bs.modalPromptNewCatalogueXmlImport', ['mc.util.messages', 'mc.core.ui.bs.importCtrl']).config ['messagesProvider', (messagesProvider)->
-  factory = [ '$modal', ($modal) ->
+  factory = [ '$uibModal', ($uibModal) ->
     (title, body, args) ->
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'basic-edit-modal-prompt'
         backdrop: 'static'
         keyboard: false

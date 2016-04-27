@@ -1,16 +1,16 @@
 angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 'mc.core.ui.bs.watchAndAskForImportOrCloneCtrl']).config (messagesProvider) ->
-  messagesProvider.setPromptFactory 'create-new-relationship', ($log, $modal, $timeout, $q, messages, catalogueElementResource, enhance, catalogue) ->
+  messagesProvider.setPromptFactory 'create-new-relationship', ($log, $uibModal, $timeout, $q, messages, catalogueElementResource, enhance, catalogue) ->
     "ngInject"
     (title, body, args) ->
       if not args?.element?
         messages.error('Cannot create relationship dialog.', 'The element to be connected to is missing.')
         return $q.reject('Missing element argument!')
 
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         size: 'lg'
         windowClass: 'new-relationship-modal-prompt'
         templateUrl: '/mc/core/ui/modals/modalNewRelationship.html'
-        controller: ($scope, messages, $modalInstance, $controller, $stateParams, catalogueElementResource) ->
+        controller: ($scope, messages, $uibModalInstance, $controller, $stateParams, catalogueElementResource) ->
 
             if not args.currentDataModel and $stateParams.dataModelId and $stateParams.dataModelId != 'catalogue'
               catalogueElementResource('dataModel').get($stateParams.dataModelId).then (dataModel) ->
@@ -151,7 +151,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 
 
               $q.all(promises)
               .then (results) ->
-                $modalInstance.close(results)
+                $uibModalInstance.close(results)
               .finally ->
                 $scope.pending = false
 

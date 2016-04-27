@@ -1,7 +1,7 @@
 angular.module('mc.core.ui.bs.modalPromptForCatalogueElement', ['mc.util.messages', 'mc.util.ui.focusMe']).config ['messagesProvider', (messagesProvider)->
-  messagesProvider.setPromptFactory 'catalogue-element',  [ '$modal', ($modal) ->
+  messagesProvider.setPromptFactory 'catalogue-element',  [ '$uibModal', ($uibModal) ->
     (title, body, args) ->
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'messages-modal-prompt'
         template: '''
          <div class="modal-header">
@@ -21,7 +21,7 @@ angular.module('mc.core.ui.bs.modalPromptForCatalogueElement', ['mc.util.message
             <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
         </div>
         '''
-        controller: ['$scope', 'catalogue', '$modalInstance', ($scope, catalogue, $modalInstance) ->
+        controller: ['$scope', 'catalogue', '$uibModalInstance', ($scope, catalogue, $uibModalInstance) ->
           $scope.value = args.value
           $scope.isElementSelected = (value) ->
             if args.allowString and value and angular.isString(value)
@@ -29,7 +29,7 @@ angular.module('mc.core.ui.bs.modalPromptForCatalogueElement', ['mc.util.message
             catalogue.isInstanceOf(value?.elementType ? 'noType', 'catalogueElement')
 
           $scope.close = (value) ->
-            $modalInstance.close(value) if $scope.isElementSelected(value)
+            $uibModalInstance.close(value) if $scope.isElementSelected(value)
 
         ]
       }

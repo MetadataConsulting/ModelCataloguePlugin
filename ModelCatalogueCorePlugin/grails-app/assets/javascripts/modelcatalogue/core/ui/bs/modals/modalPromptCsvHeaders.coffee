@@ -1,7 +1,7 @@
 angular.module('mc.core.ui.bs.modalPromptCsvHeaders', ['mc.util.messages', 'ngFileUpload']).config ['messagesProvider', (messagesProvider)->
-  factory = [ '$modal', 'messages', ($modal, messages) ->
+  factory = [ '$uibModal', 'messages', ($uibModal, messages) ->
     (title) ->
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'basic-edit-modal-prompt'
         template: '''
          <div class="modal-header">
@@ -22,7 +22,7 @@ angular.module('mc.core.ui.bs.modalPromptCsvHeaders', ['mc.util.messages', 'ngFi
             </form>
         </div>
         '''
-        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', ($scope, messages, names, catalogueElementResource, $modalInstance, Upload, modelCatalogueApiRoot, enhance) ->
+        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$uibModalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', ($scope, messages, names, catalogueElementResource, $uibModalInstance, Upload, modelCatalogueApiRoot, enhance) ->
           $scope.separator = ';'
           $scope.messages = messages.createNewMessages()
 
@@ -31,7 +31,7 @@ angular.module('mc.core.ui.bs.modalPromptCsvHeaders', ['mc.util.messages', 'ngFi
             if $scope.upload
               $scope.upload.abort()
 
-            $modalInstance.dismiss('Upload Canceled')
+            $uibModalInstance.dismiss('Upload Canceled')
 
           $scope.onFileSelect = ($files) ->
 
@@ -47,7 +47,7 @@ angular.module('mc.core.ui.bs.modalPromptCsvHeaders', ['mc.util.messages', 'ngFi
             ).success((result) ->
               $scope.uploading = false
               messages.success "Read #{result.length} data elements suggestion from the file headers"
-              $modalInstance.close(enhance result)
+              $uibModalInstance.close(enhance result)
             ).error(->
               $scope.messages.warning("Cannot process given file")
               $scope.uploading = false

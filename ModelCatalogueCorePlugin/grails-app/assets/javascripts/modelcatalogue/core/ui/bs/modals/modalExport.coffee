@@ -1,7 +1,7 @@
 angular.module('mc.core.ui.bs.modalExport', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
-  messagesProvider.setPromptFactory 'export', ['$modal', ($modal) ->
+  messagesProvider.setPromptFactory 'export', ['$uibModal', ($uibModal) ->
     (title, body, args) ->
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'messages-modal-confirm'
         templateUrl: '/mc/core/ui/modals/modalExport.html'
         controller: ['$scope', ($scope) ->

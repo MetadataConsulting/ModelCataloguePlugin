@@ -1,11 +1,11 @@
 angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'ngFileUpload', 'mc.core.ui.bs.withClassificationCtrlMixin']).config ['messagesProvider', (messagesProvider)->
-  factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
+  factory = [ '$uibModal', '$q', 'messages', ($uibModal, $q, messages) ->
     (title, body, args) ->
       if not args?.element? and not args?.create?
         messages.error('Cannot create edit dialog.', 'The element to be edited is missing.')
         return $q.reject('Missing element argument!')
 
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'basic-edit-modal-prompt'
         backdrop: 'static'
         keyboard: false
@@ -45,7 +45,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'ngFil
           <contextual-actions role="modal"></contextual-actions>
         </div>
         '''
-        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', '$rootScope', '$controller', ($scope, messages, names, catalogueElementResource, $modalInstance, Upload, modelCatalogueApiRoot, enhance, $rootScope, $controller) ->
+        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$uibModalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', '$rootScope', '$controller', ($scope, messages, names, catalogueElementResource, $uibModalInstance, Upload, modelCatalogueApiRoot, enhance, $rootScope, $controller) ->
           $scope.pending        = {dataModel: null}
           $scope.newEntity      = -> {dataModels: $scope.copy?.dataModels ? []}
           $scope.copy     = angular.copy(args.element ? $scope.newEntity())
@@ -64,7 +64,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'ngFil
             if $scope.upload
               $scope.upload.abort()
 
-            $modalInstance.dismiss('Upload Canceled')
+            $uibModalInstance.dismiss('Upload Canceled')
 
           $scope.onFileSelect = ($files) ->
             if not args?.create
@@ -120,7 +120,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'ngFil
                       messages.success('Created ' + result.getElementTypeName(), "You have created #{result.getElementTypeName()} #{result.name}.")
                     else
                       messages.success('Updated ' + result.getElementTypeName(), "You have updated #{result.getElementTypeName()} #{result.name}.")
-                    $modalInstance.close(result)
+                    $uibModalInstance.close(result)
               ).error((data) ->
                 for err in data.errors
                   $scope.messages.error err.message
@@ -140,7 +140,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'ngFil
                   messages.success('Created ' + result.getElementTypeName(), "You have created #{result.getElementTypeName()} #{result.name}.")
                 else
                   messages.success('Updated ' + result.getElementTypeName(), "You have updated #{result.getElementTypeName()} #{result.name}.")
-                $modalInstance.close(enhance result)
+                $uibModalInstance.close(enhance result)
               , (response) ->
                 for err in response.data.errors
                   $scope.messages.error err.message

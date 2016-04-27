@@ -1,7 +1,7 @@
 angular.module('mc.core.ui.bs.modalConfirm', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
- messagesProvider.setConfirmFactory [ '$modal', ($modal) ->
+ messagesProvider.setConfirmFactory [ '$uibModal', ($uibModal) ->
    (title, body) ->
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'messages-modal-confirm'
         template: '''
          <div class="modal-header">

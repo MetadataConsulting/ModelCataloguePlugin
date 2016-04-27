@@ -1,10 +1,10 @@
 angular.module('mc.core.ui.bs.modalPromptXmlValidate', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
-  factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
+  factory = [ '$uibModal', '$q', 'messages', ($uibModal, $q, messages) ->
 
     (title, body, args) ->
       return $q.reject("Missing asset argument") if not args.asset
 
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'basic-edit-modal-prompt'
         template: '''
          <div class="modal-header">
@@ -27,7 +27,7 @@ angular.module('mc.core.ui.bs.modalPromptXmlValidate', ['mc.util.messages']).con
           <alert type="danger"  ng-show="result !== true &amp;&amp; result">{{result}}</alert>
         </div>
         '''
-        controller: ['$scope', 'messages', '$modalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', ($scope, messages, $modalInstance, Upload, modelCatalogueApiRoot, enhance) ->
+        controller: ['$scope', 'messages', '$uibModalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', ($scope, messages, $uibModalInstance, Upload, modelCatalogueApiRoot, enhance) ->
           $scope.copy     = {}
           $scope.messages = messages.createNewMessages()
 
@@ -36,7 +36,7 @@ angular.module('mc.core.ui.bs.modalPromptXmlValidate', ['mc.util.messages']).con
             if $scope.upload
               $scope.upload.abort()
 
-            $modalInstance.dismiss('Upload Canceled')
+            $uibModalInstance.dismiss('Upload Canceled')
 
           $scope.onFileSelect = ($files) ->
             $scope.copy.file = $files[0]

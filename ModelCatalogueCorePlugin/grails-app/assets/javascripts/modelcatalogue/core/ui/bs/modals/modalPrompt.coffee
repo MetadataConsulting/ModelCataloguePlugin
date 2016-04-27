@@ -1,7 +1,7 @@
 angular.module('mc.core.ui.bs.modalPrompt', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
- messagesProvider.setDefaultPromptFactory [ '$modal', ($modal) ->
+ messagesProvider.setDefaultPromptFactory [ '$uibModal', ($uibModal) ->
    (title, body, args) ->
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'messages-modal-prompt'
         template: '''
          <div class="modal-header">

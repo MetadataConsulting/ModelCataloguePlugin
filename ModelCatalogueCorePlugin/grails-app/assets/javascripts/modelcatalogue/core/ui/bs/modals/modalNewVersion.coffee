@@ -1,12 +1,12 @@
 angular.module('mc.core.ui.bs.modalNewVersion', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
 
-  factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
+  factory = [ '$uibModal', '$q', 'messages', ($uibModal, $q, messages) ->
     (title, body, args) ->
       if not args?.element?
         messages.error('Cannot create edit dialog.', 'The element to be edited is missing.')
         return $q.reject('Missing element argument!')
 
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         template: '''
          <div class="modal-header">
             <h4>''' + (title ? 'New Version of Data Model') + '''</h4>
@@ -27,18 +27,18 @@ angular.module('mc.core.ui.bs.modalNewVersion', ['mc.util.messages']).config ['m
           <contextual-actions role="modal"></contextual-actions>
         </div>
         '''
-        controller: ['$rootScope', '$scope', 'messages', '$modalInstance', 'catalogueElementResource', ($rootScope, $scope, messages, $modalInstance, catalogueElementResource) ->
+        controller: ['$rootScope', '$scope', 'messages', '$uibModalInstance', 'catalogueElementResource', ($rootScope, $scope, messages, $uibModalInstance, catalogueElementResource) ->
           $scope.semanticVersion = null
           $scope.messages = messages.createNewMessages()
 
-          $scope.$dismiss = $modalInstance.dismiss
+          $scope.$dismiss = $uibModalInstance.dismiss
 
           $scope.createDraftVersion = ->
             $scope.pending = true
             args.element.execute('newVersion', 'POST', semanticVersion: $scope.semanticVersion).then (updated) ->
               args.element.updateFrom  updated
               messages.prompt('Draft progress', null, type: 'feedback', id: args.element.id).then ->
-                $modalInstance.close(updated)
+                $uibModalInstance.close(updated)
                 $scope.pending = false
             , (response) ->
               $scope.pending = false
