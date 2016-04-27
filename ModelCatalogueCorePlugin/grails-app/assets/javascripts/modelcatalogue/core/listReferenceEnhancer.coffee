@@ -1,9 +1,13 @@
-angular.module('mc.core.listReferenceEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot']).config ['enhanceProvider', (enhanceProvider)->
+angular.module('mc.core.listReferenceEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot']).config (enhanceProvider)->
   condition = (list) -> list.hasOwnProperty('count') and list.hasOwnProperty('link')
-  factory   = ['modelCatalogueApiRoot', 'rest', '$rootScope', 'enhance', '$q', (modelCatalogueApiRoot, rest, $rootScope, enhance, $q) ->
+  factory   = (modelCatalogueApiRoot, rest, $rootScope, enhance, $q, $state) ->
+    "ngInject"
     (listReference) ->
       link = "#{modelCatalogueApiRoot}#{listReference.link}"
       query = (tail = null, params = {}) ->
+        if not params.dataModel and $state.params.dataModelId
+          params = angular.extend({dataModel: $state.params.dataModelId}, params)
+
         enhance rest method: 'GET', url: "#{link}#{if tail? then '/' + tail else ''}", params: params
       query.total = listReference.count
       query.link = link.toString()
@@ -43,7 +47,4 @@ angular.module('mc.core.listReferenceEnhancer', ['mc.util.rest', 'mc.util.enhanc
         """listReference {\n  link: #{@link},\n  total: #{@total},\n  base: #{@base},\n  itemType: #{@itemType} \n}"""
 
       query
-  ]
-
   enhanceProvider.registerEnhancerFactory('listReference', condition, factory)
-]
