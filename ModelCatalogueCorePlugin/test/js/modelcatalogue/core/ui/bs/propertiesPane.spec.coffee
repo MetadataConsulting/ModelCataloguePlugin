@@ -5,6 +5,8 @@ describe "mc.core.ui.propertiesPane", ->
   beforeEach module 'mc.core.modelCatalogueApiRoot'
   beforeEach module 'mc.core.catalogueElementEnhancer'
 
+  return unless window.fixtures
+  
   it "element get compiled",  inject ($compile, $rootScope, enhance) ->
 
     $rootScope.paneProperties = [

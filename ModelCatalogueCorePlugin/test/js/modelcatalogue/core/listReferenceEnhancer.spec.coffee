@@ -15,10 +15,11 @@ describe "mc.core.listReferenceEnhancer", ->
     modelCatalogueApiRoot = _modelCatalogueApiRoot_
     enhance               = _enhance_
 
-  it "can deep enhance", ->
-    enhanced = enhance angular.copy(fixtures.dataType.showOne)
+  if window.fixtures
+    it "can deep enhance", ->
+      enhanced = enhance angular.copy(fixtures.dataType.showOne)
 
-    expect(angular.isFunction(enhanced.mappings)).toBeTruthy()
+      expect(angular.isFunction(enhanced.mappings)).toBeTruthy()
 
   it "returns function which will call the link", ->
     expected = {foo:  'bar'}

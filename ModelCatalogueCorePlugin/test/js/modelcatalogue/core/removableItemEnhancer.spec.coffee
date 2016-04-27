@@ -11,24 +11,26 @@ describe "mc.core.removableItemEnancer", ->
     modelCatalogueApiRoot = _modelCatalogueApiRoot_
     enhance               = _enhance_
 
-  it "remove method will be added if removeLink is present", ->
-    list = angular.copy(fixtures.dataType.outgoing1)
-    enhanced = enhance list
-
-    item = enhanced.list[0]
-
-    expect(angular.isFunction(item.remove)).toBeTruthy()
-
-    $httpBackend.expect("DELETE", "#{modelCatalogueApiRoot}#{item.removeLink}").respond(204)
-
-    result = null
-
-    item.remove().then (_result_) ->
-      result = _result_
-
-    expect(result).toBeNull()
-
-    $httpBackend.flush()
-
-    expect(result).toBe(204)
+    
+  if window.fixtures
+    it "remove method will be added if removeLink is present", ->
+      list = angular.copy(fixtures.dataType.outgoing1)
+      enhanced = enhance list
+  
+      item = enhanced.list[0]
+  
+      expect(angular.isFunction(item.remove)).toBeTruthy()
+  
+      $httpBackend.expect("DELETE", "#{modelCatalogueApiRoot}#{item.removeLink}").respond(204)
+  
+      result = null
+  
+      item.remove().then (_result_) ->
+        result = _result_
+  
+      expect(result).toBeNull()
+  
+      $httpBackend.flush()
+  
+      expect(result).toBe(204)
 

@@ -18,4 +18,5 @@ angular.module 'mc.util.ui', [
   'mc.util.ui.sortable'
   'mc.util.ui.resizable'
   'mc.util.ui.fakeSubmitButton'
+  'mc.util.ui.treeview.TreeviewNode'
 ]
