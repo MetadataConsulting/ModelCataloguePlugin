@@ -5,7 +5,7 @@ angular.module('mc.core.listReferenceEnhancer', ['mc.util.rest', 'mc.util.enhanc
     (listReference) ->
       link = "#{modelCatalogueApiRoot}#{listReference.link}"
       query = (tail = null, params = {}) ->
-        if not params.dataModel and $state.params.dataModelId
+        if not params.dataModel and $state.params.dataModelId and not URI(link).hasQuery('dataModel')
           params = angular.extend({dataModel: $state.params.dataModelId}, params)
 
         enhance rest method: 'GET', url: "#{link}#{if tail? then '/' + tail else ''}", params: params
