@@ -37,7 +37,7 @@ grails.project.dependency.resolution = {
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // runtime 'mysql:mysql-connector-java:5.1.27'
-        String crfBuilderVersion = '3.2.0-rc3'
+        String crfBuilderVersion = '3.2.0-rc4'
         compile ("org.modelcatalogue:crf-builder-serializer:$crfBuilderVersion")
         compile ("org.modelcatalogue:crf-builder-builder:$crfBuilderVersion")
         compile ("org.modelcatalogue:crf-builder-preview:$crfBuilderVersion")
