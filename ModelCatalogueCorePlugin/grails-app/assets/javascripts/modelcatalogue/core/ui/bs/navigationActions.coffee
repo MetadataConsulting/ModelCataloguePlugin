@@ -95,7 +95,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
       icon:       'fa fa-fw fa-puzzle-piece'
       type:       'success'
       action:     ->
-        messages.prompt('Add Data Model Import', 'If you want to reuse data classes, data types or measurement units form different data models you need to import the containing data model first.', {type: 'catalogue-elements', resource: 'dataModel', status: 'finalized' }).then (elements) ->
+        messages.prompt('Add Data Model Import', 'If you want to reuse data classes, data types or measurement units form different data models you need to import the containing data model first.', {type: 'catalogue-elements', resource: 'dataModel' }).then (elements) ->
           angular.forEach elements, (element) ->
             unless angular.isString(element)
               $scope.element.imports.add element
