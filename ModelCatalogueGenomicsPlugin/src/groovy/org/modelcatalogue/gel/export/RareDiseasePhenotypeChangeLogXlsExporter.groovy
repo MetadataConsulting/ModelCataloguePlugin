@@ -2,16 +2,11 @@ package org.modelcatalogue.gel.export
 
 import groovy.json.JsonSlurper
 import groovy.util.logging.Log4j
-import org.apache.log4j.Level
 import org.modelcatalogue.builder.spreadsheet.api.Sheet
 import org.modelcatalogue.builder.spreadsheet.api.SpreadsheetBuilder
 import org.modelcatalogue.builder.spreadsheet.api.Workbook
 import org.modelcatalogue.builder.spreadsheet.poi.PoiSpreadsheetBuilder
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.DataClass
-import org.modelcatalogue.core.DataClassService
-import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.*
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.audit.Change
 import org.modelcatalogue.core.audit.ChangeType
@@ -77,20 +72,15 @@ class RareDiseasePhenotypeChangeLogXlsExporter extends AbstractChangeLogGenerato
         def exclusions = []
         Map<String, String> groupDescriptions = new HashMap<>()
 
-//TODO remove
-        log.setLevel(Level.DEBUG)
-    log.info "Exporting Rare Diseases as xls ${model.name} (${model.combinedVersion})"
+        log.info "Exporting Rare Diseases as xls ${model.name} (${model.combinedVersion})"
 
         descendModels(model, lines, level, groupDescriptions, exclusions)
 
-    log.debug("all lines=" + lines)
-
         exportLinesAsXls PHENOTYPES_SHEET, lines, out
 
-    log.info "Exported Rare Diseases as xls spreadsheet ${model.name} (${model.combinedVersion})"
+        log.info "Exported Rare Diseases as xls spreadsheet ${model.name} (${model.combinedVersion})"
     }
 
-private int modelCounter = 0
 
     def descendModels(DataClass model, lines, level, Map groupDescriptions, exclusions) {
 
@@ -99,43 +89,18 @@ private int modelCounter = 0
                 break
 
             case [2]:
-//                if( model.name.equals("Hearing and ear disorders")) {
-//                    log.debug 'found hearing'
-//                } else {
-//                    return
-//                }
-                if( model.name.equals("Cardiovascular disorders")) {
-                    log.debug 'found cardio'
-                } else {
-                    return
-                }
-
-
                 String groupDescription = "$model.name (${model.combinedVersion})"
             log.debug("$level $groupDescription")
                 groupDescriptions.put(level, groupDescription)
                 break
 
             case [3]:
-//                if( model.name.equals("Gonadal and sex development disorders")) {
-//                    log.debug 'found Gonadal'
-//                } else {
-//                    return
-//                }
-                modelCounter++
-//            if(modelCounter > 2) return
-
                 String groupDescription = "$model.name (${model.combinedVersion})"
                 log.debug("$level $groupDescription")
                 groupDescriptions.put(level, groupDescription)
                 break
 
             case [4]:
-//                if( model.name.equals("Autosomal dominant deafness")) {
-//                    log.debug 'found premature ovarian'
-//                } else {
-//                    return
-//                }
                 String groupDescription = "$model.name (${model.combinedVersion})"
                 log.debug("$level $groupDescription")
                 groupDescriptions.put(level, groupDescription)
@@ -144,11 +109,6 @@ private int modelCounter = 0
 
             case 5:
                 log.debug "level 5 searching... $model.name"
-//                if( model.name.equals("Early onset familial premature ovarian failure Clinical Tests")) {
-//                    log.debug 'found Clinical Tests'
-//                } else {
-//                    return
-//                }
                 lines = generateLine(model, lines, groupDescriptions, level)
                 log.debug("$level $model.name")
                 return  //don't go deeper
@@ -216,15 +176,15 @@ private int modelCounter = 0
             List<Change> changed = getChanges(model, RELATIONSHIP_DELETED)
             rows = createRows(changed)
             rows.each { key, rowData ->
-                println "RELATIONSHIP_DELETED key=$key"
-                println "before=${rowData[0]}"
-                println "after${rowData[1]}"
+//                println "RELATIONSHIP_DELETED key=$key"
+//                println "before=${rowData[0]}"
+//                println "after${rowData[1]}"
 
                 if(!ignoreKeyListForDeletions.contains(key)  ) {
                     changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, REMOVE_DATA_ITEM, RELATIONSHIP_DELETED)
                     if (changes) lines << changes    //add row
                 }
-                println "resultant delete changes=$changes"
+//                println "resultant delete changes=$changes"
             }
         }
 
@@ -234,14 +194,14 @@ private int modelCounter = 0
             List<Change> changed = getChanges(model, RELATIONSHIP_CREATED)
             rows = createRows(changed)
             rows.each { key, rowData ->
-                println "RELATIONSHIP_CREATED key=$key"
-                println "before=${rowData[0]}"
-                println "after${rowData[1]}"
+//                println "RELATIONSHIP_CREATED key=$key"
+//                println "before=${rowData[0]}"
+//                println "after${rowData[1]}"
                 if(!ignoreKeyListForCreations.contains(key)  ) {
                     changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, NEW_DATA_ITEM, RELATIONSHIP_CREATED)
                     if (changes) lines << changes    //add row
                 }
-                println "resultant changes=$changes"
+//                println "resultant changes=$changes"
             }
         }
 
