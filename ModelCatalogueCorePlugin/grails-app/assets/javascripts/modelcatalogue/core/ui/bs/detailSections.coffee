@@ -38,7 +38,6 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       <div class="full-width-editable col-md-9 preserve-new-lines"><small editable-textarea="copy.revisionNotes" e-rows="5" e-cols="1000">{{element.revisionNotes || 'empty'}}</small></div>
   '''
 
-
   $templateCache.put 'modelcatalogue/core/ui/detailSections/description.html', '''
       <div class="col-md-3">
           <strong class="small">Description</strong>

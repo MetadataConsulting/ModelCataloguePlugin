@@ -27,6 +27,8 @@ describe "mc.core.catalogueElementResource", ->
 
     expect(dataTypes.getIndexPath()).toBe(dataTypesRootPath)
 
+    return unless window.fixtures
+    
     describe "with methods for CRUD operations", ->
 
       describe "can get single resource", ->

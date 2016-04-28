@@ -26,7 +26,7 @@ Apart from standard HTML + CSS + JS stack we use following languages in the fron
 
 ### Polyfills
 Polyfills grants access to features which might not be available in older browser
-
+* ES5 and ES6 features covered by via [core-js](https://github.com/zloirock/core-js)
 * [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob) via [Blob.js](https://github.com/eligrey/Blob.js/)
 * [Window.saveAs](https://dev.w3.org/2009/dap/file-system/file-writer.html) via [FileSaver.js](https://github.com/eligrey/FileSaver.js)
 

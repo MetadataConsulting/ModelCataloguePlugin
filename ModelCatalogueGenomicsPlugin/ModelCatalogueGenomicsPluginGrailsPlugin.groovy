@@ -148,6 +148,16 @@ Genomics England customisation plugin for Model Catalogue
             }
             link controller: 'genomics', action: 'exportCancerTypesAsCsv', id: true
         }
+
+        reportsRegistry.register {
+            creates asset
+            title { "GEL Changelog Document" }
+            defaultName { "${it.name} changelog as MS Word Document" }
+            depth 3
+            includeMetadata true
+            type DataClass
+            link controller: 'genomics', action: 'exportChangeLogDocument', id: true
+        }
     }
 
     def onChange = { event ->

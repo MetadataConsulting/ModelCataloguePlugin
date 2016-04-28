@@ -23,6 +23,7 @@ module.exports = function(config) {
 
         files: [
             // Required libraries
+            'grails-app/assets/bower_components/core.js/client/core.js',
             'grails-app/assets/jslibs/saxonce/Saxonce.nocache.js',
             'grails-app/assets/bower_components/rxjs/dist/rx.all.js',
             'grails-app/assets/bower_components/blob-polyfill/Blob.js',

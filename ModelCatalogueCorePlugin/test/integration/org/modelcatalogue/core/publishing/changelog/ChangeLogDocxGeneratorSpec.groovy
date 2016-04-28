@@ -114,6 +114,7 @@ class ChangeLogDocxGeneratorSpec extends AbstractIntegrationSpec {
             update 'foo' of 'C4C' to 'baz'
             update 'boo' of 'C4C' to 'dar'
             update 'one' of 'C4C' to null
+            remove 'foo' of 'C4C'
 
             create DataClass called 'Data Class XYZ', description: 'This is Data Class XYZ'
             update 'containment' of 'Data Class XYZ' add 'Data Class 1 Data Element 2', 'Min Occurs': 0, 'Max Occurs': 2

@@ -2,6 +2,8 @@ describe "mc.core.ui.catalogueElementTreeview", ->
 
   beforeEach module 'mc.core.ui'
 
+  return unless window.fixtures
+
   it "treeview with single element",  inject ($compile, $rootScope, enhance) ->
 
     catEl = enhance angular.copy(fixtures.dataType.showOne.dataType)
