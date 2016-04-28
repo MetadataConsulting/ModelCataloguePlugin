@@ -27,6 +27,7 @@ import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
 import rx.Observable
 import rx.Subscriber
+import rx.schedulers.Schedulers
 import rx.subjects.ReplaySubject
 
 import javax.annotation.PostConstruct
@@ -593,7 +594,7 @@ class ElasticSearchService implements SearchCatalogue {
                             }
                             SimpleIndexResponse.from(bulkResponseItem)
                         }
-                    }
+                    }.observeOn(Schedulers.from(executorService))
                 }
             }
         }
