@@ -158,6 +158,16 @@ Genomics England customisation plugin for Model Catalogue
             type DataClass
             link controller: 'genomics', action: 'exportChangeLogDocument', id: true
         }
+
+        reportsRegistry.register {
+            creates link
+            title { "Change Log for RD Phenotypes And Clinical Tests XSLX" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsXls', id: true
+        }
     }
 
     def onChange = { event ->
