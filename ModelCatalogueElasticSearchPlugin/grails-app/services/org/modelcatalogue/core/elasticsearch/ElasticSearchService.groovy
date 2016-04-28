@@ -29,6 +29,7 @@ import rx.subjects.ReplaySubject
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
+import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
@@ -613,8 +614,11 @@ class ElasticSearchService implements SearchCatalogue {
             try {
                 request.execute().get()
                 return response.index
-            } catch (IndexAlreadyExistsException ignored) {
-                return response.index
+            } catch (ExecutionException ex) {
+                if (ex.cause instanceof IndexAlreadyExistsException) {
+                    return response.index
+                }
+                throw ex
             }
         }
     }
