@@ -1,26 +1,11 @@
 package org.modelcatalogue.core.forms
 
-import java.awt.Container;
-
-import groovy.xml.XmlUtil;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.mutable.MutableInt;
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.DataType
-import org.modelcatalogue.core.EnumeratedType
-import org.modelcatalogue.core.DataClass
-import org.modelcatalogue.core.PrimitiveType
-import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.crf.model.CaseReportForm
-import org.modelcatalogue.crf.model.GenericItem
-import org.modelcatalogue.crf.model.GridGroup
-import org.modelcatalogue.crf.model.Item
-import org.modelcatalogue.crf.model.ItemContainer
-import org.modelcatalogue.crf.model.ResponseType
+import groovy.xml.XmlUtil
+import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang.mutable.MutableInt
+import org.modelcatalogue.core.*
+import org.modelcatalogue.crf.model.*
 import org.modelcatalogue.crf.model.DataType as FormDataType
-import org.modelcatalogue.crf.model.Section
 import org.springframework.validation.DataBinder
 import org.springframework.validation.Errors
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter
@@ -36,6 +21,9 @@ class ModelToFormExporterService {
     static final String EXT_FORM_VERSION = "http://forms.modelcatalogue.org/form#version"
     static final String EXT_FORM_VERSION_DESCRIPTION = "http://forms.modelcatalogue.org/form#versionDescription"
     static final String EXT_FORM_REVISION_NOTES = "http://forms.modelcatalogue.org/form#revisionNotes"
+    static final String EXT_SECTION_EXCLUDE = "http://forms.modelcatalogue.org/section#exclude"
+    static final String EXT_SECTION_EXCLUDE_DATA_ELEMENTS = "http://forms.modelcatalogue.org/section#excludeDataElements"
+    static final String EXT_SECTION_MERGE = "http://forms.modelcatalogue.org/section#merge"
     static final String EXT_SECTION_TITLE = "http://forms.modelcatalogue.org/section#title"
     static final String EXT_SECTION_SUBTITLE = "http://forms.modelcatalogue.org/section#subtitle"
     static final String EXT_SECTION_INSTRUCTIONS = "http://forms.modelcatalogue.org/section#instructions"
@@ -44,6 +32,7 @@ class ModelToFormExporterService {
     static final String EXT_GROUP_HEADER = "http://forms.modelcatalogue.org/group#header"
     static final String EXT_GROUP_REPEAT_NUM = "http://forms.modelcatalogue.org/group#repeatNum"
     static final String EXT_GROUP_REPEAT_MAX = "http://forms.modelcatalogue.org/group#repeatMax"
+    static final String EXT_ITEM_EXCLUDE = "http://forms.modelcatalogue.org/item#exclude"
     static final String EXT_ITEM_RESPONSE_TYPE = "http://forms.modelcatalogue.org/item#responseType"
     static final String EXT_ITEM_PHI = "http://forms.modelcatalogue.org/item#phi"
     static final String EXT_ITEM_DESCRIPTION = "http://forms.modelcatalogue.org/item#description"
@@ -73,19 +62,26 @@ class ModelToFormExporterService {
     static final String EXT_NAME_LC = "name"
     static final String EXT_NAME_CAP = "Name"
     static final String ENUM_DEFAULT = "default"
-    static final Set<String> DATA_TYPE_REAL_NAMES = ['number', 'decimal', 'float', 'double', 'real', 'xs:decimal', 'xs:double', 'xs:float']
-    static final Set<String> DATA_TYPE_INTEGER_NAMES = ['int', 'integer', 'long', 'short', 'byte', 'xs:int', 'xs:integer', 'xs:long', 'xs:short', 'xs:byte','xs:nonNegativeInteger', 'xs:nonPositiveInteger', 'xs:negativeInteger', 'xs:positiveInteger', 'xs:unsignedLong', 'xs:unsignedInt', 'xs:unsignedShort', 'xs:unsignedByte']
+    static final Set<String> DATA_TYPE_REAL_NAMES = ['number', 'decimal', 'float', 'double', 'real', 'xs:decimal',
+                                                     'xs:double', 'xs:float']
+    static final Set<String> DATA_TYPE_INTEGER_NAMES = ['int', 'integer', 'long', 'short', 'byte', 'xs:int',
+                                                        'xs:integer', 'xs:long', 'xs:short', 'xs:byte',
+                                                        'xs:nonNegativeInteger', 'xs:nonPositiveInteger',
+                                                        'xs:negativeInteger', 'xs:positiveInteger', 'xs:unsignedLong',
+                                                        'xs:unsignedInt', 'xs:unsignedShort', 'xs:unsignedByte']
     public static final ArrayList<String> DATA_TYPE_DATA_NAMES = ['date', 'xs:date']
     public static final ArrayList<String> DATA_TYPE_PDATE_NAMES = ['pdate', 'partialdate', 'xs:gYear', 'xs:gYearMonth']
 
-    private static class ItemIndex{private  int index=0}
-
+    private static class ItemIndex {
+        private int index = 0
+    }
 
     CaseReportForm convert(DataClass formModel) {
         Set<Long> processed = []
-        String formName = formModel.ext[EXT_FORM_NAME] ?:formModel.name
-        MutableInt itemNumber=new MutableInt(1)
+        String formName = formModel.ext[EXT_FORM_NAME] ?: formModel.name
+        MutableInt itemNumber = new MutableInt(1)
         CaseReportForm.build(formName) {
+            def caseReportForm = delegate
             version formModel.ext[EXT_FORM_VERSION] ?: formModel.versionNumber.toString()
             versionDescription formModel.ext[EXT_FORM_VERSION_DESCRIPTION] ?: formModel.description ?: "Generated from ${alphaNumNoSpaces(formModel.name)}"
             revisionNotes formModel.ext[EXT_FORM_REVISION_NOTES] ?: "Generated from ${alphaNumNoSpaces(formModel.name)}"
@@ -93,16 +89,19 @@ class ModelToFormExporterService {
             if (formModel.countParentOf()) {
                 processed << formModel.getId()
                 for (Relationship sectionRel in formModel.parentOfRelationships) {
-                    handleSectionModel(itemNumber,processed, formName, delegate as CaseReportForm, sectionRel)
+                    handleSectionModel(itemNumber, processed, formName, caseReportForm, sectionRel)
                 }
-            } else {
-                handleSectionModel(itemNumber,processed, '', delegate as CaseReportForm, new Relationship(destination: formModel), true)
+            }
+
+            // at least one section is mandatory (this may happen when data class has no childs or all childs are excluded)
+            if (caseReportForm.sections.isEmpty()) {
+                handleSectionModel(itemNumber, [] as Set<Long>, '', caseReportForm, new Relationship(destination: formModel), true)
             }
         }
-
     }
 
-    private void handleSectionModel(MutableInt itemNumber,Set<Long> processed, String prefix, CaseReportForm form, Relationship sectionRel, boolean dataElementsOnly = false) {
+    private void handleSectionModel(MutableInt itemNumber, Set<Long> processed, String prefix, CaseReportForm form,
+                                    Relationship sectionRel, boolean dataElementsOnly = false) {
         DataClass sectionModel = sectionRel.destination as DataClass
 
         if (sectionModel.getId() in processed) {
@@ -112,8 +111,12 @@ class ModelToFormExporterService {
         processed << sectionModel.getId()
 
         String sectionName = fromDestination(sectionRel, EXT_NAME_CAP, fromDestination(sectionRel, EXT_NAME_LC, sectionModel.name))
-
         log.info "Creating section $sectionName for model $sectionModel"
+
+        if(fromDestination(sectionRel, EXT_SECTION_EXCLUDE) == 'true') {
+            log.info "Section $sectionName is excluded from the processing"
+            return
+        }
 
         if (dataElementsOnly && sectionModel.countContains() || !dataElementsOnly) {
             form.section(alphaNumNoSpaces(sectionName)) {
@@ -122,38 +125,42 @@ class ModelToFormExporterService {
                 instructions fromDestination(sectionRel, EXT_SECTION_INSTRUCTIONS, sectionModel.description)
                 pageNumber fromDestination(sectionRel, EXT_SECTION_PAGE_NUMBER)
 
-                generateItems(itemNumber,prefix, delegate as ItemContainer, sectionModel, null, null)
+                generateItems(itemNumber, prefix, delegate as ItemContainer, sectionRel, null, null)
 
                 if (dataElementsOnly) {
                     return
                 }
 
-                handleGroupOrVirtualSection(itemNumber,processed, prefix, delegate, sectionModel.parentOfRelationships, true)
+                handleGroupOrVirtualSection(itemNumber, processed, prefix, delegate, sectionModel.parentOfRelationships, true)
             }
         }
     }
 
-    private void handleGroupOrVirtualSection(MutableInt itemNumber,Set<Long> processed, String prefix, Section section, List<Relationship> relationships, boolean nameAsHeader) {
-
-
+    private void handleGroupOrVirtualSection(MutableInt itemNumber, Set<Long> processed, String prefix, Section section,
+                                             List<Relationship> relationships, boolean nameAsHeader) {
         for (Relationship itemsWithHeaderOrGridRel in relationships) {
             DataClass itemsWithHeaderOrGrid = itemsWithHeaderOrGridRel.destination as DataClass
 
-            if (itemsWithHeaderOrGridRel.getId() in processed) {
+            if (itemsWithHeaderOrGrid.getId() in processed) {
                 return
             }
 
             processed << itemsWithHeaderOrGridRel.getId()
 
-
-            log.info "Creating group or section for model $itemsWithHeaderOrGrid"
             String itemsWithHeaderOrGridName = fromDestination(itemsWithHeaderOrGridRel, EXT_NAME_CAP, fromDestination(itemsWithHeaderOrGridRel, EXT_NAME_LC, itemsWithHeaderOrGrid.name))
+            log.info "Creating group or section for model $itemsWithHeaderOrGrid"
+
+            if(fromDestination(itemsWithHeaderOrGridRel, EXT_SECTION_EXCLUDE) == 'true') {
+                log.info "Group or section for model $itemsWithHeaderOrGrid is excluded from the processing"
+                continue
+            }
+
             if (fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_GRID) == 'true') {
 
                 section.grid(alphaNumNoSpaces(itemsWithHeaderOrGridName)) { GridGroup grid ->
                     header fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_HEADER, itemsWithHeaderOrGridName)
 
-                    generateItems(itemNumber,prefix, grid, itemsWithHeaderOrGrid)
+                    generateItems(itemNumber, prefix, grid, itemsWithHeaderOrGridRel)
 
                     Integer repeatNum = safeInteger(fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_REPEAT_NUM), EXT_GROUP_REPEAT_NUM, itemsWithHeaderOrGridRel.destination)
                     if (repeatNum) {
@@ -166,13 +173,18 @@ class ModelToFormExporterService {
                     }
                 }
             } else {
-                if (nameAsHeader) {
-                    generateItems(itemNumber,prefix, section, itemsWithHeaderOrGrid, itemsWithHeaderOrGridName)
+                if (fromDestination(itemsWithHeaderOrGridRel, EXT_SECTION_MERGE) != "true") {
+                    if (nameAsHeader) {
+                        generateItems(itemNumber, prefix, section, itemsWithHeaderOrGridRel, itemsWithHeaderOrGridName)
+                    } else {
+                        generateItems(itemNumber, prefix, section, itemsWithHeaderOrGridRel, null, itemsWithHeaderOrGridName)
+                    }
                 } else {
-                    generateItems(itemNumber,prefix, section, itemsWithHeaderOrGrid, null, itemsWithHeaderOrGridName)
+                    // if merge, do not include header
+                    generateItems(itemNumber, prefix, section, itemsWithHeaderOrGridRel)
                 }
             }
-            handleGroupOrVirtualSection(itemNumber,processed, prefix, section, itemsWithHeaderOrGrid.parentOfRelationships, false)
+            handleGroupOrVirtualSection(itemNumber, processed, prefix, section, itemsWithHeaderOrGrid.parentOfRelationships, false)
         }
     }
 
@@ -190,8 +202,15 @@ class ModelToFormExporterService {
         label?.replaceAll(/[^\pL\pN_]/, '_')
     }
 
-    private void generateItems(MutableInt itemNumber,String prefix, ItemContainer container, DataClass model, String aHeader = null, String aSubheader = null) {
+    private void generateItems(MutableInt itemNumber, String prefix, ItemContainer container, Relationship relationship,
+                               String aHeader = null, String aSubheader = null) {
+        DataClass model = relationship.destination as DataClass
         boolean first = true
+
+        if(fromDestination(relationship, EXT_SECTION_EXCLUDE_DATA_ELEMENTS) == 'true') {
+            log.info "Items for model $model are excluded from the processing"
+            return
+        }
 
         for (Relationship rel in model.containsRelationships) {
             DataElement dataElement = rel.destination as DataElement
@@ -199,22 +218,30 @@ class ModelToFormExporterService {
 
             log.info "Generating items from data element $dataElement"
 
+            if(fromDestination(rel, EXT_ITEM_EXCLUDE) == 'true') {
+                log.info "Items for data element $dataElement are excluded from the processing"
+                continue
+            }
+
             List<CatalogueElement> candidates = [dataElement, dataType].grep()
 
             collectBases(candidates, dataElement)
             collectBases(candidates, dataType)
 
-
             // bit of heuristic
             String localName = fromDestination(rel, EXT_NAME_CAP, fromDestination(rel, EXT_NAME_LC, dataElement.name))
             String itemName = alphaNumNoSpaces("${prefix ? (prefix + '_') : ''}${model.name}_${localName}")
-            String normalizedResponseType=normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE))
-            if (candidates.any { it.name.toLowerCase() == 'file' } ||  normalizedResponseType== RESPONSE_TYPE_FILE  ) {
+            String normalizedResponseType = normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE))
+            if (candidates.any { it.name.toLowerCase() == 'file' } || normalizedResponseType == RESPONSE_TYPE_FILE) {
                 container.file(itemName)
             } else if (dataType && dataType.instanceOf(EnumeratedType)) {
                 // either value domain is marked as multiple or
-                Map<String, Object> enumOptions = (dataType as EnumeratedType).enumerationsObject.iterator().collectEntries { org.modelcatalogue.core.enumeration.Enumeration enumeration -> [enumeration.value ?: enumeration.key, enumeration.key == ENUM_DEFAULT ? '' : enumeration.key]}
-                if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) in [RESPONSE_TYPE_CHECKBOX, RESPONSE_TYPE_MULTI_SELECT] ||  rel.ext[EXT_MAX_OCCURS] && rel.ext[EXT_MAX_OCCURS] != '1') {
+                Map<String, Object> enumOptions = (dataType as EnumeratedType).enumerationsObject.iterator().collectEntries {
+                    org.modelcatalogue.core.enumeration.Enumeration enumeration ->
+                        [enumeration.value ?: enumeration.key, enumeration.key == ENUM_DEFAULT ? '' : enumeration.key]
+                }
+                if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) in
+                    [RESPONSE_TYPE_CHECKBOX, RESPONSE_TYPE_MULTI_SELECT] || rel.ext[EXT_MAX_OCCURS] && rel.ext[EXT_MAX_OCCURS] != '1') {
                     // multi select or checkbox (default)
                     if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) == RESPONSE_TYPE_MULTI_SELECT) {
                         container.multiSelect(itemName) {
@@ -233,7 +260,7 @@ class ModelToFormExporterService {
                         }
                     } else {
                         container.singleSelect(itemName) {
-                            def selectOptions= ["Please select...":'']
+                            def selectOptions = ["Please select...": '']
                             selectOptions.putAll(enumOptions)
                             options selectOptions
                         }
@@ -252,22 +279,24 @@ class ModelToFormExporterService {
             last.with {
                 // TODO: is there any way to configure simple conditional display
                 // TODO: validation
-                String regexpDef = fromCandidates(rel, candidates, EXT_ITEM_REGEXP,  dataType?.regexDef)
+                String regexpDef = fromCandidates(rel, candidates, EXT_ITEM_REGEXP, dataType?.regexDef)
                 if (regexpDef) {
                     regexp regexpDef, fromCandidates(rel, candidates, EXT_ITEM_REGEXP_ERROR_MESSAGE, "Value must match /$regexpDef/")
                 }
                 description fromCandidates(rel, candidates, EXT_ITEM_DESCRIPTION, dataElement.description)
                 question fromCandidates(rel, candidates, EXT_ITEM_QUESTION, localName)
-                def qNumber =fromCandidates(rel, candidates, EXT_ITEM_QUESTION_NUMBER)
+                def qNumber = fromCandidates(rel, candidates, EXT_ITEM_QUESTION_NUMBER)
 
-                questionNumber =(qNumber==null?itemNumber.value++:qNumber)
+                questionNumber = (qNumber == null ? itemNumber.value++ : qNumber)
                 if (!last.group) {
-                    instructions generateItemElementId(dataElement,fromCandidates(rel, candidates, EXT_ITEM_INSTRUCTIONS),fromCandidates(rel, candidates, "id"),prefix+questionNumber) +generateItemInstructions(dataElement,fromCandidates(rel, candidates, EXT_ITEM_INSTRUCTIONS))
+                    instructions generateItemElementId(dataElement, fromCandidates(rel, candidates, EXT_ITEM_INSTRUCTIONS),
+                        fromCandidates(rel, candidates, "id"), prefix + questionNumber) + generateItemInstructions(dataElement,
+                        fromCandidates(rel, candidates, EXT_ITEM_INSTRUCTIONS))
                 }
                 phi(fromCandidates(rel, candidates, EXT_ITEM_PHI) == 'true')
                 required(fromCandidates(rel, candidates, EXT_ITEM_REQUIRED) == 'true' || rel.ext[EXT_MIN_OCCURS] == '1')
                 columnNumber = safeInteger(fromCandidates(rel, candidates, EXT_ITEM_COLUMN_NUMBER), EXT_ITEM_COLUMN_NUMBER, rel)
-                units fromCandidates(rel, candidates, EXT_ITEM_UNITS,  candidates.find {
+                units fromCandidates(rel, candidates, EXT_ITEM_UNITS, candidates.find {
                     it.instanceOf(PrimitiveType) && it.measurementUnit
                 }?.measurementUnit?.symbol)
 
@@ -322,34 +351,34 @@ class ModelToFormExporterService {
      * @param overridenInstructions
      * @return
      */
-    private static String  generateItemElementId(DataElement element,String overridenInstructions,String spanID,String defaultSpanID ){
-        if (overridenInstructions &&overridenInstructions.contains("</span>") &&overridenInstructions.contains("<span data-id")){
-            return overridenInstructions.subSequence(overridenInstructions.indexOf("<span data-id"), overridenInstructions.indexOf("</span>")+7)
-        }else{
+    private static String generateItemElementId(DataElement element, String overridenInstructions, String spanID,
+                                                String defaultSpanID) {
+        if (overridenInstructions && overridenInstructions.contains("</span>") && overridenInstructions.contains("<span data-id")) {
+            return overridenInstructions.subSequence(overridenInstructions.indexOf("<span data-id"), overridenInstructions.indexOf("</span>") + 7)
+        } else {
             //add a logic here to colect span ID and his associated datatype
         }
 
 
-        DataType dataType=element?.dataType
-        def regex=dataType?.regexDef?:''
-        def dataTypeName=transformDataType(dataType)
-        def defaultID=(spanID==null?defaultSpanID:spanID)
+        DataType dataType = element?.dataType
+        def regex = dataType?.regexDef ?: ''
+        def dataTypeName = transformDataType(dataType)
+        def defaultID = (spanID == null ? defaultSpanID : spanID)
 
         String hidden = "";
         String typeStr = " data-type=\"";
-        if("hidden"=="key")//TODO add additional metadata
+        if ("hidden" == "key")//TODO add additional metadata
         {
             hidden = " data-hidden=\"true\"";
         }
 
-        if(StringUtils.isNotEmpty(regex))
-        {
-            regex = " data-regex=\"" +  XmlUtil.escapeXml(dataType.regexDef) + "\"";
+        if (StringUtils.isNotEmpty(regex)) {
+            regex = " data-regex=\"" + XmlUtil.escapeXml(dataType.regexDef) + "\"";
         }
 
 
-        typeStr +=dataTypeName+ "\""
-        return "<span data-id=\"" + defaultID+ "\"" +  typeStr + hidden + regex + "> </span>"
+        typeStr += dataTypeName + "\""
+        return "<span data-id=\"" + defaultID + "\"" + typeStr + hidden + regex + "> </span>"
     }
 
     /**
@@ -358,24 +387,24 @@ class ModelToFormExporterService {
      * @param overridenInstructions
      * @return text description with or without previous saved instructions. Keep compatibility between old and new format.
      */
-    private static String  generateItemInstructions(DataElement element,String overridenInstructions){
-       if (!overridenInstructions){
-           return element.description
-       }
-       if (!overridenInstructions && !overridenInstructions.contains("<span data-id")){
-           return element.description
-       }else{
-            return overridenInstructions.substring(overridenInstructions.indexOf("</span>")+7)
-       }
+    private static String generateItemInstructions(DataElement element, String overridenInstructions) {
+        if (!overridenInstructions) {
+            return element.description
+        }
+        if (!overridenInstructions && !overridenInstructions.contains("<span data-id")) {
+            return element.description
+        } else {
+            return overridenInstructions.substring(overridenInstructions.indexOf("</span>") + 7)
+        }
 
 
-       return '';
+        return '';
     }
 
 
-    protected static transformDataType( DataType dataType) {
-        if (dataType!=null){
-            if (dataType instanceof EnumeratedType){
+    protected static transformDataType(DataType dataType) {
+        if (dataType != null) {
+            if (dataType instanceof EnumeratedType) {
                 return dataType.name
             }
 
@@ -403,7 +432,7 @@ class ModelToFormExporterService {
                 dataType2 = "string"
             }
 
-            if (dataType2==null) return "null"
+            if (dataType2 == null) return "null"
             return dataType2.replaceAll(" ", "-").replaceAll("\\(", "").replaceAll("\\)", "").replaceAll("/", "-").toLowerCase()
         }
     }
@@ -442,7 +471,8 @@ class ModelToFormExporterService {
         return defaultValue
     }
 
-    private static String fromCandidates(Relationship rel, List<CatalogueElement> candidates, String extensionName, String defaultValue = null) {
+    private static String fromCandidates(Relationship rel, List<CatalogueElement> candidates, String extensionName,
+                                         String defaultValue = null) {
         String value = rel.ext[extensionName]
         if (value) {
             return value
@@ -481,5 +511,4 @@ class ModelToFormExporterService {
             }
         }
     }
-
 }

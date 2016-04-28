@@ -342,7 +342,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     action:     ->
       rel   = getRelationship()
       rel.element.refresh().then (element) ->
-        args = {relationshipType: rel.type, direction: rel.direction, type: 'update-relationship', update: true, element: element, relation: rel.relation, classification: rel.classification, metadata: angular.copy(rel.ext)}
+        args = {relationshipType: rel.type, direction: rel.direction, type: 'update-relationship', currentDataModel: $scope.currentDataModel, update: true, element: element, relation: rel.relation, classification: rel.classification, metadata: angular.copy(rel.ext)}
         messages.prompt('Update Relationship', '', args).then (updated)->
           $rootScope.$broadcast 'catalogueElementUpdated', updated
           rel.ext = updated.ext

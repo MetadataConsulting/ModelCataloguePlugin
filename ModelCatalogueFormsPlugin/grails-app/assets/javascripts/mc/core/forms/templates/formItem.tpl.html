@@ -1,4 +1,24 @@
-<div class="col-md-12 metadata-form-item-content">
+<div class="col-md-12 metadata-form-item-content"
+     ng-init="exclude = {value: element.ext.access('http://forms.modelcatalogue.org/item#exclude').asBoolean()}">
+  <div class="row"
+       ng-if="view.handlesKey('http://forms.modelcatalogue.org/item#exclude')">
+    <div class="col-md-3">
+      <strong class="small">Exclude</strong>
+      <i class="fa fa-question"
+         popover="
+          Specifies if this data element should be excluded from the result CRF.
+          "
+         popover-title="Exclude"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9">
+      <span editable-checkbox="extAsMap['http://forms.modelcatalogue.org/item#exclude']" class="small"
+            e-ng-change="exclude.value = !exclude.value"
+            e-string-to-boolean>
+        {{ element.ext.get('http://forms.modelcatalogue.org/item#exclude') ? (element.ext.get('http://forms.modelcatalogue.org/item#exclude') == "false" ? "No": "Yes") : "" }}
+      </span>
+    </div>
+  </div>
   <div class="row" ng-if="view.handlesKey('http://forms.modelcatalogue.org/item#phi')">
     <div class="col-md-3">
       <strong class="small">Protected Health Information</strong>
@@ -16,6 +36,7 @@
     </div>
     <div class="col-md-9">
       <span editable-checkbox="extAsMap['http://forms.modelcatalogue.org/item#phi']" class="small"
+            e-ng-disabled="exclude.value"
             e-string-to-boolean>
         {{ element.ext.get('http://forms.modelcatalogue.org/item#phi') ? (element.ext.get('http://forms.modelcatalogue.org/item#phi') == "false" ? "No": "Yes") : "" }}
       </span>
@@ -40,6 +61,7 @@
     </div>
     <div class="col-md-9 full-width-editable">
             <span editable-text="extAsMap['http://forms.modelcatalogue.org/item#question']" e-maxlength="2000"
+                  e-ng-disabled="exclude.value"
                   class="small">
               {{element.ext.get('http://forms.modelcatalogue.org/item#question')}}
             </span>
@@ -60,6 +82,7 @@
     </div>
     <div class="col-md-9 full-width-editable">
       <small editable-textarea="extAsMap['http://forms.modelcatalogue.org/item#description']" e-maxlength="4000"
+             e-ng-disabled="exclude.value"
              e-rows="5">
         {{element.ext.get('http://forms.modelcatalogue.org/item#description')}}
       </small>
@@ -77,7 +100,9 @@
          popover-trigger="mouseenter"></i>
     </div>
     <div class="col-md-9 full-width-editable">
-      <small editable-text="extAsMap['http://forms.modelcatalogue.org/item#defaultValue']" e-maxlength="4000">
+      <small editable-text="extAsMap['http://forms.modelcatalogue.org/item#defaultValue']"
+             e-ng-disabled="exclude.value"
+             e-maxlength="4000">
         {{element.ext.get('http://forms.modelcatalogue.org/item#defaultValue')}}
       </small>
     </div>
@@ -100,7 +125,9 @@
          popover-trigger="mouseenter"></i>
     </div>
     <div class="col-md-9 full-width-editable">
-      <small editable-textarea="extAsMap['http://forms.modelcatalogue.org/item#instructions']" e-maxlength="2000"
+      <small editable-textarea="extAsMap['http://forms.modelcatalogue.org/item#instructions']"
+             e-ng-disabled="exclude.value"
+             e-maxlength="2000"
              e-rows="5">
         {{element.ext.get('http://forms.modelcatalogue.org/item#instructions')}}
       </small>
@@ -119,6 +146,7 @@
     </div>
     <div class="col-md-9">
             <span editable-checkbox="extAsMap['http://forms.modelcatalogue.org/item#required']" class="small"
+                  e-ng-disabled="exclude.value"
                   e-string-to-boolean>
               {{ element.ext.get('http://forms.modelcatalogue.org/item#required') ? (element.ext.get('http://forms.modelcatalogue.org/item#required') == "false" ? "No": "Yes") : "" }}
             </span>
@@ -139,6 +167,7 @@
     </div>
     <div class="col-md-9 full-width-editable">
       <span editable-checkbox="extAsMap['http://forms.modelcatalogue.org/item#layout']" class="small"
+            e-ng-disabled="exclude.value"
             e-string-to-boolean>
         {{ element.ext.get('http://forms.modelcatalogue.org/item#layout') ? (element.ext.get('http://forms.modelcatalogue.org/item#layout') == "false" ? "No": "Yes") : "" }}
       </span>
@@ -159,6 +188,7 @@
     </div>
     <div class="col-md-9 full-width-editable">
       <small editable-number="extAsMap['http://forms.modelcatalogue.org/item#columnNumber']" e-min="1" e-max="3"
+             e-ng-disabled="exclude.value"
              e-string-to-number>
         {{element.ext.get('http://forms.modelcatalogue.org/item#columnNumber')}}
       </small>
@@ -176,7 +206,9 @@
          popover-trigger="mouseenter"></i>
     </div>
     <div class="col-md-9 full-width-editable">
-      <small editable-text="extAsMap['http://forms.modelcatalogue.org/item#questionNumber']" e-maxlength="20">
+      <small editable-text="extAsMap['http://forms.modelcatalogue.org/item#questionNumber']"
+             e-ng-disabled="exclude.value"
+             e-maxlength="20">
         {{element.ext.get('http://forms.modelcatalogue.org/item#questionNumber')}}
       </small>
     </div>
@@ -194,6 +226,7 @@
     </div>
     <div class="col-md-9 full-width-editable">
       <small editable-select="extAsMap['http://forms.modelcatalogue.org/item#dataType']"
+             e-ng-disabled="exclude.value"
              e-ng-options="key for (key, value) in {'String':'string', 'Integer': 'int', 'Real':'real', 'Date':'date', 'Partial Date': 'pdate'}">
         {{element.ext.get('http://forms.modelcatalogue.org/item#dataType')}}
       </small>
@@ -212,6 +245,7 @@
     </div>
     <div class="col-md-9 full-width-editable">
       <small editable-select="extAsMap['http://forms.modelcatalogue.org/item#responseType']"
+             e-ng-disabled="exclude.value"
              e-ng-options="key for (key, value) in {'Text':'text', 'Textarea': 'textarea', 'Single Select':'singleselect', 'Radio':'radio', 'Multi Select': 'multiselect', 'Checkbox': 'checkbox', 'File': 'file'}">
         {{element.ext.get('http://forms.modelcatalogue.org/item#responseType')}}
       </small>
@@ -235,7 +269,9 @@
          popover-trigger="mouseenter"></i>
     </div>
     <div class="col-md-9 full-width-editable">
-      <small editable-text="extAsMap['http://forms.modelcatalogue.org/item#units']" e-maxlength="64">
+      <small editable-text="extAsMap['http://forms.modelcatalogue.org/item#units']"
+             e-ng-disabled="exclude.value"
+             e-maxlength="64">
         {{element.ext.get('http://forms.modelcatalogue.org/item#units')}}
       </small>
     </div>
@@ -250,6 +286,7 @@
     </div>
     <div class="col-md-9 full-width-editable">
       <small editable-number="extAsMap['http://forms.modelcatalogue.org/item#length']" e-min="1" e-max="2000"
+             e-ng-disabled="exclude.value"
              e-string-to-number>
         {{element.ext.get('http://forms.modelcatalogue.org/item#length')}}
       </small>
@@ -265,6 +302,7 @@
     </div>
     <div class="col-md-9 full-width-editable">
       <small editable-number="extAsMap['http://forms.modelcatalogue.org/item#digits']" e-min="0" e-max="20"
+             e-ng-disabled="exclude.value"
              e-string-to-number>
         {{element.ext.get('http://forms.modelcatalogue.org/item#digits')}}
       </small>
@@ -279,7 +317,9 @@
          popover-trigger="mouseenter"></i>
     </div>
     <div class="col-md-9 full-width-editable">
-      <small editable-text="extAsMap['http://forms.modelcatalogue.org/item#regexp']" e-maxlength="1000">
+      <small editable-text="extAsMap['http://forms.modelcatalogue.org/item#regexp']"
+             e-ng-disabled="exclude.value"
+             e-maxlength="1000">
         {{element.ext.get('http://forms.modelcatalogue.org/item#regexp')}}
       </small>
     </div>
@@ -293,7 +333,9 @@
          popover-trigger="mouseenter"></i>
     </div>
     <div class="col-md-9 full-width-editable">
-      <small editable-text="extAsMap['http://forms.modelcatalogue.org/item#regexpErrorMessage']" e-maxlength="1000">
+      <small editable-text="extAsMap['http://forms.modelcatalogue.org/item#regexpErrorMessage']"
+             e-ng-disabled="exclude.value"
+             e-maxlength="1000">
         {{element.ext.get('http://forms.modelcatalogue.org/item#regexpErrorMessage')}}
       </small>
     </div>

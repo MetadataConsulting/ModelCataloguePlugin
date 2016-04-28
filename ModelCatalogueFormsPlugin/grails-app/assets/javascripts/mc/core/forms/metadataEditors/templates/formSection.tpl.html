@@ -1,0 +1,116 @@
+<div ng-init="exclude = {value: (object.get('http://forms.modelcatalogue.org/section#exclude') ? (object.get('http://forms.modelcatalogue.org/section#exclude') == 'false' ? false : true) : false)}">
+  <div class="alert alert-warning">
+    The form section metadata only applies on the direct children of the form's root model and is ignored for any other
+    nested models.
+  </div>
+  <form class="form">
+    <div class="checkbox">
+      <label>
+        <input type="checkbox"
+               ng-model="object.access('http://forms.modelcatalogue.org/section#exclude')"
+               string-to-boolean
+               ng-model-options="{ getterSetter: true }"
+               ng-change="exclude.value = !exclude.value">
+        Exclude
+      </label>
+      <p class="help-block">
+        Specifies if this section should be excluded from the result CRF. This excludes this section together with all
+        its children.
+      </p>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox"
+               ng-model="object.access('http://forms.modelcatalogue.org/section#excludeDataElements')"
+               string-to-boolean
+               ng-model-options="{ getterSetter: true }"
+               ng-disabled="exclude.value">
+        Exclude Data Elements
+      </label>
+      <p class="help-block">
+        Specifies if direct child data elements should be excluded from the result CRF.
+      </p>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox"
+               ng-model="object.access('http://forms.modelcatalogue.org/section#merge')"
+               string-to-boolean
+               ng-model-options="{ getterSetter: true }"
+               ng-disabled="exclude.value">
+        Merge to Single Section
+      </label>
+      <p class="help-block">
+        This data class will be merged to parent data class section. Basically, there won't be any title for this sub
+        data class.
+      </p>
+    </div>
+    <div class="form-group">
+      <label for="section-title" class="control-label">Title</label>
+    <textarea maxlength="2000" rows="5" class="form-control" id="section-title"
+              ng-model="object.access('http://forms.modelcatalogue.org/section#title')"
+              ng-model-options="{ getterSetter: true }"
+              ng-disabled="exclude.value"></textarea>
+      <p class="help-block">
+        The value in this field will be displayed at the top of each page when a user is performing data entry, as well
+        as in the tabs and drop down list used to navigate between sections in a CRF. It does not have to be unique but
+        should be a readable value that makes sense to people entering data. An example would be 'Inclusion
+        Criteria'.<br/>
+
+        Defaults to model's name.<br/>
+
+        Long section titles may not display well.<br/>
+
+        Can contain up to 2000 characters.
+      </p>
+    </div>
+    <div class="form-group">
+      <label for="section-subtitle" class="control-label">Subtitle</label>
+    <textarea maxlength="2000" rows="5" class="form-control" id="section-subtitle"
+              ng-model="object.access('http://forms.modelcatalogue.org/section#subtitle')"
+              ng-model-options="{ getterSetter: true }"
+              ng-disabled="exclude.value"></textarea>
+      <p class="help-block">
+        A sub-title shown under the section title.<br/>
+
+        HTML elements are supported for this field.<br/>
+
+        Can contain up to 2000 characters.
+      </p>
+    </div>
+    <div class="form-group">
+      <label for="section-instructions" class="control-label">Instructions</label>
+    <textarea maxlength="2000" rows="5" class="form-control" id="section-instructions"
+              ng-model="object.access('http://forms.modelcatalogue.org/section#instructions')"
+              ng-model-options="{ getterSetter: true }"
+              ng-disabled="exclude.value"></textarea>
+      <p class="help-block">
+        Instructions at the top of the section (under the subtitle) that explains to the data entry person what to do on
+        this section of the form.<br/>
+
+        HTML elements are supported for this field.<br/>
+
+        This field should be used if there are particular data entry instructions that should be conveyed or followed
+        to users.<br/>
+
+        Can contain up to 2000 characters.
+      </p>
+    </div>
+    <div class="form-group">
+      <label for="form-page-number" class="control-label">Page Number</label>
+      <input maxlength="5" type="text" class="form-control" id="form-page-number"
+             ng-model="object.access('http://forms.modelcatalogue.org/section#pageNumber')"
+             ng-model-options="{ getterSetter: true }"
+             ng-disabled="exclude.value">
+      <p class="help-block">
+        The page number on which the section begins. If using paper source documents and have a multi-page CRF,
+        put in the printed page number.<br/>
+
+        For the most part, this field is only used in studies collecting data on multi-page paper forms and then having
+        the data keyed in at a central location performing double data entry.<br/>
+
+        Can contain up to 5 characters.
+      </p>
+    </div>
+  </form>
+</div>

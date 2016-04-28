@@ -7,6 +7,7 @@ import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.modelcatalogue.crf.model.CaseReportForm
 import org.modelcatalogue.crf.serializer.CaseReportFormSerializer
+import org.modelcatalogue.crf.preview.CaseReportFormPreview
 import org.springframework.http.HttpStatus
 import org.springframework.validation.Errors
 
@@ -88,6 +89,27 @@ class FormGeneratorController {
         response.setHeader("X-Asset-ID", asset.id.toString())
 
         redirect controller: 'asset', id: asset.id, action: 'show'
+    }
+
+    def previewForm() {
+        Long modelId = params.id as Long
+        DataClass model = DataClass.findById(modelId)
+
+        if (!model) {
+            render status: HttpStatus.NOT_FOUND
+            return
+        }
+
+
+        CaseReportForm form = modelToFormExporterService.convert(model)
+
+        response.contentType = 'text/html'
+
+        CaseReportFormPreview preview = new CaseReportFormPreview(form)
+
+
+        preview.write(response.outputStream)
+        // response.outputStream.close()
     }
 
 }

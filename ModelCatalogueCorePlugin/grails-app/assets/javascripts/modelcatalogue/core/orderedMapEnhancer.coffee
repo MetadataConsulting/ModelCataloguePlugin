@@ -48,6 +48,12 @@ angular.module('mc.core.orderedMapEnhancer', ['mc.util.enhance']).config ['enhan
           else
             parseInt(get(), 10)
 
+        getterSetter.asBoolean = (newValue) ->
+          if arguments.length
+            set(if newValue? then newValue ? 'true' : 'false' else undefined)
+          else
+            if get()? then get() == 'true' else undefined
+
         getterSetter
 
 

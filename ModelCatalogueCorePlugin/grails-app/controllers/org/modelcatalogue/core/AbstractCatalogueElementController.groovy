@@ -204,13 +204,13 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             }
 
             def newDataModel = objectToBind['__dataModel'] ?: objectToBind['__classification']
-            Long dataModelId = newDataModel instanceof Map ? newDataModel.id : null
+            Long dataModelId = newDataModel instanceof Map ? newDataModel.id as Long : null
 
             DataModel dataModel = dataModelId ? DataModel.get(dataModelId) : null
 
 
             def oldDataModel = objectToBind['__oldDataModel'] ?: objectToBind['__oldClassification']
-            Long oldDataModelId = oldDataModel instanceof Map ? oldDataModel.id : null
+            Long oldDataModelId = oldDataModel instanceof Map ? oldDataModel.id as Long : null
 
             DataModel oldDataModelInstance = oldDataModelId ? DataModel.get(oldDataModelId) : null
 
@@ -288,7 +288,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 type: type,
                 owner: element,
                 direction: direction,
-                list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), direction.composeWhere(element, type, ElementService.getStatusFromParams(params), DataModelFilter.from(modelCatalogueSecurityService.currentUser)))
+                list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), direction.composeWhere(element, type, ElementService.getStatusFromParams(params), overridableDataModelFilter))
         )
     }
 

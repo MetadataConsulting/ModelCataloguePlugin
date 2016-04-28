@@ -60,7 +60,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
             return
         }
 
-        DataModelFilter filter = DataModelFilter.from(modelCatalogueSecurityService.currentUser)
+        DataModelFilter filter = overridableDataModelFilter
 
         respond new Relationships(
                 owner: element,

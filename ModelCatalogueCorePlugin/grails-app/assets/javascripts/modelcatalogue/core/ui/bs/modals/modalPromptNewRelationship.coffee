@@ -1,5 +1,6 @@
-angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 'mc.core.ui.bs.watchAndAskForImportOrCloneCtrl']).config ['messagesProvider', (messagesProvider)->
-  messagesProvider.setPromptFactory 'create-new-relationship', [ '$log', '$modal', '$timeout', '$q', 'messages', 'catalogueElementResource', 'enhance', ($log, $modal, $timeout, $q, messages, catalogueElementResource, enhance) ->
+angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 'mc.core.ui.bs.watchAndAskForImportOrCloneCtrl']).config (messagesProvider) ->
+  messagesProvider.setPromptFactory 'create-new-relationship', ($log, $modal, $timeout, $q, messages, catalogueElementResource, enhance) ->
+    "ngInject"
     (title, body, args) ->
       if not args?.element?
         messages.error('Cannot create relationship dialog.', 'The element to be connected to is missing.')
@@ -9,12 +10,13 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 
         size: 'lg'
         windowClass: 'new-relationship-modal-prompt'
         templateUrl: '/mc/core/ui/modals/modalNewRelationship.html'
-        controller: ['$scope', 'messages', '$modalInstance', '$controller', '$stateParams', 'catalogueElementResource',
-          ($scope, messages, $modalInstance, $controller, $stateParams, catalogueElementResource) ->
+        controller: ($scope, messages, $modalInstance, $controller, $stateParams, catalogueElementResource) ->
 
             if not args.currentDataModel and $stateParams.dataModelId and $stateParams.dataModelId != 'catalogue'
               catalogueElementResource('dataModel').get($stateParams.dataModelId).then (dataModel) ->
-                args.currentDataModel = dataModel
+                $scope.currentDataModel = args.currentDataModel = dataModel
+
+            $scope.currentDataModel = args.currentDataModel
 
             angular.extend(this, $controller('watchAndAskForImportOrCloneCtrl', {$scope: $scope}))
 
@@ -117,7 +119,8 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 
                 promise = promise.then (destination) ->
                   # this is ignored by binding and handled separately
                   destination.relation.metadata = destination.metadata
-                  destination.relation.__classification = destination.classification
+                  if $scope.currentDataModel and destination.currentModelOnly
+                    destination.relation.__dataModel = $scope.currentDataModel
                   args.element["#{$scope.direction}Relationships"].add($scope.relationshipType.name, destination.relation).then (result) ->
                     destination.created = true
                     messages.success('Relationship Created', "You have added new relationship #{$scope.element.name} #{$scope.relationshipTypeInfo.value} #{destination.relation.name} in the catalogue.")
@@ -149,9 +152,6 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 
             $scope.addDestination()
 
             catalogueElementResource('relationshipType').list(max: 100).then(appendToRelationshipTypes)
-        ]
       }
 
       dialog.result
-  ]
-]
