@@ -3,6 +3,7 @@ package org.modelcatalogue.core.genomics
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
 import org.modelcatalogue.core.publishing.changelog.ChangeLogDocxGenerator
 import org.modelcatalogue.gel.RareDiseaseCsvExporter
@@ -10,6 +11,7 @@ import org.modelcatalogue.gel.GelJsonExporter
 import org.modelcatalogue.gel.export.CancerTypesCsvExporter
 import org.modelcatalogue.gel.export.CancerTypesJsonExporter
 import org.modelcatalogue.gel.export.RareDiseaseDisorderListCsvExporter
+import org.modelcatalogue.gel.export.RareDiseasePhenotypeChangeLogXlsExporter
 import org.modelcatalogue.gel.export.RareDiseasesDocExporter
 import org.modelcatalogue.gel.export.RareDiseasesJsonExporter
 import org.springframework.http.HttpStatus
@@ -23,8 +25,8 @@ import static RareDiseasesDocExporter.getStandardTemplate
  */
 class GenomicsController {
 
-    def auditService
     def assetService
+    AuditService auditService
     def elementService
     DataClassService dataClassService
 
@@ -32,6 +34,7 @@ class GenomicsController {
     static final String RD_HPO_CSV_FILENAME = "RD Phenotypes and Clinical Tests.csv"
     static final String RD_ELIGIBILITY_CRITERIA_JSON = "RD Eligibility Criteria.json"
     static final String RD_PHENOTYPE_AND_CLINICAL_TESTS_JSON = "RD Phenotype and Clinical tests.json"
+    static final String RD_PHENOTYPE_AND_CLINICAL_TESTS_XLS = "RD Change log for Phenotypes and clinical tests.xlsx"
 
     static final String DOC_IMAGE_PATH = "https://www.genomicsengland.co.uk/wp-content/uploads/2015/11/Genomics-England-logo-2015.png"
 
@@ -264,6 +267,27 @@ class GenomicsController {
             contentType: "text/csv",
         ) {
             new CancerTypesCsvExporter(it).exportCancerTypesAsCsv(model)
+        }
+
+        response.setHeader("X-Asset-ID",assetId.toString())
+        redirect controller: 'asset', id: assetId, action: 'show'
+    }
+
+    def exportRareDiseaseHPOAndClinicalTestsAsXls() {
+
+        DataClass dataClass = DataClass.get(params.id)
+
+        if (!dataClass) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        Long assetId = assetService.storeReportAsAsset(dataClass.dataModel,
+            name: "${dataClass.name} report as MS Excel Document",
+            originalFileName: "$RD_PHENOTYPE_AND_CLINICAL_TESTS_XLS",
+            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        ) { OutputStream out ->
+            new RareDiseasePhenotypeChangeLogXlsExporter(auditService, dataClassService, 0, false).exportPhenotypes(dataClass,out)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())
