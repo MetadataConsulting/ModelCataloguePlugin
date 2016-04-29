@@ -67,6 +67,15 @@ class RareDiseasePhenotypeChangeLogXlsExporter extends AbstractChangeLogGenerato
 
 
     public void exportPhenotypes(DataClass model, OutputStream out) {
+        List lines = buildContentRows(model)
+
+        exportLinesAsXls PHENOTYPES_SHEET, lines, out
+
+        log.info "Exported Rare Diseases as xls spreadsheet ${model.name} (${model.combinedVersion})"
+    }
+
+
+    public List buildContentRows(DataClass model) {
         int level = 1
         def lines = []
         def exclusions = []
@@ -76,9 +85,7 @@ class RareDiseasePhenotypeChangeLogXlsExporter extends AbstractChangeLogGenerato
 
         descendModels(model, lines, level, groupDescriptions, exclusions)
 
-        exportLinesAsXls PHENOTYPES_SHEET, lines, out
-
-        log.info "Exported Rare Diseases as xls spreadsheet ${model.name} (${model.combinedVersion})"
+        lines
     }
 
 
