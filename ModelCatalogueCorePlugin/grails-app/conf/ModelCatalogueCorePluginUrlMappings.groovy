@@ -65,6 +65,7 @@ class ModelCatalogueCorePluginUrlMappings {
                 "/api/modelCatalogue/core/$elementName/$id/mapping/$destination" (controller: controllerName, action: 'addMapping', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$elementName/$id/mapping/$destination" (controller: controllerName, action: 'removeMapping', method: HttpMethod.DELETE)
                 "/api/modelCatalogue/core/$elementName/$id/mapping" (controller: controllerName, action: 'mappings', method: HttpMethod.GET)
+                "/api/modelCatalogue/core/$elementName/$id/typeHierarchy" (controller: controllerName, action: 'typeHierarchy', method: HttpMethod.GET)
 
                 "/api/modelCatalogue/core/$elementName/$id/history"(controller: controllerName, action: 'history', method: HttpMethod.GET)
                 "/api/modelCatalogue/core/$elementName/$id/path"(controller: controllerName, action: 'path', method: HttpMethod.GET)

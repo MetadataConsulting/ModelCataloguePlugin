@@ -211,6 +211,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.MeasurementUnit.isSynonymFor', hidden: true
 
   catalogueElementPropertiesProvider.configureProperty 'relationships', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'typeHierarchy', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'content', hidden: true
   catalogueElementPropertiesProvider.configureProperty '$$metadata', hidden: true
   catalogueElementPropertiesProvider.configureProperty '$$cachedChildren', hidden: true

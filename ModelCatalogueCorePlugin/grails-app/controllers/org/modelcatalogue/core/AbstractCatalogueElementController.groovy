@@ -788,6 +788,17 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         respond Lists.wrap(params, "/${resourceName}/${params.id}/changes", auditService.getChanges(params, element))
     }
 
+    def typeHierarchy(Integer max) {
+        params.max = Math.min(max ?: 10, 100)
+        CatalogueElement element = queryForResource(params.id)
+        if (!element) {
+            notFound()
+            return
+        }
+
+        respond Lists.wrap(params, "/${resourceName}/${params.id}/typeHierarchy", elementService.getTypeHierarchy(params, element))
+    }
+
     def history(Integer max) {
         String name = getResourceName()
         Class type = resource
