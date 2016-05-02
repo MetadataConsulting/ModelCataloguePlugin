@@ -341,7 +341,6 @@ class RelationshipService {
             RELATIONSHIPS_COUNT_CACHE.invalidate(source.getId())
             RELATIONSHIPS_COUNT_CACHE.invalidate(destination.getId())
 
-
             if (relationshipType.bidirectional) {
                 unlink relationshipInstance.destination, relationshipInstance.source, relationshipType, dataModel, ignoreRules, expectedMetadata
             }

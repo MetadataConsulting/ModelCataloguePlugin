@@ -341,6 +341,7 @@ class ElasticSearchService implements SearchCatalogue {
                 if (it.exists) {
                     return from(client.admin().indices().prepareDelete(indexName).execute()).map {
                         it.acknowledged
+                        log.debug "Deleted index $indexName"
                     }.onErrorReturn { error ->
                         log.debug "Exception deleting index $indexName: $error"
                         return false
@@ -349,12 +350,13 @@ class ElasticSearchService implements SearchCatalogue {
                 return just(true)
             }
         }
-        if (CatalogueElement.isAssignableFrom(clazz)) {
-            CatalogueElement element = object as CatalogueElement
+        if (CatalogueElement.isAssignableFrom(clazz) || Relationship.isAssignableFrom(clazz) || RelationshipType.isAssignableFrom(clazz)) {
+            Object element = object
             return from(getIndices(element)).flatMap { idx ->
                 indexExists(just(idx)).flatMap { response ->
                     if (response.exists) {
                         from(client.prepareDelete(idx, getTypeName(clazz), "${element.getId()}").execute()).map {
+                            log.debug "Unindexed $element from $idx"
                             it.found
                         }.onErrorReturn { error ->
                             log.debug "Exception unindexing $element: $error"
