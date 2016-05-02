@@ -15,6 +15,7 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
     @Autowired RelationshipTypeService relationshipTypeService
     @Autowired RelationshipService relationshipService
     @Autowired DataModelService dataModelService
+    @Autowired ElementService elementService
 
     CatalogueElementMarshaller(Class type) {
         super(type)
@@ -44,7 +45,8 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
                 versionNumber        : el.versionNumber,
                 status               : el.status.toString(),
                 versionCreated       : el.versionCreated,
-                history              : [count: el.countVersions(), itemType: type.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/history".toString()]
+                history              : [count: el.countVersions(), itemType: type.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/history".toString()],
+                typeHierarchy        : [count: Integer.MAX_VALUE, itemType: type.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/typeHierarchy".toString()]
         ]
 
         Map<String, Map<String, String>> relationships = getRelationshipConfiguration(el.getClass())

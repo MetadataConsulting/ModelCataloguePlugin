@@ -12,13 +12,14 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.publishing.CloningContext
-import org.modelcatalogue.core.publishing.DraftChain
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Legacy
+import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.transaction.TransactionStatus
 
 class ElementService implements Publisher<CatalogueElement> {
@@ -699,6 +700,27 @@ class ElementService implements Publisher<CatalogueElement> {
             }
 
             return [resource]
+        }
+    }
+
+
+    public <T extends CatalogueElement> ListWithTotalAndType<T> getTypeHierarchy(Map<String, Object> params, T element) {
+        return Lists.lazy(params, element.getClass() as Class<T>) {
+            List<T> typeHierarchy = []
+
+            collectBases(element, typeHierarchy)
+
+            return typeHierarchy
+        }
+    }
+
+    private <T extends CatalogueElement> void collectBases(T element, List<T> collector) {
+        for (T base in element.isBasedOn) {
+            if (base in collector) {
+                continue
+            }
+            collector << base
+            collectBases(base, collector)
         }
     }
 
