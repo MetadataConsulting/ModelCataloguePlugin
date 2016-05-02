@@ -211,7 +211,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
 
       $scope.metadataOccurrencesToAsterisk = (element) ->
         # only Data Element and Data Class with some metadata and defined relationship
-        if (element.isInstanceOf('dataElement') || element.isInstanceOf('dataClass')) && element.$$metadata?.values? && element.$$relationship
+        if (angular.isFunction(element.isInstanceOf) && (element.isInstanceOf('dataElement') || element.isInstanceOf('dataClass'))) && element.$$metadata?.values? && element.$$relationship
           min = '0'
           max = '*'
           for row in element.$$metadata.values

@@ -368,4 +368,8 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         throw new IllegalStateException("Couldn't execute action ${actionName} on ${resource} controller with parameters ${params} after ${attempt} attempts")
     }
 
+    protected void notFound() {
+        render status: NOT_FOUND
+    }
+
 }
