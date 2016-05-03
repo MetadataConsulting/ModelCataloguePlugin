@@ -594,6 +594,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
                 $scope.element.updateFrom restored
                 $rootScope.$broadcast 'catalogueElementUpdated', restored
                 $rootScope.$broadcast 'redrawContextualActions'
+                restored.focus()
               , showErrorsUsingMessages(messages)
         else
           messages.confirm("Do you want to mark #{$scope.element.getElementTypeName()} #{$scope.element.name} as deprecated?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be marked as deprecated").then ->
@@ -601,6 +602,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
               $scope.element.updateFrom archived
               $rootScope.$broadcast 'catalogueElementUpdated', archived
               $rootScope.$broadcast 'redrawContextualActions'
+              archived.focus()
             , showErrorsUsingMessages(messages)
     }
 

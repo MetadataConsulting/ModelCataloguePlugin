@@ -24,6 +24,8 @@ import org.springframework.transaction.TransactionStatus
 
 class ElementService implements Publisher<CatalogueElement> {
 
+    public static final String DEPRECATED_DATA_CLASS_NAME = 'Obsolete'
+
     private static final Cache<Long, Integer> VERSION_COUNT_CACHE = CacheBuilder.newBuilder().initialCapacity(1000).build()
     private static Cache<Class, List<Class>> subclassesCache = CacheBuilder.newBuilder().initialCapacity(20).build()
 
@@ -289,6 +291,24 @@ class ElementService implements Publisher<CatalogueElement> {
 
                 archived.status = ElementStatus.DEPRECATED
                 archived.save(flush: true, validate: false)
+
+                if (archived.dataModel && !archived.dataModel.archived && (archived.instanceOf(DataClass) || archived.instanceOf(DataElement))) {
+                    DataClass obsoleteContainer = DataClass.findByNameAndDataModelAndStatus(DEPRECATED_DATA_CLASS_NAME, archived.dataModel, ElementStatus.DRAFT)
+
+                    if (!obsoleteContainer) {
+                        obsoleteContainer = new DataClass(dataModel: archived.dataModel, name: DEPRECATED_DATA_CLASS_NAME)
+                        obsoleteContainer.save(flush: true)
+                    }
+
+                    if (archived.instanceOf(DataClass)) {
+                        obsoleteContainer.addToParentOf(archived)
+                    } else if (archived.instanceOf(DataElement)) {
+                        obsoleteContainer.addToContains(archived)
+                    }
+                }
+
+
+
                 return archived
             }
         }
