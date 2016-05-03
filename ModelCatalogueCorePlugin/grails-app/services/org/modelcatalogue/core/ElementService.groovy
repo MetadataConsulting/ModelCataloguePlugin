@@ -293,7 +293,7 @@ class ElementService implements Publisher<CatalogueElement> {
                 archived.save(flush: true, validate: false)
 
                 if (archived.dataModel && !archived.dataModel.archived && (archived.instanceOf(DataClass) || archived.instanceOf(DataElement))) {
-                    DataClass obsoleteContainer = DataClass.findByNameAndDataModel(DEPRECATED_DATA_CLASS_NAME, archived.dataModel)
+                    DataClass obsoleteContainer = DataClass.findByNameAndDataModelAndStatus(DEPRECATED_DATA_CLASS_NAME, archived.dataModel, ElementStatus.DRAFT)
 
                     if (!obsoleteContainer) {
                         obsoleteContainer = new DataClass(dataModel: archived.dataModel, name: DEPRECATED_DATA_CLASS_NAME)

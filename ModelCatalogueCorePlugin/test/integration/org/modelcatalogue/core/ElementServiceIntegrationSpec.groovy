@@ -188,7 +188,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         merged.dataType == dataType
         destination.ext.size() == 3
         destination.ext.two == 'two'
-        source.countContainedIn() == 2
+        source.countContainedIn() == 3
         destination.countContainedIn() == 3
         source.dataModel
         destination.dataModel
