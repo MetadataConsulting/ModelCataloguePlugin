@@ -660,7 +660,7 @@ class ElasticSearchService implements SearchCatalogue {
     protected static List<String> getIndices(object) {
         Class clazz = getEntityClass(object)
         if (DataModel.isAssignableFrom(clazz)) {
-            return [DATA_MODEL_INDEX, MC_ALL_INDEX]
+            return [DATA_MODEL_INDEX, MC_ALL_INDEX, getDataModelIndex(object as DataModel)]
         }
 
         if (CatalogueElement.isAssignableFrom(clazz)) {
