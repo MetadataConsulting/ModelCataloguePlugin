@@ -28,7 +28,6 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 
             $scope.destinations = []
 
             $scope.updateInfo = (info) ->
-              console.log info
               if info
                 $scope.relationshipTypeInfo = info
                 $scope.relationshipType = info.type
