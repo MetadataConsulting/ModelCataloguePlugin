@@ -2,6 +2,15 @@
 
 set -e
 
+if [ ! -f ~/.nvm/nvm.sh ]; then
+    echo "installing nvm"
+    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh | bash
+else
+    echo "nvm is already installed on the system"
+fi
+. ~/.nvm/nvm.sh
+nvm use
+
 echo "executing npm install in folders where package.json is exists"
 
 ./where package.json run npm install
