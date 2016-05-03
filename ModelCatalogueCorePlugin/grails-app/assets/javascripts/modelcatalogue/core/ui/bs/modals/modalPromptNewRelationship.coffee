@@ -1,5 +1,5 @@
 angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 'mc.core.ui.bs.watchAndAskForImportOrCloneCtrl']).config (messagesProvider) ->
-  messagesProvider.setPromptFactory 'create-new-relationship', ($log, $modal, $timeout, $q, messages, catalogueElementResource, enhance) ->
+  messagesProvider.setPromptFactory 'create-new-relationship', ($log, $modal, $timeout, $q, messages, catalogueElementResource, enhance, catalogue) ->
     "ngInject"
     (title, body, args) ->
       if not args?.element?
@@ -28,18 +28,25 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 
             $scope.destinations = []
 
             $scope.updateInfo = (info) ->
+              console.log info
               if info
                 $scope.relationshipTypeInfo = info
                 $scope.relationshipType = info.type
-                $scope.relationType = $scope.relationshipType["#{info.relation}Class"]
                 $scope.direction = info.direction
+                if info.type.rule?.indexOf("isSameClass()") >= 0
+                  if catalogue.isInstanceOf($scope.element.elementType, 'dataType')
+                    $scope.relationType = 'org.modelcatalogue.core.DataType'
+                  else
+                    $scope.relationType = $scope.element.elementType
+                else
+                  $scope.relationType = $scope.relationshipType["#{info.relation}Class"]
 
               else
                 $scope.relationshipTypeInfo = null
                 $scope.relationshipType = null
-                $scope.relationType = null
                 $scope.direction = null
                 $scope.metadataOwner = null
+                $scope.relationType = null
 
               for destination in $scope.destinations
                 destination.updateRelation(destination.relation)
