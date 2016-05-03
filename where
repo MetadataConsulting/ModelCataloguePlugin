@@ -20,16 +20,12 @@ fi
 
 
 echo "executing in all subdirectories where $FILE_TO_TEST exists: ./$@"
-echo
 
 for file in */ .*/ ; do
     if [ -f "$file/$FILE_TO_TEST" ]; then
         cd "$file"
-        echo
         echo "executing $file$@"
-        echo
         eval "$@"
-        echo
 	    cd ..
     fi
 done
