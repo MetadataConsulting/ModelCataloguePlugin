@@ -149,8 +149,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       type: 'primary'
       action: ->
         messages.prompt('Compare ' + element.getElementTypeName(), "Select the #{element.getElementTypeName()} for the comparison",
-          {type: 'catalogue-element', resource: element.getResourceName()}).then (toBeCompared)->
-            $state.go 'mc.resource.diff', ids: ids.concat([toBeCompared.id]).join('~')
+          {type: 'catalogue-element', resource: element.getResourceName(), global: true}).then (toBeCompared)->
+            $state.go 'mc.resource.diff', dataModelId: element.dataModel.id, resource: element.getResourceName(), ids: ids.concat([toBeCompared.id]).join('|')
     }
   ]
 
