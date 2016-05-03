@@ -16,10 +16,10 @@ class CancerTypesJsonExporterSpec extends AbstractCancerTypesExporterSpec {
         new CancerTypesJsonExporter(out).exportCancerTypesAsJson(model)
 
         def response = JsonOutput.prettyPrint(new String(out.toByteArray()))
-        println "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-        println response
-        println ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+        printOutput response
+
         def expected = JsonOutput.prettyPrint(expectedSubtypesJson)
+        printOutput expected
 
         then:
         noExceptionThrown()
@@ -36,8 +36,24 @@ class CancerTypesJsonExporterSpec extends AbstractCancerTypesExporterSpec {
                         "type": "Adult Glioma",
                         "subTypes": [
                             {
+                                "id":"$cancer_type_1_adult_subType_id",
                                 "subType": "Adult Glioma subtypes 1.1",
-                                "description": "adult glioma description"
+                                "subTypes": [
+                                {
+                                    "id":"$cancer_type_1_adult_glioma_enum_id",
+                                    "enumeratedType": "Adult Glioma Enum",
+                                    "enums": [
+                                        {
+                                            "enum": "one",
+                                            "description": "1"
+                                        },
+                                        {
+                                            "enum": "two",
+                                            "description": "2"
+                                        }
+                                    ]
+                                }
+                            ]
                             }
                         ],
                         "presentations": [
@@ -51,14 +67,32 @@ class CancerTypesJsonExporterSpec extends AbstractCancerTypesExporterSpec {
                         "id":"$cancer_type_2_some_cancer_id",
                         "type": "Some other Cancer Type 2",
                         "subTypes": [
+                          {
+                            "id": "$cancer_type_2_some_cancer_subType21_id",
+                            "subType": "some other cancer subtypes 2.1",
+                            "subTypes": [
+                            ]
+                          },
                             {
-                                "subType": "some other cancer subtypes 2.1",
-                                "description": "some cancer description subtype21"
-                            },
-                            {
+                                "id":"$cancer_type_2_some_cancer_subType22_id",
                                 "subType": "some other cancer subtypes 2.2",
-                                "description": "some cancer description subtype22"
-                            }
+                                "subTypes": [
+                                {
+                                    "id":"$cancer_type_2_some_cancer_enum_id",
+                                    "enumeratedType": "Some Cancer Enum",
+                                    "enums": [
+                                        {
+                                            "enum": "first",
+                                            "description": "a"
+                                        },
+                                        {
+                                            "enum": "second",
+                                            "description": "b"
+                                        }
+                                    ]
+                                }
+                             ]
+                             }
                         ],
                         "presentations": [
                             {
