@@ -693,6 +693,12 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
+        if (destinationDataModel.status != ElementStatus.DRAFT) {
+            instance.errors.reject 'catalogue.element.can.only.clone.to.draft.data.models', "Cannot clone to non-draft data model $destinationDataModel.name"
+            respond instance.errors
+            return
+        }
+
         if (!instance.instanceOf(DataModel) && !instance.dataModel) {
             instance.errors.reject 'catalogue.element.at.least.one.data.model', "'$instance.name' has to be declared wihtin a data model to be cloned"
             respond instance.errors

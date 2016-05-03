@@ -465,7 +465,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not $scope.element
     return undefined if not angular.isFunction($scope.element.isInstanceOf)
     return undefined if not $scope.element.isInstanceOf('dataModel')
-    return undefined if not $scope.element.status == 'DRAFT'
+    return undefined if $scope.element.status != 'DRAFT'
 
     {
       position:   20000
