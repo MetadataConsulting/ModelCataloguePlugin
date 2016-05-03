@@ -9,6 +9,7 @@ else
     echo "nvm is already installed on the system"
 fi
 . ~/.nvm/nvm.sh
+nvm install
 nvm use
 
 echo "executing npm install in folders where package.json is exists"
