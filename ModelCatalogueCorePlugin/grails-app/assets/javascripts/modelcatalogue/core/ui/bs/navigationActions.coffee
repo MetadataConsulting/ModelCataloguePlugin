@@ -11,6 +11,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     'dataType'
     'measurementUnit'
     'asset'
+    'validationRule'
   ]
 
   angular.forEach RESOURCES, (resource, index) ->

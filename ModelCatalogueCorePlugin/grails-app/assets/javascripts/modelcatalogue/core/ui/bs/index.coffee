@@ -40,6 +40,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptEditRelationship'
   'mc.core.ui.bs.modalPromptWithOptions'
   'mc.core.ui.bs.modalPromptNewRelationship'
+  'mc.core.ui.bs.modalPromptValidationRuleEdit'
   'mc.core.ui.bs.modalPromptNewMapping'
   'mc.core.ui.bs.modalPromptXmlValidate'
   'mc.core.ui.bs.modalPromptForCatalogueElement'
