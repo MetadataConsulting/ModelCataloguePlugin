@@ -90,7 +90,7 @@ class CancerTypesCsvExporter {
 
     private List<String> iterateEnumTypes(List lines, groupDescriptions, level, CatalogueElement model, String subTypeName) {
 
-        if(subTypeName.matches("(?i:.*Subtype.*)") && model instanceof DataElement && getEntityClass(model.dataType) == EnumeratedType) {
+        if(subTypeName.matches("(?i:.*Subtype.*)") && getEntityClass(model) == DataElement && getEntityClass(model.dataType) == EnumeratedType) {
             EnumeratedType enumTypes = model.dataType as EnumeratedType
             log.debug("found enumType $enumTypes.name")
 

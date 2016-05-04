@@ -120,7 +120,7 @@ class CancerTypesJsonExporter {
 
     private void iterateEnumTypes(CatalogueElement model, List subtypes) {
 
-        if(model instanceof DataElement && getEntityClass(model.dataType) == EnumeratedType) {
+        if(getEntityClass(model) == DataElement && getEntityClass(model.dataType) == EnumeratedType) {
 
             EnumeratedType enumTypes = model.dataType as EnumeratedType
             log.debug("found enumType $enumTypes.name")
