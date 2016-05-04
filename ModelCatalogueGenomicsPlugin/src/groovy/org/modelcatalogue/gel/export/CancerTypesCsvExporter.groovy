@@ -4,6 +4,9 @@ import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.EnumeratedType
+import org.modelcatalogue.core.util.HibernateHelper
+
+import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
 /**
  * Created by rickrees on 31/03/2016.
@@ -87,7 +90,7 @@ class CancerTypesCsvExporter {
 
     private List<String> iterateEnumTypes(List lines, groupDescriptions, level, CatalogueElement model, String subTypeName) {
 
-        if(subTypeName.matches("(?i:.*Subtype.*)") && model instanceof DataElement && model.dataType instanceof EnumeratedType) {
+        if(subTypeName.matches("(?i:.*Subtype.*)") && getEntityClass(model) == DataElement && getEntityClass(model.dataType) == EnumeratedType) {
             EnumeratedType enumTypes = model.dataType as EnumeratedType
             log.debug("found enumType $enumTypes.name")
 
