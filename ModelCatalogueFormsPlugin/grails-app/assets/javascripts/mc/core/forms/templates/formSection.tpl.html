@@ -1,7 +1,68 @@
-<div class="col-md-12 metadata-form-item-content">
+<div class="col-md-12 metadata-form-item-content"
+     ng-init="exclude = {'value': (element.ext.get('http://forms.modelcatalogue.org/section#exclude') ? (element.ext.get('http://forms.modelcatalogue.org/section#exclude') == 'false' ? false : true) : false)}">
   <div class="row" ng-if="editableForm.$visible">
     <div class="col-md-offset-1 col-md-10 alert alert-warning">
-      The form section metadata only applies on the direct children of the form's root model and is ignored for any other nested models.
+      The form section metadata only applies on the direct children of the form's root model and is ignored for any
+      other nested models if not specified otherwise.
+    </div>
+  </div>
+
+  <div class="row" ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#exclude')">
+    <div class="col-md-3">
+      <strong class="small">Exclude</strong>
+      <i class="fa fa-question"
+         popover="
+          Specifies if this section should be excluded from the result CRF. This excludes this section together with all
+          its children.
+          "
+         popover-title="Exclude"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9 full-width-editable">
+      <span editable-checkbox="extAsMap['http://forms.modelcatalogue.org/section#exclude']" class="small"
+            e-string-to-boolean e-ng-change="exclude.value = !exclude.value">
+        {{ element.ext.get('http://forms.modelcatalogue.org/section#exclude') ? (element.ext.get('http://forms.modelcatalogue.org/section#exclude') == "false" ? "No": "Yes") : "" }}
+      </span>
+    </div>
+  </div>
+  <div class="row" ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#excludeDataElements')"
+       ng-init="excludeDataElements = {'value': (element.ext.get('http://forms.modelcatalogue.org/section#excludeDataElements') ? (element.ext.get('http://forms.modelcatalogue.org/section#excludeDataElements') == 'false' ? false : true) : false)}">
+    <div class="col-md-3">
+      <strong class="small">Exclude Data Elements</strong>
+      <i class="fa fa-question"
+         popover="
+          Specifies if direct child data elements should be excluded from the result CRF.
+          "
+         popover-title="Exclude Data Elements"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9 full-width-editable">
+      <span editable-checkbox="extAsMap['http://forms.modelcatalogue.org/section#excludeDataElements']"
+            class="small"
+            e-ng-disabled="exclude.value"
+            e-string-to-boolean e-ng-change="excludeDataElements.value = !excludeDataElements.value">
+        {{ element.ext.get('http://forms.modelcatalogue.org/section#excludeDataElements') ? (element.ext.get('http://forms.modelcatalogue.org/section#excludeDataElements') == "false" ? "No": "Yes") : "" }}
+      </span>
+    </div>
+  </div>
+  <div class="row" ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#merge')"
+       ng-init="merge = {'value': (element.ext.get('http://forms.modelcatalogue.org/section#merge') ? (element.ext.get('http://forms.modelcatalogue.org/section#merge') == 'false' ? false : true) : false)}">
+    <div class="col-md-3">
+      <strong class="small">Merge to Single Section</strong>
+      <i class="fa fa-question"
+         popover="
+          This data class will be merged to parent data class section. Basically, there won't be any title for this sub data class.
+          "
+         popover-title="Merge to Single Section"
+         popover-trigger="mouseenter"></i>
+    </div>
+    <div class="col-md-9 full-width-editable">
+      <span editable-checkbox="extAsMap['http://forms.modelcatalogue.org/section#merge']"
+            class="small"
+            e-ng-disabled="exclude.value"
+            e-string-to-boolean e-ng-change="merge.value = !merge.value">
+        {{ element.ext.get('http://forms.modelcatalogue.org/section#merge') ? (element.ext.get('http://forms.modelcatalogue.org/section#merge') == "false" ? "No": "Yes") : "" }}
+      </span>
     </div>
   </div>
   <div class="row" ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#title')">
@@ -24,6 +85,7 @@
     </div>
     <div class="col-md-9 full-width-editable">
       <span editable-textarea="extAsMap['http://forms.modelcatalogue.org/section#title']" class="small"
+            e-ng-disabled="exclude.value"
             e-maxlength="2000" e-rows="5">
         {{element.ext.get('http://forms.modelcatalogue.org/section#title')}}
       </span>
@@ -45,6 +107,7 @@
     </div>
     <div class="col-md-9 full-width-editable">
       <span editable-textarea="extAsMap['http://forms.modelcatalogue.org/section#subtitle']" class="small"
+            e-ng-disabled="exclude.value"
             e-maxlength="2000" e-rows="5">
         {{element.ext.get('http://forms.modelcatalogue.org/section#subtitle')}}
       </span>
@@ -70,6 +133,7 @@
     </div>
     <div class="col-md-9 full-width-editable">
       <span editable-textarea="extAsMap['http://forms.modelcatalogue.org/section#instructions']" class="small"
+            e-ng-disabled="exclude.value"
             e-maxlength="2000" e-rows="5">
         {{element.ext.get('http://forms.modelcatalogue.org/section#instructions')}}
       </span>
@@ -92,7 +156,9 @@
          popover-trigger="mouseenter"></i>
     </div>
     <div class="col-md-9 full-width-editable">
-      <span editable-text="extAsMap['http://forms.modelcatalogue.org/section#pageNumber']" class="small" e-maxlength="5">
+      <span editable-text="extAsMap['http://forms.modelcatalogue.org/section#pageNumber']" class="small"
+            e-ng-disabled="exclude.value"
+            qe-maxlength="5">
         {{element.ext.get('http://forms.modelcatalogue.org/section#pageNumber')}}
       </span>
     </div>

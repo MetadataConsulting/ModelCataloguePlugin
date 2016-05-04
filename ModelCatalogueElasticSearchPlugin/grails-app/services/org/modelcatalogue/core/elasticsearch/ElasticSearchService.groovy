@@ -9,6 +9,7 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsClass
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder
 import org.elasticsearch.action.bulk.BulkRequestBuilder
+import org.elasticsearch.action.bulk.BulkResponse
 import org.elasticsearch.action.search.SearchRequestBuilder
 import org.elasticsearch.client.Client
 import org.elasticsearch.client.transport.TransportClient
@@ -25,13 +26,17 @@ import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
 import rx.Observable
+import rx.Subscriber
+import rx.schedulers.Schedulers
 import rx.subjects.ReplaySubject
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
+import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.TimeUnit
 
-import static org.modelcatalogue.core.util.HibernateHelper.*
+import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 import static rx.Observable.from
 import static rx.Observable.just
 
@@ -336,6 +341,7 @@ class ElasticSearchService implements SearchCatalogue {
                 if (it.exists) {
                     return from(client.admin().indices().prepareDelete(indexName).execute()).map {
                         it.acknowledged
+                        log.debug "Deleted index $indexName"
                     }.onErrorReturn { error ->
                         log.debug "Exception deleting index $indexName: $error"
                         return false
@@ -344,12 +350,13 @@ class ElasticSearchService implements SearchCatalogue {
                 return just(true)
             }
         }
-        if (CatalogueElement.isAssignableFrom(clazz)) {
-            CatalogueElement element = object as CatalogueElement
+        if (CatalogueElement.isAssignableFrom(clazz) || Relationship.isAssignableFrom(clazz) || RelationshipType.isAssignableFrom(clazz)) {
+            Object element = object
             return from(getIndices(element)).flatMap { idx ->
                 indexExists(just(idx)).flatMap { response ->
                     if (response.exists) {
                         from(client.prepareDelete(idx, getTypeName(clazz), "${element.getId()}").execute()).map {
+                            log.debug "Unindexed $element from $idx"
                             it.found
                         }.onErrorReturn { error ->
                             log.debug "Exception unindexing $element: $error"
@@ -570,23 +577,49 @@ class ElasticSearchService implements SearchCatalogue {
         return from(indicies).flatMap { idx ->
             return ensureIndexExists(just(idx), supportedTypes).flatMap { existingIndex ->
                 documents.buffer(100).flatMap {
-                    BulkRequestBuilder bulkRequest = client.prepareBulk()
-                    for (Document document in it) {
-                        bulkRequest.add(client
-                                .prepareIndex(existingIndex, document.type, document.id)
-                                .setSource(document.payload)
-                        )
-                    }
-                    return from(bulkRequest.execute()).flatMap { bulkResponse ->
+                    int retries = 0
+                    bulkIndex(existingIndex, it).retryWhen { attempts ->
+                        attempts.flatMap { throwable ->
+                            if (retries < 9) {
+                                return Observable.timer(retries + 1, TimeUnit.SECONDS)
+                            }
+                            retries++
+                            log.warn "Error during bulk update after $retries: $throwable.message"
+                            return Observable.error(throwable)
+                        }
+                    } .flatMap { bulkResponse ->
                         from(bulkResponse.items).map { bulkResponseItem ->
+                            if (bulkResponseItem.failure) {
+                                log.warn "Failed to index ${bulkResponseItem.type}:${bulkResponseItem.id} to ${bulkResponseItem.index}"
+                            } else {
+                                log.debug "Indexed ${bulkResponseItem.type}:${bulkResponseItem.id} to ${bulkResponseItem.index}"
+                            }
                             SimpleIndexResponse.from(bulkResponseItem)
                         }
-                    }
+                    }.observeOn(Schedulers.from(executorService))
                 }
             }
         }
     }
 
+    private Observable<BulkResponse> bulkIndex(String existingIndex, List<Document> documents) {
+        return Observable.create { subscriber ->
+            BulkRequestBuilder bulkRequestBuilder = buildBulkIndexRequest(existingIndex, documents)
+            subscriber.onStart()
+            bulkRequestBuilder.execute(new BulkResponseListener(subscriber as Subscriber<BulkResponse>))
+        }
+    }
+
+    private BulkRequestBuilder buildBulkIndexRequest(String existingIndex, List<Document> documents) {
+        BulkRequestBuilder bulkRequest = client.prepareBulk()
+        for (Document document in documents) {
+            bulkRequest.add(client
+                .prepareIndex(existingIndex, document.type, document.id)
+                .setSource(document.payload)
+            )
+        }
+        return bulkRequest
+    }
 
 
     private Observable<SimpleIndicesExistsResponse> indexExists(Observable<String> indices) {
@@ -613,8 +646,11 @@ class ElasticSearchService implements SearchCatalogue {
             try {
                 request.execute().get()
                 return response.index
-            } catch (IndexAlreadyExistsException ignored) {
-                return response.index
+            } catch (ExecutionException ex) {
+                if (ex.cause instanceof IndexAlreadyExistsException) {
+                    return response.index
+                }
+                throw ex
             }
         }
     }
@@ -624,7 +660,7 @@ class ElasticSearchService implements SearchCatalogue {
     protected static List<String> getIndices(object) {
         Class clazz = getEntityClass(object)
         if (DataModel.isAssignableFrom(clazz)) {
-            return [DATA_MODEL_INDEX, MC_ALL_INDEX]
+            return [DATA_MODEL_INDEX, MC_ALL_INDEX, getDataModelIndex(object as DataModel)]
         }
 
         if (CatalogueElement.isAssignableFrom(clazz)) {

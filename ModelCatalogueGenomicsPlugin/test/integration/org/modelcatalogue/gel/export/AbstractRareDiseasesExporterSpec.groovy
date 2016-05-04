@@ -4,6 +4,10 @@ import grails.test.spock.IntegrationSpec
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.audit.AuditService
+import org.modelcatalogue.core.ddl.DataDefinitionLanguage
+import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.builder.ContextItem
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
@@ -14,6 +18,8 @@ import org.modelcatalogue.gel.RareDiseaseCsvExporter
  */
 class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
 
+    AuditService auditService
+    DataClassService dataClassService
     ElementService elementService
     DataModelService dataModelService
     InitCatalogueService initCatalogueService
@@ -97,6 +103,10 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
                                                 }
                                             }
                                         }
+
+                                        dataClass name: "Disorder >$i< Guidance name $i $j", {
+                                            description "Guidance description  $i $j"
+                                        }
                                     }
                                 }
                             }
@@ -114,6 +124,48 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
         }
 
         return testModel
+
+    }
+
+
+    DataClass makeChanges(DataClass finalized) {
+        println "status= $finalized.status"
+
+        DataClass model = DataClass.findByNameAndStatus('Dataclass Top Level 1 Root', ElementStatus.DRAFT)
+
+        DataDefinitionLanguage.with('Test Data Model') {
+
+            update 'hierarchy' of 'Disorder >1< Phenotypes Level5 Model 1 Data Element 1' remove 'Phenotype (2) name 1 1'
+
+            update 'name' of 'Phenotype (5) name 1 1' to 'Phenotype (5) changed name'   //PROPERTY_CHANGED
+
+            update 'OBO ID' of 'Phenotype (6) name 1 1' to 'modified OBO ID'            //METADATA_UPDATED
+
+            remove 'OBO ID' of 'Phenotype (7) name 1 1'            //METADATA_UPDATED  - cehck this again - nothing found for any of the change types
+
+            create DataElement called 'New Phenotype DataElement'                       //NEW_ELEMENT_CREATED
+            update 'containment' of 'Phenotype (8) name 1 1' add 'New Phenotype DataElement'    //RELATIONSHIP_CREATED - check, none found
+
+            create DataElement called '2nd New Phenotype DataElement'                       //NEW_ELEMENT_CREATED
+            update 'containment' of 'Phenotype (9) name 1 1' add '2nd New Phenotype DataElement', 'Min Occurs': 0, 'Max Occurs': 2    //RELATIONSHIP_CREATED
+                                                                                                        //RELATIONSHIP_METADATA_CREATED * 2
+
+            update 'Min Occurs' of 'Phenotype (9) name 1 1' to '1'              //METADATA_CREATED
+            update 'Max Occurs' of 'Phenotype (9) name 1 1' to '3'
+
+            update 'description' of 'Disorder >1< Guidance name 1 1' to 'new textual description replaces old'
+
+            update 'description' of 'Clinical tests (5) name 1 2' to 'description for Clinical tests (5) name 1 2  has been changed'
+
+            create DataClass called 'New Guidance class'
+            update 'description' of 'New Guidance class' to 'brand new description'
+            update 'hierarchy' of 'Disorder >>1<< heading Level4 Model Data Element 2' add 'New Guidance class'
+
+            update 'description' of 'Phenotype (2) name 2 2' to 'description for Phenotype (2) name 2 2 has been changed also'
+
+        }
+
+        return model
 
     }
 

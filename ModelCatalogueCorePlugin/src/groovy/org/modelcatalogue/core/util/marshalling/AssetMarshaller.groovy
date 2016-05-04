@@ -24,7 +24,7 @@ class AssetMarshaller extends CatalogueElementMarshaller {
                 md5: el.md5
         )
         if (el.md5) {
-            ret.downloadUrl = linkGenerator.link(controller: 'asset', action: 'download', id: el.id, absolute: true)
+            ret.downloadUrl = linkGenerator.link(uri: "/api/modelCatalogue/core/asset/$el.id/download",  absolute: true)
         }
 
         if (el.status == ElementStatus.PENDING) {

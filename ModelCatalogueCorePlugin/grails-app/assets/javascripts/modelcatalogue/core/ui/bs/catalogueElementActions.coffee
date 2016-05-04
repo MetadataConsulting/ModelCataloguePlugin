@@ -149,8 +149,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       type: 'primary'
       action: ->
         messages.prompt('Compare ' + element.getElementTypeName(), "Select the #{element.getElementTypeName()} for the comparison",
-          {type: 'catalogue-element', resource: element.getResourceName()}).then (toBeCompared)->
-            $state.go 'mc.resource.diff', ids: ids.concat([toBeCompared.id]).join('~')
+          {type: 'catalogue-element', resource: element.getResourceName(), global: true}).then (toBeCompared)->
+            $state.go 'mc.resource.diff', dataModelId: element.dataModel.id, resource: element.getResourceName(), ids: ids.concat([toBeCompared.id]).join('|')
     }
   ]
 
@@ -342,7 +342,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     action:     ->
       rel   = getRelationship()
       rel.element.refresh().then (element) ->
-        args = {relationshipType: rel.type, direction: rel.direction, type: 'update-relationship', update: true, element: element, relation: rel.relation, classification: rel.classification, metadata: angular.copy(rel.ext)}
+        args = {relationshipType: rel.type, direction: rel.direction, type: 'update-relationship', currentDataModel: $scope.currentDataModel, update: true, element: element, relation: rel.relation, classification: rel.classification, metadata: angular.copy(rel.ext)}
         messages.prompt('Update Relationship', '', args).then (updated)->
           $rootScope.$broadcast 'catalogueElementUpdated', updated
           rel.ext = updated.ext
@@ -465,7 +465,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not $scope.element
     return undefined if not angular.isFunction($scope.element.isInstanceOf)
     return undefined if not $scope.element.isInstanceOf('dataModel')
-    return undefined if not $scope.element.status == 'DRAFT'
+    return undefined if $scope.element.status != 'DRAFT'
 
     {
       position:   20000
@@ -498,8 +498,11 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
           $scope.element.delete()
           .then ->
             messages.success "#{$scope.element.getElementTypeName()} #{$scope.element.name} deleted."
-            if $state.current.name.indexOf('mc.resource.show') >= 0
-              $state.go('mc.resource.list', {resource: names.getPropertyNameFromType($scope.element.elementType)}, {reload: true})
+            resource = names.getPropertyNameFromType($scope.element.elementType)
+            if resource == 'dataModel'
+              $state.go('dataModels')
+            else if $state.current.name.indexOf('mc.resource.show') >= 0
+              $state.go('mc.resource.list', {resource: resource}, {reload: true})
           .catch showErrorsUsingMessages(messages)
     }
   ]
@@ -591,6 +594,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
                 $scope.element.updateFrom restored
                 $rootScope.$broadcast 'catalogueElementUpdated', restored
                 $rootScope.$broadcast 'redrawContextualActions'
+                restored.focus()
               , showErrorsUsingMessages(messages)
         else
           messages.confirm("Do you want to mark #{$scope.element.getElementTypeName()} #{$scope.element.name} as deprecated?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be marked as deprecated").then ->
@@ -598,6 +602,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
               $scope.element.updateFrom archived
               $rootScope.$broadcast 'catalogueElementUpdated', archived
               $rootScope.$broadcast 'redrawContextualActions'
+              archived.focus()
             , showErrorsUsingMessages(messages)
     }
 

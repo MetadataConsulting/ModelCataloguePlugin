@@ -2,6 +2,8 @@ describe "mc.core.ui.elementsAsTags", ->
 
   beforeEach module 'mc.core.ui.bs.elementsAsTags'
 
+  return unless window.fixtures
+
   it "element get compiled",  inject ($compile, $rootScope) ->
 
     $rootScope.elements = angular.copy fixtures.dataType.list1.list

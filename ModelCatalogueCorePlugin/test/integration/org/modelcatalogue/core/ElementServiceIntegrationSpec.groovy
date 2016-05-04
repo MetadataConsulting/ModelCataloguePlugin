@@ -5,6 +5,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.RelationshipDirection
+import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import spock.lang.Issue
 import spock.lang.Unroll
 
@@ -187,7 +188,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         merged.dataType == dataType
         destination.ext.size() == 3
         destination.ext.two == 'two'
-        source.countContainedIn() == 2
+        source.countContainedIn() == 3
         destination.countContainedIn() == 3
         source.dataModel
         destination.dataModel
@@ -908,6 +909,38 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         assert original.ext == clone.ext
 
         return true
+    }
+
+
+    def "get type hierarchy"() {
+        catalogueBuilder.build {
+            dataModel name: 'Data Model for Testing Type Hierarchy', {
+                dataType name: 'L3', {
+                    dataType name: 'L2', {
+                        dataType name: 'L1'
+                    }
+                }
+            }
+        }
+
+        DataType l1 = DataType.findByName('L1')
+        DataType l2 = DataType.findByName('L2')
+        DataType l3 = DataType.findByName('L3')
+
+        expect:
+        l1
+        l2
+        l3
+        l1 in l2.isBasedOn
+        l2 in l3.isBasedOn
+
+        when:
+        ListWithTotalAndType<DataType> typeHierarchy = elementService.getTypeHierarchy([:], l3)
+
+        then:
+        typeHierarchy.total == 2L
+        typeHierarchy.items[0] == l2
+        typeHierarchy.items[1] == l1
     }
 
 

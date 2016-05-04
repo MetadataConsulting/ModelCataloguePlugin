@@ -3,6 +3,10 @@ package org.modelcatalogue.gel.export
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.EnumeratedType
+import org.modelcatalogue.core.util.HibernateHelper
+
+import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
 /**
  * Created by rickrees on 31/03/2016.
@@ -11,7 +15,7 @@ import org.modelcatalogue.core.DataElement
 @Log4j
 class CancerTypesCsvExporter {
 
-    static final String CANCER_TYPES_HEADER = "Id,Cancer Types,Presentations,Id SubTypes,Cancer SubTypes"
+    static final String CANCER_TYPES_HEADER = "Id,Cancer Types,Presentations,Id SubTypes,Cancer SubTypes,Id Enum,Enum SubType"
 
     private final OutputStream out
 
@@ -20,7 +24,7 @@ class CancerTypesCsvExporter {
     }
 
 
-    void exportCancerTypesAsCsv(model) {
+    void exportCancerTypesAsCsv(CatalogueElement model) {
         int level = 1
         def lines = []
         def exclusions = []
@@ -35,7 +39,7 @@ class CancerTypesCsvExporter {
 
 
 
-    def descendModelsCsv(CatalogueElement model, lines, level, groupDescriptions, exclusions) {
+    def descendModelsCsv(CatalogueElement model, lines, level, Map groupDescriptions, exclusions) {
         def line = []
 
         //strip then re-add surrounding quotes to ensure only one set surround the name
@@ -53,8 +57,7 @@ class CancerTypesCsvExporter {
                 break
 
             case 3:
-                generateLine(line, groupDescriptions, level, model, modelName)
-                lines << line.join(',')
+                subTypeOrPresentation(lines, groupDescriptions, level, model, modelName)
                 return  //don't go deeper
 
             default:    //don't go deeper
@@ -74,19 +77,52 @@ class CancerTypesCsvExporter {
 
     }
 
-    private void generateLine(List line, groupDescriptions, level, CatalogueElement model, String modelName) {
-        line << groupDescriptions.get(level - 1)
+    private void subTypeOrPresentation(List lines, groupDescriptions, level, CatalogueElement model, String subTypeName) {
 
-        if (model.name.matches("(?i:.*Subtype.*)")) {
+        if (subTypeName.matches("(?i:.*Subtype.*)")) {
+            iterateEnumTypes(lines, groupDescriptions, level, model, subTypeName)
 
-            line << ""
-            line << model.combinedVersion
-            line << "$modelName"
-
-        } else if (model.name.matches("(?i:.*Presentation.*)")) {
-            line << "$modelName,,"
+        } else if (subTypeName.matches("(?i:.*Presentation.*)")) {
+            String line = generateLine(groupDescriptions, level, model, null, null, subTypeName)
+            lines << line
         }
     }
+
+    private List<String> iterateEnumTypes(List lines, groupDescriptions, level, CatalogueElement model, String subTypeName) {
+
+        if(subTypeName.matches("(?i:.*Subtype.*)") && getEntityClass(model) == DataElement && getEntityClass(model.dataType) == EnumeratedType) {
+            EnumeratedType enumTypes = model.dataType as EnumeratedType
+            log.debug("found enumType $enumTypes.name")
+
+            enumTypes.enumerations.each { enumType ->
+                String line = generateLine(groupDescriptions, level, model, enumTypes, enumType, subTypeName)
+                lines << line
+            }
+        }
+        lines
+    }
+
+
+    private String generateLine(groupDescriptions, level, DataElement cancerSubType, EnumeratedType enumTypes, Map.Entry enumType, String subTypeName) {
+        def vars = []
+        String line = ''
+
+        vars << groupDescriptions.get(level - 1)
+
+        if (enumType) {
+
+            vars << ""
+            vars << cancerSubType.combinedVersion
+            vars << "$subTypeName"
+            vars << "$enumTypes.combinedVersion"
+            vars << "\"${enumType.key}\""
+
+        } else {
+            vars << "$subTypeName,,,,"
+        }
+        line = vars.join(',')
+    }
+
 
 }
 

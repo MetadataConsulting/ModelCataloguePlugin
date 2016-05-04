@@ -542,10 +542,15 @@ tr.archived, .catalogue-element-treeview-text-content.archived {
   font-style: italic;
 }
 
-tr.inherited, .catalogue-element-treeview-text-content.inherited {
+tr.inherited, tr.inherited > td, tr.inherited > th, .catalogue-element-treeview-text-content.inherited {
   font-style: italic;
-  background-color: whitesmoke;
+  background-color: whitesmoke!important;
 }
+
+tr.local, tr.local > td, tr.local > th, .catalogue-element-treeview-text-content.local {
+  font-style: italic;
+}
+
 
 .ordered-map-container {
   margin-top: 15px;
@@ -853,4 +858,9 @@ tr.inherited, .catalogue-element-treeview-text-content.inherited {
   @media (min-height: 800px) {
     height: 500px;
   }
+}
+
+.code, .code td, .code span {
+  font-family: sans-serif!important;
+  white-space: pre-line;
 }

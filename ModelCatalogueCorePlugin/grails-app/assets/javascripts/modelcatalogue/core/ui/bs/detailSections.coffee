@@ -434,7 +434,6 @@ x in ['apple', 'banana', 'cherry']
             header: 'Name',
             value: "ext.get('name') || ext.get('Name') || relation.name ",
             classes: 'col-md-5',
-            href: 'relation.href()',
             href: 'relation.href()'
           }
           {
@@ -445,6 +444,43 @@ x in ['apple', 'banana', 'cherry']
           }
           {header: 'Description', value: "relation.description", classes: 'col-md-4'}
           {header: 'Occurs', value: printMetadataOccurrencesOnly, classes: 'col-md-4'}
+        ]
+    }
+  }
+
+  detailSectionsProvider.register {
+    title: 'Inherited Rules'
+    position: -29
+    types: [
+      'dataType'
+    ]
+    keys: []
+    template: '/mc/core/ui/detail-sections/tableData.html'
+    getList: (element) ->
+      return @result if @result
+
+      @result =
+        base: element.typeHierarchy.base
+        itemType: element.typeHierarchy.itemType
+
+      element.typeHierarchy(null, max: 5).then (list) =>
+        @result = list
+      return @result
+    data: {
+      columns:
+        [
+          {
+            header: 'Name',
+            value: "name",
+            classes: 'col-md-3',
+            href: 'href()'
+          }
+          {
+            header: 'Rule',
+            value: "rule",
+            classes: 'col-md-9 code',
+          }
+
         ]
     }
   }

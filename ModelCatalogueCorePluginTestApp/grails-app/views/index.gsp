@@ -47,10 +47,13 @@
         <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap${minSuffix}.css">
         <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome${minSuffix}.css">
 
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/core-js/2.3.0/core${minSuffix}.js"></script>
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/ace/1.2.3/ace.js"></script>
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/rxjs/4.0.8/rx.all${minSuffix}.js"></script>
+
         <!-- Saxon needs to be excluded from the main bulk but does not live in any CDN -->
         <asset:javascript src="saxonce/Saxonce.nocache.js"/>
+
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery${minSuffix}.js"></script>
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui${minSuffix}.js"></script>
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap${minSuffix}.js"></script>
@@ -75,6 +78,7 @@
         <asset:stylesheet href="font-awesome/css/font-awesome"/>
         <asset:stylesheet href="modelcatalogue.css"/>
 
+        <asset:javascript src="core.js/client/core.js"/>
         <asset:javascript src="ace-builds/src-min-noconflict/ace.js"/>
         <asset:javascript src="rxjs/dist/rx.all.js"/>
         <asset:javascript src="saxonce/Saxonce.nocache.js"/>

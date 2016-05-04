@@ -267,6 +267,7 @@ def assetExcludes = [
         "bootstrap/**/*.*",
         "jquery-ui/**/*.*",
         "font-awesome/**/*.*",
+        "core.js/**/*.*",
         "jquery/**/*.*",
         "angular/**/*.*",
         "ace-builds/**/*.*",

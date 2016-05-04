@@ -53,15 +53,6 @@ Forms generator plugin for Model Catalogue
 
     def doWithApplicationContext = { ctx ->
         // TODO Implement post initialization spring config (optional)
-        ReportsRegistry reportsRegistry = ctx.getBean(ReportsRegistry)
-
-        reportsRegistry.register {
-            creates asset
-            type DataClass
-            title { "Export as Case Report From" }
-            defaultName { "$it.name Case Report Form" }
-            link controller: 'formGenerator', action: 'generateForm', id: true
-        }
     }
 
     def onChange = { event ->

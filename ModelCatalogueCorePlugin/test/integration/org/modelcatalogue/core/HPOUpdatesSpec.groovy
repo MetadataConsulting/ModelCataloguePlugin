@@ -2,12 +2,7 @@ package org.modelcatalogue.core
 
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.builder.api.CatalogueBuilder
-import org.modelcatalogue.core.AbstractIntegrationSpec
-import org.modelcatalogue.core.DataClass
-import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.util.test.TestDataHelper
 import org.modelcatalogue.integration.obo.OboLoader
 import spock.lang.Shared
 import spock.lang.Unroll
@@ -66,7 +61,7 @@ class HPOUpdatesSpec extends AbstractIntegrationSpec  {
         DataClass renalCyst = DataClass.findByNameAndDataModel('Renal cyst', hpoDraft)
         DataClass something = DataClass.findByNameAndDataModel('Something Different', hpoDraft)
         DataClass somethingObsolete = DataClass.findByNameAndDataModel('Something Different Obsolete', hpoDraft)
-        DataClass obsoleteContainer = DataClass.findByNameAndDataModel(OboLoader.DEPRECATED_DATA_CLASS_NAME, hpoDraft)
+        DataClass obsoleteContainer = DataClass.findByNameAndDataModel(ElementService.DEPRECATED_DATA_CLASS_NAME, hpoDraft)
 
         then:
         renalCyst
