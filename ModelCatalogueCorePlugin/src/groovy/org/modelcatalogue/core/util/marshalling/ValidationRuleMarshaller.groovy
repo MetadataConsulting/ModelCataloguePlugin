@@ -1,11 +1,11 @@
 package org.modelcatalogue.core.util.marshalling
 
-import org.modelcatalogue.core.Asset
+import org.modelcatalogue.core.ValidationRule
 
 class ValidationRuleMarshaller extends CatalogueElementMarshaller {
 
     ValidationRuleMarshaller() {
-        super(Asset)
+        super(ValidationRule)
     }
 
     protected Map<String, Object> prepareJsonMap(el) {
