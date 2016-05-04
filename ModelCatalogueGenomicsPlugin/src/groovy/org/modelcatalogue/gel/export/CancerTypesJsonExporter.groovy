@@ -5,6 +5,9 @@ import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.EnumeratedType
+import org.modelcatalogue.core.util.HibernateHelper
+
+import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
 /**
  * Created by rickrees on 31/03/2016.
@@ -117,7 +120,7 @@ class CancerTypesJsonExporter {
 
     private void iterateEnumTypes(CatalogueElement model, List subtypes) {
 
-        if(model instanceof DataElement && model.dataType instanceof EnumeratedType) {
+        if(model instanceof DataElement && getEntityClass(model.dataType) == EnumeratedType) {
 
             EnumeratedType enumTypes = model.dataType as EnumeratedType
             log.debug("found enumType $enumTypes.name")
