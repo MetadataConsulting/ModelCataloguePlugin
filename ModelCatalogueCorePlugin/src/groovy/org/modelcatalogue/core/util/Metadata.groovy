@@ -11,13 +11,15 @@ class Metadata {
     public static final def AUTHORS = "http://www.modelcatalogue.org/metadata/#authors"
     public static final def REVIEWERS = "http://www.modelcatalogue.org/metadata/#reviewers"
 
-    //Phenotype subclass metadata
+    /**
+     * Phenotype subclass metadata
+     */
     public static final def OBO_ID = "OBO ID"
 
     /**
      * The HPO and clinical tests report exporters only work for and should only be available to the relevant data class(es), discerned by this metadata field
      */
-    public static final def HPO_REPORT_AVAILABLE = "rare-disease-reports"
+    public static final def HPO_REPORT_AVAILABLE = "http://www.modelcatalogue.org/metadata/genomics/#rare-disease-reports"
     public static final def CANCER_TYPES_AVAILABLE = "http://www.modelcatalogue.org/metadata/genomics/#cancer-types-export"
 
 }

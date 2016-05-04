@@ -24,6 +24,8 @@ import static org.modelcatalogue.gel.export.RareDiseasePhenotypeChangeLogXlsExpo
 class RareDiseasePhenotypeChangeLogXlsExporter extends AbstractChangeLogGenerator {
 
     public static final String PHENOTYPES_SHEET = 'HPO & Clinical tests change log'
+    public static final String ELIGIBILITY_SHEET = 'Eligibility Criteria change log'
+
     static final String CHANGE_REF = ''
     public static final String PHENOTYPE = 'Phenotype'
     public static final String CLINICAL_TESTS = 'Clinical tests'
@@ -34,6 +36,8 @@ class RareDiseasePhenotypeChangeLogXlsExporter extends AbstractChangeLogGenerato
     def ignoreKeyListForDeletions = ['child of','contains', 'Class Type']
     def ignoreKeyListForCreations = ['parent of', 'Class Type']
     def ignoreKeyList = ['parent of', 'child of','contains', 'Class Type']
+
+    boolean isEligibilityReport
 
     public enum RareDiseaseChangeType {
         REMOVE_DATA_ITEM('Remove Data Item',null),
@@ -65,11 +69,21 @@ class RareDiseasePhenotypeChangeLogXlsExporter extends AbstractChangeLogGenerato
     @Override
     void generateChangelog(DataClass model, OutputStream outputStream) {}
 
-
     public void exportPhenotypes(DataClass model, OutputStream out) {
+        String sheetName = PHENOTYPES_SHEET
+        export(model, out, sheetName)
+    }
+
+    public void exportEligibilityCriteria(DataClass model, OutputStream out) {
+        isEligibilityReport = true
+        String sheetName = ELIGIBILITY_SHEET
+        export(model, out, sheetName)
+    }
+
+    private void export(DataClass model, OutputStream out, String sheetName){
         List lines = buildContentRows(model)
 
-        exportLinesAsXls PHENOTYPES_SHEET, lines, out
+        exportLinesAsXls sheetName, lines, out
 
         log.info "Exported Rare Diseases as xls spreadsheet ${model.name} (${model.combinedVersion})"
     }
@@ -138,23 +152,30 @@ class RareDiseasePhenotypeChangeLogXlsExporter extends AbstractChangeLogGenerato
 
     // operates at level 5
     private List<String> generateLine(CatalogueElement model, List lines, groupDescriptions, level) {
-        String subtype
+        String subtype = null
 
-        if (model.name.matches("(?i:.*Phenotype.*)")) {
+        if(!isEligibilityReport) {
+            if (model.name.matches("(?i:.*Phenotype.*)")) {
 
-            subtype = PHENOTYPE
-            checkChangeLog(model, lines, subtype, groupDescriptions, level, TOP_LEVEL_RELATIONSHIP_TYPES)
-            iterateChildren(model, lines, subtype, groupDescriptions, level, DETAIL_CHANGE_TYPES)
+                subtype = PHENOTYPE
+                checkChangeLog(model, lines, subtype, groupDescriptions, level, TOP_LEVEL_RELATIONSHIP_TYPES)
+                iterateChildren(model, lines, subtype, groupDescriptions, level, DETAIL_CHANGE_TYPES)
 
-        } else if (model.name.matches("(?i:.*Clinical Test.*)")) {
+            } else if (model.name.matches("(?i:.*Clinical Test.*)")) {
 
-            subtype = CLINICAL_TESTS
-            checkChangeLog(model, lines, subtype, groupDescriptions, level, TOP_LEVEL_RELATIONSHIP_TYPES)
-            iterateChildren(model, lines, subtype, groupDescriptions, level, DETAIL_CHANGE_TYPES)
+                subtype = CLINICAL_TESTS
+                checkChangeLog(model, lines, subtype, groupDescriptions, level, TOP_LEVEL_RELATIONSHIP_TYPES)
+                iterateChildren(model, lines, subtype, groupDescriptions, level, DETAIL_CHANGE_TYPES)
 
-        } else if (model.name.matches("(?i:.*Guidance.*)")) {
-            subtype = GUIDANCE
-            checkChangeLog(model, lines, subtype, groupDescriptions, level, [PROPERTY_CHANGED])
+            } else if (model.name.matches("(?i:.*Guidance.*)")) {
+                subtype = GUIDANCE
+                checkChangeLog(model, lines, subtype, groupDescriptions, level, [PROPERTY_CHANGED])
+            }
+        } else {
+            if (model.name.matches("(?i:.*Eligibility.*)")) {
+                checkChangeLog(model, lines, subtype, groupDescriptions, level, TOP_LEVEL_RELATIONSHIP_TYPES)
+                iterateChildren(model, lines, subtype, groupDescriptions, level, DETAIL_CHANGE_TYPES)
+            }
         }
         lines
     }
@@ -316,7 +337,7 @@ class RareDiseasePhenotypeChangeLogXlsExporter extends AbstractChangeLogGenerato
                 changes << lvlName
             }
 
-            changes << subtype
+            if(subtype) changes << subtype
             changes << model.name
 
             String before = rowData.get(0)
@@ -486,11 +507,12 @@ class RareDiseasePhenotypeChangeLogXlsExporter extends AbstractChangeLogGenerato
                     width 60
                     style 'h3'
                 }
-                cell {
-                    value 'Phenotype /Clinical Tests/Guidance'
-                    width 35
-                    style 'h3'
-                }
+                if (!isEligibilityReport)
+                    cell {
+                        value 'Phenotype /Clinical Tests/Guidance'
+                        width 35
+                        style 'h3'
+                    }
                 cell {
                     value 'Affected Data Item'
                     width 35
