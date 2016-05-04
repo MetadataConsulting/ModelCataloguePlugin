@@ -8,7 +8,7 @@ class DataClass extends CatalogueElement {
 
     static relationships = [
             incoming: [hierarchy: 'childOf'],
-            outgoing: [containment: 'contains', hierarchy: 'parentOf']
+            outgoing: [containment: 'contains', hierarchy: 'parentOf', ruleContext: 'contextFor']
     ]
 
     @Override

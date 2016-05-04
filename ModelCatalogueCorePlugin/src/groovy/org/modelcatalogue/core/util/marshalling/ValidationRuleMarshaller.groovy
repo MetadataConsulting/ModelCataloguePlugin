@@ -12,6 +12,8 @@ class ValidationRuleMarshaller extends CatalogueElementMarshaller {
         if (!el) return [:]
         def ret = super.prepareJsonMap(el)
         ret.putAll(
+            component: el.component,
+            ruleFocus: el.ruleFocus,
             trigger: el.trigger,
             rule: el.rule,
             errorCondition: el.errorCondition,
