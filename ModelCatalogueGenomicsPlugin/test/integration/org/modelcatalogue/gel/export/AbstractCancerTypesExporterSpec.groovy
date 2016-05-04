@@ -28,12 +28,17 @@ class AbstractCancerTypesExporterSpec extends IntegrationSpec{
     protected Long cancer_type_1_adult_glioma_id
     protected Long cancer_type_2_some_cancer_id
     protected String cancer_type_1_adult_glioma_combined_id
+    protected String cancer_type_1_adult_subType_id
     protected String cancer_type_1_adult_subType_combined_id
+    protected String cancer_type_1_adult_glioma_enum_id
     protected String cancer_type_1_adult_glioma_enum_combined_id
     protected String cancer_type_1_adult_presentation_combined_id
     protected String cancer_type_2_some_cancer_combined_id
+    protected String cancer_type_2_some_cancer_subType21_id
     protected String cancer_type_2_some_cancer_subType21_combined_id
+    protected String cancer_type_2_some_cancer_subType22_id
     protected String cancer_type_2_some_cancer_subType22_combined_id
+    protected String cancer_type_2_some_cancer_enum_id
     protected String cancer_type_2_some_cancer_enum_combined_id
     protected String cancer_type_2_some_cancer_presentation2_combined_id
     protected String cancer_type_2_some_cancer_presentation22_combined_id
@@ -95,6 +100,7 @@ class AbstractCancerTypesExporterSpec extends IntegrationSpec{
         cancer_type_1_adult_glioma_id = adultType.getId()
         cancer_type_1_adult_glioma_combined_id = adultType.getCombinedVersion()
 
+        cancer_type_1_adult_subType_id = DataElement.findByName(ADULT_GLIOMA_SUBTYPE_1).getId()
         cancer_type_1_adult_subType_combined_id = DataElement.findByName(ADULT_GLIOMA_SUBTYPE_1).getCombinedVersion()
         cancer_type_1_adult_presentation_combined_id = DataElement.findByName(ADULT_GLIOMA_PRESENTATION_1).getCombinedVersion()
 
@@ -102,12 +108,16 @@ class AbstractCancerTypesExporterSpec extends IntegrationSpec{
         cancer_type_2_some_cancer_id = someCancerType.getId()
         cancer_type_2_some_cancer_combined_id = someCancerType.getCombinedVersion()
 
+        cancer_type_2_some_cancer_subType21_id = DataElement.findByName(SOME_CANCER_SUBTYPE_21).getId()
         cancer_type_2_some_cancer_subType21_combined_id = DataElement.findByName(SOME_CANCER_SUBTYPE_21).getCombinedVersion()
+        cancer_type_2_some_cancer_subType22_id = DataElement.findByName(SOME_CANCER_SUBTYPE_22).getId()
         cancer_type_2_some_cancer_subType22_combined_id = DataElement.findByName(SOME_CANCER_SUBTYPE_22).getCombinedVersion()
         cancer_type_2_some_cancer_presentation2_combined_id = DataElement.findByName(SOME_CANCER_PRESENTATION_21).getCombinedVersion()
         cancer_type_2_some_cancer_presentation22_combined_id = DataElement.findByName(SOME_CANCER_PRESENTATION_22).getCombinedVersion()
 
+        cancer_type_1_adult_glioma_enum_id = DataType.findByName(ADULT_GLIOMA_ENUM).getId()
         cancer_type_1_adult_glioma_enum_combined_id = DataType.findByName(ADULT_GLIOMA_ENUM).getCombinedVersion()
+        cancer_type_2_some_cancer_enum_id = DataType.findByName(SOME_CANCER_ENUM).getId()
         cancer_type_2_some_cancer_enum_combined_id = DataType.findByName(SOME_CANCER_ENUM).getCombinedVersion()
 
     }
