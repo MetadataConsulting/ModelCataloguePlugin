@@ -294,6 +294,27 @@ class GenomicsController {
         redirect controller: 'asset', id: assetId, action: 'show'
     }
 
+    def exportRareDiseaseEligibilityChangeLogAsXls() {
+
+        DataClass dataClass = DataClass.get(params.id)
+
+        if (!dataClass) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        Long assetId = assetService.storeReportAsAsset(dataClass.dataModel,
+            name: "${dataClass.name} report as MS Excel Document",
+            originalFileName: "$RD_PHENOTYPE_AND_CLINICAL_TESTS_XLS",
+            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        ) { OutputStream out ->
+            new RareDiseasePhenotypeChangeLogXlsExporter(auditService, dataClassService, 0, false).exportEligibilityCriteria(dataClass, out)
+        }
+
+        response.setHeader("X-Asset-ID", assetId.toString())
+        redirect controller: 'asset', id: assetId, action: 'show'
+    }
+
     def exportChangeLogDocument(String name, Integer depth, Boolean includeMetadata) {
 
         DataClass dataClass = DataClass.get(params.id)
