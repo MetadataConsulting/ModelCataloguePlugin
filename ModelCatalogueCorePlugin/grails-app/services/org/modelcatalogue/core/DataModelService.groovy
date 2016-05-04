@@ -30,7 +30,7 @@ class DataModelService {
     public Map<String, Integer> getStatistics(DataModelFilter filter) {
         def model = [:]
 
-        List<Class> displayed = [DataModel, DataClass, DataElement, DataType, MeasurementUnit, Asset]
+        List<Class> displayed = [DataModel, DataClass, DataElement, DataType, MeasurementUnit, Asset, ValidationRule]
 
         for (Class type in displayed) {
             DetachedCriteria criteria = classified(type, filter)

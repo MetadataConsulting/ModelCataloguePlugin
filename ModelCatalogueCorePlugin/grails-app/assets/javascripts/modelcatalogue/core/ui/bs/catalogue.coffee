@@ -24,6 +24,7 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setIcon 'relationship',       "fa fa-fw fa-link"
   catalogueProvider.setIcon 'relationships',      "fa fa-fw fa-link"
   catalogueProvider.setIcon 'mapping',            "fa fa-fw fa-superscript"
+  catalogueProvider.setIcon 'validationRule',     "fa fa-fw fa-university"
 
   # this should be generated automatically in the future
 
@@ -40,6 +41,7 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setInstanceOf 'measurementUnit',    'catalogueElement'
   catalogueProvider.setInstanceOf 'model',              'catalogueElement'
   catalogueProvider.setInstanceOf 'dataElement',        'catalogueElement'
+  catalogueProvider.setInstanceOf 'validationRule',     'catalogueElement'
 
   catalogueProvider.setInstanceOf 'enumeratedType',     'dataType'
   catalogueProvider.setInstanceOf 'referenceType',      'dataType'
