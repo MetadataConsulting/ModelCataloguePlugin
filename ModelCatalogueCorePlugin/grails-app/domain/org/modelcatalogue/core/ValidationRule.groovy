@@ -26,9 +26,6 @@ class ValidationRule extends CatalogueElement {
     /** Notification Target: i.e. who get the notification email? E.g. GMC, GEL, UKB etc. */
     String notificationTarget
 
-    /** Purpose: i.e. Purpose of the validation rule. */
-    String purpose
-
     static constraints = {
         component(nullable: true, maxSize: 255)
         ruleFocus(nullable: true, maxSize: 255)
@@ -38,7 +35,6 @@ class ValidationRule extends CatalogueElement {
         issueRecord(nullable: true, maxSize: 255)
         notification(nullable: true, maxSize: 255)
         notificationTarget(nullable: true, maxSize: 255)
-        purpose(nullable: true, maxSize: 255)
     }
 
     static relationships = [

@@ -19,8 +19,7 @@ class ValidationRuleMarshaller extends CatalogueElementMarshaller {
             errorCondition: el.errorCondition,
             issueRecord: el.issueRecord,
             notification: el.notification,
-            notificationTarget: el.notificationTarget,
-            purpose: el.purpose
+            notificationTarget: el.notificationTarget
         )
 
         ret
