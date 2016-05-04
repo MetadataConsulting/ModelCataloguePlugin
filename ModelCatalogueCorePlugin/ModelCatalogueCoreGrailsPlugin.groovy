@@ -106,7 +106,7 @@ Model catalogue core plugin (metadata registry)
                     new CsvTransformationMarshaller(),
                     new UserMarshaller(),
                     new ChangeMarshaller(),
-
+                    new ValidationRuleMarshaller()
             ]
         }
 
