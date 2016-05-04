@@ -11,6 +11,7 @@ import org.modelcatalogue.gel.GelJsonExporter
 import org.modelcatalogue.gel.export.CancerTypesCsvExporter
 import org.modelcatalogue.gel.export.CancerTypesJsonExporter
 import org.modelcatalogue.gel.export.RareDiseaseDisorderListCsvExporter
+import org.modelcatalogue.gel.export.RareDiseaseEligibilityChangeLogXlsExporter
 import org.modelcatalogue.gel.export.RareDiseasePhenotypeChangeLogXlsExporter
 import org.modelcatalogue.gel.export.RareDiseasesDocExporter
 import org.modelcatalogue.gel.export.RareDiseasesJsonExporter
@@ -35,6 +36,7 @@ class GenomicsController {
     static final String RD_ELIGIBILITY_CRITERIA_JSON = "RD Eligibility Criteria.json"
     static final String RD_PHENOTYPE_AND_CLINICAL_TESTS_JSON = "RD Phenotype and Clinical tests.json"
     static final String RD_PHENOTYPE_AND_CLINICAL_TESTS_XLS = "RD Change log for Phenotypes and clinical tests.xlsx"
+    static final String RD_ELIGIBILITY_CHANGELOG_XLS = "RD Change Log for Eligibility Criteria.xlsx"
 
     static final String DOC_IMAGE_PATH = "https://www.genomicsengland.co.uk/wp-content/uploads/2015/11/Genomics-England-logo-2015.png"
 
@@ -287,7 +289,7 @@ class GenomicsController {
             originalFileName: "$RD_PHENOTYPE_AND_CLINICAL_TESTS_XLS",
             contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream out ->
-            new RareDiseasePhenotypeChangeLogXlsExporter(auditService, dataClassService, 0, false).exportPhenotypes(dataClass,out)
+            new RareDiseasePhenotypeChangeLogXlsExporter(auditService, dataClassService, 0, false).export(dataClass,out)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())
@@ -305,10 +307,10 @@ class GenomicsController {
 
         Long assetId = assetService.storeReportAsAsset(dataClass.dataModel,
             name: "${dataClass.name} report as MS Excel Document",
-            originalFileName: "$RD_PHENOTYPE_AND_CLINICAL_TESTS_XLS",
+            originalFileName: "$RD_ELIGIBILITY_CHANGELOG_XLS",
             contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream out ->
-            new RareDiseasePhenotypeChangeLogXlsExporter(auditService, dataClassService, 0, false).exportEligibilityCriteria(dataClass, out)
+            new RareDiseaseEligibilityChangeLogXlsExporter(auditService, dataClassService, 0, false).export(dataClass, out)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())
