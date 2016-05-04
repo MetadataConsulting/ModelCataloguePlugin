@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.util.marshalling
 
+import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.ValidationRule
 
 class ValidationRuleMarshaller extends CatalogueElementMarshaller {
@@ -19,7 +21,8 @@ class ValidationRuleMarshaller extends CatalogueElementMarshaller {
             errorCondition: el.errorCondition,
             issueRecord: el.issueRecord,
             notification: el.notification,
-            notificationTarget: el.notificationTarget
+            notificationTarget: el.notificationTarget,
+            content: [count: el.countAppliedWithin() + el.countInvolves(), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/content"]
         )
 
         ret

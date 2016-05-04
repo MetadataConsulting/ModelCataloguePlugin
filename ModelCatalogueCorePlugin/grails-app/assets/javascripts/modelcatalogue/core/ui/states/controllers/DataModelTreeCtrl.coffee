@@ -49,7 +49,7 @@ angular.module('mc.core.ui.states.controllers.DataModelTreeCtrl', ['ui.router', 
         if type == 'dataModel'
           params.property = 'activity'
 
-        if type == 'asset'
+        if type == 'asset' || type == 'validationRule'
           params.property = 'history'
 
         $state.go 'mc.resource.show.property', params

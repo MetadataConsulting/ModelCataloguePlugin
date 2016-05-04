@@ -99,6 +99,8 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
 
     return 0.5 if "#{modelCatalogueApiRoot}#{list.base.replace('/content', '/outgoing/hierarchy')}".indexOf(url) >= 0
     return 0.5 if "#{modelCatalogueApiRoot}#{list.base.replace('/content', '/outgoing/containment')}".indexOf(url) >= 0
+    return 0.5 if "#{modelCatalogueApiRoot}#{list.base.replace('/content', '/incoming/involvedness')}".indexOf(url) >= 0
+    return 0.5 if "#{modelCatalogueApiRoot}#{list.base.replace('/content', '/incoming/ruleContext')}".indexOf(url) >= 0
 
     return 0.3 if url.indexOf("#{modelCatalogueApiRoot}#{list.base.replace('/relationships/', '/incoming/')}") >= 0
     return 0.3 if "#{modelCatalogueApiRoot}#{list.base.replace('/relationships/', '/incoming/')}".indexOf(url) >= 0

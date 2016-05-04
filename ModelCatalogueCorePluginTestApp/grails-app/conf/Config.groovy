@@ -126,6 +126,7 @@ environments {
                          "mail.smtp.socketFactory.fallback":"false"]
             }
         }
+        grails.plugin.console.enabled = true
         mc.search.elasticsearch.local="${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/es${System.currentTimeMillis()}"
     }
     local {

@@ -108,13 +108,13 @@ class SearchISpec extends AbstractIntegrationSpec{
     protected static getPaginationParameters() {
         [
                 // no, size, max, offset, total, next, previous, searchString, sort, order
-                [1, 10, 10, 0, 65, "/search/?search=a&max=10&offset=10", "", "a"],
-                [2, 5, 5, 0, 65, "/search/?search=a&max=5&sort=name&order=ASC&offset=5", "", "a", "name", "ASC"],
-                [3, 2, 2, 6, 65, "/search/?search=a&max=2&sort=name&order=ASC&offset=8", "/search/?search=a&max=2&sort=name&order=ASC&offset=4", "a", "name", "ASC"],
-                [4, 4, 4, 1, 65, "/search/?search=a&max=4&sort=name&order=ASC&offset=5", "", "a", "name", "ASC"],
-                [5, 2, 2, 2, 65, "/search/?search=a&max=2&sort=name&order=ASC&offset=4", "/search/?search=a&max=2&sort=name&order=ASC&offset=0", "a", "name", "ASC"],
-                [6, 2, 2, 4, 65, "/search/?search=a&max=2&sort=name&offset=6", "/search/?search=a&max=2&sort=name&offset=2", "a", "name", ""],
-                [7, 2, 2, 4, 65, "/search/?search=a&max=2&offset=6", "/search/?search=a&max=2&offset=2", "a", null, null]
+                [1, 10, 10, 0, 77, "/search/?search=a&max=10&offset=10", "", "a"],
+                [2, 5, 5, 0, 77, "/search/?search=a&max=5&sort=name&order=ASC&offset=5", "", "a", "name", "ASC"],
+                [3, 2, 2, 6, 77, "/search/?search=a&max=2&sort=name&order=ASC&offset=8", "/search/?search=a&max=2&sort=name&order=ASC&offset=4", "a", "name", "ASC"],
+                [4, 4, 4, 1, 77, "/search/?search=a&max=4&sort=name&order=ASC&offset=5", "", "a", "name", "ASC"],
+                [5, 2, 2, 2, 77, "/search/?search=a&max=2&sort=name&order=ASC&offset=4", "/search/?search=a&max=2&sort=name&order=ASC&offset=0", "a", "name", "ASC"],
+                [6, 2, 2, 4, 77, "/search/?search=a&max=2&sort=name&offset=6", "/search/?search=a&max=2&sort=name&offset=2", "a", "name", ""],
+                [7, 2, 2, 4, 77, "/search/?search=a&max=2&offset=6", "/search/?search=a&max=2&offset=2", "a", null, null]
         ]
     }
 

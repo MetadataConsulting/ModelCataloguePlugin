@@ -179,6 +179,17 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Asset.properties', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Asset.$$relationship', hidden: true
 
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.ValidationRule.hasAttachmentOf', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.ValidationRule.ext', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.ValidationRule.isBaseFor', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.ValidationRule.isBasedOn', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.ValidationRule.isSynonymFor', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.ValidationRule.relatedTo', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.ValidationRule.properties', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.ValidationRule.$$relationship', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.ValidationRule.appliedWithin', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.ValidationRule.involves', hidden: true
+
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataElement.hasAttachmentOf', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataElement.properties', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataElement.ext', hidden: true
