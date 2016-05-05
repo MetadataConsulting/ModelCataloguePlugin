@@ -55,4 +55,20 @@ class ValidationRuleController extends AbstractCatalogueElementController<Valida
         )
     }
 
+    @Override
+    protected bindRelations(ValidationRule instance, boolean newVersion, Object objectToBind) {
+        super.bindRelations(instance, newVersion, objectToBind)
+        def dataClasses = objectToBind.dataClasses ?: []
+
+        for (dataClass in dataClasses) {
+            DataClass context = DataClass.get(dataClass.id)
+            instance.addToAppliedWithin(context)
+        }
+
+        def dataElements = objectToBind.dataElements ?: []
+        for (dataElement in dataElements) {
+            DataElement context = DataElement.get(dataElement.id)
+            instance.addToInvolves(context)
+        }
+    }
 }

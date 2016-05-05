@@ -22,6 +22,16 @@
       <input type="text" class="form-control" id="ruleFocus" placeholder="Rule Focus" ng-model="copy.ruleFocus">
     </div>
     <div class="form-group">
+      <label for="dataClasses">Contexutal Data Classes</label>
+      <elements-as-tags elements="copy.dataClasses" ></elements-as-tags>
+      <input type="text" class="form-control" id="dataClasses" placeholder="Data Classes" ng-model="dataClass" catalogue-element-picker resource="'dataClass'" status='draft' typeahead-on-select="copy.dataClasses.push(dataClass);dataClass = null">
+    </div>
+    <div class="form-group">
+      <label for="dataElements">Involved Data Elements</label>
+      <elements-as-tags elements="copy.dataElements" ></elements-as-tags>
+      <input type="text" class="form-control" id="dataElements" placeholder="Data Elemenets" ng-model="dataElement" catalogue-element-picker resource="'dataElement'" status='draft' typeahead-on-select="copy.dataElements.push(dataElement);dataElement = null">
+    </div>
+    <div class="form-group">
       <label for="trigger">Trigger</label>
       <input type="text" class="form-control" id="trigger" placeholder="Trigger" ng-model="copy.trigger">
     </div>
