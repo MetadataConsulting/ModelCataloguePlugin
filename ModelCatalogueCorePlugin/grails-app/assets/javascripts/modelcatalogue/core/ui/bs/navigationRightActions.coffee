@@ -183,74 +183,94 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   ]
 
 
-  loincImport = ['$scope', 'messages', ($scope, messages) -> {
-    position: 13001
-    label: "Import Loinc"
-    icon:  'fa fa-upload fa-fw'
-    action: ->
-      messages.prompt('Import Loinc File', '', type: 'new-loinc-import')
-  }]
+  loincImport = ($scope, messages, security) ->
+    'ngInject'
+    return undefined if not security.hasRole('CURATOR')
+    {
+      position: 13001
+      label: "Import Loinc"
+      icon:  'fa fa-upload fa-fw'
+      action: ->
+        messages.prompt('Import Loinc File', '', type: 'new-loinc-import')
+    }
+
   actionsProvider.registerChildAction 'new-import', 'import-loinc', loincImport
   actionsProvider.registerChildAction 'import-data-models-screen', 'import-loinc', loincImport
   actionsProvider.registerChildAction 'curator-menu', 'import-loinc', loincImport
   actionsProvider.registerActionInRole 'global-import-loinc', actionsProvider.ROLE_GLOBAL_ACTION, loincImport
 
-  excelImport = ['$scope', 'messages', ($scope, messages) -> {
-    position: 13002
-    label:  "Import Excel"
-    icon:  'fa fa-upload fa-fw'
-    action: ->
-      messages.prompt('Import Excel File', '', type: 'new-excel-import')
-  }]
+  excelImport = ($scope, messages, security) ->
+    'ngInject'
+    return undefined if not security.hasRole('CURATOR')
+    {
+      position: 13002
+      label:  "Import Excel"
+      icon:  'fa fa-upload fa-fw'
+      action: ->
+        messages.prompt('Import Excel File', '', type: 'new-excel-import')
+    }
+
   actionsProvider.registerChildAction 'new-import', 'import-excel', excelImport
   actionsProvider.registerChildAction 'import-data-models-screen', 'import-excel', excelImport
   actionsProvider.registerChildAction 'curator-menu', 'import-excel', excelImport
   actionsProvider.registerActionInRole 'global-import-excel', actionsProvider.ROLE_GLOBAL_ACTION, excelImport
 
-  oboImport = ['$scope', 'messages', ($scope, messages) -> {
-    position: 13003
-    label: "Import OBO"
-    icon:  'fa fa-upload fa-fw'
-    action: ->
-      messages.prompt('Import OBO File', '', type: 'new-obo-import')
-  }]
+  oboImport = ($scope, messages, security) ->
+    'ngInject'
+    return undefined if not security.hasRole('CURATOR')
+    {
+      position: 13003
+      label: "Import OBO"
+      icon:  'fa fa-upload fa-fw'
+      action: ->
+        messages.prompt('Import OBO File', '', type: 'new-obo-import')
+    }
   actionsProvider.registerChildAction 'new-import', 'import-obo', oboImport
   actionsProvider.registerChildAction 'import-data-models-screen', 'import-obo', oboImport
   actionsProvider.registerChildAction 'curator-menu', 'import-obo', oboImport
   actionsProvider.registerActionInRole 'global-import-obo', actionsProvider.ROLE_GLOBAL_ACTION, oboImport
 
-  umlImport = ['$scope', 'messages', ($scope, messages) -> {
-    position: 13004
-    label: "Import Star Uml"
-    icon:  'fa fa-upload fa-fw'
-    action: ->
-      messages.prompt('Import Star Uml File', '', type: 'new-umlj-import')
-  }]
+  umlImport = ($scope, messages, security) ->
+    'ngInject'
+    return undefined if not security.hasRole('CURATOR')
+    {
+      position: 13004
+      label: "Import Star Uml"
+      icon:  'fa fa-upload fa-fw'
+      action: ->
+        messages.prompt('Import Star Uml File', '', type: 'new-umlj-import')
+    }
   actionsProvider.registerChildAction 'new-import', 'import-umlj', umlImport
   actionsProvider.registerChildAction 'import-data-models-screen', 'import-umlj', umlImport
   actionsProvider.registerChildAction 'curator-menu', 'import-umlj', umlImport
   actionsProvider.registerActionInRole 'global-import-uml', actionsProvider.ROLE_GLOBAL_ACTION, umlImport
 
-  mcImport = ['$scope', 'messages', ($scope, messages) -> {
-    position: 13005
-    label: "Import MC"
-    icon:  'fa fa-upload fa-fw'
-    action: ->
-      messages.prompt('Import Model Catalogue DSL File', '', type: 'new-mc-import')
-  }]
+  mcImport = ($scope, messages, security) ->
+    'ngInject'
+    return undefined if not security.hasRole('CURATOR')
+    {
+      position: 13005
+      label: "Import MC"
+      icon:  'fa fa-upload fa-fw'
+      action: ->
+        messages.prompt('Import Model Catalogue DSL File', '', type: 'new-mc-import')
+    }
   actionsProvider.registerChildAction 'new-import', 'import-mc', mcImport
   actionsProvider.registerChildAction 'import-data-models-screen', 'import-mc', mcImport
   actionsProvider.registerChildAction 'curator-menu', 'import-mc', mcImport
   actionsProvider.registerActionInRole 'global-import-mc', actionsProvider.ROLE_GLOBAL_ACTION, mcImport
 
 
-  xmlImport = ['$scope', 'messages', ($scope, messages) -> {
-    position: 13006
-    label: "Import Catalogue XML"
-    icon:  'fa fa-upload fa-fw'
-    action: ->
-      messages.prompt('Import Model Catalogue XML File', '', type: 'new-catalogue-xml-import')
-  }]
+  xmlImport = ($scope, messages, security) ->
+    'ngInject'
+    return undefined if not security.hasRole('CURATOR')
+    {
+      position: 13006
+      label: "Import Catalogue XML"
+      icon:  'fa fa-upload fa-fw'
+      action: ->
+        messages.prompt('Import Model Catalogue XML File', '', type: 'new-catalogue-xml-import')
+    }
   actionsProvider.registerChildAction 'new-import', 'import-catalogue-xml', xmlImport
   actionsProvider.registerChildAction 'import-data-models-screen', 'import-catalogue-xml', xmlImport
   actionsProvider.registerChildAction 'curator-menu', 'import-catalogue-xml', xmlImport
