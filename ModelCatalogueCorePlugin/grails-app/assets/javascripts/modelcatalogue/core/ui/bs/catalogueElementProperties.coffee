@@ -39,6 +39,8 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
 
   # global settings
   catalogueElementPropertiesProvider.configureProperty 'ext', label: 'Metadata'
+  catalogueElementPropertiesProvider.configureProperty 'contextFor', label: 'Rules'
+  catalogueElementPropertiesProvider.configureProperty 'involvedIn', label: 'Rules'
   catalogueElementPropertiesProvider.configureProperty 'childOf', label: 'Parents', columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'isContextFor', label: 'Data Classes', columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'containedIn', label: 'Data Classes', columns: nameAndIdAndMetadata()
