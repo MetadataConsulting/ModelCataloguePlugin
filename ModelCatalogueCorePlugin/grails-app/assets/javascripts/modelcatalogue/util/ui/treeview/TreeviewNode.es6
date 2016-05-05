@@ -39,9 +39,17 @@
 
     class TreeviewNodeFactory {
         static create(id, item) {
+
             let cached = cache[id];
             if (cached) {
-                cached[symbols.item] = item;
+                if (cached.item === item) {
+                  return cached;
+                }
+                if (angular.isFunction(cached.item.updateFrom)) {
+                  cached.item.updateFrom(item)
+                } else {
+                  cached[symbols.item] = item;
+                }
                 return cached;
             }
             return cache[id] = new TreeviewNode(id, item);
