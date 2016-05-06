@@ -1,0 +1,30 @@
+{
+  "validation_rule": {
+    "properties": {
+      "component": {
+        "type": "string"
+      },
+      "rule_focus": {
+        "type": "string"
+      },
+      "trigger": {
+        "type": "string"
+      },
+      "rule": {
+        "type": "string"
+      },
+      "error_condition": {
+        "type": "string"
+      },
+      "issue_record": {
+        "type": "string"
+      },
+      "notification": {
+        "type": "string"
+      },
+      "notification_target": {
+        "type": "string"
+      }
+    }
+  }
+}

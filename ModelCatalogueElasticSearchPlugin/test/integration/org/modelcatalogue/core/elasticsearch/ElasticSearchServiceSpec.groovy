@@ -63,6 +63,9 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
                     relationship {
                        //  ext 'date_in_relationship_metadata', '2014-06-06T06:34:24Z'
                     }
+                    validationRule(name: 'Test Rule') {
+                        rule 'IF this THEN that'
+                    }
                 }
             }
         }
