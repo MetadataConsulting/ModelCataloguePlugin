@@ -1,0 +1,80 @@
+<div class="col-md-6">
+  <div class="row">
+    <div class="col-md-6"><strong class="small">Component</strong></div>
+    <div class="full-width-editable col-md-6">
+      <small editable-text="copy.component">{{element.component || 'empty'}}</small>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6"><strong class="small">Rule Focus</strong></div>
+    <div class="full-width-editable col-md-6">
+      <small editable-text="copy.ruleFocus">{{element.ruleFocus || 'empty'}}</small>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6"><strong class="small">Trigger</strong></div>
+    <div class="full-width-editable col-md-6">
+      <small editable-text="copy.trigger">{{element.trigger || 'empty'}}</small>
+    </div>
+  </div>
+</div>
+<div class="col-md-6">
+  <div class="row">
+    <div class="col-md-6"><strong class="small">Last Updated</strong></div>
+    <div class="col-md-6">
+      <small>{{element.lastUpdated | date}}</small>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6"><strong class="small">Version Created</strong></div>
+    <div class="col-md-6">
+      <small>{{element.versionCreated | date}}</small>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6"><strong class="small">Status</strong></div>
+    <div class="col-md-6">
+      <small>{{element.status}}</small>
+    </div>
+  </div>
+</div>
+<div class="col-md-12">
+  <div class="row">
+    <div class="col-md-3">
+      <strong class="small">Rule</strong>
+    </div>
+    <div class="full-width-editable col-md-9 preserve-new-lines"><small editable-textarea="copy.rule" e-rows="5" e-cols="1000" class="ce-description">{{element.rule || 'empty'}}</small></div>
+  </div>
+</div>
+<div class="col-md-12">
+  <div class="row">
+    <div class="col-md-3">
+      <strong class="small">Error Condition</strong>
+    </div>
+    <div class="full-width-editable col-md-9"><small editable-text="copy.errorCondition">{{element.errorCondition || 'empty'}}</small></div>
+  </div>
+</div>
+<div class="col-md-12">
+  <div class="row">
+    <div class="col-md-3">
+      <strong class="small">Issue Record</strong>
+    </div>
+    <div class="full-width-editable col-md-9"><small editable-text="copy.issueRecord">{{element.issueRecord || 'empty'}}</small></div>
+  </div>
+</div>
+<div class="col-md-12">
+  <div class="row">
+    <div class="col-md-3">
+      <strong class="small">Notification</strong>
+    </div>
+    <div class="full-width-editable col-md-9"><small editable-text="copy.notification">{{element.notification || 'empty'}}</small></div>
+  </div>
+</div>
+<div class="col-md-12">
+  <div class="row">
+    <div class="col-md-3">
+      <strong class="small">Notification Target</strong>
+    </div>
+    <div class="full-width-editable col-md-9"><small editable-text="copy.notificationTarget">{{element.notificationTarget || 'empty'}}</small></div>
+  </div>
+</div>

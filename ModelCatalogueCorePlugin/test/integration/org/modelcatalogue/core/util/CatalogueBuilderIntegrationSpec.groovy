@@ -97,6 +97,48 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         MeasurementUnit.findByName('TestUnit').description == 'This is a test unit which is just for test purposes!'
     }
 
+    def "creates new validation rule"() {
+        build {
+            dataModel(name: 'TRDM') {
+                dataClass name: 'TRDC', {
+                    validationRule(name: 'TestRule') {
+                        description 'description'
+                        component 'component'
+                        ruleFocus 'ruleFocus'
+                        trigger 'trigger'
+                        rule 'rule'
+                        errorCondition 'errorCondition'
+                        issueRecord 'issueRecord'
+                        notification 'notification'
+                        notificationTarget 'notificationTarget'
+
+                        dataElement name: 'TRDE1'
+                        dataElement name: 'TRDE2'
+                        dataElement name: 'TRDE3'
+                    }
+                }
+            }
+        }
+
+        ValidationRule rule = ValidationRule.findByName('TestRule')
+
+        expect:
+        rule
+        rule.description == 'description'
+        rule.component == 'component'
+        rule.ruleFocus == 'ruleFocus'
+        rule.trigger == 'trigger'
+        rule.rule == 'rule'
+        rule.errorCondition == 'errorCondition'
+        rule.issueRecord == 'issueRecord'
+        rule.notification == 'notification'
+        rule.notificationTarget == 'notificationTarget'
+        rule.appliedWithin
+        rule.appliedWithin.size() == 1
+        rule.involves
+        rule.involves.size() == 3
+    }
+
     def "reuse existing measurement unit by name"() {
         MeasurementUnit unit = new MeasurementUnit(name: 'ExistingUnit', status: ElementStatus.DEPRECATED).save(failOnError: true)
 

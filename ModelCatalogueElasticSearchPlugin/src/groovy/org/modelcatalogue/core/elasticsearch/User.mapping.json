@@ -1,5 +1,5 @@
 {
-  "data_element": {
+  "user": {
     "properties": {
       "username": {
         "type": "string",

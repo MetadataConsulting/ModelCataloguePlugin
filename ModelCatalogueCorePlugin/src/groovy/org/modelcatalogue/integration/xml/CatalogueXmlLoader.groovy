@@ -95,10 +95,18 @@ class CatalogueXmlLoader {
             case 'unitOfMeasure': handleUnit(element) ; break
             case 'dataType': handleDataType(element) ; break
             case 'valueDomain': handleValueDomain(element) ; break
+            case 'validationRule': handleValidationRule(element) ; break
             case 'description': handleDescription(element) ; break
             case 'revisionNotes': handleRevisionNotes(element) ; break
             case 'regex': handleRegex(element) ; break
+            case 'component': handleComponent(element) ; break
+            case 'ruleFocus': handleRuleFocus(element) ; break
+            case 'trigger': handleTrigger(element) ; break
             case 'rule': handleRule(element) ; break
+            case 'errorCondition': handleErrorCondition(element) ; break
+            case 'issueRecord': handleIssueRecord(element) ; break
+            case 'notification': handleNotification(element) ; break
+            case 'notificationTarget': handleNotificationTarget(element) ; break
             case 'extensions': handleChildren(element) ; break
             case 'relationships': handleChildren(element) ; break
             case 'enumerations': break // handled by data type
@@ -205,6 +213,34 @@ class CatalogueXmlLoader {
         builder.rule(element.text())
     }
 
+    private void handleComponent(NodeChild element) {
+        builder.component(element.text())
+    }
+
+    private void handleRuleFocus(NodeChild element) {
+        builder.ruleFocus(element.text())
+    }
+
+    private void handleTrigger(NodeChild element) {
+        builder.trigger(element.text())
+    }
+
+    private void handleErrorCondition(NodeChild element) {
+        builder.errorCondition(element.text())
+    }
+
+    private void handleIssueRecord(NodeChild element) {
+        builder.issueRecord(element.text())
+    }
+
+    private void handleNotification(NodeChild element) {
+        builder.notification(element.text())
+    }
+
+    private void handleNotificationTarget(NodeChild element) {
+        builder.notificationTarget(element.text())
+    }
+
     private void handleDataModel(NodeChild element) {
         builder.dataModel(parameters(element)) {
             handleChildren(element)
@@ -225,6 +261,12 @@ class CatalogueXmlLoader {
 
     private void handleDataClass(NodeChild element) {
         builder.dataClass(parameters(element)) {
+            handleChildren(element)
+        }
+    }
+
+    private void handleValidationRule(NodeChild element) {
+        builder.validationRule(parameters(element)) {
             handleChildren(element)
         }
     }

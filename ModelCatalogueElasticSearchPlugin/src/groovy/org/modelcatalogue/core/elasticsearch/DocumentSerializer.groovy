@@ -9,6 +9,7 @@ import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.security.User
 
 interface DocumentSerializer<T> {
@@ -24,6 +25,7 @@ interface DocumentSerializer<T> {
                 (DataType)        : new DataTypeDocumentSerializer(),
                 (MeasurementUnit) : new MeasurementUnitDocumentSerializer(),
                 (User)            : new UserDocumentSerializer(),
+                (ValidationRule)  : new ValidationRuleSerializer(),
                 (RelationshipType): new RelationshipTypeDocumentSerializer(),
                 (Relationship)    : new RelationshipDocumentSerializer()
         ]

@@ -180,6 +180,16 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
         readByName("containment")
     }
 
+
+    static RelationshipType getInvolvednessType() {
+        readByName("involvedness")
+    }
+
+
+    static RelationshipType getRuleContextType() {
+        readByName("ruleContext")
+    }
+
     /**
      * @deprecated no longer used, set the data model directly to the CatalogueElement
      */

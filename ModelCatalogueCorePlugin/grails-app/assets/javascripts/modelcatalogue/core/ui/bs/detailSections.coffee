@@ -278,6 +278,16 @@ x in ['apple', 'banana', 'cherry']
     title: 'Basic'
     position: 0
     types: [
+      'validationRule'
+    ]
+    keys: []
+    template: '/mc/core/ui/detail-sections/validationRuleBasic.html'
+  }
+
+  detailSectionsProvider.register {
+    title: 'Basic'
+    position: 0
+    types: [
       'asset'
     ]
     keys: []
@@ -367,6 +377,7 @@ x in ['apple', 'banana', 'cherry']
       'dataElement'
       'dataType'
       'dataClass'
+      'validationRule'
     ]
     keys: []
     template: '/mc/core/ui/detail-sections/customMetadata.html'
@@ -479,6 +490,82 @@ x in ['apple', 'banana', 'cherry']
             header: 'Rule',
             value: "rule",
             classes: 'col-md-9 code',
+          }
+
+        ]
+    }
+  }
+
+  detailSectionsProvider.register {
+    title: 'Context Data Classes'
+    position: 60
+    types: [
+      'validationRule'
+    ]
+    keys: []
+    template: '/mc/core/ui/detail-sections/tableData.html'
+    getList: (element) ->
+      return @result if @result
+
+      @result =
+        base: element.appliedWithin.base
+        itemType: element.appliedWithin.itemType
+
+      element.appliedWithin(null, max: 5).then (list) =>
+        @result = list
+      return @result
+    reorder: reorderInDetail('appliedWithin')
+    data: {
+      columns:
+        [
+          {
+            header: 'Name',
+            value: "ext.get('name') || ext.get('Name') || relation.name ",
+            classes: 'col-md-6',
+            href: 'relation.href()'
+          }
+          {
+            header: 'Description',
+            value: "relation.description",
+            classes: 'col-md-6',
+          }
+
+        ]
+    }
+  }
+
+  detailSectionsProvider.register {
+    title: 'Involved Data Elements'
+    position: 70
+    types: [
+      'validationRule'
+    ]
+    keys: []
+    template: '/mc/core/ui/detail-sections/tableData.html'
+    getList: (element) ->
+      return @result if @result
+
+      @result =
+        base: element.involves.base
+        itemType: element.involves.itemType
+
+      element.involves(null, max: 5).then (list) =>
+        @result = list
+      return @result
+    reorder: reorderInDetail('involves')
+    data: {
+      columns:
+        [
+          {
+            header: 'Name',
+            value: "ext.get('name') || ext.get('Name') || relation.name ",
+            classes: 'col-md-6',
+            href: 'relation.href()'
+          }
+          {
+            header: 'Description',
+            value: "relation.description",
+            classes: 'col-md-6',
           }
 
         ]
