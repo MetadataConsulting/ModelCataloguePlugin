@@ -58,6 +58,13 @@
         </xs:restriction>
     </xs:simpleType>
 
+    <xs:simpleType name="ShortText">
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="255"/>
+        </xs:restriction>
+    </xs:simpleType>
+
     <xs:simpleType name="ExtensionKey">
         <xs:restriction base="xs:string">
             <xs:minLength value="1"/>
@@ -115,6 +122,7 @@
             <xs:enumeration value="dataElement"/>
             <xs:enumeration value="dataType"/>
             <xs:enumeration value="measurementUnit"/>
+            <xs:enumeration value="validationRule"/>
         </xs:restriction>
     </xs:simpleType>
 
@@ -161,6 +169,8 @@
             <xs:enumeration value="synonym"/>
             <xs:enumeration value="favourite"/>
             <xs:enumeration value="declaration"/>
+            <xs:enumeration value="involvedness"/>
+            <xs:enumeration value="ruleContext"/>
         </xs:restriction>
     </xs:simpleType>
 
@@ -274,12 +284,34 @@
         </xs:complexContent>
     </xs:complexType>
 
+    <xs:complexType name="ValidationRule">
+        <xs:complexContent>
+            <xs:extension base="mdr:CatalogueElement">
+                <xs:sequence>
+                    <xs:element name="component"            type="mdr:ShortText" />
+                    <xs:element name="ruleFocus"            type="mdr:ShortText" />
+                    <xs:element name="trigger"              type="mdr:ShortText" />
+                    <xs:element name="rule"                 type="mdr:Rule" />
+                    <xs:element name="errorCondition"       type="mdr:ShortText" />
+                    <xs:element name="issueRecord"          type="mdr:ShortText" />
+                    <xs:element name="notification"         type="mdr:ShortText" />
+                    <xs:element name="notificationTarget"   type="mdr:ShortText" />
+                    <xs:choice minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="dataElement"      type="mdr:DataElement" />
+                    </xs:choice>
+                </xs:sequence>
+                <xs:attribute name="type" use="prohibited"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
     <xs:complexType name="DataClass">
         <xs:complexContent>
             <xs:extension base="mdr:CatalogueElement">
                 <xs:choice minOccurs="0" maxOccurs="unbounded">
                     <xs:element name="dataClass"        type="mdr:DataClass" />
                     <xs:element name="dataElement"      type="mdr:DataElement" />
+                    <xs:element name="validationRule"   type="mdr:ValidationRule" />
                 </xs:choice>
                 <xs:attribute name="type" use="prohibited"/>
             </xs:extension>

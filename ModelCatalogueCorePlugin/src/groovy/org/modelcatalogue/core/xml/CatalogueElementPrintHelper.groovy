@@ -26,6 +26,9 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         if (Asset.isAssignableFrom(type)) {
             return new AssetPrintHelper() as CatalogueElementPrintHelper<E>
         }
+        if (ValidationRule.isAssignableFrom(type)) {
+            return new ValidationRulePrintHelper() as CatalogueElementPrintHelper<E>
+        }
         throw new IllegalArgumentException("Not yet implemented for $type")
     }
 
@@ -123,8 +126,8 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             }
         }
 
-        List<Relationship> outgoing = restOfRelationships(Relationship.where { source == element && relationshipType.system != true}).list()
-        List<Relationship> incoming = restOfRelationships(Relationship.where { destination == element  && relationshipType.system != true}).list()
+        List<Relationship> outgoing = restOfRelationships(Relationship.where { source == element && relationshipType.system }).list()
+        List<Relationship> incoming = restOfRelationships(Relationship.where { destination == element  && relationshipType.system }).list()
 
         if (outgoing || incoming) {
             theMkp.relationships {
@@ -165,7 +168,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
 
     static DetachedCriteria<Relationship> restOfRelationships(DetachedCriteria<Relationship>  criteria) {
         criteria.not {
-            'in' 'relationshipType', ['declaration', 'hierarchy', 'containment', 'supersession', 'base', 'relatedTo', 'synonym'].collect { RelationshipType.readByName(it) }
+            'in' 'relationshipType', ['declaration', 'hierarchy', 'containment', 'supersession', 'base', 'relatedTo', 'synonym', 'involedness', 'ruleContext'].collect { RelationshipType.readByName(it) }
         }
         criteria.'eq' 'archived', false
     }
