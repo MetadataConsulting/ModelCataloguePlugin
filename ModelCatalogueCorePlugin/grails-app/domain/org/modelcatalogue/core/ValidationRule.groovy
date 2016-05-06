@@ -37,6 +37,10 @@ class ValidationRule extends CatalogueElement {
         notificationTarget(nullable: true, maxSize: 255)
     }
 
+    static mapping = {
+        trigger column: 'rule_trigger'
+    }
+
     static relationships = [
             incoming: [
                 ruleContext: 'appliedWithin',
