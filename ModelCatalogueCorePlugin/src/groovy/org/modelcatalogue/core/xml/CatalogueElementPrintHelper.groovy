@@ -126,8 +126,8 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             }
         }
 
-        List<Relationship> outgoing = restOfRelationships(Relationship.where { source == element && relationshipType.system }).list()
-        List<Relationship> incoming = restOfRelationships(Relationship.where { destination == element  && relationshipType.system }).list()
+        List<Relationship> outgoing = restOfRelationships(Relationship.where { source == element && relationshipType.system != true}).list()
+        List<Relationship> incoming = restOfRelationships(Relationship.where { destination == element  && relationshipType.system != true}).list()
 
         if (outgoing || incoming) {
             theMkp.relationships {
