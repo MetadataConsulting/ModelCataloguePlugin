@@ -69,6 +69,7 @@ Model catalogue core plugin (metadata registry)
         ModelCatalogueTypes.ENUMERATED_TYPE.implementation = EnumeratedType
         ModelCatalogueTypes.PRIMITIVE_TYPE.implementation = PrimitiveType
         ModelCatalogueTypes.REFERENCE_TYPE.implementation = ReferenceType
+        ModelCatalogueTypes.VALIDATION_RULE.implementation = ValidationRule
 
 
         mergeConfig(application)
