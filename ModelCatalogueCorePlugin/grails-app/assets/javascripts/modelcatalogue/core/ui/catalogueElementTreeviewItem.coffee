@@ -187,6 +187,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
       $scope.collapseOrExpand = ->
         return if $scope.extraParameters?.prefetch
         return if $scope.node.loadingChildren
+        return unless $scope.node.numberOfChildren
         unless $scope.node.collapsed
           $scope.node.collapsed = true
           return
