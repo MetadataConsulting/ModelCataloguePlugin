@@ -2,6 +2,7 @@ package org.modelcatalogue.gel.export
 
 import groovy.json.JsonSlurper
 import groovy.util.logging.Log4j
+import org.apache.commons.lang.exception.ExceptionUtils
 import org.modelcatalogue.builder.spreadsheet.api.Sheet
 import org.modelcatalogue.builder.spreadsheet.api.SpreadsheetBuilder
 import org.modelcatalogue.builder.spreadsheet.api.Workbook
@@ -11,6 +12,7 @@ import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.audit.Change
 import org.modelcatalogue.core.audit.ChangeType
 import org.modelcatalogue.core.publishing.changelog.AbstractChangeLogGenerator
+import org.modelcatalogue.core.util.OrderedMap
 
 import static org.modelcatalogue.core.audit.ChangeType.*
 import static org.modelcatalogue.gel.export.RareDiseaseChangeLogXlsExporter.RareDiseaseChangeType.*
@@ -20,7 +22,6 @@ import static org.modelcatalogue.gel.export.RareDiseaseChangeLogXlsExporter.Rare
  *
  */
 @Log4j
-//@CompileStatic
 abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerator implements XlsExporter {
 
     public static final String PHENOTYPES_SHEET = 'HPO & Clinical tests change log'
@@ -37,7 +38,6 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     def ignoreKeyListForCreations = ['parent of', 'Class Type']
     def ignoreKeyList = ['parent of', 'child of','contains', 'Class Type']
 
-    private boolean isEligibilityReport
 
     public enum RareDiseaseChangeType {
         REMOVE_DATA_ITEM('Remove Data Item',null),
@@ -69,7 +69,6 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     @Override
     void generateChangelog(DataClass model, OutputStream outputStream) {}
 
-//    public void export(DataClass dataClass, OutputStream out){}
 
     public void exportXls(DataClass model, OutputStream out, String sheetName){
         List lines = buildContentRows(model)
@@ -102,19 +101,19 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
 
             case [2]:
                 String groupDescription = "$model.name (${model.combinedVersion})"
-            log.debug("$level $groupDescription")
+                log.debug("level$level $groupDescription")
                 groupDescriptions.put(level, groupDescription)
                 break
 
             case [3]:
                 String groupDescription = "$model.name (${model.combinedVersion})"
-                log.debug("$level $groupDescription")
+                log.debug("level$level $groupDescription")
                 groupDescriptions.put(level, groupDescription)
                 break
 
             case [4]:
                 String groupDescription = "$model.name (${model.combinedVersion})"
-                log.debug("$level $groupDescription")
+                log.debug("level$level $groupDescription")
                 groupDescriptions.put(level, groupDescription)
                 break
 
@@ -122,7 +121,6 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
             case 5:
                 log.debug "level 5 searching... $model.name"
                 lines = generateLine(model, lines, groupDescriptions, level)
-                log.debug("$level $model.name")
                 return  //don't go deeper
 
             default:    //don't go deeper
@@ -144,7 +142,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     // level 5 descending into level 6
     List<String> iterateChildren(CatalogueElement model, List lines, String subtype = null, groupDescriptions, level, List<ChangeType> typesToCheck) {
         model.parentOf?.each { CatalogueElement child ->
-            log.debug("child $child.name")
+            log.debug("model $child.name")
             checkChangeLog(child, lines, subtype, groupDescriptions, level, typesToCheck)
         }
         lines
@@ -153,27 +151,19 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
 
     // operates at level 6
     List<String> checkChangeLog(CatalogueElement model, List lines, String subtype = null, groupDescriptions, level, List<ChangeType> typesToCheck) {
+        def rows
         List<String> changes = []
-        Map<String, List<String>> rows = new TreeMap<String, List<String>>().withDefault { ['', ''] }
-        //determine changes for model
-        log.debug "determine changes for $model.name"
-        log.debug("${lines.size}")
-
+        int noLines = lines.size()
 
         if (typesToCheck.contains(RELATIONSHIP_DELETED)) {
             changes = []
             List<Change> changed = getChanges(model, RELATIONSHIP_DELETED)
             rows = createRows(changed)
             rows.each { key, rowData ->
-//                println "RELATIONSHIP_DELETED key=$key"
-//                println "before=${rowData[0]}"
-//                println "after${rowData[1]}"
-
                 if(!ignoreKeyListForDeletions.contains(key)  ) {
-                    changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, REMOVE_DATA_ITEM, RELATIONSHIP_DELETED)
+                    changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, REMOVE_DATA_ITEM)
                     if (changes) lines << changes    //add row
                 }
-//                println "resultant delete changes=$changes"
             }
         }
 
@@ -183,14 +173,10 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
             List<Change> changed = getChanges(model, RELATIONSHIP_CREATED)
             rows = createRows(changed)
             rows.each { key, rowData ->
-//                println "RELATIONSHIP_CREATED key=$key"
-//                println "before=${rowData[0]}"
-//                println "after${rowData[1]}"
                 if(!ignoreKeyListForCreations.contains(key)  ) {
-                    changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, NEW_DATA_ITEM, RELATIONSHIP_CREATED)
+                    changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, NEW_DATA_ITEM)
                     if (changes) lines << changes    //add row
                 }
-//                println "resultant changes=$changes"
             }
         }
 
@@ -202,7 +188,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
             rows = createRows(changed)
             rows.each { key, rowData ->
                 if(!ignoreKeyList.contains(key)  ) {
-                    changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, CHANGED_METADATA, null)
+                    changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, CHANGED_METADATA)
                     if (changes) lines << changes    //add row
                 }
             }
@@ -214,7 +200,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
             rows = createRows(changed)
             rows.each { key, rowData ->
                 if(!ignoreKeyList.contains(key)  ) {
-                    changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, NEW_METADATA, null)
+                    changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, NEW_METADATA)
                     lines << changes    //add row
                 }
             }
@@ -224,7 +210,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
             List<Change> changed = getChanges(model, RELATIONSHIP_METADATA_CREATED)
             rows = createRows(changed)
             rows.each { key, rowData ->
-                changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, NEW_METADATA, RELATIONSHIP_METADATA_CREATED)
+                changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, NEW_METADATA)
                 if (changes) lines << changes    //add row
             }
         }
@@ -235,7 +221,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
             changed += getChanges(model, METADATA_DELETED)
             rows = createRows(changed)
             rows.each { key, rowData ->
-                changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, REMOVE_METADATA, null)
+                changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, REMOVE_METADATA)
                 if (changes) lines << changes    //add row
             }
         }
@@ -257,9 +243,14 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
                 if(GUIDANCE.equals(subtype) && TEXT_CHANGE.catalogChangeKey.equalsIgnoreCase(key) ) {
                     changeTypeToRender = TEXT_CHANGE
                 }
-                changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, changeTypeToRender, null)
+                changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, changeTypeToRender)
                 if (changes) lines << changes    //add row
             }
+        }
+
+        if(lines.size() > noLines) {
+            log.debug "found changes for level$level model $model.name"
+            log.debug("lines ${lines.size}")
         }
 
         changes
@@ -270,24 +261,44 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
 
         for (Change change in changes) {
             String propLabel = change.property
-            if (change.type == ChangeType.RELATIONSHIP_METADATA_CREATED) {
-                if (change.newValue != null && change.newValue.length() > 10) {
+            if (change.type in [RELATIONSHIP_METADATA_CREATED,RELATIONSHIP_METADATA_UPDATED]) {
+                if (mightBeJSON(change.newValue)) {
                     def jsonSlurper = new JsonSlurper()
                     def jsonMap = jsonSlurper.parseText(change.newValue)
                     propLabel = jsonMap.name
                 }
             }
-            propLabel = propLabel ?: ''
-            List<String> vals = rows[propLabel]
-            vals[0] = vals[0] ?: valueForPrint(change.property, change.oldValue)
-            vals[1] = valueForPrint(change.property, change.newValue)
-            rows[propLabel] = vals
+
+            switch (change.type) {
+                case RELATIONSHIP_METADATA_UPDATED:
+                    propLabel = propLabel ?: ''
+                    List<String> vals = rows[propLabel]
+                    vals[0] = getOldRelationshipMetadataValue(change)?.toString() ?: change.oldValue
+                    vals[1] = getNewRelationshipMetadataValue(change)?.toString() ?: change.newValue
+                    rows[propLabel] = vals
+                    break
+
+                case RELATIONSHIP_METADATA_CREATED:
+                    propLabel = propLabel ?: ''
+                    List<String> vals = rows[propLabel]
+                    vals[0] =  change.oldValue ?: ''
+                    vals[1] = getNewRelationshipMetadataValue(change)?.toString() ?: change.newValue
+                    rows[propLabel] = vals
+                    break
+                default:
+                    propLabel = propLabel ?: ''
+                    List<String> vals = rows[propLabel]
+                    vals[0] = vals[0] ?: valueForPrint(change.property, change.oldValue)
+                    vals[1] = valueForPrint(change.property, change.newValue)
+                    rows[propLabel] = vals
+
+            }
         }
         rows
     }
 
 
-    private List<String> createSingleChangeRow(String key, List<String> rowData, CatalogueElement model, String subtype = null, groupDescriptions, RareDiseaseChangeType changeToRender, ChangeType changeType) {
+    private List<String> createSingleChangeRow(String key, List<String> rowData, CatalogueElement model, String subtype = null, groupDescriptions, RareDiseaseChangeType changeToRender) {
         List<String> changes = []
 
         try {
@@ -301,28 +312,13 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
             if(subtype) changes << subtype
             changes << model.name
 
-            String before = rowData.get(0)
-            String after = rowData.get(1)
-
-            if([NEW_METADATA, REMOVE_METADATA, CHANGED_METADATA].contains(changeToRender)) {
-                if(before.contains('orderedMap')) {
-                    before = extractDeepElement(before, key)
-                }
-                if(after.contains('orderedMap')) {
-                    after = extractDeepElement(after, key)
-                }
-            }
-
-            if ([REMOVE_DATA_ITEM, NEW_DATA_ITEM, NEW_METADATA].contains(changeToRender)) {
-                before = extractChangedElement(before)
-                after = extractChangedElement(after)
-            }
-
-            changes << changeToRender.renderedText
+            def (String before, String after) = extractValues(rowData, changeToRender, key)
 
             if (!before && !after ) {       //don't print blank lines
                 return []
             }
+
+            changes << changeToRender.renderedText
 
             if(suppressKeyDisplayList.contains(key)) {
                 changes << before
@@ -338,98 +334,149 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
         changes
     }
 
-    // hideous string parsing follows, there must be a better way...
+    private List extractValues(List<String> rowData, RareDiseaseChangeType changeToRender, String key) {
+        String before = rowData.get(0)
+        String after = rowData.get(1)
+
+        if ([NEW_METADATA, REMOVE_METADATA, CHANGED_METADATA].contains(changeToRender)) {
+            if (before.contains('orderedMap')) {
+                before = extractDeepElement(before, key)
+            }
+            if (after.contains('orderedMap')) {
+                after = extractDeepElement(after, key)
+            }
+        }
+
+        if ([REMOVE_DATA_ITEM, NEW_DATA_ITEM, NEW_METADATA].contains(changeToRender)) {
+            before = extractChangedElement(before)
+            after = extractChangedElement(after)
+        }
+        [before, after]
+    }
+
+    // hideous jsonStr parsing follows, there must be a better way...
     public static String extractDeepElement(String elemName, String key) {
         String deepElementValue =''
 
-        if (elemName && elemName.length() > 15) {   //some length indicating it might be a json string
+        if (mightBeJSON(elemName)) {
             def jsonMap
             def jsonSlurper = new JsonSlurper()
             try {
                 jsonMap = jsonSlurper.parseText(elemName)
             } catch (Exception e) {
                 log.error "Error attempting json parse of $elemName"
+                log.error ExceptionUtils.getStackTrace(e)
                 return elemName
             }
 
-            if (jsonMap && jsonMap.relationship) {
+            try {
+                if (jsonMap && jsonMap.relationship) {
 
-                def csvTokens = jsonMap.relationship.split(',')
+                    //try the quick json map
+                    if (jsonMap.relationship instanceof Map && jsonMap.relationship.ext instanceof Map && jsonMap.relationship.ext.type == 'orderedMap') {
 
-                boolean startRead = false
-                String accumulator = ''
-                int countLeftBrackets, countRightBrackets = 0
+                        Map<String, String> orderedMap = OrderedMap.fromJsonMap(jsonMap.relationship.ext)
+                        deepElementValue = "${orderedMap.get(key)}" // coerce to string even if null
+                        return deepElementValue
 
-                for ( entry in csvTokens ) {
-                    if(entry.trim() == "elementType=${Relationship.class.name}" ) {
-                        startRead = true
-                        continue
-                    }
-                    if(startRead) {
-                        String fragment = entry.trim()
-                        accumulator += ",$fragment"
+                    } else {    // fallback to long winded string parse
+                        def csvTokens = jsonMap.relationship.split(',')
 
-                        def leftBrackets = fragment =~ /\{/
-                        def rightBrackets = fragment =~ /\}/
-                        countLeftBrackets += leftBrackets.count
-                        countRightBrackets += rightBrackets.count
+                        boolean startRead = false
+                        String accumulator = ''
+                        int countLeftBrackets, countRightBrackets = 0
 
-                        if (countLeftBrackets != 0 && countLeftBrackets == countRightBrackets) {
-                            break
+                        for (entry in csvTokens) {
+                            if (entry.trim() == "elementType=${Relationship.class.name}") {
+                                startRead = true
+                                continue
+                            }
+                            if (startRead) {
+                                String fragment = entry.trim()
+                                accumulator += ",$fragment"
+
+                                def leftBrackets = fragment =~ /\{/
+                                def rightBrackets = fragment =~ /\}/
+                                countLeftBrackets += leftBrackets.count
+                                countRightBrackets += rightBrackets.count
+
+                                if (countLeftBrackets != 0 && countLeftBrackets == countRightBrackets) {
+                                    break
+                                }
+                            }
+                        }
+
+                        if (accumulator.indexOf('orderedMap') > -1 && accumulator.indexOf(key) > 0) {
+                            int index = accumulator.indexOf("$key")
+                            String keyFragment = accumulator.substring(index)
+                            def keyValues = keyFragment.split(',')
+                            for (int i = 0; i < keyValues.length; i++) {
+
+                                if (keyValues[i] == key) {
+                                    String value = keyValues[i + 1]
+                                    deepElementValue = value.replace('value=', '').replace('}', '').replace(']', '')
+                                }
+                            }
                         }
                     }
                 }
 
-                if (accumulator.indexOf('orderedMap') > -1 && accumulator.indexOf(key) > 0) {
-                    int index = accumulator.indexOf("$key")
-                    String keyFragment = accumulator.substring(index)
-                    def keyValues = keyFragment.split(',')
-                    for (int i = 0; i < keyValues.length; i++) {
-
-                        if (keyValues[i] == key) {
-                            String value = keyValues[i+1]
-                            deepElementValue = value.replace('value=','').replace('}','').replace(']','')
-                        }
-                    }
-                }
-
+            } catch (Exception e) {
+                log.error "Error attempting csv token parse of $elemName"
+                log.error ExceptionUtils.getStackTrace(e)
+                return elemName
             }
         }
         deepElementValue
     }
 
-    //probably needs more protection
+
     private String extractChangedElement(String elemName) {
-        if (elemName && elemName.length() > 15) {   //some length indicating it might be a json string
+        if (mightBeJSON(elemName)) {
             def jsonMap
             def jsonSlurper = new JsonSlurper()
             try {
                 jsonMap = jsonSlurper.parseText(elemName)
             } catch (Exception e) {
                 log.error "Error attempting json parse of $elemName"
+                log.error ExceptionUtils.getStackTrace(e)
                 return elemName
             }
-            if (jsonMap && jsonMap.destination) {
 
-                String destination = jsonMap.destination.replaceAll(/[{}]/, '')
-                Map<String, String> destinationMap = new HashMap<String, String>().withDefault { ['', ''] }
-                def csvTokens = destination.split(',')
-                csvTokens.each { csvToken ->
-                    String[] tokens = csvToken.split('=')
-                    if (tokens.length < 2) {
-                        destinationMap.put(tokens[0], tokens[0])
+
+            try {
+                if (jsonMap && jsonMap.destination) {
+
+                    String destination = jsonMap.destination.replaceAll(/[{}]/, '')
+                    Map<String, String> destinationMap = new HashMap<String, String>().withDefault { ['', ''] }
+                    def csvTokens = destination.split(',')
+                    csvTokens.each { csvToken ->
+                        String[] tokens = csvToken.split('=')
+                        if (tokens.length < 2) {
+                            destinationMap.put(tokens[0], tokens[0])
+                        } else {
+                            destinationMap.put(tokens[0].trim(), tokens[1])
+                        }
+                    }
+                    if (destinationMap.classifiedName && destinationMap.classifiedName instanceof String) {
+                        elemName = "${destinationMap.classifiedName ?: ''} (${destinationMap.semanticVersion ?: ''})"
                     } else {
-                        destinationMap.put(tokens[0].trim(), tokens[1])
+                        elemName = ''
                     }
                 }
-                if(destinationMap.classifiedName && destinationMap.classifiedName instanceof String) {
-                    elemName = "${destinationMap.classifiedName ?: ''} (${destinationMap.semanticVersion ?: ''})"
-                } else {
-                    elemName = ''
-                }
+            } catch (Exception e) {
+                log.error "Error attempting csv token parse of $elemName"
+                log.error ExceptionUtils.getStackTrace(e)
+                return elemName
             }
         }
         elemName
+    }
+
+
+    //is it potentially useful json? unlikely if less than 15 chars
+    public static boolean mightBeJSON(String jsonStr) {
+        return jsonStr != null && (jsonStr.length() > 15) && (jsonStr.startsWith("[") && jsonStr.endsWith("]") || jsonStr.startsWith("{") && jsonStr.endsWith("}"));
     }
 
 
