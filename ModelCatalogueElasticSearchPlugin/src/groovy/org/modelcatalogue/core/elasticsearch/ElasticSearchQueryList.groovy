@@ -3,6 +3,7 @@ package org.modelcatalogue.core.elasticsearch
 import groovy.util.logging.Log4j
 import org.elasticsearch.action.search.SearchRequestBuilder
 import org.elasticsearch.action.search.SearchResponse
+import org.elasticsearch.index.IndexNotFoundException
 import org.elasticsearch.search.SearchHit
 import org.joda.time.format.ISODateTimeFormat
 import org.modelcatalogue.core.CatalogueElement
@@ -43,10 +44,14 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
 
     @Override
     Long getTotal() {
-        if (!response) {
-            response = initializeResponse()
+        try {
+            if (!response) {
+                response = initializeResponse()
+            }
+            return response.hits.totalHits
+        } catch (Exception ignored) {
+            return 0L
         }
-        return response.hits.totalHits
     }
 
     private SearchResponse initializeResponse() {
@@ -62,7 +67,11 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
             }
             searchRequest.execute().get()
         } catch (Exception e) {
-            log.error("Exception searching query: ${searchRequest.toString()}")
+            if (e.cause instanceof IndexNotFoundException) {
+                log.error("Search index not found: ${e.cause.index}")
+            } else {
+                log.error("Exception searching query: ${searchRequest.toString()}")
+            }
             throw e
         }
     }
@@ -70,7 +79,11 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
     @Override
     List<T> getItems() {
         if (!response) {
-            response = initializeResponse()
+            try {
+                response = initializeResponse()
+            } catch (Exception ignored) {
+                return []
+            }
         }
         return response.hits.hits.collect { SearchHit hit ->
             type.get(hit.id().toLong())
@@ -79,6 +92,9 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
 
     @Override
     List<Object> getJsonItems() {
+        if (!response) {
+            return []
+        }
         // don't forget to add field into the fetched field in the constructor if you want to use it
         if (CatalogueElement.isAssignableFrom(type)) {
             return response.hits.hits.collect { SearchHit hit ->
