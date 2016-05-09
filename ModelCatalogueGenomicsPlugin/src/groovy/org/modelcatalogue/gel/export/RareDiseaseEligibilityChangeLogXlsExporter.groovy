@@ -11,7 +11,6 @@ import org.modelcatalogue.core.audit.AuditService
  * Eligibility Criteria spreadsheet implementation of RD Change Log Excel Exporter
  */
 @Log4j
-//@CompileStatic
 class RareDiseaseEligibilityChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
 
     RareDiseaseEligibilityChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, Integer depth = 5, Boolean includeMetadata = false) {

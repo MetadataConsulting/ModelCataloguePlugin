@@ -12,7 +12,6 @@ import static org.modelcatalogue.core.audit.ChangeType.PROPERTY_CHANGED
  * HPO and Clinical Tests spreadsheet implementation of RD Change Log Excel Exporter
  */
 @Log4j
-//@CompileStatic
 class RareDiseasePhenotypeChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
 
     RareDiseasePhenotypeChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, Integer depth = 5, Boolean includeMetadata = false) {

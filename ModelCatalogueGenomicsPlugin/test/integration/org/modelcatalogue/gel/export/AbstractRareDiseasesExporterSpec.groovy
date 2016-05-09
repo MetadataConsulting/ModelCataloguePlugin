@@ -153,6 +153,9 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
             update 'Min Occurs' of 'Phenotype (9) name 1 1' to '1'              //METADATA_CREATED
             update 'Max Occurs' of 'Phenotype (9) name 1 1' to '3'
 
+            update 'Min Occurs' of 'Phenotype (9) name 1 1' to '4'              //RELATIONSHIP_METADATA_UPDATED
+            update 'Max Occurs' of 'Phenotype (9) name 1 1' to '5'
+
             update 'description' of 'Disorder >1< Guidance name 1 1' to 'new textual description replaces old'
 
             update 'description' of 'Clinical tests (5) name 1 2' to 'description for Clinical tests (5) name 1 2  has been changed'
