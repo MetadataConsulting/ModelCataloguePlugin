@@ -135,7 +135,8 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
           loadMoreIfNeeded()
           root.on 'scroll', loadMoreIfNeeded
         else
-          $scope.node.showMore = ->
+          $scope.node.showMore = -> $scope.node.loadChildren()
+
           root.off 'scroll', loadMoreIfNeeded
 
       onElementUpdate = (element) ->
