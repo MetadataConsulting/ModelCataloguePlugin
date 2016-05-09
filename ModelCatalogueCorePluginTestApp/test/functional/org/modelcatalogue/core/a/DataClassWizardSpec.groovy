@@ -101,6 +101,9 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         when:
         click exitButton
 
+        and:
+        selectInTree 'Data Classes'
+
         then:
         check CatalogueContent.create('span.catalogue-element-treeview-name', text: startsWith("New")) displayed
 

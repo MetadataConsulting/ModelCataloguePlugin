@@ -135,13 +135,14 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
           loadMoreIfNeeded()
           root.on 'scroll', loadMoreIfNeeded
         else
-          $scope.node.showMore = ->
+          $scope.node.showMore = -> $scope.node.loadChildren()
+
           root.off 'scroll', loadMoreIfNeeded
 
       onElementUpdate = (element) ->
         handleDescendPaths()
 
-        $scope.node = TreeviewNodeFactory.create($scope.treeview.getNodeId(element.link), element)
+        $scope.node = TreeviewNodeFactory.create($scope.treeview.getNodeId("#{$scope.extraParameters?.root}:#{element.link}"), element)
 
         $scope.descendFun = $scope.element[$scope.currentDescend]
 
@@ -187,6 +188,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
       $scope.collapseOrExpand = ->
         return if $scope.extraParameters?.prefetch
         return if $scope.node.loadingChildren
+        return unless $scope.node.numberOfChildren
         unless $scope.node.collapsed
           $scope.node.collapsed = true
           return
