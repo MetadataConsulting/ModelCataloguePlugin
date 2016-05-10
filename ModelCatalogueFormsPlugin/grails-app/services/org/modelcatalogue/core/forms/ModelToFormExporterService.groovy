@@ -3,9 +3,21 @@ package org.modelcatalogue.core.forms
 import groovy.xml.XmlUtil
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.mutable.MutableInt
-import org.modelcatalogue.core.*
-import org.modelcatalogue.crf.model.*
+import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.DataClass
+import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.DataType
+import org.modelcatalogue.core.EnumeratedType
+import org.modelcatalogue.core.PrimitiveType
+import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.crf.model.CaseReportForm
 import org.modelcatalogue.crf.model.DataType as FormDataType
+import org.modelcatalogue.crf.model.GenericItem
+import org.modelcatalogue.crf.model.GridGroup
+import org.modelcatalogue.crf.model.Item
+import org.modelcatalogue.crf.model.ItemContainer
+import org.modelcatalogue.crf.model.ResponseType
+import org.modelcatalogue.crf.model.Section
 import org.springframework.validation.DataBinder
 import org.springframework.validation.Errors
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter
@@ -281,7 +293,11 @@ class ModelToFormExporterService {
                 // TODO: validation
                 String regexpDef = fromCandidates(rel, candidates, EXT_ITEM_REGEXP, dataType?.regexDef)
                 if (regexpDef) {
-                    regexp regexpDef, fromCandidates(rel, candidates, EXT_ITEM_REGEXP_ERROR_MESSAGE, "Value must match /$regexpDef/")
+                    String message = "Value must match provided regular expression"
+                    if (regexpDef.size() + message.size() < 253) {
+                        message = "$message: $regexpDef"
+                    }
+                    regexp regexpDef, fromCandidates(rel, candidates, EXT_ITEM_REGEXP_ERROR_MESSAGE, message)
                 }
                 description fromCandidates(rel, candidates, EXT_ITEM_DESCRIPTION, dataElement.description)
                 question fromCandidates(rel, candidates, EXT_ITEM_QUESTION, localName)
@@ -396,9 +412,6 @@ class ModelToFormExporterService {
         } else {
             return overridenInstructions.substring(overridenInstructions.indexOf("</span>") + 7)
         }
-
-
-        return '';
     }
 
 
