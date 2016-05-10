@@ -168,7 +168,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
 
     static DetachedCriteria<Relationship> restOfRelationships(DetachedCriteria<Relationship>  criteria) {
         criteria.not {
-            'in' 'relationshipType', ['declaration', 'hierarchy', 'containment', 'supersession', 'base', 'relatedTo', 'synonym', 'involedness', 'ruleContext'].collect { RelationshipType.readByName(it) }
+            'in' 'relationshipType', ['declaration', 'hierarchy', 'containment', 'supersession', 'base', 'relatedTo', 'synonym', 'involvedness', 'ruleContext'].collect { RelationshipType.readByName(it) }
         }
         criteria.'eq' 'archived', false
     }
