@@ -43,7 +43,7 @@ class AssetService {
         "$value B"
     }
 
-    Asset upload(Long id, Long dataModelId, String name, String description, MultipartFile file) {
+    Asset upload(Long id, Long dataModelId, String name, String description, MultipartFile file, String filename = file.originalFilename) {
         Asset asset = dataModelId ? new Asset(dataModel: DataModel.get(dataModelId)) : new Asset()
 
         if (file.size > modelCatalogueStorageService.maxFileSize) {
@@ -53,11 +53,11 @@ class AssetService {
 
         // TODO: set data model
 
-        asset.name              = name ?: file.originalFilename
+        asset.name              = name ?: filename
         asset.description       = description
         asset.contentType       = getOverridableContentType(file)
         asset.size              = file.size
-        asset.originalFileName  = file.originalFilename
+        asset.originalFileName  = filename
 
         asset.validate()
 
@@ -101,7 +101,7 @@ class AssetService {
             storeAssetFromFile(file, asset)
         } catch (e) {
             log.error('Exception storing asset ' + asset.name, e)
-            asset.errors.rejectValue('md5', 'asset.uploadfailed', "There were problems uploading file $file.originalFilename")
+            asset.errors.rejectValue('md5', 'asset.uploadfailed', "There were problems uploading file $filename")
         }
 
         return asset
