@@ -80,6 +80,8 @@ grails.project.dependency.resolution = {
         compile 'net.sourceforge.owlapi:owlapi-api:3.5.1'
         compile 'net.sourceforge.owlapi:owlapi-parsers:3.5.1'
 
+        compile 'org.gperfutils:gprof:0.3.1-groovy-2.4'
+
         test 'xmlunit:xmlunit:1.6'
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
 

@@ -40,13 +40,15 @@ class SearchController extends AbstractRestfulController<CatalogueElement>{
 
         log.info "Reindexing search service ..."
         executorService.submit {
-            modelCatalogueSearchService.reindex()
+            profile {
+                modelCatalogueSearchService.reindex()
                     .doOnError {
-                log.error("Reindexing failed", it)
-            }
-            .doOnCompleted {
-                log.info "... search service reindexed"
-            }.subscribe()
+                    log.error("Reindexing failed", it)
+                }
+                .doOnCompleted {
+                    log.info "... search service reindexed"
+                }.subscribe()
+            }.prettyPrint()
         }
 
 

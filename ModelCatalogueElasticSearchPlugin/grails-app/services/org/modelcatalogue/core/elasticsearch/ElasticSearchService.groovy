@@ -2,7 +2,6 @@ package org.modelcatalogue.core.elasticsearch
 
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
-import grails.gorm.DetachedCriteria
 import grails.util.GrailsNameUtils
 import groovy.json.JsonSlurper
 import org.codehaus.groovy.grails.commons.GrailsApplication
@@ -22,6 +21,7 @@ import org.elasticsearch.indices.IndexAlreadyExistsException
 import org.elasticsearch.node.Node
 import org.elasticsearch.node.NodeBuilder
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.rx.Observables
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -52,8 +52,6 @@ class ElasticSearchService implements SearchCatalogue {
     private static String DATA_MODEL_INDEX = "${GLOBAL_PREFIX}data_model"
     private static String DATA_MODEL_PREFIX = "${MC_PREFIX}data_model_"
     private static String ORPHANED_INDEX = "${GLOBAL_PREFIX}orphaned"
-
-    private static int EMIT_RELATIONSHIPS_PAGE = 10
 
     private static Map<String, Integer> CATALOGUE_ELEMENT_BOOSTS = [
 
@@ -498,79 +496,22 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     private Observable<Document> getElementWithRelationships(IndexingSession session, CatalogueElement element) {
-        ReplaySubject<Document> subject = ReplaySubject.create()
-
-        executorService.submit {
-            try {
-                subject.onNext(session.getDocument(element))
-                DetachedCriteria<Relationship> criteria = Relationship.where {
-                    source == element || destination == element
-                }
-
-                Number total = criteria.count()
-
-
-                for (int page = 0 ; page * EMIT_RELATIONSHIPS_PAGE < total.intValue() ; page++) {
-                    criteria.list(max: EMIT_RELATIONSHIPS_PAGE, offset: page * EMIT_RELATIONSHIPS_PAGE).each {
-                        subject.onNext(session.getDocument(it))
-                    }
-                }
-                subject.onCompleted()
-            } catch (Exception e) {
-                subject.onError(e)
-            }
-
-        }
-        return subject
+        Observables
+            .observe(Relationship.where { source == element || destination == element })
+            .subscribeOn(Schedulers.from(executorService))
+            .map { session.getDocument(it) }
     }
 
     private Observable<CatalogueElement> getDataModelWithDeclaredElements(DataModel element) {
-        ReplaySubject<CatalogueElement> subject = ReplaySubject.create()
-
-        DetachedCriteria<CatalogueElement> criteria = CatalogueElement.where {
-            dataModel == element
-        }
-
-        log.info "Going to index ${criteria.count()} items for $element"
-
-        executorService.submit {
-            try {
-                subject.onNext(element)
-
-                Number total = criteria.count()
-
-                log.info "Emitting $total items for $element"
-
-                for (int page = 0 ; page * EMIT_RELATIONSHIPS_PAGE < total.intValue() ; page++) {
-                    criteria.list(max: EMIT_RELATIONSHIPS_PAGE, offset: page * EMIT_RELATIONSHIPS_PAGE).each {
-                        subject.onNext(it)
-                    }
-                }
-
-                subject.onCompleted()
-            } catch (Exception e) {
-                subject.onError(e)
-            }
-
-        }
-        return subject
+        Observables
+            .observe(CatalogueElement.where { dataModel == element })
+            .subscribeOn(Schedulers.from(executorService))
     }
 
     private Observable<Document> getRelationshipWithSourceAndDestination(IndexingSession session, Relationship rel) {
-        ReplaySubject<Document> subject = ReplaySubject.create()
-
-        executorService.submit {
-            try {
-                subject.onNext(session.getDocument(rel))
-                subject.onNext(session.getDocument(rel.source))
-                subject.onNext(session.getDocument(rel.destination))
-                subject.onCompleted()
-            } catch (Exception e) {
-                subject.onError(e)
-            }
-        }
-
-        return subject
+        just(rel, rel.source, rel.destination)
+            .subscribeOn(Schedulers.from(executorService))
+            .map { session.getDocument(it) }
     }
 
     private Observable<SimpleIndexResponse> safeIndex(Iterable<String> indicies, Observable<Document> documents, Iterable<Class> supportedTypes) {
