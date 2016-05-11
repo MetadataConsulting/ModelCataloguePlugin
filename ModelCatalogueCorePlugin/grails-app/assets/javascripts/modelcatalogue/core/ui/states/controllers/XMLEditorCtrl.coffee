@@ -81,12 +81,44 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'ngFile
 
             $scope.upload = Upload.upload({
               url: "#{modelCatalogueApiRoot}/asset/upload"
-              params: {id: id, name: name, dataModel: $scope.currentDataModel?.id}
+              params: {id: id, name: name, dataModel: $scope.currentDataModel?.id, filename: "#{name}.xsl"}
               data: {asset: new Blob([$scope.xslt], {type: 'text/xsl'})}
             }).progress((evt) ->
               $scope.progress = parseInt(100.0 * evt.loaded / evt.total)
             ).success((result) ->
               $scope.xsltAsset = enhance(result)
+              $log.debug("asset saved", result)
+              messages.success "Asset was successfully saved."
+            ).catch( (reason) ->
+              $log.error("asset was not saved", reason)
+              messages.error "Could not save asset. #{reason}"
+            )
+      }
+  ])
+
+  actionsProvider.registerActionInRole('save-xsd', XML_EDITOR_XSD_ROLE, [
+    '$log', '$scope','messages', 'Upload', 'modelCatalogueApiRoot', 'enhance', ($log, $scope, messages, Upload, modelCatalogueApiRoot, enhance) ->
+      {
+        label: 'Save Schema'
+        icon: 'fa fa-save'
+        action: ->
+          messages
+          .prompt("Save Schema", "Asset name", type: 'catalogue-element', resource: 'asset', contentType: 'text/xml', allowString: true, value: $scope.xsdAsset)
+          .then (asset) ->
+            if angular.isString(asset)
+              name = asset
+            else
+              id = asset.id
+              name = asset.name
+
+            $scope.upload = Upload.upload({
+              url: "#{modelCatalogueApiRoot}/asset/upload"
+              params: {id: id, name: name, dataModel: $scope.currentDataModel?.id, filename: "#{name}.xsd"}
+              data: {asset: new Blob([$scope.xsd], {type: 'text/xml'})}
+            }).progress((evt) ->
+              $scope.progress = parseInt(100.0 * evt.loaded / evt.total)
+            ).success((result) ->
+              $scope.xsdAsset = enhance(result)
               $log.debug("asset saved", result)
               messages.success "Asset was successfuly saved."
             ).catch( (reason) ->
