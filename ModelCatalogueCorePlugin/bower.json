@@ -28,7 +28,7 @@
     "jasmine": "~2.3.4",
     "angular-ui-router": "0.2.17",
     "ng-file-upload": "~12.0.4",
-    "ng-file-upload-shim": "~7.0.0",
+    "ng-file-upload-shim": "~12.0.4",
     "angular-loading-bar": "~0.8.0",
     "angular-http-auth": "~1.2.1",
     "angular-sanitize": "~1.4.10",
