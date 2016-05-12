@@ -1,7 +1,9 @@
 package org.modelcatalogue.core.rx;
 
+import groovy.lang.Closure;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.groovy.runtime.StackTraceUtils;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -37,7 +39,7 @@ class RetryWithDelay implements  Func1<Observable<? extends Throwable>, Observab
                             long delay = Math.round(Math.pow(retryCount, 2)) * retryDelayMillis;
 
                             if (log.isWarnEnabled()) {
-                                log.warn("Problems with stream, retrying for " + retryCount + " time and waiting " + delay + "ms", throwable);
+                                log.warn("Problems with stream, retrying for " + retryCount + " time and waiting " + delay + "ms", StackTraceUtils.deepSanitize(throwable));
                             }
 
                             return Observable.timer(delay,

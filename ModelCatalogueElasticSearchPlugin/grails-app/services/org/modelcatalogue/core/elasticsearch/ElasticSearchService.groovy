@@ -7,6 +7,7 @@ import groovy.json.JsonSlurper
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsClass
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder
+import org.elasticsearch.action.bulk.BulkItemResponse
 import org.elasticsearch.action.bulk.BulkRequestBuilder
 import org.elasticsearch.action.bulk.BulkResponse
 import org.elasticsearch.action.search.SearchRequestBuilder
@@ -14,6 +15,8 @@ import org.elasticsearch.client.Client
 import org.elasticsearch.client.transport.TransportClient
 import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.common.transport.InetSocketTransportAddress
+import org.elasticsearch.index.VersionType
+import org.elasticsearch.index.engine.VersionConflictEngineException
 import org.elasticsearch.index.query.BoolQueryBuilder
 import org.elasticsearch.index.query.QueryBuilder
 import org.elasticsearch.index.query.QueryBuilders
@@ -27,7 +30,6 @@ import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
 import rx.Observable
-import rx.schedulers.Schedulers
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
@@ -388,7 +390,7 @@ class ElasticSearchService implements SearchCatalogue {
         }
 
         result = result.concatWith(from(DataModel.list(sort: 'lastUpdated', order: 'desc'))
-        .observeOn(Schedulers.from(executorService))
+        //.observeOn(Schedulers.from(executorService))
         .doOnNext {
             log.info "[${dataModelCounter++}/$total] Reindexing data model ${it.name} (${it.combinedVersion}) - ${it.countDeclares()} items"
         }.flatMap {
@@ -511,7 +513,7 @@ class ElasticSearchService implements SearchCatalogue {
     private Observable<SimpleIndexResponse> safeIndex(Iterable<String> indicies, Observable<Document> documents, Iterable<Class> supportedTypes) {
         return from(indicies)
             .flatMap { idx -> ensureIndexExists(just(idx), supportedTypes) }
-            .flatMap { idx -> documents.buffer(25).flatMap { bulkIndex(idx, it) }}
+            .flatMap { idx -> documents.distinct().buffer(50).flatMap { bulkIndex(idx, it) }}
             .flatMap { bulkResponse -> from(bulkResponse.items) }
             .map { bulkResponseItem ->
                 if (bulkResponseItem.failure) {
@@ -527,8 +529,14 @@ class ElasticSearchService implements SearchCatalogue {
     private Observable<BulkResponse> bulkIndex(String existingIndex, List<Document> documents) {
         RxElastic.from(buildBulkIndexRequest(existingIndex, documents))
             .flatMap {
-                if (it.hasFailures()) {
-                    return Observable.error(new RuntimeException("There were error indexing some of the items", it.items.find{it.failed}.failure.cause))
+                for (BulkItemResponse response in it.items) {
+                    if (response.failed) {
+                        if (response.failure.cause instanceof VersionConflictEngineException) {
+                            // ignore and keep the latest
+                            continue
+                        }
+                        return Observable.error(new RuntimeException("There were error indexing some of the items", response.failure.cause))
+                    }
                 }
                 return just(it)
             }
@@ -540,6 +548,8 @@ class ElasticSearchService implements SearchCatalogue {
         for (Document document in documents) {
             bulkRequest.add(client
                 .prepareIndex(existingIndex, document.type, document.id)
+                .setVersion(document.version ?: 1L)
+                .setVersionType(VersionType.EXTERNAL_GTE)
                 .setSource(document.payload)
             )
         }
