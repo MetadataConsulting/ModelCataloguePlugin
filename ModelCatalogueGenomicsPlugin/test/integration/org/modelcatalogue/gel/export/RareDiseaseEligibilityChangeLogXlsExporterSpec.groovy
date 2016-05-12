@@ -29,6 +29,13 @@ class RareDiseaseEligibilityChangeLogXlsExporterSpec extends AbstractRareDisease
             allRows+= "${row.join(',')}\n"
         }
 
+        println "EXPECTED<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+        println expectedRDPhenotypesCsv
+        println ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+        println "GOT<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+        println allRows
+        println ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+
 
         File file = temporaryFolder.newFile("${System.currentTimeMillis()}.xlsx")
         //test excel generation

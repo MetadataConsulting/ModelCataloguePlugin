@@ -21,5 +21,6 @@ class Metadata {
      */
     public static final def HPO_REPORT_AVAILABLE = "http://www.modelcatalogue.org/metadata/genomics/#rare-disease-reports"
     public static final def CANCER_TYPES_AVAILABLE = "http://www.modelcatalogue.org/metadata/genomics/#cancer-types-export"
+    public static final def CHANGE_REF = "http://www.modelcatalogue.org/metadata/genomics/#change-reference"
 
 }

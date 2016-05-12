@@ -78,7 +78,7 @@ class RareDiseaseEligibilityChangeLogXlsExporter extends RareDiseaseChangeLogXls
     }
 
     @Override
-    List<String> generateLine(CatalogueElement model, List lines, groupDescriptions, level) {
+    List<String> searchExportSpecificTypes(CatalogueElement model, List lines, groupDescriptions, level) {
 
         if (model.name.matches("(?i:.*Eligibility.*)")) {
             checkChangeLog(model, lines, groupDescriptions, level, TOP_LEVEL_RELATIONSHIP_TYPES)

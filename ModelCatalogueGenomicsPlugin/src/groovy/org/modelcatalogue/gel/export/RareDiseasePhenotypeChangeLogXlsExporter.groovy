@@ -84,9 +84,11 @@ class RareDiseasePhenotypeChangeLogXlsExporter extends RareDiseaseChangeLogXlsEx
     }
 
     @Override
-    List<String> generateLine(CatalogueElement model, List lines, groupDescriptions, level) {
+    List<String> searchExportSpecificTypes(CatalogueElement model, List lines, groupDescriptions, level) {
         String subtype
         if (model.name.matches("(?i:.*Phenotype.*)")) {
+
+            log.debug " --- $level $model $model.dataModel"
 
             subtype = PHENOTYPE
             checkChangeLog(model, lines, subtype, groupDescriptions, level, TOP_LEVEL_RELATIONSHIP_TYPES)
