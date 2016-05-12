@@ -1,6 +1,8 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.rx.LoggingSubscriber
 import org.modelcatalogue.core.util.lists.Lists
+import rx.Subscriber
 
 import java.util.concurrent.ExecutorService
 
@@ -41,13 +43,7 @@ class SearchController extends AbstractRestfulController<CatalogueElement>{
         log.info "Reindexing search service ..."
         executorService.submit {
             profile {
-                modelCatalogueSearchService.reindex()
-                    .doOnError {
-                    log.error("Reindexing failed", it)
-                }
-                .doOnCompleted {
-                    log.info "... search service reindexed"
-                }.subscribe()
+                modelCatalogueSearchService.reindex().toBlocking().subscribe(LoggingSubscriber.create(log, "... reindexing finished", "Error reindexing the catalogue"))
             }.prettyPrint()
         }
 

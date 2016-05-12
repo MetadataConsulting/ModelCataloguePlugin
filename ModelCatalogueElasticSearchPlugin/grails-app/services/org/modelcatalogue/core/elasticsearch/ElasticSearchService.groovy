@@ -21,20 +21,17 @@ import org.elasticsearch.indices.IndexAlreadyExistsException
 import org.elasticsearch.node.Node
 import org.elasticsearch.node.NodeBuilder
 import org.modelcatalogue.core.*
-import org.modelcatalogue.core.rx.Observables
+import org.modelcatalogue.core.elasticsearch.rx.RxElastic
+import org.modelcatalogue.core.rx.RxService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
 import rx.Observable
-import rx.Subscriber
 import rx.schedulers.Schedulers
-import rx.subjects.ReplaySubject
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
-import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
-import java.util.concurrent.TimeUnit
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 import static rx.Observable.from
@@ -71,6 +68,7 @@ class ElasticSearchService implements SearchCatalogue {
     GrailsApplication grailsApplication
     DataModelService dataModelService
     ElementService elementService
+    RxService rxService
     Node node
     Client client
 
@@ -337,7 +335,7 @@ class ElasticSearchService implements SearchCatalogue {
             String indexName = getDataModelIndex(object as DataModel)
             return indexExists(just(indexName)).flatMap {
                 if (it.exists) {
-                    return from(client.admin().indices().prepareDelete(indexName).execute()).map {
+                    return RxElastic.from(client.admin().indices().prepareDelete(indexName)).map {
                         it.acknowledged
                         log.debug "Deleted index $indexName"
                     }.onErrorReturn { error ->
@@ -353,7 +351,7 @@ class ElasticSearchService implements SearchCatalogue {
             return from(getIndices(element)).flatMap { idx ->
                 indexExists(just(idx)).flatMap { response ->
                     if (response.exists) {
-                        from(client.prepareDelete(idx, getTypeName(clazz), "${element.getId()}").execute()).map {
+                        return RxElastic.from(client.prepareDelete(idx, getTypeName(clazz), "${element.getId()}")).map {
                             log.debug "Unindexed $element from $idx"
                             it.found
                         }.onErrorReturn { error ->
@@ -361,6 +359,7 @@ class ElasticSearchService implements SearchCatalogue {
                             return false
                         }
                     }
+                    return just(true)
                 }
             }
         }
@@ -384,11 +383,12 @@ class ElasticSearchService implements SearchCatalogue {
         IndexingSession session = IndexingSession.create()
 
         // deleting all mc indices so we don't have to unindex each element separately
-        Observable<Boolean> result = from(client.admin().indices().prepareDelete("${MC_PREFIX}*").execute()).map {
+        Observable<Boolean> result = RxElastic.from(client.admin().indices().prepareDelete("${MC_PREFIX}*")).map {
             it.acknowledged
         }
 
         result = result.concatWith(from(DataModel.list(sort: 'lastUpdated', order: 'desc'))
+        .observeOn(Schedulers.from(executorService))
         .doOnNext {
             log.info "[${dataModelCounter++}/$total] Reindexing data model ${it.name} (${it.combinedVersion}) - ${it.countDeclares()} items"
         }.flatMap {
@@ -397,12 +397,12 @@ class ElasticSearchService implements SearchCatalogue {
             }
         })
 
-        result = result.concatWith(from(dataModelService.classified(CatalogueElement, DataModelFilter.create(true))).flatMap { element ->
+        result = result.concatWith(rxService.from(dataModelService.classified(CatalogueElement, DataModelFilter.create(true))).flatMap { element ->
             log.info "[${total - 1}/$total] Reindexing orphaned elements"
             return index(session, element)
         })
 
-        return result.concatWith(from(RelationshipType.list()).flatMap {
+        return result.concatWith(rxService.from(RelationshipType.where {}).flatMap {
             log.info "[${total}/$total] Reindexing relationship types"
             return index(session, it)
         }).doOnError {
@@ -442,6 +442,7 @@ class ElasticSearchService implements SearchCatalogue {
         if (url) {
             File mappingFile = new File(url.toURI())
             Map parsed = new JsonSlurper().parse(mappingFile) as Map
+            parsed.toString() // initialize lazy map
             Map parsedMapping = parsed[typeName] as Map
             if (!parsedMapping) {
                 log.warn "the mapping does not contain expected root entry ${typeName}"
@@ -496,59 +497,42 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     private Observable<Document> getElementWithRelationships(IndexingSession session, CatalogueElement element) {
-        Observables
-            .observe(Relationship.where { source == element || destination == element })
-            .subscribeOn(Schedulers.from(executorService))
-            .map { session.getDocument(it) }
+        Observable.<Object>just(element).concatWith(rxService.from(Relationship.where { source == element || destination == element })).map { session.getDocument(it) }
     }
 
     private Observable<CatalogueElement> getDataModelWithDeclaredElements(DataModel element) {
-        Observables
-            .observe(CatalogueElement.where { dataModel == element })
-            .subscribeOn(Schedulers.from(executorService))
+        Observable.<CatalogueElement>just(element).concatWith(rxService.from(CatalogueElement.where { dataModel == element }))
     }
 
-    private Observable<Document> getRelationshipWithSourceAndDestination(IndexingSession session, Relationship rel) {
-        just(rel, rel.source, rel.destination)
-            .subscribeOn(Schedulers.from(executorService))
-            .map { session.getDocument(it) }
+    private static Observable<Document> getRelationshipWithSourceAndDestination(IndexingSession session, Relationship rel) {
+        just(rel, rel.source, rel.destination).map { session.getDocument(it) }
     }
 
     private Observable<SimpleIndexResponse> safeIndex(Iterable<String> indicies, Observable<Document> documents, Iterable<Class> supportedTypes) {
-        return from(indicies).flatMap { idx ->
-            return ensureIndexExists(just(idx), supportedTypes).flatMap { existingIndex ->
-                documents.buffer(100).flatMap {
-                    int retries = 0
-                    bulkIndex(existingIndex, it).retryWhen { attempts ->
-                        attempts.flatMap { throwable ->
-                            if (retries < 9) {
-                                return Observable.timer(retries + 1, TimeUnit.SECONDS)
-                            }
-                            retries++
-                            log.warn "Error during bulk update after $retries: $throwable.message"
-                            return Observable.error(throwable)
-                        }
-                    } .flatMap { bulkResponse ->
-                        from(bulkResponse.items).map { bulkResponseItem ->
-                            if (bulkResponseItem.failure) {
-                                log.warn "Failed to index ${bulkResponseItem.type}:${bulkResponseItem.id} to ${bulkResponseItem.index}"
-                            } else {
-                                log.debug "Indexed ${bulkResponseItem.type}:${bulkResponseItem.id} to ${bulkResponseItem.index}"
-                            }
-                            SimpleIndexResponse.from(bulkResponseItem)
-                        }
-                    }.observeOn(Schedulers.from(executorService))
+        return from(indicies)
+            .flatMap { idx -> ensureIndexExists(just(idx), supportedTypes) }
+            .flatMap { idx -> documents.buffer(25).flatMap { bulkIndex(idx, it) }}
+            .flatMap { bulkResponse -> from(bulkResponse.items) }
+            .map { bulkResponseItem ->
+                if (bulkResponseItem.failure) {
+                    log.warn "Failed to index ${bulkResponseItem.type}:${bulkResponseItem.id} to ${bulkResponseItem.index}"
+                } else {
+                    log.debug "Indexed ${bulkResponseItem.type}:${bulkResponseItem.id} to ${bulkResponseItem.index}"
                 }
+                SimpleIndexResponse.from(bulkResponseItem)
             }
-        }
+
     }
 
     private Observable<BulkResponse> bulkIndex(String existingIndex, List<Document> documents) {
-        return Observable.create { subscriber ->
-            BulkRequestBuilder bulkRequestBuilder = buildBulkIndexRequest(existingIndex, documents)
-            subscriber.onStart()
-            bulkRequestBuilder.execute(new BulkResponseListener(subscriber as Subscriber<BulkResponse>))
-        }
+        RxElastic.from(buildBulkIndexRequest(existingIndex, documents))
+            .flatMap {
+                if (it.hasFailures()) {
+                    return Observable.error(new RuntimeException("There were error indexing some of the items", it.items.find{it.failed}.failure.cause))
+                }
+                return just(it)
+            }
+            .retryWhen(RxService.withDelay(RxElastic.DEFAULT_RETRIES, RxElastic.DEFAULT_DELAY))
     }
 
     private BulkRequestBuilder buildBulkIndexRequest(String existingIndex, List<Document> documents) {
@@ -565,16 +549,16 @@ class ElasticSearchService implements SearchCatalogue {
 
     private Observable<SimpleIndicesExistsResponse> indexExists(Observable<String> indices) {
         return indices.flatMap { index ->
-            return from(client.admin().indices().prepareExists(index).execute()).map {
+            return RxElastic.from(client.admin().indices().prepareExists(index)).map {
                 return new SimpleIndicesExistsResponse(exists: it.exists, index: index)
             }
         }
     }
 
     private Observable<String> ensureIndexExists(Observable<String> indices, Iterable<Class> supportedTypes) {
-        return indexExists(indices).map { response ->
+        return indexExists(indices).flatMap { response ->
             if (response.exists) {
-                return response.index
+                return just(response.index)
             }
             CreateIndexRequestBuilder request = client.admin()
                     .indices()
@@ -584,14 +568,13 @@ class ElasticSearchService implements SearchCatalogue {
                 request.addMapping(getTypeName(type), getMapping(type))
             }
 
-            try {
-                request.execute().get()
-                return response.index
-            } catch (ExecutionException ex) {
-                if (ex.cause instanceof IndexAlreadyExistsException) {
+            RxElastic.from(request).map {
+                response.index
+            } .onErrorReturn {
+                if (it instanceof IndexAlreadyExistsException || it.cause instanceof IndexAlreadyExistsException) {
                     return response.index
                 }
-                throw ex
+                throw it
             }
         }
     }

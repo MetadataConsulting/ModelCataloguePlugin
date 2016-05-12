@@ -12,6 +12,7 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import spock.util.concurrent.BlockingVariables
 
 class ElasticSearchServiceSpec extends IntegrationSpec {
 
@@ -83,16 +84,28 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
 
 
         when:
-        // deletes index "data_model_<id>"
-        elasticSearchService.unindex(dataModel)
-                .concatWith(elasticSearchService.unindex(element))
-                .concatWith(elasticSearchService.index(dataModel))
-                .concatWith(elasticSearchService.index(element))
-                .toBlocking().last()
+        BlockingVariables results = new BlockingVariables(10)
 
-        Thread.sleep(1000) // some time to index
+        elasticSearchService.unindex(dataModel).subscribe {
+            results.dataModelUnindexed = true
+            elasticSearchService.unindex(element).subscribe {
+                results.elementUnindexed = true
+                elasticSearchService.index(dataModel).subscribe {
+                    results.dataModelIndexed = true
+                    elasticSearchService.index(element).subscribe {
+                        results.elementIndexed = true
+                    }
+                }
+            }
+        }
+
         then:
         noExceptionThrown()
+        results.dataModelUnindexed
+        results.elementUnindexed
+        results.dataModelIndexed
+        results.elementIndexed
+
         elasticSearchService.client
                 .prepareGet(index, type, element.getId().toString())
                 .execute()
