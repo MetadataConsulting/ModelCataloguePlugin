@@ -21,7 +21,19 @@ class RxService {
      * @return function to be used with Observable#retryWhen method
      */
     static Func1<Observable<? extends Throwable>, Observable<?>> withDelay(final int maxRetries, final int retryDelayMillis) {
-        return new RetryWithDelay(maxRetries, retryDelayMillis);
+        return new RetryWithDelay(maxRetries, retryDelayMillis, Collections.emptySet());
+    }
+
+    /**
+     * Creates new function to be used with Observable#retryWhen method which retries for given times
+     * and delays by <code>attempt * attempt retryDelayMillis</code> milliseconds.
+     * @param maxRetries maximum number of attempts
+     * @param retryDelayMillis initial delay which is increased by power of attempts on each retry
+     * @param expectedExceptions set of expected exceptions classes for which only exception message is printed
+     * @return function to be used with Observable#retryWhen method
+     */
+    static Func1<Observable<? extends Throwable>, Observable<?>> withDelay(final int maxRetries, final int retryDelayMillis, final Set<Class<? extends Throwable>> expectedExceptions) {
+        return new RetryWithDelay(maxRetries, retryDelayMillis, expectedExceptions);
     }
 
     Scheduler withPersistence(Scheduler delegate) {

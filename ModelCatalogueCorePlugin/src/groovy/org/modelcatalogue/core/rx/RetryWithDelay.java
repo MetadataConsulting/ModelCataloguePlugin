@@ -7,6 +7,8 @@ import org.codehaus.groovy.runtime.StackTraceUtils;
 import rx.Observable;
 import rx.functions.Func1;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -19,11 +21,13 @@ class RetryWithDelay implements  Func1<Observable<? extends Throwable>, Observab
     private final int maxRetries;
     private final int retryDelayMillis;
     private int retryCount;
+    private Set<Class<? extends Throwable>> expected;
 
-    RetryWithDelay(final int maxRetries, final int retryDelayMillis) {
+    RetryWithDelay(final int maxRetries, final int retryDelayMillis, final Set<Class<? extends Throwable>> expected) {
         this.maxRetries = maxRetries;
         this.retryDelayMillis = retryDelayMillis;
         this.retryCount = 0;
+        this.expected = new HashSet<Class<? extends Throwable>>(expected);
     }
 
     @Override
@@ -39,7 +43,7 @@ class RetryWithDelay implements  Func1<Observable<? extends Throwable>, Observab
                             long delay = Math.round(Math.pow(retryCount, 2)) * retryDelayMillis;
 
                             if (log.isWarnEnabled()) {
-                                log.warn("Problems with stream, retrying for " + retryCount + " time and waiting " + delay + "ms", StackTraceUtils.deepSanitize(throwable));
+                                logThrowable(throwable, delay);
                             }
 
                             return Observable.timer(delay,
@@ -50,5 +54,19 @@ class RetryWithDelay implements  Func1<Observable<? extends Throwable>, Observab
                         return Observable.error(throwable);
                     }
                 });
+    }
+
+    private void logThrowable(Throwable throwable, long nextDelay) {
+        for (Class<? extends  Throwable> clazz : expected) {
+            if (clazz.isInstance(throwable)) {
+                log.warn("Problems with stream, retrying for " + retryCount + " time and waiting " + nextDelay + "ms: " + throwable.toString());
+                return;
+            }
+            if (clazz.isInstance(throwable.getCause())) {
+                log.warn("Problems with stream, retrying for " + retryCount + " time and waiting " + nextDelay + "ms: " + throwable.getCause().toString());
+                return;
+            }
+        }
+        log.warn("Problems with stream, retrying for " + retryCount + " time and waiting " + nextDelay + "ms", StackTraceUtils.deepSanitize(throwable));
     }
 }

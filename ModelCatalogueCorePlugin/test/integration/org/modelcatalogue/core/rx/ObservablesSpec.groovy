@@ -6,12 +6,14 @@ import rx.Observable
 
 class ObservablesSpec extends AbstractIntegrationSpec {
 
+    RxService rxService
+
     def setup() {
         loadFixtures()
     }
 
     def "create observable from criteria"() {
-        Observable<DataElement> elements = Observables.observe(DataElement.where {})
+        Observable<DataElement> elements = rxService.from(DataElement.where {})
         expect:
         elements.count().toBlocking().toFuture().get() == DataElement.count()
     }

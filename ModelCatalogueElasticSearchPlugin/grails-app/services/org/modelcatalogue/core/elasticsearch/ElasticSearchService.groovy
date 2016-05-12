@@ -15,6 +15,7 @@ import org.elasticsearch.client.Client
 import org.elasticsearch.client.transport.TransportClient
 import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.common.transport.InetSocketTransportAddress
+import org.elasticsearch.common.util.concurrent.EsRejectedExecutionException
 import org.elasticsearch.index.VersionType
 import org.elasticsearch.index.engine.VersionConflictEngineException
 import org.elasticsearch.index.query.BoolQueryBuilder
@@ -23,6 +24,7 @@ import org.elasticsearch.index.query.QueryBuilders
 import org.elasticsearch.indices.IndexAlreadyExistsException
 import org.elasticsearch.node.Node
 import org.elasticsearch.node.NodeBuilder
+import org.elasticsearch.threadpool.ThreadPool
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.elasticsearch.rx.RxElastic
 import org.modelcatalogue.core.rx.RxService
@@ -66,7 +68,6 @@ class ElasticSearchService implements SearchCatalogue {
             DataModel, Asset, DataClass, DataElement, DataType, EnumeratedType, MeasurementUnit, PrimitiveType, ReferenceType, Relationship
     ]
 
-    ExecutorService executorService
     GrailsApplication grailsApplication
     DataModelService dataModelService
     ElementService elementService
@@ -76,9 +77,13 @@ class ElasticSearchService implements SearchCatalogue {
 
     @PostConstruct
     private void init() {
+        Settings.Builder settingsBuilder = Settings.builder()
+            .put("${ThreadPool.THREADPOOL_GROUP}${ThreadPool.Names.BULK}.queue_size", 3000)
+            .put("${ThreadPool.THREADPOOL_GROUP}${ThreadPool.Names.BULK}.size", 25)
         if (grailsApplication.config.mc.search.elasticsearch.local || System.getProperty('mc.search.elasticsearch.local')) {
+            settingsBuilder.put('path.home', (grailsApplication.config.mc.search.elasticsearch.local ?:  System.getProperty('mc.search.elasticsearch.local')).toString())
             node = NodeBuilder.nodeBuilder()
-                    .settings(Settings.builder().put('path.home', (grailsApplication.config.mc.search.elasticsearch.local ?:  System.getProperty('mc.search.elasticsearch.local')).toString()).build())
+                    .settings(settingsBuilder)
                     .local(true).node()
 
             client = node.client()
@@ -87,15 +92,15 @@ class ElasticSearchService implements SearchCatalogue {
         } else if (grailsApplication.config.mc.search.elasticsearch.host || System.getProperty('mc.search.elasticsearch.host')) {
             String host = grailsApplication.config.mc.search.elasticsearch.host ?: System.getProperty('mc.search.elasticsearch.host')
             String port = grailsApplication.config.mc.search.elasticsearch.port ?: System.getProperty('mc.search.elasticsearch.port') ?: "9300"
-            Settings.Builder settingBuilder = Settings.builder()
 
             if (grailsApplication.config.mc.search.elasticsearch.settings) {
-                grailsApplication.config.mc.search.elasticsearch.settings(settingBuilder)
+                grailsApplication.config.mc.search.elasticsearch.settings(settingsBuilder)
             }
+
 
             client = TransportClient
                     .builder()
-                    .settings(settingBuilder)
+                    .settings(settingsBuilder)
                     .build()
                     .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), Integer.parseInt(port, 10)))
 
@@ -540,7 +545,7 @@ class ElasticSearchService implements SearchCatalogue {
                 }
                 return just(it)
             }
-            .retryWhen(RxService.withDelay(RxElastic.DEFAULT_RETRIES, RxElastic.DEFAULT_DELAY))
+            .retryWhen(RxService.withDelay(RxElastic.DEFAULT_RETRIES, RxElastic.DEFAULT_DELAY, [EsRejectedExecutionException] as Set))
     }
 
     private BulkRequestBuilder buildBulkIndexRequest(String existingIndex, List<Document> documents) {
