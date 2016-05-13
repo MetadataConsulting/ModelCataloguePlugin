@@ -1,7 +1,6 @@
 package org.modelcatalogue.gel.export
 
 import org.modelcatalogue.core.DataClass
-import org.modelcatalogue.core.publishing.changelog.ChangeLogDocxGenerator
 
 import static junit.framework.Assert.assertEquals
 import static org.modelcatalogue.core.util.test.FileOpener.open

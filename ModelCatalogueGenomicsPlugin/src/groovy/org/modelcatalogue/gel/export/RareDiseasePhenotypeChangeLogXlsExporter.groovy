@@ -14,14 +14,15 @@ import static org.modelcatalogue.core.audit.ChangeType.PROPERTY_CHANGED
 @Log4j
 class RareDiseasePhenotypeChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
 
+    private static final String PHENOTYPES_SHEET = 'HPO & Clinical tests change log'
+
     RareDiseasePhenotypeChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, Integer depth = 5, Boolean includeMetadata = false) {
         super(auditService, dataClassService, depth, includeMetadata)
     }
 
     @Override
-    public void export(DataClass dataClass, OutputStream out) {
-        String sheetName = PHENOTYPES_SHEET
-        exportXls(dataClass, out, sheetName)
+    public void export(CatalogueElement dataClass, OutputStream out) {
+        exportXls(dataClass, out, PHENOTYPES_SHEET)
     }
 
     @Override

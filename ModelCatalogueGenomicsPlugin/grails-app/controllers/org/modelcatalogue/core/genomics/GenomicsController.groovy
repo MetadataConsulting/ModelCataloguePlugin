@@ -10,6 +10,7 @@ import org.modelcatalogue.gel.RareDiseaseCsvExporter
 import org.modelcatalogue.gel.GelJsonExporter
 import org.modelcatalogue.gel.export.CancerTypesCsvExporter
 import org.modelcatalogue.gel.export.CancerTypesJsonExporter
+import org.modelcatalogue.gel.export.DataModelChangeLogXlsExporter
 import org.modelcatalogue.gel.export.RareDiseaseDisorderListCsvExporter
 import org.modelcatalogue.gel.export.RareDiseaseEligibilityChangeLogXlsExporter
 import org.modelcatalogue.gel.export.RareDiseasePhenotypeChangeLogXlsExporter
@@ -34,9 +35,10 @@ class GenomicsController {
     static final String RD_ELIGIBILITY_CSV_FILENAME = "RD Eligibility Criteria.csv"
     static final String RD_HPO_CSV_FILENAME = "RD Phenotypes and Clinical Tests.csv"
     static final String RD_ELIGIBILITY_CRITERIA_JSON = "RD Eligibility Criteria.json"
-    static final String RD_PHENOTYPE_AND_CLINICAL_TESTS_JSON = "RD Phenotype and Clinical tests.json"
     static final String RD_PHENOTYPE_AND_CLINICAL_TESTS_XLS = "RD Change log for Phenotypes and clinical tests.xlsx"
     static final String RD_ELIGIBILITY_CHANGELOG_XLS = "RD Change Log for Eligibility Criteria.xlsx"
+    static final String RD_DATA_SPECIFICATION_CHANGELOG_XLS = "RD Data Specification Change Log.xlsx"
+    static final String CANCER_DATA_SPECIFICATION_CHANGELOG_XLS = "Cancer Model Data Specification Change Log.xlsx"
 
     static final String DOC_IMAGE_PATH = "https://www.genomicsengland.co.uk/wp-content/uploads/2015/11/Genomics-England-logo-2015.png"
 
@@ -223,7 +225,7 @@ class GenomicsController {
         Long modelId = model.id
         def assetId = assetService.storeReportAsAsset(
             model,
-            name: "${model.name} report as MS Word Document",
+            name: "${model.name} - Data Specification Report as MS Word Document",
             originalFileName: "${model.name}-${model.status}-${model.version}.docx",
             contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ) { OutputStream out ->
@@ -285,7 +287,7 @@ class GenomicsController {
         }
 
         Long assetId = assetService.storeReportAsAsset(dataClass.dataModel,
-            name: "${dataClass.name} report as MS Excel Document",
+            name: "${dataClass.name} - HPO and Clinical Tests report as MS Excel Spreadsheet",
             originalFileName: "$RD_PHENOTYPE_AND_CLINICAL_TESTS_XLS",
             contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream out ->
@@ -306,7 +308,7 @@ class GenomicsController {
         }
 
         Long assetId = assetService.storeReportAsAsset(dataClass.dataModel,
-            name: "${dataClass.name} report as MS Excel Document",
+            name: "${dataClass.name} - Eligibility Change Log as MS Excel Spreadsheet",
             originalFileName: "$RD_ELIGIBILITY_CHANGELOG_XLS",
             contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream out ->
@@ -329,12 +331,33 @@ class GenomicsController {
         Long classId = dataClass.id
         def assetId = assetService.storeReportAsAsset(
             dataClass.dataModel,
-            name: name ? name : "${dataClass.name} changelog as MS Word Document",
+            name: name ? name : "${dataClass.name} - change log as MS Word Document",
             originalFileName: "${dataClass.name}-${dataClass.status}-${dataClass.version}-changelog.docx",
             contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ) { OutputStream out ->
             new ChangeLogDocxGenerator(auditService, dataClassService, depth, includeMetadata, customTemplate, DOC_IMAGE_PATH)
                 .generateChangelog(DataClass.get(classId), out)
+        }
+
+        response.setHeader("X-Asset-ID", assetId.toString())
+        redirect controller: 'asset', id: assetId, action: 'show'
+    }
+
+    def exportDataSpecChangeLogAsXls() {
+
+        DataModel model = DataModel.get(params.id)
+
+        if (!model) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        Long assetId = assetService.storeReportAsAsset(model,
+            name: "${model.name}  - Specification change log as MS Excel Spreadsheet",
+            originalFileName: "${model.name}-${model.status}-${model.version}-Changelog.xlsx",
+            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        ) { OutputStream out ->
+            new DataModelChangeLogXlsExporter(auditService, dataClassService, 0, false).export(model, out)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())
