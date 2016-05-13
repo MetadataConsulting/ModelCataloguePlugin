@@ -5,6 +5,7 @@ import org.elasticsearch.client.Client
 import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.node.Node
 import org.elasticsearch.node.NodeBuilder
+import org.elasticsearch.threadpool.ThreadPool
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.builder.api.CatalogueBuilder
@@ -12,6 +13,7 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import spock.util.concurrent.BlockingVariables
 
 class ElasticSearchServiceSpec extends IntegrationSpec {
 
@@ -28,7 +30,11 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
         File dataFolder = data.newFolder('elasticsearch')
 
         // keep this for unit tests
-         node = NodeBuilder.nodeBuilder().settings(Settings.builder().put('path.home', dataFolder.canonicalPath).build()).local(true).node()
+         node = NodeBuilder.nodeBuilder().settings(Settings.builder()
+             .put("${ThreadPool.THREADPOOL_GROUP}${ThreadPool.Names.BULK}.queue_size", 3000)
+             .put("${ThreadPool.THREADPOOL_GROUP}${ThreadPool.Names.BULK}.size", 25)
+             .put('path.home', dataFolder.canonicalPath)
+         ).local(true).node()
          Client client = node.client()
 
         // testing with docker instance
@@ -83,22 +89,35 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
 
 
         when:
-        // deletes index "data_model_<id>"
-        elasticSearchService.unindex(dataModel)
-                .concatWith(elasticSearchService.unindex(element))
-                .concatWith(elasticSearchService.index(dataModel))
-                .concatWith(elasticSearchService.index(element))
-                .toBlocking().last()
+        BlockingVariables results = new BlockingVariables(10)
 
-        Thread.sleep(1000) // some time to index
+        elasticSearchService.unindex(dataModel).subscribe {
+            results.dataModelUnindexed = true
+            elasticSearchService.unindex(element).subscribe {
+                results.elementUnindexed = true
+                elasticSearchService.index(dataModel).subscribe {
+                    results.dataModelIndexed = true
+                    elasticSearchService.index(element).subscribe {
+                        results.elementIndexed = true
+                    }
+                }
+            }
+        }
+
         then:
         noExceptionThrown()
+        results.dataModelUnindexed
+        results.elementUnindexed
+        results.dataModelIndexed
+        results.elementIndexed
+
         elasticSearchService.client
                 .prepareGet(index, type, element.getId().toString())
                 .execute()
                 .get().exists
 
         when:
+        Thread.sleep(2000)
         ListWithTotalAndType<DataClass> foundClasses = elasticSearchService.search(DataClass, [search: 'foo'])
 
         then:
@@ -154,9 +173,13 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
         mapping.relationship.properties.relationship_type
         mapping.relationship.properties.source
         mapping.relationship.properties.source.properties
-        mapping.relationship.properties.source.properties.data_type
         mapping.relationship.properties.source.properties.data_class
         mapping.relationship.properties.source.properties.measurement_unit
+        mapping.relationship.properties.source.properties.data_type
+        mapping.relationship.properties.source.properties.data_type.properties
+        mapping.relationship.properties.source.properties.data_type.properties.measurement_unit
+        mapping.relationship.properties.source.properties.data_type.properties.measurement_unit.properties
+        mapping.relationship.properties.source.properties.data_type.properties.measurement_unit.properties.data_model
         mapping.relationship.properties.destination
     }
 

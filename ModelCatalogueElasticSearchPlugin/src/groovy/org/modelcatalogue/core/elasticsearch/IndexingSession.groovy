@@ -26,7 +26,7 @@ class IndexingSession {
 
     Document getDocument(Object o) {
         if (!o) {
-            return new Document('','',ImmutableMap.of())
+            return Document.EMPTY
         }
 
         try {
@@ -61,7 +61,7 @@ class IndexingSession {
 
     private Document createDocument(Object object) {
         if (!object) {
-            return new Document('','',ImmutableMap.of())
+            return Document.EMPTY
         }
 
         if (object instanceof Document) {
@@ -78,6 +78,6 @@ class IndexingSession {
             throw new IllegalArgumentException("Payload for $object cannot contain _type")
         }
 
-        new Document(ElasticSearchService.getTypeName(HibernateHelper.getEntityClass(object)), object.getId()?.toString(), result)
+        new Document(ElasticSearchService.getTypeName(HibernateHelper.getEntityClass(object)), object.getId()?.toString(), object.getVersion(), result)
     }
 }
