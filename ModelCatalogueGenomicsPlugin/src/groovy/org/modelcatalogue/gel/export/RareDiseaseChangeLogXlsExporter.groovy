@@ -12,6 +12,7 @@ import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.audit.Change
 import org.modelcatalogue.core.audit.ChangeType
 import org.modelcatalogue.core.publishing.changelog.AbstractChangeLogGenerator
+import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.OrderedMap
 
 import static org.modelcatalogue.core.audit.ChangeType.*
@@ -24,7 +25,7 @@ import static RareDiseaseChangeLogXlsExporter.RareDiseaseChangeType.*
 @Log4j
 abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerator implements XlsExporter {
 
-    static final String CHANGE_REF = ''
+    static final String EMPTY_CHANGE_REF = ''
     public static final String PHENOTYPE = 'Phenotype'
     public static final String CLINICAL_TESTS = 'Clinical tests'
     public static final String GUIDANCE = 'Guidance'
@@ -57,6 +58,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
         }
     }
 
+    int modelCount = 0
 
     RareDiseaseChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, Integer depth = 5, Boolean includeMetadata = false) {
         super(auditService, dataClassService, depth, includeMetadata)
@@ -90,125 +92,125 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
 
     // level 5 descending into level 6
     List<String> iterateChildren(CatalogueElement model, List lines, String subtype = null, groupDescriptions, level, List<ChangeType> typesToCheck) {
+        if (modelCount % 100 == 0) {
+            log.debug "modelCount=$modelCount"
+        }
+
         model.parentOf?.each { CatalogueElement child ->
+
             log.debug("model $child.name")
             checkChangeLog(child, lines, subtype, groupDescriptions, level, typesToCheck)
+
+            if( (PHENOTYPE == subtype || CLINICAL_TESTS ==  subtype) && child.parentOf.size > 0) {   // can be nested
+                iterateChildren(child, lines, subtype, groupDescriptions, level+1, DETAIL_CHANGE_TYPES)
+            }
         }
         lines
     }
 
-
-    // operates at level 6
-    List<String> checkChangeLog(CatalogueElement model, List lines, String subtype = null, groupDescriptions, level, List<ChangeType> typesToCheck) {
+    // operates at level 6 & below
+    private void checkChangeLog(CatalogueElement model, List lines, String subtype = null, groupDescriptions, level, List<ChangeType> typesToCheck) {
         def rows
         List<String> changes = []
         int noLines = lines.size()
 
-        if (typesToCheck.contains(RELATIONSHIP_DELETED)) {
+        List<Change> allChanged = getChanges(model, typesToCheck.toArray(new ChangeType[0]))    //get all changes in one go (perf!)
+
+
+        for (Change change : allChanged) {
             changes = []
-            List<Change> changed = getChanges(model, RELATIONSHIP_DELETED)
-            rows = createRows(changed)
-            rows.each { key, rowData ->
-                if(!ignoreKeyListForDeletions.contains(key)  ) {
-                    changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, REMOVE_DATA_ITEM)
-                    if (changes) lines << changes    //add row
+
+            if (RELATIONSHIP_DELETED.equals(change.type)) {
+                rows = createRow(change)
+                rows.each { key, rowData ->
+                    if (!ignoreKeyListForDeletions.contains(key)) {
+                        changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, REMOVE_DATA_ITEM)
+                        if (changes) lines << changes    //add row
+                    }
                 }
             }
-        }
 
 
-        if (typesToCheck.contains(RELATIONSHIP_CREATED)){
-            changes = []
-            List<Change> changed = getChanges(model, RELATIONSHIP_CREATED)
-            rows = createRows(changed)
-            rows.each { key, rowData ->
-                if(!ignoreKeyListForCreations.contains(key)  ) {
-                    changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, NEW_DATA_ITEM)
-                    if (changes) lines << changes    //add row
+            if (RELATIONSHIP_CREATED.equals(change.type)) {
+                rows = createRow(change)
+                rows.each { key, rowData ->
+                    if (!ignoreKeyListForCreations.contains(key)) {
+                        changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, NEW_DATA_ITEM)
+                        if (changes) lines << changes    //add row
+                    }
                 }
             }
-        }
 
-        if (typesToCheck.contains(METADATA_UPDATED) || typesToCheck.contains(RELATIONSHIP_METADATA_UPDATED)){
-            changes = []
-            List<Change> changed = getChanges(model, METADATA_UPDATED)
-            changed += getChanges(model, RELATIONSHIP_METADATA_UPDATED)
 
-            rows = createRows(changed)
-            rows.each { key, rowData ->
-                if(!ignoreKeyList.contains(key)  ) {
-                    changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, CHANGED_METADATA)
-                    if (changes) lines << changes    //add row
+            if ([METADATA_UPDATED, RELATIONSHIP_METADATA_UPDATED].contains(change.type)) {
+                rows = createRow(change)
+                rows.each { key, rowData ->
+                    if (!ignoreKeyList.contains(key)) {
+                        changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, CHANGED_METADATA)
+                        if (changes) lines << changes    //add row
+                    }
                 }
             }
-        }
 
-        if (typesToCheck.contains(METADATA_CREATED) ) {
-            changes = []
-            List<Change> changed = getChanges(model, METADATA_CREATED)
-            rows = createRows(changed)
-            rows.each { key, rowData ->
-                if(!ignoreKeyList.contains(key)  ) {
+
+            if (METADATA_CREATED.equals(change.type)) {
+                rows = createRow(change)
+                rows.each { key, rowData ->
+                    if (!ignoreKeyList.contains(key)) {
+                        changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, NEW_METADATA)
+                        lines << changes    //add row
+                    }
+                }
+            }
+
+            if (RELATIONSHIP_METADATA_CREATED.equals(change.type)) {
+                rows = createRow(change)
+                rows.each { key, rowData ->
                     changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, NEW_METADATA)
-                    lines << changes    //add row
+                    if (changes) lines << changes    //add row
                 }
             }
-        }
-        if ( typesToCheck.contains(RELATIONSHIP_METADATA_CREATED)) {
-            changes = []
-            List<Change> changed = getChanges(model, RELATIONSHIP_METADATA_CREATED)
-            rows = createRows(changed)
-            rows.each { key, rowData ->
-                changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, NEW_METADATA)
-                if (changes) lines << changes    //add row
+
+            if ([METADATA_DELETED,RELATIONSHIP_METADATA_DELETED].contains(change.type)) {
+                rows = createRow(change)
+                rows.each { key, rowData ->
+                    changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, REMOVE_METADATA)
+                    if (changes) lines << changes    //add row
+                }
             }
-        }
-
-        if (typesToCheck.contains(METADATA_DELETED) || typesToCheck.contains(RELATIONSHIP_METADATA_DELETED)) {
-            changes = []
-            List<Change> changed = getChanges(model, RELATIONSHIP_METADATA_DELETED)
-            changed += getChanges(model, METADATA_DELETED)
-            rows = createRows(changed)
-            rows.each { key, rowData ->
-                changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, REMOVE_METADATA)
-                if (changes) lines << changes    //add row
-            }
-        }
 
 
-        if (typesToCheck.contains(PROPERTY_CHANGED)){
-            changes = []
-            Map<String, List<String>> changedProperties = collectChangedPropertiesRows(model)
+            if (PROPERTY_CHANGED.equals(change.type)) {
+                rows = createRow(change)
+                rows.each { key, rowData ->
 
-            changedProperties.each{ key, rowData ->
-
-                def changeTypeToRender = CHANGE_DATA_VALUE
-                if (CHANGE_DESCRIPTION.catalogChangeKey.equalsIgnoreCase(key)) {
-                    changeTypeToRender = CHANGE_DESCRIPTION
+                    def changeTypeToRender = CHANGE_DATA_VALUE
+                    if (CHANGE_DESCRIPTION.catalogChangeKey.equalsIgnoreCase(key)) {
+                        changeTypeToRender = CHANGE_DESCRIPTION
+                    }
+                    if (NAME_CHANGE.catalogChangeKey.equalsIgnoreCase(key)) {
+                        changeTypeToRender = NAME_CHANGE
+                    }
+                    if (GUIDANCE.equals(subtype) && TEXT_CHANGE.catalogChangeKey.equalsIgnoreCase(key)) {
+                        changeTypeToRender = TEXT_CHANGE
+                    }
+                    changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, changeTypeToRender)
+                    if (changes) lines << changes    //add row
                 }
-                if(NAME_CHANGE.catalogChangeKey.equalsIgnoreCase(key)) {
-                    changeTypeToRender = NAME_CHANGE
-                }
-                if(GUIDANCE.equals(subtype) && TEXT_CHANGE.catalogChangeKey.equalsIgnoreCase(key) ) {
-                    changeTypeToRender = TEXT_CHANGE
-                }
-                changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, changeTypeToRender)
-                if (changes) lines << changes    //add row
             }
         }
 
         if(lines.size() > noLines) {
-            log.debug "found changes for level$level model $model.name"
-            log.debug("lines ${lines.size}")
+            log.debug "found changes for level$level model $model.name lines ${lines.size}"
         }
+        modelCount++
 
         changes
     }
 
-    protected Map<String, List<String>> createRows(List<Change> changes) {
-        Map<String, List<String>> rows = new TreeMap<String, List<String>>().withDefault { ['', ''] }
+    protected Map<String, List<String>> createRow(Change change) {
+        Map<String, List<String>> rows = new HashMap<String, List<String>>().withDefault { ['', ''] }
 
-        for (Change change in changes) {
             String propLabel = change.property
             if (change.type in [RELATIONSHIP_METADATA_CREATED,RELATIONSHIP_METADATA_UPDATED]) {
                 if (mightBeJSON(change.newValue)) {
@@ -234,15 +236,14 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
                     vals[1] = getNewRelationshipMetadataValue(change)?.toString() ?: change.newValue
                     rows[propLabel] = vals
                     break
+
                 default:
                     propLabel = propLabel ?: ''
                     List<String> vals = rows[propLabel]
-                    vals[0] = vals[0] ?: valueForPrint(change.property, change.oldValue)
+                    vals[0] = valueForPrint(change.property, change.oldValue)
                     vals[1] = valueForPrint(change.property, change.newValue)
                     rows[propLabel] = vals
-
             }
-        }
         rows
     }
 
@@ -251,8 +252,17 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
         List<String> changes = []
 
         try {
-            changes << CHANGE_REF
-            log.debug "Changed model =" + model
+            def (String before, String after) = extractValues(rowData, changeToRender, key)
+
+            if (!before && !after ) {       //don't print blank lines
+                return []
+            }
+
+            if(model.ext.get(Metadata.CHANGE_REF)) {
+                changes << model.ext.get(Metadata.CHANGE_REF)
+            } else {
+                changes << EMPTY_CHANGE_REF
+            }
 
             groupDescriptions.each { lvl, lvlName ->
                 changes << lvlName
@@ -260,12 +270,6 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
 
             if(subtype) changes << subtype
             changes << model.name
-
-            def (String before, String after) = extractValues(rowData, changeToRender, key)
-
-            if (!before && !after ) {       //don't print blank lines
-                return []
-            }
 
             changes << changeToRender.renderedText
 
@@ -278,8 +282,9 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
             }
         } catch (Exception e) {
             log.error "Error reading unpacked changelog key=$key rowdata=$rowData \n  ${e.toString()}"
-            changes = []
+            return []
         }
+        log.debug "\n$changes"
         changes
     }
 

@@ -18,14 +18,14 @@ interface XlsExporter {
     /**
      * Override to build Excel sheet as required
      * @param sheet The Excel sheet that you are populating
-     * @param lines Collection of row strings produced by {@link org.modelcatalogue.gel.export.XlsExporter#generateLine generateLine()}
+     * @param lines Collection of row strings produced by {@link org.modelcatalogue.gel.export.XlsExporter#searchExportSpecificTypes searchExportSpecificTypes()}
      */
     void buildSheet(Sheet sheet, List lines)
 
     /**
      * operates at level 5
      */
-    List<String> generateLine(CatalogueElement element, List lines, groupDescriptions, level)
+    List<String> searchExportSpecificTypes(CatalogueElement model, List lines, groupDescriptions, level)
 
     /**
      * Method called to descend through the data class hierarchy, ultimately calling {@link org.modelcatalogue.gel.export.XlsExporter#generateLine generateLine()}

@@ -21,4 +21,5 @@ databaseChangeLog = {
     include file: 'changelog_019_bidirectionalRelationships.groovy'
     include file: 'changelog_020_enum_subsets.groovy'
     include file: 'changelog_021_validation_rule.groovy'
+    include file: 'changelog_022_changelog.groovy'
 }
