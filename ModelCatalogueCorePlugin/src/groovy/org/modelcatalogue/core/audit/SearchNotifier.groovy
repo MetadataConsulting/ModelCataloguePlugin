@@ -8,6 +8,10 @@ import org.modelcatalogue.core.RelationshipMetadata
 import org.modelcatalogue.core.SearchCatalogue
 import org.modelcatalogue.core.rx.ErrorSubscriber
 import rx.Observable
+import rx.subjects.PublishSubject
+import rx.subjects.Subject
+
+import java.util.concurrent.TimeUnit
 
 import static org.modelcatalogue.core.util.HibernateHelper.*
 
@@ -15,9 +19,19 @@ class SearchNotifier extends AbstractAuditor {
 
     final SearchCatalogue searchService
     final Map<Long, Set<Object>> queues = [:].withDefault { new LinkedHashSet<Object>() }
+    final Subject<Object, Object> buffer = PublishSubject.create()
 
     SearchNotifier(SearchCatalogue searchService) {
         this.searchService = searchService
+        buffer.buffer(1L, TimeUnit.SECONDS).map {
+            new HashSet<Object>(it)
+        } .flatMap { queued ->
+            searchService.index(queued)
+        }.subscribe(ErrorSubscriber.create("Exception during batch index"))
+    }
+
+    private void indexInternal(Object object) {
+        buffer.onNext(object)
     }
 
     @Override
@@ -36,7 +50,7 @@ class SearchNotifier extends AbstractAuditor {
     @Override
     Observable<Long> logExternalChange(CatalogueElement source, String message, Long authorId) {
         if(!parentChangeId) {
-            searchService.index(source).subscribe(ErrorSubscriber.create("Exception indexing external change for #${source.getId()}"))
+            indexInternal(source)
             return Observable.empty()
         }
         queues[parentChangeId].add(source)
@@ -46,7 +60,7 @@ class SearchNotifier extends AbstractAuditor {
     @Override
     Observable<Long> logNewVersionCreated(CatalogueElement element, Long authorId) {
         if(!parentChangeId) {
-            searchService.index(element).subscribe(ErrorSubscriber.create("Exception indexing new version created for #${element.getId()}"))
+            indexInternal(element)
             return Observable.empty()
         }
         queues[parentChangeId].add(element)
@@ -56,7 +70,7 @@ class SearchNotifier extends AbstractAuditor {
     @Override
     Observable<Long> logElementFinalized(CatalogueElement element, Long authorId) {
         if(!parentChangeId) {
-            searchService.index(element).subscribe(ErrorSubscriber.create("Exception indexing element finalized for #${element.getId()}"))
+            indexInternal(element)
             return Observable.empty()
         }
         queues[parentChangeId].add(element)
@@ -66,7 +80,7 @@ class SearchNotifier extends AbstractAuditor {
     @Override
     Observable<Long> logElementDeprecated(CatalogueElement element, Long authorId) {
         if(!parentChangeId) {
-            searchService.index(element).subscribe(ErrorSubscriber.create("Exception indexing element deprecation change for #${element.getId()}"))
+            indexInternal(element)
             return Observable.empty()
         }
         queues[parentChangeId].add(element)
@@ -76,7 +90,7 @@ class SearchNotifier extends AbstractAuditor {
     @Override
     Observable<Long> logElementCreated(CatalogueElement element, Long authorId) {
         if(!parentChangeId) {
-            searchService.index(element).subscribe(ErrorSubscriber.create("Exception indexing element creation for #${element.getId()}"))
+            indexInternal(element)
             return Observable.empty()
         }
         queues[parentChangeId].add(element)
@@ -92,7 +106,7 @@ class SearchNotifier extends AbstractAuditor {
     @Override
     Observable<Long> logElementUpdated(CatalogueElement element, Long authorId) {
         if(!parentChangeId) {
-            searchService.index(element).subscribe(ErrorSubscriber.create("Exception indexing element update for #${element.getId()}"))
+            indexInternal(element)
             return Observable.empty()
         }
         queues[parentChangeId].add(element)
@@ -102,8 +116,8 @@ class SearchNotifier extends AbstractAuditor {
     @Override
     Observable<Long> logMappingCreated(Mapping mapping, Long authorId) {
         if(!parentChangeId) {
-            searchService.index(mapping.source).subscribe(ErrorSubscriber.create("Exception indexing mapping creation for #${mapping.source.getId()}"))
-            searchService.index(mapping.destination).subscribe(ErrorSubscriber.create("Exception indexing mapping creation for #${mapping.destination.getId()}"))
+            indexInternal(mapping.source)
+            indexInternal(mapping.destination)
             return Observable.empty()
         }
         queues[parentChangeId].add(mapping.source)
@@ -114,8 +128,8 @@ class SearchNotifier extends AbstractAuditor {
     @Override
     Observable<Long> logMappingDeleted(Mapping mapping, Long authorId) {
         if(!parentChangeId) {
-            searchService.index(mapping.source).subscribe(ErrorSubscriber.create("Exception indexing mapping deletion for #${mapping.source.getId()}"))
-            searchService.index(mapping.destination).subscribe(ErrorSubscriber.create("Exception indexing mapping deletion for #${mapping.destination.getId()}"))
+            indexInternal(mapping.source)
+            indexInternal(mapping.destination)
             return Observable.empty()
         }
         queues[parentChangeId].add(mapping.source)
@@ -126,8 +140,8 @@ class SearchNotifier extends AbstractAuditor {
     @Override
     Observable<Long> logMappingUpdated(Mapping mapping, Long authorId) {
         if(!parentChangeId) {
-            searchService.index(mapping.source).subscribe(ErrorSubscriber.create("Exception indexing mapping update for #${mapping.source.getId()}"))
-            searchService.index(mapping.destination).subscribe(ErrorSubscriber.create("Exception indexing mapping update for #${mapping.destination.getId()}"))
+            indexInternal(mapping.source)
+            indexInternal(mapping.destination)
             return Observable.empty()
         }
         queues[parentChangeId].add(mapping.source)
@@ -138,7 +152,7 @@ class SearchNotifier extends AbstractAuditor {
     @Override
     Observable<Long> logNewMetadata(ExtensionValue extension, Long authorId) {
         if(!parentChangeId) {
-            searchService.index(extension.element).subscribe(ErrorSubscriber.create("Exception indexing new metadata for #${extension.element.getId()}"))
+            indexInternal(extension.element)
             return Observable.empty()
         }
         queues[parentChangeId].add(extension.element)
@@ -148,7 +162,7 @@ class SearchNotifier extends AbstractAuditor {
     @Override
     Observable<Long> logMetadataUpdated(ExtensionValue extension, Long authorId) {
         if(!parentChangeId) {
-            searchService.index(extension.element).subscribe(ErrorSubscriber.create("Exception indexing updated metadata for #${extension.element.getId()}"))
+            indexInternal(extension.element)
             return Observable.empty()
         }
         queues[parentChangeId].add(extension.element)
@@ -158,7 +172,7 @@ class SearchNotifier extends AbstractAuditor {
     @Override
     Observable<Long> logMetadataDeleted(ExtensionValue extension, Long authorId) {
         if(!parentChangeId) {
-            searchService.index(extension.element).subscribe(ErrorSubscriber.create("Exception indexing deleted metadata for #${extension.element.getId()}"))
+            indexInternal(extension.element)
             return Observable.empty()
         }
         queues[parentChangeId].add(extension.element)
@@ -168,7 +182,7 @@ class SearchNotifier extends AbstractAuditor {
     @Override
     Observable<Long> logNewRelation(Relationship relationship, Long authorId) {
         if(!parentChangeId) {
-            searchService.index(relationship).subscribe(ErrorSubscriber.create("Exception indexing new relation  #${relationship.getId()}"))
+            indexInternal(relationship)
             return Observable.empty()
         }
         queues[parentChangeId].add(relationship)
@@ -177,14 +191,14 @@ class SearchNotifier extends AbstractAuditor {
 
     @Override
     Observable<Long> logRelationRemoved(Relationship relationship, Long authorId) {
-        searchService.unindex(relationship).subscribe(ErrorSubscriber.create("Exception indexing removed relation  #${relationship.getId()}"))
+        searchService.unindex(relationship)
         return Observable.empty()
     }
 
     @Override
     Observable<Long> logRelationArchived(Relationship relationship, Long authorId) {
         if(!parentChangeId) {
-            searchService.index(relationship).subscribe(ErrorSubscriber.create("Exception indexing archived relation  #${relationship.getId()}"))
+            indexInternal(relationship)
             return Observable.empty()
         }
         queues[parentChangeId].add(relationship)
@@ -194,7 +208,7 @@ class SearchNotifier extends AbstractAuditor {
     @Override
     Observable<Long> logNewRelationshipMetadata(RelationshipMetadata extension, Long authorId) {
         if(!parentChangeId) {
-            searchService.index(extension.relationship).subscribe(ErrorSubscriber.create("Exception indexing new relationship metadata  #${extension.relationship.getId()}"))
+            indexInternal(extension.relationship)
             return Observable.empty()
         }
         queues[parentChangeId].add(extension.relationship)
@@ -204,7 +218,7 @@ class SearchNotifier extends AbstractAuditor {
     @Override
     Observable<Long> logRelationshipMetadataUpdated(RelationshipMetadata extension, Long authorId) {
         if(!parentChangeId) {
-            searchService.index(extension.relationship).subscribe(ErrorSubscriber.create("Exception indexing updated relationship metadata  #${extension.relationship.getId()}"))
+            indexInternal(extension.relationship)
             return Observable.empty()
         }
         queues[parentChangeId].add(extension.relationship)
@@ -214,7 +228,7 @@ class SearchNotifier extends AbstractAuditor {
     @Override
     Observable<Long> logRelationshipMetadataDeleted(RelationshipMetadata extension, Long authorId) {
         if(!parentChangeId) {
-            searchService.index(extension.relationship).subscribe(ErrorSubscriber.create("Exception indexing deleted relationship metadata  #${extension.relationship.getId()}"))
+            indexInternal(extension.relationship)
             return Observable.empty()
         }
         queues[parentChangeId].add(extension.relationship)
