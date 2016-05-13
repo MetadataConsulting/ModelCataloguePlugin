@@ -13,7 +13,7 @@ ES_PORT="9200"
 
 if [ "$1" = "start" ] ; then
     echo -e "Starting ElasticSearch v$ES_VERSION instance with docker.\nIf you have upgraded the version of your client, you should upgrade the version in this script as well.\nInitializing containers may take a while, please be patient."
-    docker_start_or_run mc-es -p 9200:9200 -p 9300:9300 elasticsearch:"$ES_VERSION" -Dnetwork.host=0.0.0.0 -Des.threadpool.bulk.queue_size=3000
+    docker_start_or_run mc-es -p 9200:9200 -p 9300:9300 elasticsearch:"$ES_VERSION" -Dnetwork.host=0.0.0.0 -Des.threadpool.bulk.queue_size=5000
     docker_start_or_run mc-kibana -e "ELASTICSEARCH_URL=http://$DOCKER_MACHINE_IP:9200" -p 5601:5601 kibana:"$KIBANA_VERSION"
     docker_exec mc-kibana kibana plugin --install elastic/sense
     docker_restart mc-kibana

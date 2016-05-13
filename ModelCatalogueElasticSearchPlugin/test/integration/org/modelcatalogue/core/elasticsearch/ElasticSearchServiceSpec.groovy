@@ -167,9 +167,13 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
         mapping.relationship.properties.relationship_type
         mapping.relationship.properties.source
         mapping.relationship.properties.source.properties
-        mapping.relationship.properties.source.properties.data_type
         mapping.relationship.properties.source.properties.data_class
         mapping.relationship.properties.source.properties.measurement_unit
+        mapping.relationship.properties.source.properties.data_type
+        mapping.relationship.properties.source.properties.data_type.properties
+        mapping.relationship.properties.source.properties.data_type.properties.measurement_unit
+        mapping.relationship.properties.source.properties.data_type.properties.measurement_unit.properties
+        mapping.relationship.properties.source.properties.data_type.properties.measurement_unit.properties.data_model
         mapping.relationship.properties.destination
     }
 

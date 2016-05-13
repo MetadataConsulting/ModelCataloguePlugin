@@ -31,6 +31,7 @@ import org.modelcatalogue.core.rx.RxService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
+import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import rx.Observable
 
 import javax.annotation.PostConstruct
@@ -461,6 +462,12 @@ class ElasticSearchService implements SearchCatalogue {
         if (clazz == DataElement) {
             // data type is embedded into data element
             mapping[typeName].properties.data_type = getMapping(DataType).data_type
+        } else if (clazz in [PrimitiveType, DataType]) {
+            // measurement unit is embedded in primitive type
+            mapping[typeName].properties.measurement_unit = getMapping(MeasurementUnit).measurement_unit
+        } else if (clazz  in [ReferenceType, DataType]) {
+            // data class is embedded in refrence type
+            mapping[typeName].properties.data_class = getMapping(DataClass).data_class
         } else if (clazz == Relationship) {
             // source and destination combines all available catalogue element mappings
             // relationship copies relationship type mapping
@@ -540,7 +547,7 @@ class ElasticSearchService implements SearchCatalogue {
                             // ignore and keep the latest
                             continue
                         }
-                        return Observable.error(new RuntimeException("There were error indexing some of the items", response.failure.cause))
+                        return Observable.error(new RuntimeException("There were error indexing at least of one item from the batch: $response.type#$response.id@$response.index", response.failure.cause))
                     }
                 }
                 return just(it)
@@ -639,7 +646,7 @@ class ElasticSearchService implements SearchCatalogue {
 
 
     static String getTypeName(Class clazz) {
-        GrailsNameUtils.getNaturalName(clazz.simpleName).replaceAll(/\s/, '_').toLowerCase()
+        CatalogueElement.fixResourceName(GrailsNameUtils.getNaturalName(clazz.simpleName)).replaceAll(/\s/, '_').toLowerCase()
     }
 
     private static Map<String, Map> merge(Map<String, Map> current, Map<String, Map> fromSuper) {
