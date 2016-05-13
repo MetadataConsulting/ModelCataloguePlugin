@@ -31,12 +31,10 @@ import org.modelcatalogue.core.rx.RxService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
-import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import rx.Observable
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
-import java.util.concurrent.ExecutorService
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 import static rx.Observable.from
@@ -78,11 +76,11 @@ class ElasticSearchService implements SearchCatalogue {
 
     @PostConstruct
     private void init() {
-        Settings.Builder settingsBuilder = Settings.builder()
-            .put("${ThreadPool.THREADPOOL_GROUP}${ThreadPool.Names.BULK}.queue_size", 3000)
-            .put("${ThreadPool.THREADPOOL_GROUP}${ThreadPool.Names.BULK}.size", 25)
         if (grailsApplication.config.mc.search.elasticsearch.local || System.getProperty('mc.search.elasticsearch.local')) {
-            settingsBuilder.put('path.home', (grailsApplication.config.mc.search.elasticsearch.local ?:  System.getProperty('mc.search.elasticsearch.local')).toString())
+            Settings.Builder settingsBuilder = Settings.builder()
+                .put("${ThreadPool.THREADPOOL_GROUP}${ThreadPool.Names.BULK}.queue_size", 3000)
+                .put("${ThreadPool.THREADPOOL_GROUP}${ThreadPool.Names.BULK}.size", 25)
+                .put('path.home', (grailsApplication.config.mc.search.elasticsearch.local ?:  System.getProperty('mc.search.elasticsearch.local')).toString())
             node = NodeBuilder.nodeBuilder()
                     .settings(settingsBuilder)
                     .local(true).node()
@@ -93,6 +91,8 @@ class ElasticSearchService implements SearchCatalogue {
         } else if (grailsApplication.config.mc.search.elasticsearch.host || System.getProperty('mc.search.elasticsearch.host')) {
             String host = grailsApplication.config.mc.search.elasticsearch.host ?: System.getProperty('mc.search.elasticsearch.host')
             String port = grailsApplication.config.mc.search.elasticsearch.port ?: System.getProperty('mc.search.elasticsearch.port') ?: "9300"
+
+            Settings.Builder settingsBuilder = Settings.builder()
 
             if (grailsApplication.config.mc.search.elasticsearch.settings) {
                 grailsApplication.config.mc.search.elasticsearch.settings(settingsBuilder)
