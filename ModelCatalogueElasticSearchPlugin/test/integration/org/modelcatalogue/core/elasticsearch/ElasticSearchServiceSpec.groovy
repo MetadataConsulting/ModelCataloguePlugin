@@ -5,6 +5,7 @@ import org.elasticsearch.client.Client
 import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.node.Node
 import org.elasticsearch.node.NodeBuilder
+import org.elasticsearch.threadpool.ThreadPool
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.builder.api.CatalogueBuilder
@@ -29,7 +30,11 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
         File dataFolder = data.newFolder('elasticsearch')
 
         // keep this for unit tests
-         node = NodeBuilder.nodeBuilder().settings(Settings.builder().put('path.home', dataFolder.canonicalPath).build()).local(true).node()
+         node = NodeBuilder.nodeBuilder().settings(Settings.builder()
+             .put("${ThreadPool.THREADPOOL_GROUP}${ThreadPool.Names.BULK}.queue_size", 3000)
+             .put("${ThreadPool.THREADPOOL_GROUP}${ThreadPool.Names.BULK}.size", 25)
+             .put('path.home', dataFolder.canonicalPath)
+         ).local(true).node()
          Client client = node.client()
 
         // testing with docker instance
@@ -112,6 +117,7 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
                 .get().exists
 
         when:
+        Thread.sleep(2000)
         ListWithTotalAndType<DataClass> foundClasses = elasticSearchService.search(DataClass, [search: 'foo'])
 
         then:
