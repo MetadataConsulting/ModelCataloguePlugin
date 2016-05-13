@@ -3,8 +3,8 @@ package org.modelcatalogue.gel.export
 import groovy.util.logging.Log4j
 import org.modelcatalogue.builder.spreadsheet.api.Sheet
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
+import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.audit.AuditService
 
 /**
@@ -13,14 +13,15 @@ import org.modelcatalogue.core.audit.AuditService
 @Log4j
 class RareDiseaseEligibilityChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
 
+    private static final String ELIGIBILITY_SHEET = 'Eligibility Criteria change log'
+
     RareDiseaseEligibilityChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, Integer depth = 5, Boolean includeMetadata = false) {
         super(auditService, dataClassService, depth, includeMetadata)
     }
 
     @Override
-    public void export(DataClass dataClass, OutputStream out) {
-        String sheetName = ELIGIBILITY_SHEET
-        exportXls(dataClass, out, sheetName)
+    public void export(CatalogueElement dataClass, OutputStream out) {
+        exportXls(dataClass, out, ELIGIBILITY_SHEET)
     }
 
     @Override
@@ -75,6 +76,53 @@ class RareDiseaseEligibilityChangeLogXlsExporter extends RareDiseaseChangeLogXls
             buildRows(it, lines)
 
         }
+    }
+
+    @Override
+    def descendModels(CatalogueElement model, lines, level, Map groupDescriptions, exclusions) {
+
+        switch (level) {
+            case 1:     //ignore top Rare Disease level
+                break
+
+            case [2]:
+                String groupDescription = "$model.name (${model.combinedVersion})"
+                log.debug("level$level $groupDescription")
+                groupDescriptions.put(level, groupDescription)
+                break
+
+            case [3]:
+                String groupDescription = "$model.name (${model.combinedVersion})"
+                log.debug("level$level $groupDescription")
+                groupDescriptions.put(level, groupDescription)
+                break
+
+            case [4]:
+                String groupDescription = "$model.name (${model.combinedVersion})"
+                log.debug("level$level $groupDescription")
+                groupDescriptions.put(level, groupDescription)
+                break
+
+
+            case 5:
+                log.debug "level 5 searching... $model.name"
+                lines = generateLine(model, lines, groupDescriptions, level)
+                return  //don't go deeper
+
+            default:    //don't go deeper
+                return
+        }
+
+        //don't recurse dataElements
+        if (model instanceof DataElement) return
+
+        model.contains.each { CatalogueElement child ->
+            descendModels(child, lines, level + 1, groupDescriptions, exclusions)
+        }
+        model.parentOf?.each { CatalogueElement child ->
+            descendModels(child, lines, level + 1, groupDescriptions, exclusions)
+        }
+
     }
 
     @Override

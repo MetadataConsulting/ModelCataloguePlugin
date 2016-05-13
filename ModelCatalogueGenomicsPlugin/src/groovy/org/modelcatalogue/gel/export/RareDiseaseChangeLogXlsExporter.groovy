@@ -15,7 +15,7 @@ import org.modelcatalogue.core.publishing.changelog.AbstractChangeLogGenerator
 import org.modelcatalogue.core.util.OrderedMap
 
 import static org.modelcatalogue.core.audit.ChangeType.*
-import static org.modelcatalogue.gel.export.RareDiseaseChangeLogXlsExporter.RareDiseaseChangeType.*
+import static RareDiseaseChangeLogXlsExporter.RareDiseaseChangeType.*
 
 /**
  * Created by rickrees on 18/04/2016.
@@ -23,9 +23,6 @@ import static org.modelcatalogue.gel.export.RareDiseaseChangeLogXlsExporter.Rare
  */
 @Log4j
 abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerator implements XlsExporter {
-
-    public static final String PHENOTYPES_SHEET = 'HPO & Clinical tests change log'
-    public static final String ELIGIBILITY_SHEET = 'Eligibility Criteria change log'
 
     static final String CHANGE_REF = ''
     public static final String PHENOTYPE = 'Phenotype'
@@ -37,7 +34,6 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     def ignoreKeyListForDeletions = ['child of','contains', 'Class Type']
     def ignoreKeyListForCreations = ['parent of', 'Class Type']
     def ignoreKeyList = ['parent of', 'child of','contains', 'Class Type']
-
 
     public enum RareDiseaseChangeType {
         REMOVE_DATA_ITEM('Remove Data Item',null),
@@ -70,7 +66,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     void generateChangelog(DataClass model, OutputStream outputStream) {}
 
 
-    public void exportXls(DataClass model, OutputStream out, String sheetName){
+    public void exportXls(CatalogueElement model, OutputStream out, String sheetName){
         List lines = buildContentRows(model)
 
         exportLinesAsXls sheetName, lines, out
@@ -79,7 +75,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     }
 
 
-    public List buildContentRows(DataClass model) {
+    public List buildContentRows(CatalogueElement model) {
         int level = 1
         def lines = []
         def exclusions = []
@@ -90,53 +86,6 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
         descendModels(model, lines, level, groupDescriptions, exclusions)
 
         lines
-    }
-
-
-    def descendModels(DataClass model, lines, level, Map groupDescriptions, exclusions) {
-
-        switch (level) {
-            case 1:     //ignore top Rare Disease level
-                break
-
-            case [2]:
-                String groupDescription = "$model.name (${model.combinedVersion})"
-                log.debug("level$level $groupDescription")
-                groupDescriptions.put(level, groupDescription)
-                break
-
-            case [3]:
-                String groupDescription = "$model.name (${model.combinedVersion})"
-                log.debug("level$level $groupDescription")
-                groupDescriptions.put(level, groupDescription)
-                break
-
-            case [4]:
-                String groupDescription = "$model.name (${model.combinedVersion})"
-                log.debug("level$level $groupDescription")
-                groupDescriptions.put(level, groupDescription)
-                break
-
-
-            case 5:
-                log.debug "level 5 searching... $model.name"
-                lines = generateLine(model, lines, groupDescriptions, level)
-                return  //don't go deeper
-
-            default:    //don't go deeper
-                return
-        }
-
-        //don't recurse dataElements
-        if (model instanceof DataElement) return
-
-        model.contains.each { DataClass child ->
-            descendModels(child, lines, level + 1, groupDescriptions, exclusions)
-        }
-        model.parentOf?.each { DataClass child ->
-            descendModels(child, lines, level + 1, groupDescriptions, exclusions)
-        }
-
     }
 
     // level 5 descending into level 6

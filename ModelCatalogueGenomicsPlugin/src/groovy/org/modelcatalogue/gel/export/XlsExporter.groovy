@@ -2,7 +2,6 @@ package org.modelcatalogue.gel.export
 
 import org.modelcatalogue.builder.spreadsheet.api.Sheet
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.DataClass
 
 /**
  * Not quite generic Excel Exporter interface. Works for RareDiseaseChangeLogXlsExporter atm.
@@ -14,7 +13,7 @@ interface XlsExporter {
      * @param dataClass DataClass that spreadsheet is created for
      * @param out OutputStream writing to exported file
      */
-    public void export(DataClass dataClass, OutputStream out)
+    public void export(CatalogueElement element, OutputStream out)
 
     /**
      * Override to build Excel sheet as required
@@ -26,6 +25,15 @@ interface XlsExporter {
     /**
      * operates at level 5
      */
-    List<String> generateLine(CatalogueElement model, List lines, groupDescriptions, level)
+    List<String> generateLine(CatalogueElement element, List lines, groupDescriptions, level)
+
+    /**
+     * Method called to descend through the data class hierarchy, ultimately calling {@link org.modelcatalogue.gel.export.XlsExporter#generateLine generateLine()}
+     * @param element Probably top-level data class
+     * @param lines Collection of Strings to be populated by {@link org.modelcatalogue.gel.export.XlsExporter#generateLine generateLine()}
+     * @param level Level requested at
+     * @param groupDescriptions Map of change descriptions
+     */
+    def descendModels(CatalogueElement element, lines, level, Map groupDescriptions, exclusions)
 
 }
