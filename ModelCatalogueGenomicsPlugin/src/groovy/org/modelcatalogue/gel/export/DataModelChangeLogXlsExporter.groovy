@@ -128,7 +128,7 @@ class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
     }
 
     @Override
-    List<String> generateLine(CatalogueElement model, List lines, groupDescriptions, level) {
+    List<String> searchExportSpecificTypes(CatalogueElement model, List lines, groupDescriptions, level) {
 
         checkChangeLog(model, lines, groupDescriptions, level, TOP_LEVEL_RELATIONSHIP_TYPES)
         iterateChildren(model, lines, groupDescriptions, level, DETAIL_CHANGE_TYPES)
@@ -157,7 +157,7 @@ class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
             case DATA_ITEM_NAME:
                 log.debug "level 4 searching... $model.name"
                 if (model instanceof DataClass) {
-                    lines = generateLine(model, lines, groupDescriptions, level)
+                    lines = searchExportSpecificTypes(model, lines, groupDescriptions, level)
                 } else {
                     checkChangeLog(model, lines, groupDescriptions, level, TOP_LEVEL_RELATIONSHIP_TYPES)
                 }

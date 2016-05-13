@@ -79,53 +79,6 @@ class RareDiseaseEligibilityChangeLogXlsExporter extends RareDiseaseChangeLogXls
     }
 
     @Override
-    def descendModels(CatalogueElement model, lines, level, Map groupDescriptions, exclusions) {
-
-        switch (level) {
-            case 1:     //ignore top Rare Disease level
-                break
-
-            case [2]:
-                String groupDescription = "$model.name (${model.combinedVersion})"
-                log.debug("level$level $groupDescription")
-                groupDescriptions.put(level, groupDescription)
-                break
-
-            case [3]:
-                String groupDescription = "$model.name (${model.combinedVersion})"
-                log.debug("level$level $groupDescription")
-                groupDescriptions.put(level, groupDescription)
-                break
-
-            case [4]:
-                String groupDescription = "$model.name (${model.combinedVersion})"
-                log.debug("level$level $groupDescription")
-                groupDescriptions.put(level, groupDescription)
-                break
-
-
-            case 5:
-                log.debug "level 5 searching... $model.name"
-                lines = generateLine(model, lines, groupDescriptions, level)
-                return  //don't go deeper
-
-            default:    //don't go deeper
-                return
-        }
-
-        //don't recurse dataElements
-        if (model instanceof DataElement) return
-
-        model.contains.each { CatalogueElement child ->
-            descendModels(child, lines, level + 1, groupDescriptions, exclusions)
-        }
-        model.parentOf?.each { CatalogueElement child ->
-            descendModels(child, lines, level + 1, groupDescriptions, exclusions)
-        }
-
-    }
-
-    @Override
     List<String> searchExportSpecificTypes(CatalogueElement model, List lines, groupDescriptions, level) {
 
         if (model.name.matches("(?i:.*Eligibility.*)")) {

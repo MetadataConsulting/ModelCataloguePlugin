@@ -90,6 +90,64 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
         lines
     }
 
+
+    @Override
+    def descendModels(CatalogueElement model, lines, level, Map groupDescriptions, exclusions) {
+
+        switch (level) {
+            case 1:     //ignore top Rare Disease level
+                break
+
+            case [2]:
+
+                log.info "2 $model --- $model.dataModel"
+
+                String groupDescription = "$model.name (${model.combinedVersion})"
+                log.debug("level$level $groupDescription")
+                groupDescriptions.put(level, groupDescription)
+                break
+
+            case [3]:
+
+                log.info "2 $model --- $model.dataModel"
+
+                String groupDescription = "$model.name (${model.combinedVersion})"
+                log.debug("level$level $groupDescription")
+                groupDescriptions.put(level, groupDescription)
+                break
+
+            case [4]:
+
+                log.info "2 $model --- $model.dataModel"
+
+                String groupDescription = "$model.name (${model.combinedVersion})"
+                log.debug("level$level $groupDescription")
+                groupDescriptions.put(level, groupDescription)
+                break
+
+
+            case 5:
+                log.info "5 searching... $model --- $model.dataModel"
+
+                lines = searchExportSpecificTypes(model, lines, groupDescriptions, level)
+                return  //don't go deeper
+
+            default:    //don't go deeper
+                return
+        }
+
+        //don't recurse dataElements
+        if (model instanceof DataElement) return
+
+        model.contains.each { CatalogueElement child ->
+            descendModels(child, lines, level + 1, groupDescriptions, exclusions)
+        }
+        model.parentOf?.each { CatalogueElement child ->
+            descendModels(child, lines, level + 1, groupDescriptions, exclusions)
+        }
+
+    }
+
     // level 5 descending into level 6
     List<String> iterateChildren(CatalogueElement model, List lines, String subtype = null, groupDescriptions, level, List<ChangeType> typesToCheck) {
         if (modelCount % 100 == 0) {
