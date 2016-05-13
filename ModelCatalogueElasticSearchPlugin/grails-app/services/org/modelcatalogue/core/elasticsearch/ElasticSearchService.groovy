@@ -32,9 +32,11 @@ import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
 import rx.Observable
+import rx.schedulers.Schedulers
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
+import java.util.concurrent.ExecutorService
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 import static rx.Observable.from
@@ -67,6 +69,7 @@ class ElasticSearchService implements SearchCatalogue {
             DataModel, Asset, DataClass, DataElement, DataType, EnumeratedType, MeasurementUnit, PrimitiveType, ReferenceType, Relationship
     ]
 
+    ExecutorService executorService
     GrailsApplication grailsApplication
     DataModelService dataModelService
     ElementService elementService
@@ -396,7 +399,7 @@ class ElasticSearchService implements SearchCatalogue {
         }
 
         result = result.concatWith(from(DataModel.list(sort: 'lastUpdated', order: 'desc'))
-        //.observeOn(Schedulers.from(executorService))
+        .observeOn(Schedulers.from(executorService))
         .doOnNext {
             log.info "[${dataModelCounter++}/$total] Reindexing data model ${it.name} (${it.combinedVersion}) - ${it.countDeclares()} items"
         }.flatMap {
