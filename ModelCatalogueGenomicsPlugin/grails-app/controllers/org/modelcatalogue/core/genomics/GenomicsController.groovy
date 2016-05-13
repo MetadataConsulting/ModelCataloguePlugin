@@ -37,8 +37,6 @@ class GenomicsController {
     static final String RD_ELIGIBILITY_CRITERIA_JSON = "RD Eligibility Criteria.json"
     static final String RD_PHENOTYPE_AND_CLINICAL_TESTS_XLS = "RD Change log for Phenotypes and clinical tests.xlsx"
     static final String RD_ELIGIBILITY_CHANGELOG_XLS = "RD Change Log for Eligibility Criteria.xlsx"
-    static final String RD_DATA_SPECIFICATION_CHANGELOG_XLS = "RD Data Specification Change Log.xlsx"
-    static final String CANCER_DATA_SPECIFICATION_CHANGELOG_XLS = "Cancer Model Data Specification Change Log.xlsx"
 
     static final String DOC_IMAGE_PATH = "https://www.genomicsengland.co.uk/wp-content/uploads/2015/11/Genomics-England-logo-2015.png"
 
@@ -70,7 +68,7 @@ class GenomicsController {
         DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dataClass.getDefaultModelCatalogueId(true))
 
         Long assetId = assetService.storeReportAsAsset(latestVersion.dataModel,
-            name: "${latestVersion.name} report as Json",
+            name: "${latestVersion.name} - HPO and Clinical Tests report (JSON)",
             originalFileName: "${latestVersion.name}-${latestVersion.status}-${latestVersion.version}.json",
             contentType: "application/json",
         ) {
@@ -95,7 +93,7 @@ class GenomicsController {
         }
 
         Long assetId = assetService.storeReportAsAsset(dataClass.dataModel,
-            name: "${dataClass.name} report as Json",
+            name: "${dataClass.name} - Eligibility criteria report (JSON)",
             originalFileName: "$RD_ELIGIBILITY_CRITERIA_JSON",
             contentType: "application/json",
         ) {
@@ -121,7 +119,7 @@ class GenomicsController {
         DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dClass.getDefaultModelCatalogueId(true))
 
         Long assetId = assetService.storeReportAsAsset(latestVersion.dataModel,
-            name: "${latestVersion.name} report as CSV",
+            name: "${latestVersion.name} report (CSV)",
             originalFileName: "${docType == RareDiseaseCsvExporter.HPO_AND_CLINICAL_TESTS ? RD_HPO_CSV_FILENAME : RD_ELIGIBILITY_CSV_FILENAME}",
             contentType: "text/csv",
         ) {
@@ -144,7 +142,7 @@ class GenomicsController {
         String name = "Rare Disease Disorder List"
 
         Long assetId = assetService.storeReportAsAsset(latestVersion.dataModel,
-            name: "${name} as csv",
+            name: "${name} (CSV)",
             originalFileName: "${name}-${latestVersion.status}-${latestVersion.version}.csv",
             contentType: "text/csv",
         ) {
@@ -167,7 +165,7 @@ class GenomicsController {
         Long classId = model.getId()
 
         Long assetId = assetService.storeReportAsAsset(model.dataModel,
-            name: "${model.name} report as Json",
+            name: "${model.name} - HPO and Clinical Tests report (JSON)",
             originalFileName: "${model.name}-${model.status}-${model.version}.json",
             contentType: "application/json",
         ) {
@@ -201,7 +199,7 @@ class GenomicsController {
         Long classId = model.id
         def assetId = assetService.storeReportAsAsset(
             model.dataModel,
-            name: "${documentName} report as MS Word Document",
+            name: "${documentName} report (MS Word Document)",
             originalFileName: "${documentName}-${model.status}-${model.version}.docx",
             contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ) { OutputStream out ->
@@ -225,7 +223,7 @@ class GenomicsController {
         Long modelId = model.id
         def assetId = assetService.storeReportAsAsset(
             model,
-            name: "${model.name} - Data Specification Report as MS Word Document",
+            name: "${model.name} - Data Specification Report (MS Word Document)",
             originalFileName: "${model.name}-${model.status}-${model.version}.docx",
             contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ) { OutputStream out ->
@@ -246,7 +244,7 @@ class GenomicsController {
         }
 
         Long assetId = assetService.storeReportAsAsset(model.dataModel,
-            name: "${model.name} report as Json",
+            name: "${model.name} - Cancer Types report (JSON)",
             originalFileName: "${model.name}-${model.status}-${model.version}.json",
             contentType: "application/json",
         ) {
@@ -266,7 +264,7 @@ class GenomicsController {
         }
 
         Long assetId = assetService.storeReportAsAsset(model.dataModel,
-            name: "${model.name} report as csv",
+            name: "${model.name} - Cancer Types report (CSV)",
             originalFileName: "${model.name}-${model.status}-${model.version}.csv",
             contentType: "text/csv",
         ) {
@@ -287,7 +285,7 @@ class GenomicsController {
         }
 
         Long assetId = assetService.storeReportAsAsset(dataClass.dataModel,
-            name: "${dataClass.name} - HPO and Clinical Tests report as MS Excel Spreadsheet",
+            name: "${dataClass.name} - HPO and Clinical Tests (MS Excel Spreadsheet)",
             originalFileName: "$RD_PHENOTYPE_AND_CLINICAL_TESTS_XLS",
             contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream out ->
@@ -308,7 +306,7 @@ class GenomicsController {
         }
 
         Long assetId = assetService.storeReportAsAsset(dataClass.dataModel,
-            name: "${dataClass.name} - Eligibility Change Log as MS Excel Spreadsheet",
+            name: "${dataClass.name} - Eligibility change log (MS Excel Spreadsheet)",
             originalFileName: "$RD_ELIGIBILITY_CHANGELOG_XLS",
             contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream out ->
@@ -331,7 +329,7 @@ class GenomicsController {
         Long classId = dataClass.id
         def assetId = assetService.storeReportAsAsset(
             dataClass.dataModel,
-            name: name ? name : "${dataClass.name} - change log as MS Word Document",
+            name: name ? name : "${dataClass.name} - change log (MS Word Document)",
             originalFileName: "${dataClass.name}-${dataClass.status}-${dataClass.version}-changelog.docx",
             contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ) { OutputStream out ->
@@ -353,8 +351,8 @@ class GenomicsController {
         }
 
         Long assetId = assetService.storeReportAsAsset(model,
-            name: "${model.name}  - Specification change log as MS Excel Spreadsheet",
-            originalFileName: "${model.name}-${model.status}-${model.version}-Changelog.xlsx",
+            name: "${model.name}  - Specification change log (MS Excel Spreadsheet)",
+            originalFileName: "${model.name}-${model.status}-${model.version}-changelog.xlsx",
             contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream out ->
             new DataModelChangeLogXlsExporter(auditService, dataClassService, 0, false).export(model, out)
