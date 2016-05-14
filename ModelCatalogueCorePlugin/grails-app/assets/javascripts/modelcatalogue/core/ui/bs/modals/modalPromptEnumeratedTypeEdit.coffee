@@ -12,7 +12,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
         controller: ['$scope', 'messages', '$controller', '$modalInstance', 'enhance', 'names', 'catalogueElementResource', ($scope, messages, $controller, $modalInstance, enhance, names, catalogueElementResource) ->
           orderedMapEnhancer = enhance.getEnhancer('orderedMap')
 
-          $scope.newEntity = -> {enumerations: orderedMapEnhancer.emptyOrderedMap(true), dataModels: []}
+          $scope.newEntity = -> {enumerations: orderedMapEnhancer.emptyOrderedMap(true), dataModels: [args.currentDataModel], selectedEnumerations: orderedMapEnhancer.emptyOrderedMap(true)}
           $scope.pending  = {dataModel: null}
           $scope.copy     = angular.copy(args.element ? $scope.newEntity())
           $scope.copy.enumerations = $scope.copy.enumerations ? orderedMapEnhancer.emptyOrderedMap(true)
@@ -101,8 +101,6 @@ x in ['apple', 'banana', 'cherry']
                 $scope.messages.warning "You have changed the subtype of the data element. New version will be created!"
               else
                 $scope.messages.clearAllMessages()
-
-          $scope.copy.selectedEnumerations = orderedMapEnhancer.emptyOrderedMap(true)
 
           $scope.toggleSelection = (array, selection) ->
             idx = array.indexOf(selection)
