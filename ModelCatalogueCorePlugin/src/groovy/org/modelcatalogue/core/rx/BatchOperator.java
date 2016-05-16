@@ -50,6 +50,7 @@ public class BatchOperator<T> implements Observable.Operator<T, T> {
         public void onNext(T t) {
             if (processed.incrementAndGet() == by) {
                 request(by);
+                processed.set(0);
             }
             child.onNext(t);
         }
