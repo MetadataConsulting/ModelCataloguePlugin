@@ -62,7 +62,7 @@ class RxService {
      * @return the observable over all items of criteria result
      */
     public <T> Observable<T> from(DetachedCriteria<T> criteria) {
-        return Observable.create(new DetachedCriteriaOnSubscribe<T>(persistenceInterceptor, criteria, Collections.emptyMap())).onBackpressureBuffer()
+        return from(Collections.emptyMap(), criteria)
     }
 
     /**
