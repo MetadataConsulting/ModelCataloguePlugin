@@ -62,7 +62,22 @@ class RxService {
      * @return the observable over all items of criteria result
      */
     public <T> Observable<T> from(DetachedCriteria<T> criteria) {
-        return Observable.create(new DetachedCriteriaOnSubscribe<T>(persistenceInterceptor, criteria))
+        return Observable.create(new DetachedCriteriaOnSubscribe<T>(persistenceInterceptor, criteria, Collections.emptyMap())).onBackpressureBuffer()
+    }
+
+    /**
+     * Creates new observables over DetachedCriteria results.
+     *
+     * Needs to be subscribed on thread with hibernate session bound e.g.
+     * <code>Observables.observer(criteria).subscribeOn(executorService)</code>
+     *
+     * @param parameters additional parameters such as sort or order, pagining related parameters such as max or offset are ignored
+     * @param criteria criteria to observe
+     * @param <T> the type emitted
+     * @return the observable over all items of criteria result
+     */
+    public <T> Observable<T> from(Map<String, Object> parameters, DetachedCriteria<T> criteria) {
+        return Observable.create(new DetachedCriteriaOnSubscribe<T>(persistenceInterceptor, criteria, parameters)).onBackpressureBuffer()
     }
 
 }

@@ -17,10 +17,13 @@ class DetachedCriteriaOnSubscribe<T> implements Observable.OnSubscribe<T> {
 
     private final PersistenceContextInterceptor persistenceInterceptor;
     private final DetachedCriteria<T> criteria;
+    private final Map<String, Object> parameters;
 
-    public DetachedCriteriaOnSubscribe(PersistenceContextInterceptor persistenceInterceptor, DetachedCriteria<T> criteria) {
+    public DetachedCriteriaOnSubscribe(PersistenceContextInterceptor persistenceInterceptor, DetachedCriteria<T> criteria, Map<String, Object> parameters) {
         this.criteria = criteria;
         this.persistenceInterceptor = persistenceInterceptor;
+        this.parameters = new HashMap<String, Object>(parameters);
+        this.parameters.put(ARGUMENT_MAX, PAGE);
     }
 
     @Override
@@ -33,15 +36,12 @@ class DetachedCriteriaOnSubscribe<T> implements Observable.OnSubscribe<T> {
     }
 
     private void callInternal(Subscriber<? super T> subscriber) {
-        Map<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put(ARGUMENT_MAX, PAGE);
-
         int currentOffset = 0;
         List<T> result;
         try {
+            subscriber.onStart();
+            persistenceInterceptor.init();
             do {
-                subscriber.onStart();
-                persistenceInterceptor.init();
                 result = criteria.list(parameters);
                 for (T item : result) {
                     subscriber.onNext(item);

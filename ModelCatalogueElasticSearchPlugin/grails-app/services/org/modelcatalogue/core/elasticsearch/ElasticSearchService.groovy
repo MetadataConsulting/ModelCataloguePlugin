@@ -399,7 +399,6 @@ class ElasticSearchService implements SearchCatalogue {
         }
 
         result = result.concatWith(from(DataModel.list(sort: 'lastUpdated', order: 'desc'))
-        .observeOn(Schedulers.from(executorService))
         .doOnNext {
             log.info "[${dataModelCounter++}/$total] Reindexing data model ${it.name} (${it.combinedVersion}) - ${it.countDeclares()} items"
         }.flatMap {
