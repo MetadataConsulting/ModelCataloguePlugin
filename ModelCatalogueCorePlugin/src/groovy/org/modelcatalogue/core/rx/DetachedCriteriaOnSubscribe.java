@@ -48,6 +48,9 @@ class DetachedCriteriaOnSubscribe<T> implements Observable.OnSubscribe<T> {
                 }
                 currentOffset += PAGE;
                 parameters.put(ARGUMENT_OFFSET, currentOffset);
+                if (Math.round(currentOffset / PAGE) % 10 == 0) {
+                    cleanUpGorm();
+                }
             } while (result.size() == PAGE && !subscriber.isUnsubscribed());
         } finally {
             persistenceInterceptor.flush();
@@ -55,5 +58,11 @@ class DetachedCriteriaOnSubscribe<T> implements Observable.OnSubscribe<T> {
             subscriber.onCompleted();
         }
 
+    }
+
+    void cleanUpGorm() {
+        persistenceInterceptor.flush();
+        persistenceInterceptor.clear();
+        RxService.clearPropertyInstanceMap();
     }
 }

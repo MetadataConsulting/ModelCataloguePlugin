@@ -80,4 +80,8 @@ class RxService {
         return Observable.create(new DetachedCriteriaOnSubscribe<T>(persistenceInterceptor, criteria, parameters)).onBackpressureBuffer()
     }
 
+    static void clearPropertyInstanceMap() {
+        org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP.get().clear()
+    }
+
 }
