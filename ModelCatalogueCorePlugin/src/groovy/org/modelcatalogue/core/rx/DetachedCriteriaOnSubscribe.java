@@ -42,7 +42,7 @@ class DetachedCriteriaOnSubscribe<T> implements Observable.OnSubscribe<T> {
             subscriber.onStart();
             persistenceInterceptor.init();
             do {
-                result = criteria.list(parameters);
+                result = criteria.list(new HashMap<String, Object>(parameters));
                 for (T item : result) {
                     subscriber.onNext(item);
                 }
