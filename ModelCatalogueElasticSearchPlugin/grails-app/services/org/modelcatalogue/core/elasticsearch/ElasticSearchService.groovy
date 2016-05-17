@@ -299,47 +299,27 @@ class ElasticSearchService implements SearchCatalogue {
         search CatalogueElement, params
     }
 
-    @Override
-    Observable<Boolean> index(Object object) {
-        return index(IndexingSession.create(), object)
-    }
-
-    Observable<Boolean> index(IndexingSession session, Object object) {
-        session.indexOnlyOnce(object) {
-            log.debug "Indexing $object"
-
-            Observable<SimpleIndexResponse> indexing = indexAsync(session, object)
-
-            indexing.doOnError { throwable ->
-                log.error("Exception while indexing", throwable)
-            }
-
-            indexing.doOnCompleted {
-                log.debug "Indexing $object completed"
-            }
-
-            return indexing.all {
-                it.ok
-            }
-        }
-    }
 
     @Override
     boolean isIndexingManually() {
         return true
     }
 
+    @Override
+    Observable<Boolean> index(Object object) {
+        index IndexingSession.create(), just(object)
+    }
 
     @Override
     Observable<Boolean> index(Iterable<Object> resource) {
-        index IndexingSession.create(), resource
+        index IndexingSession.create(), from(resource)
     }
 
-    Observable<Boolean> index(IndexingSession session, Iterable<Object> resource) {
-        from(resource).flatMap { object ->
-            index(session, object)
-        }.all {
-            it
+    Observable<Boolean> index(IndexingSession session, Observable<Object> entities) {
+        entities.distinct().flatMap {
+            indexAsync(session, it)
+        }.all { 
+           it.ok
         }
     }
 
@@ -404,26 +384,19 @@ class ElasticSearchService implements SearchCatalogue {
             it.acknowledged
         }
 
-        result = result.concatWith(rxService.from(DataModel.where{}, sort: 'lastUpdated', order: 'desc', true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH)
+        result = result.concatWith(index(session, rxService.from(DataModel.where{}, sort: 'lastUpdated', order: 'desc', true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH)
         .doOnNext {
             log.info "[${dataModelCounter++}/$total] Reindexing data model ${it.name} (${it.combinedVersion}) - ${it.countDeclares()} items"
         }.flatMap {
             return getDataModelWithDeclaredElements(it)
-        }.flatMap { element ->
-            return index(session, element)
-        })
+        }))
 
-        result = result.concatWith(rxService.from(dataModelService.classified(CatalogueElement, DataModelFilter.create(true)), true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH).flatMap { element ->
-            log.info "[${total - 1}/$total] Reindexing orphaned elements"
-            return index(session, element)
-        })
+        result = result.concatWith(index(session, rxService.from(dataModelService.classified(CatalogueElement, DataModelFilter.create(true)), true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH)))
 
-        return result.concatWith(rxService.from(RelationshipType.where {}).flatMap {
-            log.info "[${total}/$total] Reindexing relationship types"
-            return index(session, it)
-        }).doOnError {
-            log.error "Exception reindexing catalogue: ${it.getClass()}", it
-        }
+        return result.concatWith(index(session, rxService.from(RelationshipType.where {})))
+            .doOnError {
+                log.error "Exception reindexing catalogue: ${it.getClass()}", it
+            }
 
     }
 
