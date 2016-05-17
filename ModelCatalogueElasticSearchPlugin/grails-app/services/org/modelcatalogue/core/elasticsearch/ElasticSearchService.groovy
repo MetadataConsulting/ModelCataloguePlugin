@@ -27,6 +27,7 @@ import org.elasticsearch.node.NodeBuilder
 import org.elasticsearch.threadpool.ThreadPool
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.elasticsearch.rx.RxElastic
+import org.modelcatalogue.core.rx.BatchOperator
 import org.modelcatalogue.core.rx.RxService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
@@ -48,12 +49,15 @@ class ElasticSearchService implements SearchCatalogue {
 
     private static Cache<String, Map<String, Map>> mappingsCache = CacheBuilder.newBuilder().initialCapacity(20).build()
 
-    private static String MC_PREFIX = "mc_"
-    private static String GLOBAL_PREFIX = "${MC_PREFIX}global_"
-    private static String MC_ALL_INDEX = "${MC_PREFIX}all"
-    private static String DATA_MODEL_INDEX = "${GLOBAL_PREFIX}data_model"
-    private static String DATA_MODEL_PREFIX = "${MC_PREFIX}data_model_"
-    private static String ORPHANED_INDEX = "${GLOBAL_PREFIX}orphaned"
+    private static final int ELEMENTS_PER_BATCH = 25
+    private static final int DELAY_AFTER_BATCH = 3000
+
+    private static final String MC_PREFIX = "mc_"
+    private static final String GLOBAL_PREFIX = "${MC_PREFIX}global_"
+    private static final String MC_ALL_INDEX = "${MC_PREFIX}all"
+    private static final String DATA_MODEL_INDEX = "${GLOBAL_PREFIX}data_model"
+    private static final String DATA_MODEL_PREFIX = "${MC_PREFIX}data_model_"
+    private static final String ORPHANED_INDEX = "${GLOBAL_PREFIX}orphaned"
 
     private static Map<String, Integer> CATALOGUE_ELEMENT_BOOSTS = [
 
@@ -69,7 +73,6 @@ class ElasticSearchService implements SearchCatalogue {
             DataModel, Asset, DataClass, DataElement, DataType, EnumeratedType, MeasurementUnit, PrimitiveType, ReferenceType, Relationship
     ]
 
-    ExecutorService executorService
     GrailsApplication grailsApplication
     DataModelService dataModelService
     ElementService elementService
@@ -388,7 +391,8 @@ class ElasticSearchService implements SearchCatalogue {
 
     @Override
     Observable<Boolean> reindex() {
-        int total = DataModel.count() + 2
+        final int total = DataModel.count() + 2
+
         int dataModelCounter = 1
 
         IndexingSession session = IndexingSession.create()
@@ -398,16 +402,16 @@ class ElasticSearchService implements SearchCatalogue {
             it.acknowledged
         }
 
-        result = result.concatWith(from(DataModel.list(sort: 'lastUpdated', order: 'desc'))
+        result = result.concatWith(rxService.from(DataModel.where{}, sort: 'lastUpdated', order: 'desc', true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH)
         .doOnNext {
             log.info "[${dataModelCounter++}/$total] Reindexing data model ${it.name} (${it.combinedVersion}) - ${it.countDeclares()} items"
         }.flatMap {
-            return getDataModelWithDeclaredElements(it).flatMap { element ->
-                return index(session, element)
-            }
+            return getDataModelWithDeclaredElements(it)
+        }.flatMap { element ->
+            return index(session, element)
         })
 
-        result = result.concatWith(rxService.from(dataModelService.classified(CatalogueElement, DataModelFilter.create(true))).flatMap { element ->
+        result = result.concatWith(rxService.from(dataModelService.classified(CatalogueElement, DataModelFilter.create(true)), true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH).flatMap { element ->
             log.info "[${total - 1}/$total] Reindexing orphaned elements"
             return index(session, element)
         })
@@ -416,7 +420,7 @@ class ElasticSearchService implements SearchCatalogue {
             log.info "[${total}/$total] Reindexing relationship types"
             return index(session, it)
         }).doOnError {
-            log.error "Exception reindexing catalogue", it
+            log.error "Exception reindexing catalogue: ${it.getClass()}", it
         }
 
     }
@@ -513,11 +517,11 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     private Observable<Document> getElementWithRelationships(IndexingSession session, CatalogueElement element) {
-        Observable.<Object>just(element).concatWith(rxService.from(Relationship.where { source == element || destination == element })).map { session.getDocument(it) }
+        Observable.<Object>just(element).concatWith(rxService.from(Relationship.where { source == element || destination == element }, true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH)).map { session.getDocument(it) }
     }
 
     private Observable<CatalogueElement> getDataModelWithDeclaredElements(DataModel element) {
-        Observable.<CatalogueElement>just(element).concatWith(rxService.from(CatalogueElement.where { dataModel == element }))
+        Observable.<CatalogueElement>just(element).concatWith(rxService.from(CatalogueElement.where { dataModel == element }, true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH))
     }
 
     private static Observable<Document> getRelationshipWithSourceAndDestination(IndexingSession session, Relationship rel) {

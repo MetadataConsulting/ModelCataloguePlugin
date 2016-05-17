@@ -1,7 +1,9 @@
 package org.modelcatalogue.core.rx
 
 import grails.gorm.DetachedCriteria
+import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 import org.codehaus.groovy.grails.support.PersistenceContextInterceptor
+import org.codehaus.groovy.runtime.StackTraceUtils
 import rx.Observable
 import rx.Scheduler
 import rx.functions.Func1
@@ -61,8 +63,8 @@ class RxService {
      * @param <T> the type emitted
      * @return the observable over all items of criteria result
      */
-    public <T> Observable<T> from(DetachedCriteria<T> criteria) {
-        return from(Collections.emptyMap(), criteria)
+    public <T> Observable<T> from(DetachedCriteria<T> criteria, boolean buffer = true, int batchSize = 10, long batchDelay = 0) {
+        return from(Collections.emptyMap(), criteria, buffer, batchSize, batchDelay)
     }
 
     /**
@@ -76,12 +78,33 @@ class RxService {
      * @param <T> the type emitted
      * @return the observable over all items of criteria result
      */
-    public <T> Observable<T> from(Map<String, Object> parameters, DetachedCriteria<T> criteria) {
-        return Observable.create(new DetachedCriteriaOnSubscribe<T>(persistenceInterceptor, criteria, parameters)).onBackpressureBuffer()
+    public <T> Observable<T> from(Map<String, Object> parameters, DetachedCriteria<T> criteria, boolean buffer = true, int batchSize = 10, long batchDelay = 0) {
+        Observable<T> ret = Observable
+            .create(new DetachedCriteriaOnSubscribe<T>(persistenceInterceptor, criteria, parameters))
+            .doOnError {
+                StackTraceUtils.deepSanitize(it)
+                log.warn "Error emitting from detached criteria", it
+            }
+            .lift(batch(batchSize, batchDelay))
+
+        if (buffer) {
+            ret = ret.onBackpressureBuffer()
+        }
+
+        return ret
+    }
+
+    static <T> Observable.Operator<T,T> batch(int size) {
+        return new BatchOperator<T>(size)
+    }
+
+    static <T> Observable.Operator<T,T> batch(int size, long batchDelay) {
+        return new BatchOperator<T>(size, batchDelay)
     }
 
     static void clearPropertyInstanceMap() {
-        org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP.get().clear()
+        DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP.get().clear()
     }
+
 
 }
