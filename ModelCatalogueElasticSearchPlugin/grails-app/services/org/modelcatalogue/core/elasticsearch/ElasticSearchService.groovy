@@ -316,12 +316,12 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     Observable<Boolean> index(IndexingSession session, Observable<Object> entities) {
-        entities.distinct().flatMap {
+        entities.flatMap {
             toSimpleIndexRequests(session, it)
         } groupBy {
           it.index
         } flatMap { documents ->
-            documents.distinct().buffer(50)
+            documents.buffer(ELEMENTS_PER_BATCH)
         } flatMap {
             bulkIndex(it)
         } flatMap { bulkResponse ->
@@ -399,16 +399,16 @@ class ElasticSearchService implements SearchCatalogue {
             it.acknowledged
         }
 
-        result = result.concatWith(index(session, rxService.from(DataModel.where{}, sort: 'lastUpdated', order: 'desc', true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH)
-        .doOnNext {
-            log.info "[${dataModelCounter++}/$total] Reindexing data model ${it.name} (${it.combinedVersion}) - ${it.countDeclares()} items"
-        }.flatMap {
+        Observable<Object> elements = rxService.from(DataModel.where{}, sort: 'lastUpdated', order: 'desc', true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH
+        ) flatMap {
             return getDataModelWithDeclaredElements(it)
-        }))
+        } concatWith (
+            rxService.from(dataModelService.classified(CatalogueElement, DataModelFilter.create(true)), true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH)
+        ) concatWith (
+            rxService.from(RelationshipType.where {})
+        )
 
-        result = result.concatWith(index(session, rxService.from(dataModelService.classified(CatalogueElement, DataModelFilter.create(true)), true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH)))
-
-        return result.concatWith(index(session, rxService.from(RelationshipType.where {})))
+        return result.concatWith(index(session, elements))
             .doOnError {
                 log.error "Exception reindexing catalogue: ${it.getClass()}", it
             }
