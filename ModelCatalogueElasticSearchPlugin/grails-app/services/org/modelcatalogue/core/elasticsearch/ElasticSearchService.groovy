@@ -317,8 +317,23 @@ class ElasticSearchService implements SearchCatalogue {
 
     Observable<Boolean> index(IndexingSession session, Observable<Object> entities) {
         entities.distinct().flatMap {
-            indexAsync(session, it)
-        }.all { 
+            toSimpleIndexRequests(session, it)
+        } groupBy {
+          it.index
+        } flatMap { documents ->
+            documents.distinct().buffer(50)
+        } flatMap {
+            bulkIndex(it)
+        } flatMap { bulkResponse ->
+            from(bulkResponse.items)
+        } map { bulkResponseItem ->
+            if (bulkResponseItem.failure) {
+                log.warn "Failed to index ${bulkResponseItem.type}:${bulkResponseItem.id} to ${bulkResponseItem.index}"
+            } else {
+                log.debug "Indexed ${bulkResponseItem.type}:${bulkResponseItem.id} to ${bulkResponseItem.index}"
+            }
+            SimpleIndexResponse.from(bulkResponseItem)
+        } all {
            it.ok
         }
     }
@@ -468,60 +483,52 @@ class ElasticSearchService implements SearchCatalogue {
 
     }
 
-    private Observable<SimpleIndexResponse> indexAsync(IndexingSession session, object) {
-        Class clazz = getEntityClass(object)
-        if (DataModel.isAssignableFrom(clazz)) {
-            return safeIndex(getIndices(object), getElementWithRelationships(session, object as CatalogueElement), mappedTypesInDataModel)
-        }
 
-        if (CatalogueElement.isAssignableFrom(clazz)) {
-            CatalogueElement element = object as CatalogueElement
-            return safeIndex(getIndices(element), getElementWithRelationships(session, element), mappedTypesInDataModel)
-        }
+    private Observable<SimpleIndexRequest> toSimpleIndexRequests(IndexingSession session, entity) {
+        from(getIndices(entity)).flatMap { index ->
+            Class clazz = getEntityClass(entity)
+            if (DataModel.isAssignableFrom(clazz)) {
+                return getElementWithRelationships(session, entity as DataModel).map {
+                    new SimpleIndexRequest(index, it, mappedTypesInDataModel)
+                }
+            }
 
-        if (RelationshipType.isAssignableFrom(clazz)) {
-            return safeIndex(getIndices(object), just(session.getDocument(object)).cache(), [clazz])
-        }
+            if (CatalogueElement.isAssignableFrom(clazz)) {
+                return getElementWithRelationships(session, entity as CatalogueElement).map {
+                    new SimpleIndexRequest(index, it , mappedTypesInDataModel)
+                }
+            }
 
-        if (Relationship.isAssignableFrom(clazz)) {
-            Relationship rel = object as Relationship
-            return safeIndex(getIndices(rel), getRelationshipWithSourceAndDestination(session, rel), mappedTypesInDataModel)
-        }
+            if (RelationshipType.isAssignableFrom(clazz)) {
+                return just(new SimpleIndexRequest(index, session.getDocument(entity), [clazz] as Set))
+            }
 
-        throw new UnsupportedOperationException("Not Yet Implemented for $object")
+            if (Relationship.isAssignableFrom(clazz)) {
+                return getRelationshipWithSourceAndDestination(session, entity as Relationship).map {
+                    new SimpleIndexRequest(index, it, mappedTypesInDataModel)
+                }
+            }
+            throw new UnsupportedOperationException("Not Yet Implemented for $entity")
+        }
     }
 
     private Observable<Document> getElementWithRelationships(IndexingSession session, CatalogueElement element) {
-        Observable.<Object>just(element).concatWith(rxService.from(Relationship.where { (source == element || destination == element) && relationshipType.searchable == true }, true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH)).map { session.getDocument(it) }
+        just(element as Object).concatWith(rxService.from(Relationship.where { (source == element || destination == element) && relationshipType.searchable == true }, true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH)).map { session.getDocument(it) }
     }
 
     private Observable<CatalogueElement> getDataModelWithDeclaredElements(DataModel element) {
-        Observable.<CatalogueElement>just(element).concatWith(rxService.from(CatalogueElement.where { dataModel == element }, true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH))
+        just(element as CatalogueElement).concatWith(rxService.from(CatalogueElement.where { dataModel == element }, true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH))
     }
 
     private static Observable<Document> getRelationshipWithSourceAndDestination(IndexingSession session, Relationship rel) {
         just(rel, rel.source, rel.destination).map { session.getDocument(it) }
     }
 
-    private Observable<SimpleIndexResponse> safeIndex(Iterable<String> indicies, Observable<Document> documents, Iterable<Class> supportedTypes) {
-        return from(indicies)
-            .flatMap { idx -> ensureIndexExists(just(idx), supportedTypes) }
-            .flatMap { idx -> documents.distinct().buffer(50).flatMap { bulkIndex(idx, it) }}
-            .flatMap { bulkResponse -> from(bulkResponse.items) }
-            .map { bulkResponseItem ->
-                if (bulkResponseItem.failure) {
-                    log.warn "Failed to index ${bulkResponseItem.type}:${bulkResponseItem.id} to ${bulkResponseItem.index}"
-                } else {
-                    log.debug "Indexed ${bulkResponseItem.type}:${bulkResponseItem.id} to ${bulkResponseItem.index}"
-                }
-                SimpleIndexResponse.from(bulkResponseItem)
-            }
-
-    }
-
-    private Observable<BulkResponse> bulkIndex(String existingIndex, List<Document> documents) {
-        RxElastic.from(buildBulkIndexRequest(existingIndex, documents))
-            .flatMap {
+    private Observable<BulkResponse> bulkIndex(List<SimpleIndexRequest> documents) {
+        SimpleIndexRequest first = documents.first()
+        ensureIndexExists(just(first.index), first.mappedClasses).flatMap {
+            RxElastic.from(buildBulkIndexRequest(documents))
+                .flatMap {
                 for (BulkItemResponse response in it.items) {
                     if (response.failed) {
                         if (response.failure.cause instanceof VersionConflictEngineException) {
@@ -533,17 +540,18 @@ class ElasticSearchService implements SearchCatalogue {
                 }
                 return just(it)
             }
-            .retryWhen(RxService.withDelay(RxElastic.DEFAULT_RETRIES, RxElastic.DEFAULT_DELAY, [EsRejectedExecutionException] as Set))
+        }
+        .retryWhen(RxService.withDelay(RxElastic.DEFAULT_RETRIES, RxElastic.DEFAULT_DELAY, [EsRejectedExecutionException] as Set))
     }
 
-    private BulkRequestBuilder buildBulkIndexRequest(String existingIndex, List<Document> documents) {
+    private BulkRequestBuilder buildBulkIndexRequest(List<SimpleIndexRequest> indexRequests) {
         BulkRequestBuilder bulkRequest = client.prepareBulk()
-        for (Document document in documents) {
+        for (SimpleIndexRequest indexRequest in indexRequests) {
             bulkRequest.add(client
-                .prepareIndex(existingIndex, document.type, document.id)
-                .setVersion(document.version ?: 1L)
+                .prepareIndex(indexRequest.index, indexRequest.document.type, indexRequest.document.id)
+                .setVersion(indexRequest.document.version ?: 1L)
                 .setVersionType(VersionType.EXTERNAL_GTE)
-                .setSource(document.payload)
+                .setSource(indexRequest.document.payload)
             )
         }
         return bulkRequest
