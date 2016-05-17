@@ -27,17 +27,15 @@ import org.elasticsearch.node.NodeBuilder
 import org.elasticsearch.threadpool.ThreadPool
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.elasticsearch.rx.RxElastic
-import org.modelcatalogue.core.rx.BatchOperator
 import org.modelcatalogue.core.rx.RxService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
+import org.modelcatalogue.core.util.lists.Lists
 import rx.Observable
-import rx.schedulers.Schedulers
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
-import java.util.concurrent.ExecutorService
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 import static rx.Observable.from
@@ -50,11 +48,11 @@ class ElasticSearchService implements SearchCatalogue {
     private static Cache<String, Map<String, Map>> mappingsCache = CacheBuilder.newBuilder().initialCapacity(20).build()
 
     private static final int ELEMENTS_PER_BATCH = 25
-    private static final int DELAY_AFTER_BATCH = 3000
+    private static final int DELAY_AFTER_BATCH = 0
 
     private static final String MC_PREFIX = "mc_"
     private static final String GLOBAL_PREFIX = "${MC_PREFIX}global_"
-    private static final String MC_ALL_INDEX = "${MC_PREFIX}all"
+    private static final String MC_ALL_WILDCARD = "${MC_PREFIX}*"
     private static final String DATA_MODEL_INDEX = "${GLOBAL_PREFIX}data_model"
     private static final String DATA_MODEL_PREFIX = "${MC_PREFIX}data_model_"
     private static final String ORPHANED_INDEX = "${GLOBAL_PREFIX}orphaned"
@@ -124,6 +122,10 @@ class ElasticSearchService implements SearchCatalogue {
 
     @Override
     ListWithTotalAndType<Relationship> search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
+        if (!type.searchable) {
+            return Lists.emptyListWithTotalAndType(Relationship)
+        }
+
         List<String> indicies = collectDataModelIndicies(params)
         String search = params.search
 
@@ -273,7 +275,7 @@ class ElasticSearchService implements SearchCatalogue {
         DataModelFilter filter = getOverridableDataModelFilter(params)
 
         if (!filter) {
-            return [MC_ALL_INDEX] // search all by default
+            return [MC_ALL_WILDCARD] // search all by default
         }
 
         if (filter.unclassifiedOnly) {
@@ -517,7 +519,7 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     private Observable<Document> getElementWithRelationships(IndexingSession session, CatalogueElement element) {
-        Observable.<Object>just(element).concatWith(rxService.from(Relationship.where { source == element || destination == element }, true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH)).map { session.getDocument(it) }
+        Observable.<Object>just(element).concatWith(rxService.from(Relationship.where { (source == element || destination == element) && relationshipType.searchable == true }, true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH)).map { session.getDocument(it) }
     }
 
     private Observable<CatalogueElement> getDataModelWithDeclaredElements(DataModel element) {
@@ -612,15 +614,15 @@ class ElasticSearchService implements SearchCatalogue {
     protected static List<String> getIndices(object) {
         Class clazz = getEntityClass(object)
         if (DataModel.isAssignableFrom(clazz)) {
-            return [DATA_MODEL_INDEX, MC_ALL_INDEX, getDataModelIndex(object as DataModel)]
+            return [DATA_MODEL_INDEX, getDataModelIndex(object as DataModel)]
         }
 
         if (CatalogueElement.isAssignableFrom(clazz)) {
             CatalogueElement element = object as CatalogueElement
             if (element.dataModel) {
-                return [MC_ALL_INDEX] + [getDataModelIndex(element.dataModel)]
+                return [getDataModelIndex(element.dataModel)]
             }
-            return [ORPHANED_INDEX, MC_ALL_INDEX]
+            return [ORPHANED_INDEX]
         }
 
         if (RelationshipType.isAssignableFrom(clazz)) {

@@ -8,6 +8,9 @@ databaseChangeLog = {
                     where source_class = 'org.modelcatalogue.core.Classification'
                     and name = 'classification'
                 """
+                sqlCheck expectedResult: '1', """
+                    select count(id) from relationship_type where name = 'declaration'
+                """
             }
         }
         sql """
