@@ -39,7 +39,7 @@ class RareDiseaseEligibilityChangeLogXlsExporterSpec extends AbstractRareDisease
 
         File file = temporaryFolder.newFile("${System.currentTimeMillis()}.xlsx")
         //test excel generation
-        new RareDiseasePhenotypeChangeLogXlsExporter(auditService, dataClassService, 5, false).export(dataClass, file.newOutputStream())
+        new RareDiseaseEligibilityChangeLogXlsExporter(auditService, dataClassService, 5, false).export(dataClass, file.newOutputStream())
 
         open file
 

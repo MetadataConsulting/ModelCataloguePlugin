@@ -69,13 +69,11 @@ class RareDiseasePhenotypeChangeLogXlsExporter extends RareDiseaseChangeLogXlsEx
                     value 'Current version details'
                     width 30
                     style 'h3'
-                    style {wrap text}
                 }
                 cell {
                     value 'New version details'
                     width 30
-                    style 'h3'
-                    style {background('#c2efcf')}
+                    style 'h3-green'
                 }
             }
 
@@ -87,6 +85,8 @@ class RareDiseasePhenotypeChangeLogXlsExporter extends RareDiseaseChangeLogXlsEx
     @Override
     List<String> searchExportSpecificTypes(CatalogueElement model, List lines, groupDescriptions, level) {
         String subtype
+        levelIdStack.put(level,model.id)
+
         if (model.name.matches("(?i:.*Phenotype.*)")) {
 
             log.debug " --- $level $model $model.dataModel"
@@ -107,6 +107,19 @@ class RareDiseasePhenotypeChangeLogXlsExporter extends RareDiseaseChangeLogXlsEx
         }
 
         lines
+    }
+
+    void buildRow(Sheet sheet, List<String> line) {
+        sheet.row {
+            line.eachWithIndex{ String cellValue, int i ->
+                cell {
+                    value cellValue
+                    if (i!=7 && i!=8) style 'property-value'
+                    if (i==7) style 'property-value-wrap'
+                    if (i==8) style 'property-value-green'
+                }
+            }
+        }
     }
 
 }

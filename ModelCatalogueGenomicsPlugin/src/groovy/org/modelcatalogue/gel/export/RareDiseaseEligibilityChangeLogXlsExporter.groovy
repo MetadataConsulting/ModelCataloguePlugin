@@ -63,13 +63,11 @@ class RareDiseaseEligibilityChangeLogXlsExporter extends RareDiseaseChangeLogXls
                     value 'Current version details'
                     width 30
                     style 'h3'
-                    style {wrap text}
                 }
                 cell {
                     value 'New version details'
                     width 30
-                    style 'h3'
-                    style {background('#c2efcf')}
+                    style 'h3-green'
                 }
             }
 
@@ -87,6 +85,20 @@ class RareDiseaseEligibilityChangeLogXlsExporter extends RareDiseaseChangeLogXls
         }
 
         lines
+    }
+
+
+     void buildRow(Sheet sheet, List<String> line) {
+        sheet.row {
+            line.eachWithIndex{ String cellValue, int i ->
+                cell {
+                    value cellValue
+                    if (i!=6 && i!=7) style 'property-value'
+                    if (i==6) style 'property-value-wrap'
+                    if (i==7) style 'property-value-green'
+                }
+            }
+        }
     }
 }
 
