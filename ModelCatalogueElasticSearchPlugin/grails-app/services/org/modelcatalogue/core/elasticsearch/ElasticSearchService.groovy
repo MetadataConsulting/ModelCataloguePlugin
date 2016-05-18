@@ -67,7 +67,7 @@ class ElasticSearchService implements SearchCatalogue {
             description: 1
     ]
 
-    private Set<Class> mappedTypesInDataModel = [
+    private static Set<Class> MAPPED_TYPES_IN_DATA_MODEL = [
             DataModel, Asset, DataClass, DataElement, DataType, EnumeratedType, MeasurementUnit, PrimitiveType, ReferenceType, Relationship
     ]
 
@@ -316,9 +316,7 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     Observable<Boolean> index(IndexingSession session, Observable<Object> entities) {
-        entities.flatMap {
-            toSimpleIndexRequests(session, it)
-        } groupBy {
+        toSimpleIndexRequests(session, entities).groupBy {
           it.index
         } flatMap { documents ->
             documents.buffer(ELEMENTS_PER_BATCH)
@@ -388,16 +386,7 @@ class ElasticSearchService implements SearchCatalogue {
 
     @Override
     Observable<Boolean> reindex() {
-        final int total = DataModel.count() + 2
-
-        int dataModelCounter = 1
-
         IndexingSession session = IndexingSession.create()
-
-        // deleting all mc indices so we don't have to unindex each element separately
-        Observable<Boolean> result = RxElastic.from(client.admin().indices().prepareDelete("${MC_PREFIX}*")).map {
-            it.acknowledged
-        }
 
         Observable<Object> elements = rxService.from(DataModel.where{}, sort: 'lastUpdated', order: 'desc', true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH
         ) flatMap {
@@ -408,7 +397,7 @@ class ElasticSearchService implements SearchCatalogue {
             rxService.from(RelationshipType.where {})
         )
 
-        return result.concatWith(index(session, elements))
+        return RxElastic.from(client.admin().indices().prepareDelete("${MC_PREFIX}*")).map { it.acknowledged }.concatWith(index(session, elements))
             .doOnError {
                 log.error "Exception reindexing catalogue: ${it.getClass()}", it
             }
@@ -484,36 +473,41 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
 
-    private Observable<SimpleIndexRequest> toSimpleIndexRequests(IndexingSession session, entity) {
-        from(getIndices(entity)).flatMap { index ->
-            Class clazz = getEntityClass(entity)
-            if (DataModel.isAssignableFrom(clazz)) {
-                return getElementWithRelationships(session, entity as DataModel).map {
-                    new SimpleIndexRequest(index, it, mappedTypesInDataModel)
-                }
-            }
-
+    private Observable<SimpleIndexRequest> toSimpleIndexRequests(IndexingSession session, Observable<Object> entites) {
+        entites.groupBy {
+            // XXX: shouldn't the change in data model trigger reindexing everything in the data model?
+            Class clazz = getEntityClass(it)
             if (CatalogueElement.isAssignableFrom(clazz)) {
-                return getElementWithRelationships(session, entity as CatalogueElement).map {
-                    new SimpleIndexRequest(index, it , mappedTypesInDataModel)
-                }
+                return CatalogueElement
             }
 
             if (RelationshipType.isAssignableFrom(clazz)) {
-                return just(new SimpleIndexRequest(index, session.getDocument(entity), [clazz] as Set))
+                return RelationshipType
             }
 
             if (Relationship.isAssignableFrom(clazz)) {
-                return getRelationshipWithSourceAndDestination(session, entity as Relationship).map {
-                    new SimpleIndexRequest(index, it, mappedTypesInDataModel)
+                return Relationship
+            }
+            return clazz
+        } flatMap { group ->
+            if (group.key == CatalogueElement) {
+                return group.buffer(ELEMENTS_PER_BATCH).flatMap { elements ->
+                    from(elements).concatWith(rxService.from(Relationship.where { (source in elements || destination in elements) && relationshipType.searchable == true }, true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH))
                 }
             }
-            throw new UnsupportedOperationException("Not Yet Implemented for $entity")
+            if (group.key == Relationship) {
+                return group.flatMap { entity -> getRelationshipWithSourceAndDestination(session, entity as Relationship) }
+            }
+            if (group.key == RelationshipType) {
+                return group
+            }
+            throw new UnsupportedOperationException("Not Yet Implemented for $group.key")
+        } flatMap { entity ->
+            Class clazz = getEntityClass(entity)
+            from(getIndices(entity)).map { index ->
+                new SimpleIndexRequest(index, session.getDocument(entity), (CatalogueElement.isAssignableFrom(clazz) || Relationship.isAssignableFrom(clazz)) ? MAPPED_TYPES_IN_DATA_MODEL : [clazz] as Set)
+            }
         }
-    }
-
-    private Observable<Document> getElementWithRelationships(IndexingSession session, CatalogueElement element) {
-        just(element as Object).concatWith(rxService.from(Relationship.where { (source == element || destination == element) && relationshipType.searchable == true }, true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH)).map { session.getDocument(it) }
     }
 
     private Observable<CatalogueElement> getDataModelWithDeclaredElements(DataModel element) {
