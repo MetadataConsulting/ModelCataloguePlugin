@@ -59,9 +59,32 @@ Genomics England customisation plugin for Model Catalogue
 
         reportsRegistry.register {
             creates link
-            title { "Rare Disease Disorder List CSV" }
+            title { "Generate all ${it.name} files" }
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get(Metadata.ALL_CANCER_REPORTS) == 'true'
+            }
+            link controller: 'genomics', action: 'exportAllCancerReports', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Generate all ${it.name} files" }
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get(Metadata.ALL_RD_REPORTS) == 'true'
+            }
+            link controller: 'genomics', action: 'exportAllRareDiseaseReports', id: true
+        }
+
+        reportsRegistry.register {
+            creates asset
+            title { "GEL Changelog (Word Doc)" }
+            defaultName { "${it.name} changelog as MS Word Document" }
+            depth 3
+            includeMetadata true
             type DataClass
-            link controller: 'genomics', action: 'exportRareDiseaseDisorderListAsCsv', id: true
+            link controller: 'genomics', action: 'exportChangeLogDocument', id: true
         }
 
         reportsRegistry.register {
@@ -75,21 +98,28 @@ Genomics England customisation plugin for Model Catalogue
 
         reportsRegistry.register {
             creates link
-            title { "Rare Disease Eligibility Criteria Report (Word Doc)" }
+            title { "Rare Diseases Disorder List (CSV)" }
+            type DataClass
+            link controller: 'genomics', action: 'exportRareDiseaseDisorderListAsCsv', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases Eligibility Criteria Report (Word Doc)" }
             type DataClass
             link controller: 'genomics', action: 'exportRareDiseaseEligibilityDoc', id: true
         }
 
         reportsRegistry.register {
             creates link
-            title { "Phenotypes and Clinical Tests Report" }
+            title { "Rare Diseases Phenotypes and Clinical Tests Report (Word Doc)" }
             type DataClass
             link controller: 'genomics', action: 'exportRareDiseasePhenotypesAndClinicalTestsDoc', id: true
         }
 
         reportsRegistry.register {
             creates link
-            title { "Rare Diseases HPO And Clinical Tests JSON" }
+            title { "Rare Diseases HPO And Clinical Tests (JSON)" }
             defaultName { "${it.name} report as Json" }
             type DataClass
             when { DataClass dataClass ->
@@ -100,7 +130,7 @@ Genomics England customisation plugin for Model Catalogue
 
         reportsRegistry.register {
             creates link
-            title { "Rare Diseases Eligibility Criteria JSON" }
+            title { "Rare Diseases Eligibility Criteria (JSON)" }
             defaultName { "${it.name} report as Json" }
             type DataClass
             when { DataClass dataClass ->
@@ -111,7 +141,7 @@ Genomics England customisation plugin for Model Catalogue
 
         reportsRegistry.register {
             creates link
-            title { "Rare Diseases HPO And Clinical Tests CSV" }
+            title { "Rare Diseases HPO And Clinical Tests (CSV)" }
             type DataClass
             when { DataClass dataClass ->
                 dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
@@ -121,7 +151,7 @@ Genomics England customisation plugin for Model Catalogue
 
         reportsRegistry.register {
             creates link
-            title { "Rare Disease Eligibility Criteria Report CSV" }
+            title { "Rare Disease Eligibility Criteria Report (CSV)" }
             type DataClass
             when { DataClass dataClass ->
                 dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
@@ -131,7 +161,7 @@ Genomics England customisation plugin for Model Catalogue
 
         reportsRegistry.register {
             creates link
-            title { "Cancer Types JSON" }
+            title { "Cancer Types (JSON)" }
             type DataClass
             when { DataClass dataClass ->
                 dataClass.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
@@ -141,7 +171,7 @@ Genomics England customisation plugin for Model Catalogue
 
         reportsRegistry.register {
             creates link
-            title { "Cancer Types CSV" }
+            title { "Cancer Types (CSV)" }
             type DataClass
             when { DataClass dataClass ->
                 dataClass.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
@@ -150,18 +180,8 @@ Genomics England customisation plugin for Model Catalogue
         }
 
         reportsRegistry.register {
-            creates asset
-            title { "GEL Changelog Document" }
-            defaultName { "${it.name} changelog as MS Word Document" }
-            depth 3
-            includeMetadata true
-            type DataClass
-            link controller: 'genomics', action: 'exportChangeLogDocument', id: true
-        }
-
-        reportsRegistry.register {
             creates link
-            title { "Change Log for RD Phenotypes And Clinical Tests XSLX" }
+            title { "Change Log for RD Phenotypes And Clinical Tests (Excel)" }
             type DataClass
             when { DataClass dataClass ->
                 dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
@@ -171,7 +191,7 @@ Genomics England customisation plugin for Model Catalogue
 
         reportsRegistry.register {
             creates link
-            title { "Change Log for RD Eligibility XSLX" }
+            title { "Change Log for RD Eligibility (Excel)" }
             type DataClass
             when { DataClass dataClass ->
                 dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
@@ -181,7 +201,7 @@ Genomics England customisation plugin for Model Catalogue
 
         reportsRegistry.register {
             creates link
-            title { "Gel Data Specification Change Log XSLX" }
+            title { "Gel Data Specification Change Log (Excel)" }
             type DataModel
             link controller: 'genomics', action: 'exportDataSpecChangeLogAsXls', id: true
         }
