@@ -6,6 +6,7 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.builder.ProgressMonitor
 
 @Log4j
 abstract class PublishingChain {
@@ -77,16 +78,16 @@ abstract class PublishingChain {
         this
     }
 
-    final CatalogueElement run(Publisher<CatalogueElement> publisher) {
+    final CatalogueElement run(Publisher<CatalogueElement> publisher, ProgressMonitor monitor) {
         try {
-            return doRun(publisher)
+            return doRun(publisher, monitor)
         } catch (Exception e) {
             published.errors.reject('publishing.error', e.toString())
             return published
         }
     }
 
-    protected abstract CatalogueElement doRun(Publisher<CatalogueElement> publisher)
+    protected abstract CatalogueElement doRun(Publisher<CatalogueElement> publisher, ProgressMonitor monitor)
 
     protected void restoreStatus() {
         if (published.status != initialStatus) {

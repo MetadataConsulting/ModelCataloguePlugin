@@ -19,6 +19,7 @@ import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.RelationshipDirection
 
 import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
+import org.modelcatalogue.core.util.builder.ProgressMonitor
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
@@ -394,8 +395,8 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     @Override
-    final CatalogueElement publish(Publisher<CatalogueElement> publisher) {
-        preparePublishChain(PublishingChain.finalize(this)).run(publisher)
+    final CatalogueElement publish(Publisher<CatalogueElement> publisher, ProgressMonitor monitor) {
+        preparePublishChain(PublishingChain.finalize(this)).run(publisher, monitor)
     }
 
     protected PublishingChain preparePublishChain(PublishingChain chain) { chain }
@@ -403,7 +404,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     List<CatalogueElement> collectExternalDependencies() { Collections.emptyList() }
 
     final CatalogueElement cloneElement(Publisher<CatalogueElement> publisher, CloningContext strategy) {
-        preparePublishChain(PublishingChain.clone(this, strategy)).run(publisher)
+        preparePublishChain(PublishingChain.clone(this, strategy)).run(publisher, strategy.monitor)
     }
 
     @Override

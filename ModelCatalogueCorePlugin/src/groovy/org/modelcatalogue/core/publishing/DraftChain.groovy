@@ -8,6 +8,7 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.builder.ProgressMonitor
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
@@ -29,7 +30,7 @@ class DraftChain extends PublishingChain {
         return new DraftChain(published, strategy)
     }
 
-    protected CatalogueElement doRun(Publisher<CatalogueElement> publisher) {
+    protected CatalogueElement doRun(Publisher<CatalogueElement> publisher, ProgressMonitor monitor) {
         if (!context.forceNew) {
             if (isDraft(published)) {
                 published.clearErrors()

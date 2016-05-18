@@ -7,6 +7,7 @@ import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
+import org.modelcatalogue.core.util.builder.ProgressMonitor
 import spock.lang.Issue
 
 import static org.modelcatalogue.core.util.HibernateHelper.*
@@ -579,7 +580,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         }
 
         created.each {
-            assert it.publish(elementService).errors.errorCount == 0
+            assert it.publish(elementService, ProgressMonitor.NOOP).errors.errorCount == 0
         }
 
         build {

@@ -18,6 +18,7 @@ import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Legacy
+import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.transaction.TransactionStatus
@@ -66,7 +67,7 @@ class ElementService implements Publisher<CatalogueElement> {
 
         Closure<DataModel> code = { TransactionStatus status = null ->
             return (DataModel) auditService.logNewVersionCreated(dataModel) {
-                DataModel draft = PublishingChain.createDraft(dataModel, context.within(dataModel)).run(this) as DataModel
+                DataModel draft = PublishingChain.createDraft(dataModel, context.within(dataModel)).run(this, context.monitor) as DataModel
                 if (draft.hasErrors()) {
                     status?.setRollbackOnly()
                     return dataModel
@@ -332,7 +333,7 @@ class ElementService implements Publisher<CatalogueElement> {
         }
         return (DataModel) CatalogueElement.withTransaction { TransactionStatus status ->
             auditService.logElementFinalized(draft) {
-                DataModel finalized = draft.publish(this) as DataModel
+                DataModel finalized = draft.publish(this, ProgressMonitor.NOOP) as DataModel
 
                 if (finalized.hasErrors()) {
                     status.setRollbackOnly()
@@ -352,7 +353,7 @@ class ElementService implements Publisher<CatalogueElement> {
     public <E extends CatalogueElement> E finalizeElement(E draft) {
         return (E) CatalogueElement.withTransaction { TransactionStatus status ->
             auditService.logElementFinalized(draft) {
-                E finalized = draft.publish(this) as E
+                E finalized = draft.publish(this, ProgressMonitor.NOOP) as E
                 if (finalized.hasErrors()) {
                     status.setRollbackOnly()
                 }

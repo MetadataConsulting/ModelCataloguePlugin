@@ -4,9 +4,8 @@ import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.HibernateHelper
-import org.springframework.validation.ObjectError
+import org.modelcatalogue.core.util.builder.ProgressMonitor
 
 @Log4j
 class FinalizationChain extends PublishingChain {
@@ -24,7 +23,7 @@ class FinalizationChain extends PublishingChain {
         return published as DataModel
     }
 
-    protected CatalogueElement doRun(Publisher<CatalogueElement> publisher) {
+    protected CatalogueElement doRun(Publisher<CatalogueElement> publisher, ProgressMonitor monitor) {
         if (published.published || isUpdatingInProgress(published)) {
             return published
         }

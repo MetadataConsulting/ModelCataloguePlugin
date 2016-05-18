@@ -5,6 +5,7 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.HibernateHelper
+import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.springframework.validation.ObjectError
 
 @Log4j @Deprecated
@@ -19,7 +20,7 @@ class LegacyFinalizationChain extends PublishingChain {
         return new LegacyFinalizationChain(published)
     }
 
-    protected CatalogueElement doRun(Publisher<CatalogueElement> publisher) {
+    protected CatalogueElement doRun(Publisher<CatalogueElement> publisher, ProgressMonitor monitor) {
         if (published.published || isUpdatingInProgress(published)) {
             return published
         }
@@ -49,7 +50,7 @@ class LegacyFinalizationChain extends PublishingChain {
                     return rejectFinalizationDependency(element)
                 }
                 processed << element.id
-                CatalogueElement finalized = element.publish(publisher)
+                CatalogueElement finalized = element.publish(publisher, ProgressMonitor.NOOP)
                 if (finalized.hasErrors()) {
                     return rejectFinalizationDependency(finalized)
                 }
