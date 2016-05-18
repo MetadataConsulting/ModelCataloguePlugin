@@ -229,6 +229,9 @@ log4j.main = {
     info 'grails.app.services.org.grails.plugins.console'
     info 'org.grails.plugins.console'
 
+    info 'org.modelcatalogue.core.rx.BatchOperator'
+    info 'org.modelcatalogue.core.rx.DetachedCriteriaOnSubscribe'
+
 //    debug 'org.codehaus.groovy.grails.web.mapping'
 //    debug 'org.springframework.security'
 //    debug 'org.grails.plugins.elasticsearch'

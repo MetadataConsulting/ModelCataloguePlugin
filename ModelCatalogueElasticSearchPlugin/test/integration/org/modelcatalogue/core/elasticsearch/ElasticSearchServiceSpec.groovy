@@ -72,11 +72,17 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
                     validationRule(name: 'Test Rule') {
                         rule 'IF this THEN that'
                     }
+                    dataElement(name: 'nested data element') {
+                        dataType(name: 'primitive type') {
+                            measurementUnit(name: 'unit of measure 123456', symbol: 'uom')
+                        }
+                    }
                 }
             }
         }
         DataModel dataModel = DataModel.findByName("ES Test Model")
         DataClass element = DataClass.findByName("Foo")
+        MeasurementUnit unit = MeasurementUnit.findByName('unit of measure 123456')
 
         Class elementClass = HibernateHelper.getEntityClass(element)
 
@@ -86,6 +92,7 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
         expect:
         dataModel
         element
+        unit
 
 
         when:
@@ -100,6 +107,9 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
                     elasticSearchService.index(element).subscribe {
                         results.elementIndexed = true
                     }
+                    elasticSearchService.index(unit).subscribe {
+                        results.unitIndexed = true
+                    }
                 }
             }
         }
@@ -110,6 +120,7 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
         results.elementUnindexed
         results.dataModelIndexed
         results.elementIndexed
+        results.unitIndexed
 
         elasticSearchService.client
                 .prepareGet(index, type, element.getId().toString())

@@ -49,6 +49,11 @@ angular.module('mc.core.ui.bs.modalPromptRelationshipTypeEdit', ['mc.util.messag
                   <input type="checkbox" ng-model="copy.bidirectional"> Bidirectional
                 </label>
               </div>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" ng-model="copy.searchable"> Searchable
+                </label>
+              </div>
               <div class="form-group">
                 <label for="sourceToDestinationDescription">Source to Destination Description</label>
                 <textarea rows="10" ng-model="copy.sourceToDestinationDescription" placeholder="Source to Destination Description" class="form-control" id="sourceToDestinationDescription"></textarea>

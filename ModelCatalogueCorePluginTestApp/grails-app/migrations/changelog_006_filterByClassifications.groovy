@@ -10,7 +10,7 @@ databaseChangeLog = {
         dropColumn tableName: 'user', columnName: 'default_classification_id'
     }
 
-    changeSet(author: "Vladimir Orany", id: "1412847974051-01-01") {
+    changeSet(author: "Vladimir Orany", id: "1412847974051-01-01-01", failOnError: false) {
         preConditions(onFail: 'MARK_RAN') {
             tableExists tableName: "extendible_element"
             tableExists tableName: "value_domain"
@@ -90,7 +90,7 @@ databaseChangeLog = {
         }
     }
 
-    changeSet(author: "Vladimir Orany", id: "1412847974051-02") {
+    changeSet(author: "Vladimir Orany", id: "1412847974051-02-01") {
         preConditions (onFail: 'MARK_RAN') {
             // language=SQL
             sqlCheck expectedResult: '0', """
@@ -101,8 +101,8 @@ databaseChangeLog = {
 
         // language=SQL
         sql """
-          insert into relationship_type (name, version, system, bidirectional, source_class, source_to_destination, destination_class, destination_to_source)
-          value ('classification', 1, 1, 0, 'org.modelcatalogue.core.Classification', 'classifies', 'org.modelcatalogue.core.CatalogueElement', 'classifications')
+          insert into relationship_type (name, version, system, bidirectional, source_class, source_to_destination, destination_class, destination_to_source, searchable)
+          value ('classification', 1, 1, 0, 'org.modelcatalogue.core.Classification', 'classifies', 'org.modelcatalogue.core.CatalogueElement', 'classifications', true)
         """
 
         grailsChange {
