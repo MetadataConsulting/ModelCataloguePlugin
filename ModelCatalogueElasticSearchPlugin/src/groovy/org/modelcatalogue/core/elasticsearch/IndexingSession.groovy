@@ -38,27 +38,6 @@ class IndexingSession {
         }
     }
 
-    Observable<Boolean> indexOnlyOnce(Object o, Closure<Observable<Boolean>> index) {
-        if (!o) {
-            return just(false)
-        }
-        try {
-            return indexingCache.get("${HibernateHelper.getEntityClass(o)}:${o.getId()}") {
-                index().cache()
-            }
-        } catch (IllegalStateException ignored) {
-            try {
-                return index().cache()
-            } catch(RemoteTransportException rte) {
-                if (rte.cause instanceof  InstanceAlreadyExistsException) {
-                    return just(true)
-                }
-                throw rte
-            }
-        }
-
-    }
-
     private Document createDocument(Object object) {
         if (!object) {
             return Document.EMPTY

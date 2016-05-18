@@ -6,7 +6,6 @@ import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
-import org.modelcatalogue.core.geb.CatalogueContent
 import org.modelcatalogue.integration.excel.ExcelLoader
 import org.modelcatalogue.integration.excel.HeadersMap
 import spock.lang.Ignore
@@ -23,7 +22,6 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
     public static final String dangerInFooter = '.modal-footer .alert-danger'
     public static final CatalogueAction importMc = CatalogueAction.runFirst('navigation-right', 'curator-menu', 'import-mc')
     public static final CatalogueAction refreshAsset = CatalogueAction.runFirst('item-detail', 'refresh-asset')
-    public static final CatalogueContent dataModelsProperty = CatalogueContent.create('td', 'data-value-for': 'Data Models')
     public static final CatalogueAction downloadButton = CatalogueAction.runFirst('item-detail', 'download-asset')
     public static final CatalogueAction importExcel = CatalogueAction.runFirst('navigation-right', 'curator-menu', 'import-excel')
     public static final CatalogueAction export = CatalogueAction.runFirst('item', 'export')

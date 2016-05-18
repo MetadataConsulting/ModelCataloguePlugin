@@ -1,7 +1,9 @@
 package org.modelcatalogue.core.elasticsearch
 
+import groovy.transform.CompileStatic
 import org.elasticsearch.action.bulk.BulkItemResponse
 
+@CompileStatic
 class SimpleIndexResponse {
     final String index
     final String type
