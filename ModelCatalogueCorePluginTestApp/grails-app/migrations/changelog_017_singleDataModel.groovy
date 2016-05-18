@@ -40,7 +40,7 @@ databaseChangeLog = {
         addForeignKeyConstraint(baseColumnNames: "data_model_id", baseTableName: "catalogue_element", constraintName: "FK_DATA_MODEL", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "data_model", referencesUniqueColumn: "false")
     }
 
-    changeSet(author: "Vladimir Orany", id: "1432717677788-02") {
+    changeSet(author: "Vladimir Orany", id: "1432717677788-02-01", failOnError: false) {
         sql """
             /* ensure every catalogue element does have latest version id */
             update catalogue_element

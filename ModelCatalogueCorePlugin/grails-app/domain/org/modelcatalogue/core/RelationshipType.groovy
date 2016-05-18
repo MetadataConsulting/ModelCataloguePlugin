@@ -29,6 +29,9 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
     // system relationship types are not returned from the controller
     Boolean system = false
 
+    // searchable relationships are index and reindex each time the source or destination changes
+    Boolean searchable = false
+
     //the both sides of the relationship ie. for parentChild this would be parent (for synonym this is synonym, so the same on both sides)
     String sourceToDestination
 
@@ -101,6 +104,7 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
 		destinationClass index: 'RelationType_destinationClass_idx'
         metadataHints type: 'text'
         rule type: 'text'
+        searchable defaultValue: "false"
     }
 
     void setRule(String rule) {

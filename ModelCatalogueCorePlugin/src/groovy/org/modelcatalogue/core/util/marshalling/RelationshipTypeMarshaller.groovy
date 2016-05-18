@@ -22,6 +22,7 @@ class RelationshipTypeMarshaller extends AbstractMarshaller {
                 destinationClass: el.destinationClass,
                 system: el.system,
                 versionSpecific: el.versionSpecific,
+                searchable: el.searchable,
                 sourceToDestinationDescription: el.sourceToDestinationDescription,
                 destinationToSourceDescription: el.destinationToSourceDescription,
                 rule: el.rule,
