@@ -496,7 +496,7 @@ class ElasticSearchService implements SearchCatalogue {
                 }
             }
             if (group.key == Relationship) {
-                return group.flatMap { entity -> getRelationshipWithSourceAndDestination(session, entity as Relationship) }
+                return group.flatMap { entity -> getRelationshipWithSourceAndDestination(entity as Relationship) }
             }
             if (group.key == RelationshipType) {
                 return group
@@ -514,8 +514,8 @@ class ElasticSearchService implements SearchCatalogue {
         just(element as CatalogueElement).concatWith(rxService.from(CatalogueElement.where { dataModel == element }, true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH))
     }
 
-    private static Observable<Document> getRelationshipWithSourceAndDestination(IndexingSession session, Relationship rel) {
-        just(rel, rel.source, rel.destination).map { session.getDocument(it) }
+    private static Observable<Object> getRelationshipWithSourceAndDestination(Relationship rel) {
+        just(rel, rel.source, rel.destination)
     }
 
     private Observable<BulkResponse> bulkIndex(List<SimpleIndexRequest> documents) {
