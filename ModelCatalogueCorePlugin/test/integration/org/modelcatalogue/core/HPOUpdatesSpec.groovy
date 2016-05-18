@@ -2,12 +2,7 @@ package org.modelcatalogue.core
 
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.builder.api.CatalogueBuilder
-import org.modelcatalogue.core.AbstractIntegrationSpec
-import org.modelcatalogue.core.DataClass
-import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.util.test.TestDataHelper
 import org.modelcatalogue.integration.obo.OboLoader
 import spock.lang.Shared
 import spock.lang.Unroll
@@ -40,17 +35,17 @@ class HPOUpdatesSpec extends AbstractIntegrationSpec  {
 
         then:
         hpo
-        hpo.countDeclares() == 12
+        hpo.countDeclares() == 13
 
         when:
-        hpo = elementService.finalizeElement(hpo)
+        hpo = elementService.finalizeDataModel(hpo, hpo.semanticVersion, "finalized", true)
 
         then:
         noExceptionThrown()
         hpo
         hpo.errors.errorCount == 0
         hpo.status == ElementStatus.FINALIZED
-        hpo.countDeclares() == 12
+        hpo.countDeclares() == 13
 
         when:
         InputStream test2 = getClass().getResourceAsStream('test2.obo')
@@ -60,17 +55,43 @@ class HPOUpdatesSpec extends AbstractIntegrationSpec  {
         then:
         noExceptionThrown()
         hpoDraft
-        hpoDraft.countDeclares() == 13
+        hpoDraft.countDeclares() == 15
 
         when:
         DataClass renalCyst = DataClass.findByNameAndDataModel('Renal cyst', hpoDraft)
         DataClass something = DataClass.findByNameAndDataModel('Something Different', hpoDraft)
+        DataClass somethingObsolete = DataClass.findByNameAndDataModel('Something Different Obsolete', hpoDraft)
+        DataClass obsoleteContainer = DataClass.findByNameAndDataModel(ElementService.DEPRECATED_DATA_CLASS_NAME, hpoDraft)
 
         then:
         renalCyst
         something
         something in renalCyst.parentOf
+        obsoleteContainer
+        obsoleteContainer.status == ElementStatus.DRAFT
+        obsoleteContainer.countParentOf() == 3
+        somethingObsolete
+        somethingObsolete.status == ElementStatus.DEPRECATED
 
+        when:
+        hpo = elementService.finalizeDataModel(hpoDraft, hpoDraft.semanticVersion, "finalized", true)
+
+        then:
+        noExceptionThrown()
+        hpo
+        hpo.errors.errorCount == 0
+        hpo.status == ElementStatus.FINALIZED
+        hpo.countDeclares() == 15
+
+        when:
+        InputStream test3 = getClass().getResourceAsStream('test3.obo')
+        loader.load(test3, 'HPO', idPattern)
+        hpoDraft = DataModel.findByNameAndStatus('HPO', ElementStatus.DRAFT)
+
+        then:
+        noExceptionThrown()
+        hpoDraft
+        hpoDraft.countDeclares() == 16
 
         where:
         idPattern << [

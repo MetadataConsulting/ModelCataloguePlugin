@@ -108,7 +108,7 @@ class RelationshipService {
 
             if (relationshipInstance) {
 
-                if (relationshipDefinition.metadata) {
+                if (relationshipDefinition.metadataSet) {
                     if (relationshipInstance.ext != relationshipDefinition.metadata) {
                         relationshipInstance.ext = relationshipDefinition.metadata
                         if (relationshipDefinition.relationshipType == RelationshipType.baseType) {
@@ -340,7 +340,6 @@ class RelationshipService {
 
             RELATIONSHIPS_COUNT_CACHE.invalidate(source.getId())
             RELATIONSHIPS_COUNT_CACHE.invalidate(destination.getId())
-
 
             if (relationshipType.bidirectional) {
                 unlink relationshipInstance.destination, relationshipInstance.source, relationshipType, dataModel, ignoreRules, expectedMetadata

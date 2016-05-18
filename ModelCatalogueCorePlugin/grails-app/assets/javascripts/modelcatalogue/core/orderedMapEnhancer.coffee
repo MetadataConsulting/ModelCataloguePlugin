@@ -44,16 +44,22 @@ angular.module('mc.core.orderedMapEnhancer', ['mc.util.enhance']).config ['enhan
 
         getterSetter.asInt = (newValue) ->
           if arguments.length
-            set(if newValue then  parseInt(newValue, 10) else undefined)
+            set(if newValue? then  parseInt(newValue, 10) else undefined)
           else
             parseInt(get(), 10)
+
+        getterSetter.asBoolean = (newValue) ->
+          if arguments.length
+            set(if newValue? then newValue ? 'true' : 'false' else undefined)
+          else
+            if get()? then get() == 'true' else undefined
 
         getterSetter
 
 
       orderedMap.clearIfOnlyContainsPlaceholder = ->
         ensureValuesAreArray(@)
-        if @values.length == 1 and not @values[0].value
+        if @values.length == 1 and not @values[0].value == null and @values[0].hasOwnProperty('key')
           @values = []
 
       orderedMap.addPlaceholderIfEmpty = ->

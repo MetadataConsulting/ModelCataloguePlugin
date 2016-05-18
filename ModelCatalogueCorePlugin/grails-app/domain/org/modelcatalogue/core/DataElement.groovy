@@ -19,6 +19,7 @@ class DataElement extends CatalogueElement {
     }
 
     static relationships = [
+            outgoing: [involvedness: 'involvedIn'],
             incoming: [containment: 'containedIn'],
     ]
 

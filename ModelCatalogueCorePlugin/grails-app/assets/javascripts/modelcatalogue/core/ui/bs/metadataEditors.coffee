@@ -34,7 +34,7 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
     <form class="form">
       <div class="form-group">
         <label for="minOccurs" class="control-label">Min Occurs</label>
-        <input type="number"  min="0" class="form-control" id="minOccurs" placeholder="Min Occurs" ng-model="object.access('Min Occurs').asInt" ng-model-options="{ getterSetter: true}">
+        <input type="number" min="0" class="form-control" id="minOccurs" placeholder="Min Occurs" ng-model="object.access('Min Occurs').asInt" ng-model-options="{ getterSetter: true}">
       </div>
       <div class="form-group">
         <label for="maxOccurs" class="control-label">Max Occurs</label>

@@ -8,94 +8,11 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
       dialog = $modal.open {
         windowClass: 'basic-edit-modal-prompt'
         size: 'lg'
-        template: '''
-         <div class="modal-header">
-            <h4>''' + title + '''</h4>
-        </div>
-        <div class="modal-body">
-            <messages-panel messages="messages"></messages-panel>
-            <form role="form" ng-submit="saveElement()">
-              <div class="form-group" ng-if="!hideDataModels()">
-                <label for="dataModel"> Data Models</label>
-                <elements-as-tags elements="copy.dataModels"></elements-as-tags>
-                <input id="dataModel" placeholder="Data Model" ng-model="pending.dataModel" catalogue-element-picker="dataModel" label="el.name" typeahead-on-select="addToDataModels()">
-              </div>
-              <div class="form-group">
-                <label for="name" class="">Name</label>
-                <input type="text" class="form-control" id="name" placeholder="Name" ng-model="copy.name">
-              </div>
-              <div class="form-group">
-                <label for="modelCatalogueId" class="">Catalogue ID (URL)</label>
-                <input type="text" class="form-control" id="modelCatalogueId" placeholder="e.g. external ID, namespace (leave blank for generated)" ng-model="copy.modelCatalogueId">
-              </div>
-              <div class="form-group">
-                <label for="description" class="">Description</label>
-                <textarea rows="10" ng-model="copy.description" placeholder="Description" class="form-control" id="description"></textarea>
-              </div>
-              <div class="form-group">
-                  <label for="rule" ng-click="ruleCollapsed = !ruleCollapsed">Rule <span class="glyphicon" ng-class="{'glyphicon-collapse-down': ruleCollapsed, 'glyphicon-collapse-up': !ruleCollapsed}"></span></label>
-                  <div collapse="ruleCollapsed" >
-                    <textarea rows="10" ng-model="copy.rule" placeholder="Rule" class="form-control" id="rule"></textarea>
-                    <p class="help-block">Enter valid <a href="http://www.groovy-lang.org/" target="_blank">Groovy</a> code. Variable <code>x</code> refers to the value validated value and  <code>dataType</code> to current data type. Last row is the result which should be <code>boolean</code> value. For example you can <a ng-click="showRegexExample()"><span class="fa fa-magic"></span> validate using regular expression</a> or <a ng-click="showSetExample()"><span class="fa fa-magic"></span> values in set</a></p>
-                  </div>
-                </div>
-              <label class="radio-inline">
-                <input type="radio" ng-model="subtype" name="subtype" id="pickSimpleType" value="dataType"> Simple
-              </label>
-              <label class="radio-inline">
-                <input ng-model="subtype" type="radio"  name="subtype" id="pickEnumeratedType" value="enumeratedType"> Enumerated
-              </label>
-              <label class="radio-inline">
-                <input ng-model="subtype" type="radio" name="subtype" id="pickPrimitiveType" value="primitiveType"> Primitive
-              </label>
-              <label class="radio-inline">
-                <input ng-model="subtype" type="radio" name="subtype" id="pickReferenceType" value="referenceType"> Reference
-              </label>
-              <label class="radio-inline">
-                <input ng-model="subtype" type="radio" name="subtype" id="pickSubsetType" value="subset"> Subset
-              </label>
-              <div collapse="subtype != 'enumeratedType'">
-                <ordered-map-editor object="copy.enumerations" title="Enumerations" key-placeholder="Value or copy & paste from excel" value-placeholder="Description"></ordered-map-editor>
-              </div>
-              <div collapse="subtype != 'referenceType'">
-                <div class="form-group">
-                  <label for="dataClass" class="">Data Class</label>
-                  <input type="text" id="dataClass" placeholder="Data Class" ng-model="copy.dataClass" global="'allow'" catalogue-element-picker="dataClass" label="el.name">
-                </div>
-              </div>
-              <div collapse="subtype != 'primitiveType'">
-                <div class="form-group">
-                  <label for="measurementUnit" class="">Measurement Unit</label>
-                  <input type="text" id="measurementUnit" placeholder="Measurement Unit" ng-model="copy.measurementUnit" catalogue-element-picker="measurementUnit" label="el.name">
-                </div>
-              </div>
-              <div collapse="subtype != 'subset'">
-                <div class="form-group">
-                  <label for="baseEnumeration" class="">Enumerated Type Base</label>
-                  <input type="text" id="baseEnumeration" placeholder="Enumerated Type Base" ng-model="copy.baseEnumeration" catalogue-element-picker="enumeratedType" label="el.name">
-                </div>
-                <div class="form-group" ng-if="copy.baseEnumeration.enumerations">
-                  <label for="subset">Subset</label>
-                    <div class="alert alert-warning" ng-if="copy.selectedEnumerations.values.length == 0">If no enumeration value selected, all values will be used</div>
-                    <div class="checkbox" ng-repeat="value in copy.baseEnumeration.enumerations.values">
-                      <label>
-                        <input type="checkbox" value="{{value}}" id="{{'subtype-enum-' + value.id}}" ng-checked="copy.selectedEnumerations.values.indexOf(value) > -1" ng-click="toggleSelection(copy.selectedEnumerations.values, value)">
-                        {{value.key}}: {{value.value}}
-                      </label>
-                    </div>
-                </div>
-              </div>
-              <fake-submit-button />
-            </form>
-        </div>
-        <div class="modal-footer">
-          <contextual-actions role="modal"></contextual-actions>
-        </div>
-        '''
+        templateUrl: '/mc/core/ui/modals/modalPromptEnumeratedTypeEdit.html'
         controller: ['$scope', 'messages', '$controller', '$modalInstance', 'enhance', 'names', 'catalogueElementResource', ($scope, messages, $controller, $modalInstance, enhance, names, catalogueElementResource) ->
           orderedMapEnhancer = enhance.getEnhancer('orderedMap')
 
-          $scope.newEntity = -> {enumerations: orderedMapEnhancer.emptyOrderedMap(true), dataModels: []}
+          $scope.newEntity = -> {enumerations: orderedMapEnhancer.emptyOrderedMap(true), dataModels: [args.currentDataModel], selectedEnumerations: orderedMapEnhancer.emptyOrderedMap(true)}
           $scope.pending  = {dataModel: null}
           $scope.copy     = angular.copy(args.element ? $scope.newEntity())
           $scope.copy.enumerations = $scope.copy.enumerations ? orderedMapEnhancer.emptyOrderedMap(true)
@@ -103,6 +20,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
           $scope.messages = messages.createNewMessages()
           $scope.ruleCollapsed  = not $scope.copy.rule
           $scope.currentDataModel = args.currentDataModel
+          $scope.title = title
           $scope.create   = args.create
           if args.create
             $scope.subtype = args.create
@@ -183,8 +101,6 @@ x in ['apple', 'banana', 'cherry']
                 $scope.messages.warning "You have changed the subtype of the data element. New version will be created!"
               else
                 $scope.messages.clearAllMessages()
-
-          $scope.copy.selectedEnumerations = orderedMapEnhancer.emptyOrderedMap(true)
 
           $scope.toggleSelection = (array, selection) ->
             idx = array.indexOf(selection)

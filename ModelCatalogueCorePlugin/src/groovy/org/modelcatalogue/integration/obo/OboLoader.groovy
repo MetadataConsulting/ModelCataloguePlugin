@@ -2,9 +2,9 @@ package org.modelcatalogue.integration.obo
 
 import groovy.text.SimpleTemplateEngine
 import groovy.text.Template
-import groovy.util.logging.Log
 import groovy.util.logging.Log4j
 import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.api.ElementStatus
 import org.obolibrary.oboformat.model.Clause
 import org.obolibrary.oboformat.model.Frame
@@ -13,7 +13,6 @@ import org.obolibrary.oboformat.model.OBODoc
 @Log4j
 class OboLoader {
 
-    private static final String DEPRECATED_DATA_CLASS_NAME = 'Obsolete'
 
     final CatalogueBuilder builder
 
@@ -206,13 +205,13 @@ class OboLoader {
 
                         if (modelAttributes.status == deprecated) {
                             needsDeprecated = true
-                            rel 'hierarchy' from dataClass called name,  DEPRECATED_DATA_CLASS_NAME
+                            rel 'hierarchy' from dataClass called name,  ElementService.DEPRECATED_DATA_CLASS_NAME
                         }
                     }
                 }
 
                 if (needsDeprecated) {
-                    dataClass name: DEPRECATED_DATA_CLASS_NAME, status: deprecated
+                    dataClass name: ElementService.DEPRECATED_DATA_CLASS_NAME
                 }
             }
             // TODO: find better way how to do this

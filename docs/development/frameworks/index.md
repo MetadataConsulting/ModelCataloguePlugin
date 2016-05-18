@@ -24,6 +24,12 @@ Apart from standard HTML + CSS + JS stack we use following languages in the fron
 * [CoffeeScript](http://coffeescript.org/) as alternative to JavaScript
 * [LESS](http://lesscss.org/) as alternative to CSS
 
+### Polyfills
+Polyfills grants access to features which might not be available in older browser
+* ES5 and ES6 features covered by via [core-js](https://github.com/zloirock/core-js)
+* [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob) via [Blob.js](https://github.com/eligrey/Blob.js/)
+* [Window.saveAs](https://dev.w3.org/2009/dap/file-system/file-writer.html) via [FileSaver.js](https://github.com/eligrey/FileSaver.js)
+
 ### Frameworks and Libraries
 * [Bootstrap](http://getbootstrap.com/) as the base CSS framework
 * [FontAwesome](http://fontawesome.io/) for application icons
@@ -35,9 +41,12 @@ Apart from standard HTML + CSS + JS stack we use following languages in the fron
 * [NG File Upload](https://github.com/danialfarid/ng-file-upload) for uploading assets
 * [Angular Loading Bar](http://chieffancypants.github.io/angular-loading-bar/) for showing the network progress
 * [Angular Auth Interceptor](https://github.com/witoldsz/angular-http-auth) for seamless authentication
+* [Angular File Saver](https://github.com/alferov/angular-file-saver) for storing content to the client
 * [RxJS](https://github.com/Reactive-Extensions/RxJS) ([ReactiveX](http://reactivex.io/)) for event handling (waiting for wider adoption through codebase)
 * [Rx Angular](https://github.com/Reactive-Extensions/rx.angular.js/) as a bridge between AngularJS and RxJS
 * [STOMP](http://jmesnil.net/stomp-websocket/doc/) over [SockJS](http://sockjs.org) for server push notification
+* [SaxonCE](http://www.saxonica.com/ce/index.xml) for client side XSLT 2.0 transformations
+* [vkBeautify](http://www.eslinstructor.net/vkbeautify/) for formatiing generated XML on client side
 
 See [bower.json](../../../ModelCatalogueCorePlugin/bower.json) for information on versions
 

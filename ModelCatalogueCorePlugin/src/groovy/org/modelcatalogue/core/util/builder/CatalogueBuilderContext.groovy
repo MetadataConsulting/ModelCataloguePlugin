@@ -11,11 +11,12 @@ import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.api.RelationshipConfiguration
+import org.modelcatalogue.core.ValidationRule
 
 @CompileStatic
 class CatalogueBuilderContext {
 
-    private static Set<Class> SUPPORTED_AS_CONTEXT  = new LinkedHashSet<Class>([CatalogueElement, DataModel, DataType, DataClass, MeasurementUnit, DataElement])
+    private static Set<Class> SUPPORTED_AS_CONTEXT  = new LinkedHashSet<Class>([CatalogueElement, DataModel, DataType, DataClass, MeasurementUnit, DataElement, ValidationRule])
 
     private List<Map<Class, ContextItem>> contexts = []
 

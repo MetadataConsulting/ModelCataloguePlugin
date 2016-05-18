@@ -3,6 +3,7 @@ import grails.util.Environment
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.codehaus.groovy.runtime.StackTraceUtils
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.audit.AuditJsonMarshallingCustomizer
@@ -17,6 +18,14 @@ import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.modelcatalogue.core.xml.render.RelationshipsXmlRenderer
 
 class ModelCatalogueCoreGrailsPlugin {
+
+
+    static {
+        StackTraceUtils.addClassTest {
+            !it.startsWith('rx.')
+        }
+    }
+
     // the plugin version
     def version = "1.0.0"
     // the version or versions of Grails the plugin is designed for
@@ -69,6 +78,7 @@ Model catalogue core plugin (metadata registry)
         ModelCatalogueTypes.ENUMERATED_TYPE.implementation = EnumeratedType
         ModelCatalogueTypes.PRIMITIVE_TYPE.implementation = PrimitiveType
         ModelCatalogueTypes.REFERENCE_TYPE.implementation = ReferenceType
+        ModelCatalogueTypes.VALIDATION_RULE.implementation = ValidationRule
 
 
         mergeConfig(application)
@@ -106,7 +116,7 @@ Model catalogue core plugin (metadata registry)
                     new CsvTransformationMarshaller(),
                     new UserMarshaller(),
                     new ChangeMarshaller(),
-
+                    new ValidationRuleMarshaller()
             ]
         }
 

@@ -1,0 +1,34 @@
+// Inline table w/ no padding
+
+.table-inline {
+  > thead,
+  > tbody,
+  > tfoot {
+    > tr {
+      > th,
+      > td {
+        padding: 0;
+      }
+    }
+  }
+}
+
+// Table with no borders at all
+
+.table-borderless {
+  border: none;
+  > thead,
+  > tbody,
+  > tfoot {
+    > tr {
+      > th,
+      > td {
+        border: none;
+      }
+    }
+  }
+}
+
+.table-no-margin {
+  margin-bottom: 0;
+}

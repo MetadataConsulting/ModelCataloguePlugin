@@ -2,6 +2,8 @@ describe "mc.core.ui.catalogueElementPicker", ->
   beforeEach module 'mc.core.ui.catalogueElementPicker'
   beforeEach module 'mc.core.catalogueElementEnhancer'
 
+  return unless window.fixtures
+
   it "element uses global search by default",  inject ($compile, $rootScope, enhance, $httpBackend, modelCatalogueApiRoot) ->
     catEl = enhance angular.copy(fixtures.dataType.showOne)
 

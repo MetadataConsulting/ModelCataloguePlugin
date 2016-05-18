@@ -15,7 +15,7 @@ class ModelCatalogueCorePluginUrlMappings {
 
         def legacyElements    = [model: 'dataClass', classification: 'dataModel']
         def resources         = ['batch', 'relationshipType', 'csvTransformation' ]
-        def catalogueElements = ['asset', 'dataElement', 'dataClass', 'catalogueElement', 'dataType', 'enumeratedType', 'referenceType', 'primitiveType', 'measurementUnit', 'user', 'dataModel', 'classification', 'model']
+        def catalogueElements = ['asset', 'dataElement', 'dataClass', 'catalogueElement', 'dataType', 'enumeratedType', 'referenceType', 'primitiveType', 'measurementUnit', 'user', 'dataModel', 'classification', 'model', 'validationRule']
         def allElements       = catalogueElements + resources
 
         for (String elementName in allElements) {
@@ -65,6 +65,7 @@ class ModelCatalogueCorePluginUrlMappings {
                 "/api/modelCatalogue/core/$elementName/$id/mapping/$destination" (controller: controllerName, action: 'addMapping', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$elementName/$id/mapping/$destination" (controller: controllerName, action: 'removeMapping', method: HttpMethod.DELETE)
                 "/api/modelCatalogue/core/$elementName/$id/mapping" (controller: controllerName, action: 'mappings', method: HttpMethod.GET)
+                "/api/modelCatalogue/core/$elementName/$id/typeHierarchy" (controller: controllerName, action: 'typeHierarchy', method: HttpMethod.GET)
 
                 "/api/modelCatalogue/core/$elementName/$id/history"(controller: controllerName, action: 'history', method: HttpMethod.GET)
                 "/api/modelCatalogue/core/$elementName/$id/path"(controller: controllerName, action: 'path', method: HttpMethod.GET)
@@ -115,7 +116,7 @@ class ModelCatalogueCorePluginUrlMappings {
                     "/api/modelCatalogue/core/$elementName/$id/validateXml"(controller: controllerName, action: 'validateXml', method: HttpMethod.POST)
                 }
 
-                if (controllerName in ['dataElement', 'primitiveType', 'referenceType', 'enumeratedType']) {
+                if (controllerName in ['dataElement', 'primitiveType', 'referenceType', 'enumeratedType', 'validationRule']) {
                     "/api/modelCatalogue/core/$elementName/$id/content"(controller: controllerName, action: 'content', method: HttpMethod.GET)
                 }
             }

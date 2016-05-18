@@ -118,6 +118,7 @@ is_a: HP:0000077 ! Abnormality of the kidney
 property_value: HP:0040005 "Any structural anomaly of the `kidney` (FMA:7203)." xsd:string {xref="HPO:probinson"}
 created_by: peter
 creation_date: 2013-03-14T07:41:11Z
+is_obsolete: true
 
 
 [Term]
@@ -153,6 +154,7 @@ synonym: "Multicystic renal dysplasia" EXACT []
 xref: MeSH:D021782 "Multicystic Kidney Dysplasia"
 xref: UMLS:C0345335 "Multicystic Kidney Dysplasia"
 is_a: HP:0000107 ! Renal cyst
+is_obsolete: true
 
 
 [Term]
@@ -167,3 +169,17 @@ synonym: "Multicystic renal dysplasia" EXACT []
 xref: MeSH:D021782 "Multicystic Kidney Dysplasia"
 xref: UMLS:C0345335 "Multicystic Kidney Dysplasia"
 is_a: HP:0000107 ! Renal cyst
+
+[Term]
+id: HP:00010001
+name: Something Different Obsolete
+alt_id: HP:0004716
+def: "Multicystic dysplasia of the kidney is characterized by multiple cysts of varying size in the kidney and the absence of a normal pelvocaliceal system. The condition is associated with ureteral or ureteropelvic atresia, and the affected kidney is nonfunctional." [HPO:curators]
+comment: Multicystic kidney dysplasia is the result of abnormal fetal renal development in which the affected kidney is replaced by multiple cysts and has little or no residual function. The vast majority of multicystic kidneys are unilateral. Multicystic kidney can be diagnosed on prenatal ultrasound.
+synonym: "Multicystic dysplastic kidney" EXACT []
+synonym: "Multicystic kidneys" EXACT []
+synonym: "Multicystic renal dysplasia" EXACT []
+xref: MeSH:D021782 "Multicystic Kidney Dysplasia"
+xref: UMLS:C0345335 "Multicystic Kidney Dysplasia"
+is_a: HP:0000107 ! Renal cyst
+is_obsolete: true

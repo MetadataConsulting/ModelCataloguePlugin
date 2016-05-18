@@ -2,35 +2,43 @@ package org.modelcatalogue.core.elasticsearch
 
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
-import grails.gorm.DetachedCriteria
 import grails.util.GrailsNameUtils
 import groovy.json.JsonSlurper
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsClass
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder
+import org.elasticsearch.action.bulk.BulkItemResponse
 import org.elasticsearch.action.bulk.BulkRequestBuilder
+import org.elasticsearch.action.bulk.BulkResponse
 import org.elasticsearch.action.search.SearchRequestBuilder
 import org.elasticsearch.client.Client
 import org.elasticsearch.client.transport.TransportClient
 import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.common.transport.InetSocketTransportAddress
+import org.elasticsearch.common.util.concurrent.EsRejectedExecutionException
+import org.elasticsearch.index.VersionType
+import org.elasticsearch.index.engine.VersionConflictEngineException
 import org.elasticsearch.index.query.BoolQueryBuilder
 import org.elasticsearch.index.query.QueryBuilder
 import org.elasticsearch.index.query.QueryBuilders
+import org.elasticsearch.indices.IndexAlreadyExistsException
 import org.elasticsearch.node.Node
 import org.elasticsearch.node.NodeBuilder
+import org.elasticsearch.threadpool.ThreadPool
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.elasticsearch.rx.RxElastic
+import org.modelcatalogue.core.rx.RxService
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
 import rx.Observable
-import rx.subjects.ReplaySubject
+import rx.schedulers.Schedulers
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 import java.util.concurrent.ExecutorService
 
-import static org.modelcatalogue.core.util.HibernateHelper.*
+import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 import static rx.Observable.from
 import static rx.Observable.just
 
@@ -46,8 +54,6 @@ class ElasticSearchService implements SearchCatalogue {
     private static String DATA_MODEL_INDEX = "${GLOBAL_PREFIX}data_model"
     private static String DATA_MODEL_PREFIX = "${MC_PREFIX}data_model_"
     private static String ORPHANED_INDEX = "${GLOBAL_PREFIX}orphaned"
-
-    private static int EMIT_RELATIONSHIPS_PAGE = 10
 
     private static Map<String, Integer> CATALOGUE_ELEMENT_BOOSTS = [
 
@@ -67,14 +73,19 @@ class ElasticSearchService implements SearchCatalogue {
     GrailsApplication grailsApplication
     DataModelService dataModelService
     ElementService elementService
+    RxService rxService
     Node node
     Client client
 
     @PostConstruct
     private void init() {
         if (grailsApplication.config.mc.search.elasticsearch.local || System.getProperty('mc.search.elasticsearch.local')) {
+            Settings.Builder settingsBuilder = Settings.builder()
+                .put("${ThreadPool.THREADPOOL_GROUP}${ThreadPool.Names.BULK}.queue_size", 3000)
+                .put("${ThreadPool.THREADPOOL_GROUP}${ThreadPool.Names.BULK}.size", 25)
+                .put('path.home', (grailsApplication.config.mc.search.elasticsearch.local ?:  System.getProperty('mc.search.elasticsearch.local')).toString())
             node = NodeBuilder.nodeBuilder()
-                    .settings(Settings.builder().put('path.home', (grailsApplication.config.mc.search.elasticsearch.local ?:  System.getProperty('mc.search.elasticsearch.local')).toString()).build())
+                    .settings(settingsBuilder)
                     .local(true).node()
 
             client = node.client()
@@ -83,15 +94,17 @@ class ElasticSearchService implements SearchCatalogue {
         } else if (grailsApplication.config.mc.search.elasticsearch.host || System.getProperty('mc.search.elasticsearch.host')) {
             String host = grailsApplication.config.mc.search.elasticsearch.host ?: System.getProperty('mc.search.elasticsearch.host')
             String port = grailsApplication.config.mc.search.elasticsearch.port ?: System.getProperty('mc.search.elasticsearch.port') ?: "9300"
-            Settings.Builder settingBuilder = Settings.builder()
+
+            Settings.Builder settingsBuilder = Settings.builder()
 
             if (grailsApplication.config.mc.search.elasticsearch.settings) {
-                grailsApplication.config.mc.search.elasticsearch.settings(settingBuilder)
+                grailsApplication.config.mc.search.elasticsearch.settings(settingsBuilder)
             }
+
 
             client = TransportClient
                     .builder()
-                    .settings(settingBuilder)
+                    .settings(settingsBuilder)
                     .build()
                     .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), Integer.parseInt(port, 10)))
 
@@ -194,10 +207,18 @@ class ElasticSearchService implements SearchCatalogue {
         if (CatalogueElement.isAssignableFrom(resource)) {
             indicies = resource == DataModel ? [DATA_MODEL_INDEX] : collectDataModelIndicies(params)
 
-            BoolQueryBuilder boolQuery = QueryBuilders.boolQuery().minimumNumberShouldMatch(1)
+            BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
+
+            if (search != '*') {
+                boolQuery.minimumNumberShouldMatch(1)
+            }
 
             if (params.status) {
                 boolQuery.must(QueryBuilders.termsQuery('status', ElementService.getStatusFromParams(params)*.toString()))
+            }
+
+            if (params.contentType) {
+                boolQuery.must(QueryBuilders.termsQuery('content_type', params.contentType))
             }
 
             CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
@@ -325,8 +346,9 @@ class ElasticSearchService implements SearchCatalogue {
             String indexName = getDataModelIndex(object as DataModel)
             return indexExists(just(indexName)).flatMap {
                 if (it.exists) {
-                    return from(client.admin().indices().prepareDelete(indexName).execute()).map {
+                    return RxElastic.from(client.admin().indices().prepareDelete(indexName)).map {
                         it.acknowledged
+                        log.debug "Deleted index $indexName"
                     }.onErrorReturn { error ->
                         log.debug "Exception deleting index $indexName: $error"
                         return false
@@ -335,18 +357,20 @@ class ElasticSearchService implements SearchCatalogue {
                 return just(true)
             }
         }
-        if (CatalogueElement.isAssignableFrom(clazz)) {
-            CatalogueElement element = object as CatalogueElement
+        if (CatalogueElement.isAssignableFrom(clazz) || Relationship.isAssignableFrom(clazz) || RelationshipType.isAssignableFrom(clazz)) {
+            Object element = object
             return from(getIndices(element)).flatMap { idx ->
                 indexExists(just(idx)).flatMap { response ->
                     if (response.exists) {
-                        from(client.prepareDelete(idx, getTypeName(clazz), "${element.getId()}").execute()).map {
+                        return RxElastic.from(client.prepareDelete(idx, getTypeName(clazz), "${element.getId()}")).map {
+                            log.debug "Unindexed $element from $idx"
                             it.found
                         }.onErrorReturn { error ->
                             log.debug "Exception unindexing $element: $error"
                             return false
                         }
                     }
+                    return just(true)
                 }
             }
         }
@@ -370,11 +394,12 @@ class ElasticSearchService implements SearchCatalogue {
         IndexingSession session = IndexingSession.create()
 
         // deleting all mc indices so we don't have to unindex each element separately
-        Observable<Boolean> result = from(client.admin().indices().prepareDelete("${MC_PREFIX}*").execute()).map {
+        Observable<Boolean> result = RxElastic.from(client.admin().indices().prepareDelete("${MC_PREFIX}*")).map {
             it.acknowledged
         }
 
         result = result.concatWith(from(DataModel.list(sort: 'lastUpdated', order: 'desc'))
+        .observeOn(Schedulers.from(executorService))
         .doOnNext {
             log.info "[${dataModelCounter++}/$total] Reindexing data model ${it.name} (${it.combinedVersion}) - ${it.countDeclares()} items"
         }.flatMap {
@@ -383,12 +408,12 @@ class ElasticSearchService implements SearchCatalogue {
             }
         })
 
-        result = result.concatWith(from(dataModelService.classified(CatalogueElement, DataModelFilter.create(true))).flatMap { element ->
+        result = result.concatWith(rxService.from(dataModelService.classified(CatalogueElement, DataModelFilter.create(true))).flatMap { element ->
             log.info "[${total - 1}/$total] Reindexing orphaned elements"
             return index(session, element)
         })
 
-        return result.concatWith(from(RelationshipType.list()).flatMap {
+        return result.concatWith(rxService.from(RelationshipType.where {}).flatMap {
             log.info "[${total}/$total] Reindexing relationship types"
             return index(session, it)
         }).doOnError {
@@ -428,6 +453,7 @@ class ElasticSearchService implements SearchCatalogue {
         if (url) {
             File mappingFile = new File(url.toURI())
             Map parsed = new JsonSlurper().parse(mappingFile) as Map
+            parsed.toString() // initialize lazy map
             Map parsedMapping = parsed[typeName] as Map
             if (!parsedMapping) {
                 log.warn "the mapping does not contain expected root entry ${typeName}"
@@ -439,6 +465,12 @@ class ElasticSearchService implements SearchCatalogue {
         if (clazz == DataElement) {
             // data type is embedded into data element
             mapping[typeName].properties.data_type = getMapping(DataType).data_type
+        } else if (clazz in [PrimitiveType, DataType]) {
+            // measurement unit is embedded in primitive type
+            mapping[typeName].properties.measurement_unit = getMapping(MeasurementUnit).measurement_unit
+        } else if (clazz  in [ReferenceType, DataType]) {
+            // data class is embedded in refrence type
+            mapping[typeName].properties.data_class = getMapping(DataClass).data_class
         } else if (clazz == Relationship) {
             // source and destination combines all available catalogue element mappings
             // relationship copies relationship type mapping
@@ -482,107 +514,67 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     private Observable<Document> getElementWithRelationships(IndexingSession session, CatalogueElement element) {
-        ReplaySubject<Document> subject = ReplaySubject.create()
-
-        executorService.submit {
-            try {
-                subject.onNext(session.getDocument(element))
-                DetachedCriteria<Relationship> criteria = Relationship.where {
-                    source == element || destination == element
-                }
-
-                Number total = criteria.count()
-
-
-                for (int page = 0 ; page * EMIT_RELATIONSHIPS_PAGE < total ; page++) {
-                    criteria.list(max: EMIT_RELATIONSHIPS_PAGE, offset: page * EMIT_RELATIONSHIPS_PAGE).each {
-                        subject.onNext(session.getDocument(it))
-                    }
-                }
-                subject.onCompleted()
-            } catch (Exception e) {
-                subject.onError(e)
-            }
-
-        }
-        return subject
+        Observable.<Object>just(element).concatWith(rxService.from(Relationship.where { source == element || destination == element })).map { session.getDocument(it) }
     }
 
     private Observable<CatalogueElement> getDataModelWithDeclaredElements(DataModel element) {
-        ReplaySubject<CatalogueElement> subject = ReplaySubject.create()
-
-        DetachedCriteria<CatalogueElement> criteria = CatalogueElement.where {
-            dataModel == element
-        }
-
-        log.info "Going to index ${criteria.count()} items for $element"
-
-        executorService.submit {
-            try {
-                subject.onNext(element)
-
-                Number total = criteria.count()
-
-                log.info "Emitting $total items for $element"
-
-                for (int page = 0 ; page * EMIT_RELATIONSHIPS_PAGE < total ; page++) {
-                    criteria.list(max: EMIT_RELATIONSHIPS_PAGE, offset: page * EMIT_RELATIONSHIPS_PAGE).each {
-                        subject.onNext(it)
-                    }
-                }
-
-                subject.onCompleted()
-            } catch (Exception e) {
-                subject.onError(e)
-            }
-
-        }
-        return subject
+        Observable.<CatalogueElement>just(element).concatWith(rxService.from(CatalogueElement.where { dataModel == element }))
     }
 
-    private Observable<Document> getRelationshipWithSourceAndDestination(IndexingSession session, Relationship rel) {
-        ReplaySubject<Document> subject = ReplaySubject.create()
-
-        executorService.submit {
-            try {
-                subject.onNext(session.getDocument(rel))
-                subject.onNext(session.getDocument(rel.source))
-                subject.onNext(session.getDocument(rel.destination))
-                subject.onCompleted()
-            } catch (Exception e) {
-                subject.onError(e)
-            }
-        }
-
-        return subject
+    private static Observable<Document> getRelationshipWithSourceAndDestination(IndexingSession session, Relationship rel) {
+        just(rel, rel.source, rel.destination).map { session.getDocument(it) }
     }
 
     private Observable<SimpleIndexResponse> safeIndex(Iterable<String> indicies, Observable<Document> documents, Iterable<Class> supportedTypes) {
-        return from(indicies).flatMap { idx ->
-            return ensureIndexExists(just(idx), supportedTypes).flatMap { existingIndex ->
-                documents.buffer(100).flatMap {
-                    BulkRequestBuilder bulkRequest = client.prepareBulk()
-                    for (Document document in it) {
-                        bulkRequest.add(client
-                                .prepareIndex(existingIndex, document.type, document.id)
-                                .setSource(document.payload)
-                        )
-                    }
-                    return from(bulkRequest.execute()).flatMap { bulkResponse ->
-                        from(bulkResponse.items).map { bulkResponseItem ->
-                            SimpleIndexResponse.from(bulkResponseItem)
-                        }
-                    }
+        return from(indicies)
+            .flatMap { idx -> ensureIndexExists(just(idx), supportedTypes) }
+            .flatMap { idx -> documents.distinct().buffer(50).flatMap { bulkIndex(idx, it) }}
+            .flatMap { bulkResponse -> from(bulkResponse.items) }
+            .map { bulkResponseItem ->
+                if (bulkResponseItem.failure) {
+                    log.warn "Failed to index ${bulkResponseItem.type}:${bulkResponseItem.id} to ${bulkResponseItem.index}"
+                } else {
+                    log.debug "Indexed ${bulkResponseItem.type}:${bulkResponseItem.id} to ${bulkResponseItem.index}"
                 }
+                SimpleIndexResponse.from(bulkResponseItem)
             }
-        }
+
     }
 
+    private Observable<BulkResponse> bulkIndex(String existingIndex, List<Document> documents) {
+        RxElastic.from(buildBulkIndexRequest(existingIndex, documents))
+            .flatMap {
+                for (BulkItemResponse response in it.items) {
+                    if (response.failed) {
+                        if (response.failure.cause instanceof VersionConflictEngineException) {
+                            // ignore and keep the latest
+                            continue
+                        }
+                        return Observable.error(new RuntimeException("There were error indexing at least of one item from the batch: $response.type#$response.id@$response.index", response.failure.cause))
+                    }
+                }
+                return just(it)
+            }
+            .retryWhen(RxService.withDelay(RxElastic.DEFAULT_RETRIES, RxElastic.DEFAULT_DELAY, [EsRejectedExecutionException] as Set))
+    }
+
+    private BulkRequestBuilder buildBulkIndexRequest(String existingIndex, List<Document> documents) {
+        BulkRequestBuilder bulkRequest = client.prepareBulk()
+        for (Document document in documents) {
+            bulkRequest.add(client
+                .prepareIndex(existingIndex, document.type, document.id)
+                .setVersion(document.version ?: 1L)
+                .setVersionType(VersionType.EXTERNAL_GTE)
+                .setSource(document.payload)
+            )
+        }
+        return bulkRequest
+    }
 
 
     private Observable<SimpleIndicesExistsResponse> indexExists(Observable<String> indices) {
         return indices.flatMap { index ->
-            return from(client.admin().indices().prepareExists(index).execute()).map {
+            return RxElastic.from(client.admin().indices().prepareExists(index)).map {
                 return new SimpleIndicesExistsResponse(exists: it.exists, index: index)
             }
         }
@@ -600,10 +592,14 @@ class ElasticSearchService implements SearchCatalogue {
             for (Class type in supportedTypes) {
                 request.addMapping(getTypeName(type), getMapping(type))
             }
-            return from(request.execute()).doOnError {
-                log.error "Error creating index", it
-            } .map {
-                return response.index
+
+            RxElastic.from(request).map {
+                response.index
+            } .onErrorReturn {
+                if (it instanceof IndexAlreadyExistsException || it.cause instanceof IndexAlreadyExistsException) {
+                    return response.index
+                }
+                throw it
             }
         }
     }
@@ -613,7 +609,7 @@ class ElasticSearchService implements SearchCatalogue {
     protected static List<String> getIndices(object) {
         Class clazz = getEntityClass(object)
         if (DataModel.isAssignableFrom(clazz)) {
-            return [DATA_MODEL_INDEX, MC_ALL_INDEX]
+            return [DATA_MODEL_INDEX, MC_ALL_INDEX, getDataModelIndex(object as DataModel)]
         }
 
         if (CatalogueElement.isAssignableFrom(clazz)) {
@@ -653,7 +649,7 @@ class ElasticSearchService implements SearchCatalogue {
 
 
     static String getTypeName(Class clazz) {
-        GrailsNameUtils.getNaturalName(clazz.simpleName).replaceAll(/\s/, '_').toLowerCase()
+        CatalogueElement.fixResourceName(GrailsNameUtils.getNaturalName(clazz.simpleName)).replaceAll(/\s/, '_').toLowerCase()
     }
 
     private static Map<String, Map> merge(Map<String, Map> current, Map<String, Map> fromSuper) {

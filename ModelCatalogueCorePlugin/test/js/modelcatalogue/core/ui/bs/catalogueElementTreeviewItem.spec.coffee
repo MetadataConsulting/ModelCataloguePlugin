@@ -2,6 +2,8 @@ describe "mc.core.ui.catalogueElementTreeviewItem", ->
 
   beforeEach module 'mc.core.ui.states.bs'
 
+  return unless window.fixtures
+
   it "element get compiled",  inject ($compile, $rootScope, enhance, modelCatalogueApiRoot, $httpBackend) ->
     catEl = enhance angular.copy(fixtures.dataType.showOne)
     catEl.description = "Hello World!"
@@ -11,6 +13,7 @@ describe "mc.core.ui.catalogueElementTreeviewItem", ->
     $rootScope.descend = ['outgoingRelationships']
     $rootScope.treeview =
       select: -> # do nothing
+      getNodeId: (link) -> link
 
     element = $compile('''
       <catalogue-element-treeview-item element="element" descend="descend" treeview="treeview"></catalogue-element-treeview-item>

@@ -14,6 +14,19 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
         super(Asset, false)
     }
 
+    protected boolean hasAdditionalIndexCriteria() {
+        params.contentType
+    }
+
+    protected Closure buildAdditionalIndexCriteria() {
+        if (!hasAdditionalIndexCriteria()) {
+            return super.buildAdditionalIndexCriteria()
+        }
+        return {
+            eq 'contentType', params.contentType
+        }
+    }
+
     def upload() {
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
             notAuthorized()
@@ -21,9 +34,7 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
         }
         MultipartFile file = request.getFile('asset')
 
-
-
-        Asset asset = assetService.upload(params.long('id'), params.long('dataModel'), params.name, params.description, file)
+        Asset asset = assetService.upload(params.long('id'), params.long('dataModel'), params.name, params.description, file, params.filename ?: file.originalFilename)
 
         if (!asset) {
             notFound()

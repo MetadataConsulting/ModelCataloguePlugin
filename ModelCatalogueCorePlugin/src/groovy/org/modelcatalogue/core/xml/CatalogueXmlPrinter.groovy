@@ -106,6 +106,21 @@ class CatalogueXmlPrinter {
      * @param element element to be dumped
      * @param path path to the file
      */
+    static PipedOutputStream readStream(CatalogueElement element) {
+
+        PipedInputStream input = new PipedInputStream();
+        PipedOutputStream out = new PipedOutputStream(input);
+
+        out.withWriter {
+            new CatalogueXmlPrinter(Holders.applicationContext.getBean(DataModelService), Holders.applicationContext.getBean(DataClassService)).bind(element).writeTo(it)
+        }
+    }
+
+    /**
+     * Dumps the element to file for debugging purposes.
+     * @param element element to be dumped
+     * @param path path to the file
+     */
     static void dump(CatalogueElement element, String path) {
         File file = new File(path)
         file.parentFile.mkdirs()

@@ -19,5 +19,8 @@ class DataClassPrintHelper extends CatalogueElementPrintHelper<DataClass> {
         for (Relationship rel in element.parentOfRelationships) {
             printElement(mkp, rel.destination, context, rel)
         }
+        for (Relationship rel in element.contextForRelationships) {
+            printElement(mkp, rel.destination, context, rel)
+        }
     }
 }

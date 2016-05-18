@@ -1,0 +1,1 @@
+com.craigburke.angular.AnnotateProcessor=asset.pipeline.JsAssetFile,asset.pipeline.babel.Es6AssetFile,asset.pipeline.babel.JsxAssetFile,asset.pipeline.coffee.CoffeeAssetFile

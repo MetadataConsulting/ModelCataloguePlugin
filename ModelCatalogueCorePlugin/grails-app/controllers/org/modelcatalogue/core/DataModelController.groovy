@@ -92,6 +92,7 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
             contentDescriptors << createContentDescriptor(dataModel, 'Data Elements', DataElement, stats["totalDataElementCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Data Types', DataType, stats["totalDataTypeCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Measurement Units', MeasurementUnit, stats["totalMeasurementUnitCount"])
+            contentDescriptors << createContentDescriptor(dataModel, 'Validation Rules', ValidationRule, stats["totalValidationRuleCount"])
 
             Map assets = createContentDescriptor(dataModel, 'Assets', Asset, stats["totalAssetCount"])
             assets.link = "${assets.link}&status=active"

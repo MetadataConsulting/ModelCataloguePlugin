@@ -27,6 +27,10 @@ class DataDefinitionLanguage {
         return new UpdateDefinition(this, propertyOrExtName)
     }
 
+    RemoveExtensionAction remove(String extName) {
+        return new RemoveExtensionAction(this, extName)
+    }
+
     public <T extends CatalogueElement> CreateDefinition<T> create(Class<T> domain) {
         return new CreateDefinition<T>(this, domain)
     }
@@ -35,8 +39,14 @@ class DataDefinitionLanguage {
         return new CreateDraftDefinition(this)
     }
 
-    void finalize(String name) {
-        Holders.applicationContext.getBean(ElementService).finalizeElement(find(CatalogueElement, name))
+    void finalize(String name, String version = null, String revisionNotes = null) {
+        DataModel dataModel = find(DataModel, name)
+
+        if (!dataModel) {
+            throw new IllegalArgumentException("No data model called $name exist!")
+        }
+
+        Holders.applicationContext.getBean(ElementService).finalizeDataModel(dataModel, version ?: dataModel.semanticVersion, revisionNotes ?: 'TEST', true)
     }
 
     void deprecate(String name) {
@@ -72,12 +82,13 @@ class DataDefinitionLanguage {
             }
             elements = criteria.list(sort: 'versionNumber', order: 'desc')
             element = elements ? elements[0] : null
-            if (!element.instanceOf(DataModel)) {
+            if (!element?.instanceOf(DataModel)) {
                 element = null
             }
         }
         if (!element) {
-            throw new IllegalArgumentException("${GrailsNameUtils.getNaturalName(domain.simpleName)} '$name' not found!")
+            List<T> candidates = DataModelService.classified(new DetachedCriteria(domain), DataModelFilter.includes(dataModel)).list(max: 100)
+            throw new IllegalArgumentException("${GrailsNameUtils.getNaturalName(domain.simpleName)} '$name' not found!\n\nHave you meant one of these:\n${candidates.collect {"   $it.name"}.join('\n')}\n")
         }
         return element
     }

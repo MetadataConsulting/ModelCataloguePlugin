@@ -12,16 +12,19 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.publishing.CloningContext
-import org.modelcatalogue.core.publishing.DraftChain
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Legacy
+import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.transaction.TransactionStatus
 
 class ElementService implements Publisher<CatalogueElement> {
+
+    public static final String DEPRECATED_DATA_CLASS_NAME = 'Obsolete'
 
     private static final Cache<Long, Integer> VERSION_COUNT_CACHE = CacheBuilder.newBuilder().initialCapacity(1000).build()
     private static Cache<Class, List<Class>> subclassesCache = CacheBuilder.newBuilder().initialCapacity(20).build()
@@ -288,6 +291,24 @@ class ElementService implements Publisher<CatalogueElement> {
 
                 archived.status = ElementStatus.DEPRECATED
                 archived.save(flush: true, validate: false)
+
+                if (archived.dataModel && !archived.dataModel.archived && (archived.instanceOf(DataClass) || archived.instanceOf(DataElement))) {
+                    DataClass obsoleteContainer = DataClass.findByNameAndDataModelAndStatus(DEPRECATED_DATA_CLASS_NAME, archived.dataModel, ElementStatus.DRAFT)
+
+                    if (!obsoleteContainer) {
+                        obsoleteContainer = new DataClass(dataModel: archived.dataModel, name: DEPRECATED_DATA_CLASS_NAME)
+                        obsoleteContainer.save(flush: true)
+                    }
+
+                    if (archived.instanceOf(DataClass)) {
+                        obsoleteContainer.addToParentOf(archived)
+                    } else if (archived.instanceOf(DataElement)) {
+                        obsoleteContainer.addToContains(archived)
+                    }
+                }
+
+
+
                 return archived
             }
         }
@@ -699,6 +720,27 @@ class ElementService implements Publisher<CatalogueElement> {
             }
 
             return [resource]
+        }
+    }
+
+
+    public <T extends CatalogueElement> ListWithTotalAndType<T> getTypeHierarchy(Map<String, Object> params, T element) {
+        return Lists.lazy(params, element.getClass() as Class<T>) {
+            List<T> typeHierarchy = []
+
+            collectBases(element, typeHierarchy)
+
+            return typeHierarchy
+        }
+    }
+
+    private <T extends CatalogueElement> void collectBases(T element, List<T> collector) {
+        for (T base in element.isBasedOn) {
+            if (base in collector) {
+                continue
+            }
+            collector << base
+            collectBases(base, collector)
         }
     }
 

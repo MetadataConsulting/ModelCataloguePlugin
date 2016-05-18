@@ -1,15 +1,19 @@
 class CatalogueElementTreeview
-  constructor: ($scope, enhance, $stateParams, $rootScope, $element, $attrs, rx) ->
+  constructor: ($scope, enhance, $stateParams, $rootScope, $element, $attrs, rx, TreeviewNodeFactory) ->
+    "ngInject"
     selected = undefined
+    treeview = @
 
     @id = $scope.id
 
-    @select = (element) ->
-      if selected and selected isnt element
-        selected.$$active = false
-      selected = element
-      element.$$active = true
-      $scope.onSelect({$element: element}) if angular.isFunction($scope.onSelect)
+    @select = (node) ->
+      if selected and selected isnt node
+        selected.active = false
+      selected = node
+      node.active = true
+      $scope.onSelect({$element: node.item}) if angular.isFunction($scope.onSelect)
+
+    @getNodeId = (link) -> "#{@id}:#{link}"
 
 
 
@@ -44,24 +48,15 @@ class CatalogueElementTreeview
       return if not list.list
       list.$$children = []
       for item in list.list
-        cachedChild  = if list.$$cachedChildren then list.$$cachedChildren[item.link]
-        cachedChild ?= {}
-        delete cachedChild.$$relationship
-        if cachedChild.$$collapsed
-          cachedChild.$$resetHelperProperties() if angular.isFunction(cachedChild.$$resetHelperProperties)
+        node = TreeviewNodeFactory.get(treeview.getNodeId(item.link))
+        if node?.collapsed
+          node.reset() if angular.isFunction(node.reset)
         else
-          cachedChild.$$loadChildren() if angular.isFunction(cachedChild.$$loadChildren)
-        $scope.list.$$children.push(angular.extend(cachedChild, item))
+          node.loadChildren() if angular.isFunction(node?.loadChildren)
+        $scope.list.$$children.push(angular.extend(node?.item ? {}, item))
 
-    onListChange = (list, oldList) ->
+    onListChange = (list) ->
       return if not list
-
-      if oldList
-        list.$$cachedChildren = oldList.$$cachedChildren ? {}
-
-        for child in oldList.$$children
-          delete child.$$relationship
-          list.$$cachedChildren[child.link] = child
 
       $scope.$$showingMore = false
 
@@ -101,6 +96,15 @@ class CatalogueElementTreeview
       $scope.$watch 'list', onListChange
 
       refreshList = ->
+        args = arguments[0]
+        if $scope.element || $scope.list.total == 1
+          element = $scope.element || $scope.list.list[0]
+          if args.length >= 2 and args[0].hasOwnProperty('name') and args[0].name == 'catalogueElementUpdated'
+            other = args[2]
+            if element?.link != other?.link
+              return
+
+
         $scope.list.reload(status: $stateParams.status, toplevel: true).then (newList) ->
           $scope.list = newList
 
@@ -132,6 +136,6 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
 
     controllerAs: 'treeview'
 
-    controller: ['$scope', 'enhance', '$stateParams', '$rootScope', '$element', '$attrs', 'rx', CatalogueElementTreeview]
+    controller: CatalogueElementTreeview
   }
 ]

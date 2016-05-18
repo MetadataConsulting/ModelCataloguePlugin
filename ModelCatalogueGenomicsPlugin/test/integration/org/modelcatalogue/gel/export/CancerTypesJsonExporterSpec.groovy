@@ -16,33 +16,16 @@ class CancerTypesJsonExporterSpec extends AbstractCancerTypesExporterSpec {
         new CancerTypesJsonExporter(out).exportCancerTypesAsJson(model)
 
         def response = JsonOutput.prettyPrint(new String(out.toByteArray()))
-        println "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-        println response
-        println ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+        printOutput response
+
         def expected = JsonOutput.prettyPrint(expectedSubtypesJson)
+        printOutput expected
 
         then:
         noExceptionThrown()
         response == expected
     }
 
-
-    def "export Presentation types to json"() {
-        OutputStream out = new ByteArrayOutputStream()
-        when:
-        DataClass model = DataClass.findByName(ROOT_CANCER_TYPE)
-        new CancerTypesJsonExporter(out).exportPresentationTypesAsJson(model)
-
-        def response = JsonOutput.prettyPrint(new String(out.toByteArray()))
-        println "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-        println response
-        println ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-        def expected = JsonOutput.prettyPrint(expectedPresentationsJson)
-
-        then:
-        noExceptionThrown()
-        response == expected
-    }
 
     private String getExpectedSubtypesJson() {
         return """
@@ -53,38 +36,26 @@ class CancerTypesJsonExporterSpec extends AbstractCancerTypesExporterSpec {
                         "type": "Adult Glioma",
                         "subTypes": [
                             {
+                                "id":"$cancer_type_1_adult_subType_id",
                                 "subType": "Adult Glioma subtypes 1.1",
-                                "description": "adult glioma description"
+                                "subTypes": [
+                                {
+                                    "id":"$cancer_type_1_adult_glioma_enum_id",
+                                    "enumeratedType": "Adult Glioma Enum",
+                                    "enums": [
+                                        {
+                                            "enum": "one",
+                                            "description": "1"
+                                        },
+                                        {
+                                            "enum": "two",
+                                            "description": "2"
+                                        }
+                                    ]
+                                }
+                            ]
                             }
-                        ]
-                    },
-                    {
-                        "id":"$cancer_type_2_some_cancer_id",
-                        "type": "Some other Cancer Type 2",
-                        "subTypes": [
-                            {
-                                "subType": "some other cancer subtypes 2.1",
-                                "description": "some cancer description subtype21"
-                            },
-                            {
-                                "subType": "some other cancer subtypes 2.2",
-                                "description": "some cancer description subtype22"
-                            }
-                        ]
-                    }
-                ]
-            }
-        """
-    }
-
-    //don't know what this should look like - this is just a guess...
-    private String getExpectedPresentationsJson() {
-        return """
-            {
-               "CancerTypes":[
-                    {
-                        "id":"$cancer_type_1_adult_glioma_id",
-                        "type": "Adult Glioma",
+                        ],
                         "presentations": [
                             {
                                 "presentation": "Adult Glioma presentations 1",
@@ -95,10 +66,38 @@ class CancerTypesJsonExporterSpec extends AbstractCancerTypesExporterSpec {
                     {
                         "id":"$cancer_type_2_some_cancer_id",
                         "type": "Some other Cancer Type 2",
+                        "subTypes": [
+                          {
+                            "id": "$cancer_type_2_some_cancer_subType21_id",
+                            "subType": "some other cancer subtypes 2.1",
+                            "subTypes": [
+                            ]
+                          },
+                            {
+                                "id":"$cancer_type_2_some_cancer_subType22_id",
+                                "subType": "some other cancer subtypes 2.2",
+                                "subTypes": [
+                                {
+                                    "id":"$cancer_type_2_some_cancer_enum_id",
+                                    "enumeratedType": "Some Cancer Enum",
+                                    "enums": [
+                                        {
+                                            "enum": "first",
+                                            "description": "a"
+                                        },
+                                        {
+                                            "enum": "second",
+                                            "description": "b"
+                                        }
+                                    ]
+                                }
+                             ]
+                             }
+                        ],
                         "presentations": [
                             {
-                                "presentation": "Cancer presentations 2",
-                                "description": "some cancer presentation description2"
+                                "presentation": "Cancer presentations 21",
+                                "description": "some cancer presentation description21"
                             },                            {
                                 "presentation": "Cancer presentations 22",
                                 "description": "some cancer presentation description22"

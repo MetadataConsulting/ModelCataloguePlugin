@@ -6,11 +6,12 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.path.PathFinder
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
-import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.util.*
 import org.modelcatalogue.core.util.lists.CustomizableJsonListWithTotalAndType
+import org.modelcatalogue.core.util.lists.DetachedListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeWrapper
+import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.lists.Mappings
 import org.modelcatalogue.core.util.lists.Relationships
@@ -203,13 +204,13 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             }
 
             def newDataModel = objectToBind['__dataModel'] ?: objectToBind['__classification']
-            Long dataModelId = newDataModel instanceof Map ? newDataModel.id : null
+            Long dataModelId = newDataModel instanceof Map ? newDataModel.id as Long : null
 
             DataModel dataModel = dataModelId ? DataModel.get(dataModelId) : null
 
 
             def oldDataModel = objectToBind['__oldDataModel'] ?: objectToBind['__oldClassification']
-            Long oldDataModelId = oldDataModel instanceof Map ? oldDataModel.id : null
+            Long oldDataModelId = oldDataModel instanceof Map ? oldDataModel.id as Long : null
 
             DataModel oldDataModelInstance = oldDataModelId ? DataModel.get(oldDataModelId) : null
 
@@ -287,7 +288,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 type: type,
                 owner: element,
                 direction: direction,
-                list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), direction.composeWhere(element, type, ElementService.getStatusFromParams(params), DataModelFilter.from(modelCatalogueSecurityService.currentUser)))
+                list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), direction.composeWhere(element, type, ElementService.getStatusFromParams(params), overridableDataModelFilter))
         )
     }
 
@@ -420,22 +421,47 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     protected ListWithTotalAndType<T> getAllEffectiveItems(Integer max) {
         if (params.status?.toLowerCase() == 'active') {
             if (modelCatalogueSecurityService.hasRole('CURATOR')){
-                return dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+                return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
                     'in' 'status', [ElementStatus.FINALIZED, ElementStatus.DRAFT]
-                }, overridableDataModelFilter)
+                }), overridableDataModelFilter)
             }
-            return dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+            return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
                 'eq' 'status', ElementStatus.FINALIZED
-            }, overridableDataModelFilter)
+            }), overridableDataModelFilter)
         }
 
         if (params.status) {
-            return dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+            return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
                 'in' 'status', ElementService.getStatusFromParams(params)
-            }, overridableDataModelFilter)
+            }), overridableDataModelFilter)
         }
 
-        return dataModelService.classified(Lists.all(params, resource, "/${resourceName}/"), overridableDataModelFilter)
+        return dataModelService.classified(withAdditionalIndexCriteria(Lists.all(params, resource, "/${resourceName}/")), overridableDataModelFilter)
+    }
+
+    private <T> ListWrapper<T> withAdditionalIndexCriteria(ListWrapper<T> list) {
+        if (!hasAdditionalIndexCriteria()) {
+            return list
+        }
+
+        if (!(list instanceof ListWithTotalAndTypeWrapper)) {
+            throw new IllegalArgumentException("Cannot add additional criteria list $list. Only ListWithTotalAndTypeWrapper is currently supported")
+        }
+        if (!(list.list instanceof DetachedListWithTotalAndType)) {
+            throw new IllegalArgumentException("Cannot add additional criteria list $list. Only DetachedListWithTotalAndType is currently supported")
+        }
+
+        list.list.criteria.with buildAdditionalIndexCriteria()
+
+        return list
+    }
+
+    protected boolean hasAdditionalIndexCriteria() {
+        return false
+    }
+
+    protected Closure buildAdditionalIndexCriteria() {
+        return {}
     }
 
     /**
@@ -667,6 +693,12 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
+        if (destinationDataModel.status != ElementStatus.DRAFT) {
+            instance.errors.reject 'catalogue.element.can.only.clone.to.draft.data.models', "Cannot clone to non-draft data model $destinationDataModel.name"
+            respond instance.errors
+            return
+        }
+
         if (!instance.instanceOf(DataModel) && !instance.dataModel) {
             instance.errors.reject 'catalogue.element.at.least.one.data.model', "'$instance.name' has to be declared wihtin a data model to be cloned"
             respond instance.errors
@@ -760,6 +792,17 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
 
         respond Lists.wrap(params, "/${resourceName}/${params.id}/changes", auditService.getChanges(params, element))
+    }
+
+    def typeHierarchy(Integer max) {
+        params.max = Math.min(max ?: 10, 100)
+        CatalogueElement element = queryForResource(params.id)
+        if (!element) {
+            notFound()
+            return
+        }
+
+        respond Lists.wrap(params, "/${resourceName}/${params.id}/typeHierarchy", elementService.getTypeHierarchy(params, element))
     }
 
     def history(Integer max) {

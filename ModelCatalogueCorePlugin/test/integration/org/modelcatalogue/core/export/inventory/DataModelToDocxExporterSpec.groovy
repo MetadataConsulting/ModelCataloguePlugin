@@ -47,8 +47,7 @@ class DataModelToDocxExporterSpec extends AbstractIntegrationSpec {
             'document' font: [color: '#000000']
         }
 
-        new DataModelToDocxExporter(DataModel.get(dataModel.id), dataClassService, testTemplate,
-                "http://www.genomicsengland.co.uk/wp-content/uploads/2015/11/Genomics-England-logo-2015.png").export(file.newOutputStream())
+        new DataModelToDocxExporter(DataModel.get(dataModel.id), dataClassService, testTemplate, DataModelToDocxExporterSpec.getResource('gel-logo.png').toExternalForm()).export(file.newOutputStream())
 
         open file
 

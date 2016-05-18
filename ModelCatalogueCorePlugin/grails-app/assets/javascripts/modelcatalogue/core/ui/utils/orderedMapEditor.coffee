@@ -9,7 +9,7 @@ angular.module('mc.core.ui.utils').directive 'orderedMapEditor',  [-> {
       valuePlaceholder:   '@?'
     templateUrl: '/mc/core/ui/utils/orderedMapEditor.html'
 
-    controller: ['$scope', 'enhance', '$log', 'messages', ($scope, enhance, $log, messages) ->
+    controller: ['$scope', 'enhance', '$log', 'messages', '$timeout',  ($scope, enhance, $log, messages, $timeout) ->
       isOrderedMap = (object)->
         enhance.isEnhancedBy(object, 'orderedMap')
 
@@ -62,10 +62,10 @@ angular.module('mc.core.ui.utils').directive 'orderedMapEditor',  [-> {
               propertyIndex = i
               break
 
-          $scope.$apply (scope)->
+          $timeout ->
             value = $scope.object.values[propertyIndex]
-            scope.object.values.splice(propertyIndex, 1)
-            scope.object.values.splice(newIndex, 0, value)
+            $scope.object.values.splice(propertyIndex, 1)
+            $scope.object.values.splice(newIndex, 0, value)
       }
 
       $scope.addNewRowOnTab = ($event, index, last)->
@@ -76,6 +76,7 @@ angular.module('mc.core.ui.utils').directive 'orderedMapEditor',  [-> {
           messages.error "No excel content to be imported."
           return importText
 
+        $log.debug("excel import with content #{importText}")
         updatedValues = 0
         createdValues = 0
         for line in importText.split(/\r\n|\n\r|\n|\r/g)
@@ -110,7 +111,11 @@ angular.module('mc.core.ui.utils').directive 'orderedMapEditor',  [-> {
         else if window.clipboardData? && window.clipboardData.getData? # Internet Explorer
           data = window.clipboardData.getData "Text"
 
+        # do the import
         $scope.importExcel(data)
+
+        # do not trigger the default paste event
+        event.preventDefault()
 
       $scope.$watch 'object', (newObject) ->
         onObjectChanged(newObject)

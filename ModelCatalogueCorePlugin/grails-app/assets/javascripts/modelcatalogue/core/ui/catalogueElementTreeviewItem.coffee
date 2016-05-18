@@ -1,10 +1,18 @@
 nodeid = 0
 
-angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.recursiveCompile', 'ui.router', 'rx'])
-.config(['$tooltipProvider', ($tooltipProvider) ->
+angular.module('mc.core.ui.catalogueElementTreeviewItem', [
+  'mc.util.names'
+  'mc.util.ui.treeview.TreeviewNode'
+  'mc.core.catalogueElementEnhancer'
+  'mc.core.listReferenceEnhancer'
+  'mc.core.listEnhancer'
+  'mc.util.recursiveCompile'
+  'ui.router'
+  'rx'
+]).config(['$tooltipProvider', ($tooltipProvider) ->
   $tooltipProvider.setTriggers mouseover: 'mouseout'
 ])
-.directive 'catalogueElementTreeviewItem',  [ 'recursiveCompile', (recursiveCompile) -> {
+.directive 'catalogueElementTreeviewItem',  (recursiveCompile) -> {
     restrict: 'E'
     replace: true
     scope:
@@ -18,7 +26,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
     compile: recursiveCompile.compile
 
-    controller: ['$scope', '$rootScope', '$element', 'catalogue', ($scope, $rootScope, $element, catalogue) ->
+    controller: ($scope, $rootScope, $element, catalogue, TreeviewNodeFactory) ->
       $scope.nodeid = nodeid++
       $scope.path = {segments: []}
 
@@ -62,32 +70,29 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
 
       loadMoreIfNeeded = ->
-        return if not $scope.element.$$numberOfChildren > $scope.element.$$children?.length
-        return if $scope.element.$$showingMore
+        return if not $scope.node.numberOfChildren > $scope.node.children?.length
+        return if $scope.node.showingMore
         showMore = angular.element('.show-more-' + $scope.nodeid)
         return if showMore.hasClass '.hide'
         return if showMore.offset()?.top < 0
         root = $element.closest('.catalogue-element-treeview-list-root')
-        if showMore.offset()?.top < root.offset()?.top + 3 * root.height() and angular.isFunction($scope.element.$$showMore)
-          $scope.element.$$showMore()
+        if showMore.offset()?.top < root.offset()?.top + 3 * root.height() and angular.isFunction($scope.node.showMore)
+          $scope.node.showMore()
 
       createShowMore  = (list) ->
         # function to load more items to existing $$children helper property
         ->
-          $scope.element.$$showingMore = true
+          $scope.node.showingMore = true
           list.next($scope.extraParameters).then (nextList) ->
             for item in nextList.list
               it = if item.relation then item.relation else item
-              $scope.element.$$children.push(angular.extend(it, {$$relationship: (if item.relation then item else undefined), $$metadata: item.ext, $$archived: item.archived, $$localName: getLocalName(item) }))
-            $scope.element.$$showMore = createShowMore(nextList)
+              $scope.node.children.push(angular.extend(it, {$$relationship: (if item.relation then item else undefined), $$metadata: item.ext, $$archived: item.archived, $$localName: getLocalName(item) }))
+            $scope.node.showMore = createShowMore(nextList)
             loadMoreIfNeeded()
-            $scope.element.$$showingMore = false
+            $scope.node.showingMore = false
 
       loadNewChildren = (firstList) ->
-        $scope.element.$$numberOfChildren = firstList.total
-        $scope.element.$$cachedChildren = {}
-        for child in $scope.element.$$children ? []
-          $scope.element.$$cachedChildren[child.link] = child # beware of id, it's 'all' for containers
+        $scope.node.numberOfChildren = firstList.total
 
         newChildren = []
         for item in (firstList.list ? [])
@@ -98,17 +103,17 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
 
           if id
-            cachedChild = $scope.element.$$cachedChildren[id] ? {}
+            node = TreeviewNodeFactory.get($scope.treeview.getNodeId(id))
 
-            if cachedChild.$$collapsed
-              cachedChild.$$resetHelperProperties() if angular.isFunction(cachedChild.$$resetHelperProperties)
+            if node?.collapsed
+              node.reset() if angular.isFunction(node.reset)
             else
-              cachedChild.$$loadChildren() if angular.isFunction(cachedChild.$$loadChildren)
+              node.loadChildren() if angular.isFunction(node?.loadChildren)
 
-            if cachedChild.id == it.id
-              objectToExtend = cachedChild
-            else
-              for key, prop of cachedChild
+            if node?.item.id == it.id
+              objectToExtend = node.item
+            else if node?.item
+              for key, prop of node.item
                 if key.indexOf('$') == 0
                   objectToExtend[key] = prop
 
@@ -122,73 +127,77 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
               })
           )
 
-        $scope.element.$$children = newChildren
-        $scope.element.$$collapsed  = false
+        $scope.node.children = newChildren
+        $scope.node.collapsed  = false
         root = $element.closest('.catalogue-element-treeview-list-root')
-        if $scope.element.$$numberOfChildren > $scope.element.$$children.length
-          $scope.element.$$showMore = createShowMore(firstList)
+        if $scope.node.numberOfChildren > $scope.node.children.length
+          $scope.node.showMore = createShowMore(firstList)
           loadMoreIfNeeded()
           root.on 'scroll', loadMoreIfNeeded
         else
-          $scope.element.$$showMore = ->
+          $scope.node.showMore = -> $scope.node.loadChildren()
+
           root.off 'scroll', loadMoreIfNeeded
 
       onElementUpdate = (element) ->
         handleDescendPaths()
 
+        $scope.node = TreeviewNodeFactory.create($scope.treeview.getNodeId("#{$scope.extraParameters?.root}:#{element.link}"), element)
+
         $scope.descendFun = $scope.element[$scope.currentDescend]
 
         if angular.isFunction(element.href)
-          element.$$href = element.href()
+          $scope.node.href = element.href()
 
-        element.$$resetHelperProperties = ->
-          if @[$scope.currentDescend]
-            @$$numberOfChildren = $scope.element[$scope.currentDescend].total
-            @$$loadingChildren = false
+        $scope.node.reset = ->
+          if $scope.node.item[$scope.currentDescend]
+            $scope.node.numberOfChildren = $scope.element[$scope.currentDescend].total
+            $scope.node.loadingChildren = false
           else
-            @$$numberOfChildren = 0
-            @$$loadingChildren = false
+            $scope.node.numberOfChildren = 0
+            $scope.node.loadingChildren = false
 
-          @$$children  ?= []
-          @$$collapsed ?= true
-          @$$showMore  ?= ->
-          @$$active    ?= false
+          $scope.node.children ?= []
+          $scope.node.collapsed  ?= true
+          $scope.node.showMore   ?= ->
+          $scope.node.active     ?= false
 
-        element.$$resetHelperProperties()
+        $scope.node.reset()
 
-        if $scope.element.$$numberOfChildren > $scope.element.$$children.length and $scope.element.$$showMore and not $scope.element.$$collapsed
+        if $scope.node.numberOfChildren > $scope.node.children.length and $scope.node.showMore and not $scope.node.collapsed
           loadMoreIfNeeded()
           $element.closest('.catalogue-element-treeview-list-root').on 'scroll', loadMoreIfNeeded
 
-        $scope.element.$$loadChildren = ->
+        $scope.node.loadChildren = ->
 
           unless angular.isFunction($scope.descendFun)
-            $scope.element.$$children = []
-            $scope.element.$$numberOfChildren = 0
+            $scope.node.children = []
+            $scope.node.numberOfChildren = 0
             return
 
-          $scope.element.$$numberOfChildren = $scope.descendFun.total
+          $scope.node.numberOfChildren = $scope.descendFun.total
 
           # first load
-          $scope.element.$$loadingChildren = true
+          $scope.node.loadingChildren = true
           $scope.descendFun(null, $scope.extraParameters).then(loadNewChildren).then ->
-            $scope.element.$$loadingChildren = false
+            $scope.node.loadingChildren = false
 
         if $scope.extraParameters?.prefetch or startsWithSegment($scope.element, $scope.extraParameters?.path?.segments)
-          $scope.element.$$loadChildren()
+          $scope.node.loadChildren()
 
       $scope.collapseOrExpand = ->
         return if $scope.extraParameters?.prefetch
-        return if $scope.element.$$loadingChildren
-        unless $scope.element.$$collapsed
-          $scope.element.$$collapsed = true
+        return if $scope.node.loadingChildren
+        return unless $scope.node.numberOfChildren
+        unless $scope.node.collapsed
+          $scope.node.collapsed = true
           return
 
-        unless $scope.element.$$children.length == 0 and $scope.element.$$numberOfChildren > 0
-          $scope.element.$$collapsed = false
+        unless $scope.node.children.length == 0 and $scope.node.numberOfChildren > 0
+          $scope.node.collapsed = false
           return
 
-        $scope.element.$$loadChildren()
+        $scope.node.loadChildren()
 
 
       $scope.$watch 'element', onElementUpdate
@@ -203,8 +212,8 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
         $scope.treeview.select(element)
 
       $scope.metadataOccurrencesToAsterisk = (element) ->
-        # only Data Element with some metadata and defined relationship
-        if element.$$metadata?.values? && element.getElementTypeName() == 'Data Element' && element.$$relationship
+        # only Data Element and Data Class with some metadata and defined relationship
+        if (angular.isFunction(element.isInstanceOf) && (element.isInstanceOf('dataElement') || element.isInstanceOf('dataClass'))) && element.$$metadata?.values? && element.$$relationship
           min = '0'
           max = '*'
           for row in element.$$metadata.values
@@ -219,21 +228,22 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
       reloadChildrenOnChange = (_, result, url) ->
         if result.link == $scope.element.link
           $scope.element.updateFrom result
-          $scope.element.$$loadChildren()
+          $scope.node.loadChildren()
+          return
         if catalogue.isContentCandidate($scope.element[$scope.currentDescend], result, owner: $scope.element, url: url)
-          $scope.element.$$loadChildren()
+          $scope.node.loadChildren()
 
       $scope.$on 'catalogueElementDeleted', (event, element) ->
         indexesToRemove = []
         if $scope.element.$$relationship == element
           delete $scope.element.$$relationship
-        for item, i in $scope.element.$$children
+        for item, i in $scope.node.children
           if element.relation and item.link == element.relation.link
             indexesToRemove.push i
 
         for index, i in indexesToRemove
-          $scope.element.$$children.splice index - i, 1
-          $scope.element.$$numberOfChildren--
+          $scope.node.children.splice index - i, 1
+          $scope.node.numberOfChildren--
 
         reloadChildrenOnChange event, element
 
@@ -252,8 +262,6 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
       $scope.$watch 'extraParameters.path.segments', (segments) ->
         if startsWithSegment($scope.element, segments)
-          $scope.element.$$loadChildren()
+          $scope.node.loadChildren()
           $scope.path.segments = segments.slice(1) if segments.length > 1
-    ]
   }
-]

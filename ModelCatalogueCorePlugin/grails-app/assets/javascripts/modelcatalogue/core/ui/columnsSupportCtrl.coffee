@@ -16,6 +16,6 @@ angular.module('mc.core.ui.columnsSupportCtrl', ['mc.core.ui.catalogueElementPro
    $scope.classesForStatus = (element) ->
      status = element?.status ? element?.relation?.status
      target = element?.relation ? element
-     {'warning': status == 'DRAFT' , 'archived': element.relation and element.archived, 'inherited': element.relation and element.inherited, 'info': status == 'PENDING' or element?.parent, 'danger': status == 'DEPRECATED' or element?.undone, 'info': catalogue.getDeprecationWarning(target?.elementType)(target) }
+     {'warning': status == 'DRAFT' , 'archived': element.relation and element.archived, 'inherited': element.relation and element.inherited, 'local': element.relation and (element.dataModel || element.classification), 'info': status == 'PENDING' or element?.parent, 'danger': status == 'DEPRECATED' or element?.undone, 'info': catalogue.getDeprecationWarning(target?.elementType)(target) }
 
 ]

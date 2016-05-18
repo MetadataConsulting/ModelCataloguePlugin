@@ -31,23 +31,12 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       <div class="full-width-editable col-md-9" ng-if="element.modelCatalogueId &amp;&amp; element.modelCatalogueId != element.internalModelCatalogueId"><a class="small" ng-href="{{element.modelCatalogueId}}" editable-text="copy.modelCatalogueId">{{element.modelCatalogueId}}</a></div>
   '''
 
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/customMetadata.html', '''
-      <div class="col-md-3" ng-repeat-start="value in (editableForm.$visible ? [] : customMetadata.values)">
-          <strong class="small">{{value.key}}</strong>
-      </div>
-      <div class="col-md-9 preserve-new-lines" ng-repeat-end><small>{{value.value}}</small></div>
-      <div class="custom-metadata col-md-12" ng-if="editableForm.$visible">
-          <ordered-map-editor object="customMetadata"></ordered-map-editor>
-      </div>
-  '''
-
   $templateCache.put 'modelcatalogue/core/ui/detailSections/revisionNotes.html', '''
       <div class="col-md-3">
           <strong class="small">Revision Notes</strong>
       </div>
       <div class="full-width-editable col-md-9 preserve-new-lines"><small editable-textarea="copy.revisionNotes" e-rows="5" e-cols="1000">{{element.revisionNotes || 'empty'}}</small></div>
   '''
-
 
   $templateCache.put 'modelcatalogue/core/ui/detailSections/description.html', '''
       <div class="col-md-3">
@@ -289,6 +278,16 @@ x in ['apple', 'banana', 'cherry']
     title: 'Basic'
     position: 0
     types: [
+      'validationRule'
+    ]
+    keys: []
+    template: '/mc/core/ui/detail-sections/validationRuleBasic.html'
+  }
+
+  detailSectionsProvider.register {
+    title: 'Basic'
+    position: 0
+    types: [
       'asset'
     ]
     keys: []
@@ -378,9 +377,10 @@ x in ['apple', 'banana', 'cherry']
       'dataElement'
       'dataType'
       'dataClass'
+      'validationRule'
     ]
     keys: []
-    template: 'modelcatalogue/core/ui/detailSections/customMetadata.html'
+    template: '/mc/core/ui/detail-sections/customMetadata.html'
   }
 
   reorderInDetail = (relationName) ->
@@ -445,7 +445,6 @@ x in ['apple', 'banana', 'cherry']
             header: 'Name',
             value: "ext.get('name') || ext.get('Name') || relation.name ",
             classes: 'col-md-5',
-            href: 'relation.href()',
             href: 'relation.href()'
           }
           {
@@ -456,6 +455,119 @@ x in ['apple', 'banana', 'cherry']
           }
           {header: 'Description', value: "relation.description", classes: 'col-md-4'}
           {header: 'Occurs', value: printMetadataOccurrencesOnly, classes: 'col-md-4'}
+        ]
+    }
+  }
+
+  detailSectionsProvider.register {
+    title: 'Inherited Rules'
+    position: -29
+    types: [
+      'dataType'
+    ]
+    keys: []
+    template: '/mc/core/ui/detail-sections/tableData.html'
+    getList: (element) ->
+      return @result if @result
+
+      @result =
+        base: element.typeHierarchy.base
+        itemType: element.typeHierarchy.itemType
+
+      element.typeHierarchy(null, max: 5).then (list) =>
+        @result = list
+      return @result
+    data: {
+      columns:
+        [
+          {
+            header: 'Name',
+            value: "name",
+            classes: 'col-md-3',
+            href: 'href()'
+          }
+          {
+            header: 'Rule',
+            value: "rule",
+            classes: 'col-md-9 code',
+          }
+
+        ]
+    }
+  }
+
+  detailSectionsProvider.register {
+    title: 'Context Data Classes'
+    position: 60
+    types: [
+      'validationRule'
+    ]
+    keys: []
+    template: '/mc/core/ui/detail-sections/tableData.html'
+    getList: (element) ->
+      return @result if @result
+
+      @result =
+        base: element.appliedWithin.base
+        itemType: element.appliedWithin.itemType
+
+      element.appliedWithin(null, max: 5).then (list) =>
+        @result = list
+      return @result
+    reorder: reorderInDetail('appliedWithin')
+    data: {
+      columns:
+        [
+          {
+            header: 'Name',
+            value: "ext.get('name') || ext.get('Name') || relation.name ",
+            classes: 'col-md-6',
+            href: 'relation.href()'
+          }
+          {
+            header: 'Description',
+            value: "relation.description",
+            classes: 'col-md-6',
+          }
+
+        ]
+    }
+  }
+
+  detailSectionsProvider.register {
+    title: 'Involved Data Elements'
+    position: 70
+    types: [
+      'validationRule'
+    ]
+    keys: []
+    template: '/mc/core/ui/detail-sections/tableData.html'
+    getList: (element) ->
+      return @result if @result
+
+      @result =
+        base: element.involves.base
+        itemType: element.involves.itemType
+
+      element.involves(null, max: 5).then (list) =>
+        @result = list
+      return @result
+    reorder: reorderInDetail('involves')
+    data: {
+      columns:
+        [
+          {
+            header: 'Name',
+            value: "ext.get('name') || ext.get('Name') || relation.name ",
+            classes: 'col-md-6',
+            href: 'relation.href()'
+          }
+          {
+            header: 'Description',
+            value: "relation.description",
+            classes: 'col-md-6',
+          }
+
         ]
     }
   }

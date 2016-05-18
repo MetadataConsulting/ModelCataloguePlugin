@@ -55,7 +55,7 @@ class CatalogueXmlLoaderSpec extends Specification {
         similar 'adhesion.catalogue.xml'
     }
 
-    def "write simple model"() {
+    def "load data class with validation rule"() {
         expect:
         similar 'locomotive.catalogue.xml'
     }

@@ -13,11 +13,13 @@ class GelJsonExporterSpec extends IntegrationSpec {
 
     public static final String DATA_MODEL_NAME = 'testDataModel1'
     public static final String ROOT_DATA_CLASS_NAME = 'rare disease group 1'
-    public static final String NESTED_LEVEL_1_DATA_CLASS_NAME = 'rare disease \' subgroup 1.1'
-    public static final String NESTED_LEVEL_2_DATA_CLASS_NAME = 'rare disease " disorder 1.1.1'
-    public static final String NESTED_LEVEL_3_1_DATA_CLASS_NAME = 'rare disease disorder 1.1.1 eligibility'
-    public static final String NESTED_LEVEL_3_2_DATA_CLASS_NAME = 'rare disease disorder 1.1.1 phenotypes'
-    public static final String NESTED_LEVEL_3_3_DATA_CLASS_NAME = 'rare disease disorder 1.1.1 clinical tests'
+    public static final String NESTED_LEVEL_1_DATA_CLASS_NAME = 'rare disease subgroup 1.1'
+    public static final String NESTED_LEVEL_2_DATA_CLASS_NAME = 'rare disease disorder 1.1.1'
+    public static final String NESTED_LEVEL_3_DATA_CLASS_NAME = 'rare disease 1.1.1.1'
+    public static final String NESTED_LEVEL_4_1_DATA_CLASS_NAME = 'rare disease disorder 1.1.1 eligibility'
+    public static final String NESTED_LEVEL_4_2_DATA_CLASS_NAME = 'rare disease disorder 1.1.1 phenotypes'
+    public static final String NESTED_LEVEL_4_3_DATA_CLASS_NAME = 'rare disease disorder 1.1.1 guidance'
+    public static final String NESTED_LEVEL_4_4_DATA_CLASS_NAME = 'rare disease disorder 1.1.1 clinical tests'
 
     ElementService elementService
     DataModelService dataModelService
@@ -34,19 +36,21 @@ class GelJsonExporterSpec extends IntegrationSpec {
                 dataClass(name: ROOT_DATA_CLASS_NAME) {
                     dataClass(name: NESTED_LEVEL_1_DATA_CLASS_NAME) {
                         dataClass(name: NESTED_LEVEL_2_DATA_CLASS_NAME) {
-                            dataClass(name: NESTED_LEVEL_3_1_DATA_CLASS_NAME, lastUpdated: new Date())
-                            dataClass(name: NESTED_LEVEL_3_2_DATA_CLASS_NAME, lastUpdated: new Date()) {
-                                dataClass(name: 'test hpo terms 1')
-                                dataClass(name: 'test hpo terms 2')
-                                dataClass(name: 'test hpo terms 3')
-                                dataClass(name: 'test hpo terms 4')
-                            }
-                            dataClass(name: NESTED_LEVEL_3_3_DATA_CLASS_NAME, lastUpdated: new Date())
-                            dataClass(name: NESTED_LEVEL_3_3_DATA_CLASS_NAME, lastUpdated: new Date()) {
-                                dataClass(name: 'clinical test1')
-                                dataClass(name: 'clinical test2')
-                                dataClass(name: 'clinical test3')
-                                dataClass(name: 'clinical test4')
+                            dataClass(name: NESTED_LEVEL_3_DATA_CLASS_NAME) {
+                                dataClass(name: NESTED_LEVEL_4_1_DATA_CLASS_NAME, lastUpdated: new Date())
+                                dataClass(name: NESTED_LEVEL_4_2_DATA_CLASS_NAME, lastUpdated: new Date()) {
+                                    dataClass(name: 'hpo terms 1') { ext "OBO ID", "HP:111" }
+                                    dataClass(name: 'hpo terms 2') { ext "OBO ID", "HP:222" }
+                                    dataClass(name: 'hpo terms 3') { ext "OBO ID", "HP:333" }
+                                    dataClass(name: 'hpo terms 4') { ext "OBO ID", "HP:444" }
+                                }
+                                dataClass(name: NESTED_LEVEL_4_3_DATA_CLASS_NAME, lastUpdated: new Date())
+                                dataClass(name: NESTED_LEVEL_4_4_DATA_CLASS_NAME, lastUpdated: new Date()) {
+                                    dataClass(name: 'clinical test1')
+                                    dataClass(name: 'clinical test2')
+                                    dataClass(name: 'clinical test3')
+                                    dataClass(name: 'clinical test4')
+                                }
                             }
                         }
                     }
@@ -77,64 +81,68 @@ class GelJsonExporterSpec extends IntegrationSpec {
 
     private static String getExpectedJSON() {
         final String TODAY = new Date().format("yyyy-MM-dd")
-        final Long NESTED_LEVEL_1_DATA_CLASS_NAME_ID = DataClass.findByName(NESTED_LEVEL_1_DATA_CLASS_NAME).getId()
-        final Long NESTED_LEVEL_2_DATA_CLASS_NAME_ID = DataClass.findByName(NESTED_LEVEL_2_DATA_CLASS_NAME).getId()
-        final Long NESTED_LEVEL_3_1_DATA_CLASS_NAME_ID = DataClass.findByName(NESTED_LEVEL_3_1_DATA_CLASS_NAME).getId()
-        final Long NESTED_LEVEL_3_2_DATA_CLASS_NAME_ID = DataClass.findByName(NESTED_LEVEL_3_2_DATA_CLASS_NAME).getId()
-        final Long NESTED_LEVEL_3_3_DATA_CLASS_NAME_ID = DataClass.findByName(NESTED_LEVEL_3_3_DATA_CLASS_NAME).getId()
+        final String NESTED_LEVEL_1_DATA_CLASS_NAME_ID = DataClass.findByName(NESTED_LEVEL_1_DATA_CLASS_NAME).getCombinedVersion()
+        final String NESTED_LEVEL_2_DATA_CLASS_NAME_ID = DataClass.findByName(NESTED_LEVEL_2_DATA_CLASS_NAME).getCombinedVersion()
+        final String NESTED_LEVEL_3_DATA_CLASS_NAME_ID = DataClass.findByName(NESTED_LEVEL_3_DATA_CLASS_NAME).getCombinedVersion()
+        final String clinical_test1_id = DataClass.findByName('clinical test1').getCombinedVersion()
+        final String clinical_test2_id = DataClass.findByName('clinical test2').getCombinedVersion()
+        final String clinical_test3_id = DataClass.findByName('clinical test3').getCombinedVersion()
+        final String clinical_test4_id = DataClass.findByName('clinical test4').getCombinedVersion()
 
         return """
             {
                "DiseaseGroups":[
                   {
                      "id":"$NESTED_LEVEL_1_DATA_CLASS_NAME_ID",
-                     "name":"rare disease ' subgroup 1.1",
+                     "name":"rare disease subgroup 1.1",
                      "subGroups":[
                         {
                            "id":"$NESTED_LEVEL_2_DATA_CLASS_NAME_ID",
-                           "name":"rare disease \\" disorder 1.1.1",
+                           "name":"rare disease disorder 1.1.1",
                            "specificDisorders":[
                               {
-                                 "id":"$NESTED_LEVEL_3_1_DATA_CLASS_NAME_ID",
-                                 "name":"rare disease disorder 1.1.1 eligibility",
+                                 "id":"$NESTED_LEVEL_3_DATA_CLASS_NAME_ID",
+                                 "name":"rare disease 1.1.1.1",
                                  "eligibilityQuestion":{
                                     "date":"$TODAY",
                                     "version":"1"
                                  },
-                                 "shallowPhenotypes":[
-
-                                 ],
-                                 "tests":[
-
-                                 ]
-                              },
-                              {
-                                 "id":"$NESTED_LEVEL_3_2_DATA_CLASS_NAME_ID",
-                                 "name":"rare disease disorder 1.1.1 phenotypes",
-                                 "eligibilityQuestion":{
-                                    "date":"$TODAY",
-                                    "version":"1"
-                                 },
-                                 "shallowPhenotypes":[
-
-                                 ],
-                                 "tests":[
-
-                                 ]
-                              },
-                              {
-                                 "id":"$NESTED_LEVEL_3_3_DATA_CLASS_NAME_ID",
-                                 "name":"rare disease disorder 1.1.1 clinical tests",
-                                 "eligibilityQuestion":{
-                                    "date":"$TODAY",
-                                    "version":"1"
-                                 },
-                                 "shallowPhenotypes":[
-
-                                 ],
-                                 "tests":[
-
-                                 ]
+                                 "shallowPhenotypes": [
+                                    {
+                                      "name": "hpo terms 1",
+                                      "id": "HP:111"
+                                    },
+                                    {
+                                        "name": "hpo terms 2",
+                                        "id": "HP:222"
+                                    },
+                                    {
+                                        "name": "hpo terms 3",
+                                        "id": "HP:333"
+                                    },
+                                    {
+                                        "name": "hpo terms 4",
+                                        "id": "HP:444"
+                                    }
+                                ],
+                                "tests": [
+                                    {
+                                        "name": "clinical test1",
+                                        "id": "$clinical_test1_id"
+                                    },
+                                    {
+                                        "name": "clinical test2",
+                                        "id": "$clinical_test2_id"
+                                    },
+                                    {
+                                        "name": "clinical test3",
+                                        "id": "$clinical_test3_id"
+                                    },
+                                    {
+                                        "name": "clinical test4",
+                                        "id": "$clinical_test4_id"
+                                    }
+                                ]
                               }
                            ]
                         }

@@ -5,6 +5,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.RelationshipDirection
+import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import spock.lang.Issue
 import spock.lang.Unroll
 
@@ -35,9 +36,9 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def "can supply status as parameter"() {
         expect:
-        elementService.list(status: 'DRAFT').size()                             == 17
+        elementService.list(status: 'DRAFT').size()                             == 23
         elementService.list(status: 'DRAFT', max: 10).size()                    == 10
-        elementService.list(status: ElementStatus.DRAFT).size()                 == 17
+        elementService.list(status: ElementStatus.DRAFT).size()                 == 23
         elementService.list(status: ElementStatus.DRAFT, max: 10).size()        == 10
         elementService.list(DataClass, status: 'DRAFT').size()                  == 7
         elementService.list(DataClass, status: ElementStatus.DRAFT).size()      == 7
@@ -45,8 +46,8 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         elementService.list(DataElement, status: ElementStatus.DRAFT).size()    == 5
         elementService.list(Asset, status: 'DRAFT').size()                      == 5
         elementService.list(Asset, status: ElementStatus.DRAFT).size()          == 5
-        elementService.count(status: 'DRAFT')                                   == 17L
-        elementService.count(status: ElementStatus.DRAFT)                       == 17L
+        elementService.count(status: 'DRAFT')                                   == 23L
+        elementService.count(status: ElementStatus.DRAFT)                       == 23L
         elementService.count(DataClass, status: 'DRAFT')                        == 7L
         elementService.count(DataClass, status: ElementStatus.DRAFT)            == 7L
         elementService.count(DataElement, status: 'DRAFT')                      == 5L
@@ -187,7 +188,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         merged.dataType == dataType
         destination.ext.size() == 3
         destination.ext.two == 'two'
-        source.countContainedIn() == 2
+        source.countContainedIn() == 3
         destination.countContainedIn() == 3
         source.dataModel
         destination.dataModel
@@ -908,6 +909,38 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         assert original.ext == clone.ext
 
         return true
+    }
+
+
+    def "get type hierarchy"() {
+        catalogueBuilder.build {
+            dataModel name: 'Data Model for Testing Type Hierarchy', {
+                dataType name: 'L3', {
+                    dataType name: 'L2', {
+                        dataType name: 'L1'
+                    }
+                }
+            }
+        }
+
+        DataType l1 = DataType.findByName('L1')
+        DataType l2 = DataType.findByName('L2')
+        DataType l3 = DataType.findByName('L3')
+
+        expect:
+        l1
+        l2
+        l3
+        l1 in l2.isBasedOn
+        l2 in l3.isBasedOn
+
+        when:
+        ListWithTotalAndType<DataType> typeHierarchy = elementService.getTypeHierarchy([:], l3)
+
+        then:
+        typeHierarchy.total == 2L
+        typeHierarchy.items[0] == l2
+        typeHierarchy.items[1] == l1
     }
 
 

@@ -1,7 +1,11 @@
 package org.modelcatalogue.core.util.test
 
+import groovy.util.logging.Commons
+import org.codehaus.groovy.runtime.StackTraceUtils
+
 import java.awt.Desktop
 
+@Commons
 class FileOpener {
 
 
@@ -17,8 +21,9 @@ class FileOpener {
                 println file
                 Thread.sleep(10000)
             }
-        } catch(ignored) {
-            ignored.printStackTrace()
+        } catch(e) {
+            StackTraceUtils.deepSanitize(e)
+            log.info "Failed to open file", e
         }
     }
 }

@@ -57,7 +57,9 @@ class ModelToFormExporterServiceSpec extends AbstractIntegrationSpec {
                 ext ModelToFormExporterService.EXT_FORM_VERSION_DESCRIPTION, TEST_FORM_VERSION_DESCRIPTION
                 ext ModelToFormExporterService.EXT_FORM_VERSION, TEST_FORM_VERSION
 
-                dataElement(name: 'Test Element')
+                dataElement(name: 'Test Element') {
+                    description "Test Element Description"
+                }
             }
         }
 

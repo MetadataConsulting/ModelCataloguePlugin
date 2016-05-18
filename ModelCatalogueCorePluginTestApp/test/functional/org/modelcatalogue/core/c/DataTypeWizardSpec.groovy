@@ -403,7 +403,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         waitFor { tabActive('relatedTo') }
 
         when: "click the footer action"
-        click tableFooterAction
+        click CatalogueContent.create('#relatedTo-tab').find(tableFooterAction)
 
         then: "modal is shown"
         check modalDialog displayed

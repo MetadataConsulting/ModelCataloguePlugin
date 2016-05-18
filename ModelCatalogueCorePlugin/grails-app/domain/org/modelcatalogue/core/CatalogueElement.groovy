@@ -297,6 +297,11 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         if (resourceName.contains('_')) {
             resourceName = resourceName.substring(0, resourceName.indexOf('_'))
         }
+        if (resourceName == 'org.modelcatalogue.core.ValueDomain') {
+            resourceName = 'org.modelcatalogue.core.DataType'
+        } else if (resourceName == 'org.modelcatalogue.core.Classification') {
+            resourceName = 'org.modelcatalogue.core.DataModel'
+        }
         resourceName
     }
 

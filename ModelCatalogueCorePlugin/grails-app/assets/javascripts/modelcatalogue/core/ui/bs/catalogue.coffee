@@ -24,6 +24,7 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setIcon 'relationship',       "fa fa-fw fa-link"
   catalogueProvider.setIcon 'relationships',      "fa fa-fw fa-link"
   catalogueProvider.setIcon 'mapping',            "fa fa-fw fa-superscript"
+  catalogueProvider.setIcon 'validationRule',     "fa fa-fw fa-university"
 
   # this should be generated automatically in the future
 
@@ -40,6 +41,7 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setInstanceOf 'measurementUnit',    'catalogueElement'
   catalogueProvider.setInstanceOf 'model',              'catalogueElement'
   catalogueProvider.setInstanceOf 'dataElement',        'catalogueElement'
+  catalogueProvider.setInstanceOf 'validationRule',     'catalogueElement'
 
   catalogueProvider.setInstanceOf 'enumeratedType',     'dataType'
   catalogueProvider.setInstanceOf 'referenceType',      'dataType'
@@ -48,6 +50,7 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setDefaultSort 'catalogueElement',  sort: 'name',         order: 'asc'
   catalogueProvider.setDefaultSort 'asset',             sort: 'lastUpdated',  order: 'desc'
 
+  catalogueProvider.setDefaultXslt 'catalogueElement',  '/assets/xsl/transform2CatalogueSchema.xsl'
 
   # TODO: deprecation warning for primitive and reference data type
   catalogueProvider.setDeprecationWarning 'dataElement', (dataElement) ->
@@ -96,6 +99,8 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
 
     return 0.5 if "#{modelCatalogueApiRoot}#{list.base.replace('/content', '/outgoing/hierarchy')}".indexOf(url) >= 0
     return 0.5 if "#{modelCatalogueApiRoot}#{list.base.replace('/content', '/outgoing/containment')}".indexOf(url) >= 0
+    return 0.5 if "#{modelCatalogueApiRoot}#{list.base.replace('/content', '/incoming/involvedness')}".indexOf(url) >= 0
+    return 0.5 if "#{modelCatalogueApiRoot}#{list.base.replace('/content', '/incoming/ruleContext')}".indexOf(url) >= 0
 
     return 0.3 if url.indexOf("#{modelCatalogueApiRoot}#{list.base.replace('/relationships/', '/incoming/')}") >= 0
     return 0.3 if "#{modelCatalogueApiRoot}#{list.base.replace('/relationships/', '/incoming/')}".indexOf(url) >= 0

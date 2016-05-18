@@ -12,162 +12,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
         resolve:
           args: -> args
 
-        #language=HTML
-        template: '''
-        <div class="modal-header">
-            <button type="button" class="close" ng-click="dismiss()"><span aria-hidden="true">&times;</span><span class="sr-only">Cancel</span></button>
-            <h4>Data Class Wizard</span></h4>
-            <ul class="tutorial-steps">
-              <li>
-                <button id="step-previous" ng-disabled="step == 'dataClass' || step == 'summary'" ng-click="previous()" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
-              </li>
-              <li>
-                <button id="step-dataClass" ng-disabled="step == 'summary'" ng-click="select('dataClass')" class="btn btn-default" ng-class="{'btn-primary': step == 'dataClass'}">1. Data Class*</button>
-              </li>
-              <li>
-                <button id="step-metadata" ng-disabled="!dataClass.name || step == 'summary'" ng-click="select('metadata')" class="btn btn-default" ng-class="{'btn-primary': step == 'metadata', 'btn-info': step != 'metadata' &amp;&amp; hasMetadata()}">2. Metadata</button>
-              </li>
-              <li>
-                <button id="step-parents" ng-disabled="!dataClass.name || step == 'summary'" ng-click="select('parents')" class="btn btn-default" ng-class="{'btn-primary': step == 'parents', 'btn-info': step != 'parents' &amp;&amp; parents.length > 0}">3. Parents</button>
-              </li>
-              <li>
-                <button id="step-children" ng-disabled="!dataClass.name || step == 'summary'" ng-click="select('children')" class="btn btn-default" ng-class="{'btn-primary': step == 'children', 'btn-info': step != 'children' &amp;&amp; children.length > 0}">4. Children</button>
-              </li>
-              <li>
-                <button id="step-elements" ng-disabled="!dataClass.name || step == 'summary'" ng-click="select('elements')" class="btn btn-default" ng-class="{'btn-primary': step == 'elements', 'btn-info': step != 'elements' &amp;&amp; dataElements.length > 0}">5. Elements</button>
-              </li>
-              <li ng-if="dataModels.length == 0">
-                <button id="step-dataModels" ng-disabled="!dataClass.name || step == 'summary'" ng-click="select('dataModels')" class="btn btn-default" ng-class="{'btn-primary': step == 'dataModels', 'btn-info': step != 'dataModels' &amp;&amp; dataModels.length > 0}">6. Data Models*</button>
-              </li>
-              <li>
-                <button id="step-next" ng-disabled="!dataClass.name || step == 'dataModels' || step == 'summary'" ng-click="next()" class="btn btn-default" ><span class="glyphicon glyphicon-chevron-right"></span></button>
-              </li>
-              <li>
-                <button id="step-finish" ng-disabled="!dataClass.name || !isModelCatalogueIdValid() || (dataModels.length == 0 &amp;&amp; !dataModel.element)" ng-click="finish()" class="btn btn-default btn-success"><span class="glyphicon glyphicon-ok"></span></button>
-              </li>
-            </ul>
-        </div>
-        <div class="modal-body" ng-switch="step">
-          <div ng-switch-when="dataClass" id="dataClass">
-              <form role="form" ng-submit="select('metadata')">
-                <div class="form-group">
-                  <label for="name" class="">Name</label>
-                  <div class="input-group">
-                    <input type="text" class="form-control" id="name" placeholder="Name (Required)" ng-model="dataClass.name" focus-me="step=='dataClass'" required>
-                    <span class="input-group-btn">
-                      <a class="btn btn-default" ng-click="prefillFrom()"><span class="fa fa-fw fa-copy"></span></a>
-                    </span>
-                  </div>
-                </div>
-                <div class="form-group" ng-class="{ 'has-error': !isModelCatalogueIdValid() }">
-                  <label for="modelCatalogueId" class="">Catalogue ID (URL)</label>
-                  <input type="text" class="form-control" id="modelCatalogueId" placeholder="e.g. external ID, namespace (leave blank for generated)" ng-model="dataClass.modelCatalogueId">
-                </div>
-                <div class="form-group">
-                  <label for="description" class="">Description</label>
-                  <textarea rows="10" ng-model="dataClass.description" placeholder="Description (Optional)" class="form-control" id="description" ng-keydown="navigateOnKey($event, 9, 'metadata')"></textarea>
-                </div>
-                <fake-submit-button/>
-              </form>
-          </div>
-          <div ng-switch-when="metadata" id="metadata">
-              <form ng-submit="select('parents')">
-                <div>
-                  <h4>Metadata</h4>
-                  <metadata-editor title="Key" value-title="Value" object="metadata" owner="owners.dataClass"></metadata-editor>
-                </div>
-                <fake-submit-button/>
-              </form>
-          </div>
-          <div ng-switch-when="parents" id="parents">
-              <br/>
-              <form role="form">
-                <div class="form-group">
-                  <label for="name" class="">Parent Data Class</label>
-                  <elements-as-tags elements="parents"></elements-as-tags>
-                  <div class="input-group">
-                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="parent.element" focus-me="step=='parents'" catalogue-element-picker="dataClass" status='draft' typeahead-on-select="push('parents', 'parent')">
-                    <span class="input-group-btn">
-                      <button class="btn btn-success" ng-click="push('parents', 'parent')" ng-disabled="isEmpty(parent.element)"><span class="glyphicon glyphicon-plus"></span></button>
-                    </span>
-                  </div>
-                  <p class="help-block">Parent data class is source for the hierarchy relationship</p>
-                </div>
-                <metadata-editor object="parent.ext" title="Relationship Metadata" owner="owners.parents"></metadata-editor>
-              </form>
-          </div>
-          <div ng-switch-when="children" id="children">
-              <br/>
-              <form role="form">
-                <div class="form-group">
-                  <label for="name" class="">Child Data Class</label>
-                  <elements-as-tags elements="children"></elements-as-tags>
-                  <div class="input-group">
-                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="child.element" focus-me="step=='children'" catalogue-element-picker="dataClass" global="'allow'" typeahead-on-select="pushWithDataModelCheck('children', 'child')">
-                    <span class="input-group-btn">
-                      <button class="btn btn-success" ng-click="pushWithDataModelCheck('children', 'child')" ng-disabled="isEmpty(child.element)"><span class="glyphicon glyphicon-plus"></span></button>
-                    </span>
-                  </div>
-                  <p class="help-block">Child data class is destination for the hierarchy relationship</p>
-                </div>
-                <div ng-click="importChildModelsFromCSV()">
-                  <alert type="info">
-                    <strong>Hint:</strong> If you have CSV file with sample data you can <a class="alert-link"><span class="fa fa-magic"></span> import child data classes from CSV file headers</a>.
-                  </alert>
-                </div>
-                <metadata-editor object="child.ext" title="Relationship Metadata" owner="owners.children"></metadata-editor>
-              </form>
-          </div>
-          <div ng-switch-when="elements" id="elements">
-              <br/>
-              <form role="form">
-                <div class="form-group">
-                  <label for="name" class="">Data Element</label>
-                  <elements-as-tags elements="dataElements"></elements-as-tags>
-                  <div class="input-group">
-                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="dataElement.element" focus-me="step=='elements'" catalogue-element-picker="dataElement" global="'allow'" typeahead-on-select="pushWithDataModelCheck('dataElements', 'dataElement')">
-                    <span class="input-group-btn">
-                      <button class="btn btn-success" ng-click="pushWithDataModelCheck('dataElements', 'dataElement')" ng-disabled="isEmpty(dataElement.element)"><span class="glyphicon glyphicon-plus"></span></button>
-                    </span>
-                  </div>
-                  <p class="help-block">Data element is destination for the containment relationship</p>
-                </div>
-                <div ng-click="importFromCSV()">
-                  <alert type="info">
-                    <strong>Hint:</strong> If you have CSV file with sample data you can <a class="alert-link"><span class="fa fa-magic"></span> import data elements from CSV file headers</a>.
-                  </alert>
-                </div>
-                <metadata-editor object="dataElement.ext" title="Relationship Metadata" owner="owners.contains"></metadata-editor>
-              </form>
-            </tab>
-          </div>
-          <div ng-switch-when="dataModels" id="dataModels">
-              <br/>
-              <form role="form">
-                <div class="form-group">
-                  <label for="name" class="">Data Models</label>
-                  <elements-as-tags elements="dataModels"></elements-as-tags>
-                  <div class="input-group">
-                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="dataModel.element" focus-me="step=='dataModels'" catalogue-element-picker="dataModel"  typeahead-on-select="push('dataModels', 'dataModel')" status="draft">
-                    <span class="input-group-btn">
-                      <button class="btn btn-success" ng-click="push('dataModels', 'dataModel')" ng-disabled="isEmpty(dataModel.element)"><span class="glyphicon glyphicon-plus"></span></button>
-                    </span>
-                  </div>
-                </div>
-              </form>
-            </tab>
-          </div>
-          <div ng-switch-when="summary" id="summary">
-              <h4 ng-show="dataClass.name &amp;&amp; !finished">Creating new data class <strong>{{dataClass.name}}</strong></h4>
-              <h4 ng-show="dataClass.name &amp;&amp;  finished" class='wizard-summary'>Data Class <strong>{{dataClass.name}} created</strong></h4>
-              <progressbar type="{{finished ? 'success' : 'primary'}}" value="pendingActionsCount == 0 ? 100 : Math.round(100 * (totalActions - pendingActionsCount) / totalActions)">{{totalActions - pendingActionsCount}} / {{totalActions}}</progressbar>
-          </div>
-        </div>
-        <div class="modal-footer" ng-if="step == 'summary'">
-          <button ng-disabled="!finished" class="btn btn-success" ng-click="reset()"><span class="glyphicon glyphicon-plus"></span> Create Another</button>
-          <button ng-disabled="!finished" class="btn btn-default"  ng-click="$close(dataClass)" id="exit-wizard"><span class="glyphicon glyphicon-remove"></span> Close</button>
-        </div>
-        '''
+        templateUrl: '/mc/core/ui/modals/dataClassWizard.html'
         controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', 'args', 'delayedQueueExecutor', '$q', '$log', 'enhance', 'metadataEditors', 'catalogue', '$controller', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout, args, delayedQueueExecutor, $q, $log, enhance, metadataEditors, catalogue, $controller) ->
 
           angular.extend(this, $controller('watchAndAskForImportOrCloneCtrl', {$scope: $scope}))
@@ -413,15 +258,15 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
 
           $scope.prefillFrom = ->
             dataClassPromise = messages.prompt('Clone Data Class', 'Please, select from which Data Class should be the properties cloned', type: 'catalogue-element', resource: 'dataClass')
+            dataClassPromise = dataClassPromise.then (dataClass) ->
+              return dataClass.refresh() if dataClass.minimal
+              return dataClass
             dataClassPromise.then (dataClass) ->
               promises = []
               $scope.dataClass.name         = dataClass.name
               $scope.dataClass.description  = dataClass.description
 
               $scope.metadata               = angular.copy dataClass.ext
-
-              angular.forEach dataClass.dataModels, (dataModel) ->
-                $scope.dataModels.push {element: dataModel, name: dataModel.name}
 
               push = (container, property) ->
                 (result) ->

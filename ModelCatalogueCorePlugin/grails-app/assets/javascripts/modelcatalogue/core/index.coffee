@@ -19,3 +19,9 @@ angular.module 'mc.core', [
   'mc.core.orderedMapEnhancer'
   'mc.core.serverPushUpdates'
 ]
+
+angular.module('mc.core').config(
+  ['$animateProvider', ($animateProvider) ->
+    $animateProvider.classNameFilter(/^((?!(fa-spinner)).)*$/)
+  ]
+)

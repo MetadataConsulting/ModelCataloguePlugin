@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.a
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
 import spock.lang.Stepwise
 
@@ -9,13 +10,18 @@ import static org.modelcatalogue.core.geb.Common.*
 @Stepwise
 class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 
-    private static final String stepMetadata                       = "#step-metadata"
-    private static final String stepChildren                       = "#step-children"
-    private static final String stepElements                       = "#step-elements"
-    private static final String stepFinish                         = "#step-finish"
-    private static final String exitButton                         = "#exit-wizard"
-    private static final String wizardSummary                      = '.wizard-summary'
+    private static final String stepMetadata = "#step-metadata"
+    private static final String stepChildren = "#step-children"
+    private static final String stepElements = "#step-elements"
+    private static final String stepFinish = "#step-finish"
+    private static final String exitButton = "#exit-wizard"
+    private static final String wizardSummary = '.wizard-summary'
+    private static final String xmlEditorStylesheet = '#xml-editor-stylesheet'
+    private static final String xmlEditorSource = '#xml-editor-source'
+    private static final String xmlEditorResult = '#xml-editor-result'
     private static final CatalogueContent detailSectionDataElement = CatalogueContent.create('data-view-name': 'Children')
+    private static final CatalogueAction exportXml = CatalogueAction.runLast('item', 'export', 'edit-XML')
+    private static final CatalogueContent resultContentLines = CatalogueContent.create(xmlEditorResult).find('.ace_content .ace_line')
 
     def "go to login"() {
         login admin
@@ -38,7 +44,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog displayed
 
         when: 'the model details are filled in'
-        fill name  with "New"
+        fill name with "New"
         fill modelCatalogueId with "http://www.example.com/${UUID.randomUUID().toString()}"
         fill description with "Description"
 
@@ -71,7 +77,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         click '.list-group-item.item-found'
 
         and: 'create child from scratch and leave it filled in'
-        fill name with 'This should create new child data class'
+        fill 'child-data-class' with 'This should create new child data class'
 
         and: 'elements step is clicked'
         click stepElements
@@ -83,7 +89,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         fillMetadata 'Min Occurs': '2', 'Max Occurs': '25'
 
         and: 'the element is selected'
-        fill name with 'nhs'
+        fill 'data-element' with 'nhs'
         selectCepItemIfExists()
 
         and: 'finish is clicked'
@@ -95,13 +101,16 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         when:
         click exitButton
 
+        and:
+        selectInTree 'Data Classes'
+
         then:
         check CatalogueContent.create('span.catalogue-element-treeview-name', text: startsWith("New")) displayed
 
         check modalDialog gone
     }
 
-    def "Add another data class"(){
+    def "Add another data class"() {
         click create
 
         expect: 'the data class dialog opens'
@@ -159,5 +168,18 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         check {
             $('span.catalogue-element-treeview-name', text: startsWith("Changed Name")).parent().parent().find('.badge')
         } is '1'
+    }
+
+    def "xml editor"() {
+        when:
+        click exportXml
+
+        then: "three editor present"
+        check xmlEditorStylesheet displayed
+        check xmlEditorSource displayed
+        check xmlEditorResult displayed
+
+        and: "result has some xsl generated"
+        check resultContentLines test { it.size() > 1 }
     }
 }

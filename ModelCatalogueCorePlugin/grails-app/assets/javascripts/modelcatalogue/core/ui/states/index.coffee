@@ -16,6 +16,7 @@ angular.module('mc.core.ui.states', [
   'mc.core.ui.states.mc.resource.show'
   'mc.core.ui.states.mc.resource.list'
   'mc.core.ui.states.mc.resource.list-imported'
+  'mc.core.ui.states.mc.resource.xml-editor'
   'mc.core.ui.states.mc.resource'
   'mc.core.ui.states.mc'
   'mc.core.ui.states.simple.favorites'
@@ -41,8 +42,14 @@ angular.module('mc.core.ui.states', [
     # let's keep it simple just showing the user the resource does not exist
     messages.error 'Selected resource cannot be found in the catalogue', config.url
 
+  $rootScope.$on '$stateChangeStart', (event, toState, toParams, fromState) ->
+    $log.debug "ui.router state change start from state [#{fromState.name}] to [#{toState.name}]"
+
   $rootScope.$on '$stateNotFound', (event, unfoundState, fromState) ->
     $log.warn "ui.router state not found [#{unfoundState}] going from state [#{fromState}]"
+
+  $rootScope.$on '$stateChangeSuccess', (event, toState, toParams, fromState) ->
+    $log.debug "ui.router state change success from state [#{fromState.name}] to [#{toState.name}]"
 
   $rootScope.$on '$stateChangeError', (event, toState, toParams, fromState, fromParams, error) ->
     $log.error "ui.router state change error when changing from state [#{fromState.name}] to [#{toState.name}]", error

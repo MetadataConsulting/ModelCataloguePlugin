@@ -4,6 +4,10 @@ import groovy.json.JsonBuilder
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.EnumeratedType
+import org.modelcatalogue.core.util.HibernateHelper
+
+import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
 /**
  * Created by rickrees on 31/03/2016.
@@ -12,7 +16,17 @@ import org.modelcatalogue.core.DataElement
 @Log4j
 class CancerTypesJsonExporter {
 
-    public static final int LEVEL1 = 1
+    public static final String CANCER_TYPES = 'CancerTypes'
+    public static final String SUB_TYPE = 'subType'
+    public static final String SUB_TYPES = 'subTypes'
+    public static final String PRESENTATION = 'presentation'
+    public static final String PRESENTATIONS = 'presentations'
+    public static final String ID_TAG = 'id'
+    public static final String TYPE_TAG = 'type'
+    public static final String DESCRIPTION_TAG = 'description'
+    public static final String ENUMERATED_TYPE_TAG = "enumeratedType"
+    public static final String ENUMS_TAG = "enums"
+    public static final String ENUM_TAG = "enum"
     private final OutputStream out
 
     CancerTypesJsonExporter(OutputStream out) {
@@ -22,51 +36,20 @@ class CancerTypesJsonExporter {
 
     void exportCancerTypesAsJson(model) {
         int depth = 3
-        def exclusions = ['Presentations']
-
-        log.info "Exporting CancerTypes as json ${model.name} (${model.combinedVersion})"
-
-        //define the json tagnames to use for each level in the model
-        def levelTag1 = [tag1: 'CancerTypes']
-        def levelTag2 = [tag1: 'id', tag2: 'type', tag3: 'subTypes']
-        def levelTag3 = [tag1: 'subType', tag2: 'description']
-        def levelMetaData = [1: levelTag1, 2: levelTag2, 3: levelTag3]
-
-        exportJson(model, depth, levelMetaData, exclusions)
-    }
-
-    //this is best guess at the moment...
-    void exportPresentationTypesAsJson(model) {
-        int depth = 3
-        def exclusions = ['Subtypes']
-
-        log.info "Exporting PresentationTypes as json ${model.name} (${model.combinedVersion})"
-
-        def levelTag1 = [tag1: 'CancerTypes']
-        def levelTag2 = [tag1: 'id', tag2: 'type', tag3: 'presentations']
-        def levelTag3 = [tag1: 'presentation', tag2: 'description']
-        def levelMetaData = [1: levelTag1, 2: levelTag2, 3: levelTag3]
-
-        exportJson(model, depth, levelMetaData, exclusions)
-    }
-
-
-    private void exportJson(model, depth, levelMetaData, exclusions) {
         int level = 1
         def graphList = []
         def builder = new JsonBuilder()
 
-        log.info "depth $depth exclusions $exclusions \n levelMetaData $levelMetaData"
+        log.info "Exporting CancerTypes as json ${model.name} (${model.combinedVersion})"
 
-        descendModels(model, level, graphList, depth, levelMetaData, exclusions)
+        descendModels(model, level, graphList, depth,'')
 
-        builder "${levelMetaData.get(LEVEL1).tag1}": graphList
-
-        out << builder.toString()
+        builder "$CANCER_TYPES": graphList
+        out << builder.toPrettyString()
     }
 
 
-    def descendModels(CatalogueElement model, level, graphList, depth, Map levelMetaData, exclusions) {
+    def descendModels(CatalogueElement model, level, graphList, depth, String subTag) {
         if (level > depth) return
 
         log.debug "descendModels level=$level graghList=$graphList model=$model"
@@ -75,45 +58,91 @@ class CancerTypesJsonExporter {
         def map = [:]
 
 
-        if (level == 1) {
-            modelList = graphList
-        }
-        if (level == 2) {
-            // resolves to something concrete like - map.put('id', "$model.id")
-            map.put(levelMetaData.get(level).tag1, "$model.id")
-            map.put(levelMetaData.get(level).tag2, model.name)
-            map.put(levelMetaData.get(level).tag3, modelList)
+        switch (level) {
+            case 1:
+                modelList = graphList
+                iterateAndDescendModels(model, level, modelList, depth, '')
+                return
+            case 2:
+                map.put(ID_TAG, "$model.id")
+                map.put(TYPE_TAG, model.name)
 
-            graphList << map
-        }
-        if (level == 3) {
-            map.put(levelMetaData.get(level).tag1, model.name)
-            map.put(levelMetaData.get(level).tag2, model.description)
+                def presentationList = []
+                map.put(SUB_TYPES, modelList)
+                map.put(PRESENTATIONS, presentationList)
 
-            graphList << map
-        }
+                iterateAndDescendModels(model, level, modelList, depth, SUB_TYPE)
+                iterateAndDescendModels(model, level, presentationList, depth, PRESENTATION)
 
-        //don't recurse dataElements
-        if(model instanceof DataElement) return
+                graphList << map
+                return
+            case 3:
+                buildSubTypeOrPresentation(map, subTag, model)
 
-        model.contains.eachWithIndex { CatalogueElement child, i ->
-            recurseIfIncluded(i, child, level, modelList, depth, levelMetaData, exclusions)
-        }
-        model.parentOf?.eachWithIndex { CatalogueElement child, i ->
-            recurseIfIncluded(i, child, level, modelList, depth, levelMetaData, exclusions)
+                graphList << map
+                return
+            default:
+                return
         }
 
     }
 
-    private void recurseIfIncluded(i, CatalogueElement child, level, modelList, depth, levelMetaData, exclusions) {
-        def include = true
-        exclusions.each { pattern ->
-            if (child.name.matches("(?i:.*$pattern.*)")) {
-                include = false
+    private void iterateAndDescendModels(CatalogueElement model, level, modelList, depth, String includePattern) {
+        //don't recurse dataElements
+        if (model instanceof DataElement) return
+
+        model.contains.each { CatalogueElement child ->
+            if (child.name.matches("(?i:.*$includePattern.*)")) {
+                descendModels(child, level + 1, modelList, depth, includePattern)
             }
         }
-        if (include) {
-            descendModels(child, level + 1, modelList, depth, levelMetaData, exclusions)
+        model.parentOf?.eachWithIndex { CatalogueElement child, i ->
+            if (child.name.matches("(?i:.*$includePattern.*)")) {
+                descendModels(child, level + 1, modelList, depth, includePattern)
+            }
+        }
+    }
+
+
+    private void buildSubTypeOrPresentation(Map map, String subTag, CatalogueElement model) {
+        if ( SUB_TYPE.equals(subTag) ) {
+            def subTypes = []
+            map.put(ID_TAG, "$model.id")
+            map.put(SUB_TYPE, model.name)
+            map.put(SUB_TYPES, subTypes)
+            iterateEnumTypes(model, subTypes)
+        }
+        if ( PRESENTATION.equals(subTag) ) {
+            map.put(subTag, model.name)
+            map.put(DESCRIPTION_TAG, model.description ?: '')
+        }
+    }
+
+    private void iterateEnumTypes(CatalogueElement model, List subtypes) {
+
+        if(getEntityClass(model) == DataElement && getEntityClass(model.dataType) == EnumeratedType) {
+
+            EnumeratedType enumTypes = model.dataType as EnumeratedType
+            log.debug("found enumType $enumTypes.name")
+            def subtypeMap = [:]
+            def enumList = []
+
+            subtypes << subtypeMap
+            subtypeMap.put(ID_TAG,"$enumTypes.id")
+            subtypeMap.put(ENUMERATED_TYPE_TAG,enumTypes.name)
+            subtypeMap.put(ENUMS_TAG,enumList)
+
+            buildEnumList(enumTypes, enumList)
+        }
+
+    }
+
+    private Map<String, String> buildEnumList(EnumeratedType enumTypes, enumList) {
+        enumTypes.enumerations.each { enumType ->
+            def map = [:]
+            map.put(ENUM_TAG, enumType.key)
+            map.put(DESCRIPTION_TAG, enumType.value)
+            enumList << map
         }
     }
 

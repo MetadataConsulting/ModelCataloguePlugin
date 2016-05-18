@@ -79,7 +79,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
         similar adhesion, 'adhesion.catalogue.xml'
     }
 
-    def "write simple model"() {
+    def "write simple model with validation"() {
         expect:
         similar locomotive, 'locomotive.catalogue.xml'
     }
@@ -170,6 +170,17 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
                         relationship {
                             ext 'Min. Occurs', '0'
                         }
+                    }
+                    validationRule(name: 'Locomotives Rules', id: 'http://www.example.com/rules/LocomotivesRules') {
+                        component 'Southeast Lines'
+                        ruleFocus 'Focus on trains not cars'
+                        trigger  'When the new route is planned'
+                        rule  'IF something THEN something else'
+                        errorCondition  'stop doing everytihng'
+                        issueRecord 'MET-XXXX'
+                        notification 'trains should go cars should stop'
+                        notificationTarget 'the conductor'
+                        dataElement(name: "Factor of Adhesion", id: "http://www.example.com/elements/Adhesion")
                     }
                 }
             }

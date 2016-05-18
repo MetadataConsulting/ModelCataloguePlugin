@@ -156,6 +156,10 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
             contains element, relConf
         }
 
+        context.withContextElement(ValidationRule) { ignored, Closure relConf ->
+            rel 'involvedness' from element, relConf
+        }
+
         element
     }
 
@@ -182,6 +186,27 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         }
 
         dataClass
+    }
+
+    /**
+     * Creates new validation rule, reuses the latest draft or creates new draft unless the exactly same validation rule
+     * already exists in the catalogue. Accepts any bindable parameters which valiadtion rule instances does.
+     *
+     * Models nested inside the DSL definition closure will be set as child models for this model.
+     * Data elements nested inside the DSL definition closure will be set as contained elements for this model.
+     *
+     * @param parameters map of parameters such as name or id
+     * @param c DSL definition closure
+     */
+    void validationRule(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
+        CatalogueElementProxy<ValidationRule> validationRule = createProxy(ValidationRule, parameters, null, isUnderControlIfSameClassification(parameters))
+
+        context.withNewContext validationRule, c
+        context.withContextElement(DataClass) { ignored, Closure relConf ->
+            rel 'ruleContext' to validationRule, relConf
+        }
+
+        validationRule
     }
 
     /**
@@ -283,92 +308,6 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
     }
 
     /**
-     * Adds the model specified by given classification and name to a parent model.
-     *
-     * Metadata for this hierarchy relationship can be set using the extensions DSL definition closure.
-     *
-     * @param classification classification of the child model
-     * @param name name of the child model
-     * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see RelationshipConfiguration
-     */
-    void child(String classification, String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
-        rel "hierarchy" to classification, name, extensions
-    }
-
-    /**
-     * Adds the model specified by given name to the parent model. The model is searched within the parent
-     * classification if not global search for models set.
-     *
-     * Metadata for this hierarchy relationship can be set using the extensions DSL definition closure.
-     *
-     * @param name name of the child model
-     * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see RelationshipConfiguration
-     * @see #globalSearchFor(BuilderKeyword)
-     */
-    void child(String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
-        rel "hierarchy" to name, extensions
-    }
-
-    /**
-     * Adds the model specified by given proxy to the parent model.
-     *
-     * Metadata for this hierarchy relationship can be set using the extensions DSL definition closure.
-     *
-     * @param model proxy of the child model
-     * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see RelationshipConfiguration
-     * @see #globalSearchFor(BuilderKeyword)
-     */
-    void child(ApiCatalogueElement model, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
-        rel "hierarchy" to model, extensions
-    }
-
-    /**
-     * Adds the data element specified by given classification and name to a parent model.
-     *
-     * Metadata for this hierarchy relationship can be set using the extensions DSL definition closure.
-     *
-     * @param classification classification of the contained data element
-     * @param name name of the contained data element
-     * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see RelationshipConfiguration
-     */
-    void contains(String classification, String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
-        rel "containment" to classification, name, extensions
-    }
-
-    /**
-     * Adds the data element specified by given name to the parent model. The data element is searched within the parent
-     * classification if not global search for data elements set.
-     *
-     * Metadata for this hierarchy relationship can be set using the extensions DSL definition closure.
-     *
-     * @param name name of the contained data element
-     * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see RelationshipConfiguration
-     * @see #globalSearchFor(BuilderKeyword)
-     */
-    void contains(String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
-        rel "containment" to name, extensions
-    }
-
-    /**
-     * Adds the data element specified by given proxy to the parent model.
-     *
-     * Metadata for this hierarchy relationship can be set using the extensions DSL definition closure.
-     *
-     * @param model proxy of the contained data element
-     * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see RelationshipConfiguration
-     * @see #globalSearchFor(BuilderKeyword)
-     */
-    void contains(CatalogueElement element, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
-        rel "containment" to element, extensions
-    }
-
-    /**
      * Adds the base element specified by given classification and name to a parent element.
      *
      * Metadata for this hierarchy relationship can be set using the extensions DSL definition closure.
@@ -437,34 +376,6 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         return new DefaultRelationshipBuilder(context, repository, relationshipTypeName)
     }
 
-    /**
-     * Sets the description of element.
-     * @param description description of element
-     */
-    void description(String description) { setStringValue('description', description) }
-
-    /**
-     * Sets the rule of the value domain. Fails if not inside value domain definition or any other catalogue element
-     * having the rule property.
-     * @param rule rule of the parent value domain
-     */
-    void rule(String rule)               { setStringValue('rule', rule) }
-
-    /**
-     * Sets the regular expression rule of the value domain. Fails if the current is not a value domain or any other
-     * catalogue element supporting setting the regular expression rule property.
-     * @param rule rule of the parent value domain
-     */
-    void regex(String regex)             { setStringValue('regexDef', regex) }
-
-    /**
-     * Sets the model catalogue id of the current element. The id must be a valid URL.
-     * @param id id which must be valid URL
-     * @see #id(groovy.lang.Closure)
-     */
-    void id(String id) {
-        setStringValue('modelCatalogueId', id)
-    }
 
     /**
      * Sets the status of the current element. Currently it does not work as expected as it sets the status property
@@ -613,6 +524,8 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         }
     }
 
+
+
     /**
      * Helper method to set the sting value the the parent element.
      *
@@ -718,6 +631,5 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         }
         return ret
     }
-
 }
 
