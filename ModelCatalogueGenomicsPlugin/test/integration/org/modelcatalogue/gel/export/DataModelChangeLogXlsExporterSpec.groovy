@@ -38,8 +38,11 @@ class DataModelChangeLogXlsExporterSpec extends AbstractDataModelExporterSpec {
 
         open file
 
+        println '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'
         println "expectedRDPhenotypesCsv:\n$expectedRDPhenotypesCsv"
+        println '>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<'
         println "allRows:\n$allRows"
+        println '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
 
         then:
         noExceptionThrown()

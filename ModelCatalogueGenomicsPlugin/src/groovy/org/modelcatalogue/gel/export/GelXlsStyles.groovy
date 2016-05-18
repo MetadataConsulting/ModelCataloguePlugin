@@ -35,6 +35,20 @@ class GelXlsStyles implements Stylesheet {
                     color black
                 }
             }
+            style('h3-wrap-thick') {
+                background('#dbebf6')
+                wrap text
+                border {
+                    thickVerticalBands
+                    thickHorizontalBands
+                }
+                align center left
+                font {
+                    bold
+                    size 12
+                    color black
+                }
+            }
             style('wrap-green') {
                 wrap text
                 background('#c2efcf')

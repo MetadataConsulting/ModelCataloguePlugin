@@ -14,6 +14,8 @@ import org.modelcatalogue.core.audit.AuditService
 class RareDiseaseEligibilityChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
 
     private static final String ELIGIBILITY_SHEET = 'Eligibility Criteria change log'
+    private static final int CURRENT_DETAILS = 6
+    private static final int NEW_DETAILS = 7
 
     RareDiseaseEligibilityChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, Integer depth = 5, Boolean includeMetadata = false) {
         super(auditService, dataClassService, depth, includeMetadata)
@@ -78,7 +80,7 @@ class RareDiseaseEligibilityChangeLogXlsExporter extends RareDiseaseChangeLogXls
 
     @Override
     List<String> searchExportSpecificTypes(CatalogueElement model, List lines, groupDescriptions, level) {
-
+        levelIdStack.put(level,model.id)
         if (model.name.matches("(?i:.*Eligibility.*)")) {
             checkChangeLog(model, lines, groupDescriptions, level, TOP_LEVEL_RELATIONSHIP_TYPES)
             iterateChildren(model, lines, groupDescriptions, level, DETAIL_CHANGE_TYPES)
@@ -93,9 +95,9 @@ class RareDiseaseEligibilityChangeLogXlsExporter extends RareDiseaseChangeLogXls
             line.eachWithIndex{ String cellValue, int i ->
                 cell {
                     value cellValue
-                    if (i!=6 && i!=7) style 'property-value'
-                    if (i==6) style 'property-value-wrap'
-                    if (i==7) style 'property-value-green'
+                    if (i!= CURRENT_DETAILS && i!=NEW_DETAILS) style 'property-value'
+                    if (i == CURRENT_DETAILS) style 'property-value-wrap'
+                    if (i == NEW_DETAILS) style 'property-value-green'
                 }
             }
         }

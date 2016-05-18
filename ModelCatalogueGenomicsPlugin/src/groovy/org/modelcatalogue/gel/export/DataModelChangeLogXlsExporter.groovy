@@ -23,8 +23,8 @@ class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
     private static final int SECTION = 3
     private static final int DATA_ITEM_NAME = 4
 
-    private static final int CURRENT_DETAILS = 6
-    private static final int NEW_DETAILS = 7
+    private static final int CURRENT_DETAILS = 5
+    private static final int NEW_DETAILS = 6
 
     def headers = [
         1: 'Change reference',
@@ -84,20 +84,12 @@ class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
                 cell {
                     value headers.get(6)
                     width 30
-                    style 'h3'
-                    style {
-                        wrap text
-                        border {
-                            thickVerticalBands
-                            thickHorizontalBands
-                        }
-                    }
+                    style 'h3-wrap-thick'
                 }
                 cell {
                     value headers.get(7)
                     width 30
-                    style 'h3'
-                    style { background('#c2efcf') }
+                    style 'h3-green'
                 }
             }
 
@@ -119,7 +111,7 @@ class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
             line.eachWithIndex { String cellValue, int i ->
                 cell {
                     value cellValue
-                    style 'property-value'
+                    if (i!= CURRENT_DETAILS && i!=NEW_DETAILS) style 'property-value'
                     if (i == CURRENT_DETAILS) style 'property-value-wrap'
                     if (i == NEW_DETAILS) style 'property-value-green'
                 }
@@ -129,7 +121,7 @@ class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
 
     @Override
     List<String> searchExportSpecificTypes(CatalogueElement model, List lines, groupDescriptions, level) {
-
+        levelIdStack.put(level,model.id)
         checkChangeLog(model, lines, groupDescriptions, level, TOP_LEVEL_RELATIONSHIP_TYPES)
         iterateChildren(model, lines, groupDescriptions, level, DETAIL_CHANGE_TYPES)
 

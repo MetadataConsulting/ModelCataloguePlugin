@@ -51,7 +51,8 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     SessionFactory sessionFactory
     def propertyInstanceMap = DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
 
-    int modelCount = 0
+    int callCount = 0
+    int itemCount = 0
     Map<Long,Boolean> visitedModels                     // id and TRUE/FALSE whether changes found for this model or it's children
     Map<Integer,Long> levelIdStack                      // ids in the current stack
     ListMultimap<Long,List<String>> cachedChanges       // id and the cached changes for this model (string is ',' joined)
@@ -96,7 +97,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
         exportLinesAsXls sheetName, lines, out
 
         TimeDuration elapsed = TimeCategory.minus(new Date(), timeStart)
-        log.info "stats: export took=$elapsed raw modelCount=$modelCount visitedModels (excludes previously visited) ${visitedModels.size()} cached models ${cachedChanges.size()}"
+        log.info "stats: export took=$elapsed itemcount=$itemCount visitedModels (excludes previously visited) ${visitedModels.size()} cached models ${cachedChanges.size()}"
         log.info "Exported Rare Diseases as xls spreadsheet ${model.name} (${model.combinedVersion})"
     }
 
@@ -126,14 +127,6 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
                 break
 
             case [2,3,4]:
-
-//                if(level==2) {
-//                    if (model.name.equals("Skeletal disorders")) {
-//                        log.debug 'found Skeletal disorders'
-//                    } else {
-//                        return
-//                    }
-//                }
 
                 String groupDescription = "$model.name (${model.combinedVersion})"
                 log.info "$level $model $groupDescription --- $model.dataModel"
@@ -174,13 +167,11 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
 
         levelIdStack.put(level,model.id)
 
-        if (modelCount % 500 == 0) {
-            log.info "raw modelCount=$modelCount visitedModels ${visitedModels.size()}"
-        }
-
-
-
         model.parentOf?.each { CatalogueElement child ->
+
+            if (++itemCount % 500 == 0) {
+                log.info "raw itemcount=$itemCount visitedModels ${visitedModels.size()}"
+            }
 
             boolean visited = visitedModels.containsKey(child.id)
             boolean isVisitedWithChanges
@@ -237,8 +228,8 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
             return
         }
 
-
         List<Change> allChanged = getChanges(model, typesToCheck.toArray(new ChangeType[0]))
+        callCount++
 
 
         for (Change change : allChanged) {
@@ -335,8 +326,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     // skipped if it subsequently appears below items in the tree without changes i.e. when they are checked for isVisitedWithChanges
     //
     protected void saveChangedModelsTree(List lines, int currLineCount, CatalogueElement model, int level) {
-        modelCount++
-        if (modelCount % CLEAN_UP_GORM_PERIOD == 0) {
+        if (callCount % CLEAN_UP_GORM_PERIOD == 0) {
             cleanUpGorm()
         }
 
@@ -454,6 +444,9 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
 
         groupDescriptions.each { lvl, lvlName ->
             hierarchyChanges << lvlName
+        }
+        if (groupDescriptions.size < 3) {   //DataModelChangelogs hierarchy Cancer/RD can be shallower than RD conditions
+            hierarchyChanges << model.name
         }
 
         for (String cachedChangeLog: cachedChanges.get(model.id)) {

@@ -15,6 +15,8 @@ import static org.modelcatalogue.core.audit.ChangeType.PROPERTY_CHANGED
 class RareDiseasePhenotypeChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
 
     private static final String PHENOTYPES_SHEET = 'HPO & Clinical tests change log'
+    private static final int CURRENT_DETAILS = 7
+    private static final int NEW_DETAILS = 8
 
     RareDiseasePhenotypeChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, Integer depth = 5, Boolean includeMetadata = false) {
         super(auditService, dataClassService, depth, includeMetadata)
@@ -114,9 +116,9 @@ class RareDiseasePhenotypeChangeLogXlsExporter extends RareDiseaseChangeLogXlsEx
             line.eachWithIndex{ String cellValue, int i ->
                 cell {
                     value cellValue
-                    if (i!=7 && i!=8) style 'property-value'
-                    if (i==7) style 'property-value-wrap'
-                    if (i==8) style 'property-value-green'
+                    if (i!= CURRENT_DETAILS && i!=NEW_DETAILS) style 'property-value'
+                    if (i == CURRENT_DETAILS) style 'property-value-wrap'
+                    if (i == NEW_DETAILS) style 'property-value-green'
                 }
             }
         }
