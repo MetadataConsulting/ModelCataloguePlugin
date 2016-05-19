@@ -33,7 +33,7 @@ class RareDiseasesJsonExporter {
         def levelTag3 = [tag1: 'id', tag2: 'name', tag3: 'specificDisorders']
         def levelTag4 = [tag1: 'id', tag2: 'name', tag3: 'disorderCriteria']
         def levelTag5 = [tag1: 'id', tag2: 'name', tag3: 'eligibilityCriteria']
-        def levelTag6 = [tag1: 'id', tag2: 'name']
+        def levelTag6 = [tag1: 'id', tag2: 'name', tag3: 'description']
         def levelMetaData = [1: levelTag1, 2: levelTag2, 3: levelTag3, 4: levelTag4, 5: levelTag5, 6: levelTag6]
 
         exportJson(model, depth, levelMetaData, exclusions)
@@ -59,10 +59,8 @@ class RareDiseasesJsonExporter {
 
     def descendModels(CatalogueElement model, level, graphList, depth, Map levelMetaData, exclusions) {
         if (level > depth) return
-        //TODO - comment out for prod
-//        if (modelCount > 2) return
 
-        log.debug "descendModels level=$level graghList=$graphList model=$model"
+        log.debug "descendModels level=$level model=$model"
 
         def modelList = []
         def map = [:]
@@ -86,6 +84,7 @@ class RareDiseasesJsonExporter {
             case 6:
                 map.put(levelMetaData.get(level).tag1, model.combinedVersion)
                 map.put(levelMetaData.get(level).tag2, model.name)
+                map.put(levelMetaData.get(level).tag3, model.description ?: '')
 
                 graphList << map
 
