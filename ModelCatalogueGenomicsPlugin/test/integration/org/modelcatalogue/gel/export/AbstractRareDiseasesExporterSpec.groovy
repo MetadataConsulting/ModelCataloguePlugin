@@ -11,6 +11,7 @@ import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.builder.ContextItem
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
+import org.modelcatalogue.gel.GenomicsService
 import org.modelcatalogue.gel.RareDiseaseCsvExporter
 
 /**
@@ -23,6 +24,7 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
     ElementService elementService
     DataModelService dataModelService
     InitCatalogueService initCatalogueService
+    GenomicsService genomicsService
 
     def setup() {
         initCatalogueService.initDefaultRelationshipTypes()
