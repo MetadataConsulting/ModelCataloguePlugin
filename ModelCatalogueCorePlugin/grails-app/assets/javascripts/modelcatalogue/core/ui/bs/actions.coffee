@@ -70,7 +70,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       action: ->
         catalogueElementResource('user').get(security.getCurrentUser()?.id).then (user) ->
           favourite = $scope.element.favourite
-          url = "#{modelCatalogueApiRoot}#{user.link}/outgoing/favourite"
+          url = "#{modelCatalogueApiRoot}#{user.link}/favourite"
           enhance(rest(url: url, method: (if favourite then 'DELETE' else 'POST'), data: $scope.element)).then (relation) ->
             messages.success(if favourite then "#{$scope.element.getLabel()} has been removed from favorites" else "#{$scope.element.getLabel()} has been added to favorites")
             $scope.element.favourite = not favourite
@@ -106,7 +106,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       action: ->
         messages.prompt("Add to Favourites", "Please, select which element should be added to the favourite ones", {type: 'catalogue-element', resource: 'catalogueElement'}).then (element)->
           catalogueElementResource('user').get(security.getCurrentUser()?.id).then (user) ->
-            url = "#{modelCatalogueApiRoot}#{user.link}/outgoing/favourite"
+            url = "#{modelCatalogueApiRoot}#{user.link}/favourite"
             enhance(rest(url: url, method: 'POST', data: element)).then (relation) ->
               $scope.$broadcast 'catalogueElementCreated', relation, url, element
               messages.success "#{element.getLabel()} has been added to favorites"
