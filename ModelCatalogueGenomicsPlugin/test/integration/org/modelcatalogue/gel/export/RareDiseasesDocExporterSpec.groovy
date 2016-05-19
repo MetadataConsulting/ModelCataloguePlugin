@@ -11,7 +11,6 @@ import static org.modelcatalogue.core.util.test.FileOpener.open
  */
 class RareDiseasesDocExporterSpec extends AbstractRareDiseasesExporterSpec {
 
-
     def "export eligibility dataClasses to docx"() {
         when:
         boolean eligibilityMode = true;
@@ -19,7 +18,7 @@ class RareDiseasesDocExporterSpec extends AbstractRareDiseasesExporterSpec {
         buildTestModel(true)
         DataClass dataClass = DataClass.findByName('Dataclass Top Level 1 Root')
 
-        new RareDiseasesDocExporter(dataClass, standardTemplate, DOC_IMAGE_PATH, eligibilityMode ).export(file.newOutputStream())
+        new RareDiseasesDocExporter(dataClass, standardTemplate, genomicsService.DOC_IMAGE_PATH, eligibilityMode ).export(file.newOutputStream())
 
         open file
 
@@ -37,7 +36,7 @@ class RareDiseasesDocExporterSpec extends AbstractRareDiseasesExporterSpec {
         buildTestModel(true)
         DataClass dataClass = DataClass.findByName('Dataclass Top Level 1 Root')
 
-        new RareDiseasesDocExporter(dataClass, standardTemplate, DOC_IMAGE_PATH, eligibilityMode).export(file.newOutputStream())
+        new RareDiseasesDocExporter(dataClass, standardTemplate, genomicsService.DOC_IMAGE_PATH, eligibilityMode).export(file.newOutputStream())
 
         open file
 
@@ -53,7 +52,7 @@ class RareDiseasesDocExporterSpec extends AbstractRareDiseasesExporterSpec {
         buildTestModel(false)
         DataClass dataClass = DataClass.findByName('Dataclass Top Level 1 Root')
 
-        new RareDiseasesDocExporter(dataClass, standardTemplate, DOC_IMAGE_PATH, eligibilityMode).export(file.newOutputStream())
+        new RareDiseasesDocExporter(dataClass, standardTemplate, genomicsService.DOC_IMAGE_PATH, eligibilityMode).export(file.newOutputStream())
 
         open file
 

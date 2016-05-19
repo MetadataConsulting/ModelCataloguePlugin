@@ -10,6 +10,7 @@ import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.ddl.DataDefinitionLanguage
 import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
+import org.modelcatalogue.gel.GenomicsService
 import org.modelcatalogue.gel.RareDiseaseCsvExporter
 
 /**
@@ -23,6 +24,7 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
     DataModelService dataModelService
     InitCatalogueService initCatalogueService
     SessionFactory sessionFactory
+    GenomicsService genomicsService
 
     def setup() {
         initCatalogueService.initDefaultRelationshipTypes()

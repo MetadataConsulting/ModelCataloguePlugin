@@ -133,7 +133,10 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
     private static Closure addRelationsJson(RelationshipDirection direction, CatalogueElement el, Map ret, Map<String, RelationshipType> types) {
         { String relationshipType, String name ->
             RelationshipType type = types[relationshipType]
-            def relation = [itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${direction.actionName}/${relationshipType}".toString(), search: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${direction.actionName}/${relationshipType}/search".toString()]
+            def relation = [itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${direction.actionName}/${relationshipType}".toString()]
+            if (type.searchable) {
+                relation.search = "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${direction.actionName}/${relationshipType}/search".toString()
+            }
             switch (direction) {
                 case RelationshipDirection.INCOMING:
                     relation.count = el.countIncomingRelationshipsByType(type)

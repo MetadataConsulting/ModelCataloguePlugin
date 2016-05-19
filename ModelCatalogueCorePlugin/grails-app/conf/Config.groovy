@@ -32,6 +32,9 @@ log4j = {
     warn 'org.modelcatalogue.core.xml'
     info 'org.modelcatalogue.core.RelationshipType'
 
+    info 'org.modelcatalogue.core.rx.BatchOperator'
+    info 'org.modelcatalogue.core.rx.DetachedCriteriaOnSubscribe'
+
     debug 'grails.app.domain'
 
 //    trace 'org.hibernate.type'

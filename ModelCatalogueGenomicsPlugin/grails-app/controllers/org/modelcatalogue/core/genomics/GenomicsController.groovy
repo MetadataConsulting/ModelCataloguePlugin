@@ -1,62 +1,19 @@
 package org.modelcatalogue.core.genomics
 
-import org.hibernate.SessionFactory
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.audit.AuditService
-import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
-import org.modelcatalogue.core.publishing.changelog.ChangeLogDocxGenerator
+import org.modelcatalogue.core.util.DataModelFilter
+import org.modelcatalogue.gel.GenomicsService
 import org.modelcatalogue.gel.RareDiseaseCsvExporter
-import org.modelcatalogue.gel.GelJsonExporter
-import org.modelcatalogue.gel.export.CancerTypesCsvExporter
-import org.modelcatalogue.gel.export.CancerTypesJsonExporter
-import org.modelcatalogue.gel.export.DataModelChangeLogXlsExporter
-import org.modelcatalogue.gel.export.RareDiseaseDisorderListCsvExporter
-import org.modelcatalogue.gel.export.RareDiseaseEligibilityChangeLogXlsExporter
-import org.modelcatalogue.gel.export.RareDiseasePhenotypeChangeLogXlsExporter
-import org.modelcatalogue.gel.export.RareDiseasesDocExporter
-import org.modelcatalogue.gel.export.RareDiseasesJsonExporter
 import org.springframework.http.HttpStatus
-
-import static RareDiseasesDocExporter.getStandardTemplate
-
 /**
  * Controller for GEL specific reports.
- * Should figure out which of the abstract controllers would be most suitable to extend from.
- * I think AbstractCatalogueElementController would be good if we split this controller into 2. One for data models, one for data classes...
  */
 class GenomicsController {
 
-    def assetService
-    AuditService auditService
-    def elementService
     DataClassService dataClassService
-    SessionFactory sessionFactory
-
-    static final String RD_ELIGIBILITY_CSV_FILENAME = "RD Eligibility Criteria.csv"
-    static final String RD_HPO_CSV_FILENAME = "RD Phenotypes and Clinical Tests.csv"
-    static final String RD_ELIGIBILITY_CRITERIA_JSON = "RD Eligibility Criteria.json"
-    static final String RD_PHENOTYPE_AND_CLINICAL_TESTS_XLS = "RD Change log for Phenotypes and clinical tests.xlsx"
-    static final String RD_ELIGIBILITY_CHANGELOG_XLS = "RD Change Log for Eligibility Criteria.xlsx"
-
-    static final String DOC_IMAGE_PATH = "https://www.genomicsengland.co.uk/wp-content/uploads/2015/11/Genomics-England-logo-2015.png"
-
-    static Closure customTemplate = {
-        'document' font: [family: 'Calibri', size: 11], margin: [left: 20, right: 10]
-        'paragraph.title' font: [color: '#1F497D', size: 32.pt, bold: true], margin: [top: 150.pt, bottom: 10.pt]
-        'paragraph.subtitle' font: [color: '#1F497D', size: 36.pt], margin: [top: 0.pt]
-        'paragraph.description' font: [color: '#13D4CA', size: 16.pt, italic: true], margin: [left: 30, right: 30]
-        'heading1' font: [size: 18, bold: true]
-        'heading2' font: [size: 18, bold: true]
-        'heading3' font: [size: 16, bold: true]
-        'heading4' font: [size: 16, bold: true]
-        'heading5' font: [size: 15]
-        'heading6' font: [size: 14]
-        'table.row.cell.headerCell' font: [color: '#FFFFFF', size: 12.pt, bold: true], background: '#1F497D'
-        'table.row.cell' font: [size: 10.pt]
-        'paragraph.headerImage' height: 1.366.inches, width: 2.646.inches
-    }
+    GenomicsService genomicsService
 
     def exportRareDiseaseHPOAndClinicalTestsAsJson() {
 
@@ -67,19 +24,12 @@ class GenomicsController {
             return
         }
 
-        DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dataClass.getDefaultModelCatalogueId(true))
-
-        Long assetId = assetService.storeReportAsAsset(latestVersion.dataModel,
-            name: "${latestVersion.name} - HPO and Clinical Tests report (JSON)",
-            originalFileName: "${latestVersion.name}-${latestVersion.status}-${latestVersion.version}.json",
-            contentType: "application/json",
-        ) {
-            new GelJsonExporter(it).printDiseaseOntology(latestVersion)
-        }
+        Long assetId = genomicsService.genRareDiseaseHPOAndClinicalTestsAsJson(dataClass)
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
     }
+
 
     def exportRareDiseaseEligibilityCsv() {
         exportRareDiseaseCsv(RareDiseaseCsvExporter.ELIGIBILITY)
@@ -94,13 +44,7 @@ class GenomicsController {
             return
         }
 
-        Long assetId = assetService.storeReportAsAsset(dataClass.dataModel,
-            name: "${dataClass.name} - Eligibility criteria report (JSON)",
-            originalFileName: "$RD_ELIGIBILITY_CRITERIA_JSON",
-            contentType: "application/json",
-        ) {
-            new RareDiseasesJsonExporter(it).exportEligibilityCriteriaAsJson(dataClass)
-        }
+        Long assetId = genomicsService.genRareDiseaseHPOEligibilityCriteriaAsJson(dataClass)
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
@@ -118,15 +62,7 @@ class GenomicsController {
             return
         }
 
-        DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dClass.getDefaultModelCatalogueId(true))
-
-        Long assetId = assetService.storeReportAsAsset(latestVersion.dataModel,
-            name: "${latestVersion.name} report (CSV)",
-            originalFileName: "${docType == RareDiseaseCsvExporter.HPO_AND_CLINICAL_TESTS ? RD_HPO_CSV_FILENAME : RD_ELIGIBILITY_CSV_FILENAME}",
-            contentType: "text/csv",
-        ) {
-            new RareDiseaseCsvExporter(it, docType).printReport(latestVersion)
-        }
+        def assetId = genomicsService.genRareDiseaseCsv(dClass, docType)
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
@@ -140,44 +76,37 @@ class GenomicsController {
             return
         }
 
-        DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dClass.getDefaultModelCatalogueId(true))
-        String name = "Rare Disease Disorder List"
-
-        Long assetId = assetService.storeReportAsAsset(latestVersion.dataModel,
-            name: "${name} (CSV)",
-            originalFileName: "${name}-${latestVersion.status}-${latestVersion.version}.csv",
-            contentType: "text/csv",
-        ) {
-            new RareDiseaseDisorderListCsvExporter(it).export(latestVersion)
-        }
+        Long assetId = genomicsService.genRareDiseaseDisorderListAsCsv(dClass)
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
     }
 
+//    def exportRareDiseaseHPOAndClinicalTests() {
+//        DataClass dataClass = DataClass.get(params.id)
+//
+//        if (!dataClass) {
+//            respond status: HttpStatus.NOT_FOUND
+//            return
+//        }
+//
+//        def assetId = genRareDiseaseHPOAndClinicalTestsJson(dataClass)
+//
+//        response.setHeader("X-Asset-ID", assetId.toString())
+//        redirect controller: 'asset', id: assetId, action: 'show'
+//    }
 
-    def exportRareDiseaseHPOAndClinicalTests() {
-        DataClass model = DataClass.get(params.id)
-
-        if (!model) {
-            respond status: HttpStatus.NOT_FOUND
-            return
-        }
-
-        Long classId = model.getId()
-
-        Long assetId = assetService.storeReportAsAsset(model.dataModel,
-            name: "${model.name} - HPO and Clinical Tests report (JSON)",
-            originalFileName: "${model.name}-${model.status}-${model.version}.json",
-            contentType: "application/json",
-        ) {
-            new GelJsonExporter(it).printDiseaseOntology(DataClass.get(classId))
-        }
-
-        response.setHeader("X-Asset-ID", assetId.toString())
-        redirect controller: 'asset', id: assetId, action: 'show'
-    }
-
+//    long genRareDiseaseHPOAndClinicalTestsJson(DataClass dataClass){
+//        Long classId = dataClass.getId()
+//
+//        return assetService.storeReportAsAsset(dataClass.dataModel,
+//            name: "${dataClass.name} - HPO and Clinical Tests report (JSON)",
+//            originalFileName: "${dataClass.name}-${dataClass.status}-${dataClass.version}.json",
+//            contentType: "application/json",
+//        ) {
+//            new GelJsonExporter(it).printDiseaseOntology(DataClass.get(classId))
+//        }
+//    }
 
     def exportRareDiseaseEligibilityDoc() {
         exportEligibilityOrPhenotypesAndTests(true)
@@ -189,29 +118,18 @@ class GenomicsController {
 
 
     private void exportEligibilityOrPhenotypesAndTests(boolean eligibilityMode) {
-        DataClass model = DataClass.get(params.id)
+        DataClass dataClass = DataClass.get(params.id)
 
-        if (!model) {
+        if (!dataClass) {
             respond status: HttpStatus.NOT_FOUND
             return
         }
 
-        String documentName = RareDiseasesDocExporter.documentName(eligibilityMode)
-
-        Long classId = model.id
-        def assetId = assetService.storeReportAsAsset(
-            model.dataModel,
-            name: "${documentName} report (MS Word Document)",
-            originalFileName: "${documentName}-${model.status}-${model.version}.docx",
-            contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        ) { OutputStream out ->
-            new RareDiseasesDocExporter(DataClass.get(classId), standardTemplate, DOC_IMAGE_PATH, eligibilityMode).export(out)
-        }
+        def assetId = genomicsService.genEligibilityOrPhenotypesAndTests(dataClass, eligibilityMode)
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
     }
-
 
     def exportGelSpecification() {
 
@@ -222,56 +140,35 @@ class GenomicsController {
             return
         }
 
-        Long modelId = model.id
-        def assetId = assetService.storeReportAsAsset(
-            model,
-            name: "${model.name} - Data Specification Report (MS Word Document)",
-            originalFileName: "${model.name}-${model.status}-${model.version}.docx",
-            contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        ) { OutputStream out ->
-            new DataModelToDocxExporter(DataModel.get(modelId), dataClassService, customTemplate, DOC_IMAGE_PATH).export(out)
-        }
+        def assetId = genomicsService.genGelSpecification(model)
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
     }
 
-
     def exportCancerTypesAsJson() {
-        DataClass model = DataClass.get(params.id)
+        DataClass dataClass = DataClass.get(params.id)
 
-        if (!model) {
+        if (!dataClass) {
             respond status: HttpStatus.NOT_FOUND
             return
         }
 
-        Long assetId = assetService.storeReportAsAsset(model.dataModel,
-            name: "${model.name} - Cancer Types report (JSON)",
-            originalFileName: "${model.name}-${model.status}-${model.version}.json",
-            contentType: "application/json",
-        ) {
-            new CancerTypesJsonExporter(it).exportCancerTypesAsJson(model)
-        }
+        Long assetId = genomicsService.genCancerTypesAsJson()
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
     }
 
     def exportCancerTypesAsCsv() {
-        DataClass model = DataClass.get(params.id)
+        DataClass dataClass = DataClass.get(params.id)
 
-        if (!model) {
+        if (!dataClass) {
             respond status: HttpStatus.NOT_FOUND
             return
         }
 
-        Long assetId = assetService.storeReportAsAsset(model.dataModel,
-            name: "${model.name} - Cancer Types report (CSV)",
-            originalFileName: "${model.name}-${model.status}-${model.version}.csv",
-            contentType: "text/csv",
-        ) {
-            new CancerTypesCsvExporter(it).exportCancerTypesAsCsv(model)
-        }
+        Long assetId = genomicsService.genCancerTypesAsCsv(dataClass)
 
         response.setHeader("X-Asset-ID",assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
@@ -286,13 +183,7 @@ class GenomicsController {
             return
         }
 
-        Long assetId = assetService.storeReportAsAsset(dataClass.dataModel,
-            name: "${dataClass.name} - HPO and Clinical Tests (MS Excel Spreadsheet)",
-            originalFileName: "$RD_PHENOTYPE_AND_CLINICAL_TESTS_XLS",
-            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        ) { OutputStream out ->
-            new RareDiseasePhenotypeChangeLogXlsExporter(auditService, dataClassService, 0, false, sessionFactory).export(dataClass,out)
-        }
+        Long assetId = genomicsService.genRareDiseaseHPOAndClinicalTestsAsXls(dataClass)
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
@@ -307,13 +198,7 @@ class GenomicsController {
             return
         }
 
-        Long assetId = assetService.storeReportAsAsset(dataClass.dataModel,
-            name: "${dataClass.name} - Eligibility change log (MS Excel Spreadsheet)",
-            originalFileName: "$RD_ELIGIBILITY_CHANGELOG_XLS",
-            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        ) { OutputStream out ->
-            new RareDiseaseEligibilityChangeLogXlsExporter(auditService, dataClassService, 0, false, sessionFactory).export(dataClass, out)
-        }
+        Long assetId = genomicsService.genRareDiseaseEligibilityChangeLogAsXls(dataClass)
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
@@ -328,16 +213,7 @@ class GenomicsController {
             return
         }
 
-        Long classId = dataClass.id
-        def assetId = assetService.storeReportAsAsset(
-            dataClass.dataModel,
-            name: name ? name : "${dataClass.name} - change log (MS Word Document)",
-            originalFileName: "${dataClass.name}-${dataClass.status}-${dataClass.version}-changelog.docx",
-            contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        ) { OutputStream out ->
-            new ChangeLogDocxGenerator(auditService, dataClassService, depth, includeMetadata, customTemplate, DOC_IMAGE_PATH)
-                .generateChangelog(DataClass.get(classId), out)
-        }
+        def assetId = genomicsService.genChangeLogDocument(dataClass, name, depth, includeMetadata)
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
@@ -352,16 +228,65 @@ class GenomicsController {
             return
         }
 
-        Long assetId = assetService.storeReportAsAsset(model,
-            name: "${model.name}  - Specification change log (MS Excel Spreadsheet)",
-            originalFileName: "${model.name}-${model.status}-${model.version}-changelog.xlsx",
-            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        ) { OutputStream out ->
-            new DataModelChangeLogXlsExporter(auditService, dataClassService, sessionFactory, 0, false).export(model, out)
-        }
+        Long assetId = genomicsService.genDataSpecChangeLogAsXls(model)
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
+    }
+
+    def exportAllRareDiseaseReports() {
+
+        DataModel model = DataModel.get(params.id)
+
+        if (!model) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        //Generate Model reports
+        genomicsService.genGelSpecification(model)
+        genomicsService.genDataSpecChangeLogAsXls(model)
+
+        //Generate Class reports
+        DataClass dataClass = dataClassService.getTopLevelDataClasses(DataModelFilter.includes((DataModel) model)).items.get(0)
+        genomicsService.genRareDiseaseHPOAndClinicalTestsAsXls(dataClass)
+        genomicsService.genCancerTypesAsCsv(dataClass)
+        genomicsService.genCancerTypesAsJson(dataClass)
+        genomicsService.genChangeLogDocument(dataClass,dataClass.name,3,true)
+        genomicsService.genEligibilityOrPhenotypesAndTests(dataClass,true)
+        genomicsService.genEligibilityOrPhenotypesAndTests(dataClass,false)
+        genomicsService.genRareDiseaseCsv(dataClass,RareDiseaseCsvExporter.HPO_AND_CLINICAL_TESTS)
+        genomicsService.genRareDiseaseCsv(dataClass,RareDiseaseCsvExporter.ELIGIBILITY)
+        genomicsService.genRareDiseaseDisorderListAsCsv(dataClass)
+        genomicsService.genRareDiseaseEligibilityChangeLogAsXls(dataClass)
+        genomicsService.genRareDiseaseHPOAndClinicalTestsAsJson(dataClass)
+        genomicsService.genRareDiseaseHPOEligibilityCriteriaAsJson(dataClass)
+
+        redirect uri: "/#/${model.id}/asset/all?status=active"
+
+    }
+
+    def exportAllCancerReports() {
+
+        DataModel model = DataModel.get(params.id)
+
+        if (!model) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        //Generate Model reports
+        genomicsService.genGelSpecification(model)
+        genomicsService.genDataSpecChangeLogAsXls(model)
+
+        //Generate Class reports
+        DataClass dataClass = dataClassService.getTopLevelDataClasses(DataModelFilter.includes((DataModel) model)).items.get(0)
+        genomicsService.genCancerTypesAsCsv(dataClass)
+        genomicsService.genCancerTypesAsJson(dataClass)
+        genomicsService.genChangeLogDocument(dataClass,dataClass.name,3,true)
+
+        redirect uri: "/#/${model.id}/asset/all?status=active"
+
     }
 
 }
