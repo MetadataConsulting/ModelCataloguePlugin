@@ -3,9 +3,11 @@ package org.modelcatalogue.core.util.marshalling
 import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.RelationshipDirection
+import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.springframework.beans.factory.annotation.Autowired
 
 abstract class CatalogueElementMarshaller extends AbstractMarshaller {
@@ -72,6 +74,17 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
         }
 
         ret.favourite = relationshipService.isFavorite(el)
+
+        if (el.status == ElementStatus.PENDING) {
+            BuildProgressMonitor monitor = BuildProgressMonitor.get(el.getId())
+
+            if (monitor) {
+                ret.htmlPreview = """
+                    <pre>${monitor.lastMessages}</pre>
+                """
+            }
+
+        }
 
         return ret
     }

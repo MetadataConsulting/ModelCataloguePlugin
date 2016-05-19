@@ -7,6 +7,7 @@ import org.modelcatalogue.core.path.PathFinder
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.*
+import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.core.util.lists.CustomizableJsonListWithTotalAndType
 import org.modelcatalogue.core.util.lists.DetachedListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
@@ -20,6 +21,7 @@ import org.modelcatalogue.core.util.marshalling.RelationshipsMarshaller
 import org.springframework.http.HttpStatus
 
 import javax.servlet.http.HttpServletResponse
+import java.util.concurrent.ExecutorService
 
 import static org.springframework.http.HttpStatus.OK
 
@@ -31,6 +33,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     def relationshipService
     def mappingService
     def auditService
+
+    ExecutorService executorService
 
     AbstractCatalogueElementController(Class<T> resource, boolean readOnly) {
         super(resource, readOnly)
@@ -627,7 +631,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      * Archive element
      * @param id
      */
-    @Transactional
     def finalizeElement() {
         // TODO: this should be moved to DataModelController
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
@@ -651,15 +654,36 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
+
+        String semanticVersion = params.semanticVersion
+        String revisionNotes = params.revisionNotes
+
         if (instance.instanceOf(DataModel)) {
-            instance = elementService.finalizeDataModel(instance, params.semanticVersion, params.revisionNotes)
-        } else {
-            instance = elementService.finalizeElement(instance)
+            instance.checkFinalizeEligibility(semanticVersion, revisionNotes)
         }
 
         if (instance.hasErrors()) {
             respond instance.errors, view: 'edit' // STATUS CODE 422
             return
+        }
+
+        Long id = instance.getId()
+
+        executorService.submit {
+            try {
+                CatalogueElement element = resource.get(id)
+                if (element.instanceOf(DataModel)) {
+                    elementService.finalizeDataModel(element as DataModel, semanticVersion, revisionNotes, BuildProgressMonitor.create("Finalizing $element", id))
+                } else {
+                    elementService.finalizeElement(element, BuildProgressMonitor.create("Finalizing $element", id))
+                }
+             } catch (e) {
+                log.error "Exception finalizing element on the background", e
+                CatalogueElement element = resource.get(id)
+                element.status = ElementStatus.DRAFT
+                element.save(flush: true)
+            }
+
         }
 
         respond instance, [status: OK]

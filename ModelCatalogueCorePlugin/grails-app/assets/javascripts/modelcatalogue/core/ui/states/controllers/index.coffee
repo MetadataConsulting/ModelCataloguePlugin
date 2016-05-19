@@ -9,6 +9,7 @@ angular.module('mc.core.ui.states.controllers', [
   'mc.core.ui.states.controllers.BatchOnlyCtrl'
   'mc.core.ui.states.controllers.CsvTransformationCtrl'
   'mc.core.ui.states.controllers.FavoritesCtrl'
+  'mc.core.ui.states.controllers.FeedbackCtrl'
   'mc.core.ui.states.controllers.DiffCtrl'
   'mc.core.ui.states.controllers.ListCtrl'
   'mc.core.ui.states.controllers.ListWithDataModelCtrl'

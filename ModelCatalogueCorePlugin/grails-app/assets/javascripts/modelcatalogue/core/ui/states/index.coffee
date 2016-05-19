@@ -20,6 +20,7 @@ angular.module('mc.core.ui.states', [
   'mc.core.ui.states.mc.resource'
   'mc.core.ui.states.mc'
   'mc.core.ui.states.simple.favorites'
+  'mc.core.ui.states.simple.feedback'
   'mc.core.ui.states.simple.resource.show.property'
   'mc.core.ui.states.simple.resource.show'
   'mc.core.ui.states.simple.resource.list'

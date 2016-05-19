@@ -26,18 +26,6 @@ class AssetMarshaller extends CatalogueElementMarshaller {
         if (el.md5) {
             ret.downloadUrl = linkGenerator.link(uri: "/api/modelCatalogue/core/asset/$el.id/download",  absolute: true)
         }
-
-        if (el.status == ElementStatus.PENDING) {
-            BuildProgressMonitor monitor = BuildProgressMonitor.get(el.id)
-
-            if (monitor) {
-                ret.htmlPreview = """
-                    <pre>${monitor.lastMessages}</pre>
-                """
-            }
-
-        }
-
         ret
     }
 

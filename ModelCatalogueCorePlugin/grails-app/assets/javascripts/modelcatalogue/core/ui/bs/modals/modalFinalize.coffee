@@ -31,7 +31,7 @@ angular.module('mc.core.ui.bs.modalFinalize', ['mc.util.messages']).config ['mes
           <contextual-actions role="modal"></contextual-actions>
         </div>
         '''
-        controller: ['$rootScope', '$scope', 'messages', '$modalInstance', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, $modalInstance, enhance, rest, modelCatalogueApiRoot) ->
+        controller: ($rootScope, $scope, messages, $modalInstance, enhance, rest, modelCatalogueApiRoot) ->
           $scope.semanticVersion = args.element.semanticVersion
           $scope.revisionNotes = args.element.revisionNotes
           $scope.messages = messages.createNewMessages()
@@ -46,15 +46,13 @@ angular.module('mc.core.ui.bs.modalFinalize', ['mc.util.messages']).config ['mes
               $rootScope.$broadcast 'catalogueElementUpdated', finalized
               $rootScope.$broadcast 'catalogueElementFinalized', finalized
               $rootScope.$broadcast 'redrawContextualActions'
-              $modalInstance.close(finalized)
               $scope.working = false
+              messages.prompt('Finalization progress', null, type: 'feedback', id: args.element.id).then ->
+                $modalInstance.close(finalized)
+                finalized.show(true)
             , (response) ->
               $scope.messages.showErrorsFromResponse(response)
               $scope.working = false
-
-
-        ]
-
       }
 
       dialog.result

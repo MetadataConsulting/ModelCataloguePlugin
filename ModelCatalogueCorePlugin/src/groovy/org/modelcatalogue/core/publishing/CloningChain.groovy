@@ -11,6 +11,7 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
+import rx.Observer
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
@@ -28,7 +29,7 @@ class CloningChain extends PublishingChain {
         return new CloningChain(published, strategy)
     }
 
-    protected CatalogueElement doRun(Publisher<CatalogueElement> publisher) {
+    protected CatalogueElement doRun(Publisher<CatalogueElement> publisher, Observer<String> monitor) {
         CatalogueElement existing = context.resolve(published)
 
         if (existing && existing != published) {

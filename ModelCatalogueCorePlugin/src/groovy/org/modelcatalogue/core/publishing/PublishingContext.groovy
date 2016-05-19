@@ -6,6 +6,8 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.util.RelationshipDirection
+import org.modelcatalogue.core.util.builder.ProgressMonitor
+import rx.Observer
 
 import java.util.regex.Matcher
 
@@ -17,6 +19,8 @@ abstract class PublishingContext<C extends PublishingContext> {
     protected final Map<Long, Long> resolutions = [:]
     protected final Map<Long, Class<? extends CatalogueElement>> newTypes = [:]
 
+    protected Observer<String> monitor = ProgressMonitor.NOOP
+
     protected DataModel dataModel
 
     PublishingContext(DataModel dataModel) {
@@ -24,6 +28,10 @@ abstract class PublishingContext<C extends PublishingContext> {
     }
 
     PublishingContext() {}
+
+    Observer<String> getMonitor() {
+        return monitor
+    }
 
     static String hashForRelationship(CatalogueElement source, CatalogueElement destination, RelationshipType type) {
         "$source.id:$type.id:$destination.id"
@@ -114,6 +122,11 @@ abstract class PublishingContext<C extends PublishingContext> {
 
     final C changeType(CatalogueElement element, Class<? extends CatalogueElement> newType) {
         newTypes[element.getId()] = newType
+        this as C
+    }
+
+    final C withMonitor(Observer<String> monitor) {
+        this.monitor = monitor
         this as C
     }
 

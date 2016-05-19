@@ -18,9 +18,11 @@ import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Legacy
+import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.transaction.TransactionStatus
+import rx.Observer
 
 class ElementService implements Publisher<CatalogueElement> {
 
@@ -66,7 +68,7 @@ class ElementService implements Publisher<CatalogueElement> {
 
         Closure<DataModel> code = { TransactionStatus status = null ->
             return (DataModel) auditService.logNewVersionCreated(dataModel) {
-                DataModel draft = PublishingChain.createDraft(dataModel, context.within(dataModel)).run(this) as DataModel
+                DataModel draft = PublishingChain.createDraft(dataModel, context.within(dataModel)).run(this, context.monitor) as DataModel
                 if (draft.hasErrors()) {
                     status?.setRollbackOnly()
                     return dataModel
@@ -314,28 +316,30 @@ class ElementService implements Publisher<CatalogueElement> {
         }
     }
 
-    public DataModel finalizeDataModel(DataModel draft, String version, String revisionNotes) {
-        return finalizeDataModel(draft, version, revisionNotes, false)
+    public DataModel finalizeDataModel(DataModel draft, String version, String revisionNotes, Observer<String> monitor = ProgressMonitor.NOOP) {
+        return finalizeDataModel(draft, version, revisionNotes, false, monitor)
     }
 
     /**
      * @deprecated skipping the eligibility is only available for tests
      */
-    public DataModel finalizeDataModel(DataModel draft, String version, String revisionNotes, boolean skipEligibility) {
+    public DataModel finalizeDataModel(DataModel draft, String version, String revisionNotes, boolean skipEligibility, Observer<String> monitor = ProgressMonitor.NOOP) {
         // check eligibility for finalization
         if (!skipEligibility) {
             draft.checkFinalizeEligibility(version, revisionNotes)
         }
 
         if (draft.hasErrors()) {
+            monitor.onNext(FriendlyErrors.printErrors("Element is not valid", draft.errors))
             return draft
         }
         return (DataModel) CatalogueElement.withTransaction { TransactionStatus status ->
             auditService.logElementFinalized(draft) {
-                DataModel finalized = draft.publish(this) as DataModel
+                DataModel finalized = draft.publish(this, monitor) as DataModel
 
                 if (finalized.hasErrors()) {
                     status.setRollbackOnly()
+                    monitor.onNext(FriendlyErrors.printErrors("Element is not valid", finalized.errors))
                 }
 
                 finalized.semanticVersion = version
@@ -349,10 +353,10 @@ class ElementService implements Publisher<CatalogueElement> {
     /**
      * @deprecated finalization should only happen on the data model level
      */
-    public <E extends CatalogueElement> E finalizeElement(E draft) {
+    public <E extends CatalogueElement> E finalizeElement(E draft, Observer<String> monitor = ProgressMonitor.NOOP) {
         return (E) CatalogueElement.withTransaction { TransactionStatus status ->
             auditService.logElementFinalized(draft) {
-                E finalized = draft.publish(this) as E
+                E finalized = draft.publish(this, monitor) as E
                 if (finalized.hasErrors()) {
                     status.setRollbackOnly()
                 }

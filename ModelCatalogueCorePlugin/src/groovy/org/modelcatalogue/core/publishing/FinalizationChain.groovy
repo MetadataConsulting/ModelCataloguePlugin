@@ -2,83 +2,77 @@ package org.modelcatalogue.core.publishing
 
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.HibernateHelper
-import org.springframework.validation.ObjectError
+import org.modelcatalogue.core.util.builder.ProgressMonitor
+import rx.Observer
 
 @Log4j
 class FinalizationChain extends PublishingChain {
 
 
-    private FinalizationChain(CatalogueElement published) {
+    private FinalizationChain(DataModel published) {
         super(published)
     }
 
-    static FinalizationChain create(CatalogueElement published) {
+    static FinalizationChain create(DataModel published) {
         return new FinalizationChain(published)
     }
 
-    protected CatalogueElement doRun(Publisher<CatalogueElement> publisher) {
-        if (published.published || isUpdatingInProgress(published)) {
+    private DataModel getPublishedDataModel() {
+        return published as DataModel
+    }
+
+    protected CatalogueElement doRun(Publisher<CatalogueElement> publisher, Observer<String> monitor) {
+        if (published.published) {
+            monitor.onNext("Already published")
             return published
         }
 
         if (published.status != ElementStatus.DRAFT) {
-            published.errors.rejectValue('status', 'org.modelcatalogue.core.CatalogueElement.element.must.be.draft', 'Element is not draft!')
+            final String message = 'Element is not draft!'
+            published.errors.rejectValue('status', 'org.modelcatalogue.core.CatalogueElement.element.must.be.draft', message)
+            monitor.onNext(message)
             return published
         }
 
-        log.debug("Finalizing $published ...")
+        published.status = ElementStatus.PENDING
+        published.save()
 
-        startUpdating()
-
-        for (CatalogueElement element in required) {
-            if (!element.published) {
-                return rejectRequiredDependency(element)
+        for (CatalogueElement element in publishedDataModel.declares) {
+            for (CatalogueElement dependency in element.collectExternalDependencies()) {
+                final String message = "Dependencies outside the current data model $published.dataModel must be finalized: $element => $dependency"
+                monitor.onNext(message)
+                published.errors.rejectValue('status', 'org.modelcatalogue.core.CatalogueElement.dependency.not.finalized', message)
             }
         }
 
-        for (Collection<CatalogueElement> elements in queue) {
-            for (CatalogueElement element in elements) {
-                if (element.id in processed || isUpdatingInProgress(element)) {
-                    continue
-                }
-                if (!ableToFinalize(element)) {
-                    element.errors.rejectValue('status', 'org.modelcatalogue.core.CatalogueElement.dependency.not.finalized', "Dependencies outside the current data model $published.dataModel must be finalized.")
-                    return rejectFinalizationDependency(element)
-                }
-                processed << element.id
-                CatalogueElement finalized = element.publish(publisher)
-                if (finalized.hasErrors()) {
-                    return rejectFinalizationDependency(finalized)
-                }
+        if (published.hasErrors()) {
+            monitor.onNext(FriendlyErrors.printErrors('Elements to be finalized not valid', published.errors))
+            return published
+        }
+
+        for (CatalogueElement element in publishedDataModel.declares) {
+            // already finalized for some reason (legacy data, unsuccessful previous finalization, deprecated)
+            if (element.published) {
+                continue
             }
+
+            doPublish(element, publisher, monitor)
         }
-        return doPublish(publisher)
+
+        doPublish(published, publisher, monitor, true)
+        monitor.onNext("Finalization finished")
+        return published
     }
 
-    private boolean ableToFinalize(CatalogueElement element) {
-        if (element.status == ElementStatus.FINALIZED) {
-            // it's finalized already
-            return true
-        }
+    private static CatalogueElement doPublish(CatalogueElement published, Publisher<CatalogueElement> archiver, Observer<String> monitor, boolean flush = false) {
+        monitor.onNext("Finalizing $published ...")
 
-        if (element.dataModel == published.dataModel) {
-            // in the same data model
-            return true
-        }
-
-        if (element.dataModel == published) {
-            // the data model is the initiator of the publish chain
-            return true
-        }
-        return false
-    }
-
-    private CatalogueElement doPublish(Publisher<CatalogueElement> archiver) {
         published.status = ElementStatus.FINALIZED
-        published.save(flush: true, deepValidate: false)
+        published.save(flush: flush, deepValidate: false)
 
         if (published.latestVersionId) {
             List<CatalogueElement> previousFinalized = HibernateHelper.getEntityClass(published).findAllByLatestVersionIdAndStatus(published.latestVersionId, ElementStatus.FINALIZED)
@@ -89,28 +83,8 @@ class FinalizationChain extends PublishingChain {
             }
         }
 
-        log.debug("... finalized $published")
+        monitor.onNext("... finalized $published")
 
-        published
-    }
-
-
-    private CatalogueElement rejectFinalizationDependency(CatalogueElement element) {
-        log.info FriendlyErrors.printErrors("Rejected dependency for $element", element.errors)
-        restoreStatus()
-        for (ObjectError error in element.errors.getFieldErrors('status')) {
-            published.errors.reject(error.code, error.arguments, error.defaultMessage)
-        }
-        for (ObjectError error in element.errors.globalErrors) {
-            published.errors.reject(error.code, error.arguments, error.defaultMessage)
-        }
-        published.errors.reject('org.modelcatalogue.core.CatalogueElement.cannot.finalize.dependency', "Cannot finalize dependency ${element}, please, resolve the issue first. You'll see more details when you try to finalize it manualy")
-        published
-    }
-
-    private CatalogueElement rejectRequiredDependency(CatalogueElement element) {
-        restoreStatus()
-        published.errors.reject('org.modelcatalogue.core.CatalogueElement.required.finalization.dependency', "Dependency ${element} is not finalized. Please, finalize it first.")
         published
     }
 

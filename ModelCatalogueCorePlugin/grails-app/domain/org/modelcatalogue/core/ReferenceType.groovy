@@ -23,6 +23,14 @@ class ReferenceType extends DataType {
         super.preparePublishChain(chain).add(this.dataClass)
     }
 
+    List<CatalogueElement> collectExternalDependencies() {
+        if (dataClass?.dataModel != dataModel) {
+            return [dataClass]
+        }
+        return super.collectExternalDependencies()
+    }
+
+
     List<String> getInheritedAssociationsNames() { ['dataClass'] }
 
 }

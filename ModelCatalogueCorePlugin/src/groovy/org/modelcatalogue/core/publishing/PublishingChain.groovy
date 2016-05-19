@@ -1,10 +1,13 @@
 package org.modelcatalogue.core.publishing
 
 import groovy.util.logging.Log4j
+import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.builder.ProgressMonitor
+import rx.Observer
 
 @Log4j
 abstract class PublishingChain {
@@ -18,8 +21,15 @@ abstract class PublishingChain {
 
     protected ElementStatus initialStatus
 
-    public static PublishingChain finalize(CatalogueElement published) {
+    public static PublishingChain finalize(DataModel published) {
         FinalizationChain.create(published)
+    }
+
+    public static PublishingChain finalize(CatalogueElement published) {
+        if (HibernateProxyHelper.getClassWithoutInitializingProxy(published) == DataModel) {
+            return FinalizationChain.create(published as DataModel)
+        }
+        LegacyFinalizationChain.create(published)
     }
 
     public static PublishingChain createDraft(DataModel published, DraftContext strategy) {
@@ -69,16 +79,20 @@ abstract class PublishingChain {
         this
     }
 
-    final CatalogueElement run(Publisher<CatalogueElement> publisher) {
+    final CatalogueElement run(Publisher<CatalogueElement> publisher, Observer<String> monitor = ProgressMonitor.NOOP) {
         try {
-            return doRun(publisher)
+            CatalogueElement result = doRun(publisher, monitor)
+            monitor.onCompleted()
+            return result
         } catch (Exception e) {
+            log.error("Error processing chain", e)
+            monitor.onError(e)
             published.errors.reject('publishing.error', e.toString())
             return published
         }
     }
 
-    protected abstract CatalogueElement doRun(Publisher<CatalogueElement> publisher)
+    protected abstract CatalogueElement doRun(Publisher<CatalogueElement> publisher, Observer<String> monitor)
 
     protected void restoreStatus() {
         if (published.status != initialStatus) {

@@ -5,6 +5,7 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.DataModelFilter
+import org.modelcatalogue.core.util.builder.ProgressMonitor
 
 
 class AuditingIntegrationSpec extends IntegrationSpec {
@@ -40,7 +41,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         DataModel dataModel = new DataModel(name: "codeil", status: ElementStatus.FINALIZED, semanticVersion: "1.0.0").save(failOnError: true)
         when:
         DataType vOne = new DataType(name: "DT4DCL", dataModel: dataModel, status: ElementStatus.FINALIZED).save(failOnError: true)
-        elementService.createDraftVersion(vOne.publish(elementService), DraftContext.userFriendly()) as DataType
+        elementService.createDraftVersion(vOne.publish(elementService, ProgressMonitor.NOOP), DraftContext.userFriendly()) as DataType
 
         Thread.sleep(100)
 

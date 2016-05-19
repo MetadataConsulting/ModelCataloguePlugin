@@ -1,8 +1,10 @@
 package org.modelcatalogue.core
 
+import grails.converters.JSON
 import grails.gorm.DetachedCriteria
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.util.HibernateHelper
+import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 import org.springframework.http.HttpStatus
 
@@ -63,6 +65,11 @@ class CatalogueController {
         }
 
         redirect url: "${grailsApplication.config.grails.serverURL}/catalogue/${GrailsNameUtils.getPropertyName(HibernateHelper.getEntityClass(element))}/${element.id}"
+    }
+
+
+    def feedback(String key) {
+        render(BuildProgressMonitor.get(key) as JSON)
     }
 
 }
