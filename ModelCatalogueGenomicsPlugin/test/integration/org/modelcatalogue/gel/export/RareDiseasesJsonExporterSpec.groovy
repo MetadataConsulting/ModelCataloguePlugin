@@ -46,19 +46,23 @@ class RareDiseasesJsonExporterSpec extends AbstractRareDiseasesExporterSpec {
                                     "eligibilityCriteria": [
                                         {
                                             "id": "$level6_inclusion_1",
-                                            "name": "Inclusion criteria name 1 1"
+                                            "name": "Inclusion criteria name 1 1",
+                                            "description": "Inclusion criteria description  1 1"
                                         },
                                         {
                                             "id": "$level6_exclusion_1",
-                                            "name": "Exclusion criteria name 1 1"
+                                            "name": "Exclusion criteria name 1 1",
+                                            "description": "Exclusion criteria description  1 1"
                                         },
                                         {
                                             "id": "$level6_priorGenetic_1",
-                                            "name": "Prior Genetic testing name 1 1"
+                                            "name": "Prior Genetic testing name 1 1",
+                                            "description": "Prior Genetic testing description  1 1"
                                         },
                                         {
                                             "id": "$level6_prior_genes_1",
-                                            "name": "Prior testing genes name 1 1"
+                                            "name": "Prior testing genes name 1 1",
+                                            "description": "Prior testing genes description  1 1"
                                         }
                                     ]
                                 }
@@ -80,19 +84,23 @@ class RareDiseasesJsonExporterSpec extends AbstractRareDiseasesExporterSpec {
                                     "eligibilityCriteria": [
                                         {
                                             "id": "$level6_inclusion_2",
-                                            "name": "Inclusion criteria name 1 2"
+                                            "name": "Inclusion criteria name 1 2",
+                                            "description": "Inclusion criteria description  1 2"
                                         },
                                         {
                                             "id": "$level6_exclusion_2",
-                                            "name": "Exclusion criteria name 1 2"
+                                            "name": "Exclusion criteria name 1 2",
+                                            "description": "Exclusion criteria description  1 2"
                                         },
                                         {
                                             "id": "$level6_priorGenetic_2",
-                                            "name": "Prior Genetic testing name 1 2"
+                                            "name": "Prior Genetic testing name 1 2",
+                                            "description": "Prior Genetic testing description  1 2"
                                         },
                                         {
                                             "id": "$level6_prior_genes_2",
-                                            "name": "Prior testing genes name 1 2"
+                                            "name": "Prior testing genes name 1 2",
+                                            "description": "Prior testing genes description  1 2"
                                         }
                                     ]
                                 }
@@ -120,19 +128,23 @@ class RareDiseasesJsonExporterSpec extends AbstractRareDiseasesExporterSpec {
                                     "eligibilityCriteria": [
                                         {
                                             "id": "$level6_inclusion_3",
-                                            "name": "Inclusion criteria name 2 1"
+                                            "name": "Inclusion criteria name 2 1",
+                                            "description": "Inclusion criteria description  2 1"
                                         },
                                         {
                                             "id": "$level6_exclusion_3",
-                                            "name": "Exclusion criteria name 2 1"
+                                            "name": "Exclusion criteria name 2 1",
+                                            "description": "Exclusion criteria description  2 1"
                                         },
                                         {
                                             "id": "$level6_priorGenetic_3",
-                                            "name": "Prior Genetic testing name 2 1"
+                                            "name": "Prior Genetic testing name 2 1",
+                                            "description": "Prior Genetic testing description  2 1"
                                         },
                                         {
                                             "id": "$level6_prior_genes_3",
-                                            "name": "Prior testing genes name 2 1"
+                                            "name": "Prior testing genes name 2 1",
+                                            "description": "Prior testing genes description  2 1"
                                         }
                                     ]
                                 }
@@ -154,19 +166,23 @@ class RareDiseasesJsonExporterSpec extends AbstractRareDiseasesExporterSpec {
                                     "eligibilityCriteria": [
                                         {
                                             "id": "$level6_inclusion_4",
-                                            "name": "Inclusion criteria name 2 2"
+                                            "name": "Inclusion criteria name 2 2",
+                                            "description": "Inclusion criteria description  2 2"
                                         },
                                         {
                                             "id": "$level6_exclusion_4",
-                                            "name": "Exclusion criteria name 2 2"
+                                            "name": "Exclusion criteria name 2 2",
+                                            "description": "Exclusion criteria description  2 2"
                                         },
                                         {
                                             "id": "$level6_priorGenetic_4",
-                                            "name": "Prior Genetic testing name 2 2"
+                                            "name": "Prior Genetic testing name 2 2",
+                                            "description": "Prior Genetic testing description  2 2"
                                         },
                                         {
                                             "id": "$level6_prior_genes_4",
-                                            "name": "Prior testing genes name 2 2"
+                                            "name": "Prior testing genes name 2 2",
+                                            "description": "Prior testing genes description  2 2"
                                         }
                                     ]
                                 }
