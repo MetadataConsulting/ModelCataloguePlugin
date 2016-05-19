@@ -2,7 +2,6 @@ package org.modelcatalogue.gel.export
 
 import com.google.common.collect.ArrayListMultimap
 import com.google.common.collect.ListMultimap
-import grails.util.Holders
 import groovy.json.JsonSlurper
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
@@ -81,9 +80,9 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     }
 
 
-    RareDiseaseChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, Integer depth = 5, Boolean includeMetadata = false) {
+    RareDiseaseChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, SessionFactory sessionFactory, Integer depth = 5, Boolean includeMetadata = false) {
         super(auditService, dataClassService, depth, includeMetadata)
-        sessionFactory = Holders.applicationContext.sessionFactory
+        this.sessionFactory = sessionFactory
     }
 
     @Override

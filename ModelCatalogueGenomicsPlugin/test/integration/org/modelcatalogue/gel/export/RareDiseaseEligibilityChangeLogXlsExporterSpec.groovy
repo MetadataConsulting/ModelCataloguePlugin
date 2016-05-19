@@ -19,7 +19,7 @@ class RareDiseaseEligibilityChangeLogXlsExporterSpec extends AbstractRareDisease
         makeChanges(dataClass)
 
         //test generated content
-        RareDiseaseEligibilityChangeLogXlsExporter exporter = new RareDiseaseEligibilityChangeLogXlsExporter(auditService, dataClassService, 5, false)
+        RareDiseaseEligibilityChangeLogXlsExporter exporter = new RareDiseaseEligibilityChangeLogXlsExporter(auditService, dataClassService, sessionFactory, 5, false)
         List<String> rows = exporter.buildContentRows(dataClass)
 
         //need to prime with header as we're not running the excel part of the exporter here
@@ -39,7 +39,7 @@ class RareDiseaseEligibilityChangeLogXlsExporterSpec extends AbstractRareDisease
 
         File file = temporaryFolder.newFile("${System.currentTimeMillis()}.xlsx")
         //test excel generation
-        new RareDiseaseEligibilityChangeLogXlsExporter(auditService, dataClassService, 5, false).export(dataClass, file.newOutputStream())
+        new RareDiseaseEligibilityChangeLogXlsExporter(auditService, dataClassService, sessionFactory, 5, false).export(dataClass, file.newOutputStream())
 
         open file
 

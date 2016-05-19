@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.genomics
 
+import org.hibernate.SessionFactory
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
@@ -31,6 +32,7 @@ class GenomicsController {
     AuditService auditService
     def elementService
     DataClassService dataClassService
+    SessionFactory sessionFactory
 
     static final String RD_ELIGIBILITY_CSV_FILENAME = "RD Eligibility Criteria.csv"
     static final String RD_HPO_CSV_FILENAME = "RD Phenotypes and Clinical Tests.csv"
@@ -289,7 +291,7 @@ class GenomicsController {
             originalFileName: "$RD_PHENOTYPE_AND_CLINICAL_TESTS_XLS",
             contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream out ->
-            new RareDiseasePhenotypeChangeLogXlsExporter(auditService, dataClassService, 0, false).export(dataClass,out)
+            new RareDiseasePhenotypeChangeLogXlsExporter(auditService, dataClassService, 0, false, sessionFactory).export(dataClass,out)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())
@@ -310,7 +312,7 @@ class GenomicsController {
             originalFileName: "$RD_ELIGIBILITY_CHANGELOG_XLS",
             contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream out ->
-            new RareDiseaseEligibilityChangeLogXlsExporter(auditService, dataClassService, 0, false).export(dataClass, out)
+            new RareDiseaseEligibilityChangeLogXlsExporter(auditService, dataClassService, 0, false, sessionFactory).export(dataClass, out)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())
@@ -355,7 +357,7 @@ class GenomicsController {
             originalFileName: "${model.name}-${model.status}-${model.version}-changelog.xlsx",
             contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream out ->
-            new DataModelChangeLogXlsExporter(auditService, dataClassService, 0, false).export(model, out)
+            new DataModelChangeLogXlsExporter(auditService, dataClassService, sessionFactory, 0, false).export(model, out)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())

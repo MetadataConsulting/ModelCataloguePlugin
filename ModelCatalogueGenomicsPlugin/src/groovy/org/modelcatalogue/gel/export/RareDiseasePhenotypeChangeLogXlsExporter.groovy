@@ -1,6 +1,7 @@
 package org.modelcatalogue.gel.export
 
 import groovy.util.logging.Log4j
+import org.hibernate.SessionFactory
 import org.modelcatalogue.builder.spreadsheet.api.Sheet
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.audit.AuditService
@@ -18,8 +19,8 @@ class RareDiseasePhenotypeChangeLogXlsExporter extends RareDiseaseChangeLogXlsEx
     private static final int CURRENT_DETAILS = 7
     private static final int NEW_DETAILS = 8
 
-    RareDiseasePhenotypeChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, Integer depth = 5, Boolean includeMetadata = false) {
-        super(auditService, dataClassService, depth, includeMetadata)
+    RareDiseasePhenotypeChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, SessionFactory sessionFactory, Integer depth = 5, Boolean includeMetadata = false) {
+        super(auditService, dataClassService, sessionFactory, depth, includeMetadata)
     }
 
     @Override

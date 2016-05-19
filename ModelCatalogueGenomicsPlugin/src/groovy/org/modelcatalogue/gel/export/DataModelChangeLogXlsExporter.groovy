@@ -1,6 +1,7 @@
 package org.modelcatalogue.gel.export
 
 import groovy.util.logging.Log4j
+import org.hibernate.SessionFactory
 import org.modelcatalogue.builder.spreadsheet.api.AutoKeyword
 import org.modelcatalogue.builder.spreadsheet.api.Sheet
 import org.modelcatalogue.core.CatalogueElement
@@ -36,8 +37,8 @@ class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
         7: 'New version details'
     ]
 
-    DataModelChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, Integer depth = 5, Boolean includeMetadata = false) {
-        super(auditService, dataClassService, depth, includeMetadata)
+    DataModelChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, SessionFactory sessionFactory, Integer depth = 5, Boolean includeMetadata = false) {
+        super(auditService, dataClassService, sessionFactory, depth, includeMetadata)
     }
 
     @Override
