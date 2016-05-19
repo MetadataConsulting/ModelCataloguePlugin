@@ -4,8 +4,10 @@ import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.builder.ProgressMonitor
+import rx.Observer
 
 @Log4j
 class FinalizationChain extends PublishingChain {
@@ -23,23 +25,32 @@ class FinalizationChain extends PublishingChain {
         return published as DataModel
     }
 
-    protected CatalogueElement doRun(Publisher<CatalogueElement> publisher, ProgressMonitor monitor) {
-        if (published.published || isUpdatingInProgress(published)) {
+    protected CatalogueElement doRun(Publisher<CatalogueElement> publisher, Observer<String> monitor) {
+        if (published.published) {
+            monitor.onNext("Already published")
             return published
         }
 
         if (published.status != ElementStatus.DRAFT) {
-            published.errors.rejectValue('status', 'org.modelcatalogue.core.CatalogueElement.element.must.be.draft', 'Element is not draft!')
+            final String message = 'Element is not draft!'
+            published.errors.rejectValue('status', 'org.modelcatalogue.core.CatalogueElement.element.must.be.draft', message)
+            monitor.onNext(message)
             return published
         }
 
+        published.status = ElementStatus.PENDING
+        published.save()
+
         for (CatalogueElement element in publishedDataModel.declares) {
             for (CatalogueElement dependency in element.collectExternalDependencies()) {
-                published.errors.rejectValue('status', 'org.modelcatalogue.core.CatalogueElement.dependency.not.finalized', "Dependencies outside the current data model $published.dataModel must be finalized: $element => $dependency")
+                final String message = "Dependencies outside the current data model $published.dataModel must be finalized: $element => $dependency"
+                monitor.onNext(message)
+                published.errors.rejectValue('status', 'org.modelcatalogue.core.CatalogueElement.dependency.not.finalized', message)
             }
         }
 
         if (published.hasErrors()) {
+            monitor.onNext(FriendlyErrors.printErrors('Elements to be finalized not valid', published.errors))
             return published
         }
 
@@ -49,14 +60,16 @@ class FinalizationChain extends PublishingChain {
                 continue
             }
 
-            doPublish(element, publisher)
+            doPublish(element, publisher, monitor)
         }
 
-        return doPublish(published, publisher, true)
+        doPublish(published, publisher, monitor, true)
+        monitor.onNext("Finalization finished")
+        return published
     }
 
-    private static CatalogueElement doPublish(CatalogueElement published, Publisher<CatalogueElement> archiver, boolean flush = false) {
-        log.debug("Finalizing $published ...")
+    private static CatalogueElement doPublish(CatalogueElement published, Publisher<CatalogueElement> archiver, Observer<String> monitor, boolean flush = false) {
+        monitor.onNext("Finalizing $published ...")
 
         published.status = ElementStatus.FINALIZED
         published.save(flush: flush, deepValidate: false)
@@ -70,7 +83,7 @@ class FinalizationChain extends PublishingChain {
             }
         }
 
-        log.debug("... finalized $published")
+        monitor.onNext("... finalized $published")
 
         published
     }

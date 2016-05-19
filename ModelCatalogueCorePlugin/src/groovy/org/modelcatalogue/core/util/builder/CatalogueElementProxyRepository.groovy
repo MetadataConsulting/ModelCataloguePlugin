@@ -533,17 +533,17 @@ class CatalogueElementProxyRepository {
     }
 
     void logDebug(String string) {
-        monitor.log(string)
+        monitor.onNext(string)
         log.debug string
     }
 
     void logInfo(String string) {
-        monitor.log(string)
+        monitor.onNext(string)
         log.info string
     }
 
     void logWarn(String string) {
-        monitor.log(string)
+        monitor.onNext(string)
         log.warn string
     }
 

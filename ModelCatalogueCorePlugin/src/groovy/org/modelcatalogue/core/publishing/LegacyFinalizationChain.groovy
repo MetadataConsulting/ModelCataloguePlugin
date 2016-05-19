@@ -7,6 +7,7 @@ import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.springframework.validation.ObjectError
+import rx.Observer
 
 @Log4j @Deprecated
 class LegacyFinalizationChain extends PublishingChain {
@@ -20,7 +21,7 @@ class LegacyFinalizationChain extends PublishingChain {
         return new LegacyFinalizationChain(published)
     }
 
-    protected CatalogueElement doRun(Publisher<CatalogueElement> publisher, ProgressMonitor monitor) {
+    protected CatalogueElement doRun(Publisher<CatalogueElement> publisher, Observer<String> monitor) {
         if (published.published || isUpdatingInProgress(published)) {
             return published
         }

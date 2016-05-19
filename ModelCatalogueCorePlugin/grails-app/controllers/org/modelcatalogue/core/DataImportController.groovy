@@ -2,7 +2,6 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.integration.excel.ExcelLoader
 import org.modelcatalogue.integration.excel.HeadersMap
@@ -75,7 +74,7 @@ class DataImportController  {
         if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xls")) {
             def asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
             def id = asset.id
-            builder.monitor = BuildProgressMonitor.create(id)
+            builder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             InputStream inputStream = file.inputStream
             HeadersMap headersMap = HeadersMap.create(request.JSON.headersMap ?: [:])
             executeInBackground(id, "Imported from Excel") {
@@ -94,7 +93,7 @@ class DataImportController  {
         if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xml")) {
             def asset = assetService.storeAsset(params, file, 'application/xml')
             def id = asset.id
-            builder.monitor = BuildProgressMonitor.create(id)
+            builder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             InputStream inputStream = file.inputStream
             executeInBackground(id, "Imported from XML") {
                 try {
@@ -112,7 +111,7 @@ class DataImportController  {
         if (file.size > 0 && file.originalFilename.endsWith(".obo")) {
             def asset = assetService.storeAsset(params, file, 'text/obo')
             def id = asset.id
-            builder.monitor = BuildProgressMonitor.create(id)
+            builder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             InputStream inputStream = file.inputStream
             String name = params?.name
             String idpattern = params.idpattern
@@ -134,7 +133,7 @@ class DataImportController  {
         if (file.size > 0 && file.originalFilename.endsWith("c.csv")) {
             def asset = assetService.storeAsset(params, file, 'application/model-catalogue')
             def id = asset.id
-            builder.monitor = BuildProgressMonitor.create(id)
+            builder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             InputStream inputStream = file.inputStream
 
             executeInBackground(id, "Imported from LOINC")  {
@@ -153,7 +152,7 @@ class DataImportController  {
         if (file.size > 0 && file.originalFilename.endsWith(".mc")) {
             def asset = assetService.storeAsset(params, file, 'application/model-catalogue')
             def id = asset.id
-            builder.monitor = BuildProgressMonitor.create(id)
+            builder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             InputStream inputStream = file.inputStream
 
             executeInBackground(id, "Imported from Model Catalogue DSL")  {
@@ -172,7 +171,7 @@ class DataImportController  {
         if (file.size > 0 && file.originalFilename.endsWith(".umlj")) {
             def asset = assetService.storeAsset(params, file, 'text/umlj')
             def id = asset.id
-            builder.monitor = BuildProgressMonitor.create(id)
+            builder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             InputStream inputStream = file.inputStream
             String name = params?.name
 

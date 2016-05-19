@@ -7,6 +7,7 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.builder.ProgressMonitor
+import rx.Observer
 
 import java.util.regex.Matcher
 
@@ -18,7 +19,7 @@ abstract class PublishingContext<C extends PublishingContext> {
     protected final Map<Long, Long> resolutions = [:]
     protected final Map<Long, Class<? extends CatalogueElement>> newTypes = [:]
 
-    protected ProgressMonitor monitor
+    protected Observer<String> monitor = ProgressMonitor.NOOP
 
     protected DataModel dataModel
 
@@ -28,7 +29,7 @@ abstract class PublishingContext<C extends PublishingContext> {
 
     PublishingContext() {}
 
-    ProgressMonitor getMonitor() {
+    Observer<String> getMonitor() {
         return monitor
     }
 
@@ -124,7 +125,7 @@ abstract class PublishingContext<C extends PublishingContext> {
         this as C
     }
 
-    final C withMonitor(ProgressMonitor monitor) {
+    final C withMonitor(Observer<String> monitor) {
         this.monitor = monitor
         this as C
     }

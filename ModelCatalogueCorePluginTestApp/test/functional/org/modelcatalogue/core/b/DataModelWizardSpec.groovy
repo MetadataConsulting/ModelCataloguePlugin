@@ -19,10 +19,12 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
     static final String stepImports = "#step-imports"
     static final String stepFinish = "#step-finish"
     static final String exitButton = "#exit-wizard"
-    public static final CatalogueContent metadataReviewed = CatalogueContent.create('*[name=metadata-reviewed] input')
-    public static final CatalogueContent metadataApproved = CatalogueContent.create('*[name=metadata-approved] input')
-    public static final CatalogueAction modalFinalize = CatalogueAction.runLast('modal', 'modal-finalize-data-modal')
-    public static final CatalogueAction modalCreateNewVersion = CatalogueAction.runLast('modal', 'modal-create-new-version')
+    static final CatalogueContent metadataReviewed = CatalogueContent.create('*[name=metadata-reviewed] input')
+    static final CatalogueContent metadataApproved = CatalogueContent.create('*[name=metadata-approved] input')
+    static final CatalogueAction modalFinalize = CatalogueAction.runLast('modal', 'modal-finalize-data-modal')
+    static final CatalogueAction modalCreateNewVersion = CatalogueAction.runLast('modal', 'modal-create-new-version')
+    static final String modalFeedback = '.messages-modal-feedback'
+    static final String feedback = '.messages-modal-feedback pre'
 
 
     def "go to login"() {
@@ -96,6 +98,13 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         fill 'semanticVersion' with '1.0.0'
         fill 'revisionNotes' with 'initial commit'
         click modalFinalize
+
+        then:
+        check modalFeedback displayed
+        check feedback contains 'Finalization finished'
+
+        when:
+        click modalPrimaryButton
 
         then: "the element is finalized"
         check status has 'label-primary'
