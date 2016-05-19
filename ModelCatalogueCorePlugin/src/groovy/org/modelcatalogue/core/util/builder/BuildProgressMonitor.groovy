@@ -42,14 +42,17 @@ class BuildProgressMonitor implements Serializable, ProgressMonitor {
         this.name = name
         this.key = key
         this.buffer = new StringBuffer()
+        if (!brokerMessagingTemplate) {
+            brokerMessagingTemplate = Holders.applicationContext.getBean('brokerMessagingTemplate', MessageSendingOperations)
+        }
         queue
             .buffer(300, TimeUnit.MILLISECONDS)
+            .doOnError {
+                brokerMessagingTemplate.convertAndSend("/topic/feedback/$key/lines".toString(), [lines: printException(it).toString()])
+            }
             .subscribe {
                 if (!it) {
                     return
-                }
-                if (!brokerMessagingTemplate) {
-                    brokerMessagingTemplate = Holders.applicationContext.getBean('brokerMessagingTemplate', MessageSendingOperations)
                 }
                 brokerMessagingTemplate.convertAndSend("/topic/feedback/$key/lines".toString(), [lines: it.join('\n')])
             }
@@ -72,12 +75,17 @@ class BuildProgressMonitor implements Serializable, ProgressMonitor {
 
     @Override
     void onError(Throwable th) {
+        StringWriter sw = printException(th)
+        onNext(sw.toString())
+        queue.onError(th)
+    }
+
+    private static StringWriter printException(Throwable th) {
         StackTraceUtils.deepSanitize(th)
         StringWriter sw = new StringWriter()
         PrintWriter pw = new PrintWriter(sw)
         th.print(pw)
-        onNext(sw.toString())
-        queue.onError(th)
+        sw
     }
 
     String getLastMessages() {
