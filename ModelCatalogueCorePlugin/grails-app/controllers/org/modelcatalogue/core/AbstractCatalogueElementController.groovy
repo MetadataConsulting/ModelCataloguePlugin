@@ -182,9 +182,9 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
     }
 
-    private void addRelation(Long id, String type, boolean outgoing) {
+    private void addRelation(Long id, String type, boolean outgoing, String minRole = 'CURATOR') {
         withRetryingTransaction {
-            if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            if (!modelCatalogueSecurityService.hasRole(minRole)) {
                 notAuthorized()
                 return
             }
