@@ -46,9 +46,10 @@ angular.module('mc.core.ui.bs.modalFinalize', ['mc.util.messages']).config ['mes
               $rootScope.$broadcast 'catalogueElementUpdated', finalized
               $rootScope.$broadcast 'catalogueElementFinalized', finalized
               $rootScope.$broadcast 'redrawContextualActions'
-              $modalInstance.close(finalized)
               $scope.working = false
-              messages.prompt('Finalization progress', null, type: 'feedback', id: args.element.id)
+              messages.prompt('Finalization progress', null, type: 'feedback', id: args.element.id).then ->
+                $modalInstance.close(finalized)
+                finalized.show(true)
             , (response) ->
               $scope.messages.showErrorsFromResponse(response)
               $scope.working = false

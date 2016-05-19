@@ -25,7 +25,8 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
 
 
   condition = (element) -> element.hasOwnProperty('elementType') and element.hasOwnProperty('link')
-  factory   = [ 'modelCatalogueApiRoot', 'rest', '$rootScope', '$state', 'names', 'enhance','serverPushUpdates', 'rx', (modelCatalogueApiRoot, rest, $rootScope, $state, names, enhance, serverPushUpdates, rx) ->
+  factory   =  (modelCatalogueApiRoot, rest, $rootScope, $state, names, enhance, serverPushUpdates) ->
+    "ngInject"
     catalogueElementEnhancer = (element) ->
       class CatalogueElement
         constructor: (element) ->
@@ -82,20 +83,20 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
             return 'catalogue'
 
 
-          self.show           = () ->
+          self.show           = (reload = false) ->
             if self.isInstanceOf "batch"
-              return $state.go('simple.actions.show', {id: self.id}); self
+              return $state.go('simple.actions.show', {id: self.id}, {reload: reload}); self
             if self.isInstanceOf "csvTransformation"
-              return $state.go('mc.csvTransformations.show', {id: self.id}); self
+              return $state.go('mc.csvTransformations.show', {id: self.id}, {reload: reload}); self
             if self.isInstanceOf "relationships"
-              return $state.go('mc.resource.show.property', {dataModelId: self.element.getDataModelId(), id: self.element.id, resource: names.getPropertyNameFromType(self.element.elementType), property: self.property})
+              return $state.go('mc.resource.show.property', {dataModelId: self.element.getDataModelId(), id: self.element.id, resource: names.getPropertyNameFromType(self.element.elementType), property: self.property}, {reload: reload})
             if self.isInstanceOf "enumeratedValue"
-              return $state.go('mc.resource.show.property', {resource: 'enumeratedType', id: self.id, dataModelId: self.getDataModelId(), property: 'enumerations'}) ; self
+              return $state.go('mc.resource.show.property', {resource: 'enumeratedType', id: self.id, dataModelId: self.getDataModelId(), property: 'enumerations'}, {reload: reload}) ; self
             if self.isInstanceOf "versions"
-              return $state.go('mc.resource.show.property', {resource: 'dataModel', id:  self.getDataModelId(), dataModelId: self.getDataModelId(), property: 'history'}) ; self
+              return $state.go('mc.resource.show.property', {resource: 'dataModel', id:  self.getDataModelId(), dataModelId: self.getDataModelId(), property: 'history'}, {reload: reload}) ; self
             if self.getDataModelId() != 'catalogue'
-              return $state.go('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id, dataModelId: self.getDataModelId()})
-            $state.go('simple.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id}) ; self
+              return $state.go('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id, dataModelId: self.getDataModelId()}, {reload: reload})
+            $state.go('simple.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id}, {reload: reload}) ; self
 
           self.href = () ->
             if self.isInstanceOf "batch"
@@ -233,6 +234,6 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
     catalogueElementEnhancer.updateFrom = updateFrom
 
     catalogueElementEnhancer
-  ]
+
   enhanceProvider.registerEnhancerFactory('catalogueElement', condition, factory)
 ]
