@@ -1,15 +1,14 @@
 package org.modelcatalogue.gel.export
 
 import grails.test.spock.IntegrationSpec
+import org.hibernate.SessionFactory
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.ddl.DataDefinitionLanguage
-import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.Metadata
-import org.modelcatalogue.core.util.builder.ContextItem
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.gel.GenomicsService
 import org.modelcatalogue.gel.RareDiseaseCsvExporter
@@ -24,6 +23,7 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
     ElementService elementService
     DataModelService dataModelService
     InitCatalogueService initCatalogueService
+    SessionFactory sessionFactory
     GenomicsService genomicsService
 
     def setup() {

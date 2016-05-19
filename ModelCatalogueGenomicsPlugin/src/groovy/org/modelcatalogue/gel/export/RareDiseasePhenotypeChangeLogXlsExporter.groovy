@@ -1,6 +1,7 @@
 package org.modelcatalogue.gel.export
 
 import groovy.util.logging.Log4j
+import org.hibernate.SessionFactory
 import org.modelcatalogue.builder.spreadsheet.api.Sheet
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.audit.AuditService
@@ -15,9 +16,11 @@ import static org.modelcatalogue.core.audit.ChangeType.PROPERTY_CHANGED
 class RareDiseasePhenotypeChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
 
     private static final String PHENOTYPES_SHEET = 'HPO & Clinical tests change log'
+    private static final int CURRENT_DETAILS = 7
+    private static final int NEW_DETAILS = 8
 
-    RareDiseasePhenotypeChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, Integer depth = 5, Boolean includeMetadata = false) {
-        super(auditService, dataClassService, depth, includeMetadata)
+    RareDiseasePhenotypeChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, SessionFactory sessionFactory, Integer depth = 5, Boolean includeMetadata = false) {
+        super(auditService, dataClassService, sessionFactory, depth, includeMetadata)
     }
 
     @Override
@@ -69,13 +72,11 @@ class RareDiseasePhenotypeChangeLogXlsExporter extends RareDiseaseChangeLogXlsEx
                     value 'Current version details'
                     width 30
                     style 'h3'
-                    style {wrap text}
                 }
                 cell {
                     value 'New version details'
                     width 30
-                    style 'h3'
-                    style {background('#c2efcf')}
+                    style 'h3-green'
                 }
             }
 
@@ -87,6 +88,8 @@ class RareDiseasePhenotypeChangeLogXlsExporter extends RareDiseaseChangeLogXlsEx
     @Override
     List<String> searchExportSpecificTypes(CatalogueElement model, List lines, groupDescriptions, level) {
         String subtype
+        levelIdStack.put(level,model.id)
+
         if (model.name.matches("(?i:.*Phenotype.*)")) {
 
             log.debug " --- $level $model $model.dataModel"
@@ -107,6 +110,19 @@ class RareDiseasePhenotypeChangeLogXlsExporter extends RareDiseaseChangeLogXlsEx
         }
 
         lines
+    }
+
+    void buildRow(Sheet sheet, List<String> line) {
+        sheet.row {
+            line.eachWithIndex{ String cellValue, int i ->
+                cell {
+                    value cellValue
+                    if (i!= CURRENT_DETAILS && i!=NEW_DETAILS) style 'property-value'
+                    if (i == CURRENT_DETAILS) style 'property-value-wrap'
+                    if (i == NEW_DETAILS) style 'property-value-green'
+                }
+            }
+        }
     }
 
 }

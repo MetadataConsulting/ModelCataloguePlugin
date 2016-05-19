@@ -82,7 +82,21 @@ class ModelCatalogueStyles implements Stylesheet {
                     bold
                 }
             }
-            style('data-element-row') {
+            style('data-element') {
+                foreground whiteSmoke
+                font {
+                    bold
+                }
+            }
+            style('data-element-bottom-right') {
+                align bottom right
+                foreground whiteSmoke
+                font {
+                    bold
+                }
+            }
+            style('data-element-top-right') {
+                align top right
                 foreground whiteSmoke
                 font {
                     bold

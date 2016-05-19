@@ -1,7 +1,7 @@
 package org.modelcatalogue.gel
 
 import grails.transaction.Transactional
-
+import org.hibernate.SessionFactory
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
@@ -24,6 +24,7 @@ class GenomicsService {
     def assetService
     def dataClassService
     def elementService
+    SessionFactory sessionFactory
 
     static final String RD_ELIGIBILITY_CSV_FILENAME = "RD Eligibility Criteria.csv"
     static final String RD_HPO_CSV_FILENAME = "RD Phenotypes and Clinical Tests.csv"
@@ -148,7 +149,7 @@ class GenomicsService {
             originalFileName: "$RD_PHENOTYPE_AND_CLINICAL_TESTS_XLS",
             contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream out ->
-            new RareDiseasePhenotypeChangeLogXlsExporter(auditService, dataClassService, 0, false).export(dataClass,out)
+            new RareDiseasePhenotypeChangeLogXlsExporter(auditService, dataClassService, sessionFactory, 0, false).export(dataClass,out)
         }
     }
 
@@ -158,7 +159,7 @@ class GenomicsService {
             originalFileName: "$RD_ELIGIBILITY_CHANGELOG_XLS",
             contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream out ->
-            new RareDiseaseEligibilityChangeLogXlsExporter(auditService, dataClassService, 0, false).export(dataClass, out)
+            new RareDiseaseEligibilityChangeLogXlsExporter(auditService, dataClassService, sessionFactory, 0, false).export(dataClass, out)
         }
     }
 
@@ -180,7 +181,7 @@ class GenomicsService {
             originalFileName: "${model.name}-${model.status}-${model.version}-changelog.xlsx",
             contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream out ->
-            new DataModelChangeLogXlsExporter(auditService, dataClassService, 0, false).export(model, out)
+            new DataModelChangeLogXlsExporter(auditService, dataClassService, sessionFactory, 0, false).export(model, out)
         }
     }
 

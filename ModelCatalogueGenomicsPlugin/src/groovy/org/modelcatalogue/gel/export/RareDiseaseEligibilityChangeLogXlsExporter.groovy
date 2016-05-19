@@ -1,10 +1,10 @@
 package org.modelcatalogue.gel.export
 
 import groovy.util.logging.Log4j
+import org.hibernate.SessionFactory
 import org.modelcatalogue.builder.spreadsheet.api.Sheet
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClassService
-import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.audit.AuditService
 
 /**
@@ -14,9 +14,11 @@ import org.modelcatalogue.core.audit.AuditService
 class RareDiseaseEligibilityChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
 
     private static final String ELIGIBILITY_SHEET = 'Eligibility Criteria change log'
+    private static final int CURRENT_DETAILS = 6
+    private static final int NEW_DETAILS = 7
 
-    RareDiseaseEligibilityChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, Integer depth = 5, Boolean includeMetadata = false) {
-        super(auditService, dataClassService, depth, includeMetadata)
+    RareDiseaseEligibilityChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, SessionFactory sessionFactory, Integer depth = 5, Boolean includeMetadata = false) {
+        super(auditService, dataClassService, sessionFactory, depth, includeMetadata)
     }
 
     @Override
@@ -63,13 +65,11 @@ class RareDiseaseEligibilityChangeLogXlsExporter extends RareDiseaseChangeLogXls
                     value 'Current version details'
                     width 30
                     style 'h3'
-                    style {wrap text}
                 }
                 cell {
                     value 'New version details'
                     width 30
-                    style 'h3'
-                    style {background('#c2efcf')}
+                    style 'h3-green'
                 }
             }
 
@@ -80,13 +80,27 @@ class RareDiseaseEligibilityChangeLogXlsExporter extends RareDiseaseChangeLogXls
 
     @Override
     List<String> searchExportSpecificTypes(CatalogueElement model, List lines, groupDescriptions, level) {
-
+        levelIdStack.put(level,model.id)
         if (model.name.matches("(?i:.*Eligibility.*)")) {
             checkChangeLog(model, lines, groupDescriptions, level, TOP_LEVEL_RELATIONSHIP_TYPES)
             iterateChildren(model, lines, groupDescriptions, level, DETAIL_CHANGE_TYPES)
         }
 
         lines
+    }
+
+
+     void buildRow(Sheet sheet, List<String> line) {
+        sheet.row {
+            line.eachWithIndex{ String cellValue, int i ->
+                cell {
+                    value cellValue
+                    if (i!= CURRENT_DETAILS && i!=NEW_DETAILS) style 'property-value'
+                    if (i == CURRENT_DETAILS) style 'property-value-wrap'
+                    if (i == NEW_DETAILS) style 'property-value-green'
+                }
+            }
+        }
     }
 }
 

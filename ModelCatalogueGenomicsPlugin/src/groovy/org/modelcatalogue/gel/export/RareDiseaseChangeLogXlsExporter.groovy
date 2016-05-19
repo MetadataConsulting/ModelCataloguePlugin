@@ -1,8 +1,14 @@
 package org.modelcatalogue.gel.export
 
+import com.google.common.collect.ArrayListMultimap
+import com.google.common.collect.ListMultimap
 import groovy.json.JsonSlurper
+import groovy.time.TimeCategory
+import groovy.time.TimeDuration
 import groovy.util.logging.Log4j
 import org.apache.commons.lang.exception.ExceptionUtils
+import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
+import org.hibernate.SessionFactory
 import org.modelcatalogue.builder.spreadsheet.api.Sheet
 import org.modelcatalogue.builder.spreadsheet.api.SpreadsheetBuilder
 import org.modelcatalogue.builder.spreadsheet.api.Workbook
@@ -15,6 +21,9 @@ import org.modelcatalogue.core.publishing.changelog.AbstractChangeLogGenerator
 import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.OrderedMap
 
+import static java.lang.Boolean.FALSE
+import static java.lang.Boolean.TRUE
+import static java.util.Map.Entry
 import static org.modelcatalogue.core.audit.ChangeType.*
 import static RareDiseaseChangeLogXlsExporter.RareDiseaseChangeType.*
 
@@ -31,10 +40,22 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     public static final String GUIDANCE = 'Guidance'
     public static final ArrayList<ChangeType> TOP_LEVEL_RELATIONSHIP_TYPES = [RELATIONSHIP_DELETED, RELATIONSHIP_CREATED]
     public static final ArrayList<ChangeType> DETAIL_CHANGE_TYPES = [RELATIONSHIP_DELETED, RELATIONSHIP_CREATED, RELATIONSHIP_METADATA_UPDATED, METADATA_UPDATED, METADATA_CREATED, METADATA_DELETED, RELATIONSHIP_METADATA_CREATED, RELATIONSHIP_METADATA_DELETED, PROPERTY_CHANGED]
+    public static final int CLEAN_UP_GORM_PERIOD = 100      //cleanup every 100 changelog calls - seems to be best performing
+
     def suppressKeyDisplayList = ['parent of', 'child of', 'contains', 'name', 'description']
     def ignoreKeyListForDeletions = ['child of','contains', 'Class Type']
     def ignoreKeyListForCreations = ['parent of', 'Class Type']
     def ignoreKeyList = ['parent of', 'child of','contains', 'Class Type']
+
+    SessionFactory sessionFactory
+    def propertyInstanceMap = DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
+
+    int callCount = 0
+    int itemCount = 0
+    Map<Long,Boolean> visitedModels                     // id and TRUE/FALSE whether changes found for this model or it's children
+    Map<Integer,Long> levelIdStack                      // ids in the current stack
+    ListMultimap<Long,List<String>> cachedChanges       // id and the cached changes for this model (string is ',' joined)
+
 
     public enum RareDiseaseChangeType {
         REMOVE_DATA_ITEM('Remove Data Item',null),
@@ -58,10 +79,10 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
         }
     }
 
-    int modelCount = 0
 
-    RareDiseaseChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, Integer depth = 5, Boolean includeMetadata = false) {
+    RareDiseaseChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, SessionFactory sessionFactory, Integer depth = 5, Boolean includeMetadata = false) {
         super(auditService, dataClassService, depth, includeMetadata)
+        this.sessionFactory = sessionFactory
     }
 
     @Override
@@ -69,10 +90,13 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
 
 
     public void exportXls(CatalogueElement model, OutputStream out, String sheetName){
+        def timeStart = new Date()
         List lines = buildContentRows(model)
 
         exportLinesAsXls sheetName, lines, out
 
+        TimeDuration elapsed = TimeCategory.minus(new Date(), timeStart)
+        log.info "stats: export took=$elapsed itemcount=$itemCount visitedModels (excludes previously visited) ${visitedModels.size()} cached models ${cachedChanges.size()}"
         log.info "Exported Rare Diseases as xls spreadsheet ${model.name} (${model.combinedVersion})"
     }
 
@@ -82,6 +106,9 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
         def lines = []
         def exclusions = []
         Map<String, String> groupDescriptions = new HashMap<>()
+        visitedModels = new HashMap<>()
+        levelIdStack = new HashMap<>()
+        cachedChanges = ArrayListMultimap.create()
 
         log.info "Exporting Rare Diseases as xls ${model.name} (${model.combinedVersion})"
 
@@ -98,33 +125,12 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
             case 1:     //ignore top Rare Disease level
                 break
 
-            case [2]:
-
-                log.info "2 $model --- $model.dataModel"
+            case [2,3,4]:
 
                 String groupDescription = "$model.name (${model.combinedVersion})"
-                log.debug("level$level $groupDescription")
+                log.info "$level $model $groupDescription --- $model.dataModel"
                 groupDescriptions.put(level, groupDescription)
                 break
-
-            case [3]:
-
-                log.info "2 $model --- $model.dataModel"
-
-                String groupDescription = "$model.name (${model.combinedVersion})"
-                log.debug("level$level $groupDescription")
-                groupDescriptions.put(level, groupDescription)
-                break
-
-            case [4]:
-
-                log.info "2 $model --- $model.dataModel"
-
-                String groupDescription = "$model.name (${model.combinedVersion})"
-                log.debug("level$level $groupDescription")
-                groupDescriptions.put(level, groupDescription)
-                break
-
 
             case 5:
                 log.info "5 searching... $model --- $model.dataModel"
@@ -148,31 +154,81 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
 
     }
 
-    // level 5 descending into level 6
+    // There is a significant performance improvement just knowing whether a model/children
+    // have been seen before and do/don't have changes - if there are no changes we can skip.
+    //
+    // cases
+    // 1. never visited before
+    // 2. visited before and no changes here or below
+    // 3. visited before and has changes or children have changes
+    //
     List<String> iterateChildren(CatalogueElement model, List lines, String subtype = null, groupDescriptions, level, List<ChangeType> typesToCheck) {
-        if (modelCount % 100 == 0) {
-            log.debug "modelCount=$modelCount"
-        }
+
+        levelIdStack.put(level,model.id)
 
         model.parentOf?.each { CatalogueElement child ->
 
-            log.debug("model $child.name")
-            checkChangeLog(child, lines, subtype, groupDescriptions, level, typesToCheck)
-
-            if( (PHENOTYPE == subtype || CLINICAL_TESTS ==  subtype) && child.parentOf.size > 0) {   // can be nested
-                iterateChildren(child, lines, subtype, groupDescriptions, level+1, DETAIL_CHANGE_TYPES)
+            if (++itemCount % 500 == 0) {
+                log.info "raw itemcount=$itemCount visitedModels ${visitedModels.size()}"
             }
+
+            boolean visited = visitedModels.containsKey(child.id)
+            boolean isVisitedWithChanges
+
+            // case 1. not yet visited
+            if(!visited) {
+                log.debug("new model $child")
+                checkChangesAndDescend(child, lines, subtype, groupDescriptions, level, typesToCheck)
+                return
+            }
+            // else visited...with/without changes
+
+            isVisitedWithChanges = visitedModels.get(child.id)
+
+            //case 2.
+            if(!isVisitedWithChanges ) {
+                log.debug("visited no Changes $child.name")
+                return
+            }
+
+            //case 3.
+            log.debug("visited should have changes in cache $child.name")
+            checkChangesAndDescend(child, lines, subtype, groupDescriptions, level, typesToCheck)
+            return
         }
         lines
     }
 
+
+    protected void checkChangesAndDescend(CatalogueElement child, List lines, String subtype, groupDescriptions, level, List<ChangeType> typesToCheck) {
+        checkChangeLog(child, lines, subtype, groupDescriptions, level, typesToCheck)
+
+        if ((PHENOTYPE == subtype || CLINICAL_TESTS == subtype) && child.parentOf.size > 0) {   // can be nested
+            iterateChildren(child, lines, subtype, groupDescriptions, level + 1, DETAIL_CHANGE_TYPES)
+        }
+    }
+
+
     // operates at level 6 & below
-    private void checkChangeLog(CatalogueElement model, List lines, String subtype = null, groupDescriptions, level, List<ChangeType> typesToCheck) {
+    //
+    // Check whether we have cached changes otherwise get them from db
+    //
+    boolean checkChangeLog(CatalogueElement model, List lines, String subtype = null, groupDescriptions, level, List<ChangeType> typesToCheck) {
         def rows
         List<String> changes = []
-        int noLines = lines.size()
+        int currLineCount = lines.size()
+        levelIdStack.put(level, model.id)
 
-        List<Change> allChanged = getChanges(model, typesToCheck.toArray(new ChangeType[0]))    //get all changes in one go (perf!)
+        // cache hit? use the cached changelog info
+        if(cachedChanges.containsKey(model.id)) {
+            log.debug("cache hit $model.name")
+            generateLinesFromCachedChangeLogs(model, lines, groupDescriptions)
+            saveChangedModelsTree(lines, currLineCount, model, level)
+            return
+        }
+
+        List<Change> allChanged = getChanges(model, typesToCheck.toArray(new ChangeType[0]))
+        callCount++
 
 
         for (Change change : allChanged) {
@@ -258,13 +314,34 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
             }
         }
 
-        if(lines.size() > noLines) {
-            log.debug "found changes for level$level model $model.name lines ${lines.size}"
-        }
-        modelCount++
+        saveChangedModelsTree(lines, currLineCount, model, level)
 
-        changes
+        allChanged.isEmpty()
     }
+
+
+    //
+    // if this item has changed, mark all the ids in the tree above as having changes (breadcrumbs) so that it won't get
+    // skipped if it subsequently appears below items in the tree without changes i.e. when they are checked for isVisitedWithChanges
+    //
+    protected void saveChangedModelsTree(List lines, int currLineCount, CatalogueElement model, int level) {
+        if (callCount % CLEAN_UP_GORM_PERIOD == 0) {
+            cleanUpGorm()
+        }
+
+        if (lines.size() > currLineCount) {
+            visitedModels.put(model.id, TRUE)
+            for (Entry<Integer, Long> entry : levelIdStack.entrySet()) {
+                if (entry.key < level) {
+                    visitedModels.put(entry.value, TRUE)
+                }
+            }
+            log.debug "found changes for level$level model $model lines ${lines.size}"
+        } else {
+            visitedModels.put(model.id, FALSE)
+        }
+    }
+
 
     protected Map<String, List<String>> createRow(Change change) {
         Map<String, List<String>> rows = new HashMap<String, List<String>>().withDefault { ['', ''] }
@@ -338,6 +415,11 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
                 changes << (before ? "$key: $before" : '')
                 changes << (after ? "$key: $after" : '')
             }
+
+            if (changes) {          // cache detail changes
+                cachedChanges.put(model.id, changes[4..-1].join(','))
+            }
+
         } catch (Exception e) {
             log.error "Error reading unpacked changelog key=$key rowdata=$rowData \n  ${e.toString()}"
             return []
@@ -345,6 +427,38 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
         log.debug "\n$changes"
         changes
     }
+
+
+    // merge this item's hierarchy info with the (possibly multiple) cached changelogs
+    private void generateLinesFromCachedChangeLogs(CatalogueElement model, List lines, groupDescriptions) {
+        log.debug "use cached model =$model lines ${lines.size}"
+
+        List<String> hierarchyChanges = []
+
+        if(model.ext.get(Metadata.CHANGE_REF)) {
+            hierarchyChanges << model.ext.get(Metadata.CHANGE_REF)
+        } else {
+            hierarchyChanges << EMPTY_CHANGE_REF
+        }
+
+        groupDescriptions.each { lvl, lvlName ->
+            hierarchyChanges << lvlName
+        }
+        if (groupDescriptions.size < 3) {   //DataModelChangelogs hierarchy Cancer/RD can be shallower than RD conditions
+            hierarchyChanges << model.name
+        }
+
+        for (String cachedChangeLog: cachedChanges.get(model.id)) {
+            List<String> changes = []
+            changes.addAll(hierarchyChanges)
+
+            String[] cachedChangeValues = cachedChangeLog.split(',')
+            changes.addAll(cachedChangeValues)
+            lines << changes
+        }
+        log.debug("lines ${lines.size} after cache use")
+    }
+
 
     private List extractValues(List<String> rowData, RareDiseaseChangeType changeToRender, String key) {
         String before = rowData.get(0)
@@ -489,6 +603,14 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     //is it potentially useful json? unlikely if less than 15 chars
     public static boolean mightBeJSON(String jsonStr) {
         return jsonStr != null && (jsonStr.length() > 15) && (jsonStr.startsWith("[") && jsonStr.endsWith("]") || jsonStr.startsWith("{") && jsonStr.endsWith("}"));
+    }
+
+
+    def cleanUpGorm() {
+        def session = sessionFactory.currentSession
+        session.flush()
+        session.clear()
+        propertyInstanceMap.get().clear()
     }
 
 

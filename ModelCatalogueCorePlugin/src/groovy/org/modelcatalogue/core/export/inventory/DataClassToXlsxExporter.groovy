@@ -180,7 +180,6 @@ class DataClassToXlsxExporter {
                 cell {
                     value dataClass.lastUpdated
                     style 'date'
-                    style 'property-value'
                     colspan 2
                 }
             }
@@ -266,43 +265,37 @@ class DataClassToXlsxExporter {
             for (Relationship containsRelationship in dataClass.containsRelationships) {
                 DataElement element = containsRelationship.destination as DataElement
                 row {
-                    style 'data-element-row'
                     cell {
                         value element.combinedVersion
-                        style {
-                            align bottom right
-                        }
+                        style 'data-element-bottom-right'
                     }
                     cell {
                         value element.name
+                        style 'data-element'
                         colspan 2
                     }
                     cell {
                         value getMultiplicity(containsRelationship)
-                        style {
-                            align top right
-                        }
+                        style 'data-element-top-right'
                     }
                     if (element.dataType) {
                         cell {
                             value element.dataType.combinedVersion
-                            style {
-                                align bottom right
-                            }
+                            style 'data-element-bottom-right'
                         }
                         cell {
                             value element.dataType.name
+                            style 'data-element'
                         }
 
                         if (element.dataType.instanceOf(PrimitiveType) && element.dataType.measurementUnit) {
                             cell('F') {
                                 value element.dataType.measurementUnit.combinedVersion
-                                style {
-                                    align bottom right
-                                }
+                                style 'data-element-bottom-right'
                             }
                             cell {
                                 value element.dataType.measurementUnit.name
+                                style 'data-element'
                             }
                         } else {
                             2.times { cell() }
@@ -311,12 +304,10 @@ class DataClassToXlsxExporter {
                         if (element.dataType.instanceOf(ReferenceType) && element.dataType.dataClass) {
                             cell('H') {
                                 value element.dataType.dataClass.combinedVersion
-                                style {
-                                    align bottom right
-                                }
-                            }
+                                style 'data-element-bottom-right'                            }
                             cell {
                                 value element.dataType.dataClass.name
+                                style 'data-element'
                             }
                         } else {
                             2.times { cell() }
@@ -448,7 +439,6 @@ class DataClassToXlsxExporter {
             row {
                 cell {
                     value dataClass.dataModel?.name
-                    style 'property-value'
                     style 'model-catalogue-id'
                     colspan 2
                 }
