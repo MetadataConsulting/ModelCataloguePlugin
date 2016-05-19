@@ -1,6 +1,7 @@
 import grails.util.Environment
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
 import org.modelcatalogue.core.security.Role
@@ -9,7 +10,7 @@ import org.modelcatalogue.core.security.UserRole
 import org.modelcatalogue.core.testapp.Requestmap
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.util.ExtensionModulesLoader
-import org.modelcatalogue.core.util.test.TestDataHelper
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.springframework.http.HttpMethod
 
 class BootStrap {
@@ -87,18 +88,19 @@ class BootStrap {
             createRequestmapIfMissing(url, 'permitAll', null)
         }
 
-        createRequestmapIfMissing('/asset/download/*',                      'IS_AUTHENTICATED_FULLY',        org.springframework.http.HttpMethod.GET)
+        createRequestmapIfMissing('/asset/download/*',                      'IS_AUTHENTICATED_FULLY',        HttpMethod.GET)
         createRequestmapIfMissing('/oauth/*/**',                            'IS_AUTHENTICATED_ANONYMOUSLY')
-        createRequestmapIfMissing('/user/current',                          'IS_AUTHENTICATED_ANONYMOUSLY',  org.springframework.http.HttpMethod.GET)
-        createRequestmapIfMissing('/catalogue/upload',                      'ROLE_METADATA_CURATOR',         org.springframework.http.HttpMethod.POST)
-        createRequestmapIfMissing('/catalogue/*/**',                        'IS_AUTHENTICATED_FULLY',        org.springframework.http.HttpMethod.GET)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'IS_AUTHENTICATED_FULLY',        org.springframework.http.HttpMethod.GET)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/*/comments',  'IS_AUTHENTICATED_FULLY',        org.springframework.http.HttpMethod.POST)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'ROLE_METADATA_CURATOR',         org.springframework.http.HttpMethod.POST)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'ROLE_METADATA_CURATOR',         org.springframework.http.HttpMethod.PUT)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'ROLE_METADATA_CURATOR',         org.springframework.http.HttpMethod.DELETE)
+        createRequestmapIfMissing('/user/current',                          'IS_AUTHENTICATED_ANONYMOUSLY',  HttpMethod.GET)
+        createRequestmapIfMissing('/catalogue/upload',                      'ROLE_METADATA_CURATOR',         HttpMethod.POST)
+        createRequestmapIfMissing('/catalogue/*/**',                        'IS_AUTHENTICATED_FULLY',        HttpMethod.GET)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'IS_AUTHENTICATED_FULLY',        HttpMethod.GET)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/*/comments',  'IS_AUTHENTICATED_FULLY',        HttpMethod.POST) // post a comment
+        createRequestmapIfMissing('/api/modelCatalogue/core/user/*/favourite', 'IS_AUTHENTICATED_FULLY',     HttpMethod.POST) // favourite item
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'ROLE_METADATA_CURATOR',         HttpMethod.POST)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'ROLE_METADATA_CURATOR',         HttpMethod.PUT)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'ROLE_METADATA_CURATOR',         HttpMethod.DELETE)
 
-        createRequestmapIfMissing('/sso/*/**',                              'IS_AUTHENTICATED_REMEMBERED',   org.springframework.http.HttpMethod.GET)
+        createRequestmapIfMissing('/sso/*/**',                              'IS_AUTHENTICATED_REMEMBERED',   HttpMethod.GET)
 
         createRequestmapIfMissing('/role/**',                               'ROLE_ADMIN')
         createRequestmapIfMissing('/userAdmin/**',                          'ROLE_ADMIN')
@@ -127,11 +129,11 @@ class BootStrap {
             importService.importData()
 
             println 'Finalizing all published elements'
-            CatalogueElement.findAllByStatus(org.modelcatalogue.core.api.ElementStatus.DRAFT).each {
+            CatalogueElement.findAllByStatus(ElementStatus.DRAFT).each {
                 if (it instanceof DataClass) {
                     elementService.finalizeElement(it)
                 } else {
-                    it.status = org.modelcatalogue.core.api.ElementStatus.FINALIZED
+                    it.status = ElementStatus.FINALIZED
                     it.save failOnError: true
                 }
             }
@@ -162,7 +164,7 @@ class BootStrap {
 
             Action createRelationshipAction = actionService.create(batch, CreateRelationship, source: MeasurementUnit.findByName("celsius"), destination: MeasurementUnit.findByName("fahrenheit"), type: RelationshipType.readByName('relatedTo'))
             if (createRelationshipAction.hasErrors()) {
-                println(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Failed to create relationship actions", createRelationshipAction.errors))
+                println(FriendlyErrors.printErrors("Failed to create relationship actions", createRelationshipAction.errors))
                 throw new AssertionError("Failed to create relationship actions!")
             }
 
