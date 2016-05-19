@@ -2,6 +2,8 @@ package org.modelcatalogue.core.elasticsearch
 
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import com.google.common.collect.ImmutableSet
+import com.google.common.collect.Iterables
 import grails.util.GrailsNameUtils
 import groovy.json.JsonSlurper
 import org.codehaus.groovy.grails.commons.GrailsApplication
@@ -52,7 +54,7 @@ class ElasticSearchService implements SearchCatalogue {
 
     private static final String MC_PREFIX = "mc_"
     private static final String GLOBAL_PREFIX = "${MC_PREFIX}global_"
-    private static final String MC_ALL_WILDCARD = "${MC_PREFIX}*"
+    private static final String MC_ALL_INDEX = "${MC_PREFIX}all"
     private static final String DATA_MODEL_INDEX = "${GLOBAL_PREFIX}data_model"
     private static final String DATA_MODEL_PREFIX = "${MC_PREFIX}data_model_"
     private static final String ORPHANED_INDEX = "${GLOBAL_PREFIX}orphaned"
@@ -68,7 +70,7 @@ class ElasticSearchService implements SearchCatalogue {
     ]
 
     private static Set<Class> MAPPED_TYPES_IN_DATA_MODEL = [
-            DataModel, Asset, DataClass, DataElement, DataType, EnumeratedType, MeasurementUnit, PrimitiveType, ReferenceType, Relationship
+            DataModel, Asset, DataClass, DataElement, DataType, EnumeratedType, MeasurementUnit, PrimitiveType, ReferenceType, ValidationRule, Relationship
     ]
 
     GrailsApplication grailsApplication
@@ -275,7 +277,7 @@ class ElasticSearchService implements SearchCatalogue {
         DataModelFilter filter = getOverridableDataModelFilter(params)
 
         if (!filter) {
-            return [MC_ALL_WILDCARD] // search all by default
+            return [MC_ALL_INDEX] // search all by default
         }
 
         if (filter.unclassifiedOnly) {
@@ -586,27 +588,27 @@ class ElasticSearchService implements SearchCatalogue {
 
 
 
-    protected static List<String> getIndices(object) {
+    protected static ImmutableSet<String> getIndices(object) {
         Class clazz = getEntityClass(object)
         if (DataModel.isAssignableFrom(clazz)) {
-            return [DATA_MODEL_INDEX, getDataModelIndex(object as DataModel)]
+            return ImmutableSet.of(DATA_MODEL_INDEX, MC_ALL_INDEX, getDataModelIndex(object as DataModel))
         }
 
         if (CatalogueElement.isAssignableFrom(clazz)) {
             CatalogueElement element = object as CatalogueElement
             if (element.dataModel) {
-                return [getDataModelIndex(element.dataModel)]
+                return ImmutableSet.of(MC_ALL_INDEX, getDataModelIndex(element.dataModel))
             }
-            return [ORPHANED_INDEX]
+            return ImmutableSet.of(ORPHANED_INDEX, MC_ALL_INDEX)
         }
 
         if (RelationshipType.isAssignableFrom(clazz)) {
-            return [getGlobalIndexName(clazz)]
+            return ImmutableSet.of(getGlobalIndexName(clazz))
         }
 
         if (Relationship.isAssignableFrom(clazz)) {
             Relationship rel = object as Relationship
-            return (getIndices(rel.source) + getIndices(rel.destination)).unique()
+            return ImmutableSet.builder().addAll(getIndices(rel.source)).addAll(getIndices(rel.destination)).build()
         }
 
         throw new UnsupportedOperationException("Not Yet Implemented for $object")
