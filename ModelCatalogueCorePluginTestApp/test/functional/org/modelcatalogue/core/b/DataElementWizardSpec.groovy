@@ -7,9 +7,6 @@ import static org.modelcatalogue.core.geb.Common.*
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
 
-/**
- * Created by david on 02/11/14.
- */
 @Stepwise
 class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
 
@@ -21,7 +18,7 @@ class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
         select('Test 1') / 'Test 1' / 'Data Elements'
 
         expect:
-        check rightSideTitle is 'Data Elements'
+        check rightSideTitle is 'Active Data Elements'
     }
 
     def "Add new data element"() {

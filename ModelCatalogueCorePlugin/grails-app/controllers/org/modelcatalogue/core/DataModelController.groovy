@@ -93,11 +93,13 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
             contentDescriptors << createContentDescriptor(dataModel, 'Data Types', DataType, stats["totalDataTypeCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Measurement Units', MeasurementUnit, stats["totalMeasurementUnitCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Validation Rules', ValidationRule, stats["totalValidationRuleCount"])
+            contentDescriptors << createContentDescriptor(dataModel, 'Assets', Asset, stats["totalAssetCount"])
 
-            Map assets = createContentDescriptor(dataModel, 'Assets', Asset, stats["totalAssetCount"])
-            assets.link = "${assets.link}&status=active"
-            assets.content.link = assets.link
-            contentDescriptors << assets
+            Map deprecatedItems = createContentDescriptor(dataModel, 'Deprecated Items', CatalogueElement, stats["deprecatedCatalogueElementCount"])
+            deprecatedItems.link = deprecatedItems.link.replace('status=active', 'status=deprecated')
+            deprecatedItems.content.link = deprecatedItems.link
+            deprecatedItems.status = 'DEPRECATED'
+            contentDescriptors << deprecatedItems
 
             contentDescriptors << createContentDescriptorForRelationship('Imported Data Models', 'imports',  dataModel, RelationshipType.importType, RelationshipDirection.OUTGOING)
 
@@ -112,7 +114,7 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
     }
 
     private static Map createContentDescriptor(DataModel dataModel, String name, Class clazz, long count) {
-        String link = "/${GrailsNameUtils.getPropertyName(clazz)}?toplevel=true&dataModel=${dataModel.getId()}"
+        String link = "/${GrailsNameUtils.getPropertyName(clazz)}?toplevel=true&dataModel=${dataModel.getId()}&status=active"
         Map ret = [:]
         ret.id = 'all'
         ret.dataModels = [CatalogueElementMarshaller.minimalCatalogueElementJSON(dataModel)]

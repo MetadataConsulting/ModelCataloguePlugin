@@ -34,7 +34,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 
         expect:
         check '#jserrors' gone
-        check rightSideTitle contains "Data Classes"
+        check rightSideTitle contains "Active Data Classes"
     }
 
 

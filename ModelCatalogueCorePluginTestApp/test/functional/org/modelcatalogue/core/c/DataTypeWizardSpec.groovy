@@ -49,7 +49,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         select('NHIC') / 'NHIC' / 'Data Types'
 
         then:
-        check rightSideTitle is 'Data Types'
+        check rightSideTitle is 'Active Data Types'
     }
 
     def "create reference"() {
