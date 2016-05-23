@@ -8,6 +8,7 @@ import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.ValidationRule
 
 /**
  * Prints the tables for element data specification using the DocumentBuilder library
@@ -117,6 +118,20 @@ class DocxSpecificationDataHelper {
                                     lineBreak()
                                 }
 
+                            }
+                        }
+                    }
+                }
+            }
+
+            if(dataClass.contextFor){
+                dataClass.contextFor.each{
+                    ValidationRule vr ->
+                    if(vr instanceof ValidationRule) {
+                        table(border:[size:0.px]){
+                            row {
+                                cell "Rule"
+                                cell vr.rule
                             }
                         }
                     }
