@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import com.google.common.collect.ImmutableMap
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.actions.Batch
 import org.modelcatalogue.core.api.ElementStatus
@@ -30,7 +29,7 @@ class DataModelService {
     public Map<String, Integer> getStatistics(DataModelFilter filter) {
         def model = [:]
 
-        List<Class> displayed = [DataModel, DataClass, DataElement, DataType, MeasurementUnit, Asset, ValidationRule]
+        List<Class> displayed = [CatalogueElement, DataModel, DataClass, DataElement, DataType, MeasurementUnit, Asset, ValidationRule]
 
         for (Class type in displayed) {
             DetachedCriteria criteria = classified(type, filter)
@@ -58,7 +57,7 @@ class DataModelService {
             model["finalized${type.simpleName}Count"]   = finalized
             model["pending${type.simpleName}Count"]     = pending
             model["deprecated${type.simpleName}Count"]  = deprecated
-            model["total${type.simpleName}Count"]       = draft + finalized + pending + deprecated
+            model["total${type.simpleName}Count"]       = draft + finalized + pending
         }
 
         model.putAll([
