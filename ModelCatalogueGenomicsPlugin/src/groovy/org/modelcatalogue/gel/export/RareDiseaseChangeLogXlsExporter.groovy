@@ -444,7 +444,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
         groupDescriptions.each { lvl, lvlName ->
             hierarchyChanges << lvlName
         }
-        if (groupDescriptions.size < 3) {   //DataModelChangelogs hierarchy Cancer/RD can be shallower than RD conditions
+        if (groupDescriptions.size() < 3) {   //DataModelChangelogs hierarchy Cancer/RD can be shallower than RD conditions
             hierarchyChanges << model.name
         }
 
