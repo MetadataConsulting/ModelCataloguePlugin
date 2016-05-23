@@ -1,6 +1,8 @@
 package org.modelcatalogue.core.publishing
 
 import groovy.util.logging.Log4j
+import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsHibernateUtil
+import org.hibernate.proxy.HibernateProxy
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
@@ -69,6 +71,11 @@ class FinalizationChain extends PublishingChain {
     }
 
     private static CatalogueElement doPublish(CatalogueElement published, Publisher<CatalogueElement> archiver, Observer<String> monitor, boolean flush = false) {
+        if (published instanceof HibernateProxy) {
+            GrailsHibernateUtil.unwrapProxy(published)
+        } else if (published.getClass().name.contains('_javassist_')) {
+            GrailsHibernateUtil.unwrapIfProxy(published)
+        }
         monitor.onNext("Finalizing $published ...")
 
         published.status = ElementStatus.FINALIZED
