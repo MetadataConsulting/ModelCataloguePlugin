@@ -2,10 +2,11 @@ package org.modelcatalogue.core.policy
 
 import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
-import spock.lang.Specification
+import org.modelcatalogue.core.util.Metadata
 
 class ConventionCheckersSpec extends AbstractIntegrationSpec {
 
@@ -19,16 +20,61 @@ class ConventionCheckersSpec extends AbstractIntegrationSpec {
         complexModel = buildComplexModel(dataModelService, elementService)
     }
 
-    def "test regexp checker"() {
-        RegexChecker checker = new RegexChecker()
+    def "test regexp checker - property"() {
+        ConventionChecker checker = new RegexChecker()
 
         when:
         for (CatalogueElement item in complexModel.declares) {
-            checker.check(complexModel, item, 'name', /[abc]+/)
+            checker.check(complexModel, CatalogueElement, item, 'name', /[abc]+/, null)
         }
 
         then:
         complexModel.errors.errorCount == 231
+    }
+
+    def "test regexp checker - extension"() {
+        ConventionChecker checker = new RegexChecker()
+
+        when:
+        checker.check(complexModel, CatalogueElement, complexModel, "ext[${Metadata.AUTHORS}]", /Author Two.*/, null)
+
+        then:
+        complexModel.errors.errorCount == 1
+    }
+
+    def "test required checker - property"() {
+        ConventionChecker checker = new RequiredChecker()
+
+        when:
+        for (CatalogueElement item in complexModel.declares) {
+            checker.check(complexModel, CatalogueElement, item, 'description', null, null)
+        }
+
+        then:
+        complexModel.errors.errorCount == 1
+    }
+
+    def "test required checker - extension"() {
+        ConventionChecker checker = new RequiredChecker()
+
+        when:
+        checker.check(complexModel, CatalogueElement, complexModel, "ext[no.such.ext]", null, null)
+
+        then:
+        complexModel.errors.errorCount == 1
+    }
+
+    def "test unique checker - property"() {
+        new DataClass(dataModel: complexModel, name: "C4CTDE Model 1").save(failOnError: true)
+        ConventionChecker checker = new UniqueChecker()
+
+        when:
+        for (CatalogueElement item in complexModel.declares) {
+            checker.check(complexModel, CatalogueElement, item, 'name', null, null)
+        }
+
+        then:
+        complexModel.errors.errorCount == 2
     }
 
 }
