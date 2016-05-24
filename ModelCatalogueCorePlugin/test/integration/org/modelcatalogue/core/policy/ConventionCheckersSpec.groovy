@@ -104,7 +104,7 @@ class ConventionCheckersSpec extends AbstractIntegrationSpec {
         new DataClass(dataModel: complexModel, name: "C4CTDE Model 1").save(failOnError: true)
 
         Policy policy = PolicyBuilder.build """
-            check every property 'name' apply regex: /[abc]+/
+            check every property 'name' apply regex: '[abc]+'
             check dataClass property 'name' is unique
         """
 
@@ -113,6 +113,23 @@ class ConventionCheckersSpec extends AbstractIntegrationSpec {
 
         then:
         complexModel.errors.errorCount == 234
+    }
+
+    def "print policy - string"() {
+        new DataClass(dataModel: complexModel, name: "C4CTDE Model 1").save(failOnError: true)
+
+        String original = """
+            |check every property 'name' apply regex: '[abc]+' otherwise 'You can only use abc letters in the name of {2}'
+            |check dataClass property 'name' is 'unique'
+        """.stripMargin().trim()
+
+        Policy policy = PolicyBuilder.build original
+
+        when:
+        String printed = policy.toString()
+
+        then:
+        printed == original
     }
 
 }

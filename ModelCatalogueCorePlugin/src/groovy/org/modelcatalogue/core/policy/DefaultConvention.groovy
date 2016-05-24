@@ -25,4 +25,39 @@ import org.modelcatalogue.core.DataModel
     void verify(DataModel model, CatalogueElement item) {
         checker.check(model, target, item, property, configuration, message)
     }
+
+    @Override
+    String toString() {
+        StringBuilder builder = new StringBuilder("check ")
+        builder << getClassNameOrShortcut(target)
+        if (property) {
+            if (Conventions.isExtensionAlias(property)) {
+                builder << ' extension ' << Conventions.getExtension(property).replace('\'', '\\\'')
+            } else {
+                builder << ' property \'' << property.replace('\'', '\\\'') << '\''
+            }
+        }
+        if (checker) {
+            if (configuration) {
+                builder << ' apply ' << Conventions.getCheckerName(checker) << ': \'' << configuration.replace('\'', '\\\'') << '\''
+            } else {
+                builder << ' is \'' << Conventions.getCheckerName(checker) << '\''
+            }
+        }
+        if (message) {
+            builder << ' otherwise \'' << message.replace('\'', '\\\'') << '\''
+        }
+        return builder.toString()
+    }
+
+    private static String getClassNameOrShortcut(Class<?> clazz) {
+        if (clazz == CatalogueElement) {
+            return 'every'
+        }
+        if (clazz.package.name == CatalogueElement.package.name) {
+            String name = clazz.simpleName
+            return name[0].toLowerCase() + name[1..-1]
+        }
+        return clazz.name
+    }
 }

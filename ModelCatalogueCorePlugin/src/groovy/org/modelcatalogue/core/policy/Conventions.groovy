@@ -34,6 +34,15 @@ class Conventions {
         return EXT_PATTERN.matcher(property).matches()
     }
 
+    static String getExtension(String property) {
+        Matcher matcher = EXT_PATTERN.matcher(property);
+
+        if (matcher.matches()) {
+            return matcher.group(1)
+        }
+        return null
+    }
+
     static String getValueOrName(Object value) {
         if (!value) {
             return ""
@@ -57,10 +66,9 @@ class Conventions {
         return CHECKERS = checkers.build()
     }
 
-    private static String getCheckerName(ConventionChecker checker) {
+    static String getCheckerName(ConventionChecker checker) {
         String name = checker.getClass().simpleName
         name[0].toLowerCase() + name[1..(name.lastIndexOf('Checker') - 1)]
     }
-
 
 }

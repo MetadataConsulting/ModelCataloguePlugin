@@ -25,4 +25,9 @@ import org.modelcatalogue.core.DataModel
             }
         }
     }
+
+    @Override
+    String toString() {
+        conventions.collect { it.toString() }.join('\n')
+    }
 }

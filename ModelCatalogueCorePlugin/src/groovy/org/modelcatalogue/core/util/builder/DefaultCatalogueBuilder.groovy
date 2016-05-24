@@ -5,12 +5,16 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Log4j
 import org.modelcatalogue.builder.api.BuilderKeyword
+import org.modelcatalogue.builder.api.DataModelPolicyBuilder
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.builder.util.AbstractCatalogueBuilder
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.api.RelationshipBuilder
 import org.modelcatalogue.builder.api.RelationshipConfiguration
 import org.modelcatalogue.builder.api.RelationshipTypeBuilder
+import org.modelcatalogue.core.policy.Conventions
+import org.modelcatalogue.core.policy.Policy
+import org.modelcatalogue.core.policy.PolicyBuilder
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.CatalogueElement
@@ -614,6 +618,34 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         classifyIfNeeded element
 
         element
+    }
+
+    @Override
+    void policy(String policy) {
+        if (!policy) {
+            return
+        }
+        context.withContextElement(CatalogueElement) {
+            List<String> policies = it.getParameter('dataModelPolicies') as List<String> ?: new ArrayList<String>()
+            policies.add(policy)
+            it.setParameter('dataModelPolicies', policies)
+        } or {
+            throw new IllegalStateException("No element to set string value '$policy'")
+        }
+    }
+
+    @Override @CompileDynamic
+    void dataModelPolicy(Map<String, Object> parameters, @DelegatesTo(DataModelPolicyBuilder.class) Closure configuration) {
+        DataModelPolicy policy = DataModelPolicy.findByName(parameters.name?.toString())
+        if (policy) {
+            return
+        }
+
+        PolicyBuilder builder = PolicyBuilder.create()
+        new DefaultDataModelPolicyBuilder(builder).with configuration
+        Policy builtPolicy = builder.createPolicy()
+
+        FriendlyErrors.failFriendlySave(new DataModelPolicy(name: parameters.name?.toString(), policyText: builtPolicy.toString()))
     }
 
     @CompileDynamic

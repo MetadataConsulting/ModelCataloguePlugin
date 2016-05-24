@@ -7,7 +7,7 @@ import org.modelcatalogue.core.CatalogueElement
 
 @CompileStatic class ConventionBuilder {
 
-    private final Class<? extends CatalogueElement> target
+    private Class<? extends CatalogueElement> target
     private String property
     private ConventionChecker checker
     private String configuration
@@ -24,6 +24,11 @@ import org.modelcatalogue.core.CatalogueElement
 
     ConventionBuilder extension(String extension) {
         this.property = Conventions.getExtensionAlias(extension)
+        return this
+    }
+
+    ConventionBuilder configuration(String configuration) {
+        this.configuration = configuration
         return this
     }
 
@@ -46,6 +51,11 @@ import org.modelcatalogue.core.CatalogueElement
 
     ConventionBuilder otherwise(String errorMessage) {
         this.message = errorMessage
+        return this
+    }
+
+    ConventionBuilder check(Class<? extends CatalogueElement> target) {
+        this.target = target
         return this
     }
 

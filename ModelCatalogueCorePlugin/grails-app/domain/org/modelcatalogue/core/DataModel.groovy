@@ -29,12 +29,14 @@ class DataModel extends CatalogueElement {
         revisionNotes maxSize: 2000, nullable: true
     }
 
-    static transients = ['namespace']
+    static transients = ['namespace', 'dataModelPolicies']
 
     static relationships = [
         outgoing: [classificationFilter: 'usedAsFilterBy', 'import': 'imports'],
         incoming: ['import': 'importedBy']
     ]
+
+    static hasMany = [policies: DataModelPolicy, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping, extensions: ExtensionValue]
 
     @Override
     protected PublishingChain preparePublishChain(PublishingChain chain) {
@@ -45,6 +47,12 @@ class DataModel extends CatalogueElement {
     @Override
     void setModelCatalogueId(String mcID) {
         super.setModelCatalogueId(Legacy.fixModelCatalogueId(mcID))
+    }
+
+    void setDataModelPolicies(List<String> policies) {
+        for (String policy in policies) {
+            addToPolicies(DataModelPolicy.findByName(policy))
+        }
     }
 
     List<CatalogueElement> getDeclares() {
@@ -105,7 +113,7 @@ class DataModel extends CatalogueElement {
     void checkFinalizeEligibility(String semanticVersion, String revisionNotes) {
         // initialize error object
         validate()
-        
+
         // check semantic version
         checkPublishSemanticVersion(semanticVersion)
 

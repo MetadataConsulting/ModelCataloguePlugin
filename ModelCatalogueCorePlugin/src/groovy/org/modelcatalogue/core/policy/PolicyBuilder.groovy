@@ -12,6 +12,10 @@ import org.modelcatalogue.core.util.SecuredRuleExecutor
 
     @PackageScope PolicyBuilder(){}
 
+    static PolicyBuilder create() {
+        return new PolicyBuilder()
+    }
+
     static Policy build(@DelegatesTo(PolicyBuilder) Closure builder) {
         PolicyBuilder policyBuilder = new PolicyBuilder()
         policyBuilder.with builder
