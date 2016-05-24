@@ -53,6 +53,9 @@ class DataModel extends CatalogueElement {
         for (String policy in policies) {
             addToPolicies(DataModelPolicy.findByName(policy))
         }
+        if (policies) {
+            save()
+        }
     }
 
     List<CatalogueElement> getDeclares() {

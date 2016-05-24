@@ -15,7 +15,7 @@ class DefaultDataModelPolicyBuilder implements DataModelPolicyBuilder {
 
     @Override
     void convention(@DelegatesTo(ConventionBuilder.class) Closure builder) {
-        new DefaultConventionBuilder(this.builder.check(CatalogueElement)).with conventionBuilder
+        new DefaultConventionBuilder(this.builder.check(CatalogueElement)).with builder
     }
 
 

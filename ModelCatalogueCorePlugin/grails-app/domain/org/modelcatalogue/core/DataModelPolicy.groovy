@@ -13,7 +13,7 @@ class DataModelPolicy {
     String name
     String policyText
 
-    static hasMany = [dataModel: DataModel]
+    static hasMany = [dataModels: DataModel]
     static transients = ['policy']
     static belongsTo = DataModel
 
