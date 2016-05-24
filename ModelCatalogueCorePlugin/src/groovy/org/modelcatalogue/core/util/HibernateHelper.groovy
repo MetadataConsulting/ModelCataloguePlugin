@@ -1,5 +1,8 @@
 package org.modelcatalogue.core.util
 
+import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsHibernateUtil
+import org.hibernate.proxy.HibernateProxy
+
 class HibernateHelper {
 
     /**
@@ -21,4 +24,13 @@ class HibernateHelper {
         return (Class<T>) object.class
     }
 
+    static <T> T ensureNoProxy(T published) {
+        if (published instanceof HibernateProxy) {
+            return GrailsHibernateUtil.unwrapProxy(published) as T
+        }
+        if (published.getClass().name.contains('_javassist_')) {
+            return GrailsHibernateUtil.unwrapIfProxy(published)
+        }
+        return published
+    }
 }
