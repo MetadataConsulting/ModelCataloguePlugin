@@ -45,9 +45,11 @@ class FinalizationChain extends PublishingChain {
 
         for (CatalogueElement element in publishedDataModel.declares) {
             for (CatalogueElement dependency in element.collectExternalDependencies()) {
-                final String message = "Dependencies outside the current data model $published.dataModel must be finalized: $element => $dependency"
-                monitor.onNext(message)
-                published.errors.rejectValue('status', 'org.modelcatalogue.core.CatalogueElement.dependency.not.finalized', message)
+                if (dependency.status != ElementStatus.FINALIZED) {
+                    final String message = "Dependencies outside the current data model $published.dataModel must be finalized: $element => $dependency"
+                    monitor.onNext(message)
+                    published.errors.rejectValue('status', 'org.modelcatalogue.core.CatalogueElement.dependency.not.finalized', message)
+                }
             }
         }
 
