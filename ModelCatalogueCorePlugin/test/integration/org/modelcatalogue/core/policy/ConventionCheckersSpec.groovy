@@ -6,6 +6,7 @@ import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Metadata
 
 class ConventionCheckersSpec extends AbstractIntegrationSpec {
@@ -75,6 +76,43 @@ class ConventionCheckersSpec extends AbstractIntegrationSpec {
 
         then:
         complexModel.errors.errorCount == 2
+    }
+
+    def "checkers are loaded"() {
+        expect:
+        Conventions.checkers.any { it.key == 'unique'}
+        Conventions.checkers.any { it.key == 'required'}
+        Conventions.checkers.any { it.key == 'regex'}
+    }
+
+    def "verify policy"() {
+        new DataClass(dataModel: complexModel, name: "C4CTDE Model 1").save(failOnError: true)
+
+        Policy policy = PolicyBuilder.build {
+            check every property 'name' apply regex: /[abc]+/
+            check dataClass property 'name' is unique
+        }
+
+        when:
+        policy.verify(complexModel)
+
+        then:
+        complexModel.errors.errorCount == 234
+    }
+
+    def "verify policy - string"() {
+        new DataClass(dataModel: complexModel, name: "C4CTDE Model 1").save(failOnError: true)
+
+        Policy policy = PolicyBuilder.build """
+            check every property 'name' apply regex: /[abc]+/
+            check dataClass property 'name' is unique
+        """
+
+        when:
+        policy.verify(complexModel)
+
+        then:
+        complexModel.errors.errorCount == 234
     }
 
 }
