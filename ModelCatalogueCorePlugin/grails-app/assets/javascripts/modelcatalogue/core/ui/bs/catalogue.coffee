@@ -1,6 +1,7 @@
 angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalogueProvider', (catalogueProvider)->
   catalogueProvider.setPlural 'dataClass', 'Data Classes'
   catalogueProvider.setPlural 'batch', 'Batches'
+  catalogueProvider.setPlural 'dataModelPolicy', 'Data Model Policies'
 
   catalogueProvider.setIcon 'dataModel',          "fa fa-fw fa-book"
   catalogueProvider.setIcon 'classification',     "fa fa-fw fa-book"
@@ -25,6 +26,7 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setIcon 'relationships',      "fa fa-fw fa-link"
   catalogueProvider.setIcon 'mapping',            "fa fa-fw fa-superscript"
   catalogueProvider.setIcon 'validationRule',     "fa fa-fw fa-university"
+  catalogueProvider.setIcon 'dataModelPolicy',    "fa fa-fw fa-check-square-o"
 
   # this should be generated automatically in the future
 

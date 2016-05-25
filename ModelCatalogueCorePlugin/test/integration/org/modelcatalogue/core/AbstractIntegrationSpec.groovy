@@ -41,7 +41,7 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
     void loadFixtures(){
         TestDataHelper.initFreshDb(sessionFactory, 'testdata.sql') {
             initCatalogueService.initDefaultRelationshipTypes()
-            fixtures = fixtureLoader.load("assets/*", "batches/*", "dataTypes/*", "enumeratedTypes/*", "measurementUnits/*", "models/*", "relationshipTypes/*", "classifications/*").load("actions/*", "users/*", "referenceTypes/*", "primitiveTypes/*").load("dataElements/*", "validationRules/*").load("extensions/*", "mappings/*").load("csvTransformations/*")
+            fixtures = fixtureLoader.load("assets/*", "batches/*", "dataTypes/*", "enumeratedTypes/*", "measurementUnits/*", "models/*", "relationshipTypes/*", "dataModelPolicies/*", "classifications/*").load("actions/*", "users/*", "referenceTypes/*", "primitiveTypes/*").load("dataElements/*", "validationRules/*").load("extensions/*", "mappings/*").load("csvTransformations/*")
         }
         relationshipTypeService.clearCache()
         RelationshipType.clearCache()

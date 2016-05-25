@@ -118,7 +118,8 @@ Model catalogue core plugin (metadata registry)
                     new UserMarshaller(),
                     new ChangeMarshaller(),
                     new ValidationRuleMarshaller(),
-                    new ProgressMonitorMarshaller()
+                    new ProgressMonitorMarshaller(),
+                    new DataModelPolicyMarshaller()
             ]
         }
 
