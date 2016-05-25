@@ -120,13 +120,17 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
         Shows the warning message to the user. Returns the message instance.
       ###
       messages.warning = (title, body) ->
-        addMessage(title, body, 'warning').timeout(errorHideAfter)
+        msg = addMessage(title, body, 'warning')
+        msg.timeout(errorHideAfter) if timeout
+        msg
 
       ###
         Shows the error message to the user. Returns the message instance.
       ###
       messages.error = (title, body) ->
-        addMessage(title, body, 'danger').timeout(errorHideAfter)
+        msg = addMessage(title, body, 'danger')
+        msg.timeout(errorHideAfter) if timeout
+        msg
 
       ###
         Shows the confirm dialog and returns a promise which is always resolved to boolean value which
@@ -140,7 +144,7 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
         and rejected if the user cancels the input. The type is optional type of input which doesn't have to be
         supported by all the implementations.
       ###
-      
+
       messages.prompt = (title, body, args) ->
         return prompt(title, body, args) if not args?.type?
         customPrompt = promptByTypes[args.type]

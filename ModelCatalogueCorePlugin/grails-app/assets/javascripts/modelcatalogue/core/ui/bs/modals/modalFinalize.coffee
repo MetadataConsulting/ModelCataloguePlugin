@@ -14,7 +14,7 @@ angular.module('mc.core.ui.bs.modalFinalize', ['mc.util.messages']).config ['mes
         <div class="modal-body">
             <p>Do you want to finalize data model <strong>''' + args.element.name + '''</strong>?</p>
             <p><small>Every item declared inside data model will be finalized as well. The data model will be published under given semantic version which cannot be changed later.</small></p>
-            <messages-panel messages="messages"></messages-panel>
+            <messages-panel messages="messages" max="10000"></messages-panel>
             <form role="form" ng-submit="finalizeElement()">
               <div class="form-group">
                 <label for="semanticVersion" class="">Semantic Version</label>

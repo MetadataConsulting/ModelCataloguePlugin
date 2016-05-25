@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.policy
 
 import com.google.common.collect.ImmutableList
+import com.google.common.collect.Iterables
 import groovy.transform.CompileStatic
 import groovy.transform.PackageScope
 import org.modelcatalogue.core.CatalogueElement
@@ -17,7 +18,7 @@ import org.modelcatalogue.core.DataModel
     @Override
     void verify(DataModel model) {
         // we might need something more efficient than DataModel#declares in future
-        for (CatalogueElement element in model.declares) {
+        for (CatalogueElement element in Iterables.concat(model.declares, ImmutableList.of(model))) {
             for (Convention convention in conventions) {
                 if (element.instanceOf(convention.target)) {
                     convention.verify(model, element)

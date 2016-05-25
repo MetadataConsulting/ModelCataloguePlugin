@@ -124,51 +124,55 @@ class DataModel extends CatalogueElement {
         // check semantic version
         checkPublishSemanticVersion(semanticVersion)
 
-        // check revision notes
-        if (!revisionNotes)
-            errors.rejectValue('revisionNotes', 'finalize.revisionNotes.null', 'Please, provide the revision notes')
-
-        // check basic metadata
-        ["authors", "reviewers", "owner", "reviewed", "approved"].each {
-            checkExtensionPresence(it)
+        for (DataModelPolicy policy in policies) {
+            policy.policy.verify(this)
         }
 
-        // check namespace and organization
-        ["namespace", "organization"].each {
-            checkExtensionPresence(it)
-        }
-
-        // check all data element have type
-        def wrongDataElements = getDataElements().findAll { !it.dataType }
-        if (wrongDataElements.size() > 0) {
-            errors.reject("dataModel.dataElements.dataType.null",
-                "All data elements must have data types! (See ${wrongDataElements.collect { it.name }}.)")
-        }
-
-        // check all data types doesn't contains dash, underscore or space
-        def wrongDataTypes = getDataTypes().findAll { !(it.name ==~ /[^_ -]+/) }
-        if (wrongDataTypes.size() > 0) {
-            errors.reject("dataModel.dataTypes.camelCase",
-                "All data types names must not contain space, dash and underscore characters: '-', '_', ' ')! (See ${wrongDataTypes.collect { it.name }}.)")
-        }
-
-        // check data elements have unique names
-        def dataElements = getDataElements()
-        def dataElementsUnique = dataElements.unique(false) { a, b -> a.name <=> b.name }
-        if (dataElements.size() != dataElementsUnique.size()) {
-            errors.reject("dataModel.dataElements.unique",
-                "All data elements names must be unique, there are duplicate entries. (See " +
-                    "${(dataElements - dataElementsUnique).collect { it.name }.unique()}.)")
-        }
-
-        // check data types have unique names
-        def dataTypes = getDataTypes()
-        def dataTypesUnique = dataTypes.unique(false) { a, b -> a.name <=> b.name }
-        if (dataTypes.size() != dataTypesUnique.size()) {
-            errors.reject("dataModel.dataTypes.unique",
-                "All data type names must be unique, there are duplicate entries. (See " +
-                    "${(dataTypes - dataTypesUnique).collect { it.name }.unique()}.)")
-        }
+//        // check revision notes
+//        if (!revisionNotes)
+//            errors.rejectValue('revisionNotes', 'finalize.revisionNotes.null', 'Please, provide the revision notes')
+//
+//        // check basic metadata
+//        ["authors", "reviewers", "owner", "reviewed", "approved"].each {
+//            checkExtensionPresence(it)
+//        }
+//
+//        // check namespace and organization
+//        ["namespace", "organization"].each {
+//            checkExtensionPresence(it)
+//        }
+//
+//        // check all data element have type
+//        def wrongDataElements = getDataElements().findAll { !it.dataType }
+//        if (wrongDataElements.size() > 0) {
+//            errors.reject("dataModel.dataElements.dataType.null",
+//                "All data elements must have data types! (See ${wrongDataElements.collect { it.name }}.)")
+//        }
+//
+//        // check all data types doesn't contains dash, underscore or space
+//        def wrongDataTypes = getDataTypes().findAll { !(it.name ==~ /[^_ -]+/) }
+//        if (wrongDataTypes.size() > 0) {
+//            errors.reject("dataModel.dataTypes.camelCase",
+//                "All data types names must not contain space, dash and underscore characters: '-', '_', ' ')! (See ${wrongDataTypes.collect { it.name }}.)")
+//        }
+//
+//        // check data elements have unique names
+//        def dataElements = getDataElements()
+//        def dataElementsUnique = dataElements.unique(false) { a, b -> a.name <=> b.name }
+//        if (dataElements.size() != dataElementsUnique.size()) {
+//            errors.reject("dataModel.dataElements.unique",
+//                "All data elements names must be unique, there are duplicate entries. (See " +
+//                    "${(dataElements - dataElementsUnique).collect { it.name }.unique()}.)")
+//        }
+//
+//        // check data types have unique names
+//        def dataTypes = getDataTypes()
+//        def dataTypesUnique = dataTypes.unique(false) { a, b -> a.name <=> b.name }
+//        if (dataTypes.size() != dataTypesUnique.size()) {
+//            errors.reject("dataModel.dataTypes.unique",
+//                "All data type names must be unique, there are duplicate entries. (See " +
+//                    "${(dataTypes - dataTypesUnique).collect { it.name }.unique()}.)")
+//        }
     }
 
     private void rejectSemanticVersion() {
@@ -181,4 +185,10 @@ class DataModel extends CatalogueElement {
         revisionNotes = null
     }
 
+    @Override
+    void afterDraftPersisted(CatalogueElement draft, PublishingContext context) {
+        for(DataModelPolicy policy in policies) {
+            draft.addToPolicies(policy)
+        }
+    }
 }

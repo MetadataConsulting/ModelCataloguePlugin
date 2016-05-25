@@ -32,7 +32,7 @@ import org.modelcatalogue.core.DataModel
         builder << Conventions.getClassNameOrShortcut(target)
         if (property) {
             if (Conventions.isExtensionAlias(property)) {
-                builder << ' extension ' << Conventions.getExtension(property).replace('\'', '\\\'')
+                builder << ' extension \'' << Conventions.getExtension(property).replace('\'', '\\\'') << '\''
             } else {
                 builder << ' property \'' << property.replace('\'', '\\\'') << '\''
             }

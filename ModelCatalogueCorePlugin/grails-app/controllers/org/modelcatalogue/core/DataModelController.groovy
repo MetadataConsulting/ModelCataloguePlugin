@@ -192,7 +192,17 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
                 FriendlyErrors.failFriendlySave(catalogueElement)
 			}
 		}
-	}
+
+        Set<DataModelPolicy> policies = (objectToBind.policies ?: []).collect { DataModelPolicy.get(it.id) } as Set<DataModelPolicy>
+        Set<DataModelPolicy> existing = instance.policies
+        (policies - existing).each {
+            instance.addToPolicies(it)
+        }
+        (existing - policies).each {
+            instance.removeFromPolicies(it)
+        }
+
+    }
 
 	@Override
 	protected getIncludeFields() {
