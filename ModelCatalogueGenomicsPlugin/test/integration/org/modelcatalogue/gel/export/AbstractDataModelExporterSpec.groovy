@@ -31,6 +31,8 @@ class AbstractDataModelExporterSpec extends IntegrationSpec {
     String level2_id_1, level2_id_2
     String level3_id_1, level3_id_2, level3_id_3, level3_id_4
     String level4_id_1, level4_id_2, level4_id_3, level4_id_4
+    String elem1_id, elem2_id, elem3_id, elem4_id, elem5_id, elem6_id
+    String newParticipant_id
 
     // Model Based on Strcture of RD and Cancer Models
     DataModel buildTestModel() {
@@ -112,6 +114,14 @@ class AbstractDataModelExporterSpec extends IntegrationSpec {
         level4_id_2 = DataClass.findByNameIlike("Info%1%Level4%2").combinedVersion
         level4_id_3 = DataClass.findByNameIlike("Info%2%Level4%1").combinedVersion
         level4_id_4 = DataClass.findByNameIlike("Info%2%Level4%2").combinedVersion
+        newParticipant_id = DataClass.findByName("New Participant Info class").combinedVersion
+
+        elem1_id = DataElement.findByName("Form Element 1").combinedVersion
+        elem2_id = DataElement.findByName("Form Element 2").combinedVersion
+        elem3_id = DataElement.findByName("Form Element 3").combinedVersion
+        elem4_id = DataElement.findByName("Form Element 4").combinedVersion
+        elem5_id = DataElement.findByName("Form Element 5").combinedVersion
+        elem6_id = DataElement.findByName("Form Element 6").combinedVersion
 
     }
 

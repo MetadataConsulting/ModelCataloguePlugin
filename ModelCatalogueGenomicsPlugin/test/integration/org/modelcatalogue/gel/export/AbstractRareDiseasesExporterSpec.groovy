@@ -32,6 +32,7 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
 
     @Rule TemporaryFolder temporaryFolder
 
+    String level5_guidanceid_1
     String level2_id_1,level2_id_2
     String level3_id_1, level3_id_2, level3_id_3, level3_id_4
     String level4_id_1, level4_id_2, level4_id_3, level4_id_4
@@ -40,6 +41,12 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
     String level6_exclusion_1,level6_exclusion_2,level6_exclusion_3,level6_exclusion_4
     String level6_priorGenetic_1,level6_priorGenetic_2,level6_priorGenetic_3,level6_priorGenetic_4
     String level6_prior_genes_1,level6_prior_genes_2,level6_prior_genes_3,level6_prior_genes_4
+    String level6_closing_1,level6_closing_2,level6_closing_3,level6_closing_4
+    String level6_guidance_1,level6_guidance_2,level6_guidance_3,level6_guidance_4
+    String[][][] phenotypeIds = new String[2][2][15]
+    String[][][] clinicalTestIds = new String[2][2][5]
+    String phenotypeLevel5Id_1, phenotypeLevel5Id_2, phenotypeLevel5Id_3, phenotypeLevel5Id_4
+    String clinicalLevel5Id_1, clinicalLevel5Id_2, clinicalLevel5Id_3, clinicalLevel5Id_4
 
     // this model reflects the data mix of eligibility criteria, phenotypes & clinical tests that need to be extracted
     // by the two report generation methods it's a bit nasty looking but creates a fairly realistic model
@@ -168,6 +175,14 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
 
             update 'description' of 'Phenotype (2) name 2 2' to 'description for Phenotype (2) name 2 2 has been changed also'
 
+            create DataClass called 'Nested 1st level Phenotype'
+            create DataClass called 'Nested 2nd level Phenotype'
+            create DataClass called 'Nested 3rd level Phenotype'
+
+            update 'hierarchy' of 'Phenotype (5) name 2 2' add 'Nested 1st level Phenotype'
+            update 'hierarchy' of 'Nested 1st level Phenotype' add 'Nested 2nd level Phenotype'
+            update 'hierarchy' of 'Nested 2nd level Phenotype' add 'Nested 3rd level Phenotype'
+
         }
 
         return model
@@ -194,6 +209,8 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
         level5_id_3 = DataClass.findByNameIlike("Disorder%2%Level5%1").combinedVersion
         level5_id_4 = DataClass.findByNameIlike("Disorder%2%Level5%2").combinedVersion
 
+        level5_guidanceid_1 = DataClass.findByName("Disorder >1< Guidance name 1 1").combinedVersion
+
         level6_inclusion_1 = DataClass.findByNameIlike("Inclusion%1 1").combinedVersion
         level6_inclusion_2 = DataClass.findByNameIlike("Inclusion%1 2").combinedVersion
         level6_inclusion_3 = DataClass.findByNameIlike("Inclusion%2 1").combinedVersion
@@ -214,6 +231,43 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
         level6_prior_genes_3 = DataClass.findByNameIlike("Prior%genes%2 1").combinedVersion
         level6_prior_genes_4 = DataClass.findByNameIlike("Prior%genes%2 2").combinedVersion
 
+        level6_closing_1 = DataClass.findByNameIlike("Closing%1 1").combinedVersion
+        level6_closing_2 = DataClass.findByNameIlike("Closing%1 2").combinedVersion
+        level6_closing_3 = DataClass.findByNameIlike("Closing%2 1").combinedVersion
+        level6_closing_4 = DataClass.findByNameIlike("Closing%2 2").combinedVersion
+
+        level6_guidance_1 = DataClass.findByNameIlike("Guidance%1 1").combinedVersion
+        level6_guidance_2 = DataClass.findByNameIlike("Guidance%1 2").combinedVersion
+        level6_guidance_3 = DataClass.findByNameIlike("Guidance%2 1").combinedVersion
+        level6_guidance_4 = DataClass.findByNameIlike("Guidance%2 2").combinedVersion
+
+
+        for (int i in 1..2) {
+            for (int j in 1..2) {
+                    for (int k in 1..15) {
+                        def version = DataClass.findByName("Phenotype ($k) name $i $j").combinedVersion
+                        phenotypeIds[i-1][j-1][k-1] = version
+                    }
+            }
+        }
+        for (int i in 1..2) {
+            for (int j in 1..2) {
+                    for (int k in 1..5) {
+                        def version = DataClass.findByName("Clinical tests ($k) name $i $j").combinedVersion
+                        clinicalTestIds[i-1][j-1][k-1] = version
+                    }
+            }
+        }
+
+        phenotypeLevel5Id_1 = DataClass.findByNameIlike("%Phenotypes Level5 Model 1 Data Element 1").combinedVersion
+        phenotypeLevel5Id_2 = DataClass.findByNameIlike("%Phenotypes Level5 Model 1 Data Element 2").combinedVersion
+        phenotypeLevel5Id_3 = DataClass.findByNameIlike("%Phenotypes Level5 Model 2 Data Element 1").combinedVersion
+        phenotypeLevel5Id_4 = DataClass.findByNameIlike("%Phenotypes Level5 Model 2 Data Element 2").combinedVersion
+
+        clinicalLevel5Id_1 = DataClass.findByNameIlike("%Clinical tests Level5 Model 1 Data Element 1").combinedVersion
+        clinicalLevel5Id_2 = DataClass.findByNameIlike("%Clinical tests Level5 Model 1 Data Element 2").combinedVersion
+        clinicalLevel5Id_3 = DataClass.findByNameIlike("%Clinical tests Level5 Model 2 Data Element 1").combinedVersion
+        clinicalLevel5Id_4 = DataClass.findByNameIlike("%Clinical tests Level5 Model 2 Data Element 2").combinedVersion
     }
 
     String getLevel2Id(def pos){
