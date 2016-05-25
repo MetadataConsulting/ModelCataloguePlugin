@@ -1148,12 +1148,8 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
                 policy POLICY_NAME
             }
             dataModelPolicy(name: POLICY_NAME) {
-                convention {
-                    target dataType
-                    property 'name'
-                    type 'regex'
-                    argument '[a-zA-Z0-9]+'
-                }
+                check dataType property 'name' apply regex: '[a-zA-Z0-9]+'
+                check dataClass property 'name' apply regex: '[a-zA-Z0-9]+'
             }
         }
 
@@ -1166,5 +1162,11 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         policy
         dataModel in policy.dataModels
         policy in dataModel.policies
+        policy.policy
+        policy.policy.conventions.size() == 2
+        policy.policyText.toString() == """
+        |check dataType property 'name' apply regex: '[a-zA-Z0-9]+'
+        |check dataClass property 'name' apply regex: '[a-zA-Z0-9]+'
+        """.stripMargin().trim()
     }
 }

@@ -3,7 +3,7 @@ catalogueElementPicker.run ['$templateCache', ($templateCache) ->
   $templateCache.put "modelcatalogue/core/ui/catalogueElementPickerTypeahead.html", """
         <a class="cep-item" ng-class="{'show-more-cep-item': match.model.more}">
         <span class="omnisearch-text" ng-class="{'text-warning': match.model.status == 'DRAFT', 'text-info': match.model.status == 'PENDING'}">
-          <span class="text-muted" ng-class="match.model.getIcon()"/><span> {{match.model.classifiedName}}
+          <span class="text-muted" ng-class="match.model.getIcon()"/><span> {{match.model.classifiedName || match.model.name}}
         </span><br/>
         <small ng-if="match.model.description">{{match.model.description}}</small>
         </a>

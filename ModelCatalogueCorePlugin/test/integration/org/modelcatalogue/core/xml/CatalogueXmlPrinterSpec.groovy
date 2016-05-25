@@ -146,11 +146,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
                     dataElement(name: "Factor of Adhesion", id: "http://www.example.com/elements/Adhesion")
                 }
                 dataModelPolicy(name: 'CD Policy') {
-                    convention {
-                        target dataClass
-                        property 'name'
-                        type 'required'
-                    }
+                    check dataClass property 'name' is 'required'
                 }
             }
 

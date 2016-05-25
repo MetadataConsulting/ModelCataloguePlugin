@@ -1,0 +1,12 @@
+{
+  "data_model_policy": {
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "policy_text": {
+        "type": "string"
+      }
+    }
+  }
+}

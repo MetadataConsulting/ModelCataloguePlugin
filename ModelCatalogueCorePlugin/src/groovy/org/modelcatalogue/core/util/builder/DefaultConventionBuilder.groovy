@@ -1,8 +1,6 @@
 package org.modelcatalogue.core.util.builder
 
-import org.modelcatalogue.builder.api.BuilderKeyword
 import org.modelcatalogue.builder.api.ConventionBuilder
-import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.policy.ConventionBuilder as PolicyConventionBuilder
 
 class DefaultConventionBuilder implements ConventionBuilder {
@@ -11,28 +9,6 @@ class DefaultConventionBuilder implements ConventionBuilder {
 
     DefaultConventionBuilder(org.modelcatalogue.core.policy.ConventionBuilder builder) {
         this.builder = builder
-    }
-
-    @Override
-    ConventionBuilder target(BuilderKeyword domain) {
-        if (domain instanceof ModelCatalogueTypes) {
-            builder.check(domain.implementation)
-        } else {
-            throw new IllegalArgumentException("$domain is not valid input for policy target")
-        }
-        return this
-    }
-
-    @Override
-    ConventionBuilder type(String type) {
-        builder.is(type)
-        return this
-    }
-
-    @Override
-    ConventionBuilder argument(String argument) {
-        builder.configuration(argument)
-        return this
     }
 
     @Override
@@ -48,10 +24,20 @@ class DefaultConventionBuilder implements ConventionBuilder {
     }
 
     @Override
-    ConventionBuilder message(String message) {
-        builder.otherwise(message)
+    ConventionBuilder apply(Map<String, Object> checkerToConf) {
+        builder.apply(checkerToConf)
         return this
     }
 
+    @Override
+    ConventionBuilder is(String argument) {
+        builder.is(argument)
+        return this
+    }
 
+    @Override
+    ConventionBuilder otherwise(String message) {
+        builder.otherwise(message)
+        return this
+    }
 }

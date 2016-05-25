@@ -4,6 +4,7 @@ import groovy.util.logging.Log
 import groovy.util.slurpersupport.GPathResult
 import groovy.util.slurpersupport.NodeChild
 import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.builder.api.ConventionBuilder
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.enumeration.Enumerations
 
@@ -79,22 +80,21 @@ class CatalogueXmlLoader {
             String name = policy.@name.text()
             builder.dataModelPolicy(name: name){
                policy.convention.each { c ->
-                   convention {
-                       if (c.target.text()) {
-                           target ModelCatalogueTypes.values().find { it.toString() == c.target.text() }
-                       }
-                       if (c.property.text()) {
-                           property c.property.text()
-                       }
-                       if (c.extension.text()) {
-                           extension c.extension.text()
-                       }
-                       if (c.type.text()) {
-                           type c.type.text()
-                       }
-                       if (c.argument.text()) {
-                           argument c.argument.text()
-                       }
+                   ConventionBuilder cb = check(ModelCatalogueTypes.values().find { it.toString() == c.@target.text()}) d
+                   if (c.@property.text()) {
+                       cb.property c.@property.text()
+                   }
+                   if (c.@extension.text()) {
+                       cb.extension c.@extension.text()
+                   }
+                   if (c.@type.text()) {
+                       cb.is c.@type.text()
+                   }
+                   if (c.@argument.text()) {
+                       cb.apply((c.@type.text()):c.@argument.text())
+                   }
+                   if (c.@message.text()) {
+                       cb.otherwise(c.@message.text())
                    }
                }
             }

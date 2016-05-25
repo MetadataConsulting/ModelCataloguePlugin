@@ -13,6 +13,7 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import spock.util.concurrent.BlockingVariable
 import spock.util.concurrent.BlockingVariables
 
 class ElasticSearchServiceSpec extends IntegrationSpec {
@@ -62,6 +63,7 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
     def "play with elasticsearch"() {
         catalogueBuilder.build {
             dataModel(name: "ES Test Model") {
+                policy 'TEST POLICY'
                 dataClass(name: "Foo") {
                     description "foo bar"
                     ext 'foo', 'bar'
@@ -79,10 +81,14 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
                     }
                 }
             }
+            dataModelPolicy(name: 'TEST POLICY') {
+                check dataType property 'name' is 'unique'
+            }
         }
         DataModel dataModel = DataModel.findByName("ES Test Model")
         DataClass element = DataClass.findByName("Foo")
         MeasurementUnit unit = MeasurementUnit.findByName('unit of measure 123456')
+        DataModelPolicy policy = DataModelPolicy.findByName('TEST POLICY')
 
         Class elementClass = HibernateHelper.getEntityClass(element)
 
@@ -93,6 +99,7 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
         dataModel
         element
         unit
+        policy
 
 
         when:
@@ -149,6 +156,15 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
         foundDataModels.total == 1L
         dataModel in foundDataModels.items
 
+        when:
+        BlockingVariable<Boolean> policyIndexed = new BlockingVariable<Boolean>(60)
+        elasticSearchService.index(policy).subscribe {
+            policyIndexed.set(true)
+        }
+
+        then:
+        policyIndexed.get()
+        elasticSearchService.search(DataModelPolicy, [search: 'test policy', max: '1']).total == 1L
     }
 
 

@@ -201,15 +201,12 @@
     </xs:complexType>
 
     <xs:complexType name="Convention">
-        <xs:sequence>
-            <xs:element name="target" type="mdr:CatalogueElementType"/>
-            <xs:choice>
-                <xs:element name="property" type="xs:string"/>
-                <xs:element name="extension" type="xs:string"/>
-            </xs:choice>
-            <xs:element name="type" type="xs:string"/>
-            <xs:element name="argument" type="xs:string" minOccurs="0"/>
-        </xs:sequence>
+            <xs:attribute name="target" type="mdr:CatalogueElementType"/>
+            <xs:attribute name="property" type="xs:string"/>
+            <xs:attribute name="extension" type="xs:string"/>
+            <xs:attribute name="type" type="xs:string"/>
+            <xs:attribute name="argument" type="xs:string"/>
+            <xs:attribute name="message" type="xs:string"/>
     </xs:complexType>
 
     <xs:complexType name="DataModelPolicyDefinition">

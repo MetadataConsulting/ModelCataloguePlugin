@@ -38,6 +38,10 @@ class DataModel extends CatalogueElement {
 
     static hasMany = [policies: DataModelPolicy, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping, extensions: ExtensionValue]
 
+    static mapping = {
+        policies lazy: false
+    }
+
     @Override
     protected PublishingChain preparePublishChain(PublishingChain chain) {
         super.preparePublishChain(chain).add(this.declares)

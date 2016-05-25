@@ -1,8 +1,9 @@
 package org.modelcatalogue.core.util.builder
 
+import org.modelcatalogue.builder.api.BuilderKeyword
 import org.modelcatalogue.builder.api.ConventionBuilder
 import org.modelcatalogue.builder.api.DataModelPolicyBuilder
-import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.policy.PolicyBuilder
 
 class DefaultDataModelPolicyBuilder implements DataModelPolicyBuilder {
@@ -14,9 +15,11 @@ class DefaultDataModelPolicyBuilder implements DataModelPolicyBuilder {
     }
 
     @Override
-    void convention(@DelegatesTo(ConventionBuilder.class) Closure builder) {
-        new DefaultConventionBuilder(this.builder.check(CatalogueElement)).with builder
+    ConventionBuilder check(BuilderKeyword domain) {
+        if (domain instanceof ModelCatalogueTypes) {
+            return new DefaultConventionBuilder(this.builder.check(domain.implementation))
+        }
+        throw new IllegalArgumentException("$domain is not valid input for policy target")
     }
-
 
 }
