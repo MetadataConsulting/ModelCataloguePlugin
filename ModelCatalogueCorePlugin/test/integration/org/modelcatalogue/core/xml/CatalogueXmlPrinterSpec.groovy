@@ -125,6 +125,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
     private DataModel getTransportation() {
         build {
             dataModel (name: "Transportation", id: "http://www.example.com/datasets/Transportation") {
+                policy 'CD Policy'
                 dataElement(name: "Factor of Adhesion", id: "http://www.example.com/elements/Adhesion") {
                     dataType(name: 'Force', id: "http://www.example.com/domains/Force") {
                         description "A force is a push or pull upon an object resulting from the object's interaction with another object."
@@ -143,6 +144,13 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
                 }
                 dataClass(name: 'Engine', id: "http://www.example.com/models/Engine") {
                     dataElement(name: "Factor of Adhesion", id: "http://www.example.com/elements/Adhesion")
+                }
+                dataModelPolicy(name: 'CD Policy') {
+                    convention {
+                        target dataClass
+                        property 'name'
+                        type 'required'
+                    }
                 }
             }
 

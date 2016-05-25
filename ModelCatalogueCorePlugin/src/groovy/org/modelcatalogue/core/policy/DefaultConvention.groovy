@@ -29,7 +29,7 @@ import org.modelcatalogue.core.DataModel
     @Override
     String toString() {
         StringBuilder builder = new StringBuilder("check ")
-        builder << getClassNameOrShortcut(target)
+        builder << Conventions.getClassNameOrShortcut(target)
         if (property) {
             if (Conventions.isExtensionAlias(property)) {
                 builder << ' extension ' << Conventions.getExtension(property).replace('\'', '\\\'')
@@ -50,14 +50,4 @@ import org.modelcatalogue.core.DataModel
         return builder.toString()
     }
 
-    private static String getClassNameOrShortcut(Class<?> clazz) {
-        if (clazz == CatalogueElement) {
-            return 'every'
-        }
-        if (clazz.package.name == CatalogueElement.package.name) {
-            String name = clazz.simpleName
-            return name[0].toLowerCase() + name[1..-1]
-        }
-        return clazz.name
-    }
 }

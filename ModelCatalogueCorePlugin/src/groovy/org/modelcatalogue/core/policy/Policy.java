@@ -5,6 +5,7 @@ import org.modelcatalogue.core.DataModel;
 
 public interface Policy {
 
+    ImmutableList<Convention> getConventions();
     void verify(DataModel policy);
 
 }

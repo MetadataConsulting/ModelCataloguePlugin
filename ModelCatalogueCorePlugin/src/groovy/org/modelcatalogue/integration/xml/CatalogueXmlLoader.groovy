@@ -4,6 +4,7 @@ import groovy.util.logging.Log
 import groovy.util.slurpersupport.GPathResult
 import groovy.util.slurpersupport.NodeChild
 import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.enumeration.Enumerations
 
 @Log
@@ -39,6 +40,7 @@ class CatalogueXmlLoader {
             XmlSlurper xs = new XmlSlurper(false, true)
             GPathResult loaded = xs.parse(xml)
             handleRelationshipTypes(loaded)
+            handlePolicies(loaded)
             handleChildren(loaded)
         }
     }
@@ -72,6 +74,33 @@ class CatalogueXmlLoader {
         }
     }
 
+    private void handlePolicies(GPathResult parent) {
+        parent.dataModelPolicies.children().each { policy ->
+            String name = policy.@name.text()
+            builder.dataModelPolicy(name: name){
+               policy.convention.each { c ->
+                   convention {
+                       if (c.target.text()) {
+                           target ModelCatalogueTypes.values().find { it.toString() == c.target.text() }
+                       }
+                       if (c.property.text()) {
+                           property c.property.text()
+                       }
+                       if (c.extension.text()) {
+                           extension c.extension.text()
+                       }
+                       if (c.type.text()) {
+                           type c.type.text()
+                       }
+                       if (c.argument.text()) {
+                           argument c.argument.text()
+                       }
+                   }
+               }
+            }
+        }
+    }
+
     private void handleChildren(GPathResult parent) {
         parent.children().each {
             handleNode(it as NodeChild)
@@ -98,6 +127,7 @@ class CatalogueXmlLoader {
             case 'validationRule': handleValidationRule(element) ; break
             case 'description': handleDescription(element) ; break
             case 'revisionNotes': handleRevisionNotes(element) ; break
+            case 'policy': handlePolicy(element) ; break
             case 'regex': handleRegex(element) ; break
             case 'component': handleComponent(element) ; break
             case 'ruleFocus': handleRuleFocus(element) ; break
@@ -111,6 +141,7 @@ class CatalogueXmlLoader {
             case 'relationships': handleChildren(element) ; break
             case 'enumerations': break // handled by data type
             case 'relationshipTypes': break // handled already by handleRelationshipTypes(GPathResult)
+            case 'dataModelPolicies': break // handled already by handleDataModelPolicies(GPathResult)
             case 'metadata': handleMetadata(element) ; break
             case 'archived': handleArchived(element) ; break
             case 'inherited': handleInherited(element) ; break
@@ -195,6 +226,10 @@ class CatalogueXmlLoader {
             }
             archived(element.archived.text() == 'true')
         }
+    }
+
+    private void handlePolicy(NodeChild element) {
+        builder.policy(element.text())
     }
 
     private void handleRevisionNotes(NodeChild element) {

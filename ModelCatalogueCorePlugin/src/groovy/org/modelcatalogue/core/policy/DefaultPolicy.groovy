@@ -8,7 +8,7 @@ import org.modelcatalogue.core.DataModel
 
 @CompileStatic @PackageScope class DefaultPolicy implements Policy {
 
-    private final ImmutableList<Convention> conventions;
+    final ImmutableList<Convention> conventions;
 
     DefaultPolicy(ImmutableList<Convention> conventions) {
         this.conventions = conventions

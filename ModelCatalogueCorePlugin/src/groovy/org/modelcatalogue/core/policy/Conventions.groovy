@@ -71,4 +71,14 @@ class Conventions {
         name[0].toLowerCase() + name[1..(name.lastIndexOf('Checker') - 1)]
     }
 
+    static String getClassNameOrShortcut(Class<?> clazz) {
+        if (clazz == CatalogueElement) {
+            return 'every'
+        }
+        if (clazz.package.name == CatalogueElement.package.name) {
+            String name = clazz.simpleName
+            return name[0].toLowerCase() + name[1..-1]
+        }
+        return clazz.name
+    }
 }

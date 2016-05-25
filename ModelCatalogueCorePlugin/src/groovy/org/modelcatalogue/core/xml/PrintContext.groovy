@@ -18,6 +18,7 @@ class PrintContext {
     Set<Long> idsOfPrinted = []
 
     Set<String> typesUsed = new TreeSet<String>()
+    Set<String> policiesUsed = new TreeSet<String>()
 
     PrintContext(DataModelService dataModelService, DataClassService modelService) {
         this.dataModelService = dataModelService
