@@ -284,6 +284,12 @@ class DataModelToDocxExporter {
                     }
                 }
 
+                pageBreak()
+                heading2 'Validation Rules'
+                for(DataClass dataClass in dataClasses) {
+                    docHelper.printRules(builder, dataClass, 1)
+                }
+
             }
         }
 

@@ -17,6 +17,7 @@ import org.modelcatalogue.core.ValidationRule
 class DocxSpecificationDataHelper {
 
     final Set<Long> processedDataClasses = new HashSet<Long>()
+    final Set<Long> processedDataClassesForRules = new HashSet<Long>()
 
     private static final Map<String, Object> HEADER_CELL = [background: '#F2F2F2']
     private static
@@ -28,7 +29,7 @@ class DocxSpecificationDataHelper {
         a?.name <=> b?.name
     }] as Comparator<DataType>)
 
-    public void printModel(DocumentBuilder builder, DataClass dataClass, int level){
+    def printModel(DocumentBuilder builder, DataClass dataClass, int level) {
         if (level > 50) {
             // only go 3 levels deep
             return
@@ -124,16 +125,16 @@ class DocxSpecificationDataHelper {
                 }
             }
 
-            if(dataClass.contextFor){
-                dataClass.contextFor.each{
-                    ValidationRule vr ->
-                    if(vr instanceof ValidationRule) {
-                        table(border:[size:0.px]){
-                            row {
-                                cell "Rule"
-                                cell vr.rule
+            if (dataClass.contextFor) {
+                table(border: [size: 0.px]) {
+                    dataClass.contextFor.each {
+                        ValidationRule vr ->
+                            if (vr instanceof ValidationRule) {
+                                row {
+                                    cell "Rule"
+                                    cell vr.rule
+                                }
                             }
-                        }
                     }
                 }
             }
@@ -159,6 +160,78 @@ class DocxSpecificationDataHelper {
 
     private static String getMultiplicity(Relationship relationship) {
         "${relationship.ext['Min Occurs'] ?: 0}..${relationship.ext['Max Occurs'] ?: 'unbounded'}"
+    }
+
+    def printRules(DocumentBuilder builder, DataClass dataClass, int level) {
+
+        builder.with {
+//            if (dataClass.contextFor) {
+                dataClass.contextFor?.each {
+                    ValidationRule vr ->
+                        if (vr instanceof ValidationRule) {
+                            println "Printing rules for ${dataClass.name}"
+                            heading3 vr.name
+                            table(border: [size: 1, color: '#D2D2D2']) {
+                                row {
+                                    cell "Component"
+                                    cell vr.component, font: [bold: true]
+                                }
+                                row {
+                                    cell "Rule Focus"
+                                    cell vr.ruleFocus, font: [bold: true]
+                                }
+                                row {
+                                    cell "Trigger"
+                                    cell vr.trigger, font: [bold: true]
+                                }
+                                row {
+                                    cell "Rule"
+                                    cell vr.rule, font: [bold: true]
+                                }
+                                row {
+                                    cell "Error Condition"
+                                    cell vr.errorCondition, font: [bold: true]
+                                }
+                                row {
+                                    cell "Issue Record"
+                                    cell vr.issueRecord, font: [bold: true]
+                                }
+                                row {
+                                    cell "Notification"
+                                    cell vr.notification, font: [bold: true]
+                                }
+                                row {
+                                    cell "Notification Target"
+                                    cell vr.notificationTarget, font: [bold: true]
+                                }
+                                row {
+                                    cell "Last Updated"
+                                    cell vr.lastUpdated, font: [bold: true]
+                                }
+                                row {
+                                    cell "Version Created"
+                                    cell vr.versionCreated, font: [bold: true]
+                                }
+                                row {
+                                    cell "Status"
+                                    cell vr.status, font: [bold: true]
+                                }
+
+                            }
+                        }
+                }
+//            }
+        }
+
+        if (!(dataClass.getId() in processedDataClassesForRules)) {
+            if (dataClass.countParentOf()) {
+                for (DataClass child in dataClass.parentOf) {
+                    printRules(builder, child, level + 1)
+                }
+            }
+        }
+
+        processedDataClassesForRules << dataClass.getId()
     }
 
 }

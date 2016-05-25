@@ -201,7 +201,7 @@ Genomics England customisation plugin for Model Catalogue
 
         reportsRegistry.register {
             creates link
-            title { "Gel Data Specification Change Log (Excel)" }
+            title { "GEL Data Specification Change Log (Excel)" }
             type DataModel
             link controller: 'genomics', action: 'exportDataSpecChangeLogAsXls', id: true
         }
