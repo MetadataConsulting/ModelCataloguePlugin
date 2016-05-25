@@ -202,18 +202,10 @@ class OboLoader {
                         handleIsA(frame, idTemplate, oboIdsToNames)
                         handleSynonym(frame)
                         handleReplacedBy(frame, idTemplate, oboIdsToNames)
-
-                        if (modelAttributes.status == deprecated) {
-                            needsDeprecated = true
-                            rel 'hierarchy' from dataClass called name,  ElementService.DEPRECATED_DATA_CLASS_NAME
-                        }
                     }
                 }
-
-                if (needsDeprecated) {
-                    dataClass name: ElementService.DEPRECATED_DATA_CLASS_NAME
-                }
             }
+
             // TODO: find better way how to do this
             // no longer supported at the moment as there must be only one owning data model
 //            for (Clause clause in document.headerFrame.getClauses('subsetdef')) {

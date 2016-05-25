@@ -15,7 +15,7 @@ class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
         select('Test 2') / 'Test 2' / "Measurement Units"
 
         then:
-        check rightSideTitle is 'Measurement Units'
+        check rightSideTitle is 'Active Measurement Units'
     }
 
     def "create new unit"() {

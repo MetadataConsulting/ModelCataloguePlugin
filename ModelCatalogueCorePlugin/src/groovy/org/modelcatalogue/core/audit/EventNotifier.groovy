@@ -71,6 +71,7 @@ class EventNotifier extends LoggingAuditor {
     }
 
     private static String render(CatalogueElement element) {
+        element = HibernateHelper.ensureNoProxy(element)
         try {
             StringWriter sw = new StringWriter()
             new JSON(element).render(sw)
