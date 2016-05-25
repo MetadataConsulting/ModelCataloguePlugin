@@ -55,6 +55,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     Map<Long,Boolean> visitedModels                     // id and TRUE/FALSE whether changes found for this model or it's children
     Map<Integer,Long> levelIdStack                      // ids in the current stack
     ListMultimap<Long,List<String>> cachedChanges       // id and the cached changes for this model (string is ',' joined)
+    Map<Integer, String> levelNameStack = new HashMap<>()
 
 
     public enum RareDiseaseChangeType {
@@ -162,7 +163,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     // 2. visited before and no changes here or below
     // 3. visited before and has changes or children have changes
     //
-    List<String> iterateChildren(CatalogueElement model, List lines, String subtype = null, groupDescriptions, level, List<ChangeType> typesToCheck) {
+    List<String> iterateChildren(CatalogueElement model, List lines, String subtype = null, groupDescriptions, int level, List<ChangeType> typesToCheck) {
 
         levelIdStack.put(level,model.id)
 
@@ -200,7 +201,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     }
 
 
-    protected void checkChangesAndDescend(CatalogueElement child, List lines, String subtype, groupDescriptions, level, List<ChangeType> typesToCheck) {
+    protected void checkChangesAndDescend(CatalogueElement child, List lines, String subtype, groupDescriptions, int level, List<ChangeType> typesToCheck) {
         checkChangeLog(child, lines, subtype, groupDescriptions, level, typesToCheck)
 
         if ((PHENOTYPE == subtype || CLINICAL_TESTS == subtype) && child.parentOf.size > 0) {   // can be nested
@@ -213,16 +214,17 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     //
     // Check whether we have cached changes otherwise get them from db
     //
-    boolean checkChangeLog(CatalogueElement model, List lines, String subtype = null, groupDescriptions, level, List<ChangeType> typesToCheck) {
+    boolean checkChangeLog(CatalogueElement model, List lines, String subtype = null, groupDescriptions, int level, List<ChangeType> typesToCheck) {
         def rows
         List<String> changes = []
         int currLineCount = lines.size()
         levelIdStack.put(level, model.id)
+        levelNameStack.put(level,"$model.name (${model.combinedVersion})")
 
         // cache hit? use the cached changelog info
         if(cachedChanges.containsKey(model.id)) {
             log.debug("cache hit $model.name")
-            generateLinesFromCachedChangeLogs(model, lines, groupDescriptions)
+            generateLinesFromCachedChangeLogs(model, level, subtype, lines, groupDescriptions)
             saveChangedModelsTree(lines, currLineCount, model, level)
             return
         }
@@ -238,7 +240,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
                 rows = createRow(change)
                 rows.each { key, rowData ->
                     if (!ignoreKeyListForDeletions.contains(key)) {
-                        changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, REMOVE_DATA_ITEM)
+                        changes = createSingleChangeRow(key, rowData, model, level, subtype, groupDescriptions, REMOVE_DATA_ITEM)
                         if (changes) lines << changes    //add row
                     }
                 }
@@ -249,7 +251,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
                 rows = createRow(change)
                 rows.each { key, rowData ->
                     if (!ignoreKeyListForCreations.contains(key)) {
-                        changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, NEW_DATA_ITEM)
+                        changes = createSingleChangeRow(key, rowData, model, level, subtype, groupDescriptions, NEW_DATA_ITEM)
                         if (changes) lines << changes    //add row
                     }
                 }
@@ -260,7 +262,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
                 rows = createRow(change)
                 rows.each { key, rowData ->
                     if (!ignoreKeyList.contains(key)) {
-                        changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, CHANGED_METADATA)
+                        changes = createSingleChangeRow(key, rowData, model, level, subtype, groupDescriptions, CHANGED_METADATA)
                         if (changes) lines << changes    //add row
                     }
                 }
@@ -271,7 +273,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
                 rows = createRow(change)
                 rows.each { key, rowData ->
                     if (!ignoreKeyList.contains(key)) {
-                        changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, NEW_METADATA)
+                        changes = createSingleChangeRow(key, rowData, model, level, subtype, groupDescriptions, NEW_METADATA)
                         lines << changes    //add row
                     }
                 }
@@ -280,7 +282,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
             if (RELATIONSHIP_METADATA_CREATED.equals(change.type)) {
                 rows = createRow(change)
                 rows.each { key, rowData ->
-                    changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, NEW_METADATA)
+                    changes = createSingleChangeRow(key, rowData, model, level, subtype, groupDescriptions, NEW_METADATA)
                     if (changes) lines << changes    //add row
                 }
             }
@@ -288,7 +290,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
             if ([METADATA_DELETED,RELATIONSHIP_METADATA_DELETED].contains(change.type)) {
                 rows = createRow(change)
                 rows.each { key, rowData ->
-                    changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, REMOVE_METADATA)
+                    changes = createSingleChangeRow(key, rowData, model, level, subtype, groupDescriptions, REMOVE_METADATA)
                     if (changes) lines << changes    //add row
                 }
             }
@@ -308,7 +310,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
                     if (GUIDANCE.equals(subtype) && TEXT_CHANGE.catalogChangeKey.equalsIgnoreCase(key)) {
                         changeTypeToRender = TEXT_CHANGE
                     }
-                    changes = createSingleChangeRow(key, rowData, model, subtype, groupDescriptions, changeTypeToRender)
+                    changes = createSingleChangeRow(key, rowData, model, level, subtype, groupDescriptions, changeTypeToRender)
                     if (changes) lines << changes    //add row
                 }
             }
@@ -383,7 +385,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     }
 
 
-    private List<String> createSingleChangeRow(String key, List<String> rowData, CatalogueElement model, String subtype = null, groupDescriptions, RareDiseaseChangeType changeToRender) {
+    private List<String> createSingleChangeRow(String key, List<String> rowData, CatalogueElement model, int level, String subtype = null, groupDescriptions, RareDiseaseChangeType changeToRender) {
         List<String> changes = []
 
         try {
@@ -403,8 +405,12 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
                 changes << lvlName
             }
 
-            if(subtype) changes << subtype
-            changes << model.name
+            if(subtype) {                   // Phenotypes/Clinical tests report format - extra cols
+                changes << buildElementHierachyText(level, model)
+                changes << subtype
+            }
+
+            changes << "$model.name (${model.combinedVersion})"           // Affected Data Item
 
             changes << changeToRender.renderedText
 
@@ -416,7 +422,9 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
                 changes << (after ? "$key: $after" : '')
             }
 
-            if (changes) {          // cache detail changes
+            if (subtype) {          // cache detail changes
+                cachedChanges.put(model.id, changes[5..-1].join(','))
+            } else {
                 cachedChanges.put(model.id, changes[4..-1].join(','))
             }
 
@@ -429,8 +437,20 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     }
 
 
+    protected String buildElementHierachyText(int level, CatalogueElement model) {
+        def hierarchyDescr = []
+
+        levelNameStack.each { lvl, lvlName ->
+            if (level > lvl) {
+                hierarchyDescr << lvlName
+            }
+        }
+
+        hierarchyDescr.join("->") ?: ''
+    }
+
     // merge this item's hierarchy info with the (possibly multiple) cached changelogs
-    private void generateLinesFromCachedChangeLogs(CatalogueElement model, List lines, groupDescriptions) {
+    private void generateLinesFromCachedChangeLogs(CatalogueElement model, int level, String subtype, List lines, groupDescriptions) {
         log.debug "use cached model =$model lines ${lines.size}"
 
         List<String> hierarchyChanges = []
@@ -444,9 +464,15 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
         groupDescriptions.each { lvl, lvlName ->
             hierarchyChanges << lvlName
         }
+
         if (groupDescriptions.size() < 3) {   //DataModelChangelogs hierarchy Cancer/RD can be shallower than RD conditions
-            hierarchyChanges << model.name
+            hierarchyChanges << "$model.name (${model.combinedVersion})"
         }
+
+        if(subtype) {
+            hierarchyChanges << buildElementHierachyText(level, model)
+        }
+
 
         for (String cachedChangeLog: cachedChanges.get(model.id)) {
             List<String> changes = []
