@@ -80,7 +80,7 @@ class CatalogueXmlLoader {
             String name = policy.@name.text()
             builder.dataModelPolicy(name: name){
                policy.convention.each { c ->
-                   ConventionBuilder cb = check(ModelCatalogueTypes.values().find { it.toString() == c.@target.text()}) d
+                   ConventionBuilder cb = check(ModelCatalogueTypes.values().find { it.toString() == c.@target.text()})
                    if (c.@property.text()) {
                        cb.property c.@property.text()
                    }
