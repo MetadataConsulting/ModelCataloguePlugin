@@ -175,17 +175,24 @@ class BootStrap {
                 automatic dataType
 
                 dataModel(name: 'Test 1') {
+                    policy 'Unique of Kind'
                     dataElement(name: 'Test Element 1') {
                         dataType(name: 'Same Name')
                     }
                 }
 
                 dataModel(name: 'Test 2') {
+                    policy 'Unique of Kind'
                     dataElement(name: 'Test Element 2') {
                         dataType(name: 'Same Name')
                     }
                 }
-
+                dataModelPolicy(name: 'Unique of Kind') {
+                    check dataClass property 'name' is 'unique'
+                    check dataElement property 'name' is 'unique'
+                    check dataType property 'name' is 'unique'
+                    check validationRule property 'name' is 'unique'
+                }
             }
             println "Init finished in ${new Date()}"
         } catch (e) {
