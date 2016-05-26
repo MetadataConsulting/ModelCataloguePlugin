@@ -6,6 +6,7 @@ import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.hibernate.StaleStateException
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
@@ -183,6 +184,9 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         def instance = createResource()
 
         instance.validate()
+
+        validatePolicies(VerificationPhase.PROPERTY_CHECK, instance, objectToBind)
+
         if (instance.hasErrors()) {
             if (!hasUniqueName() || getObjectToBind().size() > 1 || !getObjectToBind().containsKey('name')) {
                 respond instance.errors
@@ -215,6 +219,8 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         instance.save flush:true
 
         bindRelations(instance, false)
+
+        validatePolicies(VerificationPhase.EXTENSIONS_CHECK, instance, objectToBind)
 
         if (instance.hasErrors()) {
             respond instance.errors
@@ -252,6 +258,8 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         bindData instance, getObjectToBind(), [include: includeFields]
 
+        validatePolicies(VerificationPhase.PROPERTY_CHECK, instance, objectToBind)
+
         if (instance.hasErrors()) {
             respond instance.errors, view:'edit' // STATUS CODE 422
             return
@@ -267,6 +275,13 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         }
 
         bindRelations(instance, false)
+
+        validatePolicies(VerificationPhase.EXTENSIONS_CHECK, instance, objectToBind)
+
+        if (instance.hasErrors()) {
+            respond instance.errors, view:'edit' // STATUS CODE 422
+            return
+        }
 
         respond instance, [status: OK]
     }
@@ -323,6 +338,8 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
      * @param instance the instance to persisted
      */
     protected cleanRelations(T instance) { }
+
+    protected void validatePolicies(VerificationPhase phase, T instance, Object objectToBind) { }
 
     /**
      * Bind the relations as soon as the instance is persisted.

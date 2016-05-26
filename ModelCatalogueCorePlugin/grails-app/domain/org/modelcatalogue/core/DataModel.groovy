@@ -1,9 +1,14 @@
 package org.modelcatalogue.core
 
+import com.google.common.collect.ImmutableList
+import com.google.common.collect.Iterables
+import org.modelcatalogue.core.policy.Convention
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Legacy
+
+import static org.modelcatalogue.core.policy.VerificationPhase.FINALIZATION_CHECK
 
 class DataModel extends CatalogueElement {
 
@@ -117,8 +122,20 @@ class DataModel extends CatalogueElement {
         // check semantic version
         checkPublishSemanticVersion(semanticVersion)
 
-        for (DataModelPolicy policy in policies) {
-            policy.policy.verify(this)
+        // check revision notes
+        if (!revisionNotes)
+            errors.rejectValue('revisionNotes', 'finalize.revisionNotes.null', 'Please, provide the revision notes')
+
+        if (policies) {
+            for (CatalogueElement element in Iterables.concat(ImmutableList.of(this), this.declares)) {
+                for (DataModelPolicy policy in policies) {
+                    for (Convention convention in policy.policy.conventions) {
+                        if (element.instanceOf(convention.target)) {
+                            convention.verify(FINALIZATION_CHECK, this, element, false)
+                        }
+                    }
+                }
+            }
         }
 
 //        // check revision notes

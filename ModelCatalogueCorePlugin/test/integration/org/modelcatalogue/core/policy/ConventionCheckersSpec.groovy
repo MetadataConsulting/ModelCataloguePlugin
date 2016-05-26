@@ -6,7 +6,6 @@ import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
-import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Metadata
 
 class ConventionCheckersSpec extends AbstractIntegrationSpec {
@@ -26,7 +25,7 @@ class ConventionCheckersSpec extends AbstractIntegrationSpec {
 
         when:
         for (CatalogueElement item in complexModel.declares) {
-            checker.check(complexModel, CatalogueElement, item, 'name', /[abc]+/, null)
+            checker.check(VerificationPhase.FINALIZATION_CHECK, complexModel, CatalogueElement, item, 'name', /[abc]+/, null, false)
         }
 
         then:
@@ -37,7 +36,7 @@ class ConventionCheckersSpec extends AbstractIntegrationSpec {
         ConventionChecker checker = new RegexChecker()
 
         when:
-        checker.check(complexModel, CatalogueElement, complexModel, "ext[${Metadata.AUTHORS}]", /Author Two.*/, null)
+        checker.check(VerificationPhase.EXTENSIONS_CHECK, complexModel, CatalogueElement, complexModel, "ext[${Metadata.AUTHORS}]", /Author Two.*/, null, false)
 
         then:
         complexModel.errors.errorCount == 1
@@ -48,7 +47,7 @@ class ConventionCheckersSpec extends AbstractIntegrationSpec {
 
         when:
         for (CatalogueElement item in complexModel.declares) {
-            checker.check(complexModel, CatalogueElement, item, 'description', null, null)
+            checker.check(VerificationPhase.FINALIZATION_CHECK, complexModel, CatalogueElement, item, 'description', null, null, false)
         }
 
         then:
@@ -59,7 +58,7 @@ class ConventionCheckersSpec extends AbstractIntegrationSpec {
         ConventionChecker checker = new RequiredChecker()
 
         when:
-        checker.check(complexModel, CatalogueElement, complexModel, "ext[no.such.ext]", null, null)
+        checker.check(VerificationPhase.EXTENSIONS_CHECK, complexModel, CatalogueElement, complexModel, "ext[no.such.ext]", null, null, false)
 
         then:
         complexModel.errors.errorCount == 1
@@ -71,7 +70,7 @@ class ConventionCheckersSpec extends AbstractIntegrationSpec {
 
         when:
         for (CatalogueElement item in complexModel.declares) {
-            checker.check(complexModel, CatalogueElement, item, 'name', null, null)
+            checker.check(VerificationPhase.FINALIZATION_CHECK, complexModel, CatalogueElement, item, 'name', null, null, false)
         }
 
         then:
@@ -94,7 +93,7 @@ class ConventionCheckersSpec extends AbstractIntegrationSpec {
         }
 
         when:
-        policy.verify(complexModel)
+        policy.verifyAll(complexModel)
 
         then:
         complexModel.errors.errorCount == 235
@@ -109,7 +108,7 @@ class ConventionCheckersSpec extends AbstractIntegrationSpec {
         """
 
         when:
-        policy.verify(complexModel)
+        policy.verifyAll(complexModel)
 
         then:
         complexModel.errors.errorCount == 235

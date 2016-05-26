@@ -22,8 +22,8 @@ import org.modelcatalogue.core.DataModel
     }
 
     @Override
-    void verify(DataModel model, CatalogueElement item) {
-        checker.check(model, target, item, property, configuration, message)
+    void verify(VerificationPhase phase, DataModel model, CatalogueElement item, boolean errorsToItem) {
+        checker.check(phase, model, target, item, property, configuration, message, errorsToItem)
     }
 
     @Override

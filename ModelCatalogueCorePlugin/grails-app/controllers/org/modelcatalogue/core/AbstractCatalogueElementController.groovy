@@ -4,6 +4,8 @@ import grails.transaction.Transactional
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.path.PathFinder
+import org.modelcatalogue.core.policy.Policy
+import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.*
@@ -539,6 +541,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
         bindData(helper, getObjectToBind(), [include: includeParams])
 
+        validatePolicies(VerificationPhase.PROPERTY_CHECK, helper, getObjectToBind())
 
         if (helper.hasErrors()) {
             respond helper.errors, view: 'edit' // STATUS CODE 422
@@ -577,6 +580,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
 
         bindRelations(instance, newVersion)
+
+        validatePolicies(VerificationPhase.EXTENSIONS_CHECK, instance, getObjectToBind())
 
         if (instance.hasErrors()) {
             respond instance.errors
@@ -925,6 +930,26 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     protected clearAssociationsBeforeDelete(T instance) {
         // it is safe to remove all classifications
         instance.clearAssociationsBeforeDelete()
+    }
+
+    protected void validatePolicies(VerificationPhase phase, T instance, Object objectToBind) {
+        DataModel effectiveDataModel = instance.dataModel
+        def dataModels = objectToBind.classifications ?: objectToBind.dataModels
+        if (dataModels) {
+            effectiveDataModel = DataModel.get(dataModels.first().id as Long)
+        }
+
+        if (!effectiveDataModel && resource == DataModel) {
+            effectiveDataModel = instance as DataModel
+        }
+
+
+        if (effectiveDataModel && effectiveDataModel.policies) {
+            for (DataModelPolicy policyEntity in effectiveDataModel.policies) {
+                Policy policy = policyEntity.policy
+                policy.verifySingle(phase, effectiveDataModel, instance)
+            }
+        }
     }
 
     protected DataModelFilter getOverridableDataModelFilter() {

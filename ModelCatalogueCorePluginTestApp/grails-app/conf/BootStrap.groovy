@@ -194,14 +194,13 @@ class BootStrap {
                     check validationRule property 'name' is 'unique'
                 }
                 dataModelPolicy(name: 'Default Checks') {
-                    check dataModel extension 'authors' is 'required' otherwise 'Metadata "Authors" is missing for {2}'
-                    check dataModel extension 'reviewers' is 'required' otherwise 'Metadata "Reviewers" is missing for {2}'
-                    check dataModel extension 'owner' is 'required' otherwise 'Metadata "Owner" is missing for {2}'
-                    check dataModel extension 'reviewed' is 'required' otherwise 'Metadata "Reviewed" is missing for {2}'
-                    check dataModel extension 'approved' is 'required' otherwise 'Metadata "Approved" is missing for {2}'
-                    check dataModel extension 'namespace' is 'required' otherwise 'Metadata "Namespace" is missing for {2}'
-                    check dataModel extension 'organization' is 'required' otherwise 'Metadata "Organization" is missing for {2}'
-                    check dataModel property 'revisionNotes' is 'required' otherwise 'Please, provide the revision notes'
+                    check dataModel extension 'http://www.modelcatalogue.org/metadata/#authors' is 'required' otherwise 'Metadata "Authors" is missing for {2}'
+                    check dataModel extension 'http://www.modelcatalogue.org/metadata/#reviewers' is 'required' otherwise 'Metadata "Reviewers" is missing for {2}'
+                    check dataModel extension 'http://www.modelcatalogue.org/metadata/#owner' is 'required' otherwise 'Metadata "Owner" is missing for {2}'
+                    check dataModel extension 'http://www.modelcatalogue.org/metadata/#reviewed' is 'required' otherwise 'Metadata "Reviewed" is missing for {2}'
+                    check dataModel extension 'http://www.modelcatalogue.org/metadata/#approved' is 'required' otherwise 'Metadata "Approved" is missing for {2}'
+                    check dataModel extension 'http://www.modelcatalogue.org/metadata/#namespace' is 'required' otherwise 'Metadata "Namespace" is missing for {2}'
+                    check dataModel extension 'http://www.modelcatalogue.org/metadata/#organization' is 'required' otherwise 'Metadata "Organization" is missing for {2}'
 
                     check dataElement property 'dataType' is 'required' otherwise 'Data type is missing for {2}'
                     check dataElement property 'name' is 'unique' otherwise 'Data element\'s name is not unique for {2}'

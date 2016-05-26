@@ -11,6 +11,6 @@ public interface Convention {
     String getConfiguration();
     String getMessage();
 
-    void verify(DataModel model, CatalogueElement item);
+    void verify(VerificationPhase phase, DataModel model, CatalogueElement item, boolean errorsToItem);
 
 }
