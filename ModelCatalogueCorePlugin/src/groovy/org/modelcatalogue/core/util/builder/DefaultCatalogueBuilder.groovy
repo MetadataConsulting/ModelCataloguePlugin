@@ -626,9 +626,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
             return
         }
         context.withContextElement(CatalogueElement) {
-            List<String> policies = it.getParameter('dataModelPolicies') as List<String> ?: new ArrayList<String>()
-            policies.add(policy)
-            it.setParameter('dataModelPolicies', policies)
+            it.addToPendingPolicies(policy)
         } or {
             throw new IllegalStateException("No element to set string value '$policy'")
         }

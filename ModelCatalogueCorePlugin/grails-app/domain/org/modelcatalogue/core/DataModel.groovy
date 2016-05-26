@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.publishing.PublishingContext
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Legacy
 
 class DataModel extends CatalogueElement {
@@ -53,14 +54,6 @@ class DataModel extends CatalogueElement {
         super.setModelCatalogueId(Legacy.fixModelCatalogueId(mcID))
     }
 
-    void setDataModelPolicies(List<String> policies) {
-        for (String policy in policies) {
-            addToPolicies(DataModelPolicy.findByName(policy))
-        }
-        if (policies) {
-            save()
-        }
-    }
 
     List<CatalogueElement> getDeclares() {
         CatalogueElement.findAllByDataModel(this)
@@ -187,8 +180,11 @@ class DataModel extends CatalogueElement {
 
     @Override
     void afterDraftPersisted(CatalogueElement draft, PublishingContext context) {
-        for(DataModelPolicy policy in policies) {
-            draft.addToPolicies(policy)
+        if (policies) {
+            for(DataModelPolicy policy in policies) {
+                draft.addToPolicies(policy)
+            }
+            FriendlyErrors.failFriendlySave(draft)
         }
     }
 }

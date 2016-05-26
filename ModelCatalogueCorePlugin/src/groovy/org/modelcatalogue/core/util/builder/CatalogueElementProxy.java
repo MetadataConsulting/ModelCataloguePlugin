@@ -8,6 +8,7 @@ public interface CatalogueElementProxy<T> extends CatalogueElement {
     T resolve();
 
     Set<RelationshipProxy> getPendingRelationships();
+    Set<String> getPendingPolicies();
 
     CatalogueElementProxy<T> merge(CatalogueElementProxy<T> other);
 
@@ -30,6 +31,7 @@ public interface CatalogueElementProxy<T> extends CatalogueElement {
     void setExtension(String key, String value);
 
     void addToPendingRelationships(RelationshipProxy relationshipProxy);
+    void addToPendingPolicies(String policyName);
 
     boolean isNew();
 

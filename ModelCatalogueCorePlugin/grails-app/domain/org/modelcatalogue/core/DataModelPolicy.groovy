@@ -16,9 +16,7 @@ class DataModelPolicy {
     String name
     String policyText
 
-    static hasMany = [dataModels: DataModel]
     static transients = ['policy']
-    static belongsTo = DataModel
 
     static constraints = {
         name size: 1..255, unique: true

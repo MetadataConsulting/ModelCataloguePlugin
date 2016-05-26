@@ -38,11 +38,7 @@
     </relationshipTypes>
     <dataModelPolicies>
         <dataModelPolicy name="CD Policy">
-            <convention>
-                <target>dataClass</target>
-                <property>name</property>
-                <type>required</type>
-            </convention>
+            <convention target="dataClass" property="name" type="required"/>
         </dataModelPolicy>
     </dataModelPolicies>
 </catalogue>

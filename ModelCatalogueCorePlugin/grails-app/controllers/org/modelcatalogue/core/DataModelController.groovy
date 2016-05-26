@@ -179,15 +179,18 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
 			}
 		}
 
-        Set<DataModelPolicy> policies = (objectToBind.policies ?: []).collect { DataModelPolicy.get(it.id) } as Set<DataModelPolicy>
-        Set<DataModelPolicy> existing = instance.policies
-        (policies - existing).each {
-            instance.addToPolicies(it)
+        if (objectToBind.policies != null) {
+            Set<DataModelPolicy> policies = objectToBind.policies.collect { DataModelPolicy.get(it.id) } as Set<DataModelPolicy>
+            Set<DataModelPolicy> existing = instance.policies ?: Collections.emptySet()
+            (policies - existing).each {
+                instance.addToPolicies(it)
+            }
+            (existing - policies).each {
+                instance.removeFromPolicies(it)
+            }
+            FriendlyErrors.failFriendlySave(instance)
         }
-        (existing - policies).each {
-            instance.removeFromPolicies(it)
-        }
-        FriendlyErrors.failFriendlySave(instance)
+
     }
 
 	@Override

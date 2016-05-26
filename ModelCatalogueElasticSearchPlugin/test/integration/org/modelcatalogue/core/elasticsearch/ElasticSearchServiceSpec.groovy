@@ -164,7 +164,7 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
 
         then:
         policyIndexed.get()
-        elasticSearchService.search(DataModelPolicy, [search: 'test policy', max: '1']).total == 1L
+        retry (10, 100) { elasticSearchService.search(DataModelPolicy, [search: 'test policy', max: '1']).total == 1L }
     }
 
 
@@ -311,6 +311,16 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
 
         then:
         noExceptionThrown()
+    }
+
+    private static boolean retry(int times, long timeout, Closure<Boolean> test) {
+        for (int i = 0; i < times; i++) {
+            if (test()) {
+                return true
+            }
+            Thread.sleep(timeout)
+        }
+        return false
     }
 
 }
