@@ -97,7 +97,7 @@ class ConventionCheckersSpec extends AbstractIntegrationSpec {
         policy.verify(complexModel)
 
         then:
-        complexModel.errors.errorCount == 234
+        complexModel.errors.errorCount == 235
     }
 
     def "verify policy - string"() {
@@ -112,7 +112,7 @@ class ConventionCheckersSpec extends AbstractIntegrationSpec {
         policy.verify(complexModel)
 
         then:
-        complexModel.errors.errorCount == 234
+        complexModel.errors.errorCount == 235
     }
 
     def "print policy - string"() {

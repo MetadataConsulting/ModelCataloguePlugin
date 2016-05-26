@@ -1160,7 +1160,6 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         then:
         dataModel
         policy
-        dataModel in policy.dataModels
         policy in dataModel.policies
         policy.policy
         policy.policy.conventions.size() == 2
