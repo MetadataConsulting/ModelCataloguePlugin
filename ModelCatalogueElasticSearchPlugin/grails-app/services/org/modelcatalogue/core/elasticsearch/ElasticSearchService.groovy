@@ -49,8 +49,21 @@ class ElasticSearchService implements SearchCatalogue {
 
     private static Cache<String, Map<String, Map>> mappingsCache = CacheBuilder.newBuilder().initialCapacity(20).build()
 
-    private static final int ELEMENTS_PER_BATCH = 25
-    private static final int DELAY_AFTER_BATCH = 0
+    private static final int ELEMENTS_PER_BATCH = readFromEnv('MC_ES_ELEMENTS_PER_BATCH', 25)
+    private static final int DELAY_AFTER_BATCH = readFromEnv('MC_ES_DELAY_AFTER_BATCH', 0)
+
+    private static int readFromEnv(String envName, int defaultValue) {
+        int ret = defaultValue
+        String value = System.getenv(envName)
+        if (value) {
+            try {
+                ret = Integer.parseInt(value, 10)
+            } catch (NumberFormatException e) {
+                e.printStackTrace()
+            }
+        }
+        return ret
+    }
 
     private static final String MC_PREFIX = "mc_"
     private static final String GLOBAL_PREFIX = "${MC_PREFIX}global_"
