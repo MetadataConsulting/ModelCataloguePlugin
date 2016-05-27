@@ -1,3 +1,4 @@
+import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.reports.ReportsRegistry

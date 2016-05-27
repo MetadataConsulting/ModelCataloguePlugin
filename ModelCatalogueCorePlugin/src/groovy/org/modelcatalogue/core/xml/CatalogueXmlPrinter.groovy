@@ -4,9 +4,12 @@ import grails.util.Holders
 import groovy.xml.MarkupBuilder
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.DataModelPolicy
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.policy.Convention
+import org.modelcatalogue.core.policy.Conventions
 
 class CatalogueXmlPrinter {
 
@@ -38,6 +41,7 @@ class CatalogueXmlPrinter {
             builder.catalogue (ns) {
                 CatalogueElementPrintHelper.printElement(builder, element, context, null)
                 printRelationshipTypes(builder, context)
+                printPolicies(builder, context)
             }
 
             writer
@@ -57,6 +61,7 @@ class CatalogueXmlPrinter {
                     CatalogueElementPrintHelper.printElement(builder, element, context, null)
                 }
                 printRelationshipTypes(builder, context)
+                printPolicies(builder, context)
             }
 
             writer
@@ -76,6 +81,38 @@ class CatalogueXmlPrinter {
                     destinationToSource(label: type.destinationToSource, type.destinationToSourceDescription)
                     if (type.rule) {
                         rule type.rule
+                    }
+                }
+            }
+        }
+    }
+
+    private static void printPolicies(MarkupBuilder builder, PrintContext context) {
+        if (!context.policiesUsed) {
+            return
+        }
+        builder.mkp.comment("Policies are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored!")
+        builder.dataModelPolicies {
+            for (String policyName in context.policiesUsed) {
+                DataModelPolicy policy = DataModelPolicy.findByName(policyName)
+                if (!policy) {
+                    mkp.comment("Policy '$policyName' is missing in the catalogue.")
+                    continue
+                }
+                dataModelPolicy(name: policyName) {
+                    for (Convention c in policy.policy.conventions) {
+                        convention {
+                            target Conventions.getClassNameOrShortcut(c.target)
+                            if (Conventions.isExtensionAlias(c.property)) {
+                                extension Conventions.getExtension(c.property)
+                            } else {
+                                property c.property
+                            }
+                            type Conventions.getCheckerName(c.checker)
+                            if (c.configuration) {
+                                argument c.configuration
+                            }
+                        }
                     }
                 }
             }

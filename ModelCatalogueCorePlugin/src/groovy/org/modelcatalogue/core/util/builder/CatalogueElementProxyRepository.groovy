@@ -195,6 +195,14 @@ class CatalogueElementProxyRepository {
                 CatalogueElement resolved = element.resolve() as CatalogueElement
                 created.add(resolved)
                 relationshipProxiesToBeResolved.addAll element.pendingRelationships
+                if (element.pendingPolicies) {
+                    DataModel dataModel = resolved as DataModel
+                    for (String policyName in element.pendingPolicies) {
+                        DataModelPolicy policy = DataModelPolicy.findByName(policyName)
+                        dataModel.addToPolicies(policy)
+                    }
+                    FriendlyErrors.failFriendlySave(dataModel)
+                }
                 logDebug "${'-' * (elNumberOfPositions * 2 + 3)} Resolved as $resolved"
             } catch (e) {
                 if (anyCause(e, ReferenceNotPresentInTheCatalogueException)) {

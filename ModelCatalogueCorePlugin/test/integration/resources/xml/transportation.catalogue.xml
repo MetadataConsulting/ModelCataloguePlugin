@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.0/metadataregistry.xsd">
   <dataModel name="Transportation" id="http://www.example.com/datasets/Transportation" status="DRAFT" semanticVersion="0.0.1">
+    <policy>CD Policy</policy>
     <dataClass name="Engine" id="http://www.example.com/models/Engine" status="DRAFT">
       <dataElement name="Factor of Adhesion" id="http://www.example.com/elements/Adhesion" status="DRAFT">
         <dataType name="Force" id="http://www.example.com/domains/Force" status="DRAFT">
@@ -55,4 +56,14 @@
       <destinationToSource label="declared within">Any element can be declared within multiple data models. When new draft of the element is created then drafts for data models are created as well.</destinationToSource>
     </relationshipType>
   </relationshipTypes>
+  <!-- Policies are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored! -->
+  <dataModelPolicies>
+    <dataModelPolicy name="CD Policy">
+      <convention>
+        <target>dataClass</target>
+        <property>name</property>
+        <type>required</type>
+      </convention>
+    </dataModelPolicy>
+  </dataModelPolicies>
 </catalogue>

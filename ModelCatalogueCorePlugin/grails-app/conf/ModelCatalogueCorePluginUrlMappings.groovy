@@ -16,7 +16,7 @@ class ModelCatalogueCorePluginUrlMappings {
         "/api/modelCatalogue/core/feedback/$key"(controller: 'catalogue', action: 'feedback', method: HttpMethod.GET)
 
         def legacyElements    = [model: 'dataClass', classification: 'dataModel']
-        def resources         = ['batch', 'relationshipType', 'csvTransformation' ]
+        def resources         = ['batch', 'relationshipType', 'csvTransformation', 'dataModelPolicy' ]
         def catalogueElements = ['asset', 'dataElement', 'dataClass', 'catalogueElement', 'dataType', 'enumeratedType', 'referenceType', 'primitiveType', 'measurementUnit', 'user', 'dataModel', 'classification', 'model', 'validationRule']
         def allElements       = catalogueElements + resources
 

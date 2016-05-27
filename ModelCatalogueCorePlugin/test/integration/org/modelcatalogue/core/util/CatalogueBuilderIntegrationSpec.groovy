@@ -1139,4 +1139,33 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         // there is one draft
         DataClass.findByNameAndStatus(dc1name, ElementStatus.DRAFT)
     }
+
+    def "create data model with policy"() {
+        final String DATA_MODEL_NAME = 'TestPolicy'
+        final String POLICY_NAME = "TEST POLICY"
+        build {
+            dataModel(name:  DATA_MODEL_NAME) {
+                policy POLICY_NAME
+            }
+            dataModelPolicy(name: POLICY_NAME) {
+                check dataType property 'name' apply regex: '[a-zA-Z0-9]+'
+                check dataClass property 'name' apply regex: '[a-zA-Z0-9]+'
+            }
+        }
+
+        when:
+        DataModel dataModel = DataModel.findByName(DATA_MODEL_NAME)
+        DataModelPolicy policy = DataModelPolicy.findByName(POLICY_NAME)
+
+        then:
+        dataModel
+        policy
+        policy in dataModel.policies
+        policy.policy
+        policy.policy.conventions.size() == 2
+        policy.policyText.toString() == """
+        |check dataType property 'name' apply regex: '[a-zA-Z0-9]+'
+        |check dataClass property 'name' apply regex: '[a-zA-Z0-9]+'
+        """.stripMargin().trim()
+    }
 }

@@ -13,7 +13,7 @@
                     ng-class="{'label-warning': element.getDataModelStatus() == 'DRAFT', 'label-info': element.getDataModelStatus() == 'PENDING', 'label-primary': element.getDataModelStatus() == 'FINALIZED', 'label-danger': element.getDataModelStatus() == 'DEPRECATED'}">{{element.getDataModelWithVersion()}}</a>
           </small>
         </h3>
-        <messages-panel messages="messages"></messages-panel>
+        <messages-panel messages="messages" max="1000"></messages-panel>
         <div class="row detail-section" ng-repeat="view in detailSections" data-view-name="{{view.title}}">
           <p ng-if="view.title"
              class="text-center detail-section-title small"

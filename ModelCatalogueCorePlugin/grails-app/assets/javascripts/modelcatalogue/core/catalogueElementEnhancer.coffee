@@ -88,6 +88,8 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
               return $state.go('simple.actions.show', {id: self.id}, {reload: reload}); self
             if self.isInstanceOf "csvTransformation"
               return $state.go('mc.csvTransformations.show', {id: self.id}, {reload: reload}); self
+            if self.isInstanceOf "dataModelPolicy"
+              return $state.go('simple.resource.show', {id: self.id, resource: 'dataModelPolicy'}) ; self
             if self.isInstanceOf "relationships"
               return $state.go('mc.resource.show.property', {dataModelId: self.element.getDataModelId(), id: self.element.id, resource: names.getPropertyNameFromType(self.element.elementType), property: self.property}, {reload: reload})
             if self.isInstanceOf "enumeratedValue"
@@ -103,6 +105,8 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
               return $state.href('simple.actions.show', {id: self.id})
             if self.isInstanceOf "csvTransformation"
               return $state.href('mc.csvTransformations.show', {id: self.id})
+            if self.isInstanceOf "dataModelPolicy"
+              return $state.href('simple.resource.show', {id: self.id, resource: 'dataModelPolicy'})
             if self.isInstanceOf "relationships"
               return $state.href('mc.resource.show.property', {dataModelId: self.element.getDataModelId(), id: self.element.id, resource: names.getPropertyNameFromType(self.element.elementType), property: self.property})
             if self.isInstanceOf "enumeratedValue"

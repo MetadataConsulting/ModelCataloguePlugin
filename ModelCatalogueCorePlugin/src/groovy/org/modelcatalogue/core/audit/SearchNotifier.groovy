@@ -23,7 +23,7 @@ class SearchNotifier extends AbstractAuditor {
 
     SearchNotifier(SearchCatalogue searchService) {
         this.searchService = searchService
-        buffer.buffer(200L, TimeUnit.MILLISECONDS).map {
+        buffer.buffer(200L, TimeUnit.MILLISECONDS).filter{ !it.isEmpty() }.map {
             new HashSet<Object>(it)
         } .flatMap { queued ->
             searchService.index(queued)

@@ -180,6 +180,6 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         check xmlEditorResult displayed
 
         and: "result has some xsl generated"
-        check resultContentLines test { it.size() > 1 }
+        check resultContentLines test 10, { it.size() > 1 }
     }
 }

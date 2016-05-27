@@ -254,9 +254,17 @@ class ElasticSearchService implements SearchCatalogue {
 
             BoolQueryBuilder boolQuery = QueryBuilders.boolQuery().minimumNumberShouldMatch(1)
 
-            if (params.status) {
-                boolQuery.must(QueryBuilders.termsQuery('status', ElementService.getStatusFromParams(params)*.toString()))
+            CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
+                boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
             }
+
+            boolQuery.should(QueryBuilders.prefixQuery('name', search).boost(200))
+
+            qb = boolQuery
+        } else if (DataModelPolicy.isAssignableFrom(resource)) {
+            indicies = [getGlobalIndexName(resource)]
+
+            BoolQueryBuilder boolQuery = QueryBuilders.boolQuery().minimumNumberShouldMatch(1)
 
             CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
                 boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
@@ -280,7 +288,7 @@ class ElasticSearchService implements SearchCatalogue {
         return ElasticSearchQueryList.search(params,resource, request)
     }
 
-    private static String getGlobalIndexName(Class resource) {
+    protected static String getGlobalIndexName(Class resource) {
         "${GLOBAL_PREFIX}${getTypeName(resource)}"
     }
 
@@ -408,6 +416,8 @@ class ElasticSearchService implements SearchCatalogue {
             rxService.from(dataModelService.classified(CatalogueElement, DataModelFilter.create(true)), true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH)
         ) concatWith (
             rxService.from(RelationshipType.where {})
+        ) concatWith (
+            rxService.from(DataModelPolicy.where {})
         )
 
         return RxElastic.from(client.admin().indices().prepareDelete("${MC_PREFIX}*")).map { it.acknowledged }.concatWith(index(session, elements))
@@ -501,6 +511,10 @@ class ElasticSearchService implements SearchCatalogue {
             if (Relationship.isAssignableFrom(clazz)) {
                 return Relationship
             }
+
+            if (DataModelPolicy.isAssignableFrom(clazz)) {
+                return DataModelPolicy
+            }
             return clazz
         } flatMap { group ->
             if (group.key == CatalogueElement) {
@@ -511,7 +525,7 @@ class ElasticSearchService implements SearchCatalogue {
             if (group.key == Relationship) {
                 return group.flatMap { entity -> getRelationshipWithSourceAndDestination(entity as Relationship) }
             }
-            if (group.key == RelationshipType) {
+            if (group.key in [RelationshipType, DataModelPolicy]) {
                 return group
             }
             throw new UnsupportedOperationException("Not Yet Implemented for $group.key")
@@ -622,7 +636,7 @@ class ElasticSearchService implements SearchCatalogue {
             return ImmutableSet.of(ORPHANED_INDEX, MC_ALL_INDEX)
         }
 
-        if (RelationshipType.isAssignableFrom(clazz)) {
+        if (RelationshipType.isAssignableFrom(clazz) || DataModelPolicy.isAssignableFrom(clazz)) {
             return ImmutableSet.of(getGlobalIndexName(clazz))
         }
 

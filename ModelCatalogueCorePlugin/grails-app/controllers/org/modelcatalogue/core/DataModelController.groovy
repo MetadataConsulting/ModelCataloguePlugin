@@ -158,20 +158,6 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
 		ret
 	}
 
-	private Collection getDataClassesForDataModel(Long dataModelId) {
-		def results = DataClass.createCriteria().list {
-			fetchMode "extensions", FetchMode.JOIN
-			fetchMode "outgoingRelationships.extensions", FetchMode.JOIN
-			fetchMode "outgoingRelationships.destination.classifications", FetchMode.JOIN
-            dataModel {
-                eq 'id', dataModelId
-            }
-		}
-		return results
-	}
-
-
-
 	@Override
 	protected boolean hasUniqueName() {
 		true
@@ -194,7 +180,20 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
                 FriendlyErrors.failFriendlySave(catalogueElement)
 			}
 		}
-	}
+
+        if (objectToBind.policies != null) {
+            Set<DataModelPolicy> policies = objectToBind.policies.collect { DataModelPolicy.get(it.id) } as Set<DataModelPolicy>
+            Set<DataModelPolicy> existing = instance.policies ?: Collections.emptySet()
+            (policies - existing).each {
+                instance.addToPolicies(it)
+            }
+            (existing - policies).each {
+                instance.removeFromPolicies(it)
+            }
+            FriendlyErrors.failFriendlySave(instance)
+        }
+
+    }
 
 	@Override
 	protected getIncludeFields() {

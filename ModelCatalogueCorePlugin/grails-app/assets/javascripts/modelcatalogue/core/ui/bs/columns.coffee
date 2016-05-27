@@ -144,4 +144,9 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
     {header: "Message"     , value: 'message'                      , classes: 'col-md-7' }
   ]
 
+  columnsProvider.registerColumns 'org.modelcatalogue.core.DataModelPolicy', [
+    {header: "Name"         , value: 'name'           , classes: 'col-md-6', show: true, href: 'href()', sort: {property: 'name', type: 'alpha'}}
+    {header: "Policy Text"  , value: 'policyText'     , classes: 'col-md-6'}
+  ]
+
 ]
