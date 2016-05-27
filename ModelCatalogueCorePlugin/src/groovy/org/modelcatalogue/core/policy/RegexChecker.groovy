@@ -15,7 +15,7 @@ import static com.google.common.base.Preconditions.checkNotNull
         checkNotNull(property, 'Property must be set', new Object[0])
         checkNotNull(configuration, 'Regex must be set', new Object[0])
 
-        if (phase == VerificationPhase.EXTENSIONS_CHECK && Conventions.isExtensionAlias(property)) {
+        if (phase == VerificationPhase.PROPERTY_CHECK && Conventions.isExtensionAlias(property)) {
             return
         }
 
