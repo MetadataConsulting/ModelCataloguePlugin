@@ -5,12 +5,12 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class SimpleIndexRequest {
 
-    final String index
+    final Set<String> indices
     final Document document
     final Set<Class> mappedClasses
 
-    SimpleIndexRequest(String index, Document document, Set<Class> mappedClasses) {
-        this.index = index
+    SimpleIndexRequest(Set<String> indices, Document document, Set<Class> mappedClasses) {
+        this.indices = indices
         this.document = document
         this.mappedClasses = mappedClasses
     }
@@ -22,14 +22,14 @@ class SimpleIndexRequest {
         SimpleIndexRequest that = (SimpleIndexRequest) o
 
         if (document != that.document) return false
-        if (index != that.index) return false
+        if (indices != that.indices) return false
 
         return true
     }
 
     int hashCode() {
         int result
-        result = (index != null ? index.hashCode() : 0)
+        result = (indices != null ? indices.hashCode() : 0)
         result = 31 * result + (document != null ? document.hashCode() : 0)
         return result
     }
