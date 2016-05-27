@@ -95,8 +95,6 @@ class AbstractDataModelExporterSpec extends IntegrationSpec {
             update 'description' of 'New Participant Info class' to 'brand new description'
             update 'hierarchy' of 'Info >>>1<<< subCategory Level3 Model Data Element 2' add 'New Participant Info class'
 
-            finalize 'Test Data Model'
-
         }
 
     }

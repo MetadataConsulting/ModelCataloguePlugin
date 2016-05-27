@@ -610,8 +610,23 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
                             destinationMap.put(tokens[0].trim(), tokens[1])
                         }
                     }
-                    if (destinationMap.classifiedName && destinationMap.classifiedName instanceof String) {
-                        elemName = "${destinationMap.classifiedName ?: ''} (${destinationMap.semanticVersion ?: ''})"
+                    if (destinationMap.classifiedName && destinationMap.classifiedName instanceof String) { // classifiedName acts as a filter
+                        String name = "${destinationMap.name ?: ''}"
+                        String semanticVersion
+                        if(destinationMap.semanticVersion && destinationMap.semanticVersion instanceof String) {
+                            semanticVersion = "${destinationMap.semanticVersion ?: ''}"
+                        } else {
+                            String version = destinationMap.versionNumber instanceof String ? destinationMap.versionNumber : "1"
+                            semanticVersion = "0.0.${version}"
+                        }
+                        String id = "${destinationMap.id ?: ''}"
+
+                        if(name && id && semanticVersion) {
+                            elemName = "$name (${id}@${semanticVersion})"
+                        } else {
+                            elemName = name
+                        }
+
                     } else {
                         elemName = ''
                     }
