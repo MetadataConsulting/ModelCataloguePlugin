@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.rx;
 
-import groovy.lang.Closure;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.groovy.runtime.StackTraceUtils;
@@ -59,14 +58,14 @@ class RetryWithDelay implements  Func1<Observable<? extends Throwable>, Observab
     private void logThrowable(Throwable throwable, long nextDelay) {
         for (Class<? extends  Throwable> clazz : expected) {
             if (clazz.isInstance(throwable)) {
-                log.warn("Problems with stream, retrying for " + retryCount + " time and waiting " + nextDelay + "ms: " + throwable.toString());
+                log.warn("Problems with stream, retrying for " + retryCount + " time and waiting " + nextDelay + "ms: " + throwable.getClass() + " - " + throwable.toString());
                 return;
             }
             if (clazz.isInstance(throwable.getCause())) {
-                log.warn("Problems with stream, retrying for " + retryCount + " time and waiting " + nextDelay + "ms: " + throwable.getCause().toString());
+                log.warn("Problems with stream, retrying for " + retryCount + " time and waiting " + nextDelay + "ms: " + throwable.getCause().getClass() + " - " + throwable.getCause().toString());
                 return;
             }
         }
-        log.warn("Problems with stream, retrying for " + retryCount + " time and waiting " + nextDelay + "ms", StackTraceUtils.deepSanitize(throwable));
+        log.warn("Problems with stream, retrying for " + retryCount + " time and waiting " + nextDelay + "ms: " + throwable.getClass(), StackTraceUtils.deepSanitize(throwable));
     }
 }

@@ -7,12 +7,10 @@ class SimpleIndexRequest {
 
     final Set<String> indices
     final Document document
-    final Set<Class> mappedClasses
 
-    SimpleIndexRequest(Set<String> indices, Document document, Set<Class> mappedClasses) {
+    SimpleIndexRequest(Set<String> indices, Document document) {
         this.indices = indices
         this.document = document
-        this.mappedClasses = mappedClasses
     }
 
     boolean equals(o) {

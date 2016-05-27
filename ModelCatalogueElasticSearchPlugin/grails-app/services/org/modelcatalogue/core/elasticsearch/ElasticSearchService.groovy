@@ -29,6 +29,7 @@ import org.elasticsearch.threadpool.ThreadPool
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.elasticsearch.rx.RxElastic
 import org.modelcatalogue.core.rx.RxService
+import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -81,9 +82,7 @@ class ElasticSearchService implements SearchCatalogue {
             description: 1
     ]
 
-    private static Set<Class> MAPPED_TYPES_IN_DATA_MODEL = [
-            DataModel, Asset, DataClass, DataElement, DataType, EnumeratedType, MeasurementUnit, PrimitiveType, ReferenceType, ValidationRule, Relationship
-    ]
+    private static ImmutableSet<Class> MAPPED_TYPES_IN_DATA_MODEL = ImmutableSet.of(DataModel, Asset, DataClass, DataElement, DataType, EnumeratedType, MeasurementUnit, PrimitiveType, ReferenceType, ValidationRule, Relationship, User)
 
     GrailsApplication grailsApplication
     DataModelService dataModelService
@@ -94,19 +93,7 @@ class ElasticSearchService implements SearchCatalogue {
 
     @PostConstruct
     private void init() {
-        if (grailsApplication.config.mc.search.elasticsearch.local || System.getProperty('mc.search.elasticsearch.local')) {
-            Settings.Builder settingsBuilder = Settings.builder()
-                .put("${ThreadPool.THREADPOOL_GROUP}${ThreadPool.Names.BULK}.queue_size", 3000)
-                .put("${ThreadPool.THREADPOOL_GROUP}${ThreadPool.Names.BULK}.size", 25)
-                .put('path.home', (grailsApplication.config.mc.search.elasticsearch.local ?:  System.getProperty('mc.search.elasticsearch.local')).toString())
-            node = NodeBuilder.nodeBuilder()
-                    .settings(settingsBuilder)
-                    .local(true).node()
-
-            client = node.client()
-
-            log.info "Using local ElasticSearch instance in directory ${grailsApplication.config.mc.search.elasticsearch.local}"
-        } else if (grailsApplication.config.mc.search.elasticsearch.host || System.getProperty('mc.search.elasticsearch.host')) {
+        if (grailsApplication.config.mc.search.elasticsearch.host || System.getProperty('mc.search.elasticsearch.host')) {
             String host = grailsApplication.config.mc.search.elasticsearch.host ?: System.getProperty('mc.search.elasticsearch.host')
             String port = grailsApplication.config.mc.search.elasticsearch.port ?: System.getProperty('mc.search.elasticsearch.port') ?: "9300"
 
@@ -124,6 +111,20 @@ class ElasticSearchService implements SearchCatalogue {
                     .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), Integer.parseInt(port, 10)))
 
             log.info "Using ElasticSearch instance at $host:$port"
+        } else if (grailsApplication.config.mc.search.elasticsearch.local || System.getProperty('mc.search.elasticsearch.local')) {
+            Settings.Builder settingsBuilder = Settings.builder()
+                .put("${ThreadPool.THREADPOOL_GROUP}${ThreadPool.Names.BULK}.queue_size", 3000)
+                .put("${ThreadPool.THREADPOOL_GROUP}${ThreadPool.Names.BULK}.size", 25)
+                .put("action.auto_create_index", false)
+                .put("index.mapper.dynamic", false)
+                .put('path.home', (grailsApplication.config.mc.search.elasticsearch.local ?:  System.getProperty('mc.search.elasticsearch.local')).toString())
+            node = NodeBuilder.nodeBuilder()
+                .settings(settingsBuilder)
+                .local(true).node()
+
+            client = node.client()
+
+            log.info "Using local ElasticSearch instance in directory ${grailsApplication.config.mc.search.elasticsearch.local}"
         }
 
     }
@@ -331,7 +332,7 @@ class ElasticSearchService implements SearchCatalogue {
 
     Observable<Boolean> index(IndexingSession session, Observable<Object> entities) {
         toSimpleIndexRequests(session, entities).buffer(ELEMENTS_PER_BATCH).flatMap {
-            bulkIndex(session, it)
+            bulkIndex(it)
         } flatMap { bulkResponse ->
             from(bulkResponse.items)
         } map { bulkResponseItem ->
@@ -485,8 +486,8 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
 
-    private Observable<SimpleIndexRequest> toSimpleIndexRequests(IndexingSession session, Observable<Object> entites) {
-        entites.groupBy {
+    private Observable<SimpleIndexRequest> toSimpleIndexRequests(IndexingSession session, Observable<Object> entities) {
+        entities.groupBy {
             // XXX: shouldn't the change in data model trigger reindexing everything in the data model?
             Class clazz = getEntityClass(it)
             if (CatalogueElement.isAssignableFrom(clazz)) {
@@ -514,9 +515,14 @@ class ElasticSearchService implements SearchCatalogue {
                 return group
             }
             throw new UnsupportedOperationException("Not Yet Implemented for $group.key")
-        } map { entity ->
+        } flatMap { entity ->
             Class clazz = getEntityClass(entity)
-            new SimpleIndexRequest(getIndices(entity), session.getDocument(entity), (CatalogueElement.isAssignableFrom(clazz) || Relationship.isAssignableFrom(clazz)) ? MAPPED_TYPES_IN_DATA_MODEL : [clazz] as Set)
+            ImmutableSet<String> indices = getIndices(entity)
+            ImmutableSet<Class> mappedClasses = (CatalogueElement.isAssignableFrom(clazz) || Relationship.isAssignableFrom(clazz)) ? MAPPED_TYPES_IN_DATA_MODEL : ImmutableSet.of(clazz)
+            Document document = session.getDocument(entity)
+            ensureIndexExists(session, from(indices), mappedClasses).map {
+                new SimpleIndexRequest(indices,  document)
+            }
         }
     }
 
@@ -528,24 +534,19 @@ class ElasticSearchService implements SearchCatalogue {
         just(rel, rel.source, rel.destination)
     }
 
-    private Observable<BulkResponse> bulkIndex(IndexingSession session, List<SimpleIndexRequest> documents) {
-        SimpleIndexRequest first = documents.first()
-        ensureIndexExists(session, from(first.indices), first.mappedClasses).toList().flatMap {
-            RxElastic.from(buildBulkIndexRequest(documents))
-                .flatMap {
-                for (BulkItemResponse response in it.items) {
-                    if (response.failed) {
-                        if (response.failure.cause instanceof VersionConflictEngineException) {
-                            // ignore and keep the latest
-                            continue
-                        }
-                        return Observable.error(new RuntimeException("There were error indexing at least of one item from the batch: $response.type#$response.id@$response.index", response.failure.cause))
+    private Observable<BulkResponse> bulkIndex(List<SimpleIndexRequest> documents) {
+        RxElastic.from(buildBulkIndexRequest(documents)) .flatMap {
+            for (BulkItemResponse response in it.items) {
+                if (response.failed) {
+                    if (response.failure.cause instanceof VersionConflictEngineException) {
+                        // ignore and keep the latest
+                        continue
                     }
+                    return Observable.error(new RuntimeException("There were error indexing at least of one item from the batch: $response.type#$response.id@$response.index", response.failure.cause))
                 }
-                return just(it)
             }
-        }
-        .retryWhen(RxService.withDelay(RxElastic.DEFAULT_RETRIES, RxElastic.DEFAULT_DELAY, [EsRejectedExecutionException] as Set))
+            return just(it)
+        }.retryWhen(RxService.withDelay(RxElastic.DEFAULT_RETRIES, RxElastic.DEFAULT_DELAY, [EsRejectedExecutionException] as Set))
     }
 
     private BulkRequestBuilder buildBulkIndexRequest(List<SimpleIndexRequest> indexRequests) {
@@ -589,9 +590,13 @@ class ElasticSearchService implements SearchCatalogue {
                 request.addMapping(getTypeName(type), getMapping(type))
             }
 
-            RxElastic.from(request).map {
-                log.info "Create index $response.index for following types: $supportedTypes"
-                response.index
+            RxElastic.from(request).flatMap {
+                if (!it.acknowledged) {
+                    return ensureIndexExists(session, indices, supportedTypes)
+                }
+                log.info "Created index $response.index for following types: $supportedTypes"
+                session.indexExist(response.index, true)
+                return just(response.index)
             } .onErrorReturn {
                 if (it instanceof IndexAlreadyExistsException || it.cause instanceof IndexAlreadyExistsException) {
                     return response.index
