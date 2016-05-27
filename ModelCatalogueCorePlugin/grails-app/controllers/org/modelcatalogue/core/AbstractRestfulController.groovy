@@ -220,6 +220,8 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         bindRelations(instance, false)
 
+        instance.save flush:true
+
         validatePolicies(VerificationPhase.EXTENSIONS_CHECK, instance, objectToBind)
 
         if (instance.hasErrors()) {
@@ -275,6 +277,13 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         }
 
         bindRelations(instance, false)
+
+        instance.save flush:true
+
+        if (instance.hasErrors()) {
+            respond instance.errors
+            return
+        }
 
         validatePolicies(VerificationPhase.EXTENSIONS_CHECK, instance, objectToBind)
 

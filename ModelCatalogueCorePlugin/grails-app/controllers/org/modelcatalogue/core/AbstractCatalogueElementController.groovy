@@ -581,6 +581,12 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
         bindRelations(instance, newVersion)
 
+        instance.save flush:true
+        if (instance.hasErrors()) {
+            respond instance.errors
+            return
+        }
+
         validatePolicies(VerificationPhase.EXTENSIONS_CHECK, instance, getObjectToBind())
 
         if (instance.hasErrors()) {
