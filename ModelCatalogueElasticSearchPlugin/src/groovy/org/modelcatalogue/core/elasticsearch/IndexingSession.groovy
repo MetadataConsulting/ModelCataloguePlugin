@@ -16,7 +16,7 @@ import static rx.Observable.just
 class IndexingSession {
 
     final Cache<String, Document> documentCache = CacheBuilder.newBuilder().build()
-    final Cache<String, Observable<Boolean>> indexingCache = CacheBuilder.newBuilder().build()
+    final Cache<String, Boolean> indexExistsCache = CacheBuilder.newBuilder().build()
 
     static IndexingSession create() {
         return new IndexingSession()
@@ -58,5 +58,13 @@ class IndexingSession {
         }
 
         new Document(ElasticSearchService.getTypeName(HibernateHelper.getEntityClass(object)), object.getId()?.toString(), object.getVersion(), result)
+    }
+
+    boolean indexExist(String index) {
+        indexExistsCache.getIfPresent(index) ?: false
+    }
+
+    void indexExist(String index, boolean exists) {
+        indexExistsCache.put(index, exists)
     }
 }
