@@ -98,6 +98,18 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     }
   ]
 
+
+
+  actionsProvider.registerChildAction 'admin-menu', 'data-model-policies', ['$state', ($state) ->
+    {
+      position:   2100
+      icon:       'fa fa-check-square-o fa-fw'
+      label:      'Data Model Policies'
+      action: ->
+        $state.go 'simple.resource.list', resource: 'dataModelPolicy'
+    }
+  ]
+
   actionsProvider.registerChildAction 'admin-menu', 'action-batches', ['$state', ($state) ->
     {
       position:   1000

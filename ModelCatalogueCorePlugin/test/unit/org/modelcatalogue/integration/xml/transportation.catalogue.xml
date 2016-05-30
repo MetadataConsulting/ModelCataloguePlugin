@@ -2,6 +2,7 @@
 <catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.0/metadataregistry.xsd">
     <dataModel name="Transportation" id="http://www.example.com/datasets/Transportation" status="DRAFT" semanticVersion="1.0.0">
         <revisionNotes>This is a new model</revisionNotes>
+        <policy>CD Policy</policy>
         <dataClass name="Locomotive" id="http://www.example.com/models/Locomotive" status="DRAFT">
             <dataElement name="Factor of Adhesion" id="http://www.example.com/elements/Adhesion" status="DRAFT">
                 <dataType name="Force" id="http://www.example.com/domains/Force" status="DRAFT">
@@ -35,4 +36,9 @@
             <rule>/* A RULE */</rule>
         </relationshipType>
     </relationshipTypes>
+    <dataModelPolicies>
+        <dataModelPolicy name="CD Policy">
+            <convention target="dataClass" property="name" type="required"/>
+        </dataModelPolicy>
+    </dataModelPolicies>
 </catalogue>

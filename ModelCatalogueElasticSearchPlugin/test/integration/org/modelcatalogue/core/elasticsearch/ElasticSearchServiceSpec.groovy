@@ -66,6 +66,7 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
     def "play with elasticsearch"() {
         catalogueBuilder.build {
             dataModel(name: "ES Test Model") {
+                policy 'TEST POLICY'
                 dataClass(name: "Foo") {
                     description "foo bar"
                     ext 'foo', 'bar'
@@ -83,10 +84,14 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
                     }
                 }
             }
+            dataModelPolicy(name: 'TEST POLICY') {
+                check dataType property 'name' is 'unique'
+            }
         }
         DataModel dataModel = DataModel.findByName("ES Test Model")
         DataClass element = DataClass.findByName("Foo")
         MeasurementUnit unit = MeasurementUnit.findByName('unit of measure 123456')
+        DataModelPolicy policy = DataModelPolicy.findByName('TEST POLICY')
 
         Class elementClass = HibernateHelper.getEntityClass(element)
 
@@ -97,6 +102,7 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
         dataModel
         element
         unit
+        policy
 
 
         when:
@@ -153,6 +159,15 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
         foundDataModels.total == 1L
         dataModel in foundDataModels.items
 
+        when:
+        BlockingVariable<Boolean> policyIndexed = new BlockingVariable<Boolean>(60)
+        elasticSearchService.index(policy).subscribe {
+            policyIndexed.set(true)
+        }
+
+        then:
+        policyIndexed.get()
+        retry (10, 100) { elasticSearchService.search(DataModelPolicy, [search: 'test policy', max: '1']).total == 1L }
     }
 
     def "index user"() {
@@ -311,6 +326,16 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
 
         then:
         noExceptionThrown()
+    }
+
+    private static boolean retry(int times, long timeout, Closure<Boolean> test) {
+        for (int i = 0; i < times; i++) {
+            if (test()) {
+                return true
+            }
+            Thread.sleep(timeout)
+        }
+        return false
     }
 
 }

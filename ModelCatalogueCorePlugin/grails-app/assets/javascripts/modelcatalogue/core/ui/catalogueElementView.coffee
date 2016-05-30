@@ -245,13 +245,14 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
           $scope.copy.ext.updateFrom($scope.customMetadata)
 
+        $scope.messages.clearAllMessages()
+        
         catalogueElementResource($scope.copy.elementType).update($scope.copy).then (updated) ->
           $scope.element.updateFrom(updated)
 
           updateInlineEditHelperVariables updated
 
           deferred.resolve()
-          $scope.messages.clearAllMessages()
           $timeout ->
             $scope.$broadcast 'redrawContextualActions'
         , (response) ->

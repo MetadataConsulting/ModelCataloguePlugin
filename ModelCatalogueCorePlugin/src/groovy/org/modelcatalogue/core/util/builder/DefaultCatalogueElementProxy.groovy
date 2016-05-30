@@ -36,6 +36,7 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
     private final Map<String, Object> parameters = [:]
     private final Map<String, String> extensions = [:]
     final Set<RelationshipProxy> relationships = []
+    final Set<String> policies = []
 
     private CatalogueElementProxy<T> replacedBy
     private T resolved
@@ -58,6 +59,10 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
     Set<RelationshipProxy> getPendingRelationships() {
         relationships
+    }
+
+    Set<String> getPendingPolicies() {
+        policies
     }
 
     boolean isNew() {
@@ -432,6 +437,11 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
         relationships << relationshipProxy
     }
 
+    @Override
+    void addToPendingPolicies(String policyName) {
+        policies << policyName
+    }
+
     String toString() {
         "Proxy of $domain.simpleName[id: $modelCatalogueId, dataModel: $classification, name: $name]"
     }
@@ -472,6 +482,10 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
                 addToPendingRelationships(relationshipProxy)
                 relationship.source.addToPendingRelationships(relationshipProxy)
             }
+        }
+
+        typedOther.policies.each {
+            policies << it
         }
 
 

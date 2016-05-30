@@ -7,6 +7,7 @@ import grails.util.GrailsNameUtils
 import org.apache.log4j.Logger
 import org.codehaus.groovy.grails.exceptions.DefaultStackTraceFilterer
 import org.codehaus.groovy.grails.exceptions.StackTraceFilterer
+import org.modelcatalogue.core.rx.ErrorSubscriber
 import org.modelcatalogue.core.util.RelationshipTypeRuleScript
 import org.modelcatalogue.core.util.SecuredRuleExecutor
 
@@ -22,6 +23,7 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
     }
 
     def relationshipTypeService
+    def modelCatalogueSearchService
 
     //name of the relationship type i.e. parentChild  or synonym
     String name
@@ -285,6 +287,7 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
 
     def afterInsert() {
         typesCache.put name, getId()
+        modelCatalogueSearchService.index(this).subscribe(ErrorSubscriber.create("Exception indexing relationship type after insert"))
     }
 
     def beforeUpdate() {
@@ -294,11 +297,13 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
 
     def afterUpdate() {
         typesCache.put name, getId()
+        modelCatalogueSearchService.index(this).subscribe(ErrorSubscriber.create("Exception indexing relationship type after update"))
     }
 
     def beforeDelete() {
         relationshipTypeService.clearCache()
         typesCache.invalidate(name)
+        modelCatalogueSearchService.unindex(this).subscribe(ErrorSubscriber.create("Exception unindexing relationship type before delete"))
     }
 
 

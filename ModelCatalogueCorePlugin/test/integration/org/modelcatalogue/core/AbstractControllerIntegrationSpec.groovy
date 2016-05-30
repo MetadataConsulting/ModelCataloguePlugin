@@ -334,8 +334,9 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     abstract RestfulController<T> getController()
     //i.e. new RelationshipTypeController()
 
-    abstract String getResourceName()
-    //i.e. {GrailsNameUtils.getLogicalPropertyName(getClass().getSimpleName(), "ControllerIntegrationSpec")}
+    String getResourceName() {
+        GrailsNameUtils.getLogicalPropertyName(getClass().getSimpleName(), "ControllerIntegrationSpec")
+    }
 
     protected final optimize(params, boolean skipRest = record) {
         if (skipRest) {

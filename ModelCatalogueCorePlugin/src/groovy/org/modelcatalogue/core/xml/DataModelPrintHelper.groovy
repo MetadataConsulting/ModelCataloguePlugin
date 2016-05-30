@@ -24,7 +24,13 @@ class DataModelPrintHelper extends CatalogueElementPrintHelper<DataModel> {
     @Override
     void processElements(Object theMkp, DataModel element, PrintContext context, Relationship rel) {
         super.processElements(theMkp, element, context, rel)
-
+        if (element.revisionNotes) {
+            theMkp.revisionNotes element.revisionNotes
+        }
+        for (DataModelPolicy policy in element.policies) {
+            theMkp.policy(policy.name)
+            context.policiesUsed << policy.name
+        }
         for (CatalogueElement other in context.modelService.getTopLevelDataClasses(DataModelFilter.includes(element), [:]).items) {
                 printElement(theMkp, other, context, null)
         }
