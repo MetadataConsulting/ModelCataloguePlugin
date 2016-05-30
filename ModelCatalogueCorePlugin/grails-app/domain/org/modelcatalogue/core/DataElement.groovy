@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import com.google.common.collect.ImmutableSet
+import com.google.common.collect.Iterables
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.util.FriendlyErrors
@@ -47,8 +49,8 @@ class DataElement extends CatalogueElement {
     }
 
     @Override
-    List<String> getInheritedAssociationsNames() {
-        ['dataType']
+    Iterable<String> getInheritedAssociationsNames() {
+        Iterables.concat(super.inheritedAssociationsNames, ImmutableSet.of('dataType'))
     }
 
     @Override

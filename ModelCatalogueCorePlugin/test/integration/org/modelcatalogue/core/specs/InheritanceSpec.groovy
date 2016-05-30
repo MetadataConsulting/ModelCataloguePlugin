@@ -581,4 +581,60 @@ class InheritanceSpec extends IntegrationSpec  {
         and: "the enum is no longer marked as subtype"
         enumeratedType2.ext[EnumeratedType.SUBSET_METADATA_KEY] == null
     }
+
+
+    def "data element inheritance"() {
+        final String dataModelName = 'Test Data Element Inheritance'
+        final String inheritedName = 'Test Element 1'
+        final String firstInheritedDescription = 'Test Element 1 Description'
+        final String secondInheritedDescription = 'Test Element 1 Description Changed'
+        final String inheritingName = 'Test Element 2'
+        final String firstInheritedTypeName = 'Test Type 1'
+        final String secondInheritedTypeName = 'Test Type 2'
+        catalogueBuilder.build {
+            dataModel(name: dataModelName) {
+                dataElement(name: inheritedName) {
+                    description firstInheritedDescription
+                    dataType(name: firstInheritedTypeName)
+                }
+
+                dataElement(name: inheritingName) {
+                    basedOn inheritedName
+                }
+            }
+        }
+
+        when:
+        DataElement inheriting = DataElement.findByName(inheritingName)
+        DataElement inherited = DataElement.findByName(inheritedName)
+
+        then:
+        inherited
+        inherited.dataType
+        inherited.description == firstInheritedDescription
+        inherited.dataType.name == firstInheritedTypeName
+
+        inheriting
+        inheriting.dataType
+        inheriting.description == firstInheritedDescription
+        inheriting.dataType.name == firstInheritedTypeName
+
+        when:
+        inherited.description = secondInheritedDescription
+        inherited.dataType = new DataType(dataModel: inherited.dataModel, name: secondInheritedTypeName).save(failOnError: true)
+        inherited.save(failOnError: true, flush: true)
+
+        then:
+        inherited
+        inherited.dataType
+        inherited.dataType.name == secondInheritedTypeName
+        inherited.description == secondInheritedDescription
+        inheriting
+        inheriting.dataType
+        inheriting.dataType.name == secondInheritedTypeName
+        inheriting.description == secondInheritedDescription
+
+
+    }
+
 }

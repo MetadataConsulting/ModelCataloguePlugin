@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import com.google.common.base.Function
+import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Lists
 import grails.util.GrailsNameUtils
 import org.hibernate.proxy.HibernateProxyHelper
@@ -14,6 +15,7 @@ import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.DataModelAware
 import org.modelcatalogue.core.util.ExtensionsWrapper
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.Inheritance
 import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -440,7 +442,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
                 boolean changed = false
 
                 for (String propertyName in inheritedAssociationsNames) {
-                    if (self.isDirty(propertyName) && it.getProperty(propertyName) == self.getValueToBeInherited(it, propertyName, rel.ext, true)) {
+                    if (self.isDirty(propertyName) && HibernateHelper.ensureNoProxy(it.getProperty(propertyName)) == HibernateHelper.ensureNoProxy(self.getValueToBeInherited(it, propertyName, rel.ext, true))) {
                         it.setProperty(propertyName, self.getValueToBeInherited(it, propertyName, rel.ext, false))
                         changed = true
                     }
@@ -602,7 +604,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         return persistent ? getPersistentValue(propertyName) : getProperty(propertyName)
     }
 
-    List<String> getInheritedAssociationsNames() { Collections.emptyList() }
+    Iterable<String> getInheritedAssociationsNames() { ImmutableSet.of('description') }
 
     String getDataModelSemanticVersion() {
         if (HibernateProxyHelper.getClassWithoutInitializingProxy(this) == DataModel) {

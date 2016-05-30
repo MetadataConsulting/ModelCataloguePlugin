@@ -1,6 +1,8 @@
 package org.modelcatalogue.core
 
 import com.google.common.collect.ImmutableMap
+import com.google.common.collect.ImmutableSet
+import com.google.common.collect.Iterables
 import org.modelcatalogue.core.enumeration.Enumeration
 import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.publishing.PublishingContext
@@ -109,8 +111,8 @@ class EnumeratedType extends DataType {
     }
 
     @Override
-    List<String> getInheritedAssociationsNames() {
-        return ['enumAsString']
+    Iterable<String> getInheritedAssociationsNames() {
+        Iterables.concat(super.inheritedAssociationsNames, ImmutableSet.of('enumAsString'))
     }
 
     @Override
