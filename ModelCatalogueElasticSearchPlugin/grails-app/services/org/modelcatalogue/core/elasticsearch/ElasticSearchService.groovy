@@ -98,6 +98,8 @@ class ElasticSearchService implements SearchCatalogue {
             Settings.Builder settingsBuilder = Settings.builder()
                 .put("${ThreadPool.THREADPOOL_GROUP}${ThreadPool.Names.BULK}.queue_size", 3000)
                 .put("${ThreadPool.THREADPOOL_GROUP}${ThreadPool.Names.BULK}.size", 25)
+                .put("action.auto_create_index", false)
+                .put("index.mapper.dynamic", false)
                 .put('path.home', (grailsApplication.config.mc.search.elasticsearch.local ?:  System.getProperty('mc.search.elasticsearch.local')).toString())
             node = NodeBuilder.nodeBuilder()
                     .settings(settingsBuilder)
