@@ -10,11 +10,14 @@ import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import spock.util.concurrent.BlockingVariable
 import spock.util.concurrent.BlockingVariables
+
+import java.util.concurrent.TimeUnit
 
 class ElasticSearchServiceSpec extends IntegrationSpec {
 
@@ -165,6 +168,18 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
         then:
         policyIndexed.get()
         retry (10, 100) { elasticSearchService.search(DataModelPolicy, [search: 'test policy', max: '1']).total == 1L }
+    }
+
+    def "index user"() {
+        BlockingVariable<Boolean> userIndexed = new BlockingVariable<>(60, TimeUnit.SECONDS)
+
+        when:
+        elasticSearchService.index(new User(name: 'tester', username: 'tester', password: 'tester').save(failOnError: true)).subscribe {
+            userIndexed.set(true)
+        }
+
+        then:
+        userIndexed.get()
     }
 
 
