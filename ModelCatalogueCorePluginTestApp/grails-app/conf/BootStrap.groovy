@@ -11,6 +11,7 @@ import org.modelcatalogue.core.testapp.Requestmap
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.util.ExtensionModulesLoader
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.test.TestDataHelper
 import org.springframework.http.HttpMethod
 
 class BootStrap {
@@ -21,14 +22,21 @@ class BootStrap {
     def actionService
     def mappingService
     CatalogueBuilder catalogueBuilder
+    def sessionFactory
+    def elasticSearchService
 
     def init = { servletContext ->
         ExtensionModulesLoader.addExtensionModules()
 
         if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST]) {
-            initCatalogueService.initCatalogue(true)
-            initSecurity()
-            setupStuff()
+            TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
+                initCatalogueService.initCatalogue(true)
+                initSecurity()
+                setupStuff()
+            }
+            elasticSearchService.reindex().all { it }.toBlocking().subscribe {
+                System.out.println "Reindexed"
+            }
         } else {
             initCatalogueService.initDefaultRelationshipTypes()
             initSecurity()
