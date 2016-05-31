@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.publishing.Publisher
+import com.google.common.collect.ImmutableSet
+import com.google.common.collect.Iterables
 import org.modelcatalogue.core.publishing.PublishingChain
 
 class ReferenceType extends DataType {
@@ -31,6 +32,6 @@ class ReferenceType extends DataType {
     }
 
 
-    List<String> getInheritedAssociationsNames() { ['dataClass'] }
+    Iterable<String> getInheritedAssociationsNames() { Iterables.concat(super.inheritedAssociationsNames, ImmutableSet.of('dataClass')) }
 
 }

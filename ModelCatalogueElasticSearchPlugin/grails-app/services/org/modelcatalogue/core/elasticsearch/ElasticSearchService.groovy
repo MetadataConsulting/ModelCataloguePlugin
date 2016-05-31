@@ -17,6 +17,7 @@ import org.elasticsearch.client.transport.TransportClient
 import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.common.transport.InetSocketTransportAddress
 import org.elasticsearch.common.util.concurrent.EsRejectedExecutionException
+import org.elasticsearch.index.IndexNotFoundException
 import org.elasticsearch.index.VersionType
 import org.elasticsearch.index.engine.VersionConflictEngineException
 import org.elasticsearch.index.query.BoolQueryBuilder
@@ -549,7 +550,7 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     private Observable<BulkResponse> bulkIndex(List<SimpleIndexRequest> documents) {
-        RxElastic.from(buildBulkIndexRequest(documents)) .flatMap {
+        RxElastic.from { buildBulkIndexRequest(documents) }.flatMap {
             for (BulkItemResponse response in it.items) {
                 if (response.failed) {
                     if (response.failure.cause instanceof VersionConflictEngineException) {
@@ -560,7 +561,10 @@ class ElasticSearchService implements SearchCatalogue {
                 }
             }
             return just(it)
-        }.retryWhen(RxService.withDelay(RxElastic.DEFAULT_RETRIES, RxElastic.DEFAULT_DELAY, [EsRejectedExecutionException] as Set))
+        }.retryWhen(RxService.withDelay(RxElastic.DEFAULT_RETRIES, RxElastic.DEFAULT_DELAY, [
+            EsRejectedExecutionException,
+            IndexNotFoundException // sometimes by race condition
+        ] as Set))
     }
 
     private BulkRequestBuilder buildBulkIndexRequest(List<SimpleIndexRequest> indexRequests) {

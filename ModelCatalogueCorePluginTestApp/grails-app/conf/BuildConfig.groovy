@@ -35,6 +35,9 @@ grails.plugin.location.'model-catalogue-genomics' = '../ModelCatalogueGenomicsPl
 
 grails.project.dependency.resolver = "maven" // or ivy
 grails.project.dependency.resolution = {
+
+    final String gebVersion = '0.12.2'
+
     // inherit Grails' default dependencies
     inherits("global") {
         // specify dependency exclusions here; for example, uncomment this to disable ehcache:
@@ -74,7 +77,7 @@ grails.project.dependency.resolution = {
         def webDriverVersion =  System.getenv('WEB_DRIVER_VERSION') ?: "2.53.0"
 
         // Testing modules
-        test "org.gebish:geb-spock:0.9.3"
+        test "org.gebish:geb-spock:$gebVersion"
         test "org.seleniumhq.selenium:selenium-support:${webDriverVersion}"
         test "org.seleniumhq.selenium:selenium-firefox-driver:${webDriverVersion}"
         test "org.seleniumhq.selenium:selenium-chrome-driver:${webDriverVersion}"
@@ -105,7 +108,7 @@ grails.project.dependency.resolution = {
 
         compile ":grails-melody:1.55.0"
 
-        test ":geb:0.12.2"
+        test ":geb:$gebVersion"
 
         test ':build-test-data:2.1.2'
         test ':fixtures:1.3'

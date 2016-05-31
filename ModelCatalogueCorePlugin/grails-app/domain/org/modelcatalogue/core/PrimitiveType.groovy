@@ -1,5 +1,8 @@
 package org.modelcatalogue.core
 
+import com.google.common.collect.ImmutableSet
+import com.google.common.collect.Iterables
+
 class PrimitiveType extends DataType {
 
     MeasurementUnit measurementUnit
@@ -14,7 +17,7 @@ class PrimitiveType extends DataType {
 
     static fetchMode = [measurementUnit: 'eager']
 
-    List<String> getInheritedAssociationsNames() { ['measurementUnit'] }
+    Iterable<String> getInheritedAssociationsNames() { Iterables.concat(super.inheritedAssociationsNames, ImmutableSet.of('measurementUnit')) }
 
     List<CatalogueElement> collectExternalDependencies() {
         if (measurementUnit?.dataModel != dataModel) {
