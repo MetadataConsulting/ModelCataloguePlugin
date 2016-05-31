@@ -1,0 +1,39 @@
+<div class="modal-header">
+  <h4>{{title}}</h4>
+</div>
+<div class="modal-body">
+  <messages-panel messages="messages"></messages-panel>
+  <form role="form" ng-submit="upload()">
+    <div class="form-group">
+      <label for="dataModel" class="">Data Model</label>
+      <input type="text" class="form-control" id="dataModel" placeholder="Name" ng-model="dataModel"
+             catalogue-element-picker="dataModel">
+      <p class="help-block">Select an existing data model to be updated or type name for new one.</p>
+    </div>
+    <div class="form-group">
+      <label for="hpoDataModel" class="">Hpo Data Model</label>
+      <input type="text" class="form-control" id="hpoDataModel" placeholder="" ng-model="hpoDataModel"
+             catalogue-element-picker="dataModel">
+      <p class="help-block">Create new hpo data model if it doesn't exist.</p>
+    </div>
+    <div class="form-group">
+      <label for="testDataModel" class="">Clinical Tests Data Model</label>
+      <input type="text" class="form-control" id="testDataModel" placeholder="" ng-model="testDataModel"
+             catalogue-element-picker="dataModel">
+      <p class="help-block">Create new clinical test data model if it doesn't exist.</p>
+    </div>
+    <div class="form-group">
+      <label for="asset" class="">File</label>
+      <input ng-hide="uploading" type="file" accept=".csv" class="form-control" id="asset"
+             placeholder="File" ngf-model="asset" ngf-select="onFileSelect($files)">
+      <progressbar value="progress" ng-show="uploading &amp;&amp; progress">{{progress}} %</progressbar>
+    </div>
+    <fake-submit-button/>
+  </form>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-success" ng-click="upload()" ng-disabled="!canUpload()">
+    <span class="glyphicon glyphicon-ok"></span> Save
+  </button>
+  <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+</div>

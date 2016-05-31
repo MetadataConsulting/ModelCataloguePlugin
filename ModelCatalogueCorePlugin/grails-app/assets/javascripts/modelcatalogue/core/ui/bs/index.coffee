@@ -17,6 +17,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptNewExcelImport'
   'mc.core.ui.bs.modalPromptNewLoincImport'
   'mc.core.ui.bs.modalPromptNewOboImport'
+  'mc.core.ui.bs.modalPromptNewRareDiseaseImport'
   'mc.core.ui.bs.modalPromptNewUmljImport'
   'mc.core.ui.bs.modalPromptNewXsdImport'
   'mc.core.ui.bs.modalPromptNewMCImport'
