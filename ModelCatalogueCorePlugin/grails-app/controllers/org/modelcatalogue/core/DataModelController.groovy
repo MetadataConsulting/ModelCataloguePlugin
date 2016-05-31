@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import com.google.common.collect.ImmutableSet
 import grails.util.GrailsNameUtils
 import org.hibernate.FetchMode
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.export.inventory.DataModelToXlsxExporter
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
@@ -83,7 +84,7 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
         DataModelFilter filter = DataModelFilter.create(ImmutableSet.<DataModel>of(dataModel), ImmutableSet.<DataModel>of())
         Map<String, Integer> stats = dataModelService.getStatistics(filter)
 
-        ListWithTotalAndType<DataClass> dataClasses = dataClassService.getTopLevelDataClasses(filter, [toplevel: true])
+        ListWithTotalAndType<DataClass> dataClasses = dataClassService.getTopLevelDataClasses(filter, [toplevel: true, status: dataModel.status != ElementStatus.DEPRECATED ? 'active' : '' ])
 
         ListWithTotalAndType<Map> list = Lists.lazy(params, Map) {
             List<Map> contentDescriptors = []
@@ -95,11 +96,13 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
             contentDescriptors << createContentDescriptor(dataModel, 'Validation Rules', ValidationRule, stats["totalValidationRuleCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Assets', Asset, stats["totalAssetCount"])
 
-            Map deprecatedItems = createContentDescriptor(dataModel, 'Deprecated Items', CatalogueElement, stats["deprecatedCatalogueElementCount"])
-            deprecatedItems.link = deprecatedItems.link.replace('status=active', 'status=deprecated')
-            deprecatedItems.content.link = deprecatedItems.link
-            deprecatedItems.status = 'DEPRECATED'
-            contentDescriptors << deprecatedItems
+            if (dataModel.status != ElementStatus.DEPRECATED) {
+                Map deprecatedItems = createContentDescriptor(dataModel, 'Deprecated Items', CatalogueElement, stats["deprecatedCatalogueElementCount"])
+                deprecatedItems.link = deprecatedItems.link.replace('status=active', 'status=deprecated')
+                deprecatedItems.content.link = deprecatedItems.link
+                deprecatedItems.status = 'DEPRECATED'
+                contentDescriptors << deprecatedItems
+            }
 
             contentDescriptors << createContentDescriptorForRelationship('Imported Data Models', 'imports',  dataModel, RelationshipType.importType, RelationshipDirection.OUTGOING)
 
@@ -114,7 +117,7 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
     }
 
     private static Map createContentDescriptor(DataModel dataModel, String name, Class clazz, long count) {
-        String link = "/${GrailsNameUtils.getPropertyName(clazz)}?toplevel=true&dataModel=${dataModel.getId()}&status=active"
+        String link = "/${GrailsNameUtils.getPropertyName(clazz)}?toplevel=true&dataModel=${dataModel.getId()}&status=${dataModel.status != ElementStatus.DEPRECATED ? 'active' : ''}"
         Map ret = [:]
         ret.id = 'all'
         ret.dataModels = [CatalogueElementMarshaller.minimalCatalogueElementJSON(dataModel)]
