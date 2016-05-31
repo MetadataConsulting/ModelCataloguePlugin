@@ -136,7 +136,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         when:
         waitUntilFinalized()
 
-        select 'MET-522'
+        click 'h3 a.label.label-warning'
 
         then:
         check rightSideTitle is 'MET-522 0.0.1'
