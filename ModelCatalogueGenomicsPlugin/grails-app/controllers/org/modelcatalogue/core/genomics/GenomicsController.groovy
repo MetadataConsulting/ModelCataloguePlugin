@@ -154,7 +154,7 @@ class GenomicsController {
             return
         }
 
-        Long assetId = genomicsService.genCancerTypesAsJson()
+        Long assetId = genomicsService.genCancerTypesAsJson(dataClass)
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
