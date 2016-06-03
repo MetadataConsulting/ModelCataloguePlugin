@@ -125,7 +125,7 @@ class ChangeLogDocxGenerator extends AbstractChangeLogGenerator{
                 for (DataClass child in classes) {
                     log.info "[${counter++}/${size}] Processing changes from Data Class $child.name"
                     delayable.whilePaused {
-                        docHelper.printModel(builder, child, depth - 1)
+                        docHelper.printModel(child, depth - 1)
                         printPropertiesChanges(delayable, child)
                         printClassStructuralChanges(delayable, child)
                     }

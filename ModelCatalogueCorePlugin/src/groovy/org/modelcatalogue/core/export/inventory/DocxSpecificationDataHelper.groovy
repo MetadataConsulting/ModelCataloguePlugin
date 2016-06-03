@@ -17,19 +17,24 @@ import org.modelcatalogue.core.ValidationRule
 class DocxSpecificationDataHelper {
 
     final Set<Long> processedDataClasses = new HashSet<Long>()
-    final Set<Long> processedDataClassesForRules = new HashSet<Long>()
+    final Set<ValidationRule> rules = new HashSet<>()
 
     private static final Map<String, Object> HEADER_CELL = [background: '#F2F2F2']
-    private static
-    final Map<String, Object> HEADER_CELL_TEXT = [font: [color: '#29BDCA', size: 12, bold: true, family: 'Times New Roman']]
+    private static final Map<String, Object> HEADER_CELL_TEXT = [font: [color: '#29BDCA', size: 12, bold: true, family: 'Times New Roman']]
     private static final Map<String, Object> CELL_TEXT = [font: [size: 10, family: 'Calibri']]
     private static final Map<String, Object> CELL_TEXT_FIRST = [font: [size: 10, family: 'Calibri', bold: true]]
+    private static final def TITLE_COLUMN_CELL = [font: [bold: true]]
 
+    private DocumentBuilder builder
+
+    DocxSpecificationDataHelper(DocumentBuilder builder) {
+        this.builder = builder
+    }
     final Set<DataType> usedDataTypes = new TreeSet<DataType>([compare: { DataType a, DataType b ->
         a?.name <=> b?.name
     }] as Comparator<DataType>)
 
-    def printModel(DocumentBuilder builder, DataClass dataClass, int level) {
+    def printModel(DataClass dataClass, int level) {
         if (level > 50) {
             // only go 3 levels deep
             return
@@ -129,12 +134,11 @@ class DocxSpecificationDataHelper {
                 table(border: [size: 0.px]) {
                     dataClass.contextFor.each {
                         ValidationRule vr ->
-                            if (vr instanceof ValidationRule) {
-                                row {
-                                    cell "Rule"
-                                    cell vr.rule
-                                }
+                            row {
+                                cell "Rule"
+                                cell vr.rule
                             }
+                            if (!(vr in rules)) rules << vr
                     }
                 }
             }
@@ -142,7 +146,7 @@ class DocxSpecificationDataHelper {
             if (!(dataClass.getId() in processedDataClasses)) {
                 if (dataClass.countParentOf()) {
                     for (DataClass child in dataClass.parentOf) {
-                        printModel(builder, child, level + 1)
+                        printModel(child, level + 1)
                     }
                 }
             }
@@ -162,76 +166,59 @@ class DocxSpecificationDataHelper {
         "${relationship.ext['Min Occurs'] ?: 0}..${relationship.ext['Max Occurs'] ?: 'unbounded'}"
     }
 
-    def printRules(DocumentBuilder builder, DataClass dataClass, int level) {
-
+    def printRules() {
         builder.with {
-//            if (dataClass.contextFor) {
-                dataClass.contextFor?.each {
-                    ValidationRule vr ->
-                        if (vr instanceof ValidationRule) {
-                            println "Printing rules for ${dataClass.name}"
-                            heading3 vr.name
-                            table(border: [size: 1, color: '#D2D2D2']) {
-                                row {
-                                    cell "Component"
-                                    cell vr.component, font: [bold: true]
-                                }
-                                row {
-                                    cell "Rule Focus"
-                                    cell vr.ruleFocus, font: [bold: true]
-                                }
-                                row {
-                                    cell "Trigger"
-                                    cell vr.trigger, font: [bold: true]
-                                }
-                                row {
-                                    cell "Rule"
-                                    cell vr.rule, font: [bold: true]
-                                }
-                                row {
-                                    cell "Error Condition"
-                                    cell vr.errorCondition, font: [bold: true]
-                                }
-                                row {
-                                    cell "Issue Record"
-                                    cell vr.issueRecord, font: [bold: true]
-                                }
-                                row {
-                                    cell "Notification"
-                                    cell vr.notification, font: [bold: true]
-                                }
-                                row {
-                                    cell "Notification Target"
-                                    cell vr.notificationTarget, font: [bold: true]
-                                }
-                                row {
-                                    cell "Last Updated"
-                                    cell vr.lastUpdated, font: [bold: true]
-                                }
-                                row {
-                                    cell "Version Created"
-                                    cell vr.versionCreated, font: [bold: true]
-                                }
-                                row {
-                                    cell "Status"
-                                    cell vr.status, font: [bold: true]
-                                }
-
-                            }
-                        }
-                }
-//            }
-        }
-
-        if (!(dataClass.getId() in processedDataClassesForRules)) {
-            if (dataClass.countParentOf()) {
-                for (DataClass child in dataClass.parentOf) {
-                    printRules(builder, child, level + 1)
+            rules.each { vr ->
+                println "Printing rule: ${vr.name}"
+                heading3 vr.name
+                table(border: [size: 1, color: '#D2D2D2']) {
+                    row {
+                        cell "Component"
+                        cell TITLE_COLUMN_CELL, vr.component
+                    }
+                    row {
+                        cell "Rule Focus"
+                        cell TITLE_COLUMN_CELL, vr.ruleFocus
+                    }
+                    row {
+                        cell "Trigger"
+                        cell TITLE_COLUMN_CELL, vr.trigger
+                    }
+                    row {
+                        cell "Rule"
+                        cell TITLE_COLUMN_CELL, vr.rule
+                    }
+                    row {
+                        cell "Error Condition"
+                        cell TITLE_COLUMN_CELL, vr.errorCondition
+                    }
+                    row {
+                        cell "Issue Record"
+                        cell TITLE_COLUMN_CELL, vr.issueRecord
+                    }
+                    row {
+                        cell "Notification"
+                        cell TITLE_COLUMN_CELL, vr.notification
+                    }
+                    row {
+                        cell "Notification Target"
+                        cell TITLE_COLUMN_CELL, vr.notificationTarget
+                    }
+                    row {
+                        cell "Last Updated"
+                        cell TITLE_COLUMN_CELL, vr.lastUpdated.format("yyyy-MM-dd")
+                    }
+                    row {
+                        cell "Version Created"
+                        cell TITLE_COLUMN_CELL, vr.versionCreated.format("yyyy-MM-dd")
+                    }
+                    row {
+                        cell "Status"
+                        cell TITLE_COLUMN_CELL, vr.status.toString()
+                    }
                 }
             }
         }
-
-        processedDataClassesForRules << dataClass.getId()
     }
 
 }
