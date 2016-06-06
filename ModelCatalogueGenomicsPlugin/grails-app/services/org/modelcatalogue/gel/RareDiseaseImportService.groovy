@@ -11,10 +11,10 @@ import org.modelcatalogue.integration.obo.OboLoader
 
 class RareDiseaseImportService {
 
-    CatalogueBuilder catalogueBuilder
     LinkGenerator grailsLinkGenerator
 
-    Set<CatalogueElement> importDisorderedCsv(String dataModelName, String hpoDataModelName, String testDataModelName, InputStream inputStream) {
+    Set<CatalogueElement> importDisorderedCsv(CatalogueBuilder catalogueBuilder, String dataModelName,
+                                              String hpoDataModelName, String testDataModelName, InputStream inputStream) {
         Preconditions.checkArgument(dataModelName as Boolean)
         Preconditions.checkArgument(hpoDataModelName as Boolean)
         Preconditions.checkArgument(testDataModelName as Boolean)

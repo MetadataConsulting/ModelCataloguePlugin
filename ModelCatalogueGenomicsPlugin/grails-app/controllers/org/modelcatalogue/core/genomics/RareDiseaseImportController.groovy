@@ -57,7 +57,7 @@ class RareDiseaseImportController {
             def testDataModelName = params.testDataModelName
             executeInBackground(asset.id, "Imported from Rare Disease Csv") {
                 try {
-                    def created = rareDiseaseImportService.importDisorderedCsv(dataModelName, hpoDataModelName,
+                    def created = rareDiseaseImportService.importDisorderedCsv(builder, dataModelName, hpoDataModelName,
                         testDataModelName, file.inputStream)
                     finalizeAsset(asset.id, (DataModel) (created.find {it.instanceOf(DataModel)} ?: created.find{it.dataModel}?.dataModel),
                         modelCatalogueSecurityService.currentUser?.id)
