@@ -137,6 +137,7 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
     }
 
 
+    //sleeps are only necessary to ensure changes to same object happen in different millisecs for order of changelogs to be consistent in test
     DataClass makeChanges(DataClass finalized) {
         println "status= $finalized.status"
 
@@ -158,11 +159,14 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
             create DataElement called '2nd New Phenotype DataElement'                       //NEW_ELEMENT_CREATED
             update 'containment' of 'Phenotype (9) name 1 1' add '2nd New Phenotype DataElement', 'Min Occurs': 0, 'Max Occurs': 2    //RELATIONSHIP_CREATED
                                                                                                         //RELATIONSHIP_METADATA_CREATED * 2
-
+            sleep(1)
             update 'Min Occurs' of 'Phenotype (9) name 1 1' to '1'              //METADATA_CREATED
+            sleep(1)
             update 'Max Occurs' of 'Phenotype (9) name 1 1' to '3'
+            sleep(1)
 
             update 'Min Occurs' of 'Phenotype (9) name 1 1' to '4'              //RELATIONSHIP_METADATA_UPDATED
+            sleep(1)
             update 'Max Occurs' of 'Phenotype (9) name 1 1' to '5'
 
             update 'description' of 'Disorder >1< Guidance name 1 1' to 'new textual description replaces old'
