@@ -41,7 +41,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRareDiseaseImport', ['mc.util.messag
               params: {
                 dataModelName: toDataModelName($scope.dataModel)
                 hpoDataModelName: toDataModelName($scope.hpoDataModel)
-                testDataModelName: toDataModelName($scope.hpoDataModel)
+                testDataModelName: toDataModelName($scope.testDataModel)
               }
               data: {
                 file: $scope.file
