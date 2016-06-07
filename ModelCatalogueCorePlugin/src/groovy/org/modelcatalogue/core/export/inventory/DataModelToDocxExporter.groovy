@@ -17,15 +17,13 @@ import java.text.SimpleDateFormat
 @Log4j
 class DataModelToDocxExporter {
 
-    DocxSpecificationDataHelper docHelper
+    DataClassService dataClassService
+    DataModel rootModel
 
     private static final Map<String, Object> ENUM_HEADER_CELL_TEXT = [font: [size: 12, bold: true]]
     private static final Map<String, Object> DOMAIN_NAME = [font: [color: '#29BDCA', size: 14, bold: true]]
-    private static
-    final Map<String, Object> DOMAIN_CLASSIFICATION_NAME = [font: [color: '#999999', size: 12, bold: true]]
+    private static final Map<String, Object> DOMAIN_CLASSIFICATION_NAME = [font: [color: '#999999', size: 12, bold: true]]
 
-    DataClassService dataClassService
-    DataModel rootModel
     final Set<DataType> usedDataTypes = new TreeSet<DataType>([compare: { DataType a, DataType b ->
         a?.name <=> b?.name
     }] as Comparator<DataType>)
@@ -37,7 +35,6 @@ class DataModelToDocxExporter {
     void initVars(rootModel, dataClassService) {
         this.dataClassService = dataClassService
         this.rootModel = rootModel
-        docHelper = new DocxSpecificationDataHelper()
     }
 
     DataModelToDocxExporter(DataModel rootModel, DataClassService dataClassService) {
@@ -87,6 +84,7 @@ class DataModelToDocxExporter {
 
         def dataClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.includes(rootModel)).items
         def builder = new ModelCatalogueWordDocumentBuilder(outputStream)
+        def docHelper = new DocxSpecificationDataHelper(builder)
 
         List<DataModel> allVersionsOfModel = getAllVersionsOfModel(rootModel, [rootModel])
 
@@ -191,7 +189,7 @@ class DataModelToDocxExporter {
                 }
 
                 for (DataClass dClass in dataClasses) {
-                    docHelper.printModel(builder, dClass, 1)
+                    docHelper.printModel(dClass, 1)
                 }
 
                 if (usedDataTypes) {
@@ -256,7 +254,7 @@ class DataModelToDocxExporter {
                                 } else if (dataType.rule) {
                                     row {
                                         cell 'Rule'
-                                        cell dataType.rule
+                                        cell dataType.name + ' (' + dataType.latestVersionId + ')'
                                     }
                                 }
 
@@ -286,9 +284,7 @@ class DataModelToDocxExporter {
 
                 pageBreak()
                 heading2 'Validation Rules'
-                for(DataClass dataClass in dataClasses) {
-                    docHelper.printRules(builder, dataClass, 1)
-                }
+                docHelper.printRules()
 
             }
         }

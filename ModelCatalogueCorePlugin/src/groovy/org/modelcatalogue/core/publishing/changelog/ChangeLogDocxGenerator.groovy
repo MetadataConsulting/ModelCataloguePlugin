@@ -54,13 +54,14 @@ class ChangeLogDocxGenerator extends AbstractChangeLogGenerator{
         super(auditService, dataClassService, depth, includeMetadata)
         this.customTemplate=customTemplate
         this.imagePath=imagePath
-        docHelper = new DocxSpecificationDataHelper()
     }
 
     @Override
     void generateChangelog(DataClass dataClass, OutputStream outputStream) {
         log.info "Generating changelog for data class $dataClass.name ($dataClass.combinedVersion)"
         DocumentBuilder builder = new ModelCatalogueWordDocumentBuilder(outputStream)
+
+        docHelper = new DocxSpecificationDataHelper(builder)
 
         Delayable<DocumentBuilder> delayable = new Delayable<>(builder)
 
@@ -125,7 +126,7 @@ class ChangeLogDocxGenerator extends AbstractChangeLogGenerator{
                 for (DataClass child in classes) {
                     log.info "[${counter++}/${size}] Processing changes from Data Class $child.name"
                     delayable.whilePaused {
-                        docHelper.printModel(builder, child, depth - 1)
+                        docHelper.printModel(child, depth - 1)
                         printPropertiesChanges(delayable, child)
                         printClassStructuralChanges(delayable, child)
                     }
