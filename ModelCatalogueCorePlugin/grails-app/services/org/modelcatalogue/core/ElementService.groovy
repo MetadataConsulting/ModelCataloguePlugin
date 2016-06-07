@@ -191,13 +191,7 @@ class ElementService implements Publisher<CatalogueElement> {
                 }
                 if (version) {
                     or {
-                        if (resource == DataModel) {
-                            eq 'semanticVersion', version
-                        } else {
-                            dataModel {
-                                eq 'semanticVersion', version
-                            }
-                        }
+                        eq 'semanticVersion', version
                         if (versionNumberFound) {
                             eq 'versionNumber', versionNumberFound
                         }
