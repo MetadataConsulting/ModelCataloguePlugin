@@ -60,6 +60,9 @@ dataSource {
 if (System.getenv("MC_ES_NAME")) {
     // mc-es is bound
     mc.search.elasticsearch.host='mc-es'
+} else if (System.getenv('MC_ES_HOST')) {
+    mc.search.elasticsearch.host=System.getenv('MC_ES_HOST')
+    mc.search.elasticsearch.port=System.getenv('MC_ES_PORT')
 } else {
     mc.search.elasticsearch.local="${System.properties['catalina.base']}/es"
 }
@@ -144,6 +147,13 @@ if (System.getenv("MC_GOOGLE_KEY")) {
             }
         }
     }
+}
+
+if (System.getenv('MC_S3_BUCKET')) {
+    mc.storage.s3.key = System.getenv('MC_S3_KEY') ?: System.getenv('AWS_ACCESS_KEY_ID')
+    mc.storage.s3.secret = System.getenv('MC_S3_SECRET') ?: System.getenv('AWS_SECRET_KEY')
+    mc.storage.s3.region = System.getenv('MC_S3_REGION')
+    mc.storage.s3.bucket = System.getenv('MC_S3_BUCKET')
 }
 
 
