@@ -7,12 +7,16 @@ grails.serverURL =  "http://${System.getenv('VIRTUAL_HOST') ?: System.getenv('ME
 // datasource
 dataSource {
 
-    def metadataDbPassword = System.getenv('METADATA_PASSWORD') ?: System.getenv('MC_MYSQL_ENV_MYSQL_PASSWORD') ?: 'metadata'
-    def metadataDbUsername = System.getenv('METADATA_USERNAME') ?: System.getenv('MC_MYSQL_ENV_MYSQL_USER') ?: 'metadata'
+    def metadataDbPassword = System.getenv('METADATA_PASSWORD') ?: System.getenv('MC_MYSQL_ENV_MYSQL_PASSWORD') ?: System.getenv('RDS_PASSWORD') ?: 'metadata'
+    def metadataDbUsername = System.getenv('METADATA_USERNAME') ?: System.getenv('MC_MYSQL_ENV_MYSQL_USER') ?: System.getenv('RDS_USERNAME') ?: 'metadata'
     def metadataJdbcString = System.getenv('METADATA_JDBC_URL')
 
     if (!metadataJdbcString && System.getenv("MC_MYSQL_NAME")) {
         metadataJdbcString = "jdbc:mysql://mc-mysql:3306/${System.getenv('MC_MYSQL_ENV_MYSQL_DATABASE') ?: 'metadata'}?autoReconnect=true&useUnicode=yes"
+    }
+
+    if (!metadataJdbcString && System.getenv("RDS_HOSTNAME")) {
+        metadataJdbcString = "jdbc:mysql://${System.getenv('RDS_HOSTNAME')}:${System.getenv('RDS_PORT')}/${System.getenv('RDS_DB_NAME')}?autoReconnect=true&useUnicode=yes"
     }
 
     if (metadataJdbcString) {
@@ -60,6 +64,9 @@ dataSource {
 if (System.getenv("MC_ES_NAME")) {
     // mc-es is bound
     mc.search.elasticsearch.host='mc-es'
+} else if (System.getenv('MC_ES_HOST')) {
+    mc.search.elasticsearch.host=System.getenv('MC_ES_HOST')
+    mc.search.elasticsearch.port=System.getenv('MC_ES_PORT')
 } else {
     mc.search.elasticsearch.local="${System.properties['catalina.base']}/es"
 }
@@ -144,6 +151,13 @@ if (System.getenv("MC_GOOGLE_KEY")) {
             }
         }
     }
+}
+
+if (System.getenv('MC_S3_BUCKET')) {
+    mc.storage.s3.key = System.getenv('MC_S3_KEY') ?: System.getenv('AWS_ACCESS_KEY_ID')
+    mc.storage.s3.secret = System.getenv('MC_S3_SECRET') ?: System.getenv('AWS_SECRET_KEY')
+    mc.storage.s3.region = System.getenv('MC_S3_REGION')
+    mc.storage.s3.bucket = System.getenv('MC_S3_BUCKET')
 }
 
 
