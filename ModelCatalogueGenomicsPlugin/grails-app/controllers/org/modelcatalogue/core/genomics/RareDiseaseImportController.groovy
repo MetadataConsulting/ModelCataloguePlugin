@@ -52,13 +52,13 @@ class RareDiseaseImportController {
             def asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
             builder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", asset.id)
 
-            def dataModelName = params.dataModelName
-            def hpoDataModelName = params.hpoDataModelName
-            def testDataModelName = params.testDataModelName
+            def dataModel = elementService.findByModelCatalogueId(DataModel, params.dataModelId)
+            def hpoDataModel = elementService.findByModelCatalogueId(DataModel, params.hpoDataModelId)
+            def testDataModel = elementService.findByModelCatalogueId(DataModel, params.testDataModelId)
             executeInBackground(asset.id, "Imported from Rare Disease Csv") {
                 try {
-                    def created = rareDiseaseImportService.importDisorderedCsv(builder, dataModelName, hpoDataModelName,
-                        testDataModelName, file.inputStream)
+                    def created = rareDiseaseImportService.importDisorderedCsv(builder, dataModel, hpoDataModel,
+                        testDataModel, file.inputStream)
                     finalizeAsset(asset.id, (DataModel) (created.find {it.instanceOf(DataModel)} ?: created.find{it.dataModel}?.dataModel),
                         modelCatalogueSecurityService.currentUser?.id)
                 } catch (Exception e) {

@@ -26,22 +26,29 @@ angular.module('mc.core.ui.bs.modalPromptNewRareDiseaseImport', ['mc.util.messag
           $scope.canUpload = ->
             !$scope.uploading and $scope.file and $scope.dataModel and $scope.hpoDataModel and $scope.testDataModel
 
-          toDataModelName = (catalogueElement) ->
-            if (typeof catalogueElement is 'string')
-              return catalogueElement
-            else
-              return catalogueElement.name
-
           $scope.upload = ->
+            wasError = false
             $scope.messages.clearAllMessages()
+            if (!angular.isObject($scope.dataModel))
+              $scope.messages.error "Data Model #{$scope.dataModel} doesn't exist.", "Please select existing Data Model."
+              wasError = true
+            if (!angular.isObject($scope.hpoDataModel))
+              $scope.messages.error "Data Model #{$scope.hpoDataModel} doesn't exist.", "Please select existing Data Model."
+              wasError = true
+            if (!angular.isObject($scope.testDataModel))
+              $scope.messages.error "Data Model #{$scope.testDataModel} doesn't exist.", "Please select existing Data Model."
+              wasError = true
+            if (wasError)
+              return
+
             $scope.uploading = true
 
             $scope.upload = Upload.upload({
               url: "#{modelCatalogueApiRoot}/genomics/imports/upload"
               params: {
-                dataModelName: toDataModelName($scope.dataModel)
-                hpoDataModelName: toDataModelName($scope.hpoDataModel)
-                testDataModelName: toDataModelName($scope.testDataModel)
+                dataModelId: $scope.dataModel.modelCatalogueId
+                hpoDataModelId: $scope.hpoDataModel.modelCatalogueId
+                testDataModelId: $scope.testDataModel.modelCatalogueId
               }
               data: {
                 file: $scope.file
