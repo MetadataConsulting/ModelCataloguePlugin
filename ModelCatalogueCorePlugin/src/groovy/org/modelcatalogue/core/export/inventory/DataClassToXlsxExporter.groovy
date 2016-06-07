@@ -49,6 +49,7 @@ class DataClassToXlsxExporter {
             int counter = 0
 
             for (DataClass dataClassForDetail in processedDataClasss.values()) {
+                dataClassForDetail.setName("${dataClassForDetail.name}".replace("'",''))
                 log.info "[${++counter}/${dataClasssCount}] Exporting detail for Data Class ${dataClassForDetail.name} (${dataClassForDetail.combinedVersion})"
                 buildDataClassDetailSheet(workbook, processedDataClasss, dataClassForDetail)
             }
@@ -65,10 +66,16 @@ class DataClassToXlsxExporter {
                     width 10
                 }
                 cell {
+                    width 10
+                }
+                cell {
                     width 30
                 }
                 cell {
                     width 30
+                }
+                cell {
+                    width 10
                 }
                 cell {
                     width 10
@@ -83,7 +90,13 @@ class DataClassToXlsxExporter {
                     width 10
                 }
                 cell {
+                    width 10
+                }
+                cell {
                     width 70
+                }
+                cell {
+                    width 10
                 }
                 cell {
                     width 10
@@ -97,7 +110,7 @@ class DataClassToXlsxExporter {
                     value dataClass.name
                     name getReferenceName(dataClass)
                     style 'h1'
-                    colspan 4
+                    colspan 5
                 }
             }
             row {
@@ -108,7 +121,7 @@ class DataClassToXlsxExporter {
                         height 100
 
                         style 'description'
-                        colspan 4
+                        colspan 5
                     }
                 }
             }
@@ -122,7 +135,7 @@ class DataClassToXlsxExporter {
                 cell {
                     value dataClass.dataModel?.name
                     style 'property-value'
-                    colspan 2
+                    colspan 3
                 }
             }
             for(DataClass parent in dataClass.childOf) {
@@ -139,7 +152,7 @@ class DataClassToXlsxExporter {
                             if (parent.getId() in processedDataClasss.keySet()) {
                                 link to name getReferenceName(parent)
                             }
-                            colspan 2
+                            colspan 3
                         }
                     }
                 }
@@ -153,7 +166,7 @@ class DataClassToXlsxExporter {
                 cell {
                     value dataClass.combinedVersion
                     style 'property-value'
-                    colspan 2
+                    colspan 3
                 }
             }
             row {
@@ -165,7 +178,7 @@ class DataClassToXlsxExporter {
                 cell {
                     value dataClass.status
                     style 'property-value'
-                    colspan 2
+                    colspan 3
                 }
             }
 
@@ -180,7 +193,7 @@ class DataClassToXlsxExporter {
                 cell {
                     value dataClass.lastUpdated
                     style 'date'
-                    colspan 2
+                    colspan 3
                 }
             }
 
@@ -198,7 +211,7 @@ class DataClassToXlsxExporter {
                     value '<< Back to all Data Classes'
                     link to name 'DataClasses'
                     style 'note'
-                    colspan 4
+                    colspan 5
                 }
             }
         }
@@ -210,12 +223,17 @@ class DataClassToXlsxExporter {
                 cell {
                     value 'All Contained Data Elements'
                     style 'h2'
-                    colspan 4
+                    colspan 5
                 }
             }
             row {
                 cell {
                     value 'DE ID'
+                    style 'inner-table-header'
+                }
+
+                cell {
+                    value 'Status'
                     style 'inner-table-header'
                 }
 
@@ -236,6 +254,11 @@ class DataClassToXlsxExporter {
                 }
 
                 cell {
+                    value 'Status'
+                    style 'inner-table-header'
+                }
+
+                cell {
                     value 'Data Type Name'
                     style 'inner-table-header'
                 }
@@ -246,12 +269,22 @@ class DataClassToXlsxExporter {
                 }
 
                 cell {
+                    value 'Status'
+                    style 'inner-table-header'
+                }
+
+                cell {
                     value 'Measurement Unit Name'
                     style 'inner-table-header'
                 }
 
                 cell {
                     value 'DC ID'
+                    style 'inner-table-header'
+                }
+
+                cell {
+                    value 'Status'
                     style 'inner-table-header'
                 }
 
@@ -270,6 +303,10 @@ class DataClassToXlsxExporter {
                         style 'data-element-bottom-right'
                     }
                     cell {
+                        value element.status
+                        style 'data-element-center-center'
+                    }
+                    cell {
                         value element.name
                         style 'data-element'
                         colspan 2
@@ -284,60 +321,73 @@ class DataClassToXlsxExporter {
                             style 'data-element-bottom-right'
                         }
                         cell {
+                            value element.dataType.status
+                            style 'data-element-center-center'
+                        }
+                        cell {
                             value element.dataType.name
                             style 'data-element'
                         }
 
                         if (element.dataType.instanceOf(PrimitiveType) && element.dataType.measurementUnit) {
-                            cell('F') {
+                            cell('I') {
                                 value element.dataType.measurementUnit.combinedVersion
                                 style 'data-element-bottom-right'
+                            }
+                            cell {
+                                value element.dataType.measurementUnit.status
+                                style 'data-element-center-center'
                             }
                             cell {
                                 value element.dataType.measurementUnit.name
                                 style 'data-element'
                             }
                         } else {
-                            2.times { cell() }
+                            3.times { cell() }
                         }
 
                         if (element.dataType.instanceOf(ReferenceType) && element.dataType.dataClass) {
-                            cell('H') {
+                            cell('L') {
                                 value element.dataType.dataClass.combinedVersion
-                                style 'data-element-bottom-right'                            }
+                                style 'data-element-bottom-right'
+                            }
+                            cell {
+                                value element.dataType.dataClass.status
+                                style 'data-element-center-center'
+                            }
                             cell {
                                 value element.dataType.dataClass.name
                                 style 'data-element'
                             }
                         } else {
-                            2.times { cell() }
+                            3.times { cell() }
                         }
                     } else {
-                        6.times { cell() }
+                        9.times { cell() }
                     }
                 }
                 row {
                     style 'data-element-description-row'
 
 
-                    cell('B') {
+                    cell('C') {
                         value element.description
                         colspan 3
                     }
 
                     if (element.dataType) {
-                        cell ('F') { Cell theCell ->
+                        cell ('H') { Cell theCell ->
                             createDescriptionAndOrEnums(theCell, element.dataType)
                         }
 
                         if (element.dataType.instanceOf(PrimitiveType) && element.dataType.measurementUnit) {
-                            cell ('H') {
+                            cell ('K') {
                                 value element.dataType.measurementUnit.description
                             }
                         }
 
                         if (element.dataType.instanceOf(ReferenceType) && element.dataType.dataClass) {
-                            cell ('J') {
+                            cell ('N') {
                                 value element.dataType.dataClass.description
                             }
                         }
@@ -348,7 +398,7 @@ class DataClassToXlsxExporter {
                 if (element.ext) {
                     for (Map.Entry<String, String> entry in element.ext) {
                         row {
-                            cell('B') {
+                            cell('C') {
                                 value entry.key
                                 style 'metadata-key'
                             }
@@ -477,12 +527,18 @@ class DataClassToXlsxExporter {
                 cell {
                     value 'All Inner Data Classes'
                     style 'h2'
-                    colspan 2
+                    colspan 3
                 }
             }
             row {
                 cell {
                     value 'ID'
+                    width 10
+                    style 'inner-table-header'
+                }
+
+                cell {
+                    value 'Status'
                     width 10
                     style 'inner-table-header'
                 }
@@ -518,6 +574,12 @@ class DataClassToXlsxExporter {
                     align bottom right
                 }
                 link to name getReferenceName(dataClass)
+            }
+            cell {
+                value dataClass.status
+                style {
+                    align center center
+                }
             }
             cell {
                 value dataClass.name

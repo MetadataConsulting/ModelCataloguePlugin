@@ -95,6 +95,13 @@ class ModelCatalogueStyles implements Stylesheet {
                     bold
                 }
             }
+            style('data-element-center-center') {
+                align center center
+                foreground whiteSmoke
+                font {
+                    bold
+                }
+            }
             style('data-element-top-right') {
                 align top right
                 foreground whiteSmoke
