@@ -24,9 +24,6 @@ class DataModelToDocxExporter {
     private static final Map<String, Object> DOMAIN_NAME = [font: [color: '#29BDCA', size: 14, bold: true]]
     private static final Map<String, Object> DOMAIN_CLASSIFICATION_NAME = [font: [color: '#999999', size: 12, bold: true]]
 
-    final Set<DataType> usedDataTypes = new TreeSet<DataType>([compare: { DataType a, DataType b ->
-        a?.name <=> b?.name
-    }] as Comparator<DataType>)
     Closure customTemplate
 
     //If there is an image to display on the front page
@@ -192,11 +189,11 @@ class DataModelToDocxExporter {
                     docHelper.printModel(dClass, 1)
                 }
 
-                if (usedDataTypes) {
+                if (docHelper.usedDataTypes) {
                     pageBreak()
                     heading1 'Data Types'
 
-                    for (DataType dataType in usedDataTypes) {
+                    for (DataType dataType in docHelper.usedDataTypes) {
 
                         log.debug "Exporting data type $dataType to Word Document"
 
@@ -282,9 +279,11 @@ class DataModelToDocxExporter {
                     }
                 }
 
-                pageBreak()
-                heading2 'Validation Rules'
-                docHelper.printRules()
+                if(docHelper.rules) {
+                    pageBreak()
+                    heading2 'Validation Rules'
+                    docHelper.printRules()
+                }
 
             }
         }
