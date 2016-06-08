@@ -16,7 +16,7 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
   priority: 10000
 
 
-  controller: ['$scope', '$q', '$parse', '$state', '$attrs',  ($scope, $q, $parse, $state, $attrs) ->
+  controller: ['$scope', '$q', '$parse', '$state', '$attrs', 'security', 'names',  ($scope, $q, $parse, $state, $attrs, security, names) ->
     $scope.searchForElement = (query, ngModel, pickerValue, resourceAttr, statusAttr, globalAttr, contentTypeAttr, onSelect) ->
       searchFun     = null
       resource      = if resourceAttr then $scope.$eval(resourceAttr) ? $scope.$parent.$eval(resourceAttr) else undefined
@@ -49,6 +49,17 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
           openSearchMore: ->
             $scope.searchForMore(ngModel, pickerValue, resourceAttr, statusAttr, globalAttr, contentTypeAttr, onSelect)
         })
+        # create new catalogue element
+        if (security.hasRole('CURATOR') && (messages.hasPromptFactory("create-#{names.getPropertyNameFromType(value)}") || messages.hasPromptFactory("edit-#{names.getPropertyNameFromType(value)}")))
+          list.push({
+            name: "Create New"
+            classifiedName: "Create New"
+            getIcon: -> "fa fa-fw fa-plus"
+            create: true
+            description: "Create new item inside current data model. Press 'Esc' to dismiss."
+            openCreateNew: ->
+              $scope.createNewInline(ngModel, pickerValue, resourceAttr, statusAttr, globalAttr, contentTypeAttr, onSelect, query)
+          })
         deferred.resolve(list)
       deferred.promise
 
@@ -68,12 +79,32 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
         $parse(ngModel).assign($scope, element)
         $scope.$eval onSelect, {$item: element, $model: element, $label: element.classifiedName} if onSelect
 
+    $scope.createNewInline = (ngModel, pickerValue, resourceAttr, statusAttr, globalAttr, contentTypeAttr, onSelect, query)->
+      unless ngModel
+        throw "ng-model for catalogue-element-picker is missing, cannot create new item"
+
+      resource = if resourceAttr then $scope.$eval(resourceAttr) ? $scope.$parent.$eval(resourceAttr) else undefined
+      value = if pickerValue then pickerValue else resource
+
+      createType = "create-#{names.getPropertyNameFromType(value)}"
+      type = if messages.hasPromptFactory(createType) then createType else "edit-#{names.getPropertyNameFromType(value)}"
+
+      messages.prompt(null, null, {type: type, currentDataModel: $scope.currentDataModel, create: value, name: query}).then (element) ->
+        $parse(ngModel).assign($scope, element)
+        $scope.$eval onSelect, {$item: element, $model: element, $label: element.classifiedName} if onSelect
+
     $scope.customCepOnSelect = ($item, $model, $label, typeaheadOnSelect) ->
-      if $item and $item.more and angular.isFunction($item.openSearchMore)
-        $item.openSearchMore()
-        $scope.$evalAsync ->
-          $parse($attrs.ngModel).assign($scope, undefined)
-        return
+      if $item
+        if $item.more and angular.isFunction($item.openSearchMore)
+          $item.openSearchMore()
+          $scope.$evalAsync ->
+            $parse($attrs.ngModel).assign($scope, undefined)
+          return
+        if $item.create and angular.isFunction($item.openCreateNew)
+          $item.openCreateNew()
+          $scope.$evalAsync ->
+            $parse($attrs.ngModel).assign($scope, undefined)
+          return
 
       if typeaheadOnSelect
         $scope.$eval typeaheadOnSelect, $item: $item, $model: $model, $label: $label

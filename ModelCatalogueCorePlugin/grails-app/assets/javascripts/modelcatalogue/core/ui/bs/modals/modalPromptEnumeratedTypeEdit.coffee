@@ -5,6 +5,9 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
         messages.error('Cannot create edit dialog.', 'The element to be edited is missing.')
         return $q.reject('Missing element argument!')
 
+      if not title
+        title = "Create Data Type"
+
       dialog = $modal.open {
         windowClass: 'basic-edit-modal-prompt'
         size: 'lg'
@@ -16,6 +19,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
           $scope.pending  = {dataModel: null}
           $scope.copy     = angular.copy(args.element ? $scope.newEntity())
           $scope.copy.enumerations = $scope.copy.enumerations ? orderedMapEnhancer.emptyOrderedMap(true)
+          $scope.copy.name = args.name
           $scope.original = args.element ? $scope.newEntity()
           $scope.messages = messages.createNewMessages()
           $scope.ruleCollapsed  = not $scope.copy.rule

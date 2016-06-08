@@ -6,6 +6,9 @@ angular.module('mc.core.ui.bs.modalPromptDataElementEdit', ['mc.util.messages'])
         messages.error('Cannot create edit dialog.', 'The element to be edited is missing.')
         return $q.reject('Missing element argument!')
 
+      if not title
+        title = "Create Data Element"
+
       dialog = $modal.open {
         windowClass: 'basic-edit-modal-prompt'
         size: 'lg'
