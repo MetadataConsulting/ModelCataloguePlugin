@@ -32,7 +32,8 @@ class AbstractDataModelExporterSpec extends IntegrationSpec {
     String level3_id_1, level3_id_2, level3_id_3, level3_id_4
     String level4_id_1, level4_id_2, level4_id_3, level4_id_4
     String elem1_id, elem2_id, elem3_id, elem4_id, elem5_id, elem6_id
-    String newParticipant_id
+    String level5_id1,level5_id2,level5_id3,level5_id4
+    String newParticipant_id, newParticipant_id2
 
     // Model Based on Strcture of RD and Cancer Models
     DataModel buildTestModel() {
@@ -61,6 +62,10 @@ class AbstractDataModelExporterSpec extends IntegrationSpec {
                                         dataElement name: "Form Element 4" //e.g. Participant ID
                                         dataElement name: "Form Element 5" //e.g. DOB
                                         dataElement name: "Form Element 6" //e.g. NHS Number
+
+                                        dataClass name: ">>$i<< Level5 Model Data Element $j", { //e.g. ??
+                                            description ">$i< Level5 description for Model $i Data item $j"
+                                        }
                                     }
                                 }
                             }
@@ -93,8 +98,13 @@ class AbstractDataModelExporterSpec extends IntegrationSpec {
 
             create DataClass called 'New Participant Info class'
             update 'description' of 'New Participant Info class' to 'brand new description'
-            update 'hierarchy' of 'Info >>>1<<< subCategory Level3 Model Data Element 2' add 'New Participant Info class'
+            update 'hierarchy' of 'Info >>1<< heading Level4 Model Data Element 2' add 'New Participant Info class'
 
+            create DataClass called 'New Participant Info class2'
+            // this description change won't be output as DataModel changelog is not recursive below level 5
+            // i.e. the addition of 'New Participant Info class2' to '>>1<< Level5 Model Data Element 2' is logged but not changes to the 'New Participant Info class2' itself
+            update 'description' of 'New Participant Info class2' to 'new description2'
+            update 'hierarchy' of '>>1<< Level5 Model Data Element 2' add 'New Participant Info class2'
         }
 
     }
@@ -113,6 +123,7 @@ class AbstractDataModelExporterSpec extends IntegrationSpec {
         level4_id_3 = DataClass.findByNameIlike("Info%2%Level4%1").combinedVersion
         level4_id_4 = DataClass.findByNameIlike("Info%2%Level4%2").combinedVersion
         newParticipant_id = DataClass.findByName("New Participant Info class").combinedVersion
+        newParticipant_id2 = DataClass.findByName("New Participant Info class2").combinedVersion
 
         elem1_id = DataElement.findByName("Form Element 1").combinedVersion
         elem2_id = DataElement.findByName("Form Element 2").combinedVersion
@@ -120,6 +131,11 @@ class AbstractDataModelExporterSpec extends IntegrationSpec {
         elem4_id = DataElement.findByName("Form Element 4").combinedVersion
         elem5_id = DataElement.findByName("Form Element 5").combinedVersion
         elem6_id = DataElement.findByName("Form Element 6").combinedVersion
+
+        level5_id1 = DataClass.findByNameIlike(">>1<< Level5 Model Data Element 1").combinedVersion
+        level5_id2 = DataClass.findByNameIlike(">>1<< Level5 Model Data Element 2").combinedVersion
+        level5_id3 = DataClass.findByNameIlike(">>2<< Level5 Model Data Element 1").combinedVersion
+        level5_id4 = DataClass.findByNameIlike(">>2<< Level5 Model Data Element 2").combinedVersion
 
     }
 

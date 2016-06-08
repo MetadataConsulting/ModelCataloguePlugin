@@ -44,7 +44,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
 
     def suppressKeyDisplayList = ['parent of', 'child of', 'contains', 'name', 'description']
     def ignoreKeyListForDeletions = ['child of','contains', 'Class Type']
-    def ignoreKeyListForCreations = ['parent of', 'Class Type']
+    def ignoreKeyListForCreations = ['child of', 'Class Type']
     def ignoreKeyList = ['parent of', 'child of','contains', 'Class Type']
 
     SessionFactory sessionFactory
@@ -619,7 +619,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
                             String version = destinationMap.versionNumber instanceof String ? destinationMap.versionNumber : "1"
                             semanticVersion = "0.0.${version}"
                         }
-                        String id = "${destinationMap.id ?: ''}"
+                        String id = "${destinationMap.latestVersionId ?: ''}"
 
                         if(name && id && semanticVersion) {
                             elemName = "$name (${id}@${semanticVersion})"
