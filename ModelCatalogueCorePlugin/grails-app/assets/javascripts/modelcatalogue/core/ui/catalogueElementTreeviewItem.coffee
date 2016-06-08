@@ -139,20 +139,6 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
 
           root.off 'scroll', loadMoreIfNeeded
 
-      metadataOccurrencesToAsterisk = (element) ->
-        # only Data Element and Data Class with some metadata and defined relationship
-        if (angular.isFunction(element.isInstanceOf) && (element.isInstanceOf('dataElement') || element.isInstanceOf('dataClass'))) && element.$$metadata?.values? && element.$$relationship
-          min = '0'
-          max = '*'
-          for row in element.$$metadata.values
-            if (row.key == 'Min Occurs')
-              min = row.value
-            else if (row.key == 'Max Occurs')
-              max = row.value
-          return "#{min}..#{max}"
-        else
-          return ""
-
       onElementUpdate = (element) ->
         handleDescendPaths()
 
@@ -162,15 +148,6 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
 
         if angular.isFunction(element.href)
           $scope.node.href = element.href()
-
-        if angular.isFunction(element.getIcon)
-          $scope.node.icon = element.getIcon()
-
-        if angular.isFunction(element.getDataModelWithVersion)
-          $scope.node.dataModelWithVersion = element.getDataModelWithVersion()
-
-        $scope.node.metadataOccurrencesToAsterisk = metadataOccurrencesToAsterisk(element)
-        $scope.node.name = element.$$localName || element.name
 
         $scope.node.reset = ->
           if $scope.node.item[$scope.currentDescend]
@@ -233,6 +210,20 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
       $scope.select = (element) ->
         $scope.collapseOrExpand()
         $scope.treeview.select(element)
+
+      $scope.metadataOccurrencesToAsterisk = (element) ->
+        # only Data Element and Data Class with some metadata and defined relationship
+        if (angular.isFunction(element.isInstanceOf) && (element.isInstanceOf('dataElement') || element.isInstanceOf('dataClass'))) && element.$$metadata?.values? && element.$$relationship
+          min = '0'
+          max = '*'
+          for row in element.$$metadata.values
+            if (row.key == 'Min Occurs')
+              min = row.value
+            else if (row.key == 'Max Occurs')
+              max = row.value
+          return "#{min}..#{max}"
+        else
+          return ""
 
       reloadChildrenOnChange = (_, result, url) ->
         if result.link == $scope.element.link
