@@ -100,18 +100,18 @@ class RareDiseasePhenotypeChangeLogXlsExporter extends RareDiseaseChangeLogXlsEx
             log.debug " --- $level $model $model.dataModel"
 
             subtype = PHENOTYPE
-            checkChangeLog(model, lines, subtype, groupDescriptions, level, TOP_LEVEL_RELATIONSHIP_TYPES)
+            checkChangeLog(model, lines, subtype, groupDescriptions, level, DETAIL_CHANGE_TYPES)
             iterateChildren(model, lines, subtype, groupDescriptions, level, DETAIL_CHANGE_TYPES)
 
         } else if (model.name.matches("(?i:.*Clinical Test.*)")) {
 
             subtype = CLINICAL_TESTS
-            checkChangeLog(model, lines, subtype, groupDescriptions, level, TOP_LEVEL_RELATIONSHIP_TYPES)
+            checkChangeLog(model, lines, subtype, groupDescriptions, level, DETAIL_CHANGE_TYPES)
             iterateChildren(model, lines, subtype, groupDescriptions, level, DETAIL_CHANGE_TYPES)
 
         } else if (model.name.matches("(?i:.*Guidance.*)")) {
             subtype = GUIDANCE
-            checkChangeLog(model, lines, subtype, groupDescriptions, level, [PROPERTY_CHANGED])
+            checkChangeLog(model, lines, subtype, groupDescriptions, level, DETAIL_CHANGE_TYPES)
         }
 
         lines
