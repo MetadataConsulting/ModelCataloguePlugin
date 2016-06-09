@@ -34,4 +34,20 @@ databaseChangeLog = {
         }
     }
 
+
+    changeSet(author: "Vladimir Orany", id: "20160511112830-3") {
+        preConditions (onFail: 'MARK_RAN') {
+            not {
+                indexExists(tableName: 'change', indexName: 'change_idx_3')
+            }
+        }
+
+        createIndex(indexName: "change_idx_3", tableName: "change") {
+            column(name: "author_id")
+            column(name: "other_side")
+            column(name: "system")
+            column(name: "date_created")
+        }
+    }
+
 }
