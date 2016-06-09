@@ -145,9 +145,9 @@ class AuditService {
 
         if (!dataModels) {
             return Lists.fromCriteria(params, Change) {
+                isNull 'parentId'
                 ne 'system', true
                 ne 'otherSide', true
-                isNull 'parentId'
 
             }
         }
@@ -159,7 +159,7 @@ class AuditService {
         //language=HQL
         Lists.fromQuery params, Change, """
             from Change c
-            where c.system != true and c.otherSide != true and c.parentId is null and c.changedId  in (""" + subquery + """)""", args
+            where c.parentId is null and c.system != true and c.otherSide != true and c.changedId  in (""" + subquery + """)""", args
     }
 
     private static String getClassifiedElementsSubQuery(DataModelFilter dataModels, Map<String, Object> args) {
