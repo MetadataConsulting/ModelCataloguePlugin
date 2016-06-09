@@ -24,7 +24,7 @@ describe "mc.core.ui.catalogueElementTreeviewItem", ->
     expect(element.prop('tagName').toLowerCase()).toBe('li')
     expect(element.find('span.catalogue-element-treeview-name').text().replace(/^\s+|\s+$/g, '').replace(/\s\s+/g, ' '))
       .toBe("#{catEl.name} None 0.0.0")
-    expect(element.find('span.badge').text()).toBe("#{catEl.outgoingRelationships.total}")
+    expect(element.find('span.badge').text().replace(/^\s+|\s+$/g, '').replace(/\s\s+/g, ' ')).toBe("#{catEl.outgoingRelationships.total}")
 
 
     relationships = angular.copy(fixtures.dataType.outgoing1)
