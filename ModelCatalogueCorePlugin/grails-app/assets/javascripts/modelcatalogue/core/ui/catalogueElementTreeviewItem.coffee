@@ -160,17 +160,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
 
         $scope.descendFun = $scope.element[$scope.currentDescend]
 
-        if angular.isFunction(element.href)
-          $scope.node.href = element.href()
-
-        if angular.isFunction(element.getIcon)
-          $scope.node.icon = element.getIcon()
-
-        if angular.isFunction(element.getDataModelWithVersion)
-          $scope.node.dataModelWithVersion = element.getDataModelWithVersion()
-
         $scope.node.metadataOccurrencesToAsterisk = metadataOccurrencesToAsterisk(element)
-        $scope.node.name = element.$$localName || element.name
 
         $scope.node.reset = ->
           if $scope.node.item[$scope.currentDescend]
