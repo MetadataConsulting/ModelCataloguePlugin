@@ -253,7 +253,7 @@ class ElementService implements Publisher<CatalogueElement> {
         return null
     }
 
-    private static CatalogueElement getLatestFromCriteria(DetachedCriteria<? extends CatalogueElement> criteria) {
+    static CatalogueElement getLatestFromCriteria(DetachedCriteria<? extends CatalogueElement> criteria) {
         List<CatalogueElement> elements = criteria.list(sort: 'versionNumber', order: 'desc', max: 1)
         if (elements) {
             return elements.first()
