@@ -1,12 +1,13 @@
 package org.modelcatalogue.core.audit
 
+import com.google.common.collect.ImmutableMap
+import grails.util.GrailsNameUtils
 import grails.web.JSONBuilder
 import groovy.json.JsonSlurper
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
-import org.modelcatalogue.core.util.marshalling.RelationshipMarshallers
+import org.modelcatalogue.core.util.HibernateHelper
 import rx.Observable
 
 abstract class LoggingAuditor extends AbstractAuditor {
@@ -391,26 +392,46 @@ abstract class LoggingAuditor extends AbstractAuditor {
     }
 
     protected static objectToStore(Object object) {
+        object = HibernateHelper.ensureNoProxy(object)
         if (object instanceof CatalogueElement) {
-            return CatalogueElementMarshaller.minimalCatalogueElementJSON(object)
+            return ImmutableMap.of(
+                'name', (Object) object.name,
+                'id', (Object) object.id,
+                'elementType', (Object) object.getClass().name,
+                'link', (Object) "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(object.getClass()))}/$object.id".toString(),
+                'versionNumber', (Object) object.versionNumber
+            )
         }
         if (object instanceof Mapping) {
-            return [
-                    source : CatalogueElementMarshaller.minimalCatalogueElementJSON(object.source),
-                    destination: CatalogueElementMarshaller.minimalCatalogueElementJSON(object.destination),
-                    mapping: object.mapping,
-                    id     : object.id
-            ]
+            return ImmutableMap.of(
+                'source',  objectToStore(object.source),
+                'destination', objectToStore(object.destination),
+                'mapping', object.mapping,
+                'id', object.id
+            )
         }
         if (object instanceof RelationshipMetadata) {
-            return [
-                    name: object.name,
-                    extensionValue: object.extensionValue,
-                    relationship: objectToStore(object.relationship)
-            ]
+            return ImmutableMap.of(
+                'name', object.name,
+                'extensionValue', object.extensionValue,
+                'relationship', objectToStore(object.relationship)
+            )
+        }
+        if (object instanceof ExtensionValue) {
+            return ImmutableMap.of(
+                'name', object.name,
+                'extensionValue', object.extensionValue,
+                'relationship', objectToStore(object.relationship)
+            )
         }
         if (object instanceof Relationship){
-            return RelationshipMarshallers.getRelationshipAsMap(object)
+            return ImmutableMap.of(
+                'id', object.id,
+                'source', objectToStore(object.source),
+                'destination', objectToStore(object.destination),
+                'type', object.relationshipType.info,
+                'elementType', Relationship.name,
+            )
         }
         if (object instanceof Enum) {
             return object.toString()
