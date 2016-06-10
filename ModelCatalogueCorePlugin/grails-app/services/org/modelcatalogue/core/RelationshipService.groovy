@@ -300,8 +300,10 @@ class RelationshipService {
             source.refresh()
 
             if (relationshipType == RelationshipType.baseType) {
-                for (Relationship relationship in new LinkedHashSet<Relationship>(source.outgoingRelationships)) {
-                    if (relationship.relationshipType.versionSpecific) {
+                Set<Long> destinations = new HashSet<Long>()
+                destinations.addAll(source.outgoingRelationships*.destination*.id)
+                for (Relationship relationship in new LinkedHashSet<Relationship>(destination.outgoingRelationships)) {
+                    if (relationship.relationshipType.versionSpecific && relationship.inherited && relationship.destination.id in destinations) {
                         unlink relationship.source, relationship.destination, relationship.relationshipType, relationship.dataModel, true, relationship.ext
                     }
                 }
