@@ -12,7 +12,7 @@ angular.module('mc.core.ui.bs.modalOptions', ['mc.util.messages']).config ['mess
         </div>
         <div class="modal-footer">
           <form role="form">
-            <button ng-disabled="pending" ng-repeat="option in options" class="btn" ng-class="option.classes" ng-click="select(option.value)"><span ng-if="option.icon" ng-class="option.icon"></span> {{option.label}}</button>
+            <button ng-disabled="pending" ng-repeat="option in options track by option.label" class="btn" ng-class="option.classes" ng-click="select(option.value)"><span ng-if="option.icon" ng-class="option.icon"></span> {{option.label}}</button>
             <button ng-disabled="pending" class="btn btn-warning" ng-click="close(false)"><span class="fa fa-fw fa-ban"></span> Cancel</button>
           </form>
         </div>

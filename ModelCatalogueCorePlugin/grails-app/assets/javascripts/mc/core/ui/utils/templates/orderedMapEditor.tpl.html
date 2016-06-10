@@ -1,5 +1,5 @@
 <div>
-  <div ng-repeat="editor in availableEditors">
+  <div ng-repeat="editor in availableEditors track by editor.getTitle()">
     <hr/>
     <h4 class="text-center">{{editor.getTitle()}}</h4>
     <hr/>
@@ -19,7 +19,7 @@
     </th>
     </thead>
     <tbody sortable="sortableOptions">
-    <tr class="soe-table-property-row" ng-repeat="property in object.values"
+    <tr class="soe-table-property-row" ng-repeat="property in object.values track by property.key"
         ng-class="{'has-error': !isKeyUnique(property.key)}">
       <td><span class="handle fa fa-ellipsis-v fa-fw text-muted with-move"></span></td>
       <th class="soe-table-property-key col-md-5 col-sm-5">

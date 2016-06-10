@@ -11,7 +11,7 @@ angular.module('mc.core.ui.bs.simpleObjectEditor', ['mc.core.ui.simpleObjectEdit
           </th>
         </thead>
         <tbody>
-          <tr class="soe-table-property-row" ng-repeat="property in editableProperties" ng-class="{'has-error': !isKeyUnique(property.key)}">
+          <tr class="soe-table-property-row" ng-repeat="property in editableProperties track by property.key" ng-class="{'has-error': !isKeyUnique(property.key)}">
             <th class="soe-table-property-key col-md-5 col-sm-5">
               <input type="text" ng-model="property.key" class="form-control" ng-change="keyChanged(property)" placeholder="{{valuePlaceholder ? keyPlaceholder : 'Key'}}" autofocus="autofocus" focus-me="lastAddedRow == $index &amp;&amp; $index != 0">
             </th>

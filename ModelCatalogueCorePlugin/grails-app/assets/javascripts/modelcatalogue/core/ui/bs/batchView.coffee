@@ -7,7 +7,7 @@ angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView',  'mc.core.ui.
         <div class="col-md-6 pending-actions">
           <h4>Pending Actions</h4>
           <alert type="info" ng-hide="loading || pendingActions.length > 0">There no pending actions</alert>
-          <alert ng-repeat="action in pendingActions" type="{{getType(action)}}" id="action-{{action.id}}">
+          <alert ng-repeat="action in pendingActions track by action.id" type="{{getType(action)}}" id="action-{{action.id}}">
             <div class="action-header">
               <div class="pull-right">
                 <contextual-actions group="true" icon-only="true" size="sm" no-colors="true" role="action"/>
@@ -31,7 +31,7 @@ angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView',  'mc.core.ui.
         <div class="col-md-6 performed-actions">
           <h4>Performed Actions</h4>
           <alert type="info" ng-hide="loading || performedActions.length > 0">There no actions performed or failed</alert>
-          <alert ng-repeat="action in performedActions" type="{{getType(action)}}" id="action-{{action.id}}">
+          <alert ng-repeat="action in performedActions track by action.id" type="{{getType(action)}}" id="action-{{action.id}}">
             <div>
               <div class="pull-right">
                 <contextual-actions group="true" icon-only="true" size="sm" no-colors="true" role="action"/>

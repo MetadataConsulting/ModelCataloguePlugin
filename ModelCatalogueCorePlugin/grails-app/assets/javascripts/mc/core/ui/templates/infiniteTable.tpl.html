@@ -3,7 +3,7 @@
     <table class="inf-table table">
       <thead>
       <tr class="inf-table-header-row">
-        <th class="inf-table-header-cell" ng-repeat="column in columns" ng-class="evaluateClasses(column.classes)">
+        <th class="inf-table-header-cell" ng-repeat="column in columns track by column.header" ng-class="evaluateClasses(column.classes)">
           <span ng-if="!column.sort">
             {{column.header}}
           </span>

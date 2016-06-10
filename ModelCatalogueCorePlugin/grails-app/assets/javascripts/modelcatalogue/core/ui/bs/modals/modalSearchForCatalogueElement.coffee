@@ -28,7 +28,7 @@ module.config ['messagesProvider', (messagesProvider)->
             <div>
               <div class="list-group">
                 <div class="leave-10-before"></div>
-                <a ng-repeat="element in elements" class="list-group-item with-pointer item-found" ng-class="{'list-group-item-warning': element.status == 'DRAFT', 'list-group-item-info': element.status == 'PENDING', 'list-group-item-danger': element.status == 'DEPRECATED', 'active': $index == selected}" ng-click="$close(element)">
+                <a ng-repeat="element in elements track by element.link" class="list-group-item with-pointer item-found" ng-class="{'list-group-item-warning': element.status == 'DRAFT', 'list-group-item-info': element.status == 'PENDING', 'list-group-item-danger': element.status == 'DEPRECATED', 'active': $index == selected}" ng-click="$close(element)">
                     <h4 class="list-group-item-heading"><catalogue-element-icon type="element.elementType"></catalogue-element-icon> <span class='classified-name'>{{element.classifiedName || element.name}}</span></h4>
                     <p ng-if="element.modelCatalogueId || element.internalModelCatalogueId" class="search-model-catalogue-id small">{{element.modelCatalogueId || element.internalModelCatalogueId}}</p>
                     <p ng-if="element.description" class="list-group-item-text preserve-new-lines modal-search-for-catalogue-element-description">{{element.description}}</p>

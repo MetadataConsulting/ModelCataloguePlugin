@@ -4,7 +4,7 @@
   <th class="col-md-6">{{valueTitle}}</th>
   </thead>
   <tbody>
-  <tr class="pp-table-property-row" ng-repeat="property in properties" ng-switch="displayType(property.value, item)"
+  <tr class="pp-table-property-row" ng-repeat="property in properties track by property.value" ng-switch="displayType(property.value, item)"
       ng-init="theValue = evaluateValue(property.value, item)">
     <th class="pp-table-property-label col-md-4">{{property.label}}</th>
     <td class="pp-table-property-value-no-wrap col-md-8 pp-table-property-element-value"
@@ -43,7 +43,7 @@
     </td>
     <td class="pp-table-property-value col-md-8 pp-table-property-element-value" data-value-for="{{property.label}}"
         ng-switch-when="elementArray">
-      <span ng-repeat="element in theValue">
+      <span ng-repeat="element in theValue track by element.link">
         <a class="label with-pointer" ng-href="{{element.href()}}">
           <span ng-class="element.getIcon()"></span>
           {{element.name}}
@@ -58,7 +58,7 @@
     </td>
     <td class="pp-table-property-value col-md-8 pp-table-property-element-value" data-value-for="{{property.label}}"
         ng-switch-when="array">
-      <span ng-repeat="element in theValue">
+      <span ng-repeat="element in theValue track by element.link">
         {{element}}
         <span ng-hide="$last">, </span>
       </span>

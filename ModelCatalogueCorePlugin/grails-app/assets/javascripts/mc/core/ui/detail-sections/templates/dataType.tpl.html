@@ -41,7 +41,7 @@
 <div class="small col-md-9 col-md-offset-3" ng-if="!editableForm.$visible &amp;&amp; element.dataType.enumerations">
   <div class="row">
     <div class="col-md-12"><strong class="small">Enumerations</strong></div>
-    <div class="col-md-3" ng-repeat-start="value in element.dataType.enumerations.values">
+    <div class="col-md-3" ng-repeat-start="value in element.dataType.enumerations.values track by value.key">
       <strong class="small">{{value.key}}</strong>
     </div>
     <div class="col-md-9 preserve-new-lines" ng-repeat-end>
