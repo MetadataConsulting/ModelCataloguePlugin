@@ -337,15 +337,6 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change2.oldValue == initialValue
         change2.newValue == null
         !change2.otherSide
-
-        and:
-        ChangeType.RELATIONSHIP_DELETED.undoSupported
-
-        when:
-        ChangeType.RELATIONSHIP_DELETED.undo change1
-
-        then:
-        base in type.isBasedOn
     }
 
     def "adding relationship metadata is logged"() {

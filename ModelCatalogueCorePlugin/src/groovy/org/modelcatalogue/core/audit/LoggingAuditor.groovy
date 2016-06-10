@@ -8,6 +8,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.HibernateHelper
+import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import rx.Observable
 
 abstract class LoggingAuditor extends AbstractAuditor {
@@ -394,13 +395,15 @@ abstract class LoggingAuditor extends AbstractAuditor {
     protected static objectToStore(Object object) {
         object = HibernateHelper.ensureNoProxy(object)
         if (object instanceof CatalogueElement) {
-            return ImmutableMap.of(
-                'name', (Object) object.name,
-                'id', (Object) object.id,
-                'elementType', (Object) object.getClass().name,
-                'link', (Object) "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(object.getClass()))}/$object.id".toString(),
-                'versionNumber', (Object) object.versionNumber
-            )
+            return ImmutableMap.builder()
+                .put('name', object.name)
+                .put('id', object.id)
+                .put('elementType', object.getClass().name)
+                .put('link', "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(object.getClass()))}/$object.id".toString())
+                .put('versionNumber', object.versionNumber)
+                .put('latestVersionId', object.latestVersionId ?: object.id)
+                .put('classifiedName', CatalogueElementMarshaller.getClassifiedName(object))
+                .build()
         }
         if (object instanceof Mapping) {
             return ImmutableMap.of(
