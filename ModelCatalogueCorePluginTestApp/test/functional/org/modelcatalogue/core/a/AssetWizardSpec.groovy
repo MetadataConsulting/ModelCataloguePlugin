@@ -8,6 +8,7 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.integration.excel.ExcelLoader
 import org.modelcatalogue.integration.excel.HeadersMap
+import org.openqa.selenium.By
 import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Stepwise
@@ -33,8 +34,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
     def "go to login"() {
         when:
         loginAdmin()
-        select "Test 1"
-        selectInTree "Test 1"
+        select 'Rare Disease Conditions'
         selectInTree "Assets"
 
         then:
@@ -55,7 +55,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         click save
 
         then:
-        check infiniteTableRow present once
+        check infiniteTableRow displayed
 
         and:
         check modalDialog gone
@@ -67,7 +67,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
         click { infTableCell(1, 2).find('a:not(.inf-cell-expand)') }
 
-        check rightSideTitle contains 'Sample XSD Test 1'
+        check rightSideTitle contains 'Sample XSD'
     }
 
     def "validate xml schema"() {

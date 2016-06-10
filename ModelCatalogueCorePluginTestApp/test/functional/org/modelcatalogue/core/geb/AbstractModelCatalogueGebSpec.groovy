@@ -4,6 +4,9 @@ import geb.Browser
 import geb.navigator.Navigator
 import geb.spock.GebReportingSpec
 import geb.waiting.WaitTimeoutException
+import grails.util.Holders
+import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.ElementService
 import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.StaleElementReferenceException
 import org.openqa.selenium.logging.LogEntries
@@ -13,6 +16,8 @@ import org.openqa.selenium.logging.LogType
 import static org.modelcatalogue.core.geb.Common.*
 
 abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
+
+//    ElementService elementService
 
     // keep the passwords simply stupid, they are only for dev/test or very first setup
     // sauce labs connector for some reason fails with the six in the input
@@ -65,6 +70,27 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
                 }
             }
 
+        }
+
+        return new DataModelNavigator(this)
+    }
+
+    DataModelNavigator selectLatestVersion(String dataModelId, String dataModelName) {
+
+        for (int i = 0; i < 10; i++) {
+            try {
+                go "catalogue/dataModel/${URLEncoder.encode(dataModelId, 'UTF-8')}"
+
+                waitFor {
+                    title ==~ "Activity of $dataModelName"
+                }
+
+                break
+            } catch (e) {
+                if (i == 9) {
+                    throw e
+                }
+            }
         }
 
         return new DataModelNavigator(this)
@@ -389,6 +415,14 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     def selectInTree(String name) {
         noStale({ $('.catalogue-element-treeview-name', text: name) }) {
             it.click()
+        }
+    }
+
+    def descendTree(String... names) {
+        for(String name in names) {
+            noStale({ $('.catalogue-element-treeview-name', text: name) }) {
+                it.click()
+            }
         }
     }
 
