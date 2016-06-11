@@ -31,7 +31,7 @@ class DataClassSpec extends IntegrationSpec {
         where:
         no | validates | size | args
         1  | false     | 0    | [name: "x" * 256, description: "this is the the result description"]
-        2  | false     | 0    | [name: "x", description: "x" * 2001]
+        2  | false     | 0    | [name: "x", description: "x" * 20001]
         3  | false     | 0    | [name: "result1", description: "this is the the result description", modelCatalogueId: "x" * 256]
         4  | true      | 1    | [name: "result1", description: "this is the the result description", modelCatalogueId: "http://example.com/123"]
         5  | true      | 1    | [name: "result2", description: "this is the the result description"]
