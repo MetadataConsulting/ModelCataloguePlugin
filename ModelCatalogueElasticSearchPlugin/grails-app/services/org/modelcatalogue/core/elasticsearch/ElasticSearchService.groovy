@@ -88,6 +88,7 @@ class ElasticSearchService implements SearchCatalogue {
     GrailsApplication grailsApplication
     DataModelService dataModelService
     ElementService elementService
+    SecurityService modelCatalogueSecurityService
     RxService rxService
     Node node
     Client client
@@ -158,7 +159,7 @@ class ElasticSearchService implements SearchCatalogue {
         List<String> states = []
 
         if (params.status) {
-            states = ElementService.getStatusFromParams(params)*.toString()
+            states = ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER'))*.toString()
         }
 
         List<String> types = []
@@ -235,7 +236,7 @@ class ElasticSearchService implements SearchCatalogue {
             }
 
             if (params.status) {
-                boolQuery.must(QueryBuilders.termsQuery('status', ElementService.getStatusFromParams(params)*.toString()))
+                boolQuery.must(QueryBuilders.termsQuery('status', ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER'))*.toString()))
             }
 
             if (params.contentType) {
