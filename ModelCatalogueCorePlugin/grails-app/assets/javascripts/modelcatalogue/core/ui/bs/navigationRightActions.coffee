@@ -88,6 +88,16 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     }
   ]
 
+  actionsProvider.registerChildAction 'admin-menu', 'user-admin', ($window, security) ->
+    "ngInject"
+    {
+      position:   1000
+      icon:       'fa fa-fw fa-user-plus'
+      label:      'Users'
+      action: ->
+        $window.open("#{security.contextPath}/userAdmin")
+    }
+
   actionsProvider.registerChildAction 'admin-menu', 'relationship-types', ['$state', ($state) ->
     {
       position:   2000
@@ -97,8 +107,6 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
         $state.go 'simple.resource.list', resource: 'relationshipType'
     }
   ]
-
-
 
   actionsProvider.registerChildAction 'admin-menu', 'data-model-policies', ['$state', ($state) ->
     {
