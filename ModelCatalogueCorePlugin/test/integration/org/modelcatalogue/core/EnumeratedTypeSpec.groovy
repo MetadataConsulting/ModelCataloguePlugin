@@ -25,7 +25,7 @@ class EnumeratedTypeSpec extends IntegrationSpec {
         false     | [:]
         true      | [name: 'test1']
         false     | [name: 'test2', enumerations: ['male']]
-        false     | [name: 'test3', enumAsString: ('m:s|' * 2500) + 's:m']
+        false     | [name: 'test3', enumAsString: ('m:s|' * 11000) + 's:m']
         true      | [name: 'test4', enumerations: ['m': 'male', 'f': 'female', 'u': 'unknown']]
         true      | [name: 'test5', enumerations: ['m': 'male', 'f': 'female', 'u': null]]
     }
