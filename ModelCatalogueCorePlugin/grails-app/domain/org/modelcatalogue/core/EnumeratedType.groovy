@@ -26,7 +26,7 @@ class EnumeratedType extends DataType {
 
     static constraints = {
         name unique: false
-        enumAsString nullable: true, maxSize: 10000
+        enumAsString nullable: true, maxSize: 50000
     }
 
     /**
