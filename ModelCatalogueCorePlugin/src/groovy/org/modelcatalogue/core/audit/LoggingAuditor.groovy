@@ -396,6 +396,7 @@ abstract class LoggingAuditor extends AbstractAuditor {
         object = HibernateHelper.ensureNoProxy(object)
         if (object instanceof CatalogueElement) {
             return ImmutableMap.builder()
+                .put('semanticVersion', object.dataModelSemanticVersion ?: object.combinedVersion)
                 .put('name', object.name)
                 .put('id', object.id)
                 .put('elementType', object.getClass().name)
@@ -424,7 +425,7 @@ abstract class LoggingAuditor extends AbstractAuditor {
             return ImmutableMap.of(
                 'name', object.name,
                 'extensionValue', object.extensionValue,
-                'relationship', objectToStore(object.relationship)
+                'element', objectToStore(object.element)
             )
         }
         if (object instanceof Relationship){
