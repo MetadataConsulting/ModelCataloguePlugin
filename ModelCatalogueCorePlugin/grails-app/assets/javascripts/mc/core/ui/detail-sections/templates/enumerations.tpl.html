@@ -5,7 +5,8 @@
     </div>
   </div>
 
-  <div class="row" ng-repeat="value in (editableForm.$visible ? [] : element.enumerations.values)">
+  <div class="row" ng-repeat="value in (editableForm.$visible ? [] : element.enumerations.values)"
+       ng-class="{'text-danger': value.deprecated}">
     <div class="col-md-3">
       <strong class="small text-wrap">{{value.key}}</strong>
     </div>

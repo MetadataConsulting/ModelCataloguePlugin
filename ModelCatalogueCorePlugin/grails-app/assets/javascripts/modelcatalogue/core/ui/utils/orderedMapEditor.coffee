@@ -28,6 +28,9 @@ angular.module('mc.core.ui.utils').directive 'orderedMapEditor',  [-> {
         $scope.lastAddedRow = newIndex
         $scope.object.values.splice(newIndex, 0, newProperty)
 
+      $scope.setDeprecated = (property, deprecated) ->
+        property.deprecated = deprecated
+
       $scope.isKeyUnique = (key) ->
         return false if not key and $scope.object.values.length > 1
         firstFound = false
