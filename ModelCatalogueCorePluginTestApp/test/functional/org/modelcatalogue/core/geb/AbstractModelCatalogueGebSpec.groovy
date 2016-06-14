@@ -342,10 +342,13 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         while (parent.find('.soe-table-property-row').size() > 1) {
             parent.find('.soe-table-property-row:first-child .soe-table-property-actions .soe-remove-row').click()
         }
+        // last value might not be deleted
+        parent.find('.soe-table-property-row:first-child .soe-table-property-actions .soe-remove-row').click()
 
         newMetadata.each { key, value ->
-            parent.find('.soe-table-property-row:last-child .soe-table-property-key input').value(key?.toString() ?: '')
+            // fill value first as key might disable both input
             parent.find('.soe-table-property-row:last-child .soe-table-property-value input').value(value?.toString() ?: '')
+            parent.find('.soe-table-property-row:last-child .soe-table-property-key input').value(key?.toString() ?: '')
             parent.find('.soe-table-property-row:last-child .soe-table-property-actions .soe-add-row').click()
         }
     }

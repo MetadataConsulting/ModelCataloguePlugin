@@ -16,7 +16,7 @@ angular.module('mc.core.orderedMapEnhancer', ['mc.util.enhance']).config ['enhan
               value.value = newValue
               return newValue
           # only push if the value is defined
-          self.values.push(key: key, value: newValue) if allowEmpty or newValue or not key
+          self.values.push(key: key, value: newValue) if allowEmpty or angular.isDefined(newValue) or not key
           return newValue
         get =  ->
           ensureValuesAreArray(self)
