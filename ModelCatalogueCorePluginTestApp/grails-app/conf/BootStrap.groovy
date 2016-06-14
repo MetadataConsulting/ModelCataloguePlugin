@@ -53,26 +53,26 @@ class BootStrap {
 
         // keep the passwords lame, they are only for dev/test or very first setup
         // sauce labs connector for some reason fails with the six in the input
-        def admin = User.findByNameOrUsername('admin') ?: new User(name: 'admin', username: 'admin', enabled: true, password: 'admin').save(failOnError: true)
-        def viewer = User.findByNameOrUsername('viewer') ?: new User(name: 'viewer', username: 'viewer', enabled: true, password: 'viewer').save(failOnError: true)
-        def curator = User.findByNameOrUsername('curator') ?: new User(name: 'curator', username: 'curator', enabled: true, password: 'curator').save(failOnError: true)
-        User.findByNameOrUsername('registered') ?: new User(name: 'registered', username: 'registered', enabled: true, password: 'registered').save(failOnError: true)
-
-        if (!admin.authorities.contains(roleAdmin)) {
-            UserRole.create admin, roleUser
-            UserRole.create admin, metadataCurator
-            UserRole.create admin, roleStacktrace
-            UserRole.create admin, roleAdmin, true
-        }
-
-        if (!curator.authorities.contains(metadataCurator)) {
-            UserRole.create curator, roleUser
-            UserRole.create curator, metadataCurator
-        }
-
-        if (!viewer.authorities.contains(viewer)) {
-            UserRole.create viewer, roleUser
-        }
+//        def admin = User.findByNameOrUsername('admin', 'admin') ?: new User(name: 'admin', username: 'admin', enabled: true, password: 'admin').save(failOnError: true)
+//        def viewer = User.findByNameOrUsername('viewer', 'viewer') ?: new User(name: 'viewer', username: 'viewer', enabled: true, password: 'viewer').save(failOnError: true)
+//        def curator = User.findByNameOrUsername('curator', 'curator') ?: new User(name: 'curator', username: 'curator', enabled: true, password: 'curator').save(failOnError: true)
+//        User.findByNameOrUsername('registered', 'registered') ?: new User(name: 'registered', username: 'registered', enabled: true, password: 'registered').save(failOnError: true)
+//
+//        if (!admin.authorities.contains(roleAdmin)) {
+//            UserRole.create admin, roleUser
+//            UserRole.create admin, metadataCurator
+//            UserRole.create admin, roleStacktrace
+//            UserRole.create admin, roleAdmin, true
+//        }
+//
+//        if (!curator.authorities.contains(metadataCurator)) {
+//            UserRole.create curator, roleUser
+//            UserRole.create curator, metadataCurator
+//        }
+//
+//        if (!viewer.authorities.contains(viewer)) {
+//            UserRole.create viewer, roleUser
+//        }
 
         //permit all for assets and initial pages
         for (String url in [

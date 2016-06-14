@@ -3,6 +3,7 @@ package org.modelcatalogue.core.util.marshalling
 import grails.converters.JSON
 import grails.util.GrailsNameUtils
 import groovy.util.logging.Log4j
+import org.codehaus.groovy.runtime.InvokerInvocationException
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.audit.Change
@@ -51,18 +52,35 @@ class ChangeMarshaller extends AbstractMarshaller {
     }
 
     private static Object getPotentiallyDeletedInfo(Long id) {
-        CatalogueElement existing = CatalogueElement.get(id)
-        if (existing) {
-            return CatalogueElementMarshaller.minimalCatalogueElementJSON(existing)
+        try {
+            CatalogueElement existing = CatalogueElement.get(id)
+            if (existing) {
+                return CatalogueElementMarshaller.minimalCatalogueElementJSON(existing)
+            }
+
+            Change change = Change.findByChangedIdAndType(id, ChangeType.ELEMENT_DELETED)
+
+            if (change) {
+                def deleted = JSON.parse(change.oldValue as String)
+                deleted.deleted = true
+                return deleted
+            }
+        } catch (org.hibernate.InstantiationException ignored) {
+            log.warn("Error fetching changed element - the element is probably inconsistent: $id")
+        } catch (InvokerInvocationException e) {
+            if (e.cause instanceof org.hibernate.InstantiationException) {
+                log.warn("Error fetching changed element - the element is probably inconsistent: $id")
+            } else {
+                log.warn("Error fetching changed element - the element is probably inconsistent: $id", e)
+            }
+        } catch (Throwable e) {
+            if (e.cause instanceof org.hibernate.InstantiationException) {
+                log.warn("Error fetching changed element - the element is probably inconsistent: $id")
+            } else {
+                log.warn("Error fetching changed element - the element is probably inconsistent: $id", e)
+            }
         }
 
-        Change change = Change.findByChangedIdAndType(id, ChangeType.ELEMENT_DELETED)
-
-        if (change) {
-            def deleted = JSON.parse(change.oldValue as String)
-            deleted.deleted = true
-            return deleted
-        }
 
         return null
     }

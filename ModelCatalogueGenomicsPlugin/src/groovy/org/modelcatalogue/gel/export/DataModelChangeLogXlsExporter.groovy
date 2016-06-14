@@ -160,8 +160,9 @@ class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
                 return
         }
 
-        //don't recurse dataElements
-        if (model instanceof DataElement) return
+        if (!(model.instanceOf(DataClass))) {
+            return
+        }
 
         model.contains.each { CatalogueElement child ->
             descendModels(child, lines, level + 1, groupDescriptions, exclusions)
