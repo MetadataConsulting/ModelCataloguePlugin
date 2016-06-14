@@ -219,7 +219,7 @@ class AssetService {
 
         executorService.submit {
             auditService.withDefaultAuthorId(authorId) {
-                Asset updated = Asset.get(id)
+                Asset updated = Asset.getWithRetries(id)
                 try {
                     //do the hard work
                     storeAssetWithSteam(updated, assetParams.contentType?.toString(), worker)

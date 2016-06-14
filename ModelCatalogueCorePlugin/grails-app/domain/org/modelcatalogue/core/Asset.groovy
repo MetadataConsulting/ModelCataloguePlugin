@@ -18,4 +18,16 @@ class Asset extends CatalogueElement {
             incoming: [attachment: 'isAttachedTo']
     ]
 
+    static Asset getWithRetries(Serializable id, int attempts = 10) {
+        for (int i = 0; i < attempts ; i++) {
+            Asset found = Asset.get(id)
+            if (found) {
+                return found
+            } else {
+                sleep(1)
+            }
+        }
+        return null
+    }
+
 }
