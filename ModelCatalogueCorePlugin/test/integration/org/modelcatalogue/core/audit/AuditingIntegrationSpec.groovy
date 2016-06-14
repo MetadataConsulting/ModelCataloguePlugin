@@ -131,7 +131,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
     def "invalid updating property is not logged"() {
         String original = "The Data Type for Update Log"
-        String changed  = 'x' * 3000
+        String changed  = 'x' * 20001
 
         when:
         DataType type = new DataType(name: "DT4ULI", description: original).save(failOnError: true, flush: true)

@@ -69,7 +69,7 @@ class RelationshipService {
         if (!params.sort) {
             params.sort = direction.sortProperty
         }
-        Lists.fromCriteria(params, direction.composeWhere(element, type, ElementService.getStatusFromParams(params), element.instanceOf(User) ? DataModelFilter.NO_FILTER : DataModelFilter.from(modelCatalogueSecurityService.currentUser)))
+        Lists.fromCriteria(params, direction.composeWhere(element, type, ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')), element.instanceOf(User) ? DataModelFilter.NO_FILTER : DataModelFilter.from(modelCatalogueSecurityService.currentUser)))
     }
 
     /**
@@ -300,8 +300,10 @@ class RelationshipService {
             source.refresh()
 
             if (relationshipType == RelationshipType.baseType) {
-                for (Relationship relationship in new LinkedHashSet<Relationship>(source.outgoingRelationships)) {
-                    if (relationship.relationshipType.versionSpecific) {
+                Set<Long> destinations = new HashSet<Long>()
+                destinations.addAll(source.outgoingRelationships*.destination*.id)
+                for (Relationship relationship in new LinkedHashSet<Relationship>(destination.outgoingRelationships)) {
+                    if (relationship.relationshipType.versionSpecific && relationship.inherited && relationship.destination.id in destinations) {
                         unlink relationship.source, relationship.destination, relationship.relationshipType, relationship.dataModel, true, relationship.ext
                     }
                 }

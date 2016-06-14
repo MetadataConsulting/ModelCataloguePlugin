@@ -30,7 +30,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     ListWithTotalAndType<Relationship> search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
         String query = "%$params.search%"
 
-        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, ElementService.getStatusFromParams(params), getOverridableDataModelFilter(params))
+        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')), getOverridableDataModelFilter(params))
 
         if (query != '%*%') {
             switch (direction) {
@@ -71,7 +71,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                 ilike('modelCatalogueId', query)
             }
             if (params.status) {
-                criteria.'in'('status', ElementService.getStatusFromParams(params))
+                criteria.'in'('status', ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')))
             }
             return Lists.fromCriteria(params, criteria).customize {
                 it.collect { item -> CatalogueElementMarshaller.minimalCatalogueElementJSON(item) }

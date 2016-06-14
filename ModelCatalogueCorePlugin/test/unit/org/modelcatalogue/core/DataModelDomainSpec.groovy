@@ -31,7 +31,7 @@ class DataModelDomainSpec extends Specification {
         validates  | args
         false      | [name: "", description: "test concept description"]
         false      | [name:"t"*256, description: "test concept description"]
-        false      | [name:"test concept", description: "t"*2001]
+        false      | [name:"test concept", description: "t"*20001]
         true       | [name:"test concept", description: "test concept description"]
 
     }

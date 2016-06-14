@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import com.google.common.collect.ImmutableList
 import grails.gorm.DetachedCriteria
 import grails.util.Environment
 import grails.util.GrailsNameUtils
@@ -26,8 +27,6 @@ import rx.Observer
 
 class ElementService implements Publisher<CatalogueElement> {
 
-    public static final String DEPRECATED_DATA_CLASS_NAME = 'Obsolete'
-
     private static final Cache<Long, Integer> VERSION_COUNT_CACHE = CacheBuilder.newBuilder().initialCapacity(1000).build()
     private static Cache<Class, List<Class>> subclassesCache = CacheBuilder.newBuilder().initialCapacity(20).build()
 
@@ -36,23 +35,24 @@ class ElementService implements Publisher<CatalogueElement> {
     GrailsApplication grailsApplication
     RelationshipService relationshipService
     SearchCatalogue modelCatalogueSearchService
+    SecurityService modelCatalogueSecurityService
     def messageSource
     AuditService auditService
 
     List<CatalogueElement> list(Map params = [:]) {
-        CatalogueElement.findAllByStatusInList(getStatusFromParams(params), params)
+        CatalogueElement.findAllByStatusInList(getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')), params)
     }
 
     public <E extends CatalogueElement> List<E> list(params = [:], Class<E> resource) {
-        resource.findAllByStatusInList(getStatusFromParams(params), params)
+        resource.findAllByStatusInList(getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')), params)
     }
 
     Long count(params = [:]) {
-        CatalogueElement.countByStatusInList(getStatusFromParams(params))
+        CatalogueElement.countByStatusInList(getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')))
     }
 
     public <E extends CatalogueElement> Long count(params = [:], Class<E> resource) {
-        resource.countByStatusInList(getStatusFromParams(params))
+        resource.countByStatusInList(getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')))
     }
 
 
@@ -348,16 +348,20 @@ class ElementService implements Publisher<CatalogueElement> {
         }
     }
 
-    static List<ElementStatus> getStatusFromParams(params) {
+    static List<ElementStatus> getStatusFromParams(params, boolean canViewDrafts) {
         if (!params.status) {
-            return ElementStatus.values().toList()
-        } else if (params.status == 'active') {
-            return [ElementStatus.FINALIZED, ElementStatus.DRAFT]
+            return ImmutableList.copyOf(ElementStatus.values().toList())
+        }
+        if (params.status == 'active') {
+            if (canViewDrafts) {
+                return ImmutableList.of(ElementStatus.FINALIZED, ElementStatus.DRAFT)
+            }
+            return ImmutableList.of(ElementStatus.FINALIZED)
         }
         if (params.status instanceof ElementStatus) {
-            return [params.status as ElementStatus]
+            return ImmutableList.of(params.status as ElementStatus)
         }
-        return [ElementStatus.valueOf(params.status.toString().toUpperCase())]
+        return ImmutableList.of(ElementStatus.valueOf(params.status.toString().toUpperCase()))
     }
 
 

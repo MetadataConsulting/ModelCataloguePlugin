@@ -190,7 +190,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
     private void addRelation(Long id, String type, boolean outgoing, String minRole = 'CURATOR') {
         withRetryingTransaction {
-            if (!modelCatalogueSecurityService.hasRole(minRole)) {
+            if (minRole && !modelCatalogueSecurityService.hasRole(minRole)) {
                 notAuthorized()
                 return
             }
@@ -294,7 +294,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 type: type,
                 owner: element,
                 direction: direction,
-                list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), direction.composeWhere(element, type, ElementService.getStatusFromParams(params), overridableDataModelFilter))
+                list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), direction.composeWhere(element, type, ElementService.getStatusFromParams(params, true), overridableDataModelFilter))
         )
     }
 
@@ -402,7 +402,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     def index(Integer max) {
         handleParams(max)
 
-        if(params.status && !(params.status.toLowerCase() in ['finalized', 'deprecated']) && !modelCatalogueSecurityService.hasRole('VIEWER')) {
+        if(params.status && !(params.status.toLowerCase() in ['finalized', 'deprecated', 'active']) && !modelCatalogueSecurityService.hasRole('VIEWER')) {
             notAuthorized()
             return
         }
@@ -438,7 +438,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
         if (params.status) {
             return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
-                'in' 'status', ElementService.getStatusFromParams(params)
+                'in' 'status', ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER'))
             }), overridableDataModelFilter)
         }
 

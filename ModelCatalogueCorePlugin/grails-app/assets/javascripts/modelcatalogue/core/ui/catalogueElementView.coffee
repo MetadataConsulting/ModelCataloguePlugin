@@ -243,10 +243,10 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           for key in $scope.customMetadataKeys
             $scope.copy.ext.remove(key)
 
-          $scope.copy.ext.updateFrom($scope.customMetadata)
+          $scope.copy.ext.updateFrom($scope.customMetadata, true)
 
         $scope.messages.clearAllMessages()
-        
+
         catalogueElementResource($scope.copy.elementType).update($scope.copy).then (updated) ->
           $scope.element.updateFrom(updated)
 

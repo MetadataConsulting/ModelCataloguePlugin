@@ -60,7 +60,6 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         when: 'metadata are filled in'
         fillMetadata foo: 'bar', one: 'two'
 
-
         and: 'children step is clicked'
         click stepChildren
 
