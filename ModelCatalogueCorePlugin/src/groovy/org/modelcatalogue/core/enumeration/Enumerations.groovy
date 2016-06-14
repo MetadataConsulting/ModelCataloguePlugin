@@ -18,7 +18,7 @@ import groovy.transform.CompileStatic
         }
 
         if (o instanceof Map) {
-            return from(o as Map<String, String>)
+            return from(o as Map<String, Object>)
         }
 
         throw new IllegalArgumentException("Cannot create enumeration from $o")
@@ -41,8 +41,9 @@ import groovy.transform.CompileStatic
                         continue
                     }
 
+                    boolean deprecated = value.deprecated?.toBoolean() ? true : false
                     if (!value.id) {
-                        enumerations.put(value.key?.toString(), value.value?.toString())
+                        enumerations.put(value.key?.toString(), value.value?.toString(), deprecated)
                     }
 
                     Long id
@@ -52,7 +53,7 @@ import groovy.transform.CompileStatic
                         id = Long.parseLong(value.id.toString(), 10)
                     }
 
-                    enumerations.put(id, value.key?.toString(), value.value?.toString())
+                    enumerations.put(id, value.key?.toString(), value.value?.toString(), deprecated)
                 }
 
                 return enumerations
@@ -66,7 +67,7 @@ import groovy.transform.CompileStatic
     }
 
     @CompileDynamic
-    static Enumerations from(Map<String, String> enumerations) {
+    static Enumerations from(Map<String, Object> enumerations) {
         if (!enumerations) {
             return new Enumerations()
         }
@@ -78,10 +79,11 @@ import groovy.transform.CompileStatic
                     continue
                 }
                 Long id = (value.id as Number)?.longValue()
+                boolean deprecated = value.deprecated ? true : false
                 if (id != null) {
-                    enums.put(id, value.key?.toString(), value.value?.toString())
+                    enums.put(id, value.key?.toString(), value.value?.toString(), deprecated)
                 } else {
-                    enums.put(value.key?.toString(), value.value?.toString())
+                    enums.put(value.key?.toString(), value.value?.toString(), deprecated)
                 }
             }
             return enums
@@ -148,29 +150,29 @@ import groovy.transform.CompileStatic
         return enumerationsById.get(id)
     }
 
-    String put(Long id, String key, String value) {
+    String put(Long id, String key, String value, boolean deprecated = false) {
         genid = Math.max(genid, id) + 1
 
         Enumeration existing = enumerationsById.get(id)
 
         if (existing) {
-            return replaceExistingEnumeration(id, key, value, existing)
+            return replaceExistingEnumeration(id, key, value, deprecated, existing)
         }
 
         existing = enumerationsByKeys.get(key)
         if (existing) {
-            return replaceExistingEnumeration(id, key, value, existing)
+            return replaceExistingEnumeration(id, key, value, deprecated, existing)
         }
 
-        Enumeration newOne = Enumeration.create(id, key, value)
+        Enumeration newOne = Enumeration.create(id, key, value, deprecated)
         enumerations.add(newOne)
         enumerationsByKeys.put(key, newOne)
         enumerationsById.put(id, newOne)
         return null
     }
 
-    private String replaceExistingEnumeration(long id, String key, String value, Enumeration existing) {
-        Enumeration newOne = Enumeration.create(id, key, value)
+    private String replaceExistingEnumeration(long id, String key, String value, boolean deprecated, Enumeration existing) {
+        Enumeration newOne = Enumeration.create(id, key, value, deprecated)
         enumerationsByKeys.remove(existing.key)
         enumerationsByKeys.put(key, newOne)
         enumerationsById.remove(existing.id)
@@ -178,6 +180,10 @@ import groovy.transform.CompileStatic
         enumerations.remove(existing)
         enumerations.add(newOne)
         return existing.value
+    }
+
+    String put(String key, String value, boolean deprecated) {
+        put(genid, key, value ?: '', deprecated)
     }
 
     @Override
@@ -251,6 +257,6 @@ import groovy.transform.CompileStatic
     }
 
     Map<String, Object> toJsonMap() {
-        [type: 'orderedMap', values: enumerations.collect { [id: it.id, key: it.key, value: it.value ] }]
+        [type: 'orderedMap', values: enumerations.collect { [id: it.id, key: it.key, value: it.value, deprecated: it.deprecated] }]
     }
 }
