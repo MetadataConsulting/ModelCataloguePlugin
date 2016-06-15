@@ -20,7 +20,7 @@ class PrimitiveType extends DataType {
     Iterable<String> getInheritedAssociationsNames() { Iterables.concat(super.inheritedAssociationsNames, ImmutableSet.of('measurementUnit')) }
 
     List<CatalogueElement> collectExternalDependencies() {
-        if (measurementUnit?.dataModel != dataModel) {
+        if (measurementUnit && measurementUnit.dataModel != dataModel) {
             return [measurementUnit]
         }
         return super.collectExternalDependencies()
