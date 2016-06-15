@@ -336,10 +336,10 @@ abstract class AbstractChangeLogGenerator {
 
             def value = LoggingAuditor.readValue(deleteChange.oldValue)
 
-            String heading = "${value.destination.name} ($value.destination.latestVersionId@${value.destination.dataModel?.semanticVersion ?: value.destination.semanticVersion}, $value.destination.status)"
+            String heading = value.destination.classifiedName
 
             if (configuration.incoming) {
-                heading = "${value.source.name} (${value.source.getCombinedVersion()}, $value.source.status)"
+                heading = value.source.classifiedName
             }
 
             changeItemsByHeading[heading].title = configuration.removedRelationshipNote

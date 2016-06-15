@@ -615,8 +615,10 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
                     if (destinationMap.classifiedName && destinationMap.classifiedName instanceof String) { // classifiedName acts as a filter
                         String name = "${destinationMap.name ?: ''}"
                         String semanticVersion
-                        if(destinationMap.semanticVersion && destinationMap.semanticVersion instanceof String) {
-                            semanticVersion = "${destinationMap.semanticVersion ?: ''}"
+                        if(destinationMap.semanticVersion instanceof String) {
+                            semanticVersion = destinationMap.semanticVersion
+                        } else if(destinationMap.dataModel?.semanticVersion instanceof String) {
+                            semanticVersion = destinationMap.dataModel.semanticVersion
                         } else {
                             String version = destinationMap.versionNumber instanceof String ? destinationMap.versionNumber : "1"
                             semanticVersion = "0.0.${version}"
