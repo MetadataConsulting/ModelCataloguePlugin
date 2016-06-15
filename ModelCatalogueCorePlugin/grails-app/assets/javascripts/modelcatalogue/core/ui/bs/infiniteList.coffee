@@ -2,7 +2,7 @@ angular.module('mc.core.ui.bs.infiniteList', ['mc.core.ui.infiniteList', 'ngSani
     $templateCache.put 'modelcatalogue/core/ui/infinitePanels.html', '''
     <div>
       <div class="row" infinite-scroll="loadMore()" infinite-scroll-disabled="loading || !isVisible()" infinite-scroll-distance="2" infinite-scroll-immediate-check="isVisible()" infinite-scroll-listen-for-event="infiniteList:filtered">
-        <div ng-repeat="item in elements track by item.link" ng-init="element = getElement(item)" class="not-editable infinite-scroll-item col-lg-12 col-sm-12 col-md-12" >
+        <div ng-repeat="item in elements track by item.id" ng-init="element = getElement(item)" class="not-editable infinite-scroll-item col-lg-12 col-sm-12 col-md-12" >
           <div class="panel" ng-class="{'panel-warning': element.status == 'DRAFT', 'panel-info': element.status == 'PENDING', 'panel-default': element.status == 'FINALIZED' || !element.status, 'panel-danger': element.status == 'DEPRECATED'}">
             <div class="panel-heading">
               <h3 class="panel-title" title="{{element.name}}"><a class="full-width-link" ng-href="{{href(element)}}"><span ng-class="element.getIcon()" class="text-muted"></span> {{element.name}} <small>{{element.getDataModelWithVersion()}}</small><span class="small pull-right fa fa-fw fa-external-link"></span></a> </h3>
