@@ -25,7 +25,7 @@ class ReferenceType extends DataType {
     }
 
     List<CatalogueElement> collectExternalDependencies() {
-        if (dataClass?.dataModel != dataModel) {
+        if (dataClass && dataClass.dataModel != dataModel) {
             return [dataClass]
         }
         return super.collectExternalDependencies()

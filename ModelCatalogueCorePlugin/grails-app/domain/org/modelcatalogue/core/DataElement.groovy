@@ -33,7 +33,7 @@ class DataElement extends CatalogueElement {
     }
 
     List<CatalogueElement> collectExternalDependencies() {
-        if (dataType?.dataModel != dataModel) {
+        if (dataType && dataType.dataModel != dataModel) {
             return [dataType]
         }
         return super.collectExternalDependencies()
