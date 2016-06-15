@@ -123,7 +123,7 @@ class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
     @Override
     List<String> searchExportSpecificTypes(CatalogueElement model, List lines, groupDescriptions, level) {
         levelIdStack.put(level,model.id)
-        checkChangeLog(model, lines, groupDescriptions, level, TOP_LEVEL_RELATIONSHIP_TYPES)
+        checkChangeLog(model, lines, groupDescriptions, level, DETAIL_CHANGE_TYPES)
         iterateChildren(model, lines, groupDescriptions, level, DETAIL_CHANGE_TYPES)
 
         lines
@@ -152,7 +152,7 @@ class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
                 if (model instanceof DataClass) {
                     lines = searchExportSpecificTypes(model, lines, groupDescriptions, level)
                 } else {
-                    checkChangeLog(model, lines, groupDescriptions, level, TOP_LEVEL_RELATIONSHIP_TYPES)
+                    checkChangeLog(model, lines, groupDescriptions, level, DETAIL_CHANGE_TYPES)
                 }
                 return  //don't go deeper
 

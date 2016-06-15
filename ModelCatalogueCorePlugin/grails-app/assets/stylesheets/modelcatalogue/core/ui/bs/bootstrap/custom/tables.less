@@ -1,3 +1,5 @@
+@import "../../../../../mixins/vendor-prefixes.less";
+
 // Inline table w/ no padding
 
 .table-inline {
@@ -31,4 +33,12 @@
 
 .table-no-margin {
   margin-bottom: 0;
+}
+
+.table-expand {
+  > tbody, & {
+    > tr:last-child > td {
+      .box-shadow(inset 0px -16px 24px -24px rgba(0,0,0,1));
+    }
+  }
 }

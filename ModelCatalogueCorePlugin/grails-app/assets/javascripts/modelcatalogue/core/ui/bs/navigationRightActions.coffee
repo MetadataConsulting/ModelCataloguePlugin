@@ -88,6 +88,16 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     }
   ]
 
+  actionsProvider.registerChildAction 'admin-menu', 'user-admin', ($window, security) ->
+    "ngInject"
+    {
+      position:   1000
+      icon:       'fa fa-fw fa-user-plus'
+      label:      'Users'
+      action: ->
+        $window.open("#{security.contextPath}/userAdmin")
+    }
+
   actionsProvider.registerChildAction 'admin-menu', 'relationship-types', ['$state', ($state) ->
     {
       position:   2000
@@ -97,8 +107,6 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
         $state.go 'simple.resource.list', resource: 'relationshipType'
     }
   ]
-
-
 
   actionsProvider.registerChildAction 'admin-menu', 'data-model-policies', ['$state', ($state) ->
     {
@@ -158,6 +166,15 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   actionsProvider.registerActionInRoles 'reindex-catalogue', [actionsProvider.ROLE_GLOBAL_ACTION], reindexCatalogue
   actionsProvider.registerChildAction 'admin-menu', 'reindex-catalogue-child', reindexCatalogue
 
+  actionsProvider.registerChildAction 'admin-menu', 'monitoring', ($window, security) ->
+    "ngInject"
+    {
+      position:   10300
+      icon:       'fa fa-fw fa-cogs'
+      label:      'Monitoring'
+      action: ->
+        $window.open("#{security.contextPath}/monitoring")
+    }
 
   actionsProvider.registerActionInRole 'curator-menu', actionsProvider.ROLE_NAVIGATION_RIGHT, ['security', (security) ->
     return undefined unless security.hasRole('CURATOR')
@@ -272,7 +289,6 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   actionsProvider.registerChildAction 'curator-menu', 'import-mc', mcImport
   actionsProvider.registerActionInRole 'global-import-mc', actionsProvider.ROLE_GLOBAL_ACTION, mcImport
 
-
   xmlImport = ($scope, messages, security) ->
     'ngInject'
     return undefined if not security.hasRole('CURATOR')
@@ -288,4 +304,18 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   actionsProvider.registerChildAction 'curator-menu', 'import-catalogue-xml', xmlImport
   actionsProvider.registerActionInRole 'global-import-xml', actionsProvider.ROLE_GLOBAL_ACTION, xmlImport
 
+  rareDiseaseCsvImport = ($scope, messages, security) ->
+    'ngInject'
+    return undefined if not security.hasRole('CURATOR')
+    {
+      position: 13007
+      label: "Import Rare Disease Csv"
+      icon:  'fa fa-upload fa-fw'
+      action: ->
+        messages.prompt('Import Rare Disease Csv File', '', type: 'new-rare-disease-csv-import')
+    }
+  actionsProvider.registerChildAction 'new-import', 'rare-disease-csv', rareDiseaseCsvImport
+  actionsProvider.registerChildAction 'import-data-models-screen', 'rare-disease-csv', rareDiseaseCsvImport
+  actionsProvider.registerChildAction 'curator-menu', 'rare-disease-csv', rareDiseaseCsvImport
+  actionsProvider.registerActionInRole 'global-import-csv', actionsProvider.ROLE_GLOBAL_ACTION, rareDiseaseCsvImport
 ]

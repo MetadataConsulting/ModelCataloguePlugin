@@ -82,7 +82,7 @@ class RareDiseaseEligibilityChangeLogXlsExporter extends RareDiseaseChangeLogXls
     List<String> searchExportSpecificTypes(CatalogueElement model, List lines, groupDescriptions, level) {
         levelIdStack.put(level,model.id)
         if (model.name.matches("(?i:.*Eligibility.*)")) {
-            checkChangeLog(model, lines, groupDescriptions, level, TOP_LEVEL_RELATIONSHIP_TYPES)
+            checkChangeLog(model, lines, groupDescriptions, level, DETAIL_CHANGE_TYPES)
             iterateChildren(model, lines, groupDescriptions, level, DETAIL_CHANGE_TYPES)
         }
 

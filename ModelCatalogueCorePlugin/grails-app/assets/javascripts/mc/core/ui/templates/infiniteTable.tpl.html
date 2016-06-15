@@ -21,7 +21,7 @@
   <div class="inf-table-spacer">
   </div>
   <div class="inf-table-body">
-    <table class="inf-table table">
+    <table class="inf-table table" ng-class="{'table-expand': manualLoad && total != elements.length && elements.length > 0}">
       <tbody ng-if="rows" sortable="sortableOptions">
       <tr class="inf-table-item-row" ng-repeat-start="row in rows" ng-class="row.classesForStatus">
         <td class="inf-table-item-cell" ng-class="row.head.classes" ng-switch="row.head.type">
@@ -76,12 +76,16 @@
             <tr class="active" ng-if="loading">
               <td class="text-center">
                 <span class="fa fa-fw fa-refresh fa-spin"></span>
-                <span class="pull-right text-muted" ng-if="total != 0"><em>{{elements.length}} of {{total}}</em></span>
-                <span class="pull-right text-muted" ng-if="total == 0"><em>Empty</em></span>
               </td>
               <td class="col-md-1"></td>
             </tr>
-            <tr class="active inf-table-footer-action cursor-pointer" ng-if="!loading" ng-click="footerAction.run()">
+            <tr class="active cursor-pointer" ng-if="!loading && manualLoad && total != elements.length && elements.length > 0" ng-click="loadMore()">
+              <td class="text-center">
+                <span class="fa fa-angle-double-down"></span>
+              </td>
+              <td class="col-md-1"></td>
+            </tr>
+            <tr class="active inf-table-footer-action cursor-pointer" ng-click="footerAction.run()">
               <td class="text-center">
                 <span class="fa" ng-class="getFooterCentralIconClass()"></span>
               </td>
@@ -89,12 +93,6 @@
                 <span class="pull-right text-muted" ng-if="total != 0"><em>{{elements.length}} of {{total}}</em></span>
                 <span class="pull-right text-muted" ng-if="total == 0"><em>Empty</em></span>
               </td>
-            </tr>
-            <tr class="active cursor-pointer" ng-if="manualLoad &amp;&amp; total != elements.length &amp;&amp; elements.length > 0" ng-click="loadMore()">
-              <td class="text-center">
-                <span class="fa fa-angle-double-down"></span>
-              </td>
-              <td class="col-md-1"></td>
             </tr>
             </tfoot>
           </table>

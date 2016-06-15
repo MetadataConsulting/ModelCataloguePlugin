@@ -24,6 +24,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
           $scope.reset = ->
             $scope.args = args
             $scope.dataClass = {dataModels: []}
+            $scope.dataClass.name = args.name
             $scope.metadata = orderedMapEnhancer.emptyOrderedMap()
             $scope.parent = {ext: orderedMapEnhancer.emptyOrderedMap()}
             $scope.parents = []

@@ -50,7 +50,7 @@ class UserController extends AbstractCatalogueElementController<User> {
     }
 
     def favourite(Long id) {
-        addRelation(id, 'favourite', true, 'VIEWER')
+        addRelation(id, 'favourite', true, null)
     }
 
 }

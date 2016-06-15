@@ -47,6 +47,7 @@ module.config ['messagesProvider', (messagesProvider)->
         controller: ['$scope', 'catalogueElementResource', '$modalInstance', '$window', '$state', 'security', 'messages', ($scope, catalogueElementResource, $modalInstance, $window, $state, security, messages) ->
           $scope.title = title
           $scope.currentDataModel = args.currentDataModel
+          $scope.query = args.query
 
           if args.global == 'allow'
             $scope.allowGlobal = true
