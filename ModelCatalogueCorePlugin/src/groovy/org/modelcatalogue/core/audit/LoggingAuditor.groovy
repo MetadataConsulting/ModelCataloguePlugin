@@ -407,24 +407,43 @@ abstract class LoggingAuditor extends AbstractAuditor {
                 .build()
         }
         if (object instanceof Mapping) {
+            if (object.mapping) {
+                return ImmutableMap.of(
+                    'source',  objectToStore(object.source),
+                    'destination', objectToStore(object.destination),
+                    'mapping', object.mapping,
+                    'id', object.id
+                )
+            }
             return ImmutableMap.of(
                 'source',  objectToStore(object.source),
                 'destination', objectToStore(object.destination),
-                'mapping', object.mapping,
                 'id', object.id
             )
         }
         if (object instanceof RelationshipMetadata) {
+            if (object.extensionValue) {
+                return ImmutableMap.of(
+                    'name', object.name,
+                    'extensionValue', object.extensionValue,
+                    'relationship', objectToStore(object.relationship)
+                )
+            }
             return ImmutableMap.of(
                 'name', object.name,
-                'extensionValue', object.extensionValue,
                 'relationship', objectToStore(object.relationship)
             )
         }
         if (object instanceof ExtensionValue) {
+            if (object.extensionValue) {
+                return ImmutableMap.of(
+                    'name', object.name,
+                    'extensionValue', object.extensionValue,
+                    'element', objectToStore(object.element)
+                )
+            }
             return ImmutableMap.of(
                 'name', object.name,
-                'extensionValue', object.extensionValue,
                 'element', objectToStore(object.element)
             )
         }
