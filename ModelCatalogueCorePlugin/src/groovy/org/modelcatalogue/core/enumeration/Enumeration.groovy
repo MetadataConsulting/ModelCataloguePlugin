@@ -8,7 +8,7 @@ import groovy.transform.PackageScope
     final Long id
     final String key
     final String value
-    final boolean deprecated = false
+    final boolean deprecated
 
     @PackageScope static Enumeration create(Long id, String key, String value, boolean deprecated = false) {
         return new Enumeration(id, key, value, deprecated)

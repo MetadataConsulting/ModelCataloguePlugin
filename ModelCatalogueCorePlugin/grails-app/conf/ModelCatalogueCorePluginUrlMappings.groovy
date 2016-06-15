@@ -30,6 +30,7 @@ class ModelCatalogueCorePluginUrlMappings {
 
             "/api/modelCatalogue/core/$elementName/search/$search?" (controller: controllerName, action: 'search', method: HttpMethod.GET)
             "/api/modelCatalogue/core/$elementName/$id/validate" (controller: controllerName, action: 'validate', method: HttpMethod.POST)
+            "/api/modelCatalogue/core/$elementName/$id/setDeprecated" (controller: controllerName, action: 'setDeprecated', method: HttpMethod.POST)
             "/api/modelCatalogue/core/$elementName/validate" (controller: controllerName, action: 'validate', method: HttpMethod.POST)
             "/api/modelCatalogue/core/$elementName/$id" (controller: controllerName, action: 'show', method: HttpMethod.GET)
             "/api/modelCatalogue/core/$elementName/$id" (controller: controllerName, action: 'update', method: HttpMethod.PUT)

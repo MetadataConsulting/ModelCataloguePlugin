@@ -10,16 +10,16 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
     templateUrl: '/mc/core/ui/catalogueElementView.html'
 
     controller: [
-     '$scope', '$filter', '$q', '$timeout', '$state', 'enhance', 'names', 'columns', 'messages', '$element', '$rootScope', 'security', 'catalogueElementProperties', '$injector', 'applicationTitle', 'catalogue', 'catalogueElementResource', 'detailSections',
-     ($scope ,  $filter ,  $q ,  $timeout ,  $state ,  enhance ,  names ,  columns ,  messages ,  $element ,  $rootScope ,  security ,  catalogueElementProperties ,  $injector ,  applicationTitle ,  catalogue ,  catalogueElementResource ,  detailSections) ->
-      showErrorsUsingMessages = (messages) ->
+     '$scope', '$filter', '$q', '$timeout', '$state', 'enhance', 'names', 'columns', 'messages', '$element', '$rootScope', 'security', 'catalogueElementProperties', '$injector', 'applicationTitle', 'catalogue', 'catalogueElementResource', 'detailSections', 'rest', 'modelCatalogueApiRoot',
+     ($scope ,  $filter ,  $q ,  $timeout ,  $state ,  enhance ,  names ,  columns ,  messages ,  $element ,  $rootScope ,  security ,  catalogueElementProperties ,  $injector ,  applicationTitle ,  catalogue ,  catalogueElementResource ,  detailSections, rest, modelCatalogueApiRoot) ->
+      showErrorsUsingMessages = (localMessages) ->
         (response) ->
           if response?.data and response.data.errors
             if angular.isString response.data.errors
-              messages.error response.data.errors
+              localMessages.error response.data.errors
             else
               for err in response.data.errors
-                messages.error err.message
+                localMessages.error err.message
 
       getTabDefinition = (element, name, value) ->
         possibilities = ["#{element.elementType}.#{name}"]
@@ -41,6 +41,9 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       $scope.property ?= $rootScope?.$stateParams?.property
       $scope.reports  = []
       $scope.messages = messages.createNewMessages()
+      $scope.rest = rest
+      $scope.modelCatalogueApiRoot = modelCatalogueApiRoot
+      $scope.globalMessages = messages
 
 
 

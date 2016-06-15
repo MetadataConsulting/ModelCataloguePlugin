@@ -6,6 +6,8 @@ import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 
+import static org.springframework.http.HttpStatus.OK
+
 class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
 
     EnumeratedTypeController() {
@@ -37,6 +39,24 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
         }
 
         respond Lists.wrap(params, "/${resourceName}/${params.id}/content", list)
+    }
+
+    def setDeprecated() {
+        def jsonPayload = request.JSON
+        def enumeratedType = EnumeratedType.get(params.id)
+
+        if (!enumeratedType) {
+            notFound()
+            return
+        }
+
+        def enumerations = enumeratedType.enumerationsObject
+        println enumerations.toJsonString()
+        enumeratedType.setEnumerations(enumerations.withDeprecatedEnumeration(jsonPayload.enumerationId, jsonPayload.deprecated))
+
+        enumeratedType.save(failOnError: true)
+
+        respond enumeratedType, [status: OK]
     }
 
     @Override

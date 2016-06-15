@@ -130,6 +130,35 @@ class EnumerationsSpec extends Specification {
 
     }
 
+
+    def "deprecate by id"() {
+        Enumerations enumerations = Enumerations.create()
+        enumerations.put(5, "foo", "bar")
+        enumerations.put(6, "zoo", "war")
+
+        expect:
+        enumerations.size() == 2
+        enumerations.containsKey("foo")
+        enumerations.containsKey("zoo")
+
+        enumerations.asList()[0].key == 'foo'
+        enumerations.asList()[1].key == 'zoo'
+
+        when:
+        Enumerations withDeprecatedFoo = enumerations.withDeprecatedEnumeration(5, true)
+        Enumeration fooDeprecated = withDeprecatedFoo.getEnumerationById(5)
+
+        then:
+        fooDeprecated
+        fooDeprecated.key == 'foo'
+        fooDeprecated.deprecated
+
+        withDeprecatedFoo.size() == 2
+
+        withDeprecatedFoo.asList()[0].key == 'foo'
+        withDeprecatedFoo.asList()[1].key == 'zoo'
+    }
+
     private static Map<String, Object> getJsonEnumerationsMap() {
         return [
             type: 'orderedMap',

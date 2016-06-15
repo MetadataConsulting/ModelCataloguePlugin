@@ -2,7 +2,6 @@ package org.modelcatalogue.core.enumeration
 
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
-import groovy.json.internal.Exceptions.JsonInternalException
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
@@ -258,5 +257,13 @@ import groovy.transform.CompileStatic
 
     Map<String, Object> toJsonMap() {
         [type: 'orderedMap', values: enumerations.collect { [id: it.id, key: it.key, value: it.value, deprecated: it.deprecated] }]
+    }
+
+    @CompileDynamic
+    Enumerations withDeprecatedEnumeration(Long id, boolean deprecated) {
+        Map<String, Object> asJson = toJsonMap()
+        List<Map<String, Object>> values = asJson.values
+        values.find({ it.id == id }).deprecated = deprecated
+        return from(asJson)
     }
 }
