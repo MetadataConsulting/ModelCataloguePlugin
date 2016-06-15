@@ -10,7 +10,7 @@ SessionFactory sessionFactory = ctx.getBean(SessionFactory)
 
 @Field JsonSlurper slurper = new JsonSlurper()
 @Field List<String> keysToRemove = ImmutableList.of('dateCreated', 'versionCreated', 'lastUpdated', 'classification', 'archived', 'ext', 'description', 'enumerations', 'internalModelCatalogueId', 'modelCatalogueId')
-@Field List<String> nestedToClean = ImmutableList.of('source', 'destination', 'dataModel', 'dataType', 'measurementUnit', 'unitOfMeasure', 'relationship', 'element')
+@Field List<String> nestedToClean = ImmutableList.of('source', 'destination', 'dataModel', 'dataType', 'measurementUnit', 'unitOfMeasure')
 
 BuildProgressMonitor monitor = BuildProgressMonitor.create('Truncate changes', 123)
 
@@ -21,7 +21,7 @@ BuildProgressMonitor monitor = BuildProgressMonitor.create('Truncate changes', 1
 
         Map<Long, List<String>> values = [:].withDefault { [] }
 
-        sql.eachRow("SELECT id, old_value, new_value FROM `change` limit 1000 offset ${count * pageSize}") { row ->
+        sql.eachRow("SELECT id, old_value, new_value FROM `change` limit 1000 offset ${count * 1000}") { row ->
             trimValues(row, values)
         }
 
