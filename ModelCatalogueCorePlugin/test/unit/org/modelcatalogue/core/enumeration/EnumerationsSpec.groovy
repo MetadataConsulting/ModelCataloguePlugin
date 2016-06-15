@@ -163,9 +163,9 @@ class EnumerationsSpec extends Specification {
         return [
             type: 'orderedMap',
             values: [
-                [id: 1, key: '01', value: 'one'],
-                [id: 2, key: '02', value: 'two'],
-                [id: 3, key: '03', value: 'three'],
+                [id: 1, key: '01', value: 'one', deprecated: false],
+                [id: 2, key: '02', value: 'two', deprecated: true],
+                [id: 3, key: '03', value: 'three', deprecated: false],
         ]]
     }
 
