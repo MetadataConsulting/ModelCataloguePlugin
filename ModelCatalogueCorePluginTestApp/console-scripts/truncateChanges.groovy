@@ -10,7 +10,7 @@ SessionFactory sessionFactory = ctx.getBean(SessionFactory)
 
 @Field JsonSlurper slurper = new JsonSlurper()
 @Field List<String> keysToRemove = ImmutableList.of('dateCreated', 'versionCreated', 'lastUpdated', 'classification', 'archived', 'ext', 'description', 'enumerations', 'internalModelCatalogueId', 'modelCatalogueId')
-@Field List<String> nestedToClean = ImmutableList.of('source', 'destination', 'dataModel', 'dataType', 'measurementUnit', 'unitOfMeasure')
+@Field List<String> nestedToClean = ImmutableList.of('source', 'destination', 'dataModel', 'dataType', 'measurementUnit', 'unitOfMeasure', 'relationship', 'element')
 
 BuildProgressMonitor monitor = BuildProgressMonitor.create('Truncate changes', 123)
 
