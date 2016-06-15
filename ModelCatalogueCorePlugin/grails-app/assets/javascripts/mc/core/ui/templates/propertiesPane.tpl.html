@@ -4,7 +4,7 @@
   <th class="col-md-6">{{valueTitle}}</th>
   </thead>
   <tbody>
-  <tr class="pp-table-property-row" ng-repeat="property in properties track by property.value" ng-switch="displayType(property.value, item)"
+  <tr class="pp-table-property-row" ng-repeat="property in properties track by property.label" ng-switch="displayType(property.value, item)"
       ng-init="theValue = evaluateValue(property.value, item)">
     <th class="pp-table-property-label col-md-4">{{property.label}}</th>
     <td class="pp-table-property-value-no-wrap col-md-8 pp-table-property-element-value"
