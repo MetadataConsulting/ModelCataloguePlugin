@@ -271,6 +271,18 @@ abstract class AbstractChangeLogGenerator {
         }.items
     }
 
+    protected List<Change> getChangesAfterDate(CatalogueElement element, Date startDate, ChangeType... types) {
+        auditService.getChanges(element, sort: 'dateCreated', order: 'asc'){
+            ne 'undone', true
+            isNull 'parentId'
+            gt 'dateCreated', startDate
+
+            if (types) {
+                inList 'type', types.toList()
+            }
+        }.items
+    }
+
     protected Map<String, RelationshipChangeItem> collectRelationshipChanges(RelationshipChangesCheckConfiguration configuration) {
         Map<String, RelationshipChangeItem> changeItemsByHeading = new TreeMap<String, RelationshipChangeItem>().withDefault {
             new RelationshipChangeItem()

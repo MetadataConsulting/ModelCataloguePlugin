@@ -56,6 +56,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     Map<Integer,Long> levelIdStack                      // ids in the current stack
     ListMultimap<Long,List<String>> cachedChanges       // id and the cached changes for this model (string is ',' joined)
     Map<Integer, String> levelNameStack = new HashMap<>()
+    private Date modelCreation
 
 
     public enum RareDiseaseChangeType {
@@ -110,6 +111,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
         visitedModels = new HashMap<>()
         levelIdStack = new HashMap<>()
         cachedChanges = ArrayListMultimap.create()
+        modelCreation = model.dataModel.dateCreated
 
         log.info "Exporting Rare Diseases as xls ${model.name} (${model.combinedVersion})"
 
@@ -229,7 +231,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
             return
         }
 
-        List<Change> allChanged = getChanges(model, typesToCheck.toArray(new ChangeType[0]))
+        List<Change> allChanged = getChangesAfterDate(model, modelCreation, typesToCheck.toArray(new ChangeType[0]))
         callCount++
 
 
