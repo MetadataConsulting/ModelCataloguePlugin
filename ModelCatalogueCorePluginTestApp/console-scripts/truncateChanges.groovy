@@ -21,7 +21,7 @@ BuildProgressMonitor monitor = BuildProgressMonitor.create('Truncate changes', 1
 
         Map<Long, List<String>> values = [:].withDefault { [] }
 
-        sql.eachRow("SELECT id, old_value, new_value FROM `change` limit 1000 offset ${count * pageSize}") { row ->
+        sql.eachRow("SELECT id, old_value, new_value FROM `change` limit 1000 offset ${count * 1000}") { row ->
             trimValues(row, values)
         }
 
