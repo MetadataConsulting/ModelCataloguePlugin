@@ -8,7 +8,6 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.integration.excel.ExcelLoader
 import org.modelcatalogue.integration.excel.HeadersMap
-import org.openqa.selenium.By
 import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Stepwise
@@ -34,7 +33,8 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
     def "go to login"() {
         when:
         loginAdmin()
-        select 'Rare Disease Conditions'
+        select "Test 1"
+        selectInTree "Test 1"
         selectInTree "Assets"
 
         then:

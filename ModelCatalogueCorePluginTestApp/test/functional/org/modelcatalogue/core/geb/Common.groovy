@@ -21,6 +21,7 @@ class Common {
 
     static final String status = "h3 small a.label"
     static final String rightSideTitle = "h3:not(.ng-hide):not(.data-model-heading)"
+    static final String rightSideDescription = "small.ce-description.ng-scope.ng-binding.editable"
     static final String wizard = 'div.basic-edit-modal-prompt'
     static final String modalDialog = "div.modal"
     static final String modalHeader = "div.modal-header h4"

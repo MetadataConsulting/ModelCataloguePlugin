@@ -4,9 +4,6 @@ import geb.Browser
 import geb.navigator.Navigator
 import geb.spock.GebReportingSpec
 import geb.waiting.WaitTimeoutException
-import grails.util.Holders
-import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.ElementService
 import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.StaleElementReferenceException
 import org.openqa.selenium.logging.LogEntries
@@ -16,8 +13,6 @@ import org.openqa.selenium.logging.LogType
 import static org.modelcatalogue.core.geb.Common.*
 
 abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
-
-//    ElementService elementService
 
     // keep the passwords simply stupid, they are only for dev/test or very first setup
     // sauce labs connector for some reason fails with the six in the input
@@ -36,60 +31,70 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         }
     }
 
-    DataModelNavigator select(String dataModelName) {
+    DataModelNavigator select(String dataModelName, boolean latest = false) {
 
-        for (int i = 0; i < 10; i++) {
-            try {
-                go "#/dataModels?type=catalogue&q=${URLEncoder.encode(dataModelName, 'UTF-8')}"
+        if(latest){
+            for (int i = 0; i < 10; i++) {
+                try {
 
-                waitFor {
-                    title == 'Data Models'
-                }
-                waitFor {
-                    $("h3.panel-title", title: dataModelName).displayed
-                }
-                break
-            } catch (e) {
-                if (i == 9) {
-                    throw e
-                }
-            }
-        }
+                    go "#/dataModels?type=catalogue&q=${URLEncoder.encode(dataModelName, 'UTF-8')}"
 
+                    waitFor {
+                        title == 'Data Models'
+                    }
 
-        for (int i = 0; i < 10; i++) {
-            try {
-                noStale({$("h3.panel-title", title: dataModelName)}) {
-                    it.find('a.full-width-link').click()
-                }
-                check rightSideTitle contains dataModelName
-                break
-            } catch (e) {
-                if (i == 9) {
-                    throw e
+                    String modelCatalogueId = $("div.col-md-9.ng-scope").eq(2).text()
+                    println "modelCatalogueId: $modelCatalogueId"
+                    String url = modelCatalogueId.substring(0,modelCatalogueId.indexOf('@'))
+                    println "url: $url"
+                    go url
+
+                    waitFor {
+                        title ==~ "Activity of $dataModelName"
+                    }
+
+                    break
+                } catch (e) {
+                    if (i == 9) {
+                        throw e
+                    }
                 }
             }
 
-        }
+        } else {
 
-        return new DataModelNavigator(this)
-    }
+            for (int i = 0; i < 10; i++) {
+                try {
+                    go "#/dataModels?type=catalogue&q=${URLEncoder.encode(dataModelName, 'UTF-8')}"
 
-    DataModelNavigator selectLatestVersion(String dataModelId, String dataModelName) {
+                    waitFor {
+                        title == 'Data Models'
+                    }
+                    waitFor {
+                        $("h3.panel-title", title: dataModelName).displayed
+                    }
+                    break
+                } catch (e) {
+                    if (i == 9) {
+                        throw e
+                    }
+                }
+            }
 
-        for (int i = 0; i < 10; i++) {
-            try {
-                go "catalogue/dataModel/${URLEncoder.encode(dataModelId, 'UTF-8')}"
 
-                waitFor {
-                    title ==~ "Activity of $dataModelName"
+            for (int i = 0; i < 10; i++) {
+                try {
+                    noStale({ $("h3.panel-title", title: dataModelName) }) {
+                        it.find('a.full-width-link').click()
+                    }
+                    check rightSideTitle contains dataModelName
+                    break
+                } catch (e) {
+                    if (i == 9) {
+                        throw e
+                    }
                 }
 
-                break
-            } catch (e) {
-                if (i == 9) {
-                    throw e
-                }
             }
         }
 
@@ -415,14 +420,6 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     def selectInTree(String name) {
         noStale({ $('.catalogue-element-treeview-name', text: name) }) {
             it.click()
-        }
-    }
-
-    def descendTree(String... names) {
-        for(String name in names) {
-            noStale({ $('.catalogue-element-treeview-name', text: name) }) {
-                it.click()
-            }
         }
     }
 

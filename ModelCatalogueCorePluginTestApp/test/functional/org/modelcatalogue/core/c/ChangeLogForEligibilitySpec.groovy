@@ -8,7 +8,7 @@ import spock.lang.Stepwise
 import static org.modelcatalogue.core.geb.Common.getAdmin
 import static org.modelcatalogue.core.geb.Common.getModalDialog
 import static org.modelcatalogue.core.geb.Common.getRightSideTitle
-import static org.modelcatalogue.core.geb.Common.getRightSideTitle
+import static org.modelcatalogue.core.geb.Common.getRightSideDescription
 
 @Stepwise
 class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
@@ -23,17 +23,15 @@ class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
         waitFor(120) { browser.title == 'Data Models' }
 
         when:
-//        select('Rare Disease Conditions') / 'Rare Disease Conditions' / 'Data Classes'
-        selectLatestVersion '22535','Rare Disease Conditions' //Rare Disease Conditions
-        descendTree 'Data Classes','Rare Disease Conditions and Phenotypes'
+        select 'Rare Disease Conditions', true
+        selectInTree 'Data Classes'
+        selectInTree 'Rare Disease Conditions and Phenotypes'
 
         then:
-
-//        check rightSideTitle contains 'Rare Disease Conditions and Phenotypes Rare Disease Conditions 0.0.1'
         check rightSideTitle contains 'Rare Disease Conditions and Phenotypes Rare Disease Conditions'
     }
 
-    def "download the changeLog Ms excel document"() {
+    def "download the change log as MS Excel spreadsheet"() {
 
         when:
         click exportButton
@@ -44,13 +42,11 @@ class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
 
         withNewWindow({ $(ChangeLogforRDEligibilityXSLX).click() }, wait: true, close: false) {
             waitFor(30) {
-                $(rightSideTitle).text() == 'Rare Disease Conditions and Phenotypes - Eligibility change log (MS Excel Spreadsheet) Rare Disease Conditions 0.0.2'
+                $(rightSideTitle).text().startsWith('Rare Disease Conditions and Phenotypes - Eligibility change log (MS Excel Spreadsheet) Rare Disease Conditions')
             }
             waitFor(60) {
-                $(rightSideTitle).text() == 'Your report is ready. Use Download button to download it.'
+                $(rightSideDescription).text() == 'Your report is ready. Use Download button to download it.'
             }
-
-
         }
     }
 }
