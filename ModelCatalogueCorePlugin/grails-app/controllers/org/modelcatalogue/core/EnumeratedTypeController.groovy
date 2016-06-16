@@ -54,9 +54,10 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
         println enumerations.toJsonString()
         enumeratedType.setEnumerations(enumerations.withDeprecatedEnumeration(jsonPayload.enumerationId, jsonPayload.deprecated))
 
-        enumeratedType.save(failOnError: true)
-
-        respond enumeratedType, [status: OK]
+        if (enumeratedType.save(flush: true))  {
+            return respond(enumeratedType, [status: OK])
+        }
+        respond enumeratedType.errors
     }
 
     @Override
