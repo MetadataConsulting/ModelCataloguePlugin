@@ -281,7 +281,7 @@ class DataModelToDocxExporter {
 
                 if(docHelper.rules) {
                     pageBreak()
-                    heading2 'Validation Rules'
+                    heading1 'Validation Rules'
                     docHelper.printRules()
                 }
 
