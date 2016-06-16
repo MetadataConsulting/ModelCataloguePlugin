@@ -341,7 +341,7 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     Observable<Boolean> index(IndexingSession session, Observable<Object> entities) {
-        toSimpleIndexRequests(session, entities).buffer(ELEMENTS_PER_BATCH * 10).flatMap {
+        toSimpleIndexRequests(session, entities).buffer(ELEMENTS_PER_BATCH).flatMap {
             bulkIndex(it)
         } flatMap { bulkResponse ->
             from(bulkResponse.items)
