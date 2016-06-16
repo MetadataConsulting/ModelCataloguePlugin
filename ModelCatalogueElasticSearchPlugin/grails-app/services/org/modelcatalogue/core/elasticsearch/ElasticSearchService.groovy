@@ -94,7 +94,25 @@ class ElasticSearchService implements SearchCatalogue {
 
     @PostConstruct
     private void init() {
-        if (grailsApplication.config.mc.search.elasticsearch.local || System.getProperty('mc.search.elasticsearch.local')) {
+        if (grailsApplication.config.mc.search.elasticsearch.host || System.getProperty('mc.search.elasticsearch.host')) {
+            String host = grailsApplication.config.mc.search.elasticsearch.host ?: System.getProperty('mc.search.elasticsearch.host')
+            String port = grailsApplication.config.mc.search.elasticsearch.port ?: System.getProperty('mc.search.elasticsearch.port') ?: "9300"
+
+            Settings.Builder settingsBuilder = Settings.builder()
+
+            if (grailsApplication.config.mc.search.elasticsearch.settings) {
+                grailsApplication.config.mc.search.elasticsearch.settings(settingsBuilder)
+            }
+
+
+            client = TransportClient
+                .builder()
+                .settings(settingsBuilder)
+                .build()
+                .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), Integer.parseInt(port, 10)))
+
+            log.info "Using ElasticSearch instance at $host:$port"
+        } else if (grailsApplication.config.mc.search.elasticsearch.local || System.getProperty('mc.search.elasticsearch.local')) {
             Settings.Builder settingsBuilder = Settings.builder()
                 .put("${ThreadPool.THREADPOOL_GROUP}${ThreadPool.Names.BULK}.queue_size", 3000)
                 .put("${ThreadPool.THREADPOOL_GROUP}${ThreadPool.Names.BULK}.size", 25)
@@ -108,24 +126,6 @@ class ElasticSearchService implements SearchCatalogue {
             client = node.client()
 
             log.info "Using local ElasticSearch instance in directory ${grailsApplication.config.mc.search.elasticsearch.local}"
-        } else if (grailsApplication.config.mc.search.elasticsearch.host || System.getProperty('mc.search.elasticsearch.host')) {
-            String host = grailsApplication.config.mc.search.elasticsearch.host ?: System.getProperty('mc.search.elasticsearch.host')
-            String port = grailsApplication.config.mc.search.elasticsearch.port ?: System.getProperty('mc.search.elasticsearch.port') ?: "9300"
-
-            Settings.Builder settingsBuilder = Settings.builder()
-
-            if (grailsApplication.config.mc.search.elasticsearch.settings) {
-                grailsApplication.config.mc.search.elasticsearch.settings(settingsBuilder)
-            }
-
-
-            client = TransportClient
-                    .builder()
-                    .settings(settingsBuilder)
-                    .build()
-                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), Integer.parseInt(port, 10)))
-
-            log.info "Using ElasticSearch instance at $host:$port"
         }
 
     }
@@ -340,7 +340,7 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     Observable<Boolean> index(IndexingSession session, Observable<Object> entities) {
-        toSimpleIndexRequests(session, entities).buffer(ELEMENTS_PER_BATCH).flatMap {
+        toSimpleIndexRequests(session, entities).buffer(ELEMENTS_PER_BATCH * 10).flatMap {
             bulkIndex(it)
         } flatMap { bulkResponse ->
             from(bulkResponse.items)
