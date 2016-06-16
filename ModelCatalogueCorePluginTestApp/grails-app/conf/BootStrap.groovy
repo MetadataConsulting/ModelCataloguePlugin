@@ -52,11 +52,10 @@ class BootStrap {
         Role.findByAuthority('ROLE_REGISTERED') ?: new Role(authority: 'ROLE_REGISTERED').save(failOnError: true)
 
         // keep the passwords lame, they are only for dev/test or very first setup
-        // sauce labs connector for some reason fails with the six in the input
-        def admin = User.findByName('admin') ?: new User(name: 'admin', username: 'admin', enabled: true, password: 'admin').save(failOnError: true)
-        def viewer = User.findByName('viewer') ?: new User(name: 'viewer', username: 'viewer', enabled: true, password: 'viewer').save(failOnError: true)
-        def curator = User.findByName('curator') ?: new User(name: 'curator', username: 'curator', enabled: true, password: 'curator').save(failOnError: true)
-        User.findByName('registered') ?: new User(name: 'registered', username: 'registered', enabled: true, password: 'registered').save(failOnError: true)
+        def admin = User.findByNameOrUsername('admin', 'admin') ?: new User(name: 'admin', username: 'admin', enabled: true, password: 'admin').save(failOnError: true)
+        def viewer = User.findByNameOrUsername('viewer', 'viewer') ?: new User(name: 'viewer', username: 'viewer', enabled: true, password: 'viewer').save(failOnError: true)
+        def curator = User.findByNameOrUsername('curator', 'curator') ?: new User(name: 'curator', username: 'curator', enabled: true, password: 'curator').save(failOnError: true)
+        User.findByNameOrUsername('registered', 'registered') ?: new User(name: 'registered', username: 'registered', enabled: true, password: 'registered').save(failOnError: true)
 
         if (!admin.authorities.contains(roleAdmin)) {
             UserRole.create admin, roleUser
@@ -96,14 +95,14 @@ class BootStrap {
             createRequestmapIfMissing(url, 'permitAll', null)
         }
 
-        createRequestmapIfMissing('/asset/download/*',                      'IS_AUTHENTICATED_REMEMBERED',   HttpMethod.GET)
+        createRequestmapIfMissing('/asset/download/*',                      'IS_AUTHENTICATED_FULLY',        HttpMethod.GET)
         createRequestmapIfMissing('/oauth/*/**',                            'IS_AUTHENTICATED_ANONYMOUSLY')
         createRequestmapIfMissing('/user/current',                          'IS_AUTHENTICATED_ANONYMOUSLY',  HttpMethod.GET)
         createRequestmapIfMissing('/catalogue/upload',                      'ROLE_METADATA_CURATOR',         HttpMethod.POST)
-        createRequestmapIfMissing('/catalogue/*/**',                        'IS_AUTHENTICATED_REMEMBERED',   HttpMethod.GET)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'IS_AUTHENTICATED_REMEMBERED',   HttpMethod.GET)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/*/comments',  'IS_AUTHENTICATED_REMEMBERED',   HttpMethod.POST) // post a comment
-        createRequestmapIfMissing('/api/modelCatalogue/core/user/*/favourite', 'IS_AUTHENTICATED_REMEMBERED',HttpMethod.POST) // favourite item
+        createRequestmapIfMissing('/catalogue/*/**',                        'IS_AUTHENTICATED_FULLY',        HttpMethod.GET)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'IS_AUTHENTICATED_FULLY',        HttpMethod.GET)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/*/comments',  'IS_AUTHENTICATED_FULLY',        HttpMethod.POST) // post a comment
+        createRequestmapIfMissing('/api/modelCatalogue/core/user/*/favourite', 'IS_AUTHENTICATED_FULLY',     HttpMethod.POST) // favourite item
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'ROLE_METADATA_CURATOR',         HttpMethod.POST)
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'ROLE_METADATA_CURATOR',         HttpMethod.PUT)
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'ROLE_METADATA_CURATOR',         HttpMethod.DELETE)

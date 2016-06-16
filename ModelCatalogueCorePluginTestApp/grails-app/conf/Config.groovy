@@ -285,6 +285,7 @@ def assetExcludes = [
         "angular-mocks/**/*.*",
         "angular-sanitize/**/*.*",
         "jasmine/**/*.*",
+        "libs/**/*.*",
         "**/*/GruntFile",
         "**/*/gulpfile.babel.js",
         "**/*/karma.conf.js",
@@ -319,15 +320,6 @@ grails.assets.plugin."model-catalogue-core-plugin".excludes = assetExcludes
 grails.assets.plugin."model-catalogue-core".excludes = assetExcludes
 grails.assets.plugin.ModelCatalogueCore.excludes = assetExcludes
 grails.assets.plugin.ModelCatalogueCorePlugin.excludes = assetExcludes
-
-def assetIncludes = [
-    "saxonce/**/*.cache.html"
-]
-
-grails.assets.plugin."model-catalogue-core-plugin".includes = assetIncludes
-grails.assets.plugin."model-catalogue-core".includes = assetIncludes
-grails.assets.plugin.ModelCatalogueCore.includes = assetIncludes
-grails.assets.plugin.ModelCatalogueCorePlugin.includes = assetIncludes
 
 grails.assets.babel.enabled = true
 
