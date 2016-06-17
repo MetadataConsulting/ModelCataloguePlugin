@@ -14,7 +14,7 @@
           </small>
         </h3>
         <messages-panel messages="messages" max="1000"></messages-panel>
-        <div class="row detail-section" ng-repeat="view in detailSections" data-view-name="{{view.title}}">
+        <div class="row detail-section" ng-repeat="view in detailSections track by view.title" data-view-name="{{view.title}}">
           <p ng-if="view.title"
              class="text-center detail-section-title small"
              ng-init="view.templateHidden = view.hideIfNoData && !view.hasData(element)">
@@ -33,15 +33,15 @@
         </div>
       </form>
       <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" ng-repeat="tab in tabs" ng-if="!tab.hidden" ng-class="{active: tab.active}"
+        <li role="presentation" ng-repeat="tab in tabs track by tab.name" ng-if="!tab.hidden" ng-class="{active: tab.active}"
             data-tab-name="{{tab.name}}"><a ng-click="select(tab)"><span
           ng-class="{'text-muted': tab.type == 'decorated-list' &amp;&amp; tab.value.total == 0}">{{tab.heading}}</span><span
           ng-show="tab.value.total"> <span class="badge tab-value-total" ng-if="tab.value.total != 2147483647">{{tab.value.total}}</span><span
           class="badge tab-value-total" ng-if="tab.value.total == 2147483647"><span
-          class="fa fa-question fa-inverse"</span></span></a></li>
+          class="fa fa-question fa-inverse"></span></span></span></a></li>
       </ul>
 
-      <div ng-repeat="tab in tabs" class="tab-pane">
+      <div ng-repeat="tab in tabs track by tab.name" class="tab-pane">
         <div id="{{tab.name}}-tab" class="cev-tab-content" ng-if="tab.active">
           <ng-include src="'modelcatalogue/core/ui/catalogueElementView/' + tab.type + '.html'"></ng-include>
         </div>
@@ -50,7 +50,7 @@
   </div>
   <div ng-if="displayOnly">
     <div class="col-md-12">
-      <div ng-repeat="tab in tabs" class="tab-pane">
+      <div ng-repeat="tab in tabs track by tab.name" class="tab-pane">
         <div id="{{tab.name}}-tab" class="cev-tab-content" ng-if="tab.active">
           <h3 class="ce-name">
             <small ng-class="element.getIcon()" title="{{element.getElementTypeName()}}"></small>
