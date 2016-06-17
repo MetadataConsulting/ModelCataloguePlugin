@@ -6,47 +6,43 @@ import org.modelcatalogue.core.geb.CatalogueContent
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.getAdmin
-import static org.modelcatalogue.core.geb.Common.getModalDialog
 import static org.modelcatalogue.core.geb.Common.getRightSideTitle
 import static org.modelcatalogue.core.geb.Common.getRightSideDescription
 
 @Stepwise
 class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
 
-    public static final String exportButton = '#role_item_export-menu-item'
-    public static final String ChangeLogforRDEligibilityXSLX = '#catalogue-element-export-specific-reports_13-menu-item-link'
+    public static final CatalogueAction exportAction = CatalogueAction.runFirst('item', 'export')
+    public static
+    final CatalogueContent changeLogForRDEligibilityXSLX = CatalogueContent.create('.menu-item-link', text: 'Change Log for RD Eligibility (Excel)')
 
     def "go to login"() {
         login admin
 
         expect:
-        waitFor(120) { browser.title == 'Data Models' }
+            waitFor(120) { browser.title == 'Data Models' }
 
         when:
-        select 'Rare Disease Conditions', true
-        selectInTree 'Data Classes'
-        selectInTree 'Rare Disease Conditions and Phenotypes'
+            select 'Rare Disease Conditions', true
+            selectInTree 'Data Classes'
+            selectInTree 'Rare Disease Conditions and Phenotypes'
 
         then:
-        check rightSideTitle contains 'Rare Disease Conditions and Phenotypes Rare Disease Conditions'
+            check rightSideTitle contains 'Rare Disease Conditions and Phenotypes Rare Disease Conditions'
     }
 
     def "download the change log as MS Excel spreadsheet"() {
 
         when:
-        click exportButton
+            click exportAction
+            click changeLogForRDEligibilityXSLX
+
+            // tracking the window open does not work very well but the asset will appear in the treeview when created
+            selectInTree 'Assets'
+            selectInTree 'Rare Disease Conditions and Phenotypes - Eligibility change log (MS Excel Spreadsheet)'
 
         then:
-
-        check ChangeLogforRDEligibilityXSLX displayed
-
-        withNewWindow({ $(ChangeLogforRDEligibilityXSLX).click() }, wait: true, close: false) {
-            waitFor(30) {
-                $(rightSideTitle).text().startsWith('Rare Disease Conditions and Phenotypes - Eligibility change log (MS Excel Spreadsheet) Rare Disease Conditions')
-            }
-            waitFor(60) {
-                $(rightSideDescription).text() == 'Your report is ready. Use Download button to download it.'
-            }
-        }
+            check rightSideTitle contains 'Rare Disease Conditions and Phenotypes - Eligibility change log (MS Excel Spreadsheet) Rare Disease Conditions'
+            check rightSideDescription is 'Your report is ready. Use Download button to download it.'
     }
 }
