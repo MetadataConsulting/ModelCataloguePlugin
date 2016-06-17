@@ -33,69 +33,38 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
     DataModelNavigator select(String dataModelName, boolean latest = false) {
 
-        if(latest){
-            for (int i = 0; i < 10; i++) {
-                try {
+        for (int i = 0; i < 10; i++) {
+            try {
+                go "#/dataModels?type=catalogue&q=${URLEncoder.encode(dataModelName, 'UTF-8')}"
 
-                    go "#/dataModels?type=catalogue&q=${URLEncoder.encode(dataModelName, 'UTF-8')}"
+                waitFor {
+                    title == 'Data Models'
+                }
+                waitFor {
+                    $("h3.panel-title", title: dataModelName).displayed
+                }
+                break
+            } catch (e) {
+                if (i == 9) {
+                    throw e
+                }
+            }
+        }
 
-                    waitFor {
-                        title == 'Data Models'
-                    }
 
-                    String modelCatalogueId = $("div.col-md-9.ng-scope").eq(2).text()
-                    println "modelCatalogueId: $modelCatalogueId"
-                    String url = modelCatalogueId.substring(0,modelCatalogueId.indexOf('@'))
-                    println "url: $url"
-                    go url
-
-                    waitFor {
-                        title ==~ "Activity of $dataModelName"
-                    }
-
-                    break
-                } catch (e) {
-                    if (i == 9) {
-                        throw e
-                    }
+        for (int i = 0; i < 10; i++) {
+            try {
+                noStale({ latest ? $("h3.panel-title", title: dataModelName).last() : $("h3.panel-title", title: dataModelName).first() }) {
+                    it.find('a.full-width-link').click()
+                }
+                check rightSideTitle contains dataModelName
+                break
+            } catch (e) {
+                if (i == 9) {
+                    throw e
                 }
             }
 
-        } else {
-
-            for (int i = 0; i < 10; i++) {
-                try {
-                    go "#/dataModels?type=catalogue&q=${URLEncoder.encode(dataModelName, 'UTF-8')}"
-
-                    waitFor {
-                        title == 'Data Models'
-                    }
-                    waitFor {
-                        $("h3.panel-title", title: dataModelName).displayed
-                    }
-                    break
-                } catch (e) {
-                    if (i == 9) {
-                        throw e
-                    }
-                }
-            }
-
-
-            for (int i = 0; i < 10; i++) {
-                try {
-                    noStale({ $("h3.panel-title", title: dataModelName) }) {
-                        it.find('a.full-width-link').click()
-                    }
-                    check rightSideTitle contains dataModelName
-                    break
-                } catch (e) {
-                    if (i == 9) {
-                        throw e
-                    }
-                }
-
-            }
         }
 
         return new DataModelNavigator(this)
