@@ -12,7 +12,7 @@ angular.module('mc.core.ui.bs.modalPromptCurrentActivity', ['mc.util.messages'])
               <div class="form-group">
                 <table class="table table-striped">
                   <tr><th colspan="2">Most Recent Active Users</th></tr>
-                  <tr ng-repeat="seen in lastSeen">
+                  <tr ng-repeat="seen in lastSeen track by seen.username">
                     <th class="col-md-4">{{seen.username}}</th>
                     <td class="col-md-8">{{seen.lastSeen | date:'short'}}</td>
                   </tr>

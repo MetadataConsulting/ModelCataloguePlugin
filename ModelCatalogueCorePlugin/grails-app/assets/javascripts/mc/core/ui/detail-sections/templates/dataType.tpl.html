@@ -42,7 +42,7 @@
   <div class="row">
     <div class="col-md-12"><strong class="small">Enumerations</strong></div>
   </div>
-  <div class="row" ng-repeat="value in element.dataType.enumerations.values">
+  <div class="row" ng-repeat="value in element.dataType.enumerations.values track by value.key">
     <div class="col-md-3">
       <strong class="small text-wrap">{{value.key}}</strong>
     </div>
