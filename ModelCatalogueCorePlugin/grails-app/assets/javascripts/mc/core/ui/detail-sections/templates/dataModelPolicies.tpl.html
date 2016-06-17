@@ -3,7 +3,7 @@
 </div>
 <div class="col-md-9">
   <div ng-if="!editableForm.$visible">
-    <span ng-repeat="policy in element.policies" class="small"><a ng-href="{{policy.href()}}" target="_blank" title="{{policy.policyText}}"><catalogue-element-icon type="policy.elementType"></catalogue-element-icon> {{policy.name}}</a><br ng-if="!$last"/></span>
+    <span ng-repeat="policy in element.policies track by policy.id" class="small"><a ng-href="{{policy.href()}}" target="_blank" title="{{policy.policyText}}"><catalogue-element-icon type="policy.elementType"></catalogue-element-icon> {{policy.name}}</a><br ng-if="!$last"/></span>
   </div>
   <div ng-if="editableForm.$visible">
     <elements-as-tags elements="copy.policies"></elements-as-tags>

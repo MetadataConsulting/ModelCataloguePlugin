@@ -55,7 +55,7 @@
   </div>
   <ul ng-if="node.children" ng-hide="node.collapsed" class="catalogue-element-treeview-list">
     <catalogue-element-treeview-item extra-parameters="{'path': path}" element="child" descend="nextDescend" repeat="repeat" treeview="treeview"
-                                     ng-repeat="child in node.children track by $index"></catalogue-element-treeview-item>
+                                     ng-repeat="child in node.children track by child.link"></catalogue-element-treeview-item>
     <li ng-if="node.numberOfChildren > node.children.length" class="catalogue-element-treeview-item">
       <span class="catalogue-element-treeview-labels" ng-click="node.showMore()">
         <a class="catalogue-element-treeview-icon btn btn-link catalogue-element-treeview-show-more"
