@@ -31,7 +31,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         }
     }
 
-    DataModelNavigator select(String dataModelName) {
+    DataModelNavigator select(String dataModelName, boolean latest = false) {
 
         for (int i = 0; i < 10; i++) {
             try {
@@ -54,7 +54,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
         for (int i = 0; i < 10; i++) {
             try {
-                noStale({$("h3.panel-title", title: dataModelName)}) {
+                noStale({ latest ? $("h3.panel-title", title: dataModelName).last() : $("h3.panel-title", title: dataModelName).first() }) {
                     it.find('a.full-width-link').click()
                 }
                 check rightSideTitle contains dataModelName

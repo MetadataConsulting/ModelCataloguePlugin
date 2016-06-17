@@ -55,7 +55,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         click save
 
         then:
-        check infiniteTableRow present once
+        check infiniteTableRow displayed
 
         and:
         check modalDialog gone
@@ -67,7 +67,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
         click { infTableCell(1, 2).find('a:not(.inf-cell-expand)') }
 
-        check rightSideTitle contains 'Sample XSD Test 1'
+        check rightSideTitle contains 'Sample XSD'
     }
 
     def "validate xml schema"() {

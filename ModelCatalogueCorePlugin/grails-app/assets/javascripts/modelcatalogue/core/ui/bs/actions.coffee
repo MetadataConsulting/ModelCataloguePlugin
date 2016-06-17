@@ -286,7 +286,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       }
   ]
 
-  generateReports = ($scope, $window, enhance, rest, $log, messages) ->
+  generateReports = ($scope, $window, enhance, rest, $log, messages, $timeout) ->
     (reports = []) ->
       for report in reports
         {
@@ -303,7 +303,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
             depth = @depth
             includeMetadata = @includeMetadata
             if @type == 'LINK'
-              $window.open(url, '_blank')
+              $timeout -> $window.open(url, '_blank')
             else if @type == 'ASSET'
               messages.prompt('Export Settings', '', {type: 'export', assetName: defaultValue, depth: depth, includeMetadata: includeMetadata})
               .then (result) ->
@@ -317,14 +317,14 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
                   $log.debug "exporting with includeMetadata: #{result.includeMetadata}"
                   url = URI(url).setQuery({includeMetadata: result.includeMetadata})
                 $log.debug "export new asset using url #{url}"
-                $window.open(url, '_blank')
+                $timeout -> $window.open(url, '_blank')
             else
               $log.error "unknown type of report '#{@type}'"
             return true
         }
 
   actionsProvider.registerChildActionInRoles('export', 'catalogue-element-export-specific-reports', [actionsProvider.ROLE_ITEM_ACTION],
-    ['$scope', '$window', 'enhance', 'rest', '$log', 'messages', ($scope, $window, enhance, rest, $log, messages) ->
+    ['$scope', '$window', 'enhance', 'rest', '$log', 'messages', '$timeout', ($scope, $window, enhance, rest, $log, messages, $timeout) ->
       return undefined if not $scope.element
 
       {
@@ -333,24 +333,24 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       disabled:   not $scope.element?.availableReports?.length
       watches:    'element.availableReports'
       generator:  (action) ->
-        action.createActionsFrom 'element.availableReports', generateReports($scope, $window, enhance, rest, $log, messages)
+        action.createActionsFrom 'element.availableReports', generateReports($scope, $window, enhance, rest, $log, messages, $timeout)
       }
     ])
 
   actionsProvider.registerChildAction('export', 'generic-reports',
-    ['$scope', '$window', 'enhance', 'rest', '$log', 'messages', ($scope, $window, enhance, rest, $log, messages) ->
+    ['$scope', '$window', 'enhance', 'rest', '$log', 'messages', '$timeout', ($scope, $window, enhance, rest, $log, messages, $timeout) ->
       {
       position:   2000
       label:      "Other Reports"
       disabled:   not $scope.reports?.length
       watches:   'reports'
       generator: (action) ->
-        action.createActionsFrom 'reports', generateReports($scope, $window, enhance, rest, $log, messages)
+        action.createActionsFrom 'reports', generateReports($scope, $window, enhance, rest, $log, messages, $timeout)
       }
     ])
 
   actionsProvider.registerChildAction('export', 'list-exports-current', actionsProvider.ROLE_LIST_ACTION,
-    ['$scope', '$window', 'enhance', 'rest', '$log', 'messages', ($scope, $window, enhance, rest, $log, messages) ->
+    ['$scope', '$window', 'enhance', 'rest', '$log', 'messages', '$timeout', ($scope, $window, enhance, rest, $log, messages, $timeout) ->
       return undefined if not $scope.list?
 
       {
@@ -359,7 +359,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       disabled:   not $scope.list.availableReports?.length
       watches:    'list.availableReports'
       generator:  (action) ->
-        action.createActionsFrom 'list.availableReports', generateReports($scope, $window, enhance, rest, $log, messages)
+        action.createActionsFrom 'list.availableReports', generateReports($scope, $window, enhance, rest, $log, messages, $timeout)
       }
     ])
 

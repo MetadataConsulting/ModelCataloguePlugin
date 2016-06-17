@@ -2,6 +2,7 @@ package org.modelcatalogue.core.b
 
 import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
+import org.modelcatalogue.core.geb.ScrollDirection
 import spock.lang.Ignore
 
 import static org.modelcatalogue.core.geb.Common.*
@@ -35,14 +36,17 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "add new data model"() {
+
+        def uuid = UUID.randomUUID().toString()
+
         click createNewDataModel
 
         expect: 'the model dialog opens'
         check classificationWizzard displayed
 
         when:
-        fill name with "New Data Model"
-        fill modelCatalogueId with "http://www.example.com/${UUID.randomUUID().toString()}"
+        fill name with "New Data Model $uuid"
+        fill modelCatalogueId with "http://www.example.com/$uuid"
         fill description with "Description of Data Model"
 
         then:
@@ -63,14 +67,14 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         click stepFinish
 
         then:
-        check '#summary' is "Data Model New Data Model created"
+        check '#summary' is "Data Model New Data Model $uuid created"
 
         when:
         click exitButton
         check closeGrowlMessage gone
 
         then:
-        check rightSideTitle is 'New Data Model 0.0.1'
+        check rightSideTitle is "New Data Model $uuid 0.0.1"
     }
 
     def "finalize element"() {
@@ -85,6 +89,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         fill metadataApproved with '29/04/2016'
         fill 'metadata-namespace' with 'Namespace'
         fill 'metadata-organization' with 'Organization'
+        scroll up
         click inlineEditSubmit
         check "input[name='name']" gone
 
