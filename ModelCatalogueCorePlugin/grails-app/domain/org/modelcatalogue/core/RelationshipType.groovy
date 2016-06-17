@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import com.google.common.collect.ImmutableMap
 import com.google.common.util.concurrent.UncheckedExecutionException
 import grails.util.GrailsNameUtils
 import org.apache.log4j.Logger
@@ -274,11 +275,11 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
     }
 
     Map<String, Object> getInfo() {
-        [
-                id: id,
-                name: name,
-                link: "/${GrailsNameUtils.getPropertyName(getClass())}/$id"
-        ]
+        ImmutableMap.of(
+            'id', id,
+            'name', name,
+            'link', "/${GrailsNameUtils.getPropertyName(getClass())}/$id"
+        )
     }
 
     def beforeInsert() {

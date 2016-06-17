@@ -11,9 +11,9 @@
   <table class="soe-table table" title="{{title}}">
     <thead ng-if="title || valueTitle">
     <th></th>
-    <th class="col-md-6 col-sm-5 soe-table-property-key">{{title}}</th>
+    <th class="col-md-5 col-sm-4 soe-table-property-key">{{title}}</th>
     <th class="col-md-5 col-sm-5 soe-table-property-value ">{{valueTitle}}</th>
-    <th class="col-md-1 col-sm-2 soe-table-property-actions">
+    <th class="col-md-2 col-sm-3 soe-table-property-actions">
       <!-- to allow submitting forms with only this editor within -->
       <input type="submit" class="hide">
     </th>
@@ -22,27 +22,31 @@
     <tr class="soe-table-property-row" ng-repeat="property in object.values track by property.key"
         ng-class="{'has-error': !isKeyUnique(property.key)}">
       <td><span class="handle fa fa-ellipsis-v fa-fw text-muted with-move"></span></td>
-      <th class="soe-table-property-key col-md-5 col-sm-5">
+      <th class="soe-table-property-key">
         <input type="text" ng-model="property.key" class="form-control"
                ng-paste="pasteExcel($event)"
                placeholder="{{valuePlaceholder ? keyPlaceholder : 'Key'}}" autofocus="autofocus"
-               focus-me="lastAddedRow == $index &amp;&amp; $index != 0">
+               focus-me="lastAddedRow == $index &amp;&amp; $index != 0"
+               ng-disabled="property.deprecated">
       </th>
-      <td class="soe-table-property-value col-md-5 col-sm-5">
+      <td class="soe-table-property-value">
         <input type="text" ng-model="property.value"
                class="form-control"
                data-for-property="{{property.key}}"
                placeholder="{{valuePlaceholder ? valuePlaceholder : 'Value (leave blank for null)'}}"
                ng-keydown="addNewRowOnTab($event, $index, $last)"
-               ng-disabled="handledKeys.indexOf(property.key) > -1"/>
+               ng-disabled="handledKeys.indexOf(property.key) > -1 || property.deprecated"/>
       </td>
-      <td class="soe-table-property-actions col-md-2 col-sm-2">
+      <td class="soe-table-property-actions">
         <p>
           <a class="btn btn-link btn-sm soe-add-row" ng-click="addProperty($index)" data-for-property="{{property.key}}">
             <span class="glyphicon glyphicon-plus"></span>
           </a>
           <a class="btn btn-link btn-sm soe-remove-row" ng-click="removeProperty($index)" data-for-property="{{property.key}}">
             <span class="glyphicon glyphicon-minus"></span>
+          </a>
+          <a class="btn btn-link btn-sm" ng-click="setDeprecated(property, !property.deprecated)">
+            <span class="fa" ng-class="{'fa-ban': !property.deprecated, 'fa-repeat': property.deprecated}"></span>
           </a>
         </p>
       </td>

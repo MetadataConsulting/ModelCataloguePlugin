@@ -213,31 +213,7 @@ enum ChangeType {
             return !old.hasErrors()
         }
     },
-    RELATIONSHIP_DELETED {
-        @Override
-        boolean isUndoSupported() {
-            true
-        }
-
-        @Override
-        boolean doUndo(Change change, CatalogueElement target) {
-            def rel = LoggingAuditor.readValue(change.oldValue)
-            CatalogueElement source = CatalogueElement.get(rel.source.id)
-            CatalogueElement destination = CatalogueElement.get(rel.destination.id)
-            RelationshipType type = RelationshipType.readByName(rel.type.name)
-            def storedDataModel = rel.dataModel ?: rel.classification
-            DataModel classification = storedDataModel ? DataModel.get(storedDataModel.id) : null
-            Relationship newOne = source.relationshipService.link(source, destination, type, classification)
-            if (!newOne) {
-                return false
-            }
-            if (newOne.hasErrors()) {
-                return false
-            }
-            newOne.ext = rel.ext
-            return true
-        }
-    },
+    RELATIONSHIP_DELETED,
 
     RELATIONSHIP_ARCHIVED {
         @Override

@@ -3,7 +3,7 @@ package org.modelcatalogue.core.elasticsearch
 import groovy.transform.CompileStatic
 
 @CompileStatic
-class SimpleIndexRequest {
+class SimpleIndexRequest implements Serializable {
 
     final Set<String> indices
     final Document document

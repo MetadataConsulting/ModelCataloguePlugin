@@ -7,5 +7,6 @@
         {{ feedback.name }}
       </h3>
         <pre>{{ feedback.log || 'Nothing logged yet or the log entry has expired after 24 hours of inactivity'}}</pre>
+        <div class="btn btn-block btn-default" ng-click="reload()"><span class="fa fa-fw fa-refresh"></span></div>
     </div>
 </div>

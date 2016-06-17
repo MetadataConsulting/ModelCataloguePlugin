@@ -271,6 +271,18 @@ abstract class AbstractChangeLogGenerator {
         }.items
     }
 
+    protected List<Change> getChangesAfterDate(CatalogueElement element, Date startDate, ChangeType... types) {
+        auditService.getChanges(element, sort: 'dateCreated', order: 'asc'){
+            ne 'undone', true
+            isNull 'parentId'
+            gt 'dateCreated', startDate
+
+            if (types) {
+                inList 'type', types.toList()
+            }
+        }.items
+    }
+
     protected Map<String, RelationshipChangeItem> collectRelationshipChanges(RelationshipChangesCheckConfiguration configuration) {
         Map<String, RelationshipChangeItem> changeItemsByHeading = new TreeMap<String, RelationshipChangeItem>().withDefault {
             new RelationshipChangeItem()
@@ -324,10 +336,10 @@ abstract class AbstractChangeLogGenerator {
 
             def value = LoggingAuditor.readValue(deleteChange.oldValue)
 
-            String heading = "${value.destination.name} ($value.destination.latestVersionId@${value.destination.dataModel?.semanticVersion ?: value.destination.semanticVersion}, $value.destination.status)"
+            String heading = value.destination.classifiedName
 
             if (configuration.incoming) {
-                heading = "${value.source.name} (${value.source.getCombinedVersion()}, $value.source.status)"
+                heading = value.source.classifiedName
             }
 
             changeItemsByHeading[heading].title = configuration.removedRelationshipNote

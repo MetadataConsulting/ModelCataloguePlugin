@@ -656,15 +656,25 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         final String sourceModelName = 'Source Model 3'
         final String destinationModelName = 'Destination Model 3'
         final String originalDataClassName = 'DC CDC'
+        final String childDataClassName = 'DC CDC II'
+        final String grandChildDataClassName = 'DC CDC III'
         final String originalDataElementName = 'DE CDC'
         final String originalDataTypeName = 'DT CDC'
 
         when:
         catalogueBuilder.build {
+            dataModel(name: 'Sea Otter') {
+                dataClass name: 'DC CDC IV - other'
+            }
             dataModel(name: sourceModelName) {
                 dataClass name: originalDataClassName, {
                     dataElement name: originalDataElementName, {
                         dataType name: originalDataTypeName, enumerations: [one: '1', two: '2']
+                    }
+                    dataClass name: childDataClassName, {
+                        dataClass name: grandChildDataClassName, {
+                            dataClass name: 'DC CDC IV - other', dataModel: 'Sea Otter'
+                        }
                     }
                 }
             }
@@ -673,29 +683,42 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         DataModel source = DataModel.findByName(sourceModelName)
         DataModel destination = DataModel.findByName(destinationModelName)
+        DataModel other = DataModel.findByName('Sea Otter')
 
         DataClass originalDataClass = DataClass.findByName(originalDataClassName)
+        DataClass childDataClass = DataClass.findByName(childDataClassName)
+        DataClass grandChildDataClass = DataClass.findByName(grandChildDataClassName)
+        DataClass otherDataClass = DataClass.findByName('DC CDC IV - other')
         DataElement originalDataElement = DataElement.findByName(originalDataElementName)
         DataType originalDataType = DataType.findByName(originalDataTypeName)
 
         then:
         source
         destination
+        other
         originalDataClass
+        childDataClass
+        grandChildDataClass
         originalDataElement
         originalDataType
+        otherDataClass
 
         originalDataType instanceof EnumeratedType
 
         originalDataClass.dataModel == source
+        childDataClass.dataModel == source
+        grandChildDataClass.dataModel == source
         originalDataElement.dataModel == source
         originalDataType.dataModel == source
+        otherDataClass.dataModel == other
 
         originalDataElement in originalDataClass.contains
         originalDataElement.dataType == originalDataType
 
         when:
         DataClass clonedDataClass = elementService.cloneElement(originalDataClass, CloningContext.create(source, destination))
+        DataClass clonedChildDataClass = DataClass.findByNameAndDataModel(childDataClassName, destination)
+        DataClass clonedGrandChildDataClass = DataClass.findByNameAndDataModel(grandChildDataClassName, destination)
         DataElement clonedDataElement = DataElement.findByNameAndDataModel(originalDataElementName, destination)
         DataType clonedDataType = DataType.findByNameAndDataModel(originalDataTypeName, destination)
 
@@ -703,10 +726,15 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         clonedDataType instanceof EnumeratedType
 
         verifyCloned source, destination, originalDataClass, clonedDataClass
+        verifyCloned source, destination, childDataClass, clonedChildDataClass
+        verifyCloned source, destination, grandChildDataClass, clonedGrandChildDataClass
         verifyCloned source, destination, originalDataElement, clonedDataElement
         verifyCloned source, destination, originalDataType, clonedDataType
 
         clonedDataElement in clonedDataClass.contains
+        clonedChildDataClass in clonedDataClass.parentOf
+        clonedGrandChildDataClass in clonedChildDataClass.parentOf
+        otherDataClass in clonedGrandChildDataClass.parentOf
         clonedDataElement.dataType == clonedDataType
     }
 
