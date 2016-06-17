@@ -2,7 +2,7 @@ package org.modelcatalogue.core.elasticsearch
 
 import com.google.common.collect.ImmutableMap
 
-class Document {
+class Document implements Serializable {
 
     static final Document EMPTY = new Document('','',0, ImmutableMap.of())
     final String type

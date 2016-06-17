@@ -95,14 +95,14 @@ class BootStrap {
             createRequestmapIfMissing(url, 'permitAll', null)
         }
 
-        createRequestmapIfMissing('/asset/download/*',                      'IS_AUTHENTICATED_FULLY',        HttpMethod.GET)
+        createRequestmapIfMissing('/asset/download/*',                      'IS_AUTHENTICATED_REMEMBERED',   HttpMethod.GET)
         createRequestmapIfMissing('/oauth/*/**',                            'IS_AUTHENTICATED_ANONYMOUSLY')
         createRequestmapIfMissing('/user/current',                          'IS_AUTHENTICATED_ANONYMOUSLY',  HttpMethod.GET)
         createRequestmapIfMissing('/catalogue/upload',                      'ROLE_METADATA_CURATOR',         HttpMethod.POST)
-        createRequestmapIfMissing('/catalogue/*/**',                        'IS_AUTHENTICATED_FULLY',        HttpMethod.GET)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'IS_AUTHENTICATED_FULLY',        HttpMethod.GET)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/*/comments',  'IS_AUTHENTICATED_FULLY',        HttpMethod.POST) // post a comment
-        createRequestmapIfMissing('/api/modelCatalogue/core/user/*/favourite', 'IS_AUTHENTICATED_FULLY',     HttpMethod.POST) // favourite item
+        createRequestmapIfMissing('/catalogue/*/**',                        'IS_AUTHENTICATED_REMEMBERED',   HttpMethod.GET)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'IS_AUTHENTICATED_REMEMBERED',   HttpMethod.GET)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/*/comments',  'IS_AUTHENTICATED_REMEMBERED',   HttpMethod.POST) // post a comment
+        createRequestmapIfMissing('/api/modelCatalogue/core/user/*/favourite', 'IS_AUTHENTICATED_REMEMBERED',HttpMethod.POST) // favourite item
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'ROLE_METADATA_CURATOR',         HttpMethod.POST)
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'ROLE_METADATA_CURATOR',         HttpMethod.PUT)
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'ROLE_METADATA_CURATOR',         HttpMethod.DELETE)
