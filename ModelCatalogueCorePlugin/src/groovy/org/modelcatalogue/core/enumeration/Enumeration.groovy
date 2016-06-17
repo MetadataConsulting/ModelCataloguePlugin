@@ -8,20 +8,22 @@ import groovy.transform.PackageScope
     final Long id
     final String key
     final String value
+    final boolean deprecated
 
-    @PackageScope static Enumeration create(Long id, String key, String value) {
-        return new Enumeration(id, key, value)
+    @PackageScope static Enumeration create(Long id, String key, String value, boolean deprecated = false) {
+        return new Enumeration(id, key, value, deprecated)
     }
 
-    private Enumeration(Long id, String key, String value) {
+    private Enumeration(Long id, String key, String value, boolean deprecated) {
         this.id = id
         this.key = key
         this.value = value
+        this.deprecated = deprecated
     }
 
     @Override
     public String toString() {
-        return "[${id.toString().padLeft(5, '0')}] $key: $value"
+        return "[${id.toString().padLeft(5, '0')}] $key: $value${deprecated ? ' (deprecated)' : ''}"
     }
 
     boolean equals(o) {
