@@ -81,12 +81,16 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
         "${getClass().simpleName}[id: ${id}, source: ${source}, destination: ${destination}, type: ${relationshipType?.name}]"
     }
 
-    def beforeDelete(){
+    /**
+     * Removes relationship from {@link #source} and {@link #destination}. This method causes {@link Relationship} object
+     * to be in inconsistent state and should be use before its delete.
+     */
+    def clearRelationships() {
         if (source) {
-            source?.removeFromOutgoingRelationships(this)
+            source.removeFromOutgoingRelationships(this)
         }
-        if(destination){
-            destination?.removeFromIncomingRelationships(this)
+        if (destination) {
+            destination.removeFromIncomingRelationships(this)
         }
     }
 

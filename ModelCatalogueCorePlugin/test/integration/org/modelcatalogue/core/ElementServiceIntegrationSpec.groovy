@@ -200,9 +200,9 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         cleanup:
         source?.ext?.clear()
         destination?.ext?.clear()
-        source?.beforeDelete()
+        source?.deleteRelationships()
         source?.delete()
-        destination?.beforeDelete()
+        destination?.deleteRelationships()
         destination?.delete()
         dataType?.delete()
         m1?.delete()

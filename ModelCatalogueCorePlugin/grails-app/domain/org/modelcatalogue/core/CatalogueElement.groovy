@@ -226,23 +226,24 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     def beforeDelete(){
-        new HashSet(outgoingRelationships).each{ Relationship relationship->
-            relationship.beforeDelete()
-            relationship.delete(flush:true)
-        }
-        new HashSet(incomingRelationships).each{ Relationship relationship ->
-            relationship.beforeDelete()
-            relationship.delete(flush:true)
-        }
-        new HashSet(outgoingMappings).each{ Mapping mapping ->
-            mapping.beforeDelete()
-            mapping.delete(flush:true)
-        }
-        new HashSet(incomingMappings).each{ Mapping mapping ->
-            mapping.beforeDelete()
-            mapping.delete(flush:true)
-        }
         auditService.logElementDeleted(this)
+    }
+
+    /**
+     * Deletes all catalogue relationships: {@link #outgoingMappings}, {@link #incomingRelationships},
+     * {@link #outgoingMappings}, {@link #incomingMappings}.
+     */
+    void deleteRelationships() {
+        // delete Relationship
+        (outgoingRelationships + incomingRelationships).each {
+            it.clearRelationships()
+            it.delete()
+        }
+        // delete Mappings
+        (outgoingMappings + incomingMappings).each {
+            it.clearRelationships()
+            it.delete()
+        }
     }
 
     boolean hasModelCatalogueId() {
