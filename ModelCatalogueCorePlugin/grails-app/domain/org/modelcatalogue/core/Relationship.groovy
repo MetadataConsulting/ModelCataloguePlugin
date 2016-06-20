@@ -1,10 +1,6 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.util.DataModelAware
-import org.modelcatalogue.core.util.ExtensionsWrapper
-import org.modelcatalogue.core.util.FriendlyErrors
-import org.modelcatalogue.core.util.Inheritance
-import org.modelcatalogue.core.util.OrderedMap
+import org.modelcatalogue.core.util.*
 
 /*
 * Users can create relationships between all catalogue elements. They include

@@ -5,22 +5,11 @@ import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Lists
 import grails.util.GrailsNameUtils
 import org.hibernate.proxy.HibernateProxyHelper
-import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.publishing.CloningContext
-import org.modelcatalogue.core.publishing.Published
-import org.modelcatalogue.core.publishing.Publisher
-import org.modelcatalogue.core.publishing.PublishingChain
-import org.modelcatalogue.core.publishing.PublishingContext
-import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.util.DataModelAware
-import org.modelcatalogue.core.util.ExtensionsWrapper
-import org.modelcatalogue.core.util.FriendlyErrors
-import org.modelcatalogue.core.util.HibernateHelper
-import org.modelcatalogue.core.util.Inheritance
-import org.modelcatalogue.core.util.OrderedMap
-import org.modelcatalogue.core.util.RelationshipDirection
-
 import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
+import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.publishing.*
+import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.util.*
 import rx.Observer
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
