@@ -5,7 +5,7 @@
       <span ng-switch-when="2147483647" class="fa fa-question fa-inverse"></span>
     </span>
     <span class="catalogue-element-treeview-labels">
-      <span ng-if="!element.elementType">
+      <span ng-if="::!element.elementType">
         <a class="catalogue-element-treeview-icon btn btn-link">
           <span class="fa fa-fw fa-ban"></span>
         </a>
@@ -37,15 +37,15 @@
         </span>
         <small class="text-muted" ng-if="element.$$localName">{{element.name}}</small>
         <small class="text-muted">
-          <span ng-if="element.latestVersionId"
+          <span ng-if="::element.latestVersionId"
                 class="catalogue-element-treeview-version-number">
             {{node.dataModelWithVersion}}
           </span>
         </small>
       </span>
-      <small class="text-muted" ng-if="node.href">
+      <small class="text-muted" ng-if="::node.href">
         <a class="catalogue-element-treeview-link"
-           ng-href="{{node.href}}"
+           ng-href="{{::node.href}}"
            title="{{node.name}}"
            target="_blank">
           <span class="fa fa-external-link text-muted"></span>
@@ -54,7 +54,7 @@
     </span>
   </div>
   <ul ng-if="node.children" ng-hide="node.collapsed" class="catalogue-element-treeview-list">
-    <catalogue-element-treeview-item extra-parameters="{'path': path}" element="child" descend="nextDescend" repeat="repeat" treeview="treeview"
+    <catalogue-element-treeview-item extra-parameters="::{'path': path}" element="::child" descend="::nextDescend" repeat="::repeat" treeview="::treeview"
                                      ng-repeat="child in node.children track by child.link"></catalogue-element-treeview-item>
     <li ng-if="node.numberOfChildren > node.children.length" class="catalogue-element-treeview-item">
       <span class="catalogue-element-treeview-labels" ng-click="node.showMore()">
