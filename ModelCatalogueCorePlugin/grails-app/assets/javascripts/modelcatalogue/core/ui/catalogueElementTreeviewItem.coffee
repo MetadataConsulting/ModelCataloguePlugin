@@ -18,7 +18,6 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
     scope:
       element:  '='
       descend:  '='
-      repeat:   '='
       treeview: '='
       extraParameters: '=?'
 
@@ -59,11 +58,10 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
           else
             $scope.currentDescend = $scope.descend[0]
             if $scope.descend.length == 1
-              $scope.nextDescend = if $scope.repeat then $scope.descend else []
+              $scope.nextDescend = $scope.descend
             else
               $scope.nextDescend = $scope.descend.slice(1)
-              if $scope.repeat
-                $scope.nextDescend.push($scope.currentDescend)
+              $scope.nextDescend.push($scope.currentDescend)
         else
           $scope.currentDescend = $scope.descend
           $scope.nextDescend    = $scope.descend

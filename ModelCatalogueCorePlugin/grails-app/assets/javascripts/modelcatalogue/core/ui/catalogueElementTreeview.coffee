@@ -37,7 +37,6 @@ class CatalogueElementTreeview
 
     $scope.mode     = if $scope.element then 'element' else 'list'
     $scope.id       = null  if !$scope.id
-    $scope.repeat   = false if !$scope.repeat
     $scope.list    ?= listEnhancer.createEmptyList()
     $scope.path     = {segments: []}
 
@@ -127,7 +126,6 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
       element: '=?'
       list:    '=?'
       descend: '='
-      repeat:  '=?'
       prefetch:'=?'
       id:      '@'
       onSelect: '&?'
