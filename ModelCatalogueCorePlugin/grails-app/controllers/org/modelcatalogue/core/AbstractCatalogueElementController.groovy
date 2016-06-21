@@ -556,9 +556,12 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 newType = ModelCatalogueTypes.values().find { it.toString() == request.JSON?.newType }
             }
 
+            if (newType && newType.implementation) {
+                instance = elementService.changeType(instance, newType.implementation) as T
+            }
             // when draft version is created from the UI still just create plain draft ignoring dependencies
 
-            DraftContext context = newType?.implementation ? DraftContext.userFriendly().changeType(instance, newType.implementation) : DraftContext.userFriendly()
+            DraftContext context = DraftContext.userFriendly()
             if (instance.instanceOf(DataModel)) {
                 instance = elementService.createDraftVersion((DataModel) instance, semanticVersion, context) as T
             } else {
