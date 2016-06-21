@@ -17,7 +17,6 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
     replace: true
     scope:
       element:  '='
-      descend:  '='
       treeview: '='
       extraParameters: '=?'
 
@@ -49,23 +48,6 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
         return undefined if not angular.isFunction(item.ext.get)
 
         return item.ext.get('name') ? item.ext.get('Name')
-
-      handleDescendPaths = ->
-        if angular.isArray($scope.descend)
-          if $scope.descend.length == 0
-            $scope.currentDescend = null
-            $scope.nextDescend    = []
-          else
-            $scope.currentDescend = $scope.descend[0]
-            if $scope.descend.length == 1
-              $scope.nextDescend = $scope.descend
-            else
-              $scope.nextDescend = $scope.descend.slice(1)
-              $scope.nextDescend.push($scope.currentDescend)
-        else
-          $scope.currentDescend = $scope.descend
-          $scope.nextDescend    = $scope.descend
-
 
       loadMoreIfNeeded = ->
         return if not $scope.node.numberOfChildren > $scope.node.children?.length
@@ -152,17 +134,16 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
           return ""
 
       onElementUpdate = (element) ->
-        handleDescendPaths()
 
         $scope.node = TreeviewNodeFactory.create($scope.treeview.getNodeId("#{$scope.extraParameters?.root}:#{element.link}"), element)
 
-        $scope.descendFun = $scope.element[$scope.currentDescend]
+        $scope.descendFun = $scope.element[$scope.treeview.getDescend()]
 
         $scope.node.metadataOccurrencesToAsterisk = metadataOccurrencesToAsterisk(element)
 
         $scope.node.reset = ->
-          if $scope.node.item[$scope.currentDescend]
-            $scope.node.numberOfChildren = $scope.element[$scope.currentDescend].total
+          if $scope.node.item[$scope.treeview.getDescend()]
+            $scope.node.numberOfChildren = $scope.element[$scope.treeview.getDescend()].total
             $scope.node.loadingChildren = false
           else
             $scope.node.numberOfChildren = 0
@@ -212,8 +193,6 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
 
 
       $scope.$watch 'element', onElementUpdate
-      $scope.$watch 'descend', ->
-        onElementUpdate($scope.element)
 
       onElementUpdate($scope.element)
 
@@ -227,7 +206,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
           $scope.element.updateFrom result
           $scope.node.loadChildren()
           return
-        if catalogue.isContentCandidate($scope.element[$scope.currentDescend], result, owner: $scope.element, url: url)
+        if catalogue.isContentCandidate($scope.element[$scope.treeview.getDescend()], result, owner: $scope.element, url: url)
           $scope.node.loadChildren()
 
       $scope.$on 'catalogueElementDeleted', (event, element) ->

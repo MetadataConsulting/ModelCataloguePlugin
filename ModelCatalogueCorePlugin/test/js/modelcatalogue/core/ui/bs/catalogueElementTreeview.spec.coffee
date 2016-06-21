@@ -9,10 +9,9 @@ describe "mc.core.ui.catalogueElementTreeview", ->
     catEl = enhance angular.copy(fixtures.dataType.showOne.dataType)
 
     $rootScope.element = catEl
-    $rootScope.descend = ['dataTypes']
 
     element = $compile('''
-      <catalogue-element-treeview element="element" descend="descend" id="tree-widget"></catalogue-element-treeview>
+      <catalogue-element-treeview element="element" descend="dataTypes" id="tree-widget"></catalogue-element-treeview>
     ''')($rootScope)
 
     $rootScope.$digest()
@@ -26,10 +25,9 @@ describe "mc.core.ui.catalogueElementTreeview", ->
     elements = enhance angular.copy(fixtures.dataType.list1)
 
     $rootScope.list = elements
-    $rootScope.descend = ['relationships']
 
     element = $compile('''
-      <catalogue-element-treeview list="list" descend="descend"></catalogue-element-treeview>
+      <catalogue-element-treeview list="list" descend="dataTypes"></catalogue-element-treeview>
     ''')($rootScope)
 
     $rootScope.$digest()

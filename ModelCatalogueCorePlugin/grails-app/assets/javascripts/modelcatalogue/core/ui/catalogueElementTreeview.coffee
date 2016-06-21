@@ -14,6 +14,7 @@ class CatalogueElementTreeview
       $scope.onSelect({$element: node.item}) if angular.isFunction($scope.onSelect)
 
     @getNodeId = (link) -> "#{@id}:#{link}"
+    @getDescend = -> $scope.descend
 
 
 
@@ -125,7 +126,7 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
     scope:
       element: '=?'
       list:    '=?'
-      descend: '='
+      descend: '@'
       prefetch:'=?'
       id:      '@'
       onSelect: '&?'
