@@ -11,7 +11,7 @@ angular.module('mc.util.ui.bs.actionButtonDropdown', []).run [ '$templateCache',
           </button>
 
           <ul id="{{::action.id}}BtnItems" class="dropdown-menu" role="menu">
-            <li ng-repeat="::childAction in ::action.children track by childAction.id" ng-class="::({'dropdown-header': childAction.heading, 'active': childAction.active, 'disabled': childAction.disabled})">
+            <li ng-repeat="childAction in ::action.children track by childAction.id" ng-class="::({'dropdown-header': childAction.heading, 'active': childAction.active, 'disabled': childAction.disabled})">
               <a id="{{::childAction.id}}Btn" ng-hide="::childAction.heading" ng-click="childAction.run()" ng-class="::({'disabled': childAction.disabled})"><span ng-class="::childAction.icon"></span></span><span> {{::childAction.label}}</span></a>
               <span ng-show="::childAction.heading">{{::childAction.label}}</span>
             </li>
