@@ -54,6 +54,8 @@ enabled to get important configuration from the environmental variables. You can
 The average memory consumption of the application is under 2 GB but some of the processes such as search reindexing or
 some of the reports may require more memory to run. Because of this the recommended memory setting for production environment is 8 GB.
 
+CPU consumption is usually low.
+
 The application can store Assets (blob files) in database (not recommended), file system (needs additional backup settings)
 or to Amazon S3 (preferred).
 
