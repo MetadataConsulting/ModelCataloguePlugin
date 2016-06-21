@@ -115,7 +115,7 @@ class DataModelToDocxExporter {
                 }
 
                 paragraph(style: 'document', margin: [top: 120]) {
-                    text "Version ${rootModel.versionNumber} ${rootModel.status}"
+                    text "Version ${rootModel.semanticVersion} ${rootModel.status}"
                     lineBreak()
                     text SimpleDateFormat.dateInstance.format(new Date())
                 }
@@ -140,7 +140,7 @@ class DataModelToDocxExporter {
                     }
                     allVersionsOfModel.each { DataModel model ->
                         row {
-                            cell "${model.versionNumber}", style: 'cell'
+                            cell "${model.semanticVersion}", style: 'cell'
                             cell model.lastUpdated, style: 'cell'
                             cell "${model.revisionNotes}", style:'cell'
                         }
@@ -292,7 +292,7 @@ class DataModelToDocxExporter {
     }
 
     private boolean hasExtraInformation(DataType dataType) {
-        (dataType.instanceOf(PrimitiveType) && dataType.measurementUnit) || (dataType.instanceOf(ReferenceType) && dataType.dataClass) || dataType.rule
+        (dataType.instanceOf(PrimitiveType) && dataType.measurementUnit) || dataType.instanceOf(EnumeratedType) || (dataType.instanceOf(ReferenceType) && dataType.dataClass) || dataType.rule
     }
 
 }

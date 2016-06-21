@@ -53,7 +53,7 @@ class DocxSpecificationDataHelper {
                 if (dataClass.description) {
                     text dataClass.description
                 } else {
-                    text "${dataClass.name} data class does not have any description yet.", font: [italic: true]
+                    text " ", font: [italic: true]
                 }
             }
 
@@ -79,7 +79,7 @@ class DocxSpecificationDataHelper {
                             text HEADER_CELL_TEXT, 'Data Type'
                         }
                         cell HEADER_CELL, {
-                            text HEADER_CELL_TEXT, 'Same As'
+                            text HEADER_CELL_TEXT, 'Related To'
                         }
                     }
                     for (Relationship dataElementRelationship in dataClass.containsRelationships) {
@@ -119,8 +119,8 @@ class DocxSpecificationDataHelper {
                                 }
                             }
                             cell {
-                                for (CatalogueElement synonym in dataElement.isSynonymFor) {
-                                    text CELL_TEXT, getSameAs(synonym)
+                                for (CatalogueElement relatedTo in dataElement.relatedTo) {
+                                    text CELL_TEXT, getSameAs(relatedTo)
                                     lineBreak()
                                 }
 
