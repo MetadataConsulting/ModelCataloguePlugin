@@ -10,7 +10,6 @@ import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
-import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.springframework.dao.ConcurrencyFailureException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.validation.Errors
@@ -28,8 +27,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     SecurityService modelCatalogueSecurityService
     ElementService elementService
 
-    XLSXListRenderer xlsxListRenderer
-
+    private Random random = new Random()
 
     AbstractRestfulController(Class<T> resource, boolean readOnly) {
         super(resource, readOnly)
@@ -39,7 +37,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         super(resource, false)
     }
 
-    def search(Integer max){
+    def search(Integer max) {
         handleParams(max)
 
         if (!params.search) {
@@ -52,37 +50,14 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         respond Lists.wrap(params, "/${resourceName}/search?search=${URLEncoder.encode(params.search, 'UTF-8')}", results)
     }
 
-    protected handleParams(Integer max) {
-        withFormat {
-            json {
-                params.max = Math.min(max ?: 25, 100)
-            }
-            xml {
-                params.max = Math.min(max ?: 10000, 10000)
-            }
-            xlsx {
-                params.max = Math.min(max ?: 10000, 10000)
-            }
-        }
-        if (defaultSort && !params.sort)    params.sort     = defaultSort
-        if (defaultOrder && !params.order)  params.order    = defaultOrder
-    }
-
     @Override
     def index(Integer max) {
         handleParams(max)
         respond Lists.all(params, resource, basePath)
     }
 
-
-    protected getBasePath()     { "/${resourceName}/" }
-    protected getDefaultSort()  { null }
-    protected getDefaultOrder() { null }
-    protected boolean hasUniqueName() { false }
-
-
     def validate() {
-        if(handleReadOnly()) {
+        if (handleReadOnly()) {
             return
         }
         def instance = createResource()
@@ -96,79 +71,6 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         respond instance
     }
 
-    @Override
-    @Transactional
-    def delete() {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
-            notAuthorized()
-            return
-        }
-
-        if(handleReadOnly()) {
-            return
-        }
-
-        def instance = queryForResource(params.id)
-        if (instance == null) {
-            notFound()
-            return
-        }
-
-        clearAssociationsBeforeDelete(instance)
-        checkAssociationsBeforeDelete(instance)
-
-        if (instance.hasErrors()) {
-            respond instance.errors
-            return
-        }
-
-        try{
-            instance.delete flush:true
-        }catch (DataIntegrityViolationException ignored){
-            response.status = HttpServletResponse.SC_CONFLICT
-            respond errors: message(code: "org.modelcatalogue.core.CatalogueElement.error.delete", args: [instance.name, ignored.message])
-            // STATUS CODE 409
-            return
-        } catch (Exception ignored){
-            response.status = HttpServletResponse.SC_NOT_IMPLEMENTED
-            respond errors: message(code: "org.modelcatalogue.core.CatalogueElement.error.delete", args: [instance.name, "/${resourceName}/delete/${instance.id}"])
-            // STATUS CODE 501
-            return
-        }
-
-        render status: NO_CONTENT // NO CONTENT STATUS CODE
-    }
-
-    /**
-     * Removes all the associations which can be removed before checking for their presence in
-     * checkAssociationsBeforeDelete method.
-     * @param instance
-     */
-    protected clearAssociationsBeforeDelete(T instance){
-        // do nothing by default
-    }
-
-    protected checkAssociationsBeforeDelete(T instance) {
-        GrailsDomainClass domainClass = grailsApplication.getDomainClass(resource.name)
-
-        for (GrailsDomainClassProperty property in domainClass.persistentProperties) {
-            if ((property.oneToMany || property.manyToMany) && instance.hasProperty(property.name) ){
-                def value = instance[property.name]
-                if (value) {
-                    instance.errors.rejectValue property.name, "delete.association.before.delete.entity.${property.name}", "You must remove all ${property.naturalName.toLowerCase()} before you delete this element"
-                }
-            }
-        }
-    }
-
-    protected String getRoleForSaveAndEdit() {
-        'CURATOR'
-    }
-
-    protected boolean isFavoriteAfterUpdate() {
-        return false
-    }
-
     /**
      * Saves a resource
      */
@@ -178,7 +80,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             notAuthorized()
             return
         }
-        if(handleReadOnly()) {
+        if (handleReadOnly()) {
             return
         }
         def instance = createResource()
@@ -216,11 +118,11 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         cleanRelations(instance)
 
-        instance.save flush:true
+        instance.save flush: true
 
         bindRelations(instance, false)
 
-        instance.save flush:true
+        instance.save flush: true
 
         validatePolicies(VerificationPhase.EXTENSIONS_CHECK, instance, objectToBind)
 
@@ -247,7 +149,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             notAuthorized()
             return
         }
-        if(handleReadOnly()) {
+        if (handleReadOnly()) {
             return
         }
 
@@ -263,13 +165,13 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         validatePolicies(VerificationPhase.PROPERTY_CHECK, instance, objectToBind)
 
         if (instance.hasErrors()) {
-            respond instance.errors, view:'edit' // STATUS CODE 422
+            respond instance.errors, view: 'edit' // STATUS CODE 422
             return
         }
 
         cleanRelations(instance)
 
-        instance.save flush:true
+        instance.save flush: true
 
         if (instance.hasErrors()) {
             respond instance.errors
@@ -278,7 +180,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         bindRelations(instance, false)
 
-        instance.save flush:true
+        instance.save flush: true
 
         if (instance.hasErrors()) {
             respond instance.errors
@@ -288,11 +190,108 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         validatePolicies(VerificationPhase.EXTENSIONS_CHECK, instance, objectToBind)
 
         if (instance.hasErrors()) {
-            respond instance.errors, view:'edit' // STATUS CODE 422
+            respond instance.errors, view: 'edit' // STATUS CODE 422
             return
         }
 
         respond instance, [status: OK]
+    }
+
+    @Override
+    @Transactional
+    def delete() {
+        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
+            notAuthorized()
+            return
+        }
+
+        if (handleReadOnly()) {
+            return
+        }
+
+        def instance = queryForResource(params.id)
+        if (instance == null) {
+            notFound()
+            return
+        }
+
+        clearAssociationsBeforeDelete(instance)
+        checkAssociationsBeforeDelete(instance)
+
+        if (instance.hasErrors()) {
+            respond instance.errors
+            return
+        }
+
+        try {
+            instance.delete flush: true
+        } catch (DataIntegrityViolationException ignored) {
+            response.status = HttpServletResponse.SC_CONFLICT
+            respond errors: message(code: "org.modelcatalogue.core.CatalogueElement.error.delete", args: [instance.name, ignored.message])
+            // STATUS CODE 409
+            return
+        } catch (Exception ignored) {
+            response.status = HttpServletResponse.SC_NOT_IMPLEMENTED
+            respond errors: message(code: "org.modelcatalogue.core.CatalogueElement.error.delete", args: [instance.name, "/${resourceName}/delete/${instance.id}"])
+            // STATUS CODE 501
+            return
+        }
+
+        render status: NO_CONTENT // NO CONTENT STATUS CODE
+    }
+
+    protected handleParams(Integer max) {
+        withFormat {
+            json {
+                params.max = Math.min(max ?: 25, 100)
+            }
+            xml {
+                params.max = Math.min(max ?: 10000, 10000)
+            }
+            xlsx {
+                params.max = Math.min(max ?: 10000, 10000)
+            }
+        }
+        if (defaultSort && !params.sort) params.sort = defaultSort
+        if (defaultOrder && !params.order) params.order = defaultOrder
+    }
+
+    protected getBasePath() { "/${resourceName}/" }
+
+    protected getDefaultSort() { null }
+
+    protected getDefaultOrder() { null }
+
+    protected boolean hasUniqueName() { false }
+
+    /**
+     * Removes all the associations which can be removed before checking for their presence in
+     * checkAssociationsBeforeDelete method.
+     * @param instance
+     */
+    protected clearAssociationsBeforeDelete(T instance) {
+        // do nothing by default
+    }
+
+    protected checkAssociationsBeforeDelete(T instance) {
+        GrailsDomainClass domainClass = grailsApplication.getDomainClass(resource.name)
+
+        for (GrailsDomainClassProperty property in domainClass.persistentProperties) {
+            if ((property.oneToMany || property.manyToMany) && instance.hasProperty(property.name)) {
+                def value = instance[property.name]
+                if (value) {
+                    instance.errors.rejectValue property.name, "delete.association.before.delete.entity.${property.name}", "You must remove all ${property.naturalName.toLowerCase()} before you delete this element"
+                }
+            }
+        }
+    }
+
+    protected String getRoleForSaveAndEdit() {
+        'CURATOR'
+    }
+
+    protected boolean isFavoriteAfterUpdate() {
+        return false
     }
 
     /**
@@ -312,7 +311,8 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     /**
      * @deprecated This method is no longer used by index action
      */
-    @Override @Deprecated
+    @Override
+    @Deprecated
     protected List<T> listAllResources(Map params) {
         return super.listAllResources(params)
     }
@@ -320,7 +320,8 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     /**
      * @deprecated This method is no longer used by index action
      */
-    @Override @Deprecated
+    @Override
+    @Deprecated
     protected Integer countResources() {
         return super.countResources()
     }
@@ -329,16 +330,16 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         render status: UNAUTHORIZED
     }
 
-    protected getIncludeFields(){
+    protected getIncludeFields() {
         GrailsDomainClass clazz = grailsApplication.getDomainClass(resource.name)
-        def fields = clazz.persistentProperties.collect{it.name}
-        fields.removeAll(['dateCreated', 'classifiedName', 'lastUpdated','incomingMappings', 'incomingRelationships', 'outgoingMappings', 'outgoingRelationships'])
+        def fields = clazz.persistentProperties.collect { it.name }
+        fields.removeAll(['dateCreated', 'classifiedName', 'lastUpdated', 'incomingMappings', 'incomingRelationships', 'outgoingMappings', 'outgoingRelationships'])
         fields
     }
 
     @Override
-    protected getObjectToBind(){
-        if(request.format=='json') return request.JSON
+    protected getObjectToBind() {
+        if (request.format == 'json') return request.JSON
         request
     }
 
@@ -346,9 +347,9 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
      * Clean the relations before persisting.
      * @param instance the instance to persisted
      */
-    protected cleanRelations(T instance) { }
+    protected cleanRelations(T instance) {}
 
-    protected void validatePolicies(VerificationPhase phase, T instance, Object objectToBind) { }
+    protected void validatePolicies(VerificationPhase phase, T instance, Object objectToBind) {}
 
     /**
      * Bind the relations as soon as the instance is persisted.
@@ -367,8 +368,6 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     }
 
     protected bindRelations(T instance, boolean newVersion, Object objectToBind) {}
-
-    private Random random = new Random()
 
     protected <T> T withRetryingTransaction(Map<String, Integer> settings = [:], Closure<T> body) {
         int MAX_ATTEMPTS = settings.attempts ?: 10
@@ -397,5 +396,4 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     protected void notFound() {
         render status: NOT_FOUND
     }
-
 }
