@@ -27,7 +27,7 @@ describe "mc.core.ui.catalogueElementTreeview", ->
     $rootScope.list = elements
 
     element = $compile('''
-      <catalogue-element-treeview list="list" descend="dataTypes"></catalogue-element-treeview>
+      <catalogue-element-treeview list="list" descend="relationships"></catalogue-element-treeview>
     ''')($rootScope)
 
     $rootScope.$digest()

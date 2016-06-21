@@ -11,7 +11,7 @@
         </a>
         No Data
       </span>
-      <a ng-if="element.elementType" class="catalogue-element-treeview-icon  btn btn-link"
+      <a ng-if="::element.elementType" class="catalogue-element-treeview-icon  btn btn-link"
          ng-click="select(node)">
         <span ng-if="!extraParameters.prefetch &amp;&amp; node.numberOfChildren &amp;&amp; !node.loadingChildren">
           <span class="fa fa-fw fa-caret-right text-muted" ng-if="node.collapsed">
@@ -32,7 +32,7 @@
         <span class="text-muted">
           {{node.metadataOccurrencesToAsterisk}}
         </span>
-        <small class="text-mutedd" ng-if="element.$$localName">{{element.name}}</small>
+        <small class="text-muted" ng-if="element.$$localName">{{element.name}}</small>
         <small class="text-muted">
           <span ng-if="::element.latestVersionId"
                 class="catalogue-element-treeview-version-number">
@@ -51,7 +51,7 @@
     </span>
   </div>
   <ul ng-if="node.children" ng-hide="node.collapsed" class="catalogue-element-treeview-list">
-    <catalogue-element-treeview-item extra-parameters="::{'path': path}" element="::child" treeview="::treeview"
+    <catalogue-element-treeview-item extra-parameters="::{'path': path}" element="child" treeview="::treeview"
                                      ng-repeat="child in node.children track by child.link"></catalogue-element-treeview-item>
     <li ng-if="node.numberOfChildren > node.children.length" class="catalogue-element-treeview-item">
       <span class="catalogue-element-treeview-labels" ng-click="node.showMore()">
