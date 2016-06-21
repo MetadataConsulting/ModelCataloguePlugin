@@ -104,15 +104,17 @@ class DocxSpecificationDataHelper {
                                     text attrs, dataElement.dataType.name
                                     if (dataElement.dataType?.instanceOf(EnumeratedType)) {
                                         text '\n\n'
-                                        text 'Enumerations', font: [italic: true]
-                                        text '\n'
                                         if (dataElement.dataType.enumerations.size() <= 10) {
+                                            text 'Enumerations', font: [italic: true]
+                                            text '\n'
                                             for (entry in dataElement.dataType.enumerations) {
                                                 text "${entry.key ?: ''}", font: [bold: true]
                                                 text ":"
                                                 text "${entry.value ?: ''}"
                                                 text "\n"
                                             }
+                                        } else {
+                                            text 'Enumeration >10 values, please click the link above to view the enumerations', font: [italic: true]
                                         }
 
                                     }
