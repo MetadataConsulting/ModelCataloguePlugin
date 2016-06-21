@@ -8,19 +8,13 @@ import org.modelcatalogue.core.policy.Policy
 import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftContext
-import org.modelcatalogue.core.util.*
+import org.modelcatalogue.core.util.DataModelFilter
+import org.modelcatalogue.core.util.OrderedMap
+import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
-import org.modelcatalogue.core.util.lists.CustomizableJsonListWithTotalAndType
-import org.modelcatalogue.core.util.lists.DetachedListWithTotalAndType
-import org.modelcatalogue.core.util.lists.ListWithTotalAndType
-import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeWrapper
-import org.modelcatalogue.core.util.lists.ListWrapper
-import org.modelcatalogue.core.util.lists.Lists
-import org.modelcatalogue.core.util.lists.Mappings
-import org.modelcatalogue.core.util.lists.Relationships
+import org.modelcatalogue.core.util.lists.*
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import org.modelcatalogue.core.util.marshalling.RelationshipsMarshaller
-import org.springframework.http.HttpStatus
 
 import javax.servlet.http.HttpServletResponse
 import java.util.concurrent.ExecutorService
@@ -85,7 +79,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     private reorderInternal(RelationshipDirection direction, Long id, String type) {
         // begin sanity checks
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            notAuthorized()
+            unauthorized()
             return
         }
 
@@ -106,7 +100,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         Long currentId = objectToBind?.current?.id
 
         if (!movedId) {
-            render status: HttpStatus.NOT_ACCEPTABLE
+            notAcceptable()
             return
         }
 
@@ -138,7 +132,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     private void removeRelation(Long id, String type, boolean outgoing) {
         withRetryingTransaction {
             if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-                notAuthorized()
+                unauthorized()
                 return
             }
 
@@ -191,7 +185,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     private void addRelation(Long id, String type, boolean outgoing, String minRole = 'CURATOR') {
         withRetryingTransaction {
             if (minRole && !modelCatalogueSecurityService.hasRole(minRole)) {
-                notAuthorized()
+                unauthorized()
                 return
             }
 
@@ -353,7 +347,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     private addOrRemoveMapping(boolean add) {
         withRetryingTransaction {
             if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-                notAuthorized()
+                unauthorized()
                 return
             }
 
@@ -403,7 +397,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         handleParams(max)
 
         if(params.status && !(params.status.toLowerCase() in ['finalized', 'deprecated', 'active']) && !modelCatalogueSecurityService.hasRole('VIEWER')) {
-            notAuthorized()
+            unauthorized()
             return
         }
 
@@ -484,7 +478,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
 
         if (!modelCatalogueSecurityService.hasRole('VIEWER') && !(element.status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED])) {
-            notAuthorized()
+            unauthorized()
             return
         }
 
@@ -499,7 +493,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     def update() {
 
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            notAuthorized()
+            unauthorized()
             return
         }
         if(handleReadOnly()) {
@@ -608,7 +602,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     def merge() {
 
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            notAuthorized()
+            unauthorized()
             return
         }
 
@@ -645,7 +639,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     def finalizeElement() {
         // TODO: this should be moved to DataModelController
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            notAuthorized()
+            unauthorized()
             return
         }
 
@@ -708,7 +702,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     @Transactional
     def cloneElement() {
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            notAuthorized()
+            unauthorized()
             return
         }
 
@@ -760,7 +754,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     def archive() {
         // TODO: this should be moved to DataModelController
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            notAuthorized()
+            unauthorized()
             return
         }
 
@@ -793,7 +787,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     def restore() {
         // TODO: this should be moved to DataModelController
         if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
-            notAuthorized()
+            unauthorized()
             return
         }
 

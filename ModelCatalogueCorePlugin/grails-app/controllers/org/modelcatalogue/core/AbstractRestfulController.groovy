@@ -77,7 +77,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     @Transactional
     def save() {
         if (!modelCatalogueSecurityService.hasRole(roleForSaveAndEdit)) {
-            notAuthorized()
+            unauthorized()
             return
         }
         if (handleReadOnly()) {
@@ -146,7 +146,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     @Transactional
     def update() {
         if (!modelCatalogueSecurityService.hasRole(roleForSaveAndEdit)) {
-            notAuthorized()
+            unauthorized()
             return
         }
         if (handleReadOnly()) {
@@ -201,7 +201,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     @Transactional
     def delete() {
         if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
-            notAuthorized()
+            unauthorized()
             return
         }
 
@@ -237,7 +237,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
-        render status: NO_CONTENT // NO CONTENT STATUS CODE
+        noContent()
     }
 
     protected handleParams(Integer max) {
@@ -326,10 +326,6 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         return super.countResources()
     }
 
-    protected void notAuthorized() {
-        render status: UNAUTHORIZED
-    }
-
     protected getIncludeFields() {
         GrailsDomainClass clazz = grailsApplication.getDomainClass(resource.name)
         def fields = clazz.persistentProperties.collect { it.name }
@@ -393,7 +389,28 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         throw new IllegalStateException("Couldn't execute action ${actionName} on ${resource} controller with parameters ${params} after ${attempt} attempts")
     }
 
+    protected void ok() {
+        render status: OK
+    }
+
+    protected void noContent() {
+        render status: NO_CONTENT
+    }
+
+    protected void unauthorized() {
+        render status: UNAUTHORIZED
+    }
+
+    @Override
     protected void notFound() {
         render status: NOT_FOUND
+    }
+
+    protected void methodNotAllowed() {
+        render status: METHOD_NOT_ALLOWED
+    }
+
+    protected void notAcceptable() {
+        render status: NOT_ACCEPTABLE
     }
 }

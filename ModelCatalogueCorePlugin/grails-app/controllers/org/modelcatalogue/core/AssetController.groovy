@@ -29,7 +29,7 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
 
     def upload() {
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            notAuthorized()
+            unauthorized()
             return
         }
         MultipartFile file = request.getFile('asset')

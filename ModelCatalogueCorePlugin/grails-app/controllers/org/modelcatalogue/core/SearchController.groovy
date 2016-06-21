@@ -2,13 +2,12 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.rx.LoggingSubscriber
 import org.modelcatalogue.core.util.lists.Lists
-import rx.Subscriber
 
 import java.util.concurrent.ExecutorService
 
-import static org.springframework.http.HttpStatus.*
+import static org.springframework.http.HttpStatus.OK
 
-class SearchController extends AbstractRestfulController<CatalogueElement>{
+class SearchController extends AbstractRestfulController<CatalogueElement> {
 
     static responseFormats = ['json', 'xml', 'xlsx']
 
@@ -18,7 +17,7 @@ class SearchController extends AbstractRestfulController<CatalogueElement>{
         super(CatalogueElement, true)
     }
 
-    def index(Integer max){
+    def index(Integer max) {
         setSafeMax(max)
 
         if (!params.search) {
@@ -36,7 +35,7 @@ class SearchController extends AbstractRestfulController<CatalogueElement>{
      */
     def reindex() {
         if (!modelCatalogueSecurityService.hasRole("ADMIN")) {
-            notAuthorized()
+            unauthorized()
             return
         }
 
@@ -46,7 +45,6 @@ class SearchController extends AbstractRestfulController<CatalogueElement>{
                 modelCatalogueSearchService.reindex().toBlocking().subscribe(LoggingSubscriber.create(log, "... reindexing finished", "Error reindexing the catalogue"))
             }.prettyPrint()
         }
-
 
         respond(success: true, status: OK)
     }
@@ -60,7 +58,5 @@ class SearchController extends AbstractRestfulController<CatalogueElement>{
                 params.max = Math.min(max ?: 10000, 10000)
             }
         }
-
     }
-
 }

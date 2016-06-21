@@ -22,7 +22,7 @@ class CsvTransformationController extends AbstractRestfulController<CsvTransform
         }
 
         if (!modelCatalogueSecurityService.hasRole('USER')) {
-            notAuthorized()
+            unauthorized()
             return
         }
 
