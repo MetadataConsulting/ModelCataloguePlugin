@@ -49,11 +49,11 @@ cd ..
 #cd ..
 
 # moved to test app
-cd ModelCatalogueElasticSearchPlugin
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "es_integration" ] || [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
-    ./grailsw test-app integration: --non-interactive
-fi
-cd ..
+#cd ModelCatalogueElasticSearchPlugin
+#if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "es_integration" ] || [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+#    ./grailsw test-app integration: --non-interactive
+#fi
+#cd ..
 
 cd ModelCatalogueGenomicsPlugin
 if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "gel_integration" ] || [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
