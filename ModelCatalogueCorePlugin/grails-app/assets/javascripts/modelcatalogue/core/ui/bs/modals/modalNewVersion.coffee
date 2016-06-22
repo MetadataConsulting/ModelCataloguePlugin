@@ -35,13 +35,14 @@ angular.module('mc.core.ui.bs.modalNewVersion', ['mc.util.messages']).config ['m
 
           $scope.createDraftVersion = ->
             $scope.pending = true
-            catalogueElementResource(args.element.elementType).update(args.element, {newVersion: true, semanticVersion: $scope.semanticVersion}).then (updated) ->
+            args.element.execute('newVersion', 'POST', semanticVersion: $scope.semanticVersion).then (updated) ->
               args.element.updateFrom  updated
-              messages.success("New version created for #{args.element.name}")
-              $rootScope.$broadcast 'newVersionCreated', updated
-              $rootScope.$broadcast 'redrawContextualActions'
-              $modalInstance.close(updated)
-              $scope.pending = false
+              messages.prompt('Draft progress', null, type: 'feedback', id: args.element.id).then ->
+                $modalInstance.close(updated)
+                $scope.pending = false
+                $rootScope.$broadcast 'newVersionCreated', updated
+                $rootScope.$broadcast 'redrawContextualActions'
+                updated.show(true)
             , (response) ->
               $scope.pending = false
               $scope.messages.showErrorsFromResponse(response)

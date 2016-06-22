@@ -43,12 +43,12 @@ angular.module('mc.core.ui.bs.modalFinalize', ['mc.util.messages']).config ['mes
             $scope.working = true
             enhance(rest(url: "#{modelCatalogueApiRoot}#{args.element.link}/finalize", method: 'POST', params: {semanticVersion: $scope.semanticVersion, revisionNotes: $scope.revisionNotes})).then (finalized) ->
               args.element.updateFrom finalized
-              $rootScope.$broadcast 'catalogueElementUpdated', finalized
-              $rootScope.$broadcast 'catalogueElementFinalized', finalized
-              $rootScope.$broadcast 'redrawContextualActions'
               $scope.working = false
               messages.prompt('Finalization progress', null, type: 'feedback', id: args.element.id).then ->
                 $modalInstance.close(finalized)
+                $rootScope.$broadcast 'catalogueElementUpdated', finalized
+                $rootScope.$broadcast 'catalogueElementFinalized', finalized
+                $rootScope.$broadcast 'redrawContextualActions'
                 finalized.show(true)
             , (response) ->
               $scope.messages.showErrorsFromResponse(response)
