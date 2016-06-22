@@ -13,8 +13,6 @@ import static org.modelcatalogue.core.util.test.FileOpener.open
  */
 class DataModelChangeLogXlsExporterSpec extends AbstractDataModelExporterSpec {
 
-    SessionFactory sessionFactory
-
     def "Export data spec change logs to xls"() {
         when:
         DataModel dataModel = buildTestModel()

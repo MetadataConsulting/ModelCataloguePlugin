@@ -1,6 +1,7 @@
 package org.modelcatalogue.gel.export
 
 import grails.test.spock.IntegrationSpec
+import org.hibernate.SessionFactory
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModelService
@@ -8,6 +9,7 @@ import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.InitCatalogueService
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
+import org.modelcatalogue.core.util.test.TestDataHelper
 
 /**
  * Created by rickrees on 07/04/2016.
@@ -45,56 +47,58 @@ class AbstractCancerTypesExporterSpec extends IntegrationSpec{
     ElementService elementService
     DataModelService dataModelService
     InitCatalogueService initCatalogueService
+    SessionFactory sessionFactory
 
     def setup() {
-        initCatalogueService.initDefaultRelationshipTypes()
+        TestDataHelper.initFreshDb(sessionFactory, 'cancer-types.sql') {
+            initCatalogueService.initDefaultRelationshipTypes()
 
-        DefaultCatalogueBuilder catalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
+            DefaultCatalogueBuilder catalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
 
-        catalogueBuilder.build {
+            catalogueBuilder.build {
 
-            dataModel(name: DATA_MODEL_NAME) {
-                dataClass(name: ROOT_CANCER_TYPE) {
-                    dataClass(name: ADULT_GLIOMA_TYPE1) {
-                        dataElement name: ADULT_GLIOMA_SUBTYPE_1, {
-                            description "adult glioma description"
-                            dataType name: ADULT_GLIOMA_ENUM, enumerations: [    //shouldn't display this level
-                                'one': '1',
-                                'two': '2',
-                            ]
+                dataModel(name: DATA_MODEL_NAME) {
+                    dataClass(name: ROOT_CANCER_TYPE) {
+                        dataClass(name: ADULT_GLIOMA_TYPE1) {
+                            dataElement name: ADULT_GLIOMA_SUBTYPE_1, {
+                                description "adult glioma description"
+                                dataType name: ADULT_GLIOMA_ENUM, enumerations: [    //shouldn't display this level
+                                                                                     'one': '1',
+                                                                                     'two': '2',
+                                ]
 
-                        }
+                            }
 
-                        dataElement(name: ADULT_GLIOMA_PRESENTATION_1) {
-                            description "adult glioma presentation description"
-                            dataType name: "Data Element12"
+                            dataElement(name: ADULT_GLIOMA_PRESENTATION_1) {
+                                description "adult glioma presentation description"
+                                dataType name: "Data Element12"
+                            }
                         }
-                    }
-                    dataClass(name: SOME_CANCER_TYPE2) {
-                        dataElement(name: SOME_CANCER_SUBTYPE_21) {
-                            description "some cancer description subtype21"
-                            dataType name: "Data Element21"
-                        }
-                        dataElement(name: SOME_CANCER_SUBTYPE_22) {
-                            description "some cancer description subtype22"
-                            dataType name: SOME_CANCER_ENUM, enumerations: [
-                                'first': 'a',
-                                'second': 'b',
-                            ]
-                        }
-                        dataElement(name: SOME_CANCER_PRESENTATION_21) {
-                            description "some cancer presentation description21"
-                            dataType name: "Data Element23"
-                        }
-                        dataElement(name: SOME_CANCER_PRESENTATION_22) {
-                            description "some cancer presentation description22"
-                            dataType name: "Data Element24"
+                        dataClass(name: SOME_CANCER_TYPE2) {
+                            dataElement(name: SOME_CANCER_SUBTYPE_21) {
+                                description "some cancer description subtype21"
+                                dataType name: "Data Element21"
+                            }
+                            dataElement(name: SOME_CANCER_SUBTYPE_22) {
+                                description "some cancer description subtype22"
+                                dataType name: SOME_CANCER_ENUM, enumerations: [
+                                    'first': 'a',
+                                    'second': 'b',
+                                ]
+                            }
+                            dataElement(name: SOME_CANCER_PRESENTATION_21) {
+                                description "some cancer presentation description21"
+                                dataType name: "Data Element23"
+                            }
+                            dataElement(name: SOME_CANCER_PRESENTATION_22) {
+                                description "some cancer presentation description22"
+                                dataType name: "Data Element24"
+                            }
                         }
                     }
                 }
             }
         }
-
 
         def adultType = DataClass.findByName(ADULT_GLIOMA_TYPE1)
         cancer_type_1_adult_glioma_id = adultType.getId()
