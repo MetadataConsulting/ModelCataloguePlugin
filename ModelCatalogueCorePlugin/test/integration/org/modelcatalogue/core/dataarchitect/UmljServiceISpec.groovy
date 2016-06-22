@@ -1,4 +1,4 @@
-package x.org.modelcatalogue.core.dataarchitect
+package org.modelcatalogue.core.dataarchitect
 import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataClass

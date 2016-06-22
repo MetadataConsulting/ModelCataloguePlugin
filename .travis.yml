@@ -14,9 +14,8 @@ addons:
     paths:
     - $HOME/reports
 env:
-- TEST_SUITE=app_functional
-- TEST_SUITE=other_integration
-- TEST_SUITE=core
+- TEST_SUITE=functional
+- TEST_SUITE=unit_and_integration
 jdk:
 - oraclejdk8
 before_install:
