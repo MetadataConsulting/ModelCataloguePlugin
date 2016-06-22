@@ -58,6 +58,10 @@ class DraftChain extends PublishingChain {
         return draftDataModel
     }
 
+    public <T extends CatalogueElement> T changeType(T element, Publisher<CatalogueElement> archiver) {
+        return createDraft(element, element.dataModel, archiver)
+    }
+
     private <T extends CatalogueElement> T createDraft(T element, DataModel draftDataModel, Publisher<CatalogueElement> archiver) {
         if (!element.latestVersionId) {
             element.latestVersionId = element.id
