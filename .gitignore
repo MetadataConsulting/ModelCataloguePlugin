@@ -1,6 +1,8 @@
 **.iml
 **/.idea/**/*
 **/atlassian-ide-plugin.xml
+ModelCatalogueCorePluginTestApp/elasticsearch/
+ModelCatalogueCorePluginTestApp/test/drivers/
 ModelCatalogueCorePlugin/test/unit/resources/SACT/Breast_XMLSchema.xsd
 ModelCatalogueCorePlugin/test/unit/resources/SACT/XMLDataTypes.xsd
 ModelCatalogueCorePlugin/test/integration/resources/rare_diseases_combined.umlj
