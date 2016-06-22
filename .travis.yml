@@ -37,7 +37,7 @@ deploy:
   - conf/docker/mc-config.groovy
   on:
     tags: true
-    condition: $TEST_SUITE = other_integration
+    condition: $TEST_SUITE = functional
 notifications:
   slack:
     secure: T234ojDb39JTjjtaNYICpTu3V0HNSwHb2LWq9cMrvDmoHjzKOOeudpel3ev1Am5/bI0WNKqQYBcIpgxJ6578425JDk0XmFR+AKJqMQdhTB9vDIvRI0p/vhoC6QbNF+Kdo6sXuOPAtqlU1L2CM/occnxbbI7mcxkjBADohmAlpbY=
