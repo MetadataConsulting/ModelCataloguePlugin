@@ -55,11 +55,12 @@ cd ..
 #fi
 #cd ..
 
-cd ModelCatalogueGenomicsPlugin
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "gel_integration" ] || [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
-    ./grailsw test-app integration: --non-interactive
-fi
-cd ..
+# moved to test app
+#cd ModelCatalogueGenomicsPlugin
+#if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "gel_integration" ] || [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+#    ./grailsw test-app integration: --non-interactive
+#fi
+#cd ..
 
 cd ModelCatalogueCorePlugin
 # karma tests, part of the integration as they needs the fixtures generated from the integration tests
