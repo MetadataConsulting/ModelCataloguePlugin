@@ -30,7 +30,9 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
 
     void initCatalogue(){
         relationshipTypeService.clearCache()
-        initCatalogueService.initCatalogue(true)
+        TestDataHelper.initFreshDb(sessionFactory, 'initcatalogue.sql') {
+            initCatalogueService.initCatalogue(true)
+        }
     }
 
     void loadFixtures(){

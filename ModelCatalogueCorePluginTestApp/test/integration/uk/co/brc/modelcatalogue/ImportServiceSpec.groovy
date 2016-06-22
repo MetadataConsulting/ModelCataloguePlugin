@@ -4,6 +4,7 @@ import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
+import org.modelcatalogue.core.util.test.TestDataHelper
 import org.modelcatalogue.testapp.AbstractIntegrationSpec
 
 class ImportServiceSpec extends AbstractIntegrationSpec {
@@ -11,8 +12,11 @@ class ImportServiceSpec extends AbstractIntegrationSpec {
     def importService
 
     def setup() {
-        initCatalogue()
-        importService.importData()
+        TestDataHelper.initFreshDb(sessionFactory, 'nhic.sql') {
+            relationshipTypeService.clearCache()
+            initCatalogue()
+            importService.importData()
+        }
     }
 
 
