@@ -5,7 +5,7 @@ source ./bin/lib/test-setup.sh
 # please update sibling script /collect/reports.sh when you update this file
 
 # karma and functional tests needs to fetch the bower components
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "core" ] || [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "app_functional_a" ] || [ "$TEST_SUITE" = "app_functional_b" ] || [ "$TEST_SUITE" = "app_functional_c" ] ||  [ "$TEST_SUITE" = "" ] ; then
+if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "core" ] || [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "app_functional_a" ] || [ "$TEST_SUITE" = "app_functional_ab" ] || [ "$TEST_SUITE" = "app_functional_b" ] || [ "$TEST_SUITE" = "app_functional_c" ] ||  [ "$TEST_SUITE" = "" ] ; then
     ./setup-frontend.sh
 fi
 
@@ -88,12 +88,12 @@ if [ "$TEST_SUITE" = "functional" ] || [ "$TEST_SUITE" = "app_functional" ] || [
     ./grailsw test-app functional: -war --non-interactive
 fi
 
-if [ "$TEST_SUITE" = "app_functional_a" ] || [ "$TEST_SUITE" = "app_integration_ab" ] ; then
+if [ "$TEST_SUITE" = "app_functional_a" ] || [ "$TEST_SUITE" = "app_functional_ab" ] ; then
     set -x
     ./grailsw test-app functional: org.modelcatalogue.core.a.**.* -war --non-interactive
 fi
 
-if [ "$TEST_SUITE" = "app_functional_b" ] || [ "$TEST_SUITE" = "app_integration_ab" ] ; then
+if [ "$TEST_SUITE" = "app_functional_b" ] || [ "$TEST_SUITE" = "app_functional_ab" ] ; then
     set -x
     ./grailsw test-app functional: org.modelcatalogue.core.b.**.* -war --non-interactive
 fi
