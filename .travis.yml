@@ -14,8 +14,7 @@ addons:
     paths:
     - $HOME/reports
 env:
-- TEST_SUITE=app_functional_a
-- TEST_SUITE=app_functional_b
+- TEST_SUITE=app_functional_ab
 - TEST_SUITE=app_functional_c
 - TEST_SUITE=other_integration
 - TEST_SUITE=core

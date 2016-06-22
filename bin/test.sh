@@ -88,12 +88,12 @@ if [ "$TEST_SUITE" = "functional" ] || [ "$TEST_SUITE" = "app_functional" ] || [
     ./grailsw test-app functional: -war --non-interactive
 fi
 
-if [ "$TEST_SUITE" = "app_functional_a" ] ; then
+if [ "$TEST_SUITE" = "app_functional_a" ] || [ "$TEST_SUITE" = "app_integration_ab" ] ; then
     set -x
     ./grailsw test-app functional: org.modelcatalogue.core.a.**.* -war --non-interactive
 fi
 
-if [ "$TEST_SUITE" = "app_functional_b" ] ; then
+if [ "$TEST_SUITE" = "app_functional_b" ] || [ "$TEST_SUITE" = "app_integration_ab" ] ; then
     set -x
     ./grailsw test-app functional: org.modelcatalogue.core.b.**.* -war --non-interactive
 fi
