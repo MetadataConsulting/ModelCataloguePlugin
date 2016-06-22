@@ -53,8 +53,6 @@ fi
 
 if [ "$TEST_SUITE" = "functional" ] || [ "$TEST_SUITE" = "" ] ; then
     ./grailsw test-app functional: -war --non-interactive
-    ./grailsw test-app integration: --non-interactive
-    copy_functional_test_results
 fi
 
 cd ..
