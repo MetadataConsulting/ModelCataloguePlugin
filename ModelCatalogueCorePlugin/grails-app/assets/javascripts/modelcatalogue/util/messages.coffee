@@ -68,6 +68,7 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
         promptByTypes[type] = $injector.invoke(factory, undefined, {messages: messages})
 
       addMessage = (title, body, type) ->
+        afterTimeout = null
         # if you pass only first argument it will became the body
         if not body?
           body = title
@@ -83,7 +84,10 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
 
 
         msg.timeout = (timeout) ->
-          $timeout((-> msg.remove()), timeout)
+          # first cancel the old timeout
+          $timeout.cancel(afterTimeout) if afterTimeout
+          # set new timeout
+          afterTimeout = $timeout((-> msg.remove()), timeout)
           msg
 
 
