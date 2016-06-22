@@ -1,6 +1,7 @@
 package org.modelcatalogue.gel.export
 
 import grails.test.spock.IntegrationSpec
+import org.hibernate.SessionFactory
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.core.*
@@ -8,6 +9,7 @@ import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.ddl.DataDefinitionLanguage
 import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
+import org.modelcatalogue.core.util.test.TestDataHelper
 import org.modelcatalogue.gel.RareDiseaseCsvExporter
 
 /**
@@ -15,11 +17,13 @@ import org.modelcatalogue.gel.RareDiseaseCsvExporter
  */
 class AbstractDataModelExporterSpec extends IntegrationSpec {
 
+    public static final String DATA_MODEL_EXPORTER_DATA_MODEL_NAME = 'Data Exporter Test Data Model'
     AuditService auditService
     DataClassService dataClassService
     ElementService elementService
     DataModelService dataModelService
     InitCatalogueService initCatalogueService
+    SessionFactory sessionFactory
 
     def setup() {
         initCatalogueService.initDefaultRelationshipTypes()
@@ -37,59 +41,62 @@ class AbstractDataModelExporterSpec extends IntegrationSpec {
 
     // Model Based on Strcture of RD and Cancer Models
     DataModel buildTestModel() {
-        DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
+        TestDataHelper.initFreshDb(sessionFactory, 'data-model-exporter.sql') {
+            initCatalogueService.initDefaultRelationshipTypes()
+            DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
 
-        DataModel testModel = builder.build {
-            dataModel(name: 'Test Data Model') { //e.g. Cancer Model
-                description "This is a data model for testing Data Specification change log exports"
+            builder.build {
+                dataModel(name: DATA_MODEL_EXPORTER_DATA_MODEL_NAME) { //e.g. Cancer Model
+                    description "This is a data model for testing Data Specification change log exports"
 
-                dataClass(name: 'Dataclass Top Level 1 Root') { //e.g. Cancer
-                    for (int i in 1..2) {
-                        dataClass name: "Info >>>$i<<< Level2", {
-                            description "This is a description for Model $i" //E.g. Essential Sample Metadata
+                    dataClass(name: 'Dataclass Top Level 1 Root') { //e.g. Cancer
+                        for (int i in 1..2) {
+                            dataClass name: "Info >>>$i<<< Level2", {
+                                description "This is a description for Model $i" //E.g. Essential Sample Metadata
 
-                            for (int j in 1..2) {
-                                dataClass name: "Info >>>$i<<< subCategory Level3 Model Data Element $j", {//e.g. Patient, Contact Details, Consent...
-                                    description "This is a description for Model $i Data Element $j"
+                                for (int j in 1..2) {
+                                    dataClass name: "Info >>>$i<<< subCategory Level3 Model Data Element $j", {//e.g. Patient, Contact Details, Consent...
+                                        description "This is a description for Model $i Data Element $j"
 
-                                    dataElement name: "Form Element 1" //e.g. Surname
-                                    dataElement name: "Form Element 2" //e.g. Gender
-                                    dataElement name: "Form Element 3" //e.g. GCM ID
+                                        dataElement name: "Form Element 1" //e.g. Surname
+                                        dataElement name: "Form Element 2" //e.g. Gender
+                                        dataElement name: "Form Element 3" //e.g. GCM ID
 
-                                    dataClass name: "Info >>$i<< heading Level4 Model Data Element $j", { //e.g. Participant Identifiers
-                                        description "Disorder >$i< heading Level4 description for Model $i Data Element $j"
+                                        dataClass name: "Info >>$i<< heading Level4 Model Data Element $j", { //e.g. Participant Identifiers
+                                            description "Disorder >$i< heading Level4 description for Model $i Data Element $j"
 
-                                        dataElement name: "Form Element 4" //e.g. Participant ID
-                                        dataElement name: "Form Element 5" //e.g. DOB
-                                        dataElement name: "Form Element 6" //e.g. NHS Number
+                                            dataElement name: "Form Element 4" //e.g. Participant ID
+                                            dataElement name: "Form Element 5" //e.g. DOB
+                                            dataElement name: "Form Element 6" //e.g. NHS Number
 
-                                        dataClass name: ">>$i<< Level5 Model Data Element $j", { //e.g. ??
-                                            description ">$i< Level5 description for Model $i Data item $j"
+                                            dataClass name: ">>$i<< Level5 Model Data Element $j", { //e.g. ??
+                                                description ">$i< Level5 description for Model $i Data item $j"
+                                            }
                                         }
                                     }
                                 }
-                            }
 
+                            }
                         }
                     }
+
+                    ext Metadata.OWNER, 'The Owner'
+                    ext Metadata.ORGANISATION, 'The Organisation'
+                    ext Metadata.AUTHORS, 'Author One, Author Two, Author Three'
+                    ext Metadata.REVIEWERS, 'Reviewer One, Reviewer Two, Reviewer Three'
+
                 }
-
-                ext Metadata.OWNER, 'The Owner'
-                ext Metadata.ORGANISATION, 'The Organisation'
-                ext Metadata.AUTHORS, 'Author One, Author Two, Author Three'
-                ext Metadata.REVIEWERS, 'Reviewer One, Reviewer Two, Reviewer Three'
-
             }
         }
 
-        return testModel
+        return DataModel.findByName(DATA_MODEL_EXPORTER_DATA_MODEL_NAME)
 
     }
 
 
     void makeChanges() {
 
-        DataDefinitionLanguage.with('Test Data Model') {
+        DataDefinitionLanguage.with(DATA_MODEL_EXPORTER_DATA_MODEL_NAME) {
 
             update 'Min Occurs' of 'Info >>1<< heading Level4 Model Data Element 2' to '1'
             update 'Max Occurs' of 'Info >>2<< heading Level4 Model Data Element 1' to '3'

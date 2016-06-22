@@ -1,8 +1,6 @@
 package org.modelcatalogue.gel.export
 
-import groovy.json.JsonOutput
 import org.modelcatalogue.core.DataClass
-import spock.lang.Specification
 
 /**
  * Created by rickrees on 07/04/2016.
