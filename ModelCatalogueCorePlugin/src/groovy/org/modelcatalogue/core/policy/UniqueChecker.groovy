@@ -4,6 +4,7 @@ import grails.gorm.DetachedCriteria
 import groovy.transform.CompileStatic
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.api.ElementStatus
 
 import static com.google.common.base.Preconditions.checkNotNull
 
@@ -28,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull
         Object value = item.getProperty(property)
 
         DetachedCriteria<? extends T> criteria = new DetachedCriteria<? extends T>(resource)
-        criteria.eq('dataModel', model).eq(property, value)
+        criteria.eq('dataModel', model).eq(property, value).ne('status', ElementStatus.DEPRECATED)
 
         if (criteria.count() > 1) {
             (errorsToItem ? item : model).errors.reject('uniqueChecker.duplicate', [model, ignored, item, property, ignored] as Object[], messageOverride ?: "Property {3} must be unique for every {2} within {0}")

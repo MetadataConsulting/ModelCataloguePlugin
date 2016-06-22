@@ -13,7 +13,6 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def setup() {
         loadFixtures()
-
     }
 
     def elementService
@@ -969,6 +968,26 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         typeHierarchy.total == 2L
         typeHierarchy.items[0] == l2
         typeHierarchy.items[1] == l1
+    }
+
+    def "change type"() {
+        given:
+            DataModel dataModel = new DataModel(name: 'Test Change Type').save(failOnError: true)
+            EnumeratedType type = new EnumeratedType(name: 'Test Change Type Enum', enumerations: [a: 'b'], dataModel: dataModel).save(failOnError: true)
+            DataElement element = new DataElement(name: 'Data Element for Testing Change Type', dataModel: dataModel, dataType: type).save(failOnError: true)
+        expect:
+            type
+            type.instanceOf(EnumeratedType)
+            type.dataModel == dataModel
+            element.dataType == type
+        when:
+            PrimitiveType primitiveType = elementService.changeType(type, PrimitiveType)
+        then:
+            primitiveType
+            primitiveType.instanceOf(PrimitiveType)
+            primitiveType.dataModel == dataModel
+            type.status == ElementStatus.DEPRECATED
+            element.dataType == primitiveType
     }
 
 

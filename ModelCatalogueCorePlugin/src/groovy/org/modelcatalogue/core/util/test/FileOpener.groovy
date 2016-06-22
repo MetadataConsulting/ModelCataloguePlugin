@@ -15,6 +15,9 @@ class FileOpener {
      * @param file file to be opened
      */
     static void open(File file) {
+        if (System.getenv('FILE_OPENER_SKIP') == 'true') {
+            return
+        }
         try {
             if (Desktop.desktopSupported && Desktop.desktop.isSupported(Desktop.Action.OPEN)) {
                 Desktop.desktop.open(file)

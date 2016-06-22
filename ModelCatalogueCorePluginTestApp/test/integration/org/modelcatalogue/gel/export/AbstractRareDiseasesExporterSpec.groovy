@@ -10,6 +10,7 @@ import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.ddl.DataDefinitionLanguage
 import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
+import org.modelcatalogue.core.util.test.TestDataHelper
 import org.modelcatalogue.gel.GenomicsService
 import org.modelcatalogue.gel.RareDiseaseCsvExporter
 
@@ -18,6 +19,7 @@ import org.modelcatalogue.gel.RareDiseaseCsvExporter
  */
 class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
 
+    public static final String RARE_DISEASE_DATA_MODEL_NAME = 'Rare Diseases Test Data Model'
     AuditService auditService
     DataClassService dataClassService
     ElementService elementService
@@ -51,88 +53,91 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
     // this model reflects the data mix of eligibility criteria, phenotypes & clinical tests that need to be extracted
     // by the two report generation methods it's a bit nasty looking but creates a fairly realistic model
     DataModel buildTestModel(boolean createPhenotypes) {
-        DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
+        TestDataHelper.initFreshDb(sessionFactory, 'rare-diseases.sql') {
+            initCatalogueService.initDefaultRelationshipTypes()
+            DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
 
-        DataModel testModel = builder.build {
-            dataModel(name: 'Test Data Model') {
-                description "This is a data model for testing Eligibility OR Phenotype and Clinicals tests exports"
+            builder.build {
+                dataModel(name: RARE_DISEASE_DATA_MODEL_NAME) {
+                    description "This is a data model for testing Eligibility OR Phenotype and Clinicals tests exports"
 
-                dataClass (name: 'Dataclass Top Level 1 Root') {
-                    for (int i in 1..2) {
-                        dataClass name: "Disorder >>>$i<<< Level2", {
-                            description "This is a description for Model $i"
+                    dataClass (name: 'Dataclass Top Level 1 Root') {
+                        for (int i in 1..2) {
+                            dataClass name: "Disorder >>>$i<<< Level2", {
+                                description "This is a description for Model $i"
 
-                            for (int j in 1..2) {
-                                dataClass name: "Disorder >>>$i<<< SubCondition Level3 Model Data Element $j", {
-                                    description "This is a description for Model $i Data Element $j"
+                                for (int j in 1..2) {
+                                    dataClass name: "Disorder >>>$i<<< SubCondition Level3 Model Data Element $j", {
+                                        description "This is a description for Model $i Data Element $j"
 
-                                    dataClass name: "Disorder >>$i<< heading Level4 Model Data Element $j", {
-                                        description "Disorder >>$i<< heading Level4 description for Model Data Element $j"
+                                        dataClass name: "Disorder >>$i<< heading Level4 Model Data Element $j", {
+                                            description "Disorder >>$i<< heading Level4 description for Model Data Element $j"
 
-                                        dataClass name: "Disorder >$i< Eligibility Level5 Model $i Data Element $j", {
-                                            description "Disorder >$i< heading Level5 description for Model $i Data Element $j"
+                                            dataClass name: "Disorder >$i< Eligibility Level5 Model $i Data Element $j", {
+                                                description "Disorder >$i< heading Level5 description for Model $i Data Element $j"
 
-                                            dataClass name: "Inclusion criteria name $i $j", {
-                                                description "Inclusion criteria description  $i $j"
+                                                dataClass name: "Inclusion criteria name $i $j", {
+                                                    description "Inclusion criteria description  $i $j"
+                                                }
+                                                dataClass name: "Exclusion criteria name $i $j", {
+                                                    description "Exclusion criteria description  $i $j"
+                                                }
+                                                dataClass name: "Prior Genetic testing name $i $j", {
+                                                    description "Prior Genetic testing description  $i $j"
+                                                }
+                                                dataClass name: "Prior testing genes name $i $j", {
+                                                    description "Prior testing genes description  $i $j"
+                                                }
+                                                dataClass name: "Closing statement name $i $j", {
+                                                    description "Closing statement description  $i $j"
+                                                }
+                                                dataClass name: "Guidance name $i $j", {
+                                                    description "Guidance description  $i $j"
+                                                }
                                             }
-                                            dataClass name: "Exclusion criteria name $i $j", {
-                                                description "Exclusion criteria description  $i $j"
-                                            }
-                                            dataClass name: "Prior Genetic testing name $i $j", {
-                                                description "Prior Genetic testing description  $i $j"
-                                            }
-                                            dataClass name: "Prior testing genes name $i $j", {
-                                                description "Prior testing genes description  $i $j"
-                                            }
-                                            dataClass name: "Closing statement name $i $j", {
-                                                description "Closing statement description  $i $j"
-                                            }
-                                            dataClass name: "Guidance name $i $j", {
-                                                description "Guidance description  $i $j"
-                                            }
-                                        }
 
-                                        dataClass name: "Disorder >$i< Phenotypes Level5 Model $i Data Element $j", {
-                                            description "Disorder >$i< heading Level5 description for Model $i Data Element $j"
+                                            dataClass name: "Disorder >$i< Phenotypes Level5 Model $i Data Element $j", {
+                                                description "Disorder >$i< heading Level5 description for Model $i Data Element $j"
 
-                                            if (createPhenotypes) {
-                                                for (int k in 1..15) {
-                                                    dataClass name: "Phenotype ($k) name $i $j", {
-                                                        ext "OBO ID", "HP:" + (i + j + k)
+                                                if (createPhenotypes) {
+                                                    for (int k in 1..15) {
+                                                        dataClass name: "Phenotype ($k) name $i $j", {
+                                                            ext "OBO ID", "HP:" + (i + j + k)
+                                                        }
                                                     }
                                                 }
                                             }
-                                        }
 
-                                        dataClass name: "Disorder >$i< Clinical tests Level5 Model $i Data Element $j", {
-                                            description "Disorder >$i< heading Level5 description for Model $i Data Element $j"
+                                            dataClass name: "Disorder >$i< Clinical tests Level5 Model $i Data Element $j", {
+                                                description "Disorder >$i< heading Level5 description for Model $i Data Element $j"
 
-                                            for (int k in 1..5) {
-                                                dataClass name: "Clinical tests ($k) name $i $j", {
+                                                for (int k in 1..5) {
+                                                    dataClass name: "Clinical tests ($k) name $i $j", {
+                                                    }
                                                 }
                                             }
-                                        }
 
-                                        dataClass name: "Disorder >$i< Guidance name $i $j", {
-                                            description "Guidance description  $i $j"
+                                            dataClass name: "Disorder >$i< Guidance name $i $j", {
+                                                description "Guidance description  $i $j"
+                                            }
                                         }
                                     }
                                 }
-                            }
 
+                            }
                         }
                     }
+
+                    ext Metadata.OWNER, 'The Owner'
+                    ext Metadata.ORGANISATION, 'The Organisation'
+                    ext Metadata.AUTHORS, 'Author One, Author Two, Author Three'
+                    ext Metadata.REVIEWERS, 'Reviewer One, Reviewer Two, Reviewer Three'
+
                 }
-
-                ext Metadata.OWNER, 'The Owner'
-                ext Metadata.ORGANISATION, 'The Organisation'
-                ext Metadata.AUTHORS, 'Author One, Author Two, Author Three'
-                ext Metadata.REVIEWERS, 'Reviewer One, Reviewer Two, Reviewer Three'
-
             }
         }
 
-        return testModel
+        return DataModel.findByName(RARE_DISEASE_DATA_MODEL_NAME)
 
     }
 
@@ -143,7 +148,7 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
 
         DataClass model = DataClass.findByNameAndStatus('Dataclass Top Level 1 Root', ElementStatus.DRAFT)
 
-        DataDefinitionLanguage.with('Test Data Model') {
+        DataDefinitionLanguage.with(RARE_DISEASE_DATA_MODEL_NAME) {
 
             update 'hierarchy' of 'Disorder >1< Phenotypes Level5 Model 1 Data Element 1' remove 'Phenotype (2) name 1 1'
 

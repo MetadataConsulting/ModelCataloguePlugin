@@ -14,6 +14,7 @@ class CatalogueElementTreeview
       $scope.onSelect({$element: node.item}) if angular.isFunction($scope.onSelect)
 
     @getNodeId = (link) -> "#{@id}:#{link}"
+    @getDescend = -> $scope.descend
 
 
 
@@ -37,7 +38,6 @@ class CatalogueElementTreeview
 
     $scope.mode     = if $scope.element then 'element' else 'list'
     $scope.id       = null  if !$scope.id
-    $scope.repeat   = false if !$scope.repeat
     $scope.list    ?= listEnhancer.createEmptyList()
     $scope.path     = {segments: []}
 
@@ -126,8 +126,7 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
     scope:
       element: '=?'
       list:    '=?'
-      descend: '='
-      repeat:  '=?'
+      descend: '@'
       prefetch:'=?'
       id:      '@'
       onSelect: '&?'

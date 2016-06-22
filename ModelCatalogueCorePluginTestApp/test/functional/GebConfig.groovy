@@ -19,7 +19,14 @@ reportOnTestFailureOnly = false
 baseUrl = 'http://localhost:8080/ModelCatalogueCorePluginTestApp/'
 
 driver = {
-    new FirefoxDriver()
+    DesiredCapabilities caps = DesiredCapabilities.firefox();
+    LoggingPreferences logPrefs = new LoggingPreferences();
+    logPrefs.enable(LogType.BROWSER, Level.ALL);
+    logPrefs.enable(LogType.CLIENT, Level.ALL);
+    logPrefs.enable(LogType.DRIVER, Level.ALL);
+    caps.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
+    caps.setCapability("marionette", true);
+    new FirefoxDriver(caps)
 }
 
 waiting {
@@ -48,23 +55,9 @@ environments {
     // See: http://code.google.com/p/selenium/wiki/ChromeDriver
     chrome {
         def chromeDriver = new File('test/drivers/chrome/chromedriver')
-        downloadDriver(chromeDriver, "http://chromedriver.storage.googleapis.com/2.11/chromedriver_mac32.zip")
+        downloadDriver(chromeDriver, "http://chromedriver.storage.googleapis.com/2.22/chromedriver_mac32.zip")
         System.setProperty('webdriver.chrome.driver', chromeDriver.absolutePath)
         driver = { new ChromeDriver() }
-    }
-
-    // run as "grails -Dgeb.env=firefox test-app"
-    // See: http://code.google.com/p/selenium/wiki/FirefoxDriver
-    firefox {
-        driver = {
-            DesiredCapabilities caps = DesiredCapabilities.firefox();
-            LoggingPreferences logPrefs = new LoggingPreferences();
-            logPrefs.enable(LogType.BROWSER, Level.ALL);
-            logPrefs.enable(LogType.CLIENT, Level.ALL);
-            logPrefs.enable(LogType.DRIVER, Level.ALL);
-            caps.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
-            new FirefoxDriver(caps)
-        }
     }
 
     sauce {
