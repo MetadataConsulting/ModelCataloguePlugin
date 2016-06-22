@@ -17,6 +17,7 @@ import org.modelcatalogue.gel.RareDiseaseCsvExporter
  */
 class AbstractDataModelExporterSpec extends IntegrationSpec {
 
+    public static final String DATA_MODEL_EXPORTER_DATA_MODEL_NAME = 'Data Exporter Test Data Model'
     AuditService auditService
     DataClassService dataClassService
     ElementService elementService
@@ -45,7 +46,7 @@ class AbstractDataModelExporterSpec extends IntegrationSpec {
             DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
 
             builder.build {
-                dataModel(name: 'Test Data Model') { //e.g. Cancer Model
+                dataModel(name: DATA_MODEL_EXPORTER_DATA_MODEL_NAME) { //e.g. Cancer Model
                     description "This is a data model for testing Data Specification change log exports"
 
                     dataClass(name: 'Dataclass Top Level 1 Root') { //e.g. Cancer
@@ -88,14 +89,14 @@ class AbstractDataModelExporterSpec extends IntegrationSpec {
             }
         }
 
-        return DataModel.findByName('Test Data Model')
+        return DataModel.findByName(DATA_MODEL_EXPORTER_DATA_MODEL_NAME)
 
     }
 
 
     void makeChanges() {
 
-        DataDefinitionLanguage.with('Test Data Model') {
+        DataDefinitionLanguage.with(DATA_MODEL_EXPORTER_DATA_MODEL_NAME) {
 
             update 'Min Occurs' of 'Info >>1<< heading Level4 Model Data Element 2' to '1'
             update 'Max Occurs' of 'Info >>2<< heading Level4 Model Data Element 1' to '3'

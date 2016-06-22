@@ -4,8 +4,6 @@ source ./bin/lib/test-setup.sh
 
 # please update sibling script /collect/reports.sh when you update this file
 
-export MC_ES_DISABLED=true
-
 # karma and functional tests needs to fetch the bower components
 if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "core" ] || [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "app_functional_a" ] || [ "$TEST_SUITE" = "app_functional_ab" ] || [ "$TEST_SUITE" = "app_functional_b" ] || [ "$TEST_SUITE" = "app_functional_c" ] ||  [ "$TEST_SUITE" = "" ] ; then
     ./setup-frontend.sh
@@ -82,6 +80,8 @@ if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "functional" ] ||  [ "
 fi
 
 if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "app_integration" ] || [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+    export MC_ES_DISABLED=true
+    export FILE_OPENER_SKIP=true
     ./grailsw test-app integration: --non-interactive
 fi
 

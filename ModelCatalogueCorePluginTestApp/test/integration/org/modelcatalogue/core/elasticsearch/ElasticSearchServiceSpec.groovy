@@ -19,6 +19,7 @@ class ElasticSearchServiceSpec extends org.modelcatalogue.testapp.AbstractIntegr
 
     def setup() {
         initRelationshipTypes()
+        elasticSearchService.initLocalClient()
         elasticSearchService.reindex().toBlocking().subscribe()
     }
 

@@ -19,6 +19,7 @@ import org.modelcatalogue.gel.RareDiseaseCsvExporter
  */
 class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
 
+    public static final String RARE_DISEASE_DATA_MODEL_NAME = 'Rare Diseases Test Data Model'
     AuditService auditService
     DataClassService dataClassService
     ElementService elementService
@@ -57,7 +58,7 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
             DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
 
             builder.build {
-                dataModel(name: 'Test Data Model') {
+                dataModel(name: RARE_DISEASE_DATA_MODEL_NAME) {
                     description "This is a data model for testing Eligibility OR Phenotype and Clinicals tests exports"
 
                     dataClass (name: 'Dataclass Top Level 1 Root') {
@@ -136,7 +137,7 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
             }
         }
 
-        return DataModel.findByName('Test Data Model')
+        return DataModel.findByName(RARE_DISEASE_DATA_MODEL_NAME)
 
     }
 
@@ -147,7 +148,7 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
 
         DataClass model = DataClass.findByNameAndStatus('Dataclass Top Level 1 Root', ElementStatus.DRAFT)
 
-        DataDefinitionLanguage.with('Test Data Model') {
+        DataDefinitionLanguage.with(RARE_DISEASE_DATA_MODEL_NAME) {
 
             update 'hierarchy' of 'Disorder >1< Phenotypes Level5 Model 1 Data Element 1' remove 'Phenotype (2) name 1 1'
 

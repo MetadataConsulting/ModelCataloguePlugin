@@ -3,6 +3,10 @@ package uk.co.brc.modelcatalogue
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.integration.excel.ExcelLoader
 
+/**
+ * @deprecated should be replaced by XML import
+ */
+@Deprecated
 class ImportService {
 
     static transactional = false
