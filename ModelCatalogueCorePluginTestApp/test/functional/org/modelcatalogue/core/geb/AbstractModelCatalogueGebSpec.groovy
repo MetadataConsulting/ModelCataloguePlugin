@@ -236,7 +236,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     int totalOf(String name) {
-        int result = noStale(5, true, { tab(name).find('span.badge.tab-value-total') }) {
+        int result = noStale(5, -1, { tab(name).find('span.badge.tab-value-total') }) {
             if (!it.displayed) {
                 // cannot be null, otherwise the wait block will fail
                 return -1
@@ -276,7 +276,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
 
-    public <R> R noStale(int maxAttempts = 5, boolean ignoreMissing = false, Closure<Navigator> navigatorClosure, Closure<R> resultClosure) {
+    public <R> R noStale(int maxAttempts = 5, R defaultValue = null, Closure<Navigator> navigatorClosure, Closure<R> resultClosure) {
         int attempt = 0
         Throwable error = null
         Navigator navigator = null
@@ -286,6 +286,9 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
                 navigator = navigatorClosure()
 
                 if (navigator == null) {
+                    if (defaultValue != null) {
+                        return defaultValue
+                    }
                     System.err.println("Navigator is null!")
                     try {
                         throw new RuntimeException()
@@ -297,7 +300,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
                     return null
                 }
 
-                if (!navigator.displayed && !ignoreMissing) {
+                if (!navigator.displayed && defaultValue == null) {
                     waitFor(attempt ** 2) {
                         navigator.displayed
                     }
