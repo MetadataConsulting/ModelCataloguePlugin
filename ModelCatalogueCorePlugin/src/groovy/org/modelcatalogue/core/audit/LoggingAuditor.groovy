@@ -476,7 +476,7 @@ abstract class LoggingAuditor extends AbstractAuditor {
         if (object.containsKey('value')) {
             return object.value
         }
-        if (object.containsKey('mapping') || object.containsKey('extensionValue')) {
+        if (object.containsKey('mapping') || object.containsKey('extensionValue') || object.containsKey('relationship') || object.containsKey('element')) {
             return object
         }
         if (object.containsKey('elementType')) {
