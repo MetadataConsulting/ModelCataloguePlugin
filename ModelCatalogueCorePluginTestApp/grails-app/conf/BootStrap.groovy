@@ -23,7 +23,7 @@ class BootStrap {
     def mappingService
     CatalogueBuilder catalogueBuilder
     def sessionFactory
-    def elasticSearchService
+    def modelCatalogueSearchService
 
     def init = { servletContext ->
         ExtensionModulesLoader.addExtensionModules()
@@ -34,7 +34,7 @@ class BootStrap {
                 initSecurity()
                 setupStuff()
             }
-            elasticSearchService.reindex().all { it }.toBlocking().subscribe {
+            modelCatalogueSearchService.reindex().all { it }.toBlocking().subscribe {
                 System.out.println "Reindexed"
             }
         } else {
