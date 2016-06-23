@@ -40,9 +40,6 @@ angular.module('mc.core.ui.bs.modalNewVersion', ['mc.util.messages']).config ['m
               messages.prompt('Draft progress', null, type: 'feedback', id: args.element.id).then ->
                 $modalInstance.close(updated)
                 $scope.pending = false
-                $rootScope.$broadcast 'newVersionCreated', updated
-                $rootScope.$broadcast 'redrawContextualActions'
-                updated.show(true)
             , (response) ->
               $scope.pending = false
               $scope.messages.showErrorsFromResponse(response)
