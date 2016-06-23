@@ -52,7 +52,7 @@ if [ "$TEST_SUITE" = "unit_and_integration" ] || [ "$TEST_SUITE" = "" ] ; then
 fi
 
 if [ "$TEST_SUITE" = "functional" ] || [ "$TEST_SUITE" = "" ] ; then
-    ./grailsw test-app functional: -war --non-interactive
+    ./grailsw "-Dgeb.env=$MC_GEB_ENV" test-app functional: -war --non-interactive
 fi
 
 cd ..
