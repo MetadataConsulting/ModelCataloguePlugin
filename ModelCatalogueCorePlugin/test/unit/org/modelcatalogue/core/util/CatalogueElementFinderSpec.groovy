@@ -1,9 +1,23 @@
 package org.modelcatalogue.core.util
 
+import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.*
 import spock.lang.Specification
 
 class CatalogueElementFinderSpec extends Specification {
+
+    def setup() {
+        ModelCatalogueTypes.CATALOGUE_ELEMENT.implementation = CatalogueElement
+        ModelCatalogueTypes.DATA_MODEL.implementation = DataModel
+        ModelCatalogueTypes.DATA_CLASS.implementation = DataClass
+        ModelCatalogueTypes.DATA_ELEMENT.implementation = DataElement
+        ModelCatalogueTypes.DATA_TYPE.implementation = DataType
+        ModelCatalogueTypes.MEASUREMENT_UNIT.implementation = MeasurementUnit
+        ModelCatalogueTypes.ENUMERATED_TYPE.implementation = EnumeratedType
+        ModelCatalogueTypes.PRIMITIVE_TYPE.implementation = PrimitiveType
+        ModelCatalogueTypes.REFERENCE_TYPE.implementation = ReferenceType
+        ModelCatalogueTypes.VALIDATION_RULE.implementation = ValidationRule
+    }
 
     def "Find all subclasses"() {
         def candidatesClasses = CatalogueElementFinder.catalogueElementClasses
