@@ -497,7 +497,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      */
     @Transactional
     def update() {
-
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
             notAuthorized()
             return
@@ -512,10 +511,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        def newVersion = params.boolean('newVersion',false)
-        def semanticVersion = params.semanticVersion
-
-        if (instance.status.ordinal() >= ElementStatus.FINALIZED.ordinal() && !newVersion) {
+        if (instance.status.ordinal() >= ElementStatus.FINALIZED.ordinal()) {
             instance.errors.rejectValue 'status', 'cannot.modify.finalized.or.deprecated', 'Cannot modify element in finalized or deprecated state!'
             respond instance.errors, view: 'edit' // STATUS CODE 422
             return
@@ -529,15 +525,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
         def includeParams = includeFields
 
-        if (!newVersion) newVersion = (request.JSON?.newVersion) ? request.JSON?.newVersion?.toBoolean() : false
-        if (!semanticVersion) semanticVersion = request.JSON?.semanticVersion
         if (!ext) ext = OrderedMap.fromJsonMap(request.JSON?.ext)
 
-
-        if (newVersion) {
-            includeParams.remove('status')
-            includeParams.remove('semanticVersion')
-        }
 
         bindData(helper, getObjectToBind(), [include: includeParams])
 
@@ -548,32 +537,16 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        if (newVersion) {
-            ModelCatalogueTypes newType = null
-            if (params.newType) {
-                newType = ModelCatalogueTypes.values().find { it.toString() == params.newType }
-            } else if(request.JSON?.newType) {
-                newType = ModelCatalogueTypes.values().find { it.toString() == request.JSON?.newType }
-            }
-
-            if (newType && newType.implementation) {
-                instance = elementService.changeType(instance, newType.implementation) as T
-            }
-            // when draft version is created from the UI still just create plain draft ignoring dependencies
-
-            DraftContext context = DraftContext.userFriendly()
-            if (instance.instanceOf(DataModel)) {
-                instance = elementService.createDraftVersion((DataModel) instance, semanticVersion, context) as T
-            } else {
-                instance = elementService.createDraftVersion(instance, context) as T
-            }
-
-            if (instance.hasErrors()) {
-                respond instance.errors, view: 'edit' // STATUS CODE 422
-                return
-            }
+        ModelCatalogueTypes newType = null
+        if (params.newType) {
+            newType = ModelCatalogueTypes.values().find { it.toString() == params.newType }
+        } else if(request.JSON?.newType) {
+            newType = ModelCatalogueTypes.values().find { it.toString() == request.JSON?.newType }
         }
 
+        if (newType && newType.implementation) {
+            instance = elementService.changeType(instance, newType.implementation) as T
+        }
 
         bindData(instance, getObjectToBind(), [include: includeParams])
         instance.save flush:true
@@ -582,7 +555,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             instance.setExt(ext)
         }
 
-        bindRelations(instance, newVersion)
+        bindRelations(instance, false)
 
         instance.save flush:true
         if (instance.hasErrors()) {
@@ -603,6 +576,52 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
 
         instance.save flush:true
+
+        respond instance, [status: OK]
+    }
+
+    /**
+     * Updates a resource for the given id
+     * @param id
+     */
+    @Transactional
+    def newVersion() {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
+
+        if(handleReadOnly()) {
+            return
+        }
+
+        T instance = queryForResource(params.id)
+        if (instance == null) {
+            notFound()
+            return
+        }
+
+        def semanticVersion = params.semanticVersion ?: objectToBind.semanticVersion
+
+        Long id = instance.getId()
+
+        executorService.submit {
+            try {
+                CatalogueElement element = resource.get(id)
+                DraftContext context = DraftContext.userFriendly().withMonitor(BuildProgressMonitor.create("Create new version of $element", id))
+                if (element.instanceOf(DataModel)) {
+                    elementService.createDraftVersion((DataModel) element, semanticVersion, context) as T
+                } else {
+                    elementService.createDraftVersion(element, context) as T
+                }
+            } catch (e) {
+                log.error "Exception creating draft in the background", e
+                CatalogueElement element = resource.get(id)
+                element.status = ElementStatus.DRAFT
+                element.save(flush: true)
+            }
+
+        }
 
         respond instance, [status: OK]
     }

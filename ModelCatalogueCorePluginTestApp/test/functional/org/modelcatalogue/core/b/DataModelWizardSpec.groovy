@@ -106,7 +106,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         check modalFeedback displayed
-        check feedback contains 'Finalization finished'
+        check feedback contains 'COMPLETED SUCCESSFULLY'
 
         when:
         click modalPrimaryButton
@@ -129,6 +129,14 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         click modalCreateNewVersion
 
         then: "the element new draft version is created"
+        check modalFeedback displayed
+        check feedback contains 'COMPLETED SUCCESSFULLY'
+
+        when:
+        click '.new-version-link'
+        click modalPrimaryButton
+
+        then:
         check status has 'label-warning'
     }
 

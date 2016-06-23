@@ -62,6 +62,7 @@ class ElementService implements Publisher<CatalogueElement> {
         dataModel.checkNewSemanticVersion(newSemanticVersion)
 
         if (dataModel.hasErrors()) {
+            context.monitor.onError(new IllegalArgumentException(FriendlyErrors.printErrors("Wrong semantic version", dataModel.errors)))
             return dataModel
         }
 
