@@ -78,13 +78,13 @@ class NavigatorCondition {
 
     boolean present(Keywords once) {
         if (once == Keywords.ONCE) {
-            return spec.noStale(NUM_OF_RETRIES, true, navigator) { it.size() == 1}
+            return spec.noStale(NUM_OF_RETRIES, false, navigator) { it.size() == 1 }
         }
         throw new IllegalArgumentException("Only 'once' allowed here")
     }
 
     boolean test(int retries = 1, @ClosureParams(value=FromString, options='geb.navigator.Navigator') Closure<Boolean> test) {
-        spec.noStale(retries, true, navigator, test)
+        spec.noStale(retries, navigator, test)
     }
 
     boolean asBoolean() {
