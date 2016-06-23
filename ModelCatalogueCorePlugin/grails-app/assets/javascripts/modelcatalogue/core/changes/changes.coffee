@@ -195,7 +195,7 @@ changes.config ['columnsProvider', 'names', (columnsProvider, names)->
     return """<a title="Parent Action: #{change.parent.name}" href="#/catalogue/change/#{change.parent.id}/changes"><span class="fa fa-fw fa-level-up"></span></a>"""
 
   getIcon = (change) -> "#{getIconForChangeType(change)}#{getLinkToParent(change)}"
-  getChangeDescription = (change, catalogueElementProperties) -> """<a href="#/catalogue/change/#{change.id}"><span class="fa fa-fw fa-link"></span></a> #{getChangeForChangeType(change, catalogueElementProperties)}"""
+  getChangeDescription = (change, catalogueElementProperties) -> """<a href="#/catalogue/change/#{change.id}" class="change-#{change.type}"><span class="fa fa-fw fa-link"></span></a> #{getChangeForChangeType(change, catalogueElementProperties)}"""
 
   valueOrName = (property) ->
     (change) ->

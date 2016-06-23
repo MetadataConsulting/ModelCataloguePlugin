@@ -12,6 +12,9 @@ import static org.modelcatalogue.core.geb.Common.save
 @Stepwise
 class ChangesSpec extends AbstractModelCatalogueGebSpec {
 
+
+    public static final String FIRST_NEW_ELEMENT_CREATED_CHANGE = "a.change-NEW_ELEMENT_CREATED:first-of-type"
+
     def "go to login"() {
         loginAdmin()
 
@@ -38,9 +41,8 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
 
     def "check the unit shows up with own detail page"(){
         when:
-        check { infTableCell(1, 4).find('a span.fa.fa-fw.fa-link') } displayed
 
-        click { infTableCell(1, 4).find('a span.fa.fa-fw.fa-link').parent('a') }
+        click FIRST_NEW_ELEMENT_CREATED_CHANGE
 
         then:
         check "li[data-tab-name='changes']" displayed
