@@ -9,6 +9,7 @@ import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.PerformanceUtilService
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.util.DataModelFilter
 
@@ -37,8 +38,8 @@ class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
         7: 'New version details'
     ]
 
-    DataModelChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, SessionFactory sessionFactory, Integer depth = 5, Boolean includeMetadata = false) {
-        super(auditService, dataClassService, sessionFactory, depth, includeMetadata)
+    DataModelChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, PerformanceUtilService performanceUtilService, Integer depth = 5, Boolean includeMetadata = false) {
+        super(auditService, dataClassService, performanceUtilService, depth, includeMetadata)
     }
 
     @Override

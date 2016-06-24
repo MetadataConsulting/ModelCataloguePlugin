@@ -206,9 +206,12 @@ hibernate {
 log4j.main = {
     // Example of changing the log pattern for the default console appender:
     //
-    //appenders {
-    //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
-    //}
+    appenders {
+//        console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
+        file name:'myLogger', file:"rickmc.log", immediateFlush:'true', threshold:org.apache.log4j.Level.DEBUG
+    }
+
+    debug myLogger: ['grails.app', 'org.modelcatalogue']
 
     debug 'grails.app.services.org.modelcatalogue'
     debug 'grails.app.controllers.org.modelcatalogue'

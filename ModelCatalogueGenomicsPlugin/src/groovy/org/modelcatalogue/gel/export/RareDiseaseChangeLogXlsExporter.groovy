@@ -651,14 +651,6 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     }
 
 
-    def cleanUpGorm() {
-        def session = sessionFactory.currentSession
-        session.flush()
-        session.clear()
-        propertyInstanceMap.get().clear()
-    }
-
-
     def exportLinesAsXls(String sheetName, List lines, OutputStream out) {
         SpreadsheetBuilder builder = new PoiSpreadsheetBuilder()
         builder.build(out) { Workbook workbook ->

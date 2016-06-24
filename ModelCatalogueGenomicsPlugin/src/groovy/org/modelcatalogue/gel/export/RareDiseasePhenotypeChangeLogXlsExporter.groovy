@@ -19,8 +19,8 @@ class RareDiseasePhenotypeChangeLogXlsExporter extends RareDiseaseChangeLogXlsEx
     private static final int CURRENT_DETAILS = 8
     private static final int NEW_DETAILS = 9
 
-    RareDiseasePhenotypeChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, SessionFactory sessionFactory, Integer depth = 5, Boolean includeMetadata = false) {
-        super(auditService, dataClassService, sessionFactory, depth, includeMetadata)
+    RareDiseasePhenotypeChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, PerformanceUtilService performanceUtilService, Integer depth = 5, Boolean includeMetadata = false) {
+        super(auditService, dataClassService, performanceUtilService, depth, includeMetadata)
     }
 
     @Override
