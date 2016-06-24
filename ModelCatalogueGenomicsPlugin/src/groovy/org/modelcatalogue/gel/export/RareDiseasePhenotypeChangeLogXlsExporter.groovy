@@ -1,7 +1,6 @@
 package org.modelcatalogue.gel.export
 
 import groovy.util.logging.Log4j
-import org.hibernate.SessionFactory
 import org.modelcatalogue.builder.spreadsheet.api.Sheet
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.audit.AuditService

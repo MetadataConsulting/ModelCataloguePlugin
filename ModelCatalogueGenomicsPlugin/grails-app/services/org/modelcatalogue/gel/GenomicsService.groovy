@@ -25,7 +25,6 @@ class GenomicsService {
     def assetService
     def dataClassService
     def elementService
-    SessionFactory sessionFactory
     PerformanceUtilService performanceUtilService
 
     static final String RD_ELIGIBILITY_CSV_FILENAME = "RD Eligibility Criteria.csv"
