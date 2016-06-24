@@ -151,7 +151,7 @@ class GenomicsService {
             originalFileName: "$RD_PHENOTYPE_AND_CLINICAL_TESTS_XLS",
             contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream out ->
-            new RareDiseasePhenotypeChangeLogXlsExporter(auditService, dataClassService, sessionFactory, 0, false).export(dataClass,out)
+            new RareDiseasePhenotypeChangeLogXlsExporter(auditService, dataClassService, performanceUtilService, 0, false).export(dataClass,out)
         }
     }
 
@@ -161,7 +161,7 @@ class GenomicsService {
             originalFileName: "$RD_ELIGIBILITY_CHANGELOG_XLS",
             contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream out ->
-            new RareDiseaseEligibilityChangeLogXlsExporter(auditService, dataClassService, sessionFactory, 0, false).export(dataClass, out)
+            new RareDiseaseEligibilityChangeLogXlsExporter(auditService, dataClassService, performanceUtilService, 0, false).export(dataClass, out)
         }
     }
 
