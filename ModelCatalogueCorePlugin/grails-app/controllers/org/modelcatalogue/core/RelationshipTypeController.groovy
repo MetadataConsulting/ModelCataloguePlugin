@@ -11,8 +11,8 @@ import static org.springframework.http.HttpStatus.OK
 class RelationshipTypeController extends AbstractRestfulController<RelationshipType>{
 
     @Override
-    protected String getRoleForSaveAndEdit() {
-        "ADMIN"
+    protected boolean allowSaveAndEdit() {
+        modelCatalogueSecurityService.hasRole('ADMIN')
     }
 
     RelationshipTypeController() {

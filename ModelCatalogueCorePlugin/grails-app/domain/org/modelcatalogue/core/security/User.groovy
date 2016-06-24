@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.security
 
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.publishing.PublishingContext
 
 class User extends CatalogueElement {
@@ -60,6 +61,11 @@ class User extends CatalogueElement {
 
     protected void encodePassword() {
         password = modelCatalogueSecurityService.encodePassword(password)
+    }
+
+    @Override
+    Map<CatalogueElement, Object> manualDeleteRelationships(DataModel toBeDeleted) {
+        return [:]
     }
 
     @Override

@@ -15,20 +15,6 @@ class DataModel extends CatalogueElement {
     String semanticVersion = '0.0.1'
     String revisionNotes
 
-    /**
-     * @deprecated use model catalogue id instead
-     */
-    String getNamespace() {
-        modelCatalogueId
-    }
-
-    /**
-     * @deprecated use model catalogue id instead
-     */
-    void setNamespace(String namespace) {
-        modelCatalogueId = namespace
-    }
-
     static constraints = {
         name unique: 'versionNumber'
         semanticVersion size: 1..20, nullable: true
@@ -53,12 +39,67 @@ class DataModel extends CatalogueElement {
         super.preparePublishChain(chain).add(this.declares)
     }
 
+    @Override
+    Map<CatalogueElement, Object> manualDeleteRelationships(DataModel toBeDeleted) {
+        // inspect declarations
+        def manualDelete = declares.collectEntries {
+            if (it.dataModel != toBeDeleted) {
+                return [(it): it.dataModel]
+            } else {
+                // inspect the element if belongs to same DataModel
+                def relationshipManualDelete = it.manualDeleteRelationships(this)
+                if (relationshipManualDelete.size() > 0)
+                    return [(it): relationshipManualDelete]
+                else
+                    return [:]
+            }
+        }
+        // inspect relationships
+        manualDelete << (outgoingRelations + incomingRelations).collectEntries {
+            if (it.dataModel)
+                return [(it.dataModel): it]
+            else
+                return [:]
+        }
+
+        return manualDelete
+    }
 
     @Override
     void setModelCatalogueId(String mcID) {
         super.setModelCatalogueId(Legacy.fixModelCatalogueId(mcID))
     }
 
+    /**
+     * Deletes all {@link CatalogueElement}s assigned to this datamodel and then call super class method
+     * {@link CatalogueElement#deleteRelationships()}.
+     */
+    @Override
+    void deleteRelationships() {
+        // delete all declarations
+        // delete all relationship where rel.dataModel == this
+        declares.sort { a, b ->
+
+        }.each {
+            it.deleteRelationships()
+            it.delete()
+        }
+        super.deleteRelationships()
+    }
+
+    /**
+     * @deprecated use model catalogue id instead
+     */
+    String getNamespace() {
+        modelCatalogueId
+    }
+
+    /**
+     * @deprecated use model catalogue id instead
+     */
+    void setNamespace(String namespace) {
+        modelCatalogueId = namespace
+    }
 
     List<CatalogueElement> getDeclares() {
         CatalogueElement.findAllByDataModel(this)

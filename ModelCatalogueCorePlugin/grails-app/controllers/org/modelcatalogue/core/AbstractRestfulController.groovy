@@ -1,10 +1,11 @@
 package org.modelcatalogue.core
 
+import grails.converters.JSON
 import grails.rest.RestfulController
 import grails.transaction.Transactional
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
-import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.hibernate.StaleStateException
+import org.hibernate.util.JDBCExceptionReporter
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.DraftContext
@@ -13,8 +14,6 @@ import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.dao.ConcurrencyFailureException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.validation.Errors
-
-import javax.servlet.http.HttpServletResponse
 
 import static org.springframework.http.HttpStatus.*
 
@@ -25,6 +24,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     AssetService assetService
     SearchCatalogue modelCatalogueSearchService
     SecurityService modelCatalogueSecurityService
+    CatalogueElementService catalogueElementService
     ElementService elementService
 
     private Random random = new Random()
@@ -76,7 +76,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
      */
     @Transactional
     def save() {
-        if (!modelCatalogueSecurityService.hasRole(roleForSaveAndEdit)) {
+        if (!allowSaveAndEdit()) {
             unauthorized()
             return
         }
@@ -145,7 +145,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
      */
     @Transactional
     def update() {
-        if (!modelCatalogueSecurityService.hasRole(roleForSaveAndEdit)) {
+        if (!allowSaveAndEdit()) {
             unauthorized()
             return
         }
@@ -158,7 +158,6 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             notFound()
             return
         }
-
 
         bindData instance, getObjectToBind(), [include: includeFields]
 
@@ -198,9 +197,8 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     }
 
     @Override
-    @Transactional
     def delete() {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
+        if (!allowDelete()) {
             unauthorized()
             return
         }
@@ -210,34 +208,56 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         }
 
         def instance = queryForResource(params.id)
-        if (instance == null) {
+        if (!instance) {
             notFound()
             return
         }
 
-        clearAssociationsBeforeDelete(instance)
-        checkAssociationsBeforeDelete(instance)
+        // only CatalogueElements can be deleted now
+        if (!(instance instanceof CatalogueElement)) {
+            forbidden()
+            return
+        }
 
-        if (instance.hasErrors()) {
-            respond instance.errors
+        // find out if CatalogueElement can be deleted
+        def manualDeleteRelationships = instance.manualDeleteRelationships(instance instanceof DataModel ? instance : null)
+        if (manualDeleteRelationships.size() > 0) {
+            log.debug("cannot delete object $instance as there are relationship objects which needs to be handled " +
+                          "manually $manualDeleteRelationships")
+
+            def printError
+            printError = { Map<CatalogueElement, Object> map ->
+                map.collect { key, val ->
+                    if (val instanceof Map) {
+                        printError(val)
+                    } else if (val instanceof DataModel) {
+                        [message: "Cannot delete [$key] as it belongs to different data model [$val]. " +
+                            "Remove the relationship to this element first."]
+                    } else if (val instanceof Relationship) {
+                        [message: "Cannot delete [$key] as it is part of relationhip [${val.source}, " +
+                            "${val.destination}] which beongs to different data model [${val.dataModel}]"]
+                    } else {
+                        [message: "Cannot automatically delete [$key], delete it manually or remove the relationship to it."]
+                    }
+                }.flatten()
+            }
+
+            response.status = CONFLICT.value()
+            respond errors: printError(manualDeleteRelationships)
             return
         }
 
         try {
-            instance.delete flush: true
-        } catch (DataIntegrityViolationException ignored) {
-            response.status = HttpServletResponse.SC_CONFLICT
-            respond errors: message(code: "org.modelcatalogue.core.CatalogueElement.error.delete", args: [instance.name, ignored.message])
-            // STATUS CODE 409
-            return
-        } catch (Exception ignored) {
-            response.status = HttpServletResponse.SC_NOT_IMPLEMENTED
-            respond errors: message(code: "org.modelcatalogue.core.CatalogueElement.error.delete", args: [instance.name, "/${resourceName}/delete/${instance.id}"])
-            // STATUS CODE 501
-            return
+            catalogueElementService.delete(instance)
+            noContent()
+        } catch (IllegalStateException e) {
+            response.status = CONFLICT.value()
+            respond errors: message(code: "org.modelcatalogue.core.CatalogueElement.error.delete", args: [instance.name, e.message])
+        } catch (e) {
+            response.status = INTERNAL_SERVER_ERROR.value()
+            respond errors: "Unexpected error while deleting $instance"
+            log.error("unexpected error while deleting $instance", e)
         }
-
-        noContent()
     }
 
     protected handleParams(Integer max) {
@@ -265,29 +285,19 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     protected boolean hasUniqueName() { false }
 
     /**
-     * Removes all the associations which can be removed before checking for their presence in
-     * checkAssociationsBeforeDelete method.
-     * @param instance
+     * Specify if save and edit are allowed.
+     * @return Returns true if user role is CURATOR, false otherwise.
      */
-    protected clearAssociationsBeforeDelete(T instance) {
-        // do nothing by default
+    protected boolean allowSaveAndEdit() {
+        modelCatalogueSecurityService.hasRole('CURATOR')
     }
 
-    protected checkAssociationsBeforeDelete(T instance) {
-        GrailsDomainClass domainClass = grailsApplication.getDomainClass(resource.name)
-
-        for (GrailsDomainClassProperty property in domainClass.persistentProperties) {
-            if ((property.oneToMany || property.manyToMany) && instance.hasProperty(property.name)) {
-                def value = instance[property.name]
-                if (value) {
-                    instance.errors.rejectValue property.name, "delete.association.before.delete.entity.${property.name}", "You must remove all ${property.naturalName.toLowerCase()} before you delete this element"
-                }
-            }
-        }
-    }
-
-    protected String getRoleForSaveAndEdit() {
-        'CURATOR'
+    /**
+     * Specify if delete is allowed.
+     * @return Returns true if user role is ADMIN, false otherwise.
+     */
+    protected boolean allowDelete() {
+        modelCatalogueSecurityService.hasRole('ADMIN')
     }
 
     protected boolean isFavoriteAfterUpdate() {
@@ -389,28 +399,18 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         throw new IllegalStateException("Couldn't execute action ${actionName} on ${resource} controller with parameters ${params} after ${attempt} attempts")
     }
 
-    protected void ok() {
-        render status: OK
-    }
+    protected void ok() { render status: OK }
 
-    protected void noContent() {
-        render status: NO_CONTENT
-    }
+    protected void noContent() { render status: NO_CONTENT }
 
-    protected void unauthorized() {
-        render status: UNAUTHORIZED
-    }
+    protected void unauthorized() { render status: UNAUTHORIZED }
+
+    protected void forbidden() { render status: FORBIDDEN }
 
     @Override
-    protected void notFound() {
-        render status: NOT_FOUND
-    }
+    protected void notFound() { render status: NOT_FOUND }
 
-    protected void methodNotAllowed() {
-        render status: METHOD_NOT_ALLOWED
-    }
+    protected void methodNotAllowed() { render status: METHOD_NOT_ALLOWED }
 
-    protected void notAcceptable() {
-        render status: NOT_ACCEPTABLE
-    }
+    protected void notAcceptable() { render status: NOT_ACCEPTABLE }
 }

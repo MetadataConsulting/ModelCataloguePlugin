@@ -25,5 +25,4 @@ class PrimitiveType extends DataType {
         }
         return super.collectExternalDependencies()
     }
-
 }

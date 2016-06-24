@@ -8,7 +8,6 @@ import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.*
-import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.*
 import rx.Observer
 
@@ -87,7 +86,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 		latestVersionId index :'CtlgElement_latestVersionId_idx'
         modelCatalogueId index :'CtlgElement_modelCatalogueId_idx'
         description type: "text"
-        extensions lazy: false, sort: 'orderIndex'
+        extensions lazy: false, sort: 'orderIndex', cascade: "all-delete-orphan"
         dataModel lazy: false
     }
 
@@ -219,10 +218,25 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     /**
+     * List all relationships to this object which cannot be automatically deleted.
+     * @param toBeDeleted If deleting whole {@link DataModel}, this should be specifies. Null if item to be deleted is
+     * not {@link DataModel}.
+     * @return Map of object which needs to be manually delete. Key is {@link CatalogueElement} and value is either
+     * {@link Map} with same structure (nested relationships) or following objects:
+     * <ul>
+     *     <li>null: means the {@link CatalogueElement} is problem itself, it should be deleted manualy before deleting this</li>
+     *     <li>{@link DataModel}: means cannot delete elements which belongs to different {@link DataModel}</li>
+     *     <li>{@link Relationship}: means cannot delete relationship which belongs to different {@link DataModel}</li>
+     * </ul>
+     */
+    abstract Map<CatalogueElement, Object> manualDeleteRelationships(DataModel toBeDeleted)
+
+    /**
      * Deletes all catalogue relationships: {@link #outgoingMappings}, {@link #incomingRelationships},
      * {@link #outgoingMappings}, {@link #incomingMappings}.
      */
     void deleteRelationships() {
+        // manual delete as belongsTo doesn't work here...
         // delete Relationship
         (outgoingRelationships + incomingRelationships).each {
             it.clearRelationships()
@@ -452,19 +466,6 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
                     }
                 }
             }
-        }
-    }
-
-    void clearAssociationsBeforeDelete() {
-        // it is safe to remove all versioning informations
-        for (CatalogueElement e in this.supersededBy) {
-            this.removeFromSupersededBy(e)
-        }
-        for (CatalogueElement e in this.supersedes) {
-            this.removeFromSupersedes(e)
-        }
-        for (User u in this.isFavouriteOf) {
-            this.removeFromIsFavouriteOf(u)
         }
     }
 

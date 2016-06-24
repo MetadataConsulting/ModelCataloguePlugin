@@ -3,8 +3,8 @@ package org.modelcatalogue.core
 class DataModelPolicyController extends AbstractRestfulController<DataModelPolicy>{
 
     @Override
-    protected String getRoleForSaveAndEdit() {
-        "ADMIN"
+    protected boolean allowSaveAndEdit() {
+        modelCatalogueSecurityService.hasRole('ADMIN')
     }
 
     DataModelPolicyController() {

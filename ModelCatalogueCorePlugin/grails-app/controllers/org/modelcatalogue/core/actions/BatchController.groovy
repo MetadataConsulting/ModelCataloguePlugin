@@ -10,8 +10,8 @@ class BatchController extends AbstractRestfulController<Batch> {
     static allowedMethods = [index: 'GET', actions: 'GET', run: 'POST', reactivate: 'POST', dismiss: 'POST', updateActionParameters: 'PUT', addDependency: 'POST', removeDependency: 'DELETE']
 
     @Override
-    protected String getRoleForSaveAndEdit() {
-        "ADMIN"
+    protected boolean allowSaveAndEdit() {
+        modelCatalogueSecurityService.hasRole('ADMIN')
     }
 
     BatchController() {

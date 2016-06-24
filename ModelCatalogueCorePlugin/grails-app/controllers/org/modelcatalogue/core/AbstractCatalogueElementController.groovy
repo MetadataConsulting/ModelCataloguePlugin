@@ -926,12 +926,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         fields
     }
 
-    @Override
-    protected clearAssociationsBeforeDelete(T instance) {
-        // it is safe to remove all classifications
-        instance.clearAssociationsBeforeDelete()
-    }
-
     protected void validatePolicies(VerificationPhase phase, T instance, Object objectToBind) {
         DataModel effectiveDataModel = instance.dataModel
         def dataModels = objectToBind.classifications ?: objectToBind.dataModels

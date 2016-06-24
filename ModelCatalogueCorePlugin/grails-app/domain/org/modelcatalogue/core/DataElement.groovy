@@ -6,12 +6,10 @@ import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.util.FriendlyErrors
 
-/*
-* A data element is an atomic unit of data
-* i.e. xml  <xs:element name="title" />
-*
-* */
-
+/**
+ * A data element is an atomic unit of data
+ * i.e. xml  <xs:element name="title" />
+ */
 class DataElement extends CatalogueElement {
 
     DataType dataType
@@ -26,6 +24,12 @@ class DataElement extends CatalogueElement {
     ]
 
     static fetchMode = [dataType: 'eager']
+
+    @Override
+    Map<CatalogueElement, Object> manualDeleteRelationships(DataModel toBeDeleted) {
+        // there are no relationships which restrict the deletion
+        return [:]
+    }
 
     @Override
     protected PublishingChain preparePublishChain(PublishingChain chain) {

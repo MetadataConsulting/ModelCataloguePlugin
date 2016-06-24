@@ -11,7 +11,9 @@ class UserController extends AbstractCatalogueElementController<User> {
     }
 
     @Override
-    protected String getRoleForSaveAndEdit() { "ADMIN" }
+    protected boolean allowSaveAndEdit() {
+        modelCatalogueSecurityService.hasRole('ADMIN')
+    }
 
     def classifications() {
         if (!modelCatalogueSecurityService.isUserLoggedIn()) {
