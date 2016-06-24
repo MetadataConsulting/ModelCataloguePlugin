@@ -23,6 +23,7 @@ class AbstractDataModelExporterSpec extends IntegrationSpec {
     ElementService elementService
     DataModelService dataModelService
     InitCatalogueService initCatalogueService
+    PerformanceUtilService performanceUtilService
     SessionFactory sessionFactory
 
     def setup() {
