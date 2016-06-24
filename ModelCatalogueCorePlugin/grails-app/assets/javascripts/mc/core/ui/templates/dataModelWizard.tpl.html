@@ -15,7 +15,7 @@
         <button id="step-next" ng-disabled="!nameUnique || step == 'imports'" ng-click="next()" class="btn btn-default" ><span class="glyphicon glyphicon-chevron-right"></span></button>
       </li>
       <li>
-        <button id="step-finish" ng-disabled="!nameUnique" ng-click="finish()" class="btn btn-default btn-success"><span class="glyphicon glyphicon-ok"></span></button>
+        <button id="step-finish" ng-disabled="!nameUnique || finishInProgress" ng-click="finish()" class="btn btn-default btn-success"><span class="glyphicon glyphicon-ok"></span></button>
       </li>
     </ul>
 </div>
