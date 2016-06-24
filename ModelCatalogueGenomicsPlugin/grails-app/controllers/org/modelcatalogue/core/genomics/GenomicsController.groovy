@@ -131,7 +131,7 @@ class GenomicsController {
         redirect controller: 'asset', id: assetId, action: 'show'
     }
 
-    def exportGelSpecification() {
+    def exportGelSpecification(Integer depth) {
 
         DataModel model = DataModel.get(params.id)
 
@@ -139,8 +139,7 @@ class GenomicsController {
             respond status: HttpStatus.NOT_FOUND
             return
         }
-
-        def assetId = genomicsService.genGelSpecification(model)
+        def assetId = genomicsService.genGelSpecification(model, depth)
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
@@ -244,7 +243,7 @@ class GenomicsController {
         }
 
         //Generate Model reports
-        genomicsService.genGelSpecification(model)
+        genomicsService.genGelSpecification(model,3)
         genomicsService.genDataSpecChangeLogAsXls(model)
 
         //Generate Class reports
@@ -276,7 +275,7 @@ class GenomicsController {
         }
 
         //Generate Model reports
-        genomicsService.genGelSpecification(model)
+        genomicsService.genGelSpecification(model,3)
         genomicsService.genDataSpecChangeLogAsXls(model)
 
         //Generate Class reports

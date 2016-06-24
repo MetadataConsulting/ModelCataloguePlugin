@@ -4,6 +4,7 @@ import grails.transaction.Transactional
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.PerformanceUtilService
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
 import org.modelcatalogue.core.publishing.changelog.ChangeLogDocxGenerator
 import org.modelcatalogue.gel.export.CancerTypesCsvExporter
@@ -25,6 +26,7 @@ class GenomicsService {
     def dataClassService
     def elementService
     SessionFactory sessionFactory
+    PerformanceUtilService performanceUtilService
 
     static final String RD_ELIGIBILITY_CSV_FILENAME = "RD Eligibility Criteria.csv"
     static final String RD_HPO_CSV_FILENAME = "RD Phenotypes and Clinical Tests.csv"
@@ -111,7 +113,7 @@ class GenomicsService {
         }
     }
 
-    long genGelSpecification(DataModel model){
+    long genGelSpecification(DataModel model, Integer depth){
         Long modelId = model.id
         return assetService.storeReportAsAsset(
             model,
@@ -119,7 +121,7 @@ class GenomicsService {
             originalFileName: "${model.name}-${model.status}-${model.version}.docx",
             contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ) { OutputStream out ->
-            new DataModelToDocxExporter(DataModel.get(modelId), dataClassService, customTemplate, DOC_IMAGE_PATH).export(out)
+            new DataModelToDocxExporter(DataModel.get(modelId), dataClassService, customTemplate, DOC_IMAGE_PATH, depth).export(out)
         }
     }
 
@@ -170,7 +172,7 @@ class GenomicsService {
             originalFileName: "${dataClass.name}-${dataClass.status}-${dataClass.version}-changelog.docx",
             contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ) { OutputStream out ->
-            new ChangeLogDocxGenerator(auditService, dataClassService, depth, includeMetadata, customTemplate, DOC_IMAGE_PATH)
+            new ChangeLogDocxGenerator(auditService, dataClassService, performanceUtilService, depth, includeMetadata, customTemplate, DOC_IMAGE_PATH)
                 .generateChangelog(DataClass.get(classId), out)
         }
     }
@@ -181,7 +183,7 @@ class GenomicsService {
             originalFileName: "${model.name}-${model.status}-${model.version}-changelog.xlsx",
             contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream out ->
-            new DataModelChangeLogXlsExporter(auditService, dataClassService, sessionFactory, 0, false).export(model, out)
+            new DataModelChangeLogXlsExporter(auditService, dataClassService, performanceUtilService, 0, false).export(model, out)
         }
     }
 

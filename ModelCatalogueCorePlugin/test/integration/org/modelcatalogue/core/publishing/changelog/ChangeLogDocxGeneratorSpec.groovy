@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.publishing.changelog
 
+import org.modelcatalogue.core.PerformanceUtilService
 import org.modelcatalogue.core.api.ElementStatus
 
 import static org.modelcatalogue.core.util.test.FileOpener.open
@@ -23,6 +24,7 @@ class ChangeLogDocxGeneratorSpec extends AbstractIntegrationSpec {
     DataClassService dataClassService
     DataModelService dataModelService
     ElementService elementService
+    PerformanceUtilService performanceUtilService
 
     @Rule TemporaryFolder tmp = new TemporaryFolder()
 
@@ -36,7 +38,7 @@ class ChangeLogDocxGeneratorSpec extends AbstractIntegrationSpec {
         when:
         File file = tmp.newFile('changelog.docx')
 
-        ChangeLogDocxGenerator generator = new ChangeLogDocxGenerator(auditService, dataClassService)
+        ChangeLogDocxGenerator generator = new ChangeLogDocxGenerator(auditService, dataClassService, performanceUtilService)
 
         generator.generateChangelog(draft, file.newOutputStream())
 
