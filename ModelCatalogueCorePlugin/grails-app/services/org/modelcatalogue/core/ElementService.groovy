@@ -75,7 +75,6 @@ class ElementService implements Publisher<CatalogueElement> {
                     status?.setRollbackOnly()
                     return dataModel
                 }
-                context.resolvePendingRelationships()
 
                 // TODO: better target the changes
                 VERSION_COUNT_CACHE.invalidateAll()
