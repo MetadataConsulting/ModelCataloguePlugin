@@ -24,7 +24,7 @@ class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
 
         when:
             select 'Rare Disease Conditions', true
-            selectInTree 'Data Classes'
+            selectInTree 'Data Classes', true
             selectInTree 'Rare Disease Conditions and Phenotypes'
 
         then:
@@ -38,7 +38,7 @@ class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
             click changeLogForRDEligibilityXSLX
 
             // tracking the window open does not work very well but the asset will appear in the treeview when created
-            selectInTree 'Assets'
+            selectInTree 'Assets', true
             selectInTree 'Rare Disease Conditions and Phenotypes - Eligibility change log (MS Excel Spreadsheet)'
 
         then:
