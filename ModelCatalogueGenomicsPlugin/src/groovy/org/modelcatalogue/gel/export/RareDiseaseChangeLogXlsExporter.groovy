@@ -47,8 +47,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     def ignoreKeyListForCreations = ['child of', 'Class Type']
     def ignoreKeyList = ['parent of', 'child of','contains', 'Class Type']
 
-    SessionFactory sessionFactory
-    def propertyInstanceMap = DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
+    PerformanceUtilService performanceUtilService
 
     int callCount = 0
     int itemCount = 0
@@ -82,9 +81,9 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     }
 
 
-    RareDiseaseChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, SessionFactory sessionFactory, Integer depth = 5, Boolean includeMetadata = false) {
+    RareDiseaseChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, PerformanceUtilService performanceUtilService, Integer depth = 5, Boolean includeMetadata = false) {
         super(auditService, dataClassService, depth, includeMetadata)
-        this.sessionFactory = sessionFactory
+        this.performanceUtilService = performanceUtilService
     }
 
     @Override
@@ -330,7 +329,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     //
     protected void saveChangedModelsTree(List lines, int currLineCount, CatalogueElement model, int level) {
         if (callCount % CLEAN_UP_GORM_PERIOD == 0) {
-            cleanUpGorm()
+            performanceUtilService.cleanUpGorm()
         }
 
         if (lines.size() > currLineCount) {
@@ -648,14 +647,6 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     //is it potentially useful json? unlikely if less than 15 chars
     public static boolean mightBeJSON(String jsonStr) {
         return jsonStr != null && (jsonStr.length() > 15) && (jsonStr.startsWith("[") && jsonStr.endsWith("]") || jsonStr.startsWith("{") && jsonStr.endsWith("}"));
-    }
-
-
-    def cleanUpGorm() {
-        def session = sessionFactory.currentSession
-        session.flush()
-        session.clear()
-        propertyInstanceMap.get().clear()
     }
 
 

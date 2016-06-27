@@ -26,21 +26,22 @@ class DocxSpecificationDataHelper {
     private static final def TITLE_COLUMN_CELL = [font: [bold: true]]
 
     private DocumentBuilder builder
+    int depth = 3
 
-    DocxSpecificationDataHelper(DocumentBuilder builder) {
+    DocxSpecificationDataHelper(DocumentBuilder builder, Integer depth) {
         this.builder = builder
+        this.depth = depth
     }
     final Set<DataType> usedDataTypes = new TreeSet<DataType>([compare: { DataType a, DataType b ->
         a?.name <=> b?.name
     }] as Comparator<DataType>)
 
-    def printModel(DataClass dataClass, int level) {
-        if (level > 50) {
-            // only go 3 levels deep
+    def printModel(DataClass dataClass, boolean recurse, int level) {
+        if ((recurse && level > depth) || level > 50 ) { //stop potential runaway?
             return
         }
 
-        log.debug "Exporting data class $dataClass to Word Document"
+        log.debug "Exporting data class $dataClass to Word Document level=$level"
 
         builder.with {
             if (dataClass.getId() in processedDataClasses) {
@@ -143,10 +144,10 @@ class DocxSpecificationDataHelper {
                 }
             }
 
-            if (!(dataClass.getId() in processedDataClasses)) {
+            if (recurse && !(dataClass.getId() in processedDataClasses)) {
                 if (dataClass.countParentOf()) {
                     for (DataClass child in dataClass.parentOf) {
-                        printModel(child, level + 1)
+                        printModel(child, true, level + 1)
                     }
                 }
             }

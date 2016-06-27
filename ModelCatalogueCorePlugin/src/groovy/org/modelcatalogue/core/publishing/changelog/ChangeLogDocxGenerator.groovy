@@ -8,6 +8,7 @@ import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
+import org.modelcatalogue.core.PerformanceUtilService
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.audit.Change
@@ -24,6 +25,8 @@ import java.text.SimpleDateFormat
 class ChangeLogDocxGenerator extends AbstractChangeLogGenerator{
 
     def customTemplate
+    PerformanceUtilService performanceUtilService
+    public static final int CLEAN_UP_GORM_FREQUENCY = 10    //tuned for speed
     String imagePath
 
     DocxSpecificationDataHelper docHelper
@@ -50,10 +53,11 @@ class ChangeLogDocxGenerator extends AbstractChangeLogGenerator{
 
     }
 
-    ChangeLogDocxGenerator(AuditService auditService, DataClassService dataClassService, Integer depth = 3, Boolean includeMetadata = true, Closure customTemplate = defaultTemplate, String imagePath = null) {
+    ChangeLogDocxGenerator(AuditService auditService, DataClassService dataClassService, PerformanceUtilService performanceUtilService, Integer depth = 3, Boolean includeMetadata = true, Closure customTemplate = defaultTemplate, String imagePath = null) {
         super(auditService, dataClassService, depth, includeMetadata)
         this.customTemplate=customTemplate
         this.imagePath=imagePath
+        this.performanceUtilService = performanceUtilService
     }
 
     @Override
@@ -61,7 +65,7 @@ class ChangeLogDocxGenerator extends AbstractChangeLogGenerator{
         log.info "Generating changelog for data class $dataClass.name ($dataClass.combinedVersion)"
         DocumentBuilder builder = new ModelCatalogueWordDocumentBuilder(outputStream)
 
-        docHelper = new DocxSpecificationDataHelper(builder)
+        docHelper = new DocxSpecificationDataHelper(builder, depth)
 
         Delayable<DocumentBuilder> delayable = new Delayable<>(builder)
 
@@ -123,10 +127,17 @@ class ChangeLogDocxGenerator extends AbstractChangeLogGenerator{
                 Collection<DataClass> classes = collectDataClasses(dataClass)
                 int counter = 1
                 int size = classes.size()
+                performanceUtilService.cleanUpGorm()
+
                 for (DataClass child in classes) {
-                    log.info "[${counter++}/${size}] Processing changes from Data Class $child.name"
+                    if ((counter % CLEAN_UP_GORM_FREQUENCY == 0)) {
+                        performanceUtilService.cleanUpGorm()
+                    }
+
+                    log.info "[${counter++}/${size}] Processing changes from Data Class $child.name - depth $depth"
+
                     delayable.whilePaused {
-                        docHelper.printModel(child, depth - 1)
+                        docHelper.printModel(child, false, depth)   //don't recurse
                         printPropertiesChanges(delayable, child)
                         printClassStructuralChanges(delayable, child)
                     }

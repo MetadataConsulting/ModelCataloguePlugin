@@ -28,6 +28,7 @@ class DataModelToDocxExporter {
 
     //If there is an image to display on the front page
     def imagePath
+    int depth = 3
 
     void initVars(rootModel, dataClassService) {
         this.dataClassService = dataClassService
@@ -60,10 +61,11 @@ class DataModelToDocxExporter {
 
     }
 
-    DataModelToDocxExporter(DataModel rootModel, DataClassService dataClassService, Closure customTemplate, imagePath) {
+    DataModelToDocxExporter(DataModel rootModel, DataClassService dataClassService, Closure customTemplate, imagePath, Integer depth = 3) {
         initVars(rootModel, dataClassService)
         this.customTemplate = customTemplate
         if(imagePath) this.imagePath = imagePath
+        this.depth = depth
     }
 
     ArrayList getAllVersionsOfModel(DataModel model, List<DataModel> models) {
@@ -81,7 +83,7 @@ class DataModelToDocxExporter {
 
         def dataClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.includes(rootModel)).items
         def builder = new ModelCatalogueWordDocumentBuilder(outputStream)
-        def docHelper = new DocxSpecificationDataHelper(builder)
+        def docHelper = new DocxSpecificationDataHelper(builder, depth + 1)
 
         List<DataModel> allVersionsOfModel = getAllVersionsOfModel(rootModel, [rootModel])
 
@@ -185,8 +187,9 @@ class DataModelToDocxExporter {
                     }
                 }
 
+                log.debug "found ${dataClasses.size()} top level dataClasses"
                 for (DataClass dClass in dataClasses) {
-                    docHelper.printModel(dClass, 1)
+                    docHelper.printModel(dClass, true, 1)
                 }
 
                 if (docHelper.usedDataTypes) {

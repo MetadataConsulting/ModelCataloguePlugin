@@ -20,7 +20,7 @@ class DataModelChangeLogXlsExporterSpec extends AbstractDataModelExporterSpec {
         findDataIds()
 
         //test generated content
-        DataModelChangeLogXlsExporter exporter = new DataModelChangeLogXlsExporter(auditService, dataClassService, sessionFactory, 5, false)
+        DataModelChangeLogXlsExporter exporter = new DataModelChangeLogXlsExporter(auditService, dataClassService, performanceUtilService, 5, false)
         List<DataClass> dataClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.includes((DataModel) dataModel)).items
         DataClass dataClass = dataClasses?.get(0)
 
@@ -35,7 +35,7 @@ class DataModelChangeLogXlsExporterSpec extends AbstractDataModelExporterSpec {
 
         File file = temporaryFolder.newFile("${System.currentTimeMillis()}.xlsx")
         //test excel generation
-        new DataModelChangeLogXlsExporter(auditService, dataClassService, sessionFactory, 5, false).export(dataModel, file.newOutputStream())
+        new DataModelChangeLogXlsExporter(auditService, dataClassService, performanceUtilService, 5, false).export(dataModel, file.newOutputStream())
 
         open file
 

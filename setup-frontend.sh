@@ -22,6 +22,11 @@ echo "executing npm install in folders where bower.json is exists"
 
 # there is a failing java file which grails tries to compile
 rm -rf ModelCatalogueCorePlugin/grails-app/assets/bower_components/ace-builds/demo
+rm -rf ModelCatalogueCorePlugin/grails-app/assets/bower_components/ace-builds/src
+rm -rf ModelCatalogueCorePlugin/grails-app/assets/bower_components/ace-builds/src-min
+rm -rf ModelCatalogueCorePlugin/grails-app/assets/bower_components/ace-builds/src-noconflict
+rm -rf ModelCatalogueCorePlugin/grails-app/assets/bower_components/ace-builds/textarea
+rm -f  ModelCatalogueCorePlugin/grails-app/assets/bower_components/ace-builds/*.html
 rm -f  ModelCatalogueCorePlugin/grails-app/assets/bower_components/angular-file-saver/gulpfile.babel.js
 rm -rf ModelCatalogueCorePlugin/grails-app/assets/bower_components/angular-file-saver/src
 rm -rf ModelCatalogueCorePlugin/grails-app/assets/bower_components/angular-file-saver/docs

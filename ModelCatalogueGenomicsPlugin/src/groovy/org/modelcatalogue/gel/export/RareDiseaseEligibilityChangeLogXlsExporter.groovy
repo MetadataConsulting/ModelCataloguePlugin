@@ -5,6 +5,7 @@ import org.hibernate.SessionFactory
 import org.modelcatalogue.builder.spreadsheet.api.Sheet
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClassService
+import org.modelcatalogue.core.PerformanceUtilService
 import org.modelcatalogue.core.audit.AuditService
 
 /**
@@ -17,8 +18,8 @@ class RareDiseaseEligibilityChangeLogXlsExporter extends RareDiseaseChangeLogXls
     private static final int CURRENT_DETAILS = 6
     private static final int NEW_DETAILS = 7
 
-    RareDiseaseEligibilityChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, SessionFactory sessionFactory, Integer depth = 5, Boolean includeMetadata = false) {
-        super(auditService, dataClassService, sessionFactory, depth, includeMetadata)
+    RareDiseaseEligibilityChangeLogXlsExporter(AuditService auditService, DataClassService dataClassService, PerformanceUtilService performanceUtilService, Integer depth = 5, Boolean includeMetadata = false) {
+        super(auditService, dataClassService, performanceUtilService, depth, includeMetadata)
     }
 
     @Override
