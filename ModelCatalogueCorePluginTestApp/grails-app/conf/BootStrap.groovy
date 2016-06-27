@@ -28,24 +28,19 @@ class BootStrap {
     def init = { servletContext ->
         ExtensionModulesLoader.addExtensionModules()
 
-//        if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST]) {
-//            TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
-//                initCatalogueService.initCatalogue(true)
-//                initSecurity()
-//                setupStuff()
-//            }
-//            elasticSearchService.reindex().all { it }.toBlocking().subscribe {
-//                System.out.println "Reindexed"
-//            }
-//        } else {
+        if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST]) {
+            TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
+                initCatalogueService.initCatalogue(true)
+                initSecurity()
+                setupStuff()
+            }
+            modelCatalogueSearchService.reindex().all { it }.toBlocking().subscribe {
+                System.out.println "Reindexed"
+            }
+        } else {
             initCatalogueService.initDefaultRelationshipTypes()
             initSecurity()
-
-//            elasticSearchService.reindex().all { it }.toBlocking().subscribe {
-//                System.out.println "Reindexed"
-//            }
-
-//        }
+        }
     }
 
     private static void initSecurity() {
