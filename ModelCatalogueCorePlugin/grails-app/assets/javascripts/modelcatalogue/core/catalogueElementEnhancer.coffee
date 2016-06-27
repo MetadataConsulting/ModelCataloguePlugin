@@ -76,7 +76,8 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
 
           self['delete'] = () ->
             enhance(rest(method: 'DELETE', url: "#{modelCatalogueApiRoot}#{self.link}")).then (result)->
-              $rootScope.$broadcast 'catalogueElementDeleted', self
+              if(!self.isInstanceOf('dataModel'))
+                $rootScope.$broadcast 'catalogueElementDeleted', self
               result
 
           self.execute = (tail, method = 'GET', data = undefined) ->
