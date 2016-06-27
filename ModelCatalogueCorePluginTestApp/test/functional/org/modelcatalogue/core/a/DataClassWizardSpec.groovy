@@ -30,7 +30,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 
         addDataModelImport 'nhic'
 
-        selectInTree "Data Classes", true
+        selectInTree "Data Classes"
 
         expect:
         check '#jserrors' gone

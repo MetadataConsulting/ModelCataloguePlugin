@@ -61,7 +61,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
         addDataModelImport 'XMLSchema', 'NHIC'
 
-        selectInTree 'Data Types', true
+        selectInTree 'Data Types'
 
         when:
         check closeGrowlMessage gone
@@ -199,6 +199,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         refresh browser
         select('Test 1') % 'Test 1' % 'Data Types' / 'Enumeration 1'
 
+        scroll up
         click inlineEdit
         click removeEnumerationOne
         click inlineEditSubmit

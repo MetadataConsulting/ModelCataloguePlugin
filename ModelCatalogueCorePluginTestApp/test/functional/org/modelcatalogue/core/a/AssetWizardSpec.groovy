@@ -35,7 +35,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         loginAdmin()
         select "Test 1"
         selectInTree "Test 1"
-        selectInTree "Assets", true
+        selectInTree "Assets"
 
         then:
         check rightSideTitle is 'Active Assets'
