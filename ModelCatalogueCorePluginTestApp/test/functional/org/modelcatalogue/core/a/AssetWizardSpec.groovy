@@ -35,7 +35,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         loginAdmin()
         select "Test 1"
         selectInTree "Test 1"
-        selectInTree "Assets"
+        selectInTree "Assets", true
 
         then:
         check rightSideTitle is 'Active Assets'
@@ -142,7 +142,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check rightSideTitle is 'MET-522 0.0.1'
 
         when:
-        select('MET-522') / 'MET-522' / 'Data Classes' / 'MET-522.M1'
+        select('MET-522') % 'MET-522' % 'Data Classes' / 'MET-522.M1'
 
         then:
         check rightSideTitle is 'MET-522.M1 MET-522 0.0.1'

@@ -26,11 +26,11 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
     def "go to login"() {
         login admin
 
-        select('Test 2') / "Test 2"
+        select('Test 2') % "Test 2"
 
         addDataModelImport 'nhic'
 
-        selectInTree "Data Classes"
+        selectInTree "Data Classes", true
 
         expect:
         check '#jserrors' gone
@@ -101,7 +101,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         click exitButton
 
         and:
-        selectInTree 'Data Classes'
+        selectInTree 'Data Classes', true
 
         then:
         check CatalogueContent.create('span.catalogue-element-treeview-name', text: startsWith("New")) displayed

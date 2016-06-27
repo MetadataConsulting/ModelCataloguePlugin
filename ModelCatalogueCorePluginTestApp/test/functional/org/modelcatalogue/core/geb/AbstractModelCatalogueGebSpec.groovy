@@ -392,7 +392,20 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
 
-    def selectInTree(String name) {
+    void selectInTree(String name, boolean ensureExpanded = false) {
+        if (ensureExpanded) {
+            noStale({
+                $('.catalogue-element-treeview-name', text: name).parent().find('.catalogue-element-treeview-icon')
+            }) { Navigator it ->
+                if (it.find('.fa-caret-down').displayed) {
+                    return true
+                }
+                click { $('.catalogue-element-treeview-name', text: name) }
+                return false
+            }
+            return
+        }
+
         noStale({ $('.catalogue-element-treeview-name', text: name) }) {
             it.click()
         }
