@@ -26,14 +26,20 @@ class CatalogueElementService {
      */
     void delete(CatalogueElement catalogueElement) {
         def subject = BehaviorSubject.create()
-        // if you delete relationships manually not using unlink you have to clear the relationship cache
-        // and maybe other caches (search for com.google.common.cache.Cache)
         // first un-index catalogue element from search
         modelCatalogueSearchService.unindex(catalogueElement).doOnNext {
             log.debug("Unindexing for search has started before the catalogue element $catalogueElement is deleted")
         }.subscribe(subject)
 
         try {
+            // control if manual delete of some relationships is needed
+            def manualDeleteRelationships = catalogueElement
+                .manualDeleteRelationships(catalogueElement instanceof DataModel ? catalogueElement : null)
+            if (manualDeleteRelationships.size()) {
+                throw new IllegalStateException("There are some relationships which needs to be deleted manually first " +
+                                                    "${manualDeleteRelationships}")
+            }
+
             // remove all associations
             catalogueElement.deleteRelationships()
 
@@ -45,32 +51,7 @@ class CatalogueElementService {
                 modelCatalogueSearchService.index(catalogueElement)
             }.subscribe(ErrorSubscriber.create("Error during indexing catalogue element $catalogueElement"))
 
-            def errors = []
-            if (e instanceof DataIntegrityViolationException || e instanceof ConstraintViolationException) {
-                for (def property in catalogueElement.domainClass.persistentProperties) {
-                    if ((property.oneToMany || property.manyToMany) && catalogueElement.hasProperty(property.name)) {
-                        def value = catalogueElement[property.name]
-                        if (value) {
-                            def valueToLog = value
-                            if (value instanceof Iterable) {
-                                valueToLog = value.take(3)
-                                if (value.size() > 3)
-                                    valueToLog.add("...")
-                            }
-                            errors.add("${property.naturalName.toLowerCase()}: ${valueToLog}")
-                        }
-                    }
-                }
-            }
-
-            if (errors.size() > 0) {
-                def errorsToLog = errors.take(5)
-                if (errors.size() > 5)
-                    errorsToLog.add("...")
-                throw new IllegalStateException("Cannot delete $catalogueElement, remove all relationship first: ${errorsToLog}")
-            } else {
-                throw new RuntimeException("Exception while deleting catalogue element $catalogueElement", e)
-            }
+            throw new RuntimeException("Exception while deleting catalogue element $catalogueElement", e)
         }
     }
 }

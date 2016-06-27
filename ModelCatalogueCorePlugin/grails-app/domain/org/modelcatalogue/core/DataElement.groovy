@@ -2,6 +2,8 @@ package org.modelcatalogue.core
 
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Iterables
+import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
+import org.modelcatalogue.core.dataarchitect.CsvTransformation
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.util.FriendlyErrors
@@ -19,16 +21,30 @@ class DataElement extends CatalogueElement {
     }
 
     static relationships = [
-            outgoing: [involvedness: 'involvedIn'],
-            incoming: [containment: 'containedIn'],
+        outgoing: [involvedness: 'involvedIn'],
+        incoming: [containment: 'containedIn'],
     ]
 
     static fetchMode = [dataType: 'eager']
 
     @Override
     Map<CatalogueElement, Object> manualDeleteRelationships(DataModel toBeDeleted) {
-        // there are no relationships which restrict the deletion
-        return [:]
+        // data elements might be in transformation definition
+        ColumnTransformationDefinition.findAllBySourceOrDestination(this, this).collectEntries {
+            if (toBeDeleted) {
+                // source is in different data model
+                if (it.source && it.source.dataModel != toBeDeleted) {
+                    return [(it): it.source.dataModel]
+                } else if (it.destination && it.destination.dataModel != toBeDeleted) {
+                    return [(it): it.destination.dataModel]
+                } else {
+                    // we cannot delete column transformation definition anyway due to session flush exception
+                    return [(it): null]
+                }
+            } else {
+                return [(it): null]
+            }
+        }
     }
 
     @Override

@@ -1,18 +1,15 @@
 package org.modelcatalogue.core
 
-import grails.converters.JSON
 import grails.rest.RestfulController
 import grails.transaction.Transactional
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.hibernate.StaleStateException
-import org.hibernate.util.JDBCExceptionReporter
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.dao.ConcurrencyFailureException
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.validation.Errors
 
 import static org.springframework.http.HttpStatus.*
@@ -250,12 +247,9 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         try {
             catalogueElementService.delete(instance)
             noContent()
-        } catch (IllegalStateException e) {
-            response.status = CONFLICT.value()
-            respond errors: message(code: "org.modelcatalogue.core.CatalogueElement.error.delete", args: [instance.name, e.message])
         } catch (e) {
             response.status = INTERNAL_SERVER_ERROR.value()
-            respond errors: "Unexpected error while deleting $instance"
+            respond errors: "Unexpected error while deleting $instance ${e.message}"
             log.error("unexpected error while deleting $instance", e)
         }
     }

@@ -43,20 +43,16 @@ class DataModel extends CatalogueElement {
     Map<CatalogueElement, Object> manualDeleteRelationships(DataModel toBeDeleted) {
         // inspect declarations
         def manualDelete = declares.collectEntries {
-            if (it.dataModel != toBeDeleted) {
-                return [(it): it.dataModel]
-            } else {
-                // inspect the element if belongs to same DataModel
-                def relationshipManualDelete = it.manualDeleteRelationships(this)
-                if (relationshipManualDelete.size() > 0)
-                    return [(it): relationshipManualDelete]
-                else
-                    return [:]
-            }
+            // check the element for the same - if manual delete is needed
+            def relationshipManualDelete = it.manualDeleteRelationships(this)
+            if (relationshipManualDelete.size() > 0)
+                return [(it): relationshipManualDelete]
+            else
+                return [:]
         }
         // inspect relationships
-        manualDelete << (outgoingRelations + incomingRelations).collectEntries {
-            if (it.dataModel)
+        manualDelete << (outgoingRelationships + incomingRelationships).collectEntries {
+            if (it.dataModel && it.dataModel != toBeDeleted)
                 return [(it.dataModel): it]
             else
                 return [:]
@@ -65,26 +61,28 @@ class DataModel extends CatalogueElement {
         return manualDelete
     }
 
-    @Override
-    void setModelCatalogueId(String mcID) {
-        super.setModelCatalogueId(Legacy.fixModelCatalogueId(mcID))
-    }
-
     /**
-     * Deletes all {@link CatalogueElement}s assigned to this datamodel and then call super class method
+     * Deletes all {@link CatalogueElement}s assigned to this {@link DataModel} and then call super class method
      * {@link CatalogueElement#deleteRelationships()}.
      */
     @Override
     void deleteRelationships() {
-        // delete all declarations
-        // delete all relationship where rel.dataModel == this
+        // delete all declarations, in following order: DataElements, DataTypes, DataClasses and anything else
         declares.sort { a, b ->
-
+            def sortMap = [(DataElement): 0, (DataType): 1, (DataClass): 2]
+            def aSort = sortMap.get(a.class) != null ? sortMap.get(a.class) : 3
+            def bSort = sortMap.get(b.class) != null ? sortMap.get(b.class) : 3
+            aSort <=> bSort
         }.each {
             it.deleteRelationships()
             it.delete()
         }
         super.deleteRelationships()
+    }
+
+    @Override
+    void setModelCatalogueId(String mcID) {
+        super.setModelCatalogueId(Legacy.fixModelCatalogueId(mcID))
     }
 
     /**

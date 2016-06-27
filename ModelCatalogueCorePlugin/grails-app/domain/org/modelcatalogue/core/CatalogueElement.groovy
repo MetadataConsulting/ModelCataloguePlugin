@@ -232,8 +232,11 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     abstract Map<CatalogueElement, Object> manualDeleteRelationships(DataModel toBeDeleted)
 
     /**
-     * Deletes all catalogue relationships: {@link #outgoingMappings}, {@link #incomingRelationships},
-     * {@link #outgoingMappings}, {@link #incomingMappings}.
+     * This method deletes all related relationships which cannot be cleared automatically when object is deleted.
+     * It should be overridden by implementors if needed. Deletes all catalogue relationships: {@link #outgoingMappings},
+     * {@link #incomingRelationships}, {@link #outgoingMappings}, {@link #incomingMappings} and {@link #extensions}.
+     * @throws IllegalStateException when some manual delete of relationships needs to be done, see
+     * @{link #manualDeleteRelationships}.
      */
     void deleteRelationships() {
         // manual delete as belongsTo doesn't work here...

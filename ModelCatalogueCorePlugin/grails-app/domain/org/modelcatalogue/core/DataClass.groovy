@@ -31,11 +31,11 @@ class DataClass extends CatalogueElement {
             if (toBeDeleted) {
                 // if DataModel is going to be deleted, then ReferenceType needs to be from same DataModel
                 if (it.dataModel != toBeDeleted)
-                    return [(it): it.toBeDeleted]
+                    return [(it): it.dataModel]
                 else
                     return [:]
             } else {
-                // if delets DataClass, it should not be used anywhere
+                // if deletes DataClass, it should not be used anywhere
                 return [(it): null]
             }
         }
