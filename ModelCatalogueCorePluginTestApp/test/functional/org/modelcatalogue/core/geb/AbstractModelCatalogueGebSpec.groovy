@@ -241,7 +241,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
                 // cannot be null, otherwise the wait block will fail
                 return -1
             }
-            it.text() to Integer
+            it.first().text() to Integer
         }
         if (result == -1) {
             return 0

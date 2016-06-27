@@ -69,7 +69,7 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
         waitFor {
             batchName.first().displayed
         }
-        batchName.text().startsWith 'Test Batch'
+        batchName.first().text().startsWith 'Test Batch'
         waitFor {
             noPerformedActions.first().displayed
         }
