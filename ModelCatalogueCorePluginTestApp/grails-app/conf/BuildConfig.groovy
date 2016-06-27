@@ -36,7 +36,7 @@ grails.plugin.location.'model-catalogue-genomics' = '../ModelCatalogueGenomicsPl
 grails.project.dependency.resolver = "maven" // or ivy
 grails.project.dependency.resolution = {
 
-    final String gebVersion = '0.12.2'
+    final String gebVersion = '0.13.1'
 
     // inherit Grails' default dependencies
     inherits("global") {

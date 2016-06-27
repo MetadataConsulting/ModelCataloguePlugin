@@ -21,7 +21,7 @@ class NavigatorCondition {
 
     boolean isDisplayed() {
         spec.noStale(NUM_OF_RETRIES, navigator) {
-            it.displayed
+            it.first().displayed
         }
     }
 
@@ -47,7 +47,7 @@ class NavigatorCondition {
 
     boolean isGone() {
         spec.noStale(NUM_OF_RETRIES, true, navigator) {
-            !it.displayed
+            !it.first().displayed
         }
     }
 

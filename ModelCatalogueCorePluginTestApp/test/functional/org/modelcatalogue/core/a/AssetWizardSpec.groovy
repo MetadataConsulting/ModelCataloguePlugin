@@ -177,9 +177,9 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
     void waitUntilFinalized() {
         int counter = 0
-        while (!$(downloadButton.toSelector()).displayed && counter++ < 100) {
+        while (!$(downloadButton.toSelector()).first().displayed && counter++ < 100) {
             // ! + gone does not implicitly require the element
-            if ($(refreshAsset.toSelector()).displayed) {
+            if ($(refreshAsset.toSelector()).first().displayed) {
                 try {
                     click refreshAsset
                 } catch (ignored) {}
