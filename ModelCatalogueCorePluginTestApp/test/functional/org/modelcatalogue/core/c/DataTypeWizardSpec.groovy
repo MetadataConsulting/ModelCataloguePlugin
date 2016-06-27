@@ -199,7 +199,8 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         refresh browser
         select('Test 1') % 'Test 1' % 'Data Types' / 'Enumeration 1'
 
-        scroll up
+        4.times { scroll up }
+
         click inlineEdit
         click removeEnumerationOne
         click inlineEditSubmit

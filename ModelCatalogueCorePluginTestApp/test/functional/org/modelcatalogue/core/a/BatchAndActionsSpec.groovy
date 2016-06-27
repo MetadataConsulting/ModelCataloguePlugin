@@ -32,7 +32,7 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
         at BatchListPage
 
         waitFor {
-            linkToTestBatch.displayed
+            linkToTestBatch.first().displayed
         }
         waitFor {
             menuItem('generate-merge-models', 'list').displayed
@@ -46,7 +46,7 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         waitFor {
-            modalDialog.displayed
+            modalDialog.first().displayed
         }
         when:
         modalPrimaryButton.click()
@@ -55,7 +55,7 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
         waitFor(120) {
             menuItem('refresh-batches', 'list').click()
             Thread.sleep(100)
-            linkToRename.displayed
+            linkToRename.first().displayed
         }
     }
 
@@ -67,11 +67,11 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
         then:
         at BatchActionsPage
         waitFor {
-            batchName.displayed
+            batchName.first().displayed
         }
-        batchName.text().startsWith 'Test Batch'
+        batchName.first().text().startsWith 'Test Batch'
         waitFor {
-            noPerformedActions.displayed
+            noPerformedActions.first().displayed
         }
         pendingActions.size() > 10
         'alert-danger' in pendingActions[0].classes()
@@ -96,7 +96,7 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         waitFor {
-            pendingActions[0].find('.glyphicon-play').displayed
+            pendingActions[0].find('.glyphicon-play').first().displayed
         }
 
         when:

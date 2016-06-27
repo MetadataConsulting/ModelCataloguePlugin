@@ -41,7 +41,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
                     title == 'Data Models'
                 }
                 waitFor {
-                    $("h3.panel-title", title: dataModelName).displayed
+                    $("h3.panel-title", title: dataModelName).first().displayed
                 }
                 break
             } catch (e) {
@@ -55,7 +55,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         for (int i = 0; i < 10; i++) {
             try {
                 noStale({ latest ? $("h3.panel-title", title: dataModelName).last() : $("h3.panel-title", title: dataModelName).first() }) {
-                    it.find('a.full-width-link').click()
+                    it.find('a.full-width-link').first().click()
                 }
                 check rightSideTitle contains dataModelName
                 break
@@ -76,19 +76,19 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         $("#username").value(user)
         $("#password").value(pwd)
 
-        $("#loginForm").find("button.btn-primary").click()
+        $("#loginForm").find("button.btn-primary").first().click()
 
         go "#/dataModels"
 
         waitFor {
-            $("#role_navigation-right_user-menu-menu-item-link").displayed
+            $("#role_navigation-right_user-menu-menu-item-link").first().displayed
         }
         check "#my-models" displayed
     }
 
     boolean waitUntilModalClosed(int timeout = 10) {
         waitFor(timeout){
-            !$('.modal-backdrop').displayed
+            !$('.modal-backdrop').first().displayed
         }
         return true
     }
@@ -100,7 +100,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     boolean selectCepItemIfExists(long waitTime = 3) {
         try {
             waitFor(waitTime) {
-                $('.cep-item:not(.show-more-cep-item), .item-found').displayed
+                $('.cep-item:not(.show-more-cep-item), .item-found').first().displayed
             }
             $('.cep-item:not(.show-more-cep-item), .item-found').first().click()
             return true
@@ -157,7 +157,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
     boolean no(Navigator navigator) {
         waitFor {
-            !navigator.displayed
+            !navigator.first().displayed
         }
     }
 
@@ -190,7 +190,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     void click(Closure<Navigator> navigatorClosure) {
         try {
             noStale(navigatorClosure) {
-                it.click()
+                it.first().click()
             }
         } catch (IllegalArgumentException iae) {
             throw new IllegalArgumentException("${navigatorClosure()} didn't return any results after a 10 attempts", iae)
@@ -232,16 +232,16 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         waitFor {
             $('div.inf-table-body tbody tr:nth-child(' + row +') a.inf-cell-expand')
         }
-        $('div.inf-table-body tbody tr:nth-child(' + row +') a.inf-cell-expand').click()
+        $('div.inf-table-body tbody tr:nth-child(' + row +') a.inf-cell-expand').first().click()
     }
 
     int totalOf(String name) {
         int result = noStale(5, -1, { tab(name).find('span.badge.tab-value-total') }) {
-            if (!it.displayed) {
+            if (!it.first().displayed) {
                 // cannot be null, otherwise the wait block will fail
                 return -1
             }
-            it.text() to Integer
+            it.first().text() to Integer
         }
         if (result == -1) {
             return 0
@@ -262,7 +262,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         5.times {
             try {
                 noStale({ $("li[data-tab-name='$name'] a") }) {
-                    it.click()
+                    it.first().click()
                 }
                 waitFor { tabActive(name) }
             } catch (e) {
@@ -300,9 +300,9 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
                     return null
                 }
 
-                if (!navigator.displayed && defaultValue == null) {
+                if (!navigator.first().displayed && defaultValue == null) {
                     waitFor(attempt ** 2) {
-                        navigator.displayed
+                        navigator.first().displayed
                     }
                     return (R) waitFor(1) {
                         return resultClosure(navigator)
@@ -330,7 +330,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
 
     boolean tabActive(String name) {
-        $("li[data-tab-name='$name'].active").displayed
+        $("li[data-tab-name='$name'].active").first().displayed
     }
 
     /**
@@ -343,16 +343,16 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         }
 
         while (parent.find('.soe-table-property-row').size() > 1) {
-            parent.find('.soe-table-property-row:first-child .soe-table-property-actions .soe-remove-row').click()
+            parent.find('.soe-table-property-row:first-child .soe-table-property-actions .soe-remove-row').first().click()
         }
         // last value might not be deleted
-        parent.find('.soe-table-property-row:first-child .soe-table-property-actions .soe-remove-row').click()
+        parent.find('.soe-table-property-row:first-child .soe-table-property-actions .soe-remove-row').first().click()
 
         newMetadata.each { key, value ->
             // fill value first as key might disable both input
             parent.find('.soe-table-property-row:last-child .soe-table-property-value input').value(value?.toString() ?: '')
             parent.find('.soe-table-property-row:last-child .soe-table-property-key input').value(key?.toString() ?: '')
-            parent.find('.soe-table-property-row:last-child .soe-table-property-actions .soe-add-row').click()
+            parent.find('.soe-table-property-row:last-child .soe-table-property-actions .soe-add-row').first().click()
         }
     }
 
@@ -387,7 +387,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         }
 
         noStale({$('a.item-found h4', text: name)}) { Navigator item ->
-            item.parent().click()
+            item.parent().first().click()
         }
     }
 
@@ -397,7 +397,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
             noStale({
                 $('.catalogue-element-treeview-name', text: name).parent().find('.catalogue-element-treeview-icon')
             }) { Navigator it ->
-                if (it.find('.fa-caret-down').displayed) {
+                if (it.find('.fa-caret-down').first().displayed) {
                     return true
                 }
                 click { $('.catalogue-element-treeview-name', text: name) }
@@ -407,7 +407,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         }
 
         noStale({ $('.catalogue-element-treeview-name', text: name) }) {
-            it.click()
+            it.first().click()
         }
     }
 
