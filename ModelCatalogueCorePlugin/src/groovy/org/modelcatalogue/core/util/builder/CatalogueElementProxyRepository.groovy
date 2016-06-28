@@ -145,7 +145,7 @@ class CatalogueElementProxyRepository {
             for (CatalogueElementProxy element in elementProxiesToBeResolved) {
                 try {
                     String change = element.changed
-                    if (change && change != DefaultCatalogueElementProxy.CHANGE_NEW || element.getParameter('status') == ElementStatus.DRAFT) {
+                    if (change || element.getParameter('status') == ElementStatus.DRAFT) {
                         if (element.domain == DataModel) {
                             draftRequiredDataModels.add(element)
                         } else if (element.classification) {
