@@ -2,12 +2,9 @@ package org.modelcatalogue.core.b
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
-import org.modelcatalogue.core.pages.GlobalChangesPage
 import spock.lang.Stepwise
 
-import static org.modelcatalogue.core.geb.Common.create
-import static org.modelcatalogue.core.geb.Common.getCloseGrowlMessage
-import static org.modelcatalogue.core.geb.Common.save
+import static org.modelcatalogue.core.geb.Common.*
 
 @Stepwise
 class ChangesSpec extends AbstractModelCatalogueGebSpec {
@@ -34,8 +31,6 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
         go "#/catalogue/change/all"
 
         then:
-        at GlobalChangesPage
-
         check 'h3' is 'Changes'
     }
 
@@ -52,10 +47,10 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
         click CatalogueAction.runLast('item', 'undo-change')
 
         then:
-        check confirmDialog displayed
+        check modalDialog displayed
 
         when:
-        click confirmOk
+        click modalPrimaryButton
 
         then:
         check ".pp-table-property-element-value", 'data-value-for': 'Undone' is 'true'
