@@ -701,6 +701,10 @@ class ElementService implements Publisher<CatalogueElement> {
         VERSION_COUNT_CACHE.cleanUp()
     }
 
+    void invalidateCache(CatalogueElement catalogueElement) {
+        VERSION_COUNT_CACHE.invalidate(catalogueElement.id)
+        VERSION_COUNT_CACHE.cleanUp()
+    }
 
     List<Class> collectSubclasses(Class<?> resource) {
         subclassesCache.get(resource) {

@@ -16,6 +16,7 @@ class CatalogueElementService {
     SearchCatalogue modelCatalogueSearchService
 
     def grailsApplication
+    def cacheService
 
     /**
      * Deletes {@link CatalogueElement}, removes all indexes (search) and all relationships
@@ -39,6 +40,9 @@ class CatalogueElementService {
                 throw new IllegalStateException("There are some relationships which needs to be deleted manually first " +
                                                     "${manualDeleteRelationships}")
             }
+
+            // invalidate cache
+            cacheService.invalidate(catalogueElement)
 
             // remove all associations
             catalogueElement.deleteRelationships()
