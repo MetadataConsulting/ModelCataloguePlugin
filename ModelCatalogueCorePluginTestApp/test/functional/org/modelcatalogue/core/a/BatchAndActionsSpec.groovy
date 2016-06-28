@@ -3,122 +3,97 @@ package org.modelcatalogue.core.a
 import geb.waiting.WaitTimeoutException
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
-import org.modelcatalogue.core.pages.BatchActionsPage
-import org.modelcatalogue.core.pages.BatchListPage
+import org.modelcatalogue.core.geb.CatalogueContent
 import spock.lang.Stepwise
 
-import static org.modelcatalogue.core.geb.Common.getCloseGrowlMessage
+import static org.modelcatalogue.core.geb.Common.*
 
 @Stepwise
 class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
 
     private static final CatalogueAction showBatches = CatalogueAction.runFirst('navigation-right', 'admin-menu', 'action-batches')
 
+    private static final String batchName                   = 'h3.ce-name'
+    private static final String performedActions            = 'div.performed-actions .alert:not(.alert-info)'
+    private static final String pendingActions              = 'div.pending-actions .alert:not(.alert-info)'
+    private static final String noPerformedActions          = 'div.performed-actions .alert.alert-info'
+    private static final CatalogueContent nameProperty      = CatalogueContent.create('td.soe-table-property-value input', 'data-for-property': 'name')
+
+    private static final CatalogueContent linkToTestBatch   = CatalogueContent.create('td.inf-table-item-cell a', text: 'Test Batch')
+    private static final CatalogueContent linkToRename      = CatalogueContent.create('td.inf-table-item-cell a', text: 'Create Synonyms for Enumerated Type \'personGenderCode(current)\'')
+    private static final CatalogueAction generateMerge      = CatalogueAction.runFirst('list', 'generate-merge-models')
+    private static final CatalogueAction refreshList        = CatalogueAction.runFirst('list', 'refresh-batches')
+    private static final CatalogueAction reloadActions      = CatalogueAction.runFirst('item', 'reload-actions')
+
     def "see test batch in action "() {
         loginAdmin()
 
-        // FIXME: temporary workaround of https://metadata.atlassian.net/browse/MET-949
-        // should be using action menu item
-        go "#/dataModels"
-        refresh browser
-
-        go "#/catalogue/relationshipType/all"
-        refresh browser
-
-        go "#/catalogue/batch/all"
-        refresh browser
+        click showBatches
 
         expect:
-        at BatchListPage
-
-        waitFor {
-            linkToTestBatch.first().displayed
-        }
-        waitFor {
-            menuItem('generate-merge-models', 'list').displayed
-        }
+        check linkToTestBatch displayed
     }
 
     def "generate suggestions"() {
-        waitUntilModalClosed()
+        check backdrop gone
+
         when:
-        menuItem('generate-merge-models', 'list').click()
+        click generateMerge
 
         then:
-        waitFor {
-            modalDialog.first().displayed
-        }
+        check modalDialog displayed
+
         when:
-        modalPrimaryButton.click()
+        click modalPrimaryButton
+
+        while (check(linkToRename).missing) {
+            click refreshList
+            Thread.sleep(300)
+        }
 
         then:
-        waitFor(120) {
-            menuItem('refresh-batches', 'list').click()
-            Thread.sleep(100)
-            linkToRename.first().displayed
-        }
+        check linkToRename displayed
     }
 
     def "go to detail page and execute few actions"() {
-        waitUntilModalClosed()
+        check backdrop gone
+
         when:
-        linkToTestBatch.click()
+        click linkToTestBatch
 
         then:
-        at BatchActionsPage
-        waitFor {
-            batchName.first().displayed
-        }
-        batchName.first().text().startsWith 'Test Batch'
-        waitFor {
-            noPerformedActions.first().displayed
-        }
-        pendingActions.size() > 10
-        'alert-danger' in pendingActions[0].classes()
-        pendingActions[0].find('.glyphicon-edit').click()
+        check batchName displayed
+        check batchName contains 'Test Batch'
+        check noPerformedActions displayed
+        check pendingActions present 10 or more
+        check pendingActions has 'alert-danger'
 
         when:
-        nameProperty = 'BrandNewModel'
-        $('button#update-parameters').click()
-
+        click { $(pendingActions).first().find('.glyphicon-edit') }
+        fill nameProperty with 'BrandNewModel'
+        click 'button#update-parameters'
 
         then:
         check '.modal-body' gone
         check closeGrowlMessage gone
 
-        waitFor {
-            pendingActions[0].text().contains('BrandNewModel')
-        }
+        check pendingActions contains 'BrandNewModel'
 
         when:
-        pendingActions[0].find('.glyphicon-repeat').click()
-
+        click { $(pendingActions).first().find('.glyphicon-repeat') }
 
         then:
-        waitFor {
-            pendingActions[0].find('.glyphicon-play').first().displayed
-        }
+        check { $(pendingActions).first().find('.glyphicon-play') } displayed
 
         when:
-        pendingActions[0].find('.glyphicon-play').click()
+        click { $(pendingActions).first().find('.glyphicon-play') }
+
+        while (check(pendingActions).missing) {
+            click reloadActions
+        }
 
         then:
-        actionsPerformed
-    }
-
-    protected boolean isActionsPerformed() {
-        try {
-            waitFor (5) {
-                performedActions.size() == 1
-            }
-            return true
-        } catch (WaitTimeoutException ignored) {
-            menuItem('reload-actions', 'item').click()
-            waitFor (5) {
-                performedActions.size() == 1
-            }
-            return true
-        }
+        check pendingActions present once
     }
 
 }
