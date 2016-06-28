@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import grails.converters.JSON
 import grails.rest.RestfulController
 import grails.transaction.Transactional
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
@@ -212,8 +213,25 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         // only CatalogueElements can be deleted now
         if (!(instance instanceof CatalogueElement)) {
-            forbidden()
+            response.status = FORBIDDEN.value()
+            respond errors: "only catalogue elements can be deleted"
             return
+        }
+
+        // only drafts can be deleted
+        def error = "only elements with status of DRAFT can be deleted"
+        if (instance instanceof DataModel) {
+            if (instance.status != ElementStatus.DRAFT) {
+                response.status = FORBIDDEN.value()
+                respond errors: error
+                return
+            }
+        } else {
+            if (instance.dataModel?.status != ElementStatus.DRAFT) {
+                response.status = FORBIDDEN.value()
+                respond errors: error
+                return
+            }
         }
 
         // find out if CatalogueElement can be deleted
@@ -291,7 +309,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
      * @return Returns true if user role is ADMIN, false otherwise.
      */
     protected boolean allowDelete() {
-        modelCatalogueSecurityService.hasRole('ADMIN')
+        modelCatalogueSecurityService.hasRole('CURATOR')
     }
 
     protected boolean isFavoriteAfterUpdate() {
@@ -399,7 +417,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
     protected void unauthorized() { render status: UNAUTHORIZED }
 
-    protected void forbidden() { render status: FORBIDDEN }
+    protected void forbidden(String text) { render status: FORBIDDEN, text: text }
 
     @Override
     protected void notFound() { render status: NOT_FOUND }
