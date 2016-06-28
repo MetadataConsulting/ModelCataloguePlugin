@@ -33,7 +33,7 @@ class GenomicsService {
     static final String RD_PHENOTYPE_AND_CLINICAL_TESTS_XLS = "RD Change log for Phenotypes and clinical tests.xlsx"
     static final String RD_ELIGIBILITY_CHANGELOG_XLS = "RD Change Log for Eligibility Criteria.xlsx"
 
-    static final String DOC_IMAGE_PATH = "https://www.genomicsengland.co.uk/wp-content/uploads/2015/11/Genomics-England-logo-2015.png"
+    static final String DOC_IMAGE_PATH = GenomicsService.getResource('Genomics-England-logo-2015.png')?.toExternalForm()
 
     static Closure customTemplate = {
         'document' font: [family: 'Calibri', size: 11], margin: [left: 20, right: 10]
