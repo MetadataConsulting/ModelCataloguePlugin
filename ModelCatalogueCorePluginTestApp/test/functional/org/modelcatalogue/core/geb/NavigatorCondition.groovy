@@ -21,7 +21,7 @@ class NavigatorCondition {
 
     boolean isDisplayed() {
         spec.noStale(NUM_OF_RETRIES, navigator) {
-            it.displayed
+            it.first().displayed
         }
     }
 
@@ -47,28 +47,28 @@ class NavigatorCondition {
 
     boolean isGone() {
         spec.noStale(NUM_OF_RETRIES, true, navigator) {
-            !it.displayed
+            !it.first().displayed
         }
     }
 
     boolean is(String text) {
         isDisplayed()
         spec.noStale(NUM_OF_RETRIES, navigator) {
-            it.text().trim() == text
+            it.first().text().trim() == text
         }
     }
 
     boolean contains(String text) {
         isDisplayed()
         spec.noStale(NUM_OF_RETRIES, navigator) {
-            it.text().contains text
+            it.first().text().contains text
         }
     }
 
     boolean missing(String text) {
         isDisplayed()
         spec.noStale(NUM_OF_RETRIES, navigator) {
-            !it.text().contains(text)
+            !it.first().text().contains(text)
         }
     }
 
@@ -94,6 +94,6 @@ class NavigatorCondition {
     @Override
     String toString() {
         Navigator current = navigator()
-        return "Navigator condition based on ${current} (text='${current.text()?.trim()}', size=${current.size()})".toString()
+        return "Navigator condition based on ${current} (text='${current.first().text()?.trim()}', size=${current.size()})".toString()
     }
 }

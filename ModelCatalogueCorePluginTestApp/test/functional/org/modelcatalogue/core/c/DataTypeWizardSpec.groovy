@@ -262,7 +262,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         when:
         fillMetadata foo: 'bar'
 
-        3.times { scroll up }
+        scroll up
 
         click inlineEditSubmit
 
@@ -466,7 +466,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "change type"() {
         given:
-            3.times { scroll up }
+            scroll up
         expect:
             check backdrop gone
             check closeGrowlMessage gone
