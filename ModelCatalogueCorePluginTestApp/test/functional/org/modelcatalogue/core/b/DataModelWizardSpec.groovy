@@ -89,7 +89,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         fill metadataApproved with '29/04/2016'
         fill 'metadata-namespace' with 'Namespace'
         fill 'metadata-organization' with 'Organization'
-        scroll up
+        3.times { scroll up }
         click inlineEditSubmit
         check "input[name='name']" gone
 

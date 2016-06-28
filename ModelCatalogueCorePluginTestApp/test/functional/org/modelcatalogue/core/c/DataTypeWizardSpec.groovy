@@ -199,7 +199,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         refresh browser
         select('Test 1') % 'Test 1' % 'Data Types' / 'Enumeration 1'
 
-        scroll up
+        3.times { scroll up }
         click inlineEdit
         click removeEnumerationOne
         click inlineEditSubmit
@@ -262,7 +262,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         when:
         fillMetadata foo: 'bar'
 
-        scroll up
+        3.times { scroll up }
 
         click inlineEditSubmit
 
@@ -466,7 +466,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "change type"() {
         given:
-            scroll up
+            3.times { scroll up }
         expect:
             check backdrop gone
             check closeGrowlMessage gone
