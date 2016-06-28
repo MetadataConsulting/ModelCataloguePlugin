@@ -93,7 +93,7 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
         }
 
         then:
-        check pendingActions present once
+        noExceptionThrown()
     }
 
 }
