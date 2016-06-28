@@ -197,7 +197,8 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     @Override
     def delete() {
         if (!allowDelete()) {
-            unauthorized()
+            response.status = FORBIDDEN.value()
+            respond errors: "Delete is not allowed for you, you probably need higher user role."
             return
         }
 
@@ -214,12 +215,12 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         // only CatalogueElements can be deleted now
         if (!(instance instanceof CatalogueElement)) {
             response.status = FORBIDDEN.value()
-            respond errors: "only catalogue elements can be deleted"
+            respond errors: "Only catalogue elements can be deleted."
             return
         }
 
         // only drafts can be deleted
-        def error = "only elements with status of DRAFT can be deleted"
+        def error = "Only elements with status of DRAFT can be deleted."
         if (instance instanceof DataModel) {
             if (instance.status != ElementStatus.DRAFT) {
                 response.status = FORBIDDEN.value()
