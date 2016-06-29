@@ -19,12 +19,12 @@ class DataModelNavigator {
     }
 
     DataModelNavigator div(String node) {
-        return rightShift(node)
+        return rightShiftUnsigned(node)
     }
 
 
 
     DataModelNavigator mod(String node) {
-        return rightShiftUnsigned(node)
+        return rightShift(node)
     }
 }

@@ -142,7 +142,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check rightSideTitle is 'MET-522 0.0.1'
 
         when:
-        select('MET-522') % 'MET-522' % 'Data Classes' / 'MET-522.M1'
+        select('MET-522') / 'MET-522' % 'Data Classes' / 'MET-522.M1'
 
         then:
         check rightSideTitle is 'MET-522.M1 MET-522 0.0.1'
