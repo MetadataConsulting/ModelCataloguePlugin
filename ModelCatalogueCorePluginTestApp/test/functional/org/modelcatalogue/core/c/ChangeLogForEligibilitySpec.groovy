@@ -23,9 +23,7 @@ class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
             waitFor(120) { browser.title == 'Data Models' }
 
         when:
-            select 'Rare Disease Conditions', true
-            selectInTree 'Data Classes', true
-            selectInTree 'Rare Disease Conditions and Phenotypes'
+            select 'Rare Disease Conditions' open 'Data Classes' select 'Rare Disease Conditions and Phenotypes'
 
         then:
             check rightSideTitle contains 'Rare Disease Conditions and Phenotypes Rare Disease Conditions'

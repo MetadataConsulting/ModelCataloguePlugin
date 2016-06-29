@@ -108,6 +108,11 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
             data:         angular.copy configuration.data
             handlesKey:   (key) -> key in @keys
             hasData:      (element) -> configuration.keys.some (key) -> element.ext.get(key)?
+            isTemplateHidden: (element) ->
+              if @hasOwnProperty('templateHidden')
+                return @templateHidden
+              return @templateHidden = @hideIfNoData and not @hasData(element)
+            toggleTemplateHidden: (element) -> @templateHidden = not @isTemplateHidden(element)
 
           # assign values to the view
           angular.forEach configuration, (value, key) ->

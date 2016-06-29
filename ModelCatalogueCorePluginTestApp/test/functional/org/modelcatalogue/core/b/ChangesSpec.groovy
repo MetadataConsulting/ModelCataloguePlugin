@@ -15,7 +15,7 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
     def "go to login"() {
         loginAdmin()
 
-        select('Test 1') % 'Data Types'
+        select 'Test 1' select 'Data Types'
 
         click create
 

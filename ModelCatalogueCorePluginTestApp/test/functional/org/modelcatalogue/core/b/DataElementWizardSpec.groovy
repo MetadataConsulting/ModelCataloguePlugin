@@ -15,7 +15,7 @@ class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "login and select Data Element"() {
         login admin
-        select('Test 1') % 'Test 1' % 'Data Elements'
+        select 'Test 1' select 'Data Elements'
 
         expect:
         check rightSideTitle is 'Active Data Elements'
