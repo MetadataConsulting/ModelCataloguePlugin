@@ -408,7 +408,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
                 changes << lvlName
             }
 
-            if(PHENOTYPE == subtype || CLINICAL_TESTS == subtype) {                   // Phenotypes/Clinical tests report format - extra cols
+            if([PHENOTYPE,CLINICAL_TESTS,GUIDANCE].contains(subtype)) {                   // Phenotypes/Clinical tests report format - extra cols
                 changes << buildElementHierachyText(level, model)
                 changes << subtype
             }
