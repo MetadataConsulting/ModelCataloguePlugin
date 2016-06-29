@@ -12,7 +12,7 @@ class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
         login admin
 
         when:
-        select('Test 2') / 'Test 2' % "Measurement Units"
+        select 'Test 2' select "Measurement Units"
 
         then:
         check rightSideTitle is 'Active Measurement Units'

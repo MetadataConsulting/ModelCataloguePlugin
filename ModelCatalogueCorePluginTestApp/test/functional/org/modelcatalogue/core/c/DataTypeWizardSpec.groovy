@@ -50,14 +50,14 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         login admin
 
         when:
-        select('NHIC') / 'NHIC' % 'Data Types'
+        select 'NHIC' select 'Data Types'
 
         then:
         check rightSideTitle is 'Active Data Types'
     }
 
     def "create reference"() {
-        select('Test 1') / 'Test 1'
+        select 'Test 1'
 
         addDataModelImport 'XMLSchema', 'NHIC'
 
@@ -197,7 +197,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     def "updating parent propagates to child and grandchild"() {
         when:
         refresh browser
-        select('Test 1') / 'Test 1' % 'Data Types' / 'Enumeration 1'
+        select 'Test 1' open 'Data Types' select 'Enumeration 1'
 
         3.times { scroll up }
         click inlineEdit
@@ -205,7 +205,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click inlineEditSubmit
 
         refresh browser
-        select('Test 1') / 'Test 1' % 'Data Types' / 'Enumeration 3'
+        select 'Test 1' open 'Data Types' select 'Enumeration 3'
         then:
 
         check enumerationsDetail missing 'one'
@@ -214,7 +214,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "create standard"() {
         when:
-        select('Test 1') / 'Test 1' % 'Data Types'
+        select 'Test 1' select 'Data Types'
         check closeGrowlMessage gone
         click create
 

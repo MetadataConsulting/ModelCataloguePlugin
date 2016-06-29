@@ -26,7 +26,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
     def "go to login"() {
         login admin
 
-        select('Test 2') / "Test 2"
+        select 'Test 2'
 
         addDataModelImport 'nhic'
 
