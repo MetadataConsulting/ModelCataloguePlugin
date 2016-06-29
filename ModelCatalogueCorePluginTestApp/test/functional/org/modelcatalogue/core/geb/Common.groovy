@@ -44,6 +44,8 @@ class Common {
     static final Keywords last = Keywords.LAST
     static final Keywords first = Keywords.FIRST
     static final Keywords once = Keywords.ONCE
+    static final SizeConditionKeyword more = SizeConditionKeyword.MORE
+    static final SizeConditionKeyword less = SizeConditionKeyword.LESS
 
     static final ScrollDirection up = ScrollDirection.UP
     static final ScrollDirection down = ScrollDirection.DOWN

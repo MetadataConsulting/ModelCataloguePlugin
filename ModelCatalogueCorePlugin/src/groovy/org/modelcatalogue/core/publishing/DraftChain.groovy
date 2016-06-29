@@ -35,6 +35,7 @@ class DraftChain extends PublishingChain {
         if (!context.forceNew) {
             if (isDraft(published)) {
                 published.clearErrors()
+                monitor.onNext("\nData model is already ${published.status}")
                 return published
             }
 
@@ -42,6 +43,7 @@ class DraftChain extends PublishingChain {
                 def existingDrafts = getEntityClass(published).findAllByLatestVersionIdAndStatus(published.latestVersionId, ElementStatus.DRAFT, [sort: 'versionNumber', order: 'desc'])
                 for (existing in existingDrafts) {
                     if (existing.id != published.id) {
+                        monitor.onNext("\nExisting draft data model available: <a class='new-version-link' href='#/$existing.id/dataModel/$existing.id/'>$existing</a>")
                         return existing
                     }
                 }
@@ -55,6 +57,10 @@ class DraftChain extends PublishingChain {
         }
 
         monitor.onNext("\nDraft data model available: <a class='new-version-link' href='#/$draftDataModel.id/dataModel/$draftDataModel.id/'>$draftDataModel</a>")
+
+        if (!draftDataModel.hasErrors()) {
+            context.resolvePendingRelationships()
+        }
 
         return draftDataModel
     }

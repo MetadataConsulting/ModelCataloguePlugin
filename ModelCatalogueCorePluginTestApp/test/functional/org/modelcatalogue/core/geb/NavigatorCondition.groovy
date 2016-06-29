@@ -39,16 +39,22 @@ class NavigatorCondition {
 
     boolean has(String clazz) {
         spec.noStale(NUM_OF_RETRIES, navigator) {
-            it.hasClass(clazz)
+            it.first().hasClass(clazz)
         }
     }
 
-
-
+    /**
+     * @return return true if the element was either not present on the websited or is present but diappears
+     */
     boolean isGone() {
-        spec.noStale(NUM_OF_RETRIES, true, navigator) {
-            !it.first().displayed
-        }
+        spec.noStale(NUM_OF_RETRIES, true, navigator) { !it.first().displayed }
+    }
+
+    /**
+     * @return true if the element is not displayed on the website
+     */
+    boolean isMissing() {
+        spec.noStale(NUM_OF_RETRIES, "gone", navigator) { it.first().displayed ? "present" : "gone" } == "gone"
     }
 
     boolean is(String text) {
@@ -78,7 +84,7 @@ class NavigatorCondition {
 
     boolean present(Keywords once) {
         if (once == Keywords.ONCE) {
-            return spec.noStale(NUM_OF_RETRIES, false, navigator) { it.size() == 1 }
+            return present(1).times
         }
         throw new IllegalArgumentException("Only 'once' allowed here")
     }

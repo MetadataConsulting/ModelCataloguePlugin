@@ -322,6 +322,10 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
                     }.join('\n > ')
                 }
 
+                if (defaultValue != null) {
+                    return defaultValue
+                }
+
                 error = e
             }
         }
