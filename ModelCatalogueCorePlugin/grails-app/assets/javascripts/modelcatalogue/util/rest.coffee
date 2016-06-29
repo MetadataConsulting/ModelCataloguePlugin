@@ -20,7 +20,6 @@ angular.module('mc.util.rest', ['mc.util.messages']).factory 'rest', ($q, $http,
         return
       if response.status is 404
         if config.noRetry404
-          $rootScope.$broadcast 'resourceNotFound', response, config
           deferred.reject response
           return
 

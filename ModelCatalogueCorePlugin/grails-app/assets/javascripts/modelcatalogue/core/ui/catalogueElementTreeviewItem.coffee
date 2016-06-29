@@ -192,7 +192,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
 
           # first load
           $scope.node.loadingChildren = true
-          $scope.descendFun(null, $scope.extraParameters).then(loadNewChildren).then ->
+          $scope.descendFun(null, $scope.extraParameters).then(loadNewChildren).finally ->
             $scope.node.loadingChildren = false
 
         if $scope.extraParameters?.prefetch or startsWithSegment($scope.element, $scope.extraParameters?.path?.segments)
@@ -233,11 +233,12 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
           $scope.node.loadChildren()
 
       $scope.$on 'catalogueElementDeleted', (event, element) ->
+        console.log event, element, $scope.element
         indexesToRemove = []
         if $scope.element.$$relationship == element
           delete $scope.element.$$relationship
         for item, i in $scope.node.children
-          if element.relation and item.link == element.relation.link
+          if element.relation and item.link == element.relation.link or element.link == item.link
             indexesToRemove.push i
 
         for index, i in indexesToRemove
