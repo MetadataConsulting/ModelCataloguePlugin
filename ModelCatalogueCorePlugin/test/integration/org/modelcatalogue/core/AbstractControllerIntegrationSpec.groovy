@@ -6,6 +6,7 @@ import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.ResultRecorder
@@ -21,6 +22,8 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     ResultRecorder recorder
     @Shared
     Long totalCount
+
+    ElementService elementService
 
     protected boolean getRecord() {
         false
@@ -294,7 +297,13 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         if (controller instanceof AbstractRestfulController) {
             controller.cleanRelations(elementToDelete)
             elementToDelete.save()
+
             controller.bindRelations(elementToDelete, false, newInstance)
+
+            if (controller instanceof AbstractCatalogueElementController) {
+                return elementService.createDraftVersion(elementToDelete, DraftContext.userFriendly())
+            }
+
             return elementToDelete
         }
         elementToDelete.save()
@@ -313,7 +322,10 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         controller.response.text == ""
         controller.response.status == HttpServletResponse.SC_NO_CONTENT
         !resource.get(controller.params.id)
-        resourceCount == totalCount
+
+        sessionFactory.currentSession.flush()
+
+        resourceCount == totalCount + 1L
     }
 
     abstract Map getPropertiesToEdit()

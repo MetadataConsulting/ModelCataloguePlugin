@@ -18,8 +18,6 @@ import javax.xml.crypto.Data
 abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends AbstractControllerIntegrationSpec implements ResultRecorder{
 
 
-    def elementService
-
     def "update and create new version"() {
         if (controller.readOnly) return
 
