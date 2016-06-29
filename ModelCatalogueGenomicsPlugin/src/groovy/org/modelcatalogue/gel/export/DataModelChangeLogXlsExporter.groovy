@@ -119,7 +119,7 @@ class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
     List<String> searchExportSpecificTypes(CatalogueElement model, List lines, groupDescriptions, level) {
         levelIdStack.put(level,model.id)
         checkChangeLog(model, lines, groupDescriptions, level, DETAIL_CHANGE_TYPES)
-        iterateChildren(model, lines, groupDescriptions, level, DETAIL_CHANGE_TYPES)
+        iterateChildren(model, lines, GENERAL_RECURSIVE_CHANGELOG, groupDescriptions, level, DETAIL_CHANGE_TYPES)
 
         lines
     }

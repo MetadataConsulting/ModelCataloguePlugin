@@ -35,6 +35,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     public static final String EMPTY = ''
     public static final String PHENOTYPE = 'Phenotype'
     public static final String CLINICAL_TESTS = 'Clinical tests'
+    public static final String GENERAL_RECURSIVE_CHANGELOG = 'Recurse Generic Model'
     public static final String GUIDANCE = 'Guidance'
     public static final ArrayList<ChangeType> TOP_LEVEL_RELATIONSHIP_TYPES = [RELATIONSHIP_DELETED, RELATIONSHIP_CREATED]
     public static final ArrayList<ChangeType> DETAIL_CHANGE_TYPES = [RELATIONSHIP_DELETED, RELATIONSHIP_CREATED, RELATIONSHIP_METADATA_UPDATED, METADATA_UPDATED, METADATA_CREATED, METADATA_DELETED, RELATIONSHIP_METADATA_CREATED, RELATIONSHIP_METADATA_DELETED, PROPERTY_CHANGED]
@@ -203,7 +204,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     protected void checkChangesAndDescend(CatalogueElement child, List lines, String subtype, groupDescriptions, int level, List<ChangeType> typesToCheck) {
         checkChangeLog(child, lines, subtype, groupDescriptions, level, typesToCheck)
 
-        if ((PHENOTYPE == subtype || CLINICAL_TESTS == subtype) && child.parentOf.size > 0) {   // can be nested
+        if ((PHENOTYPE == subtype || CLINICAL_TESTS == subtype || GENERAL_RECURSIVE_CHANGELOG == subtype) && child.parentOf.size > 0) {   // can be nested
             iterateChildren(child, lines, subtype, groupDescriptions, level + 1, DETAIL_CHANGE_TYPES)
         }
     }
@@ -407,7 +408,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
                 changes << lvlName
             }
 
-            if(subtype) {                   // Phenotypes/Clinical tests report format - extra cols
+            if(PHENOTYPE == subtype || CLINICAL_TESTS == subtype) {                   // Phenotypes/Clinical tests report format - extra cols
                 changes << buildElementHierachyText(level, model)
                 changes << subtype
             }

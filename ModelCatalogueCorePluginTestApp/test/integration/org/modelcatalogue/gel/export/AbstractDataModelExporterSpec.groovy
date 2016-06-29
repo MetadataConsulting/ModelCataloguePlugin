@@ -33,7 +33,7 @@ class AbstractDataModelExporterSpec extends IntegrationSpec {
     @Rule
     TemporaryFolder temporaryFolder
 
-    String level2_id_1, level2_id_2
+    String level1_id, level2_id_1, level2_id_2
     String level3_id_1, level3_id_2, level3_id_3, level3_id_4
     String level4_id_1, level4_id_2, level4_id_3, level4_id_4
     String elem1_id, elem2_id, elem3_id, elem4_id, elem5_id, elem6_id
@@ -109,8 +109,6 @@ class AbstractDataModelExporterSpec extends IntegrationSpec {
             update 'hierarchy' of 'Info >>1<< heading Level4 Model Data Element 2' add 'New Participant Info class'
 
             create DataClass called 'New Participant Info class2'
-            // this description change won't be output as DataModel changelog is not recursive below level 5
-            // i.e. the addition of 'New Participant Info class2' to '>>1<< Level5 Model Data Element 2' is logged but not changes to the 'New Participant Info class2' itself
             update 'description' of 'New Participant Info class2' to 'new description2'
             update 'hierarchy' of '>>1<< Level5 Model Data Element 2' add 'New Participant Info class2'
         }
@@ -118,6 +116,7 @@ class AbstractDataModelExporterSpec extends IntegrationSpec {
     }
 
     def findDataIds() {
+        level1_id = DataClass.findByName("Dataclass Top Level 1 Root").combinedVersion
         level2_id_1 = DataClass.findByNameIlike("Info%1%Level2").combinedVersion
         level2_id_2 = DataClass.findByNameIlike("Info%2%Level2").combinedVersion
 
