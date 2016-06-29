@@ -8,7 +8,8 @@ import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.util.DataModelFilter
 
 /**
- * Eligibility Criteria spreadsheet implementation of Change Log Excel Exporter
+ * General purpose Change Log Excel Exporter
+ * Runs from the DataModel level and traverses the DataClasses
  */
 @Log4j
 class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
@@ -18,8 +19,6 @@ class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
     private static final int DATA_CATEGORY = 2
     private static final int SECTION = 3
     private static final int DATA_ITEM_NAME = 4
-
-
     private static final int CURRENT_DETAILS = 5
     private static final int NEW_DETAILS = 6
 
@@ -40,13 +39,13 @@ class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
     @Override
     public void export(CatalogueElement dataModel, OutputStream out) {
 
-        println headers.get(DATA_CATEGORY)
-        println headers.get(SECTION)
-        println headers.get(DATA_ITEM_NAME)
-        println headers.get(CURRENT_DETAILS)
-
         List<DataClass> dataClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.includes((DataModel) dataModel)).items
-        exportXls(dataClasses?.get(0), out, DATA_SPEC_SHEET) // expecting Cancer Model and Rare Disease Model to only have one DataClass(?)
+
+        if (dataClasses.size() > 0) {
+            exportXls(dataClasses?.get(0), out, DATA_SPEC_SHEET) // this report is dataClass centric
+        } else {
+            exportLinesAsXls DATA_SPEC_SHEET, [], out
+        }
     }
 
     @Override
@@ -128,19 +127,27 @@ class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
     @Override
     def descendModels(CatalogueElement model, lines, Object level, Map groupDescriptions, Object exclusions) {
         switch (level) {
-            case 1:     //ignore top Rare Disease level
+            case 1:
+                String groupDescription = "$model.name (${model.combinedVersion})"
+                log.debug("level$level $groupDescription")
+                groupDescriptions.put(DATA_CATEGORY, EMPTY)     //pad for when no lower levels present
+                groupDescriptions.put(SECTION, EMPTY)
+                checkChangeLog(model, lines, groupDescriptions, level, DETAIL_CHANGE_TYPES)
                 break
 
             case DATA_CATEGORY:
                 String groupDescription = "$model.name (${model.combinedVersion})"
                 log.debug("level$level $groupDescription")
                 groupDescriptions.put(level, groupDescription)
+                groupDescriptions.put(SECTION, EMPTY)           //pad for when no lower levels present
+                checkChangeLog(model, lines, groupDescriptions, level, DETAIL_CHANGE_TYPES)
                 break
 
             case SECTION:
                 String groupDescription = "$model.name (${model.combinedVersion})"
                 log.debug("level$level $groupDescription")
                 groupDescriptions.put(level, groupDescription)
+                checkChangeLog(model, lines, groupDescriptions, level, DETAIL_CHANGE_TYPES)
                 break
 
             case DATA_ITEM_NAME:

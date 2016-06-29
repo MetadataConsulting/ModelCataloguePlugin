@@ -7,8 +7,6 @@ import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import groovy.util.logging.Log4j
 import org.apache.commons.lang.exception.ExceptionUtils
-import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
-import org.hibernate.SessionFactory
 import org.modelcatalogue.builder.spreadsheet.api.Sheet
 import org.modelcatalogue.builder.spreadsheet.api.SpreadsheetBuilder
 import org.modelcatalogue.builder.spreadsheet.api.Workbook
@@ -34,7 +32,7 @@ import static RareDiseaseChangeLogXlsExporter.RareDiseaseChangeType.*
 @Log4j
 abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerator implements XlsExporter {
 
-    static final String EMPTY_CHANGE_REF = ''
+    public static final String EMPTY = ''
     public static final String PHENOTYPE = 'Phenotype'
     public static final String CLINICAL_TESTS = 'Clinical tests'
     public static final String GUIDANCE = 'Guidance'
@@ -355,6 +353,9 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
                     def jsonSlurper = new JsonSlurper()
                     def jsonMap = jsonSlurper.parseText(change.newValue)
                     propLabel = jsonMap.name
+                    if(propLabel.contains('merge') || propLabel.contains('exclude')) {
+                        propLabel = ''
+                    }
                 }
             }
 
@@ -399,7 +400,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
             if(model.ext.get(Metadata.CHANGE_REF)) {
                 changes << model.ext.get(Metadata.CHANGE_REF)
             } else {
-                changes << EMPTY_CHANGE_REF
+                changes << EMPTY
             }
 
             groupDescriptions.each { lvl, lvlName ->
@@ -459,7 +460,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
         if(model.ext.get(Metadata.CHANGE_REF)) {
             hierarchyChanges << model.ext.get(Metadata.CHANGE_REF)
         } else {
-            hierarchyChanges << EMPTY_CHANGE_REF
+            hierarchyChanges << EMPTY
         }
 
         groupDescriptions.each { lvl, lvlName ->
