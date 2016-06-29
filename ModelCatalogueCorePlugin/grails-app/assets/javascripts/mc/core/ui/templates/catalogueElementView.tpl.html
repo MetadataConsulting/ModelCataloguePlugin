@@ -16,10 +16,9 @@
         <messages-panel messages="messages" max="1000"></messages-panel>
         <div class="row detail-section" ng-repeat="view in detailSections track by view.title" data-view-name="{{view.title}}">
           <p ng-if="view.title"
-             class="text-center detail-section-title small"
-             ng-init="view.templateHidden = view.hideIfNoData && !view.hasData(element)">
+             class="text-center detail-section-title small">
                 <span class="title btn btn-link btn-sm"
-                      ng-click="view.templateHidden = !view.templateHidden"
+                      ng-click="view.toggleTemplateHidden(element)"
                       ng-show="view.hideIfNoData && !view.hasData(element)">
                   {{view.title}}
                 </span>
@@ -27,7 +26,7 @@
                   {{view.title}}
                 </span>
           </p>
-          <div ng-hide="view.templateHidden" data-view-content-name="{{view.title}}">
+          <div ng-hide="view.isTemplateHidden(element)" data-view-content-name="{{view.title}}">
             <ng-include src="view.template"></ng-include>
           </div>
         </div>
