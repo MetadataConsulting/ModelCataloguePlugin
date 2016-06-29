@@ -491,6 +491,9 @@ class ElasticSearchService implements SearchCatalogue {
             // relationship copies relationship type mapping
             mapping[typeName].properties.relationship_type = getMapping(RelationshipType).relationship_type
 
+            // the same applies for
+            mapping[typeName].properties.data_model = getMapping(DataModel).data_model
+
             Map catalogueElementMappingCombined = combineMappingForAllCatalogueElements()
 
             mapping[typeName].properties.source = catalogueElementMappingCombined.catalogue_element

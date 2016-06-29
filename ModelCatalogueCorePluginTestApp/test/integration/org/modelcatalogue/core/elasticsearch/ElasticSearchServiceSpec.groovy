@@ -19,6 +19,10 @@ class ElasticSearchServiceSpec extends org.modelcatalogue.testapp.AbstractIntegr
 
     def setup() {
         initRelationshipTypes()
+        RelationshipType.relatedToType.searchable = true
+        RelationshipType.relatedToType.save()
+        relationshipTypeService.clearCache()
+
         elasticSearchService.initLocalClient()
         elasticSearchService.reindex().toBlocking().subscribe()
     }
@@ -26,6 +30,7 @@ class ElasticSearchServiceSpec extends org.modelcatalogue.testapp.AbstractIntegr
     def "play with elasticsearch"() {
         catalogueBuilder.build {
             dataModel(name: "ES Test Model") {
+                ext 'date_in_model_metadata', '2014-06-06T06:34:24Z'
                 policy 'TEST POLICY'
                 dataClass(name: "Foo") {
                     description "foo bar"
@@ -43,7 +48,16 @@ class ElasticSearchServiceSpec extends org.modelcatalogue.testapp.AbstractIntegr
                         }
                     }
                 }
+
+                dataType(name: 'Test Primitive Data Type') {
+                    dataClass(name: 'Test Primitive Data Type Data Class')
+                }
+
+                dataType(name: 'Test Primitive Data Type Relation') {
+                    rel 'relatedTo' to 'Test Primitive Data Type'
+                }
             }
+
             dataModelPolicy(name: 'TEST POLICY') {
                 check dataType property 'name' is 'unique'
             }
