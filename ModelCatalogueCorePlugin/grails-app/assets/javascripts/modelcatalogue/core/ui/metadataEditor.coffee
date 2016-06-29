@@ -51,8 +51,6 @@ angular.module('mc.core.ui.metadataEditor', ['mc.core.ui.metadataEditors']).dire
           for editor in $scope.availableEditors
             for key in editor.getKeys()
               $scope.handledKeys.push(key)
-              unless $scope.object.get(key)?
-                $scope.object.access(key).set('')
 
           $scope.object.access('').remove() if $scope.handledKeys.length
 
