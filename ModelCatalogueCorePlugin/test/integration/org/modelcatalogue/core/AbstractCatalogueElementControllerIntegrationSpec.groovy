@@ -147,6 +147,36 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         direction << ["incoming", "outgoing"]
     }
 
+
+    T prepareInstanceForDelete() {
+        T elementToDelete = resource.newInstance(newInstance)
+        controller.cleanRelations(elementToDelete)
+        elementToDelete.save()
+
+        controller.bindRelations(elementToDelete, false, newInstance)
+
+        return elementService.createDraftVersion(elementToDelete, DraftContext.userFriendly())
+    }
+
+    def "Return 204 for existing item as JSON on delete"() {
+        if (controller.readOnly) return
+
+        def elementToDelete = prepareInstanceForDelete()
+        removeAllRelations(elementToDelete)
+        controller.response.format = "json"
+        controller.params.id = elementToDelete.id
+        controller.delete()
+
+        expect:
+            controller.response.text == ""
+            controller.response.status == HttpServletResponse.SC_NO_CONTENT
+            !resource.get(controller.params.id)
+
+            sessionFactory.currentSession.flush()
+
+            resourceCount == totalCount + 1L
+    }
+
     @Unroll
     def "Unlink non existing elements using add to #direction endpoint with json result"(){
 

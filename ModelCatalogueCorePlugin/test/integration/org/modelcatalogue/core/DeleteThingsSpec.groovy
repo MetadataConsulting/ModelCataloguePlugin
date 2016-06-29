@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import grails.test.spock.IntegrationSpec
 import groovy.util.slurpersupport.GPathResult
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.ResultRecorder
 import spock.lang.Shared
@@ -31,12 +32,12 @@ class DeleteThingsSpec extends IntegrationSpec{
     @Unroll
     def "json bad delete i.e. MU used in another resource, returns errors"(){
 
-        def m
+        def m, dm
 
         expect:
-
-        assert(m = new MeasurementUnit(name:"cm per hour", symbol: "cmph").save())
-        assert(new PrimitiveType(name: "ground_speed", measurementUnit: m, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle").save())
+        assert(dm = new DataModel(name: "delete things spec", status: ElementStatus.DRAFT).save(failOnError: true))
+        assert(m = new MeasurementUnit(dataModel: dm, name:"cm per hour", symbol: "cmph").save(failOnError: true))
+        assert(new PrimitiveType(dataModel: dm, name: "ground_speed", measurementUnit: m, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle").save(failOnError: true))
 
 
         when:
@@ -52,10 +53,11 @@ class DeleteThingsSpec extends IntegrationSpec{
         recorder.recordResult 'deleteFailed', json
 
         then:
-
-        json.errors
-        json.errors.startsWith "Cannot delete cm per hour due to referential integrity constraint violation"
         controller.response.status == HttpServletResponse.SC_CONFLICT
+        json.errors
+        json.errors instanceof List
+        json.errors.size() == 1
+        json.errors[0].message == "Cannot automatically delete [ground_speed [3@0.0.1] (DRAFT:PrimitiveType:3)], delete it manually or remove the relationship to it."
 
     }
 

@@ -291,43 +291,6 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         resourceCount == totalCount
     }
 
-
-    T prepareInstanceForDelete() {
-        T elementToDelete = resource.newInstance(newInstance)
-        if (controller instanceof AbstractRestfulController) {
-            controller.cleanRelations(elementToDelete)
-            elementToDelete.save()
-
-            controller.bindRelations(elementToDelete, false, newInstance)
-
-            if (controller instanceof AbstractCatalogueElementController) {
-                return elementService.createDraftVersion(elementToDelete, DraftContext.userFriendly())
-            }
-
-            return elementToDelete
-        }
-        elementToDelete.save()
-    }
-
-    def "Return 204 for existing item as JSON on delete"() {
-        if (controller.readOnly) return
-
-        def elementToDelete = prepareInstanceForDelete()
-        removeAllRelations(elementToDelete)
-        controller.response.format = "json"
-        controller.params.id = elementToDelete.id
-        controller.delete()
-
-        expect:
-        controller.response.text == ""
-        controller.response.status == HttpServletResponse.SC_NO_CONTENT
-        !resource.get(controller.params.id)
-
-        sessionFactory.currentSession.flush()
-
-        resourceCount == totalCount + 1L
-    }
-
     abstract Map getPropertiesToEdit()
     //i.e. the properties map to pass in to test the edit functionality
 
