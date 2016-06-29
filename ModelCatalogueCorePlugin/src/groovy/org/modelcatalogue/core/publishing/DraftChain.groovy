@@ -105,7 +105,9 @@ class DraftChain extends PublishingChain {
         draft.beforeDraftPersisted(context)
 
         if (!draft.save(/*flush: true, */ deepValidate: false)) {
-            return draft as T
+            Throwable error = new IllegalStateException(FriendlyErrors.printErrors("Failed to create draft", draft.errors))
+            monitor.onError(error)
+            throw error
         }
 
         draft.addToSupersedes(element, skipUniqueChecking: true)

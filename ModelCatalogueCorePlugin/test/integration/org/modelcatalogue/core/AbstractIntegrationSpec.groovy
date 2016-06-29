@@ -30,12 +30,14 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
         }
         relationshipTypeService.clearCache()
         RelationshipType.clearCache()
+        ElementService.VERSION_COUNT_CACHE.invalidateAll()
     }
 
     void initCatalogue(){
         initCatalogueService.initCatalogue(true)
         relationshipTypeService.clearCache()
         RelationshipType.clearCache()
+        ElementService.VERSION_COUNT_CACHE.invalidateAll()
     }
 
     void loadFixtures(){
@@ -45,6 +47,7 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
         }
         relationshipTypeService.clearCache()
         RelationshipType.clearCache()
+        ElementService.VERSION_COUNT_CACHE.invalidateAll()
     }
 
     /**
