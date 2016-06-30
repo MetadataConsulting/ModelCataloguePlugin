@@ -15,15 +15,14 @@ angular.module('mc.core.ui.bs.modalFeedback', ['mc.util.messages']).config (mess
         <div class="modal-body">
             <div class="row">
               <div class="col-lg-12 col-sm-12 col-md-12">
-                  <pre>{{ feedback.log || 'Nothing logged yet or the log entry has expired after 24 hours of inactivity'}}</pre>
+                  <pre ng-bind-html="feedback.log || 'Nothing logged yet or the log entry has expired after 24 hours of inactivity'"></pre>
               </div>
           </div>
         </div>
         <div class="modal-footer">
           <form role="form">
             <button class="btn btn-default" ng-click="open()"><span class="fa fa-fw fa-external-link"></span> Open in Separate Page</button>
-            <button class="btn btn-primary" ng-click="$close(true)">OK</button>
-            <button class="btn btn-warning" ng-click="$dismiss(false)">Close</button>
+            <button class="btn btn-primary" ng-click="$close(true)">Hide</button>
           </form>
         </div>
         '''

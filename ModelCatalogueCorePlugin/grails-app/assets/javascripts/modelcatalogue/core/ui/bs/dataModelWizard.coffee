@@ -1,5 +1,6 @@
-angular.module('mc.core.ui.bs.dataModelWizard', ['mc.util.messages', 'mc.util.ui.focusMe']).config ['messagesProvider', (messagesProvider)->
-  factory = [ '$modal', '$q', 'messages', '$rootScope', ($modal, $q, messages,$rootScope) ->
+angular.module('mc.core.ui.bs.dataModelWizard', ['mc.util.messages', 'mc.util.ui.focusMe']).config (messagesProvider)->
+  factory = ($modal, $q, messages,$rootScope) ->
+    'ngInject'
     (title, body, args) ->
 
       $rootScope.createDataModelWizard ?= $modal.open {
@@ -11,7 +12,7 @@ angular.module('mc.core.ui.bs.dataModelWizard', ['mc.util.messages', 'mc.util.ui
 
         #language=HTML
         templateUrl: '/mc/core/ui/dataModelWizard.html'
-        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$q', '$modalInstance', 'catalogue', '$rootScope', 'delayedQueueExecutor', ($scope, $state, $window, messages, names, catalogueElementResource, $q, $modalInstance, catalogue, $rootScope, delayedQueueExecutor) ->
+        controller: ($scope, $state, $window, messages, names, catalogueElementResource, $q, $modalInstance, catalogue, $rootScope, delayedQueueExecutor) ->
           execAfter50 = delayedQueueExecutor(500)
 
           $scope.reset = ->
@@ -141,14 +142,10 @@ angular.module('mc.core.ui.bs.dataModelWizard', ['mc.util.messages', 'mc.util.ui
                 $modalInstance.dismiss(reason)
             else
               $modalInstance.dismiss(reason)
-        ]
-
       }
 
       $rootScope.createDataModelWizard.result.finally ->
         $rootScope.createDataModelWizard = undefined
-  ]
 
   messagesProvider.setPromptFactory 'create-classification', factory
   messagesProvider.setPromptFactory 'create-dataModel', factory
-]

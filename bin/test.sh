@@ -2,104 +2,57 @@
 
 source ./bin/lib/test-setup.sh
 
+export FILE_OPENER_SKIP=true
+
 # please update sibling script /collect/reports.sh when you update this file
 
 # karma and functional tests needs to fetch the bower components
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "core" ] || [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "app_functional_a" ] || [ "$TEST_SUITE" = "app_functional_b" ] || [ "$TEST_SUITE" = "app_functional_c" ] ||  [ "$TEST_SUITE" = "" ] ; then
-    ./setup-frontend.sh
-fi
+./setup-frontend.sh
 
 cd ModelCatalogueCorePlugin
 
 # local builds needs to run in clean environment
-if [ -z "$TEST_SUITE" ]; then
+if [ "$TEST_SUITE" = "" ] ; then
     ./grailsw clean-all --non-interactive
     ./grailsw refresh-dependencies --non-interactive
 fi
 
-# plugin unit tests
-if [ "$TEST_SUITE" = "unit" ] || [ "$TEST_SUITE" = "core_unit" ] || [ "$TEST_SUITE" = "core" ] || [ "$TEST_SUITE" = "" ] ; then
+if [ "$TEST_SUITE" = "unit_and_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+    # plugin unit tests
     ./grailsw test-app unit: --non-interactive
-fi
+    mkdir -p "$HOME/reports/core-unit-tests-reports"
+    cp -Rf target/test-reports/ "$HOME/reports/core-unit-tests-reports" || true
 
-# plugin integration all tests
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "" ] ; then
-    ./grailsw test-app integration:
-    mkdir -p "$HOME/reports/fast-integration-tests-reports"
-    cp -Rf target/test-reports/ "$HOME/reports/fast-integration-tests-reports"
-fi
-
-
-# plugin integration tests
-if [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "core" ] ; then
-    ./grailsw test-app integration: org.modelcatalogue.**.* --non-interactive
-fi
-
-# slow and polluting (imports)
-if [ "$TEST_SUITE" = "core_integration_slow" ] || [ "$TEST_SUITE" = "core" ] ; then
-    ./grailsw test-app integration: x.org.modelcatalogue.**.* --non-interactive
-fi
-cd ..
-
-# moved to test app
-#cd ModelCatalogueFormsPlugin
-#if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "forms_integration" ] || [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
-#    ./grailsw test-app integration: --non-interactive
-#fi
-#cd ..
-
-# moved to test app
-cd ModelCatalogueElasticSearchPlugin
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "es_integration" ] || [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+    # plugin integration all tests
     ./grailsw test-app integration: --non-interactive
-fi
-cd ..
+    mkdir -p "$HOME/reports/core-integration-tests-reports"
+    cp -Rf target/test-reports/ "$HOME/reports/core-integration-tests-reports" || true
 
-cd ModelCatalogueGenomicsPlugin
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "gel_integration" ] || [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
-    ./grailsw test-app integration: --non-interactive
-fi
-cd ..
-
-cd ModelCatalogueCorePlugin
-# karma tests, part of the integration as they needs the fixtures generated from the integration tests
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "core_integration" ]|| [ "$TEST_SUITE" = "core" ] || [ "$TEST_SUITE" = "" ] ; then
+    # karma tests, part of the integration as they needs the fixtures generated from the integration tests
     ./node_modules/karma/bin/karma start --single-run --browsers Firefox
+    mkdir -p "$HOME/reports/karma-tests-reports"
+    cp -Rf target/test-reports/ "$HOME/reports/karma-tests-reports" || true
 fi
+
 cd ..
 
 cd ModelCatalogueCorePluginTestApp
-# if we're running app tests
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "functional" ] ||  [ "$TEST_SUITE" = "app_integration" ] || [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "" ] ; then
-    # local builds needs to run in clean environment
-    if [ -z "$TEST_SUITE" ]; then
-        ./grailsw clean-all --non-interactive
-        ./grailsw refresh-dependencies --non-interactive
-    fi
+
+# local builds needs to run in clean environment
+if [ "$TEST_SUITE" = "" ] ; then
+    ./grailsw clean-all --non-interactive
+    ./grailsw refresh-dependencies --non-interactive
 fi
 
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "app_integration" ] || [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+if [ "$TEST_SUITE" = "unit_and_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+    export MC_ES_DISABLED=true
     ./grailsw test-app integration: --non-interactive
+    mkdir -p "$HOME/reports/app-integration-tests-reports"
+    cp -Rf target/test-reports/ "$HOME/reports/app-integration-tests-reports" || true
 fi
 
-if [ "$TEST_SUITE" = "functional" ] || [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "" ] ; then
-    set -x
-    ./grailsw test-app functional: -war --non-interactive
-fi
-
-if [ "$TEST_SUITE" = "app_functional_a" ] ; then
-    set -x
-    ./grailsw test-app functional: org.modelcatalogue.core.a.**.* -war --non-interactive
-fi
-
-if [ "$TEST_SUITE" = "app_functional_b" ] ; then
-    set -x
-    ./grailsw test-app functional: org.modelcatalogue.core.b.**.* -war --non-interactive
-fi
-
-if [ "$TEST_SUITE" = "app_functional_c" ] ; then
-    set -x
-    ./grailsw test-app functional: org.modelcatalogue.core.c.**.* -war --non-interactive
+if [ "$TEST_SUITE" = "functional" ] || [ "$TEST_SUITE" = "" ] ; then
+    ./grailsw "-Dgeb.env=$MC_GEB_ENV" test-app functional: -war --non-interactive
 fi
 
 cd ..

@@ -10,8 +10,10 @@ import org.modelcatalogue.core.util.lists.Lists
 @Transactional
 class DataClassService {
 
+    public static final int CLEAN_UP_GORM_FREQUENCY = 50
     SecurityService modelCatalogueSecurityService
     DataModelService dataModelService
+    PerformanceUtilService performanceUtilService
 
     ListWithTotalAndType<DataClass> getTopLevelDataClasses(Map params = [:]) {
         getTopLevelDataClasses(dataModelService.dataModelFilter, params)
@@ -141,9 +143,16 @@ class DataClassService {
     }
 
 
+    static int counter = 0;
 
     protected Map<String, DataClass> collectChildren(int maxLevel, DataClass dataClass, Map<String, DataClass> results) {
         log.info "Collecting inner classes for $dataClass.name ($dataClass.combinedVersion)"
+
+        counter++
+        if (counter % CLEAN_UP_GORM_FREQUENCY == 0) {
+            performanceUtilService.cleanUpGorm()
+        }
+
         String key = "$dataClass.name $dataClass.combinedVersion".toString()
         if (dataClass && !results.containsKey(key)) {
             results[key] = dataClass

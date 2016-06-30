@@ -8,6 +8,7 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.builder.ProgressMonitor
 import rx.Observer
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
@@ -34,6 +35,7 @@ class DraftChain extends PublishingChain {
         if (!context.forceNew) {
             if (isDraft(published)) {
                 published.clearErrors()
+                monitor.onNext("\nData model is already ${published.status}")
                 return published
             }
 
@@ -41,24 +43,34 @@ class DraftChain extends PublishingChain {
                 def existingDrafts = getEntityClass(published).findAllByLatestVersionIdAndStatus(published.latestVersionId, ElementStatus.DRAFT, [sort: 'versionNumber', order: 'desc'])
                 for (existing in existingDrafts) {
                     if (existing.id != published.id) {
+                        monitor.onNext("\nExisting draft data model available: <a class='new-version-link' href='#/$existing.id/dataModel/$existing.id/'>$existing</a>")
                         return existing
                     }
                 }
             }
         }
 
-        log.debug("Creating draft for $published ($context) ...")
-
-        DataModel draftDataModel = createDraft(publishedDataModel, null, publisher)
+        DataModel draftDataModel = createDraft(publishedDataModel, null, publisher, monitor)
 
         for (CatalogueElement element in publishedDataModel.declares) {
-            createDraft(element, draftDataModel, publisher)
+            createDraft(element, draftDataModel, publisher, monitor)
+        }
+
+        monitor.onNext("\nDraft data model available: <a class='new-version-link' href='#/$draftDataModel.id/dataModel/$draftDataModel.id/'>$draftDataModel</a>")
+
+        if (!draftDataModel.hasErrors()) {
+            context.resolvePendingRelationships()
         }
 
         return draftDataModel
     }
 
-    private <T extends CatalogueElement> T createDraft(T element, DataModel draftDataModel, Publisher<CatalogueElement> archiver) {
+    public <T extends CatalogueElement> T changeType(T element, Publisher<CatalogueElement> archiver) {
+        return createDraft(element, element.dataModel, archiver, ProgressMonitor.NOOP)
+    }
+
+    private <T extends CatalogueElement> T createDraft(T element, DataModel draftDataModel, Publisher<CatalogueElement> archiver, Observer<String> monitor) {
+        monitor.onNext("Creating draft for $published ($context) ...")
         if (!element.latestVersionId) {
             element.latestVersionId = element.id
             FriendlyErrors.failFriendlySave(element)
@@ -115,7 +127,7 @@ class DraftChain extends PublishingChain {
 
         context.addResolution(element, draft)
 
-        log.debug("... created draft $draft for $element using $context")
+        monitor.onNext("... created draft $draft for $element using $context")
 
         return draft as T
     }

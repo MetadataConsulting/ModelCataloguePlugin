@@ -71,7 +71,8 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
     throw new Error('Please provide supported template configuration ("template" configuration property)') unless configuration.template?
     throw new Error('Provided template configuration must be a string ("template" configuration property)') unless angular.isString(configuration.template)
     throw new Error('Please provide supported template configuration ("position" configuration property)') unless configuration.position?
-    throw new Error('Provided title configuration must be a number ("position" configuration property)') unless angular.isNumber(configuration.position)
+    throw new Error('Provided position configuration must be a number ("position" configuration property)') unless angular.isNumber(configuration.position)
+    throw new Error('Provided title configuration must be a string ("title" configuration property)') unless angular.isString(configuration.title)
 
     # TODO should handle $$relationship
 

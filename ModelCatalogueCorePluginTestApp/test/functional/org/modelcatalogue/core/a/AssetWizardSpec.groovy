@@ -55,7 +55,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         click save
 
         then:
-        check infiniteTableRow present once
+        check infiniteTableRow displayed
 
         and:
         check modalDialog gone
@@ -67,7 +67,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
         click { infTableCell(1, 2).find('a:not(.inf-cell-expand)') }
 
-        check rightSideTitle contains 'Sample XSD Test 1'
+        check rightSideTitle contains 'Sample XSD'
     }
 
     def "validate xml schema"() {
@@ -142,7 +142,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check rightSideTitle is 'MET-522 0.0.1'
 
         when:
-        select('MET-522') / 'MET-522' / 'Data Classes' / 'MET-522.M1'
+        select('MET-522') % 'MET-522' % 'Data Classes' / 'MET-522.M1'
 
         then:
         check rightSideTitle is 'MET-522.M1 MET-522 0.0.1'
@@ -177,9 +177,9 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
     void waitUntilFinalized() {
         int counter = 0
-        while (!$(downloadButton.toSelector()).displayed && counter++ < 100) {
+        while (!$(downloadButton.toSelector()).first().displayed && counter++ < 100) {
             // ! + gone does not implicitly require the element
-            if ($(refreshAsset.toSelector()).displayed) {
+            if ($(refreshAsset.toSelector()).first().displayed) {
                 try {
                     click refreshAsset
                 } catch (ignored) {}

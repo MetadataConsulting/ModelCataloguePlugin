@@ -9,11 +9,22 @@ class DataModelNavigator {
     }
 
     DataModelNavigator rightShift(String node) {
+        spec.selectInTree(node, true);
+        return this
+    }
+
+    DataModelNavigator rightShiftUnsigned(String node) {
         spec.selectInTree(node);
         return this
     }
 
     DataModelNavigator div(String node) {
         return rightShift(node)
+    }
+
+
+
+    DataModelNavigator mod(String node) {
+        return rightShiftUnsigned(node)
     }
 }

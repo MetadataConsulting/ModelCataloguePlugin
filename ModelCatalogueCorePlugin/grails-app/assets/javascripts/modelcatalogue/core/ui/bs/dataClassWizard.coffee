@@ -1,5 +1,6 @@
-angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.focusMe', 'mc.core.ui.bs.watchAndAskForImportOrCloneCtrl']).config ['messagesProvider', (messagesProvider)->
-  factory = [ '$modal', '$q', 'messages', '$rootScope', ($modal, $q, messages,$rootScope) ->
+angular.module('mc.core.ui.bs.dataClassWizard', ['mc.util.messages', 'mc.util.ui.focusMe', 'mc.core.ui.bs.watchAndAskForImportOrCloneCtrl']).config (messagesProvider)->
+  factory = ($modal, $q, messages,$rootScope) ->
+    'ngInject'
     (title, body, args) ->
 
       # TODO: add add dataModels step
@@ -13,7 +14,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
           args: -> args
 
         templateUrl: '/mc/core/ui/modals/dataClassWizard.html'
-        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', 'args', 'delayedQueueExecutor', '$q', '$log', 'enhance', 'metadataEditors', 'catalogue', '$controller', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout, args, delayedQueueExecutor, $q, $log, enhance, metadataEditors, catalogue, $controller) ->
+        controller: ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout, args, delayedQueueExecutor, $q, $log, enhance, metadataEditors, catalogue, $controller) ->
 
           angular.extend(this, $controller('watchAndAskForImportOrCloneCtrl', {$scope: $scope}))
 
@@ -294,14 +295,10 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             parents: metadataEditors.createFakeOwner('=[hierarchy]=>dataClass')
             children: metadataEditors.createFakeOwner('dataClass=[hierarchy]=>')
             contains: metadataEditors.createFakeOwner('dataClass=[containment]=>')
-        ]
-
       }
 
       $rootScope.createModelWizard.result.finally ->
         $rootScope.createModelWizard = undefined
-  ]
 
   messagesProvider.setPromptFactory 'create-model', factory
   messagesProvider.setPromptFactory 'create-dataClass', factory
-]

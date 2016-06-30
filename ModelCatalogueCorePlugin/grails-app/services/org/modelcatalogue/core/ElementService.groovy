@@ -13,6 +13,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.publishing.CloningContext
+import org.modelcatalogue.core.publishing.DraftChain
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
@@ -61,6 +62,7 @@ class ElementService implements Publisher<CatalogueElement> {
         dataModel.checkNewSemanticVersion(newSemanticVersion)
 
         if (dataModel.hasErrors()) {
+            context.monitor.onError(new IllegalArgumentException(FriendlyErrors.printErrors("Wrong semantic version", dataModel.errors)))
             return dataModel
         }
 
@@ -73,7 +75,6 @@ class ElementService implements Publisher<CatalogueElement> {
                     status?.setRollbackOnly()
                     return dataModel
                 }
-                context.resolvePendingRelationships()
 
                 // TODO: better target the changes
                 VERSION_COUNT_CACHE.invalidateAll()
@@ -727,6 +728,13 @@ class ElementService implements Publisher<CatalogueElement> {
 
             return typeHierarchy
         }
+    }
+
+    public <CE extends CatalogueElement> CE changeType(CatalogueElement element, Class<CE> newType) {
+        DraftContext context = DraftContext.userFriendly().changeType(element, newType)
+        CE newOne = DraftChain.create(element.dataModel, context).changeType(element, this) as CE
+        context.resolvePendingRelationships()
+        newOne
     }
 
     private <T extends CatalogueElement> void collectBases(T element, List<T> collector) {

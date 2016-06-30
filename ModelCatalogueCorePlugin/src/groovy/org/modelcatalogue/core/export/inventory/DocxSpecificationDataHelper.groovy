@@ -26,21 +26,22 @@ class DocxSpecificationDataHelper {
     private static final def TITLE_COLUMN_CELL = [font: [bold: true]]
 
     private DocumentBuilder builder
+    int depth = 3
 
-    DocxSpecificationDataHelper(DocumentBuilder builder) {
+    DocxSpecificationDataHelper(DocumentBuilder builder, Integer depth) {
         this.builder = builder
+        this.depth = depth
     }
     final Set<DataType> usedDataTypes = new TreeSet<DataType>([compare: { DataType a, DataType b ->
         a?.name <=> b?.name
     }] as Comparator<DataType>)
 
-    def printModel(DataClass dataClass, int level) {
-        if (level > 50) {
-            // only go 3 levels deep
+    def printModel(DataClass dataClass, boolean recurse, int level) {
+        if ((recurse && level > depth) || level > 50 ) { //stop potential runaway?
             return
         }
 
-        log.debug "Exporting data class $dataClass to Word Document"
+        log.debug "Exporting data class $dataClass to Word Document level=$level"
 
         builder.with {
             if (dataClass.getId() in processedDataClasses) {
@@ -53,7 +54,7 @@ class DocxSpecificationDataHelper {
                 if (dataClass.description) {
                     text dataClass.description
                 } else {
-                    text "${dataClass.name} data class does not have any description yet.", font: [italic: true]
+                    text " ", font: [italic: true]
                 }
             }
 
@@ -79,7 +80,7 @@ class DocxSpecificationDataHelper {
                             text HEADER_CELL_TEXT, 'Data Type'
                         }
                         cell HEADER_CELL, {
-                            text HEADER_CELL_TEXT, 'Same As'
+                            text HEADER_CELL_TEXT, 'Related To'
                         }
                     }
                     for (Relationship dataElementRelationship in dataClass.containsRelationships) {
@@ -119,8 +120,8 @@ class DocxSpecificationDataHelper {
                                 }
                             }
                             cell {
-                                for (CatalogueElement synonym in dataElement.isSynonymFor) {
-                                    text CELL_TEXT, getSameAs(synonym)
+                                for (CatalogueElement relatedTo in dataElement.relatedTo) {
+                                    text CELL_TEXT, getSameAs(relatedTo)
                                     lineBreak()
                                 }
 
@@ -143,10 +144,10 @@ class DocxSpecificationDataHelper {
                 }
             }
 
-            if (!(dataClass.getId() in processedDataClasses)) {
+            if (recurse && !(dataClass.getId() in processedDataClasses)) {
                 if (dataClass.countParentOf()) {
                     for (DataClass child in dataClass.parentOf) {
-                        printModel(child, level + 1)
+                        printModel(child, true, level + 1)
                     }
                 }
             }

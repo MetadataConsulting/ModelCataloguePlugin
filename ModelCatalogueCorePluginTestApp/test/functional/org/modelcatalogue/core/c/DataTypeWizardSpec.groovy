@@ -41,19 +41,23 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     static final CatalogueContent detailSectionFormItem = CatalogueContent.create('data-view-name': 'Form (Item)')
     static final String detailSectionFormItemContent = ".metadata-form-item-content"
     static final String detailSectionCustomMetadataContent = '[data-view-content-name="Custom Metadata"]'
+    static final CatalogueAction changeType = CatalogueAction.runFirst('item-detail', 'change-type')
+    public static final String primitiveTypeIcon = 'h3.ce-name small.fa-cog'
+    public static final String dataTypeSelector = '#option'
+    public static final String primitiveTypeValue = 'string:primitiveType'
 
     def "go to login"() {
         login admin
 
         when:
-        select('NHIC') / 'NHIC' / 'Data Types'
+        select('NHIC') % 'NHIC' % 'Data Types'
 
         then:
         check rightSideTitle is 'Active Data Types'
     }
 
     def "create reference"() {
-        select('Test 1') / 'Test 1'
+        select('Test 1') % 'Test 1'
 
         addDataModelImport 'XMLSchema', 'NHIC'
 
@@ -193,14 +197,15 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     def "updating parent propagates to child and grandchild"() {
         when:
         refresh browser
-        select('Test 1') / 'Test 1' / 'Data Types' / 'Enumeration 1'
+        select('Test 1') % 'Test 1' % 'Data Types' / 'Enumeration 1'
 
+        3.times { scroll up }
         click inlineEdit
         click removeEnumerationOne
         click inlineEditSubmit
 
         refresh browser
-        select('Test 1') / 'Test 1' / 'Data Types' / 'Enumeration 3'
+        select('Test 1') % 'Test 1' % 'Data Types' / 'Enumeration 3'
         then:
 
         check enumerationsDetail missing 'one'
@@ -209,7 +214,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "create standard"() {
         when:
-        select('Test 1') / 'Test 1' / 'Data Types'
+        select('Test 1') % 'Test 1' % 'Data Types'
         check closeGrowlMessage gone
         click create
 
@@ -457,5 +462,25 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         waitFor {
             totalOf('mappings') == 0
         }
+    }
+
+    def "change type"() {
+        given:
+            scroll up
+        expect:
+            check backdrop gone
+            check closeGrowlMessage gone
+        when:
+            click changeType
+        then:
+            check modalDialog displayed
+        when:
+            fill dataTypeSelector with primitiveTypeValue
+            click modalPrimaryButton
+        then:
+            check backdrop gone
+            check primitiveTypeIcon displayed
+
+
     }
 }

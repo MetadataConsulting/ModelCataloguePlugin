@@ -4,6 +4,7 @@ import grails.transaction.Transactional
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.PerformanceUtilService
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
 import org.modelcatalogue.core.publishing.changelog.ChangeLogDocxGenerator
 import org.modelcatalogue.gel.export.CancerTypesCsvExporter
@@ -24,7 +25,7 @@ class GenomicsService {
     def assetService
     def dataClassService
     def elementService
-    SessionFactory sessionFactory
+    PerformanceUtilService performanceUtilService
 
     static final String RD_ELIGIBILITY_CSV_FILENAME = "RD Eligibility Criteria.csv"
     static final String RD_HPO_CSV_FILENAME = "RD Phenotypes and Clinical Tests.csv"
@@ -32,7 +33,7 @@ class GenomicsService {
     static final String RD_PHENOTYPE_AND_CLINICAL_TESTS_XLS = "RD Change log for Phenotypes and clinical tests.xlsx"
     static final String RD_ELIGIBILITY_CHANGELOG_XLS = "RD Change Log for Eligibility Criteria.xlsx"
 
-    static final String DOC_IMAGE_PATH = "https://www.genomicsengland.co.uk/wp-content/uploads/2015/11/Genomics-England-logo-2015.png"
+    static final String DOC_IMAGE_PATH = GenomicsService.getResource('Genomics-England-logo-2015.png')?.toExternalForm()
 
     static Closure customTemplate = {
         'document' font: [family: 'Calibri', size: 11], margin: [left: 20, right: 10]
@@ -111,7 +112,7 @@ class GenomicsService {
         }
     }
 
-    long genGelSpecification(DataModel model){
+    long genGelSpecification(DataModel model, Integer depth){
         Long modelId = model.id
         return assetService.storeReportAsAsset(
             model,
@@ -119,7 +120,7 @@ class GenomicsService {
             originalFileName: "${model.name}-${model.status}-${model.version}.docx",
             contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ) { OutputStream out ->
-            new DataModelToDocxExporter(DataModel.get(modelId), dataClassService, customTemplate, DOC_IMAGE_PATH).export(out)
+            new DataModelToDocxExporter(DataModel.get(modelId), dataClassService, customTemplate, DOC_IMAGE_PATH, depth).export(out)
         }
     }
 
@@ -149,7 +150,7 @@ class GenomicsService {
             originalFileName: "$RD_PHENOTYPE_AND_CLINICAL_TESTS_XLS",
             contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream out ->
-            new RareDiseasePhenotypeChangeLogXlsExporter(auditService, dataClassService, sessionFactory, 0, false).export(dataClass,out)
+            new RareDiseasePhenotypeChangeLogXlsExporter(auditService, dataClassService, performanceUtilService, 0, false).export(dataClass,out)
         }
     }
 
@@ -159,7 +160,7 @@ class GenomicsService {
             originalFileName: "$RD_ELIGIBILITY_CHANGELOG_XLS",
             contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream out ->
-            new RareDiseaseEligibilityChangeLogXlsExporter(auditService, dataClassService, sessionFactory, 0, false).export(dataClass, out)
+            new RareDiseaseEligibilityChangeLogXlsExporter(auditService, dataClassService, performanceUtilService, 0, false).export(dataClass, out)
         }
     }
 
@@ -170,7 +171,7 @@ class GenomicsService {
             originalFileName: "${dataClass.name}-${dataClass.status}-${dataClass.version}-changelog.docx",
             contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ) { OutputStream out ->
-            new ChangeLogDocxGenerator(auditService, dataClassService, depth, includeMetadata, customTemplate, DOC_IMAGE_PATH)
+            new ChangeLogDocxGenerator(auditService, dataClassService, performanceUtilService, depth, includeMetadata, customTemplate, DOC_IMAGE_PATH)
                 .generateChangelog(DataClass.get(classId), out)
         }
     }
@@ -181,7 +182,7 @@ class GenomicsService {
             originalFileName: "${model.name}-${model.status}-${model.version}-changelog.xlsx",
             contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream out ->
-            new DataModelChangeLogXlsExporter(auditService, dataClassService, sessionFactory, 0, false).export(model, out)
+            new DataModelChangeLogXlsExporter(auditService, dataClassService, performanceUtilService, 0, false).export(model, out)
         }
     }
 

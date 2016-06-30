@@ -2,20 +2,20 @@ package org.modelcatalogue.core.b
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
-import org.modelcatalogue.core.pages.GlobalChangesPage
 import spock.lang.Stepwise
 
-import static org.modelcatalogue.core.geb.Common.create
-import static org.modelcatalogue.core.geb.Common.getCloseGrowlMessage
-import static org.modelcatalogue.core.geb.Common.save
+import static org.modelcatalogue.core.geb.Common.*
 
 @Stepwise
 class ChangesSpec extends AbstractModelCatalogueGebSpec {
 
+
+    public static final String FIRST_NEW_ELEMENT_CREATED_CHANGE = "a.change-NEW_ELEMENT_CREATED:first-of-type"
+
     def "go to login"() {
         loginAdmin()
 
-        select('Test 1') /'Data Types'
+        select('Test 1') % 'Data Types'
 
         click create
 
@@ -31,16 +31,13 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
         go "#/catalogue/change/all"
 
         then:
-        at GlobalChangesPage
-
         check 'h3' is 'Changes'
     }
 
     def "check the unit shows up with own detail page"(){
         when:
-        check { infTableCell(1, 4).find('a span.fa.fa-fw.fa-link') } displayed
 
-        click { infTableCell(1, 4).find('a span.fa.fa-fw.fa-link').parent('a') }
+        click FIRST_NEW_ELEMENT_CREATED_CHANGE
 
         then:
         check "li[data-tab-name='changes']" displayed
@@ -50,10 +47,10 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
         click CatalogueAction.runLast('item', 'undo-change')
 
         then:
-        check confirmDialog displayed
+        check modalDialog displayed
 
         when:
-        click confirmOk
+        click modalPrimaryButton
 
         then:
         check ".pp-table-property-element-value", 'data-value-for': 'Undone' is 'true'

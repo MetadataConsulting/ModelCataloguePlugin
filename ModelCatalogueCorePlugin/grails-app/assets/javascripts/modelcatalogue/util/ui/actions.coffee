@@ -59,7 +59,7 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
   actionsProvider.registerChildAction = (parentId, id, actionFactory, roles = undefined) ->
     registerActionInternal(parentId, id, actionFactory, roles)
 
-  actionsProvider.$get = [ '$injector', '$filter', '$rootScope', '$q', '$log', ($injector, $filter, $rootScope, $q, $log) ->
+  actionsProvider.$get = [ '$injector', '$filter', '$rootScope', '$q', '$log', '$timeout', ($injector, $filter, $rootScope, $q, $log, $timeout) ->
 
     createAction = (parentId, id, actionFactory, actionsService, $scope) ->
       try
@@ -77,7 +77,8 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
       if action.action
         action.run = ->
           unless action.disabled
-            $rootScope.$broadcast "actionPerformed", action.id, $q.when(action.action())
+            $q.when(action.action()).then (result) ->
+              $rootScope.$broadcast "actionPerformed", action.id, $q.when(result)
       else
         action.run = action.run ? ->
 

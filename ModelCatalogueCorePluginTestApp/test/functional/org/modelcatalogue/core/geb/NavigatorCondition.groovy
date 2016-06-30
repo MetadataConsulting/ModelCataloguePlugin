@@ -21,7 +21,7 @@ class NavigatorCondition {
 
     boolean isDisplayed() {
         spec.noStale(NUM_OF_RETRIES, navigator) {
-            it.displayed
+            it.first().displayed
         }
     }
 
@@ -39,36 +39,42 @@ class NavigatorCondition {
 
     boolean has(String clazz) {
         spec.noStale(NUM_OF_RETRIES, navigator) {
-            it.hasClass(clazz)
+            it.first().hasClass(clazz)
         }
     }
 
-
-
+    /**
+     * @return return true if the element was either not present on the websited or is present but diappears
+     */
     boolean isGone() {
-        spec.noStale(NUM_OF_RETRIES, true, navigator) {
-            !it.displayed
-        }
+        spec.noStale(NUM_OF_RETRIES, true, navigator) { !it.first().displayed }
+    }
+
+    /**
+     * @return true if the element is not displayed on the website
+     */
+    boolean isMissing() {
+        spec.noStale(NUM_OF_RETRIES, "gone", navigator) { it.first().displayed ? "present" : "gone" } == "gone"
     }
 
     boolean is(String text) {
         isDisplayed()
         spec.noStale(NUM_OF_RETRIES, navigator) {
-            it.text().trim() == text
+            it.first().text().trim() == text
         }
     }
 
     boolean contains(String text) {
         isDisplayed()
         spec.noStale(NUM_OF_RETRIES, navigator) {
-            it.text().contains text
+            it.first().text().contains text
         }
     }
 
     boolean missing(String text) {
         isDisplayed()
         spec.noStale(NUM_OF_RETRIES, navigator) {
-            !it.text().contains(text)
+            !it.first().text().contains(text)
         }
     }
 
@@ -78,13 +84,13 @@ class NavigatorCondition {
 
     boolean present(Keywords once) {
         if (once == Keywords.ONCE) {
-            return spec.noStale(NUM_OF_RETRIES, true, navigator) { it.size() == 1}
+            return present(1).times
         }
         throw new IllegalArgumentException("Only 'once' allowed here")
     }
 
     boolean test(int retries = 1, @ClosureParams(value=FromString, options='geb.navigator.Navigator') Closure<Boolean> test) {
-        spec.noStale(retries, true, navigator, test)
+        spec.noStale(retries, navigator, test)
     }
 
     boolean asBoolean() {
@@ -94,6 +100,6 @@ class NavigatorCondition {
     @Override
     String toString() {
         Navigator current = navigator()
-        return "Navigator condition based on ${current} (text='${current.text()?.trim()}', size=${current.size()})".toString()
+        return "Navigator condition based on ${current} (text='${current.first().text()?.trim()}', size=${current.size()})".toString()
     }
 }

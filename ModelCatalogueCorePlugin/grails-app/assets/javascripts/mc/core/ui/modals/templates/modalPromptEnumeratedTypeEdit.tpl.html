@@ -66,7 +66,7 @@
       <div class="form-group" ng-if="copy.baseEnumeration.enumerations">
         <label for="subset">Subset</label>
         <div class="alert alert-warning" ng-if="copy.selectedEnumerations.values.length == 0">If no enumeration value selected, all values will be used</div>
-        <div class="checkbox" ng-repeat="value in copy.baseEnumeration.enumerations.values">
+        <div class="checkbox" ng-repeat="value in copy.baseEnumeration.enumerations.values track by value.key">
           <label>
             <input type="checkbox" value="{{value}}" id="{{'subtype-enum-' + value.id}}" ng-checked="copy.selectedEnumerations.values.indexOf(value) > -1" ng-click="toggleSelection(copy.selectedEnumerations.values, value)">
             {{value.key}}: {{value.value}}

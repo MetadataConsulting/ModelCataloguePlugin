@@ -1,71 +1,36 @@
 package org.modelcatalogue.core.elasticsearch
-import grails.test.spock.IntegrationSpec
 import groovy.json.JsonOutput
-import org.elasticsearch.client.Client
-import org.elasticsearch.common.settings.Settings
-import org.elasticsearch.node.Node
-import org.elasticsearch.node.NodeBuilder
-import org.elasticsearch.threadpool.ThreadPool
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.Lists
 import spock.util.concurrent.BlockingVariable
 import spock.util.concurrent.BlockingVariables
 
 import java.util.concurrent.TimeUnit
 
-class ElasticSearchServiceSpec extends IntegrationSpec {
+class ElasticSearchServiceSpec extends org.modelcatalogue.testapp.AbstractIntegrationSpec {
 
     ElasticSearchService elasticSearchService
-    InitCatalogueService initCatalogueService
     CatalogueBuilder catalogueBuilder
-    Node node
-
-    @Rule TemporaryFolder data
 
     def setup() {
-        initCatalogueService.initDefaultRelationshipTypes()
+        initRelationshipTypes()
+        RelationshipType.relatedToType.searchable = true
+        RelationshipType.relatedToType.save()
+        relationshipTypeService.clearCache()
 
-        File dataFolder = data.newFolder('elasticsearch')
-
-        // keep this for unit tests
-         node = NodeBuilder.nodeBuilder().settings(Settings.builder()
-             .put("${ThreadPool.THREADPOOL_GROUP}${ThreadPool.Names.BULK}.queue_size", 3000)
-             .put("${ThreadPool.THREADPOOL_GROUP}${ThreadPool.Names.BULK}.size", 25)
-             .put('path.home', dataFolder.canonicalPath)
-         ).local(true).node()
-         Client client = node.client()
-
-        // testing with docker instance
-//        Settings settings = Settings.settingsBuilder()
-//                .put("client.transport.sniff", false)
-//                .put("client.transport.ignore_cluster_name", false).build();
-//        Client client = TransportClient
-//                .builder()
-//                .settings(settings)
-//                .build()
-//                .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("192.168.1.9"), 9300))
-
-        elasticSearchService.client = client
-
-    }
-
-    def cleanup() {
-        node?.close()
-        elasticSearchService.client?.close()
-
-        node = null
-        elasticSearchService.client = null
+        elasticSearchService.initLocalClient()
+        elasticSearchService.reindex().toBlocking().subscribe()
     }
 
     def "play with elasticsearch"() {
         catalogueBuilder.build {
             dataModel(name: "ES Test Model") {
+                ext 'date_in_model_metadata', '2014-06-06T06:34:24Z'
                 policy 'TEST POLICY'
                 dataClass(name: "Foo") {
                     description "foo bar"
@@ -83,7 +48,16 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
                         }
                     }
                 }
+
+                dataType(name: 'Test Primitive Data Type') {
+                    dataClass(name: 'Test Primitive Data Type Data Class')
+                }
+
+                dataType(name: 'Test Primitive Data Type Relation') {
+                    rel 'relatedTo' to 'Test Primitive Data Type'
+                }
             }
+
             dataModelPolicy(name: 'TEST POLICY') {
                 check dataType property 'name' is 'unique'
             }
@@ -138,11 +112,19 @@ class ElasticSearchServiceSpec extends IntegrationSpec {
                 .get().exists
 
         when:
-        Thread.sleep(2000)
-        ListWithTotalAndType<DataClass> foundClasses = elasticSearchService.search(DataClass, [search: 'foo'])
+        boolean found = false
+        ListWithTotalAndType<DataClass> foundClasses = Lists.emptyListWithTotalAndType(DataClass)
+        for (int i = 0; i < 100; i++) {
+            foundClasses = elasticSearchService.search(DataClass, [search: 'foo'])
+            found = foundClasses.total == 1L
+            if (found) {
+                break
+            }
+            Thread.sleep(100)
+        }
 
         then:
-        foundClasses.total == 1L
+        found
         element in foundClasses.items
 
 

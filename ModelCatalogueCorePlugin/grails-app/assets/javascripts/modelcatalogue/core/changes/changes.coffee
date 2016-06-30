@@ -12,7 +12,7 @@ changes = angular.module('mc.core.changes', ['mc.core.ui.columns', 'mc.util.ui.a
 changes.run ['$templateCache', ($templateCache) ->
   $templateCache.put 'modelcatalogue/core/ui/catalogueElementView/history-tab.html', '''
       <div class="history-tab">
-        <catalogue-element-treeview  no-resize id="{{tab.name}}-table" list="tab.value" descend="'changes'"></catalogue-element-treeview>
+        <catalogue-element-treeview  no-resize id="{{tab.name}}-table" list="tab.value" descend="changes"></catalogue-element-treeview>
       </div>
     '''
 ]
@@ -195,7 +195,7 @@ changes.config ['columnsProvider', 'names', (columnsProvider, names)->
     return """<a title="Parent Action: #{change.parent.name}" href="#/catalogue/change/#{change.parent.id}/changes"><span class="fa fa-fw fa-level-up"></span></a>"""
 
   getIcon = (change) -> "#{getIconForChangeType(change)}#{getLinkToParent(change)}"
-  getChangeDescription = (change, catalogueElementProperties) -> """<a href="#/catalogue/change/#{change.id}"><span class="fa fa-fw fa-link"></span></a> #{getChangeForChangeType(change, catalogueElementProperties)}"""
+  getChangeDescription = (change, catalogueElementProperties) -> """<a href="#/catalogue/change/#{change.id}" class="change-#{change.type}"><span class="fa fa-fw fa-link"></span></a> #{getChangeForChangeType(change, catalogueElementProperties)}"""
 
   valueOrName = (property) ->
     (change) ->

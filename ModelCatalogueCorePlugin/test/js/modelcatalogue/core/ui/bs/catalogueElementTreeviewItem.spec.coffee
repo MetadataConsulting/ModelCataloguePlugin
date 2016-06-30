@@ -10,13 +10,13 @@ describe "mc.core.ui.catalogueElementTreeviewItem", ->
     catEl.outgoingRelationships.total = 5
 
     $rootScope.element = catEl
-    $rootScope.descend = ['outgoingRelationships']
     $rootScope.treeview =
       select: -> # do nothing
       getNodeId: (link) -> link
+      getDescend: -> 'outgoingRelationships'
 
     element = $compile('''
-      <catalogue-element-treeview-item element="element" descend="descend" treeview="treeview"></catalogue-element-treeview-item>
+      <catalogue-element-treeview-item element="element" treeview="treeview"></catalogue-element-treeview-item>
     ''')($rootScope)
 
     $rootScope.$digest()

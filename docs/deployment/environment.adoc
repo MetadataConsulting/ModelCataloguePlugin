@@ -1,0 +1,208 @@
+= Environment
+
+== Database
+
+Model Catalogue is currently tested and deployed against *MySQL* database server with InnoDB
+storage engine. The application was tested with versions `5.6.x` and `5.7.x`. The database
+schema is created automatically yet if the database is created automatically following
+indexes are not present but highly recommended:
+
+[source,SQL]
+----
+CREATE INDEX change_idx_1 ON `change` (changed_id, system, undone, parent_id, type, date_created);
+CREATE INDEX change_idx_2 ON `change` (parent_id, system, other_side, changed_id);
+CREATE INDEX change_idx_3 ON `change` (author_id, other_side, system, date_created);
+----
+
+The expected load are lower tens of users so the CPU and memory can be rather small (`db.t2.micro` or `db.t2.micro`
+equivalent). Average database can take consume about 2 GB of disk space.
+
+Daily backups are expected to enabled for the database.
+
+== Search
+
+Model Catalogue uses *Elasticsearch* server as a search engine. Currently the version `2.1.2` is in use and
+should be compatible to any newer release in `2.1.x` but not with the newer ones such as `2.2.x` or `2.3.x`. The version
+of the server should correspond the drivers used by the application. The best way to achieve this is to use
+https://hub.docker.com/r/metadata/registry-elasticsearch/[metadata/registry-elasticsearch] Docker image which is
+guaranteed to be synchronized with the main application image https://hub.docker.com/r/metadata/registry/[metadata/registry]
+and expected Elasticsearch settings.
+
+The search indicies can be rebuild from the database yet the docker container should be run with `-v /path/to/es/backup:/usr/share/elasticsearch/data`
+to retain the indicies between the potential container restarts and upgrades.
+
+When the main application is not running on the same docker engine then the port `9300` needs to be published with `-p 9300:9300`.
+
+To achieve the best performance 4 GB of system memory is recommended. You can achieve this by running the container with
+`--memory="4g" -e ES_HEAP_SIZE=2g` parameters.
+
+See https://www.elastic.co/blog/how-to-make-a-dockerfile-for-elasticsearch[How to Make a Dockerfile for Elasticsearch] for
+further information.
+
+Here's the summary of recommended `docker run` parameters (the port setting is omited as running within the same engine is recommended):
+
+----
+docker run -d --restart="always" --name=mc-es -v "$PWD/esdata":/usr/share/elasticsearch/data --memory="4g" -e ES_HEAP_SIZE=2g metadata/registry-elasticsearch:2
+----
+
+== Application
+
+Model Catalogue is Java web application running on Tomcat 8 and JDK 8. It is distributed as Docker image https://hub.docker.com/r/metadata/registry/[metadata/registry]
+which contains the application deployed as ROOT application and the link:production.adoc[Model Catalogue configuration file]
+enabled to get important configuration from the environmental variables. You can find reference of all the environmental variables at the end of this section.
+
+The average memory consumption of the application is under 2 GB but some of the processes such as search reindexing or
+some of the reports may require more memory to run. Because of this the recommended memory setting for production environment is 8 GB.
+
+CPU consumption is usually low.
+
+The application can store Assets (blob files) in database (not recommended), file system (needs additional backup settings)
+or to Amazon S3 (preferred).
+
+Mail server configuration is needed to enable user self-registration and sending forgotten password.
+
+Users can log in with their Google accounts if Google API key and secret is set.
+
+As the number of environmental variable is high the best way how to supply it to the docker command is with environment file `--env-file mc.env`. The file
+contains variable declaration in `ENV_VAR=value` format on each line.
+
+For most secure communication with the Elasticsearch server run the Elasticsearch container within the same docker engine and link it with `--link mc-es:mc-es`.
+
+----
+docker run -d --restart="always" --name=mc --env-file mc.env metadata/registry:2
+----
+
+[cols="4*", options="header"]
+.Available Environmental Variables
+|===
+|Group |Name |Description |Default Value
+
+|Application
+|`CATALINA_OPTS`
+|Additional options for Tomcat. Use it to tune memory settings e.g. `-Djava.awt.headless=true -Dfile.encoding=UTF-8 -server -Xms2g -Xmx8g -XX:NewSize=1g -XX:MaxNewSize=1g -XX:PermSize=1g -XX:MaxPermSize=1g -XX:+DisableExplicitGC`
+|_None_
+
+|Application
+|`METADATA_HOST`
+|The URL where the application is available for the users
+|Value of `VIRTUAL_HOST` variable for easy integration with `nginx` reverse proxy image, value of `DOCKER_MACHINE_IP` variable
+or the result of calling `http://checkip.amazonaws.com` service (in this order of precedence)
+
+|Database
+|`METADATA_PASSWORD`
+|The password for the Model Catalogue database
+|Value of `MC_MYSQL_ENV_MYSQL_PASSWORD` variable (set automatically when running from `docker-compose`) or
+value of `RDS_PASSWORD` variable (set automatically when running on Amazon ElasticBeanstalk) or
+`metadata`
+
+|Database
+|`METADATA_USERNAME`
+|The username for the Model Catalogue database
+|Value of `MC_MYSQL_ENV_MYSQL_USER` variable (set automatically when running with `docker-compose`) or
+value of `RDS_USERNAME` variable (set automatically when running on Amazon ElasticBeanstalk) or
+`metadata`
+
+|Database
+|`METADATA_JDBC_URL`
+|The JDBC connection string
+|Set automatically if running with `docker-compose` or Amazon ElasticBeanstalk or
+uses local H2 database if not set as `"${System.properties['catalina.base']}/db"`
+
+|Search
+|`MC_ES_HOST`
+|Hostname where Elasticsearch server is running
+|Set automatically if running with `docker-compose` or uses local embedded instance if not set
+at `"${System.properties['catalina.base']}/es"`
+
+|Mail
+|`MC_MAIL_FROM`
+|Default mail sender for the application
+|_None_
+
+|Mail
+|`MC_MAIL_HOST`
+|Hostname of the mail server
+|_None_
+
+|Mail
+|`MC_MAIL_PORT`
+|Port of the mail server
+|_None_
+
+|Mail
+|`MC_MAIL_USERNAME`
+|Username for themail server
+|_None_
+
+|Mail
+|`MC_MAIL_PASSWORD`
+|Password for the mail server
+|_None_
+
+|Mail
+|`MC_MAIL_PROPS`
+|JSON containing additional mail properties (see http://grails.org/plugins/mail[Grails Mail Plugin])
+|_None_
+
+
+|Assets
+|`MC_S3_BUCKET`
+|Name of the Amazon S3 bucket to store the assets
+|_None_
+
+|Assets
+|`MC_S3_KEY`
+|AWS Access Key for S3 access
+|Value of variable `AWS_ACCESS_KEY_ID`
+
+|Assets
+|`MC_S3_SECRET`
+|AWS Secret Key for S3 access
+|Value of variable `AWS_SECRET_KEY`
+
+|Assets
+|`MC_S3_REGION`
+|AWS Region to store the assets
+|_None_
+
+|Assets
+|`MC_USE_LOCAL_STORAGE`
+|Stores assets locally to the file system at `"${System.properties['catalina.base']}/storage"` instead of the database.
+*Use this option only if you can't store assets to Amazon S3!*
+|By default the assets are stored inside the database (not recommended)
+
+|Appearance
+|`MC_NAME`
+|Name of the application displayed in the menu toolbar
+|_None_
+
+|Appearance
+|`MC_WELCOME_JUMBO`
+|HTML text to appear to users not logged in on the home page (inside big gray box)
+|_None_
+
+|Appearance
+|`MC_WELCOME_INFO`
+|HTML text to appear to users not logged in on the home page (bellow big gray box)
+|_None_
+
+|Authentication
+|`MC_GOOGLE_KEY`
+|Google API client key to enable users to log in with Google credentials
+|_None_
+
+|Authentication
+|`MC_GOOGLE_SECRET`
+|Google API client secret to enable users to log in with Google credentials
+|_None_
+
+|Authentication
+|`MC_ALLOW_SIGNUP`
+|Enables user self-registration
+|_None_
+
+|===
+
+
+
+

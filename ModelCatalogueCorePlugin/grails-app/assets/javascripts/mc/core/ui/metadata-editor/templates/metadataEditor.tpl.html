@@ -13,7 +13,7 @@
   </div>
 
   <div class="col-sm-9 col-md-9 col-lg-9 editor">
-    <div ng-repeat="editor in availableEditors">
+    <div ng-repeat="editor in availableEditors track by editor.getTitle()">
       <div ng-include="editor.getTemplate()" ng-if="selectedEditor == editor.getTitle()"></div>
     </div>
     <div ng-if="selectedEditor == '__ALL__'">

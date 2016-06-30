@@ -286,7 +286,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       }
   ]
 
-  generateReports = ($scope, $window, enhance, rest, $log, messages) ->
+  generateReports = ($scope, $window, enhance, rest, $log, messages, $timeout) ->
     (reports = []) ->
       for report in reports
         {
@@ -303,7 +303,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
             depth = @depth
             includeMetadata = @includeMetadata
             if @type == 'LINK'
-              $window.open(url, '_blank')
+              $timeout -> $window.open(url, '_blank')
             else if @type == 'ASSET'
               messages.prompt('Export Settings', '', {type: 'export', assetName: defaultValue, depth: depth, includeMetadata: includeMetadata})
               .then (result) ->
@@ -317,14 +317,14 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
                   $log.debug "exporting with includeMetadata: #{result.includeMetadata}"
                   url = URI(url).setQuery({includeMetadata: result.includeMetadata})
                 $log.debug "export new asset using url #{url}"
-                $window.open(url, '_blank')
+                $timeout -> $window.open(url, '_blank')
             else
               $log.error "unknown type of report '#{@type}'"
             return true
         }
 
   actionsProvider.registerChildActionInRoles('export', 'catalogue-element-export-specific-reports', [actionsProvider.ROLE_ITEM_ACTION],
-    ['$scope', '$window', 'enhance', 'rest', '$log', 'messages', ($scope, $window, enhance, rest, $log, messages) ->
+    ['$scope', '$window', 'enhance', 'rest', '$log', 'messages', '$timeout', ($scope, $window, enhance, rest, $log, messages, $timeout) ->
       return undefined if not $scope.element
 
       {
@@ -333,24 +333,24 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       disabled:   not $scope.element?.availableReports?.length
       watches:    'element.availableReports'
       generator:  (action) ->
-        action.createActionsFrom 'element.availableReports', generateReports($scope, $window, enhance, rest, $log, messages)
+        action.createActionsFrom 'element.availableReports', generateReports($scope, $window, enhance, rest, $log, messages, $timeout)
       }
     ])
 
   actionsProvider.registerChildAction('export', 'generic-reports',
-    ['$scope', '$window', 'enhance', 'rest', '$log', 'messages', ($scope, $window, enhance, rest, $log, messages) ->
+    ['$scope', '$window', 'enhance', 'rest', '$log', 'messages', '$timeout', ($scope, $window, enhance, rest, $log, messages, $timeout) ->
       {
       position:   2000
       label:      "Other Reports"
       disabled:   not $scope.reports?.length
       watches:   'reports'
       generator: (action) ->
-        action.createActionsFrom 'reports', generateReports($scope, $window, enhance, rest, $log, messages)
+        action.createActionsFrom 'reports', generateReports($scope, $window, enhance, rest, $log, messages, $timeout)
       }
     ])
 
   actionsProvider.registerChildAction('export', 'list-exports-current', actionsProvider.ROLE_LIST_ACTION,
-    ['$scope', '$window', 'enhance', 'rest', '$log', 'messages', ($scope, $window, enhance, rest, $log, messages) ->
+    ['$scope', '$window', 'enhance', 'rest', '$log', 'messages', '$timeout', ($scope, $window, enhance, rest, $log, messages, $timeout) ->
       return undefined if not $scope.list?
 
       {
@@ -359,7 +359,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       disabled:   not $scope.list.availableReports?.length
       watches:    'list.availableReports'
       generator:  (action) ->
-        action.createActionsFrom 'list.availableReports', generateReports($scope, $window, enhance, rest, $log, messages)
+        action.createActionsFrom 'list.availableReports', generateReports($scope, $window, enhance, rest, $log, messages, $timeout)
       }
     ])
 
@@ -648,7 +648,9 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
 
-  actionsProvider.registerActionInRole 'modal-save-element', actionsProvider.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
+  actionsProvider.registerActionInRole 'modal-save-element', actionsProvider.ROLE_MODAL_ACTION, ($scope) ->
+    'ngInject'
+    
     return undefined unless $scope.hasChanged and $scope.saveElement
 
     {
@@ -656,14 +658,19 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       label:      'Save'
       icon:       'glyphicon glyphicon-ok'
       type:       'success'
-      watches:    'hasChanged()'
-      disabled:   not $scope.hasChanged()
+      watches:    ['hasChanged()', 'saveInProgress']
+      disabled:   not $scope.hasChanged() or $scope.saveInProgress
       action: ->
-       $scope.saveElement() if $scope.hasChanged()
+          if $scope.hasChanged() and not $scope.saveInProgress
+            $scope.saveInProgress = true
+            $scope.saveElement().then (result) ->
+              $scope.saveInProgress = false
+              return result
     }
-  ]
 
-  actionsProvider.registerActionInRole 'modal-save-and-add-another', actionsProvider.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
+  actionsProvider.registerActionInRole 'modal-save-and-add-another', actionsProvider.ROLE_MODAL_ACTION, ($scope, $q) ->
+    'ngInject'
+
     return undefined unless $scope.hasChanged and $scope.saveAndCreateAnother
 
     {
@@ -671,28 +678,16 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       label:      'Save and Create Another'
       icon:       'glyphicon glyphicon-ok'
       type:       'success'
-      watches:    'hasChanged()'
-      disabled:   not $scope.hasChanged()
+      watches:    ['hasChanged()', 'saveInProgress']
+      disabled:   not $scope.hasChanged() or $scope.saveInProgress
       action: ->
-        $scope.saveAndCreateAnother() if $scope.hasChanged()
+        if $scope.hasChanged() and not $scope.saveInProgress
+          $scope.saveInProgress = true
+          $q.when($scope.saveAndCreateAnother()).then (result) ->
+            $scope.saveInProgress = false
+            return result
+
     }
-  ]
-
-
-  actionsProvider.registerChildAction 'modal-save-element', 'modal-save-element-as-new-version', ['$scope', ($scope) ->
-    return undefined unless $scope.hasChanged and $scope.saveElement and not $scope.create and $scope.original and $scope.original.isInstanceOf and $scope.original.isInstanceOf 'catalogueElement'
-
-    {
-      position:   1000
-      label:      'Save as New Version'
-      icon:       'glyphicon glyphicon-circle-arrow-up'
-      type:       'success'
-      watches:    'hasChanged()'
-      disabled:   not $scope.hasChanged()
-      action: ->
-        $scope.saveElement(true) if $scope.hasChanged()
-    }
-  ]
 
   actionsProvider.registerActionInRole 'expand-all-rows', actionsProvider.ROLE_LIST_HEADER_ACTION, ['$scope', ($scope) ->
     return undefined unless $scope.rows

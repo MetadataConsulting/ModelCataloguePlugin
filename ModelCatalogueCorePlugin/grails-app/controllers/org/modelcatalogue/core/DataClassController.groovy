@@ -13,6 +13,7 @@ import org.modelcatalogue.core.util.lists.Relationships
 class DataClassController extends AbstractCatalogueElementController<DataClass> {
 
     def dataClassService
+    PerformanceUtilService performanceUtilService
 
     DataClassController() {
         super(DataClass, false)
@@ -127,7 +128,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
                 originalFileName: "${model.name}-${model.status}-${model.version}-changelog.docx",
                 contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ) { OutputStream out ->
-            new ChangeLogDocxGenerator(auditService, dataClassService, depth, includeMetadata)
+            new ChangeLogDocxGenerator(auditService, dataClassService, performanceUtilService , depth, includeMetadata)
                 .generateChangelog(DataClass.get(modelId), out)
         }
 

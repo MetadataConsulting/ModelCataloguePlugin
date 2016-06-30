@@ -65,6 +65,7 @@ class BuildProgressMonitor implements Serializable, ProgressMonitor {
     }
 
     void onCompleted() {
+        onNext("\n<strong class='text-success'> JOB $name COMPLETED SUCCESSFULLY</strong>")
         queue.onCompleted()
     }
 
@@ -77,6 +78,7 @@ class BuildProgressMonitor implements Serializable, ProgressMonitor {
     void onError(Throwable th) {
         StringWriter sw = printException(th)
         onNext(sw.toString())
+        onNext("\n\n<strong class='text-danger'> JOB $name FAILED</strong>\n")
         queue.onError(th)
     }
 

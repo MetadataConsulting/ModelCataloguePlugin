@@ -15,78 +15,21 @@ function copy_functional_test_results() {
 
 cd ModelCatalogueCorePlugin
 
-# plugin unit tests
-if [ "$TEST_SUITE" = "unit" ] || [ "$TEST_SUITE" = "core_unit" ] || [ "$TEST_SUITE" = "core" ] || [ "$TEST_SUITE" = "" ] ; then
-    set -x
-    mkdir -p "$HOME/reports/unit-tests-reports"
-    cp -Rf target/test-reports/ "$HOME/reports/unit-tests-reports" || true
+if [ "$TEST_SUITE" = "unit_and_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+    mkdir -p "$HOME/reports/last-core-tests-reports"
+    cp -Rf target/test-reports/ "$HOME/reports/last-core-tests-reports" || true
 fi
 
-# plugin integration all tests
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "" ] ; then
-    set -x
-    mkdir -p "$HOME/reports/fast-integration-tests-reports"
-    cp -Rf target/test-reports/ "$HOME/reports/fast-integration-tests-reports" || true
-fi
-
-
-# plugin integration tests
-if [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "core" ]  ; then
-    set -x
-    mkdir -p "$HOME/reports/fast-integration-tests-reports"
-    cp -Rf target/test-reports/ "$HOME/reports/fast-integration-tests-reports" || true
-fi
-
-# slow and polluting (imports)
-if [ "$TEST_SUITE" = "core_integration_slow" ] || [ "$TEST_SUITE" = "core" ] ; then
-    set -x
-    mkdir -p "$HOME/reports/slow-integration-tests-reports"
-    cp -Rf target/test-reports/ "$HOME/reports/slow-integration-tests-reports" || true
-fi
-cd ..
-
-cd ModelCatalogueFormsPlugin
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "forms_integration" ]|| [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
-    set -x
-    mkdir -p "$HOME/reports/forms-integration-tests-reports"
-    cp -Rf target/test-reports/ "$HOME/reports/forms-integration-tests-reports" || true
-fi
-cd ..
-
-cd ModelCatalogueElasticSearchPlugin
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "es_integration" ] || [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
-    set -x
-    mkdir -p "$HOME/reports/es-integration-tests-reports"
-    cp -Rf target/test-reports/ "$HOME/reports/es-integration-tests-reports" || true
-fi
-cd ..
-
-cd ModelCatalogueGenomicsPlugin
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "gel_integration" ] || [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
-    set -x
-    mkdir -p "$HOME/reports/gel-integration-tests-reports"
-    cp -Rf target/test-reports/ "$HOME/reports/gel-integration-tests-reports" || true
-fi
-cd ..
-
-cd ModelCatalogueCorePlugin
-# karma tests, part of the integration as they needs the fixtures generated from the integration tests
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "core" ] || [ "$TEST_SUITE" = "" ] ; then
-    set -x
-    mkdir -p "$HOME/reports/karma-tests-reports"
-    cp -Rf target/reports/ "$HOME/reports/karma-tests-reports" || true
-fi
 cd ..
 
 cd ModelCatalogueCorePluginTestApp
 
-if [ "$TEST_SUITE" = "integration" ] || [ "$TEST_SUITE" = "app_integration" ] || [ "$TEST_SUITE" = "other_integration" ] || [ "$TEST_SUITE" = "" ] ; then
-    set -x
-    mkdir -p "$HOME/reports/test-app-integration-tests-reports"
-    cp -Rf target/test-reports/ "$HOME/reports/test-app-integration-tests-reports" || true
+if [ "$TEST_SUITE" = "unit_and_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+    mkdir -p "$HOME/reports/last-app-tests-reports"
+    cp -Rf target/test-reports/ "$HOME/reports/last-app-tests-reports" || true
 fi
 
-if [ "$TEST_SUITE" = "functional" ] || [[ "$TEST_SUITE" == app_functional* ]] || [ "$TEST_SUITE" = "" ] ; then
+if [ "$TEST_SUITE" = "functional" ] || [ "$TEST_SUITE" = "" ] ; then
     copy_functional_test_results
 fi
 

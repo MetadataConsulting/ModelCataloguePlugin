@@ -7,6 +7,7 @@ hibernate {
 
 // environment specific settings
 environments {
+    // XXX: never commit your local configuration overrides for this file!!!
     development {
         dataSource {
             pooled = true

@@ -718,7 +718,11 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     def "update and set metadata"() {
         if (controller.readOnly) return
-        CatalogueElement another        = CatalogueElement.get(anotherLoadItem.id)
+        Map props = new HashMap(newInstance)
+        props.name = "Test ${UUID.randomUUID()}"
+        CatalogueElement another        =  resource.newInstance()
+        another.properties = props
+        another.save(failOnError: true)
         String newName                  = "UPDATED NAME"
         Map keyValue = new HashMap()
         keyValue.put('testKey', 'testValue')
@@ -728,8 +732,6 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         when:
         controller.request.method       = 'PUT'
         controller.params.id            = another.id
-        controller.params.newVersion    = true
-        controller.params.semanticVersion = "${System.currentTimeMillis()}"
         controller.request.json         = [name: newName, ext: OrderedMap.toJsonMap(keyValue), dataModel: dataModelForSpec]
         controller.response.format      = "json"
 
@@ -737,7 +739,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         def json = controller.response.json
 
         then:
-        json.name                   == newName
+        json.name == newName
         OrderedMap.fromJsonMap(json.ext) == keyValue
 
     }
