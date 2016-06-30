@@ -5,13 +5,13 @@
     </div>
   </div>
 
-  <div class="row" ng-repeat="value in (editableForm.$visible ? [] : element.enumerations.values) track by value.key"
+  <div class="row" ng-repeat="value in ::(editableForm.$visible ? [] : element.enumerations.values) track by value.key"
        ng-class="{'text-danger': value.deprecated}">
     <div class="col-md-3">
-      <strong class="small text-wrap">{{value.key}}</strong>
+      <strong class="small text-wrap">{{::value.key}}</strong>
     </div>
     <div class="col-md-8 preserve-new-lines">
-      <small>{{value.value}}</small>
+      <small>{{::value.value}}</small>
     </div>
     <div class="col-md-1">
       <a class="btn btn-link btn-sm" ng-click="view.setDeprecated(value, !value.deprecated, globalMessages, element, rest, modelCatalogueApiRoot)">

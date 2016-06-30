@@ -1,7 +1,7 @@
 <div>
-  <div ng-repeat="editor in availableEditors">
+  <div ng-repeat="editor in ::availableEditors"><!-- This is the edit rows for the enumerated types... adds about 420 watchers-->
     <hr/>
-    <h4 class="text-center">{{editor.getTitle()}}</h4>
+    <h4 class="text-center">{{::editor.getTitle()}}</h4>
     <hr/>
     <div ng-include="editor.getTemplate()"></div>
     <hr/>
@@ -11,15 +11,15 @@
   <table class="soe-table table" title="{{title}}">
     <thead ng-if="title || valueTitle">
     <th></th>
-    <th class="col-md-5 col-sm-4 soe-table-property-key">{{title}}</th>
-    <th class="col-md-5 col-sm-5 soe-table-property-value ">{{valueTitle}}</th>
+    <th class="col-md-5 col-sm-4 soe-table-property-key">{{::title}}</th>
+    <th class="col-md-5 col-sm-5 soe-table-property-value ">{{::valueTitle}}</th>
     <th class="col-md-2 col-sm-3 soe-table-property-actions">
       <!-- to allow submitting forms with only this editor within -->
       <input type="submit" class="hide">
     </th>
     </thead>
     <tbody sortable="sortableOptions">
-    <tr class="soe-table-property-row" ng-repeat="property in object.values"
+    <tr class="soe-table-property-row" ng-repeat="property in ::object.values"
         ng-class="{'has-error': !isKeyUnique(property.key)}">
       <td><span class="handle fa fa-ellipsis-v fa-fw text-muted with-move"></span></td>
       <th class="soe-table-property-key">
