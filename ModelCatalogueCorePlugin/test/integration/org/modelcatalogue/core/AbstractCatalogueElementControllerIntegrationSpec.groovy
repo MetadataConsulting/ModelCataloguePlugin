@@ -18,47 +18,6 @@ import javax.xml.crypto.Data
 abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends AbstractControllerIntegrationSpec implements ResultRecorder{
 
 
-    def "update and create new version"() {
-        if (controller.readOnly) return
-
-        String newName = "UPDATED NAME WITH NEW VERSION"
-        CatalogueElement another = CatalogueElement.get(anotherLoadItem.id)
-
-        if (another.status == ElementStatus.DRAFT) {
-            another = elementService.finalizeElement(another)
-        }
-
-        addDataModelIfNotPresent(another)
-
-        String currentName = another.name
-        Integer currentVersionNumber = another.versionNumber
-        Integer numberOfCurrentVersions = another.countVersions()
-
-        when:
-        controller.request.method = 'PUT'
-        controller.params.id = another.id
-        controller.params.newVersion = true
-        controller.params.semanticVersion = "${System.currentTimeMillis()}"
-        controller.request.json = [name: newName, dataModel: dataModelForSpec]
-        controller.response.format = "json"
-
-        controller.update()
-
-        CatalogueElement oldVersion = CatalogueElement.findByLatestVersionIdAndVersionNumber(another.latestVersionId ?: another.id, currentVersionNumber)
-
-        def json = controller.response.json
-
-        then:
-        json.versionNumber == currentVersionNumber + 1
-        json.name == newName
-
-        another.countVersions() == numberOfCurrentVersions + 1
-
-        oldVersion.versionNumber == currentVersionNumber
-        oldVersion.name == currentName
-        oldVersion.name != json.name
-    }
-
     void addDataModelIfNotPresent(CatalogueElement another) {
         if (!another.dataModel) {
             another.dataModel = new DataModel(name: "DM${System.currentTimeMillis()}", status: ElementStatus.FINALIZED, semanticVersion: '0.1.1').save(failOnError: true)
