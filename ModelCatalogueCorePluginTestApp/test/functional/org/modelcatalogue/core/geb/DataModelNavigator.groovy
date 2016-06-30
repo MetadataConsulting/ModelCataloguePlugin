@@ -8,23 +8,19 @@ class DataModelNavigator {
         this.spec = spec
     }
 
-    DataModelNavigator rightShift(String node) {
+    /**
+     * Selects a tree node and ensures it is opened.
+     */
+    DataModelNavigator open(String node) {
         spec.selectInTree(node, true);
         return this
     }
 
-    DataModelNavigator rightShiftUnsigned(String node) {
+    /**
+     * Selects a tree node nevertheless it is possible to open.
+     */
+    DataModelNavigator select(String node) {
         spec.selectInTree(node);
         return this
-    }
-
-    DataModelNavigator div(String node) {
-        return rightShift(node)
-    }
-
-
-
-    DataModelNavigator mod(String node) {
-        return rightShiftUnsigned(node)
     }
 }

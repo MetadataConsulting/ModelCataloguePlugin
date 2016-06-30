@@ -52,6 +52,14 @@ class DataModelChangeLogXlsExporterSpec extends AbstractDataModelExporterSpec {
 
     private String getExpectedRDPhenotypesCsv() {
         return """Change reference,Data Category,Section (model cat ref),Data Item Name,Change Type,Current version details
+,,,Dataclass Top Level 1 Root ($level1_id),New Data Item,,Info >>>1<<< Level2 ($level2_id_1)
+,,,Dataclass Top Level 1 Root ($level1_id),New Data Item,,Info >>>2<<< Level2 ($level2_id_2)
+,Info >>>1<<< Level2 ($level2_id_1),,Info >>>1<<< Level2 ($level2_id_1),New Data Item,,Info >>>1<<< subCategory Level3 Model Data Element 1 ($level3_id_1)
+,Info >>>1<<< Level2 ($level2_id_1),,Info >>>1<<< Level2 ($level2_id_1),New Data Item,,Info >>>1<<< subCategory Level3 Model Data Element 2 ($level3_id_2)
+,Info >>>1<<< Level2 ($level2_id_1),Info >>>1<<< subCategory Level3 Model Data Element 1 ($level3_id_1),Info >>>1<<< subCategory Level3 Model Data Element 1 ($level3_id_1),New Data Item,,Form Element 1 ($elem1_id)
+,Info >>>1<<< Level2 ($level2_id_1),Info >>>1<<< subCategory Level3 Model Data Element 1 ($level3_id_1),Info >>>1<<< subCategory Level3 Model Data Element 1 ($level3_id_1),New Data Item,,Form Element 2 ($elem2_id)
+,Info >>>1<<< Level2 ($level2_id_1),Info >>>1<<< subCategory Level3 Model Data Element 1 ($level3_id_1),Info >>>1<<< subCategory Level3 Model Data Element 1 ($level3_id_1),New Data Item,,Form Element 3 ($elem3_id)
+,Info >>>1<<< Level2 ($level2_id_1),Info >>>1<<< subCategory Level3 Model Data Element 1 ($level3_id_1),Info >>>1<<< subCategory Level3 Model Data Element 1 ($level3_id_1),New Data Item,,Info >>1<< heading Level4 Model Data Element 1 ($level4_id_1)
 ,Info >>>1<<< Level2 ($level2_id_1),Info >>>1<<< subCategory Level3 Model Data Element 1 ($level3_id_1),Form Element 1 ($elem1_id),New Data Item,,contained in: Form Element 1 ($elem1_id)
 ,Info >>>1<<< Level2 ($level2_id_1),Info >>>1<<< subCategory Level3 Model Data Element 1 ($level3_id_1),Form Element 1 ($elem1_id),New Data Item,,contained in: Form Element 1 ($elem1_id)
 ,Info >>>1<<< Level2 ($level2_id_1),Info >>>1<<< subCategory Level3 Model Data Element 1 ($level3_id_1),Form Element 1 ($elem1_id),New Data Item,,contained in: Form Element 1 ($elem1_id)
@@ -68,6 +76,11 @@ class DataModelChangeLogXlsExporterSpec extends AbstractDataModelExporterSpec {
 ,Info >>>1<<< Level2 ($level2_id_1),Info >>>1<<< subCategory Level3 Model Data Element 1 ($level3_id_1),Info >>1<< heading Level4 Model Data Element 1 ($level4_id_1),New Data Item,,Form Element 5 ($elem5_id)
 ,Info >>>1<<< Level2 ($level2_id_1),Info >>>1<<< subCategory Level3 Model Data Element 1 ($level3_id_1),Info >>1<< heading Level4 Model Data Element 1 ($level4_id_1),New Data Item,,Form Element 6 ($elem6_id)
 ,Info >>>1<<< Level2 ($level2_id_1),Info >>>1<<< subCategory Level3 Model Data Element 1 ($level3_id_1),Info >>1<< heading Level4 Model Data Element 1 ($level4_id_1),New Data Item,,>>1<< Level5 Model Data Element 1 ($level5_id1)
+,Info >>>1<<< Level2 ($level2_id_1),Info >>>1<<< subCategory Level3 Model Data Element 2 ($level3_id_2),Info >>>1<<< subCategory Level3 Model Data Element 2 ($level3_id_2),New Data Item,,Form Element 1 ($elem1_id)
+,Info >>>1<<< Level2 ($level2_id_1),Info >>>1<<< subCategory Level3 Model Data Element 2 ($level3_id_2),Info >>>1<<< subCategory Level3 Model Data Element 2 ($level3_id_2),New Data Item,,Form Element 2 ($elem2_id)
+,Info >>>1<<< Level2 ($level2_id_1),Info >>>1<<< subCategory Level3 Model Data Element 2 ($level3_id_2),Info >>>1<<< subCategory Level3 Model Data Element 2 ($level3_id_2),New Data Item,,Form Element 3 ($elem3_id)
+,Info >>>1<<< Level2 ($level2_id_1),Info >>>1<<< subCategory Level3 Model Data Element 2 ($level3_id_2),Info >>>1<<< subCategory Level3 Model Data Element 2 ($level3_id_2),New Data Item,,Info >>1<< heading Level4 Model Data Element 2 ($level4_id_2)
+,Info >>>1<<< Level2 ($level2_id_1),Info >>>1<<< subCategory Level3 Model Data Element 2 ($level3_id_2),Info >>>1<<< subCategory Level3 Model Data Element 2 ($level3_id_2),Change Description,This is a description for Model 1 Data Element 2,new textual description replaces old
 ,Info >>>1<<< Level2 ($level2_id_1),Info >>>1<<< subCategory Level3 Model Data Element 2 ($level3_id_2),Form Element 1 ($elem1_id),New Data Item,,contained in: Form Element 1 ($elem1_id)
 ,Info >>>1<<< Level2 ($level2_id_1),Info >>>1<<< subCategory Level3 Model Data Element 2 ($level3_id_2),Form Element 1 ($elem1_id),New Data Item,,contained in: Form Element 1 ($elem1_id)
 ,Info >>>1<<< Level2 ($level2_id_1),Info >>>1<<< subCategory Level3 Model Data Element 2 ($level3_id_2),Form Element 1 ($elem1_id),New Data Item,,contained in: Form Element 1 ($elem1_id)
@@ -87,7 +100,14 @@ class DataModelChangeLogXlsExporterSpec extends AbstractDataModelExporterSpec {
 ,Info >>>1<<< Level2 ($level2_id_1),Info >>>1<<< subCategory Level3 Model Data Element 2 ($level3_id_2),Info >>1<< heading Level4 Model Data Element 2 ($level4_id_2),New Metadata,,Min Occurs: 1
 ,Info >>>1<<< Level2 ($level2_id_1),Info >>>1<<< subCategory Level3 Model Data Element 2 ($level3_id_2),Info >>1<< heading Level4 Model Data Element 2 ($level4_id_2),New Data Item,,New Participant Info class ($newParticipant_id)
 ,Info >>>1<<< Level2 ($level2_id_1),Info >>>1<<< subCategory Level3 Model Data Element 2 ($level3_id_2),>>1<< Level5 Model Data Element 2 ($level5_id2),New Data Item,,New Participant Info class2 ($newParticipant_id2)
+,Info >>>1<<< Level2 ($level2_id_1),Info >>>1<<< subCategory Level3 Model Data Element 2 ($level3_id_2),New Participant Info class2 ($newParticipant_id2),Change Description,,new description2
 ,Info >>>1<<< Level2 ($level2_id_1),Info >>>1<<< subCategory Level3 Model Data Element 2 ($level3_id_2),New Participant Info class ($newParticipant_id),Change Description,,brand new description
+,Info >>>2<<< Level2 ($level2_id_2),,Info >>>2<<< Level2 ($level2_id_2),New Data Item,,Info >>>2<<< subCategory Level3 Model Data Element 1 ($level3_id_3)
+,Info >>>2<<< Level2 ($level2_id_2),,Info >>>2<<< Level2 ($level2_id_2),New Data Item,,Info >>>2<<< subCategory Level3 Model Data Element 2 ($level3_id_4)
+,Info >>>2<<< Level2 ($level2_id_2),Info >>>2<<< subCategory Level3 Model Data Element 1 ($level3_id_3),Info >>>2<<< subCategory Level3 Model Data Element 1 ($level3_id_3),New Data Item,,Form Element 1 ($elem1_id)
+,Info >>>2<<< Level2 ($level2_id_2),Info >>>2<<< subCategory Level3 Model Data Element 1 ($level3_id_3),Info >>>2<<< subCategory Level3 Model Data Element 1 ($level3_id_3),New Data Item,,Form Element 2 ($elem2_id)
+,Info >>>2<<< Level2 ($level2_id_2),Info >>>2<<< subCategory Level3 Model Data Element 1 ($level3_id_3),Info >>>2<<< subCategory Level3 Model Data Element 1 ($level3_id_3),New Data Item,,Form Element 3 ($elem3_id)
+,Info >>>2<<< Level2 ($level2_id_2),Info >>>2<<< subCategory Level3 Model Data Element 1 ($level3_id_3),Info >>>2<<< subCategory Level3 Model Data Element 1 ($level3_id_3),New Data Item,,Info >>2<< heading Level4 Model Data Element 1 ($level4_id_3)
 ,Info >>>2<<< Level2 ($level2_id_2),Info >>>2<<< subCategory Level3 Model Data Element 1 ($level3_id_3),Form Element 1 ($elem1_id),New Data Item,,contained in: Form Element 1 ($elem1_id)
 ,Info >>>2<<< Level2 ($level2_id_2),Info >>>2<<< subCategory Level3 Model Data Element 1 ($level3_id_3),Form Element 1 ($elem1_id),New Data Item,,contained in: Form Element 1 ($elem1_id)
 ,Info >>>2<<< Level2 ($level2_id_2),Info >>>2<<< subCategory Level3 Model Data Element 1 ($level3_id_3),Form Element 1 ($elem1_id),New Data Item,,contained in: Form Element 1 ($elem1_id)
@@ -105,6 +125,10 @@ class DataModelChangeLogXlsExporterSpec extends AbstractDataModelExporterSpec {
 ,Info >>>2<<< Level2 ($level2_id_2),Info >>>2<<< subCategory Level3 Model Data Element 1 ($level3_id_3),Info >>2<< heading Level4 Model Data Element 1 ($level4_id_3),New Data Item,,Form Element 6 ($elem6_id)
 ,Info >>>2<<< Level2 ($level2_id_2),Info >>>2<<< subCategory Level3 Model Data Element 1 ($level3_id_3),Info >>2<< heading Level4 Model Data Element 1 ($level4_id_3),New Data Item,,>>2<< Level5 Model Data Element 1 ($level5_id3)
 ,Info >>>2<<< Level2 ($level2_id_2),Info >>>2<<< subCategory Level3 Model Data Element 1 ($level3_id_3),Info >>2<< heading Level4 Model Data Element 1 ($level4_id_3),New Metadata,,Max Occurs: 3
+,Info >>>2<<< Level2 ($level2_id_2),Info >>>2<<< subCategory Level3 Model Data Element 2 ($level3_id_4),Info >>>2<<< subCategory Level3 Model Data Element 2 ($level3_id_4),New Data Item,,Form Element 1 ($elem1_id)
+,Info >>>2<<< Level2 ($level2_id_2),Info >>>2<<< subCategory Level3 Model Data Element 2 ($level3_id_4),Info >>>2<<< subCategory Level3 Model Data Element 2 ($level3_id_4),New Data Item,,Form Element 2 ($elem2_id)
+,Info >>>2<<< Level2 ($level2_id_2),Info >>>2<<< subCategory Level3 Model Data Element 2 ($level3_id_4),Info >>>2<<< subCategory Level3 Model Data Element 2 ($level3_id_4),New Data Item,,Form Element 3 ($elem3_id)
+,Info >>>2<<< Level2 ($level2_id_2),Info >>>2<<< subCategory Level3 Model Data Element 2 ($level3_id_4),Info >>>2<<< subCategory Level3 Model Data Element 2 ($level3_id_4),New Data Item,,Info >>2<< heading Level4 Model Data Element 2 ($level4_id_4)
 ,Info >>>2<<< Level2 ($level2_id_2),Info >>>2<<< subCategory Level3 Model Data Element 2 ($level3_id_4),Form Element 1 ($elem1_id),New Data Item,,contained in: Form Element 1 ($elem1_id)
 ,Info >>>2<<< Level2 ($level2_id_2),Info >>>2<<< subCategory Level3 Model Data Element 2 ($level3_id_4),Form Element 1 ($elem1_id),New Data Item,,contained in: Form Element 1 ($elem1_id)
 ,Info >>>2<<< Level2 ($level2_id_2),Info >>>2<<< subCategory Level3 Model Data Element 2 ($level3_id_4),Form Element 1 ($elem1_id),New Data Item,,contained in: Form Element 1 ($elem1_id)
