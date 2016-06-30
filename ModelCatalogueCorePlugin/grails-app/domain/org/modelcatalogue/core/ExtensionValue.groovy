@@ -2,7 +2,6 @@ package org.modelcatalogue.core
 
 class ExtensionValue implements Extension {
 
-
     String name
     String extensionValue
 
@@ -19,6 +18,4 @@ class ExtensionValue implements Extension {
     public String toString() {
         return "extension for ${element} (${name}=${extensionValue})"
     }
-
-
 }

@@ -371,7 +371,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
         cleanup:
         [dt2].each {
-            it.beforeDelete()
+            it.deleteRelationships()
             it.delete()
         }
     }

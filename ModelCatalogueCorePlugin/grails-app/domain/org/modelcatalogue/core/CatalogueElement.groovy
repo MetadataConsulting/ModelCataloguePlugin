@@ -5,22 +5,10 @@ import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Lists
 import grails.util.GrailsNameUtils
 import org.hibernate.proxy.HibernateProxyHelper
-import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.publishing.CloningContext
-import org.modelcatalogue.core.publishing.Published
-import org.modelcatalogue.core.publishing.Publisher
-import org.modelcatalogue.core.publishing.PublishingChain
-import org.modelcatalogue.core.publishing.PublishingContext
-import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.util.DataModelAware
-import org.modelcatalogue.core.util.ExtensionsWrapper
-import org.modelcatalogue.core.util.FriendlyErrors
-import org.modelcatalogue.core.util.HibernateHelper
-import org.modelcatalogue.core.util.Inheritance
-import org.modelcatalogue.core.util.OrderedMap
-import org.modelcatalogue.core.util.RelationshipDirection
-
 import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
+import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.publishing.*
+import org.modelcatalogue.core.util.*
 import rx.Observer
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
@@ -98,7 +86,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 		latestVersionId index :'CtlgElement_latestVersionId_idx'
         modelCatalogueId index :'CtlgElement_modelCatalogueId_idx'
         description type: "text"
-        extensions lazy: false, sort: 'orderIndex'
+        extensions lazy: false, sort: 'orderIndex', cascade: "all-delete-orphan"
         dataModel lazy: false
     }
 
@@ -226,23 +214,42 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     def beforeDelete(){
-        new HashSet(outgoingRelationships).each{ Relationship relationship->
-            relationship.beforeDelete()
-            relationship.delete(flush:true)
-        }
-        new HashSet(incomingRelationships).each{ Relationship relationship ->
-            relationship.beforeDelete()
-            relationship.delete(flush:true)
-        }
-        new HashSet(outgoingMappings).each{ Mapping mapping ->
-            mapping.beforeDelete()
-            mapping.delete(flush:true)
-        }
-        new HashSet(incomingMappings).each{ Mapping mapping ->
-            mapping.beforeDelete()
-            mapping.delete(flush:true)
-        }
         auditService.logElementDeleted(this)
+    }
+
+    /**
+     * List all relationships to this object which cannot be automatically deleted.
+     * @param toBeDeleted If deleting whole {@link DataModel}, this should be specifies. Null if item to be deleted is
+     * not {@link DataModel}.
+     * @return Map of object which needs to be manually delete. Key is {@link CatalogueElement} and value is either
+     * {@link Map} with same structure (nested relationships) or following objects:
+     * <ul>
+     *     <li>null: means the {@link CatalogueElement} is problem itself, it should be deleted manualy before deleting this</li>
+     *     <li>{@link DataModel}: means cannot delete elements which belongs to different {@link DataModel}</li>
+     *     <li>{@link Relationship}: means cannot delete relationship which belongs to different {@link DataModel}</li>
+     * </ul>
+     */
+    abstract Map<CatalogueElement, Object> manualDeleteRelationships(DataModel toBeDeleted)
+
+    /**
+     * This method deletes all related relationships which cannot be cleared automatically when object is deleted.
+     * It should be overridden by implementors if needed. Deletes all catalogue relationships: {@link #outgoingMappings},
+     * {@link #incomingRelationships}, {@link #outgoingMappings}, {@link #incomingMappings} and {@link #extensions}.
+     * @throws IllegalStateException when some manual delete of relationships needs to be done, see
+     * @{link #manualDeleteRelationships}.
+     */
+    void deleteRelationships() {
+        // manual delete as belongsTo doesn't work here...
+        // delete Relationship
+        (outgoingRelationships + incomingRelationships).each {
+            it.clearRelationships()
+            it.delete()
+        }
+        // delete Mappings
+        (outgoingMappings + incomingMappings).each {
+            it.clearRelationships()
+            it.delete()
+        }
     }
 
     boolean hasModelCatalogueId() {
@@ -462,19 +469,6 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
                     }
                 }
             }
-        }
-    }
-
-    void clearAssociationsBeforeDelete() {
-        // it is safe to remove all versioning informations
-        for (CatalogueElement e in this.supersededBy) {
-            this.removeFromSupersededBy(e)
-        }
-        for (CatalogueElement e in this.supersedes) {
-            this.removeFromSupersedes(e)
-        }
-        for (User u in this.isFavouriteOf) {
-            this.removeFromIsFavouriteOf(u)
         }
     }
 

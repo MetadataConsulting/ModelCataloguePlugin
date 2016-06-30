@@ -459,6 +459,13 @@ class RelationshipService {
         RELATIONSHIPS_COUNT_CACHE.cleanUp()
     }
 
+    void invalidateCache(CatalogueElement catalogueElement) {
+        FAVORITE_CACHE.invalidate(catalogueElement.id)
+        FAVORITE_CACHE.cleanUp()
+        RELATIONSHIPS_COUNT_CACHE.invalidate(catalogueElement.id)
+        RELATIONSHIPS_COUNT_CACHE.cleanUp()
+    }
+
     int countIncomingRelationshipsByType(CatalogueElement element, RelationshipType type) {
         getRelationshipsCounts(element).count(RelationshipDirection.INCOMING, type)
     }

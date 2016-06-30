@@ -15,20 +15,6 @@ class DataModel extends CatalogueElement {
     String semanticVersion = '0.0.1'
     String revisionNotes
 
-    /**
-     * @deprecated use model catalogue id instead
-     */
-    String getNamespace() {
-        modelCatalogueId
-    }
-
-    /**
-     * @deprecated use model catalogue id instead
-     */
-    void setNamespace(String namespace) {
-        modelCatalogueId = namespace
-    }
-
     static constraints = {
         name unique: 'versionNumber'
         semanticVersion size: 1..20, nullable: true
@@ -53,12 +39,65 @@ class DataModel extends CatalogueElement {
         super.preparePublishChain(chain).add(this.declares)
     }
 
+    @Override
+    Map<CatalogueElement, Object> manualDeleteRelationships(DataModel toBeDeleted) {
+        // inspect declarations
+        def manualDelete = declares.collectEntries {
+            // check the element for the same - if manual delete is needed
+            def relationshipManualDelete = it.manualDeleteRelationships(this)
+            if (relationshipManualDelete.size() > 0)
+                return [(it): relationshipManualDelete]
+            else
+                return [:]
+        }
+        // inspect relationships
+        manualDelete << (outgoingRelationships + incomingRelationships).collectEntries {
+            if (it.dataModel && it.dataModel != toBeDeleted)
+                return [(it.dataModel): it]
+            else
+                return [:]
+        }
+
+        return manualDelete
+    }
+
+    /**
+     * Deletes all {@link CatalogueElement}s assigned to this {@link DataModel} and then call super class method
+     * {@link CatalogueElement#deleteRelationships()}.
+     */
+    @Override
+    void deleteRelationships() {
+        // delete all declarations, in following order: DataElements, DataTypes, DataClasses and anything else
+        declares.sort { a, b ->
+            def sortMap = [(DataElement): 0, (DataType): 1, (DataClass): 2]
+            def aSort = sortMap.get(a.class) != null ? sortMap.get(a.class) : 3
+            def bSort = sortMap.get(b.class) != null ? sortMap.get(b.class) : 3
+            aSort <=> bSort
+        }.each {
+            it.deleteRelationships()
+            it.delete()
+        }
+        super.deleteRelationships()
+    }
 
     @Override
     void setModelCatalogueId(String mcID) {
         super.setModelCatalogueId(Legacy.fixModelCatalogueId(mcID))
     }
 
+    /**
+     * @deprecated use model catalogue id instead
+     */
+    String getNamespace() {
+        modelCatalogueId
+    }
+
+    /**
+     * @deprecated use model catalogue id instead
+     */
+    void setNamespace(String namespace) {
+        modelCatalogueId = namespace
+    }
 
     List<CatalogueElement> getDeclares() {
         CatalogueElement.findAllByDataModel(this)

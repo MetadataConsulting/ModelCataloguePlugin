@@ -60,8 +60,6 @@ class EnumeratedType extends DataType {
         Enumerations.from(enumAsString)
     }
 
-
-
 	 class EnumBean{
 		String name
 		String code

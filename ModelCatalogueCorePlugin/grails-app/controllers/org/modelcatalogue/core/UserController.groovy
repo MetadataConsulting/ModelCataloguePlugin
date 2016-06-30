@@ -11,11 +11,13 @@ class UserController extends AbstractCatalogueElementController<User> {
     }
 
     @Override
-    protected String getRoleForSaveAndEdit() { "ADMIN" }
+    protected boolean allowSaveAndEdit() {
+        modelCatalogueSecurityService.hasRole('ADMIN')
+    }
 
     def classifications() {
         if (!modelCatalogueSecurityService.isUserLoggedIn()) {
-            notAuthorized()
+            unauthorized()
             return
         }
 
@@ -52,5 +54,4 @@ class UserController extends AbstractCatalogueElementController<User> {
     def favourite(Long id) {
         addRelation(id, 'favourite', true, null)
     }
-
 }

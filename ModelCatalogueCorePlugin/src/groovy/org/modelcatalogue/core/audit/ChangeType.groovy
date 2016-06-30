@@ -27,7 +27,7 @@ enum ChangeType {
                 return true
             }
 
-            created.clearAssociationsBeforeDelete()
+            created.deleteRelationships()
             created.delete(flush: true)
 
             return true

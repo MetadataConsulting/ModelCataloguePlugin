@@ -62,13 +62,16 @@ class Mapping {
         "${getClass().simpleName}[id: ${id}, source: ${source}, destination: ${destination}]"
     }
 
-    def beforeDelete(){
+    /**
+     * Removes relationship from {@link #source} and {@link #destination}. This method causes {@link Mapping} object
+     * to be in inconsistent state and should be use before its delete.
+     */
+    def clearRelationships(){
         if (source) {
-            source?.removeFromOutgoingMappings(this)
+            source.removeFromOutgoingMappings(this)
         }
-        if(destination){
-            destination?.removeFromIncomingMappings(this)
+        if (destination) {
+            destination.removeFromIncomingMappings(this)
         }
     }
-
 }

@@ -48,4 +48,8 @@ class ValidationRule extends CatalogueElement {
             ]
     ]
 
+    @Override
+    Map<CatalogueElement, Object> manualDeleteRelationships(DataModel toBeDeleted) {
+        return [:]
+    }
 }

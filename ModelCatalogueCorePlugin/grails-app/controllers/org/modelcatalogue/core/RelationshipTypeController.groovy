@@ -11,8 +11,8 @@ import static org.springframework.http.HttpStatus.OK
 class RelationshipTypeController extends AbstractRestfulController<RelationshipType>{
 
     @Override
-    protected String getRoleForSaveAndEdit() {
-        "ADMIN"
+    protected boolean allowSaveAndEdit() {
+        modelCatalogueSecurityService.hasRole('ADMIN')
     }
 
     RelationshipTypeController() {
@@ -56,7 +56,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
     @Transactional
     def update() {
         if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
-            notAuthorized()
+            unauthorized()
             return
         }
         if(handleReadOnly()) {
@@ -98,6 +98,4 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
         instance.save flush:true
         respond instance, [status: OK]
     }
-
-
 }

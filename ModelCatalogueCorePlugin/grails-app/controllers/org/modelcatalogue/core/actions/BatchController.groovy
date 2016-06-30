@@ -2,7 +2,6 @@ package org.modelcatalogue.core.actions
 
 import org.modelcatalogue.core.AbstractRestfulController
 import org.modelcatalogue.core.util.lists.Lists
-import org.springframework.http.HttpStatus
 
 class BatchController extends AbstractRestfulController<Batch> {
 
@@ -11,8 +10,8 @@ class BatchController extends AbstractRestfulController<Batch> {
     static allowedMethods = [index: 'GET', actions: 'GET', run: 'POST', reactivate: 'POST', dismiss: 'POST', updateActionParameters: 'PUT', addDependency: 'POST', removeDependency: 'DELETE']
 
     @Override
-    protected String getRoleForSaveAndEdit() {
-        "ADMIN"
+    protected boolean allowSaveAndEdit() {
+        modelCatalogueSecurityService.hasRole('ADMIN')
     }
 
     BatchController() {
@@ -21,7 +20,7 @@ class BatchController extends AbstractRestfulController<Batch> {
 
     def archive() {
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            notAuthorized()
+            unauthorized()
             return
         }
 
@@ -44,7 +43,7 @@ class BatchController extends AbstractRestfulController<Batch> {
 
     def runAll() {
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            notAuthorized()
+            unauthorized()
             return
         }
 
@@ -70,7 +69,7 @@ class BatchController extends AbstractRestfulController<Batch> {
     @Override
     def index(Integer max) {
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            notAuthorized()
+            unauthorized()
             return
         }
         handleParams(max)
@@ -83,7 +82,7 @@ class BatchController extends AbstractRestfulController<Batch> {
     def updateActionParameters() {
 
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            notAuthorized()
+            unauthorized()
             return
         }
 
@@ -100,7 +99,7 @@ class BatchController extends AbstractRestfulController<Batch> {
         }
 
         if (action.state in [ActionState.PERFORMING, ActionState.PERFORMED]) {
-            render status: HttpStatus.METHOD_NOT_ALLOWED
+            methodNotAllowed()
             return
         }
         actionService.updateParameters(action, request.getJSON() as Map<String, String>)
@@ -114,7 +113,7 @@ class BatchController extends AbstractRestfulController<Batch> {
 
     def listActions(Integer max) {
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            notAuthorized()
+            unauthorized()
             return
         }
         handleParams(max)
@@ -138,7 +137,7 @@ class BatchController extends AbstractRestfulController<Batch> {
 
     def dismiss() {
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            notAuthorized()
+            unauthorized()
             return
         }
 
@@ -155,12 +154,12 @@ class BatchController extends AbstractRestfulController<Batch> {
         }
 
         actionService.dismiss(action)
-        respond status: HttpStatus.OK
+        ok()
     }
 
-    def reactivate(){
+    def reactivate() {
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            notAuthorized()
+            unauthorized()
             return
         }
         if (!params.actionId) {
@@ -176,13 +175,13 @@ class BatchController extends AbstractRestfulController<Batch> {
         }
 
         actionService.reactivate(action)
-        respond status: HttpStatus.OK
+        ok()
     }
 
 
-    def run(){
+    def run() {
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            notAuthorized()
+            unauthorized()
             return
         }
 
@@ -199,12 +198,12 @@ class BatchController extends AbstractRestfulController<Batch> {
         }
 
         actionService.run(action)
-        respond status: HttpStatus.OK
+        ok()
     }
 
     def addDependency() {
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            notAuthorized()
+            unauthorized()
             return
         }
 
@@ -233,7 +232,7 @@ class BatchController extends AbstractRestfulController<Batch> {
         ActionDependency dependency = actionService.addDependency(action, provider, params.role.toString())
 
         if (!dependency) {
-            respond status: HttpStatus.METHOD_NOT_ALLOWED
+            methodNotAllowed()
         }
 
         respond action
@@ -241,7 +240,7 @@ class BatchController extends AbstractRestfulController<Batch> {
 
     def removeDependency() {
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            notAuthorized()
+            unauthorized()
             return
         }
 

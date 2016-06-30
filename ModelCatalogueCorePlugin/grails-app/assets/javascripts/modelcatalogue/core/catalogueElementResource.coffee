@@ -1,6 +1,7 @@
 angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRoot', 'mc.util.rest', 'mc.util.enhance', 'mc.util.names']).provider 'catalogueElementResource', [ ->
   # Method for instantiating
-  @$get = ['$rootScope', 'modelCatalogueApiRoot', 'rest', 'enhance', 'names', ($rootScope, modelCatalogueApiRoot, rest, enhance, names) ->
+  @$get = ($rootScope, modelCatalogueApiRoot, rest, enhance, names, $q) ->
+    "ngInject"
     class CatalogueElementResource
       constructor: (pathName) ->
         throw "Resource pathname must be defined" if not pathName?
@@ -13,7 +14,10 @@ angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRo
         enhance rest method: 'GET', url: "#{@getIndexPath()}/uuid/#{uuid}"
 
       get: (id) ->
-        enhance rest method: 'GET', url: "#{@getIndexPath()}/#{id}"
+        promise = rest(method: 'GET', url: "#{@getIndexPath()}/#{id}").catch (response) ->
+          $rootScope.$broadcast('resourceNotFound', response) if response.status == 404
+          $q.reject(response)
+        enhance promise
 
       delete: (id) ->
         thePathName = @pathName
@@ -53,7 +57,6 @@ angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRo
         enhance rest method: 'GET', url: "#{@getIndexPath()}/search", params: params
 
     (pathName) -> new CatalogueElementResource(pathName)
-  ]
   # Always return this from CoffeeScript AngularJS factory functions!
   @
 ]

@@ -219,4 +219,9 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
     protected String getHistorySortProperty() {
         'semanticVersion'
     }
+
+    @Override
+    protected boolean allowDelete() {
+        modelCatalogueSecurityService.hasRole('ADMIN')
+    }
 }

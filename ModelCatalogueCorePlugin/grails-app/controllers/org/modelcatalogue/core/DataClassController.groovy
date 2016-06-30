@@ -19,14 +19,6 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
         super(DataClass, false)
     }
 
-    @Override
-    protected ListWithTotalAndType<DataClass> getAllEffectiveItems(Integer max) {
-        if (!params.boolean("toplevel")) {
-            return super.getAllEffectiveItems(max)
-        }
-        return Lists.wrap(params, "/${resourceName}/", dataClassService.getTopLevelDataClasses(overridableDataModelFilter, params))
-    }
-
     def referenceTypes(Integer max){
         handleParams(max)
 
@@ -142,5 +134,18 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
 
         response.setHeader("X-Asset-ID",assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
+    }
+
+    @Override
+    protected ListWithTotalAndType<DataClass> getAllEffectiveItems(Integer max) {
+        if (!params.boolean("toplevel")) {
+            return super.getAllEffectiveItems(max)
+        }
+        return Lists.wrap(params, "/${resourceName}/", dataClassService.getTopLevelDataClasses(overridableDataModelFilter, params))
+    }
+
+    @Override
+    protected boolean allowDelete() {
+        modelCatalogueSecurityService.hasRole('ADMIN')
     }
 }

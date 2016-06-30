@@ -7,24 +7,45 @@ import org.modelcatalogue.core.util.DataTypeRuleScript
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.SecuredRuleExecutor
 
-/*
-* A Data Type is like a primitive type
-* i.e. integer, string, byte, boolean, time........
-* additional types can be specified (as well as enumerated types (see EnumeratedType))
-*/
-
-
+/**
+ * A Data Type is like a primitive type
+ * i.e. integer, string, byte, boolean, time........
+ * additional types can be specified (as well as enumerated types (see EnumeratedType))
+ */
 class DataType extends CatalogueElement {
 
     String rule
 
     static constraints = {
         name size: 1..255
-
-        rule nullable:true, maxSize: 10000, validator: { val,obj ->
-            if(!val){return true}
+        rule nullable: true, maxSize: 10000, validator: { val, obj ->
+            if (!val) {
+                return true
+            }
             SecuredRuleExecutor.ValidationResult result = new SecuredRuleExecutor(DataTypeRuleScript, new Binding(x: null, dataType: obj)).validate(val)
             result ? true : ['wontCompile', result.compilationFailedMessage]
+        }
+    }
+
+    static mapping = {
+        tablePerHierarchy false
+    }
+
+    static transients = ['relatedDataElements', 'regexDef']
+
+    @Override
+    Map<CatalogueElement, Object> manualDeleteRelationships(DataModel toBeDeleted) {
+        DataElement.findAllByDataType(this).collectEntries {
+            if (toBeDeleted) {
+                // if DataModel is going to be deleted, then DataElement needs to be from same DataModel
+                if (it.dataModel != this.dataModel)
+                    return [(it): it.dataModel]
+                else
+                    return [:]
+            } else {
+                // if deletes DataType, it should not be used anywhere
+                return [(it): null]
+            }
         }
     }
 
@@ -75,12 +96,6 @@ class DataType extends CatalogueElement {
         }
         return true
     }
-
-    static mapping = {
-        tablePerHierarchy false
-    }
-
-    static transients = ['relatedDataElements', 'regexDef']
 
     static String suggestName(Set<String> suggestions) {
         if (!suggestions) {
@@ -158,6 +173,8 @@ class DataType extends CatalogueElement {
 
     @Override
     Long getFirstParentId() {
-        return getRelatedDataElements().find { it.getDataModelId() == getDataModelId() }?.getId() ?: super.getFirstParentId()
+        return getRelatedDataElements().find {
+            it.getDataModelId() == getDataModelId()
+        }?.getId() ?: super.getFirstParentId()
     }
 }
