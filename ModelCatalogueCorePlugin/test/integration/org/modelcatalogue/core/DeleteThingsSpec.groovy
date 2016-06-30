@@ -57,7 +57,7 @@ class DeleteThingsSpec extends IntegrationSpec{
         json.errors
         json.errors instanceof List
         json.errors.size() == 1
-        json.errors[0].message == "Cannot automatically delete [ground_speed [3@0.0.1] (DRAFT:PrimitiveType:3)], delete it manually or remove the relationship to it."
+        json.errors[0].message?.startsWith "Cannot automatically delete"
 
     }
 

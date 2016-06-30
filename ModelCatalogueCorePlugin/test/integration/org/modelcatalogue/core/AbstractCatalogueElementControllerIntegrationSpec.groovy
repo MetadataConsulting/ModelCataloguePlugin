@@ -168,13 +168,13 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         controller.delete()
 
         expect:
-            controller.response.text == ""
-            controller.response.status == HttpServletResponse.SC_NO_CONTENT
-            !resource.get(controller.params.id)
+        controller.response.text == ""
+        controller.response.status == HttpServletResponse.SC_NO_CONTENT
+        !resource.get(controller.params.id)
 
-            sessionFactory.currentSession.flush()
+        sessionFactory.currentSession.flush()
 
-            resourceCount == totalCount + 1L
+        resourceCount == totalCount + (resource == DataModel ? 0L : 1L)
     }
 
     @Unroll
