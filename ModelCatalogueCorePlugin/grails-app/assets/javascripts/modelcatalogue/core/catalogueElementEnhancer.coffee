@@ -10,7 +10,10 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
     if original == update
       return original
 
-    if update and angular.isFunction(update.updateFrom) and angular.isFunction(update.isInstanceOf) and update.link and update.elementType
+    if not original.minimal and original.lastUpdated == update.lastUpdated
+      return original
+
+    if update and update.link and update.elementType
       unless relaxed
         for own originalKey of original
           # keep the private fields such as number of children in tree view
@@ -39,15 +42,14 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
     $state.href('simple.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id})
 
 
-
-
-
   condition = (element) -> element.hasOwnProperty('elementType') and element.hasOwnProperty('link')
-  factory   =  (modelCatalogueApiRoot, rest, $rootScope, $state, names, enhance, serverPushUpdates) ->
+  factory   =  (modelCatalogueApiRoot, rest, $rootScope, $state, names, enhance, serverPushUpdates, $cacheFactory) ->
     "ngInject"
     catalogueElementEnhancer = (element) ->
       class CatalogueElement
         constructor: (element) ->
+          @original = element
+
           angular.extend(@, element)
 
           @defaultExcludes = ['id','elementTypeName', 'classifiedName', 'elementType', 'incomingRelationships', 'outgoingRelationships', 'link', 'mappings']
@@ -216,8 +218,8 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
           self.setupUpdateHook = ->
             if @isInstanceOf('catalogueElement')
               serverPushUpdates.subscribe "/topic/changes#{@link}", (element) =>
-                updateFrom(@, enhance(element), true)
-                $rootScope.$broadcast 'catalogueElementUpdated', @
+                updateFrom(@, element, true)
+                $rootScope.$broadcast 'catalogueElementUpdated', enhance(@)
 
           self.focus = ->
             self.execute('path').then (response) ->
@@ -233,11 +235,34 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
               $rootScope.$broadcast('expandTreeview', path)
 
 
+      cache = $cacheFactory.get('CatalogueElement')
+      cache = $cacheFactory('CatalogueElement') if not cache
+
+      cached = cache.get(element.link)
+
+      if cached
+        unless cached.original is element
+          delete element.minimal
+          cached.original = element
+          updateFrom(cached, element, true)
+        if cached.minimal
+          cached.refresh().then (full) ->
+            delete cached.minimal
+            cached.original = full
+            updateFrom(cached, full, true)
+
+        return cached
+
       # wrap original element
       enhanced = new CatalogueElement(element)
+      cache.put(element.link, enhanced)
+
+      if enhanced.minimal
+        enhanced.refresh().then (full) ->
+          updateFrom(enhanced, full, true)
+          delete enhanced.minimal
 
       enhanced.setupUpdateHook()
-
       enhanced
 
     catalogueElementEnhancer.updateFrom = updateFrom
