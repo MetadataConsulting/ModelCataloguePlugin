@@ -10,7 +10,7 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
     if original == update
       return original
 
-    if not original.minimal and original.lastUpdated == update.lastUpdated
+    if original and not original.minimal and original.lastUpdated and original.lastUpdated == update.lastUpdated
       return original
 
     if update and update.link and update.elementType
