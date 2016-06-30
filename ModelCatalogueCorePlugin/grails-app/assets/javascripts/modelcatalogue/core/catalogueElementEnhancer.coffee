@@ -241,14 +241,11 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
       cached = cache.get(element.link)
 
       if cached
-        unless cached.original is element
-          delete element.minimal
-          cached.original = element
-          updateFrom(cached, element, true)
+        delete element.minimal
+        updateFrom(cached, element, true)
         if cached.minimal
           cached.refresh().then (full) ->
             delete cached.minimal
-            cached.original = full
             updateFrom(cached, full, true)
 
         return cached
