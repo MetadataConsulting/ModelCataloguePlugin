@@ -37,6 +37,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     public static final String CLINICAL_TESTS = 'Clinical tests'
     public static final String GENERAL_RECURSIVE_CHANGELOG = 'Recurse Generic Model'
     public static final String GUIDANCE = 'Guidance'
+    public static final int COLUMN_CONTEXT_THRESHOLD = 4
     public static final ArrayList<ChangeType> TOP_LEVEL_RELATIONSHIP_TYPES = [RELATIONSHIP_DELETED, RELATIONSHIP_CREATED]
     public static final ArrayList<ChangeType> DETAIL_CHANGE_TYPES = [RELATIONSHIP_DELETED, RELATIONSHIP_CREATED, RELATIONSHIP_METADATA_UPDATED, METADATA_UPDATED, METADATA_CREATED, METADATA_DELETED, RELATIONSHIP_METADATA_CREATED, RELATIONSHIP_METADATA_DELETED, PROPERTY_CHANGED]
     public static final int CLEAN_UP_GORM_PERIOD = 100      //cleanup every 100 changelog calls - seems to be best performing
@@ -123,14 +124,24 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
     def descendModels(CatalogueElement model, lines, level, Map groupDescriptions, exclusions) {
 
         switch (level) {
-            case 1:     //ignore top Rare Disease level
+            case 1:
+                String groupDescription = "$model.name (${model.combinedVersion})"
+                log.debug("level$level $groupDescription")
+                groupDescriptions.put(2, EMPTY)     //pad for when no lower levels present
+                groupDescriptions.put(3, EMPTY)
+                groupDescriptions.put(4, EMPTY)
+                checkChangeLog(model, lines, groupDescriptions, level, DETAIL_CHANGE_TYPES)
                 break
 
-            case [2,3,4]:
-
+            case 2:
+                groupDescriptions.put(3, EMPTY)     //pad for when no lower levels present
+            case 3:
+                groupDescriptions.put(4, EMPTY)
+            case 4:
                 String groupDescription = "$model.name (${model.combinedVersion})"
                 log.info "$level $model $groupDescription --- $model.dataModel"
                 groupDescriptions.put(level, groupDescription)
+                checkChangeLog(model, lines, groupDescriptions, level, DETAIL_CHANGE_TYPES)
                 break
 
             case 5:
@@ -408,9 +419,9 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
                 changes << lvlName
             }
 
-            if([PHENOTYPE,CLINICAL_TESTS,GUIDANCE].contains(subtype)) {                   // Phenotypes/Clinical tests report format - extra cols
+            if(this instanceof RareDiseasePhenotypeChangeLogXlsExporter) {                   // Phenotypes/Clinical tests report format - extra cols
                 changes << buildElementHierachyText(level, model)
-                changes << subtype
+                changes << (subtype ?: EMPTY)
             }
 
             changes << "$model.name (${model.combinedVersion})"           // Affected Data Item
@@ -425,7 +436,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
                 changes << (after ? "$key: $after" : '')
             }
 
-            if (subtype) {          // cache detail changes
+            if(this instanceof RareDiseasePhenotypeChangeLogXlsExporter) {            // cache detail changes
                 cachedChanges.put(model.id, changes[5..-1].join(','))
             } else {
                 cachedChanges.put(model.id, changes[4..-1].join(','))
@@ -444,7 +455,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
         def hierarchyDescr = []
 
         levelNameStack.each { lvl, lvlName ->
-            if (level > lvl) {
+            if (level > lvl && lvl > COLUMN_CONTEXT_THRESHOLD) {    //ignore columns that are already on the sheet
                 hierarchyDescr << lvlName
             }
         }

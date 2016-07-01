@@ -35,7 +35,7 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
 
     @Rule TemporaryFolder temporaryFolder
 
-    String level5_guidanceid_1
+    String level1_id
     String level2_id_1,level2_id_2
     String level3_id_1, level3_id_2, level3_id_3, level3_id_4
     String level4_id_1, level4_id_2, level4_id_3, level4_id_4
@@ -49,7 +49,10 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
     String[][][] phenotypeIds = new String[2][2][15]
     String[][][] clinicalTestIds = new String[2][2][5]
     String phenotypeLevel5Id_1, phenotypeLevel5Id_2, phenotypeLevel5Id_3, phenotypeLevel5Id_4
+    String eligibLevel5Id_1, eligibLevel5Id_2, eligibLevel5Id_3, eligibLevel5Id_4
     String clinicalLevel5Id_1, clinicalLevel5Id_2, clinicalLevel5Id_3, clinicalLevel5Id_4
+    String level5_guidanceid_1, level5_guidanceid_2, level5_guidanceid_3, level5_guidanceid_4
+    String new_guidance_id
 
     // this model reflects the data mix of eligibility criteria, phenotypes & clinical tests that need to be extracted
     // by the two report generation methods it's a bit nasty looking but creates a fairly realistic model
@@ -201,6 +204,7 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
 
     //this is painful...why did I make the test data so big?
     def findDataIds() {
+        level1_id = DataClass.findByName('Dataclass Top Level 1 Root').combinedVersion
         level2_id_1 = DataClass.findByNameIlike("Disorder%1%Level2").combinedVersion
         level2_id_2 = DataClass.findByNameIlike("Disorder%2%Level2").combinedVersion
 
@@ -220,6 +224,9 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
         level5_id_4 = DataClass.findByNameIlike("Disorder%2%Level5%2").combinedVersion
 
         level5_guidanceid_1 = DataClass.findByName("Disorder >1< Guidance name 1 1").combinedVersion
+        level5_guidanceid_2 = DataClass.findByName("Disorder >1< Guidance name 1 2").combinedVersion
+        level5_guidanceid_3 = DataClass.findByName("Disorder >2< Guidance name 2 1").combinedVersion
+        level5_guidanceid_4 = DataClass.findByName("Disorder >2< Guidance name 2 2").combinedVersion
 
         level6_inclusion_1 = DataClass.findByNameIlike("Inclusion%1 1").combinedVersion
         level6_inclusion_2 = DataClass.findByNameIlike("Inclusion%1 2").combinedVersion
@@ -273,6 +280,11 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
         phenotypeLevel5Id_2 = DataClass.findByNameIlike("%Phenotypes Level5 Model 1 Data Element 2").combinedVersion
         phenotypeLevel5Id_3 = DataClass.findByNameIlike("%Phenotypes Level5 Model 2 Data Element 1").combinedVersion
         phenotypeLevel5Id_4 = DataClass.findByNameIlike("%Phenotypes Level5 Model 2 Data Element 2").combinedVersion
+
+        eligibLevel5Id_1 = DataClass.findByNameIlike("%Eligibility Level5 Model 1 Data Element 1").combinedVersion
+        eligibLevel5Id_2 = DataClass.findByNameIlike("%Eligibility Level5 Model 1 Data Element 2").combinedVersion
+        eligibLevel5Id_3 = DataClass.findByNameIlike("%Eligibility Level5 Model 2 Data Element 1").combinedVersion
+        eligibLevel5Id_4 = DataClass.findByNameIlike("%Eligibility Level5 Model 2 Data Element 2").combinedVersion
 
         clinicalLevel5Id_1 = DataClass.findByNameIlike("%Clinical tests Level5 Model 1 Data Element 1").combinedVersion
         clinicalLevel5Id_2 = DataClass.findByNameIlike("%Clinical tests Level5 Model 1 Data Element 2").combinedVersion
