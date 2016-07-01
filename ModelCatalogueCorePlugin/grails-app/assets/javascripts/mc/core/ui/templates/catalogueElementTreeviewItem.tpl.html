@@ -1,7 +1,7 @@
 <li class="catalogue-element-treeview-item">
   <div class="catalogue-element-treeview-text-content" ng-class="{'active': node.active, 'archived': element.$$archived}">
     <span class="badge pull-right" ng-if="node.numberOfChildren" ng-switch="node.numberOfChildren">
-      <span ng-switch-default>{{::node.numberOfChildren}}</span>
+      <span ng-switch-default>{{node.numberOfChildren}}</span>
       <span ng-switch-when="2147483647" class="fa fa-question fa-inverse"></span>
     </span>
     <span class="catalogue-element-treeview-labels">
@@ -51,8 +51,8 @@
     </span>
   </div>
   <ul ng-if="node.children" ng-hide="node.collapsed" class="catalogue-element-treeview-list">
-    <catalogue-element-treeview-item treeview="::treeview" sly-repeat="child in node.children" extra-parameters="::{'path': path}"
-                                     element="child"></catalogue-element-treeview-item>
+    <catalogue-element-treeview-item extra-parameters="::{'path': path}" element="child" treeview="::treeview"
+                                     ng-repeat="child in node.children track by child.link"></catalogue-element-treeview-item>
     <li ng-if="node.numberOfChildren > node.children.length" class="catalogue-element-treeview-item">
       <span class="catalogue-element-treeview-labels" ng-click="node.showMore()">
         <a class="catalogue-element-treeview-icon btn btn-link catalogue-element-treeview-show-more"
