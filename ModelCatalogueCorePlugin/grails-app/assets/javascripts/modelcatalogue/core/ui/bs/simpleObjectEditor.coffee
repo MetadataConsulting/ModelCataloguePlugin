@@ -3,8 +3,8 @@ angular.module('mc.core.ui.bs.simpleObjectEditor', ['mc.core.ui.simpleObjectEdit
       <table class="soe-table table">
         <thead ng-if="title || valueTitle">
           <th></th>
-          <th class="col-md-6 col-sm-5 soe-table-property-key">{{title}}</th>
-          <th class="col-md-5 col-sm-5 soe-table-property-value ">{{valueTitle}}</th>
+          <th class="col-md-6 col-sm-5 soe-table-property-key">{{::title}}</th>
+          <th class="col-md-5 col-sm-5 soe-table-property-value ">{{::valueTitle}}</th>
           <th class="col-md-1 col-sm-2 soe-table-property-actions">
             <!-- to allow submitting forms with only this editor within -->
             <input type="submit" class="hide">
