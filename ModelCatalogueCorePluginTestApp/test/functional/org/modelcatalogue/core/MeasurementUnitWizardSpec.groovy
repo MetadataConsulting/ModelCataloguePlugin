@@ -1,4 +1,6 @@
-package org.modelcatalogue.core.b
+package org.modelcatalogue.core
+
+import org.modelcatalogue.core.geb.Common
 
 import static org.modelcatalogue.core.geb.Common.*
 

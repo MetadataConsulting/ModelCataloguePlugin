@@ -6,7 +6,7 @@ import groovy.transform.stc.FromString
 
 class NavigatorCondition {
 
-    private static final int NUM_OF_RETRIES = 5
+    private static final int NUM_OF_RETRIES = 6
 
     final AbstractModelCatalogueGebSpec spec
     final Closure<Navigator> navigator
