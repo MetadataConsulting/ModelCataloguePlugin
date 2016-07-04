@@ -1,13 +1,12 @@
 package org.modelcatalogue.core
 
-import com.google.common.cache.Cache
-import com.google.common.cache.CacheBuilder
 import com.google.common.collect.ImmutableMap
 import com.google.common.util.concurrent.UncheckedExecutionException
 import grails.util.GrailsNameUtils
 import org.apache.log4j.Logger
 import org.codehaus.groovy.grails.exceptions.DefaultStackTraceFilterer
 import org.codehaus.groovy.grails.exceptions.StackTraceFilterer
+import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.rx.ErrorSubscriber
 import org.modelcatalogue.core.util.RelationshipTypeRuleScript
 import org.modelcatalogue.core.util.SecuredRuleExecutor
@@ -15,13 +14,6 @@ import org.modelcatalogue.core.util.SecuredRuleExecutor
 import java.util.concurrent.Callable
 
 class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
-
-    private static final Cache<String, Long> typesCache = CacheBuilder.newBuilder().initialCapacity(20).build()
-
-    static void clearCache() {
-        typesCache.invalidateAll()
-        typesCache.cleanUp()
-    }
 
     def relationshipTypeService
     def modelCatalogueSearchService
@@ -243,7 +235,7 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
             return declarationType
         }
         try {
-            Long id = typesCache.get(name, { ->
+            Long id = CacheService.TYPES_CACHE.get(name, { ->
                 RelationshipType type = RelationshipType.findByName(name, [cache: true, readOnly: true])
                 if (!type) {
                     throw new IllegalArgumentException("Type '$name' does not exist!")
@@ -257,7 +249,7 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
             }
             type = RelationshipType.findByName(name)
             if (type) {
-                typesCache.asMap().put(name, type.id)
+                CacheService.TYPES_CACHE.asMap().put(name, type.id)
                 return type
             }
             return null
@@ -287,23 +279,23 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
     }
 
     def afterInsert() {
-        typesCache.put name, getId()
+        CacheService.TYPES_CACHE.put name, getId()
         modelCatalogueSearchService.index(this).subscribe(ErrorSubscriber.create("Exception indexing relationship type after insert"))
     }
 
     def beforeUpdate() {
         relationshipTypeService.clearCache()
-        typesCache.invalidate(name)
+        CacheService.TYPES_CACHE.invalidate(name)
     }
 
     def afterUpdate() {
-        typesCache.put name, getId()
+        CacheService.TYPES_CACHE.put name, getId()
         modelCatalogueSearchService.index(this).subscribe(ErrorSubscriber.create("Exception indexing relationship type after update"))
     }
 
     def beforeDelete() {
         relationshipTypeService.clearCache()
-        typesCache.invalidate(name)
+        CacheService.TYPES_CACHE.invalidate(name)
         modelCatalogueSearchService.unindex(this).subscribe(ErrorSubscriber.create("Exception unindexing relationship type before delete"))
     }
 

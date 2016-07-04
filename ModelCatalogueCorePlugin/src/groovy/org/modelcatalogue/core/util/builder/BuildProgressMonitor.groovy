@@ -1,10 +1,9 @@
 package org.modelcatalogue.core.util.builder
 
-import com.google.common.cache.Cache
-import com.google.common.cache.CacheBuilder
 import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.StackTraceUtils
+import org.modelcatalogue.core.cache.CacheService
 import org.springframework.messaging.core.MessageSendingOperations
 import rx.subjects.PublishSubject
 
@@ -17,21 +16,20 @@ class BuildProgressMonitor implements Serializable, ProgressMonitor {
 
     static BuildProgressMonitor create(String name, key) {
         BuildProgressMonitor monitor = new BuildProgressMonitor(name, key?.toString())
-        MONITORS_CACHE.put(key?.toString(), monitor)
+        CacheService.MONITORS_CACHE.put(key?.toString(), monitor)
         monitor
     }
 
     static BuildProgressMonitor get(key) {
-        MONITORS_CACHE.getIfPresent(key?.toString())
+        CacheService.MONITORS_CACHE.getIfPresent(key?.toString())
     }
 
     static BuildProgressMonitor remove(key) {
-        BuildProgressMonitor monitor = MONITORS_CACHE.getIfPresent(key?.toString())
-        MONITORS_CACHE.invalidate(key?.toString())
+        BuildProgressMonitor monitor = CacheService.MONITORS_CACHE.getIfPresent(key?.toString())
+        CacheService.MONITORS_CACHE.invalidate(key?.toString())
         return monitor
     }
 
-    private static final Cache<String, BuildProgressMonitor> MONITORS_CACHE = CacheBuilder.newBuilder().initialCapacity(20).expireAfterAccess(1, TimeUnit.DAYS).build()
 
     private final String name
     private final String key

@@ -1,7 +1,5 @@
 package org.modelcatalogue.core
 
-import com.google.common.cache.Cache
-import com.google.common.cache.CacheBuilder
 import com.google.common.collect.ImmutableList
 import grails.gorm.DetachedCriteria
 import grails.util.Environment
@@ -11,6 +9,7 @@ import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.audit.AuditService
+import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.publishing.CloningContext
 import org.modelcatalogue.core.publishing.DraftChain
@@ -28,8 +27,6 @@ import rx.Observer
 
 class ElementService implements Publisher<CatalogueElement> {
 
-    private static final Cache<Long, Integer> VERSION_COUNT_CACHE = CacheBuilder.newBuilder().initialCapacity(1000).build()
-    private static Cache<Class, List<Class>> subclassesCache = CacheBuilder.newBuilder().initialCapacity(20).build()
 
     static transactional = false
 
@@ -56,8 +53,6 @@ class ElementService implements Publisher<CatalogueElement> {
         resource.countByStatusInList(getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')))
     }
 
-
-
     public DataModel createDraftVersion(DataModel dataModel, String newSemanticVersion, DraftContext context) {
         dataModel.checkNewSemanticVersion(newSemanticVersion)
 
@@ -77,7 +72,7 @@ class ElementService implements Publisher<CatalogueElement> {
                 }
 
                 // TODO: better target the changes
-                VERSION_COUNT_CACHE.invalidateAll()
+                CacheService.VERSION_COUNT_CACHE.invalidateAll()
 
                 return draft
             }
@@ -683,7 +678,7 @@ class ElementService implements Publisher<CatalogueElement> {
             return 1
         }
 
-        Integer count = VERSION_COUNT_CACHE.getIfPresent(id)
+        Integer count = CacheService.VERSION_COUNT_CACHE.getIfPresent(id)
 
         if (count == null) {
             if (!catalogueElement.getLatestVersionId()) {
@@ -691,24 +686,15 @@ class ElementService implements Publisher<CatalogueElement> {
             } else {
                 count = CatalogueElement.countByLatestVersionId(catalogueElement.getLatestVersionId())
             }
-            VERSION_COUNT_CACHE.put(id, count)
+            CacheService.VERSION_COUNT_CACHE.put(id, count)
         }
 
         return count
     }
 
-    static void clearCache() {
-        VERSION_COUNT_CACHE.invalidateAll()
-        VERSION_COUNT_CACHE.cleanUp()
-    }
-
-    void invalidateCache(CatalogueElement catalogueElement) {
-        VERSION_COUNT_CACHE.invalidate(catalogueElement.id)
-        VERSION_COUNT_CACHE.cleanUp()
-    }
 
     List<Class> collectSubclasses(Class<?> resource) {
-        subclassesCache.get(resource) {
+        CacheService.SUBCLASSES_CACHE.get(resource) {
             GrailsDomainClass domainClass = grailsApplication.getDomainClass(resource.name) as GrailsDomainClass
 
             if (domainClass.hasSubClasses()) {

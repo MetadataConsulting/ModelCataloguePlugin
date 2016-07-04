@@ -4,6 +4,7 @@ import org.codehaus.groovy.grails.io.support.PathMatchingResourcePatternResolver
 import org.codehaus.groovy.grails.io.support.Resource
 import org.grails.datastore.gorm.GormStaticApi
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.TestDataHelper
@@ -17,6 +18,7 @@ class InitCatalogueService {
     def dataModelService
     def elementService
     def sessionFactory
+    def cacheService
 
     def initCatalogue(boolean test = false){
         Closure init = {
@@ -75,11 +77,7 @@ class InitCatalogueService {
     }
 
     def initDefaultRelationshipTypes() {
-
-        RelationshipType.clearCache()
-        RelationshipService.clearCache()
-        ElementService.clearCache()
-
+        cacheService.clearCache()
         def defaultDataTypes = grailsApplication.config.modelcatalogue.defaults.relationshiptypes
 
         for (Map definition in defaultDataTypes) {

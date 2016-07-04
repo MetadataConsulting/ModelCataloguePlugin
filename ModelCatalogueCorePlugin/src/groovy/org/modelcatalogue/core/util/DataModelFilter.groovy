@@ -1,25 +1,16 @@
 package org.modelcatalogue.core.util
 
-import com.google.common.cache.Cache
-import com.google.common.cache.CacheBuilder
 import com.google.common.collect.ImmutableSet
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
-
-import java.util.concurrent.TimeUnit
 
 class DataModelFilter {
 
     public static final DataModelFilter NO_FILTER = new DataModelFilter(false)
 
-    private static final Cache<Long, DataModelFilter> filtersCache = CacheBuilder
-            .newBuilder()
-            .initialCapacity(10)
-            .maximumSize(100)
-            .expireAfterAccess(1, TimeUnit.HOURS)
-            .build()
 
     private static final String UNCLASSIFIED_ONLY_KEY = '$unclassifiedOnly'
     private static final String EXCLUDE_KEY = '$exclude'
@@ -82,7 +73,7 @@ class DataModelFilter {
             return NO_FILTER
         }
 
-        filtersCache.get(user.getId()) {
+        CacheService.FILTERS_CACHE.get(user.getId()) {
             if (user.ext[UNCLASSIFIED_ONLY_KEY]) {
                 return new DataModelFilter(true)
             }
@@ -138,7 +129,7 @@ class DataModelFilter {
             user.addToFilteredBy DataModel.get(id), metadata: [(EXCLUDE_KEY): 'true']
         }
 
-        filtersCache.put(user.getId(), this)
+        CacheService.FILTERS_CACHE.put(user.getId(), this)
     }
 
     Map<String, Object> toMap() {

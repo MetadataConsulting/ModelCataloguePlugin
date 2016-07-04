@@ -5,6 +5,7 @@ import grails.gorm.DetachedCriteria
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
@@ -14,14 +15,8 @@ import org.modelcatalogue.core.util.lists.ListWithTotal
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
 
-
-import com.google.common.cache.Cache
-import com.google.common.cache.CacheBuilder
-
 class RelationshipService {
 
-    private static final Cache<Long, Set<Long>> FAVORITE_CACHE = CacheBuilder.newBuilder().initialCapacity(20).build()
-    private static final Cache<Long, RelationshipsCounts> RELATIONSHIPS_COUNT_CACHE = CacheBuilder.newBuilder().initialCapacity(1000).build()
 
     static final long INDEX_STEP = 1000
 
@@ -199,11 +194,11 @@ class RelationshipService {
         }
 
         if (relationshipDefinition.relationshipType == RelationshipType.favouriteType) {
-            FAVORITE_CACHE.invalidate(relationshipDefinition.source.getId())
+            CacheService.FAVORITE_CACHE.invalidate(relationshipDefinition.source.getId())
         }
 
-        RELATIONSHIPS_COUNT_CACHE.invalidate(relationshipDefinition.source.getId())
-        RELATIONSHIPS_COUNT_CACHE.invalidate(relationshipDefinition.destination.getId())
+        CacheService.RELATIONSHIPS_COUNT_CACHE.invalidate(relationshipDefinition.source.getId())
+        CacheService.RELATIONSHIPS_COUNT_CACHE.invalidate(relationshipDefinition.destination.getId())
 
         relationshipInstance
     }
@@ -337,11 +332,11 @@ class RelationshipService {
             }
 
             if (relationshipType == RelationshipType.favouriteType) {
-                FAVORITE_CACHE.invalidate(source.getId())
+                CacheService.FAVORITE_CACHE.invalidate(source.getId())
             }
 
-            RELATIONSHIPS_COUNT_CACHE.invalidate(source.getId())
-            RELATIONSHIPS_COUNT_CACHE.invalidate(destination.getId())
+            CacheService.RELATIONSHIPS_COUNT_CACHE.invalidate(source.getId())
+            CacheService.RELATIONSHIPS_COUNT_CACHE.invalidate(destination.getId())
 
             if (relationshipType.bidirectional) {
                 unlink relationshipInstance.destination, relationshipInstance.source, relationshipType, dataModel, ignoreRules, expectedMetadata
@@ -435,7 +430,7 @@ class RelationshipService {
 
     boolean isFavorite(CatalogueElement el) {
         if (modelCatalogueSecurityService.currentUser) {
-            Set<Long> favorites = FAVORITE_CACHE.getIfPresent(modelCatalogueSecurityService.currentUser.getId())
+            Set<Long> favorites = CacheService.FAVORITE_CACHE.getIfPresent(modelCatalogueSecurityService.currentUser.getId())
             if (favorites == null) {
                 RelationshipType favorite = RelationshipType.favouriteType
                 if (!favorite) {
@@ -444,26 +439,11 @@ class RelationshipService {
                 favorites = Relationship.where {
                     relationshipType == favorite && source == modelCatalogueSecurityService.currentUser
                 }.list().collect { it.destination.id }.toSet()
-                FAVORITE_CACHE.put(modelCatalogueSecurityService.currentUser.getId(), favorites)
+                CacheService.FAVORITE_CACHE.put(modelCatalogueSecurityService.currentUser.getId(), favorites)
             }
             return el.getId() in favorites
         }
         return false
-    }
-
-    static void clearCache() {
-        FAVORITE_CACHE.invalidateAll()
-        FAVORITE_CACHE.cleanUp()
-
-        RELATIONSHIPS_COUNT_CACHE.invalidateAll()
-        RELATIONSHIPS_COUNT_CACHE.cleanUp()
-    }
-
-    void invalidateCache(CatalogueElement catalogueElement) {
-        FAVORITE_CACHE.invalidate(catalogueElement.id)
-        FAVORITE_CACHE.cleanUp()
-        RELATIONSHIPS_COUNT_CACHE.invalidate(catalogueElement.id)
-        RELATIONSHIPS_COUNT_CACHE.cleanUp()
     }
 
     int countIncomingRelationshipsByType(CatalogueElement element, RelationshipType type) {
@@ -483,11 +463,11 @@ class RelationshipService {
         if (!el.getId()) {
             return RelationshipsCounts.EMPTY
         }
-        RelationshipsCounts counts = RELATIONSHIPS_COUNT_CACHE.getIfPresent(el.getId())
+        RelationshipsCounts counts = CacheService.RELATIONSHIPS_COUNT_CACHE.getIfPresent(el.getId())
 
         if ((!counts)) {
             counts = prepareCounts(el)
-            RELATIONSHIPS_COUNT_CACHE.put(el.getId(), counts)
+            CacheService.RELATIONSHIPS_COUNT_CACHE.put(el.getId(), counts)
         }
 
         return counts

@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import grails.test.spock.IntegrationSpec
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
+import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.TestDataHelper
@@ -16,7 +17,7 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
     def fixtures
     def initCatalogueService
     def sessionFactory
-    def relationshipTypeService
+    def cacheService
 
     void loadMarshallers() {
         def springContext = WebApplicationContextUtils.getWebApplicationContext( ServletContextHolder.servletContext )
@@ -28,16 +29,12 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
         TestDataHelper.initFreshDb(sessionFactory, 'reltypes.sql') {
             initCatalogueService.initDefaultRelationshipTypes()
         }
-        relationshipTypeService.clearCache()
-        RelationshipType.clearCache()
-        ElementService.VERSION_COUNT_CACHE.invalidateAll()
+        cacheService.clearCache()
     }
 
     void initCatalogue(){
         initCatalogueService.initCatalogue(true)
-        relationshipTypeService.clearCache()
-        RelationshipType.clearCache()
-        ElementService.VERSION_COUNT_CACHE.invalidateAll()
+        cacheService.clearCache()
     }
 
     void loadFixtures(){
@@ -45,9 +42,7 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
             initCatalogueService.initDefaultRelationshipTypes()
             fixtures = fixtureLoader.load("assets/*", "batches/*", "dataTypes/*", "enumeratedTypes/*", "measurementUnits/*", "models/*", "relationshipTypes/*", "dataModelPolicies/*", "classifications/*").load("actions/*", "users/*", "referenceTypes/*", "primitiveTypes/*").load("dataElements/*", "validationRules/*").load("extensions/*", "mappings/*").load("csvTransformations/*")
         }
-        relationshipTypeService.clearCache()
-        RelationshipType.clearCache()
-        ElementService.VERSION_COUNT_CACHE.invalidateAll()
+        cacheService.clearCache()
     }
 
     /**

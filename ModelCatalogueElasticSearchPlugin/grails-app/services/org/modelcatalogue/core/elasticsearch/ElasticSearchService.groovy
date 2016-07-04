@@ -1,7 +1,5 @@
 package org.modelcatalogue.core.elasticsearch
 
-import com.google.common.cache.Cache
-import com.google.common.cache.CacheBuilder
 import com.google.common.collect.ImmutableSet
 import grails.util.GrailsNameUtils
 import groovy.json.JsonSlurper
@@ -28,6 +26,7 @@ import org.elasticsearch.node.Node
 import org.elasticsearch.node.NodeBuilder
 import org.elasticsearch.threadpool.ThreadPool
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.elasticsearch.rx.RxElastic
 import org.modelcatalogue.core.rx.RxService
 import org.modelcatalogue.core.security.User
@@ -41,7 +40,6 @@ import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
-import static rx.Observable.concat
 import static rx.Observable.from
 import static rx.Observable.just
 
@@ -49,7 +47,6 @@ class ElasticSearchService implements SearchCatalogue {
 
     static transactional = false
 
-    private static Cache<String, Map<String, Map>> mappingsCache = CacheBuilder.newBuilder().initialCapacity(20).build()
 
     private static final int ELEMENTS_PER_BATCH = readFromEnv('MC_ES_ELEMENTS_PER_BATCH', 10)
     private static final int DELAY_AFTER_BATCH = readFromEnv('MC_ES_DELAY_AFTER_BATCH', 25)
@@ -447,7 +444,7 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     Map<String, Map> getMapping(Class clazz, Class implementation) {
-        mappingsCache.get("$clazz=>$implementation") {
+        CacheService.MAPPINGS_CACHE.get("$clazz=>$implementation") {
             getMappingInternal(clazz, implementation)
         }
     }
