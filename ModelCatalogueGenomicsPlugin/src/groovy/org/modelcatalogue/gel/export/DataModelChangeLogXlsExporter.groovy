@@ -1,5 +1,7 @@
 package org.modelcatalogue.gel.export
 
+import groovy.time.TimeCategory
+import groovy.time.TimeDuration
 import groovy.util.logging.Log4j
 import org.modelcatalogue.builder.spreadsheet.api.AutoKeyword
 import org.modelcatalogue.builder.spreadsheet.api.Sheet
@@ -38,15 +40,38 @@ class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
 
     @Override
     public void export(CatalogueElement dataModel, OutputStream out) {
-
+        def timeStart = new Date()
         List<DataClass> dataClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.includes((DataModel) dataModel)).items
 
-        if (dataClasses.size() > 0) {
-            exportXls(dataClasses?.get(0), out, DATA_SPEC_SHEET) // this report is dataClass centric
-        } else {
+        switch (dataClasses.size()) {
+
+        case 0:
             exportLinesAsXls DATA_SPEC_SHEET, [], out
+            break;
+        case 1:
+            exportXls(dataClasses?.get(0), out, DATA_SPEC_SHEET)
+            break;
+        default:    //multiple top level dataClasses
+            List<String> lines = buildContent(dataClasses)
+            exportLinesAsXls DATA_SPEC_SHEET, lines, out
+            TimeDuration elapsed = TimeCategory.minus(new Date(), timeStart)
+            log.info "multiple dataClass stats: export took=$elapsed itemcount=$itemCount visitedModels (excludes previously visited) ${visitedModels.size()} cached models ${cachedChanges.size()}"
+            log.info "Exported ${dataModel.name} (${dataModel.combinedVersion}) as xls spreadsheet"
+
+            break;
         }
+
     }
+
+    List<String> buildContent(List<DataClass> dataClasses) {
+        def lines = []
+        dataClasses.each{dataClass ->
+//            lines << buildContentRows(dataClass)
+            lines.addAll(buildContentRows(dataClass))
+        }
+        return lines
+    }
+
 
     @Override
     void buildSheet(Sheet sheet, List lines) {
