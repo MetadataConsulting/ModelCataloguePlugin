@@ -243,21 +243,11 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
       if cached
         delete element.minimal
         updateFrom(cached, element, true)
-        if cached.minimal
-          cached.refresh().then (full) ->
-            delete cached.minimal
-            updateFrom(cached, full, true)
-
         return cached
 
       # wrap original element
       enhanced = new CatalogueElement(element)
       cache.put(element.link, enhanced)
-
-      if enhanced.minimal
-        enhanced.refresh().then (full) ->
-          updateFrom(enhanced, full, true)
-          delete enhanced.minimal
 
       enhanced.setupUpdateHook()
       enhanced
