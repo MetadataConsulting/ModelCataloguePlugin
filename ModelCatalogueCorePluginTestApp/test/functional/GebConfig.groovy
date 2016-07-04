@@ -57,7 +57,15 @@ environments {
         def chromeDriver = new File('test/drivers/chrome/chromedriver')
         downloadDriver(chromeDriver, "http://chromedriver.storage.googleapis.com/2.22/chromedriver_mac32.zip")
         System.setProperty('webdriver.chrome.driver', chromeDriver.absolutePath)
-        driver = { new ChromeDriver() }
+        driver = {
+            DesiredCapabilities caps = DesiredCapabilities.chrome();
+            LoggingPreferences logPrefs = new LoggingPreferences();
+            logPrefs.enable(LogType.BROWSER, Level.ALL);
+            logPrefs.enable(LogType.CLIENT, Level.ALL);
+            logPrefs.enable(LogType.DRIVER, Level.ALL);
+            caps.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
+            new ChromeDriver(caps);
+        }
     }
 
     sauce {
