@@ -41,6 +41,7 @@ import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
+import static rx.Observable.concat
 import static rx.Observable.from
 import static rx.Observable.just
 
@@ -381,29 +382,33 @@ class ElasticSearchService implements SearchCatalogue {
                     }.onErrorReturn { error ->
                         log.debug "Exception deleting index $indexName: $error"
                         return false
-                    }
+                    }.concatWith(unindexInternal(session, object))
                 }
                 return just(true)
             }
         }
         if (CatalogueElement.isAssignableFrom(clazz) || Relationship.isAssignableFrom(clazz) || RelationshipType.isAssignableFrom(clazz)) {
-            Object element = object
-            return from(getIndices(element)).flatMap { idx ->
-                indexExists(session, just(idx)).flatMap { response ->
-                    if (response.exists) {
-                        return RxElastic.from(client.prepareDelete(idx, getTypeName(clazz), "${element.getId()}")).map {
-                            log.debug "Unindexed $element from $idx"
-                            it.found
-                        }.onErrorReturn { error ->
-                            log.debug "Exception unindexing $element: $error"
-                            return false
-                        }
-                    }
-                    return just(true)
-                }
-            }
+            unindexInternal(session, object)
+
         }
         return just(false)
+    }
+
+    private Observable<Boolean> unindexInternal(IndexingSession session, Object element) {
+        return from(getIndices(element)).flatMap { idx ->
+            indexExists(session, just(idx)).flatMap { response ->
+                if (response.exists) {
+                    return RxElastic.from(client.prepareDelete(idx, getTypeName(getEntityClass(element)), "${element.getId()}")).map {
+                        log.debug "Unindexed $element from $idx"
+                        it.found
+                    }.onErrorReturn { error ->
+                        log.debug "Exception unindexing $element: $error"
+                        return false
+                    }
+                }
+                return just(true)
+            }
+        }
     }
 
     @Override

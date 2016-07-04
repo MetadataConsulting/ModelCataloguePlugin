@@ -30,3 +30,5 @@ rm -f  ModelCatalogueCorePlugin/grails-app/assets/bower_components/ace-builds/*.
 rm -f  ModelCatalogueCorePlugin/grails-app/assets/bower_components/angular-file-saver/gulpfile.babel.js
 rm -rf ModelCatalogueCorePlugin/grails-app/assets/bower_components/angular-file-saver/src
 rm -rf ModelCatalogueCorePlugin/grails-app/assets/bower_components/angular-file-saver/docs
+rm -rf ModelCatalogueCorePlugin/grails-app/assets/bower_components/sly-repeat/scripts
+rm -rf ModelCatalogueCorePlugin/grails-app/assets/bower_components/sly-repeat/src

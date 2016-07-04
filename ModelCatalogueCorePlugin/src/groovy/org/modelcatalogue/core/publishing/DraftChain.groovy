@@ -56,11 +56,13 @@ class DraftChain extends PublishingChain {
             createDraft(element, draftDataModel, publisher, monitor)
         }
 
-        monitor.onNext("\nDraft data model available: <a class='new-version-link' href='#/$draftDataModel.id/dataModel/$draftDataModel.id/'>$draftDataModel</a>")
 
         if (!draftDataModel.hasErrors()) {
+            monitor.onNext("Copying relationships (this may take a while")
             context.resolvePendingRelationships()
         }
+
+        monitor.onNext("\nDraft data model available: <a class='new-version-link' href='#/$draftDataModel.id/dataModel/$draftDataModel.id/'>$draftDataModel</a>")
 
         return draftDataModel
     }

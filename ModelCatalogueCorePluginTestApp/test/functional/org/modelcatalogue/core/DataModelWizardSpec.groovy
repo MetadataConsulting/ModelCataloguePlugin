@@ -28,9 +28,8 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
     static final String modalFeedback = '.messages-modal-feedback'
     static final String feedback = '.messages-modal-feedback pre'
 
-
     def "go to login"() {
-        login Common.admin
+        login admin
 
         expect:
         waitFor(120) { browser.title == 'Data Models' }
@@ -40,7 +39,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         def uuid = UUID.randomUUID().toString()
 
-        click Common.createNewDataModel
+        click createNewDataModel
 
         expect: 'the model dialog opens'
         check classificationWizzard displayed
@@ -72,17 +71,17 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         click exitButton
-        check Common.closeGrowlMessage gone
+        check closeGrowlMessage gone
 
         then:
-        check Common.rightSideTitle is "New Data Model $uuid 0.0.1"
+        check rightSideTitle is "New Data Model $uuid 0.0.1"
     }
 
     def "finalize element"() {
-        check Common.backdrop gone
+        check backdrop gone
 
         setup: "fill required data for finalization"
-        click Common.inlineEdit
+        click inlineEdit
         fill 'metadata-authors' with 'Neville Chamberlain'
         fill 'metadata-reviewers' with 'Édouard Daladier'
         fill 'metadata-owner' with 'Jan Hus'
@@ -90,15 +89,15 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         fill metadataApproved with '29/04/2016'
         fill 'metadata-namespace' with 'Namespace'
         fill 'metadata-organization' with 'Organization'
-        3.times { scroll Common.up }
-        click Common.inlineEditSubmit
+        3.times { scroll up }
+        click inlineEditSubmit
         check "input[name='name']" gone
 
         when: "finalize is clicked"
-        click Common.finalize
+        click finalize
 
         then: "modal prompt is displayed"
-        check Common.modalDialog displayed
+        check modalDialog displayed
 
         when: "ok is clicked"
         fill 'semanticVersion' with '1.0.0'
@@ -110,19 +109,19 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         check feedback contains 'COMPLETED SUCCESSFULLY'
 
         when:
-        click Common.modalPrimaryButton
+        click modalPrimaryButton
 
         then: "the element is finalized"
-        check Common.status has 'label-primary'
+        check status has 'label-primary'
     }
 
     def "create new version of the element"() {
-        check Common.backdrop gone
+        check backdrop gone
         when: "new version is clicked"
-        click Common.newVersion
+        click newVersion
 
         then: "modal prompt is displayed"
-        check Common.modalDialog displayed
+        check modalDialog displayed
 
         when: "ok is clicked"
         fill 'semanticVersion' with '1.0.1'
@@ -135,47 +134,102 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         click '.new-version-link'
-        click Common.modalPrimaryButton
+        click modalPrimaryButton
 
         then:
-        check Common.status has 'label-warning'
+        check status has 'label-warning'
     }
 
     def "deprecate the data model"() {
         waitUntilModalClosed()
         when: "deprecate action is clicked"
-        click Common.archive
+        click archive
 
         then: "modal prompt is displayed"
-        check Common.confirm displayed
+        check confirm displayed
 
         when: "ok is clicked"
-        click Common.OK
+        click OK
 
         then: "the element is now deprecated"
-        check Common.status has 'label-danger'
+        check status has 'label-danger'
 
     }
 
-    /**
-     * Currently not supported - in future deleting whole data model should simply delete all its content
-     */
-    @Ignore
-    def "hard delete the data model"() {
-        check Common.backdrop gone
+    def "create new data model, hard delete the data model and create new with the same name"() {
+        given:
+            def uuid = UUID.randomUUID().toString()
+
+        when:
+            login admin
+            click createNewDataModel
+
+        then: 'the model dialog opens'
+            check classificationWizzard displayed
+
+        when:
+            fill name with "New Data Model $uuid"
+            fill modelCatalogueId with "http://www.example.com/$uuid"
+            fill description with "Description of Data Model"
+
+        then:
+            check stepFinish enabled
+
+        when:
+            click stepFinish
+
+        then:
+            check '#summary' is "Data Model New Data Model $uuid created"
+
+        when:
+            click exitButton
+            check closeGrowlMessage gone
+
+        then:
+            check rightSideTitle is "New Data Model $uuid 0.0.1"
+
+        check backdrop gone
         when: "delete action is clicked"
-        click Common.delete
+            click delete
 
         then: "modal prompt is displayed"
-        check Common.confirm displayed
+            check confirm displayed
 
         when: "ok is clicked"
-        click Common.OK
+            click OK
 
         then: "you are redirected to the data models page"
-        waitFor(120) { browser.title == 'Data Models' }
+            waitFor(120) { browser.title == 'Data Models' }
 
+        when: "you try to create the data model with the same name"
+
+            click createNewDataModel
+
+        then: 'the model dialog opens'
+            check classificationWizzard displayed
+
+        when:
+            fill name with "New Data Model $uuid"
+            fill modelCatalogueId with "http://www.example.com/$uuid"
+            fill description with "Description of Data Model"
+
+        then:
+            check stepFinish enabled
+
+        when:
+            click stepFinish
+
+        then:
+            check '#summary' is "Data Model New Data Model $uuid created"
+
+        when:
+            click exitButton
+            check closeGrowlMessage gone
+
+        then:
+            check rightSideTitle is "New Data Model $uuid 0.0.1"
     }
+
 
 
 }

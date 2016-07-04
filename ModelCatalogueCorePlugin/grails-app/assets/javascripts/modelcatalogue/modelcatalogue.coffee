@@ -12,6 +12,7 @@
 #= require angular-xeditable/dist/js/xeditable
 #= require angular-ui-ace/ui-ace
 #= require angular-file-saver/dist/angular-file-saver
+#= require sly-repeat/scalyr.js
 #= require_self
 #= require_full_tree .
 #= require mc/index
@@ -29,6 +30,7 @@ modules = [
   'xeditable'
   'ui.ace'
   'ngFileSaver'
+  'sly'
 ]
 
 modelcatalogue =
