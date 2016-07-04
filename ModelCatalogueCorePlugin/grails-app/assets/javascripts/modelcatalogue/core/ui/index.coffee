@@ -26,6 +26,4 @@ angular.module('mc.core.ui', [
   'mc.core.ui.metadataEditors'
   'mc.core.ui.detailSections'
   'mc.core.ui.metadataEditor'
-  # Optimisation directive. Source: https://github.com/scalyr/angular
-  'sly'
 ])

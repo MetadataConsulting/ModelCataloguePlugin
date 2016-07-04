@@ -42,6 +42,7 @@
     "angular-ui-ace": "~0.2.3",
     "angular-file-saver": "1.1.1",
     "vk-beautify": "https://github.com/rt/vkbeautify-wrapper.git",
+    "sly-repeat": "https://github.com/scalyr/angular.git#v1.0.3",
     "core.js": "~2.3.0"
   },
   "resolutions": {
