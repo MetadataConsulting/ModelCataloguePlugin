@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.a
+package org.modelcatalogue.core
 
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -6,6 +6,7 @@ import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
+import org.modelcatalogue.core.geb.Common
 import org.modelcatalogue.integration.excel.ExcelLoader
 import org.modelcatalogue.integration.excel.HeadersMap
 import spock.lang.Ignore
