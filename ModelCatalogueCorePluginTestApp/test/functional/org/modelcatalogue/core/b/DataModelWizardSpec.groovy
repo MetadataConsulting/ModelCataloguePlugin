@@ -27,7 +27,6 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
     static final String modalFeedback = '.messages-modal-feedback'
     static final String feedback = '.messages-modal-feedback pre'
 
-
     def "go to login"() {
         login admin
 
@@ -156,25 +155,80 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
     }
 
-    /**
-     * Currently not supported - in future deleting whole data model should simply delete all its content
-     */
-    @Ignore
-    def "hard delete the data model"() {
+    def "create new data model, hard delete the data model and create new with the same name"() {
+        given:
+            def uuid = UUID.randomUUID().toString()
+
+        when:
+            login admin
+            click createNewDataModel
+
+        then: 'the model dialog opens'
+            check classificationWizzard displayed
+
+        when:
+            fill name with "New Data Model $uuid"
+            fill modelCatalogueId with "http://www.example.com/$uuid"
+            fill description with "Description of Data Model"
+
+        then:
+            check stepFinish enabled
+
+        when:
+            click stepFinish
+
+        then:
+            check '#summary' is "Data Model New Data Model $uuid created"
+
+        when:
+            click exitButton
+            check closeGrowlMessage gone
+
+        then:
+            check rightSideTitle is "New Data Model $uuid 0.0.1"
+
         check backdrop gone
         when: "delete action is clicked"
-        click delete
+            click delete
 
         then: "modal prompt is displayed"
-        check confirm displayed
+            check confirm displayed
 
         when: "ok is clicked"
-        click OK
+            click OK
 
         then: "you are redirected to the data models page"
-        waitFor(120) { browser.title == 'Data Models' }
+            waitFor(120) { browser.title == 'Data Models' }
 
+        when: "you try to create the data model with the same name"
+
+            click createNewDataModel
+
+        then: 'the model dialog opens'
+            check classificationWizzard displayed
+
+        when:
+            fill name with "New Data Model $uuid"
+            fill modelCatalogueId with "http://www.example.com/$uuid"
+            fill description with "Description of Data Model"
+
+        then:
+            check stepFinish enabled
+
+        when:
+            click stepFinish
+
+        then:
+            check '#summary' is "Data Model New Data Model $uuid created"
+
+        when:
+            click exitButton
+            check closeGrowlMessage gone
+
+        then:
+            check rightSideTitle is "New Data Model $uuid 0.0.1"
     }
+
 
 
 }

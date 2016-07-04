@@ -49,6 +49,7 @@ class CatalogueElementService {
 
             // delete the catalogue element
             catalogueElement.delete()
+            subject.subscribe(ErrorSubscriber.create("Error during unindexing catalogue element $catalogueElement"))
         } catch (e) {
             // index catalogue element back in case of any error
             subject.flatMap {
