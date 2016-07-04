@@ -1,6 +1,6 @@
 describe "mc.core.ui.elementsAsTags", ->
 
-  beforeEach module 'mc.core.ui.bs.elementsAsTags'
+  beforeEach module 'mc.core.ui'
 
   return unless window.fixtures
 
