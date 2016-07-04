@@ -11,38 +11,38 @@ import spock.lang.Stepwise
 class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {
-        login Common.admin
+        login admin
 
         when:
         select 'Test 2' select "Measurement Units"
 
         then:
-        check Common.rightSideTitle is 'Active Measurement Units'
+        check rightSideTitle is 'Active Measurement Units'
     }
 
     def "create new unit"() {
         when:
-        click Common.create
+        click create
 
         then:
-        check Common.modalDialog displayed
+        check modalDialog displayed
 
         when:
         fill 'name' with 'Foos'
         fill 'symbol' with 'Foo'
 
-        click Common.save
+        click save
 
         then:
         check { infTableCell(1, 2, text: 'Foos') } displayed
     }
 
     def "check the unit shows up with own detail page"(){
-        check Common.closeGrowlMessage gone
+        check closeGrowlMessage gone
         click { infTableCell(1, 2).find('a') }
 
         expect:
-        check Common.rightSideTitle contains 'Foos Test 2'
+        check rightSideTitle contains 'Foos Test 2'
     }
 
     def "going to metadata tab changes the url"() {

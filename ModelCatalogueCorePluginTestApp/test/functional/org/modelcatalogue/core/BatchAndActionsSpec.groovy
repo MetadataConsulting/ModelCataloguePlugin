@@ -36,16 +36,16 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "generate suggestions"() {
-        check Common.backdrop gone
+        check backdrop gone
 
         when:
         click generateMerge
 
         then:
-        check Common.modalDialog displayed
+        check modalDialog displayed
 
         when:
-        click Common.modalPrimaryButton
+        click modalPrimaryButton
 
         while (check(linkToRename).missing) {
             click refreshList
@@ -57,7 +57,7 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "go to detail page and execute few actions"() {
-        check Common.backdrop gone
+        check backdrop gone
 
         when:
         click linkToTestBatch
@@ -66,7 +66,7 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
         check batchName displayed
         check batchName contains 'Test Batch'
         check noPerformedActions displayed
-        check pendingActions present 10 or Common.more
+        check pendingActions present 10 or more
         check pendingActions has 'alert-danger'
 
         when:
@@ -76,7 +76,7 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         check '.modal-body' gone
-        check Common.closeGrowlMessage gone
+        check closeGrowlMessage gone
 
         check pendingActions contains 'BrandNewModel'
 

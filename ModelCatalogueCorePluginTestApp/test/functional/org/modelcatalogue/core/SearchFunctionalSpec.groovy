@@ -24,7 +24,7 @@ class SearchFunctionalSpec extends AbstractModelCatalogueGebSpec {
 
 
     def "search for patient identity details"() {
-        login Common.admin
+        login admin
 
         go "#/dataModels"
 
@@ -33,7 +33,7 @@ class SearchFunctionalSpec extends AbstractModelCatalogueGebSpec {
         click search
 
         then:
-        check Common.modalDialog displayed
+        check modalDialog displayed
 
         when:
         fill searchInput with NAME_LOWER_CASE

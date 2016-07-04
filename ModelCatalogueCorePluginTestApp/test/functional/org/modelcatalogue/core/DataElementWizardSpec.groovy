@@ -15,46 +15,46 @@ class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
     static final String detailSectionFormItemContent = ".metadata-form-item-content"
 
     def "login and select Data Element"() {
-        login Common.admin
+        login admin
         select 'Test 1' select 'Data Elements'
 
         expect:
-        check Common.rightSideTitle is 'Active Data Elements'
+        check rightSideTitle is 'Active Data Elements'
     }
 
     def "Add new data element"() {
         when: 'I click the add model button'
-        click Common.create
+        click create
 
         then: 'the data element dialog opens'
-        check Common.wizard displayed
+        check wizard displayed
 
         when:
-        fill Common.name with "NewDE1"
-        fill Common.description with "NT1 Description"
+        fill name with "NewDE1"
+        fill description with "NT1 Description"
 
         and: 'save button clicked'
-        click Common.save
+        click save
 
         then: 'the data element is saved and displayed at the top of the table'
-        check Common.nameInTheFirstRow, text: "NewDE1" displayed
+        check nameInTheFirstRow, text: "NewDE1" displayed
     }
 
     def "Check the data element shows up with own details"() {
         expect:
-        check Common.backdrop gone
+        check backdrop gone
 
         when: 'Data Element is located'
-        check Common.nameInTheFirstRow, text: "NewDE1" displayed
+        check nameInTheFirstRow, text: "NewDE1" displayed
 
         then: 'Click the element'
-        click Common.firstRowLink
-        check Common.rightSideTitle contains 'NewDE1 Test 1'
+        click firstRowLink
+        check rightSideTitle contains 'NewDE1 Test 1'
     }
 
     def "Check Form (Item) detail section is present and collapsed"() {
         expect:
-        check detailSectionFormItem present Common.once
+        check detailSectionFormItem present once
         check detailSectionFormItemContent gone
 
         when: "Click the title"

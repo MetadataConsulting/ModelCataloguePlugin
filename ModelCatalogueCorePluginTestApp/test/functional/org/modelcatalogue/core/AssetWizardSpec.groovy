@@ -37,27 +37,27 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         select "Test 1" select "Assets"
 
         then:
-        check Common.rightSideTitle is 'Active Assets'
+        check rightSideTitle is 'Active Assets'
     }
 
     def "upload new asset"() {
         when:
-        click Common.create
+        click create
 
         then:
-        check Common.modalDialog displayed
+        check modalDialog displayed
 
         when:
-        fill Common.name with 'Sample XSD'
+        fill name with 'Sample XSD'
         fill asset with file('example.xsd')
 
-        click Common.save
+        click save
 
         then:
         check infiniteTableRow displayed
 
         and:
-        check Common.modalDialog gone
+        check modalDialog gone
     }
 
     def "Check the asset shows up with own detail page"(){
@@ -66,7 +66,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
         click { infTableCell(1, 2).find('a:not(.inf-cell-expand)') }
 
-        check Common.rightSideTitle contains 'Sample XSD'
+        check rightSideTitle contains 'Sample XSD'
     }
 
     def "validate xml schema"() {
@@ -74,7 +74,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         click validateXsd
 
         then:
-        check Common.modalDialog displayed
+        check modalDialog displayed
 
         when:
         fill 'xml' with file('example.xml')
@@ -89,10 +89,10 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check dangerInFooter displayed
 
         when:
-        click Common.modalCloseButton
+        click modalCloseButton
 
         then:
-        check Common.modalDialog gone
+        check modalDialog gone
     }
 
 
@@ -100,7 +100,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         click importMc
 
         expect:
-        check Common.modalDialog displayed
+        check modalDialog displayed
 
         when:
         fill asset with file('MET-523.mc')
@@ -108,7 +108,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         click '.modal-footer .btn-success'
 
         then:
-        check Common.modalDialog gone
+        check modalDialog gone
         check 'h3' contains 'Import for MET-523.mc'
 
         when:
@@ -122,7 +122,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         click importExcel
 
         expect:
-        check Common.modalDialog displayed
+        check modalDialog displayed
 
         when:
         fill asset with file('MET-522.xlsx')
@@ -138,13 +138,13 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         click 'h3 a.label.label-warning'
 
         then:
-        check Common.rightSideTitle is 'MET-522 0.0.1'
+        check rightSideTitle is 'MET-522 0.0.1'
 
         when:
         select 'MET-522' open 'Data Classes' select 'MET-522.M1'
 
         then:
-        check Common.rightSideTitle is 'MET-522.M1 MET-522 0.0.1'
+        check rightSideTitle is 'MET-522.M1 MET-522 0.0.1'
     }
 
     /**
@@ -157,9 +157,9 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         withNewWindow({
             click export
             click { $('span', text: 'Export All Elements of MET-522.M1 to Excel XSLX').parent('a') }
-            click Common.modalPrimaryButton
+            click modalPrimaryButton
         }, {
-            check Common.rightSideTitle contains 'Data Elements to Excel.xlsx'
+            check rightSideTitle contains 'Data Elements to Excel.xlsx'
             waitUntilFinalized()
 
             StringWriter sw = new StringWriter()

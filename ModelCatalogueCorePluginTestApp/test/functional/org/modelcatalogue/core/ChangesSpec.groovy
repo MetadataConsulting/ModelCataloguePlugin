@@ -18,15 +18,15 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
 
         select 'Test 1' select 'Data Types'
 
-        click Common.create
+        click create
 
         fill 'name' with "Data Type Change Test"
 
-        click Common.save
+        click save
 
         expect:
         check 'div.modal' gone
-        check Common.closeGrowlMessage gone
+        check closeGrowlMessage gone
 
         when:
         go "#/catalogue/change/all"
@@ -48,10 +48,10 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
         click CatalogueAction.runLast('item', 'undo-change')
 
         then:
-        check Common.modalDialog displayed
+        check modalDialog displayed
 
         when:
-        click Common.modalPrimaryButton
+        click modalPrimaryButton
 
         then:
         check ".pp-table-property-element-value", 'data-value-for': 'Undone' is 'true'
