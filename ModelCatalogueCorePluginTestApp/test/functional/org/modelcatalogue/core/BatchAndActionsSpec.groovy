@@ -1,9 +1,10 @@
-package org.modelcatalogue.core.a
+package org.modelcatalogue.core
 
 import geb.waiting.WaitTimeoutException
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
+import org.modelcatalogue.core.geb.Common
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.*
@@ -35,16 +36,16 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "generate suggestions"() {
-        check backdrop gone
+        check Common.backdrop gone
 
         when:
         click generateMerge
 
         then:
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when:
-        click modalPrimaryButton
+        click Common.modalPrimaryButton
 
         while (check(linkToRename).missing) {
             click refreshList
@@ -56,7 +57,7 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "go to detail page and execute few actions"() {
-        check backdrop gone
+        check Common.backdrop gone
 
         when:
         click linkToTestBatch
@@ -65,7 +66,7 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
         check batchName displayed
         check batchName contains 'Test Batch'
         check noPerformedActions displayed
-        check pendingActions present 10 or more
+        check pendingActions present 10 or Common.more
         check pendingActions has 'alert-danger'
 
         when:
@@ -75,7 +76,7 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         check '.modal-body' gone
-        check closeGrowlMessage gone
+        check Common.closeGrowlMessage gone
 
         check pendingActions contains 'BrandNewModel'
 

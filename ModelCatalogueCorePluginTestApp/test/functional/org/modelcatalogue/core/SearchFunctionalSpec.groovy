@@ -1,8 +1,9 @@
-package org.modelcatalogue.core.a
+package org.modelcatalogue.core
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
+import org.modelcatalogue.core.geb.Common
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.*
@@ -23,7 +24,7 @@ class SearchFunctionalSpec extends AbstractModelCatalogueGebSpec {
 
 
     def "search for patient identity details"() {
-        login admin
+        login Common.admin
 
         go "#/dataModels"
 
@@ -32,7 +33,7 @@ class SearchFunctionalSpec extends AbstractModelCatalogueGebSpec {
         click search
 
         then:
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when:
         fill searchInput with NAME_LOWER_CASE

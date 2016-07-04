@@ -1,6 +1,7 @@
-package org.modelcatalogue.core.b
+package org.modelcatalogue.core
 
 import org.modelcatalogue.core.geb.CatalogueContent
+import org.modelcatalogue.core.geb.Common
 
 import static org.modelcatalogue.core.geb.Common.*
 
@@ -14,46 +15,46 @@ class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
     static final String detailSectionFormItemContent = ".metadata-form-item-content"
 
     def "login and select Data Element"() {
-        login admin
+        login Common.admin
         select 'Test 1' select 'Data Elements'
 
         expect:
-        check rightSideTitle is 'Active Data Elements'
+        check Common.rightSideTitle is 'Active Data Elements'
     }
 
     def "Add new data element"() {
         when: 'I click the add model button'
-        click create
+        click Common.create
 
         then: 'the data element dialog opens'
-        check wizard displayed
+        check Common.wizard displayed
 
         when:
-        fill name with "NewDE1"
-        fill description with "NT1 Description"
+        fill Common.name with "NewDE1"
+        fill Common.description with "NT1 Description"
 
         and: 'save button clicked'
-        click save
+        click Common.save
 
         then: 'the data element is saved and displayed at the top of the table'
-        check nameInTheFirstRow, text: "NewDE1" displayed
+        check Common.nameInTheFirstRow, text: "NewDE1" displayed
     }
 
     def "Check the data element shows up with own details"() {
         expect:
-        check backdrop gone
+        check Common.backdrop gone
 
         when: 'Data Element is located'
-        check nameInTheFirstRow, text: "NewDE1" displayed
+        check Common.nameInTheFirstRow, text: "NewDE1" displayed
 
         then: 'Click the element'
-        click firstRowLink
-        check rightSideTitle contains 'NewDE1 Test 1'
+        click Common.firstRowLink
+        check Common.rightSideTitle contains 'NewDE1 Test 1'
     }
 
     def "Check Form (Item) detail section is present and collapsed"() {
         expect:
-        check detailSectionFormItem present once
+        check detailSectionFormItem present Common.once
         check detailSectionFormItemContent gone
 
         when: "Click the title"

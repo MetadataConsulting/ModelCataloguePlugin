@@ -1,7 +1,8 @@
-package org.modelcatalogue.core.b
+package org.modelcatalogue.core
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
+import org.modelcatalogue.core.geb.Common
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.*
@@ -17,15 +18,15 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
 
         select 'Test 1' select 'Data Types'
 
-        click create
+        click Common.create
 
         fill 'name' with "Data Type Change Test"
 
-        click save
+        click Common.save
 
         expect:
         check 'div.modal' gone
-        check closeGrowlMessage gone
+        check Common.closeGrowlMessage gone
 
         when:
         go "#/catalogue/change/all"
@@ -47,10 +48,10 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
         click CatalogueAction.runLast('item', 'undo-change')
 
         then:
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when:
-        click modalPrimaryButton
+        click Common.modalPrimaryButton
 
         then:
         check ".pp-table-property-element-value", 'data-value-for': 'Undone' is 'true'

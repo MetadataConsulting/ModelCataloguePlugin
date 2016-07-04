@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.a
+package org.modelcatalogue.core
 
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -6,6 +6,7 @@ import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
+import org.modelcatalogue.core.geb.Common
 import org.modelcatalogue.integration.excel.ExcelLoader
 import org.modelcatalogue.integration.excel.HeadersMap
 import spock.lang.Ignore
@@ -36,27 +37,27 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         select "Test 1" select "Assets"
 
         then:
-        check rightSideTitle is 'Active Assets'
+        check Common.rightSideTitle is 'Active Assets'
     }
 
     def "upload new asset"() {
         when:
-        click create
+        click Common.create
 
         then:
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when:
-        fill name with 'Sample XSD'
+        fill Common.name with 'Sample XSD'
         fill asset with file('example.xsd')
 
-        click save
+        click Common.save
 
         then:
         check infiniteTableRow displayed
 
         and:
-        check modalDialog gone
+        check Common.modalDialog gone
     }
 
     def "Check the asset shows up with own detail page"(){
@@ -65,7 +66,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
         click { infTableCell(1, 2).find('a:not(.inf-cell-expand)') }
 
-        check rightSideTitle contains 'Sample XSD'
+        check Common.rightSideTitle contains 'Sample XSD'
     }
 
     def "validate xml schema"() {
@@ -73,7 +74,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         click validateXsd
 
         then:
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when:
         fill 'xml' with file('example.xml')
@@ -88,10 +89,10 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check dangerInFooter displayed
 
         when:
-        click modalCloseButton
+        click Common.modalCloseButton
 
         then:
-        check modalDialog gone
+        check Common.modalDialog gone
     }
 
 
@@ -99,7 +100,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         click importMc
 
         expect:
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when:
         fill asset with file('MET-523.mc')
@@ -107,7 +108,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         click '.modal-footer .btn-success'
 
         then:
-        check modalDialog gone
+        check Common.modalDialog gone
         check 'h3' contains 'Import for MET-523.mc'
 
         when:
@@ -121,7 +122,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         click importExcel
 
         expect:
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when:
         fill asset with file('MET-522.xlsx')
@@ -137,13 +138,13 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         click 'h3 a.label.label-warning'
 
         then:
-        check rightSideTitle is 'MET-522 0.0.1'
+        check Common.rightSideTitle is 'MET-522 0.0.1'
 
         when:
         select 'MET-522' open 'Data Classes' select 'MET-522.M1'
 
         then:
-        check rightSideTitle is 'MET-522.M1 MET-522 0.0.1'
+        check Common.rightSideTitle is 'MET-522.M1 MET-522 0.0.1'
     }
 
     /**
@@ -156,9 +157,9 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         withNewWindow({
             click export
             click { $('span', text: 'Export All Elements of MET-522.M1 to Excel XSLX').parent('a') }
-            click modalPrimaryButton
+            click Common.modalPrimaryButton
         }, {
-            check rightSideTitle contains 'Data Elements to Excel.xlsx'
+            check Common.rightSideTitle contains 'Data Elements to Excel.xlsx'
             waitUntilFinalized()
 
             StringWriter sw = new StringWriter()

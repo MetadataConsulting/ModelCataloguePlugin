@@ -1,4 +1,6 @@
-package org.modelcatalogue.core.b
+package org.modelcatalogue.core
+
+import org.modelcatalogue.core.geb.Common
 
 import static org.modelcatalogue.core.geb.Common.*
 
@@ -9,38 +11,38 @@ import spock.lang.Stepwise
 class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {
-        login admin
+        login Common.admin
 
         when:
         select 'Test 2' select "Measurement Units"
 
         then:
-        check rightSideTitle is 'Active Measurement Units'
+        check Common.rightSideTitle is 'Active Measurement Units'
     }
 
     def "create new unit"() {
         when:
-        click create
+        click Common.create
 
         then:
-        check modalDialog displayed
+        check Common.modalDialog displayed
 
         when:
         fill 'name' with 'Foos'
         fill 'symbol' with 'Foo'
 
-        click save
+        click Common.save
 
         then:
         check { infTableCell(1, 2, text: 'Foos') } displayed
     }
 
     def "check the unit shows up with own detail page"(){
-        check closeGrowlMessage gone
+        check Common.closeGrowlMessage gone
         click { infTableCell(1, 2).find('a') }
 
         expect:
-        check rightSideTitle contains 'Foos Test 2'
+        check Common.rightSideTitle contains 'Foos Test 2'
     }
 
     def "going to metadata tab changes the url"() {
