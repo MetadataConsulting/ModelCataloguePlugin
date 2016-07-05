@@ -229,7 +229,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
 
       isForCurrentElement = (data) -> data[1].link is $scope.element.link
 
-      DEBOUNCE_TIME = 1000
+      DEBOUNCE_TIME = 100
 
       $scope.$eventToObservable('catalogueElementCreated').debounce(DEBOUNCE_TIME).subscribe doReloadChildrenOnChange
       $scope.$eventToObservable('catalogueElementUpdated').filter(isForCurrentElement).debounce(DEBOUNCE_TIME).subscribe doReloadChildrenOnChange
