@@ -535,7 +535,9 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not security.hasRole('CURATOR')
     return undefined if $scope.element.status == 'DRAFT'
     return undefined if $scope.element.status == 'PENDING'
-    return undefined if angular.isFunction($scope.element.isInstanceOf()) and $scope.element.isInstanceOf('asset')
+    return undefined if not angular.isFunction($scope.element.isInstanceOf)
+    return undefined if not $scope.element.isInstanceOf('catalogueElement')
+    return undefined if $scope.element.isInstanceOf('asset')
 
     {
       position:   -1900

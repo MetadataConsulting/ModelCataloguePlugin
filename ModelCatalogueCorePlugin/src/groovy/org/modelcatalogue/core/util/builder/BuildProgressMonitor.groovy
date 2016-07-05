@@ -34,6 +34,9 @@ class BuildProgressMonitor implements Serializable, ProgressMonitor {
     private final String name
     private final String key
     private final StringBuffer buffer
+
+    private BuildProgressMonitorStatus status = BuildProgressMonitorStatus.RUNNING
+    private long lastUpdated = System.currentTimeMillis()
     private PublishSubject<String> queue = PublishSubject.create()
 
     BuildProgressMonitor(String name, String key) {
@@ -58,12 +61,15 @@ class BuildProgressMonitor implements Serializable, ProgressMonitor {
 
 
     void onNext(String message) {
+        lastUpdated = System.currentTimeMillis()
         buffer << message << '\n'
         queue.onNext(message)
     }
 
     void onCompleted() {
+        lastUpdated = System.currentTimeMillis()
         onNext("\n<strong class='text-success'> JOB $name COMPLETED SUCCESSFULLY</strong>")
+        status = BuildProgressMonitorStatus.FINISHED
         queue.onCompleted()
     }
 
@@ -74,8 +80,10 @@ class BuildProgressMonitor implements Serializable, ProgressMonitor {
 
     @Override
     void onError(Throwable th) {
+        lastUpdated = System.currentTimeMillis()
         StringWriter sw = printException(th)
         onNext(sw.toString())
+        status = BuildProgressMonitorStatus.FAILED
         onNext("\n\n<strong class='text-danger'> JOB $name FAILED</strong>\n")
         queue.onError(th)
     }
@@ -92,6 +100,13 @@ class BuildProgressMonitor implements Serializable, ProgressMonitor {
         buffer.toString()
     }
 
+    BuildProgressMonitorStatus getStatus() {
+        return status
+    }
+
+    long getLastUpdated() {
+        return lastUpdated
+    }
 }
 
 

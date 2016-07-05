@@ -3,8 +3,11 @@ package org.modelcatalogue.core
 import grails.converters.JSON
 import grails.gorm.DetachedCriteria
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
+import org.modelcatalogue.core.util.builder.ProgressMonitor
+import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 import org.springframework.http.HttpStatus
 
@@ -70,6 +73,17 @@ class CatalogueController {
 
     def feedback(String key) {
         render(BuildProgressMonitor.get(key) as JSON)
+    }
+
+    def feedbacks() {
+        if (params.max) {
+            params.max = params.long('max')
+        }
+        render(Lists.lazy(params, ProgressMonitor, '/feedback', {
+            CacheService.MONITORS_CACHE.asMap().entrySet().sort{ a, b -> -(a.value.lastUpdated <=> b.value.lastUpdated) }.collect { [key: it.key, name: it.value.name, status: it.value.status.toElementStatusEquivalent().toString(), ] }
+        }, {
+            CacheService.MONITORS_CACHE.size()
+        }) as JSON)
     }
 
 }
