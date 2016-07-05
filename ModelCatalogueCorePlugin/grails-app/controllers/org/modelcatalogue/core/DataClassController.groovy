@@ -94,7 +94,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
                 originalFileName: "${model.name}-${model.status}-${model.version}.docx",
                 contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )  { OutputStream out ->
-            new DataClassToDocxExporter(DataClass.get(modelId), dataClassService, depth).export(out)
+            new DataClassToDocxExporter(DataClass.get(modelId), dataClassService, depth, elementService).export(out)
         }
 
         response.setHeader("X-Asset-ID",assetId.toString())

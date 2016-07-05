@@ -5,12 +5,14 @@ import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
+import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.docx.ModelCatalogueWordDocumentBuilder
+import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 
 import java.text.SimpleDateFormat
 
@@ -18,6 +20,7 @@ import java.text.SimpleDateFormat
 class DataModelToDocxExporter {
 
     DataClassService dataClassService
+    ElementService elementService
     DataModel rootModel
 
     private static final Map<String, Object> ENUM_HEADER_CELL_TEXT = [font: [size: 12, bold: true]]
@@ -30,13 +33,14 @@ class DataModelToDocxExporter {
     def imagePath
     int depth = 3
 
-    void initVars(rootModel, dataClassService) {
+    private void initVars(rootModel, dataClassService, ElementService elementService) {
         this.dataClassService = dataClassService
+        this.elementService = elementService
         this.rootModel = rootModel
     }
 
-    DataModelToDocxExporter(DataModel rootModel, DataClassService dataClassService) {
-        initVars(rootModel, dataClassService)
+    DataModelToDocxExporter(DataModel rootModel, DataClassService dataClassService, ElementService elementService) {
+        initVars(rootModel, dataClassService, elementService)
         customTemplate = {
             'document' font: [family: 'Calibri'], margin: [left: 20, right: 10]
             'paragraph.title' font: [color: '#13D4CA', size: 26.pt], margin: [top: 200.pt]
@@ -61,8 +65,8 @@ class DataModelToDocxExporter {
 
     }
 
-    DataModelToDocxExporter(DataModel rootModel, DataClassService dataClassService, Closure customTemplate, imagePath, Integer depth = 3) {
-        initVars(rootModel, dataClassService)
+    DataModelToDocxExporter(DataModel rootModel, DataClassService dataClassService, ElementService elementService, Closure customTemplate, imagePath, Integer depth = 3) {
+        initVars(rootModel, dataClassService, elementService)
         this.customTemplate = customTemplate
         if(imagePath) this.imagePath = imagePath
         this.depth = depth
@@ -255,6 +259,25 @@ class DataModelToDocxExporter {
                                     row {
                                         cell 'Rule'
                                         cell dataType.name + ' (' + dataType.latestVersionId + ')'
+                                    }
+                                }
+
+                                for (DataType parent in elementService.getTypeHierarchy([:], dataType).items) {
+                                    if (parent.regexDef) {
+                                        row {
+                                            cell "Regular Expression\n(${CatalogueElementMarshaller.getClassifiedName(parent)})"
+                                            cell parent.regexDef
+                                        }
+                                    } else if (parent.rule) {
+                                        row {
+                                            cell "Rule\n(${CatalogueElementMarshaller.getClassifiedName(parent)})"
+                                            cell parent.rule
+                                        }
+                                    } else {
+                                        row {
+                                            cell "Based On"
+                                            cell CatalogueElementMarshaller.getClassifiedName(parent)
+                                        }
                                     }
                                 }
 
