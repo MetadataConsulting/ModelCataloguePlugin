@@ -138,6 +138,12 @@ class RelationshipService {
 
         relationshipInstance.validate()
 
+        if (relationshipInstance) {
+            if (relationshipInstance.source == relationshipInstance.destination) {
+                relationshipInstance.errors.rejectValue('destination', 'org.modelcatalogue.core.RelationshipType.destination.self', [relationshipDefinition.source.toString()] as Object[], "Destination and source are the same: {0}.")
+            }
+        }
+
         if (relationshipInstance.hasErrors()) {
             return relationshipInstance
         }
