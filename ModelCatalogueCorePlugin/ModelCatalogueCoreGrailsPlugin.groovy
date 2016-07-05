@@ -314,6 +314,9 @@ Model catalogue core plugin (metadata registry)
             defaultName { "${it.name} report as MS Excel Document" }
             depth 3
             type DataModel
+            when { DataModel dataModel ->
+                dataModel.countDeclares() > 0
+            }
             link controller: 'dataModel', action: 'inventorySpreadsheet', id: true
         }
 
