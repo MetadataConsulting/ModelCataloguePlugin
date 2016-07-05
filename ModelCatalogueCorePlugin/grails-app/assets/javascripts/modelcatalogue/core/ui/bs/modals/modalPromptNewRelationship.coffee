@@ -119,7 +119,11 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 
                           destination.relation = catalogueElement
                           return $timeout(( -> destination), THRESHOLD)
                         .catch (response) ->
-                          destination.messages.error "Unexpected error while saving new catalogue element [#{destination.relation}]."
+                          if response.data and response.data.errors
+                            for error in response.data.errors
+                              destination.messages.error error.message
+                          else
+                            destination.messages.error "Unexpected error while saving new catalogue element [#{destination.relation}]."
                           return $q.reject response
 
                 promise = promise.then (destination) ->
@@ -132,8 +136,12 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 
                     messages.success('Relationship Created', "You have added new relationship #{$scope.element.name} #{$scope.relationshipTypeInfo.value} #{destination.relation.name} in the catalogue.")
                     result
                   , (response) ->
-                    destination.messages.error "Unexpected error while creating relationship."
-                    $q.reject response
+                    if response.data and response.data.errors
+                      for error in response.data.errors
+                        destination.messages.error error.message
+                    else
+                      destination.messages.error "Unexpected error while creating relationship."
+                    return $q.reject response
 
                 promises.push promise
 
