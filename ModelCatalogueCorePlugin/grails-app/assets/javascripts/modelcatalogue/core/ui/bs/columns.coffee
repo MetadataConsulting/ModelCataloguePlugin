@@ -149,4 +149,8 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
     {header: "Policy Text"  , value: 'policyText'     , classes: 'col-md-6'}
   ]
 
+  columnsProvider.registerColumns 'org.modelcatalogue.core.util.builder.ProgressMonitor', [
+    {header: "Name"        , value: 'name', classes: 'col-md-11', href: '"#/catalogue/feedback/" + key' }
+  ]
+
 ]

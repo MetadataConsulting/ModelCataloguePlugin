@@ -13,6 +13,7 @@ class ModelCatalogueCorePluginUrlMappings {
             format = 'xml'
         }
 
+        "/api/modelCatalogue/core/feedback"(controller: 'catalogue', action: 'feedbacks', method: HttpMethod.GET)
         "/api/modelCatalogue/core/feedback/$key"(controller: 'catalogue', action: 'feedback', method: HttpMethod.GET)
 
         def legacyElements    = [model: 'dataClass', classification: 'dataModel']

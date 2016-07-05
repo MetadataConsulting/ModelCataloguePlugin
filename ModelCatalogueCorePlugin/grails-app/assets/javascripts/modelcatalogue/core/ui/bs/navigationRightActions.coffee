@@ -196,6 +196,17 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     }
   ]
 
+  actionsProvider.registerChildAction 'curator-menu', 'feedbacks', ($state) ->
+    'ngInject'
+
+    {
+      position:   200000
+      icon:       'fa fa-tasks fa-fw'
+      label:      'Feedbacks'
+      action: ->
+        $state.go 'simple.resource.list', resource: 'feedback'
+    }
+
   actionsProvider.registerActionInRole 'new-import', actionsProvider.ROLE_LIST_ACTION, [
     '$scope', 'names','security', '$state',
     ($scope ,  names , security ,  $state ) ->

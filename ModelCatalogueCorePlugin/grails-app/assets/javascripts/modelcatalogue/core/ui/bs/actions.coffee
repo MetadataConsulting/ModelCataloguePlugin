@@ -263,7 +263,9 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
   actionsProvider.registerChildAction 'export', 'export-cart', ['security', '$state', '$window', 'modelCatalogueApiRoot', (security, $state, $window, modelCatalogueApiRoot) ->
     return undefined if not security.isUserLoggedIn()
-    return undefined if not $state.current.name == 'mc.favorites'
+    return undefined if $state.current.name != 'mc.favorites'
+
+    console.log $state.current.name
 
     {
     position:   100000
@@ -650,7 +652,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
   actionsProvider.registerActionInRole 'modal-save-element', actionsProvider.ROLE_MODAL_ACTION, ($scope) ->
     'ngInject'
-    
+
     return undefined unless $scope.hasChanged and $scope.saveElement
 
     {
