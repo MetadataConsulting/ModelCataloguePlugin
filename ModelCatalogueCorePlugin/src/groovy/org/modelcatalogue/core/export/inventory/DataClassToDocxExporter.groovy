@@ -7,11 +7,13 @@ import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
+import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.util.docx.ModelCatalogueWordDocumentBuilder
+import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 
 import java.text.SimpleDateFormat
 
@@ -28,6 +30,7 @@ class DataClassToDocxExporter {
 
 
     final DataClassService dataClassService
+    final ElementService elementService
     final Long dataClassId
     final Integer depth
     final Set<DataType> usedDataTypes = new TreeSet<DataType>([compare: { DataType a, DataType b ->
@@ -36,9 +39,10 @@ class DataClassToDocxExporter {
     final Set<Long> processedModels = new HashSet<Long>()
 
 
-    DataClassToDocxExporter(DataClass model, DataClassService dataClassService, Integer depth = 3) {
+    DataClassToDocxExporter(DataClass model, DataClassService dataClassService, Integer depth = 3, ElementService elementService) {
         this.dataClassId = model.getId()
         this.dataClassService = dataClassService
+        this.elementService = elementService
         this.depth = depth
     }
 
@@ -161,6 +165,25 @@ class DataClassToDocxExporter {
                                     }
                                 }
 
+                                for (DataType parent in elementService.getTypeHierarchy([:], dataType).items) {
+                                    if (parent.regexDef) {
+                                        row {
+                                            cell "Regular Expression\n(${CatalogueElementMarshaller.getClassifiedName(parent)})"
+                                            cell parent.regexDef
+                                        }
+                                    } else if (parent.rule) {
+                                        row {
+                                            cell "Rule\n(${CatalogueElementMarshaller.getClassifiedName(parent)})"
+                                            cell parent.rule
+                                        }
+                                    } else {
+                                        row {
+                                            cell "Based On"
+                                            cell CatalogueElementMarshaller.getClassifiedName(parent)
+                                        }
+                                    }
+                                }
+
                             }
 
                             if (dataType?.instanceOf(EnumeratedType)) {
@@ -192,7 +215,7 @@ class DataClassToDocxExporter {
     }
 
     private boolean hasExtraInformation(DataType dataType) {
-        (dataType.instanceOf(PrimitiveType) && dataType.measurementUnit) || (dataType.instanceOf(ReferenceType) && dataType.dataClass) || dataType.rule
+        (dataType.instanceOf(PrimitiveType) && dataType.measurementUnit) || (dataType.instanceOf(ReferenceType) && dataType.dataClass) || dataType.rule || dataType.countIsBasedOn() > 0
     }
 
 

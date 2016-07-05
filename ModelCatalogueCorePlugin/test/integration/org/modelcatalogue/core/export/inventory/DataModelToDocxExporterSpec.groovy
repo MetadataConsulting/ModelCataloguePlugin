@@ -30,7 +30,7 @@ class DataModelToDocxExporterSpec extends AbstractIntegrationSpec {
         when:
         File file = temporaryFolder.newFile("${System.currentTimeMillis()}.docx")
 
-        new DataModelToDocxExporter(DataModel.get(dataModel.id), dataClassService).export(file.newOutputStream())
+        new DataModelToDocxExporter(DataModel.get(dataModel.id), dataClassService, elementService).export(file.newOutputStream())
 
         open file
 
@@ -47,7 +47,7 @@ class DataModelToDocxExporterSpec extends AbstractIntegrationSpec {
             'document' font: [color: '#000000']
         }
 
-        new DataModelToDocxExporter(DataModel.get(dataModel.id), dataClassService, testTemplate, DataModelToDocxExporterSpec.getResource('gel-logo.png').toExternalForm()).export(file.newOutputStream())
+        new DataModelToDocxExporter(DataModel.get(dataModel.id), dataClassService, elementService, testTemplate, DataModelToDocxExporterSpec.getResource('gel-logo.png').toExternalForm()).export(file.newOutputStream())
 
         open file
 

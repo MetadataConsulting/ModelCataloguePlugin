@@ -1,7 +1,6 @@
 package org.modelcatalogue.gel
 
 import grails.transaction.Transactional
-import org.hibernate.SessionFactory
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.PerformanceUtilService
@@ -120,7 +119,7 @@ class GenomicsService {
             originalFileName: "${model.name}-${model.status}-${model.version}.docx",
             contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ) { OutputStream out ->
-            new DataModelToDocxExporter(DataModel.get(modelId), dataClassService, customTemplate, DOC_IMAGE_PATH, depth).export(out)
+            new DataModelToDocxExporter(DataModel.get(modelId), dataClassService, elementService, customTemplate, DOC_IMAGE_PATH, depth).export(out)
         }
     }
 

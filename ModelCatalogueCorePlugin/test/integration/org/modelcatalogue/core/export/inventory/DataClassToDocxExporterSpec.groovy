@@ -31,7 +31,7 @@ class DataClassToDocxExporterSpec extends AbstractIntegrationSpec {
         File file = temporaryFolder.newFile("${System.currentTimeMillis()}.docx")
 
 
-        new DataClassToDocxExporter(model, dataClassService).export(file.newOutputStream())
+        new DataClassToDocxExporter(model, dataClassService, elementService).export(file.newOutputStream())
 
 
         open file
