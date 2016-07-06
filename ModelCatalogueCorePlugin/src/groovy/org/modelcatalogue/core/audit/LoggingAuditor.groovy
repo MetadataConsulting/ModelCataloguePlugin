@@ -460,8 +460,8 @@ abstract class LoggingAuditor extends AbstractAuditor {
             return object.toString()
         }
         if (object instanceof CharSequence) {
-            if (object.size() > 14950) {
-                return object.toString()[0..14950] + '...(text truncated)'
+            if (object.size() > 59000) {
+                return object.toString()[0..59000] + '...(text truncated)'
             }
         }
         return object
