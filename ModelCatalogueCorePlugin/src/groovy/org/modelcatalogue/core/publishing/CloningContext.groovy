@@ -5,6 +5,7 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.util.RelationshipDirection
+import rx.Observer
 
 class CloningContext extends PublishingContext<CloningContext> {
 
@@ -24,8 +25,8 @@ class CloningContext extends PublishingContext<CloningContext> {
         return destinationDataModel
     }
 
-    void resolvePendingRelationships() {
-        super.resolvePendingRelationships()
+    void resolvePendingRelationships(Observer<String> monitor) {
+        super.resolvePendingRelationships(monitor)
         for (Long importId in imports) {
             destinationDataModel.addToImports DataModel.get(importId)
         }

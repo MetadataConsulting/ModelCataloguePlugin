@@ -77,8 +77,10 @@ abstract class PublishingContext<C extends PublishingContext> {
         new CopyAssociationsAndRelationships(draft, oldVersion, this, false, RelationshipDirection.INCOMING, RelationshipDirection.OUTGOING)
     }
 
-    void resolvePendingRelationships() {
-        pendingRelationshipsTasks.each {
+    void resolvePendingRelationships(Observer<String> monitor) {
+        Integer total = pendingRelationshipsTasks.size()
+        pendingRelationshipsTasks.eachWithIndex { CopyAssociationsAndRelationships it, int index ->
+            monitor.onNext("Copying relationships [${(index + 1).toString().padLeft(5,'0')}/${total.toString().padLeft(5,'0')}]: $it".toString())
             it.afterDraftPersisted()
             it.copyRelationships(dataModel, createdRelationshipHashes)
         }
