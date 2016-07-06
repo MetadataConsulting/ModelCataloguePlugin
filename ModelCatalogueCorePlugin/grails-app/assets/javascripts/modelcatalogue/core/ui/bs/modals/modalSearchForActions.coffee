@@ -10,6 +10,7 @@ module.config ['messagesProvider', (messagesProvider)->
               <div class="input-group input-group-lg">
                 <span class="input-group-addon"><span class="fa fa-fw fa-flash"></span></span>
                 <input id="value" class="form-control" ng-model="query" placeholder="Search for Actions and Views" ng-model-options="{debounce: 500}" focus-me="true" autofocus='true'>
+                <div class="input-group-addon with-pointer" ng-click='$dismiss()'><span class='fa fa-fw fa-close'></span></div>
               </div>
             </div>
             <div ng-if="actions.length == 0 &amp;&amp; !loading">
