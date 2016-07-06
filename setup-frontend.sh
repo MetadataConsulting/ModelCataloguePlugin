@@ -14,9 +14,11 @@ fi
 nvm install
 nvm use
 
+npm config set registry "$NPM_REGISTRY_URL"
+
 echo "executing npm install in folders where package.json is exists"
 
-./where package.json run npm install --registry "$NPM_REGISTRY_URL"
+./where package.json run npm install
 
 echo "executing npm install in folders where bower.json is exists"
 
