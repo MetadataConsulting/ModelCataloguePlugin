@@ -2,8 +2,6 @@
 
 set -e
 
-: ${NPM_REGISTRY_URL:="http://registry.npmjs.org"}
-
 if [ ! -f ~/.nvm/nvm.sh ]; then
     echo "installing nvm"
     curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh | bash
@@ -13,8 +11,6 @@ fi
 . ~/.nvm/nvm.sh
 nvm install
 nvm use
-
-npm config set registry "$NPM_REGISTRY_URL"
 
 echo "executing npm install in folders where package.json is exists"
 
