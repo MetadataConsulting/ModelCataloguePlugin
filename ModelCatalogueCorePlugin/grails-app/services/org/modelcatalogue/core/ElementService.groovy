@@ -127,7 +127,7 @@ class ElementService implements Publisher<CatalogueElement> {
                     status?.setRollbackOnly()
                     return element
                 }
-                context.resolvePendingRelationships()
+                context.resolvePendingRelationships(context.monitor)
                 return draft
             }
         }
@@ -719,7 +719,7 @@ class ElementService implements Publisher<CatalogueElement> {
     public <CE extends CatalogueElement> CE changeType(CatalogueElement element, Class<CE> newType) {
         DraftContext context = DraftContext.userFriendly().changeType(element, newType)
         CE newOne = DraftChain.create(element.dataModel, context).changeType(element, this) as CE
-        context.resolvePendingRelationships()
+        context.resolvePendingRelationships(context.monitor)
         newOne
     }
 

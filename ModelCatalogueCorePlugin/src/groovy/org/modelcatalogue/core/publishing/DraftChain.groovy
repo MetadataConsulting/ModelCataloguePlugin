@@ -50,19 +50,25 @@ class DraftChain extends PublishingChain {
             }
         }
 
-        DataModel draftDataModel = createDraft(publishedDataModel, null, publisher, monitor)
+        long total = publishedDataModel.countDeclares()
 
-        for (CatalogueElement element in publishedDataModel.declares) {
+        monitor.onNext("Creating draft [00001/${(total + 1).toString().padLeft(5,'0')}]: $publishedDataModel")
+        DataModel draftDataModel = createDraft(publishedDataModel, null, publisher, monitor)
+        monitor.onNext(" - Created draft [00001/${(total + 1).toString().padLeft(5,'0')}]: $publishedDataModel")
+
+
+        publishedDataModel.declares.eachWithIndex { CatalogueElement element, int index ->
+            monitor.onNext("Creating draft [${(index + 2).toString().padLeft(5,'0')}/${(total + 1).toString().padLeft(5,'0')}]: $element")
             createDraft(element, draftDataModel, publisher, monitor)
+            monitor.onNext(" - Created draft [${(index + 2).toString().padLeft(5,'0')}/${(total + 1).toString().padLeft(5,'0')}]: $element")
         }
 
 
         if (!draftDataModel.hasErrors()) {
-            monitor.onNext("Copying relationships (this may take a while")
-            context.resolvePendingRelationships()
+            context.resolvePendingRelationships(monitor)
         }
 
-        monitor.onNext("\nDraft data model available: <a class='new-version-link' href='#/$draftDataModel.id/dataModel/$draftDataModel.id/'>$draftDataModel</a>")
+        monitor.onNext("\nDraft data model will be available at <a class='new-version-link' href='#/$draftDataModel.id/dataModel/$draftDataModel.id/'>$draftDataModel</a> in couple of seconds")
 
         return draftDataModel
     }
@@ -72,7 +78,6 @@ class DraftChain extends PublishingChain {
     }
 
     private <T extends CatalogueElement> T createDraft(T element, DataModel draftDataModel, Publisher<CatalogueElement> archiver, Observer<String> monitor) {
-        monitor.onNext("Creating draft for $published ($context) ...")
         if (!element.latestVersionId) {
             element.latestVersionId = element.id
             FriendlyErrors.failFriendlySave(element)
@@ -131,7 +136,7 @@ class DraftChain extends PublishingChain {
 
         context.addResolution(element, draft)
 
-        monitor.onNext("... created draft $draft for $element using $context")
+
 
         return draft as T
     }

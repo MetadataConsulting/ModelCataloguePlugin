@@ -167,6 +167,6 @@ class CopyAssociationsAndRelationships {
 
     @Override
     String toString() {
-        "Task Copy Relationships from $element to $draft"
+        "from $element to $draft"
     }
 }
