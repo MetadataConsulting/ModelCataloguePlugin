@@ -11,12 +11,12 @@ else
     echo "nvm is already installed on the system"
 fi
 . ~/.nvm/nvm.sh
-nvm install --registry "$NPM_REGISTRY_URL"
+nvm install
 nvm use
 
 echo "executing npm install in folders where package.json is exists"
 
-./where package.json run npm install
+./where package.json run npm install --registry "$NPM_REGISTRY_URL"
 
 echo "executing npm install in folders where bower.json is exists"
 
