@@ -40,18 +40,18 @@ class RareDiseaseDisorderListCsvExporter {
                 break
 
             case 2:     // add disease group id,description
-                String groupDescription = "${model.combinedVersion},${modelName}"
+                String groupDescription = "${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:''},${modelName}"
                 groupDescriptions.put(level, groupDescription)
                 break
 
             case 3: // add disease sub-group id,description
-                String groupDescription = "${groupDescriptions.get(level - 1)},${model.combinedVersion},${modelName}"
+                String groupDescription = "${groupDescriptions.get(level - 1)},${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:''},${modelName}"
                 groupDescriptions.put(level, groupDescription)
                 break
 
             case 4: // generate line and add to list
                 line << groupDescriptions.get(level - 1)
-                line << model.combinedVersion
+                line << model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:''
                 line << modelName
                 lines << line.join(',')
                 return  //don't go deeper

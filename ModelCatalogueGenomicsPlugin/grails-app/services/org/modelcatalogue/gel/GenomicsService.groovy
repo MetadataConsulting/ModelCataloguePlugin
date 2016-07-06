@@ -62,6 +62,21 @@ class GenomicsService {
         }
     }
 
+    long genDiseaseListOnlyAsJson(DataClass dataClass){
+        DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dataClass.getDefaultModelCatalogueId(true))
+
+        return assetService.storeReportAsAsset(latestVersion.dataModel,
+                name: "${latestVersion.name} - Disease List Only (JSON)",
+                originalFileName: "${latestVersion.name}-${latestVersion.status}-${latestVersion.version}.json",
+                contentType: "application/json",
+        ) {
+            new RareDiseasesJsonExporter(it).exportDiseaseListOnly(latestVersion)
+        }
+    }
+
+
+
+
     long genRareDiseaseHPOEligibilityCriteriaAsJson(DataClass dataClass){
         return assetService.storeReportAsAsset(dataClass.dataModel,
             name: "${dataClass.name} - Eligibility criteria report (JSON)",

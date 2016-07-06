@@ -23,7 +23,7 @@ class GelJsonExporter {
         def builder = new JsonBuilder()
         def exclusions = ['Eligibility', 'Guidance']
 
-        log.info "Exporting Rare Disease HPO Phenotypes as json ${model.name} (${model.combinedVersion})"
+        log.info "Exporting Rare Disease HPO Phenotypes as json ${model.name} (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:''})"
 
         //define the json tagnames to use for each level in the model
         def levelTag1 = [tag1: 'DiseaseGroups']
@@ -38,7 +38,7 @@ class GelJsonExporter {
         builder "${levelMetaData.get(LEVEL1).tag1}": graphList
         out << builder.toPrettyString()
 
-        log.info "Rare Disease HPO Phenotypes exported as json ${model.name} (${model.combinedVersion}) ."
+        log.info "Rare Disease HPO Phenotypes exported as json ${model.name} (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:''}) ."
     }
 
 
@@ -59,21 +59,21 @@ class GelJsonExporter {
         if (level == 2) {
             modelCount = modelCount + 1
             // resolves to something concrete like - higherMap.put('id', "$model.id")
-            map.put(levelMetaData.get(level).tag1, model.combinedVersion)
+            map.put(levelMetaData.get(level).tag1, model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:'')
             map.put(levelMetaData.get(level).tag2, model.name)
             map.put(levelMetaData.get(level).tag3, modelList)
 
             graphList << map
         }
         if (level == 3) {
-            map.put(levelMetaData.get(level).tag1, model.combinedVersion)
+            map.put(levelMetaData.get(level).tag1, model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:'')
             map.put(levelMetaData.get(level).tag2, model.name)
             map.put(levelMetaData.get(level).tag3, modelList)
 
             graphList << map
         }
         if (level == 4) {
-            map.put(levelMetaData.get(level).tag1, model.combinedVersion)
+            map.put(levelMetaData.get(level).tag1, model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:'')
             map.put(levelMetaData.get(level).tag2, model.name)
 
             def miniMap = [:]
@@ -130,16 +130,19 @@ class GelJsonExporter {
 
         model.parentOf.each { DataClass child ->
             def map = [:]
-            map.put(levelMetaData.get(6).tag2, child.name)
+            if(child.ext.get("Investigation Type")!="Specialised") {
+                map.put(levelMetaData.get(6).tag2, child.name)
 
-            def id
-            if (isPhenotype) {
-                id = child.ext.get("OBO ID") ?: ""
-            } else { // tests
-                id = child.combinedVersion
+
+                def id
+                if (isPhenotype) {
+                    id = child.ext.get("OBO ID") ?: ""
+                } else { // tests
+                    id = child.ext.get("http://www.modelcatalogue.org/metadata/genomics/#gel-test-id-versioned") ?: ""
+                }
+                map.put(levelMetaData.get(6).tag1, id)
+                list << map
             }
-            map.put(levelMetaData.get(6).tag1, id)
-            list << map
         }
     }
 
