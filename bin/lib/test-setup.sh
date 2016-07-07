@@ -23,5 +23,4 @@ fi
 if [[ "$TRAVIS" != "" ]] ; then
     echo -e "\nTest Results will be available at\n\nhttp://mc-travis-results.orany.cz.s3.amazonaws.com/index.html?prefix=MetadataRegistry/ModelCataloguePlugin/$TRAVIS_BUILD_NUMBER/$TRAVIS_JOB_NUMBER/home/travis/reports/\n\n"
     MC_GEB_ENV="" #firefox is default
-    mysql -u root -e "create database metadata;grant all privileges on metadata.* to 'travis'@'localhost'"
 fi
