@@ -100,18 +100,30 @@ class DataModel extends CatalogueElement {
     }
 
     List<CatalogueElement> getDeclares() {
+        if (!readyForQueries) {
+            return Collections.emptyList()
+        }
         CatalogueElement.findAllByDataModel(this)
     }
 
     Number countDeclares() {
-        CatalogueElement.countByDataModel(this)
+        if (!readyForQueries) {
+            return 0
+        }
+        retunrn CatalogueElement.countByDataModel(this)
     }
 
     List<DataElement> getDataElements() {
+        if (!readyForQueries) {
+            return Collections.emptyList()
+        }
         DataElement.findAllByDataModel(this)
     }
 
     List<DataType> getDataTypes() {
+        if (!readyForQueries) {
+            return Collections.emptyList()
+        }
         DataType.findAllByDataModel(this)
     }
 
