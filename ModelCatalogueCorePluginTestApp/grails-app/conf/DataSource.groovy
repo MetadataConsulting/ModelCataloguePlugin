@@ -19,7 +19,7 @@ environments {
         }
     }
     test {
-        if (System.getenv('TRAVIS')) {
+        if (System.getenv('TRAVIS') && System.getenv('TEST_SUITE') == 'functional') {
             dataSource {
                 driverClassName = "com.mysql.jdbc.Driver"
                 dialect='org.hibernate.dialect.MySQL5InnoDBDialect'
