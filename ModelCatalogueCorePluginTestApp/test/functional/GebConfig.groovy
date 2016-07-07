@@ -23,13 +23,11 @@ driver = {
     def chromeDriver = new File('test/drivers/chrome/chromedriver')
     downloadDriver(chromeDriver, "http://chromedriver.storage.googleapis.com/2.22/chromedriver_mac32.zip")
     System.setProperty('webdriver.chrome.driver', chromeDriver.absolutePath)
-    driver = {
-        DesiredCapabilities caps = DesiredCapabilities.chrome();
-        LoggingPreferences logPrefs = new LoggingPreferences();
-        logPrefs.enable(LogType.BROWSER, Level.WARNING);
-        caps.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
-        new ChromeDriver(caps);
-    }
+    DesiredCapabilities caps = DesiredCapabilities.chrome()
+    LoggingPreferences logPrefs = new LoggingPreferences()
+    logPrefs.enable(LogType.BROWSER, Level.WARNING)
+    caps.setCapability(CapabilityType.LOGGING_PREFS, logPrefs)
+    new ChromeDriver(caps)
 }
 
 waiting {
