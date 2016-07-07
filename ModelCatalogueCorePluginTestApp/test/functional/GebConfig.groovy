@@ -4,6 +4,7 @@
  */
 
 
+import org.apache.commons.lang.SystemUtils
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.logging.LogType
@@ -18,11 +19,25 @@ reportsDir = new File("target/geb-reports")
 reportOnTestFailureOnly = false
 baseUrl = 'http://localhost:8080/ModelCatalogueCorePluginTestApp/'
 
+def chromeDriver = new File('test/drivers/chrome/chromedriver')
+def chromeDriverVersion = "2.22"
+if (SystemUtils.IS_OS_WINDOWS) {
+    downloadDriver(chromeDriver, "http://chromedriver.storage.googleapis.com/$chromeDriverVersion/chromedriver_win32.zip")
+} else if (SystemUtils.IS_OS_MAC) {
+    downloadDriver(chromeDriver, "http://chromedriver.storage.googleapis.com/$chromeDriverVersion/chromedriver_mac32.zip")
+} else if (SystemUtils.IS_OS_LINUX) {
+    if (SystemUtils.OS_ARCH.contains('xmd64')) {
+        downloadDriver(chromeDriver, "http://chromedriver.storage.googleapis.com/$chromeDriverVersion/chromedriver_linux64.zip")
+    } else {
+        downloadDriver(chromeDriver, "http://chromedriver.storage.googleapis.com/$chromeDriverVersion/chromedriver_linux32.zip")
+    }
+}
+
+
+System.setProperty('webdriver.chrome.driver', chromeDriver.absolutePath)
+
 // See: http://code.google.com/p/selenium/wiki/ChromeDriver
 driver = {
-    def chromeDriver = new File('test/drivers/chrome/chromedriver')
-    downloadDriver(chromeDriver, "http://chromedriver.storage.googleapis.com/2.22/chromedriver_mac32.zip")
-    System.setProperty('webdriver.chrome.driver', chromeDriver.absolutePath)
     DesiredCapabilities caps = DesiredCapabilities.chrome()
     LoggingPreferences logPrefs = new LoggingPreferences()
     logPrefs.enable(LogType.BROWSER, Level.WARNING)
