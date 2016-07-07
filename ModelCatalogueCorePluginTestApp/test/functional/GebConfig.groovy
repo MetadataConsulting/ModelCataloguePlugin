@@ -18,13 +18,18 @@ reportsDir = new File("target/geb-reports")
 reportOnTestFailureOnly = false
 baseUrl = 'http://localhost:8080/ModelCatalogueCorePluginTestApp/'
 
+// See: http://code.google.com/p/selenium/wiki/ChromeDriver
 driver = {
-    DesiredCapabilities caps = DesiredCapabilities.firefox();
-    LoggingPreferences logPrefs = new LoggingPreferences();
-    logPrefs.enable(LogType.BROWSER, Level.WARNING);
-    caps.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
-    caps.setCapability("marionette", true);
-    new FirefoxDriver(caps)
+    def chromeDriver = new File('test/drivers/chrome/chromedriver')
+    downloadDriver(chromeDriver, "http://chromedriver.storage.googleapis.com/2.22/chromedriver_mac32.zip")
+    System.setProperty('webdriver.chrome.driver', chromeDriver.absolutePath)
+    driver = {
+        DesiredCapabilities caps = DesiredCapabilities.chrome();
+        LoggingPreferences logPrefs = new LoggingPreferences();
+        logPrefs.enable(LogType.BROWSER, Level.WARNING);
+        caps.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
+        new ChromeDriver(caps);
+    }
 }
 
 waiting {
@@ -49,19 +54,14 @@ private void downloadDriver(File file, String path) {
 environments {
 
 
-    // run as "grails -Dgeb.env=chrome test-app"
-    // See: http://code.google.com/p/selenium/wiki/ChromeDriver
-    chrome {
-        def chromeDriver = new File('test/drivers/chrome/chromedriver')
-        downloadDriver(chromeDriver, "http://chromedriver.storage.googleapis.com/2.22/chromedriver_mac32.zip")
-        System.setProperty('webdriver.chrome.driver', chromeDriver.absolutePath)
-        driver = {
-            DesiredCapabilities caps = DesiredCapabilities.chrome();
-            LoggingPreferences logPrefs = new LoggingPreferences();
-            logPrefs.enable(LogType.BROWSER, Level.WARNING);
-            caps.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
-            new ChromeDriver(caps);
-        }
+    // run as "grails -Dgeb.env=firefox test-app"
+    firefox {
+        DesiredCapabilities caps = DesiredCapabilities.firefox();
+        LoggingPreferences logPrefs = new LoggingPreferences();
+        logPrefs.enable(LogType.BROWSER, Level.WARNING);
+        caps.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
+        caps.setCapability("marionette", true);
+        new FirefoxDriver(caps)
     }
 
     sauce {

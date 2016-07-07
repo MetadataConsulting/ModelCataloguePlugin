@@ -13,6 +13,11 @@ addons:
   artifacts:
     paths:
     - $HOME/reports
+  apt:
+    sources:
+      - google-chrome
+    packages:
+      - google-chrome
 env:
 - TEST_SUITE=functional
 - TEST_SUITE=unit_and_integration
