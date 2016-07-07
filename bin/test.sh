@@ -4,6 +4,12 @@ source ./bin/lib/test-setup.sh
 
 export FILE_OPENER_SKIP=true
 
+if [[ "$TRAVIS" != "" ]] ; then
+    if [ "$TEST_SUITE" = "functional" ] || [ "$TEST_SUITE" = "" ] ; then
+        elasticsearch -d --default.path.conf=conf/test/esconfig
+    fi
+fi
+
 # please update sibling script /collect/reports.sh when you update this file
 
 # karma and functional tests needs to fetch the bower components

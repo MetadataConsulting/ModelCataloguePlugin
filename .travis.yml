@@ -29,8 +29,6 @@ before_install:
   --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1920x1080x24
 script:
 - ./catalogue test
-before_script:
-- elasticsearch -d -Dnetwork.host=0.0.0.0 -Des.threadpool.bulk.queue_size=20000 -Des.action.auto_create_index=false -Des.index.mapper.dynamic=false
 after_script:
 - ./catalogue collect reports
 before_deploy: ./war.sh
