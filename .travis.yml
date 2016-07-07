@@ -15,7 +15,7 @@ addons:
     - $HOME/reports
   apt:
     sources:
-      - elasticsearch-1.7
+      - elasticsearch-2.1
     packages:
       - elasticsearch
 env:
