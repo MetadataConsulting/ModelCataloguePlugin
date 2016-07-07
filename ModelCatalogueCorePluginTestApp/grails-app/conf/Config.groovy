@@ -155,8 +155,8 @@ environments {
 
         grails.plugin.console.enabled = true
         grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
-        if (System.getenv('TRAVIS')) {
-            mc.search.elasticsearch.host="localhost"
+        if (System.getenv('TRAVIS') && System.getenv('TEST_SUITE') == 'functional') {
+            mc.search.elasticsearch.host="127.0.0.1"
         } else {
             mc.search.elasticsearch.local="${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/es${System.currentTimeMillis()}"
         }
