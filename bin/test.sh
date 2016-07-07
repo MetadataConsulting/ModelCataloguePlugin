@@ -4,6 +4,13 @@ source ./bin/lib/test-setup.sh
 
 export FILE_OPENER_SKIP=true
 
+if [[ "$TRAVIS" != "" ]] ; then
+    if [ "$TEST_SUITE" = "functional" ] || [ "$TEST_SUITE" = "" ] ; then
+        echo "preparing metadata database"
+        mysql -u root -e "create database metadata;grant all privileges on metadata.* to 'travis'@'localhost'"
+    fi
+fi
+
 # please update sibling script /collect/reports.sh when you update this file
 
 # karma and functional tests needs to fetch the bower components
@@ -52,7 +59,6 @@ if [ "$TEST_SUITE" = "unit_and_integration" ] || [ "$TEST_SUITE" = "" ] ; then
 fi
 
 if [ "$TEST_SUITE" = "functional" ] || [ "$TEST_SUITE" = "" ] ; then
-    mysql -u root -e "create database metadata;grant all privileges on metadata.* to 'travis'@'localhost'"
     ./grailsw "-Dgeb.env=$MC_GEB_ENV" test-app functional: -war --non-interactive
 fi
 
