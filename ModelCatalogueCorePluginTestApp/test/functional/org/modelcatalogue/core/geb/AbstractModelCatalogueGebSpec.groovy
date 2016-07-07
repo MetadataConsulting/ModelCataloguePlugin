@@ -24,7 +24,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         loginUser(user.username, user.password)
     }
 
-    def cleanup() {
+    def cleanupSpec() {
         LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
         for (LogEntry entry : logEntries) {
             println "${new Date(entry.getTimestamp())} ${entry.getLevel()} ${entry.getMessage()}"

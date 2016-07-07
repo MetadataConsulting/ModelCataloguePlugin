@@ -21,9 +21,7 @@ baseUrl = 'http://localhost:8080/ModelCatalogueCorePluginTestApp/'
 driver = {
     DesiredCapabilities caps = DesiredCapabilities.firefox();
     LoggingPreferences logPrefs = new LoggingPreferences();
-    logPrefs.enable(LogType.BROWSER, Level.ALL);
-    logPrefs.enable(LogType.CLIENT, Level.ALL);
-    logPrefs.enable(LogType.DRIVER, Level.ALL);
+    logPrefs.enable(LogType.BROWSER, Level.WARNING);
     caps.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
     caps.setCapability("marionette", true);
     new FirefoxDriver(caps)
@@ -60,9 +58,7 @@ environments {
         driver = {
             DesiredCapabilities caps = DesiredCapabilities.chrome();
             LoggingPreferences logPrefs = new LoggingPreferences();
-            logPrefs.enable(LogType.BROWSER, Level.ALL);
-            logPrefs.enable(LogType.CLIENT, Level.ALL);
-            logPrefs.enable(LogType.DRIVER, Level.ALL);
+            logPrefs.enable(LogType.BROWSER, Level.WARNING);
             caps.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
             new ChromeDriver(caps);
         }

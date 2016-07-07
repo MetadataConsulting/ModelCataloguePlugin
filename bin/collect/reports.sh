@@ -11,6 +11,7 @@ function copy_functional_test_results() {
     cp -Rf target/test-reports/ "$HOME/reports/test-app-functional-tests-reports" || true
     cp -Rf target/geb-reports/ "$HOME/reports/test-app-functional-geb-reports" || true
     cp -Rf target/assets/modelcatalogue/modelcatalogue*.js "$HOME/reports/assets/modelcatalogue" || true
+    cp     target/stacktrace.log "$HOME/reports/stacktrace.log" || true
 }
 
 cd ModelCatalogueCorePlugin
