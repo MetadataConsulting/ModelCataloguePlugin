@@ -4,7 +4,6 @@
  */
 
 
-import org.apache.commons.lang.SystemUtils
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.logging.LogType
@@ -13,28 +12,18 @@ import org.openqa.selenium.remote.CapabilityType
 import org.openqa.selenium.remote.DesiredCapabilities
 import org.openqa.selenium.remote.RemoteWebDriver
 
+import io.github.bonigarcia.wdm.ChromeDriverManager
+import io.github.bonigarcia.wdm.MarionetteDriverManager
+
 import java.util.logging.Level
 
 reportsDir = new File("target/geb-reports")
 reportOnTestFailureOnly = false
 baseUrl = 'http://localhost:8080/ModelCatalogueCorePluginTestApp/'
 
-def chromeDriver = new File('test/drivers/chrome/chromedriver')
-def chromeDriverVersion = "2.22"
-if (SystemUtils.IS_OS_WINDOWS) {
-    downloadDriver(chromeDriver, "http://chromedriver.storage.googleapis.com/$chromeDriverVersion/chromedriver_win32.zip")
-} else if (SystemUtils.IS_OS_MAC) {
-    downloadDriver(chromeDriver, "http://chromedriver.storage.googleapis.com/$chromeDriverVersion/chromedriver_mac32.zip")
-} else if (SystemUtils.IS_OS_LINUX) {
-    if (SystemUtils.OS_ARCH.contains('xmd64')) {
-        downloadDriver(chromeDriver, "http://chromedriver.storage.googleapis.com/$chromeDriverVersion/chromedriver_linux64.zip")
-    } else {
-        downloadDriver(chromeDriver, "http://chromedriver.storage.googleapis.com/$chromeDriverVersion/chromedriver_linux32.zip")
-    }
-}
+ChromeDriverManager.getInstance().setup()
+MarionetteDriverManager.getInstance().setup()
 
-
-System.setProperty('webdriver.chrome.driver', chromeDriver.absolutePath)
 
 // See: http://code.google.com/p/selenium/wiki/ChromeDriver
 driver = {

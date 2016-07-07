@@ -79,6 +79,7 @@ grails.project.dependency.resolution = {
 
         // Testing modules
         test "org.gebish:geb-spock:$gebVersion"
+        test 'io.github.bonigarcia:webdrivermanager:1.4.6'
         test "org.seleniumhq.selenium:selenium-support:${webDriverVersion}"
         test "org.seleniumhq.selenium:selenium-firefox-driver:${webDriverVersion}"
         test "org.seleniumhq.selenium:selenium-chrome-driver:${webDriverVersion}"
