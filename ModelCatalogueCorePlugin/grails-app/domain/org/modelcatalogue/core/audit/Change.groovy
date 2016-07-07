@@ -42,8 +42,8 @@ class Change {
         undone nullable: true
         system nullable: true
         property maxSize: 255, nullable: true
-        newValue maxSize: 15000, nullable: true
-        oldValue maxSize: 15000, nullable: true
+        newValue maxSize: 60000, nullable: true
+        oldValue maxSize: 60000, nullable: true
     }
 
     static mapping = {
