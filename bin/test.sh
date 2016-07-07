@@ -3,7 +3,7 @@
 source ./bin/lib/test-setup.sh
 
 export FILE_OPENER_SKIP=true
-export GRAILS_OPTS="-Xmx3G -Xms1G -XX:MaxPermSize=1G -server"
+export GRAILS_OPTS="-Xmx2G -Xms1G -XX:MaxPermSize=1G -server"
 
 # please update sibling script /collect/reports.sh when you update this file
 
