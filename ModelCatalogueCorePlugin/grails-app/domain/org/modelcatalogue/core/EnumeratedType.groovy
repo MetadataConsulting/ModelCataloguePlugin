@@ -29,6 +29,10 @@ class EnumeratedType extends DataType {
         enumAsString nullable: true, maxSize: 50000
     }
 
+    static mapping = {
+        enumAsString type: 'text'
+    }
+
     /**
      * Sets the map containing the enum values.
      *

@@ -6,6 +6,8 @@ export FILE_OPENER_SKIP=true
 
 if [[ "$TRAVIS" != "" ]] ; then
     if [ "$TEST_SUITE" = "functional" ] || [ "$TEST_SUITE" = "" ] ; then
+        echo "preparing metadata database"
+        mysql -u root -e "create database metadata;grant all privileges on metadata.* to 'travis'@'localhost'"
         echo "running elasticsearch"
         elasticsearch -d --default.path.conf=conf/test/esconfig
         curl --max-time 10 --retry 10 --retry-max-time 360  http://localhost:9200/
