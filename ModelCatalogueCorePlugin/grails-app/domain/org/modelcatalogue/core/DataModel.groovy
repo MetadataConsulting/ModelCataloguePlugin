@@ -110,7 +110,7 @@ class DataModel extends CatalogueElement {
         if (!readyForQueries) {
             return 0
         }
-        retunrn CatalogueElement.countByDataModel(this)
+        CatalogueElement.countByDataModel(this)
     }
 
     List<DataElement> getDataElements() {
