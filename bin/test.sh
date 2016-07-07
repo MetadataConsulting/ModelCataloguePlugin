@@ -8,8 +8,7 @@ if [[ "$TRAVIS" != "" ]] ; then
     if [ "$TEST_SUITE" = "functional" ] || [ "$TEST_SUITE" = "" ] ; then
         echo "running elasticsearch"
         elasticsearch -d --default.path.conf=conf/test/esconfig
-        sleep 10
-        curl http://localhost:9200/
+        curl --max-time 10 --retry 10 --retry-max-time 360  http://localhost:9200/
     fi
 fi
 
