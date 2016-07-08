@@ -17,9 +17,9 @@ addons:
     - $HOME/reports
   apt:
     sources:
-      - elasticsearch-2.1
+      - elasticsearch-2.0
     packages:
-      - elasticsearch-2.1
+      - elasticsearch
 env:
 - TEST_SUITE=functional
 - TEST_SUITE=unit_and_integration
