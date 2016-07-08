@@ -3,13 +3,15 @@
 source ./bin/lib/test-setup.sh
 
 export FILE_OPENER_SKIP=true
+export ES_VERSION=2.1.2
 
 if [[ "$TRAVIS" != "" ]] ; then
     if [ "$TEST_SUITE" = "functional" ] || [ "$TEST_SUITE" = "" ] ; then
         echo "preparing metadata database"
         mysql -u root -e "create database metadata;grant all privileges on metadata.* to 'travis'@'localhost'"
         echo "running elasticsearch"
-        elasticsearch -d --default.path.conf=conf/test/esconfig
+        wget -qO- "http://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/$ES_VERSION/elasticsearch-$ES_VERSION.tar.gz" | tar xvz
+        "./elasticsearch-$ES_VERSION/elasticsearch" -d --default.path.conf=conf/test/esconfig
         wget --retry-connrefused --read-timeout=20 --timeout=15 --tries=20 --waitretry=3 -O - http://localhost:9200/
     fi
 fi
