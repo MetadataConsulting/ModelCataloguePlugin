@@ -26,7 +26,7 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
 
         expect:
         check 'div.modal' gone
-        remove messages
+        check closeGrowlMessage gone
 
         when:
         go "#/catalogue/change/all"

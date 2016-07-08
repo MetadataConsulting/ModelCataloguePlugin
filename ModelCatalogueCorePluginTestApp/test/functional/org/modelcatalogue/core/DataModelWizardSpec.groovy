@@ -71,7 +71,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         click exitButton
-        remove messages
+        check closeGrowlMessage gone
 
         then:
         check rightSideTitle is "New Data Model $uuid 0.0.1"
@@ -183,7 +183,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
             click exitButton
-            remove messages
+            check closeGrowlMessage gone
 
         then:
             check rightSideTitle is "New Data Model $uuid 0.0.1"
@@ -224,7 +224,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
             click exitButton
-            remove messages
+            check closeGrowlMessage gone
 
         then:
             check rightSideTitle is "New Data Model $uuid 0.0.1"

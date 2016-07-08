@@ -76,7 +76,7 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         check '.modal-body' gone
-        remove messages
+        check closeGrowlMessage gone
 
         check pendingActions contains 'BrandNewModel'
 

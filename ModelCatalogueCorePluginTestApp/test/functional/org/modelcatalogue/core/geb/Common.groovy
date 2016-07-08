@@ -37,7 +37,6 @@ class Common {
     static final String tableFooterAction = 'tr.inf-table-footer-action'
     static final String closeGrowlMessage = "div.messages-panel.growl div.alert button.close"
 
-    static final Keywords messages = Keywords.MESSAGES
     static final Keywords item = Keywords.ITEM
     static final Keywords pick = Keywords.SELECT
     static final Keywords prefer = Keywords.PREFER
