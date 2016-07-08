@@ -23,7 +23,7 @@ jdk:
 before_script:
 - "export DISPLAY=:99.0"
 before_install:
-- "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
+- "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1980x1080x16"
 script:
 - ./catalogue test
 after_script:
