@@ -24,14 +24,13 @@ baseUrl = 'http://localhost:8080/ModelCatalogueCorePluginTestApp/'
 ChromeDriverManager.getInstance().setup()
 MarionetteDriverManager.getInstance().setup()
 
-
-// See: http://code.google.com/p/selenium/wiki/ChromeDriver
 driver = {
-    DesiredCapabilities caps = DesiredCapabilities.chrome()
-    LoggingPreferences logPrefs = new LoggingPreferences()
-    logPrefs.enable(LogType.BROWSER, Level.WARNING)
-    caps.setCapability(CapabilityType.LOGGING_PREFS, logPrefs)
-    new ChromeDriver(caps)
+    DesiredCapabilities caps = DesiredCapabilities.firefox();
+    LoggingPreferences logPrefs = new LoggingPreferences();
+    logPrefs.enable(LogType.BROWSER, Level.WARNING);
+    caps.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
+    caps.setCapability("marionette", true);
+    new FirefoxDriver(caps)
 }
 
 waiting {
@@ -41,29 +40,16 @@ waiting {
 // Default to wraping `at SomePage` declarations in `waitFor` closures
 atCheckWaiting = true
 
-// Download the driver and set it up automatically
-
-private void downloadDriver(File file, String path) {
-    if (!file.exists()) {
-        def ant = new AntBuilder()
-        ant.get(src: path, dest: 'driver.zip')
-        ant.unzip(src: 'driver.zip', dest: file.parent)
-        ant.delete(file: 'driver.zip')
-        ant.chmod(file: file, perm: '700')
-    }
-}
-
 environments {
 
 
-    // run as "grails -Dgeb.env=firefox test-app"
-    firefox {
-        DesiredCapabilities caps = DesiredCapabilities.firefox();
-        LoggingPreferences logPrefs = new LoggingPreferences();
-        logPrefs.enable(LogType.BROWSER, Level.WARNING);
-        caps.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
-        caps.setCapability("marionette", true);
-        new FirefoxDriver(caps)
+    // run as "grails -Dgeb.env=chrome test-app"
+    chrome {
+        DesiredCapabilities caps = DesiredCapabilities.chrome()
+        LoggingPreferences logPrefs = new LoggingPreferences()
+        logPrefs.enable(LogType.BROWSER, Level.WARNING)
+        caps.setCapability(CapabilityType.LOGGING_PREFS, logPrefs)
+        new ChromeDriver(caps)
     }
 
     sauce {
