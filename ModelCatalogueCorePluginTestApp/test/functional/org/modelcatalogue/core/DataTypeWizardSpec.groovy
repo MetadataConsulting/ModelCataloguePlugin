@@ -65,7 +65,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         selectInTree 'Data Types'
 
         when:
-        check closeGrowlMessage gone
+        remove messages
         click create
 
         then:
@@ -90,7 +90,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "create primitive"() {
         when:
-        check closeGrowlMessage gone
+        remove messages
         click create
 
         then:
@@ -115,7 +115,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "create enum"() {
         when:
-        check closeGrowlMessage gone
+        remove messages
         click create
 
         then:
@@ -141,7 +141,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "create subset 2"() {
         when:
-        check closeGrowlMessage gone
+        remove messages
         click create
 
         then:
@@ -169,7 +169,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "create subset 3"() {
         when:
-        check closeGrowlMessage gone
+        remove messages
         click create
 
         then:
@@ -216,7 +216,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     def "create standard"() {
         when:
         select 'Test 1' select 'Data Types'
-        check closeGrowlMessage gone
+        remove messages
         click create
 
         then:
@@ -286,7 +286,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "create new mapping"() {
-        check closeGrowlMessage gone
+        remove messages
         check backdrop gone
 
         when: "create new mapping action is clicked"
@@ -339,7 +339,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "edit mapping"() {
-        check closeGrowlMessage gone
+        remove messages
 
         when: "mappings tab selected"
         selectTab 'mappings'
@@ -366,7 +366,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "create relationship"() {
         check backdrop gone
-        check closeGrowlMessage gone
+        remove messages
 
         when: "create relationship action is clicked"
         click createRelationship
@@ -387,7 +387,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         when:
         fillMetadata($(modalDialog), foo: 'bar', one: 'two')
 
-        check closeGrowlMessage gone
+        remove messages
 
         click modalPrimaryButton
 
@@ -399,7 +399,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "create relationship from footer action"() {
         check backdrop gone
-        check closeGrowlMessage gone
+        remove messages
 
         when: "related to tab selected"
         selectTab('relatedTo')
@@ -417,7 +417,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         when:
         fill 'element' with 'xs:string' and pick first item
 
-        check closeGrowlMessage gone
+        remove messages
 
         click modalPrimaryButton
 
@@ -428,7 +428,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "remove relationship"() {
         check backdrop gone
-        check closeGrowlMessage gone
+        remove messages
         when:
         toggleInfTableRow(1)
 
@@ -446,7 +446,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "remove mapping"() {
         check backdrop gone
-        check closeGrowlMessage gone
+        remove messages
         when:
         selectTab('mappings')
         toggleInfTableRow(1)
@@ -457,7 +457,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         click OK
-        check closeGrowlMessage gone
+        remove messages
 
         then:
         waitFor {
@@ -470,7 +470,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
             scroll up
         expect:
             check backdrop gone
-            check closeGrowlMessage gone
+            remove messages
         when:
             click changeType
         then:

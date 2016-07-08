@@ -163,7 +163,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         click inlineEditSubmit
 
         then: "same number of children are still shown"
-        check closeGrowlMessage gone
+        remove messages
 
         check {
             $('span.catalogue-element-treeview-name', text: startsWith("Changed Name")).parent().parent().find('.badge')
