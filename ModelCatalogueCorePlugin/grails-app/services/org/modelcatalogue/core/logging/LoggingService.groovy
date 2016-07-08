@@ -14,23 +14,24 @@ class LoggingService {
 
     AssetService assetService
 
-    BuildProgressMonitor saveLogsToAsset() {
+    Long saveLogsToAsset() {
         String timestamp = TIMESTAMP_FORMAT.format(new Date())
-        BuildProgressMonitor monitor = BuildProgressMonitor.create("Export logs $timestamp", timestamp)
-
-        File logs = logsDirectory
-
-        if (!logs) {
-            monitor.onError(new IllegalStateException("Cannot find logs directory. Is application running on Tomcat?"))
-            return monitor
-        }
-
-        Long assetId = assetService.storeReportAsAsset(
+        assetService.storeReportAsAsset(
             null,
             name: "Logs from $timestamp",
             originalFileName: "${timestamp}.zip",
             contentType: "application/zip"
-        ) { OutputStream outputStream ->
+        ) { OutputStream outputStream, Long assetId ->
+            BuildProgressMonitor monitor = BuildProgressMonitor.create("Export logs $timestamp", assetId)
+
+            File logs = logsDirectory
+
+            if (!logs) {
+                monitor.onError(new IllegalStateException("Cannot find logs directory. Is application running on Tomcat?"))
+                return monitor
+            }
+
+
             ZipOutputStream output = new ZipOutputStream(outputStream)
 
             try {
@@ -52,8 +53,6 @@ class LoggingService {
                 monitor.onCompleted()
             }
         }
-
-        return monitor
     }
 
 
