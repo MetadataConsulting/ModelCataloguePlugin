@@ -12,18 +12,22 @@ import org.openqa.selenium.remote.CapabilityType
 import org.openqa.selenium.remote.DesiredCapabilities
 import org.openqa.selenium.remote.RemoteWebDriver
 
+import io.github.bonigarcia.wdm.ChromeDriverManager
+import io.github.bonigarcia.wdm.MarionetteDriverManager
+
 import java.util.logging.Level
 
 reportsDir = new File("target/geb-reports")
 reportOnTestFailureOnly = false
 baseUrl = 'http://localhost:8080/ModelCatalogueCorePluginTestApp/'
 
+ChromeDriverManager.getInstance().setup()
+MarionetteDriverManager.getInstance().setup()
+
 driver = {
     DesiredCapabilities caps = DesiredCapabilities.firefox();
     LoggingPreferences logPrefs = new LoggingPreferences();
-    logPrefs.enable(LogType.BROWSER, Level.ALL);
-    logPrefs.enable(LogType.CLIENT, Level.ALL);
-    logPrefs.enable(LogType.DRIVER, Level.ALL);
+    logPrefs.enable(LogType.BROWSER, Level.WARNING);
     caps.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
     caps.setCapability("marionette", true);
     new FirefoxDriver(caps)
@@ -36,36 +40,16 @@ waiting {
 // Default to wraping `at SomePage` declarations in `waitFor` closures
 atCheckWaiting = true
 
-// Download the driver and set it up automatically
-
-private void downloadDriver(File file, String path) {
-    if (!file.exists()) {
-        def ant = new AntBuilder()
-        ant.get(src: path, dest: 'driver.zip')
-        ant.unzip(src: 'driver.zip', dest: file.parent)
-        ant.delete(file: 'driver.zip')
-        ant.chmod(file: file, perm: '700')
-    }
-}
-
 environments {
 
 
     // run as "grails -Dgeb.env=chrome test-app"
-    // See: http://code.google.com/p/selenium/wiki/ChromeDriver
     chrome {
-        def chromeDriver = new File('test/drivers/chrome/chromedriver')
-        downloadDriver(chromeDriver, "http://chromedriver.storage.googleapis.com/2.22/chromedriver_mac32.zip")
-        System.setProperty('webdriver.chrome.driver', chromeDriver.absolutePath)
-        driver = {
-            DesiredCapabilities caps = DesiredCapabilities.chrome();
-            LoggingPreferences logPrefs = new LoggingPreferences();
-            logPrefs.enable(LogType.BROWSER, Level.ALL);
-            logPrefs.enable(LogType.CLIENT, Level.ALL);
-            logPrefs.enable(LogType.DRIVER, Level.ALL);
-            caps.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
-            new ChromeDriver(caps);
-        }
+        DesiredCapabilities caps = DesiredCapabilities.chrome()
+        LoggingPreferences logPrefs = new LoggingPreferences()
+        logPrefs.enable(LogType.BROWSER, Level.WARNING)
+        caps.setCapability(CapabilityType.LOGGING_PREFS, logPrefs)
+        new ChromeDriver(caps)
     }
 
     sauce {
