@@ -19,7 +19,7 @@ addons:
     sources:
       - elasticsearch-2.1
     packages:
-      - elasticsearch
+      - elasticsearch-2.1
 env:
 - TEST_SUITE=functional
 - TEST_SUITE=unit_and_integration
