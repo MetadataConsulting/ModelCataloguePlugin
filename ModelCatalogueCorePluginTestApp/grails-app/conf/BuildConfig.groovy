@@ -75,7 +75,7 @@ grails.project.dependency.resolution = {
         runtime "org.apache.httpcomponents:httpclient:4.3.1"
 
         // Selenium WebDriver, for use in Geb
-        def webDriverVersion =  System.getenv('WEB_DRIVER_VERSION') ?: "2.53.0"
+        def webDriverVersion =  System.getenv('WEB_DRIVER_VERSION') ?: "2.53.1"
 
         // Testing modules
         test "org.gebish:geb-spock:$gebVersion"
@@ -98,7 +98,7 @@ grails.project.dependency.resolution = {
         // plugins for the compile step
         compile ":scaffolding:2.1.2"
         compile ':cache:1.1.8'
-        compile ":asset-pipeline:2.7.4"
+        compile ":asset-pipeline:2.9.1"
 
         compile ":console:1.5.6"
 

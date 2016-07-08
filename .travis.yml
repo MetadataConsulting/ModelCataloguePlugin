@@ -1,5 +1,7 @@
 language: groovy
 sudo: false
+services:
+  - mysql
 cache:
   directories:
   - node_modules

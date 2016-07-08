@@ -95,9 +95,9 @@ grails.project.dependency.resolution = {
 
         runtime ':database-migration:1.3.6'
 
-        compile ":asset-pipeline:2.7.4"
-        compile ":coffee-asset-pipeline:2.7.2"
-        compile ":less-asset-pipeline:2.7.2"
+        compile ":asset-pipeline:2.9.1"
+        compile ":coffee-asset-pipeline:2.9.1"
+        compile ":less-asset-pipeline:2.9.1"
         compile "org.grails.plugins:angular-annotate-asset-pipeline:2.4.0"
         compile "org.grails.plugins:babel-asset-pipeline:1.4.5"
 
@@ -112,7 +112,7 @@ grails.project.dependency.resolution = {
 
         compile ":csv:0.3.1"
 
-        compile ":spring-websocket:1.2.0"
+        compile ":spring-websocket:1.3.1"
 
         test ':build-test-data:2.1.2'
         test ':fixtures:1.3'
