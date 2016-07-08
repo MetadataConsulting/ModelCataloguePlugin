@@ -25,7 +25,7 @@ driver = {
     logPrefs.enable(LogType.CLIENT, Level.ALL);
     logPrefs.enable(LogType.DRIVER, Level.ALL);
     caps.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
-    caps.setCapability("marionette", true);
+//    caps.setCapability("marionette", true);
     new FirefoxDriver(caps)
 }
 
