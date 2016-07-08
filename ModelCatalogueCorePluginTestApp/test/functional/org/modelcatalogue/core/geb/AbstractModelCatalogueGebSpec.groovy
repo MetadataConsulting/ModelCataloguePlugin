@@ -116,20 +116,12 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
 
     FormFiller fill(String nameOrId) {
-        remove messages
+        check closeGrowlMessage gone
         Closure<Navigator> navigator =  { $("input[name=$nameOrId], #$nameOrId") }
         if (nameOrId.contains('#') || nameOrId.startsWith('.')) {
             navigator = { $(nameOrId) }
         }
         new FormFiller(this, navigator)
-    }
-
-    boolean remove(Keywords keyword) {
-        if (keyword == Keywords.MESSAGES) {
-            (driver as JavascriptExecutor).executeScript('angular.element(\'.messages-panel.growl\').html(\'\')')
-            return true
-        }
-        throw new IllegalArgumentException("Only 'messages' supported")
     }
 
     FormFiller fill(Closure<Navigator> navigatorClosure) {
@@ -266,7 +258,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     void selectTab(String name) {
-        remove messages
+        check closeGrowlMessage gone
         5.times {
             try {
                 noStale({ $("li[data-tab-name='$name'] a") }) {
