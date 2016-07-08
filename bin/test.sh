@@ -11,7 +11,7 @@ if [[ "$TRAVIS" != "" ]] ; then
         mysql -u root -e "create database metadata;grant all privileges on metadata.* to 'travis'@'localhost'"
         echo "running elasticsearch"
         wget -qO- "http://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/$ES_VERSION/elasticsearch-$ES_VERSION.tar.gz" | tar xvz
-        "./elasticsearch-$ES_VERSION/elasticsearch" -d --default.path.conf=conf/test/esconfig
+        "./elasticsearch-$ES_VERSION/bin/elasticsearch" -d --default.path.conf=conf/test/esconfig
         wget --retry-connrefused --read-timeout=20 --timeout=15 --tries=20 --waitretry=3 -O - http://localhost:9200/
     fi
 fi
