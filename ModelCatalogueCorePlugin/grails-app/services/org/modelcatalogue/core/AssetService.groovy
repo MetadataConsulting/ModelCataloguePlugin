@@ -166,7 +166,11 @@ class AssetService {
             try {
                 dos = new DigestOutputStream(it, md5)
                 cos = new CountingOutputStream(dos)
-                withOutputStream(cos)
+                if (withOutputStream.maximumNumberOfParameters == 1) {
+                    withOutputStream(cos)
+                } else {
+                    withOutputStream(cos, asset.id)
+                }
                 asset.size = cos.byteCount
             } catch (InvokerInvocationException e) {
                 // sadly this sometimes happens
@@ -201,7 +205,7 @@ class AssetService {
         return asset
     }
 
-    Long storeReportAsAsset(Map<String, Object> assetParams, DataModel dataModel, @ClosureParams(value = FromString, options= "java.io.OutputStream") Closure worker){
+    Long storeReportAsAsset(Map<String, Object> assetParams, DataModel dataModel, @ClosureParams(value = FromString, options= ["java.io.OutputStream", "java.io.OutputStream,java.lang.Long"]) Closure worker){
         assert assetParams.name
         assert assetParams.contentType
         assert assetParams.originalFileName
