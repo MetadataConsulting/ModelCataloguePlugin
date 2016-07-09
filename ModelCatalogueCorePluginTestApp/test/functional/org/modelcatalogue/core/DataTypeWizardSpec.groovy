@@ -65,7 +65,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         selectInTree 'Data Types'
 
         when:
-        remove messages
+        check closeGrowlMessage gone
         click create
 
         then:
@@ -90,7 +90,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "create primitive"() {
         when:
-        remove messages
+        check closeGrowlMessage gone
         click create
 
         then:
@@ -115,7 +115,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "create enum"() {
         when:
-        remove messages
+        check closeGrowlMessage gone
         click create
 
         then:
@@ -141,7 +141,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "create subset 2"() {
         when:
-        remove messages
+        check closeGrowlMessage gone
         click create
 
         then:
@@ -169,7 +169,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "create subset 3"() {
         when:
-        remove messages
+        check closeGrowlMessage gone
         click create
 
         then:
@@ -216,7 +216,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     def "create standard"() {
         when:
         select 'Test 1' select 'Data Types'
-        remove messages
+        check closeGrowlMessage gone
         click create
 
         then:
@@ -286,7 +286,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "create new mapping"() {
-        remove messages
+        check closeGrowlMessage gone
         check backdrop gone
 
         when: "create new mapping action is clicked"
@@ -339,7 +339,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "edit mapping"() {
-        remove messages
+        check closeGrowlMessage gone
 
         when: "mappings tab selected"
         selectTab 'mappings'
@@ -366,7 +366,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "create relationship"() {
         check backdrop gone
-        remove messages
+        check closeGrowlMessage gone
 
         when: "create relationship action is clicked"
         click createRelationship
@@ -387,7 +387,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         when:
         fillMetadata($(modalDialog), foo: 'bar', one: 'two')
 
-        remove messages
+        check closeGrowlMessage gone
 
         click modalPrimaryButton
 
@@ -399,7 +399,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "create relationship from footer action"() {
         check backdrop gone
-        remove messages
+        check closeGrowlMessage gone
 
         when: "related to tab selected"
         selectTab('relatedTo')
@@ -417,7 +417,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         when:
         fill 'element' with 'xs:string' and pick first item
 
-        remove messages
+        check closeGrowlMessage gone
 
         click modalPrimaryButton
 
@@ -428,7 +428,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "remove relationship"() {
         check backdrop gone
-        remove messages
+        check closeGrowlMessage gone
         when:
         toggleInfTableRow(1)
 
@@ -446,7 +446,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "remove mapping"() {
         check backdrop gone
-        remove messages
+        check closeGrowlMessage gone
         when:
         selectTab('mappings')
         toggleInfTableRow(1)
@@ -457,7 +457,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         click OK
-        remove messages
+        check closeGrowlMessage gone
 
         then:
         waitFor {
@@ -470,7 +470,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
             scroll up
         expect:
             check backdrop gone
-            remove messages
+            check closeGrowlMessage gone
         when:
             click changeType
         then:
