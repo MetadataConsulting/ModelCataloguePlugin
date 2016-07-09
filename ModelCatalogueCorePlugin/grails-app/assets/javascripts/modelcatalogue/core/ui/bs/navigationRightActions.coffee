@@ -207,6 +207,18 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
         $state.go 'simple.resource.list', resource: 'feedback'
     }
 
+  actionsProvider.registerChildAction 'admin-menu', 'logs', (messages,  enhance, rest,  modelCatalogueApiRoot) ->
+    "ngInject"
+    {
+      position:   10300
+      icon:       'fa fa-fw fa-archive'
+      label:      'Logs'
+      action: ->
+        enhance(rest(url: "#{modelCatalogueApiRoot}/logs")).then (asset) ->
+          asset.show()
+    }
+
+
   actionsProvider.registerActionInRole 'new-import', actionsProvider.ROLE_LIST_ACTION, [
     '$scope', 'names','security', '$state',
     ($scope ,  names , security ,  $state ) ->
