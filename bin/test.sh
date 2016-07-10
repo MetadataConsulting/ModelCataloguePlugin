@@ -3,7 +3,7 @@
 source ./bin/lib/test-setup.sh
 
 export FILE_OPENER_SKIP=true
-export GRAILS_OPTS="-Xmx3G -Xms1G -XX:MaxPermSize=1G -server"
+export GRAILS_OPTS="-Xmx2G -Xms512M -XX:MaxPermSize=1G -server"
 
 if [[ "$TRAVIS" != "" ]] ; then
     if [ "$TEST_SUITE" = "functional" ] || [ "$TEST_SUITE" = "" ] ; then
