@@ -11,6 +11,7 @@ cache:
   - $HOME/.grails/ivy-cache
   - $HOME/.grails/wrapper
 addons:
+  firefox: "46.0.1"
   s3_region: us-east-1
   artifacts:
     paths:
