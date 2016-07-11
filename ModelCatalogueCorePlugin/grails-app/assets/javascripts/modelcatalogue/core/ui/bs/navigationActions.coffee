@@ -2,6 +2,11 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
 .config (actionsProvider, names)->
   'ngInject'
 
+  anyParentDataModel = ($scope) ->
+    return $scope.currentDataModel if $scope.currentDataModel
+    return anyParentDataModel($scope.$parent) if $scope.$parent
+    return undefined
+
   ##############
   # Data Model #
   ##############
@@ -28,40 +33,30 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
                 $scope.element.imports.add element
     }
 
-
-
-  anyParentDataModel = ($scope) ->
-    return $scope.currentDataModel if $scope.currentDataModel
-    return anyParentDataModel($scope.$parent) if $scope.$parent
-    return undefined
-
-  RESOURCES = [
+  # Create
+  angular.forEach [
     'dataClass'
     'dataElement'
     'dataType'
     'measurementUnit'
     'asset'
     'validationRule'
-  ]
-
-  angular.forEach RESOURCES, (resource, index) ->
-
-    actionsProvider.registerChildAction 'catalogue-element', 'catalogue-element-create-' + resource, ['$scope', 'names', 'security', 'messages', '$state', '$log', 'catalogue', ($scope, names, security, messages, $state, $log, catalogue) ->
+  ], (resource, index) ->
+    actionsProvider.registerChildAction 'catalogue-element', 'catalogue-element-create-' + resource,
+      ($scope, names, security, messages, $state, $log, catalogue) ->
+        'ngInject'
         dataModel = anyParentDataModel($scope)
-
         return undefined unless security.hasRole('CURATOR')
         return undefined unless messages.hasPromptFactory('create-' + resource) or messages.hasPromptFactory('edit-' + resource)
-        return undefined unless dataModel
-        return undefined unless dataModel.status == 'DRAFT'
         return undefined unless angular.isFunction($scope.element.isInstanceOf)
         return undefined unless $scope.element.isInstanceOf('dataModel') or resource is 'dataClass' and $scope.element.isInstanceOf('dataClass')
 
-
         {
-          label:      "New #{names.getNaturalName(resource)}"
-          icon:       catalogue.getIcon(resource)
-          type:       'success'
-          position:   5000 + index
+          label: "New #{names.getNaturalName(resource)}"
+          icon: catalogue.getIcon(resource)
+          type: 'success'
+          position: 5000 + index
+          disabled: $scope.element.status != 'DRAFT'
           action:     ->
             args =
               create: resource
@@ -78,7 +73,8 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
               $log.error errors
               messages.error('You don\'t have rights to create new elements')
         }
-      ]
+
+
 
 
   actionsProvider.registerActionInRole 'create-data-model', 'data-models' ,['$scope', 'names', 'security', 'messages', '$state', '$log', ($scope, names, security, messages, $state, $log) ->
