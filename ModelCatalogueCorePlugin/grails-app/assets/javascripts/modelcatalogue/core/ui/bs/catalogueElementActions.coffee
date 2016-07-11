@@ -68,6 +68,39 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
       action
 
+    actionsProvider.registerChildActionInRole 'catalogue-element', 'delete', actionsProvider.ROLE_ITEM_ACTION,
+      ($rootScope, $scope, $state, messages, names, security) ->
+        'ngInject'
+        return undefined if not $scope.element
+        return undefined if not angular.isFunction($scope.element.delete)
+        return undefined if not angular.isFunction($scope.element.isInstanceOf)
+        return undefined if not security.hasRole('CURATOR')
+        return undefined if not ($scope.element.isInstanceOf('asset') or $scope.element.isInstanceOf('dataClass') or
+          $scope.element.isInstanceOf('dataElement') or $scope.element.isInstanceOf('dataModel') or
+          $scope.element.isInstanceOf('dataType') or $scope.element.isInstanceOf('measurementUnit'))
+
+        {
+          position: -1500
+          label: 'Delete'
+          icon: 'fa fa-fw fa-times-circle'
+          type: 'danger'
+          disabled: $scope.element.status != 'DRAFT'
+          action: ->
+            messages.confirm("Do you really want to delete #{$scope.element.getElementTypeName()} #{$scope.element.name}?",
+              "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be deleted permanently. " +
+                "This action cannot be undone. Be ware that only DRAFT can be deleted.")
+            .then ->
+              $scope.element.delete()
+              .then ->
+                messages.success "#{$scope.element.getElementTypeName()} #{$scope.element.name} deleted."
+                resource = names.getPropertyNameFromType($scope.element.elementType)
+                if resource == 'dataModel'
+                  $state.go('dataModels')
+                else if $state.current.name.indexOf('mc.resource.show') >= 0
+                  $state.go('mc.resource.list', {resource: resource}, {reload: true})
+              .catch showErrorsUsingMessages(messages)
+        }
+
   ##############
   # Data Model #
   ##############
@@ -558,37 +591,6 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
           , showErrorsUsingMessages(messages)
     }
   ]
-
-  actionsProvider.registerChildActionInRole 'catalogue-element', 'delete', actionsProvider.ROLE_ITEM_ACTION,
-    ($rootScope, $scope, $state, messages, names, security) ->
-      'ngInject'
-      return undefined if not $scope.element
-      return undefined if not angular.isFunction($scope.element.delete)
-      return undefined unless security.hasRole('CURATOR')
-      return undefined unless $scope.element.isInstanceOf('asset') or $scope.element.isInstanceOf('dataClass') or
-        $scope.element.isInstanceOf('dataElement') or $scope.element.isInstanceOf('dataModel') or
-        $scope.element.isInstanceOf('dataType') or $scope.element.isInstanceOf('measurementUnit')
-
-      {
-        position: -1500
-        label: 'Delete'
-        icon: 'fa fa-fw fa-times-circle'
-        type: 'danger'
-        action: ->
-          messages.confirm("Do you really want to delete #{$scope.element.getElementTypeName()} #{$scope.element.name}?",
-            "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be deleted permanently. " +
-              "This action cannot be undone. Be ware that only DRAFT can be deleted.")
-          .then ->
-            $scope.element.delete()
-            .then ->
-              messages.success "#{$scope.element.getElementTypeName()} #{$scope.element.name} deleted."
-              resource = names.getPropertyNameFromType($scope.element.elementType)
-              if resource == 'dataModel'
-                $state.go('dataModels')
-              else if $state.current.name.indexOf('mc.resource.show') >= 0
-                $state.go('mc.resource.list', {resource: resource}, {reload: true})
-            .catch showErrorsUsingMessages(messages)
-      }
 
   actionsProvider.registerChildActionInRole 'catalogue-element', 'finalize', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'security', ($rootScope, $scope, messages, security) ->
     return undefined unless security.hasRole('CURATOR')
