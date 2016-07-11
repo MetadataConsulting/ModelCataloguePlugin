@@ -16,7 +16,6 @@ import org.modelcatalogue.core.ValidationRule
 @Log4j
 class DocxSpecificationDataHelper {
 
-    final Set<Long> processedDataClasses = new HashSet<Long>()
     final Set<ValidationRule> rules = new HashSet<>()
 
     private static final Map<String, Object> HEADER_CELL = [background: '#F2F2F2']
@@ -36,7 +35,7 @@ class DocxSpecificationDataHelper {
         a?.name <=> b?.name
     }] as Comparator<DataType>)
 
-    def printModel(DataClass dataClass, boolean recurse, int level) {
+    def printModel(DataClass dataClass, boolean recurse, int level, String multiplicity = "") {
         if ((recurse && level > depth) || level > 50 ) { //stop potential runaway?
             return
         }
@@ -44,11 +43,12 @@ class DocxSpecificationDataHelper {
         log.debug "Exporting data class $dataClass to Word Document level=$level"
 
         builder.with {
-            if (dataClass.getId() in processedDataClasses) {
-                "heading${Math.min(level + 1, 6)}" dataClass.name, ref: "${dataClass.getId()}"
-            } else {
-                "heading${Math.min(level + 1, 6)}" dataClass.name
+
+            if(level<5){
+                pageBreak()
             }
+
+            "heading${Math.min(level + 1, 6)}" dataClass.name + " [$multiplicity]"
 
             paragraph {
                 if (dataClass.description) {
@@ -90,7 +90,7 @@ class DocxSpecificationDataHelper {
                         }
                         row {
                             cell {
-                                text CELL_TEXT_FIRST, "${dataElement.name} (${dataElement.getCombinedVersion()})"
+                                text CELL_TEXT_FIRST, "${dataElement.name} (${(dataElement.ext.get("http://www.modelcatalogue.org/metadata/genomics/#gel-id"))? dataElement.ext.get("http://www.modelcatalogue.org/metadata/genomics/#gel-id") + "@" + dataElement.getDataModelSemanticVersion() : dataElement.getCombinedVersion()}  )"
                             }
                             cell {
                                 text CELL_TEXT, dataElement.description ?: ''
@@ -105,8 +105,6 @@ class DocxSpecificationDataHelper {
                                     text attrs, dataElement.dataType.name
                                     if (dataElement.dataType?.instanceOf(EnumeratedType)) {
                                         text '\n\n'
-                                        text 'Enumerations', font: [italic: true]
-                                        text '\n'
                                         if (dataElement.dataType.enumerations.size() <= 10) {
                                             for (entry in dataElement.dataType.enumerations) {
                                                 text "${entry.key ?: ''}", font: [bold: true]
@@ -144,15 +142,15 @@ class DocxSpecificationDataHelper {
                 }
             }
 
-            if (recurse && !(dataClass.getId() in processedDataClasses)) {
+            if (recurse) {
                 if (dataClass.countParentOf()) {
-                    for (DataClass child in dataClass.parentOf) {
-                        printModel(child, true, level + 1)
+                    for (Relationship dataClassRelationship in dataClass.parentOfRelationships) {
+                        DataClass child = dataClassRelationship.destination
+                        printModel(child, true, level + 1, "${dataClassRelationship.ext.get("Min Occurs")?:"0"}..${dataClassRelationship.ext.get("Max Occurs")?:"*"}")
                     }
                 }
             }
 
-            processedDataClasses << dataClass.getId()
         }
     }
 
