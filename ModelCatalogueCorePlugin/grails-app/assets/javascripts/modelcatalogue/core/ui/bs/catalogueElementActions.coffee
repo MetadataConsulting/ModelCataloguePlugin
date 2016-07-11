@@ -16,9 +16,61 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       return relationship.element.status is 'FINALIZED'
     return relationship.relation.status is 'FINALIZED'
 
-  ########################
-  # Data Model - actions #
-  ########################
+  ##############################
+  # Common - Catalogue Element #
+  ##############################
+
+  # Deprecate / Restore
+  actionsProvider.registerChildActionInRole 'catalogue-element', 'archive', actionsProvider.ROLE_ITEM_ACTION,
+    ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
+      'ngInject'
+      return undefined if not $scope.element
+      return undefined if not $scope.element.status
+      return undefined if not security.hasRole('CURATOR')
+
+      action = {
+        position: -1800
+        watches: ['element.status', 'element.archived']
+        disable: $scope.element.archived and not security.hasRole('ADMIN')
+        action: ->
+          if $scope.element.archived
+            if security.hasRole('ADMIN')
+              messages.confirm("Do you want to restore #{$scope.element.getElementTypeName()} #{$scope.element.name} as finalized?",
+                "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will no longer be deprecated").then ->
+                  enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/restore", method: 'POST')).then (restored) ->
+                    $scope.element.updateFrom restored
+                    $rootScope.$broadcast 'catalogueElementUpdated', restored
+                    $rootScope.$broadcast 'redrawContextualActions'
+                    restored.focus()
+                  , showErrorsUsingMessages(messages)
+          else
+            messages.confirm("Do you want to mark #{$scope.element.getElementTypeName()} #{$scope.element.name} as deprecated?",
+              "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be marked as deprecated").then ->
+                enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/archive", method: 'POST')).then (archived) ->
+                  $scope.element.updateFrom archived
+                  $rootScope.$broadcast 'catalogueElementUpdated', archived
+                  $rootScope.$broadcast 'redrawContextualActions'
+                  archived.focus()
+                , showErrorsUsingMessages(messages)
+      }
+
+      if $scope.element.archived
+        if not security.hasRole('ADMIN')
+          action.disabled = true
+        else
+          action.label = 'Restore'
+          action.icon = 'fa fa-fw fa-repeat'
+          action.type = 'primary'
+      else
+        action.label = 'Deprecate'
+        action.icon = 'fa fa-fw fa-ban'
+        action.type = 'danger'
+
+      action
+
+  ##############
+  # Data Model #
+  ##############
 
   # New Version
   newVersionAction = ($rootScope, $scope, messages, security) ->
@@ -29,18 +81,21 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not $scope.element.isInstanceOf('dataModel')
     return undefined if not security.hasRole('CURATOR')
     {
-      position:   -1900
-      label:      'New Version'
-      icon:       'fa fa-fw fa-arrow-circle-up'
-      type:       'primary'
-      watches:    ['element.status', 'element.archived']
-      disabled:   $scope.element.archived || $scope.element.status == 'DRAFT' || $scope.element.status == 'PENDING' ||
+      position: -1900
+      label: 'New Version'
+      icon: 'fa fa-fw fa-arrow-circle-up'
+      type: 'primary'
+      watches: ['element.status', 'element.archived']
+      disabled: $scope.element.archived || $scope.element.status == 'DRAFT' || $scope.element.status == 'PENDING' ||
         $scope.element.history.total != $scope.element.versionNumber
       action:     ->
         messages.prompt(null, null, type: 'new-version', element: $scope.element)
     }
   actionsProvider.registerChildActionInRole 'catalogue-element', 'create-new-version', actionsProvider.ROLE_ITEM_ACTION, newVersionAction
   actionsProvider.registerActionInRoles 'create-new-version-tiny', [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INIFINITE_LIST], newVersionAction
+
+
+
 
   actionsProvider.registerActionInRoles 'catalogue-element',[actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'security', 'names', 'catalogue', ($scope, security, name, catalogue)->
     return undefined if not security.hasRole('CURATOR')
@@ -577,52 +632,6 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
   actionsProvider.registerChildActionInRole 'catalogue-element', 'upload-new-asset-version', actionsProvider.ROLE_ITEM_ACTION, newAssetVersion
   actionsProvider.registerActionInRoles 'upload-new-asset-version-tiny', [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INIFINITE_LIST], newAssetVersion
-
-
-
-  actionsProvider.registerChildActionInRole 'catalogue-element', 'archive', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
-    return undefined if not $scope.element
-    return undefined if not $scope.element.status
-    return undefined if not security.hasRole('CURATOR')
-    return undefined if $scope.element.archived and not security.hasRole('ADMIN')
-
-    action = {
-      position:   -1800
-      watches:    ['element.status', 'element.archived']
-      action:     ->
-        if $scope.element.archived
-          if security.hasRole('ADMIN')
-            messages.confirm("Do you want to restore #{$scope.element.getElementTypeName()} #{$scope.element.name} as finalized?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will no longer be deprecated").then ->
-              enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/restore", method: 'POST')).then (restored) ->
-                $scope.element.updateFrom restored
-                $rootScope.$broadcast 'catalogueElementUpdated', restored
-                $rootScope.$broadcast 'redrawContextualActions'
-                restored.focus()
-              , showErrorsUsingMessages(messages)
-        else
-          messages.confirm("Do you want to mark #{$scope.element.getElementTypeName()} #{$scope.element.name} as deprecated?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be marked as deprecated").then ->
-            enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/archive", method: 'POST')).then (archived) ->
-              $scope.element.updateFrom archived
-              $rootScope.$broadcast 'catalogueElementUpdated', archived
-              $rootScope.$broadcast 'redrawContextualActions'
-              archived.focus()
-            , showErrorsUsingMessages(messages)
-    }
-
-    if $scope.element.archived
-      if not security.hasRole('ADMIN')
-        action.disabled = true
-      else
-        action.label = 'Restore'
-        action.icon = 'fa fa-fw fa-repeat'
-        action.type = 'primary'
-    else
-      action.label = 'Deprecate'
-      action.icon = 'fa fa-fw fa-ban'
-      action.type = 'danger'
-
-    action
-  ]
 
   actionsProvider.registerChildActionInRole 'catalogue-element', 'merge', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
     return undefined if not $scope.element
