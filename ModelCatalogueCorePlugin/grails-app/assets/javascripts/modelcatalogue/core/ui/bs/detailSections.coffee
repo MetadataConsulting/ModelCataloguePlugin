@@ -168,11 +168,12 @@ x in ['apple', 'banana', 'cherry']
     setDeprecated: (enumeration, deprecated, globalMessages, element, rest, modelCatalogueApiRoot) ->
       title = "Do you want to mark enumeration #{enumeration.key} as deprecated?"
       message = "The enumeration #{enumeration.key} will be marked as deprecated."
-      if element.archived
+      if enumeration.deprecated
         title = "Do you want to restore enumeration #{enumeration.key}?"
         message = "The enumeration #{enumeration.key} will no longer be deprecated."
       globalMessages.confirm(title, message).then ->
         rest(url: "#{modelCatalogueApiRoot}#{element.link}/setDeprecated", method: 'POST', data: {enumerationId: enumeration.id, deprecated: deprecated}).then () ->
+          enumeration.deprecated = !enumeration.deprecated
           globalMessages.success "Enumeration #{enumeration.key} has been #{if deprecated then 'deprecated' else 'restored'}."
         , (result) ->
           globalMessages.error "Error during setting deprecated."
