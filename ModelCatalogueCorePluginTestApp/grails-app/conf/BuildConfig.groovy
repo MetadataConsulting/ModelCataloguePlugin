@@ -83,9 +83,11 @@ grails.project.dependency.resolution = {
         test "org.seleniumhq.selenium:selenium-firefox-driver:${webDriverVersion}"
         test "org.seleniumhq.selenium:selenium-chrome-driver:${webDriverVersion}"
         test "org.seleniumhq.selenium:selenium-remote-driver:${webDriverVersion}"
+        test 'io.github.bonigarcia:webdrivermanager:1.4.6'
 
 
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
+
     }
 
     plugins {
