@@ -238,7 +238,7 @@ class RareDiseasesDocExporter {
     private void descendModels(DocumentBuilder builder, DataClass model, Integer level) {
         log.debug "descendModels level=$level count=" + this.modelCount
 
-        String modelName = model.name + " (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:''})"
+        String modelName = model.name + " (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getCombinedVersion()})"
         levelNameDescriptions.put(level, modelName)
         levelModelDescriptions.put(level, model.description)
 
@@ -294,7 +294,7 @@ class RareDiseasesDocExporter {
 
     private void printModel(DocumentBuilder builder, DataClass model, Integer level, boolean phenotypeMode) {
         log.debug "printModel level=$level"
-        String modelName = model.name + " (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:''})"
+        String modelName = model.name + " (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getCombinedVersion()})"
         levelNameDescriptions.put(level, modelName)
 
         builder.with {
@@ -350,7 +350,7 @@ class RareDiseasesDocExporter {
 
                     model.parentOf.each { DataClass child ->
                         if (child.name) {
-                            String childName = child.name + " (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:''})"
+                            String childName = child.name + " (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getCombinedVersion()})"
                             text CELL_TEXT_SECOND_BOLD, "\n$childName\n"
                         }
                         if (child.description) {

@@ -45,7 +45,7 @@ class RareDiseaseCsvExporter {
     }
 
     private void printRareDiseaseChild(DataClass child, String prefix, Integer level) {
-        def id = child.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')
+        def id = child.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:child.getCombinedVersion()
 
         if (level == 0) {
             out << headersLine
@@ -154,7 +154,7 @@ class RareDiseaseCsvExporter {
 //                    if (cd.description?.trim()) description = new String(StandardCharsets.UTF_8.encode(cd.description).array()).replace('•', '>').replaceAll("(?m)^\\-", '>')
                     if (cd.description?.trim()) description = cd.description.replace('•', '>').replaceAll("(?m)^\\-", '>')
                     if (index != 0) currentLine += prefix
-                    currentLine += "${cd.name.replace(',', ' - ')},${cd.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')},${description ? "\"${description.replace('\"', '\"\"')}\"" : ""}"
+                    currentLine += "${cd.name.replace(',', ' - ')},${cd.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:cd.getCombinedVersion()},${description ? "\"${description.replace('\"', '\"\"')}\"" : ""}"
                     printTrailingCommas()
                 }
             } catch (Exception e) {
@@ -195,7 +195,7 @@ class RareDiseaseCsvExporter {
     }
 
     public static String getVersionId(CatalogueElement c) {
-        return c.ext.get("http://www.modelcatalogue.org/metadata/genomics/#gel-test-id-versioned")?:c.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')
+        return c.ext.get("http://www.modelcatalogue.org/metadata/genomics/#gel-test-id-versioned")?:c.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:c.getCombinedVersion()
     }
 
     private void printTrailingCommas() {

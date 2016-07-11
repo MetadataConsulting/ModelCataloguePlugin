@@ -26,7 +26,7 @@ class RareDiseasesJsonExporter {
         int depth = 6
         def exclusions = ['Phenotype','Clinical Test','Closing Statement','Guidance']
 
-        log.info "Exporting Rare Disease Eligibility Criteria as json ${model.name} (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:''})"
+        log.info "Exporting Rare Disease Eligibility Criteria as json ${model.name} (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getCombinedVersion()})"
 
         //define the json tagnames to use for each level in the model
         def levelTag1 = [tag1: 'DiseaseGroups']
@@ -39,7 +39,7 @@ class RareDiseasesJsonExporter {
 
         exportJson(model, depth, levelMetaData, exclusions)
 
-        log.info "Rare Disease Eligibility Criteria exported as json ${model.name} (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:''}) ."
+        log.info "Rare Disease Eligibility Criteria exported as json ${model.name} (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getCombinedVersion()}) ."
     }
 
     void exportDiseaseListOnly(DataClass model) {
@@ -79,7 +79,7 @@ class RareDiseasesJsonExporter {
 
             case 4: // generate line and add to list
 
-                map.put("id", model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:'')
+                map.put("id", model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getCombinedVersion())
                 map.put("diseaseGroup",  groupDescriptions.get(level - 2))
                 map.put("diseaseSubgroup",  groupDescriptions.get(level - 1))
                 map.put("diseaseName", modelName)
@@ -131,7 +131,7 @@ class RareDiseasesJsonExporter {
             case [2,3,4,5]:
                 if(level==2) modelCount = modelCount + 1
                 // resolves to something concrete like - map.put('id', "$model.id")
-                map.put(levelMetaData.get(level).tag1, model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:'')
+                map.put(levelMetaData.get(level).tag1, model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getCombinedVersion())
                 map.put(levelMetaData.get(level).tag2, model.name)
                 map.put(levelMetaData.get(level).tag3, modelList)
 
@@ -139,7 +139,7 @@ class RareDiseasesJsonExporter {
                 break
 
             case 6:
-                map.put(levelMetaData.get(level).tag1, model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:'')
+                map.put(levelMetaData.get(level).tag1, model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?: model.getCombinedVersion())
                 map.put(levelMetaData.get(level).tag2, model.name)
                 map.put(levelMetaData.get(level).tag3, model.description ?: '')
 
