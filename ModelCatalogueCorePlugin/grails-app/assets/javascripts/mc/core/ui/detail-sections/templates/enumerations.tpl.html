@@ -23,7 +23,7 @@
   <div class="row">
     <div class="custom-metadata col-md-12" ng-if="editableForm.$visible">
       <div ng-if="copy.ext.get('http://www.modelcatalogue.org/metadata/enumerateType#subset')" class="alert alert-warning">
-        Following values are inherited and will be overriden when the base enumeration changes:
+        Following values are inherited and will be overridden when the base enumeration changes:
         {{copy.ext.get('http://www.modelcatalogue.org/metadata/enumerateType#subset')}}
       </div>
       <ordered-map-editor object="copy.enumerations"
