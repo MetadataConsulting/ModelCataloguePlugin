@@ -1,4 +1,5 @@
-angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).config ['actionsProvider', 'names', (actionsProvider, names)->
+angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).config (actionsProvider, names) ->
+  'ngInject'
 
   showErrorsUsingMessages = (messages) ->
     (response) ->
@@ -664,4 +665,3 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
   actionsProvider.registerChildActionInRole 'catalogue-element', 'upload-new-asset-version', actionsProvider.ROLE_ITEM_ACTION, newAssetVersion
   actionsProvider.registerActionInRoles 'upload-new-asset-version-tiny', [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INIFINITE_LIST], newAssetVersion
-]

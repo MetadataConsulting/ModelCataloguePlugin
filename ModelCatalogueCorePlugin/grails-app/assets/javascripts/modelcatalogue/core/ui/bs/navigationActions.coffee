@@ -1,4 +1,34 @@
-angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.util.security']).config ['actionsProvider', 'names', (actionsProvider, names)->
+angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.util.security'])
+.config (actionsProvider, names)->
+  'ngInject'
+
+  ##############
+  # Data Model #
+  ##############
+
+  # Import
+  actionsProvider.registerChildAction 'catalogue-element', 'add-import', ($scope, messages, names, security, catalogue) ->
+    'ngInject'
+    return undefined if not $scope.element
+    return undefined if not angular.isFunction($scope.element.isInstanceOf)
+    return undefined if not $scope.element.isInstanceOf('dataModel')
+    return undefined if not security.hasRole('CURATOR')
+
+    {
+      position:   -1000
+      label:      'Add Data Model Import'
+      icon:       'fa fa-fw fa-puzzle-piece'
+      type:       'success'
+      action:     ->
+        messages.prompt('Add Data Model Import', 'If you want to reuse data classes, data types or measurement units ' +
+            'form different data models you need to import the containing data model first.',
+          {type: 'catalogue-elements', resource: 'dataModel' }).then (elements) ->
+            angular.forEach elements, (element) ->
+              unless angular.isString(element)
+                $scope.element.imports.add element
+    }
+
+
 
   anyParentDataModel = ($scope) ->
     return $scope.currentDataModel if $scope.currentDataModel
@@ -84,25 +114,6 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     }
   ]
 
-  actionsProvider.registerChildAction 'catalogue-element', 'add-import', ['$scope', 'messages', 'names', 'security', 'catalogue', ($scope, messages, names, security, catalogue) ->
-    return undefined if not security.isUserLoggedIn()
-    return undefined if not $scope.element
-    return undefined if not angular.isFunction($scope.element.isInstanceOf)
-    return undefined if not $scope.element.isInstanceOf('dataModel')
-
-    {
-      position:   -1000
-      label:      'Add Data Model Import'
-      icon:       'fa fa-fw fa-puzzle-piece'
-      type:       'success'
-      action:     ->
-        messages.prompt('Add Data Model Import', 'If you want to reuse data classes, data types or measurement units form different data models you need to import the containing data model first.', {type: 'catalogue-elements', resource: 'dataModel' }).then (elements) ->
-          angular.forEach elements, (element) ->
-            unless angular.isString(element)
-              $scope.element.imports.add element
-    }
-  ]
-
   actionsProvider.registerActionInRole 'global-draft', actionsProvider.ROLE_GLOBAL_ACTION, ['$state', '$stateParams', 'catalogue', ($state, $stateParams, catalogue) ->
     return undefined unless $state.current.name == 'mc.resource.list'
     return undefined unless catalogue.isInstanceOf($stateParams.resource, 'catalogueElement')
@@ -144,5 +155,3 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
       action: ->  messages.prompt('','', type: 'about-dialog')
     }
   ]
-
-]
