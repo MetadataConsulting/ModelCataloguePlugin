@@ -15,6 +15,11 @@ addons:
   artifacts:
     paths:
     - $HOME/reports
+  apt:
+    sources:
+      - elasticsearch-2.0
+    packages:
+      - elasticsearch
 env:
 - TEST_SUITE=functional
 - TEST_SUITE=unit_and_integration
