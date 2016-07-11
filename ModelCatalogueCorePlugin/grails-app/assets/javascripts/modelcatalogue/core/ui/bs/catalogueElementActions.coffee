@@ -16,6 +16,32 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       return relationship.element.status is 'FINALIZED'
     return relationship.relation.status is 'FINALIZED'
 
+  ########################
+  # Data Model - actions #
+  ########################
+
+  # New Version
+  newVersionAction = ($rootScope, $scope, messages, security) ->
+    'ngInject'
+    return undefined if not $scope.element
+    return undefined if not $scope.element.status
+    return undefined if not angular.isFunction($scope.element.isInstanceOf)
+    return undefined if not $scope.element.isInstanceOf('dataModel')
+    return undefined if not security.hasRole('CURATOR')
+    {
+      position:   -1900
+      label:      'New Version'
+      icon:       'fa fa-fw fa-arrow-circle-up'
+      type:       'primary'
+      watches:    ['element.status', 'element.archived']
+      disabled:   $scope.element.archived || $scope.element.status == 'DRAFT' || $scope.element.status == 'PENDING' ||
+        $scope.element.history.total != $scope.element.versionNumber
+      action:     ->
+        messages.prompt(null, null, type: 'new-version', element: $scope.element)
+    }
+  actionsProvider.registerChildActionInRole 'catalogue-element', 'create-new-version', actionsProvider.ROLE_ITEM_ACTION, newVersionAction
+  actionsProvider.registerActionInRoles 'create-new-version-tiny', [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INIFINITE_LIST], newVersionAction
+
   actionsProvider.registerActionInRoles 'catalogue-element',[actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'security', 'names', 'catalogue', ($scope, security, name, catalogue)->
     return undefined if not security.hasRole('CURATOR')
     return undefined unless $scope.element
@@ -528,33 +554,6 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
         messages.prompt(null, null, type: 'finalize', element: $scope.element)
     }
   ]
-
-  newVersionAction = ['$rootScope','$scope', 'messages', 'security', ($rootScope, $scope, messages, security) ->
-    return undefined if not $scope.element
-    return undefined if not $scope.element.status
-    return undefined if not security.hasRole('CURATOR')
-    return undefined if $scope.element.status == 'DRAFT'
-    return undefined if $scope.element.status == 'PENDING'
-    return undefined if not angular.isFunction($scope.element.isInstanceOf)
-    return undefined if not $scope.element.isInstanceOf('catalogueElement')
-    return undefined if $scope.element.isInstanceOf('asset')
-
-    {
-      position:   -1900
-      label:      'New Version'
-      icon:       'fa fa-fw fa-arrow-circle-up'
-      type:       'primary'
-      watches:    ['element.status', 'element.archived']
-      disabled:   $scope.element.archived || $scope.element.status == 'DRAFT' || $scope.element.status == 'PENDING'
-      action:     ->
-        messages.prompt(null, null, type: 'new-version', element: $scope.element)
-    }
-  ]
-
-
-  actionsProvider.registerChildActionInRole 'catalogue-element', 'create-new-version', actionsProvider.ROLE_ITEM_ACTION, newVersionAction
-  actionsProvider.registerActionInRoles 'create-new-version-tiny', [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INIFINITE_LIST], newVersionAction
-
 
   newAssetVersion = ['$rootScope','$scope', 'messages', 'security', ($rootScope, $scope, messages, security) ->
     return undefined if not $scope.element
