@@ -3,6 +3,7 @@ angular.module('mc.core.ui.utils').directive 'orderedMapEditor',  [-> {
     replace: true
     scope:
       object:             '='
+      canDeprecate:       '='
       title:              '@?'
       valueTitle:         '@?'
       keyPlaceholder:     '@?'
@@ -29,7 +30,10 @@ angular.module('mc.core.ui.utils').directive 'orderedMapEditor',  [-> {
         $scope.object.values.splice(newIndex, 0, newProperty)
 
       $scope.setDeprecated = (property, deprecated) ->
-        property.deprecated = deprecated
+        if ($scope.canDeprecate)
+          property.deprecated = deprecated
+        else
+          $log.error("cannot deprecate property as it is not allowed for this orderMapEditor", property)
 
       $scope.isKeyUnique = (key) ->
         return false if not key and $scope.object.values.length > 1
