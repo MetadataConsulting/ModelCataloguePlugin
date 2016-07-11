@@ -17,16 +17,10 @@ import java.util.logging.Level
 reportsDir = new File("target/geb-reports")
 reportOnTestFailureOnly = false
 baseUrl = 'http://localhost:8080/ModelCatalogueCorePluginTestApp/'
+cacheDriver = false
 
 driver = {
-    DesiredCapabilities caps = DesiredCapabilities.firefox();
-    LoggingPreferences logPrefs = new LoggingPreferences();
-    logPrefs.enable(LogType.BROWSER, Level.ALL);
-    logPrefs.enable(LogType.CLIENT, Level.ALL);
-    logPrefs.enable(LogType.DRIVER, Level.ALL);
-    caps.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
-    caps.setCapability("marionette", true);
-    new FirefoxDriver(caps)
+    new FirefoxDriver()
 }
 
 waiting {
