@@ -68,6 +68,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
       action
 
+    # Delete
     actionsProvider.registerChildActionInRole 'catalogue-element', 'delete', actionsProvider.ROLE_ITEM_ACTION,
       ($rootScope, $scope, $state, messages, names, security) ->
         'ngInject'
@@ -100,6 +101,35 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
                   $state.go('mc.resource.list', {resource: resource}, {reload: true})
               .catch showErrorsUsingMessages(messages)
         }
+
+      # Merge
+      actionsProvider.registerChildActionInRole 'catalogue-element', 'merge', actionsProvider.ROLE_ITEM_ACTION,
+        ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
+          'ngInject'
+          return undefined if not $scope.element
+          return undefined if not $scope.element.status
+          return undefined if not security.hasRole('CURATOR')
+
+          {
+            position:   10000
+            label:      'Merge'
+            icon:       'fa fa-fw fa-code-fork fa-rotate-180 fa-flip-vertical'
+            type:       'danger'
+            watches:    ['element.status', 'element.archived']
+            disabled:   $scope.element.status != 'DRAFT'
+            action:     ->
+              messages.prompt("Merge #{$scope.element.getElementTypeName()} #{$scope.element.name} to another #{$scope.element.getElementTypeName()}",
+                "All non-system relationships of the #{$scope.element.getElementTypeName()} #{$scope.element.name} will be moved to the following destination and " +
+                "than the #{$scope.element.getElementTypeName()} #{$scope.element.name} will be archived",
+                {type: 'catalogue-element', resource: $scope.element.elementType, status: 'draft'})
+              .then (destination)->
+                enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/merge/#{destination.id}", method: 'POST')).then (merged) ->
+                  oldName = $scope.element.classifiedName
+                  messages.success "Element #{oldName} merged successfully into  #{$scope.element.classifiedName}"
+                  merged.show()
+                  $rootScope.$broadcast 'redrawContextualActions'
+                , showErrorsUsingMessages(messages)
+          }
 
   ##############
   # Data Model #
@@ -634,28 +664,4 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
   actionsProvider.registerChildActionInRole 'catalogue-element', 'upload-new-asset-version', actionsProvider.ROLE_ITEM_ACTION, newAssetVersion
   actionsProvider.registerActionInRoles 'upload-new-asset-version-tiny', [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INIFINITE_LIST], newAssetVersion
-
-  actionsProvider.registerChildActionInRole 'catalogue-element', 'merge', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
-    return undefined if not $scope.element
-    return undefined if not $scope.element.status
-    return undefined if not security.hasRole('CURATOR')
-
-    {
-      position:   10000
-      label:      'Merge'
-      icon:       'fa fa-fw fa-code-fork fa-rotate-180 fa-flip-vertical'
-      type:       'danger'
-      watches:    ['element.status', 'element.archived']
-      disabled:   $scope.element.status != 'DRAFT'
-      action:     ->
-        messages.prompt("Merge #{$scope.element.getElementTypeName()} #{$scope.element.name} to another #{$scope.element.getElementTypeName()}", "All non-system relationships of the #{$scope.element.getElementTypeName()} #{$scope.element.name} will be moved to the following destination and than the #{$scope.element.getElementTypeName()} #{$scope.element.name} will be archived", {type: 'catalogue-element', resource: $scope.element.elementType, status: 'draft'}).then (destination)->
-          enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/merge/#{destination.id}", method: 'POST')).then (merged) ->
-            oldName = $scope.element.classifiedName
-            messages.success "Element #{oldName} merged successfully into  #{$scope.element.classifiedName}"
-            merged.show()
-            $rootScope.$broadcast 'redrawContextualActions'
-          , showErrorsUsingMessages(messages)
-    }
-  ]
-
 ]
