@@ -79,16 +79,14 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     def loginUser(String user, String pwd) {
         go "login/auth"
 
-        $("#username").value(user)
-        $("#password").value(pwd)
+        fill "#username" with user
+        fill "#password" with pwd
 
-        $("#loginForm").find("button.btn-primary").first().click()
+        click "button.btn-primary"
 
         go "#/dataModels"
 
-        waitFor {
-            $("#role_navigation-right_user-menu-menu-item-link").first().displayed
-        }
+        check "#role_navigation-right_user-menu-menu-item-link"
         check "#my-models" displayed
     }
 
