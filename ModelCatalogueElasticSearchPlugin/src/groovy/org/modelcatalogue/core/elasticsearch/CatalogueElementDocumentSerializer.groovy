@@ -15,7 +15,6 @@ class CatalogueElementDocumentSerializer<T extends CatalogueElement> implements 
     ImmutableMap.Builder<String, Object> buildDocument(IndexingSession session, T element, ImmutableMap.Builder<String, Object> builder) {
         Class<? extends CatalogueElement> clazz = getEntityClass(element)
 
-        safePut(builder, 'id', element.id)
         safePut(builder, 'name', element.name)
         safePut(builder, 'name_not_analyzed', element.name)
         safePut(builder, 'link', "/${GrailsNameUtils.getPropertyName(clazz)}/${element.getId()}")
