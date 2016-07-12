@@ -22,8 +22,6 @@ class ElasticSearchServiceSpec extends org.modelcatalogue.testapp.AbstractIntegr
         RelationshipType.relatedToType.searchable = true
         RelationshipType.relatedToType.save()
         relationshipTypeService.clearCache()
-
-        elasticSearchService.initLocalClient()
         elasticSearchService.reindex().toBlocking().subscribe()
     }
 
