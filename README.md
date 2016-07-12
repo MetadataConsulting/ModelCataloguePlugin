@@ -31,7 +31,7 @@ Model Catalogue
 
 ## Credits
 The model catalogue is maintained by [Metadata Consulting](http://www.metadataconsulting.co.uk). 
-We also wish to thank [Genomics England](http://www.genomicsengland.co.uk/), [the Medical Research Council](http://www.mrc.ac.uk/) and [NIHR](http://www.nihr.ac.uk/) for their support, as well as David Milward, Adam Milward, Vladimir Orany, Matous Kucera, Soheil Saifipour, Steve Harris, Charles Chrichton, James Welch and Jim Davies.
+We also wish to thank [Genomics England](http://www.genomicsengland.co.uk/), [the Medical Research Council](http://www.mrc.ac.uk/) and [NIHR](http://www.nihr.ac.uk/) for their support, as well as Charles Chrichton, Jim Davies, Steve Harris, Matous Kucera, Adam Milward, David Milward, Vladimir Orany, Soheil Saifipour and James Welch
 
 
 
