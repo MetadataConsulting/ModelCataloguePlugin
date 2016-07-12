@@ -26,7 +26,12 @@ Model Catalogue
 ## Miscellaneous
  * [Model Catalogue XML Schema](ModelCatalogueCorePlugin/grails-app/assets/other/schema/2.0/metadataregistry.xsd)
 
+## License
+ * The Model Catalogue is license under the terms of the [Apache License, Version 2.0.](http://www.apache.org/licenses/LICENSE-2.0.html)
 
+## Credits
+The model catalogue is maintained by [Metadata Consulting](http://www.metadataconsulting.co.uk). 
+We also wish to thank [Genomics England](http://www.genomicsengland.co.uk/), [the Medical Research Council](http://www.mrc.ac.uk/) and [NIHR](http://www.nihr.ac.uk/) for their support, as well as David Milward, Adam Milward, Vladimir Orany, Matous Kucera, Soheil Saifipour, Steve Harris, Charles Chrichton, James Welch and Jim Davies.
 
 
 
