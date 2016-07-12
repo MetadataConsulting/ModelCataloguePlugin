@@ -214,8 +214,9 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
       icon:       'fa fa-fw fa-archive'
       label:      'Logs'
       action: ->
-        enhance(rest(url: "#{modelCatalogueApiRoot}/logs")).then (asset) ->
-          asset.show()
+        messages.confirm("Do you want to create logs archive?", "New asset containing the application logs will be created and accessible to all users.").then ->
+          enhance(rest(url: "#{modelCatalogueApiRoot}/logs")).then (asset) ->
+            asset.show()
     }
 
 
