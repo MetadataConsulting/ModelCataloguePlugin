@@ -3,7 +3,12 @@
 source ./bin/lib/test-setup.sh
 
 export FILE_OPENER_SKIP=true
+export GRAILS_OPTS="-server -Xmx2048M -Xms1024M -Dfile.encoding=UTF-8"
 export ES_VERSION=2.1.2
+
+if hash free 2>/dev/null ; then
+    free -m
+fi
 
 if [[ "$TRAVIS" != "" ]] ; then
     if [ "$TEST_SUITE" = "functional" ] || [ "$TEST_SUITE" = "" ] ; then
@@ -14,6 +19,10 @@ if [[ "$TRAVIS" != "" ]] ; then
         "./elasticsearch-$ES_VERSION/bin/elasticsearch" -d --default.path.conf=conf/test/esconfig
         wget --retry-connrefused --read-timeout=20 --timeout=15 --tries=20 --waitretry=3 -O - http://localhost:9200/
     fi
+fi
+
+if hash free 2>/dev/null ; then
+    free -m
 fi
 
 # please update sibling script /collect/reports.sh when you update this file
