@@ -418,7 +418,7 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     @Override
-    Observable<Boolean> reindex() {
+    Observable<Boolean> reindex(boolean soft) {
         IndexingSession session = IndexingSession.create()
 
         Observable<Object> elements = rxService.from(DataModel.where{}, sort: 'lastUpdated', order: 'desc', true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH
@@ -432,10 +432,15 @@ class ElasticSearchService implements SearchCatalogue {
             rxService.from(DataModelPolicy.where {})
         )
 
-        return RxElastic.from(client.admin().indices().prepareDelete("${MC_PREFIX}*")).map { it.acknowledged }.concatWith(index(session, elements))
-            .doOnError {
+        if (soft) {
+            return  index(session, elements).doOnError {
                 log.error "Exception reindexing catalogue: ${it.getClass()}", it
             }
+        }
+
+        return RxElastic.from(client.admin().indices().prepareDelete("${MC_PREFIX}*")).map { it.acknowledged }.concatWith(index(session, elements)).doOnError {
+            log.error "Exception reindexing catalogue: ${it.getClass()}", it
+        }
 
     }
 

@@ -14,7 +14,7 @@ public interface SearchCatalogue {
     Observable<Boolean> index(Iterable<Object> resource)
     Observable<Boolean> unindex(Object object)
     Observable<Boolean> unindex(Collection<Object> object)
-    Observable<Boolean> reindex()
+    Observable<Boolean> reindex(boolean soft)
 
     boolean isIndexingManually()
 

@@ -40,9 +40,11 @@ class SearchController extends AbstractRestfulController<CatalogueElement> {
         }
 
         log.info "Reindexing search service ..."
+
+        boolean soft = params.boolean('soft')
         executorService.submit {
             profile(excludeMethods: ['rx.observables.BlockingObservable.subscribe', 'groovyx.gprof.Profiler.stop']) {
-                modelCatalogueSearchService.reindex().toBlocking().subscribe(LoggingSubscriber.create(log, "... reindexing finished", "Error reindexing the catalogue"))
+                modelCatalogueSearchService.reindex(soft).toBlocking().subscribe(LoggingSubscriber.create(log, "... reindexing finished", "Error reindexing the catalogue"))
             }.prettyPrint()
         }
 
