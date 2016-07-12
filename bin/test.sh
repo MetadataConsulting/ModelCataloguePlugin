@@ -3,7 +3,7 @@
 source ./bin/lib/test-setup.sh
 
 export FILE_OPENER_SKIP=true
-export GRAILS_OPTS="-Xmx2G -Xms512M -XX:MaxPermSize=1G -server"
+export GRAILS_OPTS="-Xmx2G -Xms1g -XX:MaxPermSize=1G -server"
 export ES_VERSION=2.1.2
 
 if [[ "$TRAVIS" != "" ]] ; then
