@@ -3,6 +3,7 @@
 source ./bin/lib/test-setup.sh
 
 export FILE_OPENER_SKIP=true
+export GRAILS_OPTS="-server -Xmx2048M -Xms1024M -Dfile.encoding=UTF-8"
 export ES_VERSION=2.1.2
 
 if [[ "$TRAVIS" != "" ]] ; then
