@@ -12,11 +12,11 @@ dataSource {
     def metadataJdbcString = System.getenv('METADATA_JDBC_URL')
 
     if (!metadataJdbcString && System.getenv("MC_MYSQL_NAME")) {
-        metadataJdbcString = "jdbc:mysql://mc-mysql:3306/${System.getenv('MC_MYSQL_ENV_MYSQL_DATABASE') ?: 'metadata'}?autoReconnect=true&useUnicode=yes"
+        metadataJdbcString = "jdbc:mysql://mc-mysql:3306/${System.getenv('MC_MYSQL_ENV_MYSQL_DATABASE') ?: 'metadata'}?autoReconnect=true&useUnicode=yes&characterEncoding=UTF-8"
     }
 
     if (!metadataJdbcString && System.getenv("RDS_HOSTNAME")) {
-        metadataJdbcString = "jdbc:mysql://${System.getenv('RDS_HOSTNAME')}:${System.getenv('RDS_PORT')}/${System.getenv('RDS_DB_NAME')}?autoReconnect=true&useUnicode=yes"
+        metadataJdbcString = "jdbc:mysql://${System.getenv('RDS_HOSTNAME')}:${System.getenv('RDS_PORT')}/${System.getenv('RDS_DB_NAME')}?autoReconnect=true&useUnicode=yes&characterEncoding=UTF-8"
     }
 
     if (metadataJdbcString) {
