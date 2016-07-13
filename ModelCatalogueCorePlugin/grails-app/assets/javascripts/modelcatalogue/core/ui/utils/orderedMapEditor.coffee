@@ -3,7 +3,7 @@ angular.module('mc.core.ui.utils').directive 'orderedMapEditor',  [-> {
     replace: true
     scope:
       object:             '='
-      canDeprecate:       '='
+      canDeprecate:       '@?'
       title:              '@?'
       valueTitle:         '@?'
       keyPlaceholder:     '@?'
