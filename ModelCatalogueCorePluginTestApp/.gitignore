@@ -28,7 +28,7 @@ grails-app/assets/bower_components/*
 *Db.script
 
 # logs
-/stacktrace.log
+/*.log
 /test/reports
 /logs
 

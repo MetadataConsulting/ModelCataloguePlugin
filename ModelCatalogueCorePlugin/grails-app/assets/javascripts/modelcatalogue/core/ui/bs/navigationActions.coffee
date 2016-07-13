@@ -1,37 +1,62 @@
-angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.util.security']).config ['actionsProvider', 'names', (actionsProvider, names)->
+angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.util.security'])
+.config (actionsProvider, names)->
+  'ngInject'
 
   anyParentDataModel = ($scope) ->
     return $scope.currentDataModel if $scope.currentDataModel
     return anyParentDataModel($scope.$parent) if $scope.$parent
     return undefined
 
-  RESOURCES = [
+  ##############
+  # Data Model #
+  ##############
+
+  # Import
+  actionsProvider.registerChildAction 'catalogue-element', 'add-import', ($scope, messages, names, security, catalogue) ->
+    'ngInject'
+    return undefined if not $scope.element
+    return undefined if not angular.isFunction($scope.element.isInstanceOf)
+    return undefined if not $scope.element.isInstanceOf('dataModel')
+    return undefined if not security.hasRole('CURATOR')
+
+    {
+      position:   -1000
+      label:      'Add Data Model Import'
+      icon:       'fa fa-fw fa-puzzle-piece'
+      type:       'success'
+      action:     ->
+        messages.prompt('Add Data Model Import', 'If you want to reuse data classes, data types or measurement units ' +
+            'form different data models you need to import the containing data model first.',
+          {type: 'catalogue-elements', resource: 'dataModel' }).then (elements) ->
+            angular.forEach elements, (element) ->
+              unless angular.isString(element)
+                $scope.element.imports.add element
+    }
+
+  # Create
+  angular.forEach [
     'dataClass'
     'dataElement'
     'dataType'
     'measurementUnit'
     'asset'
     'validationRule'
-  ]
-
-  angular.forEach RESOURCES, (resource, index) ->
-
-    actionsProvider.registerChildAction 'catalogue-element', 'catalogue-element-create-' + resource, ['$scope', 'names', 'security', 'messages', '$state', '$log', 'catalogue', ($scope, names, security, messages, $state, $log, catalogue) ->
+  ], (resource, index) ->
+    actionsProvider.registerChildAction 'catalogue-element', 'catalogue-element-create-' + resource,
+      ($scope, names, security, messages, $state, $log, catalogue) ->
+        'ngInject'
         dataModel = anyParentDataModel($scope)
-
         return undefined unless security.hasRole('CURATOR')
         return undefined unless messages.hasPromptFactory('create-' + resource) or messages.hasPromptFactory('edit-' + resource)
-        return undefined unless dataModel
-        return undefined unless dataModel.status == 'DRAFT'
         return undefined unless angular.isFunction($scope.element.isInstanceOf)
         return undefined unless $scope.element.isInstanceOf('dataModel') or resource is 'dataClass' and $scope.element.isInstanceOf('dataClass')
 
-
         {
-          label:      "New #{names.getNaturalName(resource)}"
-          icon:       catalogue.getIcon(resource)
-          type:       'success'
-          position:   5000 + index
+          label: "New #{names.getNaturalName(resource)}"
+          icon: catalogue.getIcon(resource)
+          type: 'success'
+          position: 5000 + index
+          disabled: $scope.element.status != 'DRAFT'
           action:     ->
             args =
               create: resource
@@ -48,7 +73,8 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
               $log.error errors
               messages.error('You don\'t have rights to create new elements')
         }
-      ]
+
+
 
 
   actionsProvider.registerActionInRole 'create-data-model', 'data-models' ,['$scope', 'names', 'security', 'messages', '$state', '$log', ($scope, names, security, messages, $state, $log) ->
@@ -81,25 +107,6 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
       icon:  'fa fa-book fa-fw'
       action: ->
         $state.go 'dataModels'
-    }
-  ]
-
-  actionsProvider.registerChildAction 'catalogue-element', 'add-import', ['$scope', 'messages', 'names', 'security', 'catalogue', ($scope, messages, names, security, catalogue) ->
-    return undefined if not security.isUserLoggedIn()
-    return undefined if not $scope.element
-    return undefined if not angular.isFunction($scope.element.isInstanceOf)
-    return undefined if not $scope.element.isInstanceOf('dataModel')
-
-    {
-      position:   -1000
-      label:      'Add Data Model Import'
-      icon:       'fa fa-fw fa-puzzle-piece'
-      type:       'success'
-      action:     ->
-        messages.prompt('Add Data Model Import', 'If you want to reuse data classes, data types or measurement units form different data models you need to import the containing data model first.', {type: 'catalogue-elements', resource: 'dataModel' }).then (elements) ->
-          angular.forEach elements, (element) ->
-            unless angular.isString(element)
-              $scope.element.imports.add element
     }
   ]
 
@@ -144,5 +151,3 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
       action: ->  messages.prompt('','', type: 'about-dialog')
     }
   ]
-
-]
