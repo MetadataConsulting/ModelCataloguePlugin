@@ -1,11 +1,11 @@
 Model Catalogue
 ===============
-[![Build Status](https://travis-ci.org/MetadataRegistry/ModelCataloguePlugin.svg?branch=2.x)](https://travis-ci.org/MetadataRegistry/ModelCataloguePlugin) [![Gitter](https://badges.gitter.im/Join Chat.svg)] (https://gitter.im/MetadataRegistry/ModelCataloguePlugin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/MetadataConsulting/ModelCataloguePlugin.svg?branch=2.x)](https://travis-ci.org/MetadataConsulting/ModelCataloguePlugin) [![Gitter](https://badges.gitter.im/Join Chat.svg)] (https://gitter.im/MetadataConsulting/ModelCataloguePlugin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
 ## Deployment
 
- * [Running Model Catalogue with Docker](https://github.com/MetadataRegistry/registry/)
+ * [Running Model Catalogue with Docker](https://github.com/MetadataConsulting/registry/)
  * [Configuration for Production](docs/deployment/production.adoc)
  * [Environment](docs/deployment/environment.adoc)
  * [Using Grails Console in Production](docs/development/frameworks/grails_console.md)
