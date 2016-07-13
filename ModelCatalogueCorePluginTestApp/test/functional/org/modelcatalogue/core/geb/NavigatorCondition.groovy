@@ -10,15 +10,9 @@ class NavigatorCondition {
 
     final AbstractModelCatalogueGebSpec spec
     final Closure<Navigator> navigator
-    final Closure retry
 
-    NavigatorCondition(AbstractModelCatalogueGebSpec spec, Closure<Navigator> navigator, Closure retry) {
+    NavigatorCondition(AbstractModelCatalogueGebSpec spec, Closure<Navigator> navigator) {
         this.spec = spec
-
-        this.retry = (Closure) retry.clone()
-        this.retry.delegate = spec
-        this.retry.resolveStrategy = Closure.DELEGATE_FIRST
-
         this.navigator = (Closure<Navigator>) navigator.clone()
         this.navigator.delegate = spec
         this.navigator.resolveStrategy = Closure.DELEGATE_FIRST

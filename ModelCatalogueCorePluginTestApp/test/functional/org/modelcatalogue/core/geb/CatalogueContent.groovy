@@ -1,15 +1,13 @@
 package org.modelcatalogue.core.geb
 
 import geb.navigator.Navigator
-import groovy.transform.stc.ClosureParams
-import groovy.transform.stc.FromString
 
 class CatalogueContent {
 
     final CatalogueContent parent
     final String selector
     final Map<String, Object> args
-    final Closure beforeRetry
+    final Closure beforeSelect
 
     static CatalogueContent create(Map arguments) {
         new CatalogueContent(null, "*", arguments, null)
@@ -23,24 +21,24 @@ class CatalogueContent {
         new CatalogueContent(null, selector, arguments, null)
     }
 
-    static CatalogueContent create(Map arguments, @DelegatesTo(AbstractModelCatalogueGebSpec) Closure retryBody) {
-        new CatalogueContent(null, "*", arguments, retryBody)
+    static CatalogueContent create(Map arguments, @DelegatesTo(AbstractModelCatalogueGebSpec) Closure beforeSelect) {
+        new CatalogueContent(null, "*", arguments, beforeSelect)
     }
 
-    static CatalogueContent create(String selector, @DelegatesTo(AbstractModelCatalogueGebSpec) Closure retryBody) {
-        new CatalogueContent(null, selector, [:], retryBody)
+    static CatalogueContent create(String selector, @DelegatesTo(AbstractModelCatalogueGebSpec) Closure beforeSelect) {
+        new CatalogueContent(null, selector, [:], beforeSelect)
     }
 
-    static CatalogueContent create(Map<String, Object> arguments, String selector, @DelegatesTo(AbstractModelCatalogueGebSpec) Closure retryBody) {
-        new CatalogueContent(null, selector, arguments, retryBody)
+    static CatalogueContent create(Map<String, Object> arguments, String selector, @DelegatesTo(AbstractModelCatalogueGebSpec) Closure beforeSelect) {
+        new CatalogueContent(null, selector, arguments, beforeSelect)
 
     }
 
-    CatalogueContent(CatalogueContent parent, String selector, Map<String, Object> args, @DelegatesTo(AbstractModelCatalogueGebSpec) Closure retryBody) {
+    CatalogueContent(CatalogueContent parent, String selector, Map<String, Object> args, @DelegatesTo(AbstractModelCatalogueGebSpec) Closure beforeSelect) {
         this.parent = parent
         this.selector = selector
         this.args = args
-        this.beforeRetry = retryBody
+        this.beforeSelect = beforeSelect
     }
 
     Navigator select(AbstractModelCatalogueGebSpec spec) {
@@ -51,6 +49,6 @@ class CatalogueContent {
     }
 
     CatalogueContent find(Map arguments = [:], String selector) {
-        return new CatalogueContent(this, selector, arguments, beforeRetry)
+        return new CatalogueContent(this, selector, arguments, beforeSelect)
     }
 }
