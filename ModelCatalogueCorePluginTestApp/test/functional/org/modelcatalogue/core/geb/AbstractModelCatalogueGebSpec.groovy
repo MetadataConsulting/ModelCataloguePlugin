@@ -165,8 +165,12 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         new NavigatorCondition(this, navigator)
     }
 
+    NavigatorCondition check(Closure<Navigator> navigator, @DelegatesTo(AbstractModelCatalogueGebSpec) Closure retryBody) {
+        new NavigatorCondition(this, navigator, retryBody)
+    }
+
     NavigatorCondition check(CatalogueContent content) {
-        check { content.select(this) }
+        check({ content.select(this) }, content.beforeRetry)
     }
 
     boolean no(Navigator navigator) {
