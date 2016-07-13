@@ -444,17 +444,17 @@ class ElasticSearchService implements SearchCatalogue {
 
     }
 
-    Map<String, Map> getMapping(Class clazz) {
-        getMapping(clazz, clazz)
+    Map<String, Map> getMapping(Class clazz, Boolean toplevel = false) {
+        getMapping(clazz, clazz, toplevel)
     }
 
-    Map<String, Map> getMapping(Class clazz, Class implementation) {
-        CacheService.MAPPINGS_CACHE.get("$clazz=>$implementation") {
-            getMappingInternal(clazz, implementation)
+    Map<String, Map> getMapping(Class clazz, Class implementation, Boolean toplevel = false) {
+        CacheService.MAPPINGS_CACHE.get("$clazz=>$implementation[$toplevel]".toString()) {
+            getMappingInternal(clazz, implementation, toplevel)
         }
     }
 
-    Map<String, Map> getMappingInternal(Class clazz, Class implementation) {
+    Map<String, Map> getMappingInternal(Class clazz, Class implementation, Boolean toplevel) {
         ElasticSearchService service = this
 
         if (!clazz) {
@@ -509,6 +509,10 @@ class ElasticSearchService implements SearchCatalogue {
             // source and destination combines all available catalogue element mappings
             // relationship copies relationship type mapping
             mapping[typeName].properties.data_model = getMapping(DataModel).data_model
+        }
+
+        if (toplevel) {
+            mapping[typeName].date_detection = false
         }
 
         return mapping
@@ -624,7 +628,7 @@ class ElasticSearchService implements SearchCatalogue {
                     .prepareCreate(response.index)
 
             for (Class type in supportedTypes) {
-                request.addMapping(getTypeName(type), getMapping(type))
+                request.addMapping(getTypeName(type), getMapping(type, true))
             }
 
             RxElastic.from(request).flatMap {
@@ -699,7 +703,7 @@ class ElasticSearchService implements SearchCatalogue {
             return new LinkedHashMap<String, Map>(fromSuper)
         }
         for (Map.Entry<String, Map> entry in fromSuper) {
-            if (current.containsKey(entry.key)) {
+            if (current.containsKey(entry.key) && current[entry.key] instanceof Map) {
                 current[entry.key].putAll entry.value
             } else {
                 current[entry.key] = entry.value
