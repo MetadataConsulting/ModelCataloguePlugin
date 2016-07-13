@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.publishing
 
-import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
@@ -9,7 +8,7 @@ import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.springframework.validation.ObjectError
 import rx.Observer
 
-@Log4j @Deprecated
+@Deprecated
 class LegacyFinalizationChain extends PublishingChain {
 
 
@@ -31,7 +30,7 @@ class LegacyFinalizationChain extends PublishingChain {
             return published
         }
 
-        log.debug("Finalizing $published ...")
+        monitor.onNext("Finalizing $published ...")
 
         startUpdating()
 
@@ -48,16 +47,16 @@ class LegacyFinalizationChain extends PublishingChain {
                 }
                 if (!ableToFinalize(element)) {
                     element.errors.rejectValue('status', 'org.modelcatalogue.core.CatalogueElement.dependency.not.finalized', "Dependencies outside the current data model $published.dataModel must be finalized.")
-                    return rejectFinalizationDependency(element)
+                    return rejectFinalizationDependency(element, monitor)
                 }
                 processed << element.id
                 CatalogueElement finalized = element.publish(publisher, ProgressMonitor.NOOP)
                 if (finalized.hasErrors()) {
-                    return rejectFinalizationDependency(finalized)
+                    return rejectFinalizationDependency(finalized, monitor)
                 }
             }
         }
-        return doPublish(publisher)
+        return doPublish(publisher, monitor)
     }
 
     private boolean ableToFinalize(CatalogueElement element) {
@@ -78,7 +77,7 @@ class LegacyFinalizationChain extends PublishingChain {
         return false
     }
 
-    private CatalogueElement doPublish(Publisher<CatalogueElement> archiver) {
+    private CatalogueElement doPublish(Publisher<CatalogueElement> archiver, Observer<String> monitor) {
         published.status = ElementStatus.FINALIZED
         published.save(flush: true, deepValidate: false)
 
@@ -91,14 +90,14 @@ class LegacyFinalizationChain extends PublishingChain {
             }
         }
 
-        log.debug("... finalized $published")
+        monitor.onNext("... finalized $published")
 
         published
     }
 
 
-    private CatalogueElement rejectFinalizationDependency(CatalogueElement element) {
-        log.info FriendlyErrors.printErrors("Rejected dependency for $element", element.errors)
+    private CatalogueElement rejectFinalizationDependency(CatalogueElement element, Observer<String> monitor) {
+        monitor.onError(new IllegalArgumentException(FriendlyErrors.printErrors("Rejected dependency for $element", element.errors)))
         restoreStatus()
         for (ObjectError error in element.errors.getFieldErrors('status')) {
             published.errors.reject(error.code, error.arguments, error.defaultMessage)

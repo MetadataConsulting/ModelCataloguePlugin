@@ -373,11 +373,11 @@ class ElasticSearchService implements SearchCatalogue {
             return indexExists(session, just(indexName)).flatMap {
                 if (it.exists) {
                     return RxElastic.from(client.admin().indices().prepareDelete(indexName)).map {
-                        log.debug "Deleted index $indexName"
+                        log.info "Deleted index $indexName"
                         session.indexExist(indexName, false)
                         return it.acknowledged
                     }.onErrorReturn { error ->
-                        log.debug "Exception deleting index $indexName: $error"
+                        log.warn "Exception deleting index $indexName: $error"
                         return false
                     }.concatWith(unindexInternal(session, object))
                 }
@@ -635,7 +635,7 @@ class ElasticSearchService implements SearchCatalogue {
                 if (!it.acknowledged) {
                     return ensureIndexExists(session, indices, supportedTypes)
                 }
-                log.info "Created index $response.index for following types: $supportedTypes"
+                log.debug "Created index $response.index for following types: $supportedTypes"
                 session.indexExist(response.index, true)
                 return just(response.index)
             } .onErrorReturn {
