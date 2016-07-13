@@ -30,17 +30,5 @@ Model Catalogue
  * The Model Catalogue is license under the terms of the [Apache License, Version 2.0.](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 ## Credits
-The model catalogue is maintained by [Metadata Consulting](http://www.metadataconsulting.co.uk). 
+The model catalogue is maintained by [Metadata Consulting](http://www.metadataconsulting.co.uk).
 We also wish to thank [Genomics England](http://www.genomicsengland.co.uk/), [the Medical Research Council](http://www.mrc.ac.uk/) and [NIHR](http://www.nihr.ac.uk/) for their support, as well as Charles Chrichton, Jim Davies, Steve Harris, Matous Kucera, Adam Milward, David Milward, Vladimir Orany, Soheil Saifipour and James Welch
-
-
-
-
-
-
-
-
-
-
-
-
