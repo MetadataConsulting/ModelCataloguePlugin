@@ -189,7 +189,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         Observable.just(true)
     }
 
-    Observable<Boolean> reindex()  {
+    Observable<Boolean> reindex(boolean soft)  {
         log.info "Using database search, reindexing not needed!"
         Observable.just(true)
     }

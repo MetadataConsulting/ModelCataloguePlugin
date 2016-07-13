@@ -34,7 +34,7 @@ class BootStrap {
                 initSecurity()
                 setupStuff()
             }
-            modelCatalogueSearchService.reindex().all { it }.toBlocking().subscribe {
+            modelCatalogueSearchService.reindex(true).all { it }.toBlocking().subscribe {
                 System.out.println "Reindexed"
             }
         } else {

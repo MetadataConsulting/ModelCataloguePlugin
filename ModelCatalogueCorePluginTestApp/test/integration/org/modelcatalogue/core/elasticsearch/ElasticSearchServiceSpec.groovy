@@ -22,7 +22,8 @@ class ElasticSearchServiceSpec extends org.modelcatalogue.testapp.AbstractIntegr
         RelationshipType.relatedToType.searchable = true
         RelationshipType.relatedToType.save()
         relationshipTypeService.clearCache()
-        elasticSearchService.reindex().toBlocking().subscribe()
+
+        elasticSearchService.reindex(true).toBlocking().subscribe()
     }
 
     def "play with elasticsearch"() {
@@ -302,7 +303,7 @@ class ElasticSearchServiceSpec extends org.modelcatalogue.testapp.AbstractIntegr
         }.count() == 39
 
         when:
-        elasticSearchService.reindex().toBlocking().last()
+        elasticSearchService.reindex(true).toBlocking().last()
 
         then:
         noExceptionThrown()

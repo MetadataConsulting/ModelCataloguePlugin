@@ -158,7 +158,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
       type: 'success'
       action: ->
         messages.confirm("Do you want to reindex catalogue?", "Whole catalogue will be reindexed. This may take a long time and it can have negative impact on the performance.").then ->
-          rest(url: "#{modelCatalogueApiRoot}/search/reindex", method: 'POST').then ->
+          rest(url: "#{modelCatalogueApiRoot}/search/reindex", method: 'POST', params: {soft: true}).then ->
             messages.success('Reindex Catalogue', 'Reindexing the catalogue scheduled.')
       }
   ]

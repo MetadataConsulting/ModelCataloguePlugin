@@ -373,11 +373,11 @@ class ElasticSearchService implements SearchCatalogue {
             return indexExists(session, just(indexName)).flatMap {
                 if (it.exists) {
                     return RxElastic.from(client.admin().indices().prepareDelete(indexName)).map {
-                        log.debug "Deleted index $indexName"
+                        log.info "Deleted index $indexName"
                         session.indexExist(indexName, false)
                         return it.acknowledged
                     }.onErrorReturn { error ->
-                        log.debug "Exception deleting index $indexName: $error"
+                        log.warn "Exception deleting index $indexName: $error"
                         return false
                     }.concatWith(unindexInternal(session, object))
                 }
@@ -418,7 +418,7 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     @Override
-    Observable<Boolean> reindex() {
+    Observable<Boolean> reindex(boolean soft) {
         IndexingSession session = IndexingSession.create()
 
         Observable<Object> elements = rxService.from(DataModel.where{}, sort: 'lastUpdated', order: 'desc', true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH
@@ -432,10 +432,15 @@ class ElasticSearchService implements SearchCatalogue {
             rxService.from(DataModelPolicy.where {})
         )
 
-        return RxElastic.from(client.admin().indices().prepareDelete("${MC_PREFIX}*")).map { it.acknowledged }.concatWith(index(session, elements))
-            .doOnError {
+        if (soft) {
+            return  index(session, elements).doOnError {
                 log.error "Exception reindexing catalogue: ${it.getClass()}", it
             }
+        }
+
+        return RxElastic.from(client.admin().indices().prepareDelete("${MC_PREFIX}*")).map { it.acknowledged }.concatWith(index(session, elements)).doOnError {
+            log.error "Exception reindexing catalogue: ${it.getClass()}", it
+        }
 
     }
 
@@ -630,7 +635,7 @@ class ElasticSearchService implements SearchCatalogue {
                 if (!it.acknowledged) {
                     return ensureIndexExists(session, indices, supportedTypes)
                 }
-                log.info "Created index $response.index for following types: $supportedTypes"
+                log.debug "Created index $response.index for following types: $supportedTypes"
                 session.indexExist(response.index, true)
                 return just(response.index)
             } .onErrorReturn {

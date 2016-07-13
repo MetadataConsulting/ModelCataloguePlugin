@@ -234,6 +234,7 @@ log4j.main = {
     debug 'org.modelcatalogue.discourse'
 
     info 'grails.app.services.org.grails.plugins.console'
+    info 'grails.app.services.org.modelcatalogue.core.elasticsearch'
     info 'org.grails.plugins.console'
 
     info 'org.modelcatalogue.core.rx.BatchOperator'
