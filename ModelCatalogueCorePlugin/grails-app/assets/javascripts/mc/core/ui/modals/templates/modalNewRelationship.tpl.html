@@ -58,8 +58,8 @@
   </form>
 </div>
 <div class="modal-footer">
-  <button class="btn btn-primary" ng-click="createRelation()" type="submit">
+  <button class="btn btn-primary" ng-click="createRelation()" type="submit" ng-disabled="pending">
     <span class="glyphicon glyphicon-link"></span> Create Relationship
   </button>
-  <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
+  <button class="btn btn-warning" ng-click="$dismiss()" ng-disabled="pending">Cancel</button>
 </div>

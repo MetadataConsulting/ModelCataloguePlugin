@@ -83,6 +83,8 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 
 
 
             $scope.createRelation = ->
+              return if $scope.pending
+              $scope.pending = true
               wasError = false
               $scope.messages.clearAllMessages()
               if not $scope.relationshipType
@@ -95,7 +97,9 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 
                   destination.messages.error 'Missing Destination', 'Please select the destination from the existing elements or type new destination name.'
                   wasError = true
 
-              return if wasError
+              if wasError
+                $scope.pending = false
+                return
 
               promises = []
 
@@ -145,8 +149,11 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 
 
                 promises.push promise
 
-              $q.all(promises).then (results) ->
+              $q.all(promises)
+              .then (results) ->
                 $modalInstance.close(results)
+              .finally ->
+                $scope.pending = false
 
 
 
