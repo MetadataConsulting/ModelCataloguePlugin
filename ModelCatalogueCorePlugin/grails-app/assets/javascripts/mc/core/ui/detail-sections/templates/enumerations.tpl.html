@@ -8,7 +8,12 @@
   <div class="row" ng-repeat="value in ::(editableForm.$visible ? [] : element.enumerations.values) track by value.key"
        ng-class="{'text-danger': value.deprecated}">
     <div class="col-md-3">
-      <strong class="small text-wrap">{{::value.key}}</strong>
+      <strong class="small text-wrap">
+        {{::value.key}}
+      </strong>
+      <span ng-show="value.deprecated">
+        (deprecated)
+      </span>
     </div>
     <div class="col-md-8 preserve-new-lines">
       <small>{{::value.value}}</small>
