@@ -133,12 +133,10 @@ class ElasticSearchServiceSpec extends org.modelcatalogue.testapp.AbstractIntegr
         then: "there are no results if the related item does not contain the search term"
         foundRelationships.total == 0L
 
-        when:
-        ListWithTotalAndType<DataModel> foundDataModels = elasticSearchService.search(DataModel, [search: 'test'])
-
-        then:
-        foundDataModels.total == 1L
-        dataModel in foundDataModels.items
+        retry (10, 100) {
+            assert dataModel in elasticSearchService.search(DataModel, [search: 'test']).items
+            return true
+        }
 
         when:
         BlockingVariable<Boolean> policyIndexed = new BlockingVariable<Boolean>(60)
@@ -148,7 +146,10 @@ class ElasticSearchServiceSpec extends org.modelcatalogue.testapp.AbstractIntegr
 
         then:
         policyIndexed.get()
-        retry (10, 100) { elasticSearchService.search(DataModelPolicy, [search: 'test policy', max: '1']).total == 1L }
+        retry (10, 100) {
+            assert elasticSearchService.search(DataModelPolicy, [search: 'test policy', max: '1']).total == 1L
+            return true
+        }
     }
 
     def "index user"() {
@@ -310,13 +311,18 @@ class ElasticSearchServiceSpec extends org.modelcatalogue.testapp.AbstractIntegr
     }
 
     private static boolean retry(int times, long timeout, Closure<Boolean> test) {
+        Throwable exception = new IllegalStateException("Test haven't passed after $times retries")
         for (int i = 0; i < times; i++) {
-            if (test()) {
-                return true
+            try {
+                if (test()) {
+                    return true
+                }
+            } catch (Throwable e) {
+                exception = e
             }
             Thread.sleep(timeout)
         }
-        return false
+        throw exception
     }
 
 }

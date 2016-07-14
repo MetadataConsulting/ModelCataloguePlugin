@@ -57,7 +57,6 @@ if [ "$TEST_SUITE" = "" ] ; then
 fi
 
 if [ "$TEST_SUITE" = "unit_and_integration" ] || [ "$TEST_SUITE" = "" ] ; then
-    export MC_ES_DISABLED=true
     ./grailsw test-app integration: --non-interactive
     mkdir -p "$HOME/reports/app-integration-tests-reports"
     cp -Rf target/test-reports/ "$HOME/reports/app-integration-tests-reports" || true
