@@ -9,6 +9,7 @@ import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.docx.ModelCatalogueWordDocumentBuilder
@@ -46,12 +47,12 @@ class DataModelToDocxExporter {
             'paragraph.title' font: [color: '#13D4CA', size: 26.pt], margin: [top: 200.pt]
             'paragraph.subtitle' font: [color: '#13D4CA', size: 18.pt]
             'paragraph.description' font: [color: '#13D4CA', size: 16.pt, italic: true], margin: [left: 30, right: 30]
-            'heading1' font: [size: 20, bold: true]
-            'heading2' font: [size: 18, bold: true]
-            'heading3' font: [size: 16, bold: true]
-            'heading4' font: [size: 16]
-            'heading5' font: [size: 15]
-            'heading6' font: [size: 14]
+            'heading1' font: [size: 18, bold: true]
+            'heading2' font: [size: 17, family: 'Calibri Light', bold: true, color: '#3275B3']
+            'heading3' font: [size: 16, family: 'Calibri Light', bold: true, color: '#3275B3']
+            'heading4' font: [size: 14, family: 'Candara', color: '#124e77']
+            'heading5' font: [size: 12, family: 'Century Gothic', color: '#000000', italic: true]
+            'heading6' font: [size: 11, family: 'Calibri Light', color: '#3275B3']
             'paragraph.heading1' font: [size: 20, bold: true]
             'paragraph.heading2' font: [size: 18, bold: true]
             'paragraph.heading3' font: [size: 16, bold: true]
@@ -193,7 +194,9 @@ class DataModelToDocxExporter {
 
                 log.debug "found ${dataClasses.size()} top level dataClasses"
                 for (DataClass dClass in dataClasses) {
-                    docHelper.printModel(dClass, true, 1)
+                    if(dClass.status!= ElementStatus.DEPRECATED) {
+                        docHelper.printModel(dClass, true, 1)
+                    }
                 }
 
                 if (docHelper.usedDataTypes) {
@@ -258,19 +261,19 @@ class DataModelToDocxExporter {
                                 } else if (dataType.rule) {
                                     row {
                                         cell 'Rule'
-                                        cell dataType.name + ' (' + dataType.latestVersionId + ')'
+                                        cell dataType.rule
                                     }
                                 }
 
-                                for (DataType parent in elementService.getTypeHierarchy([:], dataType).items) {
+                                getBaseRules(dataType).each { parent ->
                                     if (parent.regexDef) {
                                         row {
-                                            cell "Regular Expression\n(${CatalogueElementMarshaller.getClassifiedName(parent)})"
+                                            cell "Regular Expression based on\n ${CatalogueElementMarshaller.getClassifiedName(parent)} "
                                             cell parent.regexDef
                                         }
                                     } else if (parent.rule) {
                                         row {
-                                            cell "Rule\n(${CatalogueElementMarshaller.getClassifiedName(parent)})"
+                                            cell "Rule based on\n ${CatalogueElementMarshaller.getClassifiedName(parent)}"
                                             cell parent.rule
                                         }
                                     } else {
@@ -284,9 +287,6 @@ class DataModelToDocxExporter {
                             }
 
                             if (dataType?.instanceOf(EnumeratedType)) {
-                                paragraph(font: [color: '#999999', bold: true]) {
-                                    text 'Enumerations'
-                                }
 
                                 table(border: [size: 1, color: '#D2D2D2']) {
                                     row(background: '#F2F2F2') {
@@ -318,7 +318,16 @@ class DataModelToDocxExporter {
     }
 
     private boolean hasExtraInformation(DataType dataType) {
-        (dataType.instanceOf(PrimitiveType) && dataType.measurementUnit) || dataType.instanceOf(EnumeratedType) || (dataType.instanceOf(ReferenceType) && dataType.dataClass) || dataType.rule
+        (dataType.instanceOf(PrimitiveType) && dataType.measurementUnit) || dataType.instanceOf(EnumeratedType) || (dataType.instanceOf(ReferenceType) && dataType.dataClass) || dataType.rule || dataType.isBasedOn
+    }
+
+    private Set getBaseRules(DataType dataType, Set basedOn = []){
+        elementService.getTypeHierarchy([:], dataType).items.each{ DataType type ->
+            println(type)
+            basedOn.add(type)
+            basedOn.addAll(getBaseRules(type, basedOn))
+        }
+        basedOn
     }
 
 }

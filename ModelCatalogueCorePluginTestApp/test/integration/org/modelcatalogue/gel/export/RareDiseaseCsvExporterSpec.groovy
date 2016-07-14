@@ -71,6 +71,14 @@ class RareDiseaseCsvExporterSpec extends AbstractRareDiseasesExporterSpec {
 //        }
 
         then:
+
+        println("-------------")
+        println "expected"
+        println(csv.replace('-', '').replace('(', '').replace(')', ''))
+        println "actual"
+        println hpoAndClinicalTestsCSV.replace('-', '').replace('(', '').replace(')', '')
+        println("-------------")
+
         noExceptionThrown()
         csv.replace('-', '').replace('(', '').replace(')', '') ==~ hpoAndClinicalTestsCSV.replace('-', '').replace('(', '').replace(')', '')
     }
