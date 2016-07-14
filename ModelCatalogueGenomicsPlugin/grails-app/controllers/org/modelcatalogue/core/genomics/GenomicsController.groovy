@@ -30,6 +30,23 @@ class GenomicsController {
         redirect controller: 'asset', id: assetId, action: 'show'
     }
 
+    def exportRareDiseaseListAsJson() {
+
+        DataClass dataClass = DataClass.get(params.id)
+
+        if (!dataClass) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        Long assetId = genomicsService.genDiseaseListOnlyAsJson(dataClass)
+
+        response.setHeader("X-Asset-ID", assetId.toString())
+        redirect controller: 'asset', id: assetId, action: 'show'
+    }
+
+
+
 
     def exportRareDiseaseEligibilityCsv() {
         exportRareDiseaseCsv(RareDiseaseCsvExporter.ELIGIBILITY)

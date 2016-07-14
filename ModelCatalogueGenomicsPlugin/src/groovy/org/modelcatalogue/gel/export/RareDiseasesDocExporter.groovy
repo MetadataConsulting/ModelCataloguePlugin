@@ -19,6 +19,8 @@ class RareDiseasesDocExporter {
     private static final Map<String, Object> CELL_TEXT_FIRST = [font: [size: 11, family: 'Calibri', bold: true]]
     private static final Map<String, Object> CELL_TEXT_SECOND = [font: [size: 10, family: 'Calibri']]
     private static final Map<String, Object> CELL_TEXT_SECOND_BOLD = [font: [size: 10, family: 'Calibri', bold: true]]
+    private static final Map<String, Object> CELL_TEXT_THIRD = [font: [size: 8, family: 'Calibri Light', color: '#000000']]
+
 
     public static final String EMPTY_STRING = ""
     public static final String LEVEL_3_TITLE = "Level 3 Title"
@@ -34,7 +36,8 @@ class RareDiseasesDocExporter {
 
     DataClass rootModel
     private final Set<Long> processedModels = new HashSet<Long>()
-    private final Map<String, String> levelDescriptions = new HashMap<>()
+    private final Map<String, String> levelNameDescriptions = new HashMap<>()
+    private final Map<String, String> levelModelDescriptions = new HashMap<>()
     private Integer modelCount = 0
 
     // determines whether the Eligibility Criteria OR Phenotypes & Clinical Tests report is produced
@@ -77,7 +80,7 @@ class RareDiseasesDocExporter {
 
 
     void export(OutputStream outputStream) {
-        log.info "Exporting Data Model ${rootModel.name} (${rootModel.combinedVersion}) to inventory document."
+        log.info "Exporting Data Model ${rootModel.name} (${rootModel.dataModel.semanticVersion}) to inventory document."
 
         DocumentBuilder builder = new ModelCatalogueWordDocumentBuilder(outputStream)
 
@@ -92,14 +95,15 @@ class RareDiseasesDocExporter {
                 }
 
                 Integer level = 1
-                levelDescriptions.put(level, rootModel.name)
+                levelNameDescriptions.put(level, rootModel.name)
+                levelModelDescriptions.put(level, rootModel.description)
                 descendModels(builder, rootModel, level)
 
             }
 
         }
 
-        log.info "data dataModel ${documentName(eligibilityMode)} (${rootModel.combinedVersion}) exported to inventory document."
+        log.info "data dataModel ${documentName(eligibilityMode)} (${rootModel.dataModel.semanticVersion}}) exported to inventory document."
     }
 
 
@@ -132,7 +136,7 @@ class RareDiseasesDocExporter {
             }
 
             paragraph(style: 'document', margin: [top: 120]) {
-                text "Version ${rootModel.versionNumber} ${rootModel.status}"
+                text "Version ${rootModelModel.semanticVersion} ${rootModelModel.status}"
                 lineBreak()
                 text SimpleDateFormat.dateInstance.format(new Date())
             }
@@ -157,8 +161,8 @@ class RareDiseasesDocExporter {
 
                 allVersionsOfDataClass.each { DataClass model ->
                     row {
-                        cell "${model.versionNumber}", style: 'cell'
-                        cell model.lastUpdated, style: 'cell'
+                        cell "${model.dataModel.semanticVersion}", style: 'cell'
+                        cell model.dataModel.ext.get("http://www.modelcatalogue.org/metadata/#released")?:'', style: 'cell'
                     }
                 }
             }
@@ -234,8 +238,9 @@ class RareDiseasesDocExporter {
     private void descendModels(DocumentBuilder builder, DataClass model, Integer level) {
         log.debug "descendModels level=$level count=" + this.modelCount
 
-        String modelName = model.name + " (${model.getLatestVersionId() ?: model.getId()}.${model.getVersionNumber() ?: 1})"
-        levelDescriptions.put(level, modelName)
+        String modelName = model.name + " (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getCombinedVersion()})"
+        levelNameDescriptions.put(level, modelName)
+        levelModelDescriptions.put(level, model.description)
 
         if (level > 5) return   //don't go too deep, nothing for us down there...
 //        if (modelCount > 10) return   //don't use too many models for testing
@@ -248,17 +253,17 @@ class RareDiseasesDocExporter {
 
         if(level==2) {  //1st sub-level heading
             builder.with {
-                heading3 levelDescriptions.get(level)
+                heading3 levelNameDescriptions.get(level)
             }
         }
         if(level==3) { //2nd sub-level heading
             builder.with {
-                heading4 levelDescriptions.get(level)
+                heading4 levelNameDescriptions.get(level)
             }
         }
         if(level==4) { //3rd sub-level heading
             builder.with {
-                heading5 levelDescriptions.get(level)
+                heading5 levelNameDescriptions.get(level)
             }
         }
 
@@ -289,13 +294,13 @@ class RareDiseasesDocExporter {
 
     private void printModel(DocumentBuilder builder, DataClass model, Integer level, boolean phenotypeMode) {
         log.debug "printModel level=$level"
-        String modelName = model.name + " (${model.getLatestVersionId() ?: model.getId()}.${model.getVersionNumber() ?: 1})"
-        levelDescriptions.put(level, modelName)
+        String modelName = model.name + " (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getCombinedVersion()})"
+        levelNameDescriptions.put(level, modelName)
 
         builder.with {
 
             //4th sub-level heading - level 5
-            heading6 levelDescriptions.get(level)  //eligibility, phenotypes & tests
+            heading6 levelNameDescriptions.get(level)  //eligibility, phenotypes & tests
 
             table(columns: [1,6], margin: [left: 20.px, right: 40.px], padding: 3.px, border: [size: 2.px]) {
 
@@ -304,7 +309,7 @@ class RareDiseasesDocExporter {
                         text CELL_TEXT_FIRST, LEVEL_3_TITLE
                     }
                     cell {
-                        text CELL_TEXT_SECOND, levelDescriptions.get(level - 2)
+                        text CELL_TEXT_SECOND, levelNameDescriptions.get(level - 2)
                     }
                 }
 
@@ -313,7 +318,7 @@ class RareDiseasesDocExporter {
                         text CELL_TEXT_FIRST, LEVEL_4_TITLE
                     }
                     cell {
-                        text CELL_TEXT_SECOND, levelDescriptions.get(level - 1)
+                        text CELL_TEXT_SECOND, levelNameDescriptions.get(level - 1)
                     }
                 }
 
@@ -345,7 +350,7 @@ class RareDiseasesDocExporter {
 
                     model.parentOf.each { DataClass child ->
                         if (child.name) {
-                            String childName = child.name + " (${child.getLatestVersionId() ?: child.getId()}.${child.getVersionNumber() ?: 1})"
+                            String childName = child.name + " (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getCombinedVersion()})"
                             text CELL_TEXT_SECOND_BOLD, "\n$childName\n"
                         }
                         if (child.description) {
@@ -367,6 +372,8 @@ class RareDiseasesDocExporter {
             if (child.name) {
                 if (phenotypeMode) {
                     childName = child.name + " (" + (child.ext.get("OBO ID") ?: EMPTY_STRING) + ")"
+                }else if(child.ext.get("http://www.modelcatalogue.org/metadata/genomics/#gel-test-id-versioned")){
+                    childName = child.name + " (" + (child.ext.get("http://www.modelcatalogue.org/metadata/genomics/#gel-test-id-versioned") ?: EMPTY_STRING) + ")"
                 } else {
                     childName = child.name + " (${child.getLatestVersionId() ?: child.getId()}.${child.getVersionNumber() ?: 1})"
                 }
@@ -394,6 +401,7 @@ class RareDiseasesDocExporter {
                     text EMPTY_STRING + "\n\n"
                 }
                 cell {
+                    if (!phenotypeMode) text CELL_TEXT_THIRD, (levelModelDescriptions.get(4))? levelModelDescriptions.get(4) + "\n\n" : EMPTY_STRING
                     text TABLE_ENTRIES_TEXT, font: [size: 8, family: 'Calibri Light', color: '#000000']
                     table(padding: 1, border: [size: 1, color: '#D2D2D2']) {
                         //inner table should be up to 3 cols wide

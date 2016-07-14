@@ -3,6 +3,7 @@ package org.modelcatalogue.gel.export
 import groovy.json.JsonBuilder
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
 
 /**
@@ -25,7 +26,7 @@ class RareDiseasesJsonExporter {
         int depth = 6
         def exclusions = ['Phenotype','Clinical Test','Closing Statement','Guidance']
 
-        log.info "Exporting Rare Disease Eligibility Criteria as json ${model.name} (${model.combinedVersion})"
+        log.info "Exporting Rare Disease Eligibility Criteria as json ${model.name} (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getCombinedVersion()})"
 
         //define the json tagnames to use for each level in the model
         def levelTag1 = [tag1: 'DiseaseGroups']
@@ -38,8 +39,64 @@ class RareDiseasesJsonExporter {
 
         exportJson(model, depth, levelMetaData, exclusions)
 
-        log.info "Rare Disease Eligibility Criteria exported as json ${model.name} (${model.combinedVersion}) ."
+        log.info "Rare Disease Eligibility Criteria exported as json ${model.name} (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getCombinedVersion()}) ."
     }
+
+    void exportDiseaseListOnly(DataClass model) {
+        Integer level = 1
+        def builder = new JsonBuilder()
+        Map<String, String> groupDescriptions = new HashMap<>()
+        def lines = []
+        descendDiseaseOnlyModels(model, lines, level, groupDescriptions)
+
+        builder "diseaseList" : lines
+
+        out << builder.toPrettyString()
+    }
+
+    def descendDiseaseOnlyModels(DataClass model, lines, level, groupDescriptions) {
+        def line = []
+        def map = [:]
+        def splitDiseaseGroups
+
+        //strip then re-add surrounding quotes to ensure only one set surround the name
+        //and to ensure names with commas are treated as a single column
+        String modelName = model.name.replaceAll('^\"|\"$', '')
+
+        switch (level) {
+            case 1:     //ignore top Rare Diseases level
+                break
+
+            case 2:     // add disease group id,description
+                String groupDescription = "${modelName}"
+                groupDescriptions.put(level, groupDescription)
+                break
+
+            case 3: // add disease sub-group id,description
+                String groupDescription = "${modelName}"
+                groupDescriptions.put(level, groupDescription)
+                break
+
+            case 4: // generate line and add to list
+
+                map.put("id", model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getCombinedVersion())
+                map.put("diseaseGroup",  groupDescriptions.get(level - 2))
+                map.put("diseaseSubgroup",  groupDescriptions.get(level - 1))
+                map.put("diseaseName", modelName)
+                lines << map
+                return  //don't go deeper
+
+            default:    //don't go deeper
+                return
+        }
+
+
+        model.parentOf?.each { DataClass child ->
+            descendDiseaseOnlyModels(child, lines, level + 1, groupDescriptions)
+        }
+    }
+
+
 
 
     private void exportJson(model, depth, levelMetaData, exclusions) {
@@ -74,7 +131,7 @@ class RareDiseasesJsonExporter {
             case [2,3,4,5]:
                 if(level==2) modelCount = modelCount + 1
                 // resolves to something concrete like - map.put('id', "$model.id")
-                map.put(levelMetaData.get(level).tag1, model.combinedVersion)
+                map.put(levelMetaData.get(level).tag1, model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getCombinedVersion())
                 map.put(levelMetaData.get(level).tag2, model.name)
                 map.put(levelMetaData.get(level).tag3, modelList)
 
@@ -82,7 +139,7 @@ class RareDiseasesJsonExporter {
                 break
 
             case 6:
-                map.put(levelMetaData.get(level).tag1, model.combinedVersion)
+                map.put(levelMetaData.get(level).tag1, model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?: model.getCombinedVersion())
                 map.put(levelMetaData.get(level).tag2, model.name)
                 map.put(levelMetaData.get(level).tag3, model.description ?: '')
 
