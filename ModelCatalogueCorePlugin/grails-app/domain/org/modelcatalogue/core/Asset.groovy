@@ -30,7 +30,7 @@ class Asset extends CatalogueElement {
             if (found) {
                 return found
             } else {
-                sleep(1)
+                sleep(5)
             }
         }
         return null
