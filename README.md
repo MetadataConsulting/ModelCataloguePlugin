@@ -6,6 +6,7 @@ Model Catalogue
 ## Deployment
 
  * [Running Model Catalogue with Docker](https://github.com/MetadataConsulting/registry/)
+ * [Running Model Catalogue on AWS](docs/deployment/aws.md)
  * [Configuration for Production](docs/deployment/production.adoc)
  * [Environment](docs/deployment/environment.adoc)
  * [Using Grails Console in Production](docs/development/frameworks/grails_console.md)
