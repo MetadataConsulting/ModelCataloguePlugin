@@ -19,7 +19,6 @@ git tag "$TRAVIS_TAG"
 git push -fq origin 2.x > /dev/null
 git push -fq origin "$TRAVIS_TAG" > /dev/null
 
-curl -H "Content-Type: application/json" --data '{"source_type": "Branch", "source_name": "2.x"}' -X POST "https://registry.hub.docker.com/u/metadata/registry/trigger/$DOCKER_HUB_TRIGGER_TOKEN/"
 curl -H "Content-Type: application/json" --data '{"source_type": "Tag", "source_name": "'"$TRAVIS_TAG"'"}' -X POST "https://registry.hub.docker.com/u/metadata/registry/trigger/$DOCKER_HUB_TRIGGER_TOKEN/"
 
 echo "Metadata Registry notified of successful build"
