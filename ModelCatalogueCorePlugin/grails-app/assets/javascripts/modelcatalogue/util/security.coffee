@@ -35,7 +35,7 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages',
 
   # you need login to return
   securityProvider.springSecurity = (config = {}) ->
-    securityFactory = ['$http', '$rootScope', '$q', '$state',  ($http, $rootScope, $q, $state) ->
+    securityFactory = ['$http', '$rootScope', '$q', '$state', '$httpParamSerializer',  ($http, $rootScope, $q, $state, $httpParamSerializer) ->
       httpMethod    = config.httpMethod ? 'POST'
       loginUrl      = 'j_spring_security_check'
       logoutUrl     = 'logout'
@@ -98,11 +98,18 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages',
           if rememberMe
             params[rememberParam] = 'on'
 
-          $http(
-            method: httpMethod,
+          config =
+            method: httpMethod
             url: loginUrl
-            params: params
-          ).then handleUserResponse
+          if httpMethod == 'POST'
+            config.data = $httpParamSerializer(params)
+            config.headers =
+              'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+
+          else
+            config.params = params
+
+          $http(config).then handleUserResponse
         logout: ->
           $http(method: httpMethod, url: logoutUrl).then ->
             currentUser = null
