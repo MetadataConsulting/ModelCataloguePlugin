@@ -2,7 +2,14 @@ import groovy.json.JsonSlurper
 
 // config
 grails.logging.jul.usebridge = false
-grails.serverURL =  "${System.getenv('METADATA_SCHEME') ?: 'http'}://${System.getenv('VIRTUAL_HOST') ?: System.getenv('METADATA_HOST') ?: System.getenv('DOCKER_MACHINE_IP') ?: new URL("http://checkip.amazonaws.com").text.trim()}"
+
+String serverURL = "${System.getenv('METADATA_SCHEME') ?: 'http'}://${System.getenv('VIRTUAL_HOST') ?: System.getenv('METADATA_HOST') ?: System.getenv('DOCKER_MACHINE_IP') ?: new URL("http://checkip.amazonaws.com").text.trim()}"
+
+grails.serverURL = serverUrl
+
+grails.plugin.springsecurity.successHandler.ajaxSuccessUrl = "${serverUrl}/login/ajaxSuccess"
+grails.plugin.springsecurity.failureHandler.ajaxAuthFailUrl = "${serverUrl}/login/ajaxAuthfail"
+grails.plugin.springsecurity.logout.filterProcessesUrl = "${serverUrl}/login/j_spring_security_logout"
 
 // datasource
 dataSource {
