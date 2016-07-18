@@ -93,6 +93,11 @@ or the result of calling `http://checkip.amazonaws.com` service (in this order o
 |The preferred scheme of the application
 |'http'
 
+|Application
+|`MC_SECURED_REVERSE_PROXY`
+|If set to any value then the Spring Security accepts `http` as secure channel as well
+|none
+
 |Database
 |`METADATA_PASSWORD`
 |The password for the Model Catalogue database
