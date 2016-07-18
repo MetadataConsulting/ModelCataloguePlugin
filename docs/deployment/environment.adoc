@@ -88,6 +88,11 @@ docker run -d --restart="always" --name=mc --env-file mc.env metadata/registry:2
 |Value of `VIRTUAL_HOST` variable for easy integration with `nginx` reverse proxy image, value of `DOCKER_MACHINE_IP` variable
 or the result of calling `http://checkip.amazonaws.com` service (in this order of precedence)
 
+|Application
+|`METADATA_SCHEME`
+|The preferred scheme of the application
+|'http'
+
 |Database
 |`METADATA_PASSWORD`
 |The password for the Model Catalogue database
