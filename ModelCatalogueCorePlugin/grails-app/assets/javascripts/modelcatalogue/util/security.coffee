@@ -98,18 +98,17 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages',
           if rememberMe
             params[rememberParam] = 'on'
 
-          config =
+          requestConfig =
             method: httpMethod
             url: loginUrl
           if httpMethod == 'POST'
-            config.data = $httpParamSerializer(params)
-            config.headers =
+            requestConfig.data = $httpParamSerializer(params)
+            requestConfig.headers =
               'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-
           else
-            config.params = params
+            requestConfig.params = params
 
-          $http(config).then handleUserResponse
+          $http(requestConfig).then handleUserResponse
         logout: ->
           $http(method: httpMethod, url: logoutUrl).then ->
             currentUser = null
