@@ -192,6 +192,7 @@ class ElasticSearchService implements SearchCatalogue {
             case RelationshipDirection.INCOMING:
                 boolQuery.should(QueryBuilders.prefixQuery('source.name', search))
                 boolQuery.should(QueryBuilders.matchQuery('source.name', search))
+                boolQuery.must(QueryBuilders.termsQuery('destination.entity_id', element.id?.toString()))
 
                 if (states) {
                     boolQuery.must(QueryBuilders.termsQuery('source.status', states))
@@ -200,11 +201,11 @@ class ElasticSearchService implements SearchCatalogue {
                 if (types) {
                     boolQuery.must(QueryBuilders.termsQuery('source.fully_qualified_type', types))
                 }
-
                 break;
             default:
                 boolQuery.should(QueryBuilders.prefixQuery('destination.name', search))
                 boolQuery.should(QueryBuilders.matchQuery('destination.name', search))
+                boolQuery.must(QueryBuilders.termsQuery('source.entity_id', element.id?.toString()))
 
                 if (states) {
                     boolQuery.must(QueryBuilders.termsQuery('destination.status', states))
