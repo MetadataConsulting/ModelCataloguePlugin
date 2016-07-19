@@ -7,6 +7,7 @@ grails.serverURL = "${System.getenv('METADATA_SCHEME') ?: 'http'}://${System.get
 
 grails.plugin.springsecurity.successHandler.ajaxSuccessUrl = "${grails.serverURL}/login/ajaxSuccess"
 grails.plugin.springsecurity.failureHandler.ajaxAuthFailUrl = "${grails.serverURL}/login/ajaxAuthfail"
+grails.plugin.springsecurity.logout.afterLogoutUrl = grails.serverURL
 
 // datasource
 dataSource {
