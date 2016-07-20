@@ -26,6 +26,9 @@ ModelCatalogueCorePluginTestApp/test/integration/resources/rare_diseases_combine
 .default-mc-config-location
 .docker-ip
 
+# loacl project configuration file
+mc-config.groovy
+
 # OsX
 .DS_Store
 .AppleDouble

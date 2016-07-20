@@ -26,6 +26,7 @@ class RareDiseaseImportService {
         Preconditions.checkNotNull(inputStream)
 
         catalogueBuilder.build {
+            copy relationships
             dataModel(id: dataModelToImport.getDefaultModelCatalogueId(true), name: dataModelToImport.name) {
                 inputStream.toCsvReader([charset: 'UTF-8', skipLines: 1]).eachLine { tokens ->
                     // check given csv

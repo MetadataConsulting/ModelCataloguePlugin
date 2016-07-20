@@ -23,9 +23,15 @@ fi
 
 if test -f ".default-mc-config-location" ; then
     MC_CONFIG_LOCATION=`cat ".default-mc-config-location"`
-    echo
-    echo -e "Using $MC_CONFIG_LOCATION configuration!\n\n"
-    echo
+    echo -e "Configuration location file found .default-mc-config-location."
+    echo -e "Trying to load external configuration from $MC_CONFIG_LOCATION."
+    if test -f "$MC_CONFIG_LOCATION" ; then
+        echo -e "Using $MC_CONFIG_LOCATION configuration!"
+        echo
+    else
+        echo -e "Configuration file $MC_CONFIG_LOCATION not found!"
+        exit 1
+    fi
 else
     MC_CONFIG_LOCATION="~/.grails/mc-config.groovy"
     echo
