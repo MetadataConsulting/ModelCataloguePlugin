@@ -26,6 +26,7 @@ Model Catalogue
 
 ## Miscellaneous
  * [Model Catalogue XML Schema](ModelCatalogueCorePlugin/grails-app/assets/other/schema/2.0/metadataregistry.xsd)
+ * [Data Model Policy Definitons](docs/development/recipes/policies.md)
 
 ## License
  * The Model Catalogue is license under the terms of the [Apache License, Version 2.0.](http://www.apache.org/licenses/LICENSE-2.0.html)
