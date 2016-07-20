@@ -23,8 +23,8 @@ angular.module('mc.core.ui.bs.modalPromptXmlValidate', ['mc.util.messages']).con
             </form>
         </div>
         <div class="modal-footer">
-          <alert type="success" ng-show="result === true">File is VALID</alert>
-          <alert type="danger"  ng-show="result !== true &amp;&amp; result">{{result}}</alert>
+          <div uib-alert class="alert alert-success" ng-show="result === true">File is VALID</div>
+          <div uib-alert class="alert alert-danger" ng-show="result !== true &amp;&amp; result">{{result}}</div>
         </div>
         '''
         controller: ['$scope', 'messages', '$uibModalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', ($scope, messages, $uibModalInstance, Upload, modelCatalogueApiRoot, enhance) ->

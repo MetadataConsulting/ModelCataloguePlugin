@@ -95,9 +95,9 @@
         <p class="help-block">Child data class is destination for the hierarchy relationship</p>
       </div>
       <div ng-click="importChildModelsFromCSV()">
-        <alert type="info">
+        <div uib-alert class="alert alert-info">
           <strong>Hint:</strong> If you have CSV file with sample data you can <a class="alert-link"><span class="fa fa-magic"></span> import child data classes from CSV file headers</a>.
-        </alert>
+        </div>
       </div>
       <metadata-editor object="child.ext" title="Relationship Metadata" owner="owners.children"></metadata-editor>
     </form>
@@ -117,9 +117,9 @@
         <p class="help-block">Data element is destination for the containment relationship</p>
       </div>
       <div ng-click="importFromCSV()">
-        <alert type="info">
+        <div uib-alert class="alert alert-info">
           <strong>Hint:</strong> If you have CSV file with sample data you can <a class="alert-link"><span class="fa fa-magic"></span> import data elements from CSV file headers</a>.
-        </alert>
+        </div>
       </div>
       <metadata-editor object="dataElement.ext" title="Relationship Metadata" owner="owners.contains"></metadata-editor>
     </form>

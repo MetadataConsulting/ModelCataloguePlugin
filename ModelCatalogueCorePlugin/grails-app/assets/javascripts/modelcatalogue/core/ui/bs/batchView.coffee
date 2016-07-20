@@ -6,8 +6,8 @@ angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView',  'mc.core.ui.
       <div class="row">
         <div class="col-md-6 pending-actions">
           <h4>Pending Actions</h4>
-          <alert type="info" ng-hide="loading || pendingActions.length > 0">There no pending actions</alert>
-          <alert ng-repeat="action in pendingActions" type="{{getType(action)}}" id="action-{{action.id}}">
+          <div uib-alert class="alert alert-info" ng-hide="loading || pendingActions.length > 0">There no pending actions</div>
+          <div uib-alert ng-class="'alert-' + getType(action)" class="alert" ng-repeat="action in pendingActions" id="action-{{action.id}}">
             <div class="action-header">
               <div class="pull-right">
                 <contextual-actions group="true" icon-only="true" size="sm" no-colors="true" role="action"/>
@@ -23,15 +23,15 @@ angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView',  'mc.core.ui.
             <div class="preserve-new-lines" ng-bind-html="action.message"></div>
             <br ng-show="action.outcome"/>
             <pre ng-show="action.outcome">{{action.outcome}}</pre>
-          </alert>
-          <alert type="info" ng-if="loading">
+          </div>
+          <div uib-alert class="alert alert-info" ng-if="loading">
             <div class="text-center"><span class="fa fa-fw fa-spin fa-refresh"></span></div>
-          </alert>
+          </div>
         </div>
         <div class="col-md-6 performed-actions">
           <h4>Performed Actions</h4>
-          <alert type="info" ng-hide="loading || performedActions.length > 0">There no actions performed or failed</alert>
-          <alert ng-repeat="action in performedActions" type="{{getType(action)}}" id="action-{{action.id}}">
+          <div uib-alert class="alert alert-info" ng-hide="loading || performedActions.length > 0">There no actions performed or failed</div>
+          <div uib-alert ng-class="'alert-' + getType(action)" class="alert" ng-repeat="action in performedActions" id="action-{{action.id}}">
             <div>
               <div class="pull-right">
                 <contextual-actions group="true" icon-only="true" size="sm" no-colors="true" role="action"/>
@@ -48,10 +48,10 @@ angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView',  'mc.core.ui.
             <br ng-show="action.outcome &amp;&amp; action.state == 'FAILED' &amp;&amp; action.message"/>
             <div class="preserve-new-lines" ng-show="action.outcome &amp;&amp; action.state == 'PERFORMED'" ng-bind-html="action.outcome"></div>
             <pre ng-show="action.outcome &amp;&amp; action.state == 'FAILED'">{{action.outcome}}</pre>
-          </alert>
-          <alert type="info" ng-if="loading">
+          </div>
+          <div uib-alert class="alert alert-info" ng-if="loading">
             <div class="text-center"><span class="fa fa-fw fa-spin fa-refresh"></span></div>
-          </alert>
+          </div>
         </div>
       </div>
     </div>
