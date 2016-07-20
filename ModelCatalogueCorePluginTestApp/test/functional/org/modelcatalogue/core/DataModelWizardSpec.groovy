@@ -26,7 +26,10 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
     static final CatalogueAction modalFinalize = CatalogueAction.runLast('modal', 'modal-finalize-data-modal')
     static final CatalogueAction modalCreateNewVersion = CatalogueAction.runLast('modal', 'modal-create-new-version')
     static final String modalFeedback = '.messages-modal-feedback'
-    static final String feedback = '.messages-modal-feedback pre'
+    static final CatalogueAction refreshFeedback = CatalogueAction.runFirst('feedback', 'refresh-feedback')
+    static final CatalogueContent feedback = CatalogueContent.create('.messages-modal-feedback pre') {
+        click refreshFeedback
+    }
 
     def "go to login"() {
         login admin

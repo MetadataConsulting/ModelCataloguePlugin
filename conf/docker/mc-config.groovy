@@ -2,7 +2,14 @@ import groovy.json.JsonSlurper
 
 // config
 grails.logging.jul.usebridge = false
-grails.serverURL =  "http://${System.getenv('VIRTUAL_HOST') ?: System.getenv('METADATA_HOST') ?: System.getenv('DOCKER_MACHINE_IP') ?: new URL("http://checkip.amazonaws.com").text.trim()}"
+
+grails.serverURL = "${System.getenv('METADATA_SCHEME') ?: 'http'}://${System.getenv('VIRTUAL_HOST') ?: System.getenv('METADATA_HOST') ?: System.getenv('DOCKER_MACHINE_IP') ?: new URL("http://checkip.amazonaws.com").text.trim()}"
+
+grails.plugin.springsecurity.auth.loginFormUrl = "${grails.serverURL}/login/auth"
+grails.plugin.springsecurity.successHandler.ajaxSuccessUrl = "${grails.serverURL}/login/ajaxSuccess"
+grails.plugin.springsecurity.failureHandler.ajaxAuthFailUrl = "${grails.serverURL}/login/ajaxAuthfail"
+grails.plugin.springsecurity.logout.afterLogoutUrl = grails.serverURL
+grails.plugin.springsecurity.successHandler.defaultTargetUrl = grails.serverURL
 
 // datasource
 dataSource {
@@ -158,6 +165,21 @@ if (System.getenv('MC_S3_BUCKET')) {
     mc.storage.s3.secret = System.getenv('MC_S3_SECRET') ?: System.getenv('AWS_SECRET_KEY')
     mc.storage.s3.region = System.getenv('MC_S3_REGION')
     mc.storage.s3.bucket = System.getenv('MC_S3_BUCKET')
+}
+
+if (System.getenv('MC_SECURED_REVERSE_PROXY')) {
+    // Setting of https behind load balancer (or proxy server) needs to set http header 'X-Forwarded-Proto' in order
+    // to decide if http or https should be used. Environment without load balancer is not affected.
+    grails.plugin.springsecurity.secureChannel.useHeaderCheckChannelSecurity = true
+    grails.plugin.springsecurity.portMapper.httpPort = 80
+    grails.plugin.springsecurity.portMapper.httpsPort = 443
+    grails.plugin.springsecurity.secureChannel.secureHeaderName = 'X-Forwarded-Proto'
+    grails.plugin.springsecurity.secureChannel.secureHeaderValue = 'http'
+    grails.plugin.springsecurity.secureChannel.insecureHeaderName = 'X-Forwarded-Proto'
+    grails.plugin.springsecurity.secureChannel.insecureHeaderValue = 'https'
+    grails.plugin.springsecurity.secureChannel.definition = [
+        [pattern: '/**', access: 'REQUIRES_SECURE_CHANNEL']
+    ]
 }
 
 

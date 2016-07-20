@@ -166,7 +166,16 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     NavigatorCondition check(CatalogueContent content) {
-        check { content.select(this) }
+        if (!content.beforeSelect) {
+            return check({ content.select(this) })
+        }
+
+        AbstractModelCatalogueGebSpec self = this
+
+        check({
+            self.with content.beforeSelect
+            content.select(this)
+        })
     }
 
     boolean no(Navigator navigator) {

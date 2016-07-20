@@ -79,7 +79,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
         return undefined if not security.hasRole('CURATOR')
         return undefined if not ($scope.element.isInstanceOf('asset') or $scope.element.isInstanceOf('dataClass') or
           $scope.element.isInstanceOf('dataElement') or $scope.element.isInstanceOf('dataModel') or
-          $scope.element.isInstanceOf('dataType') or $scope.element.isInstanceOf('measurementUnit'))
+          $scope.element.isInstanceOf('dataType') or $scope.element.isInstanceOf('measurementUnit') or
+          $scope.element.isInstanceOf('validationRule'))
 
         {
           position: -1500

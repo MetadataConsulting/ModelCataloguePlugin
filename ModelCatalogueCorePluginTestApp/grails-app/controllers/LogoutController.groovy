@@ -9,6 +9,6 @@ class LogoutController {
         flash.message = flash.message
         flash.error   = flash.error
         // TODO put any pre-logout code here
-        redirect uri: SpringSecurityUtils.securityConfig.logout.filterProcessesUrl // '/j_spring_security_logout'
+        redirect absolute: true, uri: SpringSecurityUtils.securityConfig.logout.filterProcessesUrl // '/j_spring_security_logout'
     }
 }

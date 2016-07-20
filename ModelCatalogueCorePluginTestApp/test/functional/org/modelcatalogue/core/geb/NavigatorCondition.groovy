@@ -14,7 +14,6 @@ class NavigatorCondition {
     NavigatorCondition(AbstractModelCatalogueGebSpec spec, Closure<Navigator> navigator) {
         this.spec = spec
         this.navigator = (Closure<Navigator>) navigator.clone()
-
         this.navigator.delegate = spec
         this.navigator.resolveStrategy = Closure.DELEGATE_FIRST
     }
