@@ -27,7 +27,7 @@ angular.module('mc.core.ui.bs.modalPromptNewExcelImport', ['mc.util.messages', '
               <div class="form-group">
                       <label ng-click="headersCollapsed = !headersCollapsed" ng-init="headersCollapsed = true">Customize Columns Headers</label>
               </div>
-              <div collapse="headersCollapsed">
+              <div uib-collapse="headersCollapsed">
                     <div class="form-group">
                       <label for="dataElementCode">Data Element Code</label>
                       <input type="text" class="form-control" id="dataElementCode" placeholder="Data Item Unique Code" ng-model="headersMap.dataElementCode">
