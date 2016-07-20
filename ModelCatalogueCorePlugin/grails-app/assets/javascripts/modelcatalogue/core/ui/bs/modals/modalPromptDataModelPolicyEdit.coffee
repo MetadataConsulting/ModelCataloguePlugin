@@ -8,6 +8,7 @@ angular.module('mc.core.ui.bs.modalPromptDatModelPolicyEdit', ['mc.util.messages
 
       dialog = $modal.open {
         windowClass: 'basic-edit-modal-prompt'
+        size: 'lg'
         template: '''
          <div class="modal-header">
             <h4>''' + title + '''</h4>
@@ -22,6 +23,7 @@ angular.module('mc.core.ui.bs.modalPromptDatModelPolicyEdit', ['mc.util.messages
               <div class="form-group">
                 <label for="policyText">Policy Text</label>
                 <textarea rows="10" ng-model="copy.policyText" placeholder="Policy Text" class="form-control" id="policyText"></textarea>
+                <p class="help-block">Enter valid <a href="http://www.groovy-lang.org/" target="_blank">Groovy</a> code with <a target="_blank" href="https://github.com/MetadataConsulting/ModelCataloguePlugin/blob/2.x/docs/development/recipes/policies.md">Data Model Policy DSL definition</a>. For example you can <a ng-click="requireDataType()"><span class="fa fa-magic"></span> require all data elements to have data type specified</a>, <a ng-click="uniqueName()"><span class="fa fa-magic"></span> all data elements' names to be unique</a> or <a ng-click="regexpName()"><span class="fa fa-magic"></span> all data elements' names to match regular expression</a></p>
               </div>
               <fake-submit-button/>
             </form>
@@ -55,6 +57,23 @@ angular.module('mc.core.ui.bs.modalPromptDatModelPolicyEdit', ['mc.util.messages
               $scope.messages.error 'Empty Policy Text', 'Please fill the Policy Text'
               return false
             return true
+
+          REQUIRED_EXAMPLE = """check dataElement property 'dataType' is 'required' otherwise 'Data type is missing for {2}'"""
+          UNIQUE_EXAMPLE = """check dataElement property 'name' is 'unique' otherwise 'Data element\'s name is not unique for {2}'"""
+          REGEX_EXAMPLE = """check dataElement property 'name' apply regex: '[^_ -]+' otherwise 'Name of {2} contains illegal characters ("_", "-" or " ")'"""
+
+          showExample = (example) ->
+            ->
+              if $scope.copy.policyText and $scope.copy.policyText != REGEX_EXAMPLE and $scope.copy.policyText != UNIQUE_EXAMPLE and $scope.copy.policyText != REQUIRED_EXAMPLE
+                messages.confirm("Replace current rules with example", "Do already have some rules, do you want to replace them with the example?").then ->
+                  $scope.copy.policyText = example
+              else
+                $scope.copy.policyText = example
+
+
+          $scope.requireDataType = showExample(REQUIRED_EXAMPLE)
+          $scope.uniqueName = showExample(UNIQUE_EXAMPLE)
+          $scope.regexpName = showExample(REGEX_EXAMPLE)
 
       }
 
