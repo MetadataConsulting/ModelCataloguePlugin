@@ -32,7 +32,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'ngFil
               <div class="form-group">
                 <label for="asset" class="">File</label>
                 <input ng-hide="uploading &amp;&amp; progress" type="file" class="form-control" id="asset" placeholder="File" ngf-model="copy.asset" ngf-select="onFileSelect($files)">
-                <progressbar value="progress" ng-show="uploading &amp;&amp; progress">{{progress}} %</progressbar>
+                <uib-progressbar value="progress" ng-show="uploading &amp;&amp; progress">{{progress}} %</uib-progressbar>
               </div>
               <div class="form-group">
                 <label for="description" class="">Description</label>
@@ -97,7 +97,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'ngFil
                   name: $scope.copy.name,
                   description: $scope.copy.description,
                   dataModel: $scope.currentDataModel?.id
-                } 
+                }
                 data: {asset: $scope.copy.file}
               }).progress((evt) ->
                 $scope.progress = parseInt(100.0 * evt.loaded / evt.total)
