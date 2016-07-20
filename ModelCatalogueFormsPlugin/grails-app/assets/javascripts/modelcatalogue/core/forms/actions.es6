@@ -3,7 +3,7 @@ angular.module('mc.core.forms.actions', ['mc.util.ui.actions']).config(function 
 
   actionsProvider.registerChildActionInRoles('export', 'export-crf', [actionsProvider.ROLE_LIST_ACTION,
       actionsProvider.ROLE_ITEM_ACTION, actionsProvider.ROLE_NAVIGATION, actionsProvider.ROLE_LIST_HEADER_ACTION],
-    function (security, $modal, $window, $scope, modelCatalogueApiRoot) {
+    function (security, $uibModal, $window, $scope, modelCatalogueApiRoot) {
       "ngInject"
       if (!security.hasRole('CURATOR')) {
         return undefined
@@ -17,10 +17,10 @@ angular.module('mc.core.forms.actions', ['mc.util.ui.actions']).config(function 
         position: 5000,
         label: 'Export as Case Report From',
         action: function () {
-          $modal.open(
+          $uibModal.open(
             {
               templateUrl: '/mc/core/forms/actions/exportCrf.html',
-              controller: function ($scope, $modalInstance) {
+              controller: function ($scope, $uibModalInstance) {
                 "ngInject"
                 $scope.assetName = `${element.name} Case Report Form`;
 
@@ -32,7 +32,7 @@ angular.module('mc.core.forms.actions', ['mc.util.ui.actions']).config(function 
                 $scope.submit = function () {
                   var url = URI(`${modelCatalogueApiRoot}/forms/generate/${element.id}`).setQuery({name: $scope.assetName});
                   $window.open(url, '_blank');
-                  $modalInstance.close();
+                  $uibModalInstance.close();
                 };
               }
             })

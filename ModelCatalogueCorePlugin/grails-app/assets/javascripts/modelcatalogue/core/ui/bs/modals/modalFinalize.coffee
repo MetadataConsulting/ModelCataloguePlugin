@@ -32,6 +32,7 @@ angular.module('mc.core.ui.bs.modalFinalize', ['mc.util.messages']).config ['mes
         </div>
         '''
         controller: ($rootScope, $scope, messages, $uibModalInstance, enhance, rest, modelCatalogueApiRoot) ->
+          'ngInject'
           $scope.semanticVersion = args.element.semanticVersion
           $scope.revisionNotes = args.element.revisionNotes
           $scope.messages = messages.createNewMessages()

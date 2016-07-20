@@ -12,7 +12,9 @@ angular.module('mc.core.ui.bs.dataModelWizard', ['mc.util.messages', 'mc.util.ui
 
         #language=HTML
         templateUrl: '/mc/core/ui/dataModelWizard.html'
-        controller: ($scope, $state, $window, messages, names, catalogueElementResource, $q, $uibModalInstance, catalogue, $rootScope, delayedQueueExecutor) ->
+        controller: ($scope, $state, $window, messages, names, catalogueElementResource, $q, $uibModalInstance,
+          catalogue, $rootScope, delayedQueueExecutor) ->
+          'ngInject'
           execAfter50 = delayedQueueExecutor(500)
 
           $scope.reset = ->

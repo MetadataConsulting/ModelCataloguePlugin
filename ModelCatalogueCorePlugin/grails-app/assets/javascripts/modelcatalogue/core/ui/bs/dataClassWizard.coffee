@@ -14,8 +14,9 @@ angular.module('mc.core.ui.bs.dataClassWizard', ['mc.util.messages', 'mc.util.ui
           args: -> args
 
         templateUrl: '/mc/core/ui/modals/dataClassWizard.html'
-        controller: ($scope, $state, $window, messages, names, catalogueElementResource, $uibModalInstance, $timeout, args, delayedQueueExecutor, $q, $log, enhance, metadataEditors, catalogue, $controller) ->
-
+        controller: ($scope, $state, $window, messages, names, catalogueElementResource, $uibModalInstance, $timeout,
+          args, delayedQueueExecutor, $q, $log, enhance, metadataEditors, catalogue, $controller) ->
+          'ngInject'
           angular.extend(this, $controller('watchAndAskForImportOrCloneCtrl', {$scope: $scope}))
 
           execAfter50 = delayedQueueExecutor(500)

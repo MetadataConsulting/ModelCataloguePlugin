@@ -1,8 +1,8 @@
 angular.module('mc.core.ui.bs.modalFeedback', ['mc.util.messages']).config (messagesProvider)->
- messagesProvider.setPromptFactory 'feedback', ($modal) ->
+ messagesProvider.setPromptFactory 'feedback', ($uibModal) ->
    "ngInject"
    (title, body, args) ->
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'messages-modal-feedback'
         size: 'lg'
         template: '''

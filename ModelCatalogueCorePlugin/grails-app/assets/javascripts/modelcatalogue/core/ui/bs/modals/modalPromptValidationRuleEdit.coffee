@@ -1,16 +1,17 @@
 angular.module('mc.core.ui.bs.modalPromptValidationRuleEdit', ['mc.util.messages', 'mc.core.ui.bs.withClassificationCtrlMixin']).config (messagesProvider)->
-  factory = ($modal, $q, messages) ->
+  factory = ($uibModal, $q, messages) ->
     "ngInject"
     (title, body, args) ->
       if not args?.element? and not args?.create?
         messages.error('Cannot create relationship dialog.', 'The element to be edited is missing.')
         return $q.reject('Missing element argument!')
 
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'basic-edit-modal-prompt'
         size: 'lg'
         templateUrl: '/mc/core/ui/modals/modalValidationRuleEdit.html'
-        controller: ($scope, messages, $controller, $modalInstance) ->
+        controller: ($scope, messages, $controller, $uibModalInstance) ->
+          'ngInject'
           $scope.title      = args.title
           $scope.pending    = {dataModel: null}
           $scope.newEntity  = -> {dataModels: $scope.copy?.dataModels ? [], dataClasses: $scope.copy?.dataClasses ? [], dataElements: $scope.copy?.dataElements ? []}
@@ -36,7 +37,7 @@ angular.module('mc.core.ui.bs.modalPromptValidationRuleEdit', ['mc.util.messages
             ].some (name) -> $scope.copy[name] != $scope.original[name]
 
           angular.extend(this, $controller('withClassificationCtrlMixin', {$scope: $scope}))
-          angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))
+          angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $uibModalInstance: $uibModalInstance}))
 
       }
 

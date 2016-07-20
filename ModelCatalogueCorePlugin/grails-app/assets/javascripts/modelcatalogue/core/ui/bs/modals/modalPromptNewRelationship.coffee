@@ -11,7 +11,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages', 
         windowClass: 'new-relationship-modal-prompt'
         templateUrl: '/mc/core/ui/modals/modalNewRelationship.html'
         controller: ($scope, messages, $uibModalInstance, $controller, $stateParams, catalogueElementResource) ->
-
+            'ngInject'
             if not args.currentDataModel and $stateParams.dataModelId and $stateParams.dataModelId != 'catalogue'
               catalogueElementResource('dataModel').get($stateParams.dataModelId).then (dataModel) ->
                 $scope.currentDataModel = args.currentDataModel = dataModel
