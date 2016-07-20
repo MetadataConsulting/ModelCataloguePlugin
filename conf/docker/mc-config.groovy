@@ -5,9 +5,11 @@ grails.logging.jul.usebridge = false
 
 grails.serverURL = "${System.getenv('METADATA_SCHEME') ?: 'http'}://${System.getenv('VIRTUAL_HOST') ?: System.getenv('METADATA_HOST') ?: System.getenv('DOCKER_MACHINE_IP') ?: new URL("http://checkip.amazonaws.com").text.trim()}"
 
+grails.plugin.springsecurity.auth.loginFormUrl = "${grails.serverURL}/login/auth"
 grails.plugin.springsecurity.successHandler.ajaxSuccessUrl = "${grails.serverURL}/login/ajaxSuccess"
 grails.plugin.springsecurity.failureHandler.ajaxAuthFailUrl = "${grails.serverURL}/login/ajaxAuthfail"
 grails.plugin.springsecurity.logout.afterLogoutUrl = grails.serverURL
+grails.plugin.springsecurity.successHandler.defaultTargetUrl = grails.serverURL
 
 // datasource
 dataSource {
