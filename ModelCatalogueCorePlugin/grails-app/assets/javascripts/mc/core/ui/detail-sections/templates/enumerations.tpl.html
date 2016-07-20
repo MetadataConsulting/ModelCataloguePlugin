@@ -1,6 +1,6 @@
-<div class="col-md-12">
-  <div class="row" ng-if="!editableForm.$visible && element.enumerations.values">
-    <div class="col-md-12" ng-if="!editableForm.$visible && element.enumerations.values">
+<div class="col-md-12" ng-if="!editableForm.$visible && element.enumerations.values">
+  <div class="row">
+    <div class="col-md-12">
       <strong class="small">Enumerations</strong>
     </div>
   </div>
@@ -8,25 +8,35 @@
   <div class="row" ng-repeat="value in ::(editableForm.$visible ? [] : element.enumerations.values) track by value.key"
        ng-class="{'text-danger': value.deprecated}">
     <div class="col-md-3">
-      <strong class="small text-wrap">{{::value.key}}</strong>
+      <strong class="small text-wrap">
+        {{::value.key}}
+      </strong>
+      <span ng-show="value.deprecated">
+        (deprecated)
+      </span>
     </div>
     <div class="col-md-8 preserve-new-lines">
       <small>{{::value.value}}</small>
     </div>
     <div class="col-md-1">
-      <a class="btn btn-link btn-sm" ng-click="view.setDeprecated(value, !value.deprecated, globalMessages, element, rest, modelCatalogueApiRoot)">
+      <a class="btn btn-link btn-sm"
+         ng-click="view.setDeprecated(value, !value.deprecated, globalMessages, element, rest, modelCatalogueApiRoot)">
         <span class="fa" ng-class="{'fa-ban': !value.deprecated, 'fa-repeat': value.deprecated}"></span>
       </a>
     </div>
   </div>
+</div>
 
+<div class="col-md-12" ng-if="editableForm.$visible">
   <div class="row">
-    <div class="custom-metadata col-md-12" ng-if="editableForm.$visible">
-      <div ng-if="copy.ext.get('http://www.modelcatalogue.org/metadata/enumerateType#subset')" class="alert alert-warning">
-        Following values are inherited and will be overriden when the base enumeration changes:
+    <div class="custom-metadata col-md-12">
+      <div ng-if="copy.ext.get('http://www.modelcatalogue.org/metadata/enumerateType#subset')"
+           class="alert alert-warning">
+        Following values are inherited and will be overridden when the base enumeration changes:
         {{copy.ext.get('http://www.modelcatalogue.org/metadata/enumerateType#subset')}}
       </div>
       <ordered-map-editor object="copy.enumerations"
+                          can-deprecate="true"
                           title="Enumerations"
                           key-placeholder="Value or copy & paste from excel"
                           value-placeholder="Description">
