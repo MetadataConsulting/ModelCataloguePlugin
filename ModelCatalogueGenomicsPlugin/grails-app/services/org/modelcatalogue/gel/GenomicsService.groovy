@@ -4,8 +4,11 @@ import grails.transaction.Transactional
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.PerformanceUtilService
+import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
 import org.modelcatalogue.core.publishing.changelog.ChangeLogDocxGenerator
+import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.gel.export.CancerTypesCsvExporter
 import org.modelcatalogue.gel.export.CancerTypesJsonExporter
 import org.modelcatalogue.gel.export.DataModelChangeLogXlsExporter
@@ -197,6 +200,23 @@ class GenomicsService {
             contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream out ->
             new DataModelChangeLogXlsExporter(auditService, dataClassService, performanceUtilService, 0, false).export(model, out)
+        }
+    }
+
+    ListWithTotalAndType<DataClass> findRareDiseases(Map<String, Object> params = [:], DataModel dataModel) {
+        Lists.fromCriteria(params, DataClass) {
+            eq('dataModel', dataModel)
+            outgoingRelationships {
+                eq('relationshipType', RelationshipType.hierarchyType)
+                destination {
+                    or {
+                        ilike('name', '%eligibility')
+                        ilike('name', '%phenotypes')
+                        ilike('name', '%clinical tests')
+                    }
+                }
+            }
+            order 'name'
         }
     }
 
