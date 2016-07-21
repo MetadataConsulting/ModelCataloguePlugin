@@ -28,6 +28,7 @@ angular.module('mc.core.ui.bs.modalFeedback', ['mc.util.messages']).config (mess
         '''
         resolve:
           feedback: ($http, modelCatalogueApiRoot, MessagingClient) ->
+            'ngInject'
             $http.get("#{modelCatalogueApiRoot}/feedback/#{args.id}").then (result) ->
               feedback = result.data
               MessagingClient.subscribe "/topic/feedback/#{args.id}/lines", (message) ->
@@ -35,6 +36,7 @@ angular.module('mc.core.ui.bs.modalFeedback', ['mc.util.messages']).config (mess
               feedback
 
         controller: ($scope, feedback, $state, $window) ->
+          'ngInject'
           $scope.feedback = feedback
 
           $scope.open = ->

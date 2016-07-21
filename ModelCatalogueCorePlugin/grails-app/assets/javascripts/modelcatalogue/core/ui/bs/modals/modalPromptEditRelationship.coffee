@@ -11,6 +11,7 @@ angular.module('mc.core.ui.bs.modalPromptEditRelationship', ['mc.util.messages']
         size: 'lg'
         templateUrl: '/mc/core/ui/modals/modalEditRelationship.html'
         controller: ($scope, messages, $uibModalInstance, catalogue) ->
+          'ngInject'
           $scope.relationshipTypes    = []
           $scope.relationshipTypeInfo = null
           $scope.relation             = args.relation

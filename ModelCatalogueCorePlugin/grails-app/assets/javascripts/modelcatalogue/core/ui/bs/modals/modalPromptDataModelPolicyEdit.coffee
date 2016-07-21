@@ -32,6 +32,7 @@ angular.module('mc.core.ui.bs.modalPromptDatModelPolicyEdit', ['mc.util.messages
         '''
 
         controller: ($scope, messages, $controller, $uibModalInstance) ->
+          'ngInject'
           $scope.copy     = angular.copy(args.element ? {})
           $scope.create   = args.create
           $scope.original = args.element ? {}
