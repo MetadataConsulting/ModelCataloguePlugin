@@ -1,166 +1,169 @@
 <div class="col-md-12 metadata-form-item-content"
-     ng-init="exclude = {'value': (element.ext.get('http://forms.modelcatalogue.org/section#exclude') ? (element.ext.get('http://forms.modelcatalogue.org/section#exclude') == 'false' ? false : true) : false)}">
-  <div class="row" ng-if="editableForm.$visible">
-    <div class="col-md-offset-1 col-md-10 alert alert-warning">
-      The form section metadata only applies on the direct children of the form's root model and is ignored for any
-      other nested models if not specified otherwise.
-    </div>
+     ng-init="exclude = {'value': (element.ext.get('http://forms.modelcatalogue.org/section#exclude') ?
+     (element.ext.get('http://forms.modelcatalogue.org/section#exclude') == 'false' ? false : true) : false)}">
+
+  <div class="alert alert-warning" ng-if="editableForm.$visible">
+    The form section metadata only applies on the direct children of the form's root model and is ignored for any
+    other nested models if not specified otherwise.
   </div>
 
-  <div class="row" ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#exclude')">
-    <div class="col-md-3">
-      <strong class="small">Exclude</strong>
-      <i class="fa fa-question"
-         popover="
-          Specifies if this section should be excluded from the result CRF. This excludes this section together with all
-          its children.
-          "
-         popover-title="Exclude"
-         popover-trigger="mouseenter"></i>
-    </div>
-    <div class="col-md-9 full-width-editable">
-      <span editable-checkbox="extAsMap['http://forms.modelcatalogue.org/section#exclude']" class="small"
-            e-string-to-boolean e-ng-change="exclude.value = !exclude.value">
-        {{ element.ext.get('http://forms.modelcatalogue.org/section#exclude') ? (element.ext.get('http://forms.modelcatalogue.org/section#exclude') == "false" ? "No": "Yes") : "" }}
-      </span>
-    </div>
-  </div>
-  <div class="row" ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#excludeDataElements')"
-       ng-init="excludeDataElements = {'value': (element.ext.get('http://forms.modelcatalogue.org/section#excludeDataElements') ? (element.ext.get('http://forms.modelcatalogue.org/section#excludeDataElements') == 'false' ? false : true) : false)}">
-    <div class="col-md-3">
-      <strong class="small">Exclude Data Elements</strong>
-      <i class="fa fa-question"
-         popover="
-          Specifies if direct child data elements should be excluded from the result CRF.
-          "
-         popover-title="Exclude Data Elements"
-         popover-trigger="mouseenter"></i>
-    </div>
-    <div class="col-md-9 full-width-editable">
-      <span editable-checkbox="extAsMap['http://forms.modelcatalogue.org/section#excludeDataElements']"
-            class="small"
-            e-ng-disabled="exclude.value"
-            e-string-to-boolean e-ng-change="excludeDataElements.value = !excludeDataElements.value">
-        {{ element.ext.get('http://forms.modelcatalogue.org/section#excludeDataElements') ? (element.ext.get('http://forms.modelcatalogue.org/section#excludeDataElements') == "false" ? "No": "Yes") : "" }}
-      </span>
-    </div>
-  </div>
-  <div class="row" ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#merge')"
-       ng-init="merge = {'value': (element.ext.get('http://forms.modelcatalogue.org/section#merge') ? (element.ext.get('http://forms.modelcatalogue.org/section#merge') == 'false' ? false : true) : false)}">
-    <div class="col-md-3">
-      <strong class="small">Merge to Single Section</strong>
-      <i class="fa fa-question"
-         popover="
-          This data class will be merged to parent data class section. Basically, there won't be any title for this sub data class.
-          "
-         popover-title="Merge to Single Section"
-         popover-trigger="mouseenter"></i>
-    </div>
-    <div class="col-md-9 full-width-editable">
-      <span editable-checkbox="extAsMap['http://forms.modelcatalogue.org/section#merge']"
-            class="small"
-            e-ng-disabled="exclude.value"
-            e-string-to-boolean e-ng-change="merge.value = !merge.value">
-        {{ element.ext.get('http://forms.modelcatalogue.org/section#merge') ? (element.ext.get('http://forms.modelcatalogue.org/section#merge') == "false" ? "No": "Yes") : "" }}
-      </span>
-    </div>
-  </div>
-  <div class="row" ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#title')">
-    <div class="col-md-3">
-      <strong class="small">Title</strong>
-      <i class="fa fa-question"
-         popover="
-          The value in this field will be displayed at the top of each page when a user is performing data entry, as well
-          as in the tabs and drop down list used to navigate between sections in a CRF. It does not have to be unique but
-          should be a readable value that makes sense to people entering data. An example would be 'Inclusion Criteria'.
+  <table class="table table-condensed table-striped table-borderless table-no-margin small">
 
-          Defaults to model's name.
+    <tr ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#exclude')">
+      <th class="col-md-3">
+        Exclude
+        <i class="fa fa-question"
+           popover="
+              Specifies if this section should be excluded from the result CRF. This excludes this section together
+              with all its children."
+           popover-title="Exclude"
+           popover-trigger="mouseenter"></i>
+      </th>
+      <td class="full-width-editable">
+        <span editable-checkbox="extAsMap['http://forms.modelcatalogue.org/section#exclude']" class="small"
+              e-string-to-boolean e-ng-change="exclude.value = !exclude.value">
+          {{element.ext.get('http://forms.modelcatalogue.org/section#exclude') ?
+              (element.ext.get('http://forms.modelcatalogue.org/section#exclude') == "false" ? "No": "Yes") : "" }}
+        </span>
+      </td>
+    </tr>
 
-          Long section titles may not display well.
+    <tr ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#excludeDataElements')">
+      <th class="col-md-3">
+        Exclude Data Elements
+        <i class="fa fa-question"
+           popover="Specifies if direct child data elements should be excluded from the result CRF."
+           popover-title="Exclude Data Elements"
+           popover-trigger="mouseenter"></i>
+      </th>
+      <td class="full-width-editable">
+        <span editable-checkbox="extAsMap['http://forms.modelcatalogue.org/section#excludeDataElements']"
+              class="small"
+              e-ng-disabled="exclude.value"
+              e-string-to-boolean e-ng-change="excludeDataElements.value = !excludeDataElements.value">
+          {{element.ext.get('http://forms.modelcatalogue.org/section#excludeDataElements') ?
+              (element.ext.get('http://forms.modelcatalogue.org/section#excludeDataElements') == "false" ? "No": "Yes") : "" }}
+        </span>
+      </td>
+    </tr>
 
-          Can contain up to 2000  characters.
-          "
-         popover-title="Title"
-         popover-trigger="mouseenter"></i>
-    </div>
-    <div class="col-md-9 full-width-editable">
-      <span editable-textarea="extAsMap['http://forms.modelcatalogue.org/section#title']" class="small"
-            e-ng-disabled="exclude.value"
-            e-maxlength="2000" e-rows="5">
-        {{element.ext.get('http://forms.modelcatalogue.org/section#title')}}
-      </span>
-    </div>
-  </div>
-  <div class="row" ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#subtitle')">
-    <div class="col-md-3">
-      <strong class="small">Subtitle</strong>
-      <i class="fa fa-question"
-         popover="
-          A sub-title shown under the section title.
+    <tr ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#merge')">
+      <th class="col-md-3">
+        Merge to Single Section
+        <i class="fa fa-question"
+           popover="
+              This data class will be merged to parent data class section. Basically, there won't be any title for this
+              sub data class."
+           popover-title="Merge to Single Section"
+           popover-trigger="mouseenter"></i>
+      </th>
+      <td class="full-width-editable">
+        <span editable-checkbox="extAsMap['http://forms.modelcatalogue.org/section#merge']"
+              class="small"
+              e-ng-disabled="exclude.value"
+              e-string-to-boolean e-ng-change="merge.value = !merge.value">
+          {{ element.ext.get('http://forms.modelcatalogue.org/section#merge') ? (element.ext.get('http://forms.modelcatalogue.org/section#merge') == "false" ? "No": "Yes") : "" }}
+        </span>
+      </td>
+    </tr>
 
-          HTML elements are supported for this field.
+    <tr ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#title')">
+      <th class="col-md-3">
+        Title
+        <i class="fa fa-question"
+           popover="
+              The value in this field will be displayed at the top of each page when a user is performing data entry,
+              as well as in the tabs and drop down list used to navigate between sections in a CRF. It does not have
+              to be unique but should be a readable value that makes sense to people entering data. An example would
+              be 'Inclusion Criteria'.
 
-          Can contain up to 2000 characters.
-          "
-         popover-title="Subtitle"
-         popover-trigger="mouseenter"></i>
-    </div>
-    <div class="col-md-9 full-width-editable">
-      <span editable-textarea="extAsMap['http://forms.modelcatalogue.org/section#subtitle']" class="small"
-            e-ng-disabled="exclude.value"
-            e-maxlength="2000" e-rows="5">
-        {{element.ext.get('http://forms.modelcatalogue.org/section#subtitle')}}
-      </span>
-    </div>
-  </div>
-  <div class="row" ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#instructions')">
-    <div class="col-md-3">
-      <strong class="small">Instructions</strong>
-      <i class="fa fa-question"
-         popover="
-          Instructions at the top of the section (under the subtitle) that explains to the data entry person what to do on
-          this section of the form.
+              Defaults to model's name.
 
-          HTML elements are supported for this field.
+              Long section titles may not display well.
 
-          This field should be used if there are particular data entry instructions that should be conveyed or followed
-          to users.
+              Can contain up to 2000  characters."
+           popover-title="Title"
+           popover-trigger="mouseenter"></i>
+      </th>
+      <td class="full-width-editable">
+        <span editable-textarea="extAsMap['http://forms.modelcatalogue.org/section#title']" class="small"
+              e-ng-disabled="exclude.value"
+              e-maxlength="2000" e-rows="5">
+          {{element.ext.get('http://forms.modelcatalogue.org/section#title')}}
+        </span>
+      </td>
+    </tr>
 
-          Can contain up to 2000 characters.
-          "
-         popover-title="Instructions"
-         popover-trigger="mouseenter"></i>
-    </div>
-    <div class="col-md-9 full-width-editable">
-      <span editable-textarea="extAsMap['http://forms.modelcatalogue.org/section#instructions']" class="small"
-            e-ng-disabled="exclude.value"
-            e-maxlength="2000" e-rows="5">
-        {{element.ext.get('http://forms.modelcatalogue.org/section#instructions')}}
-      </span>
-    </div>
-  </div>
-  <div class="row" ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#pageNumber')">
-    <div class="col-md-3">
-      <strong class="small">Page Number</strong>
-      <i class="fa fa-question"
-         popover="
-          The page number on which the section begins. If using paper source documents and have a multi-page CRF,
-          put in the printed page number.
+    <tr ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#subtitle')">
+      <th class="col-md-3">
+        Subtitle
+        <i class="fa fa-question"
+           popover="
+              A sub-title shown under the section title.
 
-          For the most part, this field is only used in studies collecting data on multi-page paper forms and then having
-          the data keyed in at a central location performing double data entry.
+              HTML elements are supported for this field.
 
-          Can contain up to 5 characters.
-          "
-         popover-title="Page Number"
-         popover-trigger="mouseenter"></i>
-    </div>
-    <div class="col-md-9 full-width-editable">
-      <span editable-text="extAsMap['http://forms.modelcatalogue.org/section#pageNumber']" class="small"
-            e-ng-disabled="exclude.value"
-            qe-maxlength="5">
-        {{element.ext.get('http://forms.modelcatalogue.org/section#pageNumber')}}
-      </span>
-    </div>
-  </div>
+              Can contain up to 2000 characters."
+           popover-title="Subtitle"
+           popover-trigger="mouseenter"></i>
+      </th>
+      <td class="full-width-editable">
+        <span editable-textarea="extAsMap['http://forms.modelcatalogue.org/section#subtitle']" class="small"
+              e-ng-disabled="exclude.value"
+              e-maxlength="2000" e-rows="5">
+          {{element.ext.get('http://forms.modelcatalogue.org/section#subtitle')}}
+        </span>
+      </td>
+    </tr>
+
+    <tr ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#instructions')">
+      <th class="col-md-3">
+        Instructions
+        <i class="fa fa-question"
+           popover="
+              Instructions at the top of the section (under the subtitle) that explains to the data entry person what
+              to do on this section of the form.
+
+              HTML elements are supported for this field.
+
+              This field should be used if there are particular data entry instructions that should be conveyed or
+              followed to users.
+
+              Can contain up to 2000 characters."
+           popover-title="Instructions"
+           popover-trigger="mouseenter"></i>
+      </th>
+      <td class="full-width-editable">
+        <span editable-textarea="extAsMap['http://forms.modelcatalogue.org/section#instructions']" class="small"
+              e-ng-disabled="exclude.value"
+              e-maxlength="2000" e-rows="5">
+          {{element.ext.get('http://forms.modelcatalogue.org/section#instructions')}}
+        </span>
+      </td>
+    </tr>
+
+    <tr ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#pageNumber')">
+      <th class="col-md-3">
+        Page Number
+        <i class="fa fa-question"
+           popover="
+              The page number on which the section begins. If using paper source documents and have a multi-page CRF,
+              put in the printed page number.
+
+              For the most part, this field is only used in studies collecting data on multi-page paper forms and then
+              having the data keyed in at a central location performing double data entry.
+
+              Can contain up to 5 characters."
+           popover-title="Page Number"
+           popover-trigger="mouseenter"></i>
+      </th>
+      <td class="full-width-editable">
+        <span editable-text="extAsMap['http://forms.modelcatalogue.org/section#pageNumber']" class="small"
+              e-ng-disabled="exclude.value"
+              qe-maxlength="5">
+          {{element.ext.get('http://forms.modelcatalogue.org/section#pageNumber')}}
+        </span>
+      </td>
+    </tr>
+  </table>
 </div>
