@@ -13,7 +13,13 @@
     <span class="unit-name">{{element.dataType.name}}&nbsp;</span>
     <small>
       <a ng-if="!editableForm.$visible" ng-href="{{element.dataType.dataModel.href()}}" class="label"
-         ng-class="{'label-warning': element.dataType.getDataModelStatus() == 'DRAFT', 'label-info': element.dataType.getDataModelStatus() == 'PENDING', 'label-primary': element.dataType.getDataModelStatus() == 'FINALIZED', 'label-danger': element.dataType.getDataModelStatus() == 'DEPRECATED'}">{{element.dataType.getDataModelWithVersion()}}</a>
+         ng-class="{
+          'label-warning': element.dataType.getDataModelStatus() == 'DRAFT',
+          'label-info': element.dataType.getDataModelStatus() == 'PENDING',
+          'label-primary': element.dataType.getDataModelStatus() == 'FINALIZED',
+          'label-danger': element.dataType.getDataModelStatus() == 'DEPRECATED'}">
+        {{element.dataType.getDataModelWithVersion()}}
+      </a>
     </small>
   </a>
 
@@ -24,7 +30,13 @@
   <span class="unit-name">{{element.dataType.measurementUnit.name}}&nbsp;</span>
   <small>
     <a ng-href="{{element.dataType.measurementUnit.dataModel.href()}}" class="label"
-       ng-class="{'label-warning': element.dataType.measurementUnit.getDataModelStatus() == 'DRAFT', 'label-info': element.dataType.measurementUnit.getDataModelStatus() == 'PENDING', 'label-primary': element.dataType.measurementUnit.getDataModelStatus() == 'FINALIZED', 'label-danger': element.dataType.measurementUnit.getDataModelStatus() == 'DEPRECATED'}">{{element.dataType.measurementUnit.getDataModelWithVersion()}}</a>
+       ng-class="{
+        'label-warning': element.dataType.measurementUnit.getDataModelStatus() == 'DRAFT',
+        'label-info': element.dataType.measurementUnit.getDataModelStatus() == 'PENDING',
+        'label-primary': element.dataType.measurementUnit.getDataModelStatus() == 'FINALIZED',
+        'label-danger': element.dataType.measurementUnit.getDataModelStatus() == 'DEPRECATED'}">
+      {{element.dataType.measurementUnit.getDataModelWithVersion()}}
+    </a>
   </small>
 </a>
 </div>
@@ -34,7 +46,13 @@
   <span class="unit-name">{{element.dataType.dataClass.name}}&nbsp;</span>
   <small>
     <a ng-href="{{element.dataType.dataClass.dataModel.href()}}" class="label"
-       ng-class="{'label-warning': element.dataType.dataClass.getDataModelStatus() == 'DRAFT', 'label-info': element.dataType.dataClass.getDataModelStatus() == 'PENDING', 'label-primary': element.dataType.dataClass.getDataModelStatus() == 'FINALIZED', 'label-danger': element.dataType.dataClass.getDataModelStatus() == 'DEPRECATED'}">{{element.dataType.dataClass.getDataModelWithVersion()}}</a>
+       ng-class="{
+        'label-warning': element.dataType.dataClass.getDataModelStatus() == 'DRAFT',
+        'label-info': element.dataType.dataClass.getDataModelStatus() == 'PENDING',
+        'label-primary': element.dataType.dataClass.getDataModelStatus() == 'FINALIZED',
+        'label-danger': element.dataType.dataClass.getDataModelStatus() == 'DEPRECATED'}">
+      {{element.dataType.dataClass.getDataModelWithVersion()}}
+    </a>
   </small>
 </a>
 </div>
