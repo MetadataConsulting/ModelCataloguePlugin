@@ -1,7 +1,7 @@
 angular.module('mc.core.ui.bs.modalOptions', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
- messagesProvider.setPromptFactory 'options', [ '$modal', '$q', ($modal, $q) ->
+ messagesProvider.setPromptFactory 'options', [ '$uibModal', '$q', ($uibModal, $q) ->
    (title, body, args) ->
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'messages-modal-confirm'
         template: '''
          <div class="modal-header">
@@ -18,20 +18,20 @@ angular.module('mc.core.ui.bs.modalOptions', ['mc.util.messages']).config ['mess
         </div>
         '''
 
-        controller: ['$scope', '$modalInstance', ($scope, $modalInstance) ->
+        controller: ['$scope', '$uibModalInstance', ($scope, $uibModalInstance) ->
           $scope.options = args.options
           $scope.pending = false
 
           $scope.select = (value) ->
             $scope.pending = true
             $q.when(value).then(args.onSelect).then (result)->
-              $modalInstance.close(result)
+              $uibModalInstance.close(result)
             , args.onDismiss
 
           $scope.close = (reason) ->
             $scope.pending = true
             args.onDismiss(reason) if angular.isFunction(args.onDismiss)
-            $modalInstance.dismiss(reason)
+            $uibModalInstance.dismiss(reason)
         ]
       }
 

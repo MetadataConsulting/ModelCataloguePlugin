@@ -1,7 +1,7 @@
 angular.module('mc.core.ui.bs.modalPromptNewExcelImport', ['mc.util.messages', 'mc.core.ui.bs.importCtrl']).config ['messagesProvider', (messagesProvider)->
-  factory = [ '$modal', ($modal) ->
+  factory = [ '$uibModal', ($uibModal) ->
     (title, body, args) ->
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'basic-edit-modal-prompt'
         backdrop: 'static'
         keyboard: false
@@ -22,12 +22,12 @@ angular.module('mc.core.ui.bs.modalPromptNewExcelImport', ['mc.util.messages', '
               <div class="form-group">
                 <label for="asset" class="">File</label>
                 <input ng-hide="uploading &amp;&amp; progress" type="file" accept=".xls,.xlsx" class="form-control" id="asset" placeholder="File" ngf-model="copy.asset" ngf-select="onFileSelect($files)">
-                <progressbar value="progress" ng-show="uploading &amp;&amp; progress">{{progress}} %</progressbar>
+                <uib-progressbar value="progress" ng-show="uploading &amp;&amp; progress">{{progress}} %</uib-progressbar>
               </div>
               <div class="form-group">
                       <label ng-click="headersCollapsed = !headersCollapsed" ng-init="headersCollapsed = true">Customize Columns Headers</label>
               </div>
-              <div collapse="headersCollapsed">
+              <div uib-collapse="headersCollapsed">
                     <div class="form-group">
                       <label for="dataElementCode">Data Element Code</label>
                       <input type="text" class="form-control" id="dataElementCode" placeholder="Data Item Unique Code" ng-model="headersMap.dataElementCode">

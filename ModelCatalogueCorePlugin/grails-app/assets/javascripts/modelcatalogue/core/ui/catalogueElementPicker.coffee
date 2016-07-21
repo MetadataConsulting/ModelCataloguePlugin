@@ -120,7 +120,7 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
     label = if attrs.label then attrs.label else 'null'
 
     element.attr('typeahead-on-select', 'customCepOnSelect($item, $model, $label, "' + escape(attrs.typeaheadOnSelect ? '') + '")')
-    element.attr('typeahead', "el as label(el, #{label}) for el in searchForElement($viewValue, \"" + escape(attrs.ngModel ? '') + "\", \"" + escape(attrs.catalogueElementPicker ? '') + "\",\"" + escape(attrs.resource ? '') + "\", \"" + escape(attrs.status ? '') + "\", " + attrs.global + " , \"" + escape(attrs.contentType ? '') + "\", \"" + escape(attrs.typeaheadOnSelect ? '')  + "\")" )
+    element.attr('uib-typeahead', "el as label(el, #{label}) for el in searchForElement($viewValue, \"" + escape(attrs.ngModel ? '') + "\", \"" + escape(attrs.catalogueElementPicker ? '') + "\",\"" + escape(attrs.resource ? '') + "\", \"" + escape(attrs.status ? '') + "\", " + attrs.global + " , \"" + escape(attrs.contentType ? '') + "\", \"" + escape(attrs.typeaheadOnSelect ? '')  + "\")" )
     element.attr('autocomplete', "off")
     element.attr('typeahead-wait-ms', "50") unless element.attr('typeahead-wait-ms')
     element.attr('typeahead-template-url', 'modelcatalogue/core/ui/catalogueElementPickerTypeahead.html')

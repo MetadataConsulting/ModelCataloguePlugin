@@ -1,11 +1,11 @@
 angular.module('mc.core.ui.bs.modalPromptActionParametersEdit', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
-  factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
+  factory = [ '$uibModal', '$q', 'messages', ($uibModal, $q, messages) ->
     (title, body, args) ->
       if not args?.action? and not args?.create?
         messages.error('Cannot create edit dialog.', 'The action to be edited is missing.')
         return $q.reject('Missing action argument!')
 
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'new-relationship-modal-prompt'
         template: '''
          <div class="modal-header">
@@ -26,7 +26,7 @@ angular.module('mc.core.ui.bs.modalPromptActionParametersEdit', ['mc.util.messag
             <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
         </div>
         '''
-        controller: ['$scope', 'messages', '$modalInstance', ($scope, messages, $modalInstance) ->
+        controller: ['$scope', 'messages', '$uibModalInstance', ($scope, messages, $uibModalInstance) ->
           $scope.action = args.action
           $scope.parameters = args.action.parameters
           $scope.messages = messages.createNewMessages()
@@ -38,7 +38,7 @@ angular.module('mc.core.ui.bs.modalPromptActionParametersEdit', ['mc.util.messag
 
             args.action.updateParameters().then (result) ->
               messages.success('Action Parameters Updated', "You have updated parameters for #{args.action.naturalName}")
-              $modalInstance.close(result)
+              $uibModalInstance.close(result)
             , (response) ->
               for err in response.data.errors
                 $scope.messages.error err.message

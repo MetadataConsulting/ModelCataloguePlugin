@@ -1,7 +1,7 @@
 angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies']).config ['messagesProvider', (messagesProvider)->
-  factory = [ '$modal', 'messages', 'security', ($modal, messages, security) ->
+  factory = [ '$uibModal', 'messages', 'security', ($uibModal, messages, security) ->
     ->
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'login-modal-prompt'
         template: '''
          <div class="modal-header">
@@ -36,8 +36,8 @@ angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies
             <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
         </div>
         '''
-        controller: ['$scope', '$cookies', 'messages', 'security', '$modalInstance', 'names', '$window', '$interval', '$rootScope',
-          ($scope, $cookies, messages, security, $modalInstance, names, $window, $interval, $rootScope) ->
+        controller: ['$scope', '$cookies', 'messages', 'security', '$uibModalInstance', 'names', '$window', '$interval', '$rootScope',
+          ($scope, $cookies, messages, security, $uibModalInstance, names, $window, $interval, $rootScope) ->
             $scope.user = {rememberMe: $cookies.mc_remember_me == "true"}
             $scope.messages = messages.createNewMessages()
             $scope.providers = security.oauthProviders
@@ -54,7 +54,7 @@ angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies
                   $scope.messages.error error
               else
                 $cookies.mc_remember_me = $scope.user.rememberMe
-                $modalInstance.close success
+                $uibModalInstance.close success
 
             onFailure = (failure) ->
               if failure.data.error
@@ -75,9 +75,9 @@ angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies
 
               closeWindowWhenLoggedIn = ->
                 if externalLoginWindow.closed
-                  $modalInstance.dismiss()
+                  $uibModalInstance.dismiss()
                   $interval.cancel(helperPromise)
-                  $modalInstance.dismiss()
+                  $uibModalInstance.dismiss()
                   return
                 try # mute cross origin errors when redirected login page
                   if $window.location.host is externalLoginWindow.location.host and (externalLoginWindow.location.pathname == security.contextPath or externalLoginWindow.location.pathname == "#{security.contextPath}/")
@@ -85,7 +85,7 @@ angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies
                     externalLoginWindow.close()
                     security.requireUser().then (success)->
                       $rootScope.$broadcast 'userLoggedIn', success
-                      $modalInstance.close success
+                      $uibModalInstance.close success
 
               helperPromise = $interval closeWindowWhenLoggedIn, 100
 

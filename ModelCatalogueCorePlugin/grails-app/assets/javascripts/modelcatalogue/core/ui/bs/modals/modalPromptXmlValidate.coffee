@@ -1,10 +1,10 @@
 angular.module('mc.core.ui.bs.modalPromptXmlValidate', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
-  factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
+  factory = [ '$uibModal', '$q', 'messages', ($uibModal, $q, messages) ->
 
     (title, body, args) ->
       return $q.reject("Missing asset argument") if not args.asset
 
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'basic-edit-modal-prompt'
         template: '''
          <div class="modal-header">
@@ -17,17 +17,17 @@ angular.module('mc.core.ui.bs.modalPromptXmlValidate', ['mc.util.messages']).con
               <div class="form-group">
                 <label for="asset" class="">XML File</label>
                 <input ng-hide="uploading &amp;&amp; progress" type="file" class="form-control" id="xml" placeholder="XML File" ngf-model="copy.xml" ngf-select="onFileSelect($files)">
-                <progressbar value="progress" ng-show="uploading &amp;&amp; progress">{{progress}} %</progressbar>
+                <uib-progressbar value="progress" ng-show="uploading &amp;&amp; progress">{{progress}} %</uib-progressbar>
               </div>
               <fake-submit-button/>
             </form>
         </div>
         <div class="modal-footer">
-          <alert type="success" ng-show="result === true">File is VALID</alert>
-          <alert type="danger"  ng-show="result !== true &amp;&amp; result">{{result}}</alert>
+          <div uib-alert class="alert alert-success" ng-show="result === true">File is VALID</div>
+          <div uib-alert class="alert alert-danger" ng-show="result !== true &amp;&amp; result">{{result}}</div>
         </div>
         '''
-        controller: ['$scope', 'messages', '$modalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', ($scope, messages, $modalInstance, Upload, modelCatalogueApiRoot, enhance) ->
+        controller: ['$scope', 'messages', '$uibModalInstance', 'Upload', 'modelCatalogueApiRoot', 'enhance', ($scope, messages, $uibModalInstance, Upload, modelCatalogueApiRoot, enhance) ->
           $scope.copy     = {}
           $scope.messages = messages.createNewMessages()
 
@@ -36,7 +36,7 @@ angular.module('mc.core.ui.bs.modalPromptXmlValidate', ['mc.util.messages']).con
             if $scope.upload
               $scope.upload.abort()
 
-            $modalInstance.dismiss('Upload Canceled')
+            $uibModalInstance.dismiss('Upload Canceled')
 
           $scope.onFileSelect = ($files) ->
             $scope.copy.file = $files[0]

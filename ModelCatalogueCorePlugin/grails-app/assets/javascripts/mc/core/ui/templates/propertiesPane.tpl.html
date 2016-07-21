@@ -19,7 +19,7 @@
       <span class="fa fa-fw"
             ng-class="{'fa-plus-square-o': (!theValue._expanded &amp;&amp; !theValue._expanding), 'fa-refresh': theValue._expanding, 'fa-minus-square-o':(theValue._expanded &amp;&amp; !theValue._expanding)}"
             ng-click="expandOrCollapse(theValue)"></span>
-      <div collapse="!theValue._expanded">
+      <div uib-collapse="!theValue._expanded">
         <blockquote>{{theValue.description ? theValue.description : 'No Description' }}</blockquote>
         <div ng-show="theValue.enumerations" class="preserve-new-lines"><strong>Enumerations</strong>
           {{getEnumerations(theValue)}}

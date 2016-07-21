@@ -9,8 +9,8 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
   'mc.util.recursiveCompile'
   'ui.router'
   'rx'
-]).config(['$tooltipProvider', ($tooltipProvider) ->
-  $tooltipProvider.setTriggers mouseover: 'mouseout'
+]).config(['$uibTooltipProvider', ($uibTooltipProvider) ->
+  $uibTooltipProvider.setTriggers mouseover: 'mouseout'
 ])
 .directive 'catalogueElementTreeviewItem',  (recursiveCompile) -> {
     restrict: 'E'

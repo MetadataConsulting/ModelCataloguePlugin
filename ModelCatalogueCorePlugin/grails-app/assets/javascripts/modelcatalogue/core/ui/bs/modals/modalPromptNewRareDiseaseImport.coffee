@@ -1,7 +1,7 @@
 angular.module('mc.core.ui.bs.modalPromptNewRareDiseaseImport', ['mc.util.messages', 'ngFileUpload']).config ['messagesProvider', (messagesProvider)->
-  factory = [ '$modal', ($modal) ->
+  factory = [ '$uibModal', ($uibModal) ->
     (title, body, args) ->
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'basic-edit-modal-prompt'
         backdrop: 'static'
         keyboard: false
@@ -9,7 +9,8 @@ angular.module('mc.core.ui.bs.modalPromptNewRareDiseaseImport', ['mc.util.messag
           title: -> title
           args: -> args
         templateUrl: '/mc/core/ui/modals/modalRareDiseaseImport.html'
-        controller: ($modalInstance, $scope, Upload, catalogue, enhance, messages, modelCatalogueApiRoot) ->
+        controller: ($uibModalInstance, $scope, Upload, catalogue, enhance, messages, modelCatalogueApiRoot) ->
+          'ngInject'
           $scope.title = title
           $scope.messages = messages.createNewMessages()
 
@@ -18,7 +19,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRareDiseaseImport', ['mc.util.messag
             if $scope.uploadObject
               $scope.uploadObject.abort()
 
-            $modalInstance.dismiss('Upload Canceled')
+            $uibModalInstance.dismiss('Upload Canceled')
 
           $scope.onFileSelect = ($files) ->
             $scope.file = $files[0]
@@ -63,7 +64,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRareDiseaseImport', ['mc.util.messag
                   $scope.messages.error err.message
               else
                 messages.success('Created ' + result.getElementTypeName(), "You have created #{result.getElementTypeName()} #{result.name}.")
-                $modalInstance.close(result)
+                $uibModalInstance.close(result)
                 if catalogue.isInstanceOf result.elementType, 'asset'
                   result.show()
             ).error((data) ->
@@ -71,7 +72,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRareDiseaseImport', ['mc.util.messag
                 $scope.messages.error err.message
               $scope.uploading = false
               $scope.progress  = 0
-              $modalInstance.close()
+              $uibModalInstance.close()
             )
       }
 

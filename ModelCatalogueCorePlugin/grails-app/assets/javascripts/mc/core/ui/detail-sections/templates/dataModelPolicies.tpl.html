@@ -3,10 +3,17 @@
 </div>
 <div class="col-md-9">
   <div ng-if="!editableForm.$visible">
-    <span ng-repeat="policy in element.policies track by policy.id" class="small"><a ng-href="{{policy.href()}}" target="_blank" title="{{policy.policyText}}"><catalogue-element-icon type="policy.elementType"></catalogue-element-icon> {{policy.name}}</a><br ng-if="!$last"/></span>
+    <span ng-repeat="policy in element.policies track by policy.id" class="small">
+      <a ng-href="{{policy.href()}}"
+         target="_blank"
+         title="{{policy.policyText}}"><catalogue-element-icon
+        type="policy.elementType"></catalogue-element-icon> {{policy.name}}</a><br ng-if="!$last"/>
+    </span>
   </div>
   <div ng-if="editableForm.$visible">
     <elements-as-tags elements="copy.policies"></elements-as-tags>
-    <input type="text" global="true" id="dataModelPolicy" placeholder="Data Model Policy" ng-model="copy.dataModelPolicy" catalogue-element-picker="dataModelPolicy" label="el.name" typeahead-on-select="copy.policies.push(copy.dataModelPolicy);copy.dataModelPolicy = null">
+    <input type="text" global="true" id="dataModelPolicy" placeholder="Data Model Policy"
+           ng-model="copy.dataModelPolicy" catalogue-element-picker="dataModelPolicy" label="el.name"
+           typeahead-on-select="copy.policies.push(copy.dataModelPolicy);copy.dataModelPolicy = null">
   </div>
 </div>

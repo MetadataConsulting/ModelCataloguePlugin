@@ -39,7 +39,7 @@
                   ng-class="{'fa-toggle-up': destination.metadataExpanded, 'fa-toggle-down': !destination.metadataExpanded}">
             </span>
           </label>
-          <div collapse="!destination.metadataExpanded">
+          <div uib-collapse="!destination.metadataExpanded">
             <p class="help-block metadata-help-block">
               Metadata specific to this relationship. For example <code>contains</code> and
               <code>parent of</code> relationship types supports <code>Name</code> metadata as an alias of

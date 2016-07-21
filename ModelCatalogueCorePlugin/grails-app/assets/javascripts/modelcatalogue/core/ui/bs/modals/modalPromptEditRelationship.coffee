@@ -1,16 +1,17 @@
 angular.module('mc.core.ui.bs.modalPromptEditRelationship', ['mc.util.messages']).config (messagesProvider) ->
-  messagesProvider.setPromptFactory 'update-relationship', ($modal, $q, messages, catalogueElementResource, enhance, $stateParams) ->
+  messagesProvider.setPromptFactory 'update-relationship', ($uibModal, $q, messages, catalogueElementResource, enhance, $stateParams) ->
     "ngInject"
     (title, body, args) ->
       if not args?.element?
         messages.error('Cannot create relationship dialog.', 'The element to be connected to is missing.')
         return $q.reject('Missing element argument!')
 
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'new-relationship-modal-prompt'
         size: 'lg'
         templateUrl: '/mc/core/ui/modals/modalEditRelationship.html'
-        controller: ($scope, messages, $modalInstance, catalogue) ->
+        controller: ($scope, messages, $uibModalInstance, catalogue) ->
+          'ngInject'
           $scope.relationshipTypes    = []
           $scope.relationshipTypeInfo = null
           $scope.relation             = args.relation
@@ -106,7 +107,7 @@ angular.module('mc.core.ui.bs.modalPromptEditRelationship', ['mc.util.messages']
 
             args.element["#{$scope.direction}Relationships"].add($scope.relationshipType.name, $scope.relation, args.update).then (result) ->
               messages.success('Relationship Updated', "You have updated relationship #{$scope.element.name} #{$scope.relationshipTypeInfo.value} #{$scope.relation.name}.")
-              $modalInstance.close(result)
+              $uibModalInstance.close(result)
             , (response) ->
               for err in response.data.errors
                 $scope.messages.error err.message

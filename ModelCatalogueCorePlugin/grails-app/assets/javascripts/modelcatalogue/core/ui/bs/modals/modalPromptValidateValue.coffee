@@ -1,8 +1,8 @@
 angular.module('mc.core.ui.bs.modalPromptValidateValue', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
-  factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
+  factory = [ '$uibModal', '$q', 'messages', ($uibModal, $q, messages) ->
     (title, body, args) ->
 
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'basic-edit-modal-prompt'
         template: '''
          <div class="modal-header">
@@ -24,9 +24,9 @@ angular.module('mc.core.ui.bs.modalPromptValidateValue', ['mc.util.messages']).c
             </form>
         </div>
         <div class="modal-footer">
-          <alert type="success" ng-show="result === true">VALID</alert>
-          <alert type="danger"  ng-show="result === false">INVALID</alert>
-          <alert type="warning" ng-hide="result === false || result === true">{{result ? result : defaultResult}}</alert>
+          <div uib-alert class="alert alert-success" ng-show="result === true">VALID</div>
+          <div uib-alert class="alert alert-danger" ng-show="result === false">INVALID</div>
+          <div uib-alert class="alert alert-warning" ng-hide="result === false || result === true">{{result ? result : defaultResult}}</div>
         </div>
         '''
         controller: [ '$scope', 'rest', 'modelCatalogueApiRoot', ($scope, rest, modelCatalogueApiRoot) ->

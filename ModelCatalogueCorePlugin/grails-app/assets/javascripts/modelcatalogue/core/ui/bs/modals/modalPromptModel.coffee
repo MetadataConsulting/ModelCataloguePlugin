@@ -1,11 +1,11 @@
 angular.module('mc.core.ui.bs.modalPromptModel', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
-  factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
+  factory = [ '$uibModal', '$q', 'messages', ($uibModal, $q, messages) ->
     (title, body, args) ->
       if not args?.element? and not args?.create?
         messages.error('Cannot create edit dialog.', 'The element to be edited is missing.')
         return $q.reject('Missing element argument!')
 
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'basic-edit-modal-prompt'
         size: 'lg'
         resolve:

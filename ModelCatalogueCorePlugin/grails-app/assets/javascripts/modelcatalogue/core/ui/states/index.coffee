@@ -56,6 +56,6 @@ angular.module('mc.core.ui.states', [
     $log.error "ui.router state change error when changing from state [#{fromState.name}] to [#{toState.name}]", error
 ])
 
-.config([ '$modalProvider', ($modalProvider) ->
-  $modalProvider.options.backdrop = 'static'
+.config([ '$uibModalProvider', ($uibModalProvider) ->
+  $uibModalProvider.options.backdrop = 'static'
 ])

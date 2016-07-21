@@ -1,7 +1,7 @@
 angular.module('mc.core.ui.bs.modalPromptGenerateSuggestions', ['mc.util.messages', 'mc.util.ui.focusMe']).config ['messagesProvider', (messagesProvider)->
- messagesProvider.setPromptFactory 'generate-suggestions',  [ '$modal', ($modal) ->
+ messagesProvider.setPromptFactory 'generate-suggestions',  [ '$uibModal', ($uibModal) ->
    (title, body) ->
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'messages-modal-prompt'
         template: '''
          <div class="modal-header">
@@ -24,12 +24,12 @@ angular.module('mc.core.ui.bs.modalPromptGenerateSuggestions', ['mc.util.message
           suggestionsNames: ['$http', 'modelCatalogueApiRoot', ($http, modelCatalogueApiRoot) ->
             $http.get("#{modelCatalogueApiRoot}/dataArchitect/suggestionsNames").then (response) -> response.data
           ]
-        controller: ['$scope', 'suggestionsNames', '$modalInstance', 'rest', 'modelCatalogueApiRoot', 'messages', ($scope, suggestionsNames, $modalInstance, rest, modelCatalogueApiRoot, messages) ->
+        controller: ['$scope', 'suggestionsNames', '$uibModalInstance', 'rest', 'modelCatalogueApiRoot', 'messages', ($scope, suggestionsNames, $uibModalInstance, rest, modelCatalogueApiRoot, messages) ->
           $scope.suggestionsNames = suggestionsNames
           $scope.close = ->
             rest(method: 'POST', url: "#{modelCatalogueApiRoot}/dataArchitect/generateSuggestions", params: {suggestion: $scope.suggestion}).then ->
               messages.success "Suggestions are generating in the background. Refresh batch list to see the generated results."
-              $modalInstance.close()
+              $uibModalInstance.close()
         ]
       }
 

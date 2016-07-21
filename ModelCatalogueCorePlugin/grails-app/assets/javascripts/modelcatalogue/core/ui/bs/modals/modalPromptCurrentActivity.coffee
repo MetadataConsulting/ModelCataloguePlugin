@@ -1,7 +1,7 @@
 angular.module('mc.core.ui.bs.modalPromptCurrentActivity', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
- messagesProvider.setPromptFactory 'current-activity',  [ '$modal', ($modal) ->
+ messagesProvider.setPromptFactory 'current-activity',  [ '$uibModal', ($uibModal) ->
    (title) ->
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'messages-modal-prompt'
         template: '''
          <div class="modal-header">

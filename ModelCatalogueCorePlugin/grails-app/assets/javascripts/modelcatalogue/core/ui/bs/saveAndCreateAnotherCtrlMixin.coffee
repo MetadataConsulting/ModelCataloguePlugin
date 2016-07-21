@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.saveAndCreateAnotherCtrlMixin', []).controller 'saveAndCreateAnotherCtrlMixin', ['$scope', '$modalInstance', 'messages', 'catalogueElementResource', '$q',  ($scope, $modalInstance, messages, catalogueElementResource, $q) ->
+angular.module('mc.core.ui.bs.saveAndCreateAnotherCtrlMixin', []).controller 'saveAndCreateAnotherCtrlMixin', ['$scope', '$uibModalInstance', 'messages', 'catalogueElementResource', '$q',  ($scope, $uibModalInstance, messages, catalogueElementResource, $q) ->
   $scope.newEntity ?= -> {}
 
   if $scope.create
@@ -8,7 +8,7 @@ angular.module('mc.core.ui.bs.saveAndCreateAnotherCtrlMixin', []).controller 'sa
 
   $scope.saveElement ?= (newVersion) ->
      closeModal = (result)->
-       $modalInstance.close(result)
+       $uibModalInstance.close(result)
      promise = $scope.save(newVersion)
      promise.then closeModal
 

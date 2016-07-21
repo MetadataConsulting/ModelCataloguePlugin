@@ -1,5 +1,5 @@
-angular.module('mc.core.ui.bs.saveOrUpdatePublishedElementCtrl', ['mc.core.ui.bs.withClassificationCtrlMixin', 'mc.core.ui.bs.watchAndAskForImportOrCloneCtrl', 'mc.core.ui.bs.saveAndCreateAnotherCtrlMixin']).controller 'saveOrUpdatePublishedElementCtrl', ['$scope', 'messages', '$controller', '$modalInstance', 'args', 'catalogueElementResource', '$q', ($scope, messages, $controller, $modalInstance, args, catalogueElementResource, $q) ->
-  $scope.$modalInstance = $modalInstance
+angular.module('mc.core.ui.bs.saveOrUpdatePublishedElementCtrl', ['mc.core.ui.bs.withClassificationCtrlMixin', 'mc.core.ui.bs.watchAndAskForImportOrCloneCtrl', 'mc.core.ui.bs.saveAndCreateAnotherCtrlMixin']).controller 'saveOrUpdatePublishedElementCtrl', ['$scope', 'messages', '$controller', '$uibModalInstance', 'args', 'catalogueElementResource', '$q', ($scope, messages, $controller, $uibModalInstance, args, catalogueElementResource, $q) ->
+  $scope.$uibModalInstance = $uibModalInstance
   $scope.pending        = {dataModel: null}
   $scope.newEntity      = -> {dataModels: $scope.copy?.dataModels ? []}
   $scope.copy           = angular.copy(args.element ? $scope.newEntity())
@@ -10,7 +10,7 @@ angular.module('mc.core.ui.bs.saveOrUpdatePublishedElementCtrl', ['mc.core.ui.bs
   $scope.currentDataModel = args.currentDataModel
 
   angular.extend(this, $controller('withClassificationCtrlMixin', {$scope: $scope}))
-  angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))
+  angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $uibModalInstance: $uibModalInstance}))
   angular.extend(this, $controller('watchAndAskForImportOrCloneCtrl', {$scope: $scope}))
 
   # required by save and update action

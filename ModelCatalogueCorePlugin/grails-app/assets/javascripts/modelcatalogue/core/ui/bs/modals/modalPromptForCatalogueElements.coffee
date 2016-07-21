@@ -1,7 +1,7 @@
 angular.module('mc.core.ui.bs.modalPromptForCatalogueElements', ['mc.util.messages', 'mc.util.ui.focusMe']).config ['messagesProvider', (messagesProvider)->
- messagesProvider.setPromptFactory 'catalogue-elements',  [ '$modal', ($modal) ->
+ messagesProvider.setPromptFactory 'catalogue-elements',  [ '$uibModal', ($uibModal) ->
    (title, body, args) ->
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'messages-modal-prompt'
         template: '''
          <div class="modal-header">

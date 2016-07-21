@@ -1,10 +1,10 @@
 angular.module('mc.core.ui.bs.modalPromptCsvTransform', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
-  factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
+  factory = [ '$uibModal', '$q', 'messages', ($uibModal, $q, messages) ->
 
     (title, body, args) ->
       return $q.reject("Missing element argument") if not args.element
 
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'basic-edit-modal-prompt'
         template: '''
          <div class="modal-header">
@@ -32,7 +32,7 @@ angular.module('mc.core.ui.bs.modalPromptCsvTransform', ['mc.util.messages']).co
                 <button type="button" class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
         </div>
         '''
-        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', 'modelCatalogueApiRoot', ($scope, messages, names, catalogueElementResource, $modalInstance, modelCatalogueApiRoot) ->
+        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$uibModalInstance', 'modelCatalogueApiRoot', ($scope, messages, names, catalogueElementResource, $uibModalInstance, modelCatalogueApiRoot) ->
           if angular.element('#helper-frame').length == 0
             angular.element(document.body).append('<iframe width="0" height="0" name="helper-frame" id="helper-frame" class="hide"></iframe>')
 
@@ -57,7 +57,7 @@ angular.module('mc.core.ui.bs.modalPromptCsvTransform', ['mc.util.messages']).co
 
             messages.success("Your file is being transformed.", "This may take very long time for large data sets. Please don't exit the catalogue before finished.")
 
-            $modalInstance.close()
+            $uibModalInstance.close()
         ]
 
       }

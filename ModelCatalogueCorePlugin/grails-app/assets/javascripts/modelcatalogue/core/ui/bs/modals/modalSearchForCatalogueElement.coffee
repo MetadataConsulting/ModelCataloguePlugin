@@ -1,8 +1,8 @@
 module = angular.module('mc.core.ui.bs.modalSearchForCatalogueElement', ['mc.util.messages', 'mc.util.ui.focusMe'])
 module.config ['messagesProvider', (messagesProvider)->
-  messagesProvider.setPromptFactory 'search-catalogue-element',  [ '$modal', 'names',  ($modal, names) ->
+  messagesProvider.setPromptFactory 'search-catalogue-element',  [ '$uibModal', 'names',  ($uibModal, names) ->
     (title, body, args) ->
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         size: 'lg'
         backdrop: true
         template: """
@@ -23,7 +23,7 @@ module.config ['messagesProvider', (messagesProvider)->
             </div>
             <div ng-if="elements.length == 0 &amp;&amp; !loading">
               <div class="leave-10-before"></div>
-              <alert type="warning" >No Results</alert>
+              <div uib-alert class="alert alert-warning">No Results</div>
             </div>
             <div>
               <div class="list-group">
@@ -44,7 +44,7 @@ module.config ['messagesProvider', (messagesProvider)->
         </div>
         """
 
-        controller: ['$scope', 'catalogueElementResource', '$modalInstance', '$window', '$state', 'security', 'messages', ($scope, catalogueElementResource, $modalInstance, $window, $state, security, messages) ->
+        controller: ['$scope', 'catalogueElementResource', '$uibModalInstance', '$window', '$state', 'security', 'messages', ($scope, catalogueElementResource, $uibModalInstance, $window, $state, security, messages) ->
           $scope.title = title
           $scope.currentDataModel = args.currentDataModel
           $scope.query = args.query
@@ -132,7 +132,7 @@ module.config ['messagesProvider', (messagesProvider)->
                 $scope.loadMore().then ->
                   $scope.selected = $scope.selected + 1
             else if $event.keyCode == ENTER and $scope.selected >= 0
-              $modalInstance.close($scope.elements[$scope.selected])
+              $uibModalInstance.close($scope.elements[$scope.selected])
 
             $scope.$evalAsync ->
               return unless $

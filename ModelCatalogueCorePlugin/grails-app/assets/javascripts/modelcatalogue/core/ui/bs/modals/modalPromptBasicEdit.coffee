@@ -1,11 +1,11 @@
 angular.module('mc.core.ui.bs.modalPromptBasicEdit', ['mc.util.messages', 'mc.core.ui.bs.saveAndCreateAnotherCtrlMixin']).config ['messagesProvider', (messagesProvider)->
-  factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
+  factory = [ '$uibModal', '$q', 'messages', ($uibModal, $q, messages) ->
     (title, body, args) ->
       if not args?.element? and not args?.create?
         messages.error('Cannot create edit dialog.', 'The element to be edited is missing.')
         return $q.reject('Missing element argument!')
 
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'basic-edit-modal-prompt'
         size: 'lg'
         template: '''
@@ -36,13 +36,13 @@ angular.module('mc.core.ui.bs.modalPromptBasicEdit', ['mc.util.messages', 'mc.co
           <contextual-actions role="modal"></contextual-actions>
         </div>
         '''
-        controller: ['$scope', 'messages', 'names', '$modalInstance', '$controller', ($scope, messages, names, $modalInstance, $controller) ->
+        controller: ['$scope', 'messages', 'names', '$uibModalInstance', '$controller', ($scope, messages, names, $uibModalInstance, $controller) ->
           $scope.copy     = angular.copy(args.element ? {})
           $scope.original = args.element ? {}
           $scope.messages = messages.createNewMessages()
           $scope.create   = args.create
 
-          angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))
+          angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $uibModalInstance: $uibModalInstance}))
 
           $scope.hasChanged   = ->
             $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or $scope.copy.modelCatalogueId != $scope.original.modelCatalogueId

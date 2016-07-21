@@ -1,11 +1,11 @@
 angular.module('mc.core.ui.bs.modalPromptRelationshipTypeEdit', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
-  factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
+  factory = [ '$uibModal', '$q', 'messages', ($uibModal, $q, messages) ->
     (title, body, args) ->
       if not args?.element? and not args?.create?
         messages.error('Cannot create edit dialog.', 'The element to be edited is missing.')
         return $q.reject('Missing element argument!')
 
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'basic-edit-modal-prompt'
         template: '''
          <div class="modal-header">
@@ -64,7 +64,7 @@ angular.module('mc.core.ui.bs.modalPromptRelationshipTypeEdit', ['mc.util.messag
               </div>
               <div class="form-group">
                 <label for="rule" ng-click="ruleCollapsed = !ruleCollapsed">Rule <span class="glyphicon" ng-class="{'glyphicon-collapse-down': ruleCollapsed, 'glyphicon-collapse-up': !ruleCollapsed}"></span></label>
-                <textarea collapse="ruleCollapsed" rows="10" ng-model="copy.rule" placeholder="Rule" class="form-control" id="rule"></textarea>
+                <textarea uib-collapse="ruleCollapsed" rows="10" ng-model="copy.rule" placeholder="Rule" class="form-control" id="rule"></textarea>
               </div>
               <fake-submit-button/>
             </form>
@@ -79,7 +79,7 @@ angular.module('mc.core.ui.bs.modalPromptRelationshipTypeEdit', ['mc.util.messag
             $http.get("#{modelCatalogueApiRoot}/relationshipType/elementClasses").then (response) -> response.data
           ]
 
-        controller: ['$scope', 'messages', '$controller', '$modalInstance', 'elementClasses', ($scope, messages, $controller, $modalInstance, elementClasses) ->
+        controller: ['$scope', 'messages', '$controller', '$uibModalInstance', 'elementClasses', ($scope, messages, $controller, $uibModalInstance, elementClasses) ->
           $scope.copy     = angular.copy(args.element ? {})
           $scope.create   = args.create
           $scope.original = args.element ? {}
@@ -87,7 +87,7 @@ angular.module('mc.core.ui.bs.modalPromptRelationshipTypeEdit', ['mc.util.messag
           $scope.ruleCollapsed = true
           $scope.elementClasses = elementClasses
 
-          angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))
+          angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $uibModalInstance: $uibModalInstance}))
 
           $scope.hasChanged   = ->
             for prop in ['name', 'sourceToDestination', 'destinationToSource', 'sourceClass', 'destinationClass', 'system', 'bidirectional', 'rule', 'versionSpecific', 'sourceToDestinationDescription', 'destinationToSourceDescription']

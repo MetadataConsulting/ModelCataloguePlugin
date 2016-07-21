@@ -1,5 +1,5 @@
 angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages', 'mc.core.ui.bs.withClassificationCtrlMixin', 'mc.core.ui.bs.watchAndAskForImportOrCloneCtrl']).config ['messagesProvider', (messagesProvider)->
-  factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
+  factory = [ '$uibModal', '$q', 'messages', ($uibModal, $q, messages) ->
     (title, body, args) ->
       if not args?.element? and not args?.create?
         messages.error('Cannot create edit dialog.', 'The element to be edited is missing.')
@@ -8,11 +8,11 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
       if not title
         title = "Create Data Type"
 
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'basic-edit-modal-prompt'
         size: 'lg'
         templateUrl: '/mc/core/ui/modals/modalPromptEnumeratedTypeEdit.html'
-        controller: ['$scope', 'messages', '$controller', '$modalInstance', 'enhance', 'names', 'catalogueElementResource', ($scope, messages, $controller, $modalInstance, enhance, names, catalogueElementResource) ->
+        controller: ['$scope', 'messages', '$controller', '$uibModalInstance', 'enhance', 'names', 'catalogueElementResource', ($scope, messages, $controller, $uibModalInstance, enhance, names, catalogueElementResource) ->
           orderedMapEnhancer = enhance.getEnhancer('orderedMap')
 
           $scope.newEntity = -> {enumerations: orderedMapEnhancer.emptyOrderedMap(true), dataModels: [args.currentDataModel], selectedEnumerations: orderedMapEnhancer.emptyOrderedMap(true)}
@@ -58,7 +58,7 @@ x in ['apple', 'banana', 'cherry']
           $scope.showSetExample = showExample(SET_EXAMPLE)
 
           angular.extend(this, $controller('withClassificationCtrlMixin', {$scope: $scope}))
-          angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))
+          angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $uibModalInstance: $uibModalInstance}))
           angular.extend(this, $controller('watchAndAskForImportOrCloneCtrl', {$scope: $scope}))
 
           # measurement unit are bit different - they are not supposed to be cloned at the moment

@@ -1,11 +1,11 @@
 angular.module('mc.core.ui.bs.modalPromptMeasurementUnitEdit', ['mc.util.messages', 'mc.core.ui.bs.withClassificationCtrlMixin']).config ['messagesProvider', (messagesProvider)->
-  factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
+  factory = [ '$uibModal', '$q', 'messages', ($uibModal, $q, messages) ->
     (title, body, args) ->
       if not args?.element? and not args?.create?
         messages.error('Cannot create relationship dialog.', 'The element to be edited is missing.')
         return $q.reject('Missing element argument!')
 
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'basic-edit-modal-prompt'
         size: 'lg'
         template: '''
@@ -43,7 +43,7 @@ angular.module('mc.core.ui.bs.modalPromptMeasurementUnitEdit', ['mc.util.message
           <contextual-actions role="modal"></contextual-actions>
         </div>
         '''
-        controller: ['$scope', 'messages', '$controller', '$modalInstance', ($scope, messages, $controller, $modalInstance) ->
+        controller: ['$scope', 'messages', '$controller', '$uibModalInstance', ($scope, messages, $controller, $uibModalInstance) ->
           $scope.pending    = {dataModel: null}
           $scope.newEntity  = -> {dataModels: $scope.copy?.dataModels ? []}
           $scope.copy     = angular.copy(args.element ? $scope.newEntity())
@@ -56,7 +56,7 @@ angular.module('mc.core.ui.bs.modalPromptMeasurementUnitEdit', ['mc.util.message
             $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or $scope.copy.symbol != $scope.original.symbol or $scope.copy.modelCatalogueId != $scope.original.modelCatalogueId or not angular.equals($scope.original.dataModels ? {}, $scope.copy.dataModels ? {})
 
           angular.extend(this, $controller('withClassificationCtrlMixin', {$scope: $scope}))
-          angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))
+          angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $uibModalInstance: $uibModalInstance}))
 
         ]
 

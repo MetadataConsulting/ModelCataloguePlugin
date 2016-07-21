@@ -1,12 +1,12 @@
 angular.module('mc.core.ui.bs.modalPromptDatModelPolicyEdit', ['mc.util.messages']).config (messagesProvider)->
-  factory =  ($modal, $q, messages) ->
+  factory =  ($uibModal, $q, messages) ->
     "ngInject"
     (title, body, args) ->
       if not args?.element? and not args?.create?
         messages.error('Cannot create edit dialog.', 'The element to be edited is missing.')
         return $q.reject('Missing element argument!')
 
-      dialog = $modal.open {
+      dialog = $uibModal.open {
         windowClass: 'basic-edit-modal-prompt'
         size: 'lg'
         template: '''
@@ -33,13 +33,14 @@ angular.module('mc.core.ui.bs.modalPromptDatModelPolicyEdit', ['mc.util.messages
         </div>
         '''
 
-        controller: ($scope, messages, $controller, $modalInstance) ->
+        controller: ($scope, messages, $controller, $uibModalInstance) ->
+          'ngInject'
           $scope.copy     = angular.copy(args.element ? {})
           $scope.create   = args.create
           $scope.original = args.element ? {}
           $scope.messages = messages.createNewMessages()
 
-          angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))
+          angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $uibModalInstance: $uibModalInstance}))
 
           $scope.hasChanged   = ->
             for prop in ['name', 'policyText']
