@@ -1,53 +1,94 @@
 <div class="col-md-3">
   <strong class="small">Data Type</strong>
 </div>
-<div class="full-width-editable col-md-9">
-  <div ng-if="editableForm.$visible">
-    <input type="text" id="dataType" placeholder="Data Type" ng-model="copy.dataType"
-           catalogue-element-picker="dataType" label="el.name">
-  </div>
-  <span class="editable-empty" ng-if="!editableForm.$visible &amp;&amp; !element.dataType">empty</span>
-  <a ng-if="!editableForm.$visible &amp;&amp; element.dataType" class="small with-pointer"
-     ng-href="{{element.dataType.href()}}">
-    <span ng-class="element.dataType.getIcon()">&nbsp;</span>
-    <span class="unit-name">{{element.dataType.name}}&nbsp;</span>
-    <small>
-      <a ng-if="!editableForm.$visible" ng-href="{{element.dataType.dataModel.href()}}" class="label"
-         ng-class="{'label-warning': element.dataType.getDataModelStatus() == 'DRAFT', 'label-info': element.dataType.getDataModelStatus() == 'PENDING', 'label-primary': element.dataType.getDataModelStatus() == 'FINALIZED', 'label-danger': element.dataType.getDataModelStatus() == 'DEPRECATED'}">{{element.dataType.getDataModelWithVersion()}}</a>
-    </small>
-  </a>
 
-</div>
-<div class="small col-md-9 col-md-offset-3" ng-if="!editableForm.$visible &amp;&amp; element.dataType.measurementUnit">
-  uses <a class="small with-pointer" ng-href="{{element.dataType.measurementUnit.href()}}">
-  <span ng-class="element.dataType.measurementUnit.getIcon()">&nbsp;</span>
-  <span class="unit-name">{{element.dataType.measurementUnit.name}}&nbsp;</span>
-  <small>
-    <a ng-href="{{element.dataType.measurementUnit.dataModel.href()}}" class="label"
-       ng-class="{'label-warning': element.dataType.measurementUnit.getDataModelStatus() == 'DRAFT', 'label-info': element.dataType.measurementUnit.getDataModelStatus() == 'PENDING', 'label-primary': element.dataType.measurementUnit.getDataModelStatus() == 'FINALIZED', 'label-danger': element.dataType.measurementUnit.getDataModelStatus() == 'DEPRECATED'}">{{element.dataType.measurementUnit.getDataModelWithVersion()}}</a>
-  </small>
-</a>
-</div>
-<div class="small col-md-9 col-md-offset-3" ng-if="!editableForm.$visible &amp;&amp; element.dataType.dataClass">
-  refers to <a class="small with-pointer" ng-href="{{element.dataType.dataClass.href()}}">
-  <span ng-class="element.dataType.dataClass.getIcon()">&nbsp;</span>
-  <span class="unit-name">{{element.dataType.dataClass.name}}&nbsp;</span>
-  <small>
-    <a ng-href="{{element.dataType.dataClass.dataModel.href()}}" class="label"
-       ng-class="{'label-warning': element.dataType.dataClass.getDataModelStatus() == 'DRAFT', 'label-info': element.dataType.dataClass.getDataModelStatus() == 'PENDING', 'label-primary': element.dataType.dataClass.getDataModelStatus() == 'FINALIZED', 'label-danger': element.dataType.dataClass.getDataModelStatus() == 'DEPRECATED'}">{{element.dataType.dataClass.getDataModelWithVersion()}}</a>
-  </small>
-</a>
-</div>
-<div class="small col-md-9 col-md-offset-3" ng-if="!editableForm.$visible &amp;&amp; element.dataType.enumerations">
+<div class="full-width-editable col-md-9">
+  <!--Data Type-->
   <div class="row">
-    <div class="col-md-12"><strong class="small">Enumerations</strong></div>
-  </div>
-  <div class="row" ng-repeat="value in element.dataType.enumerations.values track by value.key">
-    <div class="col-md-3">
-      <strong class="small text-wrap">{{value.key}}</strong>
+    <div class="col-md-12">
+      <div ng-if="editableForm.$visible">
+        <input type="text" id="dataType" placeholder="Data Type" ng-model="copy.dataType"
+               catalogue-element-picker="dataType" label="el.name">
+      </div>
+      <span class="editable-empty" ng-if="!editableForm.$visible &amp;&amp; !element.dataType">empty</span>
+      <a ng-if="!editableForm.$visible &amp;&amp; element.dataType" class="small with-pointer"
+         ng-href="{{element.dataType.href()}}">
+        <span ng-class="element.dataType.getIcon()">&nbsp;</span>
+        <span class="unit-name">{{element.dataType.name}}&nbsp;</span>
+        <small>
+          <a ng-if="!editableForm.$visible" ng-href="{{element.dataType.dataModel.href()}}" class="label"
+             ng-class="{
+                'label-warning': element.dataType.getDataModelStatus() == 'DRAFT',
+                'label-info': element.dataType.getDataModelStatus() == 'PENDING',
+                'label-primary': element.dataType.getDataModelStatus() == 'FINALIZED',
+                'label-danger': element.dataType.getDataModelStatus() == 'DEPRECATED'
+              }">
+            {{element.dataType.getDataModelWithVersion()}}
+          </a>
+        </small>
+      </a>
     </div>
-    <div class="col-md-9 preserve-new-lines">
-      <small>{{value.value}}</small>
+  </div>
+
+  <!--Measurement Unit-->
+  <div class="row">
+    <div class="small col-md-12"
+         ng-if="!editableForm.$visible &amp;&amp; element.dataType.measurementUnit">
+      uses
+      <a class="small with-pointer" ng-href="{{element.dataType.measurementUnit.href()}}">
+        <span ng-class="element.dataType.measurementUnit.getIcon()">&nbsp;</span>
+        <span class="unit-name">{{element.dataType.measurementUnit.name}}&nbsp;</span>
+        <small>
+          <a ng-href="{{element.dataType.measurementUnit.dataModel.href()}}" class="label"
+             ng-class="{
+                'label-warning': element.dataType.measurementUnit.getDataModelStatus() == 'DRAFT',
+                'label-info': element.dataType.measurementUnit.getDataModelStatus() == 'PENDING',
+                'label-primary': element.dataType.measurementUnit.getDataModelStatus() == 'FINALIZED',
+                'label-danger': element.dataType.measurementUnit.getDataModelStatus() == 'DEPRECATED'
+               }">
+            {{element.dataType.measurementUnit.getDataModelWithVersion()}}
+          </a>
+        </small>
+      </a>
+    </div>
+  </div>
+
+  <!--Reference-->
+  <div class="row">
+    <div class="small col-md-12" ng-if="!editableForm.$visible &amp;&amp; element.dataType.dataClass">
+      refers to
+      <a class="small with-pointer" ng-href="{{element.dataType.dataClass.href()}}">
+        <span ng-class="element.dataType.dataClass.getIcon()">&nbsp;</span>
+        <span class="unit-name">{{element.dataType.dataClass.name}}&nbsp;</span>
+        <small>
+          <a ng-href="{{element.dataType.dataClass.dataModel.href()}}" class="label"
+             ng-class="{
+                'label-warning': element.dataType.dataClass.getDataModelStatus() == 'DRAFT',
+                'label-info': element.dataType.dataClass.getDataModelStatus() == 'PENDING',
+                'label-primary': element.dataType.dataClass.getDataModelStatus() == 'FINALIZED',
+                'label-danger': element.dataType.dataClass.getDataModelStatus() == 'DEPRECATED'
+              }">
+            {{element.dataType.dataClass.getDataModelWithVersion()}}
+          </a>
+        </small>
+      </a>
+    </div>
+  </div>
+
+  <!--Enumeration-->
+  <div class="row">
+    <div class="small col-lg-8" ng-if="!editableForm.$visible &amp;&amp; element.dataType.enumerations">
+      <strong>Enumerations:</strong>
+      <table class="table table-condensed table-striped table-borderless table-no-margin">
+        <tr ng-repeat="value in element.dataType.enumerations.values track by value.key">
+          <th>
+            <small class="text-wrap">{{value.key}}</small>
+          </th>
+          <td>
+            <small>{{value.value}}</small>
+          </td>
+        </tr>
+      </table>
     </div>
   </div>
 </div>
