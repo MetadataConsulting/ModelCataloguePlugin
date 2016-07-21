@@ -5,24 +5,28 @@
     </div>
   </div>
 
-  <div class="row" ng-repeat="value in ::(editableForm.$visible ? [] : element.enumerations.values) track by value.key"
-       ng-class="{'text-danger': value.deprecated}">
-    <div class="col-md-3">
-      <strong class="small text-wrap">
-        {{::value.key}}
-      </strong>
-      <span ng-show="value.deprecated">
-        (deprecated)
-      </span>
-    </div>
-    <div class="col-md-8 preserve-new-lines">
-      <small>{{::value.value}}</small>
-    </div>
-    <div class="col-md-1">
-      <a class="btn btn-link btn-sm"
-         ng-click="view.setDeprecated(value, !value.deprecated, globalMessages, element, rest, modelCatalogueApiRoot)">
-        <span class="fa" ng-class="{'fa-ban': !value.deprecated, 'fa-repeat': value.deprecated}"></span>
-      </a>
+  <div class="row">
+    <div class="col-md-12">
+      <table class="table table-condensed table-striped table-borderless table-no-margin">
+        <tr ng-repeat="value in ::(editableForm.$visible ? [] : element.enumerations.values) track by value.key"
+            ng-class="{'danger': value.deprecated}">
+          <th class="col-md-3">
+            <small class="text-wrap">
+              {{::value.key}}
+              <span ng-show="value.deprecated">(deprecated)</span>
+            </small>
+          </th>
+          <td>
+            <small>{{::value.value}}</small>
+          </td>
+          <td>
+            <a class="btn btn-link btn-xs"
+               ng-click="view.setDeprecated(value, !value.deprecated, globalMessages, element, rest, modelCatalogueApiRoot)">
+              <span class="fa" ng-class="{'fa-ban': !value.deprecated, 'fa-repeat': value.deprecated}"></span>
+            </a>
+          </td>
+        </tr>
+      </table>
     </div>
   </div>
 </div>
