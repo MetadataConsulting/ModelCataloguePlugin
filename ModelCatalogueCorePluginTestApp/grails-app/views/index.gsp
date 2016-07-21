@@ -46,7 +46,7 @@
     <g:if test="${CDN.preferred}">
         <g:set var="minSuffix" value="${Environment.current == Environment.TEST ? '' : '.min'}"/>
         <!-- CDNs -->
-        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap${minSuffix}.css">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap${minSuffix}.css">
         <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome${minSuffix}.css">
 
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/core-js/2.3.0/core${minSuffix}.js"></script>
@@ -55,9 +55,9 @@
 
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery${minSuffix}.js"></script>
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui${minSuffix}.js"></script>
-        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap${minSuffix}.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/js/bootstrap${minSuffix}.js"></script>
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.10/angular${minSuffix}.js"></script>
-        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.4/ui-bootstrap-tpls${minSuffix}.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/1.3.3/ui-bootstrap-tpls${minSuffix}.js"></script>
 
         <!-- i18n 1.3.15 not present but hopefuly it's the same -->
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.10/i18n/angular-locale_en-gb.js"></script>
