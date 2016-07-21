@@ -21,8 +21,8 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
     static final String stepImports = "#step-imports"
     static final String stepFinish = "#step-finish"
     static final String exitButton = "#exit-wizard"
-    static final CatalogueContent metadataReviewed = CatalogueContent.create('*[name=metadata-reviewed] input')
-    static final CatalogueContent metadataApproved = CatalogueContent.create('*[name=metadata-approved] input')
+    static final CatalogueContent metadataReviewed = CatalogueContent.create('*[name=metadata-reviewed]')
+    static final CatalogueContent metadataApproved = CatalogueContent.create('*[name=metadata-approved]')
     static final CatalogueAction modalFinalize = CatalogueAction.runLast('modal', 'modal-finalize-data-modal')
     static final CatalogueAction modalCreateNewVersion = CatalogueAction.runLast('modal', 'modal-create-new-version')
     static final String modalFeedback = '.messages-modal-feedback'
