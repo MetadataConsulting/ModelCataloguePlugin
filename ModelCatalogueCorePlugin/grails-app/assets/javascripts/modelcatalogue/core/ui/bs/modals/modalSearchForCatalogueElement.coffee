@@ -23,7 +23,7 @@ module.config ['messagesProvider', (messagesProvider)->
             </div>
             <div ng-if="elements.length == 0 &amp;&amp; !loading">
               <div class="leave-10-before"></div>
-              <div uib-alert class="alert alert-warning">No Results</t>
+              <div uib-alert class="alert alert-warning">No Results</div>
             </div>
             <div>
               <div class="list-group">
