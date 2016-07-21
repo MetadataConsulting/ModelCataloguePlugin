@@ -77,18 +77,18 @@
 
   <!--Enumeration-->
   <div class="row">
-    <div class="small col-md-12" ng-if="!editableForm.$visible &amp;&amp; element.dataType.enumerations">
-      <div class="row">
-        <div class="col-md-12"><strong class="small">Enumerations</strong></div>
-      </div>
-      <div class="row" ng-repeat="value in element.dataType.enumerations.values track by value.key">
-        <div class="col-md-3">
-          <strong class="small text-wrap">{{value.key}}</strong>
-        </div>
-        <div class="col-md-9 preserve-new-lines">
-          <small>{{value.value}}</small>
-        </div>
-      </div>
+    <div class="small col-lg-8" ng-if="!editableForm.$visible &amp;&amp; element.dataType.enumerations">
+      <strong>Enumerations:</strong>
+      <table class="table table-condensed table-striped table-borderless table-no-margin">
+        <tr ng-repeat="value in element.dataType.enumerations.values track by value.key">
+          <th>
+            <small class="text-wrap">{{value.key}}</small>
+          </th>
+          <td>
+            <small>{{value.value}}</small>
+          </td>
+        </tr>
+      </table>
     </div>
   </div>
 </div>
