@@ -67,7 +67,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
       action =
         position: -20000
-        label: 'Favorite'
+        label: 'Favourite'
         iconOnly: true
         icon: 'fa fa-star'
         type: 'primary'
@@ -79,8 +79,8 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
             enhance(
               rest(url: url, method: (if favourite then 'DELETE' else 'POST'), data: $scope.element)
             ).then (relation) ->
-              messages.success(if favourite then "#{$scope.element.getLabel()} has been removed from favorites" else
-                "#{$scope.element.getLabel()} has been added to favorites")
+              messages.success(if favourite then "#{$scope.element.getLabel()} has been removed from favourites" else
+                "#{$scope.element.getLabel()} has been added to favourites")
               $scope.element.favourite = not favourite
               if favourite
                 $scope.$broadcast 'catalogueElementDeleted', $scope.element, relation, url
@@ -115,7 +115,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
             url = "#{modelCatalogueApiRoot}#{user.link}/favourite"
             enhance(rest(url: url, method: 'POST', data: element)).then (relation) ->
               $scope.$broadcast 'catalogueElementCreated', relation, url, element
-              messages.success "#{element.getLabel()} has been added to favorites"
+              messages.success "#{element.getLabel()} has been added to favourites"
               relation
 
     }
@@ -275,7 +275,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
     {
     position:   100000
-    label:      'Export Favorites'
+    label:      'Export Favourites'
     action: ->
       $window.open "#{modelCatalogueApiRoot}/user/#{security.getCurrentUser().id}/outgoing/favourite?format=xml"
 

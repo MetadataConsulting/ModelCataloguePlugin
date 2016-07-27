@@ -16,7 +16,7 @@ angular.module('mc.core.ui.states.simple.favorites', ['mc.core.ui.states.control
 
     onEnter: (applicationTitle) ->
       'ngInject'
-      applicationTitle "Favorites"
+      applicationTitle "Favourites"
 
     resolve:
       user: (security, catalogueElementResource, $q) ->
