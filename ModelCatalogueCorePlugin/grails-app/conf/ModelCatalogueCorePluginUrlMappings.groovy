@@ -112,7 +112,8 @@ class ModelCatalogueCorePluginUrlMappings {
                     "/api/modelCatalogue/core/$elementName/current"(controller: controllerName, action: 'current', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/classifications"(controller: controllerName, action: 'classifications', method: HttpMethod.POST)
                     "/api/modelCatalogue/core/$elementName/lastSeen"(controller: controllerName, action: 'lastSeen', method: HttpMethod.GET)
-                    "/api/modelCatalogue/core/$elementName/$id/favourite"(controller: controllerName, action: 'favourite', method: HttpMethod.POST)
+                    "/api/modelCatalogue/core/$elementName/$id/favourite"(controller: controllerName, action: 'addFavourite', method: HttpMethod.POST)
+                    "/api/modelCatalogue/core/$elementName/$id/favourite"(controller: controllerName, action: 'removeFavourite', method: HttpMethod.DELETE)
                 }
 
                 if (controllerName == 'asset') {
