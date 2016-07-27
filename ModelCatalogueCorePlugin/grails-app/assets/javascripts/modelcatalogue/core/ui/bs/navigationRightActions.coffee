@@ -66,7 +66,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     return undefined if not security.isUserLoggedIn()
     action =
       position:   1000
-      label:      'Favorites'
+      label:      'Favourites'
       icon:       'fa fa-star fa-fw'
       active:     $state.current.name == 'simple.favorites'
       action: ->

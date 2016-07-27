@@ -2,7 +2,7 @@ angular.module('mc.core.ui.states.controllers.FavoritesCtrl', ['ui.router', 'mc.
   '$scope', 'modelCatalogueApiRoot', 'user', 'enhance', 'rest', 'columns',
   ($scope ,  modelCatalogueApiRoot ,  user ,  enhance ,  rest ,  columns) ->
 
-    $scope.title = 'Favorites'
+    $scope.title = 'Favourites'
     $scope.user = user
 
     listEnhancer = enhance.getEnhancer('list')
