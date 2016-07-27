@@ -61,7 +61,8 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     }
   ]
 
-  actionsProvider.registerChildAction 'user-menu', 'user-favorites', ['security', '$state', '$rootScope',  (security, $state, $rootScope) ->
+  actionsProvider.registerChildAction 'user-menu', 'user-favorites', (security, $state, $rootScope) ->
+    'ngInject'
     return undefined if not security.isUserLoggedIn()
     action =
       position:   1000
@@ -75,8 +76,6 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
         action.active = state.name == 'simple.favorites'
 
     action
-  ]
-
 
   actionsProvider.registerActionInRole 'admin-menu', actionsProvider.ROLE_NAVIGATION_RIGHT, ['security', (security) ->
     return undefined unless security.hasRole('ADMIN')
