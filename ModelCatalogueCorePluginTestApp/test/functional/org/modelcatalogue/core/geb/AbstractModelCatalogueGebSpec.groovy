@@ -446,6 +446,17 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         direction.scroll(driver as JavascriptExecutor)
     }
 
+    void scroll(String selector, int offset = -150) {
+        js.exec("jQuery('$selector')[0].scrollIntoView(true);")
+        if (offset)
+            js.exec("jQuery('$selector')[0].scrollIntoView(true);")
+            js.exec("window.scrollBy(0,${offset})");
+        Thread.sleep(500);
+    }
+
+    void scrollTop() {
+        js.exec("document.body.scrollTop = document.documentElement.scrollTop = 0;")
+    }
 
     void addDataModelImport(String... imported) {
         click CatalogueAction.runFirst('item', 'catalogue-element', 'add-import')
