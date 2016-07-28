@@ -1,13 +1,11 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
-import org.modelcatalogue.core.geb.Common
+import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.*
-
-import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import spock.lang.Stepwise
 
 @Stepwise
 class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
@@ -46,6 +44,8 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     public static final String primitiveTypeIcon = 'h3.ce-name small.fa-cog'
     public static final String dataTypeSelector = '#option'
     public static final String primitiveTypeValue = 'string:primitiveType'
+    public static final String metadataTable = 'table.soe-table'
+    public static final String removeRelationshipButton = '#role_item_remove-relationshipBtn'
 
     def "go to login"() {
         login admin
@@ -259,12 +259,11 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     def "add metadata"() {
         setup:
         click inlineEdit
+        scroll metadataTable
 
         when:
         fillMetadata foo: 'bar'
-
-        scroll up
-
+        scrollTop()
         click inlineEditSubmit
 
         then:
@@ -275,9 +274,11 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     def "remove metadata"() {
         setup:
         click inlineEdit
+        scroll metadataTable
 
         when:
         click removeMetadataRow
+        scrollTop()
         click inlineEditSubmit
 
         then:
@@ -431,6 +432,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         remove messages
         when:
         toggleInfTableRow(1)
+        scroll removeRelationshipButton
 
         click removeRelationship
 
