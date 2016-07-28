@@ -1,7 +1,10 @@
-<span class="btn-group" uib-dropdown ng-class="::({'pull-right': action.expandToLeft})">
+<span class="btn-group"
+      ng-if="action.children.length > 0"
+      uib-dropdown
+      ng-class="::({'pull-right': action.expandToLeft})">
   <button id="{{::action.id}}Btn"
           ng-if="::!action.abstract"
-          ng-disabled="::(action.disabled || action.children.length == 0)"
+          ng-disabled="::(action.disabled)"
           title="{{::action.label}}"
           type="button"
           class="btn"
@@ -11,7 +14,7 @@
   </button>
   <button id="{{::action.id}}BtnDropdown"
           ng-if="::!action.abstract"
-          ng-disabled="::(action.disabled || action.children.length == 0)"
+          ng-disabled="::(action.disabled)"
           title="{{::action.label}}"
           type="button" class="btn"
           uib-dropdown-toggle
@@ -21,7 +24,7 @@
   </button>
   <button id="{{::action.id}}Btn"
           ng-if="::action.abstract"
-          ng-disabled="::(action.disabled || action.children.length == 0)"
+          ng-disabled="::(action.disabled)"
           type="button"
           class="btn"
           uib-dropdown-toggle ng-class="::('btn-' + (noColors ? 'default' : action.type) + ' btn-' + size)">
