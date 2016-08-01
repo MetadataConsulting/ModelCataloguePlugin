@@ -1,0 +1,117 @@
+/* Custom Stylesheet */
+body, html {
+    height: 100%;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    font-weight: 100;
+    background: #ffffff;
+    text-align: center;
+    font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+    color: rgb(128, 128, 128);
+    font-size: 14px;
+}
+
+a {
+	color: rgb(41, 189, 202);
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+h1 {
+	color: rgb(64, 64, 64);
+	font-size: 32px;
+	font-weight: bold;
+	margin: 20px 0 0 0;
+}
+
+.main {
+	display: block;
+	margin: 20px auto;
+	background-color: #f0a;
+}
+
+/* Tabs Demo 1 */
+.tabs input[type=radio] {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+}
+.tabs {
+  width: 900px;
+  float: none;
+  list-style: none;
+  position: relative;
+  padding: 0;
+  margin: 0 auto;
+}
+.tabs li{
+  float: left;
+}
+.tabs label {
+    display: block;
+    padding: 10px 20px;
+    border-radius: 2px 2px 0 0;
+    color: rgb(41, 189, 202);
+    font-size: 24px;
+    font-weight: normal;
+    background: rgba(255,255,255,0.2);
+    cursor: pointer;
+    position: relative;
+    top: 3px;
+    -webkit-transition: all 0.2s ease-in-out;
+    -moz-transition: all 0.2s ease-in-out;
+    -o-transition: all 0.2s ease-in-out;
+    transition: all 0.2s ease-in-out;
+}
+.tabs label:hover {
+  background: rgba(255,255,255,0.5);
+  top: 0;
+}
+
+[id^=tab]:checked + label {
+  background: rgb(41, 189, 202);
+  color: white;
+  top: 0;
+}
+
+[id^=tab]:checked ~ [id^=tab-content] {
+    display: block;
+}
+.tab-content{
+  z-index: 2;
+  display: none;
+  text-align: left;
+  width: 100%;
+  line-height: 140%;
+  padding-top: 10px;
+  background: #f2f2f2;
+  padding: 15px;
+  position: absolute;
+  top: 53px;
+  left: 0;
+  box-sizing: border-box;
+  -webkit-animation-duration: 0.5s;
+  -o-animation-duration: 0.5s;
+  -moz-animation-duration: 0.5s;
+  animation-duration: 0.5s;
+}
+
+.tab-content li {
+	float: none;
+}
+
+
+#nav {
+	display: block;
+	clear: both;
+	text-align: left;
+	width: 900px;
+	margin: 0px auto;
+}
+
+.preserve-new-lines {
+    white-space: pre-line;
+}
