@@ -40,10 +40,11 @@ class GelJsonController {
      */
     def printDiseaseOntology(){
         def model=Model.get(params.id)
+        def id = model.latestVersionId ?: model.id
 
 
-        if (!model) {
-            render status: HttpStatus.NOT_FOUND
+        if (!model || id!=11144) {
+            render status: HttpStatus.FORBIDDEN
             return
         }
 
@@ -62,6 +63,38 @@ class GelJsonController {
         response.setHeader("X-Asset-ID",assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
     }
+
+    /**
+     * Generate Cancer Type, Subtype json list
+     * @return redirect to asset controller
+     */
+
+    def printCancerTypeList(){
+        def model=Model.get(params.id)
+        def id = model.latestVersionId ?: model.id
+
+
+        if (!model || id!=37298) {
+            render status: HttpStatus.FORBIDDEN
+            return
+        }
+
+        def assetName="$model.name version "
+        def assetFileName="${model.name}_v${model.version}_${FORMAT.format(model.lastUpdated)}.json"
+
+
+        def assetPendingDesc="Your Cancer Type and Subtypes list as JSON   will be available in this asset soon. Use Refresh action to reload"
+        def assetFinalizedDesc="Your JSON is ready. Use Download button to download it."
+        def assetErrorDesc="Error generating json"
+        def assetMimeType="application/json"
+        Closure closure={return gelJsonService.printCancerTypeList(model)}
+
+        def assetId=storeAssetFromString(model,closure,assetName,assetMimeType,assetPendingDesc,assetFinalizedDesc,assetErrorDesc,assetFileName)
+
+        response.setHeader("X-Asset-ID",assetId.toString())
+        redirect controller: 'asset', id: assetId, action: 'show'
+    }
+
 
 
     /**

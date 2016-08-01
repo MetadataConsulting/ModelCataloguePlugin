@@ -129,7 +129,7 @@ class ModelService {
     }
 
     ListWithTotalAndType<Model> getSubModels(Model model) {
-        Map<String, Model> models = collectChildren(3, model, new TreeMap<String, Model>())
+        Map<String, Model> models = collectChildren(5, model, new TreeMap<String, Model>())
         new ListCountAndType<Model>(count: models.size(), list: models.values().toList(), itemType: Model)
 
     }

@@ -1,9 +1,13 @@
 package org.modelcatalogue.core.gel
 
+import java.util.Collection;
+import java.util.List;
+
 import grails.transaction.Transactional
 import groovy.xml.MarkupBuilder
 import groovy.xml.XmlUtil
 
+import org.apache.commons.collections.map.MultiValueMap
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.DataElement
@@ -15,7 +19,7 @@ import org.modelcatalogue.core.ValueDomain
 
 @Transactional
 class GelXmlService {
-    
+    static final String XSD_STUDY_NAME = "http://xsd.modelcatalogue.org/metadata#study"
     static final String XSD_SCHEMA_NAME = "http://xsd.modelcatalogue.org/metadata#schemaName"
     static final String XSD_SCHEMA_VERSION = "http://xsd.modelcatalogue.org/metadata#schemaVersion"
     static final String XSD_SCHEMA_VERSION_DESCRIPTION = "http://xsd.modelcatalogue.org/metadata#schemaVersionDescription"
@@ -34,6 +38,9 @@ class GelXmlService {
     static final String METADATA_MIN_OCCURS="Min Occurs"
     static final String METADATA_MAX_OCCURS="Max Occurs"
     static final String XSL_TABLE_NAME="http://xsl.modelcatalogue.org/tableName"
+    static final String XSD_DEFAULT_NAMESPACE="http://xsd.modelcatalogue.org/defaultNamespace"
+    static final String XSD_TARGET_NAMESPACE="http://xsd.modelcatalogue.org/targetNamespace"
+    static final String XSD_PREFIX_NAMESPACE="http://xsd.modelcatalogue.org/prefixNamespace"
 
     static final def XSD_RESTRICTION_LIST=[XSD_RESTRICTION_LENGTH,XSD_RESTRICTION_MIN_LENGTH,XSD_RESTRICTION_MAX_LENGTH,XSD_RESTRICTION_MAX_INCLUSIVE,
         XSD_RESTRICTION_MIN_INCLUSIVE,XSD_RESTRICTION_MAX_EXCLUSIVE,XSD_RESTRICTION_MIN_EXCLUSIVE,XSD_RESTRICTION_TOTAL_DIGITS,XSD_RESTRICTION_FRACTION_DIGITS,XSD_RESTRICTION_PATTERN]
@@ -45,17 +52,21 @@ class GelXmlService {
 
     private static final int MAX_COLUMN_NAME_63 = 63
 
+    
     protected List<Model> listChildren(Model model,List results = [],Boolean isRoot=false) {
         if (model && !results.contains(model)){
-           //if we send root model as parameter means that this is a child and we have to add in the list
-           if (isRoot==false){
-             results += model
-           }
-            model.parentOf?.each { child ->
-                results += listChildren(child,results,false)
+            //if we send root model as parameter means that this is a child and we have to add in the list
+            if (isRoot==false){
+                results.add(model)
+
+
             }
+            for(Relationship r : model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)){
+                listChildren(r.destination,results,false)
+            }              
         }
-        results.unique()
+        
+        return results
     }
 
     
@@ -65,12 +76,25 @@ class GelXmlService {
      * @return a string with xml formed
      */
     def printXmlModelShredder(Model model) {
+        log.info("++++beginning to generate xml shredder model for  '${model.name}'   ++++++++++ " )
+        def time=System.currentTimeMillis()
         def subModels = listChildren(model,[],true)
+      
+ 
+        log.debug("getting all childrens counting  ${subModels.size()} in ${(System.currentTimeMillis()-time)/1000} s" )
+   
         def childsRelationship=model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)
         //validate to see if have the element schema metadata
+        time=System.currentTimeMillis()
         validateFormMetadata(model, subModels)
+        log.debug(" validating  metadata for   '${model.name}'  in ${(System.currentTimeMillis()-time)/1000} s" )
+        time=System.currentTimeMillis()
         validateMetadataOccurs(childsRelationship)
-        validateModelsNameLength(subModels)
+        log.debug(" validating occurences  for  '${model.name}'  in ${(System.currentTimeMillis()-time)/1000} s" )
+        time=System.currentTimeMillis()
+        validateTableNameCompliance(model)
+        log.debug(" validateTableNameCompliance for  '${model.name}' in ${(System.currentTimeMillis()-time)/1000} s" )
+        time=System.currentTimeMillis()
 
         def writer = new StringWriter()
         def builder = new MarkupBuilder(writer)
@@ -84,66 +108,86 @@ class GelXmlService {
                 versionDescription model.ext.get(XSD_SCHEMA_VERSION_DESCRIPTION)
                 //order all elements based on their ext.order
                 //these are actually CRFs
-                subModels[0].outgoingRelationships.sort({ it.ext?.order }).each { Relationship rel ->
-                    
+                subModels.get(0).outgoingRelationships.sort({ it.ext?.order }).each { Relationship rel ->
+                
                     if (rel.relationshipType == RelationshipType.containmentType) {
                         
-                        printQuestion(rel.destination, rel.ext, builder)
+                        printQuestion(rel, builder)
                     }
                     if (rel.relationshipType == RelationshipType.hierarchyType) {
-                        printSection(rel.destination, rel.ext, builder)
+                        printSection(rel, builder)
                     }
                 }
             }
         }
+        log.debug(" converted elements string in  ${model.name} in ${System.currentTimeMillis()-time} ms" )
+  
         return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n" + writer.toString()
     }
 
-    def printSection(Model model, Map ext, MarkupBuilder builder){
+    def printSection(Relationship relationship, MarkupBuilder builder){
+        Model model=relationship.destination
+        Map ext=[(METADATA_MIN_OCCURS):fromDestination(relationship, METADATA_MIN_OCCURS),(METADATA_MAX_OCCURS):fromDestination(relationship, METADATA_MAX_OCCURS)]
+
+        
         if(model.ext.repeating=='true') {
             return builder.repeatingGroup(id: printXSDFriendlyString(model.name), minRepeat: defaultMinOccurs(ext.get(METADATA_MIN_OCCURS)), maxRepeat: defaultMaxOccurs(ext.get(METADATA_MAX_OCCURS))) {
                 setOmitEmptyAttributes(true)
                 setOmitNullAttributes(true)
                 name model.name
-                tableName getXSLTableName(model)
+                tableName getXSLTableName(relationship)
                 
                 //validate occurs
-                validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.containmentType))
-                validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType))
+                def elements=model.getOutgoingRelationshipsByType(RelationshipType.containmentType)
+                def childrens=model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)
+                validateMetadataOccurs(elements+childrens)
+
                 //recursive printing 
                 model.outgoingRelationships.each { Relationship rel ->
-                    if (rel.relationshipType == RelationshipType.containmentType) this.printQuestion(rel.destination, rel.ext, builder)
-                    if (rel.relationshipType == RelationshipType.hierarchyType) this.printSection(rel.destination, rel.ext, builder)
+                    if (rel.relationshipType == RelationshipType.hierarchyType) this.printSection(rel, builder)
+                    if (rel.relationshipType == RelationshipType.containmentType) this.printQuestion(rel, builder)
+
+
                 }
             }
         }else{
-            return builder.section(id: model.name, minRepeat: ext.get(METADATA_MIN_OCCURS), maxRepeat: ext.get("Max Occurs")) {
+            return builder.section(id: model.name, minRepeat: ext.get(METADATA_MIN_OCCURS), maxRepeat: ext.get(METADATA_MAX_OCCURS),) {
                 setOmitEmptyAttributes(true)
                 setOmitNullAttributes(true)
                 name model.name
-                tableName getXSLTableName(model)
+                tableName getXSLTableName(relationship)
                 instructions model.ext.instructions
                 
                 //validate occurs
-                validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.containmentType))
-                validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType))
+                def childrens=model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)
+                def elements=model.getOutgoingRelationshipsByType(RelationshipType.containmentType)
+                validateMetadataOccurs(elements+childrens)
                 
                 model.outgoingRelationships.each { Relationship rel ->
-                    if (rel.relationshipType == RelationshipType.containmentType) this.printQuestion(rel.destination, rel.ext, builder)
-                    if (rel.relationshipType == RelationshipType.hierarchyType) this.printSection(rel.destination, rel.ext, builder)
+                    if (rel.relationshipType == RelationshipType.hierarchyType) this.printSection(rel, builder)
+                    if (rel.relationshipType == RelationshipType.containmentType) this.printQuestion(rel, builder)
                 }
             }
 
         }
     }
 
-    def printQuestion(DataElement dataElement, Map ext, MarkupBuilder builder){
-        return builder.question(id: "R_${dataElement.id}", minRepeat: ext.get(METADATA_MIN_OCCURS), maxRepeat: ext.get(METADATA_MAX_OCCURS)){
+    /**
+     * Print as a question for Relationship which contains DataElements
+     * @param rel
+     * @param builder
+     * @return
+     */
+    def printQuestion(Relationship rel, MarkupBuilder builder){
+        DataElement dataElement=rel.destination
+        Map ext=[(METADATA_MIN_OCCURS):fromDestination(rel, METADATA_MIN_OCCURS),(METADATA_MAX_OCCURS):fromDestination(rel, METADATA_MAX_OCCURS)]
+
+        return builder.question(id: "R_${dataElement.id}", minRepeat: ext.get(METADATA_MIN_OCCURS), maxRepeat:  ext.get(METADATA_MAX_OCCURS)){
             setOmitEmptyAttributes(true)
             setOmitNullAttributes(true)
             name dataElement.name
-            if (ext.get(METADATA_MIN_OCCURS)>0||"unbounded".equals(ext.get(METADATA_MAX_OCCURS))){
-             tableName getXSLTableName(dataElement)
+            if ((ext.get(METADATA_MAX_OCCURS).isInteger()&&ext.get(METADATA_MAX_OCCURS).toInteger()>1)||"unbounded".equals(ext.get(METADATA_MAX_OCCURS))){
+             tableName getXSLTableName(rel)
             }
             text dataElement.ext.text
             instructions dataElement.description
@@ -167,7 +211,15 @@ class GelXmlService {
     }
 
     def getXSLTableName(CatalogueElement element){
-        return (element.ext.get(XSL_TABLE_NAME))?element.ext.get(XSL_TABLE_NAME):element.name
+        def tableName= (element.ext.get(XSL_TABLE_NAME))?element.ext.get(XSL_TABLE_NAME):element.name
+        tableName=tableName.replaceAll("\\s+", " ").replaceAll("[()?*.;!]", "").replaceAll("[^a-zA-Z0-9]+","_").toLowerCase().replaceAll("_+", "_")
+        return tableName
+    }
+    def getXSLTableName(Relationship relationship){
+        def candidateName=fromDestination(relationship, XSL_TABLE_NAME)
+        def tableName=candidateName?:relationship.destination.name
+        tableName=tableName.replaceAll("\\s+", " ").replaceAll("[()?*.;!]", "").replaceAll("[^a-zA-Z0-9]+","_").toLowerCase().replaceAll("_+", "_")
+        return tableName
     }
     
     protected transformDataType(String dataType) {
@@ -202,8 +254,25 @@ class GelXmlService {
 
 
     protected printXSDFriendlyString(String text){
-        if (text==null) return "null"
-        return text.replaceAll(" ", "-").replaceAll("\\(", "").replaceAll("\\)", "").replaceAll("/", "-").toLowerCase()
+       if (text==null) return "null"
+        text = text.replaceAll("[\\(\\)]", "").replaceAll("[^a-zA-Z0-9]+","-").toLowerCase()
+        if(text[0].matches("[0-9]")) text = "_" + text
+        return text
+    }
+    
+    protected printXSDFriendlyString(CatalogueElement el){
+        if (el.name==null) return "null"
+        String text="${printXSDFriendlyString(el.name)}-${getModelCatalogueId(el)}"
+        return text;
+ 
+    }
+
+
+    protected getModelCatalogueId(CatalogueElement ce){
+        def id = ce.getLatestVersionId() ? ce.getLatestVersionId() + "." + ce.getVersionNumber()  :  ce.getId() + "." + ce.getVersionNumber()
+        return id
+
+
     }
 
     protected defaultMinOccurs(String min){
@@ -230,7 +299,7 @@ class GelXmlService {
      * @throw Exception with text error messages corresponding for missing fields
      */
     def printXSDModel(Model targetModel) {
-        def valueDomains = new TreeSet({ k1, k2 -> k1.name+k1.id <=> k2.name+k1.id } as Comparator)
+        def valueDomains = new TreeSet({ k1, k2 -> printXSDFriendlyString(k1) <=> printXSDFriendlyString(k2) } as Comparator)
         StringWriter writer = new StringWriter()
         def xmlSchema = Classification.findByName("XMLSchema")
         def xml = new MarkupBuilder(writer)
@@ -242,7 +311,19 @@ class GelXmlService {
         //check if the metadata occurs it's already filled in for models
         validateMetadataOccurs(childRelations)
 
-        xml.'xs:schema'('xmlns:xs': 'http://www.w3.org/2001/XMLSchema', 'xmlns:vc': 'http://www.w3.org/2007/XMLSchema-versioning', 'xmlns:gel': 'https://genomicsengland.co.uk/xsd/', 'vc:minVersion': '1.1') {
+    
+        def namespace=targetModel.ext.get(XSD_STUDY_NAME)=='cancer'?'gelCAN':'gelRD'
+        def study=(targetModel.ext.get(XSD_STUDY_NAME)=='cancer')?'cancer':'raredisease'
+        def version = targetModel.ext.get(XSD_SCHEMA_VERSION)?:''
+
+
+        xml.'xs:schema'('xmlns:xs': 'http://www.w3.org/2001/XMLSchema',
+                "xmlns:vc": "http://www.w3.org/2007/XMLSchema-versioning",
+                "xmlns:${namespace}" : "https://genomicsengland.co.uk/xsd/${study}/${version}",
+                "xmlns": "https://genomicsengland.co.uk/xsd/${study}/${version}",
+                "targetNamespace":"https://genomicsengland.co.uk/xsd/${study}/${version}",
+                'vc:minVersion': '1.1',
+                'elementFormDefault':'qualified') {
             'xs:annotation'{
                 'xs:documentation'{
                     'h1'("Title:"+targetModel.ext.get(XSD_SCHEMA_NAME)? targetModel.ext.get(XSD_SCHEMA_NAME):targetModel.name)
@@ -264,9 +345,11 @@ class GelXmlService {
                     'xs:sequence'{
                         'xs:element'(name:'metadata',type:'metadata',minOccurs:'1',maxOccurs:'1')
                         targetModel.getOutgoingRelationshipsByType(RelationshipType.hierarchyType).each { Relationship r ->
-                            'xs:element'(name:printXSDFriendlyString(r.destination.name),type:printXSDFriendlyString(r.destination.name),
-                            minOccurs:defaultMinOccurs(r.ext.get(METADATA_MIN_OCCURS)),
-                            maxOccurs:defaultMinOccurs(r.ext.get(METADATA_MAX_OCCURS)))
+                            'xs:element'(name:printXSDFriendlyString(r.destination.name),type:printXSDFriendlyString(r.destination),
+                                
+                            minOccurs:defaultMinOccurs(fromDestination(r,METADATA_MIN_OCCURS)),
+                            maxOccurs:defaultMinOccurs(fromDestination(r,METADATA_MAX_OCCURS)))
+
                         }
                     }
                 }
@@ -312,10 +395,29 @@ class GelXmlService {
                             }
                         }
                     }
-                    'xs:element'(name:'source-organisation',type:"xs:string",minOccurs:'1',maxOccurs:'1'){
+                    'xs:element'(name:'source-organisation',minOccurs:'1',maxOccurs:'1'){
                         'xs:annotation'{
                             'xs:documentation'{
-                                'p'("ODS code of the source organisation within the GMC")
+                                'p'("ODS code of the source organisation within the GMC sending the message")
+                            }
+                        }
+                        'xs:simpleType'{
+                            'xs:restriction'(base: "xs:string"){
+                                'xs:minLength'(value: 1)
+                            }
+                        }
+                    }
+                    'xs:element'(name:'source-system',type:"xs:string",minOccurs:'0',maxOccurs:'1'){
+                        'xs:annotation'{
+                            'xs:documentation'{
+                                'p'("Source system. Optional but may be used to supply source with information if there are any issues with the submitted XML.")
+                            }
+                        }
+                    }
+                    'xs:element'(name:'local-report-id',type:"xs:string",minOccurs:'0',maxOccurs:'1'){
+                        'xs:annotation'{
+                            'xs:documentation'{
+                                'p'("Source system report Id. Optional but may be used to supply source with information if there are any issues with the submitted XML.")
                             }
                         }
                     }
@@ -331,23 +433,21 @@ class GelXmlService {
         }
         
         //validate for required metadata occurs
-        validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.containmentType))
-        validateModelsNameLength(model.getOutgoingRelationshipsByType(RelationshipType.containmentType).collect{it.destination})
-        
-        validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType))
-        validateModelsNameLength(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType).collect{it.destination})
-        
-        return xml.'xs:complexType'(name: printXSDFriendlyString(model.name)){
+        def containementRelationships=model.getOutgoingRelationshipsByType(RelationshipType.containmentType)
+        def hieracrchyRelationships=model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)
+        validateMetadataOccurs(hieracrchyRelationships+containementRelationships)
+         
+        return xml.'xs:complexType'(name: printXSDFriendlyString(model)){
             "${sectionType}"{
-             
-                
-                model.getOutgoingRelationshipsByType(RelationshipType.containmentType).each { Relationship relationship ->
-                    printDataElements(xml, relationship.destination, relationship.ext.get(METADATA_MIN_OCCURS), relationship.ext.get(METADATA_MAX_OCCURS),valueDomains,xmlSchema,relationship.ext)
+
+                hieracrchyRelationships.each { Relationship relationship ->
+                    printModelElements(xml, relationship.destination, fromDestination(relationship,METADATA_MIN_OCCURS), fromDestination(relationship,METADATA_MAX_OCCURS))
+                }
+                  
+                containementRelationships.each { Relationship relationship ->
+                    printDataElements(xml, relationship.destination, fromDestination(relationship,METADATA_MIN_OCCURS), fromDestination(relationship,METADATA_MAX_OCCURS),valueDomains,xmlSchema,relationship.ext)
                 }
 
-                model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType).each { Relationship relationship ->
-                    printModelElements(xml, relationship.destination, relationship.ext.get(METADATA_MIN_OCCURS), relationship.ext.get(METADATA_MAX_OCCURS))
-                }
             }
         }
     }
@@ -357,8 +457,9 @@ class GelXmlService {
      * @return
      */
     protected def isXsdBasicDataType(ValueDomain valueDomain){
-        return  (XSD_BUILTIN_DATA_TYPES.find{it==valueDomain.dataType?.name}!=null && (!valueDomain.ext.keySet().any {idx->(idx in XSD_RESTRICTION_LIST)}&&(!valueDomain.regexDef)))
-
+        return  (XSD_BUILTIN_DATA_TYPES.find{it==valueDomain.dataType?.name}!=null && (!valueDomain.ext.keySet().any { idx->
+            (idx in XSD_RESTRICTION_LIST) && (valueDomain.ext.get(idx)!=null)
+        }&&(!valueDomain.regexDef)))
     }
 
 
@@ -397,32 +498,65 @@ class GelXmlService {
 
     }
     
-    protected void validateModelsNameLength(List subModels){
+    
+    protected void validateTableNameCompliance(Model currModel){
+        //take submodels with override  table names if any from relationship
+        def subModels=findAllTableCandidates(currModel)
+        log.debug(" all possible tables for shredder are  ${subModels.size}" )
+
         String exceptionMessages="";
-        for (def model in subModels) {
-            if (model.name.length()>MAX_COLUMN_NAME_63){
-                exceptionMessages+="element '${model.name}' exceded in maximum allowed name size of ${MAX_COLUMN_NAME_63}\n,";
+        MultiValueMap mappedModels=subModels.collect{[it,getXSLTableName(it)]}.collectEntries( new  MultiValueMap())
+        def tableNames=mappedModels.values()
+        println "msdpprf"+ mappedModels.values()
+        
+        def duplicates=tableNames.findAll{tableNames.count(it) > 1}.unique()
+        
+        duplicates.each {  duplTableName ->
+            def duplIds=[]
+            mappedModels.each{  model, tableArray->
+                for(def table:tableArray){
+                    if (duplTableName==table){
+                        duplIds.add getModelCatalogueId(model)
+                    }
+                }
+
+            }
+            exceptionMessages+="element name or it's chosen tableName with value  '${duplTableName}' is present more than once for models ${duplIds};  ";
+        }
+        
+        mappedModels.each{ model, tableArray->
+            for(def table:tableArray){
+
+                if (table[0].matches("[0-9]")){
+                    exceptionMessages+="model '${model}'  with further table name '${table}' must not begin with numbers;";
+                }
+
+                if (table.length()>MAX_COLUMN_NAME_63){
+                    exceptionMessages+="mode  '${model}' with further table name '${table}' exceded in maximum allowed name size of ${MAX_COLUMN_NAME_63};";
+                }
             }
         }
+
         if (!exceptionMessages.empty) throw new Exception(exceptionMessages)
     }
+
     
     protected void validateMetadataOccurs(List rels){
         String exceptionMessages="";
         for (Relationship rel in rels) {
-            if (!rel.ext.get(METADATA_MIN_OCCURS)){
+            if (!fromDestination(rel,METADATA_MIN_OCCURS)){
                 exceptionMessages+="metadata 'Min Occurs' for model '${rel.destination.name}'  is missing, "
             }else{
-                if ((!rel.ext.get(METADATA_MIN_OCCURS).isLong())){
+                if ((!fromDestination(rel,METADATA_MIN_OCCURS)?.isLong())){
                     exceptionMessages+="metadata 'Min Occurs' for model '${rel.destination.name}'  is not a number, "
                 }
             }
-            if (!rel.ext.get(METADATA_MAX_OCCURS)){
+            if (!fromDestination(rel,METADATA_MAX_OCCURS)){
                 exceptionMessages+="metadata 'Max Occurs' for model '${rel.destination.name}'  is missing, ";
             }else{
-                if (rel.ext.get(METADATA_MAX_OCCURS).isLong()==false){
-                    if(rel.ext.get(METADATA_MAX_OCCURS)!='unbounded'){
-                        exceptionMessages+="metadata 'Max Occurs' for model '${rel.destination.name}'  is not a number, "
+                if (fromDestination(rel,METADATA_MAX_OCCURS)?.isLong()==false){
+                    if(fromDestination(rel,METADATA_MAX_OCCURS)!='unbounded'){
+                        exceptionMessages+="metadata 'Max Occurs' for model '${rel.destination.name}'  is not accepted notation, "
                     }
                 }
             }
@@ -431,7 +565,7 @@ class GelXmlService {
     }
 
     protected printModelElements(MarkupBuilder xml, Model model, String minOccurs, String maxOccurs){
-        return xml.'xs:element'(name: printXSDFriendlyString(model.name), type: printXSDFriendlyString(model.name), minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)){
+        return xml.'xs:element'(name: printXSDFriendlyString(model.name), type: printXSDFriendlyString(model), minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)){
             }
 
     }
@@ -453,7 +587,7 @@ class GelXmlService {
                     dataType=valueDomain.dataType.name
                 }else{
                     valueDomains.add(valueDomain)
-                    dataType=valueDomain.name+valueDomain.id
+                    dataType=printXSDFriendlyString(valueDomain)
                 }
                 return printDataElementSimpleType(xml, dataElement, dataType, minOccurs, maxOccurs)
             }
@@ -461,26 +595,68 @@ class GelXmlService {
     }
 
     protected printDataElementSchemaType(MarkupBuilder xml, DataElement dataElement, String type, String minOccurs = "0", String maxOccurs = "unbounded"){
-        return xml.'xs:element'(name: printXSDFriendlyString(dataElement.name), type:dataElement.valueDomain.dataType.name, minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)){
-            if (dataElement?.description){
-                'xs:annotation'{
-                    'xs:documentation'{
-                        'p'(XmlUtil.escapeXml(dataElement?.description))
+
+        if(type=="xs:string" && ( minOccurs.contains("unbounded")||minOccurs.toInteger()>=1)){
+
+            return xml.'xs:element'(name: printXSDFriendlyString(dataElement.name), minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)) {
+                if (dataElement?.description) {
+                    'xs:annotation' {
+                        'xs:documentation' {
+                            'p'(XmlUtil.escapeXml(dataElement?.description))
+                        }
+                    }
+                }
+                'xs:simpleType'{
+                    'xs:restriction'(base: "xs:string"){
+                        'xs:minLength'(value: 1)
+                    }
+                }
+
+            }
+        }else{
+                return xml.'xs:element'(name: printXSDFriendlyString(dataElement.name), type: dataElement.valueDomain.dataType.name, minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)) {
+                    if (dataElement?.description) {
+                        'xs:annotation' {
+                            'xs:documentation' {
+                                'p'(XmlUtil.escapeXml(dataElement?.description))
+                            }
+                        }
                     }
                 }
             }
-        }
     }
 
 
 
 
     protected printDataElementSimpleType(MarkupBuilder xml, DataElement dataElement, String type, String minOccurs = "0", String maxOccurs = "unbounded"){
-        return xml.'xs:element'(name: printXSDFriendlyString(dataElement.name), type: printXSDFriendlyString(type), minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)){
-            if (dataElement?.description){
-                'xs:annotation'{
-                    'xs:documentation'{
-                        'p'(XmlUtil.escapeXml(dataElement?.description))
+
+        if(type=="xs:string" && ( minOccurs.contains("unbounded")||minOccurs.toInteger()>=1)){
+
+            return xml.'xs:element'(name: printXSDFriendlyString(dataElement.name), minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)) {
+                if (dataElement?.description) {
+                    'xs:annotation' {
+                        'xs:documentation' {
+                            'p'(XmlUtil.escapeXml(dataElement?.description))
+                        }
+                    }
+                }
+                'xs:simpleType'{
+                    'xs:restriction'(base: "xs:string"){
+                        'xs:minLength'(value: 1)
+                    }
+                }
+
+            }
+
+        }else {
+
+            return xml.'xs:element'(name: printXSDFriendlyString(dataElement.name), type: type, minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)) {
+                if (dataElement?.description) {
+                    'xs:annotation' {
+                        'xs:documentation' {
+                            'p'(XmlUtil.escapeXml(dataElement?.description))
+                        }
                     }
                 }
             }
@@ -491,7 +667,7 @@ class GelXmlService {
     protected printSimpleType(MarkupBuilder xml, ValueDomain valueDomain){
 
         if(valueDomain?.dataType instanceof EnumeratedType){
-            return xml.'xs:simpleType'(name: printXSDFriendlyString(valueDomain.name+valueDomain.id), final: 'restriction'){
+            return xml.'xs:simpleType'(name: printXSDFriendlyString(valueDomain), final: 'restriction'){
                 'xs:restriction'(base:'xs:string'){
                         valueDomain?.dataType.enumerationsAsBeans.each { enumeration ->
                             'xs:enumeration'(value: enumeration.code) {
@@ -505,7 +681,7 @@ class GelXmlService {
                 }
             }
         }else{
-            return xml.'xs:simpleType'(name: printXSDFriendlyString(valueDomain.name+valueDomain.id), final: 'restriction'){
+            return xml.'xs:simpleType'(name: printXSDFriendlyString(valueDomain), final: 'restriction'){
                 'xs:simpleContent'
                     def dataType='xs:string'
                     if (valueDomain.ext.get(XSD_RESTRICTION_PATTERN)|| valueDomain?.regexDef){
@@ -530,7 +706,7 @@ class GelXmlService {
  * @param valueDomain
  * @return MarkupBuilder completed
  */
-  protected def printXsdDataTypeRestrictions(MarkupBuilder xml,ValueDomain valueDomain){
+  private String printXsdDataTypeRestrictions(MarkupBuilder xml,ValueDomain valueDomain){
         if (valueDomain.ext.get(XSD_RESTRICTION_MAX_LENGTH)){
             xml.'xs:maxLength'(value:valueDomain.ext.get(XSD_RESTRICTION_MAX_LENGTH))
         }
@@ -567,5 +743,49 @@ class GelXmlService {
             xml.'xs:pattern'(value:valueDomain.ext.get(XSD_RESTRICTION_PATTERN)?valueDomain.ext.get(XSD_RESTRICTION_PATTERN):valueDomain?.regexDef)
         }
     }
-   
+
+ 
+  private  String fromDestination(Relationship rel, String extensionName, String defaultValue = null) {
+      String value = rel.ext[extensionName]
+      if (value) {
+          return value
+      }
+      value = rel.destination.ext[extensionName]
+      if (value) {
+          return value
+      }
+      return defaultValue
+  }  
+  
+    protected List<CatalogueElement> findAllTableCandidates(CatalogueElement model,List results = [],Boolean isRoot=false) {    
+        if (model){ 
+           //if we send root model as parameter means that this is a child and we have to add in the list
+            if (isRoot==false){
+                results.add(model)
+            }
+
+            for (Relationship r: model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)){
+                //override table name to take from relation if any
+                def tableName=fromDestination(r,XSL_TABLE_NAME)
+                if(tableName) r.destination.ext.put(XSL_TABLE_NAME, tableName)
+                findAllTableCandidates(r.destination,results,false)
+            }
+
+            //search in data elements
+            for ( Relationship r:model.getOutgoingRelationshipsByType(RelationshipType.containmentType)) {
+                def maxOccurs=fromDestination(r,METADATA_MAX_OCCURS)
+               
+                if ( maxOccurs.contains("unbounded")|| (maxOccurs.isInteger()&&maxOccurs.toInteger()>1)){
+                    //override table name to take from relation if any                    
+                    def tableName=fromDestination(r,XSL_TABLE_NAME)
+                    if(tableName) r.destination.ext.put(XSL_TABLE_NAME, tableName)
+                    results.add(r.destination)
+                }
+            }
+            
+
+        }             
+        return results;
+    }
+
 }

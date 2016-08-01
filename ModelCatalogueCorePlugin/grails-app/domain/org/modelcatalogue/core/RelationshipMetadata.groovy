@@ -13,6 +13,9 @@ class RelationshipMetadata implements Extension {
         name size: 1..255
         extensionValue maxSize: 1000, nullable: true
     }
+    static mapping = {
+        name index :'RelMetadata_name_idx'
+    }
 
     @Override
     public String toString() {
