@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.genomics
 
+import grails.gsp.PageRenderer
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
@@ -302,6 +303,22 @@ class GenomicsController {
         genomicsService.genChangeLogDocument(dataClass,dataClass.name,3,true)
 
         redirect uri: "/#/${model.id}/asset/all?status=active"
+
+    }
+
+    def exportRareDiseasesWebsite() {
+        DataModel model = DataModel.get(params.id)
+
+        if (!model) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+
+        Long assetId = genomicsService.genRareDiseaseWebsite(model)
+
+        response.setHeader("X-Asset-ID", assetId.toString())
+        redirect controller: 'asset', id: assetId, action: 'show'
 
     }
 
