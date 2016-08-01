@@ -112,6 +112,8 @@ x ==~ /\\d+(\\.\\d+)?/
 x in ['apple', 'banana', 'cherry']
 """
 
+  LIST_MAX = 10
+
   showExample = (copy, messages, example) ->
     if copy.rule and copy.rule != REGEX_EXAMPLE and copy.rule != SET_EXAMPLE
       messages.confirm("Replace current rule with example", "Do already have some rule, do you want to replace it with the example?").then ->
@@ -378,7 +380,7 @@ x in ['apple', 'banana', 'cherry']
           base: element.contains.base
           itemType: element.contains.itemType
 
-      element.contains(null, max: 5).then (list) =>
+      element.contains(null, max: LIST_MAX).then (list) =>
         @result = list
       return @result
     reorder: reorderInDetail('contains')
@@ -409,7 +411,7 @@ x in ['apple', 'banana', 'cherry']
         base: element.parentOf.base
         itemType: element.parentOf.itemType
 
-      element.parentOf(null, max: 5).then (list) =>
+      element.parentOf(null, max: LIST_MAX).then (list) =>
         @result = list
       return @result
     reorder: reorderInDetail('parentOf')
@@ -449,7 +451,7 @@ x in ['apple', 'banana', 'cherry']
         base: element.typeHierarchy.base
         itemType: element.typeHierarchy.itemType
 
-      element.typeHierarchy(null, max: 5).then (list) =>
+      element.typeHierarchy(null, max: LIST_MAX).then (list) =>
         @result = list
       return @result
     data: {
@@ -486,7 +488,7 @@ x in ['apple', 'banana', 'cherry']
         base: element.appliedWithin.base
         itemType: element.appliedWithin.itemType
 
-      element.appliedWithin(null, max: 5).then (list) =>
+      element.appliedWithin(null, max: LIST_MAX).then (list) =>
         @result = list
       return @result
     reorder: reorderInDetail('appliedWithin')
@@ -524,7 +526,7 @@ x in ['apple', 'banana', 'cherry']
         base: element.involves.base
         itemType: element.involves.itemType
 
-      element.involves(null, max: 5).then (list) =>
+      element.involves(null, max: LIST_MAX).then (list) =>
         @result = list
       return @result
     reorder: reorderInDetail('involves')
