@@ -666,7 +666,11 @@ class ElementService implements Publisher<CatalogueElement> {
             }
         }
 
-        element.status = ElementStatus.FINALIZED
+        if (element.dataModel) {
+            element.status = element.dataModel.status
+        } else {
+            element.status = ElementStatus.FINALIZED
+        }
         element.save(flush: true)
         return element
     }
