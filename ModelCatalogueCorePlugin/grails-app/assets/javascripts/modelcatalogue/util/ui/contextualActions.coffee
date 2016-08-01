@@ -1,25 +1,26 @@
-angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingle','mc.util.ui.bs.actionButtonDropdown']).directive 'contextualActions',  ['$compile', '$templateCache', 'actions', ($compile, $templateCache, actions)-> {
+angular.module('mc.util.ui.contextualActions', ['mc.core.ui.utils'])
+.directive('contextualActions', ($compile, $templateCache, actions) -> {
+  'ngInject'
   restrict: 'E'
-  replace:  true
+  replace: true
   scope:
-    scope:      '=?'
-    group:      '@'
-    size:       '@'
-    iconOnly:   '@'
-    noColors:   '@'
-    role:       '@?'
-    noActions:  '@?'
+    scope: '=?'
+    group: '@'
+    size: '@'
+    iconOnly: '@'
+    noColors: '@'
+    role: '@?'
+    noActions: '@?'
 
-
-  templateUrl: 'modelcatalogue/util/ui/contextualActions.html'
+  templateUrl: '/mc/core/ui/utils/contextualActions.html'
 
   link: ($scope, $element) ->
     getTemplate = (action) ->
-      templateName = 'modelcatalogue/util/ui/actionButtonSingle.html'
+      templateName = '/mc/core/ui/utils/actionButtonSingle.html'
       if action.submit
-        templateName = 'modelcatalogue/util/ui/actionButtonSingleSubmit.html'
+        templateName = '/mc/core/ui/utils/actionButtonSingleSubmit.html'
       if action.children?.length or action.abstract
-        templateName = 'modelcatalogue/util/ui/actionButtonDropdown.html'
+        templateName = '/mc/core/ui/utils/actionButtonDropdown.html'
       $templateCache.get(templateName)
 
     scopes = []
@@ -29,7 +30,6 @@ angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingl
     removeWatchers = ($scope) ->
       fn() for fn in $scope.$$actionWatcherToBeRemoved
       $scope.$$actionWatcherToBeRemoved = []
-
 
     collectWatchers = (action, watches = []) ->
       if angular.isArray(action.watches)
@@ -52,7 +52,6 @@ angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingl
       scope.$destroy() for scope in scopes
       scopes = []
       content = []
-
 
       actionsScope = $scope.scope ? $scope.$parent
 
@@ -90,8 +89,7 @@ angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingl
 
     updateActions()
 
-
     $scope.$on 'userLoggedIn', updateActions
     $scope.$on 'userLoggedOut', updateActions
     $scope.$on 'redrawContextualActions', updateActions
-}]
+})
