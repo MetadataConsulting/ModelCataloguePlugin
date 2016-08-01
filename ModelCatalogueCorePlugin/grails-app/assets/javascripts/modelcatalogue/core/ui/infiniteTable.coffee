@@ -96,6 +96,9 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
       windowEl.on 'resize', ->
         updateHeader(windowEl.scrollTop())
 
+      $scope.doManualLoad = ->
+        $scope.manualLoad = false
+        $scope.loadMore()
 
       $scope.$on 'infiniteTableRedraw', ->
         updateHeader()
