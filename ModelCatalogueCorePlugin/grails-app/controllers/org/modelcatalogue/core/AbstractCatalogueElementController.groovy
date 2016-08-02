@@ -595,7 +595,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        def semanticVersion = params.semanticVersion ?: objectToBind.semanticVersion
+        String semanticVersion = params.semanticVersion ?: objectToBind.semanticVersion
+        String preferDrafts = params.preferDrafts ?: objectToBind.preferDrafts
 
         Long id = instance.getId()
 
@@ -603,6 +604,13 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             try {
                 CatalogueElement element = resource.get(id)
                 DraftContext context = DraftContext.userFriendly().withMonitor(BuildProgressMonitor.create("Create new version of $element", id))
+
+                if (preferDrafts) {
+                    preferDrafts.split(/\s*,\s*/).each {
+                        context.preferDraftFor(Long.parseLong(it, 10))
+                    }
+                }
+
                 if (element.instanceOf(DataModel)) {
                     elementService.createDraftVersion((DataModel) element, semanticVersion, context) as T
                 } else {

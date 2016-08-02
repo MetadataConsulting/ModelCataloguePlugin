@@ -92,6 +92,7 @@ class ModelCatalogueCorePluginUrlMappings {
                     "/api/modelCatalogue/core/$elementName/$id/content"(controller: controllerName, action: 'content', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/$id/newVersion"(controller: controllerName, action: 'newVersion', method: HttpMethod.POST)
                     "/api/modelCatalogue/core/$elementName/$id/inventorySpreadsheet"(controller: controllerName, action: 'inventorySpreadsheet', method: HttpMethod.GET)
+                    "/api/modelCatalogue/core/$elementName/$id/dependents"(controller: controllerName, action: 'dependents', method: HttpMethod.GET)
                 }
 
                 if (controllerName == 'measurementUnit') {

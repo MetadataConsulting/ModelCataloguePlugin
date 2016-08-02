@@ -116,6 +116,17 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
         respond Lists.wrap(params, "/${resourceName}/${params.id}/content", list)
     }
 
+    def dependents() {
+        DataModel dataModel = DataModel.get(params.id)
+        if (!dataModel) {
+            notFound()
+            return
+        }
+
+        respond dataModelService.findDependents(dataModel)
+    }
+
+
     private static Map createContentDescriptor(DataModel dataModel, String name, Class clazz, long count) {
         String link = "/${GrailsNameUtils.getPropertyName(clazz)}?toplevel=true&dataModel=${dataModel.getId()}&status=${dataModel.status != ElementStatus.DEPRECATED ? 'active' : ''}"
         Map ret = [:]
