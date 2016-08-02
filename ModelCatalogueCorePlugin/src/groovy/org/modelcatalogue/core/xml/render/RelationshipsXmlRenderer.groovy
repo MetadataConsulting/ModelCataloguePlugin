@@ -32,7 +32,7 @@ class RelationshipsXmlRenderer extends AbstractRenderer<Relationships> {
         CatalogueXmlPrinter printer = new CatalogueXmlPrinter(dataModelService, dataClassService)
 
         if (context instanceof ServletRenderContext) {
-            String fileName = "${relationships.owner.name}_${relationships.direction.actionName}_${relationships.type.name}.xml".replaceAll(/\s/, '_')
+            String fileName = "${relationships.owner.name}_${relationships.direction.actionName}_${relationships.type.name}.mc.xml".replaceAll(/\s/, '_')
 
             context.webRequest.response.contentType = MimeType.XML.name
             context.webRequest.response.setHeader("Content-disposition", "attachment; filename=\"${fileName}\"")
