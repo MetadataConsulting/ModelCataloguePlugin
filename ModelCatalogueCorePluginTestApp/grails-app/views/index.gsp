@@ -159,7 +159,7 @@
 </head>
 
 <body>
-<div id="metadataCurator" class="page-wrap" ng-app="metadataCurator" ng-strict-di>
+<div id="metadataCurator" ng-app="metadataCurator" ng-strict-di>
   <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container-fluid">
       <div class="navbar-header">
@@ -218,61 +218,5 @@
   <messages-panel max="3" growl="true"></messages-panel>
 </div>
 
-<footer class="row site-footer">
-  <div class="col-lg-12 col-sm-12 col-md-12">
-    <div class="panel panel-default">
-      <div class="panel-body">
-        <div class="row">
-          <div class=" col-xs-12 col-sm-12 col-md-4 col-lg-4"><p>Model catalogue development supported by</p></div>
-          <div class=" col-xs-3 col-sm-3 col-md-2 col-lg-2">
-            <p>
-              <a href="http://www.genomicsengland.co.uk/">
-                <asset:image src="modelcatalogue/GEL.jpg" class="img-thumbnail sponsor-logo-small"
-                             alt="Genomics England"/>
-              </a>
-            </p>
-            <p class="hidden-xs">
-              <a href="http://www.genomicsengland.co.uk/" class="text-muted">Genomics England</a>
-            </p>
-          </div>
-          <div class=" col-xs-3 col-sm-3 col-md-2 col-lg-2">
-            <p>
-              <a href="http://www.mrc.ac.uk">
-                <asset:image src="modelcatalogue/MRC.png" class="img-thumbnail sponsor-logo-small"
-                             alt="Medical Research Council"/>
-              </a>
-            </p>
-            <p class="hidden-xs"><a href="http://www.mrc.ac.uk" class="text-muted">Medical Research Council</a></p>
-          </div>
-          <div class=" col-xs-3 col-sm-3 col-md-2 col-lg-2">
-            <p>
-              <a href="http://www.nihr.ac.uk/">
-                <asset:image src="modelcatalogue/NIHR.png" class="img-thumbnail sponsor-logo-small" alt="NIHR"/>
-              </a>
-            </p>
-            <p class="hidden-xs">
-              <a href="http://www.nihr.ac.uk/" class="text-muted">
-                National Institute for Health Research
-              </a>
-            </p>
-          </div>
-          <div class=" col-xs-3 col-sm-3 col-md-2 col-lg-2">
-            <p>
-              <a href="http://www.metadataconsulting.co.uk">
-                <asset:image src="modelcatalogue/MDC.png" class="img-thumbnail sponsor-logo-small"
-                             alt="Metadata Consulting Ltd"/>
-              </a>
-            </p>
-            <p class="hidden-xs">
-              <a href="http://www.metadataconsulting.co.uk" class="text-muted">
-                Metadata Consulting
-              </a>
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</footer>
 </body>
 </html>

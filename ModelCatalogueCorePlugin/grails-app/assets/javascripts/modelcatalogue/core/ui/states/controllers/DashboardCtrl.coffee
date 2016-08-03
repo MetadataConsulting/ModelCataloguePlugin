@@ -38,15 +38,4 @@ angular.module('mc.core.ui.states.controllers.DashboardCtrl', ['ui.router', 'mc.
       $scope.user = user
 
     $scope.welcome = modelcatalogue.welcome
-
-    $scope.image = (relativePath) ->
-      lastIndex = security.contextPath.lastIndexOf('/')
-
-      if lastIndex != -1 and lastIndex + 1 == security.contextPath.length
-    # context path already ends with slash
-        "#{security.contextPath}assets#{relativePath}"
-      else
-    # context path doesn't end with slash
-        "#{security.contextPath}/assets#{relativePath}"
-
 ])
