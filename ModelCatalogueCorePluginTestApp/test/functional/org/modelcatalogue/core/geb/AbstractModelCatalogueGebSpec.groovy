@@ -203,10 +203,12 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     void click(CatalogueAction action) {
+        scroll action.toParentSelector()
         action.perform(this)
     }
 
     void click(CatalogueContent content) {
+        scroll content.selector
         click { content.select(this) }
     }
 
@@ -221,6 +223,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     void click(String idOrSelector) {
+        scroll idOrSelector
         try {
             click {
                 $(idOrSelector)
