@@ -50,6 +50,7 @@ class RelationshipDefinition {
     boolean skipUniqueChecking
     boolean otherSide
     boolean metadataSet
+    boolean dataModelOptional
 
     Relationship createRelationship() {
         new Relationship(
@@ -75,6 +76,7 @@ class RelationshipDefinition {
         definition.incomingIndex = this.incomingIndex
         definition.resetIndices = this.resetIndices
         definition.ignoreRules = this.ignoreRules
+        definition.dataModelOptional = this.dataModelOptional
         definition.skipUniqueChecking = this.skipUniqueChecking
         definition.otherSide = !this.otherSide
 

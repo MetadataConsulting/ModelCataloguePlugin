@@ -253,6 +253,12 @@ class RelationshipService {
         }
 
         log.info "Relationship $definition checked for presence but not found. Finding relationship is slow, consider using 'skipUniqueChecking' flag for optimistic relationship linking."
+
+
+        if (definition.dataModel && definition.dataModelOptional) {
+            return findExistingRelationship(definition.clone().with { it.dataModel = null ; it})
+        }
+
         return null
     }
 
@@ -272,7 +278,7 @@ class RelationshipService {
     Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, DataModel dataModel, boolean ignoreRules = false, Map<String, String> expectedMetadata = null) {
 
         if (source?.id && destination?.id && relationshipType?.id) {
-            Relationship relationshipInstance = findExistingRelationship(RelationshipDefinition.create(source, destination, relationshipType).withDataModel(dataModel).definition)
+            Relationship relationshipInstance = findExistingRelationship(RelationshipDefinition.create(source, destination, relationshipType).withOptionalDataModel(dataModel).definition)
 
             if (!relationshipInstance) {
                 return null
@@ -295,11 +301,8 @@ class RelationshipService {
                 return null
             }
 
-            CacheService.RELATIONSHIPS_COUNT_CACHE.invalidate(source.getId())
-            CacheService.RELATIONSHIPS_COUNT_CACHE.invalidate(destination.getId())
-
             if (relationshipType == RelationshipType.favouriteType) {
-                CacheService.FAVORITE_CACHE.invalidate(source.getId())
+                CacheService.FAVORITE_CACHE.getIfPresent(modelCatalogueSecurityService.currentUser.getId())?.remove(destination.id)
             }
 
             auditService.logRelationRemoved(relationshipInstance)
@@ -340,6 +343,14 @@ class RelationshipService {
             relationshipInstance.destination = null
             relationshipInstance.dataModel = null
             relationshipInstance.delete(flush: true)
+
+            CacheService.RELATIONSHIPS_COUNT_CACHE.invalidate(source.getId())
+            CacheService.RELATIONSHIPS_COUNT_CACHE.invalidate(destination.getId())
+
+            if (relationshipType == RelationshipType.favouriteType) {
+                CacheService.FAVORITE_CACHE.invalidate(source.getId())
+            }
+
             if (relationshipType == RelationshipType.baseType) {
                 source.removeInheritedAssociations(destination, metadata)
             }

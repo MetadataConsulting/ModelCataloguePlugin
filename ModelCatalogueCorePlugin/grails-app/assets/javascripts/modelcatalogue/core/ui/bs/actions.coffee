@@ -114,7 +114,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
           catalogueElementResource('user').get(security.getCurrentUser()?.id).then (user) ->
             url = "#{modelCatalogueApiRoot}#{user.link}/favourite"
             enhance(rest(url: url, method: 'POST', data: element)).then (relation) ->
-              $scope.$broadcast 'catalogueElementCreated', relation, url, element
+              $scope.$broadcast 'catalogueElementCreated', relation, $scope.list.base, element
               messages.success "#{element.getLabel()} has been added to favourites"
               relation
 

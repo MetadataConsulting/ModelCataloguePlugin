@@ -27,6 +27,9 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
     }
 
     boolean hasRole(String role) {
+        if (!role) {
+            return true
+        }
         String translated = role
         if (role == "VIEWER") {
             translated = "ROLE_USER,ROLE_METADATA_CURATOR,ROLE_ADMIN"

@@ -56,6 +56,6 @@ class UserController extends AbstractCatalogueElementController<User> {
     }
 
     def removeFavourite(Long id) {
-        removeRelation(id, 'favourite', true)
+        removeRelation(id, 'favourite', true, null)
     }
 }
