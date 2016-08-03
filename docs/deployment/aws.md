@@ -29,7 +29,7 @@ Task definition are quite similar to `Dockerfile` or `docker-compose.yml` files.
 They specify the containers to be run with some additional settings such as
 environmental variables. You need two task definitions:
 
-  1. Model Catalogue container based on [metadata/registry-elasticsearch](https://hub.docker.com/r/metadata/registry/)
+  1. Model Catalogue container based on [metadata/registry](https://hub.docker.com/r/metadata/registry/)
   2. Elasticsearch container based on [metadata/registry-elasticsearch](https://hub.docker.com/r/metadata/registry-elasticsearch/)
 
 You can easily create new _Task Definition_ using following JSON definition
