@@ -460,7 +460,6 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
               }
             }
         """
-        Thread.sleep(500);
     }
 
     void scrollTop() {
