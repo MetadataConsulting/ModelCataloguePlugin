@@ -169,6 +169,13 @@ class RelationshipService {
         relationshipDefinition.source?.addToOutgoingRelationships(relationshipInstance)?.save(validate: false/*, flush: true*/)
         relationshipDefinition.destination?.addToIncomingRelationships(relationshipInstance)?.save(validate: false/*, flush: true*/)
 
+        if (relationshipDefinition.relationshipType == RelationshipType.favouriteType) {
+            CacheService.FAVORITE_CACHE.invalidate(relationshipDefinition.source.getId())
+        }
+
+        CacheService.RELATIONSHIPS_COUNT_CACHE.invalidate(relationshipDefinition.source.getId())
+        CacheService.RELATIONSHIPS_COUNT_CACHE.invalidate(relationshipDefinition.destination.getId())
+
         auditService.logNewRelation(relationshipInstance)
 
         if (relationshipDefinition.metadata) {
@@ -198,13 +205,6 @@ class RelationshipService {
                 log.error FriendlyErrors.printErrors("Errors saving the other side of bidirectional relationship", backReference.errors)
             }
         }
-
-        if (relationshipDefinition.relationshipType == RelationshipType.favouriteType) {
-            CacheService.FAVORITE_CACHE.invalidate(relationshipDefinition.source.getId())
-        }
-
-        CacheService.RELATIONSHIPS_COUNT_CACHE.invalidate(relationshipDefinition.source.getId())
-        CacheService.RELATIONSHIPS_COUNT_CACHE.invalidate(relationshipDefinition.destination.getId())
 
         relationshipInstance
     }
@@ -295,6 +295,13 @@ class RelationshipService {
                 return null
             }
 
+            CacheService.RELATIONSHIPS_COUNT_CACHE.invalidate(source.getId())
+            CacheService.RELATIONSHIPS_COUNT_CACHE.invalidate(destination.getId())
+
+            if (relationshipType == RelationshipType.favouriteType) {
+                CacheService.FAVORITE_CACHE.invalidate(source.getId())
+            }
+
             auditService.logRelationRemoved(relationshipInstance)
 
             destination.refresh()
@@ -336,13 +343,6 @@ class RelationshipService {
             if (relationshipType == RelationshipType.baseType) {
                 source.removeInheritedAssociations(destination, metadata)
             }
-
-            if (relationshipType == RelationshipType.favouriteType) {
-                CacheService.FAVORITE_CACHE.invalidate(source.getId())
-            }
-
-            CacheService.RELATIONSHIPS_COUNT_CACHE.invalidate(source.getId())
-            CacheService.RELATIONSHIPS_COUNT_CACHE.invalidate(destination.getId())
 
             if (relationshipType.bidirectional) {
                 unlink relationshipInstance.destination, relationshipInstance.source, relationshipType, dataModel, ignoreRules, expectedMetadata
