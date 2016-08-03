@@ -28,13 +28,11 @@ login viewer
 
 To simply navigate to particular element you need to know the path in the data model tree view.
 
-You start with selecting the desired data model and than you continue the path with `/` (slash - divide) as you were clicking on the tree view.
+You start with selecting the desired data model and than you continue the path with `open` as you were clicking on the tree view. If you don't expect the tree item to expand you can use just `select`
 
 ```
-select('NHIC') / 'NHIC' / 'Data Classes' / 'NHIC Dataset'
+select('NHIC') open 'Data Classes' select 'NHIC Dataset'
 ```
-
-Please, take a note you need to repeat the data model name as the first thing to expand the data model root node in the tree view.
 
 ### Page Elements
 In a next section I'll be referring to page element in the DSL. You can use plain string selectors such as `h3` or for more complex use cases a `CatalogueContent` object which basically consist from a selector and attributes acceptable by `$` method. Model Catalogue actions have their counterparts in instances of `CatalogueActions` which are defined by role such as `navigation-right` and the action id e.g. `search-menu`. You can simply declare a nested action as well:
@@ -111,6 +109,7 @@ _Scrolling Window_
 ```
 scroll up       // scroll up by 250 px
 scroll down     // scroll down by 250 px
+scroll selector // scroll to element identified by given selector (this is done automatically before click)
 ```
 
 _Add import to the data model and than continue selecting the items in the tree view_
@@ -129,8 +128,8 @@ Very often you would like to check if the modal dialog closes. You can do so wit
 check backdrop gone
 ```
 
-Also some actions cannot be executed until there are any growl messages shown. To wait until they disappear you can do following before attempting to click
+Also some actions cannot be executed until there are any growl messages shown. You can simply close them with
 
 ```
-check closeGrowlMessage gone
+remove messages
 ```
