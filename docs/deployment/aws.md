@@ -16,10 +16,12 @@ must allow inbound connections from the ECS registered instance (see bellow).
 ### ECS Cluster
 You need _Cluster_ available with enough registered
 container instances. There is _Cluster_ called _default_ always available
-but you need to start new Amazon ESC container instance for it if not
+but it's recommended to create new cluster fo reach server. 
+You need to start new Amazon ESC container instance for it if not
 set up yet. Follow the guide here: [Amazon ECS Container Instances](http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ECS_instances.html).
 The instance should be `m3.xlarge` to allow running Model Catalogue with
-enough memory. If you've setup the instance properly it should appear
+enough memory. Don't forget to assign the cluster name to the newly created instance as described in the step _10_.
+If you've setup the instance properly it should appear
 at _Clusters_ / _ESC Instances_ table.
 
 ### Task Definitions
@@ -27,7 +29,7 @@ Task definition are quite similar to `Dockerfile` or `docker-compose.yml` files.
 They specify the containers to be run with some additional settings such as
 environmental variables. You need two task definitions:
 
-  1. Model Catalogue container based on [metadata/registry-elasticsearch](https://hub.docker.com/r/metadata/registry/)
+  1. Model Catalogue container based on [metadata/registry](https://hub.docker.com/r/metadata/registry/)
   2. Elasticsearch container based on [metadata/registry-elasticsearch](https://hub.docker.com/r/metadata/registry-elasticsearch/)
 
 You can easily create new _Task Definition_ using following JSON definition

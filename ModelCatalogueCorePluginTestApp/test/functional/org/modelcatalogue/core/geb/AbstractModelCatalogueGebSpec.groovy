@@ -203,10 +203,12 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     void click(CatalogueAction action) {
+        scroll action.toParentSelector()
         action.perform(this)
     }
 
     void click(CatalogueContent content) {
+        scroll content.selector
         click { content.select(this) }
     }
 
@@ -221,6 +223,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     void click(String idOrSelector) {
+        scroll idOrSelector
         try {
             click {
                 $(idOrSelector)
@@ -447,11 +450,16 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     void scroll(String selector, int offset = -150) {
-        js.exec("jQuery('$selector')[0].scrollIntoView(true);")
-        if (offset)
-            js.exec("jQuery('$selector')[0].scrollIntoView(true);")
-            js.exec("window.scrollBy(0,${offset})");
-        Thread.sleep(500);
+        //language=JavaScript
+        js.exec """
+            var selector = '$selector', offset = $offset;
+            if (jQuery && jQuery(selector).length > 0) {
+              jQuery(selector)[0].scrollIntoView(true);
+              if (offset) {
+                window.scrollBy(0, offset)
+              }
+            }
+        """
     }
 
     void scrollTop() {

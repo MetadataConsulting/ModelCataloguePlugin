@@ -217,6 +217,12 @@ Genomics England customisation plugin for Model Catalogue
             type DataModel
             link controller: 'genomics', action: 'exportDataSpecChangeLogAsXls', id: true
         }
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases Static Website" }
+            type DataModel
+            link controller: 'genomics', action: 'exportRareDiseasesWebsite', id: true
+        }
     }
 
     def onChange = { event ->

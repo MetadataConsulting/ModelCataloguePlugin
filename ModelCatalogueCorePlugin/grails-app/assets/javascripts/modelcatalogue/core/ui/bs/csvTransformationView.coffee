@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.csvTransformationView', ['mc.core.ui.csvTransformationView',  'mc.core.ui.propertiesPane', 'mc.core.ui.simpleObjectEditor', 'mc.util.ui.bs.contextualActions' , 'ui.bootstrap', 'ngSanitize']).run [ '$templateCache', ($templateCache) ->
+angular.module('mc.core.ui.bs.csvTransformationView', ['mc.core.ui.csvTransformationView',  'mc.core.ui.propertiesPane', 'mc.core.ui.simpleObjectEditor', 'ui.bootstrap', 'ngSanitize']).run [ '$templateCache', ($templateCache) ->
 
   $templateCache.put 'modelcatalogue/core/ui/csvTransformationView.html', '''
     <div>

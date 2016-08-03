@@ -20,6 +20,14 @@ angular.module('mc.core.ui.bs.modalNewVersion', ['mc.util.messages']).config ['m
                 <label for="semanticVersion" class="">Semantic Version</label>
                 <input type="text" class="form-control" id="semanticVersion" placeholder="Semantic Version e.g. 1.2.3" ng-model="semanticVersion">
               </div>
+              <label ng-if="dependents.length">Prefer drafts for following dependent data models:</label>
+              <div class="checkbox" ng-repeat="dependent in dependents track by dependent.id">
+                <label>
+                  <input type="checkbox" ng-model="preferDrafts[dependent.latestVersionId]">
+                  {{dependent.name}}
+                </label>
+              </div>
+
               <fake-submit-button/>
             </form>
         </div>
@@ -27,15 +35,34 @@ angular.module('mc.core.ui.bs.modalNewVersion', ['mc.util.messages']).config ['m
           <contextual-actions role="modal"></contextual-actions>
         </div>
         '''
-        controller: ['$rootScope', '$scope', 'messages', '$uibModalInstance', 'catalogueElementResource', ($rootScope, $scope, messages, $uibModalInstance, catalogueElementResource) ->
+
+        resolve:
+          dependents: ->
+            args.element.execute('dependents')
+
+        controller: ($rootScope, $scope, messages, $uibModalInstance, dependents) ->
+          'ngInject'
+
+          collectDraftPreference = (preferDrafts) ->
+            result = []
+            angular.forEach preferDrafts, (value, key) ->
+              result.push key if value
+            result.join(',')
+
           $scope.semanticVersion = null
           $scope.messages = messages.createNewMessages()
+
+          $scope.dependents = dependents
+          $scope.preferDrafts = {}
+
+          angular.forEach $scope.dependents, (dependent) ->
+            $scope.preferDrafts[dependent.latestVersionId] = true
 
           $scope.$dismiss = $uibModalInstance.dismiss
 
           $scope.createDraftVersion = ->
             $scope.pending = true
-            args.element.execute('newVersion', 'POST', semanticVersion: $scope.semanticVersion).then (updated) ->
+            args.element.execute('newVersion', 'POST', semanticVersion: $scope.semanticVersion, preferDrafts: collectDraftPreference($scope.preferDrafts)).then (updated) ->
               args.element.updateFrom  updated
               messages.prompt('Draft progress', null, type: 'feedback', id: args.element.id).then ->
                 $uibModalInstance.close(updated)
@@ -43,8 +70,6 @@ angular.module('mc.core.ui.bs.modalNewVersion', ['mc.util.messages']).config ['m
             , (response) ->
               $scope.pending = false
               $scope.messages.showErrorsFromResponse(response)
-
-        ]
 
       }
 

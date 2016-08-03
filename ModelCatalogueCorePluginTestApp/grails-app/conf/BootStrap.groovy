@@ -16,7 +16,6 @@ import org.springframework.http.HttpMethod
 
 class BootStrap {
 
-    def importService
     def initCatalogueService
     def elementService
     def actionService
@@ -132,9 +131,6 @@ class BootStrap {
         try {
 
             println 'Running post init job'
-            println 'Importing data'
-            importService.importData()
-
             println 'Finalizing all published elements'
             CatalogueElement.findAllByStatus(ElementStatus.DRAFT).each {
                 if (it instanceof DataClass) {

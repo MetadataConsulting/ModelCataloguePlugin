@@ -90,7 +90,9 @@ angular.module('mc.core.ui.bs.modalPromptRelationshipTypeEdit', ['mc.util.messag
           angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $uibModalInstance: $uibModalInstance}))
 
           $scope.hasChanged   = ->
-            for prop in ['name', 'sourceToDestination', 'destinationToSource', 'sourceClass', 'destinationClass', 'system', 'bidirectional', 'rule', 'versionSpecific', 'sourceToDestinationDescription', 'destinationToSourceDescription']
+            for prop in ['name', 'sourceToDestination', 'destinationToSource', 'sourceClass', 'destinationClass',
+              'system', 'bidirectional', 'searchable', 'rule', 'versionSpecific', 'sourceToDestinationDescription',
+              'destinationToSourceDescription']
               return true if !angular.equals($scope.copy[prop], $scope.original[prop])
             return false
 

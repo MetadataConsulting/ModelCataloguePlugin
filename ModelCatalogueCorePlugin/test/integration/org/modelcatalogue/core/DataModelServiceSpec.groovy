@@ -2,16 +2,18 @@ package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
 import grails.test.spock.IntegrationSpec
+import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 
-class DataModelServiceSpec extends IntegrationSpec {
+class DataModelServiceSpec extends AbstractIntegrationSpec {
 
     def dataModelService
-    def initCatalogueService
     def dataClassService
+
+    CatalogueBuilder catalogueBuilder
 
     DataModel model1
     DataModel model2
@@ -23,7 +25,7 @@ class DataModelServiceSpec extends IntegrationSpec {
     DataClass class3
 
     def setup() {
-        initCatalogueService.initDefaultRelationshipTypes()
+        initRelationshipTypes()
         model1 = new DataModel(name: "Test Classification 1 ${System.currentTimeMillis()}").save(failOnError: true)
         model2 = new DataModel(name: "Test Classification 2 ${System.currentTimeMillis()}").save(failOnError: true)
         model3 = new DataModel(name: "Test Classification 3 ${System.currentTimeMillis()}").save(failOnError: true)
@@ -142,6 +144,32 @@ class DataModelServiceSpec extends IntegrationSpec {
         !(class1 in criteria.list())
         class2 in criteria.list()
         class3 in criteria.list()
+    }
+
+    def "find dependents"() {
+        given:
+            catalogueBuilder.build {
+                dataModel name: 'DMFD 1', {
+                    dataType name: 'DMFD 1 DT 1'
+                }
+
+                dataModel name: 'DMFD 2', {
+                    dataType name: 'DMFD 2 DT 1'
+                }
+
+                dataModel name: 'DMFD 3', {
+                    dataElement name: 'DMFD 3 DE 1', {
+                        dataType name: 'DMFD 1 DT 1', dataModel: 'DMFD 1'
+                    }
+                    dataElement name: 'DMFD 3 DE 2', {
+                        dataType name: 'DMFD 2 DT 1', dataModel: 'DMFD 2'
+                    }
+                }
+            }
+
+        expect:
+            dataModelService.findDependents(DataModel.findByName('DMFD 3'))*.name.contains('DMFD 1')
+            dataModelService.findDependents(DataModel.findByName('DMFD 3'))*.name.contains('DMFD 2')
     }
 
 

@@ -10,6 +10,7 @@ class DraftContext extends PublishingContext<DraftContext> {
     private boolean forceNew
 
     private Set<Long> elementsUnderControl
+    private Set<Long> preferDraftsFor = new HashSet<Long>()
 
     private String semanticVersion
 
@@ -68,10 +69,12 @@ class DraftContext extends PublishingContext<DraftContext> {
             return element
         }
 
-        CatalogueElement existingDraft =  CatalogueElement.findByLatestVersionIdAndStatusInList(element.latestVersionId, [ElementStatus.DRAFT, ElementStatus.UPDATED], [sort: 'versionNumber', order: 'desc'])
+        if (element.id in preferDraftsFor || element.latestVersionId in preferDraftsFor || element.dataModel?.id in preferDraftsFor || element.dataModel?.latestVersionId in preferDraftsFor) {
+            CatalogueElement existingDraft =  CatalogueElement.findByLatestVersionIdAndStatusInList(element.latestVersionId, [ElementStatus.DRAFT, ElementStatus.UPDATED], [sort: 'versionNumber', order: 'desc'])
 
-        if (existingDraft) {
-            return existingDraft
+            if (existingDraft) {
+                return existingDraft
+            }
         }
 
         return element
@@ -99,5 +102,10 @@ class DraftContext extends PublishingContext<DraftContext> {
             ", dataModel='" + dataModel +  '\'' +
             ", semanticVersion='" + semanticVersion + '\'' +
             '}';
+    }
+
+    public DraftContext preferDraftFor(Long dataModelLatestVersionId) {
+        preferDraftsFor << dataModelLatestVersionId
+        return this
     }
 }

@@ -533,7 +533,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         elementService.restore(dataType)
 
         then:
-        dataType.status == ElementStatus.FINALIZED
+        dataType.status == dataType.dataModel.status
     }
 
     def "creating draft of data model won't set previous version as a data model"() {

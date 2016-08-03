@@ -9,6 +9,7 @@ import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.TestDataHelper
 import org.modelcatalogue.integration.mc.ModelCatalogueLoader
+import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 
 class InitCatalogueService {
 
@@ -55,6 +56,26 @@ class InitCatalogueService {
         for (Resource resource in forSecondPass) {
             readMCFile(resource, failOnError)
         }
+
+        forSecondPass.clear()
+
+        // load xml files
+        for (Resource resource in resolver.getResources('classpath*:**/*.mc.xml')) {
+            if (resource.file.absolutePath.contains('/test/')) {
+                continue
+            }
+            try {
+                readXMLFile(resource, true)
+            } catch (Exception e) {
+                log.info("Resource $resource couldn't be processed at the moment, will try again later", e)
+                forSecondPass << resource
+            }
+        }
+
+        // second pass
+        for (Resource resource in forSecondPass) {
+            readXMLFile(resource, failOnError)
+        }
     }
 
     private void readMCFile(Resource resource, boolean failOnError) {
@@ -72,6 +93,25 @@ class InitCatalogueService {
                 throw new IllegalArgumentException("Exception parsing model catalogue file ${resource.URI}", e)
             } else {
                 log.error("Exception parsing model catalogue file ${resource.URI}", e)
+            }
+        }
+    }
+
+    private void readXMLFile(Resource resource, boolean failOnError) {
+        try {
+            log.info "Importing XML file ${resource.URI}"
+
+            DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService, true)
+            CatalogueXmlLoader loader = new CatalogueXmlLoader(builder)
+
+            loader.load(resource.inputStream)
+
+            log.info "File ${resource.URI} imported"
+        } catch (e) {
+            if (failOnError) {
+                throw new IllegalArgumentException("Exception parsing model catalogue XML file ${resource.URI}", e)
+            } else {
+                log.error("Exception parsing model catalogue XML file ${resource.URI}", e)
             }
         }
     }
