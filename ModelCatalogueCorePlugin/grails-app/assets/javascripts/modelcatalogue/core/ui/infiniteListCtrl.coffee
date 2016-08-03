@@ -70,7 +70,7 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
         properties.push label: 'New Value', value: -> if element.newValue?.value then element.newValue.value else element.newValue
     properties
 
-  getRowForElement = (element) ->
+  getRowForElement = (element, oldRow) ->
     row = {element: element, properties: getPropertiesForElement(if element.relation then element.relation else element), sortable: $scope.isSortable, classesForStatus: $scope.classesForStatus(element), tail: [], $$expanded: $scope.$$expandAll ? false}
 
     if $scope.columns
@@ -89,6 +89,9 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
       else
         angular.forEach element.ext, (value, key) ->
           row.properties.push label: names.getNaturalName(key), value: -> value
+
+    if oldRow and oldRow.$$expanded
+      row.$$expanded = true
 
     row
 
@@ -198,14 +201,6 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
       $scope.list.total = $scope.total if $scope.list
       return
 
-  $scope.$on 'actionPerformed', (_, __, result) ->
-    result.then ->
-      elements          = $scope.elements
-      $scope.elements   = []
-      $scope.rows       = []
-
-      addElements elements
-
   DEBOUNCE_TIME = 500
 
   $scope.$eventToObservable('catalogueElementUpdated').debounce(DEBOUNCE_TIME).subscribe (data) ->
@@ -214,5 +209,5 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
       if item.link == element.link
         if angular.isFunction(item.updateFrom)
           item.updateFrom(element)
-          $scope.rows[index] = getRowForElement(item)
+          $scope.rows[index] = getRowForElement(item, $scope.rows[index])
 ]

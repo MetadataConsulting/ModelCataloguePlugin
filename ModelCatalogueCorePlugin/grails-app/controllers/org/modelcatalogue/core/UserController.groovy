@@ -51,7 +51,11 @@ class UserController extends AbstractCatalogueElementController<User> {
         respond modelCatalogueSecurityService.usersLastSeen.sort { it.value }.collect { [username: it.key, lastSeen: new Date(it.value)] }.reverse()
     }
 
-    def favourite(Long id) {
+    def addFavourite(Long id) {
         addRelation(id, 'favourite', true, null)
+    }
+
+    def removeFavourite(Long id) {
+        removeRelation(id, 'favourite', true, null)
     }
 }
