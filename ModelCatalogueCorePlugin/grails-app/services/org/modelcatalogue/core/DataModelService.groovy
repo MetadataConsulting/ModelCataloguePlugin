@@ -1,10 +1,14 @@
 package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
+import grails.util.Holders
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.modelcatalogue.core.actions.Batch
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
 import org.modelcatalogue.core.util.DataModelFilter
+import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.lists.DetachedListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeWrapper
@@ -155,5 +159,25 @@ class DataModelService {
 
     public boolean isLegacyDataModels() {
         return this.legacyDataModels
+    }
+
+    Set<DataModel> findDependents(DataModel dataModel) {
+        Set<DataModel> dependents = new TreeSet<DataModel>({DataModel a, DataModel b -> a.name <=> b.name} as Comparator<DataModel>)
+
+        dataModel.declares.each {
+            Class type = HibernateHelper.getEntityClass(it)
+            GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(type.name) as GrailsDomainClass
+
+            for (prop in domainClass.persistentProperties) {
+                if (prop.association && (prop.manyToOne || prop.oneToOne) && prop.name != 'dataModel') {
+                    def value = it.getProperty(prop.name)
+                    if (value instanceof CatalogueElement && value.dataModel && value.dataModel != dataModel) {
+                        dependents << value.dataModel
+                    }
+                }
+            }
+        }
+
+        dependents
     }
 }
