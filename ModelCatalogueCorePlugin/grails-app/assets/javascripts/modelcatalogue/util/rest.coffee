@@ -19,7 +19,7 @@ angular.module('mc.util.rest', ['mc.util.messages']).factory 'rest', ($q, $http,
         deferred.reject response
         return
       if response.status is 404
-        if config.noRetry404
+        if config.noRetry404 or config.method isnt 'GET'
           deferred.reject response
           return
 

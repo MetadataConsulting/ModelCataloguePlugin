@@ -129,9 +129,9 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         respond(id: rel.id, type: rel.relationshipType, ext: OrderedMap.toJsonMap(rel.ext), element: rel.source, relation: rel.destination, direction: 'sourceToDestination', removeLink: RelationshipsMarshaller.getDeleteLink(rel.source, rel), archived: rel.archived, elementType: Relationship.name)
     }
 
-    private void removeRelation(Long id, String type, boolean outgoing) {
+    private void removeRelation(Long id, String type, boolean outgoing, String minRole = 'CURATOR') {
         withRetryingTransaction {
-            if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            if (!modelCatalogueSecurityService.hasRole(minRole)) {
                 unauthorized()
                 return
             }

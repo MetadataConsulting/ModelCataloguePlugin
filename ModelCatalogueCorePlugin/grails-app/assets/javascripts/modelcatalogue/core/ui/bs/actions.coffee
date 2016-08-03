@@ -54,43 +54,49 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerActionInRoles 'favorite-element',[actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INIFINITE_LIST], ['$scope', 'messages', '$state', 'security', 'catalogueElementResource', 'modelCatalogueApiRoot', 'enhance', 'rest', ($scope, messages, $state, security, catalogueElementResource, modelCatalogueApiRoot, enhance, rest) ->
-    elementPresent = $scope.element and angular.isFunction($scope.element.getResourceName) and angular.isFunction($scope.element.getElementTypeName) and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('catalogueElement')
+  actionsProvider.registerActionInRoles 'favorite-element',
+    [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INIFINITE_LIST],
+    ($scope, messages, $state, security, catalogueElementResource, modelCatalogueApiRoot, enhance, rest) ->
+      'ngInject'
+      elementPresent = $scope.element and angular.isFunction($scope.element.getResourceName) and
+        angular.isFunction($scope.element.getElementTypeName) and angular.isFunction($scope.element.isInstanceOf) and
+        $scope.element.isInstanceOf('catalogueElement')
 
-    return undefined if not elementPresent
-    return undefined if not security.getCurrentUser()?.id
+      return undefined if not elementPresent
+      return undefined if not security.getCurrentUser()?.id
 
-    action =
-      position: -20000
-      label: 'Favorite'
-      iconOnly: true
-      icon: 'fa fa-star'
-      type: 'primary'
-      watches: ['element.favourite', 'element.id']
-      action: ->
-        catalogueElementResource('user').get(security.getCurrentUser()?.id).then (user) ->
-          favourite = $scope.element.favourite
-          url = "#{modelCatalogueApiRoot}#{user.link}/favourite"
-          enhance(rest(url: url, method: (if favourite then 'DELETE' else 'POST'), data: $scope.element)).then (relation) ->
-            messages.success(if favourite then "#{$scope.element.getLabel()} has been removed from favorites" else "#{$scope.element.getLabel()} has been added to favorites")
-            $scope.element.favourite = not favourite
-            if favourite
-              $scope.$broadcast 'catalogueElementDeleted', $scope.element, relation, url
-            else
-              $scope.$broadcast 'catalogueElementCreated', relation, url, $scope.element
+      action =
+        position: -20000
+        label: 'Favourite'
+        iconOnly: true
+        icon: 'fa fa-star'
+        type: 'primary'
+        watches: ['element.favourite', 'element.id']
+        action: ->
+          catalogueElementResource('user').get(security.getCurrentUser()?.id).then (user) ->
+            favourite = $scope.element.favourite
+            url = "#{modelCatalogueApiRoot}#{user.link}/favourite"
+            enhance(
+              rest(url: url, method: (if favourite then 'DELETE' else 'POST'), data: $scope.element)
+            ).then (relation) ->
+              messages.success(if favourite then "#{$scope.element.getLabel()} has been removed from favourites" else
+                "#{$scope.element.getLabel()} has been added to favourites")
+              $scope.element.favourite = not favourite
+              if favourite
+                $scope.$broadcast 'catalogueElementDeleted', $scope.element, relation, url
+              else
+                $scope.$broadcast 'catalogueElementCreated', relation, url, $scope.element
 
-            relation
+              relation
 
-    if $scope.element.favourite
-      action.active = true
-      action.icon   = 'fa fa-star-o'
-    else
-      action.active = false
-      action.icon   = 'fa fa-star'
+      if $scope.element.favourite
+        action.active = true
+        action.icon = 'fa fa-star-o'
+      else
+        action.active = false
+        action.icon = 'fa fa-star'
 
-    action
-  ]
-
+      action
 
   actionsProvider.registerActionInRoles 'favorite-element-in-header', [actionsProvider.ROLE_LIST_HEADER_ACTION, actionsProvider.ROLE_LIST_FOOTER_ACTION], ['$scope', 'messages', '$state', 'security', 'catalogueElementResource', 'modelCatalogueApiRoot', 'enhance', 'rest', ($scope, messages, $state, security, catalogueElementResource, modelCatalogueApiRoot, enhance, rest) ->
     return undefined if not $scope.list
@@ -108,8 +114,8 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
           catalogueElementResource('user').get(security.getCurrentUser()?.id).then (user) ->
             url = "#{modelCatalogueApiRoot}#{user.link}/favourite"
             enhance(rest(url: url, method: 'POST', data: element)).then (relation) ->
-              $scope.$broadcast 'catalogueElementCreated', relation, url, element
-              messages.success "#{element.getLabel()} has been added to favorites"
+              $scope.$broadcast 'catalogueElementCreated', relation, $scope.list.base, element
+              messages.success "#{element.getLabel()} has been added to favourites"
               relation
 
     }
@@ -269,7 +275,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
     {
     position:   100000
-    label:      'Export Favorites'
+    label:      'Export Favourites'
     action: ->
       $window.open "#{modelCatalogueApiRoot}/user/#{security.getCurrentUser().id}/outgoing/favourite?format=xml"
 

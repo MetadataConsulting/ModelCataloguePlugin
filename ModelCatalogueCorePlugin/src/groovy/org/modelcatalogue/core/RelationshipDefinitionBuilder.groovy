@@ -13,6 +13,12 @@ class RelationshipDefinitionBuilder {
         this
     }
 
+    RelationshipDefinitionBuilder withOptionalDataModel(DataModel dataModel) {
+        definition.dataModel = dataModel
+        definition.dataModelOptional = true
+        this
+    }
+
     RelationshipDefinitionBuilder withMetadata(Map<String, String> metadata) {
         if (metadata == null) {
             definition.metadata = Collections.emptyMap()
