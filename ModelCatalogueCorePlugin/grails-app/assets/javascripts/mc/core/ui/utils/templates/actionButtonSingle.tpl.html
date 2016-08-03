@@ -1,0 +1,8 @@
+<a ng-click="action.run()"
+   class="btn"
+   ng-class="::('btn-' + (noColors ? 'default' : action.type) + ' btn-' + size + ' ' + (action.active ? 'active' : ''))"
+   ng-disabled="::action.disabled"
+   id="{{::action.id}}Btn"
+   title="{{::action.label}}">
+  <span ng-class="::action.icon"></span></span><span ng-if="::!iconOnly"> {{::action.label}}</span>
+</a>

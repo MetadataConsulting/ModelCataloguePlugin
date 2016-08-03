@@ -1,11 +1,16 @@
 package org.modelcatalogue.gel
 
+import grails.gsp.PageRenderer
 import grails.transaction.Transactional
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.PerformanceUtilService
+import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
 import org.modelcatalogue.core.publishing.changelog.ChangeLogDocxGenerator
+import org.modelcatalogue.core.util.builder.BuildProgressMonitor
+import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.gel.export.CancerTypesCsvExporter
 import org.modelcatalogue.gel.export.CancerTypesJsonExporter
 import org.modelcatalogue.gel.export.DataModelChangeLogXlsExporter
@@ -14,6 +19,7 @@ import org.modelcatalogue.gel.export.RareDiseaseEligibilityChangeLogXlsExporter
 import org.modelcatalogue.gel.export.RareDiseasePhenotypeChangeLogXlsExporter
 import org.modelcatalogue.gel.export.RareDiseasesDocExporter
 import org.modelcatalogue.gel.export.RareDiseasesJsonExporter
+import org.modelcatalogue.gel.export.RareDiseasesWebsiteExporter
 
 import static org.modelcatalogue.gel.export.RareDiseasesDocExporter.getStandardTemplate
 
@@ -25,10 +31,12 @@ class GenomicsService {
     def dataClassService
     def elementService
     PerformanceUtilService performanceUtilService
+    PageRenderer groovyPageRenderer
 
     static final String RD_ELIGIBILITY_CSV_FILENAME = "RD Eligibility Criteria.csv"
     static final String RD_HPO_CSV_FILENAME = "RD Phenotypes and Clinical Tests.csv"
     static final String RD_ELIGIBILITY_CRITERIA_JSON = "RD Eligibility Criteria.json"
+    static final String RD_WEB = "website.zip"
     static final String RD_PHENOTYPE_AND_CLINICAL_TESTS_XLS = "RD Change log for Phenotypes and clinical tests.xlsx"
     static final String RD_ELIGIBILITY_CHANGELOG_XLS = "RD Change Log for Eligibility Criteria.xlsx"
 
@@ -200,4 +208,30 @@ class GenomicsService {
         }
     }
 
+    ListWithTotalAndType<DataClass> findRareDiseases(Map<String, Object> params = [:], DataModel dataModel) {
+        Lists.fromCriteria(params, DataClass) {
+            eq('dataModel', dataModel)
+            outgoingRelationships {
+                eq('relationshipType', RelationshipType.hierarchyType)
+                destination {
+                    or {
+                        ilike('name', '%Eligibility%')
+                        ilike('name', '%Phenotypes%')
+                        ilike('name', '%Clinical Tests%')
+                    }
+                }
+            }
+            order 'name'
+        }
+    }
+
+    long genRareDiseaseWebsite(DataModel dataModel) {
+        return assetService.storeReportAsAsset(dataModel,
+            name: "${dataModel.name} - Static Website",
+            originalFileName: "$RD_WEB",
+            contentType: "application/zip",
+        ) { OutputStream it, Long assetId ->
+            new RareDiseasesWebsiteExporter(this, dataModel, groovyPageRenderer, BuildProgressMonitor.create("${dataModel.name} - Static Website", assetId)).export(it)
+        }
+    }
 }

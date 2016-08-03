@@ -27,7 +27,7 @@ class CatalogueController {
 
         if (params.format == 'xml') {
             response.contentType = 'application/xml'
-            response.setHeader("Content-disposition", "attachment; filename=\"${element.name.replaceAll(/\s+/, '_')}.xml\"")
+            response.setHeader("Content-disposition", "attachment; filename=\"${element.name.replaceAll(/\s+/, '_')}.mc.xml\"")
             CatalogueXmlPrinter printer = new CatalogueXmlPrinter(dataModelService, dataClassService)
             printer.bind(element).writeTo(response.writer)
             return
@@ -61,7 +61,7 @@ class CatalogueController {
 
         if (params.format == 'xml') {
             response.contentType = 'application/xml'
-            response.setHeader("Content-disposition", "attachment; filename=\"${element.name.replaceAll(/\s+/, '_')}.xml\"")
+            response.setHeader("Content-disposition", "attachment; filename=\"${element.name.replaceAll(/\s+/, '_')}.mc.xml\"")
             CatalogueXmlPrinter printer = new CatalogueXmlPrinter(dataModelService, dataClassService)
             printer.bind(element).writeTo(response.writer)
             return

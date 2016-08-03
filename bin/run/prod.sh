@@ -33,14 +33,12 @@ if test -f ".default-mc-config-location" ; then
         exit 1
     fi
 else
-    MC_CONFIG_LOCATION="~/.grails/mc-config.groovy"
-    echo
-    echo -e "Using default configuration $MC_CONFIG_LOCATION!\n\n"
-    echo
+    MC_CONFIG_LOCATION="$HOME/.grails/mc-config.groovy"
+    echo -e "Using default configuration $MC_CONFIG_LOCATION!\n"
 fi
 
-if ! test -f "$MC_CONFIG_LOCATION" ; then
-    echo -e "\Local Model Catalogue production configuration is missing!\nPlease copy file ./ModelCatalogueCorePluginTestApp/grails-app/conf/mc-config.groovy.example into ~/.grails/mc-config.groovy and update it with your local production database settings.\n"
+if [ ! -e "$MC_CONFIG_LOCATION" ]; then
+    echo -e "\nLocal Model Catalogue production configuration is missing!\nPlease copy file ./ModelCatalogueCorePluginTestApp/grails-app/conf/mc-config.groovy.example into ~/.grails/mc-config.groovy and update it with your local production database settings.\n"
     exit 1
 fi
 

@@ -447,10 +447,16 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     void scroll(String selector, int offset = -150) {
-        js.exec("jQuery('$selector')[0].scrollIntoView(true);")
-        if (offset)
-            js.exec("jQuery('$selector')[0].scrollIntoView(true);")
-            js.exec("window.scrollBy(0,${offset})");
+        //language=JavaScript
+        js.exec """
+            var selector = '$selector', offset = $offset;
+            if (jQuery && jQuery(selector).length > 0) {
+              jQuery(selector)[0].scrollIntoView(true);
+              if (offset) {
+                window.scrollBy(0, offset)
+              }
+            }
+        """
         Thread.sleep(500);
     }
 
