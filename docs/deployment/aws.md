@@ -16,10 +16,12 @@ must allow inbound connections from the ECS registered instance (see bellow).
 ### ECS Cluster
 You need _Cluster_ available with enough registered
 container instances. There is _Cluster_ called _default_ always available
-but you need to start new Amazon ESC container instance for it if not
+but it's recommended to create new cluster fo reach server. 
+You need to start new Amazon ESC container instance for it if not
 set up yet. Follow the guide here: [Amazon ECS Container Instances](http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ECS_instances.html).
 The instance should be `m3.xlarge` to allow running Model Catalogue with
-enough memory. If you've setup the instance properly it should appear
+enough memory. Don't forget to assign the cluster name to the newly created instance as described in the step _10_.
+If you've setup the instance properly it should appear
 at _Clusters_ / _ESC Instances_ table.
 
 ### Task Definitions
