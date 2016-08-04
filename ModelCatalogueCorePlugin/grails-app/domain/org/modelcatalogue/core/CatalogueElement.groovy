@@ -463,7 +463,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
             for (String propertyName in inheritedAssociationsNames) {
                 if (self.isDirty(propertyName) && self.getProperty(propertyName) == null){
                     Inheritance.withParents(this) {
-                        if (it.getProperty(propertyName) != null) {
+                        if (it.hasProperty(propertyName) && it.getProperty(propertyName) != null) {
                             self.setProperty(propertyName, it.getProperty(propertyName))
                         }
                     }
