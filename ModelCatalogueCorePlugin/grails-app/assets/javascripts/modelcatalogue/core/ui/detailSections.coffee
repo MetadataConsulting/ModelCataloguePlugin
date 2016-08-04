@@ -73,6 +73,8 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
     throw new Error('Please provide supported template configuration ("position" configuration property)') unless configuration.position?
     throw new Error('Provided position configuration must be a number ("position" configuration property)') unless angular.isNumber(configuration.position)
     throw new Error('Provided title configuration must be a string ("title" configuration property)') unless angular.isString(configuration.title)
+    if (configuration.autoSave)
+      throw new Error('Provided autoSave configuration must be an object ("autoSave" configuration property)') unless angular.isObject(configuration.autoSave)
 
     # TODO should handle $$relationship
 
@@ -106,6 +108,7 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
             hideIfNoData: configuration.hideIfNoData?
             keys:         angular.copy configuration.keys
             data:         angular.copy configuration.data
+            autoSave:     angular.copy configuration.autoSave
             handlesKey:   (key) -> key in @keys
             hasData:      (element) -> configuration.keys.some (key) -> element.ext.get(key)?
             isTemplateHidden: (element) ->

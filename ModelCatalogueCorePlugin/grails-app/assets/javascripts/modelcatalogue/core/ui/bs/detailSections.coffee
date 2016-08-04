@@ -202,6 +202,8 @@ x in ['apple', 'banana', 'cherry']
     ]
     keys: []
     template: '/mc/core/ui/detail-sections/dataType.html'
+    autoSave:
+      dataType: 'dataType'
   }
 
   detailSectionsProvider.register {
