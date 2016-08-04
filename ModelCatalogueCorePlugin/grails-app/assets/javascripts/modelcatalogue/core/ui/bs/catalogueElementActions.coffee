@@ -163,7 +163,6 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
 
   actionsProvider.registerActionInRoles 'catalogue-element',[actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'security', 'names', 'catalogue', ($scope, security, name, catalogue)->
-    return undefined if not security.hasRole('CURATOR')
     return undefined unless $scope.element
     if $scope.element
       return undefined if not angular.isFunction $scope.element.isInstanceOf
