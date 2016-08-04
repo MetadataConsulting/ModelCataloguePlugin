@@ -671,9 +671,11 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       action: ->
           if $scope.hasChanged() and not $scope.saveInProgress
             $scope.saveInProgress = true
-            $scope.saveElement().then (result) ->
-              $scope.saveInProgress = false
+            $scope.saveElement()
+            .then (result) ->
               return result
+            .finally ->
+              $scope.saveInProgress = false
     }
 
   actionsProvider.registerActionInRole 'modal-save-and-add-another', actionsProvider.ROLE_MODAL_ACTION, ($scope, $q) ->
@@ -691,9 +693,12 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       action: ->
         if $scope.hasChanged() and not $scope.saveInProgress
           $scope.saveInProgress = true
-          $q.when($scope.saveAndCreateAnother()).then (result) ->
+          $q.when($scope.saveAndCreateAnother())
+          .then (result) ->
             $scope.saveInProgress = false
             return result
+          .finally ->
+            $scope.saveInProgress = false
 
     }
 
