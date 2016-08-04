@@ -272,12 +272,6 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             $scope.element.updateFrom(refreshed)
             onElementUpdate($scope.element)
 
-      $scope.$on 'userLoggedIn', refreshElement
-      $scope.$on 'userLoggedIn', refreshElement
-      $scope.$on 'userLoggedOut', refreshElement
-      $scope.$on 'catalogueElementCreated', refreshElement
-      $scope.$on 'catalogueElementDeleted', refreshElement
-
       isForCurrentElement = (data) -> data[1].link is $scope.element.link
 
       DEBOUNCE_TIME = 500
