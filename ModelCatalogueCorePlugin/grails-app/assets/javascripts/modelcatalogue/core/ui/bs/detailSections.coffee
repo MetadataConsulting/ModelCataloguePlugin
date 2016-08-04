@@ -273,6 +273,8 @@ x in ['apple', 'banana', 'cherry']
     ]
     keys: []
     template: '/mc/core/ui/detail-sections/dataClass.html'
+    autoSave:
+      dataClass: 'dataClass'
   }
 
   detailSectionsProvider.register {
