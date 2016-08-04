@@ -55,26 +55,6 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       </div>
   '''
 
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/measurementUnit.html', '''
-      <div class="col-md-3">
-          <strong class="small">Measurement Unit</strong>
-      </div>
-      <div class="full-width-editable col-md-9">
-          <div ng-if="editableForm.$visible">
-            <input type="text" id="measurementUnit" placeholder="Measurement Unit" ng-model="copy.measurementUnit" catalogue-element-picker="measurementUnit" label="el.name">
-          </div>
-          <span class="editable-empty" ng-if="!editableForm.$visible &amp;&amp; !element.measurementUnit">empty</span>
-          <a ng-if="!editableForm.$visible &amp;&amp; element.measurementUnit" class="small with-pointer" ng-href="{{element.measurementUnit.href()}}">
-            <span ng-class="element.measurementUnit.getIcon()">&nbsp;</span>
-            <span class="unit-name">{{element.measurementUnit.name}}&nbsp;</span>
-            <small>
-              <a ng-if="!editableForm.$visible" ng-href="{{element.mesurementUnit.dataModel.href()}}" class="label" ng-class="{'label-warning': element.measurementUnit.getDataModelStatus() == 'DRAFT', 'label-info': element.measurementUnit.getDataModelStatus() == 'PENDING', 'label-primary': element.measurementUnit.getDataModelStatus() == 'FINALIZED', 'label-danger': element.measurementUnit.getDataModelStatus() == 'DEPRECATED'}">{{element.measurementUnit.getDataModelWithVersion()}}</a>
-            </small>
-          </a>
-
-      </div>
-  '''
-
   $templateCache.put 'modelcatalogue/core/ui/detailSections/dataClass.html', '''
       <div class="col-md-3">
           <strong class="small">Data Class</strong>
@@ -300,7 +280,7 @@ x in ['apple', 'banana', 'cherry']
       'primitiveType'
     ]
     keys: []
-    template: 'modelcatalogue/core/ui/detailSections/measurementUnit.html'
+    template: '/mc/core/ui/detail-sections/measurementUnit.html'
   }
 
   detailSectionsProvider.register {
