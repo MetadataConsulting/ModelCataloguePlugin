@@ -256,10 +256,10 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         # replace string with newly created value
         # save update the final element
         angular.forEach $scope.detailSections, (detailSection) ->
-          if (detailSection.autoSave)
+          if detailSection.autoSave
             angular.forEach detailSection.autoSave, (value, key) ->
               if (angular.isString($scope.copy[key]))
-                autoSavePromises.push catalogueElementResource(value).save(name: $scope.copy[key]).then (saved) ->
+                autoSavePromises.push catalogueElementResource(value).save(name: $scope.copy[key], dataModels: $scope.copy.dataModels).then (saved) ->
                   $scope.copy[key] = saved
 
         $q.all(autoSavePromises).then ->
