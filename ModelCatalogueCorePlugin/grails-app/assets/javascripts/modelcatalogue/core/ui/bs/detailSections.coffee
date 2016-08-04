@@ -281,6 +281,8 @@ x in ['apple', 'banana', 'cherry']
     ]
     keys: []
     template: '/mc/core/ui/detail-sections/measurementUnit.html'
+    autoSave:
+      measurementUnit: 'measurementUnit'
   }
 
   detailSectionsProvider.register {
