@@ -66,7 +66,9 @@ x in ['apple', 'banana', 'cherry']
           $scope.watchAndAskForImportOrClone('copy.dataClass')
 
           $scope.hasChanged   = ->
-            $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or $scope.copy.modelCatalogueId != $scope.original.modelCatalogueId or not angular.equals($scope.original.enumerations ? {}, $scope.copy.enumerations ? {}) or not angular.equals($scope.original.dataModels ? {}, $scope.copy.dataModels ? {})
+            $scope.copy.name != $scope.original.name\
+              or $scope.copy.description != $scope.original.description\
+              or $scope.copy.modelCatalogueId != $scope.original.modelCatalogueId
 
           $scope.beforeSave = ->
             # TODO verify this works as expected - you should be able to edit this even for subtype
