@@ -52,11 +52,14 @@ angular.module('mc.core.ui.bs.modalPromptMeasurementUnitEdit', ['mc.util.message
           $scope.create   = args.create
           $scope.currentDataModel = args.currentDataModel
 
-          $scope.hasChanged   = ->
-            $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or $scope.copy.symbol != $scope.original.symbol or $scope.copy.modelCatalogueId != $scope.original.modelCatalogueId or not angular.equals($scope.original.dataModels ? {}, $scope.copy.dataModels ? {})
-
           angular.extend(this, $controller('withClassificationCtrlMixin', {$scope: $scope}))
           angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $uibModalInstance: $uibModalInstance}))
+
+          $scope.hasChanged   = ->
+            $scope.copy.name != $scope.original.name\
+              or $scope.copy.description != $scope.original.description\
+              or $scope.copy.symbol != $scope.original.symbol\
+              or $scope.copy.modelCatalogueId != $scope.original.modelCatalogueId
 
         ]
 
