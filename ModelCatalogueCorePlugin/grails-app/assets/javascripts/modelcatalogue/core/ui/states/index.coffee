@@ -28,11 +28,12 @@ angular.module('mc.core.ui.states', [
   'mc.core.ui.states.simple'
 ])
 
-.run(['$rootScope', '$log', '$state', '$stateParams', 'messages', ($rootScope, $log, $state, $stateParams, messages) ->
-# It's very handy to add references to $state and $stateParams to the $rootScope
-# so that you can access them from any scope within your applications.For example,
-# <li ui-sref-active="active }"> will set the <li> // to active whenever
-# 'contacts.list' or one of its decendents is active.
+.run(($rootScope, $log, $state, $stateParams, messages) ->
+  'ngInject'
+  # It's very handy to add references to $state and $stateParams to the $rootScope
+  # so that you can access them from any scope within your applications.For example,
+  # <li ui-sref-active="active }"> will set the <li> // to active whenever
+  # 'contacts.list' or one of its decendents is active.
   $rootScope.$state = $state
   $rootScope.$stateParams = $stateParams
 
@@ -54,8 +55,12 @@ angular.module('mc.core.ui.states', [
 
   $rootScope.$on '$stateChangeError', (event, toState, toParams, fromState, fromParams, error) ->
     $log.error "ui.router state change error when changing from state [#{fromState.name}] to [#{toState.name}]", error
-])
+)
 
-.config([ '$uibModalProvider', ($uibModalProvider) ->
+.config(($urlRouterProvider, $uibModalProvider) ->
+  'ngInject'
+  # default url
+  $urlRouterProvider.otherwise('/');
+
   $uibModalProvider.options.backdrop = 'static'
-])
+)

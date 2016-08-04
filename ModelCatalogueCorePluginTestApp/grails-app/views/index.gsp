@@ -160,95 +160,63 @@
 
 <body>
 <div id="metadataCurator" ng-app="metadataCurator" ng-strict-di>
-            <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
+  <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
 
-                    </button>
-                    <a class="navbar-brand" href="#/"><span class="fa fa-fw fa-book fa-2x"></span></a>
-                    <a class="navbar-brand mc-name-parent" href="#/"><span class="mc-name">${grailsApplication.config.mc.name ?: 'Model Catalogue'}</span></a>
-                </div>
+        </button>
+        <a class="navbar-brand" href="#/"><span class="fa fa-fw fa-book fa-2x"></span></a>
+        <a class="navbar-brand mc-name-parent" href="#/"><span
+          class="mc-name">${grailsApplication.config.mc.name ?: 'Model Catalogue'}</span></a>
+      </div>
 
-                <div class="navbar-collapse collapse">
-                    <div ui-view="navbar-left">
-                        <contextual-menu role="navigation"></contextual-menu>
-                    </div>
-                    <div ui-view="navbar-right">
-                        <contextual-menu role="navigation-right" right="true"></contextual-menu>
-                    </div>
-                </div><!--/.nav-collapse -->
-            </div>
+      <div class="navbar-collapse collapse">
+        <div ui-view="navbar-left">
+          <contextual-menu role="navigation"></contextual-menu>
         </div>
 
-        <div class="container-fluid container-main">
-          <%-- especially for re-authentication --%>
-          <div class="row">
-            <%
-              String message = flash.remove('message')
-              String error = flash.remove('error')
-
-              String flashType = message ? 'info' : 'danger'
-              String flashText = error ?: message
-
-            %>
-            <g:if test="${flashText}">
-              <div class="col-md-12 top">
-                <div class="alert alert-${flashType}">${flashText}</div>
-              </div>
-            </g:if>
-
-          </div>
-            <div class="row content-row">
-                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                    <div id="jserrors"></div>
-                    <ui-view>
-                    <div class="jumbotron">
-                        <div>
-                            <div class="text-center"><span class="fa fa-fw fa-5x fa-spin fa-spinner"></span></div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-12 col-sm-12 col-md-12">
-                            <div class="panel panel-default">
-                                <div class="panel-body">
-                                    <div class="row">
-                                        <div class=" col-xs-12 col-sm-12 col-md-4 col-lg-4"><p>Model catalogue development supported by</p></div>
-                                        <div class=" col-xs-3 col-sm-3 col-md-2 col-lg-2">
-                                            <p>
-                                                <a href="http://www.genomicsengland.co.uk/">
-                                                    <asset:image src="/modelcatalogue/GEL.jpg" class="img-thumbnail sponsor-logo-small" alt="Genomics England" />
-                                                </a>
-                                            </p>
-                                            <p class="hidden-xs"><a href="http://www.genomicsengland.co.uk/" class="text-muted">Genomics England</a></p>
-                                        </div>
-                                        <div class=" col-xs-3 col-sm-3 col-md-2 col-lg-2">
-                                            <p><a href="http://www.mrc.ac.uk"><asset:image src="/modelcatalogue/MRC.png" class="img-thumbnail sponsor-logo-small" alt="Medical Research Council"/></a></p>
-                                            <p class="hidden-xs"><a href="http://www.mrc.ac.uk" class="text-muted">Medical Research Council</a></p>
-                                        </div>
-                                        <div class=" col-xs-3 col-sm-3 col-md-2 col-lg-2">
-                                            <p><a href="http://www.nihr.ac.uk/"><asset:image src="/modelcatalogue/NIHR.png" class="img-thumbnail sponsor-logo-small" alt="NIHR"/></a></p>
-                                            <p class="hidden-xs"><a href="http://www.nihr.ac.uk/" class="text-muted">National Institute for Health Research</a></p>
-                                        </div>
-                                        <div class=" col-xs-3 col-sm-3 col-md-2 col-lg-2">
-                                            <p><a href="http://www.metadataconsusting.co.uk"><asset:image src="/modelcatalogue/MDC.png" class="img-thumbnail sponsor-logo-small" alt="Metadata Consulting Ltd" /></a></p>
-                                            <p class="hidden-xs"><a href="http://www.metadataconsusting.co.uk" class="text-muted">Metadata Consulting</a></p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    </ui-view>
-                </div>
-            </div>
+        <div ui-view="navbar-right">
+          <contextual-menu role="navigation-right" right="true"></contextual-menu>
         </div>
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
 
-    <messages-panel max="3" growl="true"></messages-panel>
+  <div class="container-fluid container-main">
+    <%-- especially for re-authentication --%>
+    <div class="row">
+      <%
+        String message = flash.remove('message')
+        String error = flash.remove('error')
+
+        String flashType = message ? 'info' : 'danger'
+        String flashText = error ?: message
+
+      %>
+      <g:if test="${flashText}">
+        <div class="col-md-12 top">
+          <div class="alert alert-${flashType}">${flashText}</div>
+        </div>
+      </g:if>
+
+    </div>
+
+    <div class="row content-row">
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div id="jserrors"></div>
+
+        <div ui-view></div>
+      </div>
+    </div>
+  </div>
+
+  <messages-panel max="3" growl="true"></messages-panel>
 </div>
+
 </body>
 </html>

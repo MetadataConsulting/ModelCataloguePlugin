@@ -3,7 +3,7 @@ angular.module('mc.core.ui.states.simple', []).config(['$stateProvider', ($state
     $stateProvider.state 'simple', {
       abstract: true
       url: '/catalogue'
-      templateUrl: 'modelcatalogue/core/ui/state/parent.html'
+      templateUrl: '/mc/core/ui/states/simple.html'
     }
 
 ])

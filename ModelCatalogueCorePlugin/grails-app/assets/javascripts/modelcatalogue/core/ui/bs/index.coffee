@@ -3,6 +3,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui'
   'mc.util.ui'
   'mc.util.ui.bs'
+  'mc.core.ui.general'
   'mc.core.ui.metadataEditor'
   'mc.core.ui.modals'
   'mc.core.ui.utils'
