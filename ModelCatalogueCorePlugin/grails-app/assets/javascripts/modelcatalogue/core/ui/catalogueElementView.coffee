@@ -240,6 +240,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
       $scope.inlineUpdateElement = ->
         deferred = $q.defer()
+        autoSavePromises = []
         if $scope.copy.ext
           $scope.copy.ext.updateFrom($scope.extAsMap)
 
@@ -250,17 +251,30 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
         $scope.messages.clearAllMessages()
 
-        catalogueElementResource($scope.copy.elementType).update($scope.copy).then (updated) ->
-          $scope.element.updateFrom(updated)
+        # for each detail section collect autoSave props
+        # check autoSave property is string - save if so
+        # replace string with newly created value
+        # save update the final element
+        angular.forEach $scope.detailSections, (detailSection) ->
+          if detailSection.autoSave
+            angular.forEach detailSection.autoSave, (value, key) ->
+              if (angular.isString($scope.copy[key]))
+                autoSavePromises.push catalogueElementResource(value).save(name: $scope.copy[key], dataModels: $scope.copy.dataModels).then (saved) ->
+                  $scope.copy[key] = saved
 
-          updateInlineEditHelperVariables updated
+        $q.all(autoSavePromises).then ->
+          catalogueElementResource($scope.copy.elementType).update($scope.copy).then (updated) ->
+            $scope.element.updateFrom(updated)
 
-          deferred.resolve()
-          $timeout ->
-            $scope.$broadcast 'redrawContextualActions'
-        , (response) ->
-          showErrorsUsingMessages($scope.messages)(response)
-          deferred.resolve("Invalid values")
+            updateInlineEditHelperVariables updated
+
+            deferred.resolve()
+            $timeout ->
+              $scope.$broadcast 'redrawContextualActions'
+          , (response) ->
+            showErrorsUsingMessages($scope.messages)(response)
+            deferred.resolve("Invalid values")
+
 
         return deferred.promise
 

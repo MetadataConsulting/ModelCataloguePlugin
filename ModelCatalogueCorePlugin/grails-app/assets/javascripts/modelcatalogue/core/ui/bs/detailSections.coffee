@@ -55,46 +55,6 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       </div>
   '''
 
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/measurementUnit.html', '''
-      <div class="col-md-3">
-          <strong class="small">Measurement Unit</strong>
-      </div>
-      <div class="full-width-editable col-md-9">
-          <div ng-if="editableForm.$visible">
-            <input type="text" id="measurementUnit" placeholder="Measurement Unit" ng-model="copy.measurementUnit" catalogue-element-picker="measurementUnit" label="el.name">
-          </div>
-          <span class="editable-empty" ng-if="!editableForm.$visible &amp;&amp; !element.measurementUnit">empty</span>
-          <a ng-if="!editableForm.$visible &amp;&amp; element.measurementUnit" class="small with-pointer" ng-href="{{element.measurementUnit.href()}}">
-            <span ng-class="element.measurementUnit.getIcon()">&nbsp;</span>
-            <span class="unit-name">{{element.measurementUnit.name}}&nbsp;</span>
-            <small>
-              <a ng-if="!editableForm.$visible" ng-href="{{element.mesurementUnit.dataModel.href()}}" class="label" ng-class="{'label-warning': element.measurementUnit.getDataModelStatus() == 'DRAFT', 'label-info': element.measurementUnit.getDataModelStatus() == 'PENDING', 'label-primary': element.measurementUnit.getDataModelStatus() == 'FINALIZED', 'label-danger': element.measurementUnit.getDataModelStatus() == 'DEPRECATED'}">{{element.measurementUnit.getDataModelWithVersion()}}</a>
-            </small>
-          </a>
-
-      </div>
-  '''
-
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/dataClass.html', '''
-      <div class="col-md-3">
-          <strong class="small">Data Class</strong>
-      </div>
-      <div class="full-width-editable col-md-9">
-          <div ng-if="editableForm.$visible">
-            <input type="text" id="dataClass" placeholder="Data Class" ng-model="copy.dataClass" catalogue-element-picker="dataClass" label="el.name">
-          </div>
-          <span class="editable-empty" ng-if="!editableForm.$visible &amp;&amp; !element.dataClass">empty</span>
-          <a ng-if="!editableForm.$visible &amp;&amp; element.dataClass" class="small with-pointer" ng-href="{{element.dataClass.href()}}">
-            <span ng-class="element.dataClass.getIcon()">&nbsp;</span>
-            <span class="unit-name">{{element.dataClass.name}}&nbsp;</span>
-            <small>
-              <a ng-if="!editableForm.$visible" ng-href="{{element.dataClass.dataModel.href()}}" class="label" ng-class="{'label-warning': element.dataClass.getDataModelStatus() == 'DRAFT', 'label-info': element.dataClass.getDataModelStatus() == 'PENDING', 'label-primary': element.dataClass.getDataModelStatus() == 'FINALIZED', 'label-danger': element.dataClass.getDataModelStatus() == 'DEPRECATED'}">{{element.dataClass.getDataModelWithVersion()}}</a>
-            </small>
-          </a>
-
-      </div>
-  '''
-
   $templateCache.put 'modelcatalogue/core/ui/detailSections/assetPreview.html', '''
       <div class="col-md-12">
           <img style="max-width: 100%" ng-src="{{element.downloadUrl}}" ng-if="element.contentType.indexOf('image/') == 0"/>
@@ -202,6 +162,8 @@ x in ['apple', 'banana', 'cherry']
     ]
     keys: []
     template: '/mc/core/ui/detail-sections/dataType.html'
+    autoSave:
+      dataType: 'dataType'
   }
 
   detailSectionsProvider.register {
@@ -298,7 +260,9 @@ x in ['apple', 'banana', 'cherry']
       'primitiveType'
     ]
     keys: []
-    template: 'modelcatalogue/core/ui/detailSections/measurementUnit.html'
+    template: '/mc/core/ui/detail-sections/measurementUnit.html'
+    autoSave:
+      measurementUnit: 'measurementUnit'
   }
 
   detailSectionsProvider.register {
@@ -308,7 +272,9 @@ x in ['apple', 'banana', 'cherry']
       'referenceType'
     ]
     keys: []
-    template: 'modelcatalogue/core/ui/detailSections/dataClass.html'
+    template: '/mc/core/ui/detail-sections/dataClass.html'
+    autoSave:
+      dataClass: 'dataClass'
   }
 
   detailSectionsProvider.register {
