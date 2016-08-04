@@ -21,7 +21,8 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
             delete original[originalKey]
 
       for newKey of update
-        original[newKey] = update[newKey]
+        unless update[newKey] == null and update.minimal
+          original[newKey] = update[newKey]
       original
 
   computeHref = (self, $state, names) ->

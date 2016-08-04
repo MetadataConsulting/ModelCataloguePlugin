@@ -21,6 +21,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptNewUmljImport'
   'mc.core.ui.bs.modalPromptNewXsdImport'
   'mc.core.ui.bs.modalPromptNewMCImport'
+  'mc.core.ui.bs.modalPromptCloneIntoDataModel'
   'mc.core.ui.bs.modalPromptNewCatalogueXmlImport'
   'mc.core.ui.bs.batchView'
   'mc.core.ui.bs.catalogueElementProperties'

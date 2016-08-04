@@ -120,12 +120,12 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
 
         Map<String, Object> ret = [
                 name: source.get('name'),
-                id: id,
+                id: id ,
                 elementType: source.get('fully_qualified_type'),
                 link:  source.get('link'), status: source.get('status'),
                 versionNumber: source.get('version_number'),
                 latestVersionId: source.get('latest_id'),
-                dataModel: readSource(source.get('data_model')?.id?.toString(), source.get('data_model') as  Map<String, Object>),
+                dataModel: readSource(source.get('data_model')?.entity_id?.toString(), source.get('data_model') as  Map<String, Object>),
                 classifiedName: source.get('data_model') ? "${source.get('name')} (${source.get('data_model').get('name')})" : source.get('name'),
                 modelCatalogueId: source.get('model_catalogue_id'),
                 internalModelCatalogueId: source.get('internal_model_catalogue_id'),
@@ -144,15 +144,15 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
             ret.symbol = source.get('symbol')
         } else if (ret.elementType == DataElement.name) {
             if (source.data_type) {
-                ret.dataType = readSource(source.data_type.id.toString(), source.data_type)
+                ret.dataType = readSource(source.data_type.entity_id.toString(), source.data_type)
             }
         } else if (ret.elementType == PrimitiveType.name) {
             if (source.measurement_unit) {
-                ret.measurementUnit = readSource(source.measurement_unit.id.toString(), source.measurement_unit)
+                ret.measurementUnit = readSource(source.measurement_unit.entity_id.toString(), source.measurement_unit)
             }
         } else if (ret.elementType == ReferenceType.name) {
             if (source.data_class) {
-                ret.dataClass = readSource(source.data_class.id.toString(), source.data_class)
+                ret.dataClass = readSource(source.data_class.entity_id.toString(), source.data_class)
             }
         } else if (ret.elementType == EnumeratedType.name) {
             if (source.enumerated_value) {

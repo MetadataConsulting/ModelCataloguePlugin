@@ -617,7 +617,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       icon:       'fa fa-fw fa-clone fa-flip-horizontal'
       type:       'primary'
       action:     ->
-        messages.prompt("Clone into #{$scope.element.name}", "Please, select the element to be cloned", type: 'catalogue-element', status: 'finalized', resource: 'catalogueElement', global: true).then (elementToBeCloned) ->
+        messages.prompt("Clone into #{$scope.element.name}", null, type: 'clone-into', currentDataModel: $scope.element).then (elementToBeCloned) ->
           enhance(rest(url: "#{modelCatalogueApiRoot}#{elementToBeCloned.link}/clone/#{$scope.element.id}", method: 'POST')).then (finalized) ->
             finalized.show()
           , showErrorsUsingMessages(messages)
