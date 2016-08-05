@@ -222,6 +222,10 @@ class CatalogueElementProxyRepository {
         relationshipProxiesToBeResolved.eachWithIndex { RelationshipProxy relationshipProxy, i ->
             logDebug "[${(i + 1).toString().padLeft(relNumberOfPositions, '0')}/${relationshipProxiesToBeResolved.size().toString().padLeft(relNumberOfPositions, '0')}] Resolving $relationshipProxy"
             try {
+                if (relationshipProxy.source.resolve() == relationshipProxy.destination.resolve()) {
+                    logWarn "Ignoring self reference: $relationshipProxy"
+                    return
+                }
                 resolvedRelationships << relationshipProxy.resolve(this)?.getId()
             } catch (e) {
                 if (anyCause(e,ReferenceNotPresentInTheCatalogueException)) {
