@@ -128,6 +128,13 @@ environments {
         }
         grails.plugin.console.enabled = true
         mc.search.elasticsearch.local="${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/es${System.currentTimeMillis()}"
+        mc.css.custom = """
+          /* green for dev mode to show it's safe to do any changes */
+          .navbar-default {
+            background-color: #c8e1c0;
+            border-color: #bee2b2;
+          }
+        """
     }
     local {
         grails.logging.jul.usebridge = true

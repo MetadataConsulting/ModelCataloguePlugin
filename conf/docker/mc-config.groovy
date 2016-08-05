@@ -182,4 +182,8 @@ if (System.getenv('MC_SECURED_REVERSE_PROXY')) {
     ]
 }
 
+if (System.getenv("MC_CSS_CUSTOM")) {
+    mc.css.custom = System.getenv("MC_CSS_CUSTOM")
+}
+
 
