@@ -154,6 +154,12 @@
             }]);
 
         </script>
+        <g:if test="${grailsApplication.config.mc.css.custom}">
+          <style type="text/css">
+            ${grailsApplication.config.mc.css.custom}
+          </style>
+        </g:if>
+
     </g:if>
 
 </head>
