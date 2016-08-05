@@ -40,7 +40,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
 
         if (element instanceof DataModel) {
             if (context.currentClassification) {
-                theMkp."${elementName}"(ref(element, context)) {
+                theMkp."${elementName}"(ref(element, context, true)) {
                     processRelationshipMetadata(theMkp, context, rel)
                 }
                 return
@@ -50,7 +50,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         }
 
         if (context.wasPrinted(element)) {
-            theMkp."${elementName}"(ref(element, context)) {
+            theMkp."${elementName}"(ref(element, context, true)) {
                 processRelationshipMetadata(theMkp, context, rel)
             }
             return
@@ -173,7 +173,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         criteria.'eq' 'archived', false
     }
 
-    static Map<String, Object> ref(CatalogueElement element, PrintContext context) {
+    static Map<String, Object> ref(CatalogueElement element, PrintContext context, boolean includeDefaultId = false) {
         if (element.hasModelCatalogueId()) {
             if (context.noHref) {
                 return [ref: element.modelCatalogueId]
@@ -182,6 +182,13 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         }
 
         if (element.dataModel) {
+            if (includeDefaultId) {
+                if (context.currentClassification == element.dataModel) {
+                    return [name: element.name, id: element.getDefaultModelCatalogueId(context.idIncludeVersion)]
+                } else {
+                    return [name: element.name, dataModel: element.dataModel.name, id: element.getDefaultModelCatalogueId(context.idIncludeVersion)]
+                }
+            }
             if (context.currentClassification == element.dataModel) {
                 return [name: element.name]
             } else {
