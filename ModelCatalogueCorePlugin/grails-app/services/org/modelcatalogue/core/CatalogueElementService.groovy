@@ -1,10 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.transaction.Transactional
-import org.hibernate.exception.ConstraintViolationException
-import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.rx.ErrorSubscriber
-import org.springframework.dao.DataIntegrityViolationException
 import rx.subjects.BehaviorSubject
 
 /**
@@ -41,14 +38,18 @@ class CatalogueElementService {
                                                     "${manualDeleteRelationships}")
             }
 
-            // invalidate cache
-            cacheService.invalidate(catalogueElement)
+            Long id = catalogueElement.getId()
+            Long latestVersionId = catalogueElement.getLatestVersionId() ?: catalogueElement.getId()
 
             // remove all associations
             catalogueElement.deleteRelationships()
 
             // delete the catalogue element
-            catalogueElement.delete()
+            catalogueElement.delete(flush: true)
+
+            // invalidate cache
+            cacheService.invalidate(id, latestVersionId)
+
             subject.subscribe(ErrorSubscriber.create("Error during unindexing catalogue element $catalogueElement"))
         } catch (e) {
             // index catalogue element back in case of any error

@@ -682,7 +682,7 @@ class ElementService implements Publisher<CatalogueElement> {
             return 1
         }
 
-        Integer count = CacheService.VERSION_COUNT_CACHE.getIfPresent(id)
+        Integer count = CacheService.VERSION_COUNT_CACHE.getIfPresent(catalogueElement.getLatestVersionId() ?: id)
 
         if (count == null) {
             if (!catalogueElement.getLatestVersionId()) {
@@ -690,7 +690,7 @@ class ElementService implements Publisher<CatalogueElement> {
             } else {
                 count = CatalogueElement.countByLatestVersionId(catalogueElement.getLatestVersionId())
             }
-            CacheService.VERSION_COUNT_CACHE.put(id, count)
+            CacheService.VERSION_COUNT_CACHE.put(catalogueElement.getLatestVersionId() ?: id, count)
         }
 
         return count

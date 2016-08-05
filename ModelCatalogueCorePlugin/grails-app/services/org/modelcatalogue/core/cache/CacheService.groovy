@@ -54,13 +54,13 @@ class CacheService {
      * Invalidate {@link CatalogueElement} from all caches.
      * @param catalogueElement Catalogue element to be invalidated.
      */
-    void invalidate(CatalogueElement catalogueElement) {
-        log.debug("invalidating cache for $catalogueElement")
-        VERSION_COUNT_CACHE.invalidate(catalogueElement.id)
+    void invalidate(Long id, Long latestVersionId) {
+        log.debug("invalidating cache for $id ($latestVersionId)")
+        VERSION_COUNT_CACHE.invalidate(latestVersionId)
         VERSION_COUNT_CACHE.cleanUp()
-        FAVORITE_CACHE.invalidate(catalogueElement.id)
+        FAVORITE_CACHE.invalidate(id)
         FAVORITE_CACHE.cleanUp()
-        RELATIONSHIPS_COUNT_CACHE.invalidate(catalogueElement.id)
+        RELATIONSHIPS_COUNT_CACHE.invalidate(id)
         RELATIONSHIPS_COUNT_CACHE.cleanUp()
     }
 }
