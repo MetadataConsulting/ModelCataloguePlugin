@@ -102,9 +102,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             theMkp.description element.description
         }
         for (Relationship rel in element.isBasedOnRelationships) {
-            theMkp.basedOn(ref(rel.source, context)) {
-                processRelationshipMetadata(theMkp, context, rel)
-            }
+            printBasedOn(theMkp, rel, context)
         }
         for (Relationship rel in element.relatedToRelationships) {
             CatalogueElement other = rel.source == element ? rel.destination : rel.source
@@ -143,6 +141,12 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
                     }
                 }
             }
+        }
+    }
+
+    protected void printBasedOn(theMkp, Relationship rel, PrintContext context) {
+        theMkp.basedOn(ref(rel.source, context)) {
+            processRelationshipMetadata(theMkp, context, rel)
         }
     }
 
