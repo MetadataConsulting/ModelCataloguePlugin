@@ -3,7 +3,7 @@ angular.module('mc.core.ui.bs.saveOrUpdatePublishedElementCtrl', ['mc.core.ui.bs
   $scope.pending        = {dataModel: null}
   $scope.newEntity      = -> {dataModels: $scope.copy?.dataModels ? []}
   $scope.copy           = angular.copy(args.element ? $scope.newEntity())
-  $scope.copy.name      = args.name
+  $scope.copy.name      = args.name ? $scope.copy.name
   $scope.original       = args.element ? {}
   $scope.messages       = messages.createNewMessages()
   $scope.create         = args.create
