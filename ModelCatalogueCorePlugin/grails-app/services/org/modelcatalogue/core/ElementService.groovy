@@ -133,7 +133,7 @@ class ElementService implements Publisher<CatalogueElement> {
         }
     }
 
-    CatalogueElement findByModelCatalogueId(Class<? extends CatalogueElement> resource, String theId) {
+    CatalogueElement findByModelCatalogueId(Class<? extends CatalogueElement> resource, String theId, Long maxCatalogueElementId = Long.MAX_VALUE) {
         if (!theId) {
             return null
         }
@@ -157,6 +157,10 @@ class ElementService implements Publisher<CatalogueElement> {
 
             if (matchVersionNumber) {
                 versionNumberFound = matchVersionNumber[0][1] as Long
+            }
+
+            if (urlId > maxCatalogueElementId) {
+                return null
             }
 
             CatalogueElement result = getLatestFromCriteria(new DetachedCriteria<CatalogueElement>(resource).build {
@@ -222,6 +226,10 @@ class ElementService implements Publisher<CatalogueElement> {
         if (matchLegacyScheme) {
             Long id  = matchLegacyScheme[0][2] as Long
             Integer version = matchLegacyScheme[0][4] as Integer
+
+            if (id > maxCatalogueElementId) {
+                return null
+            }
 
             if (version) {
                 CatalogueElement result = resource.findByLatestVersionIdAndVersionNumber(id, version)

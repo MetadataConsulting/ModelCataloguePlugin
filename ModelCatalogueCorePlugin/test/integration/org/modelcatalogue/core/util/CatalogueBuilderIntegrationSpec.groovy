@@ -1168,4 +1168,44 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         |check dataClass property 'name' apply regex: '[a-zA-Z0-9]+'
         """.stripMargin().trim()
     }
+
+
+
+    def "create bases"() {
+        given:
+            final String DATA_MODEL_NAME = "test load bases"
+            final String GRAND_PARENT_NAME = "grand parent"
+            final String PARENT_NAME = "parent"
+            final String CHILD_NAME = "child"
+            final String GRAND_CHILD_NAME = "grand child"
+
+            build {
+                dataType(name: GRAND_CHILD_NAME, dataModel: DATA_MODEL_NAME, status: draft) {
+                    dataType(name: CHILD_NAME, dataModel: DATA_MODEL_NAME, status: draft) {
+                        dataType(name: PARENT_NAME, dataModel: DATA_MODEL_NAME, status: draft) {
+                            dataType(name: GRAND_PARENT_NAME, dataModel: DATA_MODEL_NAME, status: draft)
+            }   }   }   }
+
+        when:
+            DataModel dataModel = DataModel.findByName(DATA_MODEL_NAME)
+            DataType grandParent = DataType.findByName(GRAND_PARENT_NAME)
+            DataType parent = DataType.findByName(PARENT_NAME)
+            DataType child = DataType.findByName(CHILD_NAME)
+            DataType grandChild = DataType.findByName(GRAND_CHILD_NAME)
+
+        then:
+            dataModel
+            grandParent
+            grandParent.dataModel == dataModel
+            parent
+            parent.dataModel == dataModel
+            child
+            child.dataModel == dataModel
+            grandChild
+            grandChild.dataModel == dataModel
+
+
+
+
+    }
 }
