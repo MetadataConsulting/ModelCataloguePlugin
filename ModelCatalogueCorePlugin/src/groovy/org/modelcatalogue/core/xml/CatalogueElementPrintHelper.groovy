@@ -49,7 +49,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             context.typesUsed << 'declaration'
         }
 
-        if (context.wasPrinted(element)) {
+        if (context.printOnlyReference(element)) {
             theMkp."${elementName}"(ref(element, context, true)) {
                 processRelationshipMetadata(theMkp, context, rel)
             }
