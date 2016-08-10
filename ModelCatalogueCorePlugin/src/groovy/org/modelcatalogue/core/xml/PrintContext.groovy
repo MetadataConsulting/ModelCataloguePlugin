@@ -10,11 +10,11 @@ class PrintContext {
     DataModelService dataModelService
     DataClassService modelService
 
-
     boolean idIncludeVersion
     boolean noHref
 
     DataModel currentClassification
+    DataModel keepInside
     Set<Long> idsOfPrinted = []
 
     Set<String> typesUsed = new TreeSet<String>()
@@ -33,4 +33,22 @@ class PrintContext {
         idsOfPrinted.contains(element.id)
     }
 
+    boolean printOnlyReference(CatalogueElement catalogueElement) {
+        if (wasPrinted(catalogueElement)) {
+            return true
+        }
+        if (!keepInside) {
+            return false
+        }
+        if (!catalogueElement.dataModel) {
+            return false
+        }
+        if (catalogueElement.dataModel == keepInside) {
+            return false
+        }
+        if (catalogueElement == keepInside) {
+            return false
+        }
+        return true
+    }
 }
