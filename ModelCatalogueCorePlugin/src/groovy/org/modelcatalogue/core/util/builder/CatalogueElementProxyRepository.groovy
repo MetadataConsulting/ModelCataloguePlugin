@@ -35,10 +35,12 @@ class CatalogueElementProxyRepository {
     private Set<Long> elementsUnderControl = []
 
     private boolean copyRelationships = false
+    Long maxCatalogueElementIdAtStart = Long.MAX_VALUE
 
     private final Map<String, Relationship> createdRelationships = [:]
 
     ProgressMonitor monitor = ProgressMonitor.NOOP
+
 
     CatalogueElementProxyRepository(DataModelService dataModelService, ElementService elementService) {
         this.dataModelService = dataModelService
@@ -51,6 +53,7 @@ class CatalogueElementProxyRepository {
         pendingProxies.clear()
         elementsUnderControl.clear()
         copyRelationships = false
+        maxCatalogueElementIdAtStart = Long.MAX_VALUE
     }
 
     public copyRelationships() {
@@ -88,6 +91,9 @@ class CatalogueElementProxyRepository {
     public Set<CatalogueElement> resolveAllProxies(boolean skipDirtyChecking) {
         StopWatch watch =  new StopWatch('catalogue proxy repository')
         Set<CatalogueElement> created = []
+
+        List<CatalogueElement> lastElement = CatalogueElement.list(max: 1, sort: 'id', order: 'desc')
+        maxCatalogueElementIdAtStart = lastElement ? lastElement.first().getId() : Long.MAX_VALUE
 
         watch.start('merging proxies')
         logInfo "(1/6) merging proxies"
@@ -460,7 +466,7 @@ class CatalogueElementProxyRepository {
     }
 
     protected <T extends CatalogueElement> T findById(Class<T> type, Object id) {
-        elementService.findByModelCatalogueId(type, id?.toString())?.asType(type) as T
+        elementService.findByModelCatalogueId(type, id?.toString(), maxCatalogueElementIdAtStart)?.asType(type) as T
     }
 
     private static <T extends CatalogueElement> T getLatestFromCriteria(DetachedCriteria<T> criteria, boolean unclassifiedOnly = false) {

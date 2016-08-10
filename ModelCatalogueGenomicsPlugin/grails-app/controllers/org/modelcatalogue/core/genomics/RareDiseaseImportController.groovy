@@ -75,7 +75,7 @@ class RareDiseaseImportController {
     }
 
     protected static Asset finalizeAsset(Long id, DataModel dataModel, Long userId){
-        BuildProgressMonitor.remove(id)
+        BuildProgressMonitor.get(id)?.onCompleted()
 
         Asset updated = Asset.get(id)
 

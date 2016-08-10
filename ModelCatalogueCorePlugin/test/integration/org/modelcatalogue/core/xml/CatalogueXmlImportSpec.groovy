@@ -14,13 +14,13 @@ import spock.lang.Shared
 
 class CatalogueXmlImportSpec extends AbstractIntegrationSpec {
 
-    @Shared GrailsApplication grailsApplication
+    @Shared
+    GrailsApplication grailsApplication
 
     CatalogueBuilder builder
     CatalogueXmlLoader loader
     def dataModelService
     def elementService
-
 
 
     def setup() {
@@ -29,18 +29,52 @@ class CatalogueXmlImportSpec extends AbstractIntegrationSpec {
     }
 
 
-   def "load xml - make change - load again"(){
+    def "load xml - make change - load again"() {
 
-       DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService, true)
-       loader = new CatalogueXmlLoader(builder)
+        DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService, true)
+        loader = new CatalogueXmlLoader(builder)
 
-       when:
-       InputStream nhic = getClass().getResourceAsStream('nhic.catalogue.xml')
-       loader.load(nhic)
+        when:
+            InputStream nhic = getClass().getResourceAsStream('nhic.catalogue.xml')
+            loader.load(nhic)
 
-       then:
-       DataModel.findByName("NHIC")
+        then:
+            DataModel.findByName("NHIC")
 
 
-   }
+    }
+
+
+    def "load bases"(){
+        final String DATA_MODEL_NAME = "based on test"
+        final String GRAND_PARENT_NAME = "grand parent"
+        final String PARENT_NAME = "parent"
+        final String CHILD_NAME = "child"
+        final String GRAND_CHILD_NAME = "grand child"
+
+        DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService, true)
+        loader = new CatalogueXmlLoader(builder)
+
+        when:
+            InputStream nhic = getClass().getResourceAsStream('grand_child.mc.xml')
+            loader.load(nhic)
+
+            DataModel dataModel = DataModel.findByName(DATA_MODEL_NAME)
+            DataType grandParent = DataType.findByName(GRAND_PARENT_NAME)
+            DataType parent = DataType.findByName(PARENT_NAME)
+            DataType child = DataType.findByName(CHILD_NAME)
+            DataType grandChild = DataType.findByName(GRAND_CHILD_NAME)
+
+        then:
+            dataModel
+            grandParent
+            grandParent.dataModel == dataModel
+            parent
+            parent.dataModel == dataModel
+            child
+            child.dataModel == dataModel
+            grandChild
+            grandChild.dataModel == dataModel
+    }
+
 }
