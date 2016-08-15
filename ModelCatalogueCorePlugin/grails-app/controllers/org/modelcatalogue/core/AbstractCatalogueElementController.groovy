@@ -420,7 +420,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
     protected ListWithTotalAndType<T> getAllEffectiveItems(Integer max) {
         if (params.status?.toLowerCase() == 'active') {
-            if (modelCatalogueSecurityService.hasRole('CURATOR')){
+            if (modelCatalogueSecurityService.hasRole('VIEWER')){
                 return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
                     'in' 'status', [ElementStatus.FINALIZED, ElementStatus.DRAFT, ElementStatus.PENDING]
                 }), overridableDataModelFilter)
