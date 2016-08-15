@@ -211,6 +211,11 @@ at `"${System.properties['catalina.base']}/es"`
 |Enables user self-registration
 |_None_
 
+|Authentication
+|`MC_MAX_ACTIVE_USERS`
+|Sets the maximum number of active (enabled) users to given number
+|_None_
+
 |===
 
 
