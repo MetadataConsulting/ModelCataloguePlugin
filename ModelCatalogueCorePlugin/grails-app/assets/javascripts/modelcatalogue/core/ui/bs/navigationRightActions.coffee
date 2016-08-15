@@ -89,6 +89,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
 
   actionsProvider.registerChildAction 'admin-menu', 'user-admin', ($window, security) ->
     "ngInject"
+    return undefined unless security.hasRole('SUPERVISOR')
     {
       position:   1000
       icon:       'fa fa-fw fa-user-plus'
@@ -148,7 +149,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   reindexCatalogue = [
     '$scope', 'names','security', '$state', 'messages', 'rest', 'modelCatalogueApiRoot'
     ($scope ,  names , security ,  $state ,  messages ,  rest ,  modelCatalogueApiRoot ) ->
-      return undefined if not security.hasRole('ADMIN')
+      return undefined unless security.hasRole('SUPERVISOR')
 
       {
       position: 10200
@@ -167,6 +168,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
 
   actionsProvider.registerChildAction 'admin-menu', 'monitoring', ($window, security) ->
     "ngInject"
+    return undefined unless security.hasRole('SUPERVISOR')
     {
       position:   10300
       icon:       'fa fa-fw fa-cogs'

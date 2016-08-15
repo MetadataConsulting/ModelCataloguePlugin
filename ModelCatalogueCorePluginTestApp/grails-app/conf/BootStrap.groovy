@@ -45,6 +45,7 @@ class BootStrap {
     private static void initSecurity() {
         def roleUser = Role.findByAuthority('ROLE_USER') ?: new Role(authority: 'ROLE_USER').save(failOnError: true)
         def roleAdmin = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
+        def roleSupervisor = Role.findByAuthority('ROLE_SUPERVISOR') ?: new Role(authority: 'ROLE_SUPERVISOR').save(failOnError: true)
         def roleStacktrace = Role.findByAuthority('ROLE_STACKTRACE') ?: new Role(authority: 'ROLE_STACKTRACE').save(failOnError: true)
         def metadataCurator = Role.findByAuthority('ROLE_METADATA_CURATOR') ?: new Role(authority: 'ROLE_METADATA_CURATOR').save(failOnError: true)
 
@@ -52,9 +53,14 @@ class BootStrap {
 
         // keep the passwords lame, they are only for dev/test or very first setup
         def admin = User.findByNameOrUsername('admin', 'admin') ?: new User(name: 'admin', username: 'admin', enabled: true, password: 'admin').save(failOnError: true)
+        def supervisor = User.findByNameOrUsername('supervisor', 'supervisor') ?: new User(name: 'supervisor', username: 'supervisor', enabled: true, password: 'supervisor').save(failOnError: true)
         def viewer = User.findByNameOrUsername('viewer', 'viewer') ?: new User(name: 'viewer', username: 'viewer', enabled: true, password: 'viewer').save(failOnError: true)
         def curator = User.findByNameOrUsername('curator', 'curator') ?: new User(name: 'curator', username: 'curator', enabled: true, password: 'curator').save(failOnError: true)
         User.findByNameOrUsername('registered', 'registered') ?: new User(name: 'registered', username: 'registered', enabled: true, password: 'registered').save(failOnError: true)
+
+        if (!supervisor.authorities.contains(roleSupervisor)) {
+            UserRole.create supervisor, roleSupervisor, true
+        }
 
         if (!admin.authorities.contains(roleAdmin)) {
             UserRole.create admin, roleUser
@@ -108,16 +114,16 @@ class BootStrap {
 
         createRequestmapIfMissing('/sso/*/**',                              'IS_AUTHENTICATED_REMEMBERED',   HttpMethod.GET)
 
-        createRequestmapIfMissing('/role/**',                               'ROLE_ADMIN')
-        createRequestmapIfMissing('/userAdmin/**',                          'ROLE_ADMIN')
-        createRequestmapIfMissing('/requestMap/**',                         'ROLE_ADMIN')
-        createRequestmapIfMissing('/registrationCode/**',                   'ROLE_ADMIN')
-        createRequestmapIfMissing('/securityInfo/**',                       'ROLE_ADMIN')
-        createRequestmapIfMissing('/console/**',                            'ROLE_ADMIN')
-        createRequestmapIfMissing('/plugins/console*/**',                   'ROLE_ADMIN')
-        createRequestmapIfMissing('/dbconsole/**',                          'ROLE_ADMIN')
-        createRequestmapIfMissing('/monitoring/**',                         'ROLE_ADMIN')
-        createRequestmapIfMissing('/plugins/console-1.5.0/**',              'ROLE_ADMIN')
+        createRequestmapIfMissing('/role/**',                               'ROLE_SUPERVISOR')
+        createRequestmapIfMissing('/userAdmin/**',                          'ROLE_SUPERVISOR')
+        createRequestmapIfMissing('/requestMap/**',                         'ROLE_SUPERVISOR')
+        createRequestmapIfMissing('/registrationCode/**',                   'ROLE_SUPERVISOR')
+        createRequestmapIfMissing('/securityInfo/**',                       'ROLE_SUPERVISOR')
+        createRequestmapIfMissing('/console/**',                            'ROLE_SUPERVISOR')
+        createRequestmapIfMissing('/plugins/console*/**',                   'ROLE_SUPERVISOR')
+        createRequestmapIfMissing('/dbconsole/**',                          'ROLE_SUPERVISOR')
+        createRequestmapIfMissing('/monitoring/**',                         'ROLE_SUPERVISOR')
+        createRequestmapIfMissing('/plugins/console-1.5.0/**',              'ROLE_SUPERVISOR')
 
 //        createRequestmapIfMissing('/api/modelCatalogue/core/dataClass/**', 'IS_AUTHENTICATED_ANONYMOUSLY')
 //        createRequestmapIfMissing('/api/modelCatalogue/core/dataElement/**', 'ROLE_METADATA_CURATOR')
