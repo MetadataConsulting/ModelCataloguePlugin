@@ -186,4 +186,8 @@ if (System.getenv("MC_CSS_CUSTOM")) {
     mc.css.custom = System.getenv("MC_CSS_CUSTOM")
 }
 
+if (System.getenv('MC_MAX_ACTIVE_USERS')) {
+    mc.max.active.users = System.getenv('MC_MAX_ACTIVE_USERS')
+}
+
 
