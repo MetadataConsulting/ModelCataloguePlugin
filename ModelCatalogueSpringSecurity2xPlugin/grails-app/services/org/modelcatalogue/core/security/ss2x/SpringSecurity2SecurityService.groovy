@@ -32,11 +32,13 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         }
         String translated = role
         if (role == "VIEWER") {
-            translated = "ROLE_USER,ROLE_METADATA_CURATOR,ROLE_ADMIN"
+            translated = "ROLE_USER,ROLE_METADATA_CURATOR,ROLE_ADMIN,ROLE_SUPERVISOR"
         }  else if (role == "CURATOR") {
-            translated = "ROLE_METADATA_CURATOR,ROLE_ADMIN"
+            translated = "ROLE_METADATA_CURATOR,ROLE_ADMIN,ROLE_SUPERVISOR"
         } else if (role == "ADMIN") {
-            translated = "ROLE_ADMIN"
+            translated = "ROLE_ADMIN,ROLE_SUPERVISOR"
+        } else if (role == "SUPERVISOR") {
+            translated = "ROLE_SUPERVISOR"
         } else if (!translated.startsWith('ROLE_')) {
             translated = "ROLE_${translated}"
         }
