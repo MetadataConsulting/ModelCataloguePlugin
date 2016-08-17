@@ -190,4 +190,7 @@ if (System.getenv('MC_MAX_ACTIVE_USERS')) {
     mc.max.active.users = System.getenv('MC_MAX_ACTIVE_USERS')
 }
 
+if (System.getenv('MC_PRELOAD')) {
+    mc.preload = System.getenv('MC_PRELOAD').split(/\s*,\s*/).toList()
+}
 
