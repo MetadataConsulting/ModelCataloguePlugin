@@ -23,6 +23,7 @@ class BootStrap {
     CatalogueBuilder catalogueBuilder
     def sessionFactory
     def modelCatalogueSearchService
+    def grailsApplication
 
     def init = { servletContext ->
         ExtensionModulesLoader.addExtensionModules()
@@ -39,6 +40,10 @@ class BootStrap {
         } else {
             initCatalogueService.initDefaultRelationshipTypes()
             initSecurity()
+        }
+
+        if (grailsApplication.config.mc.preload) {
+            initCatalogueService.importXMLFromURLs(grailsApplication.config.mc.preload.collect { new URL(it.toString()) }, false)
         }
     }
 

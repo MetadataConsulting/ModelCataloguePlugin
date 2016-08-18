@@ -4,7 +4,6 @@ import org.codehaus.groovy.grails.io.support.PathMatchingResourcePatternResolver
 import org.codehaus.groovy.grails.io.support.Resource
 import org.grails.datastore.gorm.GormStaticApi
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.TestDataHelper
@@ -65,7 +64,7 @@ class InitCatalogueService {
                 continue
             }
             try {
-                readXMLFile(resource, true)
+                readXMLFile(resource.URI.toString(), resource.inputStream, true)
             } catch (Exception e) {
                 log.info("Resource $resource couldn't be processed at the moment, will try again later", e)
                 forSecondPass << resource
@@ -74,7 +73,29 @@ class InitCatalogueService {
 
         // second pass
         for (Resource resource in forSecondPass) {
-            readXMLFile(resource, failOnError)
+            readXMLFile(resource.URI.toString(), resource.inputStream, failOnError)
+        }
+    }
+
+    void importXMLFromURLs(List<URL> urls, boolean failOnError) {
+        List<URL> forSecondPass = []
+
+        for (URL resource in urls) {
+            try {
+                resource.withInputStream {
+                    readXMLFile(resource.toExternalForm(), it, true)
+                }
+            } catch (Exception e) {
+                log.info("Resource $resource couldn't be processed at the moment, will try again later", e)
+                forSecondPass << resource
+            }
+        }
+
+        // second pass
+        for (URL resource in forSecondPass) {
+            resource.withInputStream {
+                readXMLFile(resource.toExternalForm(), it, failOnError)
+            }
         }
     }
 
@@ -97,21 +118,19 @@ class InitCatalogueService {
         }
     }
 
-    private void readXMLFile(Resource resource, boolean failOnError) {
-        try {
-            log.info "Importing XML file ${resource.URI}"
 
+    private void readXMLFile(String location, InputStream stream, boolean failOnError) {
+        try {
+            log.info "Importing XML file ${location}"
             DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService, true)
             CatalogueXmlLoader loader = new CatalogueXmlLoader(builder)
-
-            loader.load(resource.inputStream)
-
-            log.info "File ${resource.URI} imported"
+            loader.load(stream)
+            log.info "File ${location} imported"
         } catch (e) {
             if (failOnError) {
-                throw new IllegalArgumentException("Exception parsing model catalogue XML file ${resource.URI}", e)
+                throw new IllegalArgumentException("Exception parsing model catalogue XML file ${location}", e)
             } else {
-                log.error("Exception parsing model catalogue XML file ${resource.URI}", e)
+                log.error("Exception parsing model catalogue XML file ${location}", e)
             }
         }
     }
