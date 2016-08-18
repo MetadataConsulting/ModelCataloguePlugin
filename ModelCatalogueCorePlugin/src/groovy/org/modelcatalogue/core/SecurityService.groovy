@@ -43,4 +43,10 @@ public interface SecurityService {
     void addLogoutListener(LogoutListener listener)
 
     Map<String, Long> getUsersLastSeen()
+
+    /**
+     * Logs out user specified by username
+     * @param username username of the user to be logged out
+     */
+    void logout(String username)
 }

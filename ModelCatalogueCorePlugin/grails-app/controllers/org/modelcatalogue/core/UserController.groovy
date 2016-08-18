@@ -2,9 +2,12 @@ package org.modelcatalogue.core
 
 import grails.converters.JSON
 import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.security.UserService
 import org.modelcatalogue.core.util.DataModelFilter
 
 class UserController extends AbstractCatalogueElementController<User> {
+
+    UserService userService
 
     UserController() {
         super(User, false)
@@ -58,4 +61,71 @@ class UserController extends AbstractCatalogueElementController<User> {
     def removeFavourite(Long id) {
         removeRelation(id, 'favourite', true, null)
     }
+
+    def enable() {
+        switchEnabled(true)
+    }
+
+    def disable() {
+        switchEnabled(false)
+    }
+
+    def role() {
+        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
+            notFound()
+            return
+        }
+
+        User user = User.get(params.id)
+        if (!user) {
+            notFound()
+            return
+        }
+
+        if (user.username == 'supervisor' || params.role == 'supervisor') {
+            notFound()
+            return
+        }
+
+        userService.redefineRoles(user, params.role)
+
+        modelCatalogueSecurityService.logout(user.username)
+
+        respond user
+    }
+
+    private switchEnabled(boolean enabled) {
+        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
+            notFound()
+            return
+        }
+
+        User user = User.get(params.id)
+        if (!user) {
+            notFound()
+            return
+        }
+
+        if (user.username == 'supervisor') {
+            notFound()
+            return
+        }
+
+        user.enabled = enabled
+
+        if (!user.save(flush: true)) {
+            respond user.errors
+            return
+        }
+
+        modelCatalogueSecurityService.logout(user.username)
+
+        respond user
+    }
+
+    protected boolean hasAdditionalIndexCriteria() { return true }
+
+    protected Closure buildAdditionalIndexCriteria() { return { ne 'username', 'supervisor' } }
+
+
 }

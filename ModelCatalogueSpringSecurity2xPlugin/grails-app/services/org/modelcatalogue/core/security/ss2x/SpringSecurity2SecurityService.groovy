@@ -4,6 +4,7 @@ import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.util.Holders
 import org.modelcatalogue.core.LogoutListeners
 import org.modelcatalogue.core.SecurityService
 import org.modelcatalogue.core.security.User
@@ -67,5 +68,10 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
     @Override
     Map<String, Long> getUsersLastSeen() {
         lastSeenCache.asMap()
+    }
+
+    @Override
+    void logout(String username) {
+        Holders.applicationContext.getBean('userCache').removeUserFromCache(username)
     }
 }

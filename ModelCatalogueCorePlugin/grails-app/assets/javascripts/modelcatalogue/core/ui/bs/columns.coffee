@@ -153,4 +153,11 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
     {header: "Name"        , value: 'name', classes: 'col-md-11', href: '"#/catalogue/feedback/" + key' }
   ]
 
+  columnsProvider.registerColumns 'org.modelcatalogue.core.security.User', [
+    {header: 'Username'    , value: "username"  , classes: 'col-md-3', show: 'show()', href: 'href()'}
+    {header: 'Email'       , value: 'email'     , classes: 'col-md-3'}
+    {header: 'Role'        , value: 'role'      , classes: 'col-md-3'}
+    {header: 'Enabled'     , value: 'enabled'   , classes: 'col-md-3'}
+  ]
+
 ]

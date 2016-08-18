@@ -58,7 +58,7 @@ class BootStrap {
 
         // keep the passwords lame, they are only for dev/test or very first setup
         def admin = User.findByNameOrUsername('admin', 'admin') ?: new User(name: 'admin', username: 'admin', enabled: true, password: 'admin', passwordExpired: production, email: System.getenv('MC_ADMIN_EMAIL')).save(failOnError: true)
-        def supervisor = User.findByNameOrUsername('supervisor', 'supervisor') ?: new User(name: 'supervisor', username: 'supervisor', enabled: true, password: System.getenv('MC_SUPERVISOR_PASSWORD') ?: 'superuser', email: System.getenv('MC_SUPERVISOR_EMAIL') ?: System.getenv('MC_MAIL_FROM')).save(failOnError: true)
+        def supervisor = User.findByNameOrUsername('supervisor', 'supervisor') ?: new User(name: 'supervisor', username: 'supervisor', enabled: true, password: System.getenv('MC_SUPERVISOR_PASSWORD') ?: 'supervisor', email: System.getenv('MC_SUPERVISOR_EMAIL') ?: System.getenv('MC_MAIL_FROM')).save(failOnError: true)
 
         if (!supervisor.authorities.contains(roleSupervisor)) {
             UserRole.create supervisor, roleUser

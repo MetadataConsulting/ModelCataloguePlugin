@@ -203,6 +203,67 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
   ]
 
+
+  actionsProvider.registerActionInRoles 'update-user',[actionsProvider.ROLE_ITEM_DETAIL_ACTION], ($scope, messages, names, security) ->
+    'ngInject'
+
+    return undefined if not security.hasRole('ADMIN')
+    return undefined if not $scope.element
+    return undefined if not angular.isFunction $scope.element.isInstanceOf
+    return undefined if not $scope.element.isInstanceOf('user')
+
+    {
+      position:   -2000
+      label:      if $scope.element.enabled then 'Disable User' else 'Enable User'
+      icon:       if $scope.element.enabled then 'fa fa-ban' else 'fa fa-check'
+      disabled:   $scope.element.username in ['admin', 'supervisor']
+      type:       'primary'
+      watches:    ['element.enabled', 'element.username']
+      action:     ->
+        title = if $scope.element.enabled then "Disable User" else "Disable User"
+        desc = if $scope.element.enabled then "Do you want to disable user?" else "Do you want to enable user?"
+        messages.confirm(title, desc).then ->
+          if $scope.element.enabled
+            return $scope.element.execute('disable', 'POST').then (user) ->
+              $scope.element.updateFrom(user)
+            , showErrorsUsingMessages(messages)
+
+          return $scope.element.execute('enable', 'POST').then (user) ->
+            $scope.element.updateFrom(user)
+          , showErrorsUsingMessages(messages)
+    }
+
+  actionsProvider.registerActionInRoles 'update-role',[actionsProvider.ROLE_ITEM_DETAIL_ACTION], ($scope, messages, names, security, $rootScope) ->
+    'ngInject'
+
+    return undefined if not security.hasRole('ADMIN')
+    return undefined if not $scope.element
+    return undefined if not angular.isFunction $scope.element.isInstanceOf
+    return undefined if not $scope.element.isInstanceOf('user')
+
+    {
+      position:   -500
+      label:      "Change Role"
+      icon:       "fa fa-users"
+      disabled:   $scope.element.username in ['admin', 'supervisor']
+      type:       'primary'
+      action:     ->
+
+        options = [
+          {classes: 'btn btn-primary', icon: 'fa fa-cog', label: 'Admin', value: 'admin'}
+          {classes: 'btn btn-primary', icon: 'fa fa-object-group', label: 'Curator', value: 'curator'}
+          {classes: 'btn btn-primary', icon: 'fa fa-user', label: 'Viewer', value: 'viewer'}
+          {classes: 'btn btn-primary', icon: 'fa fa-user', label: 'Guest', value: 'guest'}
+        ]
+
+        messages.prompt("Select Role", "Select new role for user \"#{$scope.element.username}\"", type: 'options', options: options).then (role) ->
+          $scope.element.execute("role/#{role}", "POST").then (user) ->
+            $rootScope.$broadcast 'catalogueElementUpdated', user
+            # for some reason the app does not refresh properly
+            # $state.go '.', {}, {reload: true}
+
+    }
+
   actionsProvider.registerActionInRoles 'inline-edit',[actionsProvider.ROLE_ITEM_DETAIL_ACTION], ['$scope', 'messages', 'names', 'security', ($scope) ->
     return undefined if not $scope.editableForm
     return undefined if $scope.editableForm.$visible

@@ -21,7 +21,7 @@ angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies
               <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" class="form-control" id="password" placeholder="Password" ng-model="user.password">
-                <p class="help-block" ng-if="canResetPassword"><a ng-href="{{forgotPasswordLink}}">Forgot Password?</a></p>
+                <p class="help-block" ng-if="canResetPassword"><a ng-href="{{forgotPasswordLink}}">Reset Password</a></p>
               </div>
               <div class="checkbox">
                 <label>
