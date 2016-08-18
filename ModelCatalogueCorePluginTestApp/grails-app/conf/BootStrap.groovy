@@ -99,6 +99,7 @@ class BootStrap {
                 '/stomp/**',
                 '/assets/**',
                 '/plugins/**/js/**',
+                '/plugins/jquery-ui-*/**',
                 '/js/vendor/**',
                 '/**/*.less',
                 '/**/js/**',
