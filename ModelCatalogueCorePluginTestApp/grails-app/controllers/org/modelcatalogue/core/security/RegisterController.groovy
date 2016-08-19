@@ -23,8 +23,12 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
         }
 
         String salt = saltSource instanceof NullSaltSource ? null : command.username
-        def user = lookupUserClass().newInstance(email: command.email, username: command.username,
-            accountLocked: true, enabled: true)
+        def user = lookupUserClass().newInstance(email: command.email, username: command.username, accountLocked: true, enabled: true)
+
+        if (System.getenv(UserService.ENV_ADMIN_EMAIL) && user.email == System.getenv(UserService.ENV_ADMIN_EMAIL)) {
+            // unlock the admin
+            user.accountLocked = false
+        }
 
         RegistrationCode registrationCode = springSecurityUiService.register(user, command.password, salt)
         if (registrationCode == null || registrationCode.hasErrors()) {
@@ -143,7 +147,11 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
             return
         }
 
-        flash.message = message(code: 'spring.security.ui.register.complete.but.locked')
+        if (user.accountLocked) {
+            flash.message = message(code: 'spring.security.ui.register.complete.but.locked')
+        } else {
+            flash.message = message(code: 'spring.security.ui.register.complete')
+        }
 
         // make sure no user is logged in
         SecurityContextHolder.clearContext()
