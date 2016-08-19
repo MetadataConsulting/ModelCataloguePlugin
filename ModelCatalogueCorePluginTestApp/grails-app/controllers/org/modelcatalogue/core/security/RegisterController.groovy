@@ -1,11 +1,14 @@
 package org.modelcatalogue.core.security
 
 import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.plugin.springsecurity.authentication.dao.NullSaltSource
 import grails.plugin.springsecurity.ui.RegisterCommand
 import grails.plugin.springsecurity.ui.RegistrationCode
 import org.springframework.security.core.context.SecurityContextHolder
 
 class RegisterController extends grails.plugin.springsecurity.ui.RegisterController {
+
+    UserService userService
 
     def register(RegisterCommand command) {
         if (!grailsApplication.config.mc.allow.signup) {
@@ -13,7 +16,40 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
             return
         }
         params.remove 'format'
-        return super.register(command)
+
+        if (command.hasErrors()) {
+            render view: 'index', model: [command: command]
+            return
+        }
+
+        String salt = saltSource instanceof NullSaltSource ? null : command.username
+        def user = lookupUserClass().newInstance(email: command.email, username: command.username,
+            accountLocked: true, enabled: true)
+
+        RegistrationCode registrationCode = springSecurityUiService.register(user, command.password, salt)
+        if (registrationCode == null || registrationCode.hasErrors()) {
+            // null means problem creating the user
+            flash.error = message(code: 'spring.security.ui.register.miscError')
+            flash.chainedParams = params
+            redirect action: 'index'
+            return
+        }
+
+        String url = generateLink('verifyRegistration', [t: registrationCode.token])
+
+        def conf = SpringSecurityUtils.securityConfig
+        def body = conf.ui.register.emailBody
+        if (body.contains('$')) {
+            body = evaluate(body, [user: user, url: url])
+        }
+        mailService.sendMail {
+            to command.email
+            from conf.ui.register.emailFrom
+            subject conf.ui.register.emailSubject
+            html body.toString()
+        }
+
+        render view: 'index', model: [emailSent: true]
     }
 
     def forgotPassword() {
@@ -79,7 +115,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
             return
         }
 
-        def user
+        def user = null
         // TODO to ui service
         RegistrationCode.withTransaction { status ->
             String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
@@ -93,6 +129,11 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
             for (roleName in conf.ui.register.defaultRoleNames) {
                 UserRole.create user, Role.findByAuthority(roleName)
             }
+
+            if (System.getenv(UserService.ENV_ADMIN_EMAIL) && user.email == System.getenv(UserService.ENV_ADMIN_EMAIL)) {
+                userService.redefineRoles(user, UserService.ACCESS_LEVEL_ADMIN)
+            }
+
             registrationCode.delete()
         }
 
@@ -107,5 +148,11 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
         // make sure no user is logged in
         SecurityContextHolder.clearContext()
         redirect uri: defaultTargetUrl
+    }
+
+    protected String generateLink(String action, linkParams) {
+        createLink(base: grailsApplication.config.grails.serverURL,
+            controller: 'register', action: action,
+            params: linkParams)
     }
 }

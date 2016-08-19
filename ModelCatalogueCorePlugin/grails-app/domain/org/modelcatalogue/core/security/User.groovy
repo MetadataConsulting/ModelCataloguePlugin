@@ -30,7 +30,7 @@ class User extends CatalogueElement {
 
             Integer maxUsers = grailsApplication.config.mc.max.active.users as Integer
 
-            if (User.withNewSession { User.countByEnabled(true) } >= maxUsers) {
+            if (User.withNewSession { User.countByEnabledAndUsernameNotEqual(true, 'supervisor') } >= maxUsers) {
                 errors.rejectValue('enabled', 'mc.max.active.users.limit.reached', [maxUsers] as Object[], "Limit of $maxUsers users has been reached")
                 return
             }
@@ -58,6 +58,9 @@ class User extends CatalogueElement {
     }
 
     Set<Role> getAuthorities() {
+        if (!readyForQueries) {
+            return []
+        }
         UserRole.findAllByUser(this).collect { it.role } as Set
     }
 

@@ -115,6 +115,9 @@ class ModelCatalogueCorePluginUrlMappings {
                     "/api/modelCatalogue/core/$elementName/lastSeen"(controller: controllerName, action: 'lastSeen', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/$id/favourite"(controller: controllerName, action: 'addFavourite', method: HttpMethod.POST)
                     "/api/modelCatalogue/core/$elementName/$id/favourite"(controller: controllerName, action: 'removeFavourite', method: HttpMethod.DELETE)
+                    "/api/modelCatalogue/core/$elementName/$id/enable"(controller: controllerName, action: 'enable', method: HttpMethod.POST)
+                    "/api/modelCatalogue/core/$elementName/$id/disable"(controller: controllerName, action: 'disable', method: HttpMethod.POST)
+                    "/api/modelCatalogue/core/$elementName/$id/role/$role"(controller: controllerName, action: 'role', method: HttpMethod.POST)
                 }
 
                 if (controllerName == 'asset') {

@@ -98,6 +98,28 @@ or the result of calling `http://checkip.amazonaws.com` service (in this order o
 |If set to any value then the Spring Security accepts `http` as secure channel as well
 |none
 
+|Application
+|`MC_MAX_ACTIVE_USERS`
+|Sets the maximum number of active (enabled) users to given number
+|_None_
+
+
+|Application
+|`MC_SUPERVISOR_PASSWORD`
+|Sets the password for the superuser
+|_None_
+
+|Application
+|`MC_SUPERVISOR_EMAIL`
+|Sets the email for the superuser
+|Value of `MC_MAIL_FROM`
+
+|Application
+|`MC_ADMIN_EMAIL`
+|Sets the email for the admin user
+|_None_
+
+
 |Database
 |`METADATA_PASSWORD`
 |The password for the Model Catalogue database
@@ -211,10 +233,6 @@ at `"${System.properties['catalina.base']}/es"`
 |Enables user self-registration
 |_None_
 
-|Authentication
-|`MC_MAX_ACTIVE_USERS`
-|Sets the maximum number of active (enabled) users to given number
-|_None_
 
 |===
 

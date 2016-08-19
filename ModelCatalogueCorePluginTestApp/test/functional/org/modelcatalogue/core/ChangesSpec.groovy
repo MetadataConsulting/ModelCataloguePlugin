@@ -62,10 +62,10 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
 
         expect:
         check 'h3' is 'Users'
-        check { infTableCell(1, 2).find('a', text: 'admin') } displayed
+        check { infTableCell(1, 1).find('a', text: 'admin') } displayed
 
         when:
-        click { infTableCell(1, 2).find('a', text: 'admin') }
+        click { infTableCell(1, 1).find('a', text: 'admin') }
 
         then:
         check 'h3' contains 'admin'

@@ -87,7 +87,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     }
   ]
 
-  actionsProvider.registerChildAction 'admin-menu', 'user-admin', ($window, security) ->
+  actionsProvider.registerChildAction 'admin-menu', 'user-super-admin', ($window, security) ->
     "ngInject"
     return undefined unless security.hasRole('SUPERVISOR')
     {
@@ -96,6 +96,17 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
       label:      'Users'
       action: ->
         $window.open("#{security.contextPath}/userAdmin")
+    }
+
+  actionsProvider.registerChildAction 'admin-menu', 'user-simple-admin', ($window, $state, security) ->
+    "ngInject"
+    return undefined if security.hasRole('SUPERVISOR')
+    {
+      position:   1000
+      icon:       'fa fa-fw fa-user-plus'
+      label:      'Users'
+      action: ->
+        $state.go 'simple.resource.list', resource: 'user'
     }
 
   actionsProvider.registerChildAction 'admin-menu', 'relationship-types', ['$state', ($state) ->
