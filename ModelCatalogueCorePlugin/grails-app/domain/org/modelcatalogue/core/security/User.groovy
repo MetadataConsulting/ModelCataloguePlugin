@@ -58,6 +58,9 @@ class User extends CatalogueElement {
     }
 
     Set<Role> getAuthorities() {
+        if (!readyForQueries) {
+            return []
+        }
         UserRole.findAllByUser(this).collect { it.role } as Set
     }
 
