@@ -7,6 +7,7 @@ import org.modelcatalogue.core.dataarchitect.CsvTransformation
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserRole
+import org.modelcatalogue.core.security.UserService
 import org.modelcatalogue.core.testapp.Requestmap
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.util.ExtensionModulesLoader
@@ -24,6 +25,7 @@ class BootStrap {
     def sessionFactory
     def modelCatalogueSearchService
     def grailsApplication
+    def userService
 
     def init = { servletContext ->
         ExtensionModulesLoader.addExtensionModules()
@@ -45,6 +47,10 @@ class BootStrap {
         if (grailsApplication.config.mc.preload) {
             initCatalogueService.importXMLFromURLs(grailsApplication.config.mc.preload.collect { new URL(it.toString()) }, false)
         }
+
+        if (Environment.current == Environment.PRODUCTION) {
+            userService.inviteAdmin()
+        }
     }
 
     private static void initSecurity(boolean production) {
@@ -56,30 +62,28 @@ class BootStrap {
 
         Role.findByAuthority('ROLE_REGISTERED') ?: new Role(authority: 'ROLE_REGISTERED').save(failOnError: true)
 
-        // keep the passwords lame, they are only for dev/test or very first setup
-        def admin = User.findByNameOrUsername('admin', 'admin') ?: new User(name: 'admin', username: 'admin', enabled: true, password: 'admin', passwordExpired: production, email: System.getenv('MC_ADMIN_EMAIL')).save(failOnError: true)
-        def supervisor = User.findByNameOrUsername('supervisor', 'supervisor') ?: new User(name: 'supervisor', username: 'supervisor', enabled: true, password: System.getenv('MC_SUPERVISOR_PASSWORD') ?: 'supervisor', email: System.getenv('MC_SUPERVISOR_EMAIL') ?: System.getenv('MC_MAIL_FROM')).save(failOnError: true)
+        def supervisor = User.findByNameOrUsername('supervisor', 'supervisor') ?: new User(name: 'supervisor', username: 'supervisor', enabled: true, password: System.getenv('MC_SUPERVISOR_PASSWORD') ?: 'supervisor', email: System.getenv(UserService.ENV_SUPERVISOR_EMAIL)).save(failOnError: true)
 
         if (!supervisor.authorities.contains(roleSupervisor)) {
             UserRole.create supervisor, roleUser
             UserRole.create supervisor, metadataCurator
             UserRole.create supervisor, roleStacktrace
-            UserRole.create supervisor, roleAdmin, true
+            UserRole.create supervisor, roleAdmin
             UserRole.create supervisor, roleSupervisor, true
         }
 
-        if (!admin.authorities.contains(roleAdmin)) {
-            UserRole.create admin, roleUser
-            UserRole.create admin, metadataCurator
-            UserRole.create admin, roleStacktrace
-            UserRole.create admin, roleAdmin, true
-        }
-
-
         if (!production) {
+            def admin = User.findByNameOrUsername('admin', 'admin') ?: new User(name: 'admin', username: 'admin', enabled: true, password: 'admin', passwordExpired: production, email: System.getenv('MC_ADMIN_EMAIL')).save(failOnError: true)
             def viewer = User.findByNameOrUsername('viewer', 'viewer') ?: new User(name: 'viewer', username: 'viewer', enabled: true, password: 'viewer').save(failOnError: true)
             def curator = User.findByNameOrUsername('curator', 'curator') ?: new User(name: 'curator', username: 'curator', enabled: true, password: 'curator').save(failOnError: true)
             User.findByNameOrUsername('registered', 'registered') ?: new User(name: 'registered', username: 'registered', enabled: true, password: 'registered').save(failOnError: true)
+
+            if (!admin.authorities.contains(roleAdmin)) {
+                UserRole.create admin, roleUser
+                UserRole.create admin, metadataCurator
+                UserRole.create admin, roleStacktrace
+                UserRole.create admin, roleAdmin, true
+            }
 
             if (!curator.authorities.contains(metadataCurator)) {
                 UserRole.create curator, roleUser

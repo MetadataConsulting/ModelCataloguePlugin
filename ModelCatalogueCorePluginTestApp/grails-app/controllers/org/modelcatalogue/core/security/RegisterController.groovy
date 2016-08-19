@@ -8,6 +8,8 @@ import org.springframework.security.core.context.SecurityContextHolder
 
 class RegisterController extends grails.plugin.springsecurity.ui.RegisterController {
 
+    UserService userService
+
     def register(RegisterCommand command) {
         if (!grailsApplication.config.mc.allow.signup) {
             flash.error = "Registration is not enabled for this application"
@@ -127,6 +129,11 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
             for (roleName in conf.ui.register.defaultRoleNames) {
                 UserRole.create user, Role.findByAuthority(roleName)
             }
+
+            if (System.getenv(UserService.ENV_ADMIN_EMAIL) && user.email == System.getenv(UserService.ENV_ADMIN_EMAIL)) {
+                userService.redefineRoles(user, UserService.ACCESS_LEVEL_ADMIN)
+            }
+
             registrationCode.delete()
         }
 

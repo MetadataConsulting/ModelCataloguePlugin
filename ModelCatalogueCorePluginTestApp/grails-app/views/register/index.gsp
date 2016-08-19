@@ -45,8 +45,14 @@
                                                                                          default="E-mail"/>:</label>
 
                         <div class="col-sm-9">
-                            <input type='text' class='form-control' name='email' id="email-new"
-                                   value='${command?.email}'/>
+                            <g:if test="${params.email}">
+                              <g:hiddenField name="email" value="${params.email}"/>
+                              <strong>${params.email}</strong>
+                            </g:if>
+                            <g:else>
+                              <input type='text' class='form-control' name='email' id="email-new" value='${command?.email}'/>
+                            </g:else>
+
                         </div>
                     </div>
 
