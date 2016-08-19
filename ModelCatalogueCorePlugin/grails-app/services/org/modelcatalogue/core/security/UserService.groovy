@@ -42,7 +42,7 @@ class UserService {
         String invitationEmailSubject = System.getenv(ENV_INVITATION_EMAIL_SUBJECT)
         String invitationEmailBody = System.getenv(ENV_INVITATION_EMAIL_BODY)
 
-        if(!adminEmail || !supervisorEmail || invitationEmailBody) {
+        if(!adminEmail || !supervisorEmail || !invitationEmailBody) {
             return
         }
 
