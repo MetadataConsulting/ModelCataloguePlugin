@@ -65,7 +65,9 @@ class ElasticSearchService implements SearchCatalogue {
         return ret
     }
 
-    private static final String MC_PREFIX = "mc_"
+    private static final String ENV_MC_ES_PREFIX = 'MC_INDEX_PREFIX'
+
+    private static final String MC_PREFIX = "${System.getenv(ENV_MC_ES_PREFIX) ?: ''}mc_"
     private static final String GLOBAL_PREFIX = "${MC_PREFIX}global_"
     private static final String MC_ALL_INDEX = "${MC_PREFIX}all"
     private static final String DATA_MODEL_INDEX = "${GLOBAL_PREFIX}data_model"
@@ -114,7 +116,6 @@ class ElasticSearchService implements SearchCatalogue {
                           .local(true).node()
 
         client = node.client()
-
         log.info "Using local ElasticSearch instance in directory ${grailsApplication.config.mc.search.elasticsearch.local}"
     }
 

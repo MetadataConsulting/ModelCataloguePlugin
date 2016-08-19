@@ -146,6 +146,12 @@ uses local H2 database if not set as `"${System.properties['catalina.base']}/db"
 |Set automatically if running with `docker-compose` or uses local embedded instance if not set
 at `"${System.properties['catalina.base']}/es"`
 
+|Search
+|`MC_ES_PREFIX`
+|Prefix of the indicies for current application (useful for shared Elasticsearch servers)
+|_None_
+
+
 |Mail
 |`MC_MAIL_FROM`
 |Default mail sender for the application
