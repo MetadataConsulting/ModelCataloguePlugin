@@ -43,6 +43,7 @@ Spring Security 2.x implementation of Model Catalogue Core Plugin abstract secur
 
     def doWithSpring = {
         springConfig.addAlias('modelCatalogueSecurityService','springSecurity2SecurityService')
+        springConfig.addAlias('userDetailsService','gormWithEmailUserDetailsService')
         // TODO Implement runtime spring config (optional)
     }
 

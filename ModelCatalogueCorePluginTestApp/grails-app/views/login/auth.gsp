@@ -64,7 +64,7 @@
             <div class="${oauth.services ? '' : 'col-md-offset-3'} col-md-6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Login with Username and Password</h3>
+                        <h3 class="panel-title">Login with Username or Email and Password</h3>
                     </div>
                     <div class="panel-body">
                         <g:if test='${flash.message}'>
@@ -72,7 +72,7 @@
                         </g:if>
                         <form action='${postUrl}' method='POST' id='loginForm' class="form-horizontal" autocomplete='off'>
                             <div class="form-group">
-                                <label for='username' class="control-label col-sm-3"><g:message code="springSecurity.login.username.label"/>:</label>
+                                <label for='username' class="control-label col-sm-3"><g:message code="springSecurity.login.username.label"/> or Email:</label>
                                 <div class="col-sm-9">
                                     <input type='text' class='form-control' name='j_username' id='username'/>
                                 </div>

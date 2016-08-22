@@ -15,8 +15,8 @@ angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies
             </div>
             <form role="form" ng-submit="login()">
               <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" class="form-control" id="username" placeholder="Username" ng-model="user.username">
+                <label for="username">Username or Email</label>
+                <input type="text" class="form-control" id="username" placeholder="Username or Email" ng-model="user.username">
               </div>
               <div class="form-group">
                 <label for="password">Password</label>
