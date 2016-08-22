@@ -133,6 +133,23 @@
             editableOptions.theme = 'bs3';
         }]);
 
+        <%
+          String flashMessage = flash.remove('message')
+          String flashError = flash.remove('error')
+        %>
+
+        <g:if test="${flashMessage}">
+        demoConfig.run(['messages', function(messages) {
+          messages.success("${flashMessage.encodeAsJSON()}")
+        }]);
+        </g:if>
+
+        <g:if test="${flashError}">
+        demoConfig.run(['messages', function(messages) {
+          messages.error("${flashError.encodeAsJSON()}")
+        }]);
+        </g:if>
+
         modelcatalogue.registerModule('demo.config');
 
         modelcatalogue.welcome = {};
@@ -195,24 +212,6 @@
   </div>
 
   <div class="container-fluid container-main">
-    <%-- especially for re-authentication --%>
-    <div class="row">
-      <%
-        String message = flash.remove('message')
-        String error = flash.remove('error')
-
-        String flashType = message ? 'info' : 'danger'
-        String flashText = error ?: message
-
-      %>
-      <g:if test="${flashText}">
-        <div class="col-md-12 top">
-          <div class="alert alert-${flashType}">${flashText}</div>
-        </div>
-      </g:if>
-
-    </div>
-
     <div class="row content-row">
       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         <div id="jserrors"></div>
