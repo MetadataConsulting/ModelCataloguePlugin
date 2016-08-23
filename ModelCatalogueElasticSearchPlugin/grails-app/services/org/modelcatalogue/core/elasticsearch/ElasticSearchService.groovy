@@ -31,7 +31,6 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.elasticsearch.rx.RxElastic
 import org.modelcatalogue.core.rx.RxService
-import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -235,7 +234,7 @@ class ElasticSearchService implements SearchCatalogue {
         List<String> indicies
 
         if (CatalogueElement.isAssignableFrom(resource)) {
-            indicies = /* resource == DataModel ? [getGlobalIndexName(DataModel)] : */ collectDataModelIndicies(params, elementService.collectSubclasses(resource))
+            indicies = resource == DataModel ? [getGlobalIndexName(DataModel)] : collectDataModelIndicies(params, elementService.collectSubclasses(resource))
 
             BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
 
