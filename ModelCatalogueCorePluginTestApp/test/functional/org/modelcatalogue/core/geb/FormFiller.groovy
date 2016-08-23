@@ -33,7 +33,7 @@ class FormFiller {
 
     FormFiller first(Keywords item) {
         if (spec.selectCepItemIfExists()) {
-            spec.check '.cep-item:not(.show-more-cep-item), .item-found' gone
+            spec.check '.cep-item:not(.show-more-cep-item),.cep-item:not(.create-new-cep-item), .item-found' gone
             return this
         }
         if (!strict || item == Keywords.EXISTING) {

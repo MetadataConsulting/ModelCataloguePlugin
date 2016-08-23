@@ -10,6 +10,7 @@ import org.elasticsearch.action.bulk.BulkItemResponse
 import org.elasticsearch.action.bulk.BulkRequestBuilder
 import org.elasticsearch.action.bulk.BulkResponse
 import org.elasticsearch.action.search.SearchRequestBuilder
+import org.elasticsearch.action.support.IndicesOptions
 import org.elasticsearch.client.Client
 import org.elasticsearch.client.transport.TransportClient
 import org.elasticsearch.common.settings.Settings
@@ -30,7 +31,6 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.elasticsearch.rx.RxElastic
 import org.modelcatalogue.core.rx.RxService
-import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -69,8 +69,6 @@ class ElasticSearchService implements SearchCatalogue {
 
     private static final String MC_PREFIX = "${System.getenv(ENV_MC_ES_PREFIX) ?: ''}mc_"
     private static final String GLOBAL_PREFIX = "${MC_PREFIX}global_"
-    private static final String MC_ALL_INDEX = "${MC_PREFIX}all"
-    private static final String DATA_MODEL_INDEX = "${GLOBAL_PREFIX}data_model"
     private static final String DATA_MODEL_PREFIX = "${MC_PREFIX}data_model_"
     private static final String ORPHANED_INDEX = "${GLOBAL_PREFIX}orphaned"
 
@@ -83,8 +81,6 @@ class ElasticSearchService implements SearchCatalogue {
             entity_id : 70,
             description: 1
     ]
-
-    private static ImmutableSet<Class> MAPPED_TYPES_IN_DATA_MODEL = ImmutableSet.of(DataModel, Asset, DataClass, DataElement, DataType, EnumeratedType, MeasurementUnit, PrimitiveType, ReferenceType, ValidationRule, Relationship, User)
 
     GrailsApplication grailsApplication
     DataModelService dataModelService
@@ -151,7 +147,6 @@ class ElasticSearchService implements SearchCatalogue {
             return Lists.emptyListWithTotalAndType(Relationship)
         }
 
-        List<String> indicies = collectDataModelIndicies(params)
         String search = params.search
 
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
@@ -220,9 +215,12 @@ class ElasticSearchService implements SearchCatalogue {
                 break;
         }
 
+        List<String> indicies = collectDataModelIndicies(params, [Relationship])
+
         SearchRequestBuilder request = client
                 .prepareSearch(indicies as String[])
                 .setTypes(getTypeName(Relationship))
+                .setIndicesOptions(IndicesOptions.lenientExpandOpen())
                 .setQuery(boolQuery)
 
 
@@ -236,7 +234,7 @@ class ElasticSearchService implements SearchCatalogue {
         List<String> indicies
 
         if (CatalogueElement.isAssignableFrom(resource)) {
-            indicies = resource == DataModel ? [DATA_MODEL_INDEX] : collectDataModelIndicies(params)
+            indicies = resource == DataModel ? [getGlobalIndexName(DataModel)] : collectDataModelIndicies(params, elementService.collectSubclasses(resource))
 
             BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
 
@@ -293,6 +291,7 @@ class ElasticSearchService implements SearchCatalogue {
                 .prepareSearch(indicies as String[])
                 .setFetchSource(true)
                 .setTypes(collectTypes(resource) as String[])
+                .setIndicesOptions(IndicesOptions.lenientExpandOpen())
                 .setQuery(qb)
 
 
@@ -303,26 +302,29 @@ class ElasticSearchService implements SearchCatalogue {
         "${GLOBAL_PREFIX}${getTypeName(resource)}"
     }
 
+    protected static String getOrphanedIndexName(Class resource) {
+        "${ORPHANED_INDEX}_${getTypeName(resource)}"
+    }
 
 
-    private List<String> collectDataModelIndicies(Map params) {
+    private List<String> collectDataModelIndicies(Map params, List<Class> types) {
         DataModelFilter filter = getOverridableDataModelFilter(params)
 
         if (!filter) {
-            return [MC_ALL_INDEX] // search all by default
+            return types.collect { ElasticSearchService.getGlobalIndexName(it) }
         }
 
         if (filter.unclassifiedOnly) {
-            return [ORPHANED_INDEX]
+            return types.collect { ElasticSearchService.getOrphanedIndexName(it) }
         }
 
         if (filter.includes) {
             // excludes are ignored if there are includes
-            return filter.includes.collect { getDataModelIndex(it) }
+            return filter.includes.collect { types.collect { type -> ElasticSearchService.getDataModelIndex(it, getTypeName(type)) } }.flatten()
         }
 
         if (filter.excludes) {
-            return ["${DATA_MODEL_PREFIX}*"] + filter.excludes.collect { "-${getDataModelIndex(it)}" }
+            return ["${DATA_MODEL_PREFIX}*"] + filter.excludes.collect { types.collect { type -> ElasticSearchService.getDataModelIndex(it, getTypeName(type)) } }.flatten().collect {"-${it}"}
         }
 
         throw new IllegalStateException("Unknown filter setup: $filter")
@@ -372,7 +374,7 @@ class ElasticSearchService implements SearchCatalogue {
         Class clazz = getEntityClass(object)
         IndexingSession session = IndexingSession.create()
         if (DataModel.isAssignableFrom(clazz)) {
-            String indexName = getDataModelIndex(object as DataModel)
+            String indexName = getDataModelIndex(object as DataModel, clazz)
             return indexExists(session, just(indexName)).flatMap {
                 if (it.exists) {
                     return RxElastic.from(client.admin().indices().prepareDelete(indexName)).map {
@@ -563,7 +565,7 @@ class ElasticSearchService implements SearchCatalogue {
         } flatMap { entity ->
             Class clazz = getEntityClass(entity)
             ImmutableSet<String> indices = getIndices(entity)
-            ImmutableSet<Class> mappedClasses = (CatalogueElement.isAssignableFrom(clazz) || Relationship.isAssignableFrom(clazz)) ? MAPPED_TYPES_IN_DATA_MODEL : ImmutableSet.of(clazz)
+            ImmutableSet<Class> mappedClasses = ImmutableSet.of(clazz)
             Document document = session.getDocument(entity)
             ensureIndexExists(session, from(indices), mappedClasses).map {
                 new SimpleIndexRequest(indices,  document)
@@ -659,15 +661,15 @@ class ElasticSearchService implements SearchCatalogue {
     protected static ImmutableSet<String> getIndices(object) {
         Class clazz = getEntityClass(object)
         if (DataModel.isAssignableFrom(clazz)) {
-            return ImmutableSet.of(DATA_MODEL_INDEX, MC_ALL_INDEX, getDataModelIndex(object as DataModel))
+            return ImmutableSet.of(getGlobalIndexName(clazz), getDataModelIndex(object as DataModel, clazz))
         }
 
         if (CatalogueElement.isAssignableFrom(clazz)) {
             CatalogueElement element = object as CatalogueElement
             if (element.dataModel) {
-                return ImmutableSet.of(MC_ALL_INDEX, getDataModelIndex(element.dataModel))
+                return ImmutableSet.of(getGlobalIndexName(clazz), getDataModelIndex(element.dataModel, clazz))
             }
-            return ImmutableSet.of(ORPHANED_INDEX, MC_ALL_INDEX)
+            return ImmutableSet.of(getGlobalIndexName(clazz), getOrphanedIndexName(clazz))
         }
 
         if (RelationshipType.isAssignableFrom(clazz) || DataModelPolicy.isAssignableFrom(clazz)) {
@@ -676,18 +678,21 @@ class ElasticSearchService implements SearchCatalogue {
 
         if (Relationship.isAssignableFrom(clazz)) {
             Relationship rel = object as Relationship
-            return ImmutableSet.builder().addAll(getIndices(rel.source)).addAll(getIndices(rel.destination)).build()
+            return ImmutableSet.builder()
+                .add(rel.source.dataModel ? getDataModelIndex(rel.source.dataModel, Relationship) : getGlobalIndexName(Relationship))
+                .add(rel.destination.dataModel ? getDataModelIndex(rel.destination.dataModel, Relationship) : getGlobalIndexName(Relationship))
+                .build()
         }
 
         throw new UnsupportedOperationException("Not Yet Implemented for $object")
     }
 
-    protected static String getDataModelIndex(Long id) {
-        "${DATA_MODEL_PREFIX}${id}"
+    protected static String getDataModelIndex(Long id, String typeName) {
+        "${DATA_MODEL_PREFIX}${id}_${typeName}"
     }
 
-    protected static String getDataModelIndex(DataModel dataModel) {
-        getDataModelIndex(dataModel.getId())
+    protected static String getDataModelIndex(DataModel dataModel, Class elementType) {
+        getDataModelIndex(dataModel.getId(), getTypeName(elementType))
     }
 
     private Map combineMappingForAllCatalogueElements() {

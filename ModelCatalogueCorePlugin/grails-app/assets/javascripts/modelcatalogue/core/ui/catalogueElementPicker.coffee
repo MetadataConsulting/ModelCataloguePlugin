@@ -1,7 +1,7 @@
 catalogueElementPicker = angular.module('mc.core.ui.catalogueElementPicker', ['mc.core.modelCatalogueSearch', 'mc.core.catalogueElementResource', 'ui.bootstrap'])
 catalogueElementPicker.run ['$templateCache', ($templateCache) ->
   $templateCache.put "modelcatalogue/core/ui/catalogueElementPickerTypeahead.html", """
-        <a class="cep-item" ng-class="{'show-more-cep-item': match.model.more}">
+        <a class="cep-item" ng-class="{'show-more-cep-item': match.model.more, 'create-new-cep-item': match.model.create}">
         <span class="omnisearch-text" ng-class="{'text-warning': match.model.status == 'DRAFT', 'text-info': match.model.status == 'PENDING'}">
           <span class="text-muted" ng-class="match.model.getIcon()"/><span> {{match.model.classifiedName || match.model.name}}
         </span><br/>

@@ -3,7 +3,7 @@
 source ./bin/lib/test-setup.sh
 
 export FILE_OPENER_SKIP=true
-export ES_VERSION=2.1.2
+export ES_VERSION=2.3.5
 
 if [[ "$TRAVIS" != "" ]] ; then
     if [ "$TEST_SUITE" = "functional" ] || [ "$TEST_SUITE" = "" ] ; then
