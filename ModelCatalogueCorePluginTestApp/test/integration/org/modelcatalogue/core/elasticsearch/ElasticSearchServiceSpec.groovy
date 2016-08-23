@@ -23,7 +23,7 @@ class ElasticSearchServiceSpec extends org.modelcatalogue.testapp.AbstractIntegr
         RelationshipType.relatedToType.save()
         relationshipTypeService.clearCache()
 
-        elasticSearchService.reindex(true).toBlocking().subscribe()
+        elasticSearchService.reindex(false).toBlocking().subscribe()
     }
 
     def "play with elasticsearch"() {
@@ -68,8 +68,8 @@ class ElasticSearchServiceSpec extends org.modelcatalogue.testapp.AbstractIntegr
 
         Class elementClass = HibernateHelper.getEntityClass(element)
 
-        String index = elasticSearchService.getDataModelIndex(dataModel)
-        String type  = elasticSearchService.getTypeName(elementClass)
+        String index = ElasticSearchService.getDataModelIndex(dataModel, elementClass)
+        String type  = ElasticSearchService.getTypeName(elementClass)
 
         expect:
         dataModel
@@ -134,10 +134,19 @@ class ElasticSearchServiceSpec extends org.modelcatalogue.testapp.AbstractIntegr
         foundRelationships.total == 0L
 
         when:
-        ListWithTotalAndType<DataModel> foundDataModels = elasticSearchService.search(DataModel, [search: 'test'])
+        found = false
+        ListWithTotalAndType<DataModel> foundDataModels = Lists.emptyListWithTotalAndType(DataModel)
+        for (int i = 0; i < 100; i++) {
+            foundDataModels = elasticSearchService.search(DataModel, [search: 'test'])
+            found = foundDataModels.total == 1L
+            if (found) {
+                break
+            }
+            Thread.sleep(100)
+        }
 
         then:
-        foundDataModels.total == 1L
+        found
         dataModel in foundDataModels.items
 
         when:

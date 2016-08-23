@@ -86,7 +86,7 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
             }
         }
         return response.hits.hits.collect { SearchHit hit ->
-            type.get(hit.id().toLong())
+            type.get(hit.field('entity_id')?.toLong() ?: hit.id().toLong())
         }
     }
 
