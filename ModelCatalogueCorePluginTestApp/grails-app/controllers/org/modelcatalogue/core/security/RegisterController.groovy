@@ -55,6 +55,10 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
             from conf.ui.register.emailFrom
             subject conf.ui.register.emailSubject
             html body.toString()
+
+            if (System.getenv(UserService.ENV_ADMIN_EMAIL)) {
+                bcc System.getenv(UserService.ENV_ADMIN_EMAIL)
+            }
         }
 
         render view: 'index', model: [emailSent: true]
