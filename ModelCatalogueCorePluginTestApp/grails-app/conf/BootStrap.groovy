@@ -49,7 +49,7 @@ class BootStrap {
         }
 
         if (Environment.current == Environment.PRODUCTION) {
-            userService.inviteAdmin()
+            userService.inviteAdmins()
         }
     }
 
@@ -62,21 +62,21 @@ class BootStrap {
 
         Role.findByAuthority('ROLE_REGISTERED') ?: new Role(authority: 'ROLE_REGISTERED').save(failOnError: true)
 
-        def supervisor = User.findByNameOrUsername('supervisor', 'supervisor') ?: new User(name: 'supervisor', username: 'supervisor', enabled: true, password: System.getenv('MC_SUPERVISOR_PASSWORD') ?: 'supervisor', email: System.getenv(UserService.ENV_SUPERVISOR_EMAIL)).save(failOnError: true)
-
-        if (!supervisor.authorities.contains(roleSupervisor)) {
-            UserRole.create supervisor, roleUser
-            UserRole.create supervisor, metadataCurator
-            UserRole.create supervisor, roleStacktrace
-            UserRole.create supervisor, roleAdmin
-            UserRole.create supervisor, roleSupervisor, true
-        }
-
         if (!production) {
+            def supervisor = User.findByNameOrUsername('supervisor', 'supervisor') ?: new User(name: 'supervisor', username: 'supervisor', enabled: true, password: System.getenv('MC_SUPERVISOR_PASSWORD') ?: 'supervisor', email: System.getenv(UserService.ENV_SUPERVISOR_EMAIL)).save(failOnError: true)
             def admin = User.findByNameOrUsername('admin', 'admin') ?: new User(name: 'admin', username: 'admin', enabled: true, password: 'admin', passwordExpired: production, email: System.getenv('MC_ADMIN_EMAIL')).save(failOnError: true)
             def viewer = User.findByNameOrUsername('viewer', 'viewer') ?: new User(name: 'viewer', username: 'viewer', enabled: true, password: 'viewer').save(failOnError: true)
             def curator = User.findByNameOrUsername('curator', 'curator') ?: new User(name: 'curator', username: 'curator', enabled: true, password: 'curator').save(failOnError: true)
             User.findByNameOrUsername('registered', 'registered') ?: new User(name: 'registered', username: 'registered', enabled: true, password: 'registered').save(failOnError: true)
+
+
+            if (!supervisor.authorities.contains(roleSupervisor)) {
+                UserRole.create supervisor, roleUser
+                UserRole.create supervisor, metadataCurator
+                UserRole.create supervisor, roleStacktrace
+                UserRole.create supervisor, roleAdmin
+                UserRole.create supervisor, roleSupervisor, true
+            }
 
             if (!admin.authorities.contains(roleAdmin)) {
                 UserRole.create admin, roleUser

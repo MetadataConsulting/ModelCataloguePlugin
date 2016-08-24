@@ -25,7 +25,11 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
         String salt = saltSource instanceof NullSaltSource ? null : command.username
         def user = lookupUserClass().newInstance(email: command.email, username: command.username, accountLocked: true, enabled: true)
 
-        if (System.getenv(UserService.ENV_ADMIN_EMAIL) && user.email == System.getenv(UserService.ENV_ADMIN_EMAIL)) {
+        if (
+            (System.getenv(UserService.ENV_ADMIN_EMAIL) && user.email == System.getenv(UserService.ENV_ADMIN_EMAIL))
+                ||
+            (System.getenv(UserService.ENV_SUPERVISOR_EMAIL) && user.email == System.getenv(UserService.ENV_SUPERVISOR_EMAIL))
+        ) {
             // unlock the admin
             user.accountLocked = false
         }
@@ -136,6 +140,9 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 
             if (System.getenv(UserService.ENV_ADMIN_EMAIL) && user.email == System.getenv(UserService.ENV_ADMIN_EMAIL)) {
                 userService.redefineRoles(user, UserService.ACCESS_LEVEL_ADMIN)
+            }
+            if (System.getenv(UserService.ENV_SUPERVISOR_EMAIL) && user.email == System.getenv(UserService.ENV_SUPERVISOR_EMAIL)) {
+                userService.redefineRoles(user, UserService.ACCESS_LEVEL_SUPERVISOR)
             }
 
             registrationCode.delete()
