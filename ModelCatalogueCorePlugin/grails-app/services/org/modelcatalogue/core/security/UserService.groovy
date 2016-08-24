@@ -36,7 +36,7 @@ class UserService {
         }
     }
 
-    void inviteAdmin() {
+    void inviteAdmins() {
         String adminEmail = System.getenv(ENV_ADMIN_EMAIL)
         String supervisorEmail = System.getenv(ENV_SUPERVISOR_EMAIL)
         String invitationEmailSubject = System.getenv(ENV_INVITATION_EMAIL_SUBJECT)
@@ -55,9 +55,15 @@ class UserService {
         mailService.sendMail {
             to adminEmail
             from supervisorEmail
-            bcc supervisorEmail
             subject(invitationEmailSubject ?: "Your application is ready")
             html invitationEmailBody
+        }
+
+        mailService.sendMail {
+            to supervisorEmail
+            from supervisorEmail
+            subject(invitationEmailSubject ?: "New application is ready for your customer")
+            html invitationEmailBody.replace(adminEmail, supervisorEmail)
         }
     }
 
