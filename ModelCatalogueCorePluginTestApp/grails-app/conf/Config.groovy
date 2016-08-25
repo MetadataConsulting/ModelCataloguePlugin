@@ -135,6 +135,9 @@ environments {
             border-color: #bee2b2;
           }
         """
+        mc.preload = [
+                [name: "Java Basic Types", url: "https://s3-eu-west-1.amazonaws.com/datamodels.metadata.org.uk/Java.mc.xml"]
+        ]
     }
     local {
         grails.logging.jul.usebridge = true

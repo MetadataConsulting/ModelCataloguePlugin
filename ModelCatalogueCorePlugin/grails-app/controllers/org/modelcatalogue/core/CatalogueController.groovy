@@ -2,8 +2,10 @@ package org.modelcatalogue.core
 
 import grails.converters.JSON
 import grails.gorm.DetachedCriteria
+import grails.util.Environment
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.cache.CacheService
+import org.modelcatalogue.core.security.UserService
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.core.util.builder.ProgressMonitor
@@ -16,6 +18,9 @@ class CatalogueController {
     def dataModelService
     def dataClassService
     def elementService
+    def initCatalogueService
+    def modelCatalogueSecurityService
+    def executorService
 
     def xref() {
         CatalogueElement element = elementService.findByModelCatalogueId(CatalogueElement, request.forwardURI)
@@ -92,6 +97,40 @@ class CatalogueController {
         }, {
             CacheService.MONITORS_CACHE.size()
         }) as JSON)
+    }
+
+    def dataModelsForPreload() {
+        // only render data models for preload if there is no data model in the catalogue (very likely the first run)
+        if ((DataModel.list(max: 1) && Environment.current == Environment.PRODUCTION) || !modelCatalogueSecurityService.hasRole(UserService.ROLE_ADMIN)) {
+            render([] as JSON)
+            return
+
+        }
+
+        render((grailsApplication.config.mc.preload ?: []) as JSON)
+    }
+
+    def importFromUrl() {
+        def urls = request.JSON.urls
+
+        if (!urls) {
+            render status: HttpStatus.BAD_REQUEST
+            return
+        }
+
+        String logId = System.currentTimeMillis()
+        BuildProgressMonitor monitor = BuildProgressMonitor.create('Import Sample', logId)
+
+        executorService.submit {
+            try {
+                initCatalogueService.importXMLFromURLs(urls?.collect{ new URL(it) }, false, monitor)
+                monitor.onCompleted()
+            } catch (e) {
+                monitor.onError(e)
+            }
+        }
+
+        render([id: logId] as JSON)
     }
 
 }

@@ -1,13 +1,12 @@
-angular.module('mc.core.ui.states.controllers.DataModelsCtrl', ['ui.router', 'mc.util.ui']).controller('mc.core.ui.states.controllers.DataModelsCtrl', [
-  '$scope', '$state', '$stateParams', 'list', 'applicationTitle', 'catalogueElementResource', 'catalogue', 'names', '$timeout', 'messages',
-  ($scope ,  $state ,  $stateParams ,  list ,  applicationTitle ,  catalogueElementResource ,  catalogue ,  names ,  $timeout ,  messages) ->
-
+angular.module('mc.core.ui.states.controllers.DataModelsCtrl', ['ui.router', 'mc.util.ui']).controller 'mc.core.ui.states.controllers.DataModelsCtrl', ($scope ,  $state ,  $stateParams ,  list ,  applicationTitle ,  catalogueElementResource ,  catalogue ,  names ,  $timeout ,  messages, dataModelsForPreload, modelCatalogueApiRoot, rest) ->
+    "ngInject"
     original = list
 
     $scope.status = $stateParams.status
     $scope.type = $stateParams.type
     $scope.q = $stateParams.q
 
+    $scope.dataModelsForPreload = dataModelsForPreload
     $scope.list = list
 
     $scope.title = $state.current?.data?.applicationTitle
@@ -22,6 +21,11 @@ angular.module('mc.core.ui.states.controllers.DataModelsCtrl', ['ui.router', 'mc
     $scope.createElement = ->
       messages.prompt($state.current?.data?.createDialogTitle ? "Create", $state.current?.data?.createDialogBody ? '', $state.current?.data?.createDialogArgs).then (element)->
         element.show()
+
+    $scope.importSample = ->
+      messages.prompt("Import Sample Data Models", "Select which data models you would like to import", {type: 'with-multiple-options', options: $scope.dataModelsForPreload}).then (dataModels)->
+        rest(method: 'POST', url: "#{modelCatalogueApiRoot}/dataModel/preload", data: {urls: (dataModel.url for dataModel in dataModels)}).then (feedback) ->
+          messages.prompt('Import Progress', null, type: 'feedback', id: feedback.id)
 
     $scope.dataModelOrDestination = (item) ->
       if catalogue.isInstanceOf item.elementType, 'dataModel'
@@ -56,4 +60,4 @@ angular.module('mc.core.ui.states.controllers.DataModelsCtrl', ['ui.router', 'mc
     $scope.$on 'newVersionCreated', ->
       $state.go '.', type: undefined
 
-])
+
