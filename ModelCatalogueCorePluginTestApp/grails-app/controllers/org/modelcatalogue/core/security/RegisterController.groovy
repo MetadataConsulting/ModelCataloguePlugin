@@ -11,6 +11,10 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
     UserService userService
 
     def register(RegisterCommand command) {
+        def adminEmail = System.getenv(UserService.ENV_ADMIN_EMAIL)
+        def supervisorEmail = System.getenv(UserService.ENV_SUPERVISOR_EMAIL)
+        def conf = SpringSecurityUtils.securityConfig
+
         if (!grailsApplication.config.mc.allow.signup) {
             flash.error = "Registration is not enabled for this application"
             return
@@ -25,13 +29,17 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
         String salt = saltSource instanceof NullSaltSource ? null : command.username
         def user = lookupUserClass().newInstance(email: command.email, username: command.username, accountLocked: true, enabled: true)
 
-        if (
-            (System.getenv(UserService.ENV_ADMIN_EMAIL) && user.email == System.getenv(UserService.ENV_ADMIN_EMAIL))
-                ||
-            (System.getenv(UserService.ENV_SUPERVISOR_EMAIL) && user.email == System.getenv(UserService.ENV_SUPERVISOR_EMAIL))
-        ) {
-            // unlock the admin
-            user.accountLocked = false
+        if ((adminEmail && user.email != adminEmail) || (supervisorEmail && user.email != supervisorEmail)) {
+            // enable should do the admin
+            user.enabled = false
+            user.save()
+            // notify admin
+            mailService.sendMail {
+                to adminEmail
+                from conf.ui.register.emailFrom
+                subject "Metadata Registry - new user"
+                html "New user registered to your Metadata Registry. Please enable that account in user administration."
+            }
         }
 
         RegistrationCode registrationCode = springSecurityUiService.register(user, command.password, salt)
@@ -45,7 +53,6 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 
         String url = generateLink('verifyRegistration', [t: registrationCode.token])
 
-        def conf = SpringSecurityUtils.securityConfig
         def body = conf.ui.register.emailBody
         if (body.contains('$')) {
             body = evaluate(body, [user: user, url: url])
@@ -55,10 +62,6 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
             from conf.ui.register.emailFrom
             subject conf.ui.register.emailSubject
             html body.toString()
-
-            if (System.getenv(UserService.ENV_ADMIN_EMAIL)) {
-                bcc System.getenv(UserService.ENV_ADMIN_EMAIL)
-            }
         }
 
         render view: 'index', model: [emailSent: true]
@@ -135,7 +138,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
             if (!user) {
                 return
             }
-            user.save(flush:true)
+            user.save(flush: true)
             def UserRole = lookupUserRoleClass()
             def Role = lookupRoleClass()
             for (roleName in conf.ui.register.defaultRoleNames) {
@@ -171,7 +174,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 
     protected String generateLink(String action, linkParams) {
         createLink(base: grailsApplication.config.grails.serverURL,
-            controller: 'register', action: action,
-            params: linkParams)
+                   controller: 'register', action: action,
+                   params: linkParams)
     }
 }
