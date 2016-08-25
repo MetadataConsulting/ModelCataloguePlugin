@@ -28,8 +28,8 @@
       </div>
     </div>
 
-    <div class="row" ng-init="columnClasses = 'col-lg-12 col-sm-12 col-md-12' ; detailClass = 'col-md-12'">
-      <div ng-class="detailClass">
+    <div class="row">
+      <div class="col-md-12">
         <div class="pull-right data-model-create-buttons">
           <contextual-actions role="data-models" no-colors="true" size="sm"></contextual-actions>
         </div>
@@ -42,19 +42,20 @@
           </li>
         </ul>
         <div class="leave-10-before"></div>
-        <infinite-list transform="dataModelOrDestination($element)" column-classes="columnClasses"
-                       list="list"></infinite-list>
-      </div>
-      <div ng-if="element" class="col-md-6">
-        <div class="pull-right data-model-create-buttons">
-          <button type="button" class="btn btn-sm btn-default">
-            <span class="fa fa-fw fa-link"></span> Go to Detail
-          </button>
+        <div ng-if="dataModelsForPreload.length &amp;&amp; !list.total">
+          <div class="jumbotron" >
+            <h1>Welcome to  Metadata Registry</h1>
+            <p>
+              There are no data models yet. Start experimenting with one of the sample data models, import your existing model from one of the supported formats or create brand new data model from the scratch.
+            </p>
+            <p>
+              <button class="btn btn-primary btn-lg" ng-click="importSample()"><span class="fa fa-book"></span> Import Sample</button>
+              <button class="btn btn-success btn-lg" ng-click="createElement()"><span class="fa fa-plus-circle"></span> Create New</button>
+            </p>
+          </div>
         </div>
-        <ul class="nav nav-tabs" role="tablist">
-          <li class="active" role="presentation"><a>Preview</a></li>
-        </ul>
-        <catalogue-element-view element="element"></catalogue-element-view>
+        <infinite-list transform="dataModelOrDestination($element)" column-classes="'col-lg-12 col-sm-12 col-md-12'"
+                       list="list"></infinite-list>
       </div>
     </div>
   </div>

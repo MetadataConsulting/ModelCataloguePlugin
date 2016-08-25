@@ -87,6 +87,8 @@ class ModelCatalogueCorePluginUrlMappings {
                 }
 
                 if (controllerName in ['dataModel', 'classification']) {
+                    "/api/modelCatalogue/core/$elementName/preload"(controller: 'catalogue', action: 'dataModelsForPreload', method: HttpMethod.GET)
+                    "/api/modelCatalogue/core/$elementName/preload"(controller: 'catalogue', action: 'importFromUrl', method: HttpMethod.POST)
                     "/api/modelCatalogue/core/$elementName/$id/declares"(controller: controllerName, action: 'declares', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/$id/containsOrImports/$other"(controller: controllerName, action: 'containsOrImports', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/$id/content"(controller: controllerName, action: 'content', method: HttpMethod.GET)

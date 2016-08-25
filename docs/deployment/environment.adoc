@@ -105,8 +105,8 @@ or the result of calling `http://checkip.amazonaws.com` service (in this order o
 
 
 |Application
-|`MC_SUPERVISOR_PASSWORD`
-|Sets the password for the superuser
+|`MC_PRELOAD`
+|JSON containing list of objects, each having `name` and `url`
 |_None_
 
 |Application

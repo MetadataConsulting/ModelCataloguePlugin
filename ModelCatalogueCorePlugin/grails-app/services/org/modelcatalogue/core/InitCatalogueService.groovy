@@ -6,6 +6,7 @@ import org.grails.datastore.gorm.GormStaticApi
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
+import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.modelcatalogue.core.util.test.TestDataHelper
 import org.modelcatalogue.integration.mc.ModelCatalogueLoader
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
@@ -77,13 +78,13 @@ class InitCatalogueService {
         }
     }
 
-    void importXMLFromURLs(List<URL> urls, boolean failOnError) {
+    void importXMLFromURLs(List<URL> urls, boolean failOnError, ProgressMonitor monitor = ProgressMonitor.NOOP) {
         List<URL> forSecondPass = []
 
         for (URL resource in urls) {
             try {
                 resource.withInputStream {
-                    readXMLFile(resource.toExternalForm(), it, true)
+                    readXMLFile(resource.toExternalForm(), it, true, monitor)
                 }
             } catch (Exception e) {
                 log.info("Resource $resource couldn't be processed at the moment, will try again later", e)
@@ -94,7 +95,7 @@ class InitCatalogueService {
         // second pass
         for (URL resource in forSecondPass) {
             resource.withInputStream {
-                readXMLFile(resource.toExternalForm(), it, failOnError)
+                readXMLFile(resource.toExternalForm(), it, failOnError, monitor)
             }
         }
     }
@@ -119,10 +120,11 @@ class InitCatalogueService {
     }
 
 
-    private void readXMLFile(String location, InputStream stream, boolean failOnError) {
+    private void readXMLFile(String location, InputStream stream, boolean failOnError, ProgressMonitor monitor = ProgressMonitor.NOOP) {
         try {
             log.info "Importing XML file ${location}"
             DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService, true)
+            builder.monitor = monitor
             CatalogueXmlLoader loader = new CatalogueXmlLoader(builder)
             loader.load(stream)
             log.info "File ${location} imported"

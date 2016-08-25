@@ -44,10 +44,6 @@ class BootStrap {
             initSecurity(true)
         }
 
-        if (grailsApplication.config.mc.preload) {
-            initCatalogueService.importXMLFromURLs(grailsApplication.config.mc.preload.collect { new URL(it.toString()) }, false)
-        }
-
         if (Environment.current == Environment.PRODUCTION) {
             userService.inviteAdmins()
         }
