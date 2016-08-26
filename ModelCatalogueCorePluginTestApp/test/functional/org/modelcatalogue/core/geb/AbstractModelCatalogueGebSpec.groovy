@@ -255,10 +255,9 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
 
     void toggleInfTableRow(int row) {
-        waitFor {
-            $('div.inf-table-body tbody tr:nth-child(' + row +') a.inf-cell-expand')
-        }
-        $('div.inf-table-body tbody tr:nth-child(' + row +') a.inf-cell-expand').first().click()
+        check { $('div.inf-table-body tbody tr:nth-child(' + row +') a.inf-cell-expand span.fa-plus-square-o') } displayed
+        click { $('div.inf-table-body tbody tr:nth-child(' + row +') a.inf-cell-expand') }
+        check { $('div.inf-table-body tbody tr:nth-child(' + row +') a.inf-cell-expand span.fa-minus-square-o') } displayed
     }
 
     int totalOf(String name) {
