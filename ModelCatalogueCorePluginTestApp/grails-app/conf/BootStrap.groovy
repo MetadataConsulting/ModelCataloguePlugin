@@ -24,7 +24,6 @@ class BootStrap {
     CatalogueBuilder catalogueBuilder
     def sessionFactory
     def modelCatalogueSearchService
-    def grailsApplication
     def userService
 
     def init = { servletContext ->
@@ -193,6 +192,8 @@ class BootStrap {
 
             setupSimpleCsvTransformation()
 
+            DataType theType = FriendlyErrors.failFriendlySave(new DataType(name: 'data type without any data model', modelCatalogueId: 'http://www.example.com/no-data-model'))
+
             // for generate suggestion test
             catalogueBuilder.build {
                 automatic dataType
@@ -209,6 +210,9 @@ class BootStrap {
                     dataElement(name: 'Test Element 2') {
                         dataType(name: 'Same Name')
                     }
+                }
+                dataModel(name: 'Test 3') {
+                    dataElement(name: "data element with orphaned data type")
                 }
                 dataModelPolicy(name: 'Unique of Kind') {
                     check dataClass property 'name' is 'unique'
@@ -231,6 +235,13 @@ class BootStrap {
                     check dataType property 'name' apply regex: /[^_ -]+/ otherwise 'Name of {2} contains illegal characters ("_", "-" or " ")'
                 }
             }
+
+            DataElement dataElement = DataElement.findByName("data element with orphaned data type")
+
+            dataElement.dataType = theType
+
+            FriendlyErrors.failFriendlySave(dataElement)
+
             println "Init finished in ${new Date()}"
         } catch (e) {
             e.printStackTrace()

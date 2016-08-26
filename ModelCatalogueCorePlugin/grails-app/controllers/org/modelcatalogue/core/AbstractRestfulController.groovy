@@ -228,7 +228,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
                 return
             }
         } else {
-            if (instance.dataModel?.status != ElementStatus.DRAFT) {
+            if ((instance.dataModel?.status ?: instance.status) != ElementStatus.DRAFT) {
                 response.status = FORBIDDEN.value()
                 respond errors: error
                 return
