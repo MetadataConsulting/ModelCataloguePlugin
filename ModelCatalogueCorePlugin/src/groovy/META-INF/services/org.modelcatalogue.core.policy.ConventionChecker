@@ -1,3 +1,4 @@
 org.modelcatalogue.core.policy.RegexChecker
+org.modelcatalogue.core.policy.NegativeRegexChecker
 org.modelcatalogue.core.policy.RequiredChecker
 org.modelcatalogue.core.policy.UniqueChecker
