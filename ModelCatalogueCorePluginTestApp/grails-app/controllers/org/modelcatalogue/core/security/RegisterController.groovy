@@ -30,7 +30,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
         String salt = saltSource instanceof NullSaltSource ? null : command.username
         def user = lookupUserClass().newInstance(email: command.email, username: command.username, accountLocked: false, enabled: false)
 
-        if ((adminEmail && user.email != adminEmail) || (supervisorEmail && user.email != supervisorEmail)) {
+        if ((adminEmail && user.email != adminEmail) && (supervisorEmail && user.email != supervisorEmail)) {
             // notify admin
             mailService.sendMail {
                 to adminEmail
