@@ -258,7 +258,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         angular.forEach $scope.detailSections, (detailSection) ->
           if detailSection.autoSave
             angular.forEach detailSection.autoSave, (value, key) ->
-              if (angular.isString($scope.copy[key]))
+              if ($scope.copy[key] and angular.isString($scope.copy[key]))
                 autoSavePromises.push catalogueElementResource(value).save(name: $scope.copy[key], dataModels: $scope.copy.dataModels).then (saved) ->
                   $scope.copy[key] = saved
 
@@ -273,7 +273,10 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
               $scope.$broadcast 'redrawContextualActions'
           , (response) ->
             showErrorsUsingMessages($scope.messages)(response)
-            deferred.resolve("Invalid values")
+            deferred.reject("Invalid values")
+        , (response) ->
+          showErrorsUsingMessages($scope.messages)(response)
+          deferred.reject("Invalid values")
 
 
         return deferred.promise
