@@ -1,7 +1,9 @@
 package org.modelcatalogue.core
 
 import grails.converters.JSON
+import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.security.UserRole
 import org.modelcatalogue.core.security.UserService
 import org.modelcatalogue.core.util.DataModelFilter
 
@@ -82,7 +84,7 @@ class UserController extends AbstractCatalogueElementController<User> {
             return
         }
 
-        if (user.username == 'supervisor' || params.role == 'supervisor') {
+        if (user.authorities.contains(UserService.ROLE_SUPERVISOR) || params.role == 'supervisor') {
             notFound()
             return
         }
@@ -106,8 +108,9 @@ class UserController extends AbstractCatalogueElementController<User> {
             return
         }
 
-        if (user.username == 'supervisor') {
-            notFound()
+        if (user.authorities.contains(UserService.ROLE_SUPERVISOR)) {
+            user.errors.rejectValue('enabled', 'user.cannot.edit.supervisor', 'Cannot edit supervisor account')
+            respond user.errors
             return
         }
 
@@ -125,7 +128,13 @@ class UserController extends AbstractCatalogueElementController<User> {
 
     protected boolean hasAdditionalIndexCriteria() { return true }
 
-    protected Closure buildAdditionalIndexCriteria() { return { ne 'username', 'supervisor' } }
+    protected Closure buildAdditionalIndexCriteria() {
+        return {
+            not {
+                'in' 'username', UserRole.findAllByRole(Role.findByAuthority(UserService.ROLE_SUPERVISOR))*.user.name
+            }
+        }
+    }
 
 
 }
