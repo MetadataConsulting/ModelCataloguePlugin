@@ -4,6 +4,7 @@ import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.authentication.dao.NullSaltSource
 import grails.plugin.springsecurity.ui.RegisterCommand
 import grails.plugin.springsecurity.ui.RegistrationCode
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.springframework.security.core.context.SecurityContextHolder
 
 class RegisterController extends grails.plugin.springsecurity.ui.RegisterController {
@@ -27,12 +28,9 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
         }
 
         String salt = saltSource instanceof NullSaltSource ? null : command.username
-        def user = lookupUserClass().newInstance(email: command.email, username: command.username, accountLocked: true, enabled: true)
+        def user = lookupUserClass().newInstance(email: command.email, username: command.username, accountLocked: false, enabled: false)
 
         if ((adminEmail && user.email != adminEmail) || (supervisorEmail && user.email != supervisorEmail)) {
-            // enable should do the admin
-            user.enabled = false
-            user.save()
             // notify admin
             mailService.sendMail {
                 to adminEmail
@@ -40,6 +38,10 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
                 subject "Metadata Registry - new user"
                 html "New user registered to your Metadata Registry. Please enable that account in user administration."
             }
+        } else {
+            // enable should do the admin
+            user.enabled = true
+            FriendlyErrors.failFriendlySave(user)
         }
 
         RegistrationCode registrationCode = springSecurityUiService.register(user, command.password, salt)
