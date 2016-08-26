@@ -204,7 +204,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
 
 
-  actionsProvider.registerActionInRoles 'update-user',[actionsProvider.ROLE_ITEM_DETAIL_ACTION], ($scope, messages, names, security) ->
+  actionsProvider.registerActionInRoles 'update-user',[actionsProvider.ROLE_ITEM_DETAIL_ACTION], ($scope, messages, names, security, $state) ->
     'ngInject'
 
     return undefined if not security.hasRole('ADMIN')
@@ -216,9 +216,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       position:   -2000
       label:      if $scope.element.enabled then 'Disable User' else 'Enable User'
       icon:       if $scope.element.enabled then 'fa fa-ban' else 'fa fa-check'
-      disabled:   $scope.element.username in ['admin', 'supervisor']
       type:       'primary'
-      watches:    ['element.enabled', 'element.username']
+      watches:    ['element.enabled']
       action:     ->
         title = if $scope.element.enabled then "Disable User" else "Disable User"
         desc = if $scope.element.enabled then "Do you want to disable user?" else "Do you want to enable user?"
@@ -226,10 +225,14 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
           if $scope.element.enabled
             return $scope.element.execute('disable', 'POST').then (user) ->
               $scope.element.updateFrom(user)
+              # for some reason the app does not refresh properly
+              $state.go '.', {}, {reload: true}
             , showErrorsUsingMessages(messages)
 
           return $scope.element.execute('enable', 'POST').then (user) ->
             $scope.element.updateFrom(user)
+            # for some reason the app does not refresh properly
+            $state.go '.', {}, {reload: true}
           , showErrorsUsingMessages(messages)
     }
 
@@ -258,9 +261,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
         messages.prompt("Select Role", "Select new role for user \"#{$scope.element.username}\"", type: 'options', options: options).then (role) ->
           $scope.element.execute("role/#{role}", "POST").then (user) ->
-            $rootScope.$broadcast 'catalogueElementUpdated', user
             # for some reason the app does not refresh properly
-            # $state.go '.', {}, {reload: true}
+            $state.go '.', {}, {reload: true}
 
     }
 
