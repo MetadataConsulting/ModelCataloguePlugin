@@ -2,11 +2,6 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
 .config (actionsProvider, names)->
   'ngInject'
 
-  anyParentDataModel = ($scope) ->
-    return $scope.currentDataModel if $scope.currentDataModel
-    return anyParentDataModel($scope.$parent) if $scope.$parent
-    return undefined
-
   ##############
   # Data Model #
   ##############
@@ -43,9 +38,9 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     'validationRule'
   ], (resource, index) ->
     actionsProvider.registerChildAction 'catalogue-element', 'catalogue-element-create-' + resource,
-      ($scope, names, security, messages, $state, $log, catalogue) ->
+      ($scope, names, security, messages, $state, $log, catalogue, dataModelService) ->
         'ngInject'
-        dataModel = anyParentDataModel($scope)
+        dataModel = dataModelService.anyParentDataModel($scope)
         return undefined unless security.hasRole('CURATOR')
         return undefined unless messages.hasPromptFactory('create-' + resource) or messages.hasPromptFactory('edit-' + resource)
         return undefined unless angular.isFunction($scope.element.isInstanceOf)
