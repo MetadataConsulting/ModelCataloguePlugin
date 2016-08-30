@@ -24,19 +24,16 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
 
       windowEl = angular.element($window)
       handler = ($scope) -> $scope.scroll = windowEl.scrollTop()
-      windowEl.on 'scroll', ->
-        $timeout -> handler($scope)
 
-      handler($scope)
+      unless $scope.manualLoad == true
+        windowEl.on 'scroll', ->
+          $timeout -> handler($scope)
 
-      initialOffset = undefined
+        handler($scope)
+        windowEl.resize -> loadMoreIfNeeded
 
-      updateOffset = (newOffset = angular.copy(header.offset())) ->
-        return initialOffset  if newOffset.top == 0
-        return initialOffset  if not header.is(':visible')
-        initialOffset = angular.copy(header.offset())
-
-      initialOffset = updateOffset()
+        $scope.$watch 'scroll', ->
+          loadMoreIfNeeded()
 
       $scope.sortBy = (column) ->
         $state.go '.', {sort: column.sort.property, order: if $scope.list.order == 'desc' then 'asc' else 'desc'}
@@ -45,25 +42,6 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
         return 'fa-sort'                                          if column.sort.property != $scope.list.sort
         return "fa-sort-#{column.sort.type}-#{$scope.list.order}" if column.sort.type
         return "fa-sort-#{$scope.list.order}"
-
-
-      updateHeader = (scroll) ->
-        header.css(width: body.width())
-        if not initialOffset
-          header.find('.contextual-actions button.dropdown-toggle').parent().addClass('dropup')
-          return
-        topPadding = angular.element('.navbar .container-fluid').outerHeight() + 1
-        if scroll > initialOffset.top - topPadding
-          header.css(position: 'fixed', top: angular.element('.navbar .container-fluid').outerHeight() + 1)
-          spacer.css('min-height': "#{header.outerHeight()}px")
-          header.find('.contextual-actions button.dropdown-toggle').parent().removeClass('dropup')
-        else
-          updateOffset()
-          header.css(position: 'static')
-          header.find('.contextual-actions button.dropdown-toggle').parent().addClass('dropup')
-          spacer.css('min-height': "0px")
-
-
 
       checkLoadingPromise = $q.when true
 
@@ -79,31 +57,14 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
 
       loadMoreIfNeeded()
 
-      update = ->
-        updateOffset()
-        updateHeader(windowEl.scrollTop())
-        loadMoreIfNeeded()
-
-      $scope.$watch 'scroll', (scroll) ->
-        updateHeader(scroll)
-        loadMoreIfNeeded()
-
-      $scope.$watch 'list', update
-      $scope.$watch 'columns', update
+      $scope.$watch 'list', loadMoreIfNeeded
+      $scope.$watch 'columns', loadMoreIfNeeded
       $scope.$watch 'loading', (loading) ->
         loadMoreIfNeeded() unless loading
-
-      windowEl.on 'resize', ->
-        updateHeader(windowEl.scrollTop())
 
       $scope.doManualLoad = ->
         $scope.manualLoad = false
         $scope.loadMore()
-
-      $scope.$on 'infiniteTableRedraw', ->
-        updateHeader()
-        $timeout updateHeader, 100
-
 
 
       getRowAndIndexBefore = (tableRowIndex, originalRowAndIndex) ->
@@ -152,8 +113,6 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
 
               $scope.rows.splice(original.index, 1)
               $scope.rows.splice(insertIndex, 0, original.row)
-
-      windowEl.resize -> update
 
     ]
   }
