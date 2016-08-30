@@ -1,16 +1,6 @@
 catalogueElementPicker = angular.module('mc.core.ui.catalogueElementPicker',
   ['mc.core.modelCatalogueSearch', 'mc.core.catalogueElementResource', 'ui.bootstrap', 'mc.core.ui.utils'])
 
-catalogueElementPicker.run ['$templateCache', ($templateCache) ->
-  $templateCache.put "modelcatalogue/core/ui/catalogueElementPickerTypeahead.html", """
-        <a class="cep-item" ng-class="{'show-more-cep-item': match.model.more, 'create-new-cep-item': match.model.create}">
-        <span class="omnisearch-text" ng-class="{'text-warning': match.model.status == 'DRAFT', 'text-info': match.model.status == 'PENDING'}">
-          <span class="text-muted" ng-class="match.model.getIcon()"/><span> {{match.model.classifiedName || match.model.name}}
-        </span><br/>
-        <small ng-if="match.model.description">{{match.model.description}}</small>
-        </a>
-  """
-]
 catalogueElementPicker.directive 'catalogueElementPicker', ($compile, modelCatalogueSearch, catalogueElementResource,
   dataModelService, messages) -> {
   'ngInject'
@@ -139,7 +129,7 @@ catalogueElementPicker.directive 'catalogueElementPicker', ($compile, modelCatal
     element.attr('uib-typeahead', "el as label(el, #{label}) for el in searchForElement($viewValue, \"" + escape(attrs.ngModel ? '') + "\", \"" + escape(attrs.catalogueElementPicker ? '') + "\",\"" + escape(attrs.resource ? '') + "\", \"" + escape(attrs.status ? '') + "\", " + attrs.global + " , \"" + escape(attrs.contentType ? '') + "\", \"" + escape(attrs.typeaheadOnSelect ? '') + "\")")
     element.attr('autocomplete', "off")
     element.attr('typeahead-wait-ms', "50") unless element.attr('typeahead-wait-ms')
-    element.attr('typeahead-template-url', 'modelcatalogue/core/ui/catalogueElementPickerTypeahead.html')
+    element.attr('typeahead-template-url', '/mc/core/ui/utils/catalogueElementPicker.html')
     element.attr('placeholder', if attrs.status then "Start typing or click icon on the left for advanced search for #{attrs.status} elements" else 'Start typing or click icon on the left for advanced search')
     element.removeAttr('catalogue-element-picker')
     element.removeAttr('catalogueElementPicker')
