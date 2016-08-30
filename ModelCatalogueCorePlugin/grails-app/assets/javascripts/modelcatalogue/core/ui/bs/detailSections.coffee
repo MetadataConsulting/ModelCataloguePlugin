@@ -19,13 +19,6 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       </div>
       <div class="full-width-editable col-md-9"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#namespace']" e-name="metadata-namespace">{{element.ext.get('http://www.modelcatalogue.org/metadata/#namespace') || 'empty'}}</small></div>
   '''
-
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/revisionNotes.html', '''
-      <div class="col-md-3">
-          <strong class="small">Revision Notes</strong>
-      </div>
-      <div class="full-width-editable col-md-9 preserve-new-lines"><small editable-textarea="copy.revisionNotes" e-rows="5" e-cols="1000">{{element.revisionNotes || 'empty'}}</small></div>
-  '''
 ]
 
 metadataEditors.config ['detailSectionsProvider', (detailSectionsProvider)->
@@ -258,7 +251,7 @@ x in ['apple', 'banana', 'cherry']
       'dataModel'
     ]
     keys: []
-    template: 'modelcatalogue/core/ui/detailSections/revisionNotes.html'
+    template: '/mc/core/ui/detail-sections/revisionNotes.html'
   }
 
   detailSectionsProvider.register {
