@@ -27,7 +27,7 @@ angular.module('mc.core.ui.bs.modalPromptModel', ['mc.util.messages']).config ['
                 <input type="text" class="form-control" id="name" placeholder="Name" ng-model="copy.name">
               </div>
               <div class="form-group">
-                <label for="modelCatalogueId" class="">Catalogue ID (URL)</label>
+                <label for="modelCatalogueId" class="">Catalogue ID</label>
                 <input type="text" class="form-control" id="modelCatalogueId" placeholder="e.g. external ID, namespace (leave blank for generated)" ng-model="copy.modelCatalogueId">
               </div>
               <div class="form-group">

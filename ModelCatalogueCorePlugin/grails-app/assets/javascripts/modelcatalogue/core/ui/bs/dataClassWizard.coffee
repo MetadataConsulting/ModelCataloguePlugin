@@ -287,10 +287,6 @@ angular.module('mc.core.ui.bs.dataClassWizard', ['mc.util.messages', 'mc.util.ui
             return $scope.metadata.values.length > 0 and $scope.metadata.values[0].key
 
 
-          $scope.isModelCatalogueIdValid = ->
-            return true if not $scope.dataClass.modelCatalogueId
-            return new RegExp(/(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?/).test($scope.dataClass.modelCatalogueId)
-
           $scope.owners =
             dataClass: metadataEditors.createFakeOwner('dataClass')
             parents: metadataEditors.createFakeOwner('=[hierarchy]=>dataClass')

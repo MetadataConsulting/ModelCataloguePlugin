@@ -36,7 +36,7 @@ x in ['apple', 'banana', 'cherry']
           break
         result += "#{e.key} \n"
     if dataType?.dataClass
-      result = """<a href="#{dataType.dataClass.modelCatalogueId}"><span class="fa fa-fw fa-cubes"></span>#{dataType.dataClass.name}</a>"""
+      result = """<a href="#{dataType.dataClass.href()}"><span class="fa fa-fw fa-cubes"></span>#{dataType.dataClass.name}</a>"""
     else if dataType
       result = dataType?.name
     result
@@ -81,7 +81,7 @@ x in ['apple', 'banana', 'cherry']
         rest(url: "#{modelCatalogueApiRoot}#{element.link}/setDeprecated", method: 'POST', data: {enumerationId: enumeration.id, deprecated: deprecated}).then () ->
           enumeration.deprecated = !enumeration.deprecated
           globalMessages.success "Enumeration #{enumeration.key} has been #{if deprecated then 'deprecated' else 'restored'}."
-        , (result) ->
+        , ->
           globalMessages.error "Error during setting deprecated."
   }
 
