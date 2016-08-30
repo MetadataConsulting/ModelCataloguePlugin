@@ -38,13 +38,6 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       <div class="full-width-editable col-md-9 preserve-new-lines"><small editable-textarea="copy.revisionNotes" e-rows="5" e-cols="1000">{{element.revisionNotes || 'empty'}}</small></div>
   '''
 
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/description.html', '''
-      <div class="col-md-3">
-          <strong class="small">Description</strong>
-      </div>
-      <div class="full-width-editable col-md-9 preserve-new-lines"><small editable-textarea="copy.description" e-rows="5" e-cols="1000" class="ce-description">{{element.description || 'empty'}}</small></div>
-  '''
-
   $templateCache.put 'modelcatalogue/core/ui/detailSections/rule.html', '''
       <div class="col-md-3">
           <strong class="small">Rule</strong>
@@ -116,7 +109,7 @@ x in ['apple', 'banana', 'cherry']
       'catalogueElement'
     ]
     keys: []
-    template: 'modelcatalogue/core/ui/detailSections/description.html'
+    template: '/mc/core/ui/detail-sections/description.html'
   }
 
   detailSectionsProvider.register {
