@@ -1,0 +1,5 @@
+<div class="col-md-12">
+  <img style="max-width: 100%" ng-src="{{element.downloadUrl}}" ng-if="element.contentType.indexOf('image/') == 0"/>
+  <div ng-if="element.htmlPreview" ng-bind-html="element.htmlPreview"></div>
+  <pre ng-if="element.contentType.indexOf('image/') != 0 &amp;&amp; !element.htmlPreview" class="text-center">{{"No preview available"}}</pre>
+</div>

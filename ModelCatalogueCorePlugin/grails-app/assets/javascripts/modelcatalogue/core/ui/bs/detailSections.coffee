@@ -26,14 +26,6 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       </div>
       <div class="full-width-editable col-md-9 preserve-new-lines"><small editable-textarea="copy.revisionNotes" e-rows="5" e-cols="1000">{{element.revisionNotes || 'empty'}}</small></div>
   '''
-
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/assetPreview.html', '''
-      <div class="col-md-12">
-          <img style="max-width: 100%" ng-src="{{element.downloadUrl}}" ng-if="element.contentType.indexOf('image/') == 0"/>
-          <div ng-if="element.htmlPreview" ng-bind-html="element.htmlPreview"></div>
-          <pre ng-if="element.contentType.indexOf('image/') != 0 &amp;&amp; !element.htmlPreview" class="text-center">No preview available</pre>
-      </div>
-  '''
 ]
 
 metadataEditors.config ['detailSectionsProvider', (detailSectionsProvider)->
@@ -256,7 +248,7 @@ x in ['apple', 'banana', 'cherry']
       'asset'
     ]
     keys: []
-    template: 'modelcatalogue/core/ui/detailSections/assetPreview.html'
+    template: '/mc/core/ui/detail-sections/assetPreview.html'
   }
 
   detailSectionsProvider.register {
