@@ -8,62 +8,6 @@ metadataEditors = angular.module('mc.core.ui.bs.detailSections', ['mc.core.ui.de
   <span class="fa fa-question-circle text-muted" tooltip="These are the authors of the data model"></span>
 ###
 
-metadataEditors.run ['$templateCache', ($templateCache) ->
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/organization.html', '''
-      <div class="col-md-3">
-          <strong class="small">Organization</strong>
-      </div>
-      <div class="full-width-editable col-md-9"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#organization']" e-name="metadata-organization">{{element.ext.get('http://www.modelcatalogue.org/metadata/#organization') || 'empty'}}</small></div>
-      <div class="col-md-3">
-          <strong class="small">Namespace</strong>
-      </div>
-      <div class="full-width-editable col-md-9"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#namespace']" e-name="metadata-namespace">{{element.ext.get('http://www.modelcatalogue.org/metadata/#namespace') || 'empty'}}</small></div>
-  '''
-
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/modelCatalogueId.html', '''
-      <div class="col-md-3">
-          <strong class="small">Model Catalogue ID</strong>
-      </div>
-      <div class="col-md-9"><small>{{element.internalModelCatalogueId}}</small></div>
-      <div class="col-md-3" ng-if="element.modelCatalogueId &amp;&amp; element.modelCatalogueId != element.internalModelCatalogueId">
-          <strong class="small">External ID (URL)</strong>
-      </div>
-      <div class="full-width-editable col-md-9" ng-if="element.modelCatalogueId &amp;&amp; element.modelCatalogueId != element.internalModelCatalogueId"><a class="small" ng-href="{{element.modelCatalogueId}}" editable-text="copy.modelCatalogueId">{{element.modelCatalogueId}}</a></div>
-  '''
-
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/revisionNotes.html', '''
-      <div class="col-md-3">
-          <strong class="small">Revision Notes</strong>
-      </div>
-      <div class="full-width-editable col-md-9 preserve-new-lines"><small editable-textarea="copy.revisionNotes" e-rows="5" e-cols="1000">{{element.revisionNotes || 'empty'}}</small></div>
-  '''
-
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/description.html', '''
-      <div class="col-md-3">
-          <strong class="small">Description</strong>
-      </div>
-      <div class="full-width-editable col-md-9 preserve-new-lines"><small editable-textarea="copy.description" e-rows="5" e-cols="1000" class="ce-description">{{element.description || 'empty'}}</small></div>
-  '''
-
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/rule.html', '''
-      <div class="col-md-3">
-          <strong class="small">Rule</strong>
-      </div>
-      <div class="full-width-editable col-md-9 preserve-new-lines">
-        <pre editable-textarea="copy.rule" e-rows="5" e-cols="1000" class="ce-rule small">{{element.rule || 'empty'}}</pre>
-        <p ng-if="editableForm.$visible" class="help-block">Enter valid <a href="http://www.groovy-lang.org/" target="_blank">Groovy</a> code. Variable <code>x</code> refers to the value validated value and  <code>dataType</code> to current data type. Last row is the result which should be <code>boolean</code> value. For example you can <a ng-click="view.showRegexExample(copy, messages)"><span class="fa fa-magic"></span> validate using regular expression</a> or <a ng-click="view.showSetExample(copy, messages)"><span class="fa fa-magic"></span> values in set</a></p>
-      </div>
-  '''
-
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/assetPreview.html', '''
-      <div class="col-md-12">
-          <img style="max-width: 100%" ng-src="{{element.downloadUrl}}" ng-if="element.contentType.indexOf('image/') == 0"/>
-          <div ng-if="element.htmlPreview" ng-bind-html="element.htmlPreview"></div>
-          <pre ng-if="element.contentType.indexOf('image/') != 0 &amp;&amp; !element.htmlPreview" class="text-center">No preview available</pre>
-      </div>
-  '''
-]
-
 metadataEditors.config ['detailSectionsProvider', (detailSectionsProvider)->
   REGEX_EXAMPLE = """// value is decimal number
 x ==~ /\\d+(\\.\\d+)?/
@@ -116,7 +60,7 @@ x in ['apple', 'banana', 'cherry']
       'catalogueElement'
     ]
     keys: []
-    template: 'modelcatalogue/core/ui/detailSections/description.html'
+    template: '/mc/core/ui/detail-sections/description.html'
   }
 
   detailSectionsProvider.register {
@@ -148,7 +92,7 @@ x in ['apple', 'banana', 'cherry']
       'dataType'
     ]
     keys: []
-    template: 'modelcatalogue/core/ui/detailSections/rule.html'
+    template: '/mc/core/ui/detail-sections/rule.html'
 
     showRegexExample: (copy, messages) -> showExample(copy, messages, REGEX_EXAMPLE)
     showSetExample: (copy, messages) -> showExample(copy, messages, SET_EXAMPLE)
@@ -173,7 +117,7 @@ x in ['apple', 'banana', 'cherry']
       'catalogueElement'
     ]
     keys: []
-    template: 'modelcatalogue/core/ui/detailSections/modelCatalogueId.html'
+    template: '/mc/core/ui/detail-sections/modelCatalogueId.html'
   }
 
   detailSectionsProvider.register {
@@ -284,7 +228,7 @@ x in ['apple', 'banana', 'cherry']
       'asset'
     ]
     keys: []
-    template: 'modelcatalogue/core/ui/detailSections/assetPreview.html'
+    template: '/mc/core/ui/detail-sections/assetPreview.html'
   }
 
   detailSectionsProvider.register {
@@ -294,7 +238,7 @@ x in ['apple', 'banana', 'cherry']
       'dataModel'
     ]
     keys: []
-    template: 'modelcatalogue/core/ui/detailSections/revisionNotes.html'
+    template: '/mc/core/ui/detail-sections/revisionNotes.html'
   }
 
   detailSectionsProvider.register {
@@ -307,7 +251,7 @@ x in ['apple', 'banana', 'cherry']
        'http://www.modelcatalogue.org/metadata/#namespace'
        'http://www.modelcatalogue.org/metadata/#organization'
      ]
-     template: 'modelcatalogue/core/ui/detailSections/organization.html'
+     template: '/mc/core/ui/detail-sections/organization.html'
   }
 
   detailSectionsProvider.register {

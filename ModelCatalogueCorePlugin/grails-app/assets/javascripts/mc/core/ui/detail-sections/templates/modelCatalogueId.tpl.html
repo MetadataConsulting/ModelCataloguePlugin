@@ -1,0 +1,16 @@
+<div class="col-md-3">
+  <strong class="small">Model Catalogue ID</strong>
+</div>
+<div class="col-md-9">
+  <small>{{element.internalModelCatalogueId}}</small>
+</div>
+<div class="col-md-3"
+     ng-if="element.modelCatalogueId && element.modelCatalogueId != element.internalModelCatalogueId">
+  <strong class="small">External ID (URL)</strong>
+</div>
+<div class="full-width-editable col-md-9"
+     ng-if="element.modelCatalogueId && element.modelCatalogueId != element.internalModelCatalogueId">
+  <a class="small" ng-href="{{element.modelCatalogueId}}" editable-text="copy.modelCatalogueId">
+    {{element.modelCatalogueId}}
+  </a>
+</div>
