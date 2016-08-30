@@ -25,7 +25,8 @@ angular.module('mc.core.ui.states.controllers.DataModelsCtrl', ['ui.router', 'mc
     $scope.importSample = ->
       messages.prompt("Import Sample Data Models", "Select which data models you would like to import", {type: 'with-multiple-options', options: $scope.dataModelsForPreload}).then (dataModels)->
         rest(method: 'POST', url: "#{modelCatalogueApiRoot}/dataModel/preload", data: {urls: (dataModel.url for dataModel in dataModels)}).then (feedback) ->
-          messages.prompt('Import Progress', null, type: 'feedback', id: feedback.id)
+          messages.prompt('Import Progress', null, type: 'feedback', id: feedback.id).then ->
+            $state.go 'dataModels', type: 'catalogue'
 
     $scope.dataModelOrDestination = (item) ->
       if catalogue.isInstanceOf item.elementType, 'dataModel'

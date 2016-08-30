@@ -5,7 +5,7 @@
 
     angular.module("mc.util.MessagingClient", ['mc.util.Stomp']).provider("MessagingClient", MessagingClientProvider);
 
-    function MessagingClient(Stomp, SockJS, SockJSURL, $q, $interval, $log) {
+    function MessagingClient(Stomp, SockJS, SockJSURL, $q, $interval, $log, $rootScope) {
         var subscriptions = {}, StompClient;
 
         this.isConnected = function () {
@@ -20,18 +20,24 @@
             }
 
             if (!StompClient) {
-                StompClient = Stomp.over(new SockJS(SockJSURL));
+                var sockJS = new SockJS(SockJSURL);
+                StompClient = Stomp.over(sockJS);
                 StompClient.debug = function(message){
                     // uncomment to show stomp debug messages
                     // $log.debug(message);
-                }
+                };
+                sockJS.onclose = function() {
+                  $rootScope.$broadcast('displayGlobalMessage', "Connection lost", "The application has been disconnected. Please, refresh the page.", 'error', true);
+                };
             }
 
             StompClient.connect(headers, function () {}, function (err) {
+                $log.error(err);
                 if (intervalPromise) {
                     $interval.cancel(intervalPromise)
                 }
-                deferred.reject(err)
+                deferred.reject(err);
+                $rootScope.$broadcast('displayGlobalMessage', "Connection lost", "The application has been disconnected. Please, refresh the page.", 'error', true);
             });
 
             if (this.isConnected()) {
@@ -114,8 +120,8 @@
         return this;
     }
 
-    function MessagingClientFactory(Stomp, SockJS, SockJSURL, $q, $interval, $log) {
-        return new MessagingClient(Stomp, SockJS, SockJSURL, $q, $interval, $log);
+    function MessagingClientFactory(Stomp, SockJS, SockJSURL, $q, $interval, $log, $rootScope) {
+        return new MessagingClient(Stomp, SockJS, SockJSURL, $q, $interval, $log, $rootScope);
     }
 
     function MessagingClientProvider() {
