@@ -8,19 +8,6 @@ metadataEditors = angular.module('mc.core.ui.bs.detailSections', ['mc.core.ui.de
   <span class="fa fa-question-circle text-muted" tooltip="These are the authors of the data model"></span>
 ###
 
-metadataEditors.run ['$templateCache', ($templateCache) ->
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/organization.html', '''
-      <div class="col-md-3">
-          <strong class="small">Organization</strong>
-      </div>
-      <div class="full-width-editable col-md-9"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#organization']" e-name="metadata-organization">{{element.ext.get('http://www.modelcatalogue.org/metadata/#organization') || 'empty'}}</small></div>
-      <div class="col-md-3">
-          <strong class="small">Namespace</strong>
-      </div>
-      <div class="full-width-editable col-md-9"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#namespace']" e-name="metadata-namespace">{{element.ext.get('http://www.modelcatalogue.org/metadata/#namespace') || 'empty'}}</small></div>
-  '''
-]
-
 metadataEditors.config ['detailSectionsProvider', (detailSectionsProvider)->
   REGEX_EXAMPLE = """// value is decimal number
 x ==~ /\\d+(\\.\\d+)?/
@@ -264,7 +251,7 @@ x in ['apple', 'banana', 'cherry']
        'http://www.modelcatalogue.org/metadata/#namespace'
        'http://www.modelcatalogue.org/metadata/#organization'
      ]
-     template: 'modelcatalogue/core/ui/detailSections/organization.html'
+     template: '/mc/core/ui/detail-sections/organization.html'
   }
 
   detailSectionsProvider.register {
