@@ -27,16 +27,6 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       <div class="full-width-editable col-md-9 preserve-new-lines"><small editable-textarea="copy.revisionNotes" e-rows="5" e-cols="1000">{{element.revisionNotes || 'empty'}}</small></div>
   '''
 
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/rule.html', '''
-      <div class="col-md-3">
-          <strong class="small">Rule</strong>
-      </div>
-      <div class="full-width-editable col-md-9 preserve-new-lines">
-        <pre editable-textarea="copy.rule" e-rows="5" e-cols="1000" class="ce-rule small">{{element.rule || 'empty'}}</pre>
-        <p ng-if="editableForm.$visible" class="help-block">Enter valid <a href="http://www.groovy-lang.org/" target="_blank">Groovy</a> code. Variable <code>x</code> refers to the value validated value and  <code>dataType</code> to current data type. Last row is the result which should be <code>boolean</code> value. For example you can <a ng-click="view.showRegexExample(copy, messages)"><span class="fa fa-magic"></span> validate using regular expression</a> or <a ng-click="view.showSetExample(copy, messages)"><span class="fa fa-magic"></span> values in set</a></p>
-      </div>
-  '''
-
   $templateCache.put 'modelcatalogue/core/ui/detailSections/assetPreview.html', '''
       <div class="col-md-12">
           <img style="max-width: 100%" ng-src="{{element.downloadUrl}}" ng-if="element.contentType.indexOf('image/') == 0"/>
@@ -130,7 +120,7 @@ x in ['apple', 'banana', 'cherry']
       'dataType'
     ]
     keys: []
-    template: 'modelcatalogue/core/ui/detailSections/rule.html'
+    template: '/mc/core/ui/detail-sections/rule.html'
 
     showRegexExample: (copy, messages) -> showExample(copy, messages, REGEX_EXAMPLE)
     showSetExample: (copy, messages) -> showExample(copy, messages, SET_EXAMPLE)
