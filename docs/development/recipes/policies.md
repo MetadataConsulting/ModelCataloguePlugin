@@ -15,10 +15,11 @@ You can use `every` as alias to `catalogueElement`.
 Currently following checkers are available:
 
 | Constraint Name | Description                                                                            | Required Configuration
-|-----------------|----------------------------------------------------------------------------------------|-----------------------------
+|-----------------|----------------------------------------------------------------------------------------|--------------------------------
 | `unique`        | There can be only one property or extension within the given value in the data model.  | _None_
 | `required`      | The property or extension has to be present in instances of given domain.              | _None_
 | `regex`         | The given property or extension as string must match the regular expression            | Regular Expression to match
+| `negativeRegex` | The given property or extension as string must not match the regular expression        | Regular Expression not to match
 
 Values can be injected to constraint violation texts:
 
