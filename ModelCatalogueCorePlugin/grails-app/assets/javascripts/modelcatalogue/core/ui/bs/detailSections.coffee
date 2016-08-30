@@ -20,17 +20,6 @@ metadataEditors.run ['$templateCache', ($templateCache) ->
       <div class="full-width-editable col-md-9"><small editable-text="extAsMap['http://www.modelcatalogue.org/metadata/#namespace']" e-name="metadata-namespace">{{element.ext.get('http://www.modelcatalogue.org/metadata/#namespace') || 'empty'}}</small></div>
   '''
 
-  $templateCache.put 'modelcatalogue/core/ui/detailSections/modelCatalogueId.html', '''
-      <div class="col-md-3">
-          <strong class="small">Model Catalogue ID</strong>
-      </div>
-      <div class="col-md-9"><small>{{element.internalModelCatalogueId}}</small></div>
-      <div class="col-md-3" ng-if="element.modelCatalogueId &amp;&amp; element.modelCatalogueId != element.internalModelCatalogueId">
-          <strong class="small">External ID (URL)</strong>
-      </div>
-      <div class="full-width-editable col-md-9" ng-if="element.modelCatalogueId &amp;&amp; element.modelCatalogueId != element.internalModelCatalogueId"><a class="small" ng-href="{{element.modelCatalogueId}}" editable-text="copy.modelCatalogueId">{{element.modelCatalogueId}}</a></div>
-  '''
-
   $templateCache.put 'modelcatalogue/core/ui/detailSections/revisionNotes.html', '''
       <div class="col-md-3">
           <strong class="small">Revision Notes</strong>
@@ -166,7 +155,7 @@ x in ['apple', 'banana', 'cherry']
       'catalogueElement'
     ]
     keys: []
-    template: 'modelcatalogue/core/ui/detailSections/modelCatalogueId.html'
+    template: '/mc/core/ui/detail-sections/modelCatalogueId.html'
   }
 
   detailSectionsProvider.register {
