@@ -114,18 +114,6 @@ environments {
         }
         mc.allow.signup = true
 
-        grails {
-            mail {
-                host = "smtp.gmail.com"
-                port = 465
-                username = "youracount@gmail.com"
-                password = "yourpassword"
-                props = ["mail.smtp.auth":"true",
-                         "mail.smtp.socketFactory.port":"465",
-                         "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
-                         "mail.smtp.socketFactory.fallback":"false"]
-            }
-        }
         grails.plugin.console.enabled = true
         mc.search.elasticsearch.local="${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/es${System.currentTimeMillis()}"
         mc.css.custom = """
@@ -138,6 +126,7 @@ environments {
         mc.preload = [
                 [name: "Java Basic Types", url: "https://s3-eu-west-1.amazonaws.com/datamodels.metadata.org.uk/Java.mc.xml"]
         ]
+        grails.mail.disabled=true
     }
     local {
         grails.logging.jul.usebridge = true
@@ -170,6 +159,7 @@ environments {
         } else {
             mc.search.elasticsearch.local="${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/es${System.currentTimeMillis()}"
         }
+        grails.mail.disabled=true
     }
     production {
         grails.logging.jul.usebridge = false
