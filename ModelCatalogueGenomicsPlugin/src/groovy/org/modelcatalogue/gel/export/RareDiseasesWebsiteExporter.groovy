@@ -2,6 +2,7 @@ package org.modelcatalogue.gel.export
 
 import grails.gorm.DetachedCriteria
 import grails.gsp.PageRenderer
+import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.Relationship
@@ -59,7 +60,7 @@ class RareDiseasesWebsiteExporter {
     }
 
     void writeDetailPage(ZipOutputStream zos, DataClass disease) {
-        zos.putNextEntry(new ZipEntry("${disease.latestVersionId ?: disease.id}.${disease.versionNumber}.html"))
+        zos.putNextEntry(new ZipEntry("${getId(disease)}.html"))
         pageRenderer.renderTo(view: '/rareDiseasesWeb/page', model: [
             disease: disease,
             eligibility: findEligibility(disease),
@@ -104,6 +105,13 @@ class RareDiseasesWebsiteExporter {
             cs: closingStmt
 
         ]
+    }
+
+    static String getId(CatalogueElement disease) {
+        if (disease.hasModelCatalogueId() && !disease.getModelCatalogueId().startsWith('http')) {
+            return disease.getModelCatalogueId()
+        }
+        return "${disease.latestVersionId ?: disease.id}.${disease.versionNumber}"
     }
 
     static DataClass findPhenotypes(DataClass parent) {
