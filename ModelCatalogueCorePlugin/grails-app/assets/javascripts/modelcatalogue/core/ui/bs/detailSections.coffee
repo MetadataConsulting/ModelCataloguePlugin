@@ -133,7 +133,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Basic'
-    position: 0
+    position: 5
     types: [
       'dataModel'
     ]
@@ -150,7 +150,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Basic'
-    position: 0
+    position: 5
     types: [
       'measurementUnit'
     ]
@@ -160,7 +160,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Basic'
-    position: 0
+    position: 5
     types: [
       'validationRule'
     ]
@@ -170,7 +170,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Basic'
-    position: 0
+    position: 5
     types: [
       'asset'
     ]
@@ -189,7 +189,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Basic'
-    position: 0
+    position: 5
     types: [
       'dataClass'
       'dataElement'
