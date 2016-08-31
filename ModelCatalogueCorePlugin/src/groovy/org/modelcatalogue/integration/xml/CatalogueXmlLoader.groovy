@@ -20,6 +20,7 @@ class CatalogueXmlLoader {
             'http://www.metadataregistry.org.uk/assets/schema/1.1.2/metadataregistry.xsd',
             'http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd', // just for v2.0 compatibility
             'http://www.metadataregistry.org.uk/assets/schema/2.0/metadataregistry.xsd',
+            'http://www.metadataregistry.org.uk/assets/schema/2.1/metadataregistry.xsd',
     ].asImmutable()
 
     private static final String CATALOGUE_NAMESPACE_PREFIX = "http://www.metadataregistry.org.uk/assets/schema/"

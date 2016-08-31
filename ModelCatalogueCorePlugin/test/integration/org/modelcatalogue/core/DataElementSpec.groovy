@@ -55,7 +55,7 @@ class DataElementSpec extends IntegrationSpec {
         3 | false     | 0    | [name: "result1", description: "this is the the result description", modelCatalogueId: "x" * 256]
         4 | true      | 1    | [name: "result1", description: "this is the the result description", modelCatalogueId: "http://example.com/123"]
         5 | true      | 1    | [name: "result2", description: "this is the the result description"]
-        6 | false     | 0    | [name: "result1", description: "this is the the result description", modelCatalogueId: "MC_12asd33_3"]
+        6 | true      | 1    | [name: "result1", description: "this is the the result description", modelCatalogueId: "MC_12asd33_3"]
     }
 
     def "create a new data element and extend it to include additional metadata"() {

@@ -8,20 +8,6 @@ class DataElementISpec extends AbstractIntegrationSpec{
         loadFixtures()
     }
 
-    def "create writer data elements with the same code dataElement"(){
-
-        when:
-        def dataElementInstance2 = new DataElement(name: "result2", description: "this is the the result2 description")
-        dataElementInstance2.modelCatalogueId = "XXX_1"
-        dataElementInstance2.validate()
-
-        then:
-
-        dataElementInstance2.hasErrors()
-
-    }
-
-
     def "get all relations"() {
 
         initCatalogueService.initDefaultRelationshipTypes()

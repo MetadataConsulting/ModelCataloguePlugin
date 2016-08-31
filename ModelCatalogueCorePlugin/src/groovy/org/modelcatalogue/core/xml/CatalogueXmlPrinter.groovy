@@ -13,7 +13,7 @@ import org.modelcatalogue.core.policy.Conventions
 
 class CatalogueXmlPrinter {
 
-    static final String NAMESPACE_URL = 'http://www.metadataregistry.org.uk/assets/schema/2.0/metadataregistry.xsd'
+    static final String NAMESPACE_URL = 'http://www.metadataregistry.org.uk/assets/schema/2.1/metadataregistry.xsd'
     static final String ASSETS_NAMESPACE_URL = 'http://www.metadataregistry.org.uk/assets/schema/2.0/metadataregistry_asset.xsd'
 
     DataModelService dataModelService
