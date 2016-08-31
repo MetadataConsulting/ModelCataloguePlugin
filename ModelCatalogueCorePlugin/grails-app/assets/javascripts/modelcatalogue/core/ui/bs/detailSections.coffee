@@ -113,6 +113,7 @@ x in ['apple', 'banana', 'cherry']
   detailSectionsProvider.register {
     title: 'Model Catalogue ID'
     position: -10
+    hideInOverview: true
     types: [
       'catalogueElement'
     ]
