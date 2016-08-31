@@ -41,9 +41,9 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
         } else {
             // enable should do the admin
             user.enabled = true
-            FriendlyErrors.failFriendlySave(user)
         }
 
+        // the user is saved in following method
         RegistrationCode registrationCode = springSecurityUiService.register(user, command.password, salt)
         if (registrationCode == null || registrationCode.hasErrors()) {
             // null means problem creating the user
