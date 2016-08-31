@@ -2,6 +2,12 @@ angular.module('mc.core.ui.states.controllers.DataModelsCtrl', ['ui.router', 'mc
 .controller 'mc.core.ui.states.controllers.DataModelsCtrl', ($scope, $state, $stateParams, list, applicationTitle,
   catalogueElementResource, catalogue, names, $timeout, messages, dataModelsForPreload, modelCatalogueApiRoot, rest) ->
   "ngInject"
+
+  # if my list is empty, redirect to catalogue
+  if (!$stateParams.type && list.size == 0)
+    $state.go '.', {type: 'catalogue'}
+    return
+
   original = list
 
   $scope.status = $stateParams.status
@@ -58,8 +64,8 @@ angular.module('mc.core.ui.states.controllers.DataModelsCtrl', ['ui.router', 'mc
     names.capitalize(($scope.type ? 'My').toLowerCase())
 
   $scope.showMyModels = ->
-    $state.go '.', {type: undefined}
-    $scope.type = undefined
+    $state.go '.', {type: 'my'}
+    $scope.type = 'my'
 
   $scope.showAllModels = ->
     $state.go '.', {type: 'catalogue'}
