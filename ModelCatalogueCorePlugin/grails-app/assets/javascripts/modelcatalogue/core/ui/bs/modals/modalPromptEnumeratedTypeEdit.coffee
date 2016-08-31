@@ -19,7 +19,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
           $scope.pending  = {dataModel: null}
           $scope.copy     = angular.copy(args.element ? $scope.newEntity())
           $scope.copy.enumerations = $scope.copy.enumerations ? orderedMapEnhancer.emptyOrderedMap(true)
-          $scope.copy.name = args.name
+          $scope.copy.name = args.name ? $scope.copy.name
           $scope.original = args.element ? $scope.newEntity()
           $scope.messages = messages.createNewMessages()
           $scope.ruleCollapsed  = not $scope.copy.rule
