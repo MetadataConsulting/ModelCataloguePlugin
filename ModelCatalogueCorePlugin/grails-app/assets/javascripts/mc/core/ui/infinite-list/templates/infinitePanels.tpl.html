@@ -24,7 +24,8 @@
         <div class="panel-body">
           <form editable-form ng-class="{ 'shorten-detail': !element.$$full, 'full-detail': element.$$full }">
             <div class="row detail-section" ng-repeat="view in getDetailSections(element) track by view.title"
-                 ng-class="{'shorten-detail-section': view.position <= 0, 'full-detail-section': view.position > 0}">
+                 ng-class="{'shorten-detail-section': view.position <= 0, 'full-detail-section': view.position > 0}"
+                 ng-if="!view.hideInOverview">
               <p ng-if="view.title" class="text-center detail-section-title small">
                 <span class="title">{{view.title}}</span>
               </p>

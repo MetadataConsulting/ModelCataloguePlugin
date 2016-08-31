@@ -123,6 +123,7 @@ x in ['apple', 'banana', 'cherry']
   detailSectionsProvider.register {
     title: 'Policies'
     position: -10000
+    hideInOverview: true
     types: [
       'dataModel'
     ]
