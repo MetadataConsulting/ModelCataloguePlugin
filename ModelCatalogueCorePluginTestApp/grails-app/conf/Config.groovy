@@ -126,6 +126,7 @@ environments {
         mc.preload = [
                 [name: "Java Basic Types", url: "https://s3-eu-west-1.amazonaws.com/datamodels.metadata.org.uk/Java.mc.xml"]
         ]
+        grails.mail.disabled=true
     }
     local {
         grails.logging.jul.usebridge = true
@@ -158,6 +159,7 @@ environments {
         } else {
             mc.search.elasticsearch.local="${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/es${System.currentTimeMillis()}"
         }
+        grails.mail.disabled=true
     }
     production {
         grails.logging.jul.usebridge = false
