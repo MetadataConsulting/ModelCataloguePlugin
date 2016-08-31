@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                xmlns:mc="http://www.metadataregistry.org.uk/assets/schema/2.0/metadataregistry.xsd"
+                xmlns:mc="http://www.metadataregistry.org.uk/assets/schema/2.1/metadataregistry.xsd"
                 xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl"
                 exclude-result-prefixes="xs mc xd xsl"
                 version="2.0">

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.0/metadataregistry.xsd">
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.1/metadataregistry.xsd">
     <dataType id="http://www.example.com/types/Integer" status="DRAFT" name="Integer">
         <description>A number with no fractional part.</description>
         <relationships>

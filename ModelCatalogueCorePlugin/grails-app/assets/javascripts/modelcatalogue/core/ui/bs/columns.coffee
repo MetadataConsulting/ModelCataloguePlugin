@@ -2,7 +2,7 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
 
 
   idNameAndDescription = -> [
-    { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-2", show: true, href: 'modelCatalogueId'}
+    { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-2", show: true, href: 'href()'}
     { header: "Name", value: "name", classes: "col-md-3", show: true, href: 'href()', sort: {property: 'name', type: 'alpha'} }
     { header: "Description", value: "description" }
   ]

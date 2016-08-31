@@ -4,7 +4,7 @@ angular.module('mc.core.ui.columns', ['mc.util.names']).provider 'columns', ['na
   columnsRegistry = {}
 
   defaultColumns = [
-    {header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-4", show: true, href: 'modelCatalogueId'}
+    {header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-4", show: true, href: 'href()'}
     {header: "Name",        value: 'name',                  classes: 'col-md-4', show: true, href: 'href()'}
     {header: "Type",        value: ((element)-> element.getElementTypeName()),  classes: 'col-md-4', show: true}
   ]

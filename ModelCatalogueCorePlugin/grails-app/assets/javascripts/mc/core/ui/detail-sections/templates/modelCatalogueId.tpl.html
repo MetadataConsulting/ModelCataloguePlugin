@@ -6,11 +6,11 @@
 </div>
 <div class="col-md-3"
      ng-if="element.modelCatalogueId && element.modelCatalogueId != element.internalModelCatalogueId">
-  <strong class="small">External ID (URL)</strong>
+  <strong class="small">External ID</strong>
 </div>
 <div class="full-width-editable col-md-9"
      ng-if="element.modelCatalogueId && element.modelCatalogueId != element.internalModelCatalogueId">
-  <a class="small" ng-href="{{element.modelCatalogueId}}" editable-text="copy.modelCatalogueId">
+  <span class="small" editable-text="copy.modelCatalogueId">
     {{element.modelCatalogueId}}
-  </a>
+  </span>
 </div>
