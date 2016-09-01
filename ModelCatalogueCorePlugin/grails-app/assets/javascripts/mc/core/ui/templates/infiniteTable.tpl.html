@@ -3,7 +3,8 @@
     <table class="inf-table table">
       <thead>
       <tr class="inf-table-header-row">
-        <th class="inf-table-header-cell" ng-repeat="column in columns track by column.header" ng-class="evaluateClasses(column.classes)">
+        <th class="inf-table-header-cell" ng-repeat="column in columns track by column.header"
+            ng-class="evaluateClasses(column.classes)">
           <span ng-if="!column.sort">
             {{column.header}}
           </span>
@@ -21,7 +22,8 @@
   <div class="inf-table-spacer">
   </div>
   <div class="inf-table-body">
-    <table class="inf-table table" ng-class="{'table-expand': manualLoad && total != elements.length && elements.length > 0}">
+    <table class="inf-table table"
+           ng-class="{'table-expand': manualLoad && total != elements.length && elements.length > 0}">
       <tbody ng-if="rows" sortable="sortableOptions">
       <tr class="inf-table-item-row" ng-repeat-start="row in rows" ng-class="row.classesForStatus">
         <td class="inf-table-item-cell" ng-class="row.head.classes" ng-switch="row.head.type">
@@ -40,7 +42,10 @@
         <td class="inf-table-item-cell" ng-class="cell.classes" ng-repeat="cell in row.tail" ng-switch="cell.type">
           <a ng-switch-when="link" ng-href="{{cell.href}}" class="preserve-new-lines">{{cell.value}}</a>
           <span ng-switch-when="html"><span ng-bind-html="cell.value" class="preserve-new-lines"></span></span>
-          <span ng-switch-when="plain"><span class="preserve-new-lines">{{cell.value}}</span>
+          <span ng-switch-when="plain">
+            <span class="preserve-new-lines" ng-if="!cell.textEllipsis">{{cell.value}}</span>
+            <span class="preserve-new-lines" ellipsis="{{cell.value}}" max-characters="100" ng-if="cell.textEllipsis">
+            </span>
             <span ng-if="cell.shorten"
                   ng-click="cell.value = cell.fullValue ; cell.shorten = false"
                   class="fa fa-fw fa-plus-square-o"></span>
@@ -79,7 +84,9 @@
               </td>
               <td class="col-md-1"></td>
             </tr>
-            <tr class="active cursor-pointer" ng-if="!loading && manualLoad && total != elements.length && elements.length > 0" ng-click="doManualLoad()">
+            <tr class="active cursor-pointer"
+                ng-if="!loading && manualLoad && total != elements.length && elements.length > 0"
+                ng-click="doManualLoad()">
               <td class="text-center">
                 <span class="fa fa-angle-double-down"></span>
               </td>

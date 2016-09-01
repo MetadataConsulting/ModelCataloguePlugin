@@ -1,0 +1,20 @@
+<div ng-switch="showFull">
+  <div ng-switch-when="true">
+    <span class="ellipsis-text">
+      {{text}}
+    </span>
+    <button type="button" class="btn btn-sm btn-link btn-inline" ng-if="text.length > maxCharacters"
+            ng-click="show(false)">
+      (Show Less)
+    </button>
+  </div>
+  <div ng-switch-default>
+    <span class="ellipsis-text">
+      {{ text | limitTo: maxCharacters }}{{text.length > maxCharacters ? '...' : ''}}
+    </span>
+    <button type="button" class="btn btn-sm btn-link btn-inline" ng-if="text.length > maxCharacters"
+            ng-click="show(true)">
+      (Show More)
+    </button>
+  </div>
+</div>

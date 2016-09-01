@@ -4,7 +4,7 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
   idNameAndDescription = -> [
     { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-2", show: true, href: 'href()'}
     { header: "Name", value: "name", classes: "col-md-3", show: true, href: 'href()', sort: {property: 'name', type: 'alpha'} }
-    { header: "Description", value: "description" }
+    { header: "Description", value: "description", textEllipsis: true }
   ]
 
   getEnumerations = (enumeratedType) ->
@@ -49,13 +49,13 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
   columnsProvider.registerColumns 'org.modelcatalogue.core.DataElement', [
     { header: 'Model / ID',  value: getDataModelAndDataElement,  classes: 'col-md-2'}
     { header: "Name", value: "name", classes: "col-md-4", show: true, href: 'href()', sort: {property: 'name', type: 'alpha'} }
-    { header: "Description", value: "description" , classes: "col-md-6"}
+    { header: "Description", value: "description" , classes: "col-md-6", textEllipsis: true}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.DataClass', [
     { header: 'Model / ID',  value: getDataModelAndDataElement,  classes: 'col-md-2'}
     { header: "Name", value: "name", classes: "col-md-4", show: true, href: 'href()', sort: {property: 'name', type: 'alpha'} }
-    { header: "Description", value: "description" , classes: "col-md-6"}
+    { header: "Description", value: "description" , classes: "col-md-6", textEllipsis: true}
   ]
 
 
@@ -86,7 +86,7 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
   columnsProvider.registerColumns 'org.modelcatalogue.core.MeasurementUnit', [
     {header: "Symbol",      value: 'symbol',      classes: 'col-md-2', show: true, href: 'href()', sort: {property: 'symbol', type: 'alpha'}}
     {header: "Name",        value: 'name',        classes: 'col-md-4', show: true, href: 'href()', sort: {property: 'name', type: 'alpha'}}
-    {header: "Description", value: 'description', classes: 'col-md-6'}
+    {header: "Description", value: 'description', classes: 'col-md-6', textEllipsis: true}
   ]
 
   printMetadata = (relationship) ->
@@ -122,7 +122,7 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
 
   dataTypeColumns = [
     {header: "Name",                        value: 'name',          classes: 'col-md-6', show: true, href: 'href()', sort: {property: 'name', type: 'alpha'}}
-    {header: "Enumerations or Description", value: getEnumerations, classes: 'col-md-6'}
+    {header: "Enumerations or Description", value: getEnumerations, classes: 'col-md-6', textEllipsis: true}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.DataType', dataTypeColumns
