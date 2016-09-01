@@ -3,7 +3,6 @@ package org.modelcatalogue.core
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
-import org.modelcatalogue.core.geb.Common
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.*

@@ -6,19 +6,16 @@ import org.modelcatalogue.core.geb.CatalogueContent
 import org.modelcatalogue.core.geb.Common
 import spock.lang.Stepwise
 
-import static org.modelcatalogue.core.geb.Common.getAdmin
-import static org.modelcatalogue.core.geb.Common.getRightSideTitle
-import static org.modelcatalogue.core.geb.Common.getRightSideDescription
-
 @Stepwise
 class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
 
     public static final CatalogueAction exportAction = CatalogueAction.runFirst('item', 'export')
     public static
-    final CatalogueContent changeLogForRDEligibilityXSLX = CatalogueContent.create('.menu-item-link', text: 'Change Log for RD Eligibility (Excel)')
+    final CatalogueContent changeLogForRDEligibilityXSLX =
+        CatalogueContent.create('.menu-item-link', text: 'Change Log for RD Eligibility (Excel)')
 
     def "go to login"() {
-        login admin
+        login Common.admin
 
         expect:
             waitFor(120) { browser.title == 'Data Models' }
@@ -27,7 +24,7 @@ class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
             select 'Rare Disease Conditions' open 'Data Classes' select 'Rare Disease Conditions and Phenotypes'
 
         then:
-            check rightSideTitle contains 'Rare Disease Conditions and Phenotypes Rare Disease Conditions'
+            check Common.rightSideTitle contains 'Rare Disease Conditions and Phenotypes Rare Disease Conditions'
     }
 
     def "download the change log as MS Excel spreadsheet"() {
@@ -41,7 +38,7 @@ class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
             selectInTree 'Rare Disease Conditions and Phenotypes - Eligibility change log (MS Excel Spreadsheet)'
 
         then:
-            check rightSideTitle contains 'Rare Disease Conditions and Phenotypes - Eligibility change log (MS Excel Spreadsheet) Rare Disease Conditions'
-            check rightSideDescription is 'Your report is ready. Use Download button to download it.'
+            check Common.rightSideTitle contains 'Rare Disease Conditions and Phenotypes - Eligibility change log (MS Excel Spreadsheet) Rare Disease Conditions'
+            check Common.rightSideDescription is 'Your report is ready. Use Download button to download it.'
     }
 }
