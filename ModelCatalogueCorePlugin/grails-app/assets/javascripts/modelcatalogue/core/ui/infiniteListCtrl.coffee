@@ -17,9 +17,10 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
 
   getCellForColumn = (element, column) ->
     cell =
-      value:    $scope.evaluateValue(column.value, element)
-      href:     $scope.evaluateValue(column.href, element)
-      classes:  $scope.evaluateClasses(column.classes, element)
+      value:        $scope.evaluateValue(column.value, element)
+      href:         $scope.evaluateValue(column.href, element)
+      classes:      $scope.evaluateClasses(column.classes, element)
+      textEllipsis: column.textEllipsis
     cell.type = 'link'  if cell.href and cell.value
     cell.type = 'html'  if not cell.type and cell.value and cell.value.indexOf('<') < cell.value.indexOf('>')
     if not cell.type and cell.value
