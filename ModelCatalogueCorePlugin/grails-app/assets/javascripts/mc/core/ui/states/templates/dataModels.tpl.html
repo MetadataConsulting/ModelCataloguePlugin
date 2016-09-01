@@ -14,7 +14,9 @@
                   {{getCurrentStatus()}} <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right">
-                  <li ng-class="{'active' : getCurrentStatus() == 'All'}"><a ng-click="changeStatus()">All</a></li>
+                  <li ng-class="{'active' : getCurrentStatus() == 'All'}">
+                    <a ng-click="changeStatus()">All</a>
+                  </li>
                   <li ng-class="{'active' : getCurrentStatus() == 'Draft'}">
                     <a ng-click="changeStatus('draft')">Draft</a></li>
                   <li ng-class="{'active' : getCurrentStatus() == 'Finalized'}">
@@ -35,27 +37,36 @@
         </div>
         <ul class="nav nav-tabs" role="tablist">
           <li id="my-models" ng-class="{'active' : getCurrentType() == 'My'}" role="presentation">
-            <a href
-               ng-click="showMyModels()">My Models</a></li>
+            <a href ng-click="showMyModels()">
+              My Models
+            </a>
+          </li>
           <li ng-class="{'active' : getCurrentType() == 'Catalogue'}" role="presentation">
             <a href ng-click="showAllModels()">Catalogue Models</a>
           </li>
         </ul>
         <div class="leave-10-before"></div>
         <div ng-if="dataModelsForPreload.length &amp;&amp; !list.total">
-          <div class="jumbotron" >
-            <h1>Welcome to  Metadata Registry</h1>
+          <div class="jumbotron">
+            <h1>Welcome to Metadata Registry</h1>
             <p>
-              There are no data models yet. Start experimenting with one of the sample data models, import your existing model from one of the supported formats or create brand new data model from the scratch.
+              There are no data models yet. Start experimenting with one of the sample data models, import your existing
+              model from one of the supported formats or create brand new data model from the scratch.
             </p>
             <p>
-              <button class="btn btn-primary btn-lg" ng-click="importSample()"><span class="fa fa-book"></span> Import Sample</button>
-              <button class="btn btn-success btn-lg" ng-click="createElement()"><span class="fa fa-plus-circle"></span> Create New</button>
+              <button class="btn btn-primary btn-lg" ng-click="importSample()"><span class="fa fa-book"></span> Import
+                Sample
+              </button>
+              <button class="btn btn-success btn-lg" ng-click="createElement()"><span class="fa fa-plus-circle"></span>
+                Create New
+              </button>
             </p>
           </div>
         </div>
-        <infinite-list transform="dataModelOrDestination($element)" column-classes="'col-lg-12 col-sm-12 col-md-12'"
-                       list="list"></infinite-list>
+        <infinite-list transform="dataModelOrDestination($element)"
+                       column-classes="'col-lg-12 col-sm-12 col-md-12'"
+                       list="list">
+        </infinite-list>
       </div>
     </div>
   </div>

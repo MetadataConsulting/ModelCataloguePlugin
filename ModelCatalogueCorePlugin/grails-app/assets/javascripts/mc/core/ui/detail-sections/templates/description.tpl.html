@@ -1,5 +1,16 @@
 <div class="col-md-12 preserve-new-lines">
-  <small editable-textarea="copy.description" e-rows="5" e-cols="1000"class="ce-description">
-    {{element.description || 'empty'}}
-  </small>
+  <div>
+    <small editable-textarea="copy.description" e-rows="5" e-cols="1000" class="ce-description">
+      <div ng-show="view.showFull">
+        {{element.description || 'empty'}}
+      </div>
+      <div ng-hide="view.showFull">
+        {{ (element.description || 'empty') | limitTo: 500 }}{{element.description.length > 500 ? '...' : ''}}
+        <button type="button" class="btn btn-sm btn-link btn-inline" ng-if="element.description.length > 500"
+           ng-click="view.showFull = true">
+          (Show More)
+        </button>
+      </div>
+    </small>
+  </div>
 </div>

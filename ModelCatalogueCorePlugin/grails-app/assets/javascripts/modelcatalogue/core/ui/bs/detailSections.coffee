@@ -113,6 +113,7 @@ x in ['apple', 'banana', 'cherry']
   detailSectionsProvider.register {
     title: 'Model Catalogue ID'
     position: -10
+    hideInOverview: true
     types: [
       'catalogueElement'
     ]
@@ -123,6 +124,7 @@ x in ['apple', 'banana', 'cherry']
   detailSectionsProvider.register {
     title: 'Policies'
     position: -10000
+    hideInOverview: true
     types: [
       'dataModel'
     ]
@@ -132,7 +134,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Basic'
-    position: 0
+    position: 5
     types: [
       'dataModel'
     ]
@@ -149,7 +151,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Basic'
-    position: 0
+    position: 5
     types: [
       'measurementUnit'
     ]
@@ -159,7 +161,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Basic'
-    position: 0
+    position: 5
     types: [
       'validationRule'
     ]
@@ -169,7 +171,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Basic'
-    position: 0
+    position: 5
     types: [
       'asset'
     ]
@@ -188,7 +190,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Basic'
-    position: 0
+    position: 5
     types: [
       'dataClass'
       'dataElement'

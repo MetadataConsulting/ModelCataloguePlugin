@@ -8,20 +8,19 @@ grails.project.source.level = 1.6
 //grails.project.war.file = "target/${appName}-${appVersion}.war"
 
 grails.project.fork = [
-        // configure settings for compilation JVM, note that if you alter the Groovy version forked compilation is required
-        //  compile: [maxMemory: 256, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
+    // configure settings for compilation JVM, note that if you alter the Groovy version forked compilation is required
+    //  compile: [maxMemory: 256, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
 
-        // configure settings for the test-app JVM, uses the daemon by default
-        test   : false,
-        // configure settings for the run-app JVM
+    // configure settings for the test-app JVM, uses the daemon by default
+    test   : false,
+    // configure settings for the run-app JVM
 //        run    : false, //[maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false],
-        run    : [maxMemory: 1536, minMemory: 128, debug: false, maxPerm: 512, forkReserve:false],
-        // configure settings for the run-war JVM
-        war    : [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve: false],
-        // configure settings for the Console UI JVM
-        console: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256]
+    run    : [maxMemory: 1536, minMemory: 128, debug: false, maxPerm: 512, forkReserve: false],
+    // configure settings for the run-war JVM
+    war    : [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve: false],
+    // configure settings for the Console UI JVM
+    console: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256]
 ]
-
 
 grails.plugin.location.'model-catalogue-core' = "../ModelCatalogueCorePlugin"
 grails.plugin.location.'model-catalogue-discourse' = "../ModelCatalogueDiscoursePlugin"
@@ -71,11 +70,10 @@ grails.project.dependency.resolution = {
 
         runtime "org.modelcatalogue:spring-security-ajax-aware:0.1.1"
         runtime 'mysql:mysql-connector-java:5.1.24'
-
         runtime "org.apache.httpcomponents:httpclient:4.3.1"
 
         // Selenium WebDriver, for use in Geb
-        def webDriverVersion =  System.getenv('WEB_DRIVER_VERSION') ?: "2.53.0"
+        def webDriverVersion = System.getenv('WEB_DRIVER_VERSION') ?: "2.53.0"
 
         // Testing modules
         test "org.gebish:geb-spock:$gebVersion"
@@ -83,34 +81,26 @@ grails.project.dependency.resolution = {
         test "org.seleniumhq.selenium:selenium-firefox-driver:${webDriverVersion}"
         test "org.seleniumhq.selenium:selenium-chrome-driver:${webDriverVersion}"
         test "org.seleniumhq.selenium:selenium-remote-driver:${webDriverVersion}"
-
-
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
     }
 
     plugins {
-
-
         build ':tomcat:8.0.33'
-
 
         // plugins for the compile step
         compile ":scaffolding:2.1.2"
         compile ':cache:1.1.8'
         compile ":asset-pipeline:2.9.1"
-
         compile ":console:1.5.6"
+        compile ":spring-security-ui:1.0-RC2"
+        compile ":grails-melody:1.55.0"
 
         // plugins needed at runtime but not for compilation
         runtime ":hibernate:3.6.10.18" //":hibernate4:4.3.5.5" // or
         runtime ":database-migration:1.4.0"
         runtime ":jquery:1.11.1"
-        compile ":spring-security-ui:1.0-RC2"
-
-        compile ":grails-melody:1.55.0"
 
         test ":geb:$gebVersion"
-
         test ':build-test-data:2.1.2'
         test ':fixtures:1.3'
 

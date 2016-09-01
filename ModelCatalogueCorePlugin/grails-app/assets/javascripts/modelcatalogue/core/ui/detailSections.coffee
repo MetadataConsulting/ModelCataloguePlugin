@@ -102,13 +102,14 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
         angular.forEach configurations, (configuration) ->
           return unless configuration.isAvailableFor(owner)
           view =
-            template:     configuration.template
-            title:        configuration.title
-            position:     configuration.position
+            template: configuration.template
+            title: configuration.title
+            position: configuration.position
+            hideInOverview: configuration.hideInOverview
             hideIfNoData: configuration.hideIfNoData?
-            keys:         angular.copy configuration.keys
-            data:         angular.copy configuration.data
-            autoSave:     angular.copy configuration.autoSave
+            keys: angular.copy configuration.keys
+            data: angular.copy configuration.data
+            autoSave: angular.copy configuration.autoSave
             handlesKey:   (key) -> key in @keys
             hasData:      (element) -> configuration.keys.some (key) -> element.ext.get(key)?
             isTemplateHidden: (element) ->

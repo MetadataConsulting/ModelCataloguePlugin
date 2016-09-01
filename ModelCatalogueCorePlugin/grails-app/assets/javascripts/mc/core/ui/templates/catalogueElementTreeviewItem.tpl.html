@@ -1,5 +1,6 @@
 <li class="catalogue-element-treeview-item">
-  <div class="catalogue-element-treeview-text-content" ng-class="{'active': node.active, 'archived': element.$$archived}">
+  <div class="catalogue-element-treeview-text-content"
+       ng-class="{'active': node.active, 'archived': element.$$archived}">
     <span class="badge pull-right" ng-if="node.numberOfChildren" ng-switch="node.numberOfChildren">
       <span ng-switch-default>{{::node.numberOfChildren}}</span>
       <span ng-switch-when="2147483647" class="fa fa-question fa-inverse"></span>
@@ -25,7 +26,11 @@
         <span class="fa fa-fw" ng-if="!node.numberOfChildren && !node.loadingChildren"></span>
       </a>
       <span class="catalogue-element-treeview-name"
-            ng-class="{'text-warning': element.status == 'DRAFT', 'text-info': element.status == 'PENDING', 'text-danger': (element.status == 'DEPRECATED' || element.undone)}"
+            ng-class="{
+              'text-warning': element.status == 'DRAFT',
+              'text-info': element.status == 'PENDING',
+              'text-danger': (element.status == 'DEPRECATED' || element.undone)
+            }"
             ng-click="select(node)">
         <span ng-class="node.icon" class="text-muted"></span>
         {{node.name}}
@@ -51,8 +56,10 @@
     </span>
   </div>
   <ul ng-if="node.children" ng-hide="node.collapsed" class="catalogue-element-treeview-list">
-    <catalogue-element-treeview-item treeview="::treeview" sly-repeat="child in node.children" extra-parameters="::{'path': path}"
-                                     element="child"></catalogue-element-treeview-item>
+    <catalogue-element-treeview-item treeview="::treeview" sly-repeat="child in node.children"
+                                     extra-parameters="::{'path': path}"
+                                     element="child">
+    </catalogue-element-treeview-item>
     <li ng-if="node.numberOfChildren > node.children.length" class="catalogue-element-treeview-item">
       <span class="catalogue-element-treeview-labels" ng-click="node.showMore()">
         <a class="catalogue-element-treeview-icon btn btn-link catalogue-element-treeview-show-more"

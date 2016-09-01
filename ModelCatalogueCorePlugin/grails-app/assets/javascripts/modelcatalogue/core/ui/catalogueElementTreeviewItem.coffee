@@ -41,7 +41,6 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
         return true if element.link.indexOf(firstSegment) >= 0
         return false
 
-
       getLocalName = (item) ->
         return undefined if not item
         return undefined if not item.ext
@@ -66,7 +65,16 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
           list.next($scope.extraParameters).then (nextList) ->
             for item in nextList.list
               it = if item.relation then item.relation else item
-              $scope.node.children.push(angular.extend(it, {$$relationship: (if item.relation then item else undefined), $$metadata: item.ext, $$archived: item.archived, $$localName: getLocalName(item) }))
+              $scope.node.children.push(
+                angular.extend(it,
+                  {
+                    $$relationship: (if item.relation then item else undefined),
+                    $$metadata: item.ext,
+                    $$archived: item.archived,
+                    $$localName: getLocalName(item)
+                  }
+                )
+              )
             $scope.node.showMore = createShowMore(nextList)
             loadMoreIfNeeded()
             $scope.node.showingMore = false
@@ -79,8 +87,6 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
           it = if item.relation then item.relation else item
           id = it.link
           objectToExtend = {}
-
-
 
           if id
             node = TreeviewNodeFactory.get($scope.treeview.getNodeId(id))
@@ -231,7 +237,8 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
       DEBOUNCE_TIME = 100
 
       $scope.$eventToObservable('catalogueElementCreated').debounce(DEBOUNCE_TIME).subscribe doReloadChildrenOnChange
-      $scope.$eventToObservable('catalogueElementUpdated').filter(isForCurrentElement).debounce(DEBOUNCE_TIME).subscribe doReloadChildrenOnChange
+      $scope.$eventToObservable('catalogueElementUpdated').filter(isForCurrentElement).debounce(DEBOUNCE_TIME)
+      .subscribe doReloadChildrenOnChange
 
       $scope.$on 'listReferenceReordered', (ignored, listReference) ->
         reloadChildrenOnChange(ignored, listReference, listReference?.link)
