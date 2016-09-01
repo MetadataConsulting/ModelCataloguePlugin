@@ -16,12 +16,12 @@
             <a ng-href="{{element.dataModel.href()}}"
                class="label"
                ng-class="{
-                  'label-warning': element.getDataModelStatus() == 'DRAFT',
-                  'label-info': element.getDataModelStatus() == 'PENDING',
-                  'label-primary': element.getDataModelStatus() == 'FINALIZED',
-                  'label-danger': element.getDataModelStatus() == 'DEPRECATED'
-               }">
-              {{element.getDataModelWithVersion()}}
+                'label-warning': element.getDataModelStatus() == 'DRAFT',
+                'label-info': element.getDataModelStatus() == 'PENDING',
+                'label-primary': element.getDataModelStatus() == 'FINALIZED',
+                'label-danger': element.getDataModelStatus() == 'DEPRECATED'
+              }">
+              {{element.getVersionAndId()}}
             </a>
           </small>
         </h3>
