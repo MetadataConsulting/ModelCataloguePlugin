@@ -7,8 +7,10 @@
         </div>
         <h3 class="ce-name">
           <small ng-class="element.getIcon()" title="{{element.getElementTypeName()}}"></small>
-          <span class="text-danger fa fa-fw fa-warning" ng-if="getDeprecationWarning()"
-                title="{{getDeprecationWarning()}}"></span>
+          <span class="text-danger fa fa-fw fa-warning"
+                ng-if="getDeprecationWarning()"
+                title="{{getDeprecationWarning()}}">
+          </span>
           <span editable-text="copy.name" e-name="name">{{element.name}}</span>
           <small>
             <a ng-href="{{element.dataModel.href()}}"
@@ -26,7 +28,7 @@
         <messages-panel messages="messages" max="1000"></messages-panel>
         <div class="row detail-section" ng-repeat="view in detailSections track by view.title"
              data-view-name="{{view.title}}">
-          <p ng-if="view.title" class="text-center detail-section-title small title">
+          <p ng-if="view.title" class="text-center detail-section-title small">
             <span class="title">
               <span class="btn btn-link btn-sm"
                     ng-click="view.toggleTemplateHidden(element)"
