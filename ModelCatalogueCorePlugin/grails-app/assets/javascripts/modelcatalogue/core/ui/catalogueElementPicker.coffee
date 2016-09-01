@@ -128,7 +128,9 @@ catalogueElementPicker.directive 'catalogueElementPicker', ($compile, modelCatal
     element.attr('typeahead-on-select', 'customCepOnSelect($item, $model, $label, "' + escape(attrs.typeaheadOnSelect ? '') + '")')
     element.attr('uib-typeahead', "el as label(el, #{label}) for el in searchForElement($viewValue, \"" + escape(attrs.ngModel ? '') + "\", \"" + escape(attrs.catalogueElementPicker ? '') + "\",\"" + escape(attrs.resource ? '') + "\", \"" + escape(attrs.status ? '') + "\", " + attrs.global + " , \"" + escape(attrs.contentType ? '') + "\", \"" + escape(attrs.typeaheadOnSelect ? '') + "\")")
     element.attr('autocomplete', "off")
-    element.attr('typeahead-wait-ms', "50") unless element.attr('typeahead-wait-ms')
+
+#    element.attr('typeahead-wait-ms', "500") unless element.attr('typeahead-wait-ms')
+    element.attr('ng-model-options', "{ debounce: { 'default': 500, 'blur': 0 } }")
     element.attr('typeahead-template-url', '/mc/core/ui/utils/catalogueElementPicker.html')
     element.attr('placeholder', if attrs.status then "Start typing or click icon on the left for advanced search for #{attrs.status} elements" else 'Start typing or click icon on the left for advanced search')
     element.removeAttr('catalogue-element-picker')
