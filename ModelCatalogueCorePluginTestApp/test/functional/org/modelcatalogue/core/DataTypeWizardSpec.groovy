@@ -238,7 +238,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click { infTableCell(1, 1).find('a:not(.inf-cell-expand)') }
         then:
 
-        check rightSideTitle contains 'New Data Type Test 1'
+        check rightSideTitle contains 'New Data Type'
     }
 
     def "Check Form (Item) detail section is present and collapsed"() {

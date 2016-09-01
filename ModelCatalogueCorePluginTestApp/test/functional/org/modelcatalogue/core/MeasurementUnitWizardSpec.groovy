@@ -42,7 +42,7 @@ class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
         click { infTableCell(1, 2).find('a') }
 
         expect:
-        check rightSideTitle contains 'Foos Test 2'
+        check rightSideTitle contains 'Foos'
     }
 
     def "going to metadata tab changes the url"() {

@@ -77,7 +77,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         remove messages
 
         then:
-        check rightSideTitle is "New Data Model $uuid 0.0.1"
+        check rightSideTitle is "New Data Model $uuid 146@0.0.1"
     }
 
     def "finalize element"() {
@@ -189,7 +189,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
             remove messages
 
         then:
-            check rightSideTitle is "New Data Model $uuid 0.0.1"
+            check rightSideTitle is "New Data Model $uuid 148@0.0.1"
 
         check backdrop gone
         when: "delete action is clicked"
@@ -230,9 +230,6 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
             remove messages
 
         then:
-            check rightSideTitle is "New Data Model $uuid 0.0.1"
+            check rightSideTitle is "New Data Model $uuid 149@0.0.1"
     }
-
-
-
 }

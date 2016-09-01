@@ -49,7 +49,7 @@ class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then: 'Click the element'
         click firstRowLink
-        check rightSideTitle contains 'NewDE1 Test 1'
+        check rightSideTitle contains 'NewDE1'
     }
 
     def "Check Form (Item) detail section is present and collapsed"() {

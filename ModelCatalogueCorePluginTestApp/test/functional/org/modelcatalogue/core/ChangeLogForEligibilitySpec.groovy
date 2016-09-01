@@ -24,7 +24,7 @@ class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
             select 'Rare Disease Conditions' open 'Data Classes' select 'Rare Disease Conditions and Phenotypes'
 
         then:
-            check Common.rightSideTitle contains 'Rare Disease Conditions and Phenotypes Rare Disease Conditions'
+            check Common.rightSideTitle contains 'Rare Disease Conditions and Phenotypes'
     }
 
     def "download the change log as MS Excel spreadsheet"() {
@@ -38,7 +38,7 @@ class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
             selectInTree 'Rare Disease Conditions and Phenotypes - Eligibility change log (MS Excel Spreadsheet)'
 
         then:
-            check Common.rightSideTitle contains 'Rare Disease Conditions and Phenotypes - Eligibility change log (MS Excel Spreadsheet) Rare Disease Conditions'
+            check Common.rightSideTitle contains 'Rare Disease Conditions and Phenotypes - Eligibility change log (MS Excel Spreadsheet)'
             check Common.rightSideDescription is 'Your report is ready. Use Download button to download it.'
     }
 }

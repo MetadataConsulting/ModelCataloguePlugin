@@ -39,7 +39,7 @@ class ValidationRuleWizardSpec extends AbstractModelCatalogueGebSpec {
         click { infTableCell(1, 2).find('a') }
 
         expect:
-        check rightSideTitle contains 'Test Validation Rule Test 2'
+        check rightSideTitle contains 'Test Validation Rule'
     }
 
 }
