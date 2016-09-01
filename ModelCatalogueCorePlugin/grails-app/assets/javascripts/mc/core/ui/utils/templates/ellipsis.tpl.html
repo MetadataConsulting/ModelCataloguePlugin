@@ -1,5 +1,5 @@
-<div>
-  <div ng-show="showFull">
+<div ng-switch="showFull">
+  <div ng-switch-when="true">
     <span class="ellipsis-text">
       {{text}}
     </span>
@@ -8,7 +8,7 @@
       (Show Less)
     </button>
   </div>
-  <div ng-hide="showFull">
+  <div ng-switch-default>
     <span class="ellipsis-text">
       {{ text | limitTo: maxCharacters }}{{text.length > maxCharacters ? '...' : ''}}
     </span>
