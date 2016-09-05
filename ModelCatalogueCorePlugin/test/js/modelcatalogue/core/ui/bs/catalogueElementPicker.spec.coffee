@@ -4,7 +4,7 @@ describe "mc.core.ui.catalogueElementPicker", ->
 
   return unless window.fixtures
 
-  it "element uses global search by default",  inject ($compile, $rootScope, enhance, $httpBackend, modelCatalogueApiRoot) ->
+  it "element uses global search by default",  inject ($compile, $rootScope, enhance, $httpBackend, modelCatalogueApiRoot, $timeout) ->
     catEl = enhance angular.copy(fixtures.dataType.showOne)
 
     $rootScope.element = catEl
@@ -23,10 +23,11 @@ describe "mc.core.ui.catalogueElementPicker", ->
     element.val('test')
     element.change()
 
+    $timeout.flush()
     $httpBackend.flush()
 
 
-  it "label can be customized",  inject ($compile, $rootScope, enhance) ->
+  it "label can be customized",  inject ($compile, $rootScope, enhance, $timeout) ->
     catEl = enhance angular.copy(fixtures.dataType.showOne)
 
     $rootScope.element = catEl
@@ -35,13 +36,14 @@ describe "mc.core.ui.catalogueElementPicker", ->
         <input ng-model="element" catalogue-element-picker label="el.name" typeahead-wait-ms="0">
       ''')($rootScope)
 
+    $timeout.flush()
     $rootScope.$digest()
 
     expect(element.prop('tagName')).toBe('INPUT')
     expect(element.val()).toBe('boolean')
 
 
-  it "the resource can be specified as string",  inject ($compile, $rootScope, enhance, $httpBackend, modelCatalogueApiRoot) ->
+  it "the resource can be specified as string",  inject ($compile, $rootScope, enhance, $httpBackend, modelCatalogueApiRoot, $timeout) ->
     catEl = enhance angular.copy(fixtures.dataType.showOne)
 
     $rootScope.element = catEl
@@ -50,6 +52,7 @@ describe "mc.core.ui.catalogueElementPicker", ->
           <input ng-model="element" catalogue-element-picker="dataType" typeahead-wait-ms="0">
         ''')($rootScope)
 
+    $timeout.flush()
     $rootScope.$digest()
 
     expect(element.prop('tagName')).toBe('INPUT')
@@ -60,9 +63,10 @@ describe "mc.core.ui.catalogueElementPicker", ->
     element.val('test')
     element.change()
 
+    $timeout.flush()
     $httpBackend.flush()
 
-  it "the resource can be specified as reference",  inject ($compile, $rootScope, enhance, $httpBackend, modelCatalogueApiRoot) ->
+  it "the resource can be specified as reference",  inject ($compile, $rootScope, enhance, $httpBackend, modelCatalogueApiRoot, $timeout) ->
     catEl = enhance angular.copy(fixtures.dataType.showOne)
 
     $scope = $rootScope.$new(true)
@@ -74,6 +78,7 @@ describe "mc.core.ui.catalogueElementPicker", ->
           <input ng-model="element" catalogue-element-picker resource="resource" typeahead-wait-ms="0">
         ''')($scope)
 
+    $timeout.flush()
     $scope.$digest()
 
     expect(element.prop('tagName')).toBe('INPUT')
@@ -84,9 +89,11 @@ describe "mc.core.ui.catalogueElementPicker", ->
     element.val('test')
     element.change()
 
+    $timeout.flush()
     $httpBackend.flush()
 
     $scope.resource = 'model'
+    $timeout.flush()
     $scope.$digest()
 
     $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/model/search?search=other+test").respond(fixtures.dataClass.searchElement13)
@@ -94,4 +101,5 @@ describe "mc.core.ui.catalogueElementPicker", ->
     element.val('other test')
     element.change()
 
+    $timeout.flush()
     $httpBackend.flush()
