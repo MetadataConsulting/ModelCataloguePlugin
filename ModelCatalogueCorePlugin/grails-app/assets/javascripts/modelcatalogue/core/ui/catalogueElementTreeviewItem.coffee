@@ -205,7 +205,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
       # event broadcasters and listeners
       $scope.select = (element) ->
         $scope.collapseOrExpand()
-        $scope.treeview.select(element)
+        $scope.treeview.select(element, $scope.extraParameters.descendPath)
 
       reloadChildrenOnChange = (_, result, url) ->
         if result.link == $scope.element.link
