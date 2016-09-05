@@ -57,7 +57,7 @@
   </div>
   <ul ng-if="node.children" ng-hide="node.collapsed" class="catalogue-element-treeview-list">
     <catalogue-element-treeview-item treeview="::treeview" sly-repeat="child in node.children"
-                                     extra-parameters="::{'path': path}"
+                                     extra-parameters="::{'path': path, 'descendPath': extraParameters.descendPath.concat(child.id)}"
                                      element="child">
     </catalogue-element-treeview-item>
     <li ng-if="node.numberOfChildren > node.children.length" class="catalogue-element-treeview-item">

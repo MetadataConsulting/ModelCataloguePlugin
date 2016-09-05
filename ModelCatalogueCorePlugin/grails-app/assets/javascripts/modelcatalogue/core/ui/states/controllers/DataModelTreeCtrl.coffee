@@ -5,7 +5,7 @@ angular.module('mc.core.ui.states.controllers.DataModelTreeCtrl', ['ui.router', 
     listEnhancer = enhance.getEnhancer('list')
     $scope.elementAsList = listEnhancer.createSingletonList(currentDataModel) if currentDataModel
 
-    $scope.onTreeviewSelected = (element) ->
+    $scope.onTreeviewSelected = (element, descendPath) ->
       return if not element
 
       lastSelectedElementHolder.element = element
@@ -30,6 +30,7 @@ angular.module('mc.core.ui.states.controllers.DataModelTreeCtrl', ['ui.router', 
           id: element.id
           property: 'history'
           focused: undefined
+          path: descendPath.urlPath
 
         if type == 'enumeratedValue'
           params.resource = 'enumeratedType'

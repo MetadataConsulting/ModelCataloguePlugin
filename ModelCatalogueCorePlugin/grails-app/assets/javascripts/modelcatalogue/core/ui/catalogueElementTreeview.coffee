@@ -1,17 +1,17 @@
 class CatalogueElementTreeview
-  constructor: ($scope, enhance, $stateParams, $rootScope, $element, $attrs, rx, TreeviewNodeFactory) ->
+  constructor: ($scope, enhance, $stateParams, $rootScope, $element, $attrs, rx, TreeviewNodeFactory, DescendPath) ->
     "ngInject"
     selected = undefined
     treeview = @
 
     @id = $scope.id
 
-    @select = (node) ->
+    @select = (node, descendPath) ->
       if selected and selected isnt node
         selected.active = false
       selected = node
       node.active = true
-      $scope.onSelect({$element: node.item}) if angular.isFunction($scope.onSelect)
+      $scope.onSelect({$element: node.item, $descendPath: descendPath}) if angular.isFunction($scope.onSelect)
 
     @getNodeId = (link) -> "#{@id}:#{link}"
     @getDescend = -> $scope.descend
@@ -36,10 +36,11 @@ class CatalogueElementTreeview
 
     listEnhancer = enhance.getEnhancer('list')
 
-    $scope.mode     = if $scope.element then 'element' else 'list'
-    $scope.id       = null  if !$scope.id
-    $scope.list    ?= listEnhancer.createEmptyList()
-    $scope.path     = {segments: []}
+    $scope.mode = if $scope.element then 'element' else 'list'
+    $scope.id = null  if !$scope.id
+    $scope.list ?= listEnhancer.createEmptyList()
+    $scope.path = {segments: if $stateParams.path then $stateParams.path.split('-') else []}
+    $scope.createDescendPath = (id) -> new DescendPath([id])
 
     nextFun = -> {then: (callback) -> callback($scope.list)}
 
@@ -114,8 +115,11 @@ class CatalogueElementTreeview
       $scope.$eventToObservable('catalogueElementUpdated').debounce(DEBOUNCE_TIME).subscribe refreshList
       $scope.$eventToObservable('catalogueElementDeleted').debounce(DEBOUNCE_TIME).subscribe refreshList
       $scope.$eventToObservable('newVersionCreated').debounce(DEBOUNCE_TIME).subscribe refreshList
-      $scope.$eventToObservable('expandTreeview').debounce(DEBOUNCE_TIME).subscribe (args) ->
-        $scope.path.segments = args[1]
+
+
+      unless $stateParams.path
+        $scope.$eventToObservable('expandTreeview').debounce(DEBOUNCE_TIME).subscribe (args) ->
+          $scope.path.segments = args[1]
 
       $element.find('.catalogue-element-treeview-root-list-root').on 'scroll', loadMoreIfNeeded
 

@@ -1,7 +1,5 @@
 <div class="col-md-12 preserve-new-lines">
-  <pre editable-textarea="copy.rule" e-rows="5" e-cols="1000" class="ce-rule small">
-    {{element.rule || 'empty'}}
-  </pre>
+  <pre editable-textarea="copy.rule" e-rows="5" e-cols="1000" class="ce-rule small">{{element.rule || 'empty'}}</pre>
   <p ng-if="editableForm.$visible" class="help-block">
     Enter valid <a href="http://www.groovy-lang.org/" target="_blank">Groovy</a> code. Variable <code>x</code>
     refers to the value validated value and <code>dataType</code> to current data type. Last row is the result
