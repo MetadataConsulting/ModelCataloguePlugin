@@ -2,6 +2,7 @@ package org.modelcatalogue.core.util.docx
 
 import com.craigburke.document.builder.BasicDocumentPartTypes
 import com.craigburke.document.builder.WordDocumentBuilder
+import com.craigburke.document.core.Document
 
 class ModelCatalogueWordDocumentBuilder extends WordDocumentBuilder {
 
@@ -14,36 +15,8 @@ class ModelCatalogueWordDocumentBuilder extends WordDocumentBuilder {
         return true
     }
 
-    @Override
-    Object renderCustomFiles() {
-
-//        wordDocument.generateDocumentPart(BasicDocumentPartTypes.NUMBERING) { builder ->
-//            w.numbering {
-//                w.abstractNum 'w:abstractNumId': "1", {
-//                    for (int lvl in 0..8) {
-//                        w.lvl 'w:ilvl': "${lvl}", {
-//                            w.start 'w:val': '1'
-//                            w.numFmt 'w:val': 'none'
-//                            w.suff 'w:val': 'nothing'
-//                            w.lvlText 'w:val': ''
-//                            w.lvlJc 'w:val': 'left'
-//                            w.pPr {
-//                                // let's make the fifth level at the one inch
-//                                String tabPosition = pointToTwip(22 + lvl * 10).intValue()
-//                                w.tabs {
-//                                    w.tab 'w:val': 'num', 'w:pos': tabPosition
-//                                }
-//                                w.ind 'w:left': tabPosition, 'w:hanging': tabPosition
-//                            }
-//                        }
-//                    }
-//                    w.num 'w:numId': "1", {
-//                        w.abstractNumId 'w:val': '1'
-//                    }
-//                }
-//            }
-//        }
-//
+    void initializeDocument(Document document, OutputStream out) {
+        super.initializeDocument(document, out)
 
         def styles = {
             w.styles {
@@ -96,8 +69,7 @@ class ModelCatalogueWordDocumentBuilder extends WordDocumentBuilder {
         }
 
         wordDocument.generateDocumentPart(BasicDocumentPartTypes.STYLES, styles)
-        // commnent out if stylesWithEffects.xml is breaking the document
+        // comment out if stylesWithEffects.xml is breaking the document
         wordDocument.generateDocumentPart(BasicDocumentPartTypes.STYLES_WITH_EFFECTS, styles)
-
     }
 }
