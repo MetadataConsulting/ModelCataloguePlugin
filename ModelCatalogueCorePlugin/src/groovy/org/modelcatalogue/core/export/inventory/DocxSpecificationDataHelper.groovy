@@ -11,6 +11,8 @@ import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.ValidationRule
+import org.modelcatalogue.core.enumeration.Enumeration
+import org.modelcatalogue.core.enumeration.Enumerations
 
 /**
  * Prints the tables for element data specification using the DocumentBuilder library
@@ -113,11 +115,20 @@ class DocxSpecificationDataHelper {
                                     if (dataElement.dataType?.instanceOf(EnumeratedType)) {
                                         text '\n\n'
                                         if (dataElement.dataType.enumerations.size() <= 10) {
-                                            for (entry in dataElement.dataType.enumerations) {
-                                                text "${entry.key ?: ''}", font: [bold: true]
-                                                text ":"
-                                                text "${entry.value ?: ''}"
-                                                text "\n"
+                                            Enumerations enumerations = dataElement.dataType.enumerationsObject
+                                            for (Enumeration entry in enumerations) {
+                                                if (entry.deprecated) {
+                                                    text "${entry.key ?: ''}", font: [italic: true, bold: true, color: '#999999']
+                                                    text ":"
+                                                    text "${entry.value ?: ''}", font: [italic: true, color: '#999999']
+                                                    text "\n"
+                                                } else {
+                                                    text "${entry.key ?: ''}", font: [bold: true]
+                                                    text ":"
+                                                    text "${entry.value ?: ''}"
+                                                    text "\n"
+                                                }
+
                                             }
                                         }
 

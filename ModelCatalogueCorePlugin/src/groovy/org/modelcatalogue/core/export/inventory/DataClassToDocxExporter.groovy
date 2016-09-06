@@ -12,6 +12,8 @@ import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.enumeration.Enumeration
+import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.util.docx.ModelCatalogueWordDocumentBuilder
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 
@@ -193,11 +195,20 @@ class DataClassToDocxExporter {
                                         cell ENUM_HEADER_CELL_TEXT, 'Code'
                                         cell ENUM_HEADER_CELL_TEXT, 'Description'
                                     }
-                                    for (Map.Entry<String, String> entry in dataType.enumerations) {
-                                        row {
-                                            cell entry.key
-                                            cell entry.value
+                                    Enumerations enumerations = dataType.enumerationsObject
+                                    for (Enumeration entry in enumerations) {
+                                        if (entry.deprecated) {
+                                            row(DataModelToDocxExporter.DEPRECATED_ENUM_CELL_TEXT) {
+                                                cell entry.key
+                                                cell entry.value
+                                            }
+                                        } else {
+                                            row {
+                                                cell entry.key
+                                                cell entry.value
+                                            }
                                         }
+
                                     }
                                 }
                             }
@@ -293,15 +304,24 @@ class DataClassToDocxExporter {
                                     attrs.putAll(CELL_TEXT)
                                     link attrs, dataElement.dataType.name
                                     if (dataElement.dataType?.instanceOf(EnumeratedType)) {
-                                        text '\n\n'
-                                        text 'Enumerations', font: [italic: true]
-                                        text '\n'
                                         if (dataElement.dataType.enumerations.size() <= 10) {
-                                            for (entry in dataElement.dataType.enumerations) {
-                                                text "${entry.key ?: ''}", font: [bold: true]
-                                                text ":"
-                                                text "${entry.value ?: ''}"
-                                                text "\n"
+                                            text '\n\n'
+                                            text 'Enumerations', font: [italic: true]
+                                            text '\n'
+                                            Enumerations enumerations = dataElement.dataType.enumerationsObject
+                                            for (Enumeration entry in enumerations) {
+                                                if (entry.deprecated) {
+                                                    text "${entry.key ?: ''}", font: [italic: true, bold: true, color: '#999999']
+                                                    text ":", font: [italic: true, bold: true, color: '#999999']
+                                                    text "${entry.value ?: ''}", font: [italic: true, color: '#999999']
+                                                    text "\n"
+                                                } else {
+                                                    text "${entry.key ?: ''}", font: [bold: true]
+                                                    text ":"
+                                                    text "${entry.value ?: ''}"
+                                                    text "\n"
+                                                }
+
                                             }
                                         }
 
