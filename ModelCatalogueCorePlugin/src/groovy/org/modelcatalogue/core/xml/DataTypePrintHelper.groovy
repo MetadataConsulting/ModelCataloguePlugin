@@ -26,9 +26,17 @@ class DataTypePrintHelper extends CatalogueElementPrintHelper<DataType> {
             mkp.enumerations {
                 for (Enumeration entry in element.enumerationsObject) {
                     if (entry.value) {
-                        enumeration(value: entry.key, id: entry.id, entry.value)
+                        if (entry.deprecated) {
+                            enumeration(value: entry.key, id: entry.id, deprecated: true, entry.value)
+                        } else {
+                            enumeration(value: entry.key, id: entry.id, entry.value)
+                        }
                     } else {
-                        enumeration(value: entry.key, id: entry.id)
+                        if (entry.deprecated) {
+                            enumeration(value: entry.key, id: entry.id, deprecated: true)
+                        } else {
+                            enumeration(value: entry.key, id: entry.id)
+                        }
                     }
                 }
             }
