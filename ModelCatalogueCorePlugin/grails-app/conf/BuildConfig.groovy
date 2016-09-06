@@ -66,7 +66,7 @@ grails.project.dependency.resolution = {
         // compile "org.modelcatalogue:mc-integration-mc:$mcToolkitVersion"
         test "org.modelcatalogue:mc-builder-xml:$mcToolkitVersion"
 
-        compile 'com.craigburke.document:word:0.4.10-fix31'
+        compile 'com.craigburke.document:word:0.5.0'
 
         compile 'org.jsoup:jsoup:1.8.3'
 

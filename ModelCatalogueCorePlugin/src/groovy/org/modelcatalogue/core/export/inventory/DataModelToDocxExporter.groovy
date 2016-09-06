@@ -203,7 +203,7 @@ class DataModelToDocxExporter {
                     pageBreak()
                     heading1 'Data Types'
 
-                    for (DataType dataType in docHelper.usedDataTypes) {
+                    for (DataType dataType in docHelper.usedDataTypes.keySet()) {
 
                         log.debug "Exporting data type $dataType to Word Document"
 
@@ -302,6 +302,16 @@ class DataModelToDocxExporter {
                                 }
                             }
                         }
+
+
+                        paragraph style: 'heading4', margin: [bottom: 0], font: [size: 11, bold: true, color: '#999999'], "Usages"
+                        for (DataClass backref in docHelper.usedDataTypes.get(dataType)) {
+                            paragraph(margin: [top: 0, bottom: 0]) {
+                                link url: "#${backref.id}", style: 'heading4', font: [size: 9, color: '#29BDCA'], backref.name
+                            }
+
+                        }
+
                     }
                 }
 
