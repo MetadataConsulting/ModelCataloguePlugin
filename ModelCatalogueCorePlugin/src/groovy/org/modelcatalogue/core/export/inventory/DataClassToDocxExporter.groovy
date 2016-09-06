@@ -12,6 +12,8 @@ import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.enumeration.Enumeration
+import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.util.docx.ModelCatalogueWordDocumentBuilder
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 
@@ -33,9 +35,6 @@ class DataClassToDocxExporter {
     final ElementService elementService
     final Long dataClassId
     final Integer depth
-    final Set<DataType> usedDataTypes = new TreeSet<DataType>([compare: { DataType a, DataType b ->
-        a?.name <=> b?.name
-    }] as Comparator<DataType>)
     final Set<Long> processedModels = new HashSet<Long>()
 
 
@@ -47,8 +46,6 @@ class DataClassToDocxExporter {
     }
 
     void export(OutputStream outputStream) {
-
-        usedDataTypes.clear()
         processedModels.clear()
 
         DataClass rootModel = DataClass.get(dataClassId)
@@ -56,6 +53,8 @@ class DataClassToDocxExporter {
         log.info "Exporting data class $rootModel to Word Document"
 
         DocumentBuilder builder = new ModelCatalogueWordDocumentBuilder(outputStream)
+
+        DocxSpecificationDataHelper helper = new DocxSpecificationDataHelper(builder, depth)
 
         def customTemplate = {
             'document' font: [family: 'Calibri'], margin: [left: 20, right: 10]
@@ -96,14 +95,14 @@ class DataClassToDocxExporter {
                 pageBreak()
 
                 for (DataClass model in rootModel.parentOf) {
-                    printModel(builder, model, 1)
+                    printModel(builder, helper, model, 1)
                 }
 
-                if (usedDataTypes) {
+                if (helper.usedDataTypes) {
                     pageBreak()
                     heading1 'Data Types'
 
-                    for (DataType dataType in usedDataTypes) {
+                    for (DataType dataType in helper.usedDataTypes.keySet()) {
 
                         log.debug "Exporting data type $dataType to Word Document"
 
@@ -196,15 +195,33 @@ class DataClassToDocxExporter {
                                         cell ENUM_HEADER_CELL_TEXT, 'Code'
                                         cell ENUM_HEADER_CELL_TEXT, 'Description'
                                     }
-                                    for (Map.Entry<String, String> entry in dataType.enumerations) {
-                                        row {
-                                            cell entry.key
-                                            cell entry.value
+                                    Enumerations enumerations = dataType.enumerationsObject
+                                    for (Enumeration entry in enumerations) {
+                                        if (entry.deprecated) {
+                                            row(DataModelToDocxExporter.DEPRECATED_ENUM_CELL_TEXT) {
+                                                cell entry.key
+                                                cell entry.value
+                                            }
+                                        } else {
+                                            row {
+                                                cell entry.key
+                                                cell entry.value
+                                            }
                                         }
+
                                     }
                                 }
                             }
                         }
+
+                        paragraph style: 'heading4', margin: [bottom: 0], font: [size: 11, bold: true, color: '#999999'], "Usages"
+                        for (DataClass backref in helper.usedDataTypes.get(dataType)) {
+                            paragraph(margin: [top: 0, bottom: 0]) {
+                                link url: "#${backref.id}", style: 'heading4', font: [size: 9, color: '#29BDCA'], backref.name
+                            }
+
+                        }
+
                     }
                 }
 
@@ -219,7 +236,7 @@ class DataClassToDocxExporter {
     }
 
 
-    private void printModel(DocumentBuilder builder, DataClass model, int level) {
+    private void printModel(DocumentBuilder builder, DocxSpecificationDataHelper helper, DataClass model, int level) {
         if (level > depth) {
             return
         }
@@ -228,9 +245,9 @@ class DataClassToDocxExporter {
 
         builder.with {
             if (model.getId() in processedModels) {
-                "heading${Math.min(level + 1, 6)}" model.name, ref: "${model.getId()}"
-            } else {
                 "heading${Math.min(level + 1, 6)}" model.name
+            } else {
+                "heading${Math.min(level + 1, 6)}" model.name, ref: "${model.getId()}"
             }
 
             paragraph {
@@ -269,7 +286,7 @@ class DataClassToDocxExporter {
                     for (Relationship dataElementRelationship in model.containsRelationships) {
                         DataElement dataElement = dataElementRelationship.destination
                         if (dataElement.dataType) {
-                            usedDataTypes << dataElement.dataType
+                            helper.usedDataTypes.put(dataElement.dataType, model)
                         }
                         row {
                             cell {
@@ -285,17 +302,26 @@ class DataClassToDocxExporter {
                                 if (dataElement.dataType) {
                                     Map<String, Object> attrs = [url: "#${dataElement.dataType.id}", font: [bold: true]]
                                     attrs.putAll(CELL_TEXT)
-                                    text attrs, dataElement.dataType.name
+                                    link attrs, dataElement.dataType.name
                                     if (dataElement.dataType?.instanceOf(EnumeratedType)) {
-                                        text '\n\n'
-                                        text 'Enumerations', font: [italic: true]
-                                        text '\n'
                                         if (dataElement.dataType.enumerations.size() <= 10) {
-                                            for (entry in dataElement.dataType.enumerations) {
-                                                text "${entry.key ?: ''}", font: [bold: true]
-                                                text ":"
-                                                text "${entry.value ?: ''}"
-                                                text "\n"
+                                            text '\n\n'
+                                            text 'Enumerations', font: [italic: true]
+                                            text '\n'
+                                            Enumerations enumerations = dataElement.dataType.enumerationsObject
+                                            for (Enumeration entry in enumerations) {
+                                                if (entry.deprecated) {
+                                                    text "${entry.key ?: ''}", font: [italic: true, bold: true, color: '#999999']
+                                                    text ":", font: [italic: true, bold: true, color: '#999999']
+                                                    text "${entry.value ?: ''}", font: [italic: true, color: '#999999']
+                                                    text "\n"
+                                                } else {
+                                                    text "${entry.key ?: ''}", font: [bold: true]
+                                                    text ":"
+                                                    text "${entry.value ?: ''}"
+                                                    text "\n"
+                                                }
+
                                             }
                                         }
 
@@ -317,7 +343,7 @@ class DataClassToDocxExporter {
             if (!(model.getId() in processedModels)) {
                 if (model.countParentOf()) {
                     for (DataClass child in model.parentOf) {
-                        printModel(builder, child, level + 1)
+                        printModel(builder, helper, child, level + 1)
                     }
                 }
             }

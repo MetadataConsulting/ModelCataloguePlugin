@@ -57,7 +57,7 @@ grails.project.dependency.resolution = {
         // compile 'io.reactivex:rxgroovy:1.0.3'
 
 
-        String mcToolkitVersion = '2.1.0'
+        String mcToolkitVersion = '2.1.0.1'
         compile "org.modelcatalogue:mc-core-api:$mcToolkitVersion"
         compile "org.modelcatalogue:mc-builder-api:$mcToolkitVersion"
         //compile "org.modelcatalogue:mc-integration-excel:$mcToolkitVersion"
@@ -66,7 +66,7 @@ grails.project.dependency.resolution = {
         // compile "org.modelcatalogue:mc-integration-mc:$mcToolkitVersion"
         test "org.modelcatalogue:mc-builder-xml:$mcToolkitVersion"
 
-        compile 'com.craigburke.document:word:0.4.10-fix31'
+        compile 'com.craigburke.document:word:0.5.0'
 
         compile 'org.jsoup:jsoup:1.8.3'
 

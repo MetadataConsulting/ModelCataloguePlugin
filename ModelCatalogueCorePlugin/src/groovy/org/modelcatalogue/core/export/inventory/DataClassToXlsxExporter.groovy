@@ -15,6 +15,8 @@ import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.enumeration.Enumeration
+import org.modelcatalogue.core.enumeration.Enumerations
 
 @Log4j
 class DataClassToXlsxExporter {
@@ -431,7 +433,7 @@ class DataClassToXlsxExporter {
         }
 
         if (dataType.instanceOf(EnumeratedType)) {
-            Map<String, String> enumerations = dataType.enumerations
+            Enumerations enumerations = dataType.enumerationsObject
 
             if (enumerations) {
                 if (dataType.description) {
@@ -445,12 +447,27 @@ class DataClassToXlsxExporter {
 
                 cell.text '\n'
 
-                for (Map.Entry<String, String> entry in enumerations) {
+                for (Enumeration entry in enumerations) {
                     cell.text entry.key, {
                         bold
+                        if (entry.deprecated) {
+                            italic
+                            color lightGray
+                        }
                     }
-                    cell.text ': '
-                    cell.text  entry.value
+                    cell.text ': ', {
+                        bold
+                        if (entry.deprecated) {
+                            italic
+                            color lightGray
+                        }
+                    }
+                    cell.text  entry.value, {
+                        if (entry.deprecated) {
+                            italic
+                            color lightGray
+                        }
+                    }
                     cell.text '\n'
                 }
             }

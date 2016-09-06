@@ -1,6 +1,8 @@
 package org.modelcatalogue.core.export.inventory
 
 import com.craigburke.document.core.builder.DocumentBuilder
+import com.google.common.collect.SetMultimap
+import com.google.common.collect.TreeMultimap
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
@@ -9,6 +11,8 @@ import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.ValidationRule
+import org.modelcatalogue.core.enumeration.Enumeration
+import org.modelcatalogue.core.enumeration.Enumerations
 
 /**
  * Prints the tables for element data specification using the DocumentBuilder library
@@ -24,6 +28,12 @@ class DocxSpecificationDataHelper {
     private static final Map<String, Object> CELL_TEXT_FIRST = [font: [size: 10, family: 'Calibri', bold: true]]
     private static final def TITLE_COLUMN_CELL = [font: [bold: true]]
 
+    private static final <T extends CatalogueElement> Comparator<T> compareByName(Class<T> type) {
+        [compare: { T a, T b ->
+            a?.name <=> b?.name
+        }] as Comparator<T>
+    }
+
     private DocumentBuilder builder
     int depth = 3
 
@@ -31,9 +41,8 @@ class DocxSpecificationDataHelper {
         this.builder = builder
         this.depth = depth
     }
-    final Set<DataType> usedDataTypes = new TreeSet<DataType>([compare: { DataType a, DataType b ->
-        a?.name <=> b?.name
-    }] as Comparator<DataType>)
+
+    final SetMultimap<DataType, DataClass> usedDataTypes = TreeMultimap.create(compareByName(DataType), compareByName(DataClass))
 
     def printModel(DataClass dataClass, boolean recurse, int level, String multiplicity = "") {
         if ((recurse && level > depth) || level > 50 ) { //stop potential runaway?
@@ -48,7 +57,7 @@ class DocxSpecificationDataHelper {
                 pageBreak()
             }
 
-            "heading${Math.min(level + 1, 6)}" dataClass.name + " [$multiplicity]"
+            "heading${Math.min(level + 1, 6)}" dataClass.name + " [$multiplicity]", ref: dataClass.id
 
             paragraph {
                 if (dataClass.description) {
@@ -86,7 +95,7 @@ class DocxSpecificationDataHelper {
                     for (Relationship dataElementRelationship in dataClass.containsRelationships) {
                         DataElement dataElement = dataElementRelationship.destination
                         if (dataElement.dataType) {
-                            usedDataTypes << dataElement.dataType
+                            usedDataTypes.put dataElement.dataType, dataClass
                         }
                         row {
                             cell {
@@ -102,15 +111,24 @@ class DocxSpecificationDataHelper {
                                 if (dataElement.dataType) {
                                     Map<String, Object> attrs = [url: "#${dataElement.dataType.id}", font: [bold: true]]
                                     attrs.putAll(CELL_TEXT)
-                                    text attrs, dataElement.dataType.name
+                                    link attrs, dataElement.dataType.name
                                     if (dataElement.dataType?.instanceOf(EnumeratedType)) {
                                         text '\n\n'
                                         if (dataElement.dataType.enumerations.size() <= 10) {
-                                            for (entry in dataElement.dataType.enumerations) {
-                                                text "${entry.key ?: ''}", font: [bold: true]
-                                                text ":"
-                                                text "${entry.value ?: ''}"
-                                                text "\n"
+                                            Enumerations enumerations = dataElement.dataType.enumerationsObject
+                                            for (Enumeration entry in enumerations) {
+                                                if (entry.deprecated) {
+                                                    text "${entry.key ?: ''}", font: [italic: true, bold: true, color: '#999999']
+                                                    text ":"
+                                                    text "${entry.value ?: ''}", font: [italic: true, color: '#999999']
+                                                    text "\n"
+                                                } else {
+                                                    text "${entry.key ?: ''}", font: [bold: true]
+                                                    text ":"
+                                                    text "${entry.value ?: ''}"
+                                                    text "\n"
+                                                }
+
                                             }
                                         }
 

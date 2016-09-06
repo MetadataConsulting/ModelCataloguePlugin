@@ -5,6 +5,7 @@
         <enumerations>
             <enumeration value="M" id="1">Male</enumeration>
             <enumeration value="F" id="2">Female</enumeration>
+            <enumeration value="X" id="3" deprecated="true">Other</enumeration>
         </enumerations>
     </dataType>
 </catalogue>

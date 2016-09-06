@@ -315,12 +315,12 @@ class CatalogueXmlLoader {
             element.enumerations.children().each {
                 String idText = it.@id.text()
                 if (idText) {
-                    enumerations.put(Long.parseLong(idText, 10), it.@value.text(), it.text())
+                    enumerations.put(Long.parseLong(idText, 10), (String) it.@value.text(), (String) it.text(), it.@deprecated.text() == 'true')
                 } else {
-                    enumerations.put(it.@value.text(), it.text())
+                    enumerations.put((String)it.@value.text(), (String) it.text(), it.@deprecated.text() == 'true')
                 }
             }
-            if(enumerations) parameters.enumerations = enumerations
+            if (enumerations) parameters.enumerations = enumerations
         }
 
         builder.dataType(parameters) {
