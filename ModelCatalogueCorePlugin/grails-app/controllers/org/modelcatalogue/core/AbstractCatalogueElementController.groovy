@@ -865,41 +865,22 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     }
 
     def history(Integer max) {
-        String name = getResourceName()
-        Class type = resource
-
-        if (name in ['primitiveType', 'enumeratedType', 'referenceType']) {
-            name = 'dataType'
-            type = DataType
-        }
-
-        params.max = Math.min(max ?: 10, 100)
         CatalogueElement element = queryForResource(params.id)
         if (!element) {
             notFound()
             return
         }
 
-        Long id = element.id
+        params.max = Math.min(max ?: 10, 100)
 
-        if (!element.latestVersionId) {
-            respond Lists.wrap(params, "/${name}/${params.id}/history", Lists.lazy(params, type, {
-                [type.get(id)]
-            }, { 1 }))
-            return
-        }
-
-        Long latestVersionId = element.latestVersionId
-
-        def customParams = [:]
+        Map<String, Object> customParams = [:]
         customParams.putAll params
 
         customParams.sort = historySortProperty
         customParams.order = historyOrderDirection
 
-        respond Lists.fromCriteria(customParams, type, "/${name}/${params.id}/history") {
-            eq 'latestVersionId', latestVersionId
-        }
+
+        respond CatalogueElementService.getAllVersions(customParams, element)
     }
 
 

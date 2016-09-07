@@ -6,6 +6,7 @@ import org.modelcatalogue.builder.spreadsheet.api.Sheet
 import org.modelcatalogue.builder.spreadsheet.api.SpreadsheetBuilder
 import org.modelcatalogue.builder.spreadsheet.api.Workbook
 import org.modelcatalogue.builder.spreadsheet.poi.PoiSpreadsheetBuilder
+import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
@@ -23,6 +24,8 @@ class DataClassToXlsxExporter {
 
     static final String EXT_MIN_OCCURS = "Min Occurs"
     static final String EXT_MAX_OCCURS = "Max Occurs"
+    static final String CONTENT = 'Content'
+    static final String DATA_CLASSES = 'DataClasses'
 
     final DataClassService dataClassService
     final Long dataClassId
@@ -36,6 +39,10 @@ class DataClassToXlsxExporter {
         this.depth = depth
     }
 
+    protected static String getModelCatalogueIdToPrint(CatalogueElement element) {
+        element.hasModelCatalogueId() && !element.modelCatalogueId.startsWith('http') ? element.modelCatalogueId : element.combinedVersion
+    }
+
     void export(OutputStream outputStream) {
         DataClass dataClass = DataClass.get(dataClassId)
         log.info "Exporting Data Class ${dataClass.name} (${dataClass.combinedVersion}) to inventory spreadsheet."
@@ -43,7 +50,7 @@ class DataClassToXlsxExporter {
         SpreadsheetBuilder builder = new PoiSpreadsheetBuilder()
         builder.build(outputStream) { Workbook workbook ->
             apply ModelCatalogueStyles
-            sheet('DataClasses') { Sheet sheet ->
+            sheet(CONTENT) { Sheet sheet ->
                 buildOutline(sheet, dataClass)
             }
 
@@ -62,7 +69,7 @@ class DataClassToXlsxExporter {
     }
 
     public static void buildDataClassDetailSheet(Workbook workbook, Map<Long, DataClass> processedDataClasss, DataClass dataClass) {
-        workbook.sheet("${dataClass.combinedVersion} ${dataClass.name}") {
+        workbook.sheet("${getModelCatalogueIdToPrint(dataClass)} ${dataClass.name}") {
             row {
                 cell {
                     width 10
@@ -149,7 +156,7 @@ class DataClassToXlsxExporter {
                             colspan 2
                         }
                         cell {
-                            value "${parent.name} (${parent.combinedVersion})"
+                            value "${parent.name} (${getModelCatalogueIdToPrint(parent)})"
                             style 'property-value'
                             if (parent.getId() in processedDataClasss.keySet()) {
                                 link to name getReferenceName(parent)
@@ -166,7 +173,7 @@ class DataClassToXlsxExporter {
                     colspan 2
                 }
                 cell {
-                    value dataClass.combinedVersion
+                    value getModelCatalogueIdToPrint(dataClass)
                     style 'property-value'
                     colspan 3
                 }
@@ -210,8 +217,8 @@ class DataClassToXlsxExporter {
 
             row {
                 cell {
-                    value '<< Back to all Data Classes'
-                    link to name 'DataClasses'
+                    value '<< Back to Content'
+                    link to name DATA_CLASSES
                     style 'note'
                     colspan 5
                 }
@@ -301,7 +308,7 @@ class DataClassToXlsxExporter {
                 DataElement element = containsRelationship.destination as DataElement
                 row {
                     cell {
-                        value element.combinedVersion
+                        value getModelCatalogueIdToPrint(element)
                         style 'data-element-bottom-right'
                     }
                     cell {
@@ -319,7 +326,7 @@ class DataClassToXlsxExporter {
                     }
                     if (element.dataType) {
                         cell {
-                            value element.dataType.combinedVersion
+                            value getModelCatalogueIdToPrint(element.dataType)
                             style 'data-element-bottom-right'
                         }
                         cell {
@@ -333,7 +340,7 @@ class DataClassToXlsxExporter {
 
                         if (element.dataType.instanceOf(PrimitiveType) && element.dataType.measurementUnit) {
                             cell('I') {
-                                value element.dataType.measurementUnit.combinedVersion
+                                value getModelCatalogueIdToPrint(element.dataType.measurementUnit)
                                 style 'data-element-bottom-right'
                             }
                             cell {
@@ -350,7 +357,7 @@ class DataClassToXlsxExporter {
 
                         if (element.dataType.instanceOf(ReferenceType) && element.dataType.dataClass) {
                             cell('L') {
-                                value element.dataType.dataClass.combinedVersion
+                                value getModelCatalogueIdToPrint(element.dataType.dataClass)
                                 style 'data-element-bottom-right'
                             }
                             cell {
@@ -475,7 +482,7 @@ class DataClassToXlsxExporter {
     }
 
     private static String getReferenceName(DataClass dataClass) {
-        "${dataClass.name} (${dataClass.combinedVersion})"
+        "${dataClass.name} (${getModelCatalogueIdToPrint(dataClass)})"
     }
 
 
@@ -486,7 +493,7 @@ class DataClassToXlsxExporter {
                     value dataClass.name
                     style 'h1'
                     colspan 2
-                    name 'DataClasses'
+                    name DATA_CLASSES
                 }
             }
             row {
@@ -513,7 +520,7 @@ class DataClassToXlsxExporter {
 
             row {
                 cell {
-                    value dataClass.combinedVersion
+                    value getModelCatalogueIdToPrint(dataClass)
                     style 'model-catalogue-id'
                     colspan 2
                 }
@@ -586,7 +593,7 @@ class DataClassToXlsxExporter {
     private void buildChildOutline(Sheet sheet, DataClass dataClass, int level) {
         sheet.row {
             cell {
-                value dataClass.combinedVersion
+                value getModelCatalogueIdToPrint(dataClass)
                 style {
                     align bottom right
                 }

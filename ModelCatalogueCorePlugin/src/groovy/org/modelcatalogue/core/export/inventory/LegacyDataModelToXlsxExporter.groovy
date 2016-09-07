@@ -4,17 +4,16 @@ import groovy.util.logging.Log4j
 import org.modelcatalogue.builder.spreadsheet.api.Sheet
 import org.modelcatalogue.builder.spreadsheet.api.Workbook
 import org.modelcatalogue.builder.spreadsheet.poi.PoiSpreadsheetBuilder
-import org.modelcatalogue.core.CatalogueElementService
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.util.DataModelFilter
-import org.modelcatalogue.core.util.Metadata
 
-import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.*
-
-@Log4j
-class DataModelToXlsxExporter {
+/**
+ * @deprecated only kept for reference
+ */
+@Log4j @Deprecated
+class LegacyDataModelToXlsxExporter {
 
     DataClassService dataClassService
     DataModel dataModel
@@ -29,13 +28,7 @@ class DataModelToXlsxExporter {
         def builder = new PoiSpreadsheetBuilder()
         builder.build(outputStream) { Workbook workbook ->
             apply ModelCatalogueStyles
-
-            sheet("Introduction") { Sheet sheet ->
-                buildIntroduction(sheet, dataModel)
-
-            }
-
-            sheet(DataClassToXlsxExporter.CONTENT) { Sheet sheet ->
+            sheet("DataModel") { Sheet sheet ->
                 buildOutline(sheet, dataModel, dataClasses)
             }
 
@@ -48,118 +41,6 @@ class DataModelToXlsxExporter {
         }
 
         log.info "data model ${dataModel.name} (${dataModel.combinedVersion}) exported to inventory spreadsheet."
-    }
-
-    protected static void buildIntroduction(Sheet sheet, DataModel dataModel) {
-        sheet.with {
-            row {
-                cell {
-                    value dataModel.name
-                    colspan 4
-                    style H1
-                }
-            }
-            row {
-                cell {
-                    value "Version: $dataModel.semanticVersion"
-                    colspan 4
-                    style H1
-                }
-            }
-            row {
-                cell {
-                    style H1
-                    colspan 4
-                }
-            }
-            row {
-                cell {
-                    value "Introduction"
-                    colspan 4
-                    style H2
-                }
-            }
-            row {
-                cell {
-                    value dataModel.description
-                    height 100
-                    colspan 4
-                    style DESCRIPTION
-                }
-            }
-
-            row()
-
-            row {
-                cell {
-                    value "Document Version History"
-                    colspan 4
-                    style H2
-                }
-            }
-
-            row()
-
-            row {
-                cell {
-                    value 'Version'
-                    styles INNER_TABLE_HEADER, THIN_DARK_GREY_BORDER, DIM_GRAY_FONT
-                    width 12
-                }
-                cell {
-                    value 'Date Issued'
-                    styles INNER_TABLE_HEADER, THIN_DARK_GREY_BORDER
-                    width 12
-                }
-                cell {
-                    value 'Brief Summary of Change'
-                    styles INNER_TABLE_HEADER, THIN_DARK_GREY_BORDER
-                    width 40
-                }
-                cell {
-                    value 'Owner\'s Name'
-                    styles INNER_TABLE_HEADER, THIN_DARK_GREY_BORDER, DIM_GRAY_FONT
-                    width 40
-                }
-            }
-
-            for (DataModel version in CatalogueElementService.getAllVersions(dataModel).items) {
-                row {
-                    cell {
-                        value version.semanticVersion
-                        styles THIN_DARK_GREY_BORDER, CENTER_CENTER
-                    }
-                    cell {
-                        value version.versionCreated
-                        styles DATE_NORMAL, THIN_DARK_GREY_BORDER
-                    }
-                    cell {
-                        value version.revisionNotes
-                        styles DESCRIPTION, THIN_DARK_GREY_BORDER
-                        height 40
-                    }
-                    cell {
-                        value version.ext[Metadata.OWNER]
-                        styles THIN_DARK_GREY_BORDER, CENTER_CENTER
-                    }
-                }
-            }
-
-            row()
-
-            row {
-                cell {
-                    value "Date of Issue Reference"
-                    style INNER_TABLE_HEADER
-                    colspan 2
-                }
-                cell {
-                    value new Date()
-                    style DATE
-                    colspan 2
-                }
-            }
-        }
     }
 
     private void buildOutline(Sheet sheet, DataModel dataModel, List<DataClass> dataClasses) {
@@ -185,7 +66,7 @@ class DataModelToXlsxExporter {
             }
             row {
                 cell {
-                    value(DataClassToXlsxExporter.getModelCatalogueIdToPrint(dataModel))
+                    value dataModel.combinedVersion
                     style "model-catalogue-id"
                     colspan 2
                 }
@@ -211,7 +92,7 @@ class DataModelToXlsxExporter {
             row {
                 cell {
                     value "All Inner Data Classes"
-                    style  H2
+                    style "h2"
                     colspan 2
                 }
             }
@@ -242,12 +123,11 @@ class DataModelToXlsxExporter {
         }
     }
 
-
     private void buildDataClassesOutline(Sheet sheet, List<DataClass> dataClasses, int level = 1) {
         dataClasses.each { DataClass dataClass ->
             sheet.row {
                 cell {
-                    value DataClassToXlsxExporter.getModelCatalogueIdToPrint(dataClass)
+                    value dataClass.combinedVersion
                     style {
                         align bottom right
                     }
