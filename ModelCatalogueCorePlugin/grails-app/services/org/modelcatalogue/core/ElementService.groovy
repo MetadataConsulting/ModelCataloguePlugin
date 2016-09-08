@@ -718,7 +718,7 @@ class ElementService implements Publisher<CatalogueElement> {
     }
 
 
-    public <T extends CatalogueElement> ListWithTotalAndType<T> getTypeHierarchy(Map<String, Object> params, T element) {
+    public static <T extends CatalogueElement> ListWithTotalAndType<T> getTypeHierarchy(Map<String, Object> params, T element) {
         return Lists.lazy(params, element.getClass() as Class<T>) {
             List<T> typeHierarchy = []
 
@@ -735,7 +735,7 @@ class ElementService implements Publisher<CatalogueElement> {
         newOne
     }
 
-    private <T extends CatalogueElement> void collectBases(T element, List<T> collector) {
+    private static <T extends CatalogueElement> void collectBases(T element, List<T> collector) {
         for (T base in element.isBasedOn) {
             if (base in collector) {
                 continue

@@ -10,6 +10,8 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.CatalogueElementService
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.DataType
+import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
@@ -22,6 +24,8 @@ import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.Metadata
+import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.Lists
 
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H2
 
@@ -519,15 +523,18 @@ class CatalogueElementToXlsxExporter {
                         9.times { cell() }
                     }
                 }
+
+                ListWithTotalAndType<DataType> typeHierarchy = element.dataType ? ElementService.getTypeHierarchy([:], element.dataType) : Lists.emptyListWithTotalAndType(DataType)
+
                 row {
                     style 'data-element-description-row'
-
 
                     cell('C') {
                         value element.description
                         colspan 3
-                        if (HibernateHelper.getEntityClass(element.dataType) == EnumeratedType) {
-                            rowspan element.dataType.enumerations.size() + 2
+                        int desiredRowSpan = getRowSpanForDataTypeDetails(element.dataType, typeHierarchy)
+                        if (desiredRowSpan > 1) {
+                            rowspan desiredRowSpan
                         }
                     }
 
@@ -554,7 +561,8 @@ class CatalogueElementToXlsxExporter {
                     }
 
                 }
-                if (HibernateHelper.getEntityClass(element.dataType) == EnumeratedType) {
+
+                if (HibernateHelper.getEntityClass(element.dataType) == EnumeratedType && element.dataType.enumerations) {
                     row {
                         cell("H") {
                             text 'Enumerations', {
@@ -588,6 +596,32 @@ class CatalogueElementToXlsxExporter {
                         }
                     }
                 }
+
+                if (typeHierarchy.items.any { it.rule }) {
+                    row {
+                        cell("H") {
+                            text 'Rules', {
+                                size 12
+                                bold
+                            }
+                            colspan 2
+                        }
+                    }
+                    for (DataType type in typeHierarchy.items) {
+                        row {
+                            cell('H') {
+                                text type.name, {
+                                    bold
+                                }
+                            }
+                            cell { Cell cell ->
+                                text type.rule
+                                style ModelCatalogueStyles.DESCRIPTION
+                            }
+                        }
+                    }
+                }
+
                 if (element.ext) {
                     for (Map.Entry<String, String> entry in element.ext) {
                         row {
@@ -605,6 +639,27 @@ class CatalogueElementToXlsxExporter {
                 }
             }
         }
+    }
+
+    protected static int getRowSpanForDataTypeDetails(DataType dataType, ListWithTotalAndType<DataType> typeHierarchy) {
+        if (!dataType) {
+            return 1
+        }
+        int rowspan = 1
+
+        if (HibernateHelper.getEntityClass(dataType) == EnumeratedType) {
+            int enumerationSize = dataType.enumerations.size()
+            if (enumerationSize > 0) {
+                rowspan += 1 + enumerationSize
+            }
+        }
+
+        int ruleCount = typeHierarchy.items.count { it.rule }
+        if (ruleCount > 0) {
+            rowspan += 1 + ruleCount
+        }
+
+        return rowspan
     }
 
     private static String getMultiplicity(Relationship relationship) {
