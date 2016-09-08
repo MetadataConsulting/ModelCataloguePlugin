@@ -1,10 +1,8 @@
 package org.modelcatalogue.core.export.inventory
 
-import grails.test.spock.IntegrationSpec
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.core.*
-import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.FileOpener
 
 class DataModelToXlsxExporterSpec extends AbstractIntegrationSpec {
@@ -26,8 +24,7 @@ class DataModelToXlsxExporterSpec extends AbstractIntegrationSpec {
         def file = temporaryFolder.newFile("${System.currentTimeMillis()}.xlsx")
 
         when:
-        def exporter = new DataModelToXlsxExporter(dataModel: dataModel, dataClassService: dataClassService)
-        exporter.export(file.newOutputStream())
+        CatalogueElementToXlsxExporter.forDataModel(dataModel, dataClassService).export(file.newOutputStream())
         FileOpener.open(file)
 
         then:

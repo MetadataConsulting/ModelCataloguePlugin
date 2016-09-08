@@ -36,7 +36,7 @@ class LegacyDataModelToXlsxExporter {
             processedDataClasses.eachWithIndex { item, i ->
                 log.info "[${i+1}/${processedDataClasses.size()}] exporting details for data class " +
                         "${item.value.name} (${item.value.combinedVersion})"
-                DataClassToXlsxExporter.buildDataClassDetailSheet(workbook, processedDataClasses, item.value)
+                CatalogueElementToXlsxExporter.buildDataClassDetailSheet(workbook, processedDataClasses, item.value)
             }
         }
 
@@ -131,11 +131,11 @@ class LegacyDataModelToXlsxExporter {
                     style {
                         align bottom right
                     }
-                    link to name DataClassToXlsxExporter.getReferenceName(dataClass)
+                    link to name CatalogueElementToXlsxExporter.getReferenceName(dataClass)
                 }
                 cell {
                     value dataClass.name
-                    link to name DataClassToXlsxExporter.getReferenceName(dataClass)
+                    link to name CatalogueElementToXlsxExporter.getReferenceName(dataClass)
                     style {
                         if (level) {
                             indent (level * 2)

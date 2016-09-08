@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.forms
 
+import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.testapp.AbstractIntegrationSpec
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.crf.model.DataType
@@ -187,7 +188,7 @@ class ModelToFormExporterServiceSpec extends AbstractIntegrationSpec {
                         relationship {
                             ext ModelToFormExporterService.EXT_ITEM_RESPONSE_TYPE, ModelToFormExporterService.RESPONSE_TYPE_RADIO
                             ext ModelToFormExporterService.EXT_ITEM_LAYOUT, 'horizontal'
-                            ext ModelToFormExporterService.EXT_MIN_OCCURS, '1'
+                            ext Metadata.MIN_OCCURS, '1'
                         }
                     }
 

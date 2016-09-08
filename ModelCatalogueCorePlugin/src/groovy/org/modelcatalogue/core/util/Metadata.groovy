@@ -26,4 +26,6 @@ class Metadata {
     public static final def CHANGE_REF = "http://www.modelcatalogue.org/metadata/genomics/#change-reference"
 
 
+    public static final String MAX_OCCURS = "Max Occurs"
+    public static final String MIN_OCCURS = "Min Occurs"
 }

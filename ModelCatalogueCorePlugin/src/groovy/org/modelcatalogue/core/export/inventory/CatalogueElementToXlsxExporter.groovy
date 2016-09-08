@@ -7,8 +7,9 @@ import org.modelcatalogue.builder.spreadsheet.api.SpreadsheetBuilder
 import org.modelcatalogue.builder.spreadsheet.api.Workbook
 import org.modelcatalogue.builder.spreadsheet.poi.PoiSpreadsheetBuilder
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.CatalogueElementService
 import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.DataType
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
@@ -18,23 +19,33 @@ import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.enumeration.Enumeration
 import org.modelcatalogue.core.enumeration.Enumerations
+import org.modelcatalogue.core.util.DataModelFilter
+import org.modelcatalogue.core.util.HibernateHelper
+import org.modelcatalogue.core.util.Metadata
+
+import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H2
 
 @Log4j
-class DataClassToXlsxExporter {
+class CatalogueElementToXlsxExporter {
 
-    static final String EXT_MIN_OCCURS = "Min Occurs"
-    static final String EXT_MAX_OCCURS = "Max Occurs"
     static final String CONTENT = 'Content'
     static final String DATA_CLASSES = 'DataClasses'
 
     final DataClassService dataClassService
-    final Long dataClassId
+    final Long elementId
     final Integer depth
 
-    final Map<Long, DataClass> processedDataClasss = [:]
 
-    DataClassToXlsxExporter(DataClass dataClass, DataClassService dataClassService, Integer depth = 3) {
-        this.dataClassId = dataClass.getId()
+    static CatalogueElementToXlsxExporter forDataModel(DataModel element, DataClassService dataClassService, Integer depth = 3) {
+        return new CatalogueElementToXlsxExporter(element, dataClassService, depth)
+    }
+
+    static CatalogueElementToXlsxExporter forDataClass(DataClass element, DataClassService dataClassService, Integer depth = 3) {
+        return new CatalogueElementToXlsxExporter(element, dataClassService, depth)
+    }
+
+    private CatalogueElementToXlsxExporter(CatalogueElement element, DataClassService dataClassService, Integer depth = 3) {
+        this.elementId = element.getId()
         this.dataClassService = dataClassService
         this.depth = depth
     }
@@ -43,28 +54,156 @@ class DataClassToXlsxExporter {
         element.hasModelCatalogueId() && !element.modelCatalogueId.startsWith('http') ? element.modelCatalogueId : element.combinedVersion
     }
 
+    protected static void buildIntroduction(Sheet sheet, CatalogueElement dataModel) {
+        sheet.with {
+            row {
+                cell {
+                    value dataModel.name
+                    colspan 4
+                    style ModelCatalogueStyles.H1
+                }
+            }
+            row {
+                cell {
+                    value "Version: $dataModel.dataModelSemanticVersion"
+                    colspan 4
+                    style ModelCatalogueStyles.H1
+                }
+            }
+            row {
+                cell {
+                    style ModelCatalogueStyles.H1
+                    colspan 4
+                }
+            }
+            row {
+                cell {
+                    value "Introduction"
+                    colspan 4
+                    style H2
+                }
+            }
+            row {
+                cell {
+                    value dataModel.description
+                    height 100
+                    colspan 4
+                    style ModelCatalogueStyles.DESCRIPTION
+                }
+            }
+
+            row()
+
+            row {
+                cell {
+                    value "Document Version History"
+                    colspan 4
+                    style H2
+                }
+            }
+
+            row()
+
+            row {
+                cell {
+                    value 'Version'
+                    styles ModelCatalogueStyles.INNER_TABLE_HEADER, ModelCatalogueStyles.THIN_DARK_GREY_BORDER, ModelCatalogueStyles.DIM_GRAY_FONT
+                    width 12
+                }
+                cell {
+                    value 'Date Issued'
+                    styles ModelCatalogueStyles.INNER_TABLE_HEADER, ModelCatalogueStyles.THIN_DARK_GREY_BORDER
+                    width 12
+                }
+                cell {
+                    value 'Brief Summary of Change'
+                    styles ModelCatalogueStyles.INNER_TABLE_HEADER, ModelCatalogueStyles.THIN_DARK_GREY_BORDER
+                    width 40
+                }
+                cell {
+                    value 'Owner\'s Name'
+                    styles ModelCatalogueStyles.INNER_TABLE_HEADER, ModelCatalogueStyles.THIN_DARK_GREY_BORDER, ModelCatalogueStyles.DIM_GRAY_FONT
+                    width 40
+                }
+            }
+
+            for (DataModel version in CatalogueElementService.getAllVersions(dataModel.instanceOf(DataModel) ? dataModel : dataModel.dataModel).items) {
+                row {
+                    cell {
+                        value version.semanticVersion
+                        styles ModelCatalogueStyles.THIN_DARK_GREY_BORDER, ModelCatalogueStyles.CENTER_CENTER
+                    }
+                    cell {
+                        value version.versionCreated
+                        styles ModelCatalogueStyles.DATE_NORMAL, ModelCatalogueStyles.THIN_DARK_GREY_BORDER
+                    }
+                    cell {
+                        value version.revisionNotes
+                        styles ModelCatalogueStyles.DESCRIPTION, ModelCatalogueStyles.THIN_DARK_GREY_BORDER
+                        height 40
+                    }
+                    cell {
+                        value version.ext[Metadata.OWNER]
+                        styles ModelCatalogueStyles.THIN_DARK_GREY_BORDER, ModelCatalogueStyles.CENTER_CENTER
+                    }
+                }
+            }
+
+            row()
+
+            row {
+                cell {
+                    value "Date of Issue Reference"
+                    style ModelCatalogueStyles.INNER_TABLE_HEADER
+                    colspan 2
+                }
+                cell {
+                    value new Date()
+                    style ModelCatalogueStyles.DATE
+                    colspan 2
+                }
+            }
+        }
+    }
+
     void export(OutputStream outputStream) {
-        DataClass dataClass = DataClass.get(dataClassId)
-        log.info "Exporting Data Class ${dataClass.name} (${dataClass.combinedVersion}) to inventory spreadsheet."
+        CatalogueElement element = CatalogueElement.get(elementId)
+
+        List<DataClass> dataClasses = Collections.emptyList()
+
+        if (HibernateHelper.getEntityClass(element) == DataClass) {
+            dataClasses = [element as DataClass]
+        } else if (HibernateHelper.getEntityClass(element) == DataModel) {
+            dataClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.includes(element as DataModel)).items
+        }
+
+        log.info "Exporting Data Class ${element.name} (${element.combinedVersion}) to inventory spreadsheet."
 
         SpreadsheetBuilder builder = new PoiSpreadsheetBuilder()
         builder.build(outputStream) { Workbook workbook ->
             apply ModelCatalogueStyles
-            sheet(CONTENT) { Sheet sheet ->
-                buildOutline(sheet, dataClass)
+
+            sheet("Introduction") { Sheet sheet ->
+                buildIntroduction(sheet, element)
             }
 
-            int dataClasssCount = processedDataClasss.size()
+            final Map<Long, DataClass> processedDataClasses = [:]
+
+            sheet(CONTENT) { Sheet sheet ->
+                buildOutline(sheet, dataClasses, depth, processedDataClasses)
+            }
+
+            int dataClasssCount = processedDataClasses.size()
             int counter = 0
 
-            for (DataClass dataClassForDetail in processedDataClasss.values()) {
+            for (DataClass dataClassForDetail in processedDataClasses.values()) {
                 dataClassForDetail.setName("${dataClassForDetail.name}".replace("'",''))
                 log.info "[${++counter}/${dataClasssCount}] Exporting detail for Data Class ${dataClassForDetail.name} (${dataClassForDetail.combinedVersion})"
-                buildDataClassDetailSheet(workbook, processedDataClasss, dataClassForDetail)
+                buildDataClassDetailSheet(workbook, processedDataClasses, dataClassForDetail)
             }
         }
 
-        log.info "Exported Data Class ${dataClass.name} (${dataClass.combinedVersion}) to inventory spreadsheet."
+        log.info "Exported Data Class ${element.name} (${element.combinedVersion}) to inventory spreadsheet."
 
     }
 
@@ -93,7 +232,10 @@ class DataClassToXlsxExporter {
                     width 10
                 }
                 cell {
-                    width 70
+                    width 15
+                }
+                cell {
+                    width 55
                 }
                 cell {
                     width 10
@@ -270,6 +412,7 @@ class DataClassToXlsxExporter {
                 cell {
                     value 'Data Type Name'
                     style 'inner-table-header'
+                    colspan 2
                 }
 
                 cell {
@@ -336,10 +479,11 @@ class DataClassToXlsxExporter {
                         cell {
                             value element.dataType.name
                             style 'data-element'
+                            colspan 2
                         }
 
                         if (element.dataType.instanceOf(PrimitiveType) && element.dataType.measurementUnit) {
-                            cell('I') {
+                            cell('J') {
                                 value getModelCatalogueIdToPrint(element.dataType.measurementUnit)
                                 style 'data-element-bottom-right'
                             }
@@ -356,7 +500,7 @@ class DataClassToXlsxExporter {
                         }
 
                         if (element.dataType.instanceOf(ReferenceType) && element.dataType.dataClass) {
-                            cell('L') {
+                            cell('M') {
                                 value getModelCatalogueIdToPrint(element.dataType.dataClass)
                                 style 'data-element-bottom-right'
                             }
@@ -382,27 +526,67 @@ class DataClassToXlsxExporter {
                     cell('C') {
                         value element.description
                         colspan 3
+                        if (HibernateHelper.getEntityClass(element.dataType) == EnumeratedType) {
+                            rowspan element.dataType.enumerations.size() + 2
+                        }
                     }
 
                     if (element.dataType) {
                         cell ('H') { Cell theCell ->
-                            createDescriptionAndOrEnums(theCell, element.dataType)
+                            if (element.dataType.description) {
+                                text element.dataType.description
+                            }
+                            colspan 2
                         }
 
                         if (element.dataType.instanceOf(PrimitiveType) && element.dataType.measurementUnit) {
-                            cell ('K') {
+                            cell ('L') {
                                 value element.dataType.measurementUnit.description
                             }
                         }
 
                         if (element.dataType.instanceOf(ReferenceType) && element.dataType.dataClass) {
-                            cell ('N') {
+                            cell ('O') {
                                 value element.dataType.dataClass.description
                             }
                         }
 
                     }
 
+                }
+                if (HibernateHelper.getEntityClass(element.dataType) == EnumeratedType) {
+                    row {
+                        cell("H") {
+                            text 'Enumerations', {
+                                size 12
+                                bold
+                            }
+                            colspan 2
+                        }
+                    }
+                    Enumerations enumerations = element.dataType.enumerationsObject
+                    for (Enumeration entry in enumerations) {
+                        row {
+                            cell('H') { Cell cell ->
+                                cell.text entry.key, {
+                                    bold
+                                    if (entry.deprecated) {
+                                        italic
+                                        color lightGray
+                                    }
+                                }
+                            }
+                            cell { Cell cell ->
+                                text entry.value, {
+                                    if (entry.deprecated) {
+                                        italic
+                                        color lightGray
+                                    }
+                                }
+                                style ModelCatalogueStyles.DESCRIPTION
+                            }
+                        }
+                    }
                 }
                 if (element.ext) {
                     for (Map.Entry<String, String> entry in element.ext) {
@@ -424,8 +608,11 @@ class DataClassToXlsxExporter {
     }
 
     private static String getMultiplicity(Relationship relationship) {
-        String min = relationship.ext[EXT_MIN_OCCURS] ?: '0'
-        String max = relationship.ext[EXT_MAX_OCCURS] ?: '*'
+        if (!relationship) {
+            return ''
+        }
+        String min = relationship.ext[Metadata.MIN_OCCURS] ?: '0'
+        String max = relationship.ext[Metadata.MAX_OCCURS] ?: '*'
 
         if (max.toLowerCase() in ['unbounded', '' + Integer.MAX_VALUE]) {
             max = '*'
@@ -434,163 +621,61 @@ class DataClassToXlsxExporter {
         return "${min}..${max}"
     }
 
-    static void createDescriptionAndOrEnums(Cell cell, DataType dataType) {
-        if (dataType.description) {
-            cell.text dataType.description
-        }
-
-        if (dataType.instanceOf(EnumeratedType)) {
-            Enumerations enumerations = dataType.enumerationsObject
-
-            if (enumerations) {
-                if (dataType.description) {
-                    cell.text '\n\n'
-                }
-
-                cell.text 'Enumerations', {
-                    size 12
-                    bold
-                }
-
-                cell.text '\n'
-
-                for (Enumeration entry in enumerations) {
-                    cell.text entry.key, {
-                        bold
-                        if (entry.deprecated) {
-                            italic
-                            color lightGray
-                        }
-                    }
-                    cell.text ': ', {
-                        bold
-                        if (entry.deprecated) {
-                            italic
-                            color lightGray
-                        }
-                    }
-                    cell.text  entry.value, {
-                        if (entry.deprecated) {
-                            italic
-                            color lightGray
-                        }
-                    }
-                    cell.text '\n'
-                }
-            }
-        }
-    }
-
-    private static String getReferenceName(DataClass dataClass) {
+    protected static String getReferenceName(DataClass dataClass) {
         "${dataClass.name} (${getModelCatalogueIdToPrint(dataClass)})"
     }
 
 
-    private void buildOutline(Sheet sheet, DataClass dataClass) {
+    protected static void buildOutline(Sheet sheet, List<DataClass> dataClasses, int depth, Map<Long, DataClass> processedDataClasss) {
         sheet.with {
-            row(2) {
+            row {
                 cell {
-                    value dataClass.name
-                    style 'h1'
-                    colspan 2
+                    value "Data Classes"
+                    style  H2
+                    colspan 3
                     name DATA_CLASSES
                 }
             }
-            row {
-                if (dataClass.description) {
-                    cell {
-                        value dataClass.description
 
-                        height 100
-
-                        style 'description'
-                        colspan 2
-
-                    }
-                }
-            }
-
-            row {
-                cell {
-                    value dataClass.dataModel?.name
-                    style 'model-catalogue-id'
-                    colspan 2
-                }
-            }
-
-            row {
-                cell {
-                    value getModelCatalogueIdToPrint(dataClass)
-                    style 'model-catalogue-id'
-                    colspan 2
-                }
-            }
-            row {
-                cell {
-                    value dataClass.status
-                    style 'status'
-                    colspan 2
-                }
-            }
-
-            row()
-
-            row {
-                cell {
-                    value new Date()
-                    style 'date'
-                    colspan 2
-                }
-            }
-
-
-            row()
-
-
-            row {
-                cell {
-                    value 'All Inner Data Classes'
-                    style 'h2'
-                    colspan 3
-                }
-            }
             row {
                 cell {
                     value 'ID'
-                    width 10
                     style 'inner-table-header'
-                }
-
-                cell {
-                    value 'Status'
                     width 10
-                    style 'inner-table-header'
                 }
-
                 cell {
                     value 'Name'
-                    width 70
                     style 'inner-table-header'
+                    width 60
+                }
+                cell {
+                    value 'Multiplicty'
+                    style 'inner-table-header'
+                    width 10
                 }
             }
 
+            buildDataClassesOutline(it, dataClasses, depth, processedDataClasss)
 
-            buildChildOutline(it, dataClass, 1)
-
+            // footer
             row()
-
             row {
                 cell {
                     value 'Click the data class cell to show the detail'
                     style 'note'
-                    colspan 2
+                    colspan 3
                 }
             }
-
         }
     }
 
-    private void buildChildOutline(Sheet sheet, DataClass dataClass, int level) {
+    private static void buildDataClassesOutline(Sheet sheet, List<DataClass> dataClasses, int depth, Map<Long, DataClass> processedDataClasses) {
+        dataClasses.each { DataClass dataClass ->
+            buildChildOutline(sheet, dataClass, null, 1, depth, processedDataClasses)
+        }
+    }
+
+    protected static void buildChildOutline(Sheet sheet, DataClass dataClass, Relationship relationship, int level, int depth, Map<Long, DataClass> processedDataClasss) {
         sheet.row {
             cell {
                 value getModelCatalogueIdToPrint(dataClass)
@@ -600,18 +685,19 @@ class DataClassToXlsxExporter {
                 link to name getReferenceName(dataClass)
             }
             cell {
-                value dataClass.status
-                style {
-                    align center center
-                }
-            }
-            cell {
                 value dataClass.name
                 link to name getReferenceName(dataClass)
                 style {
                     if (level) {
                         indent (level * 2)
                     }
+                }
+            }
+            cell {
+                value getMultiplicity(relationship)
+                link to name getReferenceName(dataClass)
+                style {
+                    align center right
                 }
             }
         }
@@ -629,8 +715,8 @@ class DataClassToXlsxExporter {
 
         if (dataClass.countParentOf()) {
             sheet.group {
-                for (DataClass child in dataClass.parentOf) {
-                    buildChildOutline(sheet, child, level + 1)
+                for (Relationship child in dataClass.parentOfRelationships) {
+                    buildChildOutline(sheet, child.destination as DataClass, child, level + 1, depth, processedDataClasss)
                 }
             }
         }
