@@ -28,4 +28,8 @@ class Metadata {
 
     public static final String MAX_OCCURS = "Max Occurs"
     public static final String MIN_OCCURS = "Min Occurs"
+
+    // excel export
+    public static final def SKIP_EXPORT = "http://www.modelcatalogue.org/metadata/#skip-export"
+    public static final def SUBSECTION = "http://www.modelcatalogue.org/metadata/#subsection"
 }

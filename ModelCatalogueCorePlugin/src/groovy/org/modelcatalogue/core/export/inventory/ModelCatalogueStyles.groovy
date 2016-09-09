@@ -122,6 +122,7 @@ class ModelCatalogueStyles implements Stylesheet {
                 font {
                     bold
                 }
+                indent 1
             }
             style(CENTER_CENTER) {
                 align center center

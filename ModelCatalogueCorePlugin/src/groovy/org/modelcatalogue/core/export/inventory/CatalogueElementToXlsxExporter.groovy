@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.export.inventory
 
+import com.google.common.collect.ImmutableMap
+import grails.util.Holders
 import groovy.util.logging.Log4j
 import org.modelcatalogue.builder.spreadsheet.api.Cell
 import org.modelcatalogue.builder.spreadsheet.api.Sheet
@@ -34,11 +36,13 @@ class CatalogueElementToXlsxExporter {
 
     static final String CONTENT = 'Content'
     static final String DATA_CLASSES = 'DataClasses'
+    public static final String DATA_TYPE_FIRST_COLUMN = 'F'
 
     final DataClassService dataClassService
     final Long elementId
     final Integer depth
 
+    boolean printMetadata
 
     static CatalogueElementToXlsxExporter forDataModel(DataModel element, DataClassService dataClassService, Integer depth = 3) {
         return new CatalogueElementToXlsxExporter(element, dataClassService, depth)
@@ -52,6 +56,8 @@ class CatalogueElementToXlsxExporter {
         this.elementId = element.getId()
         this.dataClassService = dataClassService
         this.depth = depth
+
+        printMetadata = Holders.config.mc.export.xlsx.printMetadata ?: false
     }
 
     protected static String getModelCatalogueIdToPrint(CatalogueElement element) {
@@ -178,7 +184,7 @@ class CatalogueElementToXlsxExporter {
         if (HibernateHelper.getEntityClass(element) == DataClass) {
             dataClasses = [element as DataClass]
         } else if (HibernateHelper.getEntityClass(element) == DataModel) {
-            dataClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.includes(element as DataModel)).items
+            dataClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.includes(element as DataModel), ImmutableMap.of('status', 'active'), true).items
         }
 
         log.info "Exporting Data Class ${element.name} (${element.combinedVersion}) to inventory spreadsheet."
@@ -203,7 +209,11 @@ class CatalogueElementToXlsxExporter {
             for (DataClass dataClassForDetail in processedDataClasses.values()) {
                 dataClassForDetail.setName("${dataClassForDetail.name}".replace("'",''))
                 log.info "[${++counter}/${dataClasssCount}] Exporting detail for Data Class ${dataClassForDetail.name} (${dataClassForDetail.combinedVersion})"
-                buildDataClassDetailSheet(workbook, processedDataClasses, dataClassForDetail)
+                if (!dataClassForDetail.ext[Metadata.SKIP_EXPORT]) {
+                    buildDataClassDetailSheet(workbook, processedDataClasses, dataClassForDetail)
+                } else {
+                    log.info " - skipped as ${dataClassForDetail.ext[Metadata.SKIP_EXPORT]} evaluates to true"
+                }
             }
         }
 
@@ -211,8 +221,22 @@ class CatalogueElementToXlsxExporter {
 
     }
 
-    public static void buildDataClassDetailSheet(Workbook workbook, Map<Long, DataClass> processedDataClasss, DataClass dataClass) {
-        workbook.sheet("${getModelCatalogueIdToPrint(dataClass)} ${dataClass.name}") {
+    private void buildDataClassDetailSheet(Workbook workbook, Map<Long, DataClass> processedDataClasss, DataClass dataClass) {
+        workbook.sheet("${getModelCatalogueIdToPrint(dataClass)} ${dataClass.name}") { Sheet sheet ->
+            buildDataClassDetail(sheet, processedDataClasss, dataClass)
+        }
+    }
+
+    private void buildDataClassDetail(Sheet sheet, Map<Long, DataClass> processedDataClasss, DataClass dataClass) {
+        sheet.with {
+            row {
+                cell {
+                    value '<< Back to Content'
+                    link to name DATA_CLASSES
+                    style 'note'
+                    colspan 5
+                }
+            }
             row {
                 cell {
                     width 10
@@ -230,34 +254,16 @@ class CatalogueElementToXlsxExporter {
                     width 10
                 }
                 cell {
-                    width 10
+                    width 25
                 }
                 cell {
-                    width 10
+                    width 75
                 }
                 cell {
-                    width 15
+                    width 100
                 }
                 cell {
-                    width 55
-                }
-                cell {
-                    width 10
-                }
-                cell {
-                    width 10
-                }
-                cell {
-                    width 70
-                }
-                cell {
-                    width 10
-                }
-                cell {
-                    width 10
-                }
-                cell {
-                    width 70
+                    width 100
                 }
             }
             row {
@@ -293,7 +299,7 @@ class CatalogueElementToXlsxExporter {
                     colspan 3
                 }
             }
-            for(DataClass parent in dataClass.childOf) {
+            for (DataClass parent in dataClass.childOf) {
                 if (parent.status != ElementStatus.DEPRECATED) {
                     row {
                         cell {
@@ -304,7 +310,7 @@ class CatalogueElementToXlsxExporter {
                         cell {
                             value "${parent.name} (${getModelCatalogueIdToPrint(parent)})"
                             style 'property-value'
-                            if (parent.getId() in processedDataClasss.keySet()) {
+                            if (parent.getId() in processedDataClasss.keySet() && !parent.ext[Metadata.SKIP_EXPORT]) {
                                 link to name getReferenceName(parent)
                             }
                             colspan 3
@@ -372,7 +378,7 @@ class CatalogueElementToXlsxExporter {
         }
     }
 
-    private static buildContainedElements(Sheet sheet, DataClass dataClass) {
+    private buildContainedElements(Sheet sheet, DataClass dataClass) {
         sheet.with {
             row {
                 cell {
@@ -393,7 +399,7 @@ class CatalogueElementToXlsxExporter {
                 }
 
                 cell {
-                    value 'Data Element Name'
+                    value 'Data Element'
                     style 'inner-table-header'
                     colspan 2
                 }
@@ -404,48 +410,18 @@ class CatalogueElementToXlsxExporter {
                 }
 
                 cell {
-                    value 'DT ID'
-                    style 'inner-table-header'
-                }
-
-                cell {
-                    value 'Status'
-                    style 'inner-table-header'
-                }
-
-                cell {
-                    value 'Data Type Name'
+                    value 'Data Type'
                     style 'inner-table-header'
                     colspan 2
                 }
 
                 cell {
-                    value 'MU ID'
+                    value 'Measurement Unit'
                     style 'inner-table-header'
                 }
 
                 cell {
-                    value 'Status'
-                    style 'inner-table-header'
-                }
-
-                cell {
-                    value 'Measurement Unit Name'
-                    style 'inner-table-header'
-                }
-
-                cell {
-                    value 'DC ID'
-                    style 'inner-table-header'
-                }
-
-                cell {
-                    value 'Status'
-                    style 'inner-table-header'
-                }
-
-                cell {
-                    value 'Referenced Data Class Name'
+                    value 'Referenced Data Class'
                     style 'inner-table-header'
                 }
             }
@@ -473,54 +449,30 @@ class CatalogueElementToXlsxExporter {
                     }
                     if (element.dataType) {
                         cell {
-                            value getModelCatalogueIdToPrint(element.dataType)
-                            style 'data-element-bottom-right'
-                        }
-                        cell {
-                            value element.dataType.status
-                            style 'data-element-center-center'
-                        }
-                        cell {
                             value element.dataType.name
                             style 'data-element'
                             colspan 2
                         }
 
                         if (element.dataType.instanceOf(PrimitiveType) && element.dataType.measurementUnit) {
-                            cell('J') {
-                                value getModelCatalogueIdToPrint(element.dataType.measurementUnit)
-                                style 'data-element-bottom-right'
-                            }
-                            cell {
-                                value element.dataType.measurementUnit.status
-                                style 'data-element-center-center'
-                            }
                             cell {
                                 value element.dataType.measurementUnit.name
                                 style 'data-element'
                             }
                         } else {
-                            3.times { cell() }
+                            cell()
                         }
 
                         if (element.dataType.instanceOf(ReferenceType) && element.dataType.dataClass) {
-                            cell('M') {
-                                value getModelCatalogueIdToPrint(element.dataType.dataClass)
-                                style 'data-element-bottom-right'
-                            }
-                            cell {
-                                value element.dataType.dataClass.status
-                                style 'data-element-center-center'
-                            }
                             cell {
                                 value element.dataType.dataClass.name
                                 style 'data-element'
                             }
                         } else {
-                            3.times { cell() }
+                            cell()
                         }
                     } else {
-                        9.times { cell() }
+                        3.times { cell() }
                     }
                 }
 
@@ -539,7 +491,7 @@ class CatalogueElementToXlsxExporter {
                     }
 
                     if (element.dataType) {
-                        cell ('H') { Cell theCell ->
+                        cell (DATA_TYPE_FIRST_COLUMN) { Cell theCell ->
                             if (element.dataType.description) {
                                 text element.dataType.description
                             }
@@ -547,13 +499,13 @@ class CatalogueElementToXlsxExporter {
                         }
 
                         if (element.dataType.instanceOf(PrimitiveType) && element.dataType.measurementUnit) {
-                            cell ('L') {
+                            cell ('H') {
                                 value element.dataType.measurementUnit.description
                             }
                         }
 
                         if (element.dataType.instanceOf(ReferenceType) && element.dataType.dataClass) {
-                            cell ('O') {
+                            cell ('I') {
                                 value element.dataType.dataClass.description
                             }
                         }
@@ -564,7 +516,7 @@ class CatalogueElementToXlsxExporter {
 
                 if (HibernateHelper.getEntityClass(element.dataType) == EnumeratedType && element.dataType.enumerations) {
                     row {
-                        cell("H") {
+                        cell("F") {
                             text 'Enumerations', {
                                 size 12
                                 bold
@@ -575,7 +527,7 @@ class CatalogueElementToXlsxExporter {
                     Enumerations enumerations = element.dataType.enumerationsObject
                     for (Enumeration entry in enumerations) {
                         row {
-                            cell('H') { Cell cell ->
+                            cell(DATA_TYPE_FIRST_COLUMN) { Cell cell ->
                                 cell.text entry.key, {
                                     bold
                                     if (entry.deprecated) {
@@ -599,7 +551,7 @@ class CatalogueElementToXlsxExporter {
 
                 if (typeHierarchy.items.any { it.rule }) {
                     row {
-                        cell("H") {
+                        cell("F") {
                             text 'Rules', {
                                 size 12
                                 bold
@@ -609,7 +561,7 @@ class CatalogueElementToXlsxExporter {
                     }
                     for (DataType type in typeHierarchy.items) {
                         row {
-                            cell('H') {
+                            cell(DATA_TYPE_FIRST_COLUMN) {
                                 text type.name, {
                                     bold
                                 }
@@ -622,7 +574,7 @@ class CatalogueElementToXlsxExporter {
                     }
                 }
 
-                if (element.ext) {
+                if (element.ext && printMetadata) {
                     for (Map.Entry<String, String> entry in element.ext) {
                         row {
                             cell('C') {
@@ -737,11 +689,15 @@ class CatalogueElementToXlsxExporter {
                 style {
                     align bottom right
                 }
-                link to name getReferenceName(dataClass)
+                if (!dataClass.ext[Metadata.SKIP_EXPORT]) {
+                    link to name getReferenceName(dataClass)
+                }
             }
             cell {
                 value dataClass.name
-                link to name getReferenceName(dataClass)
+                if (!dataClass.ext[Metadata.SKIP_EXPORT]) {
+                    link to name getReferenceName(dataClass)
+                }
                 style {
                     if (level) {
                         indent (level * 2)
@@ -750,7 +706,9 @@ class CatalogueElementToXlsxExporter {
             }
             cell {
                 value getMultiplicity(relationship)
-                link to name getReferenceName(dataClass)
+                if (!dataClass.ext[Metadata.SKIP_EXPORT]) {
+                    link to name getReferenceName(dataClass)
+                }
                 style {
                     align center right
                 }
