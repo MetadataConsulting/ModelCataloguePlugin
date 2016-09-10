@@ -362,13 +362,7 @@ x in ['apple', 'banana', 'cherry']
         [
           {
             header: 'Name',
-            value: "ext.get('name') || ext.get('Name') || relation.name ",
-            classes: 'col-md-5',
-            href: 'relation.href()'
-          }
-          {
-            header: 'Identification',
-            value: "relation.getElementTypeName() + ': ' + relation.id",
+            value: "(ext.get('name') || ext.get('Name') || relation.name) + ' ' + relation.getVersionAndId()",
             classes: 'col-md-5',
             href: 'relation.href()'
           }
