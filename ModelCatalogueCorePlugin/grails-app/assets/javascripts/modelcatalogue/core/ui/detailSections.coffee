@@ -110,6 +110,7 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
             keys: angular.copy configuration.keys
             data: angular.copy configuration.data
             autoSave: angular.copy configuration.autoSave
+            actions: angular.copy configuration.actions
             handlesKey:   (key) -> key in @keys
             hasData:      (element) -> configuration.keys.some (key) -> element.ext.get(key)?
             isTemplateHidden: (element) ->
