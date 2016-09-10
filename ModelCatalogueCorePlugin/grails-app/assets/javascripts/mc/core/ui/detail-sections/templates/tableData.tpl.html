@@ -1,4 +1,5 @@
 <infinite-table id="data-elements-changes"
+                ng-if="view.getList(element).size > 0"
                 list="view.getList(element)"
                 columns="view.data.columns"
                 is-sortable="!!view.reorder"
