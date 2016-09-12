@@ -20,7 +20,6 @@ import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.enumeration.Enumeration
 import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.util.DataModelFilter
@@ -43,6 +42,9 @@ class CatalogueElementToXlsxExporter {
     final Integer depth
 
     boolean printMetadata
+
+    private Map<Long, DataClass> dataClassesProcessedInOutline = [:]
+    private Set<Long> namesPrinted = new HashSet<Long>()
 
     static CatalogueElementToXlsxExporter forDataModel(DataModel element, DataClassService dataClassService, Integer depth = 3) {
         return new CatalogueElementToXlsxExporter(element, dataClassService, depth)
@@ -177,6 +179,9 @@ class CatalogueElementToXlsxExporter {
     }
 
     void export(OutputStream outputStream) {
+        dataClassesProcessedInOutline = [:]
+        namesPrinted = new HashSet<Long>()
+
         CatalogueElement element = CatalogueElement.get(elementId)
 
         List<DataClass> dataClasses = Collections.emptyList()
@@ -197,37 +202,96 @@ class CatalogueElementToXlsxExporter {
                 buildIntroduction(sheet, element)
             }
 
-            final Map<Long, DataClass> processedDataClasses = [:]
+            sheet(CONTENT) {}
+
+            buildDataClassesDetails(dataClasses, workbook, null)
 
             sheet(CONTENT) { Sheet sheet ->
-                buildOutline(sheet, dataClasses, depth, processedDataClasses)
+                buildOutline(sheet, dataClasses)
             }
 
-            int dataClasssCount = processedDataClasses.size()
-            int counter = 0
-
-            for (DataClass dataClassForDetail in processedDataClasses.values()) {
-                dataClassForDetail.setName("${dataClassForDetail.name}".replace("'",''))
-                log.info "[${++counter}/${dataClasssCount}] Exporting detail for Data Class ${dataClassForDetail.name} (${dataClassForDetail.combinedVersion})"
-                if (!dataClassForDetail.ext[Metadata.SKIP_EXPORT]) {
-                    buildDataClassDetailSheet(workbook, processedDataClasses, dataClassForDetail)
-                } else {
-                    log.info " - skipped as ${dataClassForDetail.ext[Metadata.SKIP_EXPORT]} evaluates to true"
-                }
-            }
         }
 
         log.info "Exported Data Class ${element.name} (${element.combinedVersion}) to inventory spreadsheet."
 
     }
 
-    private void buildDataClassDetailSheet(Workbook workbook, Map<Long, DataClass> processedDataClasss, DataClass dataClass) {
-        workbook.sheet("${getModelCatalogueIdToPrint(dataClass)} ${dataClass.name}") { Sheet sheet ->
-            buildDataClassDetail(sheet, processedDataClasss, dataClass)
+    protected void buildDataClassesDetails(Iterable<DataClass> dataClasses, Workbook workbook, Sheet sheet, int level = 0, Set<Long> processed = new HashSet<Long>()) {
+        if (level > depth) {
+            log.info "${' ' * level}- skipping ${dataClasses*.name} as the level is already $level (max. depth is $depth)"
+            return
+        }
+        for (DataClass dataClassForDetail in dataClasses) {
+            buildSheets(dataClassForDetail, null, workbook, sheet, level, processed)
         }
     }
 
-    private void buildDataClassDetail(Sheet sheet, Map<Long, DataClass> processedDataClasss, DataClass dataClass) {
+    protected void buildDataClassesDetailsWithRelationships(Iterable<Relationship> relationships, Workbook workbook, Sheet sheet, int level = 0, Set<Long> processed = new HashSet<Long>()) {
+        if (level > depth) {
+            log.info "${' ' * level}- skipping ${relationships*.destination*.name} as the level is already $level (max. depth is $depth)"
+            return
+        }
+        for (Relationship relationship in relationships) {
+            buildSheets(relationship.destination as DataClass, relationship, workbook, sheet, level, processed)
+        }
+    }
+
+    private void buildSheets(DataClass dataClassForDetail, Relationship relationship, Workbook workbook, Sheet sheet, int level = 0, Set<Long> processed = new HashSet<Long>()) {
+        if (dataClassForDetail.id in processed) {
+            log.info "${' ' * level}- skipping ${dataClassForDetail.name} as it is already processed"
+            return
+        }
+
+        processed << dataClassForDetail.id
+        log.info "Exporting detail for Data Class ${dataClassForDetail.name} (${dataClassForDetail.combinedVersion})"
+
+        if (isSkipExport(dataClassForDetail)) {
+            log.info "${' ' * level}- skipped as ${Metadata.SKIP_EXPORT} evaluates to true"
+            buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, workbook, sheet, level + 1, processed)
+            return
+        }
+
+        // always render subsections on the new sheet
+        if (isSubsection(dataClassForDetail, relationship)) {
+            workbook.sheet("${getModelCatalogueIdToPrint(dataClassForDetail)} ${normalizeDataClassName(dataClassForDetail)}") { Sheet s ->
+                log.info "${' ' * level}- printing ${dataClassForDetail.name} on new sheet"
+                buildDataClassDetail(s, dataClassForDetail)
+                buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, workbook, s, level + 1, new HashSet<Long>([dataClassForDetail.id]))
+            }
+            return
+        }
+
+        // inside subsection use existing sheet
+        if (sheet) {
+            log.info "${' ' * level}- printing ${dataClassForDetail.name} on existing sheet"
+            buildDataClassDetail(sheet, dataClassForDetail)
+            buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, workbook, sheet, level + 1, processed)
+            return
+        }
+
+        // top level sheet
+        workbook.sheet("${getModelCatalogueIdToPrint(dataClassForDetail)} ${normalizeDataClassName(dataClassForDetail)}") { Sheet s ->
+            log.info "${' ' * level}- printing ${dataClassForDetail.name} on new sheet"
+            buildDataClassDetail(s, dataClassForDetail)
+            // force top level sheets for children
+            buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, workbook, null, level + 1, processed)
+        }
+    }
+
+    private static boolean isSubsection(DataClass dataClassForDetail, Relationship relationship = null) {
+        relationship?.ext?.get(Metadata.SUBSECTION) ?: dataClassForDetail.ext[Metadata.SUBSECTION]
+    }
+
+    protected static boolean isSkipExport(DataClass dataClassForDetail) {
+        dataClassForDetail.ext[Metadata.SKIP_EXPORT]
+    }
+
+    protected static String normalizeDataClassName(DataClass dataClassForDetail) {
+        "${dataClassForDetail.name}".replace("'", '')
+    }
+
+
+    private void buildDataClassDetail(Sheet sheet, DataClass dataClass) {
         sheet.with {
             row {
                 cell {
@@ -269,7 +333,10 @@ class CatalogueElementToXlsxExporter {
             row {
                 cell {
                     value dataClass.name
-                    name getReferenceName(dataClass)
+                    if (!(dataClass.id in namesPrinted)) {
+                        name getReferenceName(dataClass)
+                        namesPrinted << dataClass.id
+                    }
                     style 'h1'
                     colspan 5
                 }
@@ -297,25 +364,6 @@ class CatalogueElementToXlsxExporter {
                     value dataClass.dataModel?.name
                     style 'property-value'
                     colspan 3
-                }
-            }
-            for (DataClass parent in dataClass.childOf) {
-                if (parent.status != ElementStatus.DEPRECATED) {
-                    row {
-                        cell {
-                            value 'Parent'
-                            style 'property-title'
-                            colspan 2
-                        }
-                        cell {
-                            value "${parent.name} (${getModelCatalogueIdToPrint(parent)})"
-                            style 'property-value'
-                            if (parent.getId() in processedDataClasss.keySet() && !parent.ext[Metadata.SKIP_EXPORT]) {
-                                link to name getReferenceName(parent)
-                            }
-                            colspan 3
-                        }
-                    }
                 }
             }
             row {
@@ -633,7 +681,7 @@ class CatalogueElementToXlsxExporter {
     }
 
 
-    protected static void buildOutline(Sheet sheet, List<DataClass> dataClasses, int depth, Map<Long, DataClass> processedDataClasss) {
+    protected void buildOutline(Sheet sheet, List<DataClass> dataClasses) {
         sheet.with {
             row {
                 cell {
@@ -662,7 +710,7 @@ class CatalogueElementToXlsxExporter {
                 }
             }
 
-            buildDataClassesOutline(it, dataClasses, depth, processedDataClasss)
+            buildDataClassesOutline(it, dataClasses)
 
             // footer
             row()
@@ -676,26 +724,26 @@ class CatalogueElementToXlsxExporter {
         }
     }
 
-    private static void buildDataClassesOutline(Sheet sheet, List<DataClass> dataClasses, int depth, Map<Long, DataClass> processedDataClasses) {
+    private void buildDataClassesOutline(Sheet sheet, List<DataClass> dataClasses) {
         dataClasses.each { DataClass dataClass ->
-            buildChildOutline(sheet, dataClass, null, 1, depth, processedDataClasses)
+            buildChildOutline(sheet, dataClass, null, 1)
         }
     }
 
-    protected static void buildChildOutline(Sheet sheet, DataClass dataClass, Relationship relationship, int level, int depth, Map<Long, DataClass> processedDataClasss) {
+    protected void buildChildOutline(Sheet sheet, DataClass dataClass, Relationship relationship, int level) {
         sheet.row {
             cell {
                 value getModelCatalogueIdToPrint(dataClass)
                 style {
                     align bottom right
                 }
-                if (!dataClass.ext[Metadata.SKIP_EXPORT]) {
+                if (!isSkipExport(dataClass) && dataClass.id in namesPrinted) {
                     link to name getReferenceName(dataClass)
                 }
             }
             cell {
                 value dataClass.name
-                if (!dataClass.ext[Metadata.SKIP_EXPORT]) {
+                if (!isSkipExport(dataClass) && dataClass.id in namesPrinted) {
                     link to name getReferenceName(dataClass)
                 }
                 style {
@@ -706,7 +754,7 @@ class CatalogueElementToXlsxExporter {
             }
             cell {
                 value getMultiplicity(relationship)
-                if (!dataClass.ext[Metadata.SKIP_EXPORT]) {
+                if (!isSkipExport(dataClass) && dataClass.id in namesPrinted) {
                     link to name getReferenceName(dataClass)
                 }
                 style {
@@ -716,20 +764,22 @@ class CatalogueElementToXlsxExporter {
         }
 
         if (level > depth) {
-            processedDataClasss.put(dataClass.getId(), dataClass)
+            dataClassesProcessedInOutline.put(dataClass.getId(), dataClass)
             return
         }
 
-        if (dataClass.getId() in processedDataClasss.keySet()) {
+        if (dataClass.getId() in dataClassesProcessedInOutline.keySet()) {
             return
         }
 
-        processedDataClasss.put(dataClass.getId(), dataClass)
+        dataClassesProcessedInOutline.put(dataClass.getId(), dataClass)
 
         if (dataClass.countParentOf()) {
             sheet.group {
                 for (Relationship child in dataClass.parentOfRelationships) {
-                    buildChildOutline(sheet, child.destination as DataClass, child, level + 1, depth, processedDataClasss)
+                    if (!isSubsection(dataClass, relationship)) {
+                        buildChildOutline(sheet, child.destination as DataClass, child, level + 1)
+                    }
                 }
             }
         }
