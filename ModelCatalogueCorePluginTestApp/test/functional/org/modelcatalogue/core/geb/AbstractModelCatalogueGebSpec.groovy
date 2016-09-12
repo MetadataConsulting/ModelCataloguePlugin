@@ -77,10 +77,17 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     def loginUser(String user, String pwd) {
+        go "logout"
+
+        waitFor (120) {
+            $("i.glyphicon.glyphicon-log-in").first().displayed
+        }
+
         go "login/auth"
 
         $("#username").value(user)
         $("#password").value(pwd)
+        $("input[name=_spring_security_remember_me]").value(true)
 
         $("#loginForm").find("button.btn-primary").first().click()
 
