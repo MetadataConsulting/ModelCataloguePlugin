@@ -30,7 +30,7 @@ class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
         check wizard displayed
 
         when:
-        fill name with "NewDE1"
+        fill nameLabel with "NewDE1"
         fill description with "NT1 Description"
 
         and: 'save button clicked'

@@ -14,7 +14,7 @@ class Common {
     static final CatalogueAction delete = CatalogueAction.runLast('item', 'catalogue-element', 'delete')
     static final CatalogueAction merge = CatalogueAction.runLast('item', 'catalogue-element', 'merge')
 
-    static final String name = 'name'
+    static final String nameLabel = 'name'
     static final String description = 'description'
     static final String modelCatalogueId = 'modelCatalogueId'
 

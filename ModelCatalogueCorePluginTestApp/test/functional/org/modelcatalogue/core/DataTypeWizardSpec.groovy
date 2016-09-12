@@ -72,7 +72,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog displayed
 
         when:
-        fill name with 'New Reference Type'
+        fill nameLabel with 'New Reference Type'
 
 
         click pickReferenceType
@@ -97,7 +97,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog displayed
 
         when:
-        fill name with 'New Primitive Type'
+        fill nameLabel with 'New Primitive Type'
 
         click pickPrimitiveType
 
@@ -122,7 +122,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog displayed
 
         when:
-        fill name with 'Enumeration 1'
+        fill nameLabel with 'Enumeration 1'
 
         click pickEnumeratedType
 
@@ -148,7 +148,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog displayed
 
         when:
-        fill name with 'Enumeration 2'
+        fill nameLabel with 'Enumeration 2'
 
         click pickSubset
 
@@ -176,7 +176,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog displayed
 
         when:
-        fill name with 'Enumeration 3'
+        fill nameLabel with 'Enumeration 3'
 
         click pickSubset
 
@@ -223,7 +223,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog displayed
 
         when:
-        fill name with 'New Data Type'
+        fill nameLabel with 'New Data Type'
 
         click save
 
@@ -483,7 +483,5 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         then:
             check backdrop gone
             check primitiveTypeIcon displayed
-
-
     }
 }

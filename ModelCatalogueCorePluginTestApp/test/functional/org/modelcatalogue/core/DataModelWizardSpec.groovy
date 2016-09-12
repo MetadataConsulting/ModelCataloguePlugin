@@ -15,7 +15,7 @@ import spock.lang.Stepwise
 class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
     static final String classificationWizzard = 'div.create-classification-wizard'
-    static final String name = 'div.create-classification-wizard #name'
+    static final String wizardName = 'div.create-classification-wizard #name'
     static final String description ='div.create-classification-wizard #description'
     static final String modelCatalogueId ='div.create-classification-wizard #modelCatalogueId'
     static final String stepImports = "#step-imports"
@@ -48,7 +48,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         check classificationWizzard displayed
 
         when:
-        fill name with "New Data Model $uuid"
+        fill wizardName with "New Data Model $uuid"
         fill modelCatalogueId with "http://www.example.com/$uuid"
         fill description with "Description of Data Model"
 
@@ -62,7 +62,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         check stepImports has 'btn-primary'
 
         when:
-        fill name with 'NHIC'
+        fill wizardName with 'NHIC'
         selectCepItemIfExists()
 
 
@@ -171,7 +171,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
             check classificationWizzard displayed
 
         when:
-            fill name with "New Data Model $uuid"
+            fill wizardName with "New Data Model $uuid"
             fill modelCatalogueId with "http://www.example.com/$uuid"
             fill description with "Description of Data Model"
 
@@ -212,7 +212,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
             check classificationWizzard displayed
 
         when:
-            fill name with "New Data Model $uuid"
+            fill wizardName with "New Data Model $uuid"
             fill modelCatalogueId with "http://www.example.com/$uuid"
             fill description with "Description of Data Model"
 

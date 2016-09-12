@@ -6,7 +6,6 @@ import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
-import org.modelcatalogue.core.geb.Common
 import org.modelcatalogue.integration.excel.ExcelLoader
 import org.modelcatalogue.integration.excel.HeadersMap
 import spock.lang.Ignore
@@ -48,7 +47,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog displayed
 
         when:
-        fill name with 'Sample XSD'
+        fill nameLabel with 'Sample XSD'
         fill asset with file('example.xsd')
 
         click save

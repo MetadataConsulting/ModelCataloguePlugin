@@ -44,7 +44,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog displayed
 
         when: 'the model details are filled in'
-        fill name with "New"
+        fill nameLabel with "New"
         fill modelCatalogueId with "http://www.example.com/${UUID.randomUUID().toString()}"
         fill description with "Description"
 
@@ -116,7 +116,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog displayed
 
         when: 'the data class details are filled in'
-        fill name with "Another New"
+        fill nameLabel with "Another New"
 
         and: 'finish is clicked'
         click stepFinish
@@ -157,7 +157,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         check "input[name='name']" displayed
 
         when:
-        fill 'name' with 'Changed Name'
+        fill nameLabel with 'Changed Name'
 
         click inlineEditSubmit
 
