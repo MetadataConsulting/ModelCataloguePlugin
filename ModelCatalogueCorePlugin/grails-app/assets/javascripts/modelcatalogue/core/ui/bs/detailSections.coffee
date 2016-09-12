@@ -301,7 +301,7 @@ x in ['apple', 'banana', 'cherry']
       columns:
         [
           {header: 'Name', value: "relation.name", classes: 'col-md-3', href: 'relation.href()'}
-          {header: "Description", value: "relation.description" , classes: "col-md-5"}
+          {header: "Description", value: "relation.description" , classes: "col-md-5", textEllipsis: true}
           {header: "Data Type", value: printDataType, classes: "col-md-3", href: 'href()'}
           {header: 'Occurs',  value: printMetadataOccurrencesOnly, classes: 'col-md-2'}
         ]
@@ -342,7 +342,7 @@ x in ['apple', 'banana', 'cherry']
             classes: 'col-md-5',
             href: 'relation.href()'
           }
-          {header: 'Description', value: "relation.description", classes: 'col-md-4'}
+          {header: 'Description', value: "relation.description", classes: 'col-md-4', textEllipsis: true}
           {header: 'Occurs', value: printMetadataOccurrencesOnly, classes: 'col-md-4'}
         ]
     }
@@ -408,17 +408,17 @@ x in ['apple', 'banana', 'cherry']
       columns:
         [
           {
-            header: 'Name',
-            value: "ext.get('name') || ext.get('Name') || relation.name ",
-            classes: 'col-md-6',
+            header: 'Name'
+            value: "ext.get('name') || ext.get('Name') || relation.name "
+            classes: 'col-md-6'
             href: 'relation.href()'
           }
           {
-            header: 'Description',
-            value: "relation.description",
-            classes: 'col-md-6',
+            header: 'Description'
+            value: "relation.description"
+            classes: 'col-md-6'
+            textEllipsis: true
           }
-
         ]
     }
   }
@@ -446,17 +446,17 @@ x in ['apple', 'banana', 'cherry']
       columns:
         [
           {
-            header: 'Name',
-            value: "ext.get('name') || ext.get('Name') || relation.name ",
-            classes: 'col-md-6',
+            header: 'Name'
+            value: "ext.get('name') || ext.get('Name') || relation.name "
+            classes: 'col-md-6'
             href: 'relation.href()'
           }
           {
-            header: 'Description',
-            value: "relation.description",
-            classes: 'col-md-6',
+            header: 'Description'
+            value: "relation.description"
+            classes: 'col-md-6'
+            textEllipsis: true
           }
-
         ]
     }
   }
