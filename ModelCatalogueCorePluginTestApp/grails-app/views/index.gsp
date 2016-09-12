@@ -1,4 +1,4 @@
-<%@ page import="org.modelcatalogue.core.util.DataModelFilter; org.modelcatalogue.core.util.CDN; grails.plugin.springsecurity.SpringSecurityUtils; org.modelcatalogue.core.security.User; grails.util.BuildScope; org.modelcatalogue.core.util.DataModelFilter; grails.util.Environment" contentType="text/html;charset=UTF-8" defaultCodec="none" %>
+<%@ page import="grails.util.Metadata; org.modelcatalogue.core.util.DataModelFilter; org.modelcatalogue.core.util.CDN; grails.plugin.springsecurity.SpringSecurityUtils; org.modelcatalogue.core.security.User; grails.util.BuildScope; org.modelcatalogue.core.util.DataModelFilter; grails.util.Environment" contentType="text/html;charset=UTF-8" defaultCodec="none" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,7 +41,7 @@
             }
         </script>
     </g:if>
-    <g:if test="${BuildScope.current == BuildScope.WAR}">
+    <g:if test="${Metadata.current['grails.war.deployed']}">
       <g:javascript plugin="model-catalogue-core" src="libs/saxonce/Saxonce.nocache.js"/>
       <g:javascript plugin="model-catalogue-core" src="libs/google-diff-match-patch/javascript/diff_match_patch.js"/>
     </g:if>
