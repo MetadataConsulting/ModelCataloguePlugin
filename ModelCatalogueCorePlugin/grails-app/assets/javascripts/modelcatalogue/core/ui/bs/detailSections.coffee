@@ -288,6 +288,7 @@ x in ['apple', 'banana', 'cherry']
     actions: [
       {
         label: 'New Data Element'
+        name: 'add'
         icon: 'fa fa-plus-circle text-success'
         action: (messages, element) ->
           messages.prompt('Create Relationship', '',
@@ -334,6 +335,7 @@ x in ['apple', 'banana', 'cherry']
     actions: [
       {
         label: 'New Data Class'
+        name: 'add'
         icon: 'fa fa-plus-circle text-success'
         action: (messages, element) ->
           messages.prompt('Create Relationship', '',
@@ -420,6 +422,7 @@ x in ['apple', 'banana', 'cherry']
     actions: [
       {
         label: 'Context Data Class'
+        name: 'add'
         icon: 'fa fa-plus-circle text-success'
         action: (messages, element) ->
           messages.prompt('Create Relationship', '',
@@ -473,6 +476,7 @@ x in ['apple', 'banana', 'cherry']
     actions: [
       {
         label: 'Involved Data Elements'
+        name: 'add'
         icon: 'fa fa-plus-circle text-success'
         action: (messages, element) ->
           messages.prompt('Create Relationship', '',

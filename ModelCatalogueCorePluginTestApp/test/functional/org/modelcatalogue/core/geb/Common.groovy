@@ -35,6 +35,7 @@ class Common {
     static final String firstRowLink = 'div.inf-table-body tbody tr:nth-child(1) td:nth-child(2) a'
     static final CatalogueAction createNewDataModel = CatalogueAction.runFirst('data-models', 'create-data-model')
     static final String tableFooterAction = 'tr.inf-table-footer-action'
+    static final String detailSectionHeaderAddAction = '.title span[data-action-name="add"]'
     static final String closeGrowlMessage = "div.messages-panel.growl div.alert button.close"
 
     static final Keywords messages = Keywords.MESSAGES

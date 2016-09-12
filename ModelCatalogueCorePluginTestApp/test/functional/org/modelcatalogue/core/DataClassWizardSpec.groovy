@@ -132,7 +132,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when: "click the footer action"
         click CatalogueContent.create('span.catalogue-element-treeview-name', text: startsWith("Another New"))
-        click detailSectionDataElement.find(tableFooterAction)
+        click detailSectionDataElement.find(detailSectionHeaderAddAction)
 
         then: "modal is shown"
         check modalDialog displayed
