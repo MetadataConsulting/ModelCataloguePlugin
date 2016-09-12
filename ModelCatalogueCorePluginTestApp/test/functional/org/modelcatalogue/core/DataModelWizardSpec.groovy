@@ -77,7 +77,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         remove messages
 
         then:
-        check rightSideTitle is "New Data Model $uuid 146@0.0.1"
+        check rightSideTitle is "New Data Model $uuid 224@0.0.1"
     }
 
     def "finalize element"() {
