@@ -189,7 +189,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
             remove messages
 
         then:
-            check rightSideTitle is "New Data Model $uuid"
+            check rightSideTitle contains "New Data Model $uuid"
 
         check backdrop gone
         when: "delete action is clicked"
@@ -230,6 +230,6 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
             remove messages
 
         then:
-            check rightSideTitle is "New Data Model $uuid"
+            check rightSideTitle contains "New Data Model $uuid"
     }
 }
