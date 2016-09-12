@@ -1,14 +1,26 @@
 angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogueElementPropertiesProvider', (catalogueElementPropertiesProvider)->
 
   nameAndIdent = -> [
-    {header: 'Name', value: "relation.classifiedName ", classes: 'col-md-5', href: 'relation.href()'}
-    {header: 'Identification',  value: "relation.getElementTypeName() + ': ' + relation.id", classes: 'col-md-5', href: 'relation.href()'}
+    {
+      header: 'Name'
+      value: "(ext.get('name') || ext.get('Name') || relation.name) + ' ' + relation.getVersionAndId()"
+      classes: 'col-md-5'
+      href: 'relation.href()'
+    }
   ]
 
   nameAndIdAndMetadata = -> [
-    {header: 'Name', value: "relation.classifiedName", classes: 'col-md-3', href: 'relation.href()'}
-    {header: 'Identification',  value: "relation.modelCatalogueId", classes: 'col-md-3', href: 'relation.href()'}
-    {header: 'Metadata',  value: printMetadata, classes: 'col-md-4'}
+    {
+      header: 'Name'
+      value: "(ext.get('name') || ext.get('Name') || relation.name) + ' ' + relation.getVersionAndId()"
+      classes: 'col-md-3'
+      href: 'relation.href()'
+    }
+    {
+      header: 'Metadata'
+      value: printMetadata
+      classes: 'col-md-4'
+    }
   ]
 
   printMetadata = (relationship) ->

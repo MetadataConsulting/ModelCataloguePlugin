@@ -285,6 +285,22 @@ x in ['apple', 'banana', 'cherry']
     ]
     keys: []
     template: '/mc/core/ui/detail-sections/tableData.html'
+    actions: [
+      {
+        label: 'New Data Element'
+        name: 'add'
+        icon: 'fa fa-plus-circle text-success'
+        action: (messages, element) ->
+          messages.prompt('Create Relationship', '',
+            {
+              type: 'create-new-relationship'
+              element: element
+              relationshipTypeName: 'containment'
+              direction: "sourceToDestination"
+            }
+          )
+      }
+    ]
     getList: (element) ->
       return @result if @result
 
@@ -316,6 +332,22 @@ x in ['apple', 'banana', 'cherry']
     ]
     keys: []
     template: '/mc/core/ui/detail-sections/tableData.html'
+    actions: [
+      {
+        label: 'New Data Class'
+        name: 'add'
+        icon: 'fa fa-plus-circle text-success'
+        action: (messages, element) ->
+          messages.prompt('Create Relationship', '',
+            {
+              type: 'create-new-relationship'
+              element: element
+              relationshipTypeName: 'hierarchy'
+              direction: "sourceToDestination"
+            }
+          )
+      }
+    ]
     getList: (element) ->
       return @result if @result
 
@@ -332,13 +364,7 @@ x in ['apple', 'banana', 'cherry']
         [
           {
             header: 'Name',
-            value: "ext.get('name') || ext.get('Name') || relation.name ",
-            classes: 'col-md-5',
-            href: 'relation.href()'
-          }
-          {
-            header: 'Identification',
-            value: "relation.getElementTypeName() + ': ' + relation.id",
+            value: "(ext.get('name') || ext.get('Name') || relation.name) + ' ' + relation.getVersionAndId()",
             classes: 'col-md-5',
             href: 'relation.href()'
           }
@@ -393,6 +419,22 @@ x in ['apple', 'banana', 'cherry']
     ]
     keys: []
     template: '/mc/core/ui/detail-sections/tableData.html'
+    actions: [
+      {
+        label: 'Context Data Class'
+        name: 'add'
+        icon: 'fa fa-plus-circle text-success'
+        action: (messages, element) ->
+          messages.prompt('Create Relationship', '',
+            {
+              type: 'create-new-relationship'
+              element: element
+              relationshipTypeName: 'ruleContext'
+              direction: "destinationToSource"
+            }
+          )
+      }
+    ]
     getList: (element) ->
       return @result if @result
 
@@ -431,6 +473,23 @@ x in ['apple', 'banana', 'cherry']
     ]
     keys: []
     template: '/mc/core/ui/detail-sections/tableData.html'
+    actions: [
+      {
+        label: 'Involved Data Elements'
+        name: 'add'
+        icon: 'fa fa-plus-circle text-success'
+        action: (messages, element) ->
+          messages.prompt('Create Relationship', '',
+            {
+              type: 'create-new-relationship'
+              element: element
+              relationshipTypeName: 'involvedness'
+              direction: "destinationToSource"
+            }
+          )
+      }
+    ]
+
     getList: (element) ->
       return @result if @result
 

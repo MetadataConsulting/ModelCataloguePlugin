@@ -8,23 +8,38 @@
         <h3 class="ce-name">
           <small ng-class="element.getIcon()" title="{{element.getElementTypeName()}}"></small>
           <span class="text-danger fa fa-fw fa-warning" ng-if="getDeprecationWarning()"
-                title="{{getDeprecationWarning()}}"></span> <span editable-text="copy.name" e-name="name">{{element.name}}</span>
-          <small><a ng-href="{{element.dataModel.href()}}" class="label"
-                    ng-class="{'label-warning': element.getDataModelStatus() == 'DRAFT', 'label-info': element.getDataModelStatus() == 'PENDING', 'label-primary': element.getDataModelStatus() == 'FINALIZED', 'label-danger': element.getDataModelStatus() == 'DEPRECATED'}">{{element.getDataModelWithVersion()}}</a>
+                title="{{getDeprecationWarning()}}"></span>
+          <span editable-text="copy.name" e-name="name">{{element.name}}</span>
+          <small>
+            <a ng-href="{{element.dataModel.href()}}"
+               class="label"
+               ng-class="{
+                  'label-warning': element.getDataModelStatus() == 'DRAFT',
+                  'label-info': element.getDataModelStatus() == 'PENDING',
+                  'label-primary': element.getDataModelStatus() == 'FINALIZED',
+                  'label-danger': element.getDataModelStatus() == 'DEPRECATED'
+               }">
+              {{element.getDataModelWithVersion()}}
+            </a>
           </small>
         </h3>
         <messages-panel messages="messages" max="1000"></messages-panel>
-        <div class="row detail-section" ng-repeat="view in detailSections track by view.title" data-view-name="{{view.title}}">
-          <p ng-if="view.title"
-             class="text-center detail-section-title small">
-                <span class="title btn btn-link btn-sm"
-                      ng-click="view.toggleTemplateHidden(element)"
-                      ng-show="view.hideIfNoData && !view.hasData(element)">
-                  {{view.title}}
-                </span>
-                <span class="title" ng-hide="view.hideIfNoData && !view.hasData(element)">
-                  {{view.title}}
-                </span>
+        <div class="row detail-section" ng-repeat="view in detailSections track by view.title"
+             data-view-name="{{view.title}}">
+          <p ng-if="view.title" class="text-center detail-section-title small title">
+            <span class="title">
+              <span class="btn btn-link btn-sm"
+                    ng-click="view.toggleTemplateHidden(element)"
+                    ng-show="view.hideIfNoData && !view.hasData(element)">
+                    {{view.title}}
+              </span>
+              <span ng-hide="view.hideIfNoData && !view.hasData(element)">
+                {{view.title}}
+              </span>
+              <span ng-repeat="action in view.actions" class="btn" ng-class="action.icon"
+                    ng-click="action.action(messages, element)" data-action-name="{{action.name}}">
+              </span>
+            </span>
           </p>
           <div ng-hide="view.isTemplateHidden(element)" data-view-content-name="{{view.title}}">
             <ng-include src="view.template"></ng-include>
@@ -32,12 +47,21 @@
         </div>
       </form>
       <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" ng-repeat="tab in tabs track by tab.name" ng-if="!tab.hidden" ng-class="{active: tab.active}"
-            data-tab-name="{{tab.name}}"><a ng-click="select(tab)"><span
-          ng-class="{'text-muted': tab.type == 'decorated-list' &amp;&amp; tab.value.total == 0}">{{tab.heading}}</span><span
-          ng-show="tab.value.total"> <span class="badge tab-value-total" ng-if="tab.value.total != 2147483647">{{tab.value.total}}</span><span
-          class="badge tab-value-total" ng-if="tab.value.total == 2147483647"><span
-          class="fa fa-question fa-inverse"></span></span></span></a></li>
+        <li role="presentation" ng-repeat="tab in tabs track by tab.name" ng-if="!tab.hidden"
+            ng-class="{active: tab.active}"
+            data-tab-name="{{tab.name}}">
+          <a ng-click="select(tab)">
+            <span ng-class="{'text-muted': tab.type == 'decorated-list' &amp;&amp; tab.value.total == 0}">
+              {{tab.heading}}
+            </span>
+            <span ng-show="tab.value.total">
+              <span class="badge tab-value-total" ng-if="tab.value.total != 2147483647">{{tab.value.total}}</span>
+              <span class="badge tab-value-total" ng-if="tab.value.total == 2147483647">
+                <span class="fa fa-question fa-inverse"></span>
+              </span>
+            </span>
+          </a>
+        </li>
       </ul>
 
       <div ng-repeat="tab in tabs track by tab.name" class="tab-pane">
@@ -53,10 +77,20 @@
         <div id="{{tab.name}}-tab" class="cev-tab-content" ng-if="tab.active">
           <h3 class="ce-name">
             <small ng-class="element.getIcon()" title="{{element.getElementTypeName()}}"></small>
-            <span class="text-danger fa fa-fw fa-warning" ng-if="getDeprecationWarning()"
-                  title="{{getDeprecationWarning()}}"></span> {{element.name}} {{tab.heading}}
-            <small><span class="label"
-                         ng-class="{'label-warning': element.getDataModelStatus() == 'DRAFT', 'label-info': element.getDataModelStatus() == 'PENDING', 'label-primary': element.getDataModelStatus() == 'FINALIZED', 'label-danger': element.getDataModelStatus() == 'DEPRECATED'}">{{element.getDataModelWithVersion()}}</span>
+            <span class="text-danger fa fa-fw fa-warning"
+                  ng-if="getDeprecationWarning()"
+                  title="{{getDeprecationWarning()}}">
+            </span>
+            {{element.name}} {{tab.heading}}
+            <small>
+              <span class="label"
+                    ng-class="{
+                      'label-warning': element.getDataModelStatus() == 'DRAFT',
+                      'label-info': element.getDataModelStatus() == 'PENDING',
+                      'label-primary': element.getDataModelStatus() == 'FINALIZED',
+                      'label-danger': element.getDataModelStatus() == 'DEPRECATED'}">
+                {{element.getDataModelWithVersion()}}
+              </span>
             </small>
           </h3>
           <ng-include src="'modelcatalogue/core/ui/catalogueElementView/' + tab.type + '.html'"></ng-include>
