@@ -45,6 +45,7 @@ class CatalogueElementToXlsxExporter {
 
     private Map<Long, DataClass> dataClassesProcessedInOutline = [:]
     private Set<Long> namesPrinted = new HashSet<Long>()
+    private Set<Long> sheetsPrinted = new HashSet<Long>()
 
     static CatalogueElementToXlsxExporter forDataModel(DataModel element, DataClassService dataClassService, Integer depth = 3) {
         return new CatalogueElementToXlsxExporter(element, dataClassService, depth)
@@ -181,6 +182,7 @@ class CatalogueElementToXlsxExporter {
     void export(OutputStream outputStream) {
         dataClassesProcessedInOutline = [:]
         namesPrinted = new HashSet<Long>()
+        sheetsPrinted = new HashSet<Long>()
 
         CatalogueElement element = CatalogueElement.get(elementId)
 
@@ -253,10 +255,18 @@ class CatalogueElementToXlsxExporter {
 
         // always render subsections on the new sheet
         if (isSubsection(dataClassForDetail, relationship)) {
-            workbook.sheet("${getModelCatalogueIdToPrint(dataClassForDetail)} ${normalizeDataClassName(dataClassForDetail)}") { Sheet s ->
+            if (dataClassForDetail.id in sheetsPrinted) {
+                return
+            }
+            sheetsPrinted << dataClassForDetail.id
+            workbook.sheet(getSafeSheetName(dataClassForDetail)) { Sheet s ->
+                buildBackToContentLink(s)
                 log.info "${' ' * level}- printing ${dataClassForDetail.name} on new sheet"
                 buildDataClassDetail(s, dataClassForDetail)
                 buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, workbook, s, level + 1, new HashSet<Long>([dataClassForDetail.id]))
+
+                row()
+                buildBackToContentLink(s)
             }
             return
         }
@@ -269,12 +279,37 @@ class CatalogueElementToXlsxExporter {
             return
         }
 
+        if (dataClassForDetail.id in sheetsPrinted) {
+            return
+        }
+
+        sheetsPrinted << dataClassForDetail.id
+
         // top level sheet
-        workbook.sheet("${getModelCatalogueIdToPrint(dataClassForDetail)} ${normalizeDataClassName(dataClassForDetail)}") { Sheet s ->
+        workbook.sheet(getSafeSheetName(dataClassForDetail)) { Sheet s ->
+            buildBackToContentLink(s)
             log.info "${' ' * level}- printing ${dataClassForDetail.name} on new sheet"
             buildDataClassDetail(s, dataClassForDetail)
             // force top level sheets for children
             buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, workbook, null, level + 1, processed)
+
+            row()
+            buildBackToContentLink(s)
+        }
+    }
+
+    private static String getSafeSheetName(DataClass dataClassForDetail) {
+        "${getModelCatalogueIdToPrint(dataClassForDetail)} ${normalizeDataClassName(dataClassForDetail)}".replaceAll(/[^\p{Alnum}\\_]/, '_')
+    }
+
+    private static buildBackToContentLink(Sheet sheet) {
+        sheet.row {
+            cell {
+                value '<< Back to Content'
+                link to name DATA_CLASSES
+                style 'note'
+                colspan 7
+            }
         }
     }
 
@@ -293,14 +328,6 @@ class CatalogueElementToXlsxExporter {
 
     private void buildDataClassDetail(Sheet sheet, DataClass dataClass) {
         sheet.with {
-            row {
-                cell {
-                    value '<< Back to Content'
-                    link to name DATA_CLASSES
-                    style 'note'
-                    colspan 5
-                }
-            }
             row {
                 cell {
                     width 10
@@ -334,11 +361,11 @@ class CatalogueElementToXlsxExporter {
                 cell {
                     value dataClass.name
                     if (!(dataClass.id in namesPrinted)) {
-                        name getReferenceName(dataClass)
+                        name getSafeSheetName(dataClass)
                         namesPrinted << dataClass.id
                     }
                     style 'h1'
-                    colspan 5
+                    colspan 7
                 }
             }
             row {
@@ -349,7 +376,7 @@ class CatalogueElementToXlsxExporter {
                         height 100
 
                         style 'description'
-                        colspan 5
+                        colspan 7
                     }
                 }
             }
@@ -365,63 +392,18 @@ class CatalogueElementToXlsxExporter {
                     style 'property-value'
                     colspan 3
                 }
-            }
-            row {
                 cell {
                     value 'ID'
                     style 'property-title'
-                    colspan 2
                 }
                 cell {
                     value getModelCatalogueIdToPrint(dataClass)
                     style 'property-value'
-                    colspan 3
                 }
             }
-            row {
-                cell {
-                    value 'Status'
-                    style 'property-title'
-                    colspan 2
-                }
-                cell {
-                    value dataClass.status
-                    style 'property-value'
-                    colspan 3
-                }
-            }
-
-            row()
-
-            row {
-                cell {
-                    value 'Last Updated'
-                    style 'property-title'
-                    colspan 2
-                }
-                cell {
-                    value dataClass.lastUpdated
-                    style 'date'
-                    colspan 3
-                }
-            }
-
-            row()
-
 
             if (dataClass.countContains()) {
                 buildContainedElements(it, dataClass)
-            }
-
-            row()
-
-            row {
-                cell {
-                    value '<< Back to Content'
-                    link to name DATA_CLASSES
-                    style 'note'
-                    colspan 5
-                }
             }
         }
     }
@@ -432,7 +414,7 @@ class CatalogueElementToXlsxExporter {
                 cell {
                     value 'All Contained Data Elements'
                     style 'h2'
-                    colspan 5
+                    colspan 7
                 }
             }
             row {
@@ -676,11 +658,6 @@ class CatalogueElementToXlsxExporter {
         return "${min}..${max}"
     }
 
-    protected static String getReferenceName(DataClass dataClass) {
-        "${dataClass.name} (${getModelCatalogueIdToPrint(dataClass)})"
-    }
-
-
     protected void buildOutline(Sheet sheet, List<DataClass> dataClasses) {
         sheet.with {
             row {
@@ -738,13 +715,13 @@ class CatalogueElementToXlsxExporter {
                     align bottom right
                 }
                 if (!isSkipExport(dataClass) && dataClass.id in namesPrinted) {
-                    link to name getReferenceName(dataClass)
+                    link to name getSafeSheetName(dataClass)
                 }
             }
             cell {
                 value dataClass.name
                 if (!isSkipExport(dataClass) && dataClass.id in namesPrinted) {
-                    link to name getReferenceName(dataClass)
+                    link to name getSafeSheetName(dataClass)
                 }
                 style {
                     if (level) {
@@ -755,7 +732,7 @@ class CatalogueElementToXlsxExporter {
             cell {
                 value getMultiplicity(relationship)
                 if (!isSkipExport(dataClass) && dataClass.id in namesPrinted) {
-                    link to name getReferenceName(dataClass)
+                    link to name getSafeSheetName(dataClass)
                 }
                 style {
                     align center right
