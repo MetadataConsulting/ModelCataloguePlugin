@@ -39,6 +39,7 @@ class CatalogueElementToXlsxExporter {
 
     final DataClassService dataClassService
     final Long elementId
+    final Long elementForDiffId
     final Integer depth
 
     boolean printMetadata
@@ -59,6 +60,8 @@ class CatalogueElementToXlsxExporter {
         this.elementId = element.getId()
         this.dataClassService = dataClassService
         this.depth = depth
+
+        this.elementForDiffId = element.findPreviousVersion()?.id
 
         printMetadata = Holders.config.mc.export.xlsx.printMetadata ?: false
     }
@@ -185,6 +188,7 @@ class CatalogueElementToXlsxExporter {
         sheetsPrinted = new HashSet<Long>()
 
         CatalogueElement element = CatalogueElement.get(elementId)
+        CatalogueElement elementForDiff = elementForDiffId ? CatalogueElement.get(elementForDiffId) : null
 
         List<DataClass> dataClasses = Collections.emptyList()
 

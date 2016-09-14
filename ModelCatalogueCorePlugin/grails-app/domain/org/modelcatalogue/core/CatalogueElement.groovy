@@ -617,4 +617,13 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         }
         return null
     }
+
+    CatalogueElement findPreviousVersion() {
+        if (countSupersedes()) {
+            return supersedes.first()
+        }
+        return null
+    }
+
+
 }
