@@ -1,7 +1,12 @@
 package org.modelcatalogue.core
 
+import com.google.common.collect.ImmutableMap
 import grails.transaction.Transactional
+import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.rx.ErrorSubscriber
+import org.modelcatalogue.core.util.HibernateHelper
+import org.modelcatalogue.core.util.lists.ListWrapper
+import org.modelcatalogue.core.util.lists.Lists
 import rx.subjects.BehaviorSubject
 
 /**
@@ -14,6 +19,30 @@ class CatalogueElementService {
 
     def grailsApplication
     def cacheService
+
+    static <T extends CatalogueElement> ListWrapper<T> getAllVersions(Map<String, Object> customParams = ImmutableMap.of('sort', 'semanticVersion'), T element) {
+        Class<T> type = HibernateHelper.getEntityClass(element)
+        String name = GrailsNameUtils.getPropertyName(type)
+
+        if (name in ['primitiveType', 'enumeratedType', 'referenceType']) {
+            name = 'dataType'
+            type = DataType
+        }
+
+        final Long id = element.id
+        final Long latestVersionId = element.latestVersionId
+        final String base = "/${name}/${element.id}/history"
+
+        if (!latestVersionId) {
+            return Lists.wrap(customParams, base, Lists.lazy(customParams, type, {
+                [type.get(id)]
+            }, { 1 }))
+        }
+
+        Lists.fromCriteria(customParams, type, base) {
+            eq 'latestVersionId', latestVersionId
+        }
+    }
 
     /**
      * Deletes {@link CatalogueElement}, removes all indexes (search) and all relationships

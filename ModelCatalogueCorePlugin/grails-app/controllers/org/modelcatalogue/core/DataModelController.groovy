@@ -2,9 +2,8 @@ package org.modelcatalogue.core
 
 import com.google.common.collect.ImmutableSet
 import grails.util.GrailsNameUtils
-import org.hibernate.FetchMode
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.export.inventory.DataModelToXlsxExporter
+import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -32,9 +31,7 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream outputStream ->
             // reload domain class as this is called in separate thread
-            def exporter = new DataModelToXlsxExporter(dataClassService: dataClassService,
-                dataModel: DataModel.get(dataModelId), depth: depth)
-            exporter.export(outputStream)
+            CatalogueElementToXlsxExporter.forDataModel(DataModel.get(dataModelId), dataClassService, depth).export(outputStream)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())

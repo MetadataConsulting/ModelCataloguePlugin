@@ -60,17 +60,12 @@ grails.project.dependency.resolution = {
         String mcToolkitVersion = '2.1.0.1'
         compile "org.modelcatalogue:mc-core-api:$mcToolkitVersion"
         compile "org.modelcatalogue:mc-builder-api:$mcToolkitVersion"
-        //compile "org.modelcatalogue:mc-integration-excel:$mcToolkitVersion"
-        //compile "org.modelcatalogue:mc-integration-obo:$mcToolkitVersion"
-        //compile "org.modelcatalogue:mc-integration-xml:$mcToolkitVersion"
-        // compile "org.modelcatalogue:mc-integration-mc:$mcToolkitVersion"
-        test "org.modelcatalogue:mc-builder-xml:$mcToolkitVersion"
 
         compile 'com.craigburke.document:word:0.5.0'
 
         compile 'org.jsoup:jsoup:1.8.3'
 
-        compile 'org.modelcatalogue:spreadsheet-builder-poi:0.1.13'
+        compile 'org.modelcatalogue:spreadsheet-builder-poi:0.1.14'
 
         compile 'org.apache.poi:poi:3.13'
         compile 'org.apache.poi:poi-ooxml:3.13'
@@ -84,6 +79,7 @@ grails.project.dependency.resolution = {
 
         test 'xmlunit:xmlunit:1.6'
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
+        test "org.modelcatalogue:mc-builder-xml:$mcToolkitVersion"
 
     }
 

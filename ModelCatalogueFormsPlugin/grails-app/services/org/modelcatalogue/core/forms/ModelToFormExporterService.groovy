@@ -10,6 +10,7 @@ import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.crf.model.CaseReportForm
 import org.modelcatalogue.crf.model.DataType as FormDataType
 import org.modelcatalogue.crf.model.GenericItem
@@ -69,8 +70,6 @@ class ModelToFormExporterService {
     static final String RESPONSE_TYPE_RADIO = "radio"
     static final String RESPONSE_TYPE_CHECKBOX = "checkbox"
     static final String RESPONSE_LAYOUT_HORIZONTAL = "horizontal"
-    static final String EXT_MAX_OCCURS = "Max Occurs"
-    static final String EXT_MIN_OCCURS = "Min Occurs"
     static final String EXT_NAME_LC = "name"
     static final String EXT_NAME_CAP = "Name"
     static final String ENUM_DEFAULT = "default"
@@ -253,7 +252,7 @@ class ModelToFormExporterService {
                         [enumeration.value ?: enumeration.key, enumeration.key == ENUM_DEFAULT ? '' : enumeration.key]
                 }
                 if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) in
-                    [RESPONSE_TYPE_CHECKBOX, RESPONSE_TYPE_MULTI_SELECT] || rel.ext[EXT_MAX_OCCURS] && rel.ext[EXT_MAX_OCCURS] != '1') {
+                    [RESPONSE_TYPE_CHECKBOX, RESPONSE_TYPE_MULTI_SELECT] || rel.ext[Metadata.MAX_OCCURS] && rel.ext[Metadata.MAX_OCCURS] != '1') {
                     // multi select or checkbox (default)
                     if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) == RESPONSE_TYPE_MULTI_SELECT) {
                         container.multiSelect(itemName) {
@@ -310,7 +309,7 @@ class ModelToFormExporterService {
                         fromCandidates(rel, candidates, EXT_ITEM_INSTRUCTIONS))
                 }
                 phi(fromCandidates(rel, candidates, EXT_ITEM_PHI) == 'true')
-                required(fromCandidates(rel, candidates, EXT_ITEM_REQUIRED) == 'true' || rel.ext[EXT_MIN_OCCURS] == '1')
+                required(fromCandidates(rel, candidates, EXT_ITEM_REQUIRED) == 'true' || rel.ext[Metadata.MIN_OCCURS] == '1')
                 columnNumber = safeInteger(fromCandidates(rel, candidates, EXT_ITEM_COLUMN_NUMBER), EXT_ITEM_COLUMN_NUMBER, rel)
                 units fromCandidates(rel, candidates, EXT_ITEM_UNITS, candidates.find {
                     it.instanceOf(PrimitiveType) && it.measurementUnit

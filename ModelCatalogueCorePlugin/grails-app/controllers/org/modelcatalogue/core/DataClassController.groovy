@@ -2,7 +2,7 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.export.inventory.DataClassToDocxExporter
-import org.modelcatalogue.core.export.inventory.DataClassToXlsxExporter
+import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
 import org.modelcatalogue.core.publishing.changelog.ChangeLogDocxGenerator
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
@@ -111,7 +111,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
                 originalFileName: "${model.name}-${model.status}-${model.version}.xlsx",
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )  { OutputStream out ->
-            new DataClassToXlsxExporter(DataClass.get(modelId), dataClassService, depth).export(out)
+            CatalogueElementToXlsxExporter.forDataClass(DataClass.get(modelId), dataClassService, depth).export(out)
         }
 
         response.setHeader("X-Asset-ID",assetId.toString())
