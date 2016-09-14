@@ -83,8 +83,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
             return
         }
 
-        String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-        def user = lookupUserClass().findWhere((usernameFieldName): username)
+        User user = User.findByUsernameOrEmail(username, username)
         if (!user) {
             flash.error = message(code: 'spring.security.ui.forgotPassword.user.notFound')
             redirect action: 'forgotPassword'
