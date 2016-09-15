@@ -44,8 +44,16 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
         <a class="small text-muted text-nowrap" href="#{dataElement.href()}">#{dataElement.getVersionAndId()}</a>
       """
 
-  # default
-  idNameAndDescription = -> [
+  getNameIdAndVersion = (dataElement) ->
+    "
+      <a href='#{dataElement.href()}'>#{dataElement.name}</a>
+      <span class='label #{getStatusClass(dataElement.getDataModelStatus())}'>
+        #{dataElement.getVersionAndId()}
+      </span>
+    "
+
+  # column definitions
+  idNameAndDescriptionColumns = -> [
     {header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-2", show: true, href: 'href()'}
     {
       header: "Name"
@@ -57,25 +65,32 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
     }
     {header: "Description", value: "description", textEllipsis: true}
   ]
-  modelIdNameAndDescription = -> [
+
+  modelIdNameAndDescriptionColumns = -> [
     {
       header: "Name"
-      value: (dataElement) ->
-        "
-          <a href='#{dataElement.href()}'>#{dataElement.name}</a>
-          <span class='label #{getStatusClass(dataElement.getDataModelStatus())}'>
-            #{dataElement.getVersionAndId()}
-          </span>
-        "
+      value: getNameIdAndVersion
       classes: "col-md-4"
       show: true
       sort: {property: 'name', type: 'alpha'}
     }
     {header: "Description", value: "description", classes: "col-md-6", textEllipsis: true}
   ]
-  columnsProvider.registerColumns 'org.modelcatalogue.core.Model', idNameAndDescription()
-  columnsProvider.registerColumns 'org.modelcatalogue.core.DataClass', modelIdNameAndDescription()
-  columnsProvider.registerColumns 'org.modelcatalogue.core.DataElement', modelIdNameAndDescription()
+
+  dataTypeColumns = [
+    {
+      header: "Name"
+      value: getNameIdAndVersion
+      classes: 'col-md-6'
+      show: true
+      sort: {property: 'name', type: 'alpha'}
+    }
+    {header: "Enumerations or Description", value: getEnumerations, classes: 'col-md-6', textEllipsis: true}
+  ]
+
+  columnsProvider.registerColumns 'org.modelcatalogue.core.Model', idNameAndDescriptionColumns()
+  columnsProvider.registerColumns 'org.modelcatalogue.core.DataClass', modelIdNameAndDescriptionColumns()
+  columnsProvider.registerColumns 'org.modelcatalogue.core.DataElement', modelIdNameAndDescriptionColumns()
 
   # special
 
@@ -200,18 +215,6 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
       classes: 'col-md-3'
       sort: {property: 'destinationClass', type: 'alpha'}
     }
-  ]
-
-  dataTypeColumns = [
-    {
-      header: "Name"
-      value: 'name'
-      classes: 'col-md-6'
-      show: true
-      href: 'href()'
-      sort: {property: 'name', type: 'alpha'}
-    }
-    {header: "Enumerations or Description", value: getEnumerations, classes: 'col-md-6', textEllipsis: true}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.DataType', dataTypeColumns
