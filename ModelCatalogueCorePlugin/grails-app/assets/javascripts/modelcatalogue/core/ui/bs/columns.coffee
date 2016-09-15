@@ -91,6 +91,7 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
   columnsProvider.registerColumns 'org.modelcatalogue.core.Model', idNameAndDescriptionColumns()
   columnsProvider.registerColumns 'org.modelcatalogue.core.DataClass', modelIdNameAndDescriptionColumns()
   columnsProvider.registerColumns 'org.modelcatalogue.core.DataElement', modelIdNameAndDescriptionColumns()
+  columnsProvider.registerColumns 'org.modelcatalogue.core.ValidationRule', modelIdNameAndDescriptionColumns()
 
   # special
 
