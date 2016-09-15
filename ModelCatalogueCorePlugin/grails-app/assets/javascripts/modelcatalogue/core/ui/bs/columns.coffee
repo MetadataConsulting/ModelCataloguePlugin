@@ -58,13 +58,17 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
     {header: "Description", value: "description", textEllipsis: true}
   ]
   modelIdNameAndDescription = -> [
-    {header: 'Model / ID', value: getDataModelAndDataElement, classes: 'col-md-2'}
     {
       header: "Name"
-      value: "name"
+      value: (dataElement) ->
+        "
+          <a href='#{dataElement.href()}'>#{dataElement.name}</a>
+          <span class='label #{getStatusClass(dataElement.getDataModelStatus())}'>
+            #{dataElement.getVersionAndId()}
+          </span>
+        "
       classes: "col-md-4"
       show: true
-      href: 'href()'
       sort: {property: 'name', type: 'alpha'}
     }
     {header: "Description", value: "description", classes: "col-md-6", textEllipsis: true}
