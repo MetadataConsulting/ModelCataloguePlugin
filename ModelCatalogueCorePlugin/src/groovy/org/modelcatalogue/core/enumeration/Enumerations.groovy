@@ -149,6 +149,10 @@ import groovy.transform.CompileStatic
         return enumerationsById.get(id)
     }
 
+    Enumeration getEnumerationByKey(String key){
+        return enumerationsByKeys.get(key)
+    }
+
     String put(Long id, String key, String value, boolean deprecated = false) {
         genid = Math.max(genid, id) + 1
 
