@@ -54,9 +54,19 @@ class CatalogueElementDiffs {
             ) {
                 Object selfValue = self[property.name]
                 Object otherValue = other[property.name]
-                if (selfValue != otherValue) {
-                    builder.put(Diff.keyForProperty(property.name), Diff.createPropertyChange(property.name, selfValue, otherValue))
+                if (CatalogueElement.isAssignableFrom(property.referencedPropertyType)) {
+                    CatalogueElement selfElement = (CatalogueElement) selfValue
+                    CatalogueElement otherElement = (CatalogueElement) otherValue
+
+                    if ((selfElement.latestVersionId ?: selfElement.id) != (otherElement.latestVersionId ?: otherElement.id)) {
+                        builder.put(Diff.keyForProperty(property.name), Diff.createPropertyChange(property.name, selfValue, otherValue))
+                    }
+                } else {
+                    if (selfValue != otherValue) {
+                        builder.put(Diff.keyForProperty(property.name), Diff.createPropertyChange(property.name, selfValue, otherValue))
+                    }
                 }
+
             }
         }
 
@@ -65,16 +75,16 @@ class CatalogueElementDiffs {
             if (otherClass.fullName == EnumeratedType.name) {
                 Enumerations otherEnumerations = other.getProperty(ENUMERATIONS_OBJECT) as Enumerations
                 for (Enumeration enumeration in selfEnumerations) {
-                    Enumeration otherEnumeration = otherEnumerations.getEnumerationByKey(enumeration.key)
-                    if (enumeration.value != otherEnumeration?.value || enumeration.deprecated != otherEnumeration?.deprecated) {
-                        builder.put(Diff.keyForEnumeration(enumeration.key), Diff.createEnumerationChange(enumeration.key, enumeration, otherEnumeration))
+                    Enumeration otherEnumeration = otherEnumerations.getEnumerationById(enumeration.id)
+                    if (enumeration.key != otherEnumeration?.key || enumeration.value != otherEnumeration?.value || enumeration.deprecated != otherEnumeration?.deprecated) {
+                        builder.put(Diff.keyForEnumeration(enumeration.id), Diff.createEnumerationChange(enumeration.id, enumeration, otherEnumeration))
                     }
                 }
 
-                Set<String> missingEnumerations = Sets.difference(otherEnumerations.keySet(), selfEnumerations.keySet())
+                Set<Long> missingEnumerations = Sets.difference(otherEnumerations.iterator().collect { it.id }.toSet(), selfEnumerations.iterator().collect { it.id }.toSet())
 
-                for (String key in missingEnumerations) {
-                    builder.put(Diff.keyForEnumeration(key), Diff.createEnumerationChange(key, null, otherEnumerations.getEnumerationByKey(key)))
+                for (Long id in missingEnumerations) {
+                    builder.put(Diff.keyForEnumeration(id), Diff.createEnumerationChange(id, null, otherEnumerations.getEnumerationById(id)))
                 }
             }
         }
@@ -135,7 +145,9 @@ class CatalogueElementDiffs {
         ImmutableMap.Builder<String, Relationship> selfRelationshipsBuilder = ImmutableMap.builder()
 
         for (Relationship relationship in self.outgoingRelationships) {
-            selfRelationshipsBuilder.put(Diff.keyForRelationship(relationship), relationship)
+            if (!relationship.relationshipType.system) {
+                selfRelationshipsBuilder.put(Diff.keyForRelationship(relationship), relationship)
+            }
         }
 
         selfRelationshipsBuilder.build()

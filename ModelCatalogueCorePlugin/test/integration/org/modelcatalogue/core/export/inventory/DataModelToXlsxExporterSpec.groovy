@@ -24,7 +24,7 @@ class DataModelToXlsxExporterSpec extends AbstractIntegrationSpec {
         def file = temporaryFolder.newFile("${System.currentTimeMillis()}.xlsx")
 
         when:
-        CatalogueElementToXlsxExporter.forDataModel(dataModel, dataClassService).export(file.newOutputStream())
+        CatalogueElementToXlsxExporter.forDataModel(dataModel, dataClassService, grailsApplication).export(file.newOutputStream())
         FileOpener.open(file)
 
         then:

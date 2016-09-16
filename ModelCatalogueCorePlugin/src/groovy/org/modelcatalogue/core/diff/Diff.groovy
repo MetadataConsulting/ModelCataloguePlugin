@@ -33,8 +33,8 @@ class Diff {
         return "rel:${relationship.source.latestVersionId ?: relationship.source.id}=[${relationship.relationshipType.name}/$extensionName]=>${relationship.destination.latestVersionId ?: relationship.destination.id}"
     }
 
-    static String keyForEnumeration(String key) {
-        return "enum:$key"
+    static String keyForEnumeration(Long id) {
+        return "enum:$id"
     }
 
     static Diff createPropertyChange(String propertyKey, Object selfValue, Object otherValue) {
@@ -58,12 +58,40 @@ class Diff {
         return new Diff(keyForRelationship(relationship), null, relationship)
     }
 
-    static Diff createEnumerationChange(String key, Enumeration selfEnumeration, Enumeration otherEnumeration) {
-        return new Diff(keyForEnumeration(key), selfEnumeration, otherEnumeration)
+    static Diff createEnumerationChange(Long id, Enumeration selfEnumeration, Enumeration otherEnumeration) {
+        return new Diff(keyForEnumeration(id), selfEnumeration, otherEnumeration)
     }
 
     @Override
     String toString() {
         return "${key}: $selfValue => $otherValue"
+    }
+
+    boolean isAddition() {
+        return otherValue == null
+    }
+
+    boolean isRemoval() {
+        return selfValue == null
+    }
+
+    boolean isUpdate() {
+        return !addition && !removal
+    }
+
+    boolean isExtensionChange() {
+        return key.startsWith('ext:')
+    }
+
+    boolean isRelationshipChange() {
+        return key.startsWith('rel:')
+    }
+
+    boolean isEnumerationChange() {
+        return key.startsWith('enum:')
+    }
+
+    boolean isPropertyChange() {
+        return !extensionChange && !relationshipChange && !enumerationChange
     }
 }

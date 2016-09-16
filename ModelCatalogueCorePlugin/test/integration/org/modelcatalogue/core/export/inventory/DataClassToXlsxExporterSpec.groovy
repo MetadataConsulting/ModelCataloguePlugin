@@ -24,7 +24,7 @@ class DataClassToXlsxExporterSpec extends AbstractIntegrationSpec {
         File file = temporaryFolder.newFile("${System.currentTimeMillis()}.xlsx")
         DataClass model = DataClass.findByName(COMPLEX_MODEL_ROOT_DATA_CLASS_NAME)
 
-        CatalogueElementToXlsxExporter.forDataClass(model, dataClassService).export(file.newOutputStream())
+        CatalogueElementToXlsxExporter.forDataClass(model, dataClassService, grailsApplication).export(file.newOutputStream())
 
         open file
 

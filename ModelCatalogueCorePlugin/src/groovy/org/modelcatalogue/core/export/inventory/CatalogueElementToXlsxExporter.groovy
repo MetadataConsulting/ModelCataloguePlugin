@@ -1,8 +1,11 @@
 package org.modelcatalogue.core.export.inventory
 
+import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
-import grails.util.Holders
+import com.google.common.collect.ImmutableMultimap
+import com.google.common.collect.Multimap
 import groovy.util.logging.Log4j
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.builder.spreadsheet.api.Cell
 import org.modelcatalogue.builder.spreadsheet.api.Sheet
 import org.modelcatalogue.builder.spreadsheet.api.SpreadsheetBuilder
@@ -20,6 +23,8 @@ import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.diff.CatalogueElementDiffs
+import org.modelcatalogue.core.diff.Diff
 import org.modelcatalogue.core.enumeration.Enumeration
 import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.util.DataModelFilter
@@ -38,6 +43,8 @@ class CatalogueElementToXlsxExporter {
     public static final String DATA_TYPE_FIRST_COLUMN = 'F'
 
     final DataClassService dataClassService
+    final GrailsApplication grailsApplication
+    final CatalogueElementDiffs catalogueElementDiffs
     final Long elementId
     final Long elementForDiffId
     final Integer depth
@@ -48,22 +55,24 @@ class CatalogueElementToXlsxExporter {
     private Set<Long> namesPrinted = new HashSet<Long>()
     private Set<Long> sheetsPrinted = new HashSet<Long>()
 
-    static CatalogueElementToXlsxExporter forDataModel(DataModel element, DataClassService dataClassService, Integer depth = 3) {
-        return new CatalogueElementToXlsxExporter(element, dataClassService, depth)
+    static CatalogueElementToXlsxExporter forDataModel(DataModel element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3) {
+        return new CatalogueElementToXlsxExporter(element, dataClassService, grailsApplication, depth)
     }
 
-    static CatalogueElementToXlsxExporter forDataClass(DataClass element, DataClassService dataClassService, Integer depth = 3) {
-        return new CatalogueElementToXlsxExporter(element, dataClassService, depth)
+    static CatalogueElementToXlsxExporter forDataClass(DataClass element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3) {
+        return new CatalogueElementToXlsxExporter(element, dataClassService, grailsApplication,  depth)
     }
 
-    private CatalogueElementToXlsxExporter(CatalogueElement element, DataClassService dataClassService, Integer depth = 3) {
+    private CatalogueElementToXlsxExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3) {
         this.elementId = element.getId()
         this.dataClassService = dataClassService
+        this.grailsApplication = grailsApplication
         this.depth = depth
 
         this.elementForDiffId = element.findPreviousVersion()?.id
 
-        printMetadata = Holders.config.mc.export.xlsx.printMetadata ?: false
+        this.printMetadata = grailsApplication.config.mc.export.xlsx.printMetadata ?: false
+        this.catalogueElementDiffs = new CatalogueElementDiffs(grailsApplication)
     }
 
     protected static String getModelCatalogueIdToPrint(CatalogueElement element) {
@@ -210,7 +219,7 @@ class CatalogueElementToXlsxExporter {
 
             sheet(CONTENT) {}
 
-            buildDataClassesDetails(dataClasses, workbook, null)
+            buildDataClassesDetails(dataClasses, elementForDiff, workbook, null)
 
             sheet(CONTENT) { Sheet sheet ->
                 buildOutline(sheet, dataClasses)
@@ -222,27 +231,27 @@ class CatalogueElementToXlsxExporter {
 
     }
 
-    protected void buildDataClassesDetails(Iterable<DataClass> dataClasses, Workbook workbook, Sheet sheet, int level = 0, Set<Long> processed = new HashSet<Long>()) {
+    protected void buildDataClassesDetails(Iterable<DataClass> dataClasses, CatalogueElement elementForDiff, Workbook workbook, Sheet sheet, int level = 0, Set<Long> processed = new HashSet<Long>()) {
         if (level > depth) {
             log.info "${' ' * level}- skipping ${dataClasses*.name} as the level is already $level (max. depth is $depth)"
             return
         }
         for (DataClass dataClassForDetail in dataClasses) {
-            buildSheets(dataClassForDetail, null, workbook, sheet, level, processed)
+            buildSheets(dataClassForDetail, null, elementForDiff, workbook, sheet, level, processed)
         }
     }
 
-    protected void buildDataClassesDetailsWithRelationships(Iterable<Relationship> relationships, Workbook workbook, Sheet sheet, int level = 0, Set<Long> processed = new HashSet<Long>()) {
+    protected void buildDataClassesDetailsWithRelationships(Iterable<Relationship> relationships, CatalogueElement elementForDiff, Workbook workbook, Sheet sheet, int level = 0, Set<Long> processed = new HashSet<Long>()) {
         if (level > depth) {
             log.info "${' ' * level}- skipping ${relationships*.destination*.name} as the level is already $level (max. depth is $depth)"
             return
         }
         for (Relationship relationship in relationships) {
-            buildSheets(relationship.destination as DataClass, relationship, workbook, sheet, level, processed)
+            buildSheets(relationship.destination as DataClass, relationship, elementForDiff, workbook, sheet, level, processed)
         }
     }
 
-    private void buildSheets(DataClass dataClassForDetail, Relationship relationship, Workbook workbook, Sheet sheet, int level = 0, Set<Long> processed = new HashSet<Long>()) {
+    private void buildSheets(DataClass dataClassForDetail, Relationship relationship, CatalogueElement elementForDiff, Workbook workbook, Sheet sheet, int level = 0, Set<Long> processed = new HashSet<Long>()) {
         if (dataClassForDetail.id in processed) {
             log.info "${' ' * level}- skipping ${dataClassForDetail.name} as it is already processed"
             return
@@ -253,9 +262,11 @@ class CatalogueElementToXlsxExporter {
 
         if (isSkipExport(dataClassForDetail)) {
             log.info "${' ' * level}- skipped as ${Metadata.SKIP_EXPORT} evaluates to true"
-            buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, workbook, sheet, level + 1, processed)
+            buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, elementForDiff, workbook, sheet, level + 1, processed)
             return
         }
+
+        ImmutableMultimap<String, Diff> diffs = collectDiffs(dataClassForDetail, elementForDiff)
 
         // always render subsections on the new sheet
         if (isSubsection(dataClassForDetail, relationship)) {
@@ -266,8 +277,8 @@ class CatalogueElementToXlsxExporter {
             workbook.sheet(getSafeSheetName(dataClassForDetail)) { Sheet s ->
                 buildBackToContentLink(s)
                 log.info "${' ' * level}- printing ${dataClassForDetail.name} on new sheet"
-                buildDataClassDetail(s, dataClassForDetail)
-                buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, workbook, s, level + 1, new HashSet<Long>([dataClassForDetail.id]))
+                buildDataClassDetail(s, dataClassForDetail, elementForDiff, diffs)
+                buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, elementForDiff, workbook, s, level + 1, new HashSet<Long>([dataClassForDetail.id]))
 
                 row()
                 buildBackToContentLink(s)
@@ -278,8 +289,8 @@ class CatalogueElementToXlsxExporter {
         // inside subsection use existing sheet
         if (sheet) {
             log.info "${' ' * level}- printing ${dataClassForDetail.name} on existing sheet"
-            buildDataClassDetail(sheet, dataClassForDetail)
-            buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, workbook, sheet, level + 1, processed)
+            buildDataClassDetail(sheet, dataClassForDetail, elementForDiff, diffs)
+            buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, elementForDiff, workbook, sheet, level + 1, processed)
             return
         }
 
@@ -293,13 +304,33 @@ class CatalogueElementToXlsxExporter {
         workbook.sheet(getSafeSheetName(dataClassForDetail)) { Sheet s ->
             buildBackToContentLink(s)
             log.info "${' ' * level}- printing ${dataClassForDetail.name} on new sheet"
-            buildDataClassDetail(s, dataClassForDetail)
+            buildDataClassDetail(s, dataClassForDetail, elementForDiff, diffs)
             // force top level sheets for children
-            buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, workbook, null, level + 1, processed)
+            buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, elementForDiff, workbook, null, level + 1, processed)
 
             row()
             buildBackToContentLink(s)
         }
+    }
+
+    static <T extends CatalogueElement> T findOther(T catalogueElement, CatalogueElement topLevelOtherElement) {
+        if (!topLevelOtherElement) {
+            return null
+        }
+
+        DataModel otherDataModel
+
+        if (HibernateHelper.getEntityClass(topLevelOtherElement)) {
+            otherDataModel = (DataModel) topLevelOtherElement
+        } else {
+            otherDataModel = topLevelOtherElement.dataModel
+        }
+
+        if (!otherDataModel) {
+            return null
+        }
+
+        return (T) CatalogueElement.findByLatestVersionIdAndDataModel(catalogueElement.latestVersionId ?: catalogueElement.id, otherDataModel)
     }
 
     private static String getSafeSheetName(DataClass dataClassForDetail) {
@@ -330,7 +361,7 @@ class CatalogueElementToXlsxExporter {
     }
 
 
-    private void buildDataClassDetail(Sheet sheet, DataClass dataClass) {
+    private void buildDataClassDetail(Sheet sheet, DataClass dataClass, CatalogueElement elementForDiff, Multimap<String, Diff> diffs) {
         sheet.with {
             row {
                 cell {
@@ -368,7 +399,7 @@ class CatalogueElementToXlsxExporter {
                         name getSafeSheetName(dataClass)
                         namesPrinted << dataClass.id
                     }
-                    style 'h1'
+                    styles withChangesHighlight('h1', diffs, 'name')
                     colspan 7
                 }
             }
@@ -379,7 +410,7 @@ class CatalogueElementToXlsxExporter {
 
                         height 100
 
-                        style 'description'
+                        styles withChangesHighlight('description', diffs, 'description')
                         colspan 7
                     }
                 }
@@ -407,12 +438,32 @@ class CatalogueElementToXlsxExporter {
             }
 
             if (dataClass.countContains()) {
-                buildContainedElements(it, dataClass)
+                buildContainedElements(it, dataClass, elementForDiff, diffs)
             }
         }
     }
 
-    private buildContainedElements(Sheet sheet, DataClass dataClass) {
+    private ImmutableMultimap<String, Diff> collectDiffs(CatalogueElement element, CatalogueElement elementForDiff) {
+        if (!element) {
+            return ImmutableMultimap.of()
+        }
+
+        Multimap<String, Diff> diffs = ImmutableMultimap.of()
+        CatalogueElement other = findOther(element, elementForDiff)
+
+        if (other) {
+            diffs = catalogueElementDiffs.differentiate(element, other)
+        }
+
+
+        for (Diff diff in diffs.values()) {
+            println diff
+        }
+
+        diffs
+    }
+
+    private buildContainedElements(Sheet sheet, DataClass dataClass, CatalogueElement elementForDiff, Multimap<String, Diff> dataClassDiffs) {
         sheet.with {
             row {
                 cell {
@@ -463,6 +514,11 @@ class CatalogueElementToXlsxExporter {
 
             for (Relationship containsRelationship in dataClass.containsRelationships) {
                 DataElement element = containsRelationship.destination as DataElement
+
+                ImmutableMultimap<String, Diff> dataElementDiffs = collectDiffs(element, elementForDiff)
+                ImmutableMultimap<String, Diff> dataTypeDiffs = collectDiffs(element.dataType, elementForDiff)
+                Collection<Diff> missingEnums = dataTypeDiffs.values().findAll { it.enumerationChange && it.removal }
+
                 row {
                     cell {
                         value getModelCatalogueIdToPrint(element)
@@ -474,33 +530,39 @@ class CatalogueElementToXlsxExporter {
                     }
                     cell {
                         value element.name
-                        style 'data-element'
+                        styles withChangesHighlight('data-element', dataClassDiffs, Diff.keyForRelationship(containsRelationship))
                         colspan 2
                     }
                     cell {
                         value getMultiplicity(containsRelationship)
-                        style 'data-element-top-right'
+                        styles withChangesHighlight('data-element-top-right', dataClassDiffs, Diff.keyForRelationshipExtension(containsRelationship, Metadata.MIN_OCCURS), Diff.keyForRelationshipExtension(containsRelationship, Metadata.MIN_OCCURS))
                     }
                     if (element.dataType) {
                         cell {
                             value element.dataType.name
-                            style 'data-element'
+                            styles withChangesHighlight('data-element', dataElementDiffs, 'dataType')
                             colspan 2
                         }
 
                         if (element.dataType.instanceOf(PrimitiveType) && element.dataType.measurementUnit) {
+
+//                            ImmutableMultimap<String, Diff> unitDiffs = collectDiffs(element.dataType.measurementUnit, elementForDiff)
+
                             cell {
                                 value element.dataType.measurementUnit.name
-                                style 'data-element'
+                                styles withChangesHighlight('data-element', dataTypeDiffs, 'measurementUnit')
                             }
                         } else {
                             cell()
                         }
 
                         if (element.dataType.instanceOf(ReferenceType) && element.dataType.dataClass) {
+
+//                            ImmutableMultimap<String, Diff> referencedClassDiffs = collectDiffs(element.dataType.dataClass, elementForDiff)
+
                             cell {
                                 value element.dataType.dataClass.name
-                                style 'data-element'
+                                styles withChangesHighlight('data-element', dataTypeDiffs, 'dataClass')
                             }
                         } else {
                             cell()
@@ -518,7 +580,7 @@ class CatalogueElementToXlsxExporter {
                     cell('C') {
                         value element.description
                         colspan 3
-                        int desiredRowSpan = getRowSpanForDataTypeDetails(element.dataType, typeHierarchy)
+                        int desiredRowSpan = getRowSpanForDataTypeDetails(element.dataType, typeHierarchy, missingEnums)
                         if (desiredRowSpan > 1) {
                             rowspan desiredRowSpan
                         }
@@ -560,27 +622,13 @@ class CatalogueElementToXlsxExporter {
                     }
                     Enumerations enumerations = element.dataType.enumerationsObject
                     for (Enumeration entry in enumerations) {
-                        row {
-                            cell(DATA_TYPE_FIRST_COLUMN) { Cell cell ->
-                                cell.text entry.key, {
-                                    bold
-                                    if (entry.deprecated) {
-                                        italic
-                                        color lightGray
-                                    }
-                                }
-                            }
-                            cell { Cell cell ->
-                                text entry.value, {
-                                    if (entry.deprecated) {
-                                        italic
-                                        color lightGray
-                                    }
-                                }
-                                style ModelCatalogueStyles.DESCRIPTION
-                            }
-                        }
+                        printEnumeration(sheet, entry, dataTypeDiffs)
                     }
+
+                    for (Diff diff in missingEnums) {
+                        printEnumeration(sheet, diff.otherValue as Enumeration, dataTypeDiffs)
+                    }
+
                 }
 
                 if (typeHierarchy.items.any { it.rule }) {
@@ -627,7 +675,55 @@ class CatalogueElementToXlsxExporter {
         }
     }
 
-    protected static int getRowSpanForDataTypeDetails(DataType dataType, ListWithTotalAndType<DataType> typeHierarchy) {
+    private static printEnumeration(Sheet sheet, Enumeration entry, ImmutableMultimap<String, Diff> dataTypeDiffs) {
+        sheet.row {
+            cell(DATA_TYPE_FIRST_COLUMN) { Cell cell ->
+                text entry.key, {
+                    bold
+                    if (entry.deprecated) {
+                        italic
+                        color lightGray
+                    }
+                }
+                styles withChangesHighlight(null, dataTypeDiffs, Diff.keyForEnumeration(entry.id))
+            }
+            cell { Cell cell ->
+                text entry.value, {
+                    if (entry.deprecated) {
+                        italic
+                        color lightGray
+                    }
+                }
+                styles withChangesHighlight(ModelCatalogueStyles.DESCRIPTION, dataTypeDiffs, Diff.keyForEnumeration(entry.id))
+            }
+        }
+    }
+
+    private static String[] withChangesHighlight(String style, Multimap<String, Diff> diffs, String... diffKeys) {
+        ImmutableList.Builder<String> ret = ImmutableList.builder()
+
+        if (style) {
+            ret.add(style)
+        }
+
+        Collection<Diff> interestingDiffs = diffKeys.collect { diffs.get(it) }.flatten() as Collection<Diff>
+
+        if (!interestingDiffs) {
+            return ret.build().toArray()
+        }
+
+        if (interestingDiffs.any { it.addition } ) {
+            ret.add(ModelCatalogueStyles.CHANGE_NEW)
+        } else if (interestingDiffs.any { it.removal } ) {
+            ret.add(ModelCatalogueStyles.CHANGE_REMOVAL)
+        } else if (interestingDiffs.any { it.update } ) {
+            ret.add(ModelCatalogueStyles.CHANGE_UPDATE)
+        }
+
+        ret.build().toArray()
+    }
+
+    protected static int getRowSpanForDataTypeDetails(DataType dataType, ListWithTotalAndType<DataType> typeHierarchy, Collection<Diff> missingEnums) {
         if (!dataType) {
             return 1
         }
@@ -643,6 +739,10 @@ class CatalogueElementToXlsxExporter {
         int ruleCount = typeHierarchy.items.count { it.rule }
         if (ruleCount > 0) {
             rowspan += 1 + ruleCount
+        }
+
+        if (missingEnums) {
+            rowspan += missingEnums.size()
         }
 
         return rowspan

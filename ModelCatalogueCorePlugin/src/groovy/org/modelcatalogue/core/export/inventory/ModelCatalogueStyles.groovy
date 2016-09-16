@@ -28,6 +28,10 @@ class ModelCatalogueStyles implements Stylesheet {
     public static final String LINK = 'link'
     public static final String THIN_DARK_GREY_BORDER = 'thin-dark-grey-border'
     public static final String DIM_GRAY_FONT = 'dim-gray-font'
+    public static final String CHANGE_NEW = 'change-new'
+    public static final String CHANGE_UPDATE = 'change-update'
+    public static final String CHANGE_REMOVAL = 'change-removal'
+
 
     @Override
     void declareStyles(CanDefineStyle stylable) {
@@ -176,6 +180,30 @@ class ModelCatalogueStyles implements Stylesheet {
                     style thin
                     color darkGray
                 }
+            }
+            style (CHANGE_NEW) {
+                foreground lightGreen
+                background lightGreen
+                font {
+                  color darkGreen
+                }
+            }
+            style (CHANGE_UPDATE) {
+                foreground lightSkyBlue
+                background lightSkyBlue
+                font {
+                    color darkBlue
+
+                }
+            }
+            style (CHANGE_REMOVAL) {
+                foreground mistyRose
+                background mistyRose
+                font {
+                    strikeout
+                    color darkRed
+                }
+
             }
         }
     }
