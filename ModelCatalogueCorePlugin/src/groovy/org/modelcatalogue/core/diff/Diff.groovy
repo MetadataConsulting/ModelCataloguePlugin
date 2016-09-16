@@ -14,7 +14,6 @@ class Diff {
         this.key = key
         this.selfValue = selfValue
         this.otherValue = otherValue
-        log.info("key: $key, selfValue: $selfValue, otherValue: $otherValue")
     }
 
     static String keyForProperty(String propertyName) {
@@ -67,16 +66,16 @@ class Diff {
         return "${key}: $selfValue => $otherValue"
     }
 
-    boolean isAddition() {
+    boolean isOtherMissing() {
         return otherValue == null
     }
 
-    boolean isRemoval() {
+    boolean isSelfMissing() {
         return selfValue == null
     }
 
     boolean isUpdate() {
-        return !addition && !removal
+        return !otherMissing && !selfMissing
     }
 
     boolean isExtensionChange() {

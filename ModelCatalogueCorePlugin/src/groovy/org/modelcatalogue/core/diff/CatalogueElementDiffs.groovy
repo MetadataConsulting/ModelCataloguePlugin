@@ -40,6 +40,10 @@ class CatalogueElementDiffs {
     }
 
     ImmutableMultimap<String, Diff> differentiate(CatalogueElement self, CatalogueElement other) {
+        if (!other || !self || self == other) {
+            ImmutableMultimap.of()
+        }
+
         ImmutableMultimap.Builder<String, Diff> builder = ImmutableMultimap.builder()
 
         GrailsDomainClass selfClass = checkNotNull(grailsApplication.getDomainClass(HibernateHelper.getEntityClass(self).name), "No such domain class ${HibernateHelper.getEntityClass(self).name}") as GrailsDomainClass
@@ -58,7 +62,7 @@ class CatalogueElementDiffs {
                     CatalogueElement selfElement = (CatalogueElement) selfValue
                     CatalogueElement otherElement = (CatalogueElement) otherValue
 
-                    if ((selfElement.latestVersionId ?: selfElement.id) != (otherElement.latestVersionId ?: otherElement.id)) {
+                    if ((selfElement?.latestVersionId ?: selfElement?.id) != (otherElement?.latestVersionId ?: otherElement?.id)) {
                         builder.put(Diff.keyForProperty(property.name), Diff.createPropertyChange(property.name, selfValue, otherValue))
                     }
                 } else {
@@ -142,7 +146,7 @@ class CatalogueElementDiffs {
     }
 
     private static ImmutableMap<String, Relationship> collectRelationships(CatalogueElement self) {
-        ImmutableMap.Builder<String, Relationship> selfRelationshipsBuilder = ImmutableMap.builder()
+        Map<String, Relationship> selfRelationshipsBuilder = [:]
 
         for (Relationship relationship in self.outgoingRelationships) {
             if (!relationship.relationshipType.system) {
@@ -150,7 +154,7 @@ class CatalogueElementDiffs {
             }
         }
 
-        selfRelationshipsBuilder.build()
+        ImmutableMap.copyOf(selfRelationshipsBuilder)
     }
 
 
