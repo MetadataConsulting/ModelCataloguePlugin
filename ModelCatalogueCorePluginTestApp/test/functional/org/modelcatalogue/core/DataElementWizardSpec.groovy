@@ -48,7 +48,7 @@ class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
         check { infTableCell(1, 1) } contains "NewDE1"
 
         then: 'Click the element'
-        click firstRowLink
+        click { infTableCell(1, 1).find('a:not(.inf-cell-expand)') }
         check rightSideTitle contains 'NewDE1'
     }
 
