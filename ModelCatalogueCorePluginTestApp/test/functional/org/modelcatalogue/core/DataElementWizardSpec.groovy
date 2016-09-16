@@ -37,7 +37,7 @@ class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
         click save
 
         then: 'the data element is saved and displayed at the top of the table'
-        check nameInTheFirstRow contains "NewDE1"
+        check { infTableCell(1, 1) } contains "NewDE1"
     }
 
     def "Check the data element shows up with own details"() {
@@ -45,7 +45,7 @@ class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
         check backdrop gone
 
         when: 'Data Element is located'
-        check nameInTheFirstRow contains "NewDE1"
+        check { infTableCell(1, 1) } contains "NewDE1"
 
         then: 'Click the element'
         click firstRowLink
