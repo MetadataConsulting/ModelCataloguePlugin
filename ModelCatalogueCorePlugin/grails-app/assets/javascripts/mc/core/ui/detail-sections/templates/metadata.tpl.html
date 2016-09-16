@@ -1,3 +1,4 @@
+<!-- Basic Metadata -->
 <div ng-switch="element.elementType" class="col-md-12">
   <div ng-switch-when="org.modelcatalogue.core.DataModel">
     <h5>Basic</h5>
@@ -28,4 +29,17 @@
     <h5>Basic</h5>
     <div ng-include="'/mc/core/ui/detail-sections/metadata/assetBasic.html'"></div>
   </div>
+</div>
+
+<!-- Custom Metadata -->
+<div ng-if="element.isInstanceOf('dataModel') ||
+        element.isInstanceOf('dataClass') ||
+        element.isInstanceOf('dataElement') ||
+        element.isInstanceOf('dataType') ||
+        element.isInstanceOf('measurementUnit') ||
+        element.isInstanceOf('validationRule') ||
+        element.isInstanceOf('asset')"
+     class="col-md-12">
+  <h5>Custom Metadata</h5>
+  <div ng-include="'/mc/core/ui/detail-sections/metadata/customMetadata.html'"></div>
 </div>

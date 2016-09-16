@@ -201,22 +201,6 @@ x in ['apple', 'banana', 'cherry']
      template: '/mc/core/ui/detail-sections/organization.html'
   }
 
-  detailSectionsProvider.register {
-    title: 'Custom Metadata'
-    position: 40
-    types: [
-      'dataModel'
-      'asset'
-      'mesurementUnit'
-      'dataElement'
-      'dataType'
-      'dataClass'
-      'validationRule'
-    ]
-    keys: []
-    template: '/mc/core/ui/detail-sections/customMetadata.html'
-  }
-
   reorderInDetail = (relationName) ->
     (element, messages, $row, $current) ->
       element[relationName].reorder($row.row.element, $current?.row?.element).catch (reason) ->
