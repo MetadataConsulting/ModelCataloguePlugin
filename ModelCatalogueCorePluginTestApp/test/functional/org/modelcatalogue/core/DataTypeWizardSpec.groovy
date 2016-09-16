@@ -84,7 +84,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         check modalDialog gone
-        check { infTableCell(1, 1, text: 'New Reference Type') } displayed
+        check { infTableCell(1, 1) } contains "New Reference Type"
         check { infTableCell(1, 2, text: 'DEMOGRAPHICS') } displayed
     }
 
@@ -109,8 +109,8 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         check modalDialog gone
-        check { infTableCell(1, 1, text: 'New Primitive Type') } displayed
-        check { infTableCell(1, 2, text: 'new unit') } displayed
+        check { infTableCell(1, 1) } contains "New Primitive Type"
+        check { infTableCell(1, 2, text: 'Test Primitive Unit') } displayed
     }
 
     def "create enum"() {
@@ -136,7 +136,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         then:
         check modalDialog gone
         check backdrop gone
-        check { infTableCell(1, 1, text: 'Enumeration 1') } displayed
+        check { infTableCell(1, 1) } contains "Enumeration 1"
     }
 
     def "create subset 2"() {
@@ -164,7 +164,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         then:
         check modalDialog gone
         check backdrop gone
-        check { infTableCell(1, 1, text: 'Enumeration 2') } displayed
+        check { infTableCell(1, 1) } contains "Enumeration 2"
     }
 
     def "create subset 3"() {
@@ -191,7 +191,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         then:
         check modalDialog gone
         check backdrop gone
-        check { infTableCell(1, 1, text: 'Enumeration 3') } displayed
+        check { infTableCell(1, 1) } contains "Enumeration 3"
         check { infTableCell(1, 2) } contains '01: one'
     }
 
@@ -230,7 +230,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         then:
         check modalDialog gone
         check backdrop gone
-        check { infTableCell(1, 1, text: 'New Data Type')} displayed
+        check { infTableCell(1, 1) } contains "New Data Type"
     }
 
     def "check it shows up with own detail page"(){
