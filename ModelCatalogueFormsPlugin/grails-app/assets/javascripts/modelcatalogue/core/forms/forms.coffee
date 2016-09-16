@@ -61,7 +61,7 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
         "http://forms.modelcatalogue.org/item#dataType"
       ]
     }
-    hideIfNoData: true
+    hideByDefault: true
     template: '/mc/core/forms/formMetadata.html'
   }
 

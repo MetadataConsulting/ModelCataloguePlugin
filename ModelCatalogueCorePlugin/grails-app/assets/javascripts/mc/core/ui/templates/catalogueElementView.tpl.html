@@ -32,10 +32,10 @@
             <span class="title">
               <span class="btn btn-link btn-sm"
                     ng-click="view.toggleTemplateHidden(element)"
-                    ng-show="view.hideIfNoData && !view.hasData(element)">
+                    ng-show="view.hideByDefault != null || view.hideIfNoData != null">
                     {{view.title}}
               </span>
-              <span ng-hide="view.hideIfNoData && !view.hasData(element)">
+              <span ng-hide="view.hideByDefault != null || view.hideIfNoData != null">
                 {{view.title}}
               </span>
               <span ng-repeat="action in view.actions" class="btn" ng-class="action.icon"
