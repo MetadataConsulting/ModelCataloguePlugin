@@ -21,6 +21,8 @@ class ModelCatalogueStyles implements Stylesheet {
     public static final String DATA_ELEMENT_BOTTOM_RIGHT = 'data-element-bottom-right'
     public static final String DATA_ELEMENT_CENTER_CENTER = 'data-element-center-center'
     public static final String CENTER_CENTER = 'center-center'
+    public static final String CENTER_RIGHT = 'center-right'
+    public static final String BOTTOM_RIGHT = 'bottom-right'
     public static final String DATA_ELEMENT_TOP_RIGHT = 'data-element-top-right'
     public static final String DATA_ELEMENT_DESCRIPTION_ROW = 'data-element-description-row'
     public static final String METADATA_KEY = 'metadata-key'
@@ -131,6 +133,12 @@ class ModelCatalogueStyles implements Stylesheet {
             style(CENTER_CENTER) {
                 align center center
             }
+            style(BOTTOM_RIGHT) {
+                align bottom right
+            }
+            style(CENTER_RIGHT) {
+                align center right
+            }
             style(DATA_ELEMENT_BOTTOM_RIGHT) {
                 align bottom right
                 foreground whiteSmoke
@@ -182,15 +190,13 @@ class ModelCatalogueStyles implements Stylesheet {
                 }
             }
             style (CHANGE_NEW) {
-                foreground lightGreen
-                background lightGreen
+                foreground '#E2EFDB'
                 font {
                   color darkGreen
                 }
             }
             style (CHANGE_UPDATE) {
-                foreground lightSkyBlue
-                background lightSkyBlue
+                foreground '#DDEBF6'
                 font {
                     color darkBlue
 
@@ -198,10 +204,9 @@ class ModelCatalogueStyles implements Stylesheet {
             }
             style (CHANGE_REMOVAL) {
                 foreground mistyRose
-                background mistyRose
                 font {
                     strikeout
-                    color darkRed
+                    color '#D2787B'
                 }
 
             }

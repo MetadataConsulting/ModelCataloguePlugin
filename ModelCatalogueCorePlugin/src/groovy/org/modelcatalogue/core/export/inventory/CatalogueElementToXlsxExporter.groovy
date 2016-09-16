@@ -25,6 +25,7 @@ import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.diff.CatalogueElementDiffs
 import org.modelcatalogue.core.diff.Diff
 import org.modelcatalogue.core.enumeration.Enumeration
@@ -54,7 +55,7 @@ class CatalogueElementToXlsxExporter {
     boolean printMetadata
 
     private Map<Long, DataClass> dataClassesProcessedInOutline = [:]
-    private Set<Long> namesPrinted = new HashSet<Long>()
+    private Set<String> namesPrinted = new HashSet<String>()
     private Set<Long> sheetsPrinted = new HashSet<Long>()
 
     static CatalogueElementToXlsxExporter forDataModel(DataModel element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3) {
@@ -195,7 +196,7 @@ class CatalogueElementToXlsxExporter {
 
     void export(OutputStream outputStream) {
         dataClassesProcessedInOutline = [:]
-        namesPrinted = new HashSet<Long>()
+        namesPrinted = new HashSet<String>()
         sheetsPrinted = new HashSet<Long>()
 
         CatalogueElement element = CatalogueElement.get(elementId)
@@ -224,8 +225,30 @@ class CatalogueElementToXlsxExporter {
             buildDataClassesDetails(dataClasses, elementForDiff, workbook, null)
 
             sheet(CONTENT) { Sheet sheet ->
-                buildOutline(sheet, dataClasses)
+                buildOutline(sheet, dataClasses, elementForDiff)
             }
+
+//            sheet('Changes') {
+//
+//                for (Map.Entry<String, Multimap<String, Diff>> entry in computedDiffs.entrySet()) {
+//                    for (Diff diff in entry.value.values()) {
+//                        row {
+//                            cell {
+//                                value diff.key
+//                                width 50
+//                            }
+//                            cell {
+//                                value String.valueOf(diff.selfValue)
+//                                width 100
+//                            }
+//                            cell {
+//                                value String.valueOf(diff.otherValue)
+//                                width 100
+//                            }
+//                        }
+//                    }
+//                }
+//            }
 
         }
 
@@ -239,30 +262,33 @@ class CatalogueElementToXlsxExporter {
             return
         }
         for (DataClass dataClassForDetail in dataClasses) {
-            buildSheets(dataClassForDetail, null, elementForDiff, ImmutableMultimap.of(), workbook, sheet, level, processed)
+            buildSheets(dataClassForDetail, null, elementForDiff, ImmutableMultimap.of(), workbook, sheet, false, level, processed)
         }
     }
 
-    protected void buildDataClassesDetailsWithRelationships(Iterable<Relationship> relationships, CatalogueElement elementForDiff, Multimap<String, Diff> parentDiffs, Workbook workbook, Sheet sheet, int level = 0, Set<Long> processed = new HashSet<Long>()) {
+    protected void buildDataClassesDetailsWithRelationships(Iterable<Relationship> relationships, CatalogueElement elementForDiff, Multimap<String, Diff> parentDiffs, Workbook workbook, Sheet sheet, boolean terminal, int level = 0, Set<Long> processed = new HashSet<Long>()) {
         if (level > depth) {
             log.info "${' ' * level}- skipping ${relationships*.destination*.name} as the level is already $level (max. depth is $depth)"
             return
         }
         for (Relationship relationship in relationships) {
-            CatalogueElement childElementForDiff = elementForDiff
-            if (elementForDiff && relationship.source.dataModel != relationship.destination.dataModel) {
-                String key = Diff.keyForRelationship(relationship)
-                CatalogueElement other = findOther(relationship.source, elementForDiff)
-                if (other) {
-                    Relationship previous = other.outgoingRelationships.find { Diff.keyForRelationship(it) == key }
-                    childElementForDiff = (previous ?: relationship).destination.dataModel
-                }
-            }
-            buildSheets(relationship.destination as DataClass, relationship, childElementForDiff, parentDiffs, workbook, sheet, level, processed)
+            buildSheets(relationship.destination as DataClass, relationship, nextElementToDiff(elementForDiff, relationship), parentDiffs, workbook, sheet, terminal, level, processed)
         }
     }
 
-    private void buildSheets(DataClass dataClassForDetail, Relationship relationship, CatalogueElement elementForDiff, Multimap<String, Diff> parentDiffs, Workbook workbook, Sheet sheet, int level = 0, Set<Long> processed = new HashSet<Long>()) {
+    private static CatalogueElement nextElementToDiff(CatalogueElement elementForDiff, Relationship processedRelationship) {
+        if (elementForDiff && processedRelationship.source.dataModel != processedRelationship.destination.dataModel) {
+            String key = Diff.keyForRelationship(processedRelationship)
+            CatalogueElement other = findOther(processedRelationship.source, elementForDiff)
+            if (other) {
+                Relationship previous = other.outgoingRelationships.find { Diff.keyForRelationship(it) == key }
+                return (previous ?: processedRelationship).destination.dataModel
+            }
+        }
+        return elementForDiff
+    }
+
+    private void buildSheets(DataClass dataClassForDetail, Relationship relationship, CatalogueElement elementForDiff, Multimap<String, Diff> parentDiffs, Workbook workbook, Sheet sheet, boolean terminal, int level = 0, Set<Long> processed = new HashSet<Long>()) {
         if (dataClassForDetail.id in processed) {
             log.info "${' ' * level}- skipping ${dataClassForDetail.name} as it is already processed"
             return
@@ -271,13 +297,18 @@ class CatalogueElementToXlsxExporter {
         processed << dataClassForDetail.id
         log.info "Exporting detail for Data Class ${dataClassForDetail.name} (${dataClassForDetail.combinedVersion})"
 
+        ImmutableMultimap<String, Diff> diffs = collectDiffs(dataClassForDetail, elementForDiff)
+
         if (isSkipExport(dataClassForDetail)) {
             log.info "${' ' * level}- skipped as ${Metadata.SKIP_EXPORT} evaluates to true"
-            buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, elementForDiff, ImmutableMultimap.of(), workbook, sheet, level + 1, processed)
+            if (!terminal) {
+                buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, elementForDiff, diffs, workbook, sheet, false, level + 1, processed)
+                buildDataClassesDetailsWithRelationships(findDeleted(dataClassForDetail, diffs, RelationshipType.hierarchyType), elementForDiff, diffs, workbook, sheet, true, level + 1, processed)
+            }
             return
         }
 
-        ImmutableMultimap<String, Diff> diffs = collectDiffs(dataClassForDetail, elementForDiff)
+
 
         // always render subsections on the new sheet
         if (isSubsection(dataClassForDetail, relationship)) {
@@ -289,7 +320,11 @@ class CatalogueElementToXlsxExporter {
                 buildBackToContentLink(s)
                 log.info "${' ' * level}- printing ${dataClassForDetail.name} on new sheet"
                 buildDataClassDetail(s, dataClassForDetail, relationship, elementForDiff, diffs, parentDiffs)
-                buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, elementForDiff, diffs, workbook, s, level + 1, new HashSet<Long>([dataClassForDetail.id]))
+
+                if (!terminal) {
+                    buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, elementForDiff, diffs, workbook, s, false, level + 1, new HashSet<Long>([dataClassForDetail.id]))
+                    buildDataClassesDetailsWithRelationships(findDeleted(dataClassForDetail, diffs, RelationshipType.hierarchyType), elementForDiff, diffs, workbook, s, true, level + 1, new HashSet<Long>([dataClassForDetail.id]))
+                }
 
                 row()
                 buildBackToContentLink(s)
@@ -301,7 +336,10 @@ class CatalogueElementToXlsxExporter {
         if (sheet) {
             log.info "${' ' * level}- printing ${dataClassForDetail.name} on existing sheet"
             buildDataClassDetail(sheet, dataClassForDetail, relationship, elementForDiff, diffs, parentDiffs)
-            buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, elementForDiff, diffs, workbook, sheet, level + 1, processed)
+            if (!terminal) {
+                buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, elementForDiff, diffs, workbook, sheet, false, level + 1, processed)
+                buildDataClassesDetailsWithRelationships(findDeleted(dataClassForDetail, diffs, RelationshipType.hierarchyType), elementForDiff, diffs, workbook, sheet, true, level + 1, processed)
+            }
             return
         }
 
@@ -317,7 +355,10 @@ class CatalogueElementToXlsxExporter {
             log.info "${' ' * level}- printing ${dataClassForDetail.name} on new sheet"
             buildDataClassDetail(s, dataClassForDetail, relationship, elementForDiff, diffs, parentDiffs)
             // force top level sheets for children
-            buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, elementForDiff, diffs, workbook, null, level + 1, processed)
+            if (!terminal) {
+                buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, elementForDiff, diffs, workbook, null, false, level + 1, processed)
+                buildDataClassesDetailsWithRelationships(findDeleted(dataClassForDetail, diffs, RelationshipType.hierarchyType), elementForDiff, diffs, workbook, null, true, level + 1, processed)
+            }
 
             row()
             buildBackToContentLink(s)
@@ -351,7 +392,11 @@ class CatalogueElementToXlsxExporter {
     }
 
     private static String getSafeSheetName(DataClass dataClassForDetail) {
-        "${getModelCatalogueIdToPrint(dataClassForDetail)} ${normalizeDataClassName(dataClassForDetail)}".replaceAll(/[^\p{Alnum}\\_]/, '_')
+        getSafeName("${getModelCatalogueIdToPrint(dataClassForDetail)} ${normalizeDataClassName(dataClassForDetail)}")
+    }
+
+    private static String getSafeName(String ref) {
+        ref.replaceAll(/[^\p{Alnum}\\_]/, '_')
     }
 
     private static buildBackToContentLink(Sheet sheet) {
@@ -413,9 +458,12 @@ class CatalogueElementToXlsxExporter {
             row {
                 cell {
                     value dataClass.name
-                    if (!(dataClass.id in namesPrinted)) {
-                        name getSafeSheetName(dataClass)
-                        namesPrinted << dataClass.id
+
+                    String ref = getRef(sheet, dataClass)
+
+                    if (!(ref in namesPrinted)) {
+                        name getSafeName(ref)
+                        namesPrinted << ref
                     }
                     styles withChangesHighlight('h1', parentDiffs, Diff.keyForRelationship(relationship))
                     colspan 7
@@ -460,9 +508,25 @@ class CatalogueElementToXlsxExporter {
         }
     }
 
+    private static String getRef(Sheet sheet, DataClass dataClass) {
+        "${sheet.name()}_${dataClass.id}"
+    }
+    private static String getRef(DataClass sheetOwner, DataClass dataClass) {
+        "${getSafeSheetName(sheetOwner)}_${dataClass.id}"
+    }
+
+
+    private Map<String,ImmutableMultimap<String, Diff>> computedDiffs = [:]
+
     private ImmutableMultimap<String, Diff> collectDiffs(CatalogueElement element, CatalogueElement elementForDiff) {
         if (!element || !elementForDiff) {
             return ImmutableMultimap.of()
+        }
+
+        String key = "$element.id=>$elementForDiff.id"
+
+        if (computedDiffs.containsKey(key)) {
+            return computedDiffs[key]
         }
 
         Multimap<String, Diff> diffs = ImmutableMultimap.of()
@@ -471,6 +535,8 @@ class CatalogueElementToXlsxExporter {
         if (other) {
             diffs = catalogueElementDiffs.differentiate(element, other)
         }
+
+        computedDiffs[key] = diffs
 
         diffs
     }
@@ -527,10 +593,16 @@ class CatalogueElementToXlsxExporter {
             for (Relationship containsRelationship in dataClass.containsRelationships) {
                 buildDataElement(sheet, containsRelationship, elementForDiff, dataClassDiffs)
             }
-            for (Relationship deleted in dataClassDiffs.values().findAll { it.relationshipChange && it.selfMissing && it.key.startsWith("rel:${dataClass.latestVersionId ?: dataClass.id}=[containment]=") }.collect { it.otherValue as Relationship }) {
+            for (Relationship deleted in findDeleted(dataClass, dataClassDiffs, RelationshipType.containmentType)) {
                 buildDataElement(sheet, deleted, elementForDiff, dataClassDiffs)
             }
         }
+    }
+
+    private static List<Relationship> findDeleted(DataClass dataClass, Multimap<String, Diff> diffs, RelationshipType type) {
+        diffs.values().findAll {
+            it.relationshipChange && it.selfMissing && it.key.startsWith("rel:${dataClass.latestVersionId ?: dataClass.id}=[${type.name}]=")
+        }.collect { it.otherValue as Relationship }
     }
 
     private void buildDataElement(Sheet sheet, Relationship containsRelationship, CatalogueElement elementForDiff, Multimap<String, Diff> dataClassDiffs) {
@@ -747,6 +819,10 @@ class CatalogueElementToXlsxExporter {
             ret.add(style)
         }
 
+        if (!diffKeys || !diffs) {
+            return ret.build()
+        }
+
         Collection<Diff> interestingDiffs = diffKeys.collect { diffs.get(it) }.flatten() as Collection<Diff>
 
         if (!interestingDiffs) {
@@ -803,7 +879,7 @@ class CatalogueElementToXlsxExporter {
         return "${min}..${max}"
     }
 
-    protected void buildOutline(Sheet sheet, List<DataClass> dataClasses) {
+    protected void buildOutline(Sheet sheet, List<DataClass> dataClasses, CatalogueElement elementForDiff) {
         sheet.with {
             row {
                 cell {
@@ -832,7 +908,7 @@ class CatalogueElementToXlsxExporter {
                 }
             }
 
-            buildDataClassesOutline(it, dataClasses)
+            buildDataClassesOutline(it, dataClasses, elementForDiff)
 
             // footer
             row()
@@ -846,42 +922,50 @@ class CatalogueElementToXlsxExporter {
         }
     }
 
-    private void buildDataClassesOutline(Sheet sheet, List<DataClass> dataClasses) {
+    private void buildDataClassesOutline(Sheet sheet, List<DataClass> dataClasses, CatalogueElement elementForDiff) {
         dataClasses.each { DataClass dataClass ->
-            buildChildOutline(sheet, dataClass, null, 1)
+            buildChildOutline(sheet, dataClass, dataClass, null, elementForDiff, 1, ImmutableMultimap.of())
         }
     }
 
-    protected void buildChildOutline(Sheet sheet, DataClass dataClass, Relationship relationship, int level) {
+    protected void buildChildOutline(Sheet sheet, DataClass dataClass, DataClass sheetOwner, Relationship relationship, CatalogueElement elementForDiff, int level, Multimap<String, Diff> parentDiffs, boolean terminal = false) {
+
+        String[] relDiffKeys = new String[0]
+        String[] multiplicityRelDiffKeys = new String[0]
+
+        if (relationship) {
+            relDiffKeys = [Diff.keyForRelationship(relationship)] as String[]
+            multiplicityRelDiffKeys = [Diff.keyForRelationship(relationship),
+                           Diff.keyForRelationshipExtension(relationship, Metadata.MIN_OCCURS),
+                           Diff.keyForRelationshipExtension(relationship, Metadata.MAX_OCCURS)] as String[]
+        }
+
         sheet.row {
+            String ref = getRef(sheetOwner, dataClass)
+
             cell {
                 value getModelCatalogueIdToPrint(dataClass)
-                style {
-                    align bottom right
-                }
-                if (!isSkipExport(dataClass) && dataClass.id in namesPrinted) {
-                    link to name getSafeSheetName(dataClass)
+                styles withChangesHighlight(ModelCatalogueStyles.BOTTOM_RIGHT, parentDiffs, relDiffKeys)
+                if (ref in namesPrinted) {
+                    link to name getSafeName(ref)
                 }
             }
             cell {
                 value dataClass.name
-                if (!isSkipExport(dataClass) && dataClass.id in namesPrinted) {
-                    link to name getSafeSheetName(dataClass)
+                if (ref in namesPrinted) {
+                    link to name getSafeName(ref)
                 }
                 style {
-                    if (level) {
-                        indent (level * 2)
-                    }
+                    indent (level * 2)
                 }
+                styles withChangesHighlight(null, parentDiffs, relDiffKeys)
             }
             cell {
                 value getMultiplicity(relationship)
-                if (!isSkipExport(dataClass) && dataClass.id in namesPrinted) {
-                    link to name getSafeSheetName(dataClass)
+                if (ref in namesPrinted) {
+                    link to name getSafeName(ref)
                 }
-                style {
-                    align center right
-                }
+                styles withChangesHighlight(ModelCatalogueStyles.CENTER_RIGHT, parentDiffs, multiplicityRelDiffKeys)
             }
         }
 
@@ -896,14 +980,26 @@ class CatalogueElementToXlsxExporter {
 
         dataClassesProcessedInOutline.put(dataClass.getId(), dataClass)
 
-        if (dataClass.countParentOf()) {
+        Multimap<String, Diff> diffs = collectDiffs(dataClass, elementForDiff)
+        List<Relationship> children = findDeleted(dataClass, diffs, RelationshipType.hierarchyType)
+
+        if (!terminal && children.size() + dataClass.countParentOf() > 0) {
             sheet.group {
                 for (Relationship child in dataClass.parentOfRelationships) {
-                    if (!isSubsection(dataClass, relationship)) {
-                        buildChildOutline(sheet, child.destination as DataClass, child, level + 1)
-                    }
+                    buildChildOutline(sheet, child.destination as DataClass, nextSheetOwner(child, relationship, dataClass, sheetOwner), child, nextElementToDiff(elementForDiff, child), level + 1, diffs)
+                }
+                for (Relationship child in children) {
+                    buildChildOutline(sheet, child.destination as DataClass, nextSheetOwner(child, relationship, dataClass, sheetOwner), child, nextElementToDiff(elementForDiff, child), level + 1, diffs, true)
                 }
             }
         }
+    }
+
+    private static DataClass nextSheetOwner(Relationship child, Relationship relationship, DataClass dataClass, DataClass sheetOwner) {
+        if (isSubsection(dataClass, relationship)) {
+            return dataClass
+        }
+
+        return dataClass == sheetOwner ? child.destination as DataClass : sheetOwner
     }
 }
