@@ -35,6 +35,8 @@ class Common {
     static final String tableFooterAction = 'tr.inf-table-footer-action'
     static final String detailSectionHeader = '.title span[data-action-name="add"]'
     static final String detailSectionHeaderAddAction = '.title span[data-action-name="add"]'
+    static final CatalogueContent detailSectionMetadata = CatalogueContent.create('data-view-name': 'Metadata')
+    static final CatalogueContent detailSectionFormMetadata = CatalogueContent.create('data-view-name': 'Form Metadata')
     static final String closeGrowlMessage = "div.messages-panel.growl div.alert button.close"
 
     static final Keywords messages = Keywords.MESSAGES
