@@ -31,8 +31,8 @@ class Common {
     static final String backdrop = '.modal-backdrop'
     static final String confirm = '.modal.messages-modal-confirm'
     static final String OK = '.modal.messages-modal-confirm .btn-primary'
-    static final String nameInTheFirstRow = 'div.inf-table-body tbody tr:nth-child(1) td:nth-child(2)'
-    static final String firstRowLink = 'div.inf-table-body tbody tr:nth-child(1) td:nth-child(2) a'
+    static final String nameInTheFirstRow = 'div.inf-table-body tbody tr:nth-child(1) td:nth-child(1)'
+    static final String firstRowLink = 'div.inf-table-body tbody tr:nth-child(1) td:nth-child(1) a:not(.inf-cell-expand)'
     static final CatalogueAction createNewDataModel = CatalogueAction.runFirst('data-models', 'create-data-model')
     static final String tableFooterAction = 'tr.inf-table-footer-action'
     static final String detailSectionHeaderAddAction = '.title span[data-action-name="add"]'
