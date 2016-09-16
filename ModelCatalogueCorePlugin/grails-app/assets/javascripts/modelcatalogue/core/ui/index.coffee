@@ -25,5 +25,6 @@ angular.module('mc.core.ui', [
   'mc.core.ui.diffTable'
   'mc.core.ui.metadataEditors'
   'mc.core.ui.detailSections'
+  'mc.core.ui.detailSections.metadata'
   'mc.core.ui.metadataEditor'
 ])

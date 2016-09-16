@@ -122,50 +122,18 @@ x in ['apple', 'banana', 'cherry']
   }
 
   detailSectionsProvider.register {
-    title: 'Basic'
+    title: 'Metadata'
     position: 5
     types: [
       'dataModel'
-    ]
-    keys: [
-      'http://www.modelcatalogue.org/metadata/#authors'
-      'http://www.modelcatalogue.org/metadata/#reviewers'
-      'http://www.modelcatalogue.org/metadata/#owner'
-      'http://www.modelcatalogue.org/metadata/#reviewed'
-      'http://www.modelcatalogue.org/metadata/#approved'
-      'http://www.modelcatalogue.org/metadata/#released'
-    ]
-    template: '/mc/core/ui/detail-sections/dataModelBasic.html'
-  }
-
-  detailSectionsProvider.register {
-    title: 'Basic'
-    position: 5
-    types: [
+      'dataClass'
+      'dataElement'
       'measurementUnit'
-    ]
-    keys: []
-    template: '/mc/core/ui/detail-sections/measurementUnitBasic.html'
-  }
-
-  detailSectionsProvider.register {
-    title: 'Basic'
-    position: 5
-    types: [
       'validationRule'
-    ]
-    keys: []
-    template: '/mc/core/ui/detail-sections/validationRuleBasic.html'
-  }
-
-  detailSectionsProvider.register {
-    title: 'Basic'
-    position: 5
-    types: [
       'asset'
     ]
     keys: []
-    template: '/mc/core/ui/detail-sections/assetBasic.html'
+    template: '/mc/core/ui/detail-sections/metadata.html'
     toHumanReadableSize: (size) ->
       GIGA = 1024 * 1024 * 1024
       MEGA = 1024 * 1024
@@ -174,18 +142,6 @@ x in ['apple', 'banana', 'cherry']
       return "#{(size / MEGA).toFixed(2)} MB" if size > MEGA
       return "#{(size / KILO).toFixed(2)} kB" if size > KILO
       return "#{size} B"
-
-  }
-
-  detailSectionsProvider.register {
-    title: 'Basic'
-    position: 5
-    types: [
-      'dataClass'
-      'dataElement'
-    ]
-    keys: []
-    template: '/mc/core/ui/detail-sections/basic.html'
   }
 
   detailSectionsProvider.register {
