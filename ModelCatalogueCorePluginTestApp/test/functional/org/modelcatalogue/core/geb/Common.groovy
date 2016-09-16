@@ -33,6 +33,7 @@ class Common {
     static final String OK = '.modal.messages-modal-confirm .btn-primary'
     static final CatalogueAction createNewDataModel = CatalogueAction.runFirst('data-models', 'create-data-model')
     static final String tableFooterAction = 'tr.inf-table-footer-action'
+    static final String detailSectionHeader = '.title span[data-action-name="add"]'
     static final String detailSectionHeaderAddAction = '.title span[data-action-name="add"]'
     static final String closeGrowlMessage = "div.messages-panel.growl div.alert button.close"
 

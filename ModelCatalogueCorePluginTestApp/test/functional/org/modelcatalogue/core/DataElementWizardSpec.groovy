@@ -11,7 +11,7 @@ import spock.lang.Stepwise
 @Stepwise
 class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
 
-    static final CatalogueContent detailSectionFormItem = CatalogueContent.create('data-view-name': 'Form (Item)')
+    static final CatalogueContent detailSectionFormMetadata = CatalogueContent.create('data-view-name': 'Form Metadata')
     static final String detailSectionFormItemContent = ".metadata-form-item-content"
 
     def "login and select Data Element"() {
@@ -54,11 +54,11 @@ class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "Check Form (Item) detail section is present and collapsed"() {
         expect:
-        check detailSectionFormItem present once
+        check detailSectionFormMetadata present once
         check detailSectionFormItemContent gone
 
         when: "Click the title"
-        click detailSectionFormItem.find(".title")
+        click detailSectionFormMetadata.find('.title .btn')
 
         then: "Content is displayed"
         check detailSectionFormItemContent displayed
