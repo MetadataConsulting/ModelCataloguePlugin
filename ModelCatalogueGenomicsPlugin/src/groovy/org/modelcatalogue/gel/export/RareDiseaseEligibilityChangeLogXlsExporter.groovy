@@ -1,12 +1,11 @@
 package org.modelcatalogue.gel.export
 
 import groovy.util.logging.Log4j
-import org.hibernate.SessionFactory
-import org.modelcatalogue.builder.spreadsheet.api.Sheet
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.PerformanceUtilService
 import org.modelcatalogue.core.audit.AuditService
+import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
 
 /**
  * Eligibility Criteria spreadsheet implementation of RD Change Log Excel Exporter
@@ -28,7 +27,7 @@ class RareDiseaseEligibilityChangeLogXlsExporter extends RareDiseaseChangeLogXls
     }
 
     @Override
-    void buildSheet(Sheet sheet, List lines) {
+    void buildSheet(SheetDefinition sheet, List lines) {
         sheet.with {
             row(1) {
                 cell {
@@ -91,7 +90,7 @@ class RareDiseaseEligibilityChangeLogXlsExporter extends RareDiseaseChangeLogXls
     }
 
 
-     void buildRow(Sheet sheet, List<String> line) {
+     void buildRow(SheetDefinition sheet, List<String> line) {
         sheet.row {
             line.eachWithIndex{ String cellValue, int i ->
                 cell {

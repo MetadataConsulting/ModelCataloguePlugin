@@ -1,11 +1,9 @@
 package org.modelcatalogue.gel.export
 
 import groovy.util.logging.Log4j
-import org.modelcatalogue.builder.spreadsheet.api.Sheet
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.audit.AuditService
-
-import static org.modelcatalogue.core.audit.ChangeType.PROPERTY_CHANGED
+import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
 
 /**
  * Created by rickrees on 18/04/2016.
@@ -28,7 +26,7 @@ class RareDiseasePhenotypeChangeLogXlsExporter extends RareDiseaseChangeLogXlsEx
     }
 
     @Override
-    void buildSheet(Sheet sheet, List lines) {
+    void buildSheet(SheetDefinition sheet, List lines) {
         sheet.with {
             row(1) {
                 cell {
@@ -116,7 +114,7 @@ class RareDiseasePhenotypeChangeLogXlsExporter extends RareDiseaseChangeLogXlsEx
         lines
     }
 
-    void buildRow(Sheet sheet, List<String> line) {
+    void buildRow(SheetDefinition sheet, List<String> line) {
         sheet.row {
             line.eachWithIndex{ String cellValue, int i ->
                 cell {
