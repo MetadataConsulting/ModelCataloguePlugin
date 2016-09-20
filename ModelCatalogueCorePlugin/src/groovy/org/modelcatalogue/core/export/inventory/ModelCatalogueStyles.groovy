@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.export.inventory
 
-import org.modelcatalogue.builder.spreadsheet.api.CanDefineStyle
-import org.modelcatalogue.builder.spreadsheet.api.Stylesheet
+import org.modelcatalogue.spreadsheet.builder.api.CanDefineStyle
+import org.modelcatalogue.spreadsheet.builder.api.Stylesheet
 
 class ModelCatalogueStyles implements Stylesheet {
 

@@ -1,6 +1,6 @@
 package org.modelcatalogue.gel.export
 
-import org.modelcatalogue.builder.spreadsheet.api.Sheet
+import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
 import org.modelcatalogue.core.CatalogueElement
 
 /**
@@ -20,7 +20,7 @@ interface XlsExporter {
      * @param sheet The Excel sheet that you are populating
      * @param lines Collection of row strings produced by {@link org.modelcatalogue.gel.export.XlsExporter#searchExportSpecificTypes searchExportSpecificTypes()}
      */
-    void buildSheet(Sheet sheet, List lines)
+    void buildSheet(SheetDefinition sheet, List lines)
 
     /**
      * operates at level 5
@@ -28,9 +28,9 @@ interface XlsExporter {
     List<String> searchExportSpecificTypes(CatalogueElement model, List lines, groupDescriptions, level)
 
     /**
-     * Method called to descend through the data class hierarchy, ultimately calling {@link org.modelcatalogue.gel.export.XlsExporter#generateLine generateLine()}
+     * Method called to descend through the data class hierarchy
      * @param element Probably top-level data class
-     * @param lines Collection of Strings to be populated by {@link org.modelcatalogue.gel.export.XlsExporter#generateLine generateLine()}
+     * @param lines Collection of Strings
      * @param level Level requested at
      * @param groupDescriptions Map of change descriptions
      */

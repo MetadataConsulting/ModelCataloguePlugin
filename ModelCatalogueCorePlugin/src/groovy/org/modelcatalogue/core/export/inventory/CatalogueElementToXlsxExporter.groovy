@@ -7,11 +7,11 @@ import com.google.common.collect.Iterables
 import com.google.common.collect.Multimap
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.modelcatalogue.builder.spreadsheet.api.Cell
-import org.modelcatalogue.builder.spreadsheet.api.Sheet
-import org.modelcatalogue.builder.spreadsheet.api.SpreadsheetBuilder
-import org.modelcatalogue.builder.spreadsheet.api.Workbook
-import org.modelcatalogue.builder.spreadsheet.poi.PoiSpreadsheetBuilder
+import org.modelcatalogue.spreadsheet.builder.api.CellDefinition
+import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
+import org.modelcatalogue.spreadsheet.builder.api.SpreadsheetBuilder
+import org.modelcatalogue.spreadsheet.builder.api.WorkbookDefinition
+import org.modelcatalogue.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.CatalogueElementService
 import org.modelcatalogue.core.DataElement
@@ -82,7 +82,7 @@ class CatalogueElementToXlsxExporter {
         element.hasModelCatalogueId() && !element.modelCatalogueId.startsWith('http') ? element.modelCatalogueId : element.combinedVersion
     }
 
-    protected static void buildIntroduction(Sheet sheet, CatalogueElement dataModel) {
+    protected static void buildIntroduction(SheetDefinition sheet, CatalogueElement dataModel) {
         sheet.with {
             row {
                 cell {
@@ -213,10 +213,10 @@ class CatalogueElementToXlsxExporter {
         log.info "Exporting Data Class ${element.name} (${element.combinedVersion}) to inventory spreadsheet."
 
         SpreadsheetBuilder builder = new PoiSpreadsheetBuilder()
-        builder.build(outputStream) { Workbook workbook ->
+        builder.build(outputStream) { WorkbookDefinition workbook ->
             apply ModelCatalogueStyles
 
-            sheet("Introduction") { Sheet sheet ->
+            sheet("Introduction") { SheetDefinition sheet ->
                 buildIntroduction(sheet, element)
             }
 
@@ -224,7 +224,7 @@ class CatalogueElementToXlsxExporter {
 
             buildDataClassesDetails(dataClasses, elementForDiff, workbook, null)
 
-            sheet(CONTENT) { Sheet sheet ->
+            sheet(CONTENT) { SheetDefinition sheet ->
                 buildOutline(sheet, dataClasses, elementForDiff)
             }
 
@@ -256,7 +256,7 @@ class CatalogueElementToXlsxExporter {
 
     }
 
-    protected void buildDataClassesDetails(Iterable<DataClass> dataClasses, CatalogueElement elementForDiff, Workbook workbook, Sheet sheet, int level = 0, Set<Long> processed = new HashSet<Long>()) {
+    protected void buildDataClassesDetails(Iterable<DataClass> dataClasses, CatalogueElement elementForDiff, WorkbookDefinition workbook, SheetDefinition sheet, int level = 0, Set<Long> processed = new HashSet<Long>()) {
         if (level > depth) {
             log.info "${' ' * level}- skipping ${dataClasses*.name} as the level is already $level (max. depth is $depth)"
             return
@@ -266,7 +266,7 @@ class CatalogueElementToXlsxExporter {
         }
     }
 
-    protected void buildDataClassesDetailsWithRelationships(Iterable<Relationship> relationships, CatalogueElement elementForDiff, Multimap<String, Diff> parentDiffs, Workbook workbook, Sheet sheet, boolean terminal, int level = 0, Set<Long> processed = new HashSet<Long>()) {
+    protected void buildDataClassesDetailsWithRelationships(Iterable<Relationship> relationships, CatalogueElement elementForDiff, Multimap<String, Diff> parentDiffs, WorkbookDefinition workbook, SheetDefinition sheet, boolean terminal, int level = 0, Set<Long> processed = new HashSet<Long>()) {
         if (level > depth) {
             log.info "${' ' * level}- skipping ${relationships*.destination*.name} as the level is already $level (max. depth is $depth)"
             return
@@ -288,7 +288,7 @@ class CatalogueElementToXlsxExporter {
         return elementForDiff
     }
 
-    private void buildSheets(DataClass dataClassForDetail, Relationship relationship, CatalogueElement elementForDiff, Multimap<String, Diff> parentDiffs, Workbook workbook, Sheet sheet, boolean terminal, int level = 0, Set<Long> processed = new HashSet<Long>()) {
+    private void buildSheets(DataClass dataClassForDetail, Relationship relationship, CatalogueElement elementForDiff, Multimap<String, Diff> parentDiffs, WorkbookDefinition workbook, SheetDefinition sheet, boolean terminal, int level = 0, Set<Long> processed = new HashSet<Long>()) {
         if (dataClassForDetail.id in processed) {
             log.info "${' ' * level}- skipping ${dataClassForDetail.name} as it is already processed"
             return
@@ -316,7 +316,7 @@ class CatalogueElementToXlsxExporter {
                 return
             }
             sheetsPrinted << dataClassForDetail.id
-            workbook.sheet(getSafeSheetName(dataClassForDetail)) { Sheet s ->
+            workbook.sheet(getSafeSheetName(dataClassForDetail)) { SheetDefinition s ->
                 buildBackToContentLink(s)
                 log.info "${' ' * level}- printing ${dataClassForDetail.name} on new sheet"
                 buildDataClassDetail(s, dataClassForDetail, relationship, elementForDiff, diffs, parentDiffs)
@@ -350,7 +350,7 @@ class CatalogueElementToXlsxExporter {
         sheetsPrinted << dataClassForDetail.id
 
         // top level sheet
-        workbook.sheet(getSafeSheetName(dataClassForDetail)) { Sheet s ->
+        workbook.sheet(getSafeSheetName(dataClassForDetail)) { SheetDefinition s ->
             buildBackToContentLink(s)
             log.info "${' ' * level}- printing ${dataClassForDetail.name} on new sheet"
             buildDataClassDetail(s, dataClassForDetail, relationship, elementForDiff, diffs, parentDiffs)
@@ -399,7 +399,7 @@ class CatalogueElementToXlsxExporter {
         ref.replaceAll(/[^\p{Alnum}\\_]/, '_')
     }
 
-    private static buildBackToContentLink(Sheet sheet) {
+    private static buildBackToContentLink(SheetDefinition sheet) {
         sheet.row {
             cell {
                 value '<< Back to Content'
@@ -423,7 +423,7 @@ class CatalogueElementToXlsxExporter {
     }
 
 
-    private void buildDataClassDetail(Sheet sheet, DataClass dataClass, Relationship relationship, CatalogueElement elementForDiff, Multimap<String, Diff> diffs, Multimap<String, Diff> parentDiffs) {
+    private void buildDataClassDetail(SheetDefinition sheet, DataClass dataClass, Relationship relationship, CatalogueElement elementForDiff, Multimap<String, Diff> diffs, Multimap<String, Diff> parentDiffs) {
 
         sheet.with {
             row {
@@ -508,7 +508,7 @@ class CatalogueElementToXlsxExporter {
         }
     }
 
-    private static String getRef(Sheet sheet, DataClass dataClass) {
+    private static String getRef(SheetDefinition sheet, DataClass dataClass) {
         "${sheet.name()}_${dataClass.id}"
     }
     private static String getRef(DataClass sheetOwner, DataClass dataClass) {
@@ -541,7 +541,7 @@ class CatalogueElementToXlsxExporter {
         diffs
     }
 
-    private buildContainedElements(Sheet sheet, DataClass dataClass, CatalogueElement elementForDiff, Multimap<String, Diff> dataClassDiffs) {
+    private buildContainedElements(SheetDefinition sheet, DataClass dataClass, CatalogueElement elementForDiff, Multimap<String, Diff> dataClassDiffs) {
         sheet.with {
             row {
                 cell {
@@ -605,7 +605,7 @@ class CatalogueElementToXlsxExporter {
         }.collect { it.otherValue as Relationship }
     }
 
-    private void buildDataElement(Sheet sheet, Relationship containsRelationship, CatalogueElement elementForDiff, Multimap<String, Diff> dataClassDiffs) {
+    private void buildDataElement(SheetDefinition sheet, Relationship containsRelationship, CatalogueElement elementForDiff, Multimap<String, Diff> dataClassDiffs) {
 
         DataElement element = containsRelationship.destination as DataElement
         DataType dataType = element.dataType
@@ -702,7 +702,7 @@ class CatalogueElementToXlsxExporter {
             }
 
             if (dataType) {
-                cell(DATA_TYPE_FIRST_COLUMN) { Cell theCell ->
+                cell(DATA_TYPE_FIRST_COLUMN) { CellDefinition theCell ->
                     if (dataType.description) {
                         text dataType.description
                     }
@@ -763,7 +763,7 @@ class CatalogueElementToXlsxExporter {
                             bold
                         }
                     }
-                    cell { Cell cell ->
+                    cell { CellDefinition cell ->
                         text type.rule
                         style ModelCatalogueStyles.DESCRIPTION
                     }
@@ -788,9 +788,9 @@ class CatalogueElementToXlsxExporter {
         }
     }
 
-    private static printEnumeration(Sheet sheet, Enumeration entry, ImmutableMultimap<String, Diff> dataTypeDiffs) {
+    private static printEnumeration(SheetDefinition sheet, Enumeration entry, ImmutableMultimap<String, Diff> dataTypeDiffs) {
         sheet.row {
-            cell(DATA_TYPE_FIRST_COLUMN) { Cell cell ->
+            cell(DATA_TYPE_FIRST_COLUMN) { CellDefinition cell ->
                 text entry.key, {
                     bold
                     if (entry.deprecated) {
@@ -800,7 +800,7 @@ class CatalogueElementToXlsxExporter {
                 }
                 styles withChangesHighlight(null, dataTypeDiffs, Diff.keyForEnumeration(entry.id))
             }
-            cell { Cell cell ->
+            cell { CellDefinition cell ->
                 text entry.value, {
                     if (entry.deprecated) {
                         italic
@@ -879,7 +879,7 @@ class CatalogueElementToXlsxExporter {
         return "${min}..${max}"
     }
 
-    protected void buildOutline(Sheet sheet, List<DataClass> dataClasses, CatalogueElement elementForDiff) {
+    protected void buildOutline(SheetDefinition sheet, List<DataClass> dataClasses, CatalogueElement elementForDiff) {
         sheet.with {
             row {
                 cell {
@@ -922,13 +922,13 @@ class CatalogueElementToXlsxExporter {
         }
     }
 
-    private void buildDataClassesOutline(Sheet sheet, List<DataClass> dataClasses, CatalogueElement elementForDiff) {
+    private void buildDataClassesOutline(SheetDefinition sheet, List<DataClass> dataClasses, CatalogueElement elementForDiff) {
         dataClasses.each { DataClass dataClass ->
             buildChildOutline(sheet, dataClass, dataClass, null, elementForDiff, 1, ImmutableMultimap.of())
         }
     }
 
-    protected void buildChildOutline(Sheet sheet, DataClass dataClass, DataClass sheetOwner, Relationship relationship, CatalogueElement elementForDiff, int level, Multimap<String, Diff> parentDiffs, boolean terminal = false) {
+    protected void buildChildOutline(SheetDefinition sheet, DataClass dataClass, DataClass sheetOwner, Relationship relationship, CatalogueElement elementForDiff, int level, Multimap<String, Diff> parentDiffs, boolean terminal = false) {
 
         String[] relDiffKeys = new String[0]
         String[] multiplicityRelDiffKeys = new String[0]
