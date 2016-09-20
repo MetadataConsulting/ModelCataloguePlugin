@@ -41,7 +41,7 @@ class ModelCatalogueStyles implements Stylesheet {
             style(H1) {
                 align center center
                 font {
-                    bold
+                    make bold
                     size 22
                     color cornflowerBlue
                 }
@@ -49,7 +49,7 @@ class ModelCatalogueStyles implements Stylesheet {
             style(H2) {
                 align center center
                 font {
-                    bold
+                    make bold
                     size 16
                     color cornflowerBlue
                 }
@@ -98,7 +98,7 @@ class ModelCatalogueStyles implements Stylesheet {
             }
             style(INNER_TABLE_HEADER) {
                 font {
-                    bold
+                    make bold
                     size 12
                     color cornflowerBlue
                 }
@@ -106,7 +106,7 @@ class ModelCatalogueStyles implements Stylesheet {
             }
             style(NOTE) {
                 font {
-                    italic
+                    make italic
                     color dimGray
                     align center center
                 }
@@ -114,19 +114,19 @@ class ModelCatalogueStyles implements Stylesheet {
             style(PROPERTY_TITLE) {
                 font {
                     color dimGray
-                    bold
+                    make bold
                 }
             }
             style(DIM_GRAY_FONT) {
                 font {
                     color dimGray
-                    bold
+                    make bold
                 }
             }
             style(DATA_ELEMENT) {
                 foreground whiteSmoke
                 font {
-                    bold
+                    make bold
                 }
                 indent 1
             }
@@ -143,21 +143,21 @@ class ModelCatalogueStyles implements Stylesheet {
                 align bottom right
                 foreground whiteSmoke
                 font {
-                    bold
+                    make bold
                 }
             }
             style(DATA_ELEMENT_CENTER_CENTER) {
                 align center center
                 foreground whiteSmoke
                 font {
-                    bold
+                    make bold
                 }
             }
             style(DATA_ELEMENT_TOP_RIGHT) {
                 align top right
                 foreground whiteSmoke
                 font {
-                    bold
+                    make bold
                 }
             }
             style(DATA_ELEMENT_DESCRIPTION_ROW) {
@@ -168,7 +168,7 @@ class ModelCatalogueStyles implements Stylesheet {
             style(METADATA_KEY) {
                 font {
                     size 10
-                    bold
+                    make bold
                     indent 4
                 }
             }
@@ -180,7 +180,7 @@ class ModelCatalogueStyles implements Stylesheet {
             }
             style (LINK) {
                 font {
-                    underline
+                    make underline
                 }
             }
             style (THIN_DARK_GREY_BORDER) {
@@ -205,7 +205,7 @@ class ModelCatalogueStyles implements Stylesheet {
             style (CHANGE_REMOVAL) {
                 foreground mistyRose
                 font {
-                    strikeout
+                    make strikeout
                     color '#D2787B'
                 }
 

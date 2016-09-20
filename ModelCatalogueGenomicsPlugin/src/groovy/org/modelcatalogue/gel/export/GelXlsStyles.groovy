@@ -12,7 +12,7 @@ class GelXlsStyles implements Stylesheet {
                 background('#dbebf6')
                 align center left
                 font {
-                    bold
+                    make bold
                     size 12
                     color black
                 }
@@ -21,7 +21,7 @@ class GelXlsStyles implements Stylesheet {
                 background('#c2efcf')
                 align center left
                 font {
-                    bold
+                    make bold
                     size 12
                     color black
                 }
@@ -30,7 +30,7 @@ class GelXlsStyles implements Stylesheet {
                 wrap text
                 align center left
                 font {
-                    bold
+                    make bold
                     size 12
                     color black
                 }
@@ -44,7 +44,7 @@ class GelXlsStyles implements Stylesheet {
                 }
                 align center left
                 font {
-                    bold
+                    make bold
                     size 12
                     color black
                 }

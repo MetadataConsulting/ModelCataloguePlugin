@@ -7,10 +7,12 @@ import com.google.common.collect.Iterables
 import com.google.common.collect.Multimap
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.modelcatalogue.spreadsheet.api.Sheet
 import org.modelcatalogue.spreadsheet.builder.api.CellDefinition
 import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
 import org.modelcatalogue.spreadsheet.builder.api.SpreadsheetBuilder
 import org.modelcatalogue.spreadsheet.builder.api.WorkbookDefinition
+import org.modelcatalogue.spreadsheet.builder.poi.PoiSheetDefinition
 import org.modelcatalogue.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.CatalogueElementService
@@ -509,7 +511,10 @@ class CatalogueElementToXlsxExporter {
     }
 
     private static String getRef(SheetDefinition sheet, DataClass dataClass) {
-        "${sheet.name()}_${dataClass.id}"
+        if (sheet instanceof Sheet) {
+            return "${sheet.name}_${dataClass.id}"
+        }
+        throw new IllegalArgumentException("Please, provide a readable sheet")
     }
     private static String getRef(DataClass sheetOwner, DataClass dataClass) {
         "${getSafeSheetName(sheetOwner)}_${dataClass.id}"
@@ -730,7 +735,7 @@ class CatalogueElementToXlsxExporter {
                 cell("F") {
                     text 'Enumerations', {
                         size 12
-                        bold
+                        make bold
                     }
                     colspan 2
                 }
@@ -751,7 +756,7 @@ class CatalogueElementToXlsxExporter {
                 cell("F") {
                     text 'Rules', {
                         size 12
-                        bold
+                        make bold
                     }
                     colspan 2
                 }
@@ -760,7 +765,7 @@ class CatalogueElementToXlsxExporter {
                 sheet.row {
                     cell(DATA_TYPE_FIRST_COLUMN) {
                         text type.name, {
-                            bold
+                            make bold
                         }
                     }
                     cell { CellDefinition cell ->
@@ -792,9 +797,9 @@ class CatalogueElementToXlsxExporter {
         sheet.row {
             cell(DATA_TYPE_FIRST_COLUMN) { CellDefinition cell ->
                 text entry.key, {
-                    bold
+                    make bold
                     if (entry.deprecated) {
-                        italic
+                        make italic
                         color lightGray
                     }
                 }
@@ -803,7 +808,7 @@ class CatalogueElementToXlsxExporter {
             cell { CellDefinition cell ->
                 text entry.value, {
                     if (entry.deprecated) {
-                        italic
+                        make italic
                         color lightGray
                     }
                 }

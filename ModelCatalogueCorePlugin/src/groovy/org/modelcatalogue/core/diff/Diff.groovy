@@ -21,18 +21,30 @@ class Diff {
     }
 
     static String keyForExtension(String extensionName) {
+        if (!extensionName) {
+            return null
+        }
         return "ext:$extensionName"
     }
 
     static String keyForRelationship(Relationship relationship) {
+        if (!relationship) {
+            return null
+        }
         return "rel:${relationship.source.latestVersionId ?: relationship.source.id}=[${relationship.relationshipType.name}]=>${relationship.destination.latestVersionId ?: relationship.destination.id}"
     }
 
     static String keyForRelationshipExtension(Relationship relationship, String extensionName) {
+        if (!relationship) {
+            return null
+        }
         return "rel:${relationship.source.latestVersionId ?: relationship.source.id}=[${relationship.relationshipType.name}/$extensionName]=>${relationship.destination.latestVersionId ?: relationship.destination.id}"
     }
 
     static String keyForEnumeration(Long id) {
+        if (!id) {
+            return null
+        }
         return "enum:$id"
     }
 

@@ -23,6 +23,7 @@ import static java.lang.Boolean.FALSE
 import static java.lang.Boolean.TRUE
 import static java.util.Map.Entry
 import static org.modelcatalogue.core.audit.ChangeType.*
+import static RareDiseaseChangeLogXlsExporter.RareDiseaseChangeType.*
 
 /**
  * Created by rickrees on 18/04/2016.

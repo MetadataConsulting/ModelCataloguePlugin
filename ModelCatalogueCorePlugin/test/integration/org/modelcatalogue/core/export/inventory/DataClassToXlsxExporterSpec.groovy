@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.export.inventory
 
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.core.*
@@ -11,6 +12,7 @@ class DataClassToXlsxExporterSpec extends AbstractIntegrationSpec {
     ElementService elementService
     DataModelService dataModelService
     DataClassService dataClassService
+    GrailsApplication grailsApplication
 
     @Rule
     TemporaryFolder temporaryFolder = new TemporaryFolder()
