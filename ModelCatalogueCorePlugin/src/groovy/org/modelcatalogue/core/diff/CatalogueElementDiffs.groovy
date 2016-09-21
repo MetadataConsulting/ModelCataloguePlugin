@@ -63,16 +63,18 @@ class CatalogueElementDiffs {
                     CatalogueElement otherElement = (CatalogueElement) otherValue
 
                     if ((selfElement?.latestVersionId ?: selfElement?.id) != (otherElement?.latestVersionId ?: otherElement?.id)) {
-                        builder.put(Diff.keyForProperty(property.name), Diff.createPropertyChange(property.name, selfValue, otherValue))
+                        builder.put(Diff.keyForProperty(property.name), Diff.createPropertyChange(property.name, self, selfValue, otherValue))
                     }
                 } else {
                     if (selfValue != otherValue) {
-                        builder.put(Diff.keyForProperty(property.name), Diff.createPropertyChange(property.name, selfValue, otherValue))
+                        builder.put(Diff.keyForProperty(property.name), Diff.createPropertyChange(property.name, self, selfValue, otherValue))
                     }
                 }
 
             }
         }
+
+
 
         if (selfClass.fullName == EnumeratedType.name) {
             Enumerations selfEnumerations = self.getProperty(ENUMERATIONS_OBJECT) as Enumerations
@@ -81,14 +83,14 @@ class CatalogueElementDiffs {
                 for (Enumeration enumeration in selfEnumerations) {
                     Enumeration otherEnumeration = otherEnumerations.getEnumerationById(enumeration.id)
                     if (enumeration.key != otherEnumeration?.key || enumeration.value != otherEnumeration?.value || enumeration.deprecated != otherEnumeration?.deprecated) {
-                        builder.put(Diff.keyForEnumeration(enumeration.id), Diff.createEnumerationChange(enumeration.id, enumeration, otherEnumeration))
+                        builder.put(Diff.keyForEnumeration(enumeration.id), Diff.createEnumerationChange(self, enumeration.id, enumeration, otherEnumeration))
                     }
                 }
 
                 Set<Long> missingEnumerations = Sets.difference(otherEnumerations.iterator().collect { it.id }.toSet(), selfEnumerations.iterator().collect { it.id }.toSet())
 
                 for (Long id in missingEnumerations) {
-                    builder.put(Diff.keyForEnumeration(id), Diff.createEnumerationChange(id, null, otherEnumerations.getEnumerationById(id)))
+                    builder.put(Diff.keyForEnumeration(id), Diff.createEnumerationChange(self, id, null, otherEnumerations.getEnumerationById(id)))
                 }
             }
         }
@@ -98,14 +100,14 @@ class CatalogueElementDiffs {
             String otherValue = other.ext[extension.key]
 
             if (selfValue != otherValue) {
-                builder.put(Diff.keyForExtension(extension.key), Diff.createExtensionChange(extension.key, selfValue, otherValue))
+                builder.put(Diff.keyForExtension(extension.key), Diff.createExtensionChange(extension.key, self, selfValue, otherValue))
             }
         }
 
         Set<String> missingExtensions = Sets.difference(other.ext.keySet(), self.ext.keySet())
 
         for(String key in missingExtensions) {
-            builder.put(Diff.keyForExtension(key), Diff.createExtensionChange(key, null, other.ext[key]))
+            builder.put(Diff.keyForExtension(key), Diff.createExtensionChange(key, self, null, other.ext[key]))
         }
 
         ImmutableMap<String, Relationship> selfRelationships = collectRelationships(self)
@@ -116,7 +118,7 @@ class CatalogueElementDiffs {
             Relationship otherRelationship = otherRelationships[rel.key]
 
             if (!otherRelationship) {
-                builder.put(rel.key, Diff.createMissingRelationship(rel.value))
+                builder.put(rel.key, Diff.createMissingRelationship(self, rel.value))
                 continue
             }
             for(Map.Entry<String, String> extension in selfRelationship.ext) {
@@ -125,21 +127,21 @@ class CatalogueElementDiffs {
 
                 if (selfValue != otherValue) {
                     String changeKey = Diff.keyForRelationshipExtension(selfRelationship, extension.key)
-                    builder.put(changeKey, Diff.createRelationshipMetadataChange(selfRelationship, extension.key, selfValue, otherValue))
+                    builder.put(changeKey, Diff.createRelationshipMetadataChange(selfRelationship, extension.key, self, selfValue, otherValue))
                 }
             }
 
             Set<String> missingRelationshipExtensions = Sets.difference(otherRelationship.ext.keySet(), selfRelationship.ext.keySet())
 
             for(String key in missingRelationshipExtensions) {
-                builder.put(Diff.keyForRelationshipExtension(otherRelationship, key), Diff.createRelationshipMetadataChange(otherRelationship, key, null, otherRelationship.ext[key]))
+                builder.put(Diff.keyForRelationshipExtension(otherRelationship, key), Diff.createRelationshipMetadataChange(otherRelationship, key, self, null, otherRelationship.ext[key]))
             }
         }
 
         Set<String> missingRelationships = Sets.difference(otherRelationships.keySet(), selfRelationships.keySet())
 
         for(String key in missingRelationships) {
-            builder.put(key, Diff.createNewRelationship(otherRelationships[key]))
+            builder.put(key, Diff.createNewRelationship(self, otherRelationships[key]))
         }
 
         return builder.build()

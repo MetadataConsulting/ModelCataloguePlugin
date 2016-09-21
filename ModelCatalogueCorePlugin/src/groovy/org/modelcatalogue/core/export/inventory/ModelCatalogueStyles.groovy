@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.export.inventory
 
+import org.modelcatalogue.spreadsheet.api.Color
+import org.modelcatalogue.spreadsheet.api.HTMLColorProvider
 import org.modelcatalogue.spreadsheet.builder.api.CanDefineStyle
 import org.modelcatalogue.spreadsheet.builder.api.Stylesheet
 
@@ -22,6 +24,7 @@ class ModelCatalogueStyles implements Stylesheet {
     public static final String DATA_ELEMENT_CENTER_CENTER = 'data-element-center-center'
     public static final String CENTER_CENTER = 'center-center'
     public static final String CENTER_RIGHT = 'center-right'
+    public static final String CENTER_LEFT = 'center-left'
     public static final String BOTTOM_RIGHT = 'bottom-right'
     public static final String DATA_ELEMENT_TOP_RIGHT = 'data-element-top-right'
     public static final String DATA_ELEMENT_DESCRIPTION_ROW = 'data-element-description-row'
@@ -33,6 +36,9 @@ class ModelCatalogueStyles implements Stylesheet {
     public static final String CHANGE_NEW = 'change-new'
     public static final String CHANGE_UPDATE = 'change-update'
     public static final String CHANGE_REMOVAL = 'change-removal'
+    public static final Color CHANGE_NEW_COLOR = new Color('#E2EFDB')
+    public static final Color CHANGE_UPDATE_COLOR = new Color('#DDEBF6')
+    public static final Color CHANGE_REMOVAL_COLOR = HTMLColorProvider.mistyRose
 
 
     @Override
@@ -139,6 +145,9 @@ class ModelCatalogueStyles implements Stylesheet {
             style(CENTER_RIGHT) {
                 align center right
             }
+            style(CENTER_LEFT) {
+                align center left
+            }
             style(DATA_ELEMENT_BOTTOM_RIGHT) {
                 align bottom right
                 foreground whiteSmoke
@@ -190,20 +199,20 @@ class ModelCatalogueStyles implements Stylesheet {
                 }
             }
             style (CHANGE_NEW) {
-                foreground '#E2EFDB'
+                foreground CHANGE_NEW_COLOR
                 font {
                   color darkGreen
                 }
             }
             style (CHANGE_UPDATE) {
-                foreground '#DDEBF6'
+                foreground CHANGE_UPDATE_COLOR
                 font {
                     color darkBlue
 
                 }
             }
             style (CHANGE_REMOVAL) {
-                foreground mistyRose
+                foreground CHANGE_REMOVAL_COLOR
                 font {
                     make strikeout
                     color '#D2787B'

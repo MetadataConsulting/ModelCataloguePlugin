@@ -65,7 +65,7 @@ grails.project.dependency.resolution = {
 
         compile 'org.jsoup:jsoup:1.8.3'
 
-        compile 'org.modelcatalogue:spreadsheet-builder-poi:0.3.0-rc2'
+        compile 'org.modelcatalogue:spreadsheet-builder-poi:0.3.0-rc4'
 
         compile 'org.apache.poi:poi:3.13'
         compile 'org.apache.poi:poi-ooxml:3.13'

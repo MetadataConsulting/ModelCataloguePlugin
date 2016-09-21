@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.Iterables
 import com.google.common.collect.Multimap
+import grails.util.GrailsNameUtils
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.spreadsheet.api.Sheet
@@ -12,7 +13,6 @@ import org.modelcatalogue.spreadsheet.builder.api.CellDefinition
 import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
 import org.modelcatalogue.spreadsheet.builder.api.SpreadsheetBuilder
 import org.modelcatalogue.spreadsheet.builder.api.WorkbookDefinition
-import org.modelcatalogue.spreadsheet.builder.poi.PoiSheetDefinition
 import org.modelcatalogue.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.CatalogueElementService
@@ -38,6 +38,10 @@ import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 
+import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHANGE_NEW
+import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHANGE_REMOVAL
+import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHANGE_UPDATE
+import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H2
 
 @Log4j
@@ -90,19 +94,19 @@ class CatalogueElementToXlsxExporter {
                 cell {
                     value dataModel.name
                     colspan 4
-                    style ModelCatalogueStyles.H1
+                    style H1
                 }
             }
             row {
                 cell {
                     value "Version: $dataModel.dataModelSemanticVersion"
                     colspan 4
-                    style ModelCatalogueStyles.H1
+                    style H1
                 }
             }
             row {
                 cell {
-                    style ModelCatalogueStyles.H1
+                    style H1
                     colspan 4
                 }
             }
@@ -137,7 +141,7 @@ class CatalogueElementToXlsxExporter {
             row {
                 cell {
                     value 'Version'
-                    styles ModelCatalogueStyles.INNER_TABLE_HEADER, ModelCatalogueStyles.THIN_DARK_GREY_BORDER, ModelCatalogueStyles.DIM_GRAY_FONT
+                    styles ModelCatalogueStyles.INNER_TABLE_HEADER, ModelCatalogueStyles.THIN_DARK_GREY_BORDER
                     width 12
                 }
                 cell {
@@ -152,7 +156,7 @@ class CatalogueElementToXlsxExporter {
                 }
                 cell {
                     value 'Owner\'s Name'
-                    styles ModelCatalogueStyles.INNER_TABLE_HEADER, ModelCatalogueStyles.THIN_DARK_GREY_BORDER, ModelCatalogueStyles.DIM_GRAY_FONT
+                    styles ModelCatalogueStyles.INNER_TABLE_HEADER, ModelCatalogueStyles.THIN_DARK_GREY_BORDER
                     width 40
                 }
             }
@@ -222,7 +226,9 @@ class CatalogueElementToXlsxExporter {
                 buildIntroduction(sheet, element)
             }
 
-            sheet(CONTENT) {}
+            sheet(CONTENT) { }
+
+            sheet('Changes') { }
 
             buildDataClassesDetails(dataClasses, elementForDiff, workbook, null)
 
@@ -230,31 +236,89 @@ class CatalogueElementToXlsxExporter {
                 buildOutline(sheet, dataClasses, elementForDiff)
             }
 
-//            sheet('Changes') {
-//
-//                for (Map.Entry<String, Multimap<String, Diff>> entry in computedDiffs.entrySet()) {
-//                    for (Diff diff in entry.value.values()) {
-//                        row {
-//                            cell {
-//                                value diff.key
-//                                width 50
-//                            }
-//                            cell {
-//                                value String.valueOf(diff.selfValue)
-//                                width 100
-//                            }
-//                            cell {
-//                                value String.valueOf(diff.otherValue)
-//                                width 100
-//                            }
-//                        }
-//                    }
-//                }
-//            }
+            log.info "Printing all changes summary."
+
+            sheet('Changes') {
+                row {
+                    cell {
+                        style H1
+                        value 'Changes Summary'
+                        colspan 6
+                }   }
+                row {
+                    cell {
+                        value 'ID'
+                        width 10
+                        styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                    }
+                    cell {
+                        value 'Type'
+                        width 15
+                        styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                    }
+                    cell {
+                        value 'Name'
+                        width 25
+                        styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                    }
+                    cell {
+                        value 'Description'
+                        width 35
+                        styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                    }
+                    cell {
+                        value 'Old Value'
+                        width 35
+                        styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                    }
+                    cell {
+                        value 'New Value'
+                        width 35
+                        styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                    }
+                }
+                log.info "Sorting changes"
+                Iterable<Diff> allDiffs = Iterables.concat(computedDiffs.values().collect { it.values() }).sort { a, b ->
+                    int byName = a.element.name <=> b.element.name
+                    if (byName != 0) {
+                        return byName
+                    }
+                    return a.changeDescription <=> b.changeDescription
+                }
+                log.info "Printing ${allDiffs.size()} changes"
+                for (Diff diff in allDiffs) {
+                    row {
+                        cell {
+                            value getModelCatalogueIdToPrint(diff.element)
+                            styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
+                        }
+                        cell {
+                            value GrailsNameUtils.getNaturalName(HibernateHelper.getEntityClass(diff.element).simpleName)
+                            styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
+                        }
+                        cell {
+                            value diff.element.name
+                            styles withDiffStyles(diff, ModelCatalogueStyles.DESCRIPTION, ModelCatalogueStyles.CENTER_LEFT)
+                        }
+                        cell {
+                            value diff.changeDescription
+                            styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
+                        }
+                        cell {
+                            value humanReadableValue(diff.otherValue)
+                            styles withDiffStyles(diff, ModelCatalogueStyles.DESCRIPTION)
+                        }
+                        cell {
+                            value humanReadableValue(diff.selfValue)
+                            styles withDiffStyles(diff, ModelCatalogueStyles.DESCRIPTION)
+                        }
+                    }
+                }
+            }
 
         }
 
-        log.info "Exported Data Class ${element.name} (${element.combinedVersion}) to inventory spreadsheet."
+        log.info "Exported ${GrailsNameUtils.getNaturalName(HibernateHelper.getEntityClass(element).simpleName)} ${element.name} (${element.combinedVersion}) to inventory spreadsheet."
 
     }
 
@@ -390,7 +454,13 @@ class CatalogueElementToXlsxExporter {
             return null
         }
 
-        return (T) CatalogueElement.findByLatestVersionIdAndDataModel(catalogueElement.latestVersionId ?: catalogueElement.id, otherDataModel)
+        T result = (T) CatalogueElement.findByLatestVersionIdAndDataModel(catalogueElement.latestVersionId ?: catalogueElement.id, otherDataModel)
+
+        if (result) {
+            return result
+        }
+
+        return null
     }
 
     private static String getSafeSheetName(DataClass dataClassForDetail) {
@@ -670,6 +740,7 @@ class CatalogueElementToXlsxExporter {
                     value dataType.name
                     styles Iterables.concat(withChangesHighlight('data-element', dataElementDiffs, 'dataType'), withChangesHighlight(null, dataClassDiffs, Diff.keyForRelationship(containsRelationship)))
                     colspan 2
+                    comment dataType.dataModelSemanticVersion
                 }
 
                 if (measurementUnit) {
@@ -751,7 +822,7 @@ class CatalogueElementToXlsxExporter {
 
         }
 
-        if (typeHierarchy.items.any { it.rule }) {
+        if (typeHierarchy.items.any { it.rule } || dataType.rule) {
             sheet.row {
                 cell("F") {
                     text 'Rules', {
@@ -761,16 +832,21 @@ class CatalogueElementToXlsxExporter {
                     colspan 2
                 }
             }
-            for (DataType type in typeHierarchy.items) {
-                sheet.row {
-                    cell(DATA_TYPE_FIRST_COLUMN) {
-                        text type.name, {
-                            make bold
+
+            for (DataType type in [dataType] + typeHierarchy.items) {
+                ImmutableMultimap<String, Diff> dataTypeWithRuleDiffs = collectDiffs(type, elementForDiff)
+
+                if (type.rule || dataTypeWithRuleDiffs.containsKey('rule')) {
+                    sheet.row {
+                        cell(DATA_TYPE_FIRST_COLUMN) {
+                            text type.name, {
+                                make bold
+                            }
                         }
-                    }
-                    cell { CellDefinition cell ->
-                        text type.rule
-                        style ModelCatalogueStyles.DESCRIPTION
+                        cell { CellDefinition cell ->
+                            text(type.rule ?: (dataTypeWithRuleDiffs.get('rule') ? dataTypeWithRuleDiffs.get('rule').first().otherValue?.toString() : null))
+                            styles withChangesHighlight(ModelCatalogueStyles.DESCRIPTION, dataTypeWithRuleDiffs, 'rule')
+                        }
                     }
                 }
             }
@@ -835,14 +911,30 @@ class CatalogueElementToXlsxExporter {
         }
 
         if (interestingDiffs.any { it.otherMissing } ) {
-            ret.add(ModelCatalogueStyles.CHANGE_NEW)
+            ret.add(CHANGE_NEW)
         } else if (interestingDiffs.any { it.selfMissing } ) {
-            ret.add(ModelCatalogueStyles.CHANGE_REMOVAL)
+            ret.add(CHANGE_REMOVAL)
         } else if (interestingDiffs.any { it.update } ) {
-            ret.add(ModelCatalogueStyles.CHANGE_UPDATE)
+            ret.add(CHANGE_UPDATE)
         }
 
         ret.build()
+    }
+
+    private static Iterable<String> withDiffStyles(Diff diff, String... otherStyles) {
+        ImmutableList.Builder<String> ret = ImmutableList.builder()
+
+        ret.add(otherStyles)
+
+        if (diff.isOtherMissing()) {
+            ret.add CHANGE_NEW
+        } else if (diff.isSelfMissing()){
+            ret.add CHANGE_REMOVAL
+        } else {
+            ret.add CHANGE_UPDATE
+        }
+
+        return ret.build()
     }
 
     protected static int getRowSpanForDataTypeDetails(DataType dataType, ListWithTotalAndType<DataType> typeHierarchy, Collection<Diff> missingEnums) {
@@ -859,8 +951,11 @@ class CatalogueElementToXlsxExporter {
         }
 
         int ruleCount = typeHierarchy.items.count { it.rule }
-        if (ruleCount > 0) {
+        if (ruleCount > 0 || dataType.rule) {
             rowspan += 1 + ruleCount
+            if (dataType.rule) {
+                rowspan += 1
+            }
         }
 
         if (missingEnums) {
@@ -885,6 +980,7 @@ class CatalogueElementToXlsxExporter {
     }
 
     protected void buildOutline(SheetDefinition sheet, List<DataClass> dataClasses, CatalogueElement elementForDiff) {
+        log.info "Printing outline"
         sheet.with {
             row {
                 cell {
@@ -1006,5 +1102,30 @@ class CatalogueElementToXlsxExporter {
         }
 
         return dataClass == sheetOwner ? child.destination as DataClass : sheetOwner
+    }
+
+    private static humanReadableValue(Object o) {
+        if (!o) {
+            return ' '
+        }
+        if (o instanceof CharSequence) {
+            return o.toString()
+        }
+
+        if (o instanceof Enumeration) {
+            return o.value
+        }
+
+        Class type = HibernateHelper.getEntityClass(o)
+        if (CatalogueElement.isAssignableFrom(type)) {
+            CatalogueElement element = o as CatalogueElement
+            return element.name
+        }
+        if (Relationship.isAssignableFrom(type)) {
+            Relationship rel = o as Relationship
+            return rel.destination.name
+        }
+
+        return String.valueOf(o)
     }
 }
