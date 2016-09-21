@@ -61,10 +61,10 @@ class CatalogueElementDiffsIntegrationSpec extends AbstractIntegrationSpec {
             }
         then:
             detailsDiff
-            detailsDiff.asMap().any { k, v -> k.startsWith("rel:${detailsV2.latestVersionId}=[containment/Min Occurs") }
-            detailsDiff.asMap().any { k, v -> k.startsWith("rel:${detailsV2.latestVersionId}=[containment/Max Occurs") }
-            detailsDiff.asMap().any { k, v -> k.startsWith("rel:${detailsV2.latestVersionId}=[containment/foo") }
-            detailsDiff.asMap().any { k, v -> k.startsWith("rel:${detailsV2.latestVersionId}=[containment/bar") }
+            detailsDiff.asMap().any { k, v -> k.startsWith("rex:${detailsV2.latestVersionId}=[containment/Min Occurs") }
+            detailsDiff.asMap().any { k, v -> k.startsWith("rex:${detailsV2.latestVersionId}=[containment/Max Occurs") }
+            detailsDiff.asMap().any { k, v -> k.startsWith("rex:${detailsV2.latestVersionId}=[containment/foo") }
+            detailsDiff.asMap().any { k, v -> k.startsWith("rex:${detailsV2.latestVersionId}=[containment/bar") }
             detailsDiff.asMap().any { k, v -> k.startsWith("rel:${detailsV2.latestVersionId}=[containment]=") }
 
         when:
