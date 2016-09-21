@@ -26,8 +26,8 @@ class DataModelToXlsxExporterSpec extends AbstractIntegrationSpec {
     def setup() {
         initRelationshipTypes()
         CatalogueXmlLoader loader = new CatalogueXmlLoader(catalogueBuilder)
-        loader.load(DataModelToXlsxExporterSpec.getResourceAsStream('TestDataModelV1.mc.xml'))
-        loader.load(DataModelToXlsxExporterSpec.getResourceAsStream('TestDataModelV2.mc.xml'))
+        loader.load(DataModelToXlsxExporterSpec.getResourceAsStream('TestDataModelV1.xml'))
+        loader.load(DataModelToXlsxExporterSpec.getResourceAsStream('TestDataModelV2.xml'))
         dataModel = DataModel.findByNameAndSemanticVersion('TestDataModel', '2')
     }
 

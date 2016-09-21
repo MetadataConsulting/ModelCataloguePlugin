@@ -25,8 +25,8 @@ class CatalogueElementDiffsIntegrationSpec extends AbstractIntegrationSpec {
 
     def "some diff" () {
         when:
-            loader.load(CatalogueElementDiffsIntegrationSpec.getResourceAsStream('TestDataModelV1.mc.xml'))
-            loader.load(CatalogueElementDiffsIntegrationSpec.getResourceAsStream('TestDataModelV2.mc.xml'))
+            loader.load(CatalogueElementDiffsIntegrationSpec.getResourceAsStream('TestDataModelV1.xml'))
+            loader.load(CatalogueElementDiffsIntegrationSpec.getResourceAsStream('TestDataModelV2.xml'))
 
             DataModel testV1 = DataModel.findByNameAndSemanticVersion('TestDataModel', '1')
             DataModel testV2 = DataModel.findByNameAndSemanticVersion('TestDataModel', '2')
