@@ -1,7 +1,9 @@
 package org.modelcatalogue.core.export.inventory
 
-import org.modelcatalogue.builder.spreadsheet.api.CanDefineStyle
-import org.modelcatalogue.builder.spreadsheet.api.Stylesheet
+import org.modelcatalogue.spreadsheet.api.Color
+import org.modelcatalogue.spreadsheet.api.HTMLColorProvider
+import org.modelcatalogue.spreadsheet.builder.api.CanDefineStyle
+import org.modelcatalogue.spreadsheet.builder.api.Stylesheet
 
 class ModelCatalogueStyles implements Stylesheet {
 
@@ -21,6 +23,9 @@ class ModelCatalogueStyles implements Stylesheet {
     public static final String DATA_ELEMENT_BOTTOM_RIGHT = 'data-element-bottom-right'
     public static final String DATA_ELEMENT_CENTER_CENTER = 'data-element-center-center'
     public static final String CENTER_CENTER = 'center-center'
+    public static final String CENTER_RIGHT = 'center-right'
+    public static final String CENTER_LEFT = 'center-left'
+    public static final String BOTTOM_RIGHT = 'bottom-right'
     public static final String DATA_ELEMENT_TOP_RIGHT = 'data-element-top-right'
     public static final String DATA_ELEMENT_DESCRIPTION_ROW = 'data-element-description-row'
     public static final String METADATA_KEY = 'metadata-key'
@@ -28,6 +33,13 @@ class ModelCatalogueStyles implements Stylesheet {
     public static final String LINK = 'link'
     public static final String THIN_DARK_GREY_BORDER = 'thin-dark-grey-border'
     public static final String DIM_GRAY_FONT = 'dim-gray-font'
+    public static final String CHANGE_NEW = 'change-new'
+    public static final String CHANGE_UPDATE = 'change-update'
+    public static final String CHANGE_REMOVAL = 'change-removal'
+    public static final Color CHANGE_NEW_COLOR = new Color('#E2EFDB')
+    public static final Color CHANGE_UPDATE_COLOR = new Color('#DDEBF6')
+    public static final Color CHANGE_REMOVAL_COLOR = HTMLColorProvider.mistyRose
+
 
     @Override
     void declareStyles(CanDefineStyle stylable) {
@@ -35,7 +47,7 @@ class ModelCatalogueStyles implements Stylesheet {
             style(H1) {
                 align center center
                 font {
-                    bold
+                    make bold
                     size 22
                     color cornflowerBlue
                 }
@@ -43,7 +55,7 @@ class ModelCatalogueStyles implements Stylesheet {
             style(H2) {
                 align center center
                 font {
-                    bold
+                    make bold
                     size 16
                     color cornflowerBlue
                 }
@@ -92,7 +104,7 @@ class ModelCatalogueStyles implements Stylesheet {
             }
             style(INNER_TABLE_HEADER) {
                 font {
-                    bold
+                    make bold
                     size 12
                     color cornflowerBlue
                 }
@@ -100,7 +112,7 @@ class ModelCatalogueStyles implements Stylesheet {
             }
             style(NOTE) {
                 font {
-                    italic
+                    make italic
                     color dimGray
                     align center center
                 }
@@ -108,44 +120,53 @@ class ModelCatalogueStyles implements Stylesheet {
             style(PROPERTY_TITLE) {
                 font {
                     color dimGray
-                    bold
+                    make bold
                 }
             }
             style(DIM_GRAY_FONT) {
                 font {
                     color dimGray
-                    bold
+                    make bold
                 }
             }
             style(DATA_ELEMENT) {
                 foreground whiteSmoke
                 font {
-                    bold
+                    make bold
                 }
                 indent 1
             }
             style(CENTER_CENTER) {
                 align center center
             }
+            style(BOTTOM_RIGHT) {
+                align bottom right
+            }
+            style(CENTER_RIGHT) {
+                align center right
+            }
+            style(CENTER_LEFT) {
+                align center left
+            }
             style(DATA_ELEMENT_BOTTOM_RIGHT) {
                 align bottom right
                 foreground whiteSmoke
                 font {
-                    bold
+                    make bold
                 }
             }
             style(DATA_ELEMENT_CENTER_CENTER) {
                 align center center
                 foreground whiteSmoke
                 font {
-                    bold
+                    make bold
                 }
             }
             style(DATA_ELEMENT_TOP_RIGHT) {
                 align top right
                 foreground whiteSmoke
                 font {
-                    bold
+                    make bold
                 }
             }
             style(DATA_ELEMENT_DESCRIPTION_ROW) {
@@ -156,7 +177,7 @@ class ModelCatalogueStyles implements Stylesheet {
             style(METADATA_KEY) {
                 font {
                     size 10
-                    bold
+                    make bold
                     indent 4
                 }
             }
@@ -168,7 +189,7 @@ class ModelCatalogueStyles implements Stylesheet {
             }
             style (LINK) {
                 font {
-                    underline
+                    make underline
                 }
             }
             style (THIN_DARK_GREY_BORDER) {
@@ -176,6 +197,27 @@ class ModelCatalogueStyles implements Stylesheet {
                     style thin
                     color darkGray
                 }
+            }
+            style (CHANGE_NEW) {
+                foreground CHANGE_NEW_COLOR
+                font {
+                  color darkGreen
+                }
+            }
+            style (CHANGE_UPDATE) {
+                foreground CHANGE_UPDATE_COLOR
+                font {
+                    color darkBlue
+
+                }
+            }
+            style (CHANGE_REMOVAL) {
+                foreground CHANGE_REMOVAL_COLOR
+                font {
+                    make strikeout
+                    color '#D2787B'
+                }
+
             }
         }
     }

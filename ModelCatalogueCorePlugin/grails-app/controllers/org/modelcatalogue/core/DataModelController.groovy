@@ -31,7 +31,7 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream outputStream ->
             // reload domain class as this is called in separate thread
-            CatalogueElementToXlsxExporter.forDataModel(DataModel.get(dataModelId), dataClassService, depth).export(outputStream)
+            CatalogueElementToXlsxExporter.forDataModel(DataModel.get(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())

@@ -1,13 +1,19 @@
 package org.modelcatalogue.core.export.inventory
 
+import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
-import grails.util.Holders
+import com.google.common.collect.ImmutableMultimap
+import com.google.common.collect.Iterables
+import com.google.common.collect.Multimap
+import grails.util.GrailsNameUtils
 import groovy.util.logging.Log4j
-import org.modelcatalogue.builder.spreadsheet.api.Cell
-import org.modelcatalogue.builder.spreadsheet.api.Sheet
-import org.modelcatalogue.builder.spreadsheet.api.SpreadsheetBuilder
-import org.modelcatalogue.builder.spreadsheet.api.Workbook
-import org.modelcatalogue.builder.spreadsheet.poi.PoiSpreadsheetBuilder
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.modelcatalogue.spreadsheet.api.Sheet
+import org.modelcatalogue.spreadsheet.builder.api.CellDefinition
+import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
+import org.modelcatalogue.spreadsheet.builder.api.SpreadsheetBuilder
+import org.modelcatalogue.spreadsheet.builder.api.WorkbookDefinition
+import org.modelcatalogue.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.CatalogueElementService
 import org.modelcatalogue.core.DataElement
@@ -17,9 +23,13 @@ import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
+import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.diff.CatalogueElementDiffs
+import org.modelcatalogue.core.diff.Diff
 import org.modelcatalogue.core.enumeration.Enumeration
 import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.util.DataModelFilter
@@ -28,6 +38,10 @@ import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 
+import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHANGE_NEW
+import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHANGE_REMOVAL
+import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHANGE_UPDATE
+import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H2
 
 @Log4j
@@ -38,54 +52,61 @@ class CatalogueElementToXlsxExporter {
     public static final String DATA_TYPE_FIRST_COLUMN = 'F'
 
     final DataClassService dataClassService
+    final GrailsApplication grailsApplication
+    final CatalogueElementDiffs catalogueElementDiffs
     final Long elementId
+    final Long elementForDiffId
     final Integer depth
 
     boolean printMetadata
 
     private Map<Long, DataClass> dataClassesProcessedInOutline = [:]
-    private Set<Long> namesPrinted = new HashSet<Long>()
+    private Set<String> namesPrinted = new HashSet<String>()
     private Set<Long> sheetsPrinted = new HashSet<Long>()
 
-    static CatalogueElementToXlsxExporter forDataModel(DataModel element, DataClassService dataClassService, Integer depth = 3) {
-        return new CatalogueElementToXlsxExporter(element, dataClassService, depth)
+    static CatalogueElementToXlsxExporter forDataModel(DataModel element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3) {
+        return new CatalogueElementToXlsxExporter(element, dataClassService, grailsApplication, depth)
     }
 
-    static CatalogueElementToXlsxExporter forDataClass(DataClass element, DataClassService dataClassService, Integer depth = 3) {
-        return new CatalogueElementToXlsxExporter(element, dataClassService, depth)
+    static CatalogueElementToXlsxExporter forDataClass(DataClass element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3) {
+        return new CatalogueElementToXlsxExporter(element, dataClassService, grailsApplication,  depth)
     }
 
-    private CatalogueElementToXlsxExporter(CatalogueElement element, DataClassService dataClassService, Integer depth = 3) {
+    private CatalogueElementToXlsxExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3) {
         this.elementId = element.getId()
         this.dataClassService = dataClassService
+        this.grailsApplication = grailsApplication
         this.depth = depth
 
-        printMetadata = Holders.config.mc.export.xlsx.printMetadata ?: false
+        this.elementForDiffId = element.findPreviousVersion()?.id
+
+        this.printMetadata = grailsApplication.config.mc.export.xlsx.printMetadata ?: false
+        this.catalogueElementDiffs = new CatalogueElementDiffs(grailsApplication)
     }
 
     protected static String getModelCatalogueIdToPrint(CatalogueElement element) {
         element.hasModelCatalogueId() && !element.modelCatalogueId.startsWith('http') ? element.modelCatalogueId : element.combinedVersion
     }
 
-    protected static void buildIntroduction(Sheet sheet, CatalogueElement dataModel) {
+    protected static void buildIntroduction(SheetDefinition sheet, CatalogueElement dataModel) {
         sheet.with {
             row {
                 cell {
                     value dataModel.name
                     colspan 4
-                    style ModelCatalogueStyles.H1
+                    style H1
                 }
             }
             row {
                 cell {
                     value "Version: $dataModel.dataModelSemanticVersion"
                     colspan 4
-                    style ModelCatalogueStyles.H1
+                    style H1
                 }
             }
             row {
                 cell {
-                    style ModelCatalogueStyles.H1
+                    style H1
                     colspan 4
                 }
             }
@@ -120,7 +141,7 @@ class CatalogueElementToXlsxExporter {
             row {
                 cell {
                     value 'Version'
-                    styles ModelCatalogueStyles.INNER_TABLE_HEADER, ModelCatalogueStyles.THIN_DARK_GREY_BORDER, ModelCatalogueStyles.DIM_GRAY_FONT
+                    styles ModelCatalogueStyles.INNER_TABLE_HEADER, ModelCatalogueStyles.THIN_DARK_GREY_BORDER
                     width 12
                 }
                 cell {
@@ -135,7 +156,7 @@ class CatalogueElementToXlsxExporter {
                 }
                 cell {
                     value 'Owner\'s Name'
-                    styles ModelCatalogueStyles.INNER_TABLE_HEADER, ModelCatalogueStyles.THIN_DARK_GREY_BORDER, ModelCatalogueStyles.DIM_GRAY_FONT
+                    styles ModelCatalogueStyles.INNER_TABLE_HEADER, ModelCatalogueStyles.THIN_DARK_GREY_BORDER
                     width 40
                 }
             }
@@ -181,10 +202,11 @@ class CatalogueElementToXlsxExporter {
 
     void export(OutputStream outputStream) {
         dataClassesProcessedInOutline = [:]
-        namesPrinted = new HashSet<Long>()
+        namesPrinted = new HashSet<String>()
         sheetsPrinted = new HashSet<Long>()
 
         CatalogueElement element = CatalogueElement.get(elementId)
+        CatalogueElement elementForDiff = elementForDiffId ? CatalogueElement.get(elementForDiffId) : null
 
         List<DataClass> dataClasses = Collections.emptyList()
 
@@ -197,48 +219,142 @@ class CatalogueElementToXlsxExporter {
         log.info "Exporting Data Class ${element.name} (${element.combinedVersion}) to inventory spreadsheet."
 
         SpreadsheetBuilder builder = new PoiSpreadsheetBuilder()
-        builder.build(outputStream) { Workbook workbook ->
+        builder.build(outputStream) { WorkbookDefinition workbook ->
             apply ModelCatalogueStyles
 
-            sheet("Introduction") { Sheet sheet ->
+            sheet("Introduction") { SheetDefinition sheet ->
                 buildIntroduction(sheet, element)
             }
 
-            sheet(CONTENT) {}
+            sheet(CONTENT) { }
 
-            buildDataClassesDetails(dataClasses, workbook, null)
+            sheet('Changes') { }
 
-            sheet(CONTENT) { Sheet sheet ->
-                buildOutline(sheet, dataClasses)
+            buildDataClassesDetails(dataClasses, elementForDiff, workbook, null)
+
+            sheet(CONTENT) { SheetDefinition sheet ->
+                buildOutline(sheet, dataClasses, elementForDiff)
+            }
+
+            log.info "Printing all changes summary."
+
+            sheet('Changes') {
+                row {
+                    cell {
+                        style H1
+                        value 'Changes Summary'
+                        colspan 6
+                }   }
+                row {
+                    cell {
+                        value 'ID'
+                        width 10
+                        styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                    }
+                    cell {
+                        value 'Type'
+                        width 15
+                        styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                    }
+                    cell {
+                        value 'Name'
+                        width 25
+                        styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                    }
+                    cell {
+                        value 'Description'
+                        width 35
+                        styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                    }
+                    cell {
+                        value 'Old Value'
+                        width 35
+                        styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                    }
+                    cell {
+                        value 'New Value'
+                        width 35
+                        styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                    }
+                }
+                log.info "Sorting changes"
+                Iterable<Diff> allDiffs = Iterables.concat(computedDiffs.values().collect { it.values() }).sort { a, b ->
+                    int byName = a.element.name <=> b.element.name
+                    if (byName != 0) {
+                        return byName
+                    }
+                    return a.changeDescription <=> b.changeDescription
+                }
+                log.info "Printing ${allDiffs.size()} changes"
+                for (Diff diff in allDiffs) {
+                    row {
+                        cell {
+                            value getModelCatalogueIdToPrint(diff.element)
+                            styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
+                        }
+                        cell {
+                            value GrailsNameUtils.getNaturalName(HibernateHelper.getEntityClass(diff.element).simpleName)
+                            styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
+                        }
+                        cell {
+                            value diff.element.name
+                            styles withDiffStyles(diff, ModelCatalogueStyles.DESCRIPTION, ModelCatalogueStyles.CENTER_LEFT)
+                        }
+                        cell {
+                            value diff.changeDescription
+                            styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
+                        }
+                        cell {
+                            value humanReadableValue(diff.otherValue)
+                            styles withDiffStyles(diff, ModelCatalogueStyles.DESCRIPTION)
+                        }
+                        cell {
+                            value humanReadableValue(diff.selfValue)
+                            styles withDiffStyles(diff, ModelCatalogueStyles.DESCRIPTION)
+                        }
+                    }
+                }
             }
 
         }
 
-        log.info "Exported Data Class ${element.name} (${element.combinedVersion}) to inventory spreadsheet."
+        log.info "Exported ${GrailsNameUtils.getNaturalName(HibernateHelper.getEntityClass(element).simpleName)} ${element.name} (${element.combinedVersion}) to inventory spreadsheet."
 
     }
 
-    protected void buildDataClassesDetails(Iterable<DataClass> dataClasses, Workbook workbook, Sheet sheet, int level = 0, Set<Long> processed = new HashSet<Long>()) {
+    protected void buildDataClassesDetails(Iterable<DataClass> dataClasses, CatalogueElement elementForDiff, WorkbookDefinition workbook, SheetDefinition sheet, int level = 0, Set<Long> processed = new HashSet<Long>()) {
         if (level > depth) {
             log.info "${' ' * level}- skipping ${dataClasses*.name} as the level is already $level (max. depth is $depth)"
             return
         }
         for (DataClass dataClassForDetail in dataClasses) {
-            buildSheets(dataClassForDetail, null, workbook, sheet, level, processed)
+            buildSheets(dataClassForDetail, null, elementForDiff, ImmutableMultimap.of(), workbook, sheet, false, level, processed)
         }
     }
 
-    protected void buildDataClassesDetailsWithRelationships(Iterable<Relationship> relationships, Workbook workbook, Sheet sheet, int level = 0, Set<Long> processed = new HashSet<Long>()) {
+    protected void buildDataClassesDetailsWithRelationships(Iterable<Relationship> relationships, CatalogueElement elementForDiff, Multimap<String, Diff> parentDiffs, WorkbookDefinition workbook, SheetDefinition sheet, boolean terminal, int level = 0, Set<Long> processed = new HashSet<Long>()) {
         if (level > depth) {
             log.info "${' ' * level}- skipping ${relationships*.destination*.name} as the level is already $level (max. depth is $depth)"
             return
         }
         for (Relationship relationship in relationships) {
-            buildSheets(relationship.destination as DataClass, relationship, workbook, sheet, level, processed)
+            buildSheets(relationship.destination as DataClass, relationship, nextElementToDiff(elementForDiff, relationship), parentDiffs, workbook, sheet, terminal, level, processed)
         }
     }
 
-    private void buildSheets(DataClass dataClassForDetail, Relationship relationship, Workbook workbook, Sheet sheet, int level = 0, Set<Long> processed = new HashSet<Long>()) {
+    private static CatalogueElement nextElementToDiff(CatalogueElement elementForDiff, Relationship processedRelationship) {
+        if (elementForDiff && processedRelationship.source.dataModel != processedRelationship.destination.dataModel) {
+            String key = Diff.keyForRelationship(processedRelationship)
+            CatalogueElement other = findOther(processedRelationship.source, elementForDiff)
+            if (other) {
+                Relationship previous = other.outgoingRelationships.find { Diff.keyForRelationship(it) == key }
+                return (previous ?: processedRelationship).destination.dataModel
+            }
+        }
+        return elementForDiff
+    }
+
+    private void buildSheets(DataClass dataClassForDetail, Relationship relationship, CatalogueElement elementForDiff, Multimap<String, Diff> parentDiffs, WorkbookDefinition workbook, SheetDefinition sheet, boolean terminal, int level = 0, Set<Long> processed = new HashSet<Long>()) {
         if (dataClassForDetail.id in processed) {
             log.info "${' ' * level}- skipping ${dataClassForDetail.name} as it is already processed"
             return
@@ -247,11 +363,18 @@ class CatalogueElementToXlsxExporter {
         processed << dataClassForDetail.id
         log.info "Exporting detail for Data Class ${dataClassForDetail.name} (${dataClassForDetail.combinedVersion})"
 
+        ImmutableMultimap<String, Diff> diffs = collectDiffs(dataClassForDetail, elementForDiff)
+
         if (isSkipExport(dataClassForDetail)) {
             log.info "${' ' * level}- skipped as ${Metadata.SKIP_EXPORT} evaluates to true"
-            buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, workbook, sheet, level + 1, processed)
+            if (!terminal) {
+                buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, elementForDiff, diffs, workbook, sheet, false, level + 1, processed)
+                buildDataClassesDetailsWithRelationships(findDeleted(dataClassForDetail, diffs, RelationshipType.hierarchyType), elementForDiff, diffs, workbook, sheet, true, level + 1, processed)
+            }
             return
         }
+
+
 
         // always render subsections on the new sheet
         if (isSubsection(dataClassForDetail, relationship)) {
@@ -259,11 +382,15 @@ class CatalogueElementToXlsxExporter {
                 return
             }
             sheetsPrinted << dataClassForDetail.id
-            workbook.sheet(getSafeSheetName(dataClassForDetail)) { Sheet s ->
+            workbook.sheet(getSafeSheetName(dataClassForDetail)) { SheetDefinition s ->
                 buildBackToContentLink(s)
                 log.info "${' ' * level}- printing ${dataClassForDetail.name} on new sheet"
-                buildDataClassDetail(s, dataClassForDetail)
-                buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, workbook, s, level + 1, new HashSet<Long>([dataClassForDetail.id]))
+                buildDataClassDetail(s, dataClassForDetail, relationship, elementForDiff, diffs, parentDiffs)
+
+                if (!terminal) {
+                    buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, elementForDiff, diffs, workbook, s, false, level + 1, new HashSet<Long>([dataClassForDetail.id]))
+                    buildDataClassesDetailsWithRelationships(findDeleted(dataClassForDetail, diffs, RelationshipType.hierarchyType), elementForDiff, diffs, workbook, s, true, level + 1, new HashSet<Long>([dataClassForDetail.id]))
+                }
 
                 row()
                 buildBackToContentLink(s)
@@ -274,8 +401,11 @@ class CatalogueElementToXlsxExporter {
         // inside subsection use existing sheet
         if (sheet) {
             log.info "${' ' * level}- printing ${dataClassForDetail.name} on existing sheet"
-            buildDataClassDetail(sheet, dataClassForDetail)
-            buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, workbook, sheet, level + 1, processed)
+            buildDataClassDetail(sheet, dataClassForDetail, relationship, elementForDiff, diffs, parentDiffs)
+            if (!terminal) {
+                buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, elementForDiff, diffs, workbook, sheet, false, level + 1, processed)
+                buildDataClassesDetailsWithRelationships(findDeleted(dataClassForDetail, diffs, RelationshipType.hierarchyType), elementForDiff, diffs, workbook, sheet, true, level + 1, processed)
+            }
             return
         }
 
@@ -286,23 +416,62 @@ class CatalogueElementToXlsxExporter {
         sheetsPrinted << dataClassForDetail.id
 
         // top level sheet
-        workbook.sheet(getSafeSheetName(dataClassForDetail)) { Sheet s ->
+        workbook.sheet(getSafeSheetName(dataClassForDetail)) { SheetDefinition s ->
             buildBackToContentLink(s)
             log.info "${' ' * level}- printing ${dataClassForDetail.name} on new sheet"
-            buildDataClassDetail(s, dataClassForDetail)
+            buildDataClassDetail(s, dataClassForDetail, relationship, elementForDiff, diffs, parentDiffs)
             // force top level sheets for children
-            buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, workbook, null, level + 1, processed)
+            if (!terminal) {
+                buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, elementForDiff, diffs, workbook, null, false, level + 1, processed)
+                buildDataClassesDetailsWithRelationships(findDeleted(dataClassForDetail, diffs, RelationshipType.hierarchyType), elementForDiff, diffs, workbook, null, true, level + 1, processed)
+            }
 
             row()
             buildBackToContentLink(s)
         }
     }
 
-    private static String getSafeSheetName(DataClass dataClassForDetail) {
-        "${getModelCatalogueIdToPrint(dataClassForDetail)} ${normalizeDataClassName(dataClassForDetail)}".replaceAll(/[^\p{Alnum}\\_]/, '_')
+    static <T extends CatalogueElement> T findOther(T catalogueElement, CatalogueElement topLevelOtherElement) {
+        // FIXME: won't work outside data model!!!
+        if (!topLevelOtherElement) {
+            return null
+        }
+
+        // returning null prevents unnecessary the comparison
+        if (topLevelOtherElement == catalogueElement || catalogueElement.dataModel == topLevelOtherElement) {
+            return null
+        }
+
+        DataModel otherDataModel
+
+        if (HibernateHelper.getEntityClass(topLevelOtherElement) == DataModel) {
+            otherDataModel = (DataModel) topLevelOtherElement
+        } else {
+            otherDataModel = topLevelOtherElement.dataModel
+        }
+
+        if (!otherDataModel) {
+            return null
+        }
+
+        T result = (T) CatalogueElement.findByLatestVersionIdAndDataModel(catalogueElement.latestVersionId ?: catalogueElement.id, otherDataModel)
+
+        if (result) {
+            return result
+        }
+
+        return null
     }
 
-    private static buildBackToContentLink(Sheet sheet) {
+    private static String getSafeSheetName(DataClass dataClassForDetail) {
+        getSafeName("${getModelCatalogueIdToPrint(dataClassForDetail)} ${normalizeDataClassName(dataClassForDetail)}")
+    }
+
+    private static String getSafeName(String ref) {
+        ref.replaceAll(/[^\p{Alnum}\\_]/, '_')
+    }
+
+    private static buildBackToContentLink(SheetDefinition sheet) {
         sheet.row {
             cell {
                 value '<< Back to Content'
@@ -326,7 +495,8 @@ class CatalogueElementToXlsxExporter {
     }
 
 
-    private void buildDataClassDetail(Sheet sheet, DataClass dataClass) {
+    private void buildDataClassDetail(SheetDefinition sheet, DataClass dataClass, Relationship relationship, CatalogueElement elementForDiff, Multimap<String, Diff> diffs, Multimap<String, Diff> parentDiffs) {
+
         sheet.with {
             row {
                 cell {
@@ -360,25 +530,27 @@ class CatalogueElementToXlsxExporter {
             row {
                 cell {
                     value dataClass.name
-                    if (!(dataClass.id in namesPrinted)) {
-                        name getSafeSheetName(dataClass)
-                        namesPrinted << dataClass.id
+
+                    String ref = getRef(sheet, dataClass)
+
+                    if (!(ref in namesPrinted)) {
+                        name getSafeName(ref)
+                        namesPrinted << ref
                     }
-                    style 'h1'
+                    styles withChangesHighlight('h1', parentDiffs, Diff.keyForRelationship(relationship))
                     colspan 7
                 }
             }
             row {
-                if (dataClass.description) {
+                 if (dataClass.description) {
                     cell {
                         value dataClass.description
-
                         height 100
 
-                        style 'description'
+                        styles 'description'
                         colspan 7
                     }
-                }
+                 }
             }
 
             row {
@@ -403,12 +575,48 @@ class CatalogueElementToXlsxExporter {
             }
 
             if (dataClass.countContains()) {
-                buildContainedElements(it, dataClass)
+                buildContainedElements(it, dataClass, elementForDiff, diffs)
             }
         }
     }
 
-    private buildContainedElements(Sheet sheet, DataClass dataClass) {
+    private static String getRef(SheetDefinition sheet, DataClass dataClass) {
+        if (sheet instanceof Sheet) {
+            return "${sheet.name}_${dataClass.id}"
+        }
+        throw new IllegalArgumentException("Please, provide a readable sheet")
+    }
+    private static String getRef(DataClass sheetOwner, DataClass dataClass) {
+        "${getSafeSheetName(sheetOwner)}_${dataClass.id}"
+    }
+
+
+    private Map<String,ImmutableMultimap<String, Diff>> computedDiffs = [:]
+
+    private ImmutableMultimap<String, Diff> collectDiffs(CatalogueElement element, CatalogueElement elementForDiff) {
+        if (!element || !elementForDiff) {
+            return ImmutableMultimap.of()
+        }
+
+        String key = "$element.id=>$elementForDiff.id"
+
+        if (computedDiffs.containsKey(key)) {
+            return computedDiffs[key]
+        }
+
+        Multimap<String, Diff> diffs = ImmutableMultimap.of()
+        CatalogueElement other = findOther(element, elementForDiff)
+
+        if (other) {
+            diffs = catalogueElementDiffs.differentiate(element, other)
+        }
+
+        computedDiffs[key] = diffs
+
+        diffs
+    }
+
+    private buildContainedElements(SheetDefinition sheet, DataClass dataClass, CatalogueElement elementForDiff, Multimap<String, Diff> dataClassDiffs) {
         sheet.with {
             row {
                 cell {
@@ -458,172 +666,278 @@ class CatalogueElementToXlsxExporter {
 
 
             for (Relationship containsRelationship in dataClass.containsRelationships) {
-                DataElement element = containsRelationship.destination as DataElement
-                row {
-                    cell {
-                        value getModelCatalogueIdToPrint(element)
-                        style 'data-element-bottom-right'
-                    }
-                    cell {
-                        value element.status
-                        style 'data-element-center-center'
-                    }
-                    cell {
-                        value element.name
-                        style 'data-element'
-                        colspan 2
-                    }
-                    cell {
-                        value getMultiplicity(containsRelationship)
-                        style 'data-element-top-right'
-                    }
-                    if (element.dataType) {
-                        cell {
-                            value element.dataType.name
-                            style 'data-element'
-                            colspan 2
-                        }
+                buildDataElement(sheet, containsRelationship, elementForDiff, dataClassDiffs)
+            }
+            for (Relationship deleted in findDeleted(dataClass, dataClassDiffs, RelationshipType.containmentType)) {
+                buildDataElement(sheet, deleted, elementForDiff, dataClassDiffs)
+            }
+        }
+    }
 
-                        if (element.dataType.instanceOf(PrimitiveType) && element.dataType.measurementUnit) {
-                            cell {
-                                value element.dataType.measurementUnit.name
-                                style 'data-element'
-                            }
-                        } else {
-                            cell()
-                        }
+    private static List<Relationship> findDeleted(DataClass dataClass, Multimap<String, Diff> diffs, RelationshipType type) {
+        diffs.values().findAll {
+            it.relationshipChange && it.selfMissing && it.key.startsWith("rel:${dataClass.latestVersionId ?: dataClass.id}=[${type.name}]=")
+        }.collect { it.otherValue as Relationship }
+    }
 
-                        if (element.dataType.instanceOf(ReferenceType) && element.dataType.dataClass) {
-                            cell {
-                                value element.dataType.dataClass.name
-                                style 'data-element'
-                            }
-                        } else {
-                            cell()
-                        }
-                    } else {
-                        3.times { cell() }
+    private void buildDataElement(SheetDefinition sheet, Relationship containsRelationship, CatalogueElement elementForDiff, Multimap<String, Diff> dataClassDiffs) {
+
+        DataElement element = containsRelationship.destination as DataElement
+        DataType dataType = element.dataType
+
+        ImmutableMultimap<String, Diff> dataElementDiffs = collectDiffs(element, elementForDiff)
+        ImmutableMultimap<String, Diff> dataTypeDiffs = collectDiffs(element.dataType, elementForDiff)
+        Collection<Diff> missingEnums = dataTypeDiffs.values().findAll { it.enumerationChange && it.selfMissing }
+
+        ListWithTotalAndType<DataType> typeHierarchy = dataType ? ElementService.getTypeHierarchy([:], dataType) : Lists.emptyListWithTotalAndType(DataType)
+
+        if (!dataType && dataElementDiffs.get('dataType')) {
+            Diff removedDataType = dataElementDiffs.get('dataType').find { it.selfMissing }
+            if (removedDataType) {
+                dataType = removedDataType.otherValue as DataType
+            }
+        }
+
+        MeasurementUnit measurementUnit = dataType?.instanceOf(PrimitiveType) ? dataType.measurementUnit : null
+
+        if (!measurementUnit && dataTypeDiffs.get('measurementUnit')) {
+            Diff removedUnit = dataElementDiffs.get('measurementUnit').find { it.selfMissing }
+            if (removedUnit) {
+                measurementUnit = removedUnit.otherValue as MeasurementUnit
+            }
+        }
+
+        DataClass referencedClass = dataType?.instanceOf(ReferenceType) ? dataType.dataClass : null
+
+        if (!referencedClass && dataTypeDiffs.get('dataClass')) {
+            Diff removedClass = dataElementDiffs.get('dataClass').find { it.selfMissing }
+            if (removedClass) {
+                referencedClass = removedClass.otherValue as DataClass
+            }
+        }
+
+        sheet.row {
+            cell {
+                value getModelCatalogueIdToPrint(element)
+                styles withChangesHighlight('data-element-bottom-right', dataClassDiffs, Diff.keyForRelationship(containsRelationship))
+            }
+            cell {
+                value element.status
+                styles withChangesHighlight('data-element-center-center', dataClassDiffs, Diff.keyForRelationship(containsRelationship))
+            }
+            cell {
+                value element.name
+                styles withChangesHighlight('data-element', dataClassDiffs, Diff.keyForRelationship(containsRelationship))
+                colspan 2
+            }
+            cell {
+                value getMultiplicity(containsRelationship)
+                styles withChangesHighlight('data-element-top-right', dataClassDiffs, Diff.keyForRelationshipExtension(containsRelationship, Metadata.MIN_OCCURS), Diff.keyForRelationshipExtension(containsRelationship, Metadata.MAX_OCCURS), Diff.keyForRelationship(containsRelationship))
+            }
+
+            if (dataType) {
+                cell {
+                    value dataType.name
+                    styles Iterables.concat(withChangesHighlight('data-element', dataElementDiffs, 'dataType'), withChangesHighlight(null, dataClassDiffs, Diff.keyForRelationship(containsRelationship)))
+                    colspan 2
+                    comment dataType.dataModelSemanticVersion
+                }
+
+                if (measurementUnit) {
+                    cell {
+                        value measurementUnit.name
+                        styles Iterables.concat(withChangesHighlight('data-element', dataTypeDiffs, 'measurementUnit'), withChangesHighlight(null, dataElementDiffs, 'dataType'), withChangesHighlight(null, dataClassDiffs, Diff.keyForRelationship(containsRelationship)))
+                    }
+                } else {
+                    cell()
+                }
+
+                if (referencedClass) {
+                    cell {
+                        value referencedClass.name
+                        styles Iterables.concat(withChangesHighlight('data-element', dataTypeDiffs, 'dataClass'), withChangesHighlight(null, dataElementDiffs, 'dataType'), withChangesHighlight(null, dataClassDiffs, Diff.keyForRelationship(containsRelationship)))
+                    }
+                } else {
+                    cell()
+                }
+            } else {
+                3.times { cell() }
+            }
+        }
+
+        sheet.row {
+            style 'data-element-description-row'
+
+            cell('C') {
+                value element.description
+                colspan 3
+                int desiredRowSpan = getRowSpanForDataTypeDetails(dataType, typeHierarchy, missingEnums)
+                if (desiredRowSpan > 1) {
+                    rowspan desiredRowSpan
+                }
+            }
+
+            if (dataType) {
+                cell(DATA_TYPE_FIRST_COLUMN) { CellDefinition theCell ->
+                    if (dataType.description) {
+                        text dataType.description
+                    }
+                    colspan 2
+                }
+
+                if (measurementUnit) {
+                    cell('H') {
+                        value measurementUnit.description
                     }
                 }
 
-                ListWithTotalAndType<DataType> typeHierarchy = element.dataType ? ElementService.getTypeHierarchy([:], element.dataType) : Lists.emptyListWithTotalAndType(DataType)
+                if (referencedClass) {
+                    cell('I') {
+                        value referencedClass.description
+                    }
+                }
 
-                row {
-                    style 'data-element-description-row'
+            }
 
+        }
+
+        if (HibernateHelper.getEntityClass(dataType) == EnumeratedType && dataType.enumerations) {
+            sheet.row {
+                cell("F") {
+                    text 'Enumerations', {
+                        size 12
+                        make bold
+                    }
+                    colspan 2
+                }
+            }
+            Enumerations enumerations = dataType.enumerationsObject
+            for (Enumeration entry in enumerations) {
+                printEnumeration(sheet, entry, dataTypeDiffs)
+            }
+
+            for (Diff diff in missingEnums) {
+                printEnumeration(sheet, diff.otherValue as Enumeration, dataTypeDiffs)
+            }
+
+        }
+
+        if (typeHierarchy.items.any { it.rule } || dataType.rule) {
+            sheet.row {
+                cell("F") {
+                    text 'Rules', {
+                        size 12
+                        make bold
+                    }
+                    colspan 2
+                }
+            }
+
+            for (DataType type in [dataType] + typeHierarchy.items) {
+                ImmutableMultimap<String, Diff> dataTypeWithRuleDiffs = collectDiffs(type, elementForDiff)
+
+                if (type.rule || dataTypeWithRuleDiffs.containsKey('rule')) {
+                    sheet.row {
+                        cell(DATA_TYPE_FIRST_COLUMN) {
+                            text type.name, {
+                                make bold
+                            }
+                        }
+                        cell { CellDefinition cell ->
+                            text(type.rule ?: (dataTypeWithRuleDiffs.get('rule') ? dataTypeWithRuleDiffs.get('rule').first().otherValue?.toString() : null))
+                            styles withChangesHighlight(ModelCatalogueStyles.DESCRIPTION, dataTypeWithRuleDiffs, 'rule')
+                        }
+                    }
+                }
+            }
+        }
+
+        if (element.ext && printMetadata) {
+            for (Map.Entry<String, String> entry in element.ext) {
+                sheet.row {
                     cell('C') {
-                        value element.description
-                        colspan 3
-                        int desiredRowSpan = getRowSpanForDataTypeDetails(element.dataType, typeHierarchy)
-                        if (desiredRowSpan > 1) {
-                            rowspan desiredRowSpan
-                        }
+                        value entry.key
+                        style 'metadata-key'
                     }
-
-                    if (element.dataType) {
-                        cell (DATA_TYPE_FIRST_COLUMN) { Cell theCell ->
-                            if (element.dataType.description) {
-                                text element.dataType.description
-                            }
-                            colspan 2
-                        }
-
-                        if (element.dataType.instanceOf(PrimitiveType) && element.dataType.measurementUnit) {
-                            cell ('H') {
-                                value element.dataType.measurementUnit.description
-                            }
-                        }
-
-                        if (element.dataType.instanceOf(ReferenceType) && element.dataType.dataClass) {
-                            cell ('I') {
-                                value element.dataType.dataClass.description
-                            }
-                        }
-
-                    }
-
-                }
-
-                if (HibernateHelper.getEntityClass(element.dataType) == EnumeratedType && element.dataType.enumerations) {
-                    row {
-                        cell("F") {
-                            text 'Enumerations', {
-                                size 12
-                                bold
-                            }
-                            colspan 2
-                        }
-                    }
-                    Enumerations enumerations = element.dataType.enumerationsObject
-                    for (Enumeration entry in enumerations) {
-                        row {
-                            cell(DATA_TYPE_FIRST_COLUMN) { Cell cell ->
-                                cell.text entry.key, {
-                                    bold
-                                    if (entry.deprecated) {
-                                        italic
-                                        color lightGray
-                                    }
-                                }
-                            }
-                            cell { Cell cell ->
-                                text entry.value, {
-                                    if (entry.deprecated) {
-                                        italic
-                                        color lightGray
-                                    }
-                                }
-                                style ModelCatalogueStyles.DESCRIPTION
-                            }
-                        }
-                    }
-                }
-
-                if (typeHierarchy.items.any { it.rule }) {
-                    row {
-                        cell("F") {
-                            text 'Rules', {
-                                size 12
-                                bold
-                            }
-                            colspan 2
-                        }
-                    }
-                    for (DataType type in typeHierarchy.items) {
-                        row {
-                            cell(DATA_TYPE_FIRST_COLUMN) {
-                                text type.name, {
-                                    bold
-                                }
-                            }
-                            cell { Cell cell ->
-                                text type.rule
-                                style ModelCatalogueStyles.DESCRIPTION
-                            }
-                        }
-                    }
-                }
-
-                if (element.ext && printMetadata) {
-                    for (Map.Entry<String, String> entry in element.ext) {
-                        row {
-                            cell('C') {
-                                value entry.key
-                                style 'metadata-key'
-                            }
-                            cell {
-                                value entry.value
-                                style 'metadata-value'
-                                colspan 2
-                            }
-                        }
+                    cell {
+                        value entry.value
+                        style 'metadata-value'
+                        colspan 2
                     }
                 }
             }
         }
     }
 
-    protected static int getRowSpanForDataTypeDetails(DataType dataType, ListWithTotalAndType<DataType> typeHierarchy) {
+    private static printEnumeration(SheetDefinition sheet, Enumeration entry, ImmutableMultimap<String, Diff> dataTypeDiffs) {
+        sheet.row {
+            cell(DATA_TYPE_FIRST_COLUMN) { CellDefinition cell ->
+                text entry.key, {
+                    make bold
+                    if (entry.deprecated) {
+                        make italic
+                        color lightGray
+                    }
+                }
+                styles withChangesHighlight(null, dataTypeDiffs, Diff.keyForEnumeration(entry.id))
+            }
+            cell { CellDefinition cell ->
+                text entry.value, {
+                    if (entry.deprecated) {
+                        make italic
+                        color lightGray
+                    }
+                }
+                styles withChangesHighlight(ModelCatalogueStyles.DESCRIPTION, dataTypeDiffs, Diff.keyForEnumeration(entry.id))
+            }
+        }
+    }
+
+    private static Iterable<String> withChangesHighlight(String style, Multimap<String, Diff> diffs, String... diffKeys) {
+        ImmutableList.Builder<String> ret = ImmutableList.builder()
+
+        if (style) {
+            ret.add(style)
+        }
+
+        if (!diffKeys || !diffs) {
+            return ret.build()
+        }
+
+        Collection<Diff> interestingDiffs = diffKeys.collect { diffs.get(it) }.flatten() as Collection<Diff>
+
+        if (!interestingDiffs) {
+            return ret.build()
+        }
+
+        if (interestingDiffs.any { it.otherMissing } ) {
+            ret.add(CHANGE_NEW)
+        } else if (interestingDiffs.any { it.selfMissing } ) {
+            ret.add(CHANGE_REMOVAL)
+        } else if (interestingDiffs.any { it.update } ) {
+            ret.add(CHANGE_UPDATE)
+        }
+
+        ret.build()
+    }
+
+    private static Iterable<String> withDiffStyles(Diff diff, String... otherStyles) {
+        ImmutableList.Builder<String> ret = ImmutableList.builder()
+
+        ret.add(otherStyles)
+
+        if (diff.isOtherMissing()) {
+            ret.add CHANGE_NEW
+        } else if (diff.isSelfMissing()){
+            ret.add CHANGE_REMOVAL
+        } else {
+            ret.add CHANGE_UPDATE
+        }
+
+        return ret.build()
+    }
+
+    protected static int getRowSpanForDataTypeDetails(DataType dataType, ListWithTotalAndType<DataType> typeHierarchy, Collection<Diff> missingEnums) {
         if (!dataType) {
             return 1
         }
@@ -637,8 +951,15 @@ class CatalogueElementToXlsxExporter {
         }
 
         int ruleCount = typeHierarchy.items.count { it.rule }
-        if (ruleCount > 0) {
+        if (ruleCount > 0 || dataType.rule) {
             rowspan += 1 + ruleCount
+            if (dataType.rule) {
+                rowspan += 1
+            }
+        }
+
+        if (missingEnums) {
+            rowspan += missingEnums.size()
         }
 
         return rowspan
@@ -658,7 +979,8 @@ class CatalogueElementToXlsxExporter {
         return "${min}..${max}"
     }
 
-    protected void buildOutline(Sheet sheet, List<DataClass> dataClasses) {
+    protected void buildOutline(SheetDefinition sheet, List<DataClass> dataClasses, CatalogueElement elementForDiff) {
+        log.info "Printing outline"
         sheet.with {
             row {
                 cell {
@@ -687,7 +1009,7 @@ class CatalogueElementToXlsxExporter {
                 }
             }
 
-            buildDataClassesOutline(it, dataClasses)
+            buildDataClassesOutline(it, dataClasses, elementForDiff)
 
             // footer
             row()
@@ -701,42 +1023,50 @@ class CatalogueElementToXlsxExporter {
         }
     }
 
-    private void buildDataClassesOutline(Sheet sheet, List<DataClass> dataClasses) {
+    private void buildDataClassesOutline(SheetDefinition sheet, List<DataClass> dataClasses, CatalogueElement elementForDiff) {
         dataClasses.each { DataClass dataClass ->
-            buildChildOutline(sheet, dataClass, null, 1)
+            buildChildOutline(sheet, dataClass, dataClass, null, elementForDiff, 1, ImmutableMultimap.of())
         }
     }
 
-    protected void buildChildOutline(Sheet sheet, DataClass dataClass, Relationship relationship, int level) {
+    protected void buildChildOutline(SheetDefinition sheet, DataClass dataClass, DataClass sheetOwner, Relationship relationship, CatalogueElement elementForDiff, int level, Multimap<String, Diff> parentDiffs, boolean terminal = false) {
+
+        String[] relDiffKeys = new String[0]
+        String[] multiplicityRelDiffKeys = new String[0]
+
+        if (relationship) {
+            relDiffKeys = [Diff.keyForRelationship(relationship)] as String[]
+            multiplicityRelDiffKeys = [Diff.keyForRelationship(relationship),
+                           Diff.keyForRelationshipExtension(relationship, Metadata.MIN_OCCURS),
+                           Diff.keyForRelationshipExtension(relationship, Metadata.MAX_OCCURS)] as String[]
+        }
+
         sheet.row {
+            String ref = getRef(sheetOwner, dataClass)
+
             cell {
                 value getModelCatalogueIdToPrint(dataClass)
-                style {
-                    align bottom right
-                }
-                if (!isSkipExport(dataClass) && dataClass.id in namesPrinted) {
-                    link to name getSafeSheetName(dataClass)
+                styles withChangesHighlight(ModelCatalogueStyles.BOTTOM_RIGHT, parentDiffs, relDiffKeys)
+                if (ref in namesPrinted) {
+                    link to name getSafeName(ref)
                 }
             }
             cell {
                 value dataClass.name
-                if (!isSkipExport(dataClass) && dataClass.id in namesPrinted) {
-                    link to name getSafeSheetName(dataClass)
+                if (ref in namesPrinted) {
+                    link to name getSafeName(ref)
                 }
                 style {
-                    if (level) {
-                        indent (level * 2)
-                    }
+                    indent (level * 2)
                 }
+                styles withChangesHighlight(null, parentDiffs, relDiffKeys)
             }
             cell {
                 value getMultiplicity(relationship)
-                if (!isSkipExport(dataClass) && dataClass.id in namesPrinted) {
-                    link to name getSafeSheetName(dataClass)
+                if (ref in namesPrinted) {
+                    link to name getSafeName(ref)
                 }
-                style {
-                    align center right
-                }
+                styles withChangesHighlight(ModelCatalogueStyles.CENTER_RIGHT, parentDiffs, multiplicityRelDiffKeys)
             }
         }
 
@@ -751,14 +1081,51 @@ class CatalogueElementToXlsxExporter {
 
         dataClassesProcessedInOutline.put(dataClass.getId(), dataClass)
 
-        if (dataClass.countParentOf()) {
+        Multimap<String, Diff> diffs = collectDiffs(dataClass, elementForDiff)
+        List<Relationship> children = findDeleted(dataClass, diffs, RelationshipType.hierarchyType)
+
+        if (!terminal && children.size() + dataClass.countParentOf() > 0) {
             sheet.group {
                 for (Relationship child in dataClass.parentOfRelationships) {
-                    if (!isSubsection(dataClass, relationship)) {
-                        buildChildOutline(sheet, child.destination as DataClass, child, level + 1)
-                    }
+                    buildChildOutline(sheet, child.destination as DataClass, nextSheetOwner(child, relationship, dataClass, sheetOwner), child, nextElementToDiff(elementForDiff, child), level + 1, diffs)
+                }
+                for (Relationship child in children) {
+                    buildChildOutline(sheet, child.destination as DataClass, nextSheetOwner(child, relationship, dataClass, sheetOwner), child, nextElementToDiff(elementForDiff, child), level + 1, diffs, true)
                 }
             }
         }
+    }
+
+    private static DataClass nextSheetOwner(Relationship child, Relationship relationship, DataClass dataClass, DataClass sheetOwner) {
+        if (isSubsection(dataClass, relationship)) {
+            return dataClass
+        }
+
+        return dataClass == sheetOwner ? child.destination as DataClass : sheetOwner
+    }
+
+    private static humanReadableValue(Object o) {
+        if (!o) {
+            return ' '
+        }
+        if (o instanceof CharSequence) {
+            return o.toString()
+        }
+
+        if (o instanceof Enumeration) {
+            return o.value
+        }
+
+        Class type = HibernateHelper.getEntityClass(o)
+        if (CatalogueElement.isAssignableFrom(type)) {
+            CatalogueElement element = o as CatalogueElement
+            return element.name
+        }
+        if (Relationship.isAssignableFrom(type)) {
+            Relationship rel = o as Relationship
+            return rel.destination.name
+        }
+
+        return String.valueOf(o)
     }
 }

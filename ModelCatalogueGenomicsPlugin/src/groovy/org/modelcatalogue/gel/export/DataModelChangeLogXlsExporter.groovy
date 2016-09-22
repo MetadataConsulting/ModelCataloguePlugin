@@ -3,8 +3,7 @@ package org.modelcatalogue.gel.export
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import groovy.util.logging.Log4j
-import org.modelcatalogue.builder.spreadsheet.api.AutoKeyword
-import org.modelcatalogue.builder.spreadsheet.api.Sheet
+import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.util.DataModelFilter
@@ -74,32 +73,32 @@ class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
 
 
     @Override
-    void buildSheet(Sheet sheet, List lines) {
+    void buildSheet(SheetDefinition sheet, List lines) {
         sheet.with {
             row(1) {
                 cell {
                     value headers.get(1)
                     style 'h3' //                    height 75
-                    width AutoKeyword.AUTO
+                    width auto
                 }
                 cell {
                     value headers.get(2)
                     style 'h3'
-                    width AutoKeyword.AUTO
+                    width auto
                 }
                 cell {
                     value headers.get(3)
-                    width AutoKeyword.AUTO
+                    width auto
                     style 'h3'
                 }
                 cell {
                     value headers.get(4)
-                    width AutoKeyword.AUTO
+                    width auto
                     style 'h3'
                 }
                 cell {
                     value headers.get(5)
-                    width AutoKeyword.AUTO
+                    width auto
                     style 'h3'
                 }
                 cell {
@@ -120,14 +119,14 @@ class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
     }
 
     @Override
-    void buildRows(Sheet sheet, List<List<String>> lines) {
+    void buildRows(SheetDefinition sheet, List<List<String>> lines) {
         lines.eachWithIndex { line, int i ->
             log.debug("row $i=" + line)
             buildRow(sheet, line)
         }
     }
 
-    private buildRow(Sheet sheet, List<String> line) {
+    private buildRow(SheetDefinition sheet, List<String> line) {
         sheet.row {
             line.eachWithIndex { String cellValue, int i ->
                 cell {

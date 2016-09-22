@@ -14,7 +14,7 @@ class FileOpener {
      * Main purpose of this method is to quickly open the generated file for manual review.
      * @param file file to be opened
      */
-    static void open(File file) {
+    static void open(File file, long sleepTime = 10000) {
         if (System.getenv('FILE_OPENER_SKIP') == 'true') {
             return
         }
@@ -22,7 +22,7 @@ class FileOpener {
             if (Desktop.desktopSupported && Desktop.desktop.isSupported(Desktop.Action.OPEN)) {
                 Desktop.desktop.open(file)
                 println file
-                Thread.sleep(10000)
+                Thread.sleep(sleepTime)
             }
         } catch(e) {
             StackTraceUtils.deepSanitize(e)

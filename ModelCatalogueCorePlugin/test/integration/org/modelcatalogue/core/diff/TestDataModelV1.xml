@@ -1,0 +1,90 @@
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.1/metadataregistry.xsd">
+  <dataModel name="TestDataModel" status="FINALIZED" semanticVersion="1">
+    <description>NHIC data model i.e. data classes used the NHIC project</description>
+    <extensions>
+      <extension key="http://www.modelcatalogue.org/metadata/#reviewed">2016-03-30T11:46:30Z</extension>
+      <extension key="http://www.modelcatalogue.org/metadata/#approved">2016-03-30T11:46:30Z</extension>
+    </extensions>
+              <dataClass name="PATIENT IDENTITY DETAILS">
+                <dataElement name="NHS NUMBER*">
+                  <description>
+*For linkage purposes NHS NUMBER
+and/or
+ LOCAL PATIENT IDENTIFIER
+is required.
+
+The NHS NUMBER, the primary identifier of a PERSON, is a unique identifier for aPATIENTwithin the NHS in England and Wales. This will not vary by any ORGANISATION of which a PERSON is a PATIENT.</description>
+                  <extensions>
+                    <extension key="NHIC_Identifier:">TEST_1</extension>
+                    <extension key="Link_to_existing definition:">NHS NUMBER</extension>
+                    <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                    <extension key="[Optional]_Local_Identifier">XXXXXXX0010</extension>
+                    <extension key="A">2</extension>
+                    <extension key="B">2</extension>
+                    <extension key="C">3</extension>
+                    <extension key="D">1</extension>
+                    <extension key="E" />
+                    <extension key="F">When Patient demographics entered.</extension>
+                    <extension key="G">GC 123</extension>
+                    <extension key="H">NEO4J</extension>
+                    <extension key="E2">from source</extension>
+                  </extensions>
+                  <dataType name="String" />
+                </dataElement>
+                <dataElement name="LOCAL PATIENT IDENTIFIER*">
+                  <description>*For linkage purposes NHS NUMBER
+and/or
+ LOCAL PATIENT IDENTIFIER
+is required.
+
+This is a number used to identify a PATIENT uniquely within a Health Care Provider. It may be different from the PATIENT's casenote number and may be assigned automatically by the computer system.</description>
+                  <metadata>
+                      <extension key="Min Occurs">0</extension>
+                      <extension key="Max Occurs">100</extension>
+                      <extension key="bar">foo</extension>
+                  </metadata>
+                  <extensions>
+                    <extension key="NHIC_Identifier:">TEST_2</extension>
+                    <extension key="Link_to_existing definition:">LOCAL PATIENT IDENTIFIER</extension>
+                    <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                    <extension key="[Optional]_Local_Identifier">XXXXXXX0020</extension>
+                    <extension key="A">2</extension>
+                    <extension key="B">2</extension>
+                    <extension key="C">3</extension>
+                    <extension key="D">1</extension>
+                    <extension key="E">hard</extension>
+                    <extension key="F">When Patient demographics entered.</extension>
+                    <extension key="G">GC 124</extension>
+                    <extension key="H">NEO4J</extension>
+                    <extension key="E2">from source</extension>
+                  </extensions>
+                  <dataType name="String" />
+                </dataElement>
+                <dataElement name="testcerOrSymptomaticBreastReferralPatientStatus">
+                  <description>TESTCER OR SYMPTOMATIC BREAST REFERRAL PATIENT STATUS is recorded to enable tracking of the status of REFERRAL REQUESTS for PATIENTS referred with a suspected TESTcer, or referred with breast symptoms with TESTcer not originally suspected.
+For COSD this TEST be used for all patients regardless of referral route.</description>
+                  <dataType name="testcerOrSymptomaticBreastReferralPatientStatus">
+                    <enumerations>
+                      <enumeration value="11">Diagnosis of new TESTcer confirmed - English NHS first treatment planned</enumeration>
+                      <enumeration value="12">Diagnosis of new TESTcer confirmed - subsequent treatment not yet planned</enumeration>
+                      <enumeration value="13">Diagnosis of new TESTcer confirmed - subsequent English NHS treatment planned</enumeration>
+                      <enumeration value="14">Suspected primary TESTcer</enumeration>
+                      <enumeration value="03">No new TESTcer diagnosis identified by the Healthcare Provider</enumeration>
+                      <enumeration value="15">Suspected recurrent TESTcer</enumeration>
+                      <enumeration value="16">Diagnosis of recurrent TESTcer confirmed - first treatment not yet planned</enumeration>
+                      <enumeration value="17">Diagnosis of recurrent TESTcer confirmed - English NHS first treatment planned</enumeration>
+                      <enumeration value="07">Diagnosis of TESTcer confirmed - no English NHS treatment planned</enumeration>
+                      <enumeration value="18">Diagnosis of recurrent TESTcer confirmed - no English NHS treatment planned</enumeration>
+                      <enumeration value="08">First treatment commenced (English NHS only)</enumeration>
+                      <enumeration value="19">Diagnosis of recurrent TESTcer confirmed - subsequent treatment not yet planned</enumeration>
+                      <enumeration value="09">Under investigation following symptomatic referral, TESTcer not suspected (breast referrals only) (see note 1)</enumeration>
+                      <enumeration value="20">Diagnosis of recurrent TESTcer confirmed - subsequent English NHS treatment planned</enumeration>
+                      <enumeration value="10">Diagnosis of new TESTcer confirmed - first treatment not yet planned</enumeration>
+                      <enumeration value="21" deprecated="true">Subsequent treatment commenced (English NHS only)</enumeration>
+                      <enumeration value="22">Subsequent treatment commenced (Scottish NHS only)</enumeration>
+                    </enumerations>
+                  </dataType>
+                </dataElement>
+              </dataClass>
+  </dataModel>
+</catalogue>

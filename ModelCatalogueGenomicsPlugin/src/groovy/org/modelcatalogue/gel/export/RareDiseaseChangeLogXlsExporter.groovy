@@ -7,10 +7,10 @@ import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import groovy.util.logging.Log4j
 import org.apache.commons.lang.exception.ExceptionUtils
-import org.modelcatalogue.builder.spreadsheet.api.Sheet
-import org.modelcatalogue.builder.spreadsheet.api.SpreadsheetBuilder
-import org.modelcatalogue.builder.spreadsheet.api.Workbook
-import org.modelcatalogue.builder.spreadsheet.poi.PoiSpreadsheetBuilder
+import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
+import org.modelcatalogue.spreadsheet.builder.api.SpreadsheetBuilder
+import org.modelcatalogue.spreadsheet.builder.api.WorkbookDefinition
+import org.modelcatalogue.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.audit.Change
@@ -665,23 +665,23 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
 
     def exportLinesAsXls(String sheetName, List lines, OutputStream out) {
         SpreadsheetBuilder builder = new PoiSpreadsheetBuilder()
-        builder.build(out) { Workbook workbook ->
+        builder.build(out) { WorkbookDefinition workbook ->
             apply GelXlsStyles
-            sheet(sheetName) { Sheet sheet ->
+            sheet(sheetName) { SheetDefinition sheet ->
                 buildSheet(sheet, lines)
             }
         }
 
     }
 
-    void buildRows(Sheet sheet, List<List<String>> lines) {
+    void buildRows(SheetDefinition sheet, List<List<String>> lines) {
         lines.eachWithIndex { line, int i ->
             log.debug("row $i=" + line)
             buildRow(sheet, line)
         }
     }
 
-    private buildRow(Sheet sheet, List<String> line) {
+    private buildRow(SheetDefinition sheet, List<String> line) {
         sheet.row {
             line.eachWithIndex{ String cellValue, int i ->
                 cell {

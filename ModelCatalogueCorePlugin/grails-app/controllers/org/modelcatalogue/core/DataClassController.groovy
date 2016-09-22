@@ -111,7 +111,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
                 originalFileName: "${model.name}-${model.status}-${model.version}.xlsx",
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )  { OutputStream out ->
-            CatalogueElementToXlsxExporter.forDataClass(DataClass.get(modelId), dataClassService, depth).export(out)
+            CatalogueElementToXlsxExporter.forDataClass(DataClass.get(modelId), dataClassService, grailsApplication, depth).export(out)
         }
 
         response.setHeader("X-Asset-ID",assetId.toString())

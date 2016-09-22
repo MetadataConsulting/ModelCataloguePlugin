@@ -1,0 +1,224 @@
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.1/metadataregistry.xsd">
+  <dataModel name="TestDataModel" status="FINALIZED" semanticVersion="2">
+    <description>test data model i.e. data classes used the test project</description>
+    <extensions>
+      <extension key="http://www.modelcatalogue.org/metadata/#reviewed">2016-04-30T11:46:30Z</extension>
+      <extension key="http://www.modelcatalogue.org/metadata/#approved">2016-04-30T11:46:30Z</extension>
+    </extensions>
+              <dataClass name="PATIENT IDENTITY DETAILS">
+                <dataElement name="LOCAL PATIENT IDENTIFIER*">
+                  <description>*For linkage purposes NHS NUMBER
+and/or
+ LOCAL PATIENT IDENTIFIER
+is required.
+
+This is a number used to identify a PATIENT uniquely within a Health Care Provider. It may be different from the PATIENT's casenote number and may be assigned automatically by the computer system.</description>
+                    <metadata>
+                        <extension key="Min Occurs">1</extension>
+                        <extension key="Max Occurs">200</extension>
+                        <extension key="foo">bar</extension>
+                    </metadata>
+                    <extensions>
+                    <extension key="NHIC_Identifier:">TEST_2</extension>
+                    <extension key="Link_to_existing definition:">LOCAL PATIENT IDENTIFIER</extension>
+                    <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                    <extension key="[Optional]_Local_Identifier">XXXXXXX0020</extension>
+                    <extension key="A">2</extension>
+                    <extension key="B">2</extension>
+                    <extension key="C">3</extension>
+                    <extension key="D">1</extension>
+                    <extension key="E">hard</extension>
+                    <extension key="F">When Patient demographics entered.</extension>
+                    <extension key="G">GC 124</extension>
+                    <extension key="H">NEO4J</extension>
+                    <extension key="E2">from source</extension>
+                  </extensions>
+                  <dataType name="String" />
+                </dataElement>
+                <dataElement name="nhsNumberStatusIndicatorCode">
+                  <description>The NHS NUMBER STATUS  INDICATOR CODE indicates the verification status of the NHS number provided.</description>
+                  <extensions>
+                    <extension key="NHIC_Identifier:">TEST_3</extension>
+                    <extension key="Link_to_existing definition:">NHS NUMBER STATUS INDICATOR CODE</extension>
+                    <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                    <extension key="[Optional]_Local_Identifier">XXXXXXX1350</extension>
+                    <extension key="A">2</extension>
+                    <extension key="B">2</extension>
+                    <extension key="C">1</extension>
+                    <extension key="D">1</extension>
+                    <extension key="E">1</extension>
+                    <extension key="F">When Patient demographics entered.</extension>
+                    <extension key="G">GC 125</extension>
+                    <extension key="H">NEO4J</extension>
+                    <extension key="E2">from source</extension>
+                  </extensions>
+                  <dataType name="nhsNumberStatusIndicatorCode">
+                    <enumerations>
+                      <enumeration value="01">Number present and verified</enumeration>
+                      <enumeration value="02">Number present but not traced</enumeration>
+                      <enumeration value="03">Trace required</enumeration>
+                      <enumeration value="04">Trace attempted - No match or multiple match found</enumeration>
+                      <enumeration value="05">Trace needs to be resolved - (NHS Number or patient detail conflict)</enumeration>
+                      <enumeration value="06">Trace in progress</enumeration>
+                      <enumeration value="07">Number not present and trace not required</enumeration>
+                      <enumeration value="08">Trace postponed (baby under six weeks old)</enumeration>
+                    </enumerations>
+                  </dataType>
+                </dataElement>
+                <dataElement name="PERSON BIRTH DATE">
+                  <description>The date on which a PERSON was born or is officially deemed to have been born.</description>
+                  <extensions>
+                    <extension key="NHIC_Identifier:">TEST_4</extension>
+                    <extension key="Link_to_existing definition:">PERSON BIRTH DATE</extension>
+                    <extension key="Notes_from_GD_JCIS" />
+                    <extension key="[Optional]_Local_Identifier">XXXXXXX0100</extension>
+                    <extension key="A">2</extension>
+                    <extension key="B">2</extension>
+                    <extension key="C">1</extension>
+                    <extension key="D">1</extension>
+                    <extension key="E">1</extension>
+                    <extension key="F">When Patient demographics entered.</extension>
+                    <extension key="G">GC 126</extension>
+                    <extension key="H">NEO4J</extension>
+                    <extension key="E2">from source</extension>
+                  </extensions>
+                  <dataType name="String" />
+                </dataElement>
+                <dataElement name="ORGANISATION CODE (CODE OF PROVIDER)">
+                  <description>ORGANISATION CODE (CODE OF PROVIDER) is the ORGANISATION CODE of the ORGANISATION acting as a Health Care Provider.
+(an6 not applicable to COSD)</description>
+                  <extensions>
+                    <extension key="NHIC_Identifier:">TEST_5</extension>
+                    <extension key="Link_to_existing definition:">ORGANISATION CODE (CODE OF PROVIDER)</extension>
+                    <extension key="Notes_from_GD_JCIS" />
+                    <extension key="[Optional]_Local_Identifier">XXXXXXX0030</extension>
+                    <extension key="A">2</extension>
+                    <extension key="B">1</extension>
+                    <extension key="C">1</extension>
+                    <extension key="D">1</extension>
+                    <extension key="E">1</extension>
+                    <extension key="F">When referral details entered.</extension>
+                    <extension key="G">GC 127</extension>
+                    <extension key="H">NEO4J</extension>
+                    <extension key="E2">from source</extension>
+                  </extensions>
+                  <dataType name="String" />
+                </dataElement>
+              </dataClass>
+              <dataClass name="DIAGNOSTIC DETAILS">
+                <dataElement name="PRIMARY DIAGNOSIS (ICD)">
+                  <description>See DIAGNOSTIC CODING for details on coding and PRIMARY DIAGNOSES for the standardised definition of primary diagnosis.</description>
+                  <extensions>
+                    <extension key="NHIC_Identifier:">TEST_6</extension>
+                    <extension key="Link_to_existing definition:">PRIMARY DIAGNOSIS (ICD)</extension>
+                    <extension key="Notes_from_GD_JCIS" />
+                    <extension key="[Optional]_Local_Identifier">XXXXXXX0370</extension>
+                    <extension key="A">1</extension>
+                    <extension key="B">1</extension>
+                    <extension key="C">1</extension>
+                    <extension key="D">1</extension>
+                    <extension key="E">1</extension>
+                    <extension key="F">MDT Meeting</extension>
+                    <extension key="G">GC 128</extension>
+                    <extension key="H">NEO4J</extension>
+                    <extension key="E2">from source</extension>
+                  </extensions>
+                  <dataType name="String" />
+                </dataElement>
+                <dataElement name="DATE OF DIAGNOSIS (CLINICALLY AGREED)*">
+                  <description>*For linkage purposes DATE OF DIAGNOSIS ((CLINICALLY AGREED)
+or
+ DATE OF RECURRENCE (CLINICALLY AGREED)
+is required as mandatory.
+
+Record the date  where TESTcer was confirmed or diagnosis agreed (This will normally be  the date of the authorised  pathology report which confirms the TESTcer or if this is not available at the time it will be the date of the Multidisciplinary Team Meeting when the diagnosis was agreed)
+(This is may not be the same as Date of Diagnosis which is used for TESTcer Registration.)  </description>
+                  <extensions>
+                    <extension key="NHIC_Identifier:">TEST_7</extension>
+                    <extension key="Link_to_existing definition:">DATE OF DIAGNOSIS (TESTCER CLINICALLY AGREED)</extension>
+                    <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                    <extension key="[Optional]_Local_Identifier">XXXXXXX2030</extension>
+                    <extension key="A">2</extension>
+                    <extension key="B">2</extension>
+                    <extension key="C">1</extension>
+                    <extension key="D">1</extension>
+                    <extension key="E">1</extension>
+                    <extension key="F">MDT Meeting - From MDT against which definitive diagnosis recorded, or final pre-treatment diagnosis recorded.</extension>
+                    <extension key="G">GC 129</extension>
+                    <extension key="H">NEO4J</extension>
+                    <extension key="E2">from source</extension>
+                  </extensions>
+                  <dataType name="String" />
+                </dataElement>
+                <dataElement name="DATE OF RECURRENCE (CLINICALLY AGREED)*">
+                  <description>*For linkage purposes DATE OF DIAGNOSIS ((CLINICALLY AGREED)
+or
+ DATE OF RECURRENCE (CLINICALLY AGREED)
+is required as mandatory.
+
+(Recurrences only.)
+Record the date where TESTcer recurrence was confirmed or diagnosis of recurrence was agreed (This will normally be the  date of the authorised  pathology report which confirms the recurrence or if this is not available at the time it will be the date of the Multidisciplinary Team Meeting when the diagnosis of recurrence was agreed)
+(This is may not be the same as Date of Recurrence which is used for TESTcer Registration.)  </description>
+                  <extensions>
+                    <extension key="NHIC_Identifier:">TEST_8</extension>
+                    <extension key="Link_to_existing definition:">DATE OF RECURRENCE (TESTCER CLINICALLY AGREED)</extension>
+                    <extension key="Notes_from_GD_JCIS">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu</extension>
+                    <extension key="[Optional]_Local_Identifier">XXXXXXX0440</extension>
+                    <extension key="A">2</extension>
+                    <extension key="B">2</extension>
+                    <extension key="C">1</extension>
+                    <extension key="D">3</extension>
+                    <extension key="E">hard</extension>
+                    <extension key="F">MDT Meeting - From MDT against which definitive diagnosis recorded, or final pre-treatment diagnosis recorded. Recurrence radio button needs to be selected on MDT meeting / Diagnosis / Diagnosis tab or MDT D&amp;S tab</extension>
+                    <extension key="G">GC 130</extension>
+                    <extension key="H">NEO4J</extension>
+                    <extension key="E2">from source</extension>
+                  </extensions>
+                  <dataType name="String" />
+                </dataElement>
+                <dataElement name="PERSON FAMILY NAME">
+                  <description>That part of a PERSON's name which is used to describe family, clan, tribal group, or marital association.</description>
+                  <extensions>
+                    <extension key="NHIC_Identifier:">TEST_9</extension>
+                    <extension key="Link_to_existing definition:">PERSON FAMILY NAME</extension>
+                    <extension key="Notes_from_GD_JCIS" />
+                    <extension key="[Optional]_Local_Identifier">XXXXXXX0050</extension>
+                    <extension key="A">2</extension>
+                    <extension key="B">2</extension>
+                    <extension key="C">1</extension>
+                    <extension key="D">1</extension>
+                    <extension key="E">1</extension>
+                    <extension key="F">When Patient demographics entered.</extension>
+                    <extension key="G">GC 131</extension>
+                    <extension key="H">NEO4J</extension>
+                    <extension key="E2">from source</extension>
+                  </extensions>
+                  <dataType name="String" />
+                </dataElement>
+                <dataElement name="testcerOrSymptomaticBreastReferralPatientStatus">
+                  <description>TESTCER OR SYMPTOMATIC BREAST REFERRAL PATIENT STATUS is recorded to enable tracking of the status of REFERRAL REQUESTS for PATIENTS referred with a suspected TESTcer, or referred with breast symptoms with TESTcer not originally suspected.
+For COSD this TEST be used for all patients regardless of referral route.</description>
+                  <dataType name="testcerOrSymptomaticBreastReferralPatientStatus">
+                    <enumerations>
+                      <enumeration value="11">Diagnosis of new TESTcer confirmed - English NHS first treatment planned</enumeration>
+                      <enumeration value="12">Diagnosis of new TESTcer confirmed - subsequent treatment not yet planned</enumeration>
+                      <enumeration value="13">Diagnosis of new TESTcer confirmed - subsequent English NHS treatment planned</enumeration>
+                      <enumeration value="14">Suspected primary TESTcer</enumeration>
+                      <enumeration value="03">No new TESTcer diagnosis identified by the Healthcare Provider</enumeration>
+                      <enumeration value="15">Suspected recurrent TESTcer</enumeration>
+                      <enumeration value="16">Diagnosis of recurrent TESTcer confirmed - first treatment not yet planned</enumeration>
+                      <enumeration value="17">Diagnosis of recurrent TESTcer confirmed - English NHS first treatment planned</enumeration>
+                      <enumeration value="07">Diagnosis of TESTcer confirmed - no English NHS treatment planned</enumeration>
+                      <enumeration value="18">Diagnosis of recurrent TESTcer confirmed - no English NHS treatment planned</enumeration>
+                      <enumeration value="08">First treatment commenced (English NHS only)</enumeration>
+                      <enumeration value="19">Diagnosis of recurrent TESTcer confirmed - subsequent treatment not yet planned</enumeration>
+                      <enumeration value="09">Under investigation following symptomatic referral, TESTcer not suspected (breast referrals only) (see note 1)</enumeration>
+                      <enumeration value="20">Diagnosis of recurrent TESTcer confirmed - subsequent English NHS treatment planned</enumeration>
+                      <enumeration value="10">Diagnosis of new TESTcer confirmed - first treatment not yet planned</enumeration>
+                      <enumeration value="21">Subsequent treatment commenced (English NHS only)</enumeration>
+                    </enumerations>
+                  </dataType>
+                </dataElement>
+              </dataClass>
+  </dataModel>
+</catalogue>

@@ -488,6 +488,8 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         draftType
         draftType.dataModel == draft
+
+        draftType.findPreviousVersion() == finalizedType
     }
 
     @Unroll
