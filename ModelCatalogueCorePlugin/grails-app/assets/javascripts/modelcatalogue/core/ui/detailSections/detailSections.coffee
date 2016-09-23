@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'detailSections', ['catalogueProvider', 'names', (catalogueProvider, names) ->
+angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'detailSections', ['catalogueProvider', (catalogueProvider) ->
 
   isMeetingRelationshipCriteria = (owner, criteria) ->
     match = criteria.match(/(\w+)?(?:=\[(\w+)\])?=>(\w+)?/)
@@ -119,8 +119,12 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
               if (element == null || @typeKeys == null)
                 key in @keys
               else
-                elementTypeName = names.getPropertyNameFromType(element.elementType)
-                key in @typeKeys[elementTypeName]
+                keys = []
+                angular.forEach(@typeKeys, (values, type) ->
+                  if(element.isInstanceOf(type))
+                    keys = values
+                )
+                key in keys
             hasData:      (element) -> configuration.keys.some (key) -> element.ext.get(key)?
             isTemplateHidden: (element) ->
               if @hasOwnProperty('templateHidden')
