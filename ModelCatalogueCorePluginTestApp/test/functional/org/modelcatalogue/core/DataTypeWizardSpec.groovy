@@ -111,7 +111,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         then:
         check modalDialog gone
         check { infTableCell(1, 1) } contains "New Primitive Type"
-        check { infTableCell(1, 2, text: 'Test Primitive Unit') } displayed
+        check { infTableCell(1, 2, text: 'new unit') } displayed
     }
 
     def "create enum"() {
