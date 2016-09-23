@@ -31,15 +31,15 @@ class ValidationRuleWizardSpec extends AbstractModelCatalogueGebSpec {
         click save
 
         then:
-        check { infTableCell(1, 2, text: 'Test Validation Rule') } displayed
+        check { infTableCell(1, 1) } contains 'Test Validation Rule'
     }
 
     def "check the unit shows up with own detail page"(){
         check closeGrowlMessage gone
-        click { infTableCell(1, 2).find('a') }
+        click { infTableCell(1, 1).find('a:not(.inf-cell-expand)') }
 
         expect:
-        check rightSideTitle contains 'Test Validation Rule Test 2'
+        check rightSideTitle contains 'Test Validation Rule'
     }
 
 }

@@ -6,7 +6,6 @@ import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
-import org.modelcatalogue.core.geb.Common
 import org.modelcatalogue.integration.excel.ExcelLoader
 import org.modelcatalogue.integration.excel.HeadersMap
 import spock.lang.Ignore
@@ -48,7 +47,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog displayed
 
         when:
-        fill name with 'Sample XSD'
+        fill nameLabel with 'Sample XSD'
         fill asset with file('example.xsd')
 
         click save
@@ -115,7 +114,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         waitUntilFinalized()
 
         then:
-        check 'h3' contains 'Import for MET-523.mc MET-523 0.0.1'
+        check 'h3' contains 'Import for MET-523.mc 147@0.0.1'
     }
 
     def "upload excel file"() {
@@ -138,13 +137,13 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         click 'h3 a.label.label-warning'
 
         then:
-        check rightSideTitle is 'MET-522 0.0.1'
+        check rightSideTitle is 'MET-522 188@0.0.1'
 
         when:
         select 'MET-522' open 'Data Classes' select 'MET-522.M1'
 
         then:
-        check rightSideTitle is 'MET-522.M1 MET-522 0.0.1'
+        check rightSideTitle is 'MET-522.M1 189@0.0.1'
     }
 
     /**

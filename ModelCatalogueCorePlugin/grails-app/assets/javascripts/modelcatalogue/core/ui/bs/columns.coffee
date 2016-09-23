@@ -1,16 +1,16 @@
 angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvider', (columnsProvider)->
-
-
-  idNameAndDescription = -> [
-    { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-2", show: true, href: 'href()'}
-    { header: "Name", value: "name", classes: "col-md-3", show: true, href: 'href()', sort: {property: 'name', type: 'alpha'} }
-    { header: "Description", value: "description", textEllipsis: true }
-  ]
-
   getEnumerations = (enumeratedType) ->
     return '' if not enumeratedType
-    return """<a href="#/catalogue/dataClass/#{enumeratedType.dataClass.id}"><span class="fa fa-fw fa-cubes"></span> #{enumeratedType.dataClass.name}</a>""" if enumeratedType.dataClass
-    return """<a href="#/catalogue/measurementUnit/#{enumeratedType.measurementUnit.id}"><span class="fa fa-fw fa-dashboard"></span> #{enumeratedType.measurementUnit.name}</a>""" if enumeratedType.measurementUnit
+    return """
+      <a href="#/catalogue/dataClass/#{enumeratedType.dataClass.id}">
+        <span class="fa fa-fw fa-cubes"></span> #{enumeratedType.dataClass.name}
+      </a>
+    """ if enumeratedType.dataClass
+    return """
+      <a href="#/catalogue/measurementUnit/#{enumeratedType.measurementUnit.id}">
+        <span class="fa fa-fw fa-dashboard"></span> #{enumeratedType.measurementUnit.name}
+      </a>
+    """ if enumeratedType.measurementUnit
     return enumeratedType.description if not enumeratedType.enumerations
     return enumeratedType.description if not enumeratedType.enumerations.values
     enumerations = []
@@ -33,31 +33,65 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
       result +=
       """
         <span>
-          <a class="label #{getStatusClass(dataElement.getDataModelStatus())}" href='#{dataElement.dataModel.href()}'><span class="#{dataElement.dataModel.getIcon()}"></span> #{dataElement.dataModel.name}</a>
+          <a class="label #{getStatusClass(dataElement.getDataModelStatus())}" href='#{dataElement.dataModel.href()}'>
+            <span class="#{dataElement.dataModel.getIcon()}"></span> #{dataElement.dataModel.name}
+          </a>
         </span>
       """
 
     result +=
-      """
+    """
         <a class="small text-muted text-nowrap" href="#{dataElement.href()}">#{dataElement.getVersionAndId()}</a>
       """
 
-  # default
-  columnsProvider.registerColumns 'org.modelcatalogue.core.DataClass', idNameAndDescription()
-  columnsProvider.registerColumns 'org.modelcatalogue.core.Model',     idNameAndDescription()
+  getNameIdAndVersion = (dataElement) ->
+    "
+      <a href='#{dataElement.href()}'>#{dataElement.name}</a>
+      <span class='label #{getStatusClass(dataElement.getDataModelStatus())}'>
+        #{dataElement.getVersionAndId()}
+      </span>
+    "
 
-  columnsProvider.registerColumns 'org.modelcatalogue.core.DataElement', [
-    { header: 'Model / ID',  value: getDataModelAndDataElement,  classes: 'col-md-2'}
-    { header: "Name", value: "name", classes: "col-md-4", show: true, href: 'href()', sort: {property: 'name', type: 'alpha'} }
-    { header: "Description", value: "description" , classes: "col-md-6", textEllipsis: true}
+  # column definitions
+  idNameAndDescriptionColumns = -> [
+    {header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-2", show: true, href: 'href()'}
+    {
+      header: "Name"
+      value: "name"
+      classes: "col-md-3"
+      show: true
+      href: 'href()'
+      sort: {property: 'name', type: 'alpha'}
+    }
+    {header: "Description", value: "description", textEllipsis: true}
   ]
 
-  columnsProvider.registerColumns 'org.modelcatalogue.core.DataClass', [
-    { header: 'Model / ID',  value: getDataModelAndDataElement,  classes: 'col-md-2'}
-    { header: "Name", value: "name", classes: "col-md-4", show: true, href: 'href()', sort: {property: 'name', type: 'alpha'} }
-    { header: "Description", value: "description" , classes: "col-md-6", textEllipsis: true}
+  modelIdNameAndDescriptionColumns = -> [
+    {
+      header: "Name"
+      value: getNameIdAndVersion
+      classes: "col-md-4"
+      show: true
+      sort: {property: 'name', type: 'alpha'}
+    }
+    {header: "Description", value: "description", classes: "col-md-6", textEllipsis: true}
   ]
 
+  dataTypeColumns = [
+    {
+      header: "Name"
+      value: getNameIdAndVersion
+      classes: 'col-md-6'
+      show: true
+      sort: {property: 'name', type: 'alpha'}
+    }
+    {header: "Enumerations or Description", value: getEnumerations, classes: 'col-md-6', textEllipsis: true}
+  ]
+
+  columnsProvider.registerColumns 'org.modelcatalogue.core.Model', idNameAndDescriptionColumns()
+  columnsProvider.registerColumns 'org.modelcatalogue.core.DataClass', modelIdNameAndDescriptionColumns()
+  columnsProvider.registerColumns 'org.modelcatalogue.core.DataElement', modelIdNameAndDescriptionColumns()
+  columnsProvider.registerColumns 'org.modelcatalogue.core.ValidationRule', modelIdNameAndDescriptionColumns()
 
   # special
 
@@ -71,27 +105,64 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
     return "#{(asset.size)} B"
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.Asset', [
-    {header: "Last Updated",value: "lastUpdated | date:'short'",  classes: 'col-md-2', sort: {property: 'lastUpdated', type: 'numeric'}}
-    {header: "Name",        value: 'name',                        classes: 'col-md-3', sort: {property: 'name', type: 'alpha'}, show: true, href: 'href()'}
-    {header: "File Name",   value: 'originalFileName',            classes: 'col-md-3', sort: {property: 'originalFileName', type: 'alpha'}}
-    {header: "Size",        value: computeBytes,                  classes: 'col-md-2', sort: {property: 'size', type: 'numeric'}}
-    {header: "Mime Type",   value: 'contentType',                 classes: 'col-md-2', sort: {property: 'contentType', type: 'alpha'}}
+    {
+      header: "Last Updated"
+      value: "lastUpdated | date:'short'"
+      classes: 'col-md-2'
+      sort: {property: 'lastUpdated', type: 'numeric'}
+    }
+    {
+      header: "Name"
+      value: 'name'
+      classes: 'col-md-3'
+      sort: {property: 'name', type: 'alpha'}
+      show: true
+      href: 'href()'
+    }
+    {
+      header: "File Name"
+      value: 'originalFileName'
+      classes: 'col-md-3'
+      sort: {property: 'originalFileName', type: 'alpha'}
+    }
+    {header: "Size", value: computeBytes, classes: 'col-md-2', sort: {property: 'size', type: 'numeric'}}
+    {header: "Mime Type", value: 'contentType', classes: 'col-md-2', sort: {property: 'contentType', type: 'alpha'}}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.Mapping', [
-    {header: 'Destination',         value: "destination.name",                 classes: 'col-md-4', show: 'destination.show()', href: 'destination.href()'}
-    {header: 'Mapping',             value: 'mapping',                          classes: 'col-md-6 preserve-all'}
+    {
+      header: 'Destination'
+      value: "destination.name"
+      classes: 'col-md-4'
+      show: 'destination.show()'
+      href: 'destination.href()'
+    }
+    {header: 'Mapping', value: 'mapping', classes: 'col-md-6 preserve-all'}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.MeasurementUnit', [
-    {header: "Symbol",      value: 'symbol',      classes: 'col-md-2', show: true, href: 'href()', sort: {property: 'symbol', type: 'alpha'}}
-    {header: "Name",        value: 'name',        classes: 'col-md-4', show: true, href: 'href()', sort: {property: 'name', type: 'alpha'}}
+    {
+      header: "Symbol"
+      value: 'symbol'
+      classes: 'col-md-2'
+      show: true
+      href: 'href()'
+      sort: {property: 'symbol', type: 'alpha'}
+    }
+    {
+      header: "Name"
+      value: 'name'
+      classes: 'col-md-4'
+      show: true
+      href: 'href()'
+      sort: {property: 'name', type: 'alpha'}
+    }
     {header: "Description", value: 'description', classes: 'col-md-6', textEllipsis: true}
   ]
 
   printMetadata = (relationship) ->
-    result  = ''
-    ext     = relationship?.ext ? {values: []}
+    result = ''
+    ext = relationship?.ext ? {values: []}
     ext.values = ext.values ? []
     for row in ext.values
       result += "#{row.key}: #{row.value ? ''}\n"
@@ -104,25 +175,47 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
     relationship.relation.getElementTypeName()
 
 
-
   columnsProvider.registerColumns 'org.modelcatalogue.core.Relationship', [
-    {header: 'Relation',        value: 'type[direction]',  classes: 'col-md-3'}
-    {header: 'Destination',     value: "relation.classifiedName",    classes: 'col-md-3', show: "relation.show()", href: 'relation.href()'}
-    {header: 'Type',            value: relationTypeName,     classes: 'col-md-2'}
-    {header: 'Metadata',        value: printMetadata,     classes: 'col-md-3'}
+    {header: 'Relation', value: 'type[direction]', classes: 'col-md-3'}
+    {
+      header: 'Destination'
+      value: "relation.classifiedName"
+      classes: 'col-md-3'
+      show: "relation.show()"
+      href: 'relation.href()'
+    }
+    {header: 'Type', value: relationTypeName, classes: 'col-md-2'}
+    {header: 'Metadata', value: printMetadata, classes: 'col-md-3'}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.RelationshipType', [
-    {header: 'Name', value: 'name', classes: 'col-md-2', show: true, href: 'href()', sort: {property: 'name', type: 'alpha'}}
-    {header: 'Source to Destination', value: 'sourceToDestination', classes: 'col-md-2', sort: {property: 'sourceToDestination', type: 'alpha'}}
-    {header: 'Destination to Source', value: 'destinationToSource', classes: 'col-md-2', sort: {property: 'destinationToSource', type: 'alpha'}}
+    {
+      header: 'Name'
+      value: 'name'
+      classes: 'col-md-2'
+      show: true
+      href: 'href()'
+      sort: {property: 'name', type: 'alpha'}
+    }
+    {
+      header: 'Source to Destination'
+      value: 'sourceToDestination'
+      classes: 'col-md-2'
+      sort: {property: 'sourceToDestination', type: 'alpha'}
+    }
+    {
+      header: 'Destination to Source'
+      value: 'destinationToSource'
+      classes: 'col-md-2'
+      sort: {property: 'destinationToSource', type: 'alpha'}
+    }
     {header: 'Source Class', value: 'sourceClass', classes: 'col-md-3', sort: {property: 'sourceClass', type: 'alpha'}}
-    {header: 'Destination Class', value: 'destinationClass', classes: 'col-md-3', sort: {property: 'destinationClass', type: 'alpha'}}
-  ]
-
-  dataTypeColumns = [
-    {header: "Name",                        value: 'name',          classes: 'col-md-6', show: true, href: 'href()', sort: {property: 'name', type: 'alpha'}}
-    {header: "Enumerations or Description", value: getEnumerations, classes: 'col-md-6', textEllipsis: true}
+    {
+      header: 'Destination Class'
+      value: 'destinationClass'
+      classes: 'col-md-3'
+      sort: {property: 'destinationClass', type: 'alpha'}
+    }
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.DataType', dataTypeColumns
@@ -131,33 +224,57 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
   columnsProvider.registerColumns 'org.modelcatalogue.core.PrimitiveType', dataTypeColumns
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.actions.Batch', [
-    {header: "Last Updated", value: "lastUpdated | date:'short'"   , classes: 'col-md-2',                              sort: {property: 'lastUpdated', type: 'numeric'}}
-    {header: "Name"        , value: 'name'                         , classes: 'col-md-4', show: true, href: 'href()' , sort: {property: 'name', type: 'alpha'}}
-    {header: "Pending"     , value: "pending.total"                , classes: 'col-md-1'}
-    {header: "Running"     , value: "performing.total"             , classes: 'col-md-1'}
-    {header: "Performed"   , value: "performed.total"              , classes: 'col-md-1'}
-    {header: "Failed"      , value: "failed.total"                 , classes: 'col-md-1'}
+    {
+      header: "Last Updated"
+      value: "lastUpdated | date:'short'"
+      classes: 'col-md-2'
+      sort: {property: 'lastUpdated', type: 'numeric'}
+    }
+    {
+      header: "Name"
+      value: 'name'
+      classes: 'col-md-4'
+      show: true
+      href: 'href()'
+      sort: {property: 'name', type: 'alpha'}
+    }
+    {header: "Pending", value: "pending.total", classes: 'col-md-1'}
+    {header: "Running", value: "performing.total", classes: 'col-md-1'}
+    {header: "Performed", value: "performed.total", classes: 'col-md-1'}
+    {header: "Failed", value: "failed.total", classes: 'col-md-1'}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.actions.Action', [
-    {header: "Created"     , value: "dateCreated | date:'short'"   , classes: 'col-md-2', sort: {property: 'dateCreated', type: 'numeric'}}
-    {header: "Message"     , value: 'message'                      , classes: 'col-md-7' }
+    {
+      header: "Created"
+      value: "dateCreated | date:'short'"
+      classes: 'col-md-2'
+      sort: {property: 'dateCreated', type: 'numeric'}
+    }
+    {header: "Message", value: 'message', classes: 'col-md-7'}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.DataModelPolicy', [
-    {header: "Name"         , value: 'name'           , classes: 'col-md-6', show: true, href: 'href()', sort: {property: 'name', type: 'alpha'}}
-    {header: "Policy Text"  , value: 'policyText'     , classes: 'col-md-6'}
+    {
+      header: "Name"
+      value: 'name'
+      classes: 'col-md-6'
+      show: true
+      href: 'href()'
+      sort: {property: 'name', type: 'alpha'}
+    }
+    {header: "Policy Text", value: 'policyText', classes: 'col-md-6'}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.util.builder.ProgressMonitor', [
-    {header: "Name"        , value: 'name', classes: 'col-md-11', href: '"#/catalogue/feedback/" + key' }
+    {header: "Name", value: 'name', classes: 'col-md-11', href: '"#/catalogue/feedback/" + key'}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.security.User', [
-    {header: 'Username'    , value: "username"  , classes: 'col-md-3', show: 'show()', href: 'href()'}
-    {header: 'Email'       , value: 'email'     , classes: 'col-md-3'}
-    {header: 'Role'        , value: 'role'      , classes: 'col-md-3'}
-    {header: 'Enabled'     , value: 'enabled'   , classes: 'col-md-3'}
+    {header: 'Username', value: "username", classes: 'col-md-3', show: 'show()', href: 'href()'}
+    {header: 'Email', value: 'email', classes: 'col-md-3'}
+    {header: 'Role', value: 'role', classes: 'col-md-3'}
+    {header: 'Enabled', value: 'enabled', classes: 'col-md-3'}
   ]
 
 ]

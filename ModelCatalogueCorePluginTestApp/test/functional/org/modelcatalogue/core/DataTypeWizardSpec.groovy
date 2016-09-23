@@ -72,7 +72,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog displayed
 
         when:
-        fill name with 'New Reference Type'
+        fill nameLabel with 'New Reference Type'
 
 
         click pickReferenceType
@@ -84,7 +84,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         check modalDialog gone
-        check { infTableCell(1, 1, text: 'New Reference Type') } displayed
+        check { infTableCell(1, 1) } contains "New Reference Type"
         check { infTableCell(1, 2, text: 'DEMOGRAPHICS') } displayed
     }
 
@@ -97,7 +97,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog displayed
 
         when:
-        fill name with 'New Primitive Type'
+        fill nameLabel with 'New Primitive Type'
 
         click pickPrimitiveType
 
@@ -109,8 +109,8 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         check modalDialog gone
-        check { infTableCell(1, 1, text: 'New Primitive Type') } displayed
-        check { infTableCell(1, 2, text: 'new unit') } displayed
+        check { infTableCell(1, 1) } contains "New Primitive Type"
+        check { infTableCell(1, 2, text: 'Test Primitive Unit') } displayed
     }
 
     def "create enum"() {
@@ -122,7 +122,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog displayed
 
         when:
-        fill name with 'Enumeration 1'
+        fill nameLabel with 'Enumeration 1'
 
         click pickEnumeratedType
 
@@ -136,7 +136,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         then:
         check modalDialog gone
         check backdrop gone
-        check { infTableCell(1, 1, text: 'Enumeration 1') } displayed
+        check { infTableCell(1, 1) } contains "Enumeration 1"
     }
 
     def "create subset 2"() {
@@ -148,7 +148,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog displayed
 
         when:
-        fill name with 'Enumeration 2'
+        fill nameLabel with 'Enumeration 2'
 
         click pickSubset
 
@@ -164,7 +164,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         then:
         check modalDialog gone
         check backdrop gone
-        check { infTableCell(1, 1, text: 'Enumeration 2') } displayed
+        check { infTableCell(1, 1) } contains "Enumeration 2"
     }
 
     def "create subset 3"() {
@@ -176,7 +176,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog displayed
 
         when:
-        fill name with 'Enumeration 3'
+        fill nameLabel with 'Enumeration 3'
 
         click pickSubset
 
@@ -191,7 +191,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         then:
         check modalDialog gone
         check backdrop gone
-        check { infTableCell(1, 1, text: 'Enumeration 3') } displayed
+        check { infTableCell(1, 1) } contains "Enumeration 3"
         check { infTableCell(1, 2) } contains '01: one'
     }
 
@@ -223,14 +223,14 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog displayed
 
         when:
-        fill name with 'New Data Type'
+        fill nameLabel with 'New Data Type'
 
         click save
 
         then:
         check modalDialog gone
         check backdrop gone
-        check { infTableCell(1, 1, text: 'New Data Type')} displayed
+        check { infTableCell(1, 1) } contains "New Data Type"
     }
 
     def "check it shows up with own detail page"(){
@@ -238,7 +238,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click { infTableCell(1, 1).find('a:not(.inf-cell-expand)') }
         then:
 
-        check rightSideTitle contains 'New Data Type Test 1'
+        check rightSideTitle contains 'New Data Type'
     }
 
     def "Check Form (Item) detail section is present and collapsed"() {
@@ -483,7 +483,5 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         then:
             check backdrop gone
             check primitiveTypeIcon displayed
-
-
     }
 }
