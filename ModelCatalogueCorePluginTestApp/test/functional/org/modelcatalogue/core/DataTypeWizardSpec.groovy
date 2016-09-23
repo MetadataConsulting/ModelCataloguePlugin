@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
+import org.modelcatalogue.core.geb.Common
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.*
@@ -243,22 +244,23 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "Check Form (Item) detail section is present and collapsed"() {
         expect:
-        check detailSectionFormItem present once
+        check Common.detailSectionFormMetadata present once
         check detailSectionFormItemContent gone
 
         when: "Click the title"
-        click detailSectionFormItem.find(".title")
+        click Common.detailSectionFormMetadata.find('.title .btn')
 
         then: "Content is displayed"
         check detailSectionFormItemContent displayed
 
         cleanup:
-        click detailSectionFormItem.find(".title")
+        click Common.detailSectionFormMetadata.find('.title .btn')
     }
 
     def "add metadata"() {
         setup:
         click inlineEdit
+        click Common.detailSectionMetadata.find('.title .btn')
         scroll metadataTable
 
         when:
@@ -267,13 +269,16 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click inlineEditSubmit
 
         then:
+        click Common.detailSectionMetadata.find('.title .btn')
         check detailSectionCustomMetadataContent contains "foo"
         check detailSectionCustomMetadataContent contains "bar"
+        click Common.detailSectionMetadata.find('.title .btn')
     }
 
     def "remove metadata"() {
         setup:
         click inlineEdit
+        click Common.detailSectionMetadata.find('.title .btn')
         scroll metadataTable
 
         when:
@@ -282,8 +287,10 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click inlineEditSubmit
 
         then:
+        click Common.detailSectionMetadata.find('.title .btn')
         check detailSectionCustomMetadataContent missing "foo"
         check detailSectionCustomMetadataContent missing "bar"
+        click Common.detailSectionMetadata.find('.title .btn')
     }
 
     def "create new mapping"() {

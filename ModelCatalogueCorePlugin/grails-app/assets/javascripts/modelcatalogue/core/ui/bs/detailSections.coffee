@@ -127,6 +127,7 @@ x in ['apple', 'banana', 'cherry']
     types: [
       'dataModel'
       'dataClass'
+      'dataType'
       'dataElement'
       'measurementUnit'
       'validationRule'
