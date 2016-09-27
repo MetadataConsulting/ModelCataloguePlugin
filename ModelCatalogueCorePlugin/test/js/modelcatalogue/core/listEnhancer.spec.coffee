@@ -23,6 +23,7 @@ if window.fixtures
 
       result = null
       error  = null
+      rest.cleanCache()
       enhance(rest(method: 'GET', url: '/foo')).then( (_result_) ->
         result = _result_
       , (_error_) ->
@@ -77,6 +78,8 @@ if window.fixtures
       .when("GET", "#{modelCatalogueApiRoot}/dataType/?max=1&offset=1")
       .respond(nextList)
 
+      rest.cleanCache()
+
       nextResult = null
       nextError  = null
 
@@ -105,6 +108,8 @@ if window.fixtures
       .when("GET", "#{modelCatalogueApiRoot}/dataType/?max=10&offset=0")
       .respond(fixtures.dataType.list1)
 
+      rest.cleanCache()
+
       result = null
       error  = null
       nextResult.previous().then( (_result_) ->
@@ -125,6 +130,8 @@ if window.fixtures
       expect(result.currentPage).toBe(1)
       expect(result.list).toBeDefined()
       expect(result.list.length).toBe(1)
+
+      rest.cleanCache()
 
       gotoResult = null
       error  = null
@@ -151,6 +158,8 @@ if window.fixtures
       $httpBackend
       .when("GET", "#{modelCatalogueApiRoot}/dataType/?max=1&offset=10&order=asc&sort=name")
       .respond(nextList)
+
+      rest.cleanCache()
 
       reloadResult = null
       error  = null

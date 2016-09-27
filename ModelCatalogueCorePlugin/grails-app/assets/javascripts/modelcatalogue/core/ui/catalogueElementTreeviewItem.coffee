@@ -59,7 +59,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
           $scope.node.showMore()
 
       onlyImportant = (extraParameters) ->
-        extra = angular.copy(extraParameters)
+        extra = angular.copy(extraParameters ? {})
         extra.path = undefined
         extra.descendPath = undefined
         extra
