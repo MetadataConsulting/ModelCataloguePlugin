@@ -28,7 +28,7 @@
 				<g:form action="forgotPassword" method="post" autocomplete="off" class="form-horizontal">
 					<div class="form-group ">
 						<label for='username-new' class="control-label col-sm-3"><g:message
-								code="user.username.label" default="Username"/>:</label>
+								code="user.username.or.email.label" default="Username or Email"/>:</label>
 
 						<div class="col-sm-9">
 							<input type='text' class='form-control' name='username' id="username-new" />
