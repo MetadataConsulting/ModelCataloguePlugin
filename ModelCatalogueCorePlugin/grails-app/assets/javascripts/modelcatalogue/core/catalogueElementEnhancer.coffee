@@ -132,9 +132,9 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
                 classificationNames = commaSeparatedList(@classifications)
                 return "#{@name} (#{@getElementTypeName()} in #{classificationNames})"
               if @isInstanceOf('relationship')
-                return "#{@source.getLabel()} #{@type.sourceToDestination} {@destination.getLabel()}"
+                return "#{@source.getLabel()} #{@type.sourceToDestination} #{@destination.getLabel()}"
               if @isInstanceOf('mapping')
-                return "#{@source.getLabel()} #{@type.sourceToDestination} {@destination.getLabel()}"
+                return "#{@source.getLabel()} #{@type.sourceToDestination} #{@destination.getLabel()}"
               if (@elementType?)
                 return "#{@name} (#{@getElementTypeName()})"
 

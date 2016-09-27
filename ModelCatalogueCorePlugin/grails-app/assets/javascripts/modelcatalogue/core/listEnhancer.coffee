@@ -28,7 +28,7 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
 
           if @next
             nextUrl = @next
-            @next = (extraParameters = {}) -> enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{nextUrl}", params: extraParameters
+            @next = (extraParameters = {}) -> enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{nextUrl}", params: extraParameters, cache: true
             @next.size   = Math.min(@page, @total - (@offset + @page))
             @next.url    = nextUrl
             @next.total  = @total
@@ -50,7 +50,7 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
             @next.total  = @total
           if @previous
             prevUrl = @previous
-            @previous = (extraParameters = {}) -> enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{prevUrl}", params: extraParameters
+            @previous = (extraParameters = {}) -> enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{prevUrl}", params: extraParameters, cache: true
             @previous.size   = Math.min(@page, @offset)
             @previous.total  = @total
             @previous.url    = prevUrl
@@ -85,7 +85,7 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
             else
               theLink = "#{theLink}?offset=#{theOffset}"
 
-            enhance rest method: 'GET', url: theLink
+            enhance rest method: 'GET', url: theLink, cache: true
 
           @reload ?= (config = {}) ->
             params = {
@@ -99,7 +99,7 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
 
             theLink = "#{modelCatalogueApiRoot}#{@base}"
 
-            enhance rest method: 'GET', url: theLink, params: params
+            enhance rest method: 'GET', url: theLink, params: params #, cache: true
 
 
       # return new list decorator

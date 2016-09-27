@@ -10,20 +10,9 @@ angular.module('mc.util.enhance', []).provider 'enhance', [ ->
     enhancers.push({priority: priority, name: name, condition: condition, factory: enhancerFactory})
 
   # factory method
-  @$get = [ '$injector', '$q', ($injector, $q) ->
+  @$get = [ '$injector', ($injector) ->
     enhance = (result) ->
       return result unless result
-      if result.then? and angular.isFunction(result.then)
-        deferred = $q.defer()
-        result.then(
-          (response) ->
-            deferred.resolve enhance(response)
-        , (response) ->
-          deferred.reject enhance(response)
-        , (response) ->
-          deferred.update enhance(response)
-        )
-        return deferred.promise
 
       # for object and array enhance deepth first
       if angular.isArray(result)

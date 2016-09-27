@@ -12,10 +12,10 @@ angular.module('mc.util.rest', ['mc.util.messages']).factory 'rest', ($q, $http,
 
   rest = (config) ->
     key = createKey(config)
-    if (not config.method or config.method is 'GET') and pendingRequests.hasOwnProperty(key)
-      return pendingRequests[key].promise
+    if config.cache and (not config.method or config.method is 'GET') and pendingRequests.hasOwnProperty(key)
+      return pendingRequests[key]
 
-    pendingRequests[key] = deferred = $q.defer()
+    deferred = $q.defer()
 
     $http(config).then(
       (response) ->
@@ -57,7 +57,7 @@ angular.module('mc.util.rest', ['mc.util.messages']).factory 'rest', ($q, $http,
       $timeout((-> delete pendingRequests[key]), staleTolerance)
 
 
-    deferred.promise
+    pendingRequests[key] = deferred.promise
 
   rest.cleanCache = ->
     pendingRequests = {}
