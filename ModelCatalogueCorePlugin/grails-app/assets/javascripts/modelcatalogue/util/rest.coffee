@@ -1,7 +1,21 @@
 angular.module('mc.util.rest', ['mc.util.messages']).factory 'rest', ($q, $http, $rootScope, $timeout) ->
 
+  STALE_TOLERANCE = 100 # do not request again within this period (ms)
+  pendingRequests = {}
+
+  createKey = (config) ->
+    method = config.method ? 'GET'
+    url = config.url
+    params = config.params ? {}
+
+    return "#{method}:#{url}?#{"#{k}=#{v}" for k,v of params}"
+
   rest = (config) ->
-    deferred = $q.defer()
+    key = createKey(config)
+    if (not config.method or config.method is 'GET') and pendingRequests.hasOwnProperty(key)
+      return pendingRequests[key].promise
+
+    pendingRequests[key] = deferred = $q.defer()
 
     $http(config).then(
       (response) ->
@@ -39,7 +53,10 @@ angular.module('mc.util.rest', ['mc.util.messages']).factory 'rest', ($q, $http,
       deferred.reject response
     , (update) ->
       deferred.update update
-    )
+    ).finally ->
+      $timeout((-> delete pendingRequests[key]), STALE_TOLERANCE)
+
+
     deferred.promise
 
   rest
