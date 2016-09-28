@@ -3,25 +3,25 @@
   <h4>Data Class Wizard</h4>
   <ul class="tutorial-steps">
     <li>
-      <button id="step-previous" ng-disabled="step == 'dataClass' || step == 'summary'" ng-click="previous()" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
+      <button id="step-previous" ng-disabled="step == 'dataClass' || (step == 'summary' &amp;&amp; !errored) " ng-click="previous()" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
     </li>
     <li>
-      <button id="step-dataClass" ng-disabled="step == 'summary'" ng-click="select('dataClass')" class="btn btn-default" ng-class="{'btn-primary': step == 'dataClass'}">1. Data Class*</button>
+      <button id="step-dataClass" ng-disabled="(step == 'summary' &amp;&amp; !errored)" ng-click="select('dataClass')" class="btn btn-default" ng-class="{'btn-primary': step == 'dataClass'}">1. Data Class*</button>
     </li>
     <li>
-      <button id="step-metadata" ng-disabled="!dataClass.name || step == 'summary'" ng-click="select('metadata')" class="btn btn-default" ng-class="{'btn-primary': step == 'metadata', 'btn-info': step != 'metadata' &amp;&amp; hasMetadata()}">2. Metadata</button>
+      <button id="step-metadata" ng-disabled="!dataClass.name || (step == 'summary' &amp;&amp; !errored)" ng-click="select('metadata')" class="btn btn-default" ng-class="{'btn-primary': step == 'metadata', 'btn-info': step != 'metadata' &amp;&amp; hasMetadata()}">2. Metadata</button>
     </li>
     <li>
-      <button id="step-parents" ng-disabled="!dataClass.name || step == 'summary'" ng-click="select('parents')" class="btn btn-default" ng-class="{'btn-primary': step == 'parents', 'btn-info': step != 'parents' &amp;&amp; parents.length > 0}">3. Parents</button>
+      <button id="step-parents" ng-disabled="!dataClass.name || (step == 'summary' &amp;&amp; !errored)" ng-click="select('parents')" class="btn btn-default" ng-class="{'btn-primary': step == 'parents', 'btn-info': step != 'parents' &amp;&amp; parents.length > 0}">3. Parents</button>
     </li>
     <li>
-      <button id="step-children" ng-disabled="!dataClass.name || step == 'summary'" ng-click="select('children')" class="btn btn-default" ng-class="{'btn-primary': step == 'children', 'btn-info': step != 'children' &amp;&amp; children.length > 0}">4. Children</button>
+      <button id="step-children" ng-disabled="!dataClass.name || (step == 'summary' &amp;&amp; !errored)" ng-click="select('children')" class="btn btn-default" ng-class="{'btn-primary': step == 'children', 'btn-info': step != 'children' &amp;&amp; children.length > 0}">4. Children</button>
     </li>
     <li>
-      <button id="step-elements" ng-disabled="!dataClass.name || step == 'summary'" ng-click="select('elements')" class="btn btn-default" ng-class="{'btn-primary': step == 'elements', 'btn-info': step != 'elements' &amp;&amp; dataElements.length > 0}">5. Elements</button>
+      <button id="step-elements" ng-disabled="!dataClass.name || (step == 'summary' &amp;&amp; !errored)" ng-click="select('elements')" class="btn btn-default" ng-class="{'btn-primary': step == 'elements', 'btn-info': step != 'elements' &amp;&amp; dataElements.length > 0}">5. Elements</button>
     </li>
     <li ng-if="dataModels.length == 0">
-      <button id="step-dataModels" ng-disabled="!dataClass.name || step == 'summary'" ng-click="select('dataModels')" class="btn btn-default" ng-class="{'btn-primary': step == 'dataModels', 'btn-info': step != 'dataModels' &amp;&amp; dataModels.length > 0}">6. Data Models*</button>
+      <button id="step-dataModels" ng-disabled="!dataClass.name || (step == 'summary' &amp;&amp; !errored)" ng-click="select('dataModels')" class="btn btn-default" ng-class="{'btn-primary': step == 'dataModels', 'btn-info': step != 'dataModels' &amp;&amp; dataModels.length > 0}">6. Data Models*</button>
     </li>
     <li>
       <button id="step-next" ng-disabled="!dataClass.name || step == 'dataModels' || step == 'summary'" ng-click="next()" class="btn btn-default" ><span class="glyphicon glyphicon-chevron-right"></span></button>
@@ -32,6 +32,7 @@
   </ul>
 </div>
 <div class="modal-body" ng-switch="step">
+  <messages-panel messages="messages"></messages-panel>
   <div ng-switch-when="dataClass" id="dataClass">
     <form role="form" ng-submit="select('metadata')">
       <div class="form-group">
@@ -147,5 +148,5 @@
 </div>
 <div class="modal-footer" ng-if="step == 'summary'">
   <button ng-disabled="!finished" class="btn btn-success" ng-click="reset()"><span class="glyphicon glyphicon-plus"></span> Create Another</button>
-  <button ng-disabled="!finished" class="btn btn-default"  ng-click="$close(dataClass)" id="exit-wizard"><span class="glyphicon glyphicon-remove"></span> Close</button>
+  <button ng-disabled="!finished &amp;&amp; !errored" class="btn btn-default"  ng-click="$close(dataClass)" id="exit-wizard"><span class="glyphicon glyphicon-remove"></span> Close</button>
 </div>

@@ -22,6 +22,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
     private static final CatalogueContent detailSectionDataElement = CatalogueContent.create('data-view-name': 'Children')
     private static final CatalogueAction exportXml = CatalogueAction.runLast('item', 'export', 'edit-XML')
     private static final CatalogueContent resultContentLines = CatalogueContent.create(xmlEditorResult).find('.ace_content .ace_line')
+    private static final String NEW_DATA_CLASS_NAME = "New ${UUID.randomUUID().toString()}"
 
     def "go to login"() {
         login admin
@@ -44,7 +45,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog displayed
 
         when: 'the model details are filled in'
-        fill nameLabel with "New"
+        fill nameLabel with NEW_DATA_CLASS_NAME
         fill modelCatalogueId with "http://www.example.com/${UUID.randomUUID().toString()}"
         fill description with "Description"
 
@@ -95,7 +96,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         click stepFinish
 
         then: 'the data class is saved'
-        check wizardSummary is "Data Class New created"
+        check wizardSummary is "Data Class ${NEW_DATA_CLASS_NAME} created"
 
         when:
         click exitButton
@@ -104,7 +105,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         selectInTree 'Data Classes', true
 
         then:
-        check CatalogueContent.create('span.catalogue-element-treeview-name', text: startsWith("New")) displayed
+        check CatalogueContent.create('span.catalogue-element-treeview-name', text: startsWith(NEW_DATA_CLASS_NAME)) displayed
 
         check modalDialog gone
     }

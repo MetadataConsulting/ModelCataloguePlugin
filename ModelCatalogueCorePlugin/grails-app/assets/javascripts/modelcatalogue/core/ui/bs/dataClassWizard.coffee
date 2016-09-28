@@ -44,6 +44,7 @@ angular.module('mc.core.ui.bs.dataClassWizard', ['mc.util.messages', 'mc.util.ui
             $scope.totalActions = 0
             $scope.finishInProgress = false
             $scope.finished = false
+            $scope.errored = false
 
             $scope.parentsVisited = false
             $scope.dataModelsVisited = false
@@ -105,6 +106,8 @@ angular.module('mc.core.ui.bs.dataClassWizard', ['mc.util.messages', 'mc.util.ui
           $scope.finish = () ->
             return if $scope.finishInProgress
             $scope.finishInProgress = true
+
+            $scope.messages.clearAllMessages()
 
             $scope.parents.push($scope.parent)                  if angular.isString($scope.parent?.element)
             $scope.children.push($scope.child)                  if angular.isString($scope.child?.element)
@@ -184,17 +187,18 @@ angular.module('mc.core.ui.bs.dataClassWizard', ['mc.util.messages', 'mc.util.ui
                errorResponse = data: errorResponse unless errorResponse.data?
                if errorResponse.data?.errors
                 for error in errorResponse.data.errors
-                  messages.error(error.message)
+                  $scope.messages.error(error.message)
                else if errorResponse.data?.error
-                 messages.error(errorResponse.data.error)
+                 $scope.messages.error(errorResponse.data.error)
                else
                  $log.error 'Unknown response', errorResponse
-                 messages.error('Unknown exception happened while creating new dataClass. See application logs for details.')
+                 $scope.messages.error('Unknown exception happened while creating new dataClass. See application logs for details.')
 
+               $scope.errored = true
                $q.reject(errorResponse.data ? errorResponse)
 
             promise.then (dataClass) ->
-              messages.success "Data Class #{dataClass.name} created"
+              $scope.messages.success "Data Class #{dataClass.name} created"
               $scope.finished = true
               $scope.dataClass = dataClass
 

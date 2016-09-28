@@ -524,6 +524,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
         bindData(helper, getObjectToBind(), [include: includeParams])
 
+        helper.id = params.long('id')
+
         validatePolicies(VerificationPhase.PROPERTY_CHECK, helper, getObjectToBind())
 
         if (helper.hasErrors()) {
