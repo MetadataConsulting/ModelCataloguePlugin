@@ -7,6 +7,7 @@ angular.module('mc.core.ui.bs.dataModelWizard', ['mc.util.messages', 'mc.util.ui
         windowClass: 'create-classification-wizard'
         backdrop: 'static'
         keyboard: false
+        size: 'lg'
         resolve:
           args: -> args
 
@@ -17,8 +18,9 @@ angular.module('mc.core.ui.bs.dataModelWizard', ['mc.util.messages', 'mc.util.ui
           'ngInject'
           execAfter50 = delayedQueueExecutor(500)
 
+
           $scope.reset = ->
-            $scope.classification = { classifies:{}, semanticVersion: '0.0.1' }
+            $scope.classification = { classifies:{}, semanticVersion: '0.0.1', policies: [] }
             $scope.import = {}
             $scope.imports = []
             $scope.messages = messages.createNewMessages()
@@ -27,6 +29,11 @@ angular.module('mc.core.ui.bs.dataModelWizard', ['mc.util.messages', 'mc.util.ui
             $scope.finishInProgress = false
             $scope.finished = false
             $scope.nameUnique = false
+            $scope.copy = {}
+
+            catalogueElementResource('dataModelPolicy').search('unique of kind').then (policies) ->
+              $scope.classification.policies = policies.list
+
 
           $scope.reset()
 
