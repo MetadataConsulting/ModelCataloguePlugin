@@ -114,11 +114,9 @@ class DataImportController  {
             builder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             InputStream inputStream = file.inputStream
             String name = params?.name
-            String idpattern = params.idpattern
             executeInBackground(id, "Imported from OBO") {
                 try {
                     OboLoader loader = new OboLoader(builder)
-                    idpattern = idpattern ?: "${grailsApplication.config.grails.serverURL}/catalogue/ext/${URLEncoder.encode(OboLoader.OBO_ID, 'UTF-8')}/:id".toString().replace(':id', '$id')
                     loader.load(inputStream, name, idpattern)
                     finalizeAsset(id, (DataModel) (builder.created.find {it.instanceOf(DataModel)} ?: builder.created.find{it.dataModel}?.dataModel), userId)
                 } catch (Exception e) {

@@ -31,7 +31,7 @@ class OboLoaderSpec extends Specification {
     }
 
     boolean similar(String sampleFile, String xmlReference) {
-        loader.load(getClass().getResourceAsStream(sampleFile), sampleFile, 'http://www.example.com/obo/$id')
+        loader.load(getClass().getResourceAsStream(sampleFile), sampleFile)
         String xml = stringWriter.toString()
         String expected = getClass().getResourceAsStream(xmlReference).text
 
