@@ -16,6 +16,7 @@ angular.module('mc.core.ui.bs.modalPromptValidationRuleEdit', ['mc.util.messages
           $scope.pending    = {dataModel: null}
           $scope.newEntity  = -> {dataModels: $scope.copy?.dataModels ? [], dataClasses: $scope.copy?.dataClasses ? [], dataElements: $scope.copy?.dataElements ? []}
           $scope.copy     = angular.copy(args.element ? $scope.newEntity())
+          $scope.copy.name = args.name ? $scope.copy.name
           $scope.original = args.element ? {}
           $scope.messages = messages.createNewMessages()
           $scope.create   = args.create
