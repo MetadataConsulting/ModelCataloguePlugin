@@ -1,15 +1,11 @@
 package org.modelcatalogue.core
 
-import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.integration.obo.OboLoader
-import spock.lang.Shared
 import spock.lang.Unroll
 
 class HPOUpdatesSpec extends AbstractIntegrationSpec  {
-
-    @Shared GrailsApplication grailsApplication
 
     CatalogueBuilder catalogueBuilder
     ElementService elementService
@@ -20,12 +16,12 @@ class HPOUpdatesSpec extends AbstractIntegrationSpec  {
     }
 
     @Unroll
-    def "update HPO with id pattern #idPattern"() {
+    def "update HPO"() {
         OboLoader loader = new OboLoader(catalogueBuilder)
 
         when:
         InputStream test1 = getClass().getResourceAsStream('test1.obo')
-        loader.load(test1, 'HPO', idPattern)
+        loader.load(test1, 'HPO')
 
         then:
         noExceptionThrown()
@@ -49,7 +45,7 @@ class HPOUpdatesSpec extends AbstractIntegrationSpec  {
 
         when:
         InputStream test2 = getClass().getResourceAsStream('test2.obo')
-        loader.load(test2, 'HPO', idPattern)
+        loader.load(test2, 'HPO')
         DataModel hpoDraft = DataModel.findByNameAndStatus('HPO', ElementStatus.DRAFT)
 
         then:
@@ -81,19 +77,13 @@ class HPOUpdatesSpec extends AbstractIntegrationSpec  {
 
         when:
         InputStream test3 = getClass().getResourceAsStream('test3.obo')
-        loader.load(test3, 'HPO', idPattern)
+        loader.load(test3, 'HPO')
         hpoDraft = DataModel.findByNameAndStatus('HPO', ElementStatus.DRAFT)
 
         then:
         noExceptionThrown()
         hpoDraft
         hpoDraft.countDeclares() == 15
-
-        where:
-        idPattern << [
-            "${grailsApplication.config.grails.serverURL}/catalogue/ext/${URLEncoder.encode(OboLoader.OBO_ID, 'UTF-8')}/:id".toString().replace(':id', '$id'),
-            'http://purl.obolibrary.org/obo/${id.replace(\'%3A\', \'_\')}'
-        ]
 
     }
 

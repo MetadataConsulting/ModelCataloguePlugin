@@ -16,9 +16,6 @@ class OboLoader {
 
     final CatalogueBuilder builder
 
-    private SimpleTemplateEngine engine = new SimpleTemplateEngine()
-
-    static final String OBO_ID = 'OBO ID'
     static final String ALTERNATIVE_IDS = 'Alternative IDs'
 
     OboLoader(CatalogueBuilder builder) {
@@ -156,14 +153,12 @@ class OboLoader {
      * This import is initially tuned up for Human Phenotype ontology, few parts are still missing.
      * See http://www.geneontology.org/GO.format.obo-1_2.shtml#S.1 for full current specification.
      */
-    void load(InputStream is, String name, String mcIDPattern) {
-        assert mcIDPattern, "Id pattern must be provided"
+    void load(InputStream is, String name) {
         log.info "Parsing OBO file for ${name}"
         OBODoc document = new OrderKeepingOboFormatParser().parse(new BufferedReader(new InputStreamReader(is)))
 
         Map<String, String> namespacesToClassifications = [:]
         Map<String, String> oboIdsToNames = [:]
-        Template idTemplate = getIdTemplate(mcIDPattern)
 
         log.info "Collecting OBO IDs"
         document.termFrames.eachWithIndex { Frame frame, i ->
@@ -181,17 +176,13 @@ class OboLoader {
                     namespacesToClassifications[defaultNamespace] = name
                 }
 
-                boolean needsDeprecated = false
-
                 document.termFrames.eachWithIndex { Frame frame, i ->
                     log.info "[${(i + 1).toString().padLeft(6, '0')}/${document.termFrames.size().toString().padLeft(6, '0')}] Importing model ${frame.id}: ${frame.getClause('name')?.value}".toString()
 
 
-                    Map<String, Object> modelAttributes = getModelAttributes(frame, idTemplate)
+                    Map<String, Object> modelAttributes = getModelAttributes(frame)
 
                     dataClass(modelAttributes) {
-                        ext OBO_ID, frame.id
-
                         handleDefAndComment(frame)
                         handleCreatedBy(frame)
                         handleCreatedDate(frame)
@@ -199,31 +190,21 @@ class OboLoader {
                         handleAltIds(frame)
                         handleXrefs(frame)
                         handlePropertyValues(frame)
-                        handleIsA(frame, idTemplate, oboIdsToNames)
+                        handleIsA(frame, oboIdsToNames)
                         handleSynonym(frame)
-                        handleReplacedBy(frame, idTemplate, oboIdsToNames)
+                        handleReplacedBy(frame, oboIdsToNames)
                     }
                 }
             }
-
-            // TODO: find better way how to do this
-            // no longer supported at the moment as there must be only one owning data model
-//            for (Clause clause in document.headerFrame.getClauses('subsetdef')) {
-//                namespacesToClassifications[clause.value.toString()] = clause.value2.toString()
-//                classification(name: clause.value2.toString()) {
-//                    ext 'namespace', clause.value.toString()
-//                    rel 'classification' from classification called name
-//                }
-//            }
         }
 
         log.info "Import finished for ${name}"
     }
 
-    private static Map<String, Object> getModelAttributes(Frame frame, Template idTemplate) {
+    private static Map<String, Object> getModelAttributes(Frame frame) {
         Map<String, Object> attrs = [:]
 
-        attrs.id = getId(frame.id, idTemplate)
+        attrs.id = frame.id
         attrs.name = getName(frame)
 
         if (frame.getClause('is_obsolete') || frame.getClause('replaced_by')) {
@@ -233,13 +214,9 @@ class OboLoader {
         attrs
     }
 
-    private void handleIsA(Frame frame, Template idTemplate, Map<String, String> oboIdsToNames) {
+    private void handleIsA(Frame frame, Map<String, String> oboIdsToNames) {
         for (Clause clause in frame.getClauses('is_a')) {
-            if (idTemplate) {
-                builder.rel 'hierarchy' from builder.ref(getId(clause.value?.toString(), idTemplate))
-            } else {
-                builder.rel 'hierarchy' from oboIdsToNames[clause.value?.toString()]
-            }
+            builder.rel 'hierarchy' from oboIdsToNames[clause.value?.toString()]
         }
     }
 
@@ -252,29 +229,12 @@ class OboLoader {
         builder.ext 'Synonyms', textual.join(', ')
     }
 
-    private void handleReplacedBy(Frame frame, Template idTemplate, Map<String, String> oboIdsToNames) {
+    private void handleReplacedBy(Frame frame, Map<String, String> oboIdsToNames) {
         for (Clause clause in frame.getClauses('replaced_by')) {
-            if (idTemplate) {
-                builder.rel 'supersession' to builder.ref(getId(clause.value?.toString(), idTemplate))
-            } else {
-                builder.rel 'supersession' to oboIdsToNames[clause.value?.toString()]
-            }
+            builder.rel 'supersession' to oboIdsToNames[clause.value?.toString()]
         }
     }
 
-    private static String getId(oboId, Template idTemplate) {
-        assert idTemplate
-        StringWriter sw = new StringWriter()
-        idTemplate.make(id: URLEncoder.encode(oboId?.toString(), 'UTF-8')).writeTo(sw)
-        return sw.toString()
-    }
-
-    private Template getIdTemplate(String mcIDPattern) {
-        if (!mcIDPattern) {
-            return null
-        }
-        engine.createTemplate(mcIDPattern)
-    }
 
     private static String getName(Frame frame) {
         Object name = frame.getClause('name')
@@ -313,7 +273,7 @@ class OboLoader {
         String namespace = frame.getClause('namespace').value?.toString()
 
         if (namespace) {
-            builder.rel 'classification' from namespacesToClassification[namespace]
+            builder.rel 'declaration' from namespacesToClassification[namespace]
         }
 
         for (Clause clause in frame.getClauses('subset')) {
@@ -325,7 +285,7 @@ class OboLoader {
             if (!classification) {
                 continue
             }
-            builder.rel 'classification' from classification
+            builder.rel 'declaration' from classification
         }
     }
 

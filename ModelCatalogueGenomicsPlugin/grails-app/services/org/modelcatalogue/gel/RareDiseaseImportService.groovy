@@ -73,10 +73,7 @@ class RareDiseaseImportService {
 
     static DataClass getHpo(DataModel dataModel, String hpoId) {
         DetachedCriteria<DataClass> criteria = new DetachedCriteria<DataClass>(DataClass).build {
-            extensions {
-                eq 'name', OboLoader.OBO_ID
-                eq 'extensionValue', hpoId
-            }
+            eq 'modelCatalogueId', hpoId
             eq 'dataModel', dataModel
         }
         ElementService.getLatestFromCriteria(criteria) as DataClass
