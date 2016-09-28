@@ -8,6 +8,7 @@ if window.fixtures
     modelCatalogueApiRoot = null
 
     beforeEach module "mc.core.listEnhancer"
+    beforeEach module "mc.core.promiseEnhancer"
 
     beforeEach inject (_rest_, _enhance_, _$httpBackend_, _$rootScope_, _modelCatalogueApiRoot_) ->
       rest                  = _rest_
@@ -23,6 +24,7 @@ if window.fixtures
 
       result = null
       error  = null
+      rest.cleanCache()
       enhance(rest(method: 'GET', url: '/foo')).then( (_result_) ->
         result = _result_
       , (_error_) ->
@@ -77,6 +79,8 @@ if window.fixtures
       .when("GET", "#{modelCatalogueApiRoot}/dataType/?max=1&offset=1")
       .respond(nextList)
 
+      rest.cleanCache()
+
       nextResult = null
       nextError  = null
 
@@ -105,6 +109,8 @@ if window.fixtures
       .when("GET", "#{modelCatalogueApiRoot}/dataType/?max=10&offset=0")
       .respond(fixtures.dataType.list1)
 
+      rest.cleanCache()
+
       result = null
       error  = null
       nextResult.previous().then( (_result_) ->
@@ -125,55 +131,6 @@ if window.fixtures
       expect(result.currentPage).toBe(1)
       expect(result.list).toBeDefined()
       expect(result.list.length).toBe(1)
-
-      gotoResult = null
-      error  = null
-      result.goto(2).then( (_result_) ->
-        gotoResult = _result_
-      , (_error_) ->
-        error = _error_
-      )
-
-      expect(gotoResult).toBeNull()
-
-      $httpBackend.flush()
-
-      expect(gotoResult).toBeDefined()
-      expect(gotoResult.total).toBe(48)
-      expect(gotoResult.page).toBe(1)
-      expect(gotoResult.size).toBe(2)
-      expect(gotoResult.offset).toBe(10)
-      expect(gotoResult.currentPage).toBe(11)
-      expect(gotoResult.list).toBeDefined()
-      expect(gotoResult.list.length).toBe(1)
-
-
-      $httpBackend
-      .when("GET", "#{modelCatalogueApiRoot}/dataType/?max=1&offset=10&order=asc&sort=name")
-      .respond(nextList)
-
-      reloadResult = null
-      error  = null
-      gotoResult.reload(sort: 'name', order: 'asc').then( (_result_) ->
-        reloadResult = _result_
-      , (_error_) ->
-        error = _error_
-      )
-
-      expect(reloadResult).toBeNull()
-
-      $httpBackend.flush()
-
-      expect(reloadResult).toBeDefined()
-      expect(reloadResult.total).toBe(48)
-      expect(reloadResult.page).toBe(1)
-      expect(reloadResult.size).toBe(2)
-      expect(reloadResult.offset).toBe(10)
-      expect(reloadResult.currentPage).toBe(11)
-      expect(reloadResult.list).toBeDefined()
-      expect(reloadResult.list.length).toBe(1)
-
-
 
       listEnhancer = enhance.getEnhancer('list')
 

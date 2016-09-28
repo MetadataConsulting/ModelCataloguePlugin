@@ -5,9 +5,11 @@ describe "mc.core.catalogueElementResource", ->
   catalogueElementResource  = null
   modelCatalogueApiRoot     = null
 
+
   beforeEach module "mc.core.catalogueElementResource"
   beforeEach module "mc.core.catalogueElementEnhancer"
   beforeEach module "mc.core.listReferenceEnhancer"
+  beforeEach module "mc.core.promiseEnhancer"
 
   beforeEach inject (_catalogueElementResource_, _modelCatalogueApiRoot_, _$httpBackend_, _$rootScope_) ->
     catalogueElementResource  = _catalogueElementResource_
@@ -28,7 +30,7 @@ describe "mc.core.catalogueElementResource", ->
     expect(dataTypes.getIndexPath()).toBe(dataTypesRootPath)
 
     return unless window.fixtures
-    
+
     describe "with methods for CRUD operations", ->
 
       describe "can get single resource", ->
@@ -39,6 +41,7 @@ describe "mc.core.catalogueElementResource", ->
           $httpBackend
           .when("GET", "#{modelCatalogueApiRoot}/dataType/#{testElementId}")
           .respond(fixtures.dataType.showOne)
+
 
           result = null
           error  = null

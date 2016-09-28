@@ -10,6 +10,7 @@ angular.module 'mc.core', [
   'mc.core.elementEnhancer'
   'mc.core.listEnhancer'
   'mc.core.actionEnhancer'
+  'mc.core.promiseEnhancer'
   'mc.core.listReferenceEnhancer'
   'mc.core.modelCatalogueApiRoot'
   'mc.core.modelCatalogueSearch'

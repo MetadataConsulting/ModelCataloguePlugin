@@ -58,11 +58,16 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
         if showMore.offset()?.top < root.offset()?.top + 3 * root.height() and angular.isFunction($scope.node.showMore)
           $scope.node.showMore()
 
+      onlyImportant = (extraParameters) ->
+        extra = angular.copy(extraParameters ? {})
+        extra.path = undefined
+        extra.descendPath = undefined
+        extra
       createShowMore  = (list) ->
         # function to load more items to existing $$children helper property
         ->
           $scope.node.showingMore = true
-          list.next($scope.extraParameters).then (nextList) ->
+          list.next(onlyImportant($scope.extraParameters)).then (nextList) ->
             for item in nextList.list
               it = if item.relation then item.relation else item
               $scope.node.children.push(
@@ -177,7 +182,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', [
 
           # first load
           $scope.node.loadingChildren = true
-          $scope.descendFun(null, $scope.extraParameters).then(loadNewChildren).finally ->
+          $scope.descendFun(null, onlyImportant($scope.extraParameters)).then(loadNewChildren).finally ->
             $scope.node.loadingChildren = false
 
         if $scope.extraParameters?.prefetch or startsWithSegment($scope.element, $scope.extraParameters?.path?.segments)
