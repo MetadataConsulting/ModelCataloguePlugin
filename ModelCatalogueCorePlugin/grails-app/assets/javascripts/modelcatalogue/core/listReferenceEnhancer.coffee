@@ -8,7 +8,7 @@ angular.module('mc.core.listReferenceEnhancer', ['mc.util.rest', 'mc.util.enhanc
         if not params.dataModel and $state.params.dataModelId and not URI(link).hasQuery('dataModel')
           params = angular.extend({dataModel: $state.params.dataModelId}, params)
 
-        enhance rest method: 'GET', url: "#{link}#{if tail? then '/' + tail else ''}", params: params
+        enhance rest join: true, method: 'GET', url: "#{link}#{if tail? then '/' + tail else ''}", params: params
       query.total = listReference.count
       query.link = link.toString()
       query.base = listReference.link

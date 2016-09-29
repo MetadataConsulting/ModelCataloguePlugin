@@ -12,7 +12,7 @@ angular.module('mc.util.rest', ['mc.util.messages']).factory 'rest', ($q, $http,
 
   rest = (config) ->
     key = createKey(config)
-    if config.cache and (not config.method or config.method is 'GET') and pendingRequests.hasOwnProperty(key)
+    if config.join and (not config.method or config.method is 'GET') and pendingRequests.hasOwnProperty(key)
       return pendingRequests[key]
 
     deferred = $q.defer()
