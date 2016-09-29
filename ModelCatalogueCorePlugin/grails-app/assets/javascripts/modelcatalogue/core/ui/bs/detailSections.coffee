@@ -279,6 +279,8 @@ x in ['apple', 'banana', 'cherry']
         label: 'New Data Element'
         name: 'add'
         icon: 'fa fa-plus-circle text-success'
+        hide: (element) ->
+          element.status in ["FINALIZED", "DEPRECATED"]
         action: (messages, element) ->
           messages.prompt('Create Relationship', '',
             {
@@ -326,6 +328,8 @@ x in ['apple', 'banana', 'cherry']
         label: 'New Data Class'
         name: 'add'
         icon: 'fa fa-plus-circle text-success'
+        hide: (element) ->
+          element.status in ["FINALIZED", "DEPRECATED"]
         action: (messages, element) ->
           messages.prompt('Create Relationship', '',
             {
@@ -413,6 +417,8 @@ x in ['apple', 'banana', 'cherry']
         label: 'Context Data Class'
         name: 'add'
         icon: 'fa fa-plus-circle text-success'
+        hide: (element) ->
+          element.status in ["FINALIZED", "DEPRECATED"]
         action: (messages, element) ->
           messages.prompt('Create Relationship', '',
             {
@@ -467,6 +473,8 @@ x in ['apple', 'banana', 'cherry']
         label: 'Involved Data Elements'
         name: 'add'
         icon: 'fa fa-plus-circle text-success'
+        hide: (element) ->
+          element.status in ["FINALIZED", "DEPRECATED"]
         action: (messages, element) ->
           messages.prompt('Create Relationship', '',
             {
