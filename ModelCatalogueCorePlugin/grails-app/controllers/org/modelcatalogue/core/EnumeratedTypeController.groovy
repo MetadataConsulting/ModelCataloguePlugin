@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.enumeration.Enumeration
 import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
@@ -79,7 +80,7 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
         ret.elementType = "${EnumeratedType.name}.EnumeratedValue"
         ret.name = "${enumeratedValue.getKey() ?: ''}: ${enumeratedValue.getValue() ?: ''}"
         ret.link = "$link#${enumeratedValue.getKey()}"
-        ret.status = type.status.toString()
+        ret.status = enumeratedValue.deprecated ? ElementStatus.DEPRECATED.toString() : type.status.toString()
         ret.dataModels = relationshipService.getDataModelsInfo(type)
         ret
     }
