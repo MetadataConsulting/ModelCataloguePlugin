@@ -155,6 +155,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
       return undefined if not catalogue.isInstanceOf($scope.list.itemType, 'relationship')
       return undefined if not $scope.$parent
       return undefined if not $scope.$parent.element
+      return undefined if $scope.$parent.element.status in ["FINALIZED", "DEPRECATED"]
       return undefined if not security.hasRole('CURATOR')
 
       direction = if $scope.list.base?.indexOf('/incoming/') > -1 then 'destinationToSource' else 'sourceToDestination'
@@ -165,7 +166,6 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
         label: 'Add'
         icon: 'fa fa-plus-circle'
         type: 'success'
-        disabled: $scope.$parent.element.archived
         watches: [
           (scope) -> scope.$parent.element.status
           (scope) -> scope.$parent.element.archived
