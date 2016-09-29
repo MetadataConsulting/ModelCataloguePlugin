@@ -63,8 +63,8 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
         loadMoreIfNeeded() unless loading
 
       $scope.doManualLoad = ->
-        $scope.manualLoad = false
-        $scope.loadMore()
+        # $scope.manualLoad = false
+        $scope.loadMore(100)
 
 
       getRowAndIndexBefore = (tableRowIndex, originalRowAndIndex) ->

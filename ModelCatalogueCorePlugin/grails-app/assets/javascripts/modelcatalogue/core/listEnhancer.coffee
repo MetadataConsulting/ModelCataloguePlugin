@@ -28,7 +28,8 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
 
           if @next
             nextUrl = @next
-            @next = (extraParameters = {}) -> enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{nextUrl}", params: extraParameters, join: true
+            @next = (extraParameters = {}) ->
+              enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{arguments.callee.url}", params: extraParameters, join: true
             @next.size   = Math.min(@page, @total - (@offset + @page))
             @next.url    = nextUrl
             @next.total  = @total
@@ -50,7 +51,8 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
             @next.total  = @total
           if @previous
             prevUrl = @previous
-            @previous = (extraParameters = {}) -> enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{prevUrl}", params: extraParameters, join: true
+            @previous = (extraParameters = {}) ->
+              enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{arguments.callee.url}", params: extraParameters, join: true
             @previous.size   = Math.min(@page, @offset)
             @previous.total  = @total
             @previous.url    = prevUrl
