@@ -76,7 +76,7 @@
     <div class="small col-lg-8" ng-if="!editableForm.$visible &amp;&amp; element.dataType.enumerations">
       <strong>Enumerations:</strong>
       <table class="table table-condensed table-striped table-borderless table-no-margin">
-        <tr ng-repeat="value in element.dataType.enumerations.values track by value.key">
+        <tr ng-repeat="value in element.dataType.enumerations.values track by value.key" ng-class="{'danger': value.deprecated}">
           <th>
             <small class="text-wrap">{{value.key}}</small>
           </th>
