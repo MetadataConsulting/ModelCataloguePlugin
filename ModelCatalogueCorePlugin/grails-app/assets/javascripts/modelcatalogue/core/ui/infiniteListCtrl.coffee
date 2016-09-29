@@ -143,13 +143,16 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
 
   $scope.isVisible = -> $element.is(':visible')
 
-  $scope.loadMore = ->
+  $scope.loadMore = (max) ->
     if $scope.total > $scope.elements.length
       $scope.loading = true
 
       currentTime = new Date().getTime()
 
       if $scope.next
+        if max
+          $scope.next.url = URI($scope.next.url).removeSearch('max').addSearch('max', max).toString()
+
         $timeout($scope.next, Math.max(1, $scope.lastLoadTime + $scope.timeBetweenLoading - currentTime)).then (result) ->
           $scope.lastLoadTime = new Date().getTime()
           $scope.loading = false
