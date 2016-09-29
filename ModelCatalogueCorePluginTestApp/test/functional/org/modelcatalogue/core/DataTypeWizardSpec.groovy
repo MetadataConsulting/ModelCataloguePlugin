@@ -269,6 +269,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click inlineEditSubmit
 
         then:
+        check detailSectionCustomMetadataContent gone
         click Common.detailSectionMetadata.find('.title .btn')
         check detailSectionCustomMetadataContent contains "foo"
         check detailSectionCustomMetadataContent contains "bar"
@@ -287,6 +288,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click inlineEditSubmit
 
         then:
+        check detailSectionCustomMetadataContent gone
         click Common.detailSectionMetadata.find('.title .btn')
         check detailSectionCustomMetadataContent missing "foo"
         check detailSectionCustomMetadataContent missing "bar"
