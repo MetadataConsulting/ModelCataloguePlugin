@@ -1,5 +1,5 @@
 angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot']).config ['enhanceProvider', (enhanceProvider)->
-  condition = (list) -> list.hasOwnProperty('base')
+  condition = (list) -> list.hasOwnProperty('base') and list.hasOwnProperty('list')
   factory   = ['$q', 'modelCatalogueApiRoot', 'rest', '$rootScope', 'enhance', ($q, modelCatalogueApiRoot, rest, $rootScope, enhance) ->
     listEnhancer = (list) ->
       class ListDecorator
@@ -29,7 +29,7 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
           if @next
             nextUrl = @next
             @next = (extraParameters = {}) ->
-              enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{arguments.callee.url}", params: extraParameters, cache: true
+              enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{arguments.callee.url}", params: extraParameters, join: true
             @next.size   = Math.min(@page, @total - (@offset + @page))
             @next.url    = nextUrl
             @next.total  = @total
@@ -52,7 +52,7 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
           if @previous
             prevUrl = @previous
             @previous = (extraParameters = {}) ->
-              enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{arguments.callee.url}", params: extraParameters, cache: true
+              enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{arguments.callee.url}", params: extraParameters, join: true
             @previous.size   = Math.min(@page, @offset)
             @previous.total  = @total
             @previous.url    = prevUrl
@@ -87,7 +87,7 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
             else
               theLink = "#{theLink}?offset=#{theOffset}"
 
-            enhance rest method: 'GET', url: theLink, cache: true
+            enhance rest method: 'GET', url: theLink, join: true
 
           @reload ?= (config = {}) ->
             params = {
@@ -101,7 +101,7 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
 
             theLink = "#{modelCatalogueApiRoot}#{@base}"
 
-            enhance rest method: 'GET', url: theLink, params: params #, cache: true
+            enhance rest method: 'GET', url: theLink, params: params , join: true
 
 
       # return new list decorator
