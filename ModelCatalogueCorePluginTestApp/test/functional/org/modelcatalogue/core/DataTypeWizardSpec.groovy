@@ -108,6 +108,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         check primitiveContent displayed
         fill 'measurementUnit' with 'new unit'
         check primitiveContent.find('.dropdown-menu') displayed
+        check "$primitiveContent .dropdown-menu" displayed
         pressKey("$primitiveContent input", Keys.ESCAPE)
 
         click save
