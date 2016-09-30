@@ -257,6 +257,19 @@ x in ['apple', 'banana', 'cherry']
     }
   }
 
+
+  getRelationshipSummary = (relationship) ->
+    """
+      <a href='#{relationship.relation.href()}'>#{relationship.ext.get('name') ? relationship.ext.get('Name') ? relationship.relation.name}</a>
+      <small class='text-muted'>#{relationship.relation.getVersionAndId()}</small>
+    """
+
+  getStatusClass = (status) ->
+    return 'label-warning'  if status == 'DRAFT'
+    return 'label-info'     if status == 'PENDING'
+    return 'label-danger'   if status == 'DEPRECATED'
+    return 'label-primary'
+
   detailSectionsProvider.register {
     title: 'Children'
     position: 70
@@ -299,9 +312,8 @@ x in ['apple', 'banana', 'cherry']
         [
           {
             header: 'Name',
-            value: "(ext.get('name') || ext.get('Name') || relation.name) + ' ' + relation.getVersionAndId()",
+            value: getRelationshipSummary,
             classes: 'col-md-5',
-            href: 'relation.href()'
           }
           {header: 'Description', value: "relation.description", classes: 'col-md-4', textEllipsis: true}
           {header: 'Occurs', value: printMetadataOccurrencesOnly, classes: 'col-md-4'}
