@@ -5,6 +5,7 @@ import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
 import org.modelcatalogue.core.geb.Common
 import spock.lang.Stepwise
+import org.openqa.selenium.Keys
 
 import static org.modelcatalogue.core.geb.Common.*
 
@@ -47,7 +48,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     public static final String primitiveTypeValue = 'string:primitiveType'
     public static final String metadataTable = 'table.soe-table'
     public static final String removeRelationshipButton = '#role_item_remove-relationshipBtn'
-    public static final String modalDataTypePrimitive = 'div.modal label[for=measurementUnit]'
+    public static final String primitiveContent = '[data-view-name="Measurement Unit"]'
 
     def "go to login"() {
         login admin
@@ -104,8 +105,10 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
         click pickPrimitiveType
 
-        check modalDataTypePrimitive displayed
+        check primitiveContent displayed
         fill 'measurementUnit' with 'new unit'
+        check primitiveContent.find('.dropdown-menu') displayed
+        pressKey("$primitiveContent input", Keys.ESCAPE)
 
         click save
 

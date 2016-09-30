@@ -47,23 +47,23 @@
       <ordered-map-editor object="copy.enumerations" title="Enumerations" key-placeholder="Value or copy & paste from excel" value-placeholder="Description"></ordered-map-editor>
     </div>
     <div uib-collapse="subtype != 'referenceType'">
-      <div class="form-group">
+      <div class="form-group" data-view-name="Data Class">
         <label for="dataClass" class="">Data Class</label>
         <input type="text" id="dataClass" placeholder="Data Class" ng-model="copy.dataClass" catalogue-element-picker="dataClass" label="el.name">
       </div>
     </div>
     <div uib-collapse="subtype != 'primitiveType'">
-      <div class="form-group">
+      <div class="form-group" data-view-name="Measurement Unit">
         <label for="measurementUnit" class="">Measurement Unit</label>
         <input type="text" id="measurementUnit" placeholder="Measurement Unit" ng-model="copy.measurementUnit" catalogue-element-picker="measurementUnit" label="el.name">
       </div>
     </div>
     <div uib-collapse="subtype != 'subset'">
-      <div class="form-group">
+      <div class="form-group" data-view-name="Enumerated Type Base">
         <label for="baseEnumeration" class="">Enumerated Type Base</label>
         <input type="text" id="baseEnumeration" placeholder="Enumerated Type Base" ng-model="copy.baseEnumeration" catalogue-element-picker="enumeratedType" label="el.name">
       </div>
-      <div class="form-group" ng-if="copy.baseEnumeration.enumerations">
+      <div class="form-group" ng-if="copy.baseEnumeration.enumerations" data-view-name="Subset">
         <label for="subset">Subset</label>
         <div class="alert alert-warning" ng-if="copy.selectedEnumerations.values.length == 0">If no enumeration value selected, all values will be used</div>
         <div class="checkbox" ng-repeat="value in copy.baseEnumeration.enumerations.values track by value.key">
