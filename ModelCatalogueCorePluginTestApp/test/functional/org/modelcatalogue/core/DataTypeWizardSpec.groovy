@@ -4,6 +4,7 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
 import org.modelcatalogue.core.geb.Common
+import spock.lang.Ignore
 import spock.lang.Stepwise
 import org.openqa.selenium.Keys
 
@@ -262,6 +263,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click Common.detailSectionFormMetadata.find('.title .btn')
     }
 
+    @Ignore
     def "add metadata"() {
         setup:
         click inlineEdit
@@ -283,6 +285,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click Common.detailSectionMetadata.find('.title .btn')
     }
 
+    @Ignore
     def "remove metadata"() {
         setup:
         click inlineEdit
