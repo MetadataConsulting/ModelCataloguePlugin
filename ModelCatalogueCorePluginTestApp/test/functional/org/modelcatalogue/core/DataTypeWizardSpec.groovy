@@ -47,6 +47,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     public static final String primitiveTypeValue = 'string:primitiveType'
     public static final String metadataTable = 'table.soe-table'
     public static final String removeRelationshipButton = '#role_item_remove-relationshipBtn'
+    public static final String modalDataTypePrimitive = 'div.modal label[for=measurementUnit]'
 
     def "go to login"() {
         login admin
@@ -99,12 +100,12 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         fill nameLabel with 'New Primitive Type'
+        fill description with "Test Primitive Unit"
 
         click pickPrimitiveType
 
-
+        check modalDataTypePrimitive displayed
         fill 'measurementUnit' with 'new unit'
-        fill description with "Test Primitive Unit"
 
         click save
 
