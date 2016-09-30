@@ -85,6 +85,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         setup: "fill required data for finalization"
         click inlineEdit
+        click Common.detailSectionMetadata.find('.title .btn')
         fill 'metadata-authors' with 'Neville Chamberlain'
         fill 'metadata-reviewers' with 'Édouard Daladier'
         fill 'metadata-owner' with 'Jan Hus'

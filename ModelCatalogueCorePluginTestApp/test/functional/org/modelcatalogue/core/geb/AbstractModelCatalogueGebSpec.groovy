@@ -9,6 +9,7 @@ import org.openqa.selenium.StaleElementReferenceException
 import org.openqa.selenium.logging.LogEntries
 import org.openqa.selenium.logging.LogEntry
 import org.openqa.selenium.logging.LogType
+import org.openqa.selenium.Keys
 
 import static org.modelcatalogue.core.geb.Common.*
 
@@ -479,5 +480,9 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         }
         click 'div.modal .btn-primary'
         check backdrop gone
+    }
+
+    void pressKey(String selector = "body", Keys keys = Keys.ENTER) {
+        $(selector) << keys
     }
 }

@@ -58,10 +58,12 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
 
     @param types          supported types
     @param keys           supported metadata keys
+    @param typeKeys       supported metadata keys for certain catalogue element type
     @param template       template to be used for rendering
     @param position       position in the view (negative numbers goes before the description, positive after the description
     @param title          optional title to be displayed
     @param hideIfNoData   optional hide template when no data are in there
+    @param hideByDefault  optional hide the template by default
   ###
   detailSectionsProvider.register = (configuration) ->
     throw new Error('Please provide supported types configuration ("types" configuration property)') unless configuration.types?
@@ -106,17 +108,33 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
             title: configuration.title
             position: configuration.position
             hideInOverview: configuration.hideInOverview
-            hideIfNoData: configuration.hideIfNoData?
+            hideIfNoData: configuration.hideIfNoData
+            hideByDefault: configuration.hideByDefault
             keys: angular.copy configuration.keys
+            typeKeys: angular.copy configuration.typeKeys
             data: angular.copy configuration.data
             autoSave: angular.copy configuration.autoSave
             actions: angular.copy configuration.actions
-            handlesKey:   (key) -> key in @keys
+            handlesKey:   (key, element = null) ->
+              if (element == null || @typeKeys == null)
+                key in @keys
+              else
+                keys = []
+                angular.forEach(@typeKeys, (values, type) ->
+                  if(element.isInstanceOf(type))
+                    keys = values
+                )
+                key in keys
             hasData:      (element) -> configuration.keys.some (key) -> element.ext.get(key)?
             isTemplateHidden: (element) ->
               if @hasOwnProperty('templateHidden')
                 return @templateHidden
-              return @templateHidden = @hideIfNoData and not @hasData(element)
+              else if angular.isDefined(@hideByDefault)
+                return @templateHidden = @hideByDefault
+              else if angular.isDefined(@hideIfNoData)
+                return @templateHidden = @hideIfNoData and not @hasData(element)
+              else
+                return @templateHidden = false
             toggleTemplateHidden: (element) -> @templateHidden = not @isTemplateHidden(element)
 
           # assign values to the view

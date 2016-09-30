@@ -3,7 +3,9 @@ package org.modelcatalogue.core
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
+import org.modelcatalogue.core.geb.Common
 import spock.lang.Stepwise
+import org.openqa.selenium.Keys
 
 import static org.modelcatalogue.core.geb.Common.*
 
@@ -46,6 +48,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     public static final String primitiveTypeValue = 'string:primitiveType'
     public static final String metadataTable = 'table.soe-table'
     public static final String removeRelationshipButton = '#role_item_remove-relationshipBtn'
+    public static final String primitiveContent = '[data-view-name="Measurement Unit"]'
 
     def "go to login"() {
         login admin
@@ -98,12 +101,15 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         fill nameLabel with 'New Primitive Type'
+        fill description with "Test Primitive Unit"
 
         click pickPrimitiveType
 
-
+        check primitiveContent displayed
         fill 'measurementUnit' with 'new unit'
-        fill description with "Test Primitive Unit"
+        check primitiveContent.find('.dropdown-menu') displayed
+        check "$primitiveContent .dropdown-menu" displayed
+        pressKey("$primitiveContent input", Keys.ESCAPE)
 
         click save
 
@@ -243,22 +249,23 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "Check Form (Item) detail section is present and collapsed"() {
         expect:
-        check detailSectionFormItem present once
+        check Common.detailSectionFormMetadata present once
         check detailSectionFormItemContent gone
 
         when: "Click the title"
-        click detailSectionFormItem.find(".title")
+        click Common.detailSectionFormMetadata.find('.title .btn')
 
         then: "Content is displayed"
         check detailSectionFormItemContent displayed
 
         cleanup:
-        click detailSectionFormItem.find(".title")
+        click Common.detailSectionFormMetadata.find('.title .btn')
     }
 
     def "add metadata"() {
         setup:
         click inlineEdit
+        click Common.detailSectionMetadata.find('.title .btn')
         scroll metadataTable
 
         when:
@@ -267,13 +274,19 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click inlineEditSubmit
 
         then:
+        check inlineEditSubmit gone
+        // wait some time in order to have the view rendered
+        Thread.sleep(300)
+        click Common.detailSectionMetadata.find('.title .btn')
         check detailSectionCustomMetadataContent contains "foo"
         check detailSectionCustomMetadataContent contains "bar"
+        click Common.detailSectionMetadata.find('.title .btn')
     }
 
     def "remove metadata"() {
         setup:
         click inlineEdit
+        click Common.detailSectionMetadata.find('.title .btn')
         scroll metadataTable
 
         when:
@@ -282,8 +295,13 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         click inlineEditSubmit
 
         then:
+        check inlineEditSubmit gone
+        // wait some time in order to have the view rendered
+        Thread.sleep(300)
+        click Common.detailSectionMetadata.find('.title .btn')
         check detailSectionCustomMetadataContent missing "foo"
         check detailSectionCustomMetadataContent missing "bar"
+        click Common.detailSectionMetadata.find('.title .btn')
     }
 
     def "create new mapping"() {
