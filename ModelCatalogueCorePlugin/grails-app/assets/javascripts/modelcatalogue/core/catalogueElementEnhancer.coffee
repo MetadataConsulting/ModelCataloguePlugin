@@ -207,7 +207,12 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
             return semver
 
           self.getVersionAndId = ->
-            "#{@latestVersionId}@#{@getSemanticVersion()}"
+            "#{@getExternalId()}@#{@getSemanticVersion()}"
+
+          self.getExternalId = ->
+            return @latestVersionId if @modelCatalogueId?.indexOf('http') == 0
+            return @modelCatalogueId if @modelCatalogueId
+            return @latestVersionId
 
           self.getDataModelStatus = ->
             if @dataModel

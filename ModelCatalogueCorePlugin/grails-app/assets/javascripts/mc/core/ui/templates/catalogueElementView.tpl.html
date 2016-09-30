@@ -12,6 +12,9 @@
                 title="{{getDeprecationWarning()}}">
           </span>
           <span editable-text="copy.name" e-name="name">{{element.name}}</span>
+          <small class="text-muted" editable-text="copy.modelCatalogueId" e-name="modelCatalogueId">
+              {{element.getExternalId()}}
+          </small>
           <small>
             <a ng-href="{{element.dataModel.href()}}"
                class="label"
@@ -21,7 +24,8 @@
                 'label-primary': element.getDataModelStatus() == 'FINALIZED',
                 'label-danger': element.getDataModelStatus() == 'DEPRECATED'
               }">
-              {{element.getVersionAndId()}}
+              <catalogue-element-icon type="'dataModel'"></catalogue-element-icon>
+              {{element.getDataModelWithVersion()}}
             </a>
           </small>
         </h3>

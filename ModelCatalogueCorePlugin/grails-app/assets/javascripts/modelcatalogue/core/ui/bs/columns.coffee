@@ -47,9 +47,7 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
   getNameIdAndVersion = (dataElement) ->
     "
       <a href='#{dataElement.href()}'>#{dataElement.name}</a>
-      <span class='label #{getStatusClass(dataElement.getDataModelStatus())}'>
-        #{dataElement.getVersionAndId()}
-      </span>
+      <small class='text-muted'>#{dataElement.getExternalId()}</small>
     "
 
   # column definitions

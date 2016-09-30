@@ -114,7 +114,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         waitUntilFinalized()
 
         then:
-        check 'h3' contains 'Import for MET-523.mc 147@0.0.1'
+        check 'h3' contains 'Import for MET-523.mc'
     }
 
     def "upload excel file"() {
@@ -137,13 +137,13 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         click 'h3 a.label.label-warning'
 
         then:
-        check rightSideTitle is 'MET-522 188@0.0.1'
+        check rightSideTitle contains 'MET-522'
 
         when:
         select 'MET-522' open 'Data Classes' select 'MET-522.M1'
 
         then:
-        check rightSideTitle is 'MET-522.M1 189@0.0.1'
+        check rightSideTitle contains 'MET-522.M1'
     }
 
     /**
