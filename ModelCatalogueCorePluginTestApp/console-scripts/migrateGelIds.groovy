@@ -21,7 +21,7 @@ executorService.submit {
         join catalogue_element c
         on c.id = x.element_id
         where x.name = 'http://www.modelcatalogue.org/metadata/genomics/#gel-id'
-		and x.model_catalogue_id is null
+		and c.model_catalogue_id is null
     """) {
         gelids[it.elid] = it.gelid
         monitor.onNext("Fetched gel id $it.gelid for element $it.elid")
