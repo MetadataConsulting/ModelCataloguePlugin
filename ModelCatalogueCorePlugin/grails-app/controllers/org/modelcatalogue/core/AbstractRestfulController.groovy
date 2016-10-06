@@ -85,7 +85,9 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         instance.validate()
 
-        validatePolicies(VerificationPhase.PROPERTY_CHECK, instance, objectToBind)
+        if (!params.skipPolicies) {
+            validatePolicies(VerificationPhase.PROPERTY_CHECK, instance, objectToBind)
+        }
 
         if (instance.hasErrors()) {
             if (!hasUniqueName() || getObjectToBind().size() > 1 || !getObjectToBind().containsKey('name')) {
@@ -122,7 +124,9 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         instance.save flush: true
 
-        validatePolicies(VerificationPhase.EXTENSIONS_CHECK, instance, objectToBind)
+        if (!params.skipPolicies) {
+            validatePolicies(VerificationPhase.EXTENSIONS_CHECK, instance, objectToBind)
+        }
 
         if (instance.hasErrors()) {
             respond instance.errors
