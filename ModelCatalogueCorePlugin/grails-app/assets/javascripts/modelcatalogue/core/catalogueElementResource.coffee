@@ -25,15 +25,17 @@ angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRo
           $rootScope.$broadcast 'catalogueElementDeleted', {link: "/#{thePathName}/#{id}"}
           result
 
-      save: (data) ->
+      save: (data, extraParameters) ->
         url = "#{@getIndexPath()}"
         thePathName = @pathName
+
+        params = extraParameters ? {}
 
         creationChecker = (status) ->
           if status == 200
             $rootScope.$broadcast 'displayGlobalMessage', "#{names.getNaturalName(names.getPropertyNameFromType(thePathName))} not created", "Reused existing #{names.getNaturalName(names.getPropertyNameFromType(thePathName))} '#{data.name}' instead of creating new one.", 'warning', true
 
-        enhance(rest(method: 'POST', url: url, data: data, statusListener: creationChecker)).then (result)->
+        enhance(rest(method: 'POST', url: url, data: data, statusListener: creationChecker, params: params)).then (result)->
           $rootScope.$broadcast 'catalogueElementCreated', result, url, data
           result
 

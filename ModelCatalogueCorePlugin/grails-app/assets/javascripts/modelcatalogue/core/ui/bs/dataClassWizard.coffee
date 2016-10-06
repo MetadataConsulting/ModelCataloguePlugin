@@ -137,7 +137,7 @@ angular.module('mc.core.ui.bs.dataClassWizard', ['mc.util.messages', 'mc.util.ui
             angular.forEach $scope.parents, (parent) ->
               if angular.isString parent.element
                 $scope.pendingActions.push (dataClass) ->
-                  catalogueElementResource("dataClass").save({name: parent.element, dataModels: dataClass.dataModels}).then (parentModel) ->
+                  catalogueElementResource("dataClass").save({name: parent.element, dataModels: dataClass.dataModels}, {skipPolicies: true}).then (parentModel) ->
                     parent.element = parentModel
                     dataClass
               $scope.pendingActions.push (dataClass) ->
@@ -148,7 +148,7 @@ angular.module('mc.core.ui.bs.dataClassWizard', ['mc.util.messages', 'mc.util.ui
             angular.forEach $scope.children, (child) ->
               if angular.isString child.element
                 $scope.pendingActions.push (dataClass) ->
-                  catalogueElementResource("dataClass").save({name: child.element, dataModels: dataClass.dataModels}).then (childModel) ->
+                  catalogueElementResource("dataClass").save({name: child.element, dataModels: dataClass.dataModels}, {skipPolicies: true}).then (childModel) ->
                     child.element = childModel
                     dataClass
               $scope.pendingActions.push (dataClass) ->
@@ -159,7 +159,7 @@ angular.module('mc.core.ui.bs.dataClassWizard', ['mc.util.messages', 'mc.util.ui
             angular.forEach $scope.dataElements, (element) ->
               if angular.isString element.element
                 $scope.pendingActions.push (dataClass) ->
-                  catalogueElementResource("dataElement").save({name: element.element, dataModels: dataClass.dataModels}).then (newElement) ->
+                  catalogueElementResource("dataElement").save({name: element.element, dataModels: dataClass.dataModels}, {skipPolicies: true}).then (newElement) ->
                     element.element = newElement
                     dataClass
               $scope.pendingActions.push (dataClass) ->
