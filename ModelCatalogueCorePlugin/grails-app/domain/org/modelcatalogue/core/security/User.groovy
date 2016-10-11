@@ -18,10 +18,13 @@ class User extends CatalogueElement {
     boolean accountLocked
     boolean passwordExpired
 
+    String apiKey
+
     static constraints = {
         username blank: false, unique: true, maxSize: 255
         password blank: false, maxSize: 255
         email    nullable: true, email: true, maxSize: 255
+        apiKey   nullable: true, maxSize: 255
         enabled validator: { val, obj, errors ->
             GrailsApplication grailsApplication = Holders.grailsApplication
             if (!val || !grailsApplication.config.mc.max.active.users) {
