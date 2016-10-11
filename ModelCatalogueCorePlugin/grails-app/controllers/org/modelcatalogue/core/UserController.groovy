@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.converters.JSON
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserRole
@@ -13,6 +14,22 @@ class UserController extends AbstractCatalogueElementController<User> {
 
     UserController() {
         super(User, false)
+    }
+
+    /**
+     * Shows a single resource
+     * @param id The id of the resource
+     * @return The rendered resource or a 404 if it doesn't exist
+     */
+    def show() {
+        User element = queryForResource(params.id)
+
+        if (!element) {
+            notFound()
+            return
+        }
+
+        respond element
     }
 
     @Override
