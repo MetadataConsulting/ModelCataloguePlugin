@@ -30,6 +30,13 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         for (LogEntry entry : logEntries) {
             println "${new Date(entry.getTimestamp())} ${entry.getLevel()} ${entry.getMessage()}"
         }
+        refreshIfConnectionLost()
+    }
+
+    private void refreshIfConnectionLost() {
+        if ($('strong', text: contains('Connection lost')).displayed) {
+            refresh browser
+        }
     }
 
     def cleanupSpec() {
@@ -316,6 +323,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         while (attempt < maxAttempts) {
             attempt++
             try {
+                refreshIfConnectionLost()
                 navigator = navigatorClosure()
 
                 if (navigator == null) {
