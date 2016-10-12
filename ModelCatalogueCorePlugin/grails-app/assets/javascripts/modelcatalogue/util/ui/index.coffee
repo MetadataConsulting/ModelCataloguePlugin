@@ -19,4 +19,5 @@ angular.module 'mc.util.ui', [
   'mc.util.ui.resizable'
   'mc.util.ui.fakeSubmitButton'
   'mc.util.ui.treeview.TreeviewNode'
+  'mc.util.ui.selectOnClick'
 ]

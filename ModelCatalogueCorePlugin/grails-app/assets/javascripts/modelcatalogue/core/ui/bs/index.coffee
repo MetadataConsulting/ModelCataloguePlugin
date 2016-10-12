@@ -14,6 +14,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.catalogueElementView'
   'mc.core.ui.bs.csvTransformationView'
   'mc.core.ui.bs.importCtrl'
+  'mc.core.ui.bs.modalAlert'
   'mc.core.ui.bs.modalPromptNewExcelImport'
   'mc.core.ui.bs.modalPromptNewLoincImport'
   'mc.core.ui.bs.modalPromptNewOboImport'

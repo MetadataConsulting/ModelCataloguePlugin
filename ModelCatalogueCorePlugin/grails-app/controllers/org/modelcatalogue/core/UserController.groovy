@@ -96,6 +96,15 @@ class UserController extends AbstractCatalogueElementController<User> {
         respond user
     }
 
+    def apiKey(Boolean regenerate) {
+        if (!modelCatalogueSecurityService.isUserLoggedIn()) {
+            notFound()
+            return
+        }
+
+        render([apiKey: userService.getApiKey(modelCatalogueSecurityService.currentUser, regenerate)] as JSON)
+    }
+
     private switchEnabled(boolean enabled) {
         if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
             notFound()

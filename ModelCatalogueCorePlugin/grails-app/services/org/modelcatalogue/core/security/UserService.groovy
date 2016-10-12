@@ -1,5 +1,8 @@
 package org.modelcatalogue.core.security
 
+import com.google.common.io.BaseEncoding
+import org.modelcatalogue.core.util.FriendlyErrors
+
 class UserService {
 
     public static final String ACCESS_LEVEL_SUPERVISOR = 'supervisor'
@@ -73,5 +76,17 @@ class UserService {
 
     private static void removeExistingRole(User user, String authority) {
         UserRole.remove(user, Role.findByAuthority(authority), true)
+    }
+
+    String getApiKey(User user, Boolean regenerate) {
+        if (!user.apiKey || regenerate) {
+            user.apiKey = generateApiKey()
+            FriendlyErrors.failFriendlySave(user)
+        }
+        return user.apiKey
+    }
+
+    private static String generateApiKey() {
+        BaseEncoding.base64().encode(UUID.randomUUID().toString().bytes)
     }
 }

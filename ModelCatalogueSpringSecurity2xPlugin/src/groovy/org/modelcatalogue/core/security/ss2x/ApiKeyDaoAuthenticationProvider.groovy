@@ -29,7 +29,7 @@ class ApiKeyDaoAuthenticationProvider extends DaoAuthenticationProvider {
             String presentedPassword = authentication.credentials
 
             if (user.apiKey != presentedPassword) {
-                logger.debug("Authentication failed: password does not match stored value");
+                logger.debug("Authentication failed: api key does not match stored value");
                 throw bce;
             }
         }
