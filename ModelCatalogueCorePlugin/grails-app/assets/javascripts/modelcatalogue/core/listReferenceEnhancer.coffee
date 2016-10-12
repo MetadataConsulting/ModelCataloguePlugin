@@ -1,5 +1,5 @@
 angular.module('mc.core.listReferenceEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot', 'ui.router']).config (enhanceProvider)->
-  condition = (list) -> list.hasOwnProperty('count') and list.hasOwnProperty('link')
+  condition = (list) -> angular.isObject(list) and list.hasOwnProperty('count') and list.hasOwnProperty('link')
   factory   = (modelCatalogueApiRoot, rest, $rootScope, enhance, $q, $state) ->
     "ngInject"
     (listReference) ->

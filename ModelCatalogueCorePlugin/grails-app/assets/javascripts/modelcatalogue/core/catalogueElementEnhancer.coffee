@@ -43,7 +43,7 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
     $state.href('simple.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id})
 
 
-  condition = (element) -> element.hasOwnProperty('elementType') and element.hasOwnProperty('link')
+  condition = (element) -> angular.isObject(element) and element.hasOwnProperty('elementType') and element.hasOwnProperty('link')
   factory   =  (modelCatalogueApiRoot, rest, $rootScope, $state, names, enhance, serverPushUpdates, $cacheFactory) ->
     "ngInject"
     catalogueElementEnhancer = (element) ->

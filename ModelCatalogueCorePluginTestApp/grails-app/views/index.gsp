@@ -167,6 +167,14 @@
             // workaround https://github.com/angular-ui/ui-router/issues/2051
         }])
     </script>
+    <g:if test="${params.ngstats}">
+      <script type="application/javascript" src="//rawgit.com/kentcdodds/ng-stats/master/dist/ng-stats.js"></script>
+      <script type="application/javascript">
+        angular.element(document).ready(function () {
+          var ngStats = window.showAngularStats();
+        });
+      </script>
+    </g:if>
     <g:if test="${Environment.current in [Environment.DEVELOPMENT, Environment.TEST, Environment.CUSTOM]}">
         <script type="text/javascript">
             angular.module('demo.config').factory('$exceptionHandler', ['$log', '$window', function($log, $window) {
@@ -176,7 +184,6 @@
                     window.printErrorInPre(exception.stack);
                 };
             }]);
-
         </script>
         <g:if test="${grailsApplication.config.mc.css.custom}">
           <style type="text/css">
