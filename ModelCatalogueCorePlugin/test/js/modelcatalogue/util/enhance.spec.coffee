@@ -103,6 +103,26 @@ describe "mc.util.enhance", ->
 
     expect(nothing).toBeUndefined()
 
+  it "won't fail on circular dependencies", ->
+    circular =
+      one: 1
+      two: 2
+      three: 3
+      world: 'Hello'
+      hello: 'World'
+
+    circular.four = circular
+
+    enhanced = undefined
+
+    expect(-> enhanced = enhance(circular)).not.toThrow()
+
+    expect(enhanced).toBeDefined()
+
+    expect(enhanced.__enhancedBy).toEqual(['greeter'])
+
+
+
 
 
 

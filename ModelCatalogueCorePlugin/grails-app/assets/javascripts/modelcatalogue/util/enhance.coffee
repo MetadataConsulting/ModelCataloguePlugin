@@ -10,17 +10,29 @@ angular.module('mc.util.enhance', []).provider 'enhance', [ ->
     enhancers.push({priority: priority, name: name, condition: condition, factory: enhancerFactory})
 
   # factory method
-  @$get = [ '$injector', ($injector) ->
+  @$get = [ '$injector', '$q', ($injector, $q) ->
     enhance = (result) ->
       return result unless result
+
+      deferred = $q.defer()
+
+      result.__enhance__promise__ = deferred.promise
 
       # for object and array enhance deepth first
       if angular.isArray(result)
         for item, i in result when item?
-          result[i] = enhance item
+          if item.__enhance__promise__
+            item.__enhance__promise__.then (enhanced) ->
+              result[i] = enhanced
+          else
+            result[i] = enhance item
       else if angular.isObject(result)
-        for name, value of result when value?
-          result[name] = enhance value
+        for name, value of result when value? and name isnt '__enhance__promise__'
+          if value.__enhance__promise__
+            value.__enhance__promise__.then (enhanced) ->
+              result[name] = enhanced
+          else
+            result[name] = enhance value
 
       # enhance current object
       for enhancer in enhancers when enhancer.condition(result)
@@ -32,6 +44,9 @@ angular.module('mc.util.enhance', []).provider 'enhance', [ ->
         result = enhancer.enhancer(result)
         result.__enhancedBy = enhancedBy
         result.getEnhancedBy = -> result.__enhancedBy
+
+      deferred.resolve result
+      delete result.__enhance__promise__
 
       # and return enhanced value
       result
