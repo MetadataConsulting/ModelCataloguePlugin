@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://www.metadataregistry.org.uk/assets/schema/2.1/metadataregistry_validator.xsd"
+    elementFormDefault="qualified" version="1.0" xml:lang="EN">
+    <xs:complexType name="Constraints">
+        <xs:sequence maxOccurs="unbounded">
+            <xs:element name="constraint" type="Constraint"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="Constraint">
+        <xs:attribute name="selector" type="xs:string"/>
+        <xs:attribute name="dataType" type="xs:anyURI"/>
+    </xs:complexType>
+    <xs:element name="constraints"/>
+</xs:schema>
