@@ -239,6 +239,9 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
 
               $rootScope.$broadcast('expandTreeview', path)
 
+      if element instanceof CatalogueElement
+        # already enhanced
+        return element
 
       cache = $cacheFactory.get('CatalogueElement')
       cache = $cacheFactory('CatalogueElement') if not cache
