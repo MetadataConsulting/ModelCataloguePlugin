@@ -15,7 +15,7 @@ angular.module('mc.util.objectVisitor', ['mc.util.objectVisitor']).factory('obje
           }
           object[symbols.pendingPromises][indexOrName] = deferred.promise;
           angular.forEach(object, function(value, name){
-            let existing = value[symbols.pendingPromises] ? value[symbols.pendingPromises][name] : undefined;
+            let existing = value && value[symbols.pendingPromises] ? value[symbols.pendingPromises][name] : undefined;
             if (existing) {
               existing.then(function (result) {
                 if (result !== object[name]) {
@@ -32,7 +32,7 @@ angular.module('mc.util.objectVisitor', ['mc.util.objectVisitor']).factory('obje
         }
 
         let result = transformation(object, indexOrName);
-        if (result[symbols.pendingPromises] && (angular.isObject(result) || angular.isArray(result))) {
+        if ((angular.isObject(result) || angular.isArray(result)) && result[symbols.pendingPromises]) {
           delete result[symbols.pendingPromises][indexOrName];
         }
         deferred.resolve(result);

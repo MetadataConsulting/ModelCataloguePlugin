@@ -88,12 +88,9 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
         cursor: 'move'
         handle: '.handle'
         update: ($event, $ui) ->
-          console.log arguments...
           original =
             row: $ui.item.scope().row
             index: 0
-
-          console.log original
 
           for row, i in $scope.rows
             if row.$$hashKey == original.row.$$hashKey

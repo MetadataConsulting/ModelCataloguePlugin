@@ -13,4 +13,5 @@ angular.module 'mc.util', [
   'mc.util.vkbeautify'
   'mc.util.stringToBoolean'
   'mc.util.stringToNumber'
+  'mc.util.objectVisitor'
 ]
