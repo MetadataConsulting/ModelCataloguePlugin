@@ -20,14 +20,17 @@ angular.module('mc.util.enhance', []).provider 'enhance', [ ->
 
       # for object and array enhance deepth first
       if angular.isArray(result)
-        for item, i in result when item?
+        angular.forEach result, (item, i) ->
+          return if not item?
           if item.__enhance__promise__
             item.__enhance__promise__.then (enhanced) ->
               result[i] = enhanced
           else
             result[i] = enhance item
       else if angular.isObject(result)
-        for name, value of result when value? and name isnt '__enhance__promise__'
+        angular.forEach result, (value, name) ->
+          return if not value?
+          return if name is '__enhance__promise__'
           if value.__enhance__promise__
             value.__enhance__promise__.then (enhanced) ->
               result[name] = enhanced
