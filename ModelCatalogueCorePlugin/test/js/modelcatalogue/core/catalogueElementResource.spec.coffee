@@ -11,6 +11,10 @@ describe "mc.core.catalogueElementResource", ->
   beforeEach module "mc.core.listReferenceEnhancer"
   beforeEach module "mc.core.promiseEnhancer"
 
+  beforeEach module ($provide) ->
+    $provide.value('objectVisitor', {visit: (value) -> value})
+    return
+
   beforeEach inject (_catalogueElementResource_, _modelCatalogueApiRoot_, _$httpBackend_, _$rootScope_) ->
     catalogueElementResource  = _catalogueElementResource_
     modelCatalogueApiRoot     = _modelCatalogueApiRoot_
