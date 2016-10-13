@@ -1,5 +1,5 @@
 angular.module('mc.core.elementEnhancer', ['mc.util.rest', 'mc.util.enhance']).config ['enhanceProvider', (enhanceProvider)->
-  condition = (object) -> object.hasOwnProperty('elementType')
+  condition = (object) -> angular.isObject(object) and object.hasOwnProperty('elementType')
   factory   = ['catalogue', 'names', (catalogue, names) ->
     isInstanceOfEnhancer = (object) ->
       object.isInstanceOf = (type) ->

@@ -1,5 +1,5 @@
 angular.module('mc.core.actionEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot']).config ['enhanceProvider', (enhanceProvider)->
-  condition = (action) -> action.hasOwnProperty('link') && action.elementType == 'org.modelcatalogue.core.actions.Action'
+  condition = (action) -> angular.isObject(action) and action.hasOwnProperty('link') && action.elementType == 'org.modelcatalogue.core.actions.Action'
   factory   = ['$q', 'modelCatalogueApiRoot', 'rest', '$rootScope', 'enhance', ($q, modelCatalogueApiRoot, rest, $rootScope, enhance) ->
     actionEnhancer = (action) ->
       action.run = ->

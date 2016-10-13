@@ -640,8 +640,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
         watches: 'action.state'
         disabled: $scope.action.state in ['PERFORMING', 'PERFORMED']
         action: ->
-          messages.prompt('Update Action Parameters', '',
-            {type: 'update-action-parameters', action: $scope.action}).then (updated)->
+          messages.prompt('Update Action Parameters', '', {type: 'update-action-parameters', action: $scope.action}).then (updated)->
             $scope.action = updated
       }
 

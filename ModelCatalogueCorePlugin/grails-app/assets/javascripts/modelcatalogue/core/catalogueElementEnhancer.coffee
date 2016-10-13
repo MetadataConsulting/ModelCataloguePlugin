@@ -43,14 +43,12 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
     $state.href('simple.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id})
 
 
-  condition = (element) -> element.hasOwnProperty('elementType') and element.hasOwnProperty('link')
+  condition = (element) -> angular.isObject(element) and element.hasOwnProperty('elementType') and element.hasOwnProperty('link')
   factory   =  (modelCatalogueApiRoot, rest, $rootScope, $state, names, enhance, serverPushUpdates, $cacheFactory) ->
     "ngInject"
     catalogueElementEnhancer = (element) ->
       class CatalogueElement
         constructor: (element) ->
-          @original = element
-
           angular.extend(@, element)
 
           @defaultExcludes = ['id','elementTypeName', 'classifiedName', 'elementType', 'incomingRelationships', 'outgoingRelationships', 'link', 'mappings']
@@ -241,6 +239,9 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
 
               $rootScope.$broadcast('expandTreeview', path)
 
+      if element instanceof CatalogueElement
+        # already enhanced
+        return element
 
       cache = $cacheFactory.get('CatalogueElement')
       cache = $cacheFactory('CatalogueElement') if not cache
