@@ -98,6 +98,7 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
     return 1 if "#{modelCatalogueApiRoot}#{list.base.replace('/dataType/', '/enumeratedType/')}".indexOf(url) >= 0
     return 1 if "#{modelCatalogueApiRoot}#{list.base.replace('/dataType/', '/primitiveType/')}".indexOf(url) >= 0
     return 1 if "#{modelCatalogueApiRoot}#{list.base.replace('/dataType/', '/referenceType/')}".indexOf(url) >= 0
+    return 1 if "#{modelCatalogueApiRoot}#{list.base.replace('/outgoing/favourite', '/favourite')}".indexOf(url) >= 0
 
     return 0.5 if "#{modelCatalogueApiRoot}#{list.base.replace('/content', '/outgoing/hierarchy')}".indexOf(url) >= 0
     return 0.5 if "#{modelCatalogueApiRoot}#{list.base.replace('/content', '/outgoing/containment')}".indexOf(url) >= 0
@@ -113,6 +114,16 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
     return 0.2 if "#{modelCatalogueApiRoot}#{list.base.replace('/incoming/', '/outgoing/')}".indexOf(url) >= 0
 
     return 0.1 if list.base.indexOf('/history') >= 0
+
+    return 0
+  ]
+  catalogueProvider.addContainsCandidateTest ['list', 'element', 'extra', 'modelCatalogueApiRoot', (list, newElement, extra, modelCatalogueApiRoot) ->
+    url = extra.url
+    return 0 unless url
+    return 0 unless list
+    return 0 unless list.base
+
+    return 1 if "#{modelCatalogueApiRoot}#{list.base.replace('/outgoing/favourite', '/favourite')}".indexOf(url) >= 0
 
     return 0
   ]
