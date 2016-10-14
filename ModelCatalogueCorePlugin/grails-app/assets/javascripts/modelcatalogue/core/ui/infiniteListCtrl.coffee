@@ -1,4 +1,6 @@
-angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controller 'infiniteListCtrl',  ['$scope', 'columns', '$timeout', '$element', 'modelCatalogueApiRoot', 'actions', '$controller', 'names', 'security', 'enhance',($scope, columns, $timeout, $element, modelCatalogueApiRoot, actions, $controller, names, security, enhance) ->
+angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controller 'infiniteListCtrl', ($scope, columns, $timeout, $element, modelCatalogueApiRoot, actions, $controller, names, security, enhance, catalogue) ->
+  'ngInject'
+
   angular.extend(this, $controller('columnsSupportCtrl', {$scope: $scope}))
 
   columnsDefined = $scope.columns?
@@ -189,12 +191,13 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
     $scope.list.total = $scope.total if $scope.list
 
 
-  $scope.$on 'catalogueElementDeleted', (ignored, deleted) ->
-    # TODO: play nicely with transform attr
-    indexOfDeleted = $scope.elements.indexOf(deleted)
-    if indexOfDeleted == -1 and deleted.link
+  $scope.$on 'catalogueElementDeleted', (ignored, deleted, result, url) ->
+    console.log url, $scope.list
+    return if url and catalogue.isContentCandidate($scope.list, deleted, url: url) <= 0
+    indexOfDeleted = -1
+    if deleted.link
       for element, i in $scope.elements
-        if element.link == deleted.link
+        if $scope.transform($element: element).link == deleted.link
           indexOfDeleted = i
           break
 
@@ -214,4 +217,3 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
         if angular.isFunction(item.updateFrom)
           item.updateFrom(element)
           $scope.rows[index] = getRowForElement(item, $scope.rows[index])
-]

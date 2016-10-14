@@ -53,7 +53,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
 
   actionsProvider.registerActionInRoles 'favorite-element',
     [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INIFINITE_LIST],
-    ($scope, messages, $state, security, catalogueElementResource, modelCatalogueApiRoot, enhance, rest) ->
+    ($scope, messages, $state, security, catalogueElementResource, modelCatalogueApiRoot, enhance, rest, $rootScope) ->
       'ngInject'
       elementPresent = $scope.element and angular.isFunction($scope.element.getResourceName) and
         angular.isFunction($scope.element.getElementTypeName) and angular.isFunction($scope.element.isInstanceOf) and
@@ -80,9 +80,9 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
                 "#{$scope.element.getLabel()} has been added to favourites")
               $scope.element.favourite = not favourite
               if favourite
-                $scope.$broadcast 'catalogueElementDeleted', $scope.element, relation, url
+                $rootScope.$broadcast 'catalogueElementDeleted', $scope.element, relation, url
               else
-                $scope.$broadcast 'catalogueElementCreated', relation, url, $scope.element
+                $rootScope.$broadcast 'catalogueElementCreated', relation, url, $scope.element
 
               relation
 
