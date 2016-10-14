@@ -1,3 +1,6 @@
+import org.modelcatalogue.core.security.ss2x.ApiKeyDaoAuthenticationProvider
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider
+
 class ModelCatalogueSecuritySs2GrailsPlugin {
     // the plugin version
     def version = "0.9.1"
@@ -42,9 +45,20 @@ Spring Security 2.x implementation of Model Catalogue Core Plugin abstract secur
     }
 
     def doWithSpring = {
+        apiKeyDaoAuthenticationProvider(ApiKeyDaoAuthenticationProvider) {
+            userDetailsService = ref('userDetailsService')
+            passwordEncoder = ref('passwordEncoder')
+            userCache = ref('userCache')
+            saltSource = ref('saltSource')
+            preAuthenticationChecks = ref('preAuthenticationChecks')
+            postAuthenticationChecks = ref('postAuthenticationChecks')
+            authoritiesMapper = ref('authoritiesMapper')
+            hideUserNotFoundExceptions = true
+        }
+
         springConfig.addAlias('modelCatalogueSecurityService','springSecurity2SecurityService')
         springConfig.addAlias('userDetailsService','gormWithEmailUserDetailsService')
-        // TODO Implement runtime spring config (optional)
+        springConfig.addAlias('daoAuthenticationProvider','apiKeyDaoAuthenticationProvider')
     }
 
     def doWithDynamicMethods = { ctx ->

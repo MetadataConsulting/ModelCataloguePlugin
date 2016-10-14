@@ -266,6 +266,28 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
     }
 
+  actionsProvider.registerActionInRoles 'show-link',[actionsProvider.ROLE_ITEM_DETAIL_ACTION], ($scope, messages, security) ->
+    'ngInject'
+
+    return undefined if not $scope.element
+    return undefined if not $scope.element.internalModelCatalogueId
+
+    {
+      position:   10000
+      label:      "Show Link"
+      icon:       "fa fa-link"
+      type:       'default'
+      action:     ->
+        messages.prompt("Link for " + $scope.element.getLabel(), """
+          <h4>Permanent Link</h4>
+          <input type='text' class='form-control' value='#{$scope.element.internalModelCatalogueId}' readonly='readonly' select-on-click></input>
+          <h4>cURL</h4>
+          <input type='text' class='form-control' value='curl -L -u #{security.getCurrentUser()?.username ? 'username'}:&lt;API Key&gt; #{$scope.element.internalModelCatalogueId}/export' readonly='readonly' select-on-click></input>
+          <p class='help-block small'>You can view your API key using the action in user top right menu <span class='fa fa-fw fa-user'></span></p>
+        """, type: 'alert', size: 'lg')
+
+    }
+
   actionsProvider.registerActionInRoles 'inline-edit',[actionsProvider.ROLE_ITEM_DETAIL_ACTION], ['$scope', 'messages', 'names', 'security', ($scope) ->
     return undefined if not $scope.editableForm
     return undefined if $scope.editableForm.$visible

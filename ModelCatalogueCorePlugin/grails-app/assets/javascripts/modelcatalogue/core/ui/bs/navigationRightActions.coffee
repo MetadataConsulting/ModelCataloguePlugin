@@ -77,6 +77,34 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
 
     action
 
+  actionsProvider.registerChildAction 'user-menu', 'user-api-key', (messages, security, catalogueElementResource) ->
+    'ngInject'
+
+    return undefined if not security.isUserLoggedIn()
+
+    {
+      position:   10000
+      label:      "API Key"
+      icon:       "fa fa-key fa-fw"
+      type:       'primary'
+      action:     ->
+        options = [
+          {classes: 'btn btn-primary', icon: 'fa fa-key', label: 'Regenerate Key', value: 'regenerate'}
+        ]
+
+        console.log security.getCurrentUser()
+
+        openApiKey = (response) ->
+          messages.prompt("API Key", "<p>Use following key as password for your API calls</p><input type='text' class='form-control' readonly='readonly' value='#{response.apiKey}' select-on-click></input><p class='help-block small text-warning'>WARNING: Regenerating the key will prevent all application using the current key from accessing the catalogue on your behalf</p>", type: 'options', options: options).then (regenerate) ->
+            if regenerate is 'regenerate'
+              catalogueElementResource('user').get(security.getCurrentUser().id).then (user) ->
+                user.execute('apikey?regenerate=true', 'POST').then(openApiKey)
+
+        catalogueElementResource('user').get(security.getCurrentUser().id).then (user) ->
+          user.execute('apikey', 'POST').then(openApiKey)
+    }
+
+
   actionsProvider.registerActionInRole 'admin-menu', actionsProvider.ROLE_NAVIGATION_RIGHT, ['security', (security) ->
     return undefined unless security.hasRole('ADMIN')
     {
