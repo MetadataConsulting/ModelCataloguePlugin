@@ -69,6 +69,8 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "validate xml schema"() {
+        loginViewer()
+        select "Test 1" open "Assets" select "Sample XSD"
         when:
         click validateXsd
 
@@ -96,6 +98,8 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
 
     def "upload mc file"() {
+        loginAdmin()
+        select "Test 1" select "Assets"
         click importMc
 
         expect:

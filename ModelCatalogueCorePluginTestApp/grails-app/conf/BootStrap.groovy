@@ -127,6 +127,7 @@ class BootStrap {
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'ROLE_METADATA_CURATOR',         HttpMethod.POST)
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'ROLE_METADATA_CURATOR',         HttpMethod.PUT)
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'ROLE_METADATA_CURATOR',         HttpMethod.DELETE)
+        createRequestmapIfMissing('/api/modelCatalogue/core/asset/*/validateXML',  'isAuthenticated()',   HttpMethod.POST) // validate xml
 
         createRequestmapIfMissing('/sso/*/**',                              'isAuthenticated()',   HttpMethod.GET)
 
