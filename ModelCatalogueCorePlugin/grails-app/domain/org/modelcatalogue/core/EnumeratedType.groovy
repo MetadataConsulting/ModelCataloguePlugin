@@ -83,6 +83,11 @@ class EnumeratedType extends DataType {
 
 	}
 
+    @Override
+    String getExplicitRule() {
+        return "x in [${enumerations.keySet().collect{ "'${it.replace('\'', '\\\'')}'" }.join(', ')}]"
+    }
+
     boolean isEnumKey(Object x) {
         if (!x) {
             return true

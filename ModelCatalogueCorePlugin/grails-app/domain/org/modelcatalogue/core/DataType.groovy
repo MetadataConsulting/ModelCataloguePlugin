@@ -3,6 +3,8 @@ package org.modelcatalogue.core
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.PublishingContext
+import org.modelcatalogue.core.scripting.Validating
+import org.modelcatalogue.core.scripting.ValueValidator
 import org.modelcatalogue.core.util.DataTypeRuleScript
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.SecuredRuleExecutor
@@ -12,7 +14,7 @@ import org.modelcatalogue.core.util.SecuredRuleExecutor
  * i.e. integer, string, byte, boolean, time........
  * additional types can be specified (as well as enumerated types (see EnumeratedType))
  */
-class DataType extends CatalogueElement {
+class DataType extends CatalogueElement implements Validating {
 
     String rule
 
@@ -22,7 +24,7 @@ class DataType extends CatalogueElement {
             if (!val) {
                 return true
             }
-            SecuredRuleExecutor.ValidationResult result = new SecuredRuleExecutor(DataTypeRuleScript, new Binding(x: null, dataType: obj)).validate(val)
+            SecuredRuleExecutor.ValidationResult result = new SecuredRuleExecutor(DataTypeRuleScript, new Binding(x: null)).validate(val)
             result ? true : ['wontCompile', result.compilationFailedMessage]
         }
     }
@@ -78,23 +80,22 @@ class DataType extends CatalogueElement {
      * @return
      */
     def validateRule(Object x) {
-        if (!isEnumKey(x)) {
-            return false
-        }
+        ValueValidator.validateRule(this, x)
+    }
 
-        if (hasProperty('isBasedOn')) {
-            for (DataType domain in isBasedOn) {
-                def result = domain.validateRule(x)
-                if (result != null && (!(result instanceof Boolean) || result.is(false))) {
-                    return result
-                }
-            }
-        }
+    @Override
+    String getImplicitRule() {
+        return rule
+    }
 
-        if (rule) {
-            return new SecuredRuleExecutor(DataTypeRuleScript, new Binding(x: x, dataType: this)).execute(rule)
-        }
-        return true
+    @Override
+    String getExplicitRule() {
+        return null
+    }
+
+    @Override
+    List<? extends Validating> getBases() {
+        return isBasedOn as List<DataType>
     }
 
     static String suggestName(Set<String> suggestions) {
