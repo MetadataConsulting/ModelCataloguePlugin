@@ -67,10 +67,6 @@ class DataType extends CatalogueElement implements Validating {
         null
     }
 
-    boolean isEnumKey(Object x) {
-        return true
-    }
-
     /**
      * Validates given value. Only boolean value true is considered as valid.
      *

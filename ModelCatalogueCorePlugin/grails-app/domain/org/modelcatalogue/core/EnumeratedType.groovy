@@ -88,16 +88,6 @@ class EnumeratedType extends DataType {
         return "x in [${enumerations.keySet().collect{ "'${it.replace('\'', '\\\'')}'" }.join(', ')}]"
     }
 
-    boolean isEnumKey(Object x) {
-        if (!x) {
-            return true
-        }
-        if (!enumerations.keySet().contains(x.toString())) {
-            return false
-        }
-        return true
-    }
-
     String prettyPrint() {
         enumerations.collect { key, value -> "$key: $value" }.join('\n')
     }
