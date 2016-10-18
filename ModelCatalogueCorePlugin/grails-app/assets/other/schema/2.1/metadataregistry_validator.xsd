@@ -9,8 +9,11 @@
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="Constraint">
-        <xs:attribute name="selector" type="xs:string"/>
-        <xs:attribute name="dataType" type="xs:anyURI"/>
+        <xs:complexContent>
+            <xs:restriction base="xs:string"/>
+            <xs:attribute name="selector" type="xs:string"/>
+            <xs:attribute name="dataType" type="xs:anyURI"/>
+        </xs:complexContent>
     </xs:complexType>
-    <xs:element name="constraints"/>
+    <xs:element name="constraints" type="Constraints"/>
 </xs:schema>
