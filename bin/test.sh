@@ -64,7 +64,12 @@ if [ "$TEST_SUITE" = "unit_and_integration" ] || [ "$TEST_SUITE" = "" ] ; then
 fi
 
 if [ "$TEST_SUITE" = "functional" ] || [ "$TEST_SUITE" = "" ] ; then
-    ./grailsw "-Dgeb.env=$MC_GEB_ENV" test-app functional: -war --non-interactive
+    # only run functional tests from war for non-tag builds
+    if [ "$TRAVIS_TAG" = "" ] ; then
+        ./grailsw "-Dgeb.env=$MC_GEB_ENV" test-app functional: --non-interactive
+    else
+        ./grailsw "-Dgeb.env=$MC_GEB_ENV" test-app functional: -war --non-interactive
+    fi
 fi
 
 cd ..

@@ -101,9 +101,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
         go "#/dataModels"
 
-        waitFor {
-            $("#role_navigation-right_user-menu-menu-item-link").first().displayed
-        }
+        check CatalogueAction.runFirst('navigation-right', 'user-menu') displayed
         check "#my-models" displayed
     }
 
