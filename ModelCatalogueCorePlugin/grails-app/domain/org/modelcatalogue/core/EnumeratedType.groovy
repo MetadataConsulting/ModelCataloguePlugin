@@ -85,7 +85,7 @@ class EnumeratedType extends DataType {
 
     @Override
     String getExplicitRule() {
-        return "!x || x in [${enumerations.keySet().collect{ "'${it.replace('\'', '\\\'')}'" }.join(', ')}]"
+        return "x == null || x in [${enumerations.keySet().collect{ "'${it.replace('\'', '\\\'')}'" }.join(', ')}]"
     }
 
     String prettyPrint() {
