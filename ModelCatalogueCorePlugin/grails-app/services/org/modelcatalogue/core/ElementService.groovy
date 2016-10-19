@@ -242,7 +242,7 @@ class ElementService implements Publisher<CatalogueElement> {
                 return null
             }
 
-            CatalogueElement result = resource.findByLatestVersionId(id, [sort: 'versionNumber', order: 'desc'])
+            CatalogueElement result = resource.findByLatestVersionId(id, [sort: 'versionNumber', order: 'desc']) ?: resource.get(id)
 
             if (result && Legacy.fixModelCatalogueId(theId).toString().startsWith(result.getLegacyModelCatalogueId(true))) {
                 return result
