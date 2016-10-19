@@ -34,7 +34,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     private void refreshIfConnectionLost() {
-        if ($('strong', text: contains('Connection lost')).displayed) {
+        if ($('strong', text: contains('Connection lost')).first().displayed) {
             refresh browser
         }
     }
