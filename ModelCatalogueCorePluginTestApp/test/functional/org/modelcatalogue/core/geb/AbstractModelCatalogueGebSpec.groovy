@@ -34,11 +34,11 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     private void refreshIfConnectionLost() {
-        noStale({$('strong', text: contains('Connection lost'))}) {
+        noStale(5, null, {$('strong', text: contains('Connection lost'))}, {
             if (it.first().displayed) {
                 refresh browser
             }
-        }
+        }, false)
     }
 
     def cleanupSpec() {
@@ -318,14 +318,16 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
 
-    public <R> R noStale(int maxAttempts = 5, R defaultValue = null, Closure<Navigator> navigatorClosure, Closure<R> resultClosure) {
+    public <R> R noStale(int maxAttempts = 5, R defaultValue = null, Closure<Navigator> navigatorClosure, Closure<R> resultClosure, boolean refreshOnConnectionLost = true) {
         int attempt = 0
         Throwable error = null
         Navigator navigator = null
         while (attempt < maxAttempts) {
             attempt++
             try {
-                refreshIfConnectionLost()
+                if (refreshOnConnectionLost) {
+                    refreshIfConnectionLost()
+                }
                 navigator = navigatorClosure()
 
                 if (navigator == null) {
