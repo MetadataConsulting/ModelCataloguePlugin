@@ -60,6 +60,14 @@ class Diff {
         return "enum:$id"
     }
 
+    static String keyForSelf(Long entityId) {
+        return "entity:$entityId"
+    }
+
+    static Diff createEntityChange(CatalogueElement self, CatalogueElement other) {
+        return new Diff(keyForSelf(self.latestVersionId ?: self.id), self, null, self, other)
+    }
+
     static Diff createPropertyChange(String propertyKey, CatalogueElement source,  Object selfValue, Object otherValue) {
         return new Diff(propertyKey, source, null, selfValue, otherValue)
     }
@@ -118,8 +126,12 @@ class Diff {
         return key.startsWith('enum:')
     }
 
+    boolean isEntityChange() {
+        return key.startsWith('entity:')
+    }
+
     boolean isPropertyChange() {
-        return !extensionChange && !relationshipChange && !enumerationChange && !relationshipExtensionChange
+        return !extensionChange && !relationshipChange && !enumerationChange && !relationshipExtensionChange && !entityChange
     }
 
     private String getRelationshipExtensionKey() {
@@ -194,6 +206,11 @@ class Diff {
             }
             builder << ' Metadata ' << relationshipExtensionKey
             return builder.toString()
+        }
+
+        if (isEntityChange()) {
+            builder << " Entity"
+            return builder.toString();
         }
 
         if (isPropertyChange()) {
