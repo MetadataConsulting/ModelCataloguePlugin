@@ -30,13 +30,14 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         for (LogEntry entry : logEntries) {
             println "${new Date(entry.getTimestamp())} ${entry.getLevel()} ${entry.getMessage()}"
         }
-        refreshIfConnectionLost()
     }
 
     private void refreshIfConnectionLost() {
-        if ($('strong', text: contains('Connection lost')).displayed) {
-            refresh browser
-        }
+        noStale(1, true, {$('strong', text: contains('Connection lost'))}, {
+            if (it.first().displayed) {
+                refresh browser
+            }
+        }, false)
     }
 
     def cleanupSpec() {
@@ -316,14 +317,16 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
 
-    public <R> R noStale(int maxAttempts = 5, R defaultValue = null, Closure<Navigator> navigatorClosure, Closure<R> resultClosure) {
+    public <R> R noStale(int maxAttempts = 5, R defaultValue = null, Closure<Navigator> navigatorClosure, Closure<R> resultClosure, boolean refreshOnConnectionLost = true) {
         int attempt = 0
         Throwable error = null
         Navigator navigator = null
         while (attempt < maxAttempts) {
             attempt++
             try {
-                refreshIfConnectionLost()
+                if (refreshOnConnectionLost) {
+                    refreshIfConnectionLost()
+                }
                 navigator = navigatorClosure()
 
                 if (navigator == null) {
@@ -353,6 +356,9 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
                     return resultClosure(navigator)
                 }
             } catch (StaleElementReferenceException | WaitTimeoutException e) {
+                if (!refreshOnConnectionLost && defaultValue) {
+                    return defaultValue
+                }
                 println "Condition not met for after ${attempt ** 2} seconds, next waiting ${(attempt + 1) ** 2} seconds - elements: ${navigator?.allElements()}"
 
                 try {

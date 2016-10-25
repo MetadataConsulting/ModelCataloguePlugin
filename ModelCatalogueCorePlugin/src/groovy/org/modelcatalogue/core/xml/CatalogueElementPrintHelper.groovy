@@ -77,11 +77,12 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
 
         if (element.hasModelCatalogueId()) {
             attrs.id = element.modelCatalogueId
-            if (!context.noHref) {
-                attrs.href = element.getDefaultModelCatalogueId(!context.idIncludeVersion)
-            }
         } else {
             attrs.id = element.getDefaultModelCatalogueId(!context.idIncludeVersion)
+        }
+
+        if (!context.noHref) {
+            attrs.href = element.getDefaultModelCatalogueId(!context.idIncludeVersion)
         }
 
         if (element.status != ElementStatus.FINALIZED) {

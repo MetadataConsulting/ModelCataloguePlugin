@@ -83,14 +83,9 @@ class EnumeratedType extends DataType {
 
 	}
 
-    boolean isEnumKey(Object x) {
-        if (!x) {
-            return true
-        }
-        if (!enumerations.keySet().contains(x.toString())) {
-            return false
-        }
-        return true
+    @Override
+    String getExplicitRule() {
+        return "x == null || x in [${enumerations.keySet().collect{ "'${it.replace('\'', '\\\'')}'" }.join(', ')}]"
     }
 
     String prettyPrint() {
