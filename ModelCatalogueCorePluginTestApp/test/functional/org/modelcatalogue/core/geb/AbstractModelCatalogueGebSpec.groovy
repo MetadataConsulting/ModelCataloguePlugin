@@ -30,11 +30,10 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         for (LogEntry entry : logEntries) {
             println "${new Date(entry.getTimestamp())} ${entry.getLevel()} ${entry.getMessage()}"
         }
-        refreshIfConnectionLost()
     }
 
     private void refreshIfConnectionLost() {
-        noStale(5, null, {$('strong', text: contains('Connection lost'))}, {
+        noStale(1, true, {$('strong', text: contains('Connection lost'))}, {
             if (it.first().displayed) {
                 refresh browser
             }
@@ -357,6 +356,9 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
                     return resultClosure(navigator)
                 }
             } catch (StaleElementReferenceException | WaitTimeoutException e) {
+                if (!refreshOnConnectionLost && defaultValue) {
+                    return defaultValue
+                }
                 println "Condition not met for after ${attempt ** 2} seconds, next waiting ${(attempt + 1) ** 2} seconds - elements: ${navigator?.allElements()}"
 
                 try {
