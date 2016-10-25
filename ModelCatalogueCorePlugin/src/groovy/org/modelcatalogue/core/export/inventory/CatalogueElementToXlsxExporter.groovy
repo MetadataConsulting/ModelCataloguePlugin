@@ -537,7 +537,7 @@ class CatalogueElementToXlsxExporter {
                         name getSafeName(ref)
                         namesPrinted << ref
                     }
-                    styles withChangesHighlight('h1', parentDiffs, Diff.keyForRelationship(relationship))
+                    styles withChangesHighlight('h1', ImmutableMultimap.builder().putAll(parentDiffs).putAll(diffs).build(), Diff.keyForRelationship(relationship), Diff.keyForSelf(relationship?.destination?.latestVersionId ?: relationship?.destination?.id))
                     colspan 7
                 }
             }
@@ -607,7 +607,7 @@ class CatalogueElementToXlsxExporter {
         Multimap<String, Diff> diffs = ImmutableMultimap.of()
         CatalogueElement other = findOther(element, elementForDiff)
 
-        if (other) {
+        if (elementForDiff) {
             diffs = catalogueElementDiffs.differentiate(element, other)
         }
 
@@ -719,26 +719,26 @@ class CatalogueElementToXlsxExporter {
         sheet.row {
             cell {
                 value getModelCatalogueIdToPrint(element)
-                styles withChangesHighlight('data-element-bottom-right', dataClassDiffs, Diff.keyForRelationship(containsRelationship))
+                styles withChangesHighlight('data-element-bottom-right', dataClassDiffs, Diff.keyForRelationship(containsRelationship), Diff.keyForSelf(containsRelationship?.destination?.latestVersionId ?: containsRelationship?.destination?.id))
             }
             cell {
                 value element.status
-                styles withChangesHighlight('data-element-center-center', dataClassDiffs, Diff.keyForRelationship(containsRelationship))
+                styles withChangesHighlight('data-element-center-center', dataClassDiffs, Diff.keyForRelationship(containsRelationship), Diff.keyForSelf(containsRelationship?.destination?.latestVersionId ?: containsRelationship?.destination?.id))
             }
             cell {
                 value element.name
-                styles withChangesHighlight('data-element', dataClassDiffs, Diff.keyForRelationship(containsRelationship))
+                styles withChangesHighlight('data-element', dataClassDiffs, Diff.keyForRelationship(containsRelationship), Diff.keyForSelf(containsRelationship?.destination?.latestVersionId ?: containsRelationship?.destination?.id))
                 colspan 2
             }
             cell {
                 value getMultiplicity(containsRelationship)
-                styles withChangesHighlight('data-element-top-right', dataClassDiffs, Diff.keyForRelationshipExtension(containsRelationship, Metadata.MIN_OCCURS), Diff.keyForRelationshipExtension(containsRelationship, Metadata.MAX_OCCURS), Diff.keyForRelationship(containsRelationship))
+                styles withChangesHighlight('data-element-top-right', dataClassDiffs, Diff.keyForRelationshipExtension(containsRelationship, Metadata.MIN_OCCURS), Diff.keyForRelationshipExtension(containsRelationship, Metadata.MAX_OCCURS), Diff.keyForRelationship(containsRelationship), Diff.keyForSelf(containsRelationship?.destination?.latestVersionId ?: containsRelationship?.destination?.id))
             }
 
             if (dataType) {
                 cell {
                     value dataType.name
-                    styles Iterables.concat(withChangesHighlight('data-element', dataElementDiffs, 'dataType'), withChangesHighlight(null, dataClassDiffs, Diff.keyForRelationship(containsRelationship)))
+                    styles Iterables.concat(withChangesHighlight('data-element', dataElementDiffs, 'dataType'), withChangesHighlight(null, dataClassDiffs, Diff.keyForRelationship(containsRelationship), Diff.keyForSelf(containsRelationship?.destination?.latestVersionId ?: containsRelationship?.destination?.id)))
                     colspan 2
                     comment dataType.dataModelSemanticVersion
                 }
@@ -746,7 +746,7 @@ class CatalogueElementToXlsxExporter {
                 if (measurementUnit) {
                     cell {
                         value measurementUnit.name
-                        styles Iterables.concat(withChangesHighlight('data-element', dataTypeDiffs, 'measurementUnit'), withChangesHighlight(null, dataElementDiffs, 'dataType'), withChangesHighlight(null, dataClassDiffs, Diff.keyForRelationship(containsRelationship)))
+                        styles Iterables.concat(withChangesHighlight('data-element', dataTypeDiffs, 'measurementUnit'), withChangesHighlight(null, dataElementDiffs, 'dataType'), withChangesHighlight(null, dataClassDiffs, Diff.keyForRelationship(containsRelationship), Diff.keyForSelf(containsRelationship?.destination?.latestVersionId ?: containsRelationship?.destination?.id)))
                     }
                 } else {
                     cell()
@@ -755,7 +755,7 @@ class CatalogueElementToXlsxExporter {
                 if (referencedClass) {
                     cell {
                         value referencedClass.name
-                        styles Iterables.concat(withChangesHighlight('data-element', dataTypeDiffs, 'dataClass'), withChangesHighlight(null, dataElementDiffs, 'dataType'), withChangesHighlight(null, dataClassDiffs, Diff.keyForRelationship(containsRelationship)))
+                        styles Iterables.concat(withChangesHighlight('data-element', dataTypeDiffs, 'dataClass'), withChangesHighlight(null, dataElementDiffs, 'dataType'), withChangesHighlight(null, dataClassDiffs, Diff.keyForRelationship(containsRelationship), Diff.keyForSelf(containsRelationship?.destination?.latestVersionId ?: containsRelationship?.destination?.id)))
                     }
                 } else {
                     cell()
@@ -910,12 +910,12 @@ class CatalogueElementToXlsxExporter {
             return ret.build()
         }
 
-        if (interestingDiffs.any { it.otherMissing } ) {
-            ret.add(CHANGE_NEW)
-        } else if (interestingDiffs.any { it.selfMissing } ) {
+        if (interestingDiffs.any { it.selfMissing } ) {
             ret.add(CHANGE_REMOVAL)
         } else if (interestingDiffs.any { it.update } ) {
             ret.add(CHANGE_UPDATE)
+        } else if (interestingDiffs.any { it.otherMissing } ) {
+            ret.add(CHANGE_NEW)
         }
 
         ret.build()
@@ -1035,18 +1035,24 @@ class CatalogueElementToXlsxExporter {
         String[] multiplicityRelDiffKeys = new String[0]
 
         if (relationship) {
-            relDiffKeys = [Diff.keyForRelationship(relationship)] as String[]
-            multiplicityRelDiffKeys = [Diff.keyForRelationship(relationship),
-                           Diff.keyForRelationshipExtension(relationship, Metadata.MIN_OCCURS),
-                           Diff.keyForRelationshipExtension(relationship, Metadata.MAX_OCCURS)] as String[]
+            relDiffKeys = [Diff.keyForRelationship(relationship), Diff.keyForSelf(relationship.destination.latestVersionId ?: relationship.destination.id)] as String[]
+            multiplicityRelDiffKeys = [
+                Diff.keyForRelationship(relationship),
+                Diff.keyForSelf(relationship.destination.latestVersionId ?: relationship.destination.id),
+                Diff.keyForRelationshipExtension(relationship, Metadata.MIN_OCCURS),
+                Diff.keyForRelationshipExtension(relationship, Metadata.MAX_OCCURS),
+            ] as String[]
         }
+
+
+        ImmutableMultimap<String, Diff> allDiffs = ImmutableMultimap.builder().putAll(parentDiffs).putAll(catalogueElementDiffs.differentiate(dataClass, findOther(dataClass, elementForDiff))).build()
 
         sheet.row {
             String ref = getRef(sheetOwner, dataClass)
 
             cell {
                 value getModelCatalogueIdToPrint(dataClass)
-                styles withChangesHighlight(ModelCatalogueStyles.BOTTOM_RIGHT, parentDiffs, relDiffKeys)
+                styles withChangesHighlight(ModelCatalogueStyles.BOTTOM_RIGHT, allDiffs, relDiffKeys)
                 if (ref in namesPrinted) {
                     link to name getSafeName(ref)
                 }
@@ -1059,14 +1065,14 @@ class CatalogueElementToXlsxExporter {
                 style {
                     indent (level * 2)
                 }
-                styles withChangesHighlight(null, parentDiffs, relDiffKeys)
+                styles withChangesHighlight(null, allDiffs, relDiffKeys)
             }
             cell {
                 value getMultiplicity(relationship)
                 if (ref in namesPrinted) {
                     link to name getSafeName(ref)
                 }
-                styles withChangesHighlight(ModelCatalogueStyles.CENTER_RIGHT, parentDiffs, multiplicityRelDiffKeys)
+                styles withChangesHighlight(ModelCatalogueStyles.CENTER_RIGHT, allDiffs, multiplicityRelDiffKeys)
             }
         }
 

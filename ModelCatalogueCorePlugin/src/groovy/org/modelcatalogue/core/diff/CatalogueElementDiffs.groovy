@@ -41,7 +41,7 @@ class CatalogueElementDiffs {
 
     ImmutableMultimap<String, Diff> differentiate(CatalogueElement self, CatalogueElement other) {
         if (!other || !self || self == other) {
-            ImmutableMultimap.of()
+            return ImmutableMultimap.of(Diff.keyForSelf(self?.latestVersionId ?: self?.id ?: other?.latestVersionId ?: other?.id), Diff.createEntityChange(self, other))
         }
 
         ImmutableMultimap.Builder<String, Diff> builder = ImmutableMultimap.builder()
