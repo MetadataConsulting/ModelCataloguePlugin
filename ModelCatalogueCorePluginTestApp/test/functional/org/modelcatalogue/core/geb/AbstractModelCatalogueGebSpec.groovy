@@ -324,9 +324,6 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         while (attempt < maxAttempts) {
             attempt++
             try {
-                if (refreshOnConnectionLost) {
-                    refreshIfConnectionLost()
-                }
                 navigator = navigatorClosure()
 
                 if (navigator == null) {
@@ -356,8 +353,9 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
                     return resultClosure(navigator)
                 }
             } catch (StaleElementReferenceException | WaitTimeoutException e) {
-                if (!refreshOnConnectionLost && defaultValue) {
-                    return defaultValue
+                if (refreshOnConnectionLost && attempt == maxAttempts - 1) {
+                    // on last but one attempt try to refresh
+                    refreshIfConnectionLost()
                 }
                 println "Condition not met for after ${attempt ** 2} seconds, next waiting ${(attempt + 1) ** 2} seconds - elements: ${navigator?.allElements()}"
 
