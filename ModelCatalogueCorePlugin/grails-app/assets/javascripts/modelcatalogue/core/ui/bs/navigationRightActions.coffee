@@ -77,7 +77,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
 
     action
 
-  actionsProvider.registerChildAction 'user-menu', 'user-api-key', (messages, security, catalogueElementResource) ->
+  actionsProvider.registerChildAction 'user-menu', 'user-api-key', (messages, security, rest, modelCatalogueApiRoot) ->
     'ngInject'
 
     return undefined if not security.isUserLoggedIn()
@@ -97,11 +97,9 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
         openApiKey = (response) ->
           messages.prompt("API Key", "<p>Use following key as password for your API calls</p><input type='text' class='form-control' readonly='readonly' value='#{response.apiKey}' select-on-click></input><p class='help-block small text-warning'>WARNING: Regenerating the key will prevent all application using the current key from accessing the catalogue on your behalf</p>", type: 'options', options: options).then (regenerate) ->
             if regenerate is 'regenerate'
-              catalogueElementResource('user').get(security.getCurrentUser().id).then (user) ->
-                user.execute('apikey?regenerate=true', 'POST').then(openApiKey)
+              rest(url: "#{modelCatalogueApiRoot}/user/apikey?regenerate=true", method: 'POST').then(openApiKey)
 
-        catalogueElementResource('user').get(security.getCurrentUser().id).then (user) ->
-          user.execute('apikey', 'POST').then(openApiKey)
+        rest(url: "#{modelCatalogueApiRoot}/user/apikey", method: 'POST').then(openApiKey)
     }
 
 
