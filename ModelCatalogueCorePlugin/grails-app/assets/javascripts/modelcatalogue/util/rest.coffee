@@ -20,7 +20,7 @@ angular.module('mc.util.rest', ['mc.util.messages', 'mc.util.objectVisitor']).fa
     if config.data
 
       config.data = objectVisitor.visit config.data, (value, name) ->
-        unless value or name in ['__enhancedBy', 'defaultExcludes', 'updatableProperties', 'original', 'availableReports']
+        unless value? or name in ['__enhancedBy', 'defaultExcludes', 'updatableProperties', 'original', 'availableReports']
           return undefined
         if value and name in ['ext']
           return value
