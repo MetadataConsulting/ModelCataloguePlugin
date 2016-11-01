@@ -126,7 +126,7 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
                 versionNumber: source.get('version_number'),
                 latestVersionId: source.get('latest_id'),
                 dataModel: readSource(source.get('data_model')?.entity_id?.toString(), source.get('data_model') as  Map<String, Object>),
-                classifiedName: source.get('data_model') ? "${source.get('name')} (${source.get('data_model').get('name')})" : source.get('name'),
+                classifiedName: source.get('data_model') ? "${source.get('name')} (${source.get('data_model').get('name')} ${source.get('data_model').get('semantic_version')})" : source.get('name'),
                 modelCatalogueId: source.get('model_catalogue_id'),
                 internalModelCatalogueId: source.get('internal_model_catalogue_id'),
                 description: source.get('description'),
