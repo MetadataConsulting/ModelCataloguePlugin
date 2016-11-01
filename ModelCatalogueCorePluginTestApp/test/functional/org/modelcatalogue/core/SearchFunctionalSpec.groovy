@@ -16,7 +16,7 @@ class SearchFunctionalSpec extends AbstractModelCatalogueGebSpec {
     private static final String searchInput = '.modal-body .input-group-lg input'
     private static final String firstItemFound = '.list-group-item.item-found:first-of-type'
     private static final String firstItemFoundId = '.list-group-item.item-found:first-of-type .search-model-catalogue-id'
-    private static final String DATA_ELEMENT_NAME_WITH_DATA_MODEL = 'TESTCER SYMPTOMS FIRST NOTED DATE (NHIC)'
+    private static final String DATA_ELEMENT_NAME_WITH_DATA_MODEL = 'TESTCER SYMPTOMS FIRST NOTED DATE (NHIC 0.0.1)'
     private static final String NAME_LOWER_CASE = 'testcer symptoms first note date'
     private static final String PART_OF_DESCRIPTION = 'the time when the symptoms were first noted'
     private static final String UNIQUE_EXTENSION_VALUE = 'TEST_27'

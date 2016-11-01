@@ -116,7 +116,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         DataClass model = new DataClass(dataModel: classification, name: "Supermodel").save(failOnError: true)
 
         then:
-        CatalogueElementMarshaller.getClassifiedName(model) == 'Supermodel (classy)'
+        CatalogueElementMarshaller.getClassifiedName(model) == 'Supermodel (classy 0.0.1)'
 
         cleanup:
         classification?.delete()
