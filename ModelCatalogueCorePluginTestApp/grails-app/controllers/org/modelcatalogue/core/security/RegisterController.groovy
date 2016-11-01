@@ -96,7 +96,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
             return
         }
 
-        def registrationCode = new RegistrationCode(username: user."$usernameFieldName")
+        def registrationCode = new RegistrationCode(username: user.username)
         registrationCode.save(flush: true)
 
         String url = generateLink('resetPassword', [t: registrationCode.token])
@@ -134,8 +134,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
         def user = null
         // TODO to ui service
         RegistrationCode.withTransaction { status ->
-            String usernameFieldName = SpringSecurityUtils.securityConfig.userLookup.usernamePropertyName
-            user = lookupUserClass().findWhere((usernameFieldName): registrationCode.username)
+            user = lookupUserClass().findWhere(username: registrationCode.username)
             if (!user) {
                 return
             }
