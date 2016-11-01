@@ -221,7 +221,7 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
         }
 
         if (element.dataModel) {
-            return "${element.name} (${element.dataModel.name})"
+            return "${element.name} (${element.dataModel.name} ${element.dataModelSemanticVersion})"
         }
 
         return element.name
