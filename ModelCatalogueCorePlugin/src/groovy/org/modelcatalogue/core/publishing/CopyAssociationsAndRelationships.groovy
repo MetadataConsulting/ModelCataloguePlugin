@@ -82,7 +82,7 @@ class CopyAssociationsAndRelationships {
                 return
             }
 
-            if (r.archived) {
+            if (r.archived || r.inherited) {
                 return
             }
 
