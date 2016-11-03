@@ -42,8 +42,8 @@ class CatalogueBuilderContext {
      * @param contextElementType
      * @param closure
      */
-    public <T extends CatalogueElement> WithOptionalOrClause withContextElement(Class<T> contextElementType, @DelegatesTo(CatalogueBuilder) @ClosureParams(value=FromString, options = ['org.modelcatalogue.core.util.builder.CatalogueElementProxy<T>', 'org.modelcatalogue.core.util.builder.CatalogueElementProxy<T>,Closure']) Closure closure) {
-        ContextItem<T> contextElement = getContextElement(contextElementType) as ContextItem<T>
+    public <T extends CatalogueElement> WithOptionalOrClause withContextElement(Class<T> contextElementType, boolean anyDepth = false, @DelegatesTo(CatalogueBuilder) @ClosureParams(value=FromString, options = ['org.modelcatalogue.core.util.builder.CatalogueElementProxy<T>', 'org.modelcatalogue.core.util.builder.CatalogueElementProxy<T>,Closure']) Closure closure) {
+        ContextItem<T> contextElement = getContextElement(contextElementType, 0, anyDepth) as ContextItem<T>
         if (contextElement) {
             closure.resolveStrategy = Closure.DELEGATE_FIRST
             closure.delegate = builder
@@ -92,7 +92,7 @@ class CatalogueBuilderContext {
         contextElement
     }
 
-    private <T extends CatalogueElement> ContextItem<T> getContextElement(Class<T> contextElementType = CatalogueElement, int skip = 0) {
+    private <T extends CatalogueElement> ContextItem<T> getContextElement(Class<T> contextElementType = CatalogueElement, int skip = 0, boolean anyDepth = false) {
         int skipped = 0
         for (Map<Class, ContextItem> context in contexts.reverse()) {
             if (skipped++ < skip) {
@@ -101,6 +101,9 @@ class CatalogueBuilderContext {
             ContextItem<T> result = context[contextElementType] as ContextItem<T>
             if (result) {
                 return result
+            }
+            if (!anyDepth) {
+                return null
             }
         }
         return null

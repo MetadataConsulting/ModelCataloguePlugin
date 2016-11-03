@@ -523,7 +523,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
             return
         }
 
-        context.withContextElement(DataModel) {
+        context.withContextElement(DataModel, true) {
             element.setParameter('dataModel', it)
         }
     }
@@ -656,7 +656,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
             return true
         }
         boolean ret = true
-        context.withContextElement(DataModel) {
+        context.withContextElement(DataModel, true) {
             ret = it.name == (parameters.dataModel ?: parameters.classification)?.toString()
         }
         return ret

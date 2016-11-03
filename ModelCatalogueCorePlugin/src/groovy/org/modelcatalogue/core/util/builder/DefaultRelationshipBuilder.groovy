@@ -75,7 +75,7 @@ class DefaultRelationshipBuilder implements RelationshipBuilder {
      * @param extensions closure defining the metadata
      */
     void to(String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
-        context.withContextElement(DataModel) {
+        context.withContextElement(DataModel, true) {
             to repository.createProxy(getDestinationHintOrClass(), [classification: it.name, name: name]), extensions
         } or {
             to repository.createProxy(getDestinationHintOrClass(), [name: name]), extensions
@@ -164,7 +164,7 @@ class DefaultRelationshipBuilder implements RelationshipBuilder {
     }
 
     void from(String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
-        context.withContextElement(DataModel) {
+        context.withContextElement(DataModel, true) {
             from repository.createProxy(getSourceHintOrClass(), [classification: it.name, name: name]), extensions
         } or {
             from repository.createProxy(getSourceHintOrClass(), [name: name]), extensions

@@ -14,6 +14,11 @@ import static org.modelcatalogue.core.util.HibernateHelper.*
 
 class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
+    public static final String DATA_MODEL_NO_HIERARCHY = "test no hierarchy"
+    public static final String DATA_MODEL_NO_HIERARCHY_DATA_CLASS = "no parent"
+    public static final String DATA_MODEL_NO_HIERARCHY_DATA_ELEMENT = "reference type element test"
+    public static final String DATA_MODEL_NO_HIERARCHY_DATA_TYPE = "reference type test"
+    public static final String DATA_MODEL_NO_HIERARCHY_REFERENCE = "reference no class"
     def dataModelService
     def elementService
 
@@ -1203,9 +1208,27 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
             child.dataModel == dataModel
             grandChild
             grandChild.dataModel == dataModel
+    }
 
-
-
-
+    def "when creating refrence data type don't create hierarchy"() {
+        given:
+            build {
+                dataModel(name: DATA_MODEL_NO_HIERARCHY) {
+                    dataClass(name: DATA_MODEL_NO_HIERARCHY_DATA_CLASS) {
+                        dataElement(name: DATA_MODEL_NO_HIERARCHY_DATA_ELEMENT) {
+                            dataType(name: DATA_MODEL_NO_HIERARCHY_DATA_TYPE) {
+                                dataClass(name: DATA_MODEL_NO_HIERARCHY_REFERENCE)
+            }   }   }   }   }
+        when:
+            DataClass noParent = DataClass.findByName(DATA_MODEL_NO_HIERARCHY_DATA_CLASS)
+            DataType reference = DataType.findByName(DATA_MODEL_NO_HIERARCHY_DATA_TYPE)
+            DataClass noChild = DataClass.findByName(DATA_MODEL_NO_HIERARCHY_REFERENCE)
+        then:
+            noParent
+            reference
+            noChild
+            noParent.countParentOf() == 0
+            reference.instanceOf(ReferenceType)
+            noChild.countChildOf() == 0
     }
 }

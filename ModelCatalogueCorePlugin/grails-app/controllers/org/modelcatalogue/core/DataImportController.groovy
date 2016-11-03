@@ -227,6 +227,7 @@ class DataImportController  {
     }
 
     protected logError(Long id,Exception e){
+        BuildProgressMonitor.get(id)?.onError(e)
         log.error "Error importing Asset[$id]", e
         Asset updated = Asset.get(id)
         updated.refresh()
