@@ -25,7 +25,6 @@ grails.project.fork = [
 grails.plugin.location.'model-catalogue-core' = "../ModelCatalogueCorePlugin"
 grails.plugin.location.'model-catalogue-discourse' = "../ModelCatalogueDiscoursePlugin"
 grails.plugin.location.'model-catalogue-forms' = '../ModelCatalogueFormsPlugin'
-grails.plugin.location.'model-catalogue-elasticsearch' = '../ModelCatalogueElasticSearchPlugin'
 grails.plugin.location.'model-catalogue-genomics' = '../ModelCatalogueGenomicsPlugin'
 
 // XXX: triggers error on war deployment

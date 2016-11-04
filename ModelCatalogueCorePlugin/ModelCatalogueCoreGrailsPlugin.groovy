@@ -148,6 +148,10 @@ Model catalogue core plugin (metadata registry)
         springConfig.addAlias('modelCatalogueSecurityService','springSecurity2SecurityService')
         springConfig.addAlias('userDetailsService','gormWithEmailUserDetailsService')
         springConfig.addAlias('daoAuthenticationProvider','apiKeyDaoAuthenticationProvider')
+
+        if (System.getenv('MC_ES_DISABLED') != 'true' && (application.config.mc.search.elasticsearch.local || application.config.mc.search.elasticsearch.host || System.getProperty('mc.search.elasticsearch.host') || System.getProperty('mc.search.elasticsearch.local'))) {
+            springConfig.addAlias('modelCatalogueSearchService','elasticSearchService')
+        }
     }
 
     def doWithDynamicMethods = { ctx ->
