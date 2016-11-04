@@ -8,6 +8,7 @@ import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.audit.AuditJsonMarshallingCustomizer
 import org.modelcatalogue.core.reports.ReportsRegistry
+import org.modelcatalogue.core.security.ss2x.ApiKeyDaoAuthenticationProvider
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.js.ApiRootFrontendConfigurationProvider
@@ -133,6 +134,20 @@ Model catalogue core plugin (metadata registry)
             bean.scope = 'prototype'
         }
 
+        apiKeyDaoAuthenticationProvider(ApiKeyDaoAuthenticationProvider) {
+            userDetailsService = ref('userDetailsService')
+            passwordEncoder = ref('passwordEncoder')
+            userCache = ref('userCache')
+            saltSource = ref('saltSource')
+            preAuthenticationChecks = ref('preAuthenticationChecks')
+            postAuthenticationChecks = ref('postAuthenticationChecks')
+            authoritiesMapper = ref('authoritiesMapper')
+            hideUserNotFoundExceptions = true
+        }
+
+        springConfig.addAlias('modelCatalogueSecurityService','springSecurity2SecurityService')
+        springConfig.addAlias('userDetailsService','gormWithEmailUserDetailsService')
+        springConfig.addAlias('daoAuthenticationProvider','apiKeyDaoAuthenticationProvider')
     }
 
     def doWithDynamicMethods = { ctx ->

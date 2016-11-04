@@ -78,6 +78,27 @@ grails.project.dependency.resolution = {
 
         compile 'org.gperfutils:gprof:0.3.1-groovy-2.4'
 
+        String springSecurityVersion = '3.2.3.RELEASE'
+
+        compile "org.springframework.security:spring-security-core:$springSecurityVersion", {
+            excludes 'aopalliance', 'aspectjrt', 'cglib-nodep', 'commons-collections', 'commons-logging',
+                'ehcache', 'fest-assert', 'hsqldb', 'jcl-over-slf4j', 'jsr250-api', 'junit',
+                'logback-classic', 'mockito-core', 'powermock-api-mockito', 'powermock-api-support',
+                'powermock-core', 'powermock-module-junit4', 'powermock-module-junit4-common',
+                'powermock-reflect', 'spring-aop', 'spring-beans', 'spring-context', 'spring-core',
+                'spring-expression', 'spring-jdbc', 'spring-test', 'spring-tx'
+        }
+
+        compile "org.springframework.security:spring-security-web:$springSecurityVersion", {
+            excludes 'aopalliance', 'commons-codec', 'commons-logging', 'fest-assert', 'groovy', 'hsqldb',
+                'jcl-over-slf4j', 'junit', 'logback-classic', 'mockito-core', 'powermock-api-mockito',
+                'powermock-api-support', 'powermock-core', 'powermock-module-junit4',
+                'powermock-module-junit4-common', 'powermock-reflect', 'spock-core', 'spring-beans',
+                'spring-context', 'spring-core', 'spring-expression', 'spring-jdbc',
+                'spring-security-core', 'spring-test', 'spring-tx', 'spring-web', 'spring-webmvc',
+                'tomcat-servlet-api'
+        }
+
         test 'xmlunit:xmlunit:1.6'
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
         test "org.modelcatalogue:mc-builder-xml:$mcToolkitVersion"
@@ -121,8 +142,12 @@ grails.project.dependency.resolution = {
         test ":code-coverage:1.2.7"
 
         build ':tomcat:8.0.33'
-		//jasper report generator see in dependencies
 
+        compile ':spring-security-core:2.0.0'
+        compile ":spring-security-oauth:2.1.0-RC4"
+        compile ':spring-security-oauth-google:0.1'
+        compile ':spring-security-oauth-twitter:0.1'
+        compile ':spring-security-oauth-facebook:0.1'
     }
 }
 
