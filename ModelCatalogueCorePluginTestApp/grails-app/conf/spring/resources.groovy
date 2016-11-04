@@ -16,4 +16,6 @@ beans = {
         persistenceInterceptor = ref("persistenceInterceptor")
         executor = Executors.newCachedThreadPool()
     }
+
+    springConfig.addAlias('modelCatalogueSecurityService','springSecurity2SecurityService')
 }

@@ -1,3 +1,5 @@
+package org.modelcatalogue.repack.org.scribe.builder.api
+
 dataModel name: 'Rare Disease Conditions', {
     ext 'http://www.modelcatalogue.org/metadata/genomics/#all-rd-reports', 'true'
     dataClass name: 'Rare Disease Conditions and Phenotypes', {

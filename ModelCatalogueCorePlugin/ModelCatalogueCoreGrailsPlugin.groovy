@@ -146,7 +146,6 @@ Model catalogue core plugin (metadata registry)
             hideUserNotFoundExceptions = true
         }
 
-        springConfig.addAlias('modelCatalogueSecurityService','springSecurity2SecurityService')
         springConfig.addAlias('userDetailsService','gormWithEmailUserDetailsService')
         springConfig.addAlias('daoAuthenticationProvider','apiKeyDaoAuthenticationProvider')
 

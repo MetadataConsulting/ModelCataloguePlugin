@@ -13,7 +13,6 @@ import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import spock.lang.Unroll
 
 import javax.servlet.http.HttpServletResponse
-import javax.xml.crypto.Data
 
 abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends AbstractControllerIntegrationSpec implements ResultRecorder{
 
@@ -89,11 +88,14 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         controller.request.method       = 'POST'
         controller.request.json = loadItem as JSON
         controller."add${direction.capitalize()}"(anotherLoadItem.id, relationshipType.name)
+        expect:
+        controller.response.status == HttpServletResponse.SC_CREATED
+
+        when:
         def json = controller.response.json
         recordResult "add${direction.capitalize()}", json
 
-        expect:
-        controller.response.status == HttpServletResponse.SC_CREATED
+        then:
         json.element
         json.element.id  == anotherLoadItem.id
         json.relation
