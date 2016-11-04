@@ -20,6 +20,15 @@ import RareDiseasePhenotypeChangeLogXlsExporter
 import RareDiseasesDocExporter
 import RareDiseasesJsonExporter
 import RareDiseasesWebsiteExporter
+import org.modelcatalogue.gel.export.CancerTypesCsvExporter
+import org.modelcatalogue.gel.export.CancerTypesJsonExporter
+import org.modelcatalogue.gel.export.DataModelChangeLogXlsExporter
+import org.modelcatalogue.gel.export.RareDiseaseDisorderListCsvExporter
+import org.modelcatalogue.gel.export.RareDiseaseEligibilityChangeLogXlsExporter
+import org.modelcatalogue.gel.export.RareDiseasePhenotypeChangeLogXlsExporter
+import org.modelcatalogue.gel.export.RareDiseasesDocExporter
+import org.modelcatalogue.gel.export.RareDiseasesJsonExporter
+import org.modelcatalogue.gel.export.RareDiseasesWebsiteExporter
 
 import static RareDiseasesDocExporter.getStandardTemplate
 
