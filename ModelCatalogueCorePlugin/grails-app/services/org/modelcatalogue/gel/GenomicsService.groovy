@@ -11,17 +11,17 @@ import org.modelcatalogue.core.publishing.changelog.ChangeLogDocxGenerator
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
-import org.modelcatalogue.gel.export.CancerTypesCsvExporter
-import org.modelcatalogue.gel.export.CancerTypesJsonExporter
-import org.modelcatalogue.gel.export.DataModelChangeLogXlsExporter
-import org.modelcatalogue.gel.export.RareDiseaseDisorderListCsvExporter
-import org.modelcatalogue.gel.export.RareDiseaseEligibilityChangeLogXlsExporter
-import org.modelcatalogue.gel.export.RareDiseasePhenotypeChangeLogXlsExporter
-import org.modelcatalogue.gel.export.RareDiseasesDocExporter
-import org.modelcatalogue.gel.export.RareDiseasesJsonExporter
-import org.modelcatalogue.gel.export.RareDiseasesWebsiteExporter
+import CancerTypesCsvExporter
+import CancerTypesJsonExporter
+import DataModelChangeLogXlsExporter
+import RareDiseaseDisorderListCsvExporter
+import RareDiseaseEligibilityChangeLogXlsExporter
+import RareDiseasePhenotypeChangeLogXlsExporter
+import RareDiseasesDocExporter
+import RareDiseasesJsonExporter
+import RareDiseasesWebsiteExporter
 
-import static org.modelcatalogue.gel.export.RareDiseasesDocExporter.getStandardTemplate
+import static RareDiseasesDocExporter.getStandardTemplate
 
 @Transactional
 class GenomicsService {
@@ -130,7 +130,7 @@ class GenomicsService {
             originalFileName: "${documentName}-${dataClass.status}-${dataClass.version}.docx",
             contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ) { OutputStream out ->
-            new RareDiseasesDocExporter(DataClass.get(classId), standardTemplate, DOC_IMAGE_PATH, eligibilityMode).export(out)
+            new RareDiseasesDocExporter(DataClass.get(classId), org.modelcatalogue.gel.export.RareDiseasesDocExporter.standardTemplate, DOC_IMAGE_PATH, eligibilityMode).export(out)
         }
     }
 

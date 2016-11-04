@@ -10,6 +10,7 @@ import org.modelcatalogue.core.audit.AuditJsonMarshallingCustomizer
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.security.ss2x.ApiKeyDaoAuthenticationProvider
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
+import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.js.ApiRootFrontendConfigurationProvider
 import org.modelcatalogue.core.util.js.FrontendConfigurationProviderRegistry
@@ -376,25 +377,171 @@ Model catalogue core plugin (metadata registry)
             }
         }
 
-        // generic export of relationships to catalogue XML
-//        reportsRegistry.register {
-//            creates link
-//            title { Relationships rels ->
-//                "Export ${rels.direction != RelationshipDirection.INCOMING ? rels.type.sourceToDestination : rels.type.destinationToSource} to Catalogue XML"
-//            }
-//            type Relationships
-//            link {
-//                GrailsWebRequest webRequest = RequestContextHolder.currentRequestAttributes() as GrailsWebRequest
-//                Map params = [:]
-//                params.putAll(webRequest.params)
-//                params.format = 'xml'
-//                params.remove('sort')
-//                params.remove('order')
-//                params.remove('max')
-//                params.remove('offset')
-//                [controller: webRequest.controllerName, action: webRequest.actionName, params: params]
-//            }
-//        }
+        reportsRegistry.register {
+            creates link
+            title { "Generate all ${it.name} files" }
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get(Metadata.ALL_CANCER_REPORTS) == 'true'
+            }
+            link controller: 'genomics', action: 'exportAllCancerReports', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Generate all ${it.name} files" }
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get(Metadata.ALL_RD_REPORTS) == 'true'
+            }
+            link controller: 'genomics', action: 'exportAllRareDiseaseReports', id: true
+        }
+
+        reportsRegistry.register {
+            creates asset
+            title { "GEL Changelog (Word Doc)" }
+            defaultName { "${it.name} changelog as MS Word Document" }
+            depth 3
+            includeMetadata true
+            type DataClass
+            link controller: 'genomics', action: 'exportChangeLogDocument', id: true
+        }
+
+        reportsRegistry.register {
+            creates asset
+            title { "GEL Data Specification Report (Word Doc)" }
+            defaultName { "${it.name} report as MS Word Document" }
+            depth 3
+            type DataModel
+            link controller: 'genomics', action: 'exportGelSpecification', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases Disorder List (CSV)" }
+            type DataClass
+            link controller: 'genomics', action: 'exportRareDiseaseDisorderListAsCsv', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases Eligibility Criteria Report (Word Doc)" }
+            type DataClass
+            link controller: 'genomics', action: 'exportRareDiseaseEligibilityDoc', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases Phenotypes and Clinical Tests Report (Word Doc)" }
+            type DataClass
+            link controller: 'genomics', action: 'exportRareDiseasePhenotypesAndClinicalTestsDoc', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases HPO And Clinical Tests (JSON)" }
+            defaultName { "${it.name} report as Json" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsJson', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases Disorder List Only (JSON)" }
+            defaultName { "${it.name} report as Json" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseaseListAsJson', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases Eligibility Criteria (JSON)" }
+            defaultName { "${it.name} report as Json" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseaseHPOEligibilityCriteriaAsJson', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases HPO And Clinical Tests (CSV)" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsCsv', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Rare Disease Eligibility Criteria Report (CSV)" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseaseEligibilityCsv', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Cancer Types (JSON)" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportCancerTypesAsJson', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Cancer Types (CSV)" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportCancerTypesAsCsv', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Change Log for RD Phenotypes And Clinical Tests (Excel)" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsXls', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Change Log for RD Eligibility (Excel)" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseaseEligibilityChangeLogAsXls', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "GEL Data Specification Change Log (Excel)" }
+            type DataModel
+            link controller: 'genomics', action: 'exportDataSpecChangeLogAsXls', id: true
+        }
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases Static Website" }
+            type DataModel
+            link controller: 'genomics', action: 'exportRareDiseasesWebsite', id: true
+        }
     }
 
     def onChange = { event ->

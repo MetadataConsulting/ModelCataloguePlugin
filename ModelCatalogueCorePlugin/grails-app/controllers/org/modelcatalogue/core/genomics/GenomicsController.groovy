@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.genomics
 
-import grails.gsp.PageRenderer
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
@@ -8,6 +7,7 @@ import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.gel.GenomicsService
 import org.modelcatalogue.gel.RareDiseaseCsvExporter
 import org.springframework.http.HttpStatus
+
 /**
  * Controller for GEL specific reports.
  */
