@@ -41,14 +41,8 @@
             }
         </script>
     </g:if>
-    <g:if test="${Metadata.current['grails.war.deployed']}">
-      <g:javascript plugin="model-catalogue-core" src="libs/saxonce/Saxonce.nocache.js"/>
-      <g:javascript plugin="model-catalogue-core" src="libs/google-diff-match-patch/javascript/diff_match_patch.js"/>
-    </g:if>
-    <g:else>
-      <script src="plugins/ModelCatalogueCorePlugin/js/libs/saxonce/Saxonce.nocache.js"></script>
-      <script src="plugins/ModelCatalogueCorePlugin/js/libs/google-diff-match-patch/javascript/diff_match_patch.js"></script>
-    </g:else>
+    <g:javascript src="libs/saxonce/Saxonce.nocache.js"/>
+    <g:javascript src="libs/google-diff-match-patch/javascript/diff_match_patch.js"/>
     <g:if test="${CDN.preferred}">
         <g:set var="minSuffix" value="${Environment.current == Environment.TEST ? '' : '.min'}"/>
         <!-- CDNs -->
