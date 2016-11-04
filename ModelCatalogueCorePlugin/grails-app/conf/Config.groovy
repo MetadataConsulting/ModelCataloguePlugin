@@ -1,9 +1,37 @@
 environments {
     development {
         grails.serverURL = "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
+        oauth {
+            providers {
+                google {
+                    // this key is limited to localhost only so no need to hide it
+                    api = org.modelcatalogue.repack.org.scribe.builder.api.GoogleApi20
+                    key = '225917730237-0hg6u55rgnld9cbtm949ab9h9fk5onr3.apps.googleusercontent.com'
+                    secret = 'OG0JVVoy4bnGm48bneIS0haB'
+                    successUri = '/oauth/google/success'
+                    failureUri = '/oauth/google/error'
+                    callback = "${grails.serverURL}/oauth/google/callback"
+                    scope = 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
+                }
+            }
+        }
     }
     test {
         grails.serverURL = "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
+        oauth {
+            providers {
+                google {
+                    // this key is limited to localhost only so no need to hide it
+                    api = org.modelcatalogue.repack.org.scribe.builder.api.GoogleApi20
+                    key = '225917730237-0hg6u55rgnld9cbtm949ab9h9fk5onr3.apps.googleusercontent.com'
+                    secret = 'OG0JVVoy4bnGm48bneIS0haB'
+                    successUri = '/oauth/google/success'
+                    failureUri = '/oauth/google/error'
+                    callback = "${grails.serverURL}/oauth/google/callback"
+                    scope = 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
+                }
+            }
+        }
     }
 }
 
