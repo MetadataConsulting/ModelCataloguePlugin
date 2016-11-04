@@ -102,6 +102,11 @@ grails.project.dependency.resolution = {
         compile group: 'org.elasticsearch', name: 'elasticsearch', version: '2.3.5'
         compile 'com.vividsolutions:jts:1.13'
 
+        String crfBuilderVersion = '3.2.0-rc4'
+        compile ("org.modelcatalogue:crf-builder-serializer:$crfBuilderVersion")
+        compile ("org.modelcatalogue:crf-builder-builder:$crfBuilderVersion")
+        compile ("org.modelcatalogue:crf-builder-preview:$crfBuilderVersion")
+
         test 'xmlunit:xmlunit:1.6'
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
         test "org.modelcatalogue:mc-builder-xml:$mcToolkitVersion"
