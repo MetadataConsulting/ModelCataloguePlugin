@@ -16,6 +16,8 @@
 //
 //}
 
+import grails.util.Metadata
+
 try {
     def revision = 'git rev-list --count HEAD'.execute().text.trim()
     def hashShort = 'git rev-parse --short HEAD'.execute().text.trim()
@@ -36,6 +38,14 @@ try {
 } catch (e) {
     println "Cannot determine current version: $e"
     new FileOutputStream("grails-app/views/_version.gsp", false) << """Unknown Version"""
+}
+
+eventCleanStart = { args ->
+    File tmpFolder = new File("${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}")
+    if (tmpFolder.exists() && tmpFolder.directory) {
+        println "\nRemoving old test databases from previous runs\n"
+        tmpFolder.deleteDir()
+    }
 }
 
 eventTestCaseStart = { name ->

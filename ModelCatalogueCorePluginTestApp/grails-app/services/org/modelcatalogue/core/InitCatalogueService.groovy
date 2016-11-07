@@ -40,7 +40,7 @@ class InitCatalogueService {
 
         // first pass
         for (Resource resource in resolver.getResources('classpath*:**/*.mc')) {
-            if (resource.file.absolutePath.contains('/test/')) {
+            if (resource.file.absolutePath.contains('/test/') || resource.file.absolutePath.contains('/docs/')) {
                 continue
             }
             try {
