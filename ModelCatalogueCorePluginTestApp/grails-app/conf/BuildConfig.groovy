@@ -152,7 +152,7 @@ grails.project.dependency.resolution = {
         compile ':cache:1.1.8'
         compile ":console:1.5.6"
         compile ":spring-security-ui:1.0-RC2"
-        compile ":grails-melody:1.55.0"
+        compile ":grails-melody:1.59.0"
 
         // plugins needed at runtime but not for compilation
         runtime ":database-migration:1.4.0"

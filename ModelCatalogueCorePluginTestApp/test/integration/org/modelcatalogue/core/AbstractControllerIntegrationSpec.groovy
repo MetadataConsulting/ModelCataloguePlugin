@@ -24,6 +24,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     Long totalCount
 
     ElementService elementService
+    CatalogueElementService catalogueElementService
 
     protected boolean getRecord() {
         false
@@ -183,9 +184,16 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         created
         customJsonPropertyCheck newInstance, created, stored
 
+        when:
         removeAllRelations stored
 
-        stored.delete()
+        if (stored.instanceOf(CatalogueElement)) {
+            catalogueElementService.delete(stored)
+        } else {
+            stored.delete()
+        }
+
+        then:
         resourceCount == totalCount
     }
 

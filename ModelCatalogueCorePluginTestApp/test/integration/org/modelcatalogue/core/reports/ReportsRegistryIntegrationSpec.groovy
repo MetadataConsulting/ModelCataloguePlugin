@@ -2,6 +2,7 @@ package org.modelcatalogue.core.reports
 
 import grails.rest.render.RenderContext
 import grails.test.spock.IntegrationSpec
+import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.Relationship
@@ -19,7 +20,8 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
         DataClass model                 = new DataClass(name: "Test")
         model.id                    = 1
 
-        ReportsRegistry registry    = applicationContext.getBean(ReportsRegistry)
+        LinkGenerator linkGenerator = applicationContext.getBean(LinkGenerator)
+        ReportsRegistry registry    = new ReportsRegistry(linkGenerator: linkGenerator)
 
         registry.register {
             title 'Export All to COSD'
@@ -46,24 +48,26 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
 
         expect:
         modelReports.size()                 >= 1
-        modelReports[0].getTitle(model)     == 'Inventory Report Document'
-        modelReports[0].getLink(model)?.endsWith("/api/modelCatalogue/core/dataClass/1/inventoryDoc?asset=true")
+        modelReports[0].getTitle(model)     == 'Export All to COSD'
+        modelReports[0].getLink(model)?.endsWith("/api/modelCatalogue/core/dataArchitect/getSubModelElements?format=xslt&report=COSD&id=1")
 
         when:
         def models = new Elements(itemType: DataClass)
         def wrapperReports = registry.getAvailableReports(models)
 
         then:
-        wrapperReports.size()               >= 2
-        wrapperReports[1].getTitle(models)  == 'WRAPPER'
-        wrapperReports[1].getLink(models)?.endsWith('/foo/bar?format=xml&asset=true')
+        wrapperReports.size()               >= 1
+        wrapperReports[0].getTitle(models)  == 'WRAPPER'
+        wrapperReports[0].getLink(models)?.endsWith('/foo/bar?format=xml&asset=true')
 
     }
 
 
     def "XLSX reports are registered automatically"() {
-        ReportsRegistry registry = applicationContext.getBean(ReportsRegistry)
+        LinkGenerator linkGenerator = applicationContext.getBean(LinkGenerator)
+        ReportsRegistry registry    = new ReportsRegistry(linkGenerator: linkGenerator)
         XLSXListRenderer xlsxListRenderer = applicationContext.getBean(XLSXListRenderer)
+        xlsxListRenderer.reportsRegistry = registry
 
         xlsxListRenderer.registerRowWriter {
             title "Export Relationships TEST"
@@ -78,10 +82,10 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
         def relationshipsReports = registry.getAvailableReports(new Relationships())
 
         expect:
-        relationshipsReports.size()                           >= 2
-        relationshipsReports[1].getTitle(new Relationships()) == 'Export Relationships TEST'
-        relationshipsReports[1].renderType                    == ReportDescriptor.RenderType.ASSET
-        relationshipsReports[1].getLink(new Relationships(list: new SimpleListWrapper<Relationship>(itemType: Relationship)))  == '?format=xlsx&report=&asset=true'
+        relationshipsReports.size()                           >= 1
+        relationshipsReports[0].getTitle(new Relationships()) == 'Export Relationships TEST'
+        relationshipsReports[0].renderType                    == ReportDescriptor.RenderType.ASSET
+        relationshipsReports[0].getLink(new Relationships(list: new SimpleListWrapper<Relationship>(itemType: Relationship)))  == '/test?format=xlsx&report=&asset=true'
 
 
 

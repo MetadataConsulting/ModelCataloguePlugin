@@ -15,19 +15,17 @@ import org.modelcatalogue.gel.RareDiseaseCsvExporter
 /**
  * Abstract test class for Data Specification models (i.e. Rare Disease Models, Cancer Models)
  */
-class AbstractDataModelExporterSpec extends IntegrationSpec {
+class AbstractDataModelExporterSpec extends AbstractIntegrationSpec {
 
     public static final String DATA_MODEL_EXPORTER_DATA_MODEL_NAME = 'Data Exporter Test Data Model'
     AuditService auditService
     DataClassService dataClassService
     ElementService elementService
     DataModelService dataModelService
-    InitCatalogueService initCatalogueService
     PerformanceUtilService performanceUtilService
-    SessionFactory sessionFactory
 
     def setup() {
-        initCatalogueService.initDefaultRelationshipTypes()
+        initRelationshipTypes()
     }
 
     @Rule
@@ -43,7 +41,7 @@ class AbstractDataModelExporterSpec extends IntegrationSpec {
     // Model Based on Strcture of RD and Cancer Models
     DataModel buildTestModel() {
         TestDataHelper.initFreshDb(sessionFactory, 'data-model-exporter.sql') {
-            initCatalogueService.initDefaultRelationshipTypes()
+            initRelationshipTypes()
             DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
 
             builder.build {

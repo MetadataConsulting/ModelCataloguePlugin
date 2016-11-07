@@ -17,20 +17,18 @@ import org.modelcatalogue.gel.RareDiseaseCsvExporter
 /**
  * Created by rickrees on 10/03/2016.
  */
-class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
+class AbstractRareDiseasesExporterSpec extends AbstractIntegrationSpec {
 
     public static final String RARE_DISEASE_DATA_MODEL_NAME = 'Rare Diseases Test Data Model'
     AuditService auditService
     DataClassService dataClassService
     ElementService elementService
     DataModelService dataModelService
-    InitCatalogueService initCatalogueService
     PerformanceUtilService performanceUtilService
-    SessionFactory sessionFactory
     GenomicsService genomicsService
 
     def setup() {
-        initCatalogueService.initDefaultRelationshipTypes()
+        initRelationshipTypes()
     }
 
     @Rule TemporaryFolder temporaryFolder
@@ -58,7 +56,7 @@ class AbstractRareDiseasesExporterSpec extends IntegrationSpec {
     // by the two report generation methods it's a bit nasty looking but creates a fairly realistic model
     DataModel buildTestModel(boolean createPhenotypes) {
         TestDataHelper.initFreshDb(sessionFactory, 'rare-diseases.sql') {
-            initCatalogueService.initDefaultRelationshipTypes()
+            initRelationshipTypes()
             DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
 
             builder.build {

@@ -1,8 +1,12 @@
 package org.modelcatalogue.core
 
+import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.test.spock.IntegrationSpec
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.modelcatalogue.core.cache.CacheService
+import org.modelcatalogue.core.security.Role
+import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.security.UserRole
 import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.TestDataHelper
@@ -18,14 +22,17 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
     def initCatalogueService
     def sessionFactory
     def cacheService
+    def relationshipTypeService
 
     void loadMarshallers() {
+        relationshipTypeService.clearCache()
         def springContext = WebApplicationContextUtils.getWebApplicationContext( ServletContextHolder.servletContext )
         springContext.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
     }
 
 
     void initRelationshipTypes(){
+        relationshipTypeService.clearCache()
         TestDataHelper.initFreshDb(sessionFactory, 'reltypes.sql') {
             initCatalogueService.initDefaultRelationshipTypes()
         }
@@ -33,16 +40,26 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
     }
 
     void initCatalogue(){
-        initCatalogueService.initCatalogue(true)
+        relationshipTypeService.clearCache()
+        TestDataHelper.initFreshDb(sessionFactory, 'initcatalogue.sql') {
+            initCatalogueService.initCatalogue(true)
+        }
         cacheService.clearCache()
     }
 
     void loadFixtures(){
+        relationshipTypeService.clearCache()
         TestDataHelper.initFreshDb(sessionFactory, 'testdata.sql') {
             initCatalogueService.initDefaultRelationshipTypes()
             fixtures = fixtureLoader.load("assets/*", "batches/*", "dataTypes/*", "enumeratedTypes/*", "measurementUnits/*", "models/*", "relationshipTypes/*", "dataModelPolicies/*", "classifications/*").load("actions/*", "users/*", "referenceTypes/*", "primitiveTypes/*").load("dataElements/*", "validationRules/*").load("extensions/*", "mappings/*").load("csvTransformations/*")
         }
         cacheService.clearCache()
+        Role adminRole = Role.findOrCreateWhere(authority: 'ROLE_ADMIN').save(failOnError: true)
+        User user = User.list(max: 1).first()
+        UserRole.create(user, adminRole, true)
+        user.save(failOnError: true)
+        adminRole.save(failOnError: true)
+        SpringSecurityUtils.reauthenticate(user.username, null)
     }
 
     /**
