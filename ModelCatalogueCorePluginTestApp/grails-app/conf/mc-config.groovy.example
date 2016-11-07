@@ -2,10 +2,7 @@
 
 
 // Server URL
-grails.serverURL = System.getenv('METADATA_SERVER_URL') ?:  "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
-
-// Application Context
-// grails.app.context = '/'
+grails.serverURL = System.getenv('METADATA_SERVER_URL') ?:  "http://localhost:${System.getProperty('server.port') ?: 8080}"
 
 // Data Source
 dataSource {

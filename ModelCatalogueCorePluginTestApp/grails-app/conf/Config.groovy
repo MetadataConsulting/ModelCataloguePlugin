@@ -16,6 +16,8 @@ oauth.providers = [:]
 
 grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
 
+grails.app.context = '/'
+
 // The ACCEPT header will not be used for content negotiation for user agents containing the following strings (defaults to the 4 major rendering engines)
 grails.mime.disable.accept.header.userAgents = ['Gecko', 'WebKit', 'Presto', 'Trident']
 grails.mime.types = [ // the first one is the default format
@@ -91,7 +93,7 @@ grails.hibernate.cache.queries = false
 environments {
     development {
         grails.logging.jul.usebridge = true
-        grails.serverURL = "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
+        grails.serverURL = "http://localhost:${System.getProperty('server.port') ?: 8080}"
 //        discourse {
 //            url = "http://192.168.1.123/"
 //            api {
@@ -137,7 +139,7 @@ environments {
     }
     local {
         grails.logging.jul.usebridge = true
-        grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
+        grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}"
     }
     test {
         // uncomment for debugging failing functional tests on Travis CI
@@ -160,7 +162,7 @@ environments {
         mc.allow.signup = true
 
         grails.plugin.console.enabled = true
-        grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
+        grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}"
         if (System.getenv('TRAVIS') && System.getenv('TEST_SUITE') == 'functional') {
             mc.search.elasticsearch.host="127.0.0.1"
         } else {

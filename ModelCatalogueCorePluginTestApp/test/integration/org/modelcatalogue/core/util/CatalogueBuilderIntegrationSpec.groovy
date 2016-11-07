@@ -772,7 +772,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
     def "define id as closure"() {
         Object old = Holders.grailsApplication.config.grails.serverURL
-        Holders.grailsApplication.config.grails.serverURL = "http://localhost:8080/ModelCatalogueCorePluginTestApp"
+        Holders.grailsApplication.config.grails.serverURL = "http://localhost:8080"
         build {
             dataModel(name: 'CS4ID') {
                 id { String name, Class type ->

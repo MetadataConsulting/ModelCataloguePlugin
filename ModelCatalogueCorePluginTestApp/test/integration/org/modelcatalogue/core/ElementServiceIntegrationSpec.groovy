@@ -825,7 +825,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         when:
         DataModel anotherDataModelDraft = elementService.createDraftVersion(anotherDataModel, '0.0.2', DraftContext.userFriendly())
 
-        final String dataModelModelCatalogueId = "ModelCatalogueCorePluginTestApp/catalogue/dataModel/$anotherDataModelDraft.latestVersionId@0.0.2"
+        final String dataModelModelCatalogueId = "catalogue/dataModel/$anotherDataModelDraft.latestVersionId@0.0.2"
 
         CatalogueElement anotherDataModelFound = elementService.findByModelCatalogueId(CatalogueElement, dataModelModelCatalogueId)
 
