@@ -110,6 +110,8 @@ grails.project.dependency.resolution = {
                 'tomcat-servlet-api'
         }
 
+        compile 'net.sf.opencsv:opencsv:2.3'
+
         compile group: 'org.elasticsearch', name: 'elasticsearch', version: '2.3.5'
         compile 'com.vividsolutions:jts:1.13'
 
@@ -175,8 +177,6 @@ grails.project.dependency.resolution = {
         compile ":executor:0.3"
 
         compile ":karman-aws:0.8.4"
-
-        compile ":csv:0.3.1"
 
         compile ":spring-websocket:1.3.1"
 
