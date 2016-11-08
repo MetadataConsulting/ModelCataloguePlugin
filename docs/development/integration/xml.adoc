@@ -18,7 +18,7 @@ For example while running the catalogue in development environment you can run f
 
 [source,bash]
 ----
-curl -u admin:admin http://localhost:8080/ModelCatalogueCorePluginTestApp/catalogue/measurementUnit/1.1/export
+curl -u admin:admin http://localhost:8080/catalogue/measurementUnit/1.1/export
 ----
 
 
@@ -27,7 +27,7 @@ _Result_
 [source,xml]
 ----
 <catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd">
-  <measurementUnit name="celsius" id="http://localhost:8080/ModelCatalogueCorePluginTestApp/catalogue/measurementUnit/1" symbol="&#176;C">
+  <measurementUnit name="celsius" id="http://localhost:8080/catalogue/measurementUnit/1" symbol="&#176;C">
     <description>degrees celsius</description>
   </measurementUnit>
 </catalogue>
@@ -47,7 +47,7 @@ For example in development environment it would look like
 
 [source,bash]
 ----
-curl -D - -u admin:admin --form "file=@celsius.xml" http://localhost:8080/ModelCatalogueCorePluginTestApp/catalogue/upload
+curl -D - -u admin:admin --form "file=@celsius.xml" http://localhost:8080/catalogue/upload
 ----
 
 _Result_
@@ -58,8 +58,8 @@ HTTP/1.1 100 Continue
 HTTP/1.1 302 Found
 Server: Apache-Coyote/1.1
 X-Asset-ID: 232282
-Location: http://localhost:8080/ModelCatalogueCorePluginTestApp/api/modelCatalogue/core/asset/228
-Set-Cookie: JSESSIONID=785C02E9DEBADBD74263AD1FB1D73707; Path=/ModelCatalogueCorePluginTestApp/; HttpOnly
+Location: http://localhost:8080/api/modelCatalogue/core/asset/228
+Set-Cookie: JSESSIONID=785C02E9DEBADBD74263AD1FB1D73707; Path=/; HttpOnly
 Content-Length: 0
 Date: Wed, 04 Nov 2015 14:15:56 GMT
 ----
@@ -68,7 +68,7 @@ The upload will create new asset where you can monitor the progress. The `X-Asse
 You can use it to fetch the XML representation of the asset including the current processing status:
 
 ----
-curl -u admin:admin http://localhost:8080/ModelCatalogueCorePluginTestApp/catalogue/asset/228/export
+curl -u admin:admin http://localhost:8080/catalogue/asset/228/export
 ----
 
 If your import takes longer time use to process you may get information about the pending asset:
@@ -76,7 +76,7 @@ If your import takes longer time use to process you may get information about th
 [source,xml]
 ----
 <catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry_asset.xsd">
-  <asset name="Import for celsius.xml" id="http://localhost:8080/ModelCatalogueCorePluginTestApp/catalogue/asset/228" status="PENDING">
+  <asset name="Import for celsius.xml" id="http://localhost:8080/catalogue/asset/228" status="PENDING">
     <description>Your import will be available in this asset soon. Use Refresh action to reload.</description>
   </asset>
 </catalogue>
@@ -88,7 +88,7 @@ When the upload is fully processed you should get following result:
 [source,xml]
 ----
 <catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry_asset.xsd">
-  <asset name="Import for celsius.xml" id="http://localhost:8080/ModelCatalogueCorePluginTestApp/catalogue/asset/228">
+  <asset name="Import for celsius.xml" id="http://localhost:8080/catalogue/asset/228">
     <description>Your import has finished.</description>
   </asset>
 </catalogue>

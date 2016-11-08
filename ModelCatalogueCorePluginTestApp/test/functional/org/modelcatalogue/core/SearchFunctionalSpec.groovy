@@ -45,7 +45,7 @@ class SearchFunctionalSpec extends AbstractModelCatalogueGebSpec {
 
 
         when:
-        String id = $(firstItemFoundId).first().text() // i.e. http://localhost:8080/ModelCatalogueCorePluginTestApp/catalogue/dataClass/78@0.0.1
+        String id = $(firstItemFoundId).first().text() // i.e. http://localhost:8080/catalogue/dataClass/78@0.0.1
         fill searchInput with id
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 

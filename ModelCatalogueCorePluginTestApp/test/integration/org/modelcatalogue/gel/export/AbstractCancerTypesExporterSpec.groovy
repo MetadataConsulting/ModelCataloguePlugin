@@ -2,6 +2,7 @@ package org.modelcatalogue.gel.export
 
 import grails.test.spock.IntegrationSpec
 import org.hibernate.SessionFactory
+import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModelService
@@ -14,7 +15,7 @@ import org.modelcatalogue.core.util.test.TestDataHelper
 /**
  * Created by rickrees on 07/04/2016.
  */
-class AbstractCancerTypesExporterSpec extends IntegrationSpec{
+class AbstractCancerTypesExporterSpec extends AbstractIntegrationSpec {
     public static final String DATA_MODEL_NAME = 'testDataModel1'
     public static final String ROOT_CANCER_TYPE = 'cancer types'
     public static final String ADULT_GLIOMA_TYPE1 = 'Adult Glioma'
@@ -46,12 +47,10 @@ class AbstractCancerTypesExporterSpec extends IntegrationSpec{
     protected String cancer_type_2_some_cancer_presentation22_combined_id
     ElementService elementService
     DataModelService dataModelService
-    InitCatalogueService initCatalogueService
-    SessionFactory sessionFactory
 
     def setup() {
         TestDataHelper.initFreshDb(sessionFactory, 'cancer-types.sql') {
-            initCatalogueService.initDefaultRelationshipTypes()
+            initRelationshipTypes()
 
             DefaultCatalogueBuilder catalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
 

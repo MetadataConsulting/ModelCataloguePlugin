@@ -1,17 +1,25 @@
+import grails.rest.render.RenderContext
 import grails.util.Environment
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.grails.commons.GrailsDomainClass
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
+import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserRole
 import org.modelcatalogue.core.security.UserService
 import org.modelcatalogue.core.testapp.Requestmap
 import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.ExtensionModulesLoader
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.Metadata
+import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.test.TestDataHelper
 import org.springframework.http.HttpMethod
 
@@ -25,9 +33,19 @@ class BootStrap {
     def sessionFactory
     def modelCatalogueSearchService
     def userService
+    GrailsApplication grailsApplication
 
     def init = { servletContext ->
         ExtensionModulesLoader.addExtensionModules()
+
+        grailsApplication.domainClasses.each { GrailsDomainClass it ->
+            if (CatalogueElement.isAssignableFrom(it.clazz)) {
+                CatalogueElementDynamicHelper.addShortcuts(it.clazz)
+            }
+        }
+        JSONObject.Null.metaClass.getId = {->
+            null
+        }
 
         if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST]) {
             TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
@@ -47,6 +65,238 @@ class BootStrap {
 
         if (Environment.current == Environment.PRODUCTION) {
             userService.inviteAdmins()
+        }
+
+        //register custom json Marshallers
+        //ctx.domainModellerService.modelDomains()
+        grailsApplication.mainContext.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
+
+        ReportsRegistry reportsRegistry = grailsApplication.mainContext.getBean(ReportsRegistry)
+
+        reportsRegistry.register {
+            creates asset
+            title { "Export All Elements of ${it.name} to Excel XSLX" }
+            defaultName { "Export All Elements of ${it.name} to Excel XSLX" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.countContains() > 0
+            }
+            link controller: 'dataArchitect', action: 'getSubModelElements', params: [format: 'xlsx', report: 'NHIC'], id: true
+        }
+
+        reportsRegistry.register {
+            creates asset
+            title { "Inventory Report Spreadsheet" }
+            defaultName { "${it.name} report as MS Excel Document" }
+            depth 3
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.countDeclares() > 0
+            }
+            link controller: 'dataModel', action: 'inventorySpreadsheet', id: true
+        }
+
+        reportsRegistry.register {
+            creates asset
+            title { "Inventory Report Document" }
+            defaultName { "${it.name} report as MS Word Document" }
+            depth 3
+            type DataClass
+            link controller: 'dataClass', action: 'inventoryDoc', id: true
+        }
+
+        reportsRegistry.register {
+            creates asset
+            title { "Inventory Report Spreadsheet" }
+            defaultName { "${it.name} report as MS Excel Document" }
+            depth 3
+            type DataClass
+            link controller: 'dataClass', action: 'inventorySpreadsheet', id: true
+        }
+
+        reportsRegistry.register {
+            creates asset
+            title { "Changelog Document" }
+            defaultName { "${it.name} changelog as MS Word Document" }
+            depth 3
+            includeMetadata true
+            type DataClass
+            link controller: 'dataClass', action: 'changelogDoc', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            type DataModel, DataClass, DataElement, DataType, MeasurementUnit
+            title { "Export to Catalogue XML" }
+            link { CatalogueElement element ->
+                [url: element.getDefaultModelCatalogueId(false) + '?format=xml']
+            }
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Generate all ${it.name} files" }
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get(Metadata.ALL_CANCER_REPORTS) == 'true'
+            }
+            link controller: 'genomics', action: 'exportAllCancerReports', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Generate all ${it.name} files" }
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get(Metadata.ALL_RD_REPORTS) == 'true'
+            }
+            link controller: 'genomics', action: 'exportAllRareDiseaseReports', id: true
+        }
+
+        reportsRegistry.register {
+            creates asset
+            title { "GEL Changelog (Word Doc)" }
+            defaultName { "${it.name} changelog as MS Word Document" }
+            depth 3
+            includeMetadata true
+            type DataClass
+            link controller: 'genomics', action: 'exportChangeLogDocument', id: true
+        }
+
+        reportsRegistry.register {
+            creates asset
+            title { "GEL Data Specification Report (Word Doc)" }
+            defaultName { "${it.name} report as MS Word Document" }
+            depth 3
+            type DataModel
+            link controller: 'genomics', action: 'exportGelSpecification', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases Disorder List (CSV)" }
+            type DataClass
+            link controller: 'genomics', action: 'exportRareDiseaseDisorderListAsCsv', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases Eligibility Criteria Report (Word Doc)" }
+            type DataClass
+            link controller: 'genomics', action: 'exportRareDiseaseEligibilityDoc', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases Phenotypes and Clinical Tests Report (Word Doc)" }
+            type DataClass
+            link controller: 'genomics', action: 'exportRareDiseasePhenotypesAndClinicalTestsDoc', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases HPO And Clinical Tests (JSON)" }
+            defaultName { "${it.name} report as Json" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsJson', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases Disorder List Only (JSON)" }
+            defaultName { "${it.name} report as Json" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseaseListAsJson', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases Eligibility Criteria (JSON)" }
+            defaultName { "${it.name} report as Json" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseaseHPOEligibilityCriteriaAsJson', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases HPO And Clinical Tests (CSV)" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsCsv', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Rare Disease Eligibility Criteria Report (CSV)" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseaseEligibilityCsv', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Cancer Types (JSON)" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportCancerTypesAsJson', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Cancer Types (CSV)" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportCancerTypesAsCsv', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Change Log for RD Phenotypes And Clinical Tests (Excel)" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsXls', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Change Log for RD Eligibility (Excel)" }
+            type DataClass
+            when { DataClass dataClass ->
+                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseaseEligibilityChangeLogAsXls', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "GEL Data Specification Change Log (Excel)" }
+            type DataModel
+            link controller: 'genomics', action: 'exportDataSpecChangeLogAsXls', id: true
+        }
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases Static Website" }
+            type DataModel
+            link controller: 'genomics', action: 'exportRareDiseasesWebsite', id: true
         }
     }
 
@@ -298,6 +548,71 @@ class BootStrap {
             println "Requestmap method: $method, url: $url has different config attribute - expected: $configAttribute, actual: $map.configAttribute"
         }
         Requestmap.findOrSaveByUrlAndConfigAttributeAndHttpMethod(url, configAttribute, method, [failOnError: true])
+    }
+
+    protected static mergeConfig(GrailsApplication application){
+        application.config.merge(loadConfig(application))
+    }
+
+    protected static loadConfig(GrailsApplication application){
+        new ConfigSlurper(Environment.current.name).parse(application.classLoader.loadClass("ModelCatalogueConfig"))
+    }
+
+
+
+    def static getContainingModel(DataElement dataElement){
+        if(dataElement.containedIn) {
+            return dataElement.containedIn.first()
+        }
+        return null
+    }
+
+    def static getParentModel(DataElement dataElement){
+        DataClass containingModel = getContainingModel(dataElement)
+        if(containingModel.childOf) {
+            return containingModel.childOf.first()
+        }
+        return null
+    }
+
+    def static getUnitOfMeasure(DataElement dataElement){
+        if (dataElement.dataType && dataElement.dataType instanceof PrimitiveType) {
+            return dataElement.dataType.measurementUnit?.name
+        }
+        return null
+    }
+
+    def static getUnitOfMeasureSymbol(DataElement dataElement){
+        if (dataElement.dataType && dataElement.dataType instanceof PrimitiveType) {
+            return dataElement.dataType.measurementUnit?.symbol
+        }
+        return null
+    }
+
+    def static getDataType(DataElement dataElement){
+        DataType dataType = dataElement.dataType
+        if (!dataType) {
+            return ''
+        }
+        if (dataType instanceof EnumeratedType) {
+            return dataType.enumerations.collect { key, value -> "$key:$value"}.join('\n')
+        }
+        return dataType.name
+
+    }
+
+    def static getDataModelsString(CatalogueElement dataElement) {
+        if (!dataElement?.dataModel) {
+            return ""
+        }
+        dataElement.dataModel.name
+    }
+
+    def static getEnumerationString(DataType dataType){
+        if (dataType instanceof EnumeratedType) {
+            return dataType.prettyPrint()
+        }
+        return null
     }
 
 }

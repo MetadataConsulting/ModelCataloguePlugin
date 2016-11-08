@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.forms
 
 import org.modelcatalogue.core.util.Metadata
-import org.modelcatalogue.testapp.AbstractIntegrationSpec
+import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.crf.model.DataType
 import org.modelcatalogue.crf.model.GridGroup

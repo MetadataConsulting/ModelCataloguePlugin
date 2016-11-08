@@ -12,7 +12,7 @@ import spock.util.concurrent.BlockingVariables
 
 import java.util.concurrent.TimeUnit
 
-class ElasticSearchServiceSpec extends org.modelcatalogue.testapp.AbstractIntegrationSpec {
+class ElasticSearchServiceSpec extends AbstractIntegrationSpec {
 
     ElasticSearchService elasticSearchService
     CatalogueBuilder catalogueBuilder

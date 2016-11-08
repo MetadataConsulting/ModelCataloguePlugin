@@ -29,8 +29,11 @@ javamelody.'url-exclude-pattern' = '/assets/.*|.*/download.*|.*/gereportDoc.*|.*
 /*
 Specify jndi name of datasource to monitor in production environment
  */
-/*environments {
+javamelody.disabled = true
+
+environments {
     production {
+        javamelody.disabled = true
         javamelody.datasources = 'java:comp/env/myapp/mydatasource'
     }
-}*/
+}
