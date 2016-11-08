@@ -33,7 +33,6 @@ javamelody.disabled = true
 
 environments {
     production {
-        javamelody.disabled = true
-        javamelody.datasources = 'java:comp/env/myapp/mydatasource'
+        javamelody.disabled = false
     }
 }
