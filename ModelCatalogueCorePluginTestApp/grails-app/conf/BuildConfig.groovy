@@ -172,7 +172,6 @@ grails.project.dependency.resolution = {
 //        runtime ":hibernate4:4.3.5.5"
         runtime  ":hibernate:3.6.10.18"
 
-        compile ":excel-export:0.2.1"
         compile ":executor:0.3"
 
         compile ":karman-aws:0.8.4"

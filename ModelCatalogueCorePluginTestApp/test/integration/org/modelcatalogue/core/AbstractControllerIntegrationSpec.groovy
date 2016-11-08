@@ -2,15 +2,12 @@ package org.modelcatalogue.core
 
 import grails.rest.RestfulController
 import grails.util.GrailsNameUtils
-import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.ResultRecorder
-import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import spock.lang.Shared
 import spock.lang.Unroll
 
@@ -80,37 +77,6 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
 
     protected Long getResourceCount() {
         resource.count()
-    }
-
-
-    def "Export items to excel test"() {
-        // TODO: fix threading issue
-//        controller.params._x_wait_for_completion = true
-        controller.response.format = "xlsx"
-        controller.index()
-
-
-        def link = controller.response.getHeader('Location')
-        def id   = controller.response.getHeader('X-Asset-ID')
-
-        expect:
-        link
-        id
-
-        when:
-        Asset asset = Asset.get(id as Long)
-
-        then:
-        asset.contentType == XLSXListRenderer.XLSX.name
-//        asset.status == ElementStatus.FINALIZED
-
-//        XSSFWorkbook workbook = new XSSFWorkbook(new ByteArrayInputStream(controller.response.contentAsByteArray))
-//
-//        expect:
-//        controller.response.contentType == XLSXListRenderer.EXCEL.name
-//        workbook
-//        workbook.getSheetAt(workbook.getActiveSheetIndex()).getLastRowNum() == totalRowsExported
-//        // TODO: read the config and test the right number of columns as well
     }
 
     protected getTotalRowsExported() {

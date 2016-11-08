@@ -9,7 +9,7 @@ import static org.springframework.http.HttpStatus.OK
 
 class SearchController extends AbstractRestfulController<CatalogueElement> {
 
-    static responseFormats = ['json', 'xml', 'xlsx']
+    static responseFormats = ['json', 'xml']
 
     ExecutorService executorService
 
@@ -55,9 +55,6 @@ class SearchController extends AbstractRestfulController<CatalogueElement> {
         withFormat {
             json {
                 params.max = Math.min(max ?: 10, 100)
-            }
-            xlsx {
-                params.max = Math.min(max ?: 10000, 10000)
             }
         }
     }

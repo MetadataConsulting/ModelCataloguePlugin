@@ -17,7 +17,7 @@ import static org.springframework.http.HttpStatus.*
 
 abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
-    static responseFormats = ['json', 'xlsx']
+    static responseFormats = ['json']
 
     AssetService assetService
     SearchCatalogue modelCatalogueSearchService
@@ -283,9 +283,6 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
                 params.max = Math.min(max ?: 25, 100)
             }
             xml {
-                params.max = Math.min(max ?: 10000, 10000)
-            }
-            xlsx {
                 params.max = Math.min(max ?: 10000, 10000)
             }
         }

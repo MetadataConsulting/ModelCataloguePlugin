@@ -3,8 +3,8 @@ package org.modelcatalogue.core.forms
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.DataClass
+import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
 import org.modelcatalogue.core.util.FriendlyErrors
-import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.modelcatalogue.crf.model.CaseReportForm
 import org.modelcatalogue.crf.serializer.CaseReportFormSerializer
 import org.modelcatalogue.crf.preview.CaseReportFormPreview
@@ -34,7 +34,7 @@ class FormGeneratorController {
                 originalFileName: "$model.name Case Report Form.xls",
                 description: "Your form will be available in this asset soon. Use Refresh action to reload",
                 status: ElementStatus.PENDING,
-                contentType: XLSXListRenderer.EXCEL.name,
+                contentType: CatalogueElementToXlsxExporter.EXCEL.name,
                 size: 0
         )
 
@@ -65,7 +65,7 @@ class FormGeneratorController {
                     }
 
                     log.info "Storing form for $theModel"
-                    assetService.storeAssetWithSteam(updated, XLSXListRenderer.EXCEL.name) {
+                    assetService.storeAssetWithSteam(updated, CatalogueElementToXlsxExporter.EXCEL.name) {
                         CaseReportFormSerializer serializer = new CaseReportFormSerializer(form)
                         serializer.write(it)
                     }

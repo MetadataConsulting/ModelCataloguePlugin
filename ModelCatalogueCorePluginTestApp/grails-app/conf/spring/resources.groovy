@@ -43,7 +43,6 @@ import org.modelcatalogue.core.util.marshalling.RelationshipTypeMarshaller
 import org.modelcatalogue.core.util.marshalling.RelationshipsMarshaller
 import org.modelcatalogue.core.util.marshalling.UserMarshaller
 import org.modelcatalogue.core.util.marshalling.ValidationRuleMarshaller
-import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.modelcatalogue.core.xml.render.RelationshipsXmlRenderer
 
 import java.util.concurrent.Executors
@@ -79,7 +78,6 @@ beans = {
 
     mergeConfig(application)
 
-    xlsxListRenderer(XLSXListRenderer)
     relationshipsXmlRenderer(RelationshipsXmlRenderer)
     reportsRegistry(ReportsRegistry)
     jsonMarshallingCustomizerRegistry(JsonMarshallingCustomizerRegistry)

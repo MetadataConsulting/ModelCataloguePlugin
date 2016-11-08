@@ -8,6 +8,7 @@ import com.google.common.collect.Multimap
 import grails.util.GrailsNameUtils
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.grails.web.mime.MimeType
 import org.modelcatalogue.spreadsheet.api.Sheet
 import org.modelcatalogue.spreadsheet.builder.api.CellDefinition
 import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
@@ -50,6 +51,8 @@ class CatalogueElementToXlsxExporter {
     static final String CONTENT = 'Content'
     static final String DATA_CLASSES = 'DataClasses'
     public static final String DATA_TYPE_FIRST_COLUMN = 'F'
+    public static final MimeType XLSX                  = new MimeType('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx')
+    public static final MimeType EXCEL                 = new MimeType('application/vnd.ms-excel', 'xlsx')
 
     final DataClassService dataClassService
     final GrailsApplication grailsApplication

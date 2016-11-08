@@ -10,7 +10,6 @@ import org.modelcatalogue.core.util.lists.Elements
 import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.lists.Relationships
 import org.modelcatalogue.core.util.lists.SimpleListWrapper
-import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import spock.lang.Stepwise
 
 @Stepwise
@@ -59,35 +58,6 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
         wrapperReports.size()               >= 1
         wrapperReports[0].getTitle(models)  == 'WRAPPER'
         wrapperReports[0].getLink(models)?.endsWith('/foo/bar?format=xml&asset=true')
-
-    }
-
-
-    def "XLSX reports are registered automatically"() {
-        LinkGenerator linkGenerator = applicationContext.getBean(LinkGenerator)
-        ReportsRegistry registry    = new ReportsRegistry(linkGenerator: linkGenerator)
-        XLSXListRenderer xlsxListRenderer = applicationContext.getBean(XLSXListRenderer)
-        xlsxListRenderer.reportsRegistry = registry
-
-        xlsxListRenderer.registerRowWriter {
-            title "Export Relationships TEST"
-            headers 'Type', 'Source', 'Destination'
-            when { ListWrapper container, RenderContext context ->
-                container.itemType && Relationship.isAssignableFrom(container.itemType)
-            } then { Relationship rel ->
-                [[rel.relationshipType.name, rel.source.name, rel.destination.name]]
-            }
-        }
-
-        def relationshipsReports = registry.getAvailableReports(new Relationships())
-
-        expect:
-        relationshipsReports.size()                           >= 1
-        relationshipsReports[0].getTitle(new Relationships()) == 'Export Relationships TEST'
-        relationshipsReports[0].renderType                    == ReportDescriptor.RenderType.ASSET
-        relationshipsReports[0].getLink(new Relationships(list: new SimpleListWrapper<Relationship>(itemType: Relationship)))  == '/test?format=xlsx&report=&asset=true'
-
-
 
     }
 }
