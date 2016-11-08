@@ -196,13 +196,6 @@ grails.project.dependency.resolution = {
         compile ':spring-security-oauth-google:0.1'
         compile ':spring-security-oauth-twitter:0.1'
         compile ':spring-security-oauth-facebook:0.1'
-
-        // Uncomment these (or add new ones) to enable additional resources capabilities
-        //runtime ":zipped-resources:1.0.1"
-        //runtime ":cached-resources:1.1"
-        //runtime ":yui-minify-resources:0.1.5"
-
-        // runtime ":ModelCatalogueCorePlugin:0.1"
     }
 }
 

@@ -3,12 +3,12 @@ package org.modelcatalogue.core
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.test.spock.IntegrationSpec
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
-import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserRole
 import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
+import org.modelcatalogue.core.util.test.TestData
 import org.modelcatalogue.core.util.test.TestDataHelper
 import org.springframework.web.context.support.WebApplicationContextUtils
 
@@ -17,8 +17,6 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
     protected static final String COMPLEX_MODEL_ROOT_DATA_CLASS_NAME = 'C4CTDE Root'
     protected static final String COMPLEX_MODEL_NAME = 'C4CTDE'
 
-    def fixtureLoader
-    def fixtures
     def initCatalogueService
     def sessionFactory
     def cacheService
@@ -51,7 +49,7 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
         relationshipTypeService.clearCache()
         TestDataHelper.initFreshDb(sessionFactory, 'testdata.sql') {
             initCatalogueService.initDefaultRelationshipTypes()
-            fixtures = fixtureLoader.load("assets/*", "batches/*", "dataTypes/*", "enumeratedTypes/*", "measurementUnits/*", "models/*", "relationshipTypes/*", "dataModelPolicies/*", "classifications/*").load("actions/*", "users/*", "referenceTypes/*", "primitiveTypes/*").load("dataElements/*", "validationRules/*").load("extensions/*", "mappings/*").load("csvTransformations/*")
+            TestData.createTestData()
         }
         cacheService.clearCache()
         Role adminRole = Role.findOrCreateWhere(authority: 'ROLE_ADMIN').save(failOnError: true)
