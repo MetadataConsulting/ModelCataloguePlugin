@@ -5,6 +5,9 @@ class ModelCatalogueCorePluginUrlMappings {
 
 	static mappings = {
 
+        "/api/modelCatalogue/core/forms/generate/$id" (controller: 'formGenerator', action: 'generateForm', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/forms/preview/$id" (controller: 'formGenerator', action: 'previewForm', method: HttpMethod.GET)
+
         "/catalogue/upload" (controller: "dataImport", action: 'upload', method: HttpMethod.POST)
         "/catalogue/ext/$key/$value" (controller: 'catalogue', action: 'ext', method: HttpMethod.GET)
         "/catalogue/ext/$key/$value/export" (controller: 'catalogue', action: 'ext', method: HttpMethod.GET)

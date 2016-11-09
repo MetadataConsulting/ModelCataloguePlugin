@@ -67,7 +67,7 @@ class ElasticSearchService implements SearchCatalogue {
 
     private static final String ENV_MC_ES_PREFIX = 'MC_INDEX_PREFIX'
 
-    private static final String MC_PREFIX = "${System.getenv(ENV_MC_ES_PREFIX) ?: ''}mc_"
+    private static final String MC_PREFIX = "${System.getenv(ENV_MC_ES_PREFIX) ?:  System.getProperty(ENV_MC_ES_PREFIX) ?: ''}mc_"
     private static final String GLOBAL_PREFIX = "${MC_PREFIX}global_"
     private static final String DATA_MODEL_PREFIX = "${MC_PREFIX}data_model_"
     private static final String ORPHANED_INDEX = "${GLOBAL_PREFIX}orphaned"
