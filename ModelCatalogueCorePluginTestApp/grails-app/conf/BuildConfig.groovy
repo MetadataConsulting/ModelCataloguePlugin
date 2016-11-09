@@ -199,6 +199,3 @@ grails.project.dependency.resolution = {
     }
 }
 
-grails.tomcat.nio = true
-grails.tomcat.scan.enabled = true
-
