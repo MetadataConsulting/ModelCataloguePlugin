@@ -71,6 +71,25 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
         respond(success: false, contains: false, imports: false)
     }
 
+    def reindex() {
+        DataModel dataModel = DataModel.get(params.id)
+        if (!dataModel) {
+            notFound()
+            return
+        }
+
+        Long id = dataModel.id
+
+        executorService.submit {
+            DataModel model = DataModel.get(id)
+            modelCatalogueSearchService.index(model.declares).subscribe {
+                log.info "${model} reindexed"
+            }
+        }
+
+        respond(success: true)
+    }
+
     def content() {
         DataModel dataModel = DataModel.get(params.id)
         if (!dataModel) {
