@@ -31,6 +31,7 @@ class ModelToFormExporterService {
     static transactional = false
 
     static final String EXT_FORM_NAME = "http://forms.modelcatalogue.org/form#name"
+    static final String EXT_FORM_FORM = "http://forms.modelcatalogue.org/form#form"
     static final String EXT_FORM_VERSION = "http://forms.modelcatalogue.org/form#version"
     static final String EXT_FORM_VERSION_DESCRIPTION = "http://forms.modelcatalogue.org/form#versionDescription"
     static final String EXT_FORM_REVISION_NOTES = "http://forms.modelcatalogue.org/form#revisionNotes"
@@ -97,7 +98,7 @@ class ModelToFormExporterService {
             versionDescription formModel.ext[EXT_FORM_VERSION_DESCRIPTION] ?: formModel.description ?: "Generated from ${alphaNumNoSpaces(formModel.name)}"
             revisionNotes formModel.ext[EXT_FORM_REVISION_NOTES] ?: "Generated from ${alphaNumNoSpaces(formModel.name)}"
 
-            if (formModel.countParentOf()) {
+            if (formModel.countParentOf() && formModel.ext[EXT_FORM_FORM] != 'true') {
                 processed << formModel.getId()
                 for (Relationship sectionRel in formModel.parentOfRelationships) {
                     handleSectionModel(itemNumber, processed, formName, caseReportForm, sectionRel)
@@ -106,7 +107,7 @@ class ModelToFormExporterService {
 
             // at least one section is mandatory (this may happen when data class has no childs or all childs are excluded)
             if (caseReportForm.sections.isEmpty()) {
-                handleSectionModel(itemNumber, [] as Set<Long>, '', caseReportForm, new Relationship(destination: formModel), true)
+                handleSectionModel(itemNumber, [] as Set<Long>, '', caseReportForm, new Relationship(destination: formModel), formModel.ext[EXT_FORM_FORM] != 'true')
             }
         }
     }

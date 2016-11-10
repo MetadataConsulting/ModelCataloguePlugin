@@ -561,7 +561,7 @@ class ElasticSearchService implements SearchCatalogue {
             if (group.key in [RelationshipType, DataModelPolicy]) {
                 return group
             }
-            throw new UnsupportedOperationException("Not Yet Implemented for $group.key")
+            throw new UnsupportedOperationException("Not Yet Implemented for '$group.key': ${group.toList().toBlocking().first()}")
         } flatMap { entity ->
             Class clazz = getEntityClass(entity)
             ImmutableSet<String> indices = getIndices(entity)
