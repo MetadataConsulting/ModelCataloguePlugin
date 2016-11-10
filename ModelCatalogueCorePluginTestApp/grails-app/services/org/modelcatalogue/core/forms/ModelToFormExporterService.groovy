@@ -46,7 +46,6 @@ class ModelToFormExporterService {
     static final String EXT_GROUP_REPEAT_NUM = "http://forms.modelcatalogue.org/group#repeatNum"
     static final String EXT_GROUP_REPEAT_MAX = "http://forms.modelcatalogue.org/group#repeatMax"
     static final String EXT_ITEM_EXCLUDE = "http://forms.modelcatalogue.org/item#exclude"
-    static final String EXT_ITEM_NAME = "http://forms.modelcatalogue.org/item#name"
     static final String EXT_ITEM_RESPONSE_TYPE = "http://forms.modelcatalogue.org/item#responseType"
     static final String EXT_ITEM_PHI = "http://forms.modelcatalogue.org/item#phi"
     static final String EXT_ITEM_DESCRIPTION = "http://forms.modelcatalogue.org/item#description"
@@ -242,7 +241,7 @@ class ModelToFormExporterService {
 
             // bit of heuristic
             String localName = fromDestination(rel, EXT_NAME_CAP, fromDestination(rel, EXT_NAME_LC, dataElement.name))
-            String itemName = fromDestination(rel, EXT_ITEM_NAME, alphaNumNoSpaces("${prefix ? (prefix + '_') : ''}${model.name}_${localName}"))
+            String itemName = alphaNumNoSpaces("${prefix ? (prefix + '_') : ''}${model.name}_${localName}")
             String normalizedResponseType = normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE))
             if (candidates.any { it.name.toLowerCase() == 'file' } || normalizedResponseType == RESPONSE_TYPE_FILE) {
                 container.file(itemName)
