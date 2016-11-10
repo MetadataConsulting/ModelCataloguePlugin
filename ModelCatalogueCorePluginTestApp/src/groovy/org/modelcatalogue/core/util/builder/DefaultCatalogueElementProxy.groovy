@@ -458,19 +458,19 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
         DefaultCatalogueElementProxy<T> typedOther = other as DefaultCatalogueElementProxy<T>
 
-        typedOther.extensions.each { String key, String value ->
+        new HashMap<String, String>(typedOther.extensions).each { String key, String value ->
             if (value != null) {
                 setExtension(key, value)
             }
         }
 
-        typedOther.parameters.each { String key, Object value ->
+        new HashMap<String, Object>(typedOther.parameters).each { String key, Object value ->
             if (value != null) {
                 setParameter(key, value)
             }
         }
 
-        typedOther.relationships.each { RelationshipProxy relationship ->
+        new HashSet<RelationshipProxy>(typedOther.relationships).each { RelationshipProxy relationship ->
             if (repository.equals(this, relationship.source)) {
                 RelationshipProxy relationshipProxy = new RelationshipProxy(relationship.relationshipTypeName, this, relationship.destination, relationship.extensions)
                 addToPendingRelationships(relationshipProxy)

@@ -48,17 +48,23 @@ class BootStrap {
         }
 
         if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST]) {
-            TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
-                initCatalogueService.initCatalogue(true)
+            if (!System.getenv('MC_BLANK_DEV')) {
+                TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
+                    initCatalogueService.initCatalogue(true)
+                    initDataModelPolicies()
+                    initSecurity(false)
+                }
+                modelCatalogueSearchService.reindex(true).all { it }.toBlocking().subscribe {
+                    System.out.println "Reindexed"
+                }
+            } else {
+                initCatalogueService.initDefaultRelationshipTypes()
                 initDataModelPolicies()
                 initSecurity(false)
-                setupStuff()
             }
-            modelCatalogueSearchService.reindex(true).all { it }.toBlocking().subscribe {
-                System.out.println "Reindexed"
-            }
+
         } else {
-            initCatalogueService.initDefaultRelationshipTypes()
+            initCatalogueService.initDefaultRelationshipTypes()b
             initDataModelPolicies()
             initSecurity(true)
         }

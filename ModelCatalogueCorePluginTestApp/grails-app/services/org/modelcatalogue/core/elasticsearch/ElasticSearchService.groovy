@@ -120,6 +120,10 @@ class ElasticSearchService implements SearchCatalogue {
         String port = grailsApplication.config.mc.search.elasticsearch.port ?: System.getProperty('mc.search.elasticsearch.port') ?: "9300"
 
         Settings.Builder settingsBuilder = Settings.builder()
+        settingsBuilder.put('client.transport.ignore_cluster_name', true)
+        settingsBuilder.put('client.transport.nodes_sampler_interval',"5s")
+        settingsBuilder.put('client.transport.ping_timeout', "5s")
+        settingsBuilder.put('client.transport.sniff', false)
 
         if (grailsApplication.config.mc.search.elasticsearch.settings) {
             grailsApplication.config.mc.search.elasticsearch.settings(settingsBuilder)
