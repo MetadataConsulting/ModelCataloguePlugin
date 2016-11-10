@@ -23,7 +23,7 @@ class CatalogueController {
     def executorService
 
     def xref() {
-        CatalogueElement element = elementService.findByModelCatalogueId(CatalogueElement, request.forwardURI)
+        CatalogueElement element = elementService.findByModelCatalogueId(CatalogueElement, request.forwardURI.replace('/export', ''))
 
         if (!params.resource || !element) {
             render status: HttpStatus.NOT_FOUND
