@@ -64,7 +64,7 @@ class BootStrap {
             }
 
         } else {
-            initCatalogueService.initDefaultRelationshipTypes()b
+            initCatalogueService.initDefaultRelationshipTypes()
             initDataModelPolicies()
             initSecurity(true)
         }

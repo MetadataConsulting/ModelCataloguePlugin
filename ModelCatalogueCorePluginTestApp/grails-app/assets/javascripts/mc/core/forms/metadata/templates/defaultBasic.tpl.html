@@ -5,6 +5,22 @@
   </div>
 
   <table class="table table-condensed table-striped table-borderless table-no-margin small">
+    <tr ng-if="view.handlesKey('http://forms.modelcatalogue.org/form#form')">
+      <th class="col-md-3">
+        Single Section Form
+        <i class="fa fa-question"
+           popover="Specifies if this data class should be handled as single-section form."
+           popover-title="Single Section Form"
+           popover-trigger="mouseenter"></i>
+      </th>
+      <td>
+        <span editable-checkbox="extAsMap['http://forms.modelcatalogue.org/form#form']" class="small"
+              e-ng-change="exclude.value = !exclude.value" e-string-to-boolean>
+          {{element.ext.get('http://forms.modelcatalogue.org/form#form') ?
+              (element.ext.get('http://forms.modelcatalogue.org/form#form') == "false" ? "No": "Yes") : "" }}
+        </span>
+      </td>
+    </tr>
 
     <tr ng-if="view.handlesKey('http://forms.modelcatalogue.org/form#name')">
       <th class="col-md-3">

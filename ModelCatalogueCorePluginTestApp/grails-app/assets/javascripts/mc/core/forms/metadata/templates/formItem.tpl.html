@@ -19,6 +19,37 @@
       </td>
     </tr>
 
+    <tr ng-if="view.handlesKey('http://forms.modelcatalogue.org/item#name', element)">
+      <th class="col-md-3">
+        Name
+        <i class="fa fa-question"
+           popover="The unique label or variable name for the data element.
+           The field is not displayed as part of the CRF but can be viewed as part of the CRF and Item Metadata, and is shown
+           in the Discrepancy Notes and Rules modules.
+           This field is case-sensitive. Items with names &quot;item1&quot; and &quot;Item1&quot; will be treated as different items. This can
+           cause issues with many data analysis tools and should be avoided in most cases.
+           For Enterprise customers interested in using Datamart:
+           Please note that Datamart treat items in case-insensitive manner. Please treat all ITEM_NAMES as case-insensitive.
+           Also for use with Datamart, Postgres has a list of reserved words and special characters which should not be used
+           as item names.
+           This field should be used at all times.
+           ITEM_NAME will be used to form the OID and the variable name when exporting data from OpenClinica.
+           Brevity is recommended for the value as it will be used to generate the unique OC_OID.
+           Re-use of the same ITEM_NAME across CRF Versions indicates the variable is the same item. Once created, an item
+           name cannot be modified within the CRF. See &quot;CRF Versioning&quot; and &quot;Scope of CRFs and Items&quot; in this document
+           for more detail."
+           popover-title="Name"
+           popover-trigger="mouseenter"></i>
+      </th>
+      <td class="full-width-editable">
+        <span editable-text="extAsMap['http://forms.modelcatalogue.org/item#name']" e-maxlength="255"
+              e-ng-disabled="exclude.value"
+              class="small">
+          {{element.ext.get('http://forms.modelcatalogue.org/item#name')}}
+        </span>
+      </td>
+    </tr>
+
     <tr ng-if="view.handlesKey('http://forms.modelcatalogue.org/item#phi', element)">
       <th class="col-md-3">
         Protected Health Information

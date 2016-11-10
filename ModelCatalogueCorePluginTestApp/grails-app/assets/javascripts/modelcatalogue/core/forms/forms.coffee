@@ -15,6 +15,7 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
       'dataType'
     ]
     keys: [
+      "http://forms.modelcatalogue.org/form#form"
       "http://forms.modelcatalogue.org/form#name"
       "http://forms.modelcatalogue.org/form#version"
       "http://forms.modelcatalogue.org/form#versionDescription"
@@ -34,6 +35,7 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
     typeKeys: {
       'dataElement': [
         "http://forms.modelcatalogue.org/item#exclude"
+        "http://forms.modelcatalogue.org/item#name"
         "http://forms.modelcatalogue.org/item#question"
         "http://forms.modelcatalogue.org/item#defaultValue"
         "http://forms.modelcatalogue.org/item#phi"
@@ -108,6 +110,7 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
 
     keys: [
       "http://forms.modelcatalogue.org/item#exclude"
+      "http://forms.modelcatalogue.org/item#name"
       "http://forms.modelcatalogue.org/item#question"
       "http://forms.modelcatalogue.org/item#defaultValue"
       "http://forms.modelcatalogue.org/item#phi"
