@@ -19,6 +19,13 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
     public static final String DATA_MODEL_NO_HIERARCHY_DATA_ELEMENT = "reference type element test"
     public static final String DATA_MODEL_NO_HIERARCHY_DATA_TYPE = "reference type test"
     public static final String DATA_MODEL_NO_HIERARCHY_REFERENCE = "reference no class"
+    public static final String MODEL_MEF_NAME = 'Model Exported Fully'
+    public static final String CLASS_MEF_NAME = 'Class from MEF'
+    public static final String ELEMENT_MEF_1_NAME = 'Data Element from MEF 1'
+    public static final String DATA_TYPE_TOM_NAME = 'tom:string'
+    public static final String MODEL_TOM_NAME = 'Test Other Model'
+    public static final String DATA_TYPE_TOM_ID = "http://example.com/tom/string"
+    public static final String ELEMENT_MEF_2_NAME = 'Data Element from MEF 2'
     def dataModelService
     def elementService
 
@@ -1230,5 +1237,42 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
             noParent.countParentOf() == 0
             reference.instanceOf(ReferenceType)
             noChild.countChildOf() == 0
+    }
+
+    def "import full"() {
+        given:
+            build {
+                dataModel(name: MODEL_MEF_NAME) {
+                    dataClass(name: CLASS_MEF_NAME) {
+                        dataElement(name: ELEMENT_MEF_1_NAME) {
+                            dataType name: DATA_TYPE_TOM_NAME, dataModel: MODEL_TOM_NAME, id: DATA_TYPE_TOM_ID
+                        }
+                        dataElement(name: ELEMENT_MEF_2_NAME) {
+                            dataType id: DATA_TYPE_TOM_ID
+            }   }   }   }
+        when:
+            DataModel mef = DataModel.findByName(MODEL_MEF_NAME)
+            DataClass mefDC = DataClass.findByName(CLASS_MEF_NAME)
+            DataElement mefDE1 = DataElement.findByName(ELEMENT_MEF_1_NAME)
+            DataElement mefDE2 = DataElement.findByName(ELEMENT_MEF_2_NAME)
+            DataModel tom = DataModel.findByName(MODEL_TOM_NAME)
+            DataType tomDT = DataType.findByName(DATA_TYPE_TOM_NAME)
+            DataType tomDTById = DataType.findByModelCatalogueId(DATA_TYPE_TOM_ID)
+        then:
+            mef
+            mefDC
+            mefDE1
+            mefDE2
+            tom
+            tomDT
+            tomDTById
+
+            mefDC.dataModel == mef
+            mefDE1.dataModel == mef
+            mefDE2.dataModel == mef
+            mefDE1.dataType == tomDT
+            mefDE2.dataType == tomDT
+
+            tomDT.dataModel == tom
     }
 }
