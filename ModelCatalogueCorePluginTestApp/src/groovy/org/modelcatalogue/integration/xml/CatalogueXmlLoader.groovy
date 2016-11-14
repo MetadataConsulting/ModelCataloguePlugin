@@ -38,7 +38,7 @@ class CatalogueXmlLoader {
     void load(InputStream xml) {
         assert xml, "no input stream provided"
         builder.build {
-            // figure out how to make this validating
+            // figure out how to make this validatingd
             XmlSlurper xs = new XmlSlurper(false, true)
             GPathResult loaded = xs.parse(xml)
             handleRelationshipTypes(loaded)
@@ -48,9 +48,6 @@ class CatalogueXmlLoader {
     }
 
     private static Map<String, Object> parameters(NodeChild element) {
-        if (element.attributes().containsKey('ref')) {
-            return [id: element.attributes()['ref']]
-        }
         Map<String, Object> ret = [:]
         element.attributes().each { Object key, Object value ->
             if (key.toString() in IGNORED_ATTRS) {
@@ -58,6 +55,10 @@ class CatalogueXmlLoader {
             }
             if (key.toString() == 'classification') {
                 ret['dataModel'] = value
+                return
+            }
+            if (key.toString() == 'ref') {
+                ret['id'] = value
                 return
             }
             ret[key.toString()] = value

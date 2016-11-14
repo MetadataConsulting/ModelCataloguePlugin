@@ -229,7 +229,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
 
         context.withContextElement(DataType) {
             // this is here to simplify importing legacy 1.x XML
-            if (!parameters.name) {
+            if (!parameters.id && !parameters.name) {
                 parameters.name = it.getParameter('name')
             }
         }
@@ -523,6 +523,11 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
             return
         }
 
+        if (element.modelCatalogueId && !element.name) {
+            // ref
+            return
+        }
+
         context.withContextElement(DataModel, true) {
             element.setParameter('dataModel', it)
         }
@@ -579,7 +584,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
     protected <T extends CatalogueElement, A extends CatalogueElementProxy<T>> A createProxy(Class<T> domain, Map<String, Object> parameters, Class inheritFrom = null, boolean underControl = false) {
         if (inheritFrom && domain in SUPPORTED_FOR_AUTO) {
             context.withContextElement(inheritFrom) {
-                if (!parameters.name) {
+                if (!parameters.id && !parameters.name) {
                     if (it.name) {
                         parameters.name = it.name
                         parameters[CatalogueElementProxyRepository.AUTOMATIC_NAME_FLAG] = true

@@ -11,11 +11,18 @@ date ; echo -e "\n"
 
 cd ModelCatalogueCorePluginTestApp
 
-if [[ "$1" == "debug" ]]; then
-    ./grailsw run-app --debug-fork
-elif [[ "$1" == "war" ]]; then
-    ./grailsw dev run-war
+ARG="$1"
+
+shift 1
+
+if [[ "$ARG" == "blank" ]]; then
+    export MC_BLANK_DEV=true
+    ./grailsw run-app "$@"
+elif [[ "$ARG" == "debug" ]]; then
+    ./grailsw run-app --debug-fork "$@"
+elif [[ "$ARG" == "war" ]]; then
+    ./grailsw dev run-war "$@"
 else
-    ./grailsw run-app
+    ./grailsw run-app "$@"
 fi
 

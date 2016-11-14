@@ -35,6 +35,7 @@ class ModelToFormExporterService {
     static final String EXT_FORM_VERSION = "http://forms.modelcatalogue.org/form#version"
     static final String EXT_FORM_VERSION_DESCRIPTION = "http://forms.modelcatalogue.org/form#versionDescription"
     static final String EXT_FORM_REVISION_NOTES = "http://forms.modelcatalogue.org/form#revisionNotes"
+    static final String EXT_FORM_ITEM_NAMES = "http://forms.modelcatalogue.org/form#itemNames"
     static final String EXT_SECTION_EXCLUDE = "http://forms.modelcatalogue.org/section#exclude"
     static final String EXT_SECTION_EXCLUDE_DATA_ELEMENTS = "http://forms.modelcatalogue.org/section#excludeDataElements"
     static final String EXT_SECTION_MERGE = "http://forms.modelcatalogue.org/section#merge"
@@ -47,6 +48,7 @@ class ModelToFormExporterService {
     static final String EXT_GROUP_REPEAT_NUM = "http://forms.modelcatalogue.org/group#repeatNum"
     static final String EXT_GROUP_REPEAT_MAX = "http://forms.modelcatalogue.org/group#repeatMax"
     static final String EXT_ITEM_EXCLUDE = "http://forms.modelcatalogue.org/item#exclude"
+    static final String EXT_ITEM_NAME = "http://forms.modelcatalogue.org/item#name"
     static final String EXT_ITEM_RESPONSE_TYPE = "http://forms.modelcatalogue.org/item#responseType"
     static final String EXT_ITEM_PHI = "http://forms.modelcatalogue.org/item#phi"
     static final String EXT_ITEM_DESCRIPTION = "http://forms.modelcatalogue.org/item#description"
@@ -91,6 +93,13 @@ class ModelToFormExporterService {
     CaseReportForm convert(DataClass formModel) {
         Set<Long> processed = []
         String formName = formModel.ext[EXT_FORM_NAME] ?: formModel.name
+
+        Map<String, String> nameOverrides = formModel.ext[EXT_FORM_ITEM_NAMES]?.split('\n')?.collectEntries {
+            it.split('=')
+        } ?: [:]
+
+
+
         MutableInt itemNumber = new MutableInt(1)
         CaseReportForm.build(formName) {
             def caseReportForm = delegate
@@ -101,19 +110,18 @@ class ModelToFormExporterService {
             if (formModel.countParentOf() && formModel.ext[EXT_FORM_FORM] != 'true') {
                 processed << formModel.getId()
                 for (Relationship sectionRel in formModel.parentOfRelationships) {
-                    handleSectionModel(itemNumber, processed, formName, caseReportForm, sectionRel)
+                    handleSectionModel(itemNumber, processed, formName, caseReportForm, sectionRel, nameOverrides)
                 }
             }
 
             // at least one section is mandatory (this may happen when data class has no childs or all childs are excluded)
             if (caseReportForm.sections.isEmpty()) {
-                handleSectionModel(itemNumber, [] as Set<Long>, '', caseReportForm, new Relationship(destination: formModel), formModel.ext[EXT_FORM_FORM] != 'true')
+                handleSectionModel(itemNumber, [] as Set<Long>, '', caseReportForm, new Relationship(destination: formModel), nameOverrides, formModel.ext[EXT_FORM_FORM] != 'true')
             }
         }
     }
 
-    private void handleSectionModel(MutableInt itemNumber, Set<Long> processed, String prefix, CaseReportForm form,
-                                    Relationship sectionRel, boolean dataElementsOnly = false) {
+    private void handleSectionModel(MutableInt itemNumber, Set<Long> processed, String prefix, CaseReportForm form, Relationship sectionRel, Map<String, String> nameOverrides, boolean dataElementsOnly = false) {
         DataClass sectionModel = sectionRel.destination as DataClass
 
         if (sectionModel.getId() in processed) {
@@ -137,19 +145,19 @@ class ModelToFormExporterService {
                 instructions fromDestination(sectionRel, EXT_SECTION_INSTRUCTIONS, sectionModel.description)
                 pageNumber fromDestination(sectionRel, EXT_SECTION_PAGE_NUMBER)
 
-                generateItems(itemNumber, prefix, delegate as ItemContainer, sectionRel, null, null)
+                generateItems(itemNumber, prefix, delegate as ItemContainer, sectionRel, null, null, nameOverrides)
 
                 if (dataElementsOnly) {
                     return
                 }
 
-                handleGroupOrVirtualSection(itemNumber, processed, prefix, delegate, sectionModel.parentOfRelationships, true)
+                handleGroupOrVirtualSection(itemNumber, processed, prefix, delegate, sectionModel.parentOfRelationships, true, nameOverrides)
             }
         }
     }
 
     private void handleGroupOrVirtualSection(MutableInt itemNumber, Set<Long> processed, String prefix, Section section,
-                                             List<Relationship> relationships, boolean nameAsHeader) {
+                                             List<Relationship> relationships, boolean nameAsHeader, Map<String, String> nameOverrides) {
         for (Relationship itemsWithHeaderOrGridRel in relationships) {
             DataClass itemsWithHeaderOrGrid = itemsWithHeaderOrGridRel.destination as DataClass
 
@@ -172,7 +180,7 @@ class ModelToFormExporterService {
                 section.grid(alphaNumNoSpaces(itemsWithHeaderOrGridName)) { GridGroup grid ->
                     header fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_HEADER, itemsWithHeaderOrGridName)
 
-                    generateItems(itemNumber, prefix, grid, itemsWithHeaderOrGridRel)
+                    generateItems(itemNumber, prefix, grid, itemsWithHeaderOrGridRel, null, null, nameOverrides)
 
                     Integer repeatNum = safeInteger(fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_REPEAT_NUM), EXT_GROUP_REPEAT_NUM, itemsWithHeaderOrGridRel.destination)
                     if (repeatNum) {
@@ -187,16 +195,16 @@ class ModelToFormExporterService {
             } else {
                 if (fromDestination(itemsWithHeaderOrGridRel, EXT_SECTION_MERGE) != "true") {
                     if (nameAsHeader) {
-                        generateItems(itemNumber, prefix, section, itemsWithHeaderOrGridRel, itemsWithHeaderOrGridName)
+                        generateItems(itemNumber, prefix, section, itemsWithHeaderOrGridRel, itemsWithHeaderOrGridName, null, nameOverrides)
                     } else {
-                        generateItems(itemNumber, prefix, section, itemsWithHeaderOrGridRel, null, itemsWithHeaderOrGridName)
+                        generateItems(itemNumber, prefix, section, itemsWithHeaderOrGridRel, null, itemsWithHeaderOrGridName, nameOverrides)
                     }
                 } else {
                     // if merge, do not include header
-                    generateItems(itemNumber, prefix, section, itemsWithHeaderOrGridRel)
+                    generateItems(itemNumber, prefix, section, itemsWithHeaderOrGridRel, null, null, nameOverrides)
                 }
             }
-            handleGroupOrVirtualSection(itemNumber, processed, prefix, section, itemsWithHeaderOrGrid.parentOfRelationships, false)
+            handleGroupOrVirtualSection(itemNumber, processed, prefix, section, itemsWithHeaderOrGrid.parentOfRelationships, false, nameOverrides)
         }
     }
 
@@ -215,7 +223,7 @@ class ModelToFormExporterService {
     }
 
     private void generateItems(MutableInt itemNumber, String prefix, ItemContainer container, Relationship relationship,
-                               String aHeader = null, String aSubheader = null) {
+                               String aHeader, String aSubheader, Map<String, String> nameOverrides) {
         DataClass model = relationship.destination as DataClass
         boolean first = true
 
@@ -242,7 +250,8 @@ class ModelToFormExporterService {
 
             // bit of heuristic
             String localName = fromDestination(rel, EXT_NAME_CAP, fromDestination(rel, EXT_NAME_LC, dataElement.name))
-            String itemName = alphaNumNoSpaces("${prefix ? (prefix + '_') : ''}${model.name}_${localName}")
+            String itemName = fromDestination(rel, EXT_ITEM_NAME, alphaNumNoSpaces("${prefix ? (prefix + '_') : ''}${model.name}_${localName}"))
+            itemName = nameOverrides[itemName] ?: itemName
             String normalizedResponseType = normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE))
             if (candidates.any { it.name.toLowerCase() == 'file' } || normalizedResponseType == RESPONSE_TYPE_FILE) {
                 container.file(itemName)
