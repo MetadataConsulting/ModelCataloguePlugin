@@ -70,7 +70,7 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
             if (e.cause instanceof IndexNotFoundException) {
                 log.error("Search index not found: ${e.cause.index}")
             } else {
-                log.error("Exception searching query: ${searchRequest.toString()}", e)
+                log.error("Exception searching query: ${searchRequest.toString()}")
             }
             throw e
         }

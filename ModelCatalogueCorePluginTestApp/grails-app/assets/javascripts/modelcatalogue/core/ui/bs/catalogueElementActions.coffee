@@ -709,6 +709,25 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     }
   ]
 
+  actionsProvider.registerChildActionInRole 'catalogue-element', 'reindex-data-model', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, catalogueElementResource, enhance, rest, modelCatalogueApiRoot) ->
+    return undefined if not security.hasRole('ADMIN')
+    return undefined if not $scope.element
+    return undefined if not angular.isFunction($scope.element.isInstanceOf)
+    return undefined if not $scope.element.isInstanceOf('dataModel')
+
+    {
+      position:   50500
+      label:      'Reindex Data Model'
+      icon:       'fa fa-search fa-fw'
+      type:       'primary'
+      action:     ->
+        messages.confirm("Reindex #{$scope.element.name}", "Do you want to reindex #{$scope.element.name}? This may have negative impact on application performance for large data models.").then ->
+          $scope.element.execute('reindex', 'POST').then ->
+            messages.success("Reindexing #{$scope.element.name} started")
+          , showErrorsUsingMessages(messages)
+    }
+  ]
+
   actionsProvider.registerChildActionInRole 'catalogue-element', 'finalize', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'security', ($rootScope, $scope, messages, security) ->
     return undefined unless security.hasRole('CURATOR')
     return undefined unless $scope.element
