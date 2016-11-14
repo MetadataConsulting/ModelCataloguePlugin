@@ -5,8 +5,8 @@ services:
 cache:
   directories:
   - node_modules
-  - ModelCatalogueCorePlugin/target/work/plugins
   - ModelCatalogueCorePluginTestApp/target/work/plugins
+  - ModelCatalogueCorePluginTestApp/node_modules
   - $HOME/.m2
   - $HOME/.grails/ivy-cache
   - $HOME/.grails/wrapper
