@@ -49,7 +49,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     public static final String primitiveTypeValue = 'string:primitiveType'
     public static final String metadataTable = 'table.soe-table'
     public static final String removeRelationshipButton = '#role_item_remove-relationshipBtn'
-    public static final String primitiveContent = '[data-view-name="Measurement Unit"]'
+    public static final CatalogueContent primitiveContent = CatalogueContent.create('[data-view-name="Measurement Unit"]')
 
     def "go to login"() {
         login admin

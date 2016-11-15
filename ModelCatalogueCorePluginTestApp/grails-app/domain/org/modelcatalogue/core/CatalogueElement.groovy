@@ -4,6 +4,7 @@ import com.google.common.base.Function
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Lists
 import grails.util.GrailsNameUtils
+import org.hibernate.ObjectNotFoundException
 import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
 import org.modelcatalogue.core.api.ElementStatus
@@ -327,7 +328,12 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     final String toString() {
-        DataModel dataModel = getDataModelId() ? DataModel.get(getDataModelId()) : null
+        DataModel dataModel
+        try {
+            getDataModelId() ? DataModel.get(getDataModelId()) : null
+        } catch (ObjectNotFoundException ignored) {
+            dataModel = null
+        }
 
         StringBuilder builder = new StringBuilder()
 
