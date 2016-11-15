@@ -18,10 +18,8 @@ class HibernateHelper {
         if (!object) {
             return Object as Class<T>
         }
-        // initialize anyway to prevent problem with subclasses
-        object.toString() // this works the best, Hibernate.initialize() still left the entity untouched
         // still need to use the hibernate proxy helper
-        return (Class<T>) object.class
+        return (Class<T>) ensureNoProxy(object).class
     }
 
     static <T> T ensureNoProxy(T published) {

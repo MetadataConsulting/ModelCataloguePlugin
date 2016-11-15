@@ -416,6 +416,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         final String dataModelName = "DM4DMA"
         final String dataTypeName = "DT4DMA"
         catalogueBuilder.build {
+            skip draft
             dataModel name: dataModelName, {
                 dataType name: dataTypeName
             }
@@ -455,6 +456,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         final String dataModelName = "DM4DMA2"
         final String dataTypeName = "DT4DMA2"
         catalogueBuilder.build {
+            skip draft
             dataModel name: dataModelName, {
                 dataType name: dataTypeName
             }
@@ -560,6 +562,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         final String dataElementName = 'Data Element'
 
         catalogueBuilder.build {
+            skip draft
             dataModel name: anotherName, {
                 dataType name: anotherTypeName
             }
@@ -611,6 +614,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         when:
         catalogueBuilder.build {
+            skip draft
             dataModel(name: sourceModelName) {
                 dataElement name: originalDataElementName, {
                     dataType name: originalDataTypeName, enumerations: [
@@ -664,6 +668,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         when:
         catalogueBuilder.build {
+            skip draft
             dataModel(name: 'Sea Otter') {
                 dataClass name: 'DC CDC IV - other'
             }
@@ -747,6 +752,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         final String destinationDataModelName = 'Destination DM MET-922'
 
         catalogueBuilder.build {
+            skip draft
             dataModel name: sourceDataModelName, {
                 dataClass name: rootDataClassName, {
                     dataClass name: parentDataClassName, {
@@ -808,6 +814,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         final String anotherDataModelName = "testDM2"
 
         catalogueBuilder.build {
+            skip draft
             dataModel name: dataModelName, semanticVersion: dataModelSemVer, {
                 dataType name: dataTypeName, id: dataTypeModelCatalogueId
             }
@@ -943,6 +950,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def "get type hierarchy"() {
         catalogueBuilder.build {
+            skip draft
             dataModel name: 'Data Model for Testing Type Hierarchy', {
                 dataType name: 'L3', {
                     dataType name: 'L2', {

@@ -1,4 +1,5 @@
 classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
+    skip draft
     // formats as value domains
     // value domain definition
 

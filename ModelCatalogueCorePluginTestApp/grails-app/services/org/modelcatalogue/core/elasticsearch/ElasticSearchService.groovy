@@ -26,6 +26,7 @@ import org.elasticsearch.indices.IndexAlreadyExistsException
 import org.elasticsearch.node.Node
 import org.elasticsearch.node.NodeBuilder
 import org.elasticsearch.threadpool.ThreadPool
+import org.hibernate.ObjectNotFoundException
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.cache.CacheService
@@ -678,10 +679,15 @@ class ElasticSearchService implements SearchCatalogue {
 
         if (Relationship.isAssignableFrom(clazz)) {
             Relationship rel = object as Relationship
-            return ImmutableSet.builder()
-                .add(rel.source.dataModel ? getDataModelIndex(rel.source.dataModel, Relationship) : getGlobalIndexName(Relationship))
-                .add(rel.destination.dataModel ? getDataModelIndex(rel.destination.dataModel, Relationship) : getGlobalIndexName(Relationship))
-                .build()
+
+            try {
+                return ImmutableSet.builder()
+                                   .add(rel.source.dataModel ? getDataModelIndex(rel.source.dataModel, Relationship) : getGlobalIndexName(Relationship))
+                                   .add(rel.destination.dataModel ? getDataModelIndex(rel.destination.dataModel, Relationship) : getGlobalIndexName(Relationship))
+                                   .build()
+            } catch (ObjectNotFoundException ignored) {
+                return ImmutableSet.of()
+            }
         }
 
         throw new UnsupportedOperationException("Not Yet Implemented for $object")

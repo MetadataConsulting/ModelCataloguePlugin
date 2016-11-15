@@ -31,7 +31,7 @@ class GelJsonExporterSpec extends IntegrationSpec {
         DefaultCatalogueBuilder catalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
 
         catalogueBuilder.build {
-
+            skip draft
             dataModel(name: DATA_MODEL_NAME) {
                 dataClass(name: ROOT_DATA_CLASS_NAME) {
                     dataClass(name: NESTED_LEVEL_1_DATA_CLASS_NAME) {

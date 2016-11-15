@@ -1,4 +1,5 @@
 classification name: 'MET-523', {
+    skip draft
     model name: 'MET-523.M1', {
         dataElement name: 'MET-523.M1.DE1', {
             dataType name: 'MET-523.M1.VD1', {

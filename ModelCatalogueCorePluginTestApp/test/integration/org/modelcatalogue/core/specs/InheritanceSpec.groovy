@@ -73,6 +73,7 @@ class InheritanceSpec extends IntegrationSpec  {
     def setup() {
         initCatalogueService.initDefaultRelationshipTypes()
         catalogueBuilder.build {
+            skip draft
             dataModel name: TEST_DATA_MODEL_1_NAME, {
                 dataClass name: DUMMY_DATA_CLASS_NAME
                 dataClass name: TEST_PARENT_DATA_CLASS_NAME, {
@@ -592,6 +593,7 @@ class InheritanceSpec extends IntegrationSpec  {
         final String firstInheritedTypeName = 'Test Type 1'
         final String secondInheritedTypeName = 'Test Type 2'
         catalogueBuilder.build {
+            skip draft
             dataModel(name: dataModelName) {
                 dataElement(name: inheritedName) {
                     description firstInheritedDescription

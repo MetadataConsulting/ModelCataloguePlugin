@@ -171,6 +171,7 @@ grails.project.dependency.resolution = {
         compile "org.grails.plugins:babel-asset-pipeline:1.4.5"
 
         runtime ":angular-template-asset-pipeline:2.3.0"
+
 //        runtime ":hibernate4:4.3.5.5"
         runtime  ":hibernate:3.6.10.18"
 
@@ -179,9 +180,6 @@ grails.project.dependency.resolution = {
         compile ":karman-aws:0.8.4"
 
         compile ":spring-websocket:1.3.1"
-
-        test ':build-test-data:2.1.2'
-        test ':fixtures:1.3'
 
         // codenarc static analysis
         build ":codenarc:0.21"

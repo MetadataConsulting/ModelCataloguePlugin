@@ -54,6 +54,7 @@ class ChangeLogDocxGeneratorSpec extends AbstractIntegrationSpec {
         final String typesDataModelName = "Data Model ${System.currentTimeMillis()}"
 
         builder.build {
+            skip draft
             dataModel(name: typesDataModelName, status: finalized) {
                 for (int i in 1..3) {
                     dataType name: "Test Data Type ${i}"

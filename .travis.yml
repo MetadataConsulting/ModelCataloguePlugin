@@ -5,8 +5,8 @@ services:
 cache:
   directories:
   - node_modules
-  - ModelCatalogueCorePlugin/target/work/plugins
   - ModelCatalogueCorePluginTestApp/target/work/plugins
+  - ModelCatalogueCorePluginTestApp/node_modules
   - $HOME/.m2
   - $HOME/.grails/ivy-cache
   - $HOME/.grails/wrapper
@@ -15,11 +15,6 @@ addons:
   artifacts:
     paths:
     - $HOME/reports
-  apt:
-    sources:
-      - elasticsearch-2.0
-    packages:
-      - elasticsearch
 env:
 - TEST_SUITE=functional
 - TEST_SUITE=unit_and_integration

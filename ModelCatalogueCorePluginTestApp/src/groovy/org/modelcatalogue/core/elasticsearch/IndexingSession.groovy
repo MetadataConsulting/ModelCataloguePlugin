@@ -33,7 +33,7 @@ class IndexingSession {
             return documentCache.get("${HibernateHelper.getEntityClass(o)}:${o.getId()}") {
                 createDocument(o)
             }
-        } catch (IllegalStateException ignored) {
+        } catch (IllegalStateException | ConcurrentModificationException ignored) {
             return createDocument(o)
         }
     }

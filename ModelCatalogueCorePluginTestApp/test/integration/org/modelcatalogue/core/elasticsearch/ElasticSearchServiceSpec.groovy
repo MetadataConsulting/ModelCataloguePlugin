@@ -28,6 +28,7 @@ class ElasticSearchServiceSpec extends AbstractIntegrationSpec {
 
     def "play with elasticsearch"() {
         catalogueBuilder.build {
+            skip draft
             dataModel(name: "ES Test Model") {
                 ext 'date_in_model_metadata', '2014-06-06T06:34:24Z'
                 policy 'TEST POLICY'
@@ -219,6 +220,7 @@ class ElasticSearchServiceSpec extends AbstractIntegrationSpec {
     def "test import MET-523"() {
         when:
         catalogueBuilder.build {
+            skip draft
             dataModel name: 'MET-523', {
                 dataClass name: 'MET-523.M1', {
                     dataElement name: 'MET-523.M1.DE1', {

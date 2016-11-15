@@ -217,21 +217,21 @@ hibernate {
 
 // log4j configuration
 log4j.main = {
-    debug 'grails.app.services.org.modelcatalogue'
-    debug 'grails.app.controllers.org.modelcatalogue'
+    info 'grails.app.services.org.modelcatalogue'
+    info 'grails.app.controllers.org.modelcatalogue'
 
-    debug 'org.modelcatalogue.core.dataarchitect.xsd.XSDImporter'
+    info 'org.modelcatalogue.core.dataarchitect.xsd.XSDImporter'
 
     // detailed feedback is now visible using the ProgressMonitor API
     info 'org.modelcatalogue.core.util.builder'
     info 'org.modelcatalogue.core.util.HibernateHelper' // for some reason the logging from builder is redirected here
 
-    debug 'org.modelcatalogue.core.publishing'
-    debug 'org.modelcatalogue.core.util.test'
-    debug 'org.modelcatalogue.core.gel'
-    debug 'org.modelcatalogue.core.export'
-    debug 'org.modelcatalogue.core.elasticsearch'
-    debug 'org.modelcatalogue.discourse'
+    info 'org.modelcatalogue.core.publishing'
+    info 'org.modelcatalogue.core.util.test'
+    info 'org.modelcatalogue.core.gel'
+    info 'org.modelcatalogue.core.export'
+    info 'org.modelcatalogue.core.elasticsearch'
+    info 'org.modelcatalogue.discourse'
 
     info 'grails.app.services.org.grails.plugins.console'
     info 'grails.app.services.org.modelcatalogue.core.elasticsearch'
@@ -250,8 +250,8 @@ log4j.main = {
 //        debug 'org.hibernate.SQL'
 //    }
 
-    debug 'org.modelcatalogue'
-    debug 'grails.app.domain.org.modelcatalogue'
+    info 'org.modelcatalogue'
+    info 'grails.app.domain.org.modelcatalogue'
 
     error 'org.codehaus.groovy.grails.web.servlet',           // controllers
             'org.codehaus.groovy.grails.web.pages',          // GSP
@@ -295,6 +295,7 @@ def assetExcludes = [
         "jasmine/**/*.*",
         "libs/**/*.*",
         "**/*/GruntFile",
+        "**/*/GruntFile.js",
         "**/*/gulpfile.babel.js",
         "**/*/karma.conf.js",
         "**/*/Gruntfile",
@@ -324,12 +325,8 @@ grails.assets.excludes = assetExcludes
 
 grails.assets.plugin.famfamfam.excludes = ['**/*.*']
 
-grails.assets.plugin."model-catalogue-core-plugin".excludes = assetExcludes
-grails.assets.plugin."model-catalogue-core".excludes = assetExcludes
-grails.assets.plugin.ModelCatalogueCore.excludes = assetExcludes
-grails.assets.plugin.ModelCatalogueCorePlugin.excludes = assetExcludes
-
 grails.assets.babel.enabled = true
+grails.assets.less.compiler = 'less4j'
 
 grails.plugin.springsecurity.useBasicAuth = true
 grails.plugin.springsecurity.basic.realmName = "Model Catalogue"

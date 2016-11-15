@@ -60,6 +60,7 @@ class AbstractRareDiseasesExporterSpec extends AbstractIntegrationSpec {
             DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
 
             builder.build {
+                skip draft
                 dataModel(name: RARE_DISEASE_DATA_MODEL_NAME) {
                     description "This is a data model for testing Eligibility OR Phenotype and Clinicals tests exports"
 

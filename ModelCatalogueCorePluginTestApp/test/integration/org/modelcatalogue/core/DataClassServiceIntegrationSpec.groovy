@@ -85,6 +85,7 @@ class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def "data model filter where data classes has parents from other data models"() {
         catalogueBuilder.build {
+            skip draft
             dataModel name: 'DM1', {
                 dataClass name: 'DC1', {
                     child 'DM2', 'DC2'

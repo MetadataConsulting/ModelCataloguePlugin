@@ -89,9 +89,4 @@ class CatalogueXmlLoaderSpec extends Specification {
         return true
     }
 
-    String build(@DelegatesTo(CatalogueBuilder) Closure cl) {
-        builder.build cl
-        stringWriter.toString()
-    }
-
 }
