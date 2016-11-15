@@ -164,11 +164,12 @@ grails.project.dependency.resolution = {
         test ':build-test-data:2.1.2'
         test ':fixtures:1.3'
 
-        compile ":asset-pipeline:2.11.0"
-        compile ":coffee-asset-pipeline:2.11.0"
-        compile ":less-asset-pipeline:2.11.0"
-        compile "org.grails.plugins:angular-annotate-asset-pipeline:2.4.1"
+        compile ":asset-pipeline:2.9.1"
+        compile ":coffee-asset-pipeline:2.9.1"
+        compile ":less-asset-pipeline:2.9.1"
+        compile "org.grails.plugins:angular-annotate-asset-pipeline:2.4.0"
         compile "org.grails.plugins:babel-asset-pipeline:1.4.5"
+
         runtime ":angular-template-asset-pipeline:2.3.0"
 
 //        runtime ":hibernate4:4.3.5.5"

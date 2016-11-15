@@ -295,6 +295,7 @@ def assetExcludes = [
         "jasmine/**/*.*",
         "libs/**/*.*",
         "**/*/GruntFile",
+        "**/*/GruntFile.js",
         "**/*/gulpfile.babel.js",
         "**/*/karma.conf.js",
         "**/*/Gruntfile",
@@ -324,12 +325,8 @@ grails.assets.excludes = assetExcludes
 
 grails.assets.plugin.famfamfam.excludes = ['**/*.*']
 
-grails.assets.plugin."model-catalogue-core-plugin".excludes = assetExcludes
-grails.assets.plugin."model-catalogue-core".excludes = assetExcludes
-grails.assets.plugin.ModelCatalogueCore.excludes = assetExcludes
-grails.assets.plugin.ModelCatalogueCorePlugin.excludes = assetExcludes
-
 grails.assets.babel.enabled = true
+grails.assets.less.compiler = 'less4j'
 
 grails.plugin.springsecurity.useBasicAuth = true
 grails.plugin.springsecurity.basic.realmName = "Model Catalogue"

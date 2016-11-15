@@ -13,16 +13,17 @@ cd ModelCatalogueCorePluginTestApp
 
 ARG="$1"
 
-shift 1
-
 if [[ "$ARG" == "blank" ]]; then
+    shift 1
     export MC_BLANK_DEV=true
     ./grailsw run-app "$@"
 elif [[ "$ARG" == "debug" ]]; then
+    shift 1
     ./grailsw run-app --debug-fork "$@"
 elif [[ "$ARG" == "war" ]]; then
+    shift 1
     ./grailsw dev run-war "$@"
 else
-    ./grailsw run-app "$@"
+    ./grailsw run-app
 fi
 
