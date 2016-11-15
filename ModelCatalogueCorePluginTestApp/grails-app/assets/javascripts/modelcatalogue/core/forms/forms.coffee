@@ -20,6 +20,7 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
       "http://forms.modelcatalogue.org/form#version"
       "http://forms.modelcatalogue.org/form#versionDescription"
       "http://forms.modelcatalogue.org/form#revisionNotes"
+      "http://forms.modelcatalogue.org/form#itemNames"
       "http://forms.modelcatalogue.org/section#exclude"
       "http://forms.modelcatalogue.org/section#excludeDataElements"
       "http://forms.modelcatalogue.org/section#merge"

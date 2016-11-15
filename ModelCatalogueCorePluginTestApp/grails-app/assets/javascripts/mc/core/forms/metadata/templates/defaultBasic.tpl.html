@@ -99,6 +99,22 @@
       </td>
     </tr>
 
+    <tr ng-if="view.handlesKey('http://forms.modelcatalogue.org/form#itemNames')">
+      <th class="col-md-3">
+        Item Names Override
+        <i class="fa fa-question"
+           popover="
+              If some of the item names generated automatically by the exporter don't suite youre needs you can override
+              them by writing the generated names followed by equals sign and the new name, each name on separate line."
+           popover-title="Item Names Override"
+           popover-trigger="mouseenter"></i>
+      </th>
+      <td class="full-width-editable">
+        <span editable-textarea="extAsMap['http://forms.modelcatalogue.org/form#itemNames']" class="small" e-rows="5">
+        {{element.ext.get('http://forms.modelcatalogue.org/form#itemNames')}}
+      </span>
+      </td>
+    </tr>
     <tr ng-if="view.handlesKey('http://forms.modelcatalogue.org/form#revisionNotes')">
       <th class="col-md-3">
         Revision Notes
