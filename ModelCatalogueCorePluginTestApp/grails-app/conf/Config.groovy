@@ -217,21 +217,21 @@ hibernate {
 
 // log4j configuration
 log4j.main = {
-    debug 'grails.app.services.org.modelcatalogue'
-    debug 'grails.app.controllers.org.modelcatalogue'
+    info 'grails.app.services.org.modelcatalogue'
+    info 'grails.app.controllers.org.modelcatalogue'
 
-    debug 'org.modelcatalogue.core.dataarchitect.xsd.XSDImporter'
+    info 'org.modelcatalogue.core.dataarchitect.xsd.XSDImporter'
 
     // detailed feedback is now visible using the ProgressMonitor API
     info 'org.modelcatalogue.core.util.builder'
     info 'org.modelcatalogue.core.util.HibernateHelper' // for some reason the logging from builder is redirected here
 
-    debug 'org.modelcatalogue.core.publishing'
-    debug 'org.modelcatalogue.core.util.test'
-    debug 'org.modelcatalogue.core.gel'
-    debug 'org.modelcatalogue.core.export'
-    debug 'org.modelcatalogue.core.elasticsearch'
-    debug 'org.modelcatalogue.discourse'
+    info 'org.modelcatalogue.core.publishing'
+    info 'org.modelcatalogue.core.util.test'
+    info 'org.modelcatalogue.core.gel'
+    info 'org.modelcatalogue.core.export'
+    info 'org.modelcatalogue.core.elasticsearch'
+    info 'org.modelcatalogue.discourse'
 
     info 'grails.app.services.org.grails.plugins.console'
     info 'grails.app.services.org.modelcatalogue.core.elasticsearch'
@@ -249,6 +249,9 @@ log4j.main = {
 //        trace 'org.hibernate.stat'
 //        debug 'org.hibernate.SQL'
 //    }
+
+    info 'org.modelcatalogue'
+    info 'grails.app.domain.org.modelcatalogue'
 
     error 'org.codehaus.groovy.grails.web.servlet',           // controllers
             'org.codehaus.groovy.grails.web.pages',          // GSP
