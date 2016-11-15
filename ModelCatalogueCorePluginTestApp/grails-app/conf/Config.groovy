@@ -250,9 +250,6 @@ log4j.main = {
 //        debug 'org.hibernate.SQL'
 //    }
 
-    debug 'org.modelcatalogue'
-    debug 'grails.app.domain.org.modelcatalogue'
-
     error 'org.codehaus.groovy.grails.web.servlet',           // controllers
             'org.codehaus.groovy.grails.web.pages',          // GSP
             'org.codehaus.groovy.grails.web.sitemesh',       // layouts
