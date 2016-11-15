@@ -87,6 +87,7 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
             }
 
             builder.build {
+                skip draft
                 dataModel(name: COMPLEX_MODEL_NAME) {
                     description "This is a data model for testing DataModelToDocxExporter"
 

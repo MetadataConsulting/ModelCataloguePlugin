@@ -45,6 +45,7 @@ class AbstractDataModelExporterSpec extends AbstractIntegrationSpec {
             DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
 
             builder.build {
+                skip draft
                 dataModel(name: DATA_MODEL_EXPORTER_DATA_MODEL_NAME) { //e.g. Cancer Model
                     description "This is a data model for testing Data Specification change log exports"
 

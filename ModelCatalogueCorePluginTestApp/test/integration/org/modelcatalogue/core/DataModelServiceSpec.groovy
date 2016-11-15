@@ -149,6 +149,7 @@ class DataModelServiceSpec extends AbstractIntegrationSpec {
     def "find dependents"() {
         given:
             catalogueBuilder.build {
+                skip draft
                 dataModel name: 'DMFD 1', {
                     dataType name: 'DMFD 1 DT 1'
                 }

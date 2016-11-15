@@ -44,7 +44,7 @@ class RareDiseaseDisorderListCsvExporterSpec extends IntegrationSpec {
         DefaultCatalogueBuilder catalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
 
         catalogueBuilder.build {
-
+            skip draft
             dataModel(name: 'testDataModel1') {
                 dataClass(name: 'rare diseases') {
                     dataClass(name: LEVEL2_GROUP1) {     //with comma in names

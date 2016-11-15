@@ -1,5 +1,5 @@
 dataModel name: 'Java', {
-
+    skip draft
     dataType name: "String", description: "java.lang.String"
     dataType name: "Integer", description: "java.lang.Integer"
     dataType name: "Double", description: "java.lang.Double"

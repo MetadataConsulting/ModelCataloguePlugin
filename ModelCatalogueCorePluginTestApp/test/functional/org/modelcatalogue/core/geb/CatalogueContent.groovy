@@ -51,4 +51,14 @@ class CatalogueContent {
     CatalogueContent find(Map arguments = [:], String selector) {
         return new CatalogueContent(this, selector, arguments, beforeSelect)
     }
+
+
+    @Override
+    public String toString() {
+        return "CatalogueContent{" +
+            "parent=" + parent +
+            ", selector='" + selector + '\'' +
+            ", args=" + args +
+            '}';
+    }
 }

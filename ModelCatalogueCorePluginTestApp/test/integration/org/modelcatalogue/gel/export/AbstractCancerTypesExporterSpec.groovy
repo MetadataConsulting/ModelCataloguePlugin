@@ -55,7 +55,6 @@ class AbstractCancerTypesExporterSpec extends AbstractIntegrationSpec {
             DefaultCatalogueBuilder catalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
 
             catalogueBuilder.build {
-
                 dataModel(name: DATA_MODEL_NAME) {
                     dataClass(name: ROOT_CANCER_TYPE) {
                         dataClass(name: ADULT_GLIOMA_TYPE1) {
