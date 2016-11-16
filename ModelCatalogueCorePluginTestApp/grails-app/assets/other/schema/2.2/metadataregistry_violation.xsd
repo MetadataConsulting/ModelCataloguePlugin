@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry_violation.xsd"
+    elementFormDefault="qualified" version="1.0" xml:lang="EN">
+    <xs:redefine schemaLocation="metadataregistry_validator.xsd"/>
+    <xs:complexType name="Violation">
+        <xs:sequence>
+            <xs:element name="constraint" type="Constraint"/>
+            <xs:element name="value" type="xs:string"/>
+        </xs:sequence>
+        <xs:attribute name="index" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+    <xs:complexType name="Violations">
+        <xs:sequence>
+            <xs:element name="violation" type="Violation" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="violations" type="Violations"/>
+</xs:schema>

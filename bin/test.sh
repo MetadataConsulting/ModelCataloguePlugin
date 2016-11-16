@@ -4,6 +4,7 @@ source ./bin/lib/test-setup.sh
 
 export FILE_OPENER_SKIP=true
 export ES_VERSION=2.3.5
+export GRAILS_OPTS="-Xmx2G -Xms1G -XX:MaxPermSize=1G -server"
 
 if [[ "$TRAVIS" != "" ]] ; then
     if [ "$TEST_SUITE" = "functional" ] || [ "$TEST_SUITE" = "" ] ; then

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+        xmlns:asset="http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry_asset.xsd"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry_asset.xsd"
+        elementFormDefault="qualified" version="1.0" xml:lang="EN">
+
+    <!-- simplified version of catalogue XML which can only contain one element called asset -->
+    <xs:redefine schemaLocation="metadataregistry.xsd"/>
+
+    <xs:complexType name="Asset">
+        <xs:complexContent>
+            <xs:extension base="asset:CatalogueElement">
+                <xs:attribute name="type" use="prohibited"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="AssetCatalogue">
+        <xs:sequence>
+            <xs:element name="asset" type="asset:Asset" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="catalogue" type="asset:AssetCatalogue" />
+
+
+</xs:schema>
