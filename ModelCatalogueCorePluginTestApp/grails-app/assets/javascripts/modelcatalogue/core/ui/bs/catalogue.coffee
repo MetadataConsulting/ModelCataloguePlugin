@@ -27,6 +27,7 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setIcon 'mapping',            "fa fa-fw fa-superscript"
   catalogueProvider.setIcon 'validationRule',     "fa fa-fw fa-university"
   catalogueProvider.setIcon 'dataModelPolicy',    "fa fa-fw fa-check-square-o"
+  catalogueProvider.setIcon 'tag',                "fa fa-fw fa-tag"
 
   # this should be generated automatically in the future
 
@@ -44,6 +45,7 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setInstanceOf 'model',              'catalogueElement'
   catalogueProvider.setInstanceOf 'dataElement',        'catalogueElement'
   catalogueProvider.setInstanceOf 'validationRule',     'catalogueElement'
+  catalogueProvider.setInstanceOf 'tag',                'catalogueElement'
 
   catalogueProvider.setInstanceOf 'enumeratedType',     'dataType'
   catalogueProvider.setInstanceOf 'referenceType',      'dataType'

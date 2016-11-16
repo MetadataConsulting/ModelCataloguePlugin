@@ -59,12 +59,13 @@ angular.module('mc.core.ui.metadataEditor', ['mc.core.ui.metadataEditors']).dire
           $scope.handledKeys = []
 
       onObjectChanged = (object) ->
-        if object and not isOrderedMap(object)
-          $log.error "Object", object, "is not ordered map"
-          return
+        if object
+          unless isOrderedMap(object)
+            $log.error "Object", object, "is not ordered map"
+            return
 
-        object.clearIfOnlyContainsPlaceholder()
-        object.addPlaceholderIfEmpty()
+          object.clearIfOnlyContainsPlaceholder()
+          object.addPlaceholderIfEmpty()
 
       onObjectChanged($scope.object)
 

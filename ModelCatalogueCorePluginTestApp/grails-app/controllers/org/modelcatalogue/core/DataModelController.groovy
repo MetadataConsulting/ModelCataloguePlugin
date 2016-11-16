@@ -111,6 +111,7 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
             contentDescriptors << createContentDescriptor(dataModel, 'Measurement Units', MeasurementUnit, stats["totalMeasurementUnitCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Validation Rules', ValidationRule, stats["totalValidationRuleCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Assets', Asset, stats["totalAssetCount"])
+            contentDescriptors << createContentDescriptor(dataModel, 'Tags', Tag, stats["totalTagCount"])
 
             if (dataModel.status != ElementStatus.DEPRECATED) {
                 Map deprecatedItems = createContentDescriptor(dataModel, 'Deprecated Items', CatalogueElement, stats["deprecatedCatalogueElementCount"])
