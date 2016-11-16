@@ -95,7 +95,7 @@ class ModelToFormExporterService {
         String formName = formModel.ext[EXT_FORM_NAME] ?: formModel.name
 
         Map<String, String> nameOverrides = formModel.ext[EXT_FORM_ITEM_NAMES]?.split('\n')?.collectEntries {
-            it.split('=')
+            it.split('=') as List<String>
         } ?: [:]
 
 
