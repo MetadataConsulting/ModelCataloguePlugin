@@ -34,5 +34,4 @@ class MeasurementUnitController extends AbstractCatalogueElementController<Measu
         true
     }
 
-
 }

@@ -22,7 +22,7 @@ class ModelCatalogueCorePluginUrlMappings {
 
         def legacyElements    = [model: 'dataClass', classification: 'dataModel']
         def resources         = ['batch', 'relationshipType', 'csvTransformation', 'dataModelPolicy' ]
-        def catalogueElements = ['asset', 'dataElement', 'dataClass', 'catalogueElement', 'dataType', 'enumeratedType', 'referenceType', 'primitiveType', 'measurementUnit', 'user', 'dataModel', 'classification', 'model', 'validationRule']
+        def catalogueElements = ['asset', 'dataElement', 'dataClass', 'catalogueElement', 'dataType', 'enumeratedType', 'referenceType', 'primitiveType', 'measurementUnit', 'user', 'dataModel', 'classification', 'model', 'validationRule', 'tag']
         def allElements       = catalogueElements + resources
 
         for (String elementName in allElements) {
@@ -135,7 +135,7 @@ class ModelCatalogueCorePluginUrlMappings {
                     "/api/modelCatalogue/core/$elementName/$id/validateXml"(controller: controllerName, action: 'validateXml', method: HttpMethod.POST)
                 }
 
-                if (controllerName in ['dataElement', 'primitiveType', 'referenceType', 'enumeratedType', 'validationRule']) {
+                if (controllerName in ['dataElement', 'primitiveType', 'referenceType', 'enumeratedType', 'validationRule', 'tag']) {
                     "/api/modelCatalogue/core/$elementName/$id/content"(controller: controllerName, action: 'content', method: HttpMethod.GET)
                 }
             }

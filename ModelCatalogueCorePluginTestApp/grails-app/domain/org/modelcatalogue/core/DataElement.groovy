@@ -22,7 +22,7 @@ class DataElement extends CatalogueElement {
 
     static relationships = [
         outgoing: [involvedness: 'involvedIn'],
-        incoming: [containment: 'containedIn'],
+        incoming: [containment: 'containedIn', tag: 'isTaggedBy'],
     ]
 
     static fetchMode = [dataType: 'eager']

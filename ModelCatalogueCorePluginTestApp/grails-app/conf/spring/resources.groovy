@@ -41,6 +41,7 @@ import org.modelcatalogue.core.util.marshalling.ReferenceTypeMarshaller
 import org.modelcatalogue.core.util.marshalling.RelationshipMarshallers
 import org.modelcatalogue.core.util.marshalling.RelationshipTypeMarshaller
 import org.modelcatalogue.core.util.marshalling.RelationshipsMarshaller
+import org.modelcatalogue.core.util.marshalling.TagMarshaller
 import org.modelcatalogue.core.util.marshalling.UserMarshaller
 import org.modelcatalogue.core.util.marshalling.ValidationRuleMarshaller
 import org.modelcatalogue.core.xml.render.RelationshipsXmlRenderer
@@ -112,7 +113,8 @@ beans = {
             new ChangeMarshaller(),
             new ValidationRuleMarshaller(),
             new ProgressMonitorMarshaller(),
-            new DataModelPolicyMarshaller()
+            new DataModelPolicyMarshaller(),
+            new TagMarshaller()
         ]
     }
 
