@@ -1,8 +1,6 @@
 language: groovy
 sudo: required
 dist: trusty
-services:
-  - mysql
 cache:
   directories:
   - node_modules
@@ -16,6 +14,11 @@ addons:
   artifacts:
     paths:
     - $HOME/reports
+  apt:
+    packages:
+    - mysql-server-5.6
+    - mysql-client-core-5.6
+    - mysql-client-5.6
 env:
 - TEST_SUITE=functional
 - TEST_SUITE=unit_and_integration
