@@ -6,6 +6,11 @@
 
 import io.github.bonigarcia.wdm.ChromeDriverManager
 import org.openqa.selenium.chrome.ChromeDriver
+import org.openqa.selenium.chrome.ChromeOptions
+
+ChromeOptions options = new ChromeOptions()
+options.addArguments("test-type")
+options.addArguments("--disable-extensions")
 
 reportsDir = new File("target/geb-reports")
 reportOnTestFailureOnly = false
@@ -15,7 +20,7 @@ cacheDriver = false
 ChromeDriverManager.getInstance().setup()
 
 driver = {
-    new ChromeDriver()
+    new ChromeDriver(options)
 }
 
 waiting {
