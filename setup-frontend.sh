@@ -2,15 +2,18 @@
 
 set -e
 
-if [ ! -f ~/.nvm/nvm.sh ]; then
-    echo "installing nvm"
-    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh | bash
-else
-    echo "nvm is already installed on the system"
+
+if [ "$CIRCLECI" = "" ] ; then
+    if [ ! -f ~/.nvm/nvm.sh ]; then
+        echo "installing nvm"
+        curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh | bash
+    else
+        echo "nvm is already installed on the system"
+    fi
+    . ~/.nvm/nvm.sh
+    nvm install
+    nvm use
 fi
-. ~/.nvm/nvm.sh
-nvm install
-nvm use
 
 echo "executing npm install in folders where package.json is exists"
 

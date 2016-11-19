@@ -1,0 +1,8 @@
+machine:
+  java:
+    version: openjdk8
+  node:
+    version: v5.7.0
+test:
+  override:
+    - ./catalogue test
