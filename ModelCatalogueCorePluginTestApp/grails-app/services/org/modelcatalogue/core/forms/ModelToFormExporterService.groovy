@@ -101,7 +101,7 @@ class ModelToFormExporterService {
 
 
         MutableInt itemNumber = new MutableInt(1)
-        CaseReportForm.build(formName) {
+        CaseReportForm form = CaseReportForm.build(formName) {
             def caseReportForm = delegate
             version formModel.ext[EXT_FORM_VERSION] ?: formModel.versionNumber.toString()
             versionDescription formModel.ext[EXT_FORM_VERSION_DESCRIPTION] ?: formModel.description ?: "Generated from ${alphaNumNoSpaces(formModel.name)}"
@@ -119,6 +119,14 @@ class ModelToFormExporterService {
                 handleSectionModel(itemNumber, [] as Set<Long>, '', caseReportForm, new Relationship(destination: formModel), nameOverrides, formModel.ext[EXT_FORM_FORM] != 'true')
             }
         }
+
+        form.sections.each { String name, Section section ->
+            if (section.items.values().every { it.questionNumber }) {
+                section.sortItemsByQuestionNumber()
+            }
+        }
+        
+        return form
     }
 
     private void handleSectionModel(MutableInt itemNumber, Set<Long> processed, String prefix, CaseReportForm form, Relationship sectionRel, Map<String, String> nameOverrides, boolean dataElementsOnly = false) {
