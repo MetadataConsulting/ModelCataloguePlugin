@@ -40,6 +40,17 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     }
   ]
 
+  actionsProvider.registerChildAction 'user-menu', 'user-info', ['security', (security) ->
+    return undefined unless security.getCurrentUser()
+    {
+      position:   -100000
+      icon:       'fa fa-fw fa-user'
+      label:      security.getCurrentUser()?.username
+      disabled:   true
+      action: -> return
+    }
+  ]
+
   actionsProvider.registerChildAction 'user-menu', 'user-login-right', ['security', (security) ->
     {
       position:   100000
