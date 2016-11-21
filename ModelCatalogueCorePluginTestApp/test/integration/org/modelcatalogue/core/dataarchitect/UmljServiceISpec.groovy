@@ -2,7 +2,9 @@ package org.modelcatalogue.core.dataarchitect
 import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataClass
+import spock.lang.Requires
 
+@Requires({ !System.getenv('TRAVIS') })
 class UmljServiceISpec extends AbstractIntegrationSpec {
 
     def umljService

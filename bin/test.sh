@@ -9,7 +9,7 @@ export GRAILS_OPTS="-Xmx2G -Xms1G -XX:MaxPermSize=1G -server"
 if [[ "$TRAVIS" != "" ]] ; then
     if [ "$TEST_SUITE" = "functional" ] || [ "$TEST_SUITE" = "" ] ; then
         echo "preparing metadata database"
-        mysql -u root -e "create database metadata;grant all privileges on metadata.* to 'travis'@'localhost'"
+        mysql -u root -e "create database metadata;grant all privileges on metadata.* to 'root'@'localhost'"
         echo "running elasticsearch"
         wget -qO- "http://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/$ES_VERSION/elasticsearch-$ES_VERSION.tar.gz" | tar xvz
         "./elasticsearch-$ES_VERSION/bin/elasticsearch" -d --default.path.conf=conf/test/esconfig

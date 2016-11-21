@@ -288,7 +288,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
     }
 
-  actionsProvider.registerActionInRoles 'inline-edit',[actionsProvider.ROLE_ITEM_DETAIL_ACTION], ['$scope', 'messages', 'names', 'security', ($scope) ->
+  actionsProvider.registerActionInRoles 'inline-edit',[actionsProvider.ROLE_ITEM_DETAIL_ACTION], ($scope, security) ->
+    'ngInject'
     return undefined if not $scope.editableForm
     return undefined if $scope.editableForm.$visible
     return undefined if angular.isFunction($scope.supportsInlineEdit) and not $scope.supportsInlineEdit($scope.editableForm)
@@ -298,15 +299,13 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       label:      'Inline Edit'
       icon:       'fa fa-edit'
       type:       'primary'
-      disabled:   $scope.element.archived or $scope.element?.status == 'FINALIZED'
+      disabled:   not security.hasRole('SUPERVISOR') and ($scope.element.archived or $scope.element?.status == 'FINALIZED')
       watches:    ['element.status', 'element.archived']
       action:     ->
         $scope.editableForm.$show()
         $scope.$broadcast 'redrawContextualActions'
 
     }
-
-  ]
 
   actionsProvider.registerActionInRoles 'inline-edit-submit',[actionsProvider.ROLE_ITEM_DETAIL_ACTION], ['$scope', 'messages', 'names', 'security', ($scope) ->
     return undefined if not $scope.editableForm
@@ -567,7 +566,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       'element.relation.status'
       'element.type.versionSpecific'
     ]
-    disabled:   $scope.element.inherited or ($scope.element.type.versionSpecific and getIsSourceFinalized($scope.element))
+    disabled:   !security.hasRole('SUPERVISOR') and ($scope.element.inherited or ($scope.element.type.versionSpecific and getIsSourceFinalized($scope.element)))
     action:     ->
       rel   = getRelationship()
       rel.element.refresh().then (element) ->

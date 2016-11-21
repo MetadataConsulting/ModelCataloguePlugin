@@ -237,7 +237,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
                 or $scope.element?.isInstanceOf('validationRule')\
                 or $scope.element?.isInstanceOf('tag')\
             )\
-            and $scope.element?.status == 'DRAFT'
+            and ($scope.element?.status == 'DRAFT' or security.hasRole('SUPERVISOR'))
 
       $scope.inlineUpdateElement = ->
         deferred = $q.defer()
