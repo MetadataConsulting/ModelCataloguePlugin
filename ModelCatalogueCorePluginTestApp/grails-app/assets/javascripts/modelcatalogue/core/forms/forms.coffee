@@ -16,12 +16,14 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
     ]
     keys: [
       "http://forms.modelcatalogue.org/form#form"
+      "http://forms.modelcatalogue.org/form#customizer"
       "http://forms.modelcatalogue.org/form#name"
       "http://forms.modelcatalogue.org/form#version"
       "http://forms.modelcatalogue.org/form#versionDescription"
       "http://forms.modelcatalogue.org/form#revisionNotes"
       "http://forms.modelcatalogue.org/form#itemNames"
       "http://forms.modelcatalogue.org/section#exclude"
+      "http://forms.modelcatalogue.org/section#label"
       "http://forms.modelcatalogue.org/section#excludeDataElements"
       "http://forms.modelcatalogue.org/section#merge"
       "http://forms.modelcatalogue.org/section#title"
@@ -76,6 +78,7 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
     ]
     keys: [
       "http://forms.modelcatalogue.org/section#exclude"
+      "http://forms.modelcatalogue.org/section#label"
       "http://forms.modelcatalogue.org/section#excludeDataElements"
       "http://forms.modelcatalogue.org/section#merge"
       "http://forms.modelcatalogue.org/section#title"
