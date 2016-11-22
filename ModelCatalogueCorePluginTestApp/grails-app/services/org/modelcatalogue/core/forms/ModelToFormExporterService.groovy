@@ -11,6 +11,7 @@ import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.util.Metadata
+import org.modelcatalogue.core.util.SecuredRuleExecutor
 import org.modelcatalogue.crf.model.CaseReportForm
 import org.modelcatalogue.crf.model.DataType as FormDataType
 import org.modelcatalogue.crf.model.GenericItem
@@ -32,6 +33,7 @@ class ModelToFormExporterService {
 
     static final String EXT_FORM_NAME = "http://forms.modelcatalogue.org/form#name"
     static final String EXT_FORM_FORM = "http://forms.modelcatalogue.org/form#form"
+    static final String EXT_FORM_CUSTOMIZER = "http://forms.modelcatalogue.org/form#customizer"
     static final String EXT_FORM_VERSION = "http://forms.modelcatalogue.org/form#version"
     static final String EXT_FORM_VERSION_DESCRIPTION = "http://forms.modelcatalogue.org/form#versionDescription"
     static final String EXT_FORM_REVISION_NOTES = "http://forms.modelcatalogue.org/form#revisionNotes"
@@ -40,6 +42,7 @@ class ModelToFormExporterService {
     static final String EXT_SECTION_EXCLUDE_DATA_ELEMENTS = "http://forms.modelcatalogue.org/section#excludeDataElements"
     static final String EXT_SECTION_MERGE = "http://forms.modelcatalogue.org/section#merge"
     static final String EXT_SECTION_TITLE = "http://forms.modelcatalogue.org/section#title"
+    static final String EXT_SECTION_LABEL = "http://forms.modelcatalogue.org/section#label"
     static final String EXT_SECTION_SUBTITLE = "http://forms.modelcatalogue.org/section#subtitle"
     static final String EXT_SECTION_INSTRUCTIONS = "http://forms.modelcatalogue.org/section#instructions"
     static final String EXT_SECTION_PAGE_NUMBER = "http://forms.modelcatalogue.org/section#pageNumber"
@@ -125,7 +128,17 @@ class ModelToFormExporterService {
                 section.sortItemsByQuestionNumber()
             }
         }
-        
+
+        String customizer = formModel.ext[EXT_FORM_CUSTOMIZER]
+
+        if (customizer) {
+            try {
+                new SecuredRuleExecutor(form: form).execute(customizer)
+            } catch (Exception e) {
+                throw new IllegalArgumentException("There were problems with the form customization script!", e)
+            }
+        }
+
         return form
     }
 
@@ -138,7 +151,8 @@ class ModelToFormExporterService {
 
         processed << sectionModel.getId()
 
-        String sectionName = fromDestination(sectionRel, EXT_NAME_CAP, fromDestination(sectionRel, EXT_NAME_LC, sectionModel.name))
+        String sectionModelName = fromDestination(sectionRel, EXT_NAME_CAP, fromDestination(sectionRel, EXT_NAME_LC, sectionModel.name))
+        String sectionName = fromDestination(sectionRel, EXT_SECTION_LABEL, alphaNumNoSpaces(sectionModelName))
         log.info "Creating section $sectionName for model $sectionModel"
 
         if(fromDestination(sectionRel, EXT_SECTION_EXCLUDE) == 'true') {
@@ -147,8 +161,8 @@ class ModelToFormExporterService {
         }
 
         if (dataElementsOnly && sectionModel.countContains() || !dataElementsOnly) {
-            form.section(alphaNumNoSpaces(sectionName)) {
-                title fromDestination(sectionRel, EXT_SECTION_TITLE, sectionName)
+            form.section(sectionName) {
+                title fromDestination(sectionRel, EXT_SECTION_TITLE, sectionModelName)
                 subtitle fromDestination(sectionRel, EXT_SECTION_SUBTITLE)
                 instructions fromDestination(sectionRel, EXT_SECTION_INSTRUCTIONS, sectionModel.description)
                 pageNumber fromDestination(sectionRel, EXT_SECTION_PAGE_NUMBER)

@@ -67,6 +67,32 @@
       </td>
     </tr>
 
+    <tr ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#label')">
+      <th class="col-md-3">
+        Label
+        <i class="fa fa-question"
+           popover="
+            Must be unique in the worksheet and contain no spaces.
+
+            The SECTION_LABEL is referenced in the Items Worksheet to associate items with the appropriate section of the CRF.
+            When the CRF is accessed for data entry, each section will be a page.  The items defined with the corresponding
+            SECTION_LABEL will be shown on that single page.
+
+            This field is not displayed as part of the CRF but can be seen on the CRF Metadata page.
+
+            This value will be used in the Items Worksheet to define where the items will appear during data entry."
+           popover-title="Lable"
+           popover-trigger="mouseenter"></i>
+      </th>
+      <td class="full-width-editable">
+        <span editable-textarea="extAsMap['http://forms.modelcatalogue.org/section#label']" class="small"
+              e-maxlength="255" e-rows="2"
+              e-ng-disabled="exclude.value">
+          {{element.ext.get('http://forms.modelcatalogue.org/section#label')}}
+        </span>
+      </td>
+    </tr>
+
     <tr ng-if="view.handlesKey('http://forms.modelcatalogue.org/section#title')">
       <th class="col-md-3">
         Title
