@@ -7,6 +7,7 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
+import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.Relationship
@@ -89,6 +90,8 @@ class ModelToFormExporterService {
     public static final ArrayList<String> DATA_TYPE_DATA_NAMES = ['date', 'xs:date']
     public static final ArrayList<String> DATA_TYPE_PDATE_NAMES = ['pdate', 'partialdate', 'xs:gYear', 'xs:gYearMonth']
 
+    ElementService elementService
+
     private static class ItemIndex {
         private int index = 0
     }
@@ -123,20 +126,27 @@ class ModelToFormExporterService {
             }
         }
 
-        form.sections.each { String name, Section section ->
-            if (section.items.values().every { it.questionNumber }) {
-                section.sortItemsByQuestionNumber()
-            }
-        }
-
         String customizer = formModel.ext[EXT_FORM_CUSTOMIZER]
 
         if (customizer) {
             try {
-                new SecuredRuleExecutor(form: form).execute(customizer)
+                new SecuredRuleExecutor(
+                    form: form,
+                    include: { String mcid ->
+                        CatalogueElement dataClass = elementService.findByModelCatalogueId(DataClass, mcid)
+                        if (!dataClass) {
+                            throw new IllegalArgumentException("No data class found for id: $mcid!")
+                        }
+                        handleSectionModel(itemNumber, processed, formName, form, new Relationship(destination: dataClass), nameOverrides)
+                    }
+                ).execute(customizer)
             } catch (Exception e) {
                 throw new IllegalArgumentException("There were problems with the form customization script!", e)
             }
+        }
+
+        form.sections.each { String name, Section section ->
+            section.sortItemsByQuestionNumber()
         }
 
         return form
