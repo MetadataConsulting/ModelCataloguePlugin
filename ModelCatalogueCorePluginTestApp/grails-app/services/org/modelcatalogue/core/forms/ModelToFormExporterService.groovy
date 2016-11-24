@@ -138,6 +138,17 @@ class ModelToFormExporterService {
                             throw new IllegalArgumentException("No data class found for id: $mcid!")
                         }
                         handleSectionModel(itemNumber, processed, formName, form, new Relationship(destination: dataClass), nameOverrides)
+                    },
+                    add: { String sectionName, String mcid ->
+                        Section section = form.sections[sectionName]
+                        if (!section) {
+                            throw new IllegalArgumentException("No such section: $section!")
+                        }
+                        CatalogueElement dataElement = elementService.findByModelCatalogueId(DataElement, mcid)
+                        if (!dataElement) {
+                            throw new IllegalArgumentException("No data element found for id: $mcid!")
+                        }
+                        generateItems([new Relationship(destination: dataElement)], sectionName, sectionName, nameOverrides, section, itemNumber, null, null)
                     }
                 ).execute(customizer)
             } catch (Exception e) {
@@ -257,20 +268,25 @@ class ModelToFormExporterService {
     private void generateItems(MutableInt itemNumber, String prefix, ItemContainer container, Relationship relationship,
                                String aHeader, String aSubheader, Map<String, String> nameOverrides) {
         DataClass model = relationship.destination as DataClass
-        boolean first = true
 
         if(fromDestination(relationship, EXT_SECTION_EXCLUDE_DATA_ELEMENTS) == 'true') {
             log.info "Items for model $model are excluded from the processing"
             return
         }
 
-        for (Relationship rel in model.containsRelationships) {
+        generateItems(model.containsRelationships, prefix, model.name, nameOverrides, container, itemNumber, aHeader, aSubheader)
+    }
+
+    private void generateItems(List<Relationship> relationships, String prefix, String modelName, Map<String, String> nameOverrides, ItemContainer container, MutableInt itemNumber, String aHeader, String aSubheader) {
+        boolean first = true
+
+        for (Relationship rel in relationships) {
             DataElement dataElement = rel.destination as DataElement
             DataType dataType = dataElement.dataType
 
             log.info "Generating items from data element $dataElement"
 
-            if(fromDestination(rel, EXT_ITEM_EXCLUDE) == 'true') {
+            if (fromDestination(rel, EXT_ITEM_EXCLUDE) == 'true') {
                 log.info "Items for data element $dataElement are excluded from the processing"
                 continue
             }
@@ -282,7 +298,7 @@ class ModelToFormExporterService {
 
             // bit of heuristic
             String localName = fromDestination(rel, EXT_NAME_CAP, fromDestination(rel, EXT_NAME_LC, dataElement.name))
-            String itemName = fromDestination(rel, EXT_ITEM_NAME, alphaNumNoSpaces("${prefix ? (prefix + '_') : ''}${model.name}_${localName}"))
+            String itemName = fromDestination(rel, EXT_ITEM_NAME, alphaNumNoSpaces("${prefix ? (prefix + '_') : ''}${modelName}_${localName}"))
             itemName = nameOverrides[itemName] ?: itemName
             String normalizedResponseType = normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE))
             if (candidates.any { it.name.toLowerCase() == 'file' } || normalizedResponseType == RESPONSE_TYPE_FILE) {
