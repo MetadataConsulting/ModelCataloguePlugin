@@ -194,7 +194,7 @@ class ModelToFormExporterService {
                     return
                 }
 
-                handleGroupOrVirtualSection(itemNumber, processed, prefix, delegate, sectionModel.parentOfRelationships, true, nameOverrides)
+                handleGroupOrVirtualSection(itemNumber, processed, prefix + " " + sectionName, delegate, sectionModel.parentOfRelationships, true, nameOverrides)
             }
         }
     }
@@ -247,7 +247,7 @@ class ModelToFormExporterService {
                     generateItems(itemNumber, prefix, section, itemsWithHeaderOrGridRel, null, null, nameOverrides)
                 }
             }
-            handleGroupOrVirtualSection(itemNumber, processed, prefix, section, itemsWithHeaderOrGrid.parentOfRelationships, false, nameOverrides)
+            handleGroupOrVirtualSection(itemNumber, processed, prefix + " " + itemsWithHeaderOrGridName, section, itemsWithHeaderOrGrid.parentOfRelationships, false, nameOverrides)
         }
     }
 
