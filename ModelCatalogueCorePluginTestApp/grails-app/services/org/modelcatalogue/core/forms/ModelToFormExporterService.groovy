@@ -7,10 +7,12 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
+import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.util.Metadata
+import org.modelcatalogue.core.util.SecuredRuleExecutor
 import org.modelcatalogue.crf.model.CaseReportForm
 import org.modelcatalogue.crf.model.DataType as FormDataType
 import org.modelcatalogue.crf.model.GenericItem
@@ -32,6 +34,7 @@ class ModelToFormExporterService {
 
     static final String EXT_FORM_NAME = "http://forms.modelcatalogue.org/form#name"
     static final String EXT_FORM_FORM = "http://forms.modelcatalogue.org/form#form"
+    static final String EXT_FORM_CUSTOMIZER = "http://forms.modelcatalogue.org/form#customizer"
     static final String EXT_FORM_VERSION = "http://forms.modelcatalogue.org/form#version"
     static final String EXT_FORM_VERSION_DESCRIPTION = "http://forms.modelcatalogue.org/form#versionDescription"
     static final String EXT_FORM_REVISION_NOTES = "http://forms.modelcatalogue.org/form#revisionNotes"
@@ -40,6 +43,7 @@ class ModelToFormExporterService {
     static final String EXT_SECTION_EXCLUDE_DATA_ELEMENTS = "http://forms.modelcatalogue.org/section#excludeDataElements"
     static final String EXT_SECTION_MERGE = "http://forms.modelcatalogue.org/section#merge"
     static final String EXT_SECTION_TITLE = "http://forms.modelcatalogue.org/section#title"
+    static final String EXT_SECTION_LABEL = "http://forms.modelcatalogue.org/section#label"
     static final String EXT_SECTION_SUBTITLE = "http://forms.modelcatalogue.org/section#subtitle"
     static final String EXT_SECTION_INSTRUCTIONS = "http://forms.modelcatalogue.org/section#instructions"
     static final String EXT_SECTION_PAGE_NUMBER = "http://forms.modelcatalogue.org/section#pageNumber"
@@ -86,6 +90,8 @@ class ModelToFormExporterService {
     public static final ArrayList<String> DATA_TYPE_DATA_NAMES = ['date', 'xs:date']
     public static final ArrayList<String> DATA_TYPE_PDATE_NAMES = ['pdate', 'partialdate', 'xs:gYear', 'xs:gYearMonth']
 
+    ElementService elementService
+
     private static class ItemIndex {
         private int index = 0
     }
@@ -101,7 +107,7 @@ class ModelToFormExporterService {
 
 
         MutableInt itemNumber = new MutableInt(1)
-        CaseReportForm.build(formName) {
+        CaseReportForm form = CaseReportForm.build(formName) {
             def caseReportForm = delegate
             version formModel.ext[EXT_FORM_VERSION] ?: formModel.versionNumber.toString()
             versionDescription formModel.ext[EXT_FORM_VERSION_DESCRIPTION] ?: formModel.description ?: "Generated from ${alphaNumNoSpaces(formModel.name)}"
@@ -119,6 +125,42 @@ class ModelToFormExporterService {
                 handleSectionModel(itemNumber, [] as Set<Long>, '', caseReportForm, new Relationship(destination: formModel), nameOverrides, formModel.ext[EXT_FORM_FORM] != 'true')
             }
         }
+
+        String customizer = formModel.ext[EXT_FORM_CUSTOMIZER]
+
+        if (customizer) {
+            try {
+                new SecuredRuleExecutor(
+                    form: form,
+                    include: { String mcid ->
+                        CatalogueElement dataClass = elementService.findByModelCatalogueId(DataClass, mcid)
+                        if (!dataClass) {
+                            throw new IllegalArgumentException("No data class found for id: $mcid!")
+                        }
+                        handleSectionModel(itemNumber, processed, formName, form, new Relationship(destination: dataClass), nameOverrides)
+                    },
+                    add: { String sectionName, String mcid ->
+                        Section section = form.sections[sectionName]
+                        if (!section) {
+                            throw new IllegalArgumentException("No such section: $section!")
+                        }
+                        CatalogueElement dataElement = elementService.findByModelCatalogueId(DataElement, mcid)
+                        if (!dataElement) {
+                            throw new IllegalArgumentException("No data element found for id: $mcid!")
+                        }
+                        generateItems([new Relationship(destination: dataElement)], sectionName, sectionName, nameOverrides, section, itemNumber, null, null)
+                    }
+                ).execute(customizer)
+            } catch (Exception e) {
+                throw new IllegalArgumentException("There were problems with the form customization script!", e)
+            }
+        }
+
+        form.sections.each { String name, Section section ->
+            section.sortItemsByQuestionNumber()
+        }
+
+        return form
     }
 
     private void handleSectionModel(MutableInt itemNumber, Set<Long> processed, String prefix, CaseReportForm form, Relationship sectionRel, Map<String, String> nameOverrides, boolean dataElementsOnly = false) {
@@ -130,7 +172,8 @@ class ModelToFormExporterService {
 
         processed << sectionModel.getId()
 
-        String sectionName = fromDestination(sectionRel, EXT_NAME_CAP, fromDestination(sectionRel, EXT_NAME_LC, sectionModel.name))
+        String sectionModelName = fromDestination(sectionRel, EXT_NAME_CAP, fromDestination(sectionRel, EXT_NAME_LC, sectionModel.name))
+        String sectionName = fromDestination(sectionRel, EXT_SECTION_LABEL, alphaNumNoSpaces(sectionModelName))
         log.info "Creating section $sectionName for model $sectionModel"
 
         if(fromDestination(sectionRel, EXT_SECTION_EXCLUDE) == 'true') {
@@ -139,8 +182,8 @@ class ModelToFormExporterService {
         }
 
         if (dataElementsOnly && sectionModel.countContains() || !dataElementsOnly) {
-            form.section(alphaNumNoSpaces(sectionName)) {
-                title fromDestination(sectionRel, EXT_SECTION_TITLE, sectionName)
+            form.section(sectionName) {
+                title fromDestination(sectionRel, EXT_SECTION_TITLE, sectionModelName)
                 subtitle fromDestination(sectionRel, EXT_SECTION_SUBTITLE)
                 instructions fromDestination(sectionRel, EXT_SECTION_INSTRUCTIONS, sectionModel.description)
                 pageNumber fromDestination(sectionRel, EXT_SECTION_PAGE_NUMBER)
@@ -151,7 +194,7 @@ class ModelToFormExporterService {
                     return
                 }
 
-                handleGroupOrVirtualSection(itemNumber, processed, prefix, delegate, sectionModel.parentOfRelationships, true, nameOverrides)
+                handleGroupOrVirtualSection(itemNumber, processed, prefix + " " + sectionName, delegate, sectionModel.parentOfRelationships, true, nameOverrides)
             }
         }
     }
@@ -204,7 +247,7 @@ class ModelToFormExporterService {
                     generateItems(itemNumber, prefix, section, itemsWithHeaderOrGridRel, null, null, nameOverrides)
                 }
             }
-            handleGroupOrVirtualSection(itemNumber, processed, prefix, section, itemsWithHeaderOrGrid.parentOfRelationships, false, nameOverrides)
+            handleGroupOrVirtualSection(itemNumber, processed, prefix + " " + itemsWithHeaderOrGridName, section, itemsWithHeaderOrGrid.parentOfRelationships, false, nameOverrides)
         }
     }
 
@@ -225,20 +268,25 @@ class ModelToFormExporterService {
     private void generateItems(MutableInt itemNumber, String prefix, ItemContainer container, Relationship relationship,
                                String aHeader, String aSubheader, Map<String, String> nameOverrides) {
         DataClass model = relationship.destination as DataClass
-        boolean first = true
 
         if(fromDestination(relationship, EXT_SECTION_EXCLUDE_DATA_ELEMENTS) == 'true') {
             log.info "Items for model $model are excluded from the processing"
             return
         }
 
-        for (Relationship rel in model.containsRelationships) {
+        generateItems(model.containsRelationships, prefix, model.name, nameOverrides, container, itemNumber, aHeader, aSubheader)
+    }
+
+    private void generateItems(List<Relationship> relationships, String prefix, String modelName, Map<String, String> nameOverrides, ItemContainer container, MutableInt itemNumber, String aHeader, String aSubheader) {
+        boolean first = true
+
+        for (Relationship rel in relationships) {
             DataElement dataElement = rel.destination as DataElement
             DataType dataType = dataElement.dataType
 
             log.info "Generating items from data element $dataElement"
 
-            if(fromDestination(rel, EXT_ITEM_EXCLUDE) == 'true') {
+            if (fromDestination(rel, EXT_ITEM_EXCLUDE) == 'true') {
                 log.info "Items for data element $dataElement are excluded from the processing"
                 continue
             }
@@ -250,7 +298,7 @@ class ModelToFormExporterService {
 
             // bit of heuristic
             String localName = fromDestination(rel, EXT_NAME_CAP, fromDestination(rel, EXT_NAME_LC, dataElement.name))
-            String itemName = fromDestination(rel, EXT_ITEM_NAME, alphaNumNoSpaces("${prefix ? (prefix + '_') : ''}${model.name}_${localName}"))
+            String itemName = fromDestination(rel, EXT_ITEM_NAME, alphaNumNoSpaces("${prefix ? (prefix + '_') : ''}${modelName}_${localName}"))
             itemName = nameOverrides[itemName] ?: itemName
             String normalizedResponseType = normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE))
             if (candidates.any { it.name.toLowerCase() == 'file' } || normalizedResponseType == RESPONSE_TYPE_FILE) {

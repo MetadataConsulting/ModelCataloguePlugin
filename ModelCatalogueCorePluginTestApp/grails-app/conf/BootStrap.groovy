@@ -47,7 +47,7 @@ class BootStrap {
             null
         }
 
-        if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST]) {
+        if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST] && !System.getenv('MC_BLANK_DEV')) {
             TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
                 initCatalogueService.initCatalogue(true)
                 initDataModelPolicies()
@@ -60,7 +60,7 @@ class BootStrap {
         } else {
             initCatalogueService.initDefaultRelationshipTypes()
             initDataModelPolicies()
-            initSecurity(true)
+            initSecurity(!System.getenv('MC_BLANK_DEV'))
         }
 
         if (Environment.current == Environment.PRODUCTION) {

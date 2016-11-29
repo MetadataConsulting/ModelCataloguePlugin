@@ -46,6 +46,24 @@
       </p>
     </div>
     <div class="form-group">
+      <label for="section-label" class="control-label">Label</label>
+      <textarea maxlength="255" rows="2" class="form-control" id="section-label"
+                ng-model="object.access('http://forms.modelcatalogue.org/section#label')"
+                ng-model-options="{ getterSetter: true }"
+                ng-disabled="exclude.value"></textarea>
+      <p class="help-block">
+        Must be unique in the worksheet and contain no spaces.<br/>
+
+        The SECTION_LABEL is referenced in the Items Worksheet to associate items with the appropriate section of the CRF.
+        When the CRF is accessed for data entry, each section will be a page.  The items defined with the corresponding
+        SECTION_LABEL will be shown on that single page.<br/>
+
+        This field is not displayed as part of the CRF but can be seen on the CRF Metadata page.<br/>
+
+        This value will be used in the Items Worksheet to define where the items will appear during data entry.
+      </p>
+    </div>
+    <div class="form-group">
       <label for="section-title" class="control-label">Title</label>
     <textarea maxlength="2000" rows="5" class="form-control" id="section-title"
               ng-model="object.access('http://forms.modelcatalogue.org/section#title')"

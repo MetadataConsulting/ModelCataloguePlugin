@@ -11,7 +11,7 @@ class RelationshipMetadata implements Extension {
 
     static constraints = {
         name size: 1..255
-        extensionValue maxSize: 1000, nullable: true
+        extensionValue maxSize: 10000, nullable: true
     }
 
     @Override
