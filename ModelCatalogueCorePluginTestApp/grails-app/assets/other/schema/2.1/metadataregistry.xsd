@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema
-        xmlns:mdr="http://www.metadataregistry.org.uk/assets/schema/2.1/metadataregistry.xsd"
+        xmlns:mdr="http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry.xsd"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        targetNamespace="http://www.metadataregistry.org.uk/assets/schema/2.1/metadataregistry.xsd"
+        targetNamespace="http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry.xsd"
         elementFormDefault="qualified" version="1.0" xml:lang="EN">
 
     <xs:simpleType name="SemanticVersion">

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.1/metadataregistry.xsd">
+<?xml version="1.0" encoding="UTF-8"?><catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry.xsd">
     <dataModel name="Transportation" id="http://www.example.com/datasets/Transportation" status="DRAFT" semanticVersion="0.0.1">
         <policy>CD Policy</policy>
         <dataClass name="Engine" id="http://www.example.com/models/Engine" status="DRAFT">
