@@ -26,6 +26,9 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
     public static final String MODEL_TOM_NAME = 'Test Other Model'
     public static final String DATA_TYPE_TOM_ID = "http://example.com/tom/string"
     public static final String ELEMENT_MEF_2_NAME = 'Data Element from MEF 2'
+    public static final String DATA_MODEL_FOR_TAG_TESTING_NAME = 'Data Model for tag testing'
+    public static final String DATA_ELEMENT_FOR_TAG_TESTING_NAME = 'Data Element for tag testing'
+    public static final String TAG_FOR_TESTING_NAME = 'Tag 1'
     def dataModelService
     def elementService
 
@@ -1274,5 +1277,27 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
             mefDE2.dataType == tomDT
 
             tomDT.dataModel == tom
+    }
+
+
+    def "add tags to data element"() {
+        given:
+            build {
+                dataModel(name: DATA_MODEL_FOR_TAG_TESTING_NAME) {
+                    dataElement(name: DATA_ELEMENT_FOR_TAG_TESTING_NAME) {
+                        tag(name: TAG_FOR_TESTING_NAME)
+                    }
+                }
+            }
+        when:
+            DataModel dataModel = DataModel.findByName(DATA_MODEL_FOR_TAG_TESTING_NAME)
+            DataElement dataElement = DataElement.findByName(DATA_ELEMENT_FOR_TAG_TESTING_NAME)
+            Tag tag = Tag.findByName(TAG_FOR_TESTING_NAME)
+        then:
+            dataModel
+            dataElement
+            tag
+            tag in dataElement.isTaggedBy
+            dataElement in tag.tags
     }
 }

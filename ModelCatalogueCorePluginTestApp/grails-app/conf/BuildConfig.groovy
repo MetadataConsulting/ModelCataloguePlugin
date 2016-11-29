@@ -68,7 +68,7 @@ grails.project.dependency.resolution = {
         // compile 'io.reactivex:rxgroovy:1.0.3'
 
 
-        String mcToolkitVersion = '2.1.0.2'
+        String mcToolkitVersion = '2.2.0'
         compile "org.modelcatalogue:mc-core-api:$mcToolkitVersion"
         compile "org.modelcatalogue:mc-builder-api:$mcToolkitVersion"
         compile "org.modelcatalogue:mc-datatype-validation:$mcToolkitVersion"

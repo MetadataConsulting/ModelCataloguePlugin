@@ -214,6 +214,26 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
     }
 
     /**
+     * Creates new tag, reuses the latest draft or creates new draft unless the exactly same tag
+     * already exists in the catalogue. Accepts any bindable parameters which tag instances does.
+     *
+     * @param parameters map of parameters such as name or id
+     * @param c DSL definition closure
+     */
+    void tag(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
+        CatalogueElementProxy<Tag> tag = createProxy(Tag, parameters, null, isUnderControlIfSameClassification(parameters))
+
+        context.withNewContext tag, c
+
+
+        context.withContextElement(DataElement) { ignored, Closure relConf ->
+            rel 'tag' from tag, relConf
+        }
+
+        tag
+    }
+
+    /**
      * Creates new data type, reuses the latest draft or creates new draft unless the exactly same data type
      * already exists in the catalogue. Accepts any bindable parameters which DataType instances does.
      *
