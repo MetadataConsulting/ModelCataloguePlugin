@@ -135,7 +135,7 @@ class ModelCatalogueCorePluginUrlMappings {
                     "/api/modelCatalogue/core/$elementName/$id/validateXml"(controller: controllerName, action: 'validateXml', method: HttpMethod.POST)
                 }
 
-                if (controllerName in ['dataElement', 'primitiveType', 'referenceType', 'enumeratedType', 'validationRule', 'tag']) {
+                if (controllerName in ['dataElement', 'primitiveType', 'referenceType', 'enumeratedType', 'validationRule']) {
                     "/api/modelCatalogue/core/$elementName/$id/content"(controller: controllerName, action: 'content', method: HttpMethod.GET)
                 }
             }

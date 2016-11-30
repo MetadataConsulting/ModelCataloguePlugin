@@ -16,47 +16,4 @@ class TagController extends AbstractCatalogueElementController<Tag> {
         true
     }
 
-    def content(Integer max) {
-        handleParams(max)
-
-        params.sort = 'outgoingIndex'
-
-        Tag element = queryForResource(params.id)
-
-        if (!element) {
-            notFound()
-            return
-        }
-
-        DataModelFilter filter = overridableDataModelFilter
-
-        respond new Relationships(
-            owner: element,
-            direction: RelationshipDirection.OUTGOING,
-            list: Lists.fromCriteria(params, Relationship, "/${resourceName}/${params.id}/content") {
-                join 'destination'
-                eq 'source', element
-                eq 'relationshipType', RelationshipType.tagType
-
-                if (filter) {
-                    or {
-                        isNull 'dataModel'
-                        and {
-                            if (filter.excludes) {
-                                not {
-                                    'in' 'dataModel.id', filter.excludes
-                                }
-                            }
-                            if (filter.includes) {
-                                'in'  'dataModel.id', filter.includes
-                            }
-                        }
-                    }
-                }
-
-                sort('outgoingIndex')
-            }
-        )
-    }
-
 }
