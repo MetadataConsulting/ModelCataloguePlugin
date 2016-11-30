@@ -5,7 +5,7 @@ angular.module('mc.core.ui.states.mc.resource.list', ['mc.core.ui.states.control
     DEFAULT_ITEMS_PER_PAGE = 25
 
     $stateProvider.state 'mc.resource.list', {
-      url: '/all?page&order&sort&status&q&max&classification&display'
+      url: '/all?page&order&sort&status&q&max&classification&display&tag'
 
       views:
         "":
@@ -31,6 +31,7 @@ angular.module('mc.core.ui.states.mc.resource.list', ['mc.core.ui.states.control
           params.status = $stateParams.status
           params.max = $stateParams.max ? DEFAULT_ITEMS_PER_PAGE
           params.classification = $stateParams.classification ? undefined
+          params.tag = $stateParams.tag ? undefined
 
           if $stateParams.dataModelId and $stateParams.dataModelId != 'catalogue'
             params.dataModel = $stateParams.dataModelId

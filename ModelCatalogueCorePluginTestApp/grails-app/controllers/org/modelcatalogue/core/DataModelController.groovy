@@ -106,7 +106,7 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
             List<Map> contentDescriptors = []
 
             contentDescriptors << createContentDescriptor(dataModel, 'Data Classes', DataClass, dataClasses.total)
-            contentDescriptors << createContentDescriptor(dataModel, 'Data Elements', DataElement, stats["totalDataElementCount"])
+            contentDescriptors << createDataElementsByTagDescriptor(dataModel)
             contentDescriptors << createContentDescriptor(dataModel, 'Data Types', DataType, stats["totalDataTypeCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Measurement Units', MeasurementUnit, stats["totalMeasurementUnitCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Validation Rules', ValidationRule, stats["totalValidationRuleCount"])
@@ -143,6 +143,19 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
         respond dataModelService.findDependents(dataModel)
     }
 
+    private static Map createDataElementsByTagDescriptor(DataModel dataModel) {
+        String link = "/tag/forDataModel/${dataModel.getId()}?status=${dataModel.status != ElementStatus.DEPRECATED ? 'active' : ''}"
+        Map ret = [:]
+        ret.id = 'forDataModel'
+        ret.dataModels = [CatalogueElementMarshaller.minimalCatalogueElementJSON(dataModel)]
+        ret.elementType = DataElement.name
+        ret.name = 'Data Elements'
+        ret.content = [count: DataModelService.allTags(dataModel).size() + 1, itemType: Tag.name, link: link]
+        ret.link = link
+        ret.resource = GrailsNameUtils.getPropertyName(Tag)
+        ret.status = dataModel.status.toString()
+        ret
+    }
 
     private static Map createContentDescriptor(DataModel dataModel, String name, Class clazz, long count) {
         String link = "/${GrailsNameUtils.getPropertyName(clazz)}?toplevel=true&dataModel=${dataModel.getId()}&status=${dataModel.status != ElementStatus.DEPRECATED ? 'active' : ''}"

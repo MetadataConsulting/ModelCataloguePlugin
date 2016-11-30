@@ -1299,5 +1299,6 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
             tag
             tag in dataElement.isTaggedBy
             dataElement in tag.tags
+            tag in DataModelService.allTags(dataModel)
     }
 }

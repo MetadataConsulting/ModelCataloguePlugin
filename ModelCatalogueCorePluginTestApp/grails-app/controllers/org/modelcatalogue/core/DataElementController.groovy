@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 
@@ -37,6 +36,15 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
     protected Closure buildAdditionalIndexCriteria() {
         if (!hasAdditionalIndexCriteria()) {
             return super.buildAdditionalIndexCriteria()
+        }
+
+        if (params.tag in ['none', 'null', 'undefined']) {
+            // TODO: this is far to be optimal solution
+            return {
+                not {
+                  inList 'id', Relationship.where { relationshipType == RelationshipType.tagType }.distinct('destination').list()*.id
+                }
+            }
         }
 
         Long tagID = params.long('tag')

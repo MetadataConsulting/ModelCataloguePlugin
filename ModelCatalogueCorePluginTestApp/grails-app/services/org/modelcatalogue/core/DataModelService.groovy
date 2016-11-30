@@ -13,6 +13,7 @@ import org.modelcatalogue.core.util.lists.DetachedListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.ListWithTotalAndTypeWrapper
 import org.modelcatalogue.core.util.lists.ListWrapper
+import org.modelcatalogue.core.util.lists.Lists
 
 import javax.annotation.PostConstruct
 
@@ -179,5 +180,9 @@ class DataModelService {
         }
 
         dependents
+    }
+
+    static List<Tag> allTags(DataModel dataModel) {
+        Relationship.where { relationshipType == RelationshipType.tagType && destination.dataModel == dataModel }.distinct('source').list().sort { a, b -> a.name <=> b.name }
     }
 }
