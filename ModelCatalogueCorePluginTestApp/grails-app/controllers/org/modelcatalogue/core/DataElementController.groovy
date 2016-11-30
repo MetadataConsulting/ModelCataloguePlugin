@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 
@@ -27,5 +28,30 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
         respond Lists.wrap(params, "/${resourceName}/${params.id}/content", list)
     }
 
+    @Override
+    protected boolean hasAdditionalIndexCriteria() {
+        return params.containsKey('tag')
+    }
 
+    @Override
+    protected Closure buildAdditionalIndexCriteria() {
+        if (!hasAdditionalIndexCriteria()) {
+            return super.buildAdditionalIndexCriteria()
+        }
+
+        Long tagID = params.long('tag')
+
+        Tag tag = Tag.get(tagID)
+
+        if (!tag) {
+            return super.buildAdditionalIndexCriteria()
+        }
+
+        return {
+            incomingRelationships {
+                eq 'source', tag
+                eq 'relationshipType', RelationshipType.tagType
+            }
+        }
+    }
 }
