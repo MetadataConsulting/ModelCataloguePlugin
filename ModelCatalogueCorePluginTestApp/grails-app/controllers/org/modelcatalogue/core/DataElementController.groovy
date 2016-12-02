@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 
@@ -61,5 +62,13 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
                 eq 'relationshipType', RelationshipType.tagType
             }
         }
+    }
+
+    @Override
+    protected DataModelFilter getOverridableDataModelFilter() {
+        if (params.deep) {
+            return super.getOverridableDataModelFilter().withImports()
+        }
+        return super.getOverridableDataModelFilter()
     }
 }

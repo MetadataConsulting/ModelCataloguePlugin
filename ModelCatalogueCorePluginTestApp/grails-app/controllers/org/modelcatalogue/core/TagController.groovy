@@ -40,7 +40,7 @@ class TagController extends AbstractCatalogueElementController<Tag> {
             DataModel model = DataModel.get(dataModelId)
             List<Tag> tags = DataModelService.allTags(model)
 
-            List<Map<String, Object>> ret = [createUntaggedDescriptor(model)]
+            List<Map<String, Object>> ret = [createAllDataElementsDescriptor(model), createUntaggedDescriptor(model)]
 
             for (tag in tags) {
                 ret << createTagContentDescriptor(tag, model)
@@ -53,7 +53,7 @@ class TagController extends AbstractCatalogueElementController<Tag> {
     private static Map<String, Object> createUntaggedDescriptor(DataModel dataModel) {
         String link = "/dataElement?tag=none&dataModel=${dataModel.getId()}&status=${dataModel.status != ElementStatus.DEPRECATED ? 'active' : ''}"
         Map<String, Object> ret = [:]
-        ret.id = 'all'
+        ret.id = 'notags'
         ret.dataModels = [CatalogueElementMarshaller.minimalCatalogueElementJSON(dataModel)]
         ret.elementType = Tag.name
         ret.name = 'No tags'
@@ -65,10 +65,25 @@ class TagController extends AbstractCatalogueElementController<Tag> {
         ret
     }
 
+    private static Map<String, Object> createAllDataElementsDescriptor(DataModel dataModel) {
+        String link = "/dataElement?deep=true&dataModel=${dataModel.getId()}&status=${dataModel.status != ElementStatus.DEPRECATED ? 'active' : ''}"
+        Map<String, Object> ret = [:]
+        ret.id = 'all'
+        ret.dataModels = [CatalogueElementMarshaller.minimalCatalogueElementJSON(dataModel)]
+        ret.elementType = Tag.name
+        ret.name = 'All (including imports)'
+        ret.content = [count: Integer.MAX_VALUE, itemType: DataElement.name, link: link]
+        ret.link = link
+        ret.resource = GrailsNameUtils.getPropertyName(Tag)
+        ret.status = dataModel.status.toString()
+        ret.tagId = 'all'
+        ret
+    }
+
     private static Map<String, Object> createTagContentDescriptor(CatalogueElement tag, DataModel dataModel) {
         String link = "/dataElement?tag=${tag.getId()}&dataModel=${dataModel.getId()}&status=${dataModel.status != ElementStatus.DEPRECATED ? 'active' : ''}"
         Map<String, Object> ret = [:]
-        ret.id = 'all'
+        ret.id = 'tag-' + tag.id
         ret.dataModels = [CatalogueElementMarshaller.minimalCatalogueElementJSON(dataModel)]
         ret.elementType = Tag.name
         ret.name = tag?.name ?: 'No Tag'

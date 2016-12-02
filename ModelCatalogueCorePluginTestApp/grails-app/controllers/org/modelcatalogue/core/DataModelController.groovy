@@ -150,7 +150,7 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
         ret.dataModels = [CatalogueElementMarshaller.minimalCatalogueElementJSON(dataModel)]
         ret.elementType = DataElement.name
         ret.name = 'Data Elements'
-        ret.content = [count: DataModelService.allTags(dataModel).size() + 1, itemType: Tag.name, link: link]
+        ret.content = [count: DataModelService.allTags(dataModel).size() + 2, itemType: Tag.name, link: link]
         ret.link = link
         ret.resource = GrailsNameUtils.getPropertyName(Tag)
         ret.status = dataModel.status.toString()
