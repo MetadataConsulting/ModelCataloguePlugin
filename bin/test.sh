@@ -8,6 +8,7 @@ export ES_VERSION=2.3.5
 if [[ "$TRAVIS" != "" ]] ; then
     if [ "$TEST_SUITE" = "functional" ] || [ "$TEST_SUITE" = "" ] ; then
         echo "preparing metadata database"
+        mysql -u root -e "set password for 'root'@'localhost' = password('')"
         mysql -u root -e "create database metadata;grant all privileges on metadata.* to 'root'@'localhost'"
         echo "running elasticsearch"
         wget -qO- "http://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/$ES_VERSION/elasticsearch-$ES_VERSION.tar.gz" | tar xvz
