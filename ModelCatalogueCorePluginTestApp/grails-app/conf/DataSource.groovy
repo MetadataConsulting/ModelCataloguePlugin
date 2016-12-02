@@ -25,6 +25,7 @@ environments {
                 dialect='org.hibernate.dialect.MySQL5InnoDBDialect'
                 url = "jdbc:mysql://localhost:3306/metadata?autoReconnect=true&useUnicode=yes"
                 username = 'root'
+                password = 'password'
                 dbCreate = "update"
                 properties {
                     maxActive = -1
