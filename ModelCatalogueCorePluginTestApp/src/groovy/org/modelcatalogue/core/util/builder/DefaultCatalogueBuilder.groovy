@@ -323,7 +323,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      */
     void basedOn(String classification, String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         context.withContextElement(CatalogueElement) {
-            rel "base" from ModelCatalogueTypes.getType(it.domain) called classification, name, extensions
+            rel "base" to ModelCatalogueTypes.getType(it.domain) called classification, name, extensions
         }
     }
 
@@ -340,7 +340,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      */
     void basedOn(String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         context.withContextElement(CatalogueElement) {
-            rel "base" from ModelCatalogueTypes.getType(it.domain) called name, extensions
+            rel "base" to ModelCatalogueTypes.getType(it.domain) called name, extensions
         }
     }
 
@@ -355,7 +355,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @see #globalSearchFor(BuilderKeyword)
      */
     void basedOn(ApiCatalogueElement element, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
-        rel "base" from element, extensions
+        rel "base" to element, extensions
     }
 
     /**
