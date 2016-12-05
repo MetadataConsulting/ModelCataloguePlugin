@@ -6,6 +6,7 @@ import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
+import spock.lang.Requires
 
 class PathFinderSpec extends AbstractIntegrationSpec {
 
@@ -18,6 +19,7 @@ class PathFinderSpec extends AbstractIntegrationSpec {
 
     }
 
+    @Requires({ !System.getenv('TRAVIS') })
     def "find the path for particular data type"() {
         DataElement dataElement = DataElement.findByName('C4CTDE Model 2 Child Model 2 Data Element 2')
         DataModel dataModel = DataModel.findByName(COMPLEX_MODEL_NAME)

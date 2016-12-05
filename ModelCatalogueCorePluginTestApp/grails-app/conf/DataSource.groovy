@@ -24,7 +24,8 @@ environments {
                 driverClassName = "com.mysql.jdbc.Driver"
                 dialect='org.hibernate.dialect.MySQL5InnoDBDialect'
                 url = "jdbc:mysql://localhost:3306/metadata?autoReconnect=true&useUnicode=yes"
-                username = 'root'
+                username = 'metadata'
+                password = 'metadata'
                 dbCreate = "update"
                 properties {
                     maxActive = -1
