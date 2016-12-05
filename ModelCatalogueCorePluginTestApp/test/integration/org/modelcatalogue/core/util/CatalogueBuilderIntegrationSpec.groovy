@@ -579,8 +579,8 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         vd4 in wd40.relatedTo
         wd40 in vd4.relatedTo
 
-        vd4 in wd40.isBasedOn
-        wd40 in vd4.isBaseFor
+        vd4 in wd40.isBaseFor
+        wd40 in vd4.isBasedOn
     }
 
     def "creates new version of the element"() {

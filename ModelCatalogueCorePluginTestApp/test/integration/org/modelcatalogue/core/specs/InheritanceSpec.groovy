@@ -2,6 +2,7 @@ package org.modelcatalogue.core.specs
 
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
@@ -14,9 +15,10 @@ import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Inheritance
+import org.modelcatalogue.core.util.test.TestDataHelper
 import spock.lang.Ignore
 
-class InheritanceSpec extends IntegrationSpec  {
+class InheritanceSpec extends AbstractIntegrationSpec  {
 
     public static final String DUMMY_DATA_CLASS_NAME = 'Dummy'
     public static final String TEST_PARENT_DATA_CLASS_NAME = 'Test Parent Class'
@@ -71,41 +73,43 @@ class InheritanceSpec extends IntegrationSpec  {
     Relationship baseEnum
 
     def setup() {
-        initCatalogueService.initDefaultRelationshipTypes()
-        catalogueBuilder.build {
-            skip draft
-            dataModel name: TEST_DATA_MODEL_1_NAME, {
-                dataClass name: DUMMY_DATA_CLASS_NAME
-                dataClass name: TEST_PARENT_DATA_CLASS_NAME, {
-                    dataElement name: TEST_DATA_ELEMENT_1_NAME
-                    dataElement name: TEST_DATA_ELEMENT_2_NAME
-                    dataElement name: TEST_DATA_ELEMENT_3_NAME
-                    ext METADATA_KEY_1, METADATA_VALUE_1
-                    ext METADATA_KEY_2, METADATA_VALUE_2
-                    ext METADATA_KEY_3, METADATA_VALUE_3
-                    rel 'synonym' to dataClass called DUMMY_DATA_CLASS_NAME
-                }
-                dataElement name: TEST_PARENT_VALUE_DOMAIN_NAME, {
-                    dataType name: TEST_DATA_TYPE_1_NAME
-                }
-                dataElement name: TEST_CHILD_VALUE_DOMAIN_NAME
-                dataType name: TEST_DATA_TYPE_2_NAME
-                dataType name: TEST_ENUM_TYPE_1_NAME, enumerations: [
+        TestDataHelper.initFreshDb(sessionFactory, 'inheritanceSpec.sql') {
+            initRelationshipTypes()
+            catalogueBuilder.build {
+                skip draft
+                dataModel name: TEST_DATA_MODEL_1_NAME, {
+                    dataClass name: DUMMY_DATA_CLASS_NAME
+                    dataClass name: TEST_PARENT_DATA_CLASS_NAME, {
+                        dataElement name: TEST_DATA_ELEMENT_1_NAME
+                        dataElement name: TEST_DATA_ELEMENT_2_NAME
+                        dataElement name: TEST_DATA_ELEMENT_3_NAME
+                        ext METADATA_KEY_1, METADATA_VALUE_1
+                        ext METADATA_KEY_2, METADATA_VALUE_2
+                        ext METADATA_KEY_3, METADATA_VALUE_3
+                        rel 'synonym' to dataClass called DUMMY_DATA_CLASS_NAME
+                    }
+                    dataElement name: TEST_PARENT_VALUE_DOMAIN_NAME, {
+                        dataType name: TEST_DATA_TYPE_1_NAME
+                    }
+                    dataElement name: TEST_CHILD_VALUE_DOMAIN_NAME
+                    dataType name: TEST_DATA_TYPE_2_NAME
+                    dataType name: TEST_ENUM_TYPE_1_NAME, enumerations: [
                         'one': '1',
                         'two': '2',
                         'three': '3',
                         'four': '4',
                         'five': '5'
-                ]
+                    ]
 
-                dataType name: TEST_ENUM_TYPE_2_NAME, enumerations: [:]
-                dataType name: TEST_ENUM_TYPE_3_NAME, enumerations: [:]
-            }
+                    dataType name: TEST_ENUM_TYPE_2_NAME, enumerations: [:]
+                    dataType name: TEST_ENUM_TYPE_3_NAME, enumerations: [:]
+                }
 
-            dataModel name: TEST_DATA_MODEL_2_NAME, {
-                dataClass name: TEST_CHILD_DATA_CLASS_NAME, {
-                    dataElement name: TEST_DATA_ELEMENT_4_NAME
-                    ext METADATA_KEY_4, METADATA_VALUE_4
+                dataModel name: TEST_DATA_MODEL_2_NAME, {
+                    dataClass name: TEST_CHILD_DATA_CLASS_NAME, {
+                        dataElement name: TEST_DATA_ELEMENT_4_NAME
+                        ext METADATA_KEY_4, METADATA_VALUE_4
+                    }
                 }
             }
         }
@@ -128,7 +132,7 @@ class InheritanceSpec extends IntegrationSpec  {
         enumeratedType3 = EnumeratedType.findByName(TEST_ENUM_TYPE_3_NAME)
 
         assertNothingInherited()
-    }
+        }
 
     def "with children works"(){
         addBasedOn()
@@ -244,12 +248,12 @@ class InheritanceSpec extends IntegrationSpec  {
     def "Inherit relationships"() {
         addBasedOn()
         expect: "version specific relationships are inherited"
-        parentClass.countContains() == 3
-        childClass.countContains() == 4
+        parentClass.contains.size() == 3
+        childClass.contains.size() == 4
 
         and: "semantic links aren't"
-        parentClass.countIsSynonymFor() == 1
-        childClass.countIsSynonymFor() == 0
+        parentClass.isSynonymFor.size() == 1
+        childClass.isSynonymFor.size() == 0
 
         when: "we remove relationships from parent"
         parentClass.removeFromContains dataElement1
@@ -612,14 +616,16 @@ class InheritanceSpec extends IntegrationSpec  {
 
         then:
         inherited
-        inherited.dataType
-        inherited.description == firstInheritedDescription
-        inherited.dataType.name == firstInheritedTypeName
-
         inheriting
+
+        inherited.dataType
         inheriting.dataType
-        inheriting.description == firstInheritedDescription
+
+        inherited.dataType.name == firstInheritedTypeName
         inheriting.dataType.name == firstInheritedTypeName
+
+        inherited.description == firstInheritedDescription
+        inheriting.description == firstInheritedDescription
 
         when:
         inherited.description = secondInheritedDescription
