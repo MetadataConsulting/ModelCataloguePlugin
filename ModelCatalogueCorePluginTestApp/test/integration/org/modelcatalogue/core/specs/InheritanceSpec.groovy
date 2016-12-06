@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.specs
 
-import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.CatalogueElement
@@ -20,35 +19,34 @@ import spock.lang.Ignore
 
 class InheritanceSpec extends AbstractIntegrationSpec  {
 
-    public static final String DUMMY_DATA_CLASS_NAME = 'Dummy'
-    public static final String TEST_PARENT_DATA_CLASS_NAME = 'Test Parent Class'
-    public static final String TEST_DATA_ELEMENT_1_NAME = 'Test Data Element 1'
-    public static final String TEST_DATA_ELEMENT_2_NAME = 'Test Data Element 2'
-    public static final String TEST_DATA_ELEMENT_3_NAME = 'Test Data Element 3'
-    public static final String TEST_DATA_ELEMENT_4_NAME = 'Test Data Element 4'
-    public static final String METADATA_KEY_1 = 'one'
-    public static final String METADATA_KEY_2 = 'two'
-    public static final String METADATA_KEY_3 = 'three'
-    public static final String METADATA_KEY_4 = 'four'
-    public static final String METADATA_KEY_5 = 'five'
-    public static final String METADATA_VALUE_1 = '1'
-    public static final String METADATA_VALUE_2 = '2'
-    public static final String METADATA_VALUE_3 = '3'
-    public static final String METADATA_VALUE_4 = '4'
-    public static final String METADATA_VALUE_5 = '5'
-    public static final String METADATA_VALUE_5_ALT = 'V'
-    public static final String TEST_CHILD_DATA_CLASS_NAME = 'Test Child Class'
-    public static final String TEST_PARENT_VALUE_DOMAIN_NAME = 'Test Parent Value Domain'
-    public static final String TEST_CHILD_VALUE_DOMAIN_NAME = 'Test Child Value Domain'
-    public static final String TEST_DATA_TYPE_1_NAME = 'Test Data Type 1'
-    public static final String TEST_DATA_TYPE_2_NAME = 'Test Data Type 2'
-    public static final String TEST_ENUM_TYPE_1_NAME = 'Test Enum Type 1'
-    public static final String TEST_ENUM_TYPE_2_NAME = 'Test Enum Type 2'
-    public static final String TEST_ENUM_TYPE_3_NAME = 'Test Enum Type 3'
-    public static final String TEST_DATA_MODEL_1_NAME = 'Test Data Model 1'
-    public static final String TEST_DATA_MODEL_2_NAME = 'Test Data Model 2'
+    public static final String DUMMY_DATA_CLASS_NAME = 'IS Dummy'
+    public static final String TEST_PARENT_DATA_CLASS_NAME = 'IS Test Parent Class'
+    public static final String TEST_DATA_ELEMENT_1_NAME = 'IS Test Data Element 1'
+    public static final String TEST_DATA_ELEMENT_2_NAME = 'IS Test Data Element 2'
+    public static final String TEST_DATA_ELEMENT_3_NAME = 'IS Test Data Element 3'
+    public static final String TEST_DATA_ELEMENT_4_NAME = 'IS Test Data Element 4'
+    public static final String METADATA_KEY_1 = 'IS one'
+    public static final String METADATA_KEY_2 = 'IS two'
+    public static final String METADATA_KEY_3 = 'IS three'
+    public static final String METADATA_KEY_4 = 'IS four'
+    public static final String METADATA_KEY_5 = 'IS five'
+    public static final String METADATA_VALUE_1 = 'IS 1'
+    public static final String METADATA_VALUE_2 = 'IS 2'
+    public static final String METADATA_VALUE_3 = 'IS 3'
+    public static final String METADATA_VALUE_4 = 'IS 4'
+    public static final String METADATA_VALUE_5 = 'IS 5'
+    public static final String METADATA_VALUE_5_ALT = 'IS V'
+    public static final String TEST_CHILD_DATA_CLASS_NAME = 'IS Test Child Class'
+    public static final String TEST_PARENT_VALUE_DOMAIN_NAME = 'IS Test Parent Value Domain'
+    public static final String TEST_CHILD_VALUE_DOMAIN_NAME = 'IS Test Child Value Domain'
+    public static final String TEST_DATA_TYPE_1_NAME = 'IS Test Data Type 1'
+    public static final String TEST_DATA_TYPE_2_NAME = 'IS Test Data Type 2'
+    public static final String TEST_ENUM_TYPE_1_NAME = 'IS Test Enum Type 1'
+    public static final String TEST_ENUM_TYPE_2_NAME = 'IS Test Enum Type 2'
+    public static final String TEST_ENUM_TYPE_3_NAME = 'IS Test Enum Type 3'
+    public static final String TEST_DATA_MODEL_1_NAME = 'IS Test Data Model 1'
+    public static final String TEST_DATA_MODEL_2_NAME = 'IS Test Data Model 2'
 
-    InitCatalogueService initCatalogueService
     ElementService elementService
     CatalogueBuilder catalogueBuilder
 
@@ -70,7 +68,6 @@ class InheritanceSpec extends AbstractIntegrationSpec  {
     DataModel dataModel2
     Relationship baseClass
     Relationship baseElement
-    Relationship baseEnum
 
     def setup() {
         TestDataHelper.initFreshDb(sessionFactory, 'inheritanceSpec.sql') {
@@ -132,7 +129,7 @@ class InheritanceSpec extends AbstractIntegrationSpec  {
         enumeratedType3 = EnumeratedType.findByName(TEST_ENUM_TYPE_3_NAME)
 
         assertNothingInherited()
-        }
+    }
 
     def "with children works"(){
         addBasedOn()
@@ -463,12 +460,12 @@ class InheritanceSpec extends AbstractIntegrationSpec  {
 
     private void assertNothingInherited() {
         assert parentClass
-        assert parentClass.countIsSynonymFor() == 1
-        assert parentClass.countContains() == 3
+        assert parentClass.isSynonymFor.size() == 1
+        assert parentClass.contains.size() == 3
         assert parentClass.ext.size() == 3
 
         assert childClass
-        assert childClass.countContains() == 1
+        assert childClass.contains.size() == 1
         assert childClass.extensions.size() == 1
 
         assert dummyClass
