@@ -211,7 +211,7 @@ class RelationshipService {
 
     private void handleInheritance(RelationshipDefinition relationshipDefinition, Relationship relationshipInstance) {
         for (Relationship relationship in new LinkedHashSet<Relationship>(relationshipDefinition.destination.outgoingRelationships)) {
-            if (relationship.relationshipType.versionSpecific) {
+            if (relationship.relationshipType.versionSpecific && RelationshipType.baseType != relationship.relationshipType) {
                 RelationshipDefinition newDefinition = RelationshipDefinition.from(relationship)
                 newDefinition.source = relationshipDefinition.source
                 newDefinition.inherited = true
