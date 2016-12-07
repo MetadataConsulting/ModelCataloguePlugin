@@ -22,7 +22,7 @@ echo "executing npm install in folders where package.json is exists"
 
 echo "executing npm install in folders where bower.json is exists"
 
-./where bower.json run bower install
+./where bower.json run node_modules/bower/bin/bower install
 
 # there is a failing java file which grails tries to compile
 rm -rf ModelCatalogueCorePluginTestApp/grails-app/assets/bower_components/ace-builds/demo
