@@ -624,11 +624,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 }
             } catch (e) {
                 log.error "Exception creating draft in the background", e
-                CatalogueElement element = resource.get(id)
-                element.status = ElementStatus.DRAFT
-                element.save(flush: true)
             }
-
         }
 
         respond instance, [status: OK]
