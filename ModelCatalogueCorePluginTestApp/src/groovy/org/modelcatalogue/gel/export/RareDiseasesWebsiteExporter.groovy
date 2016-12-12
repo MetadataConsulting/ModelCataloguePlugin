@@ -108,9 +108,6 @@ class RareDiseasesWebsiteExporter {
     }
 
     static String getId(CatalogueElement disease) {
-        if (disease.hasModelCatalogueId() && !disease.getModelCatalogueId().startsWith('http')) {
-            return disease.getModelCatalogueId()
-        }
         return "${disease.latestVersionId ?: disease.id}.${disease.versionNumber}"
     }
 
