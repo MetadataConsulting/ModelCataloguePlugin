@@ -7,6 +7,7 @@ import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.util.Metadata
 import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.modelcatalogue.gel.GenomicsService
 
@@ -48,6 +49,10 @@ class RareDiseasesWebsiteExporter {
                 writeIndexFile(it, diseases)
 
                 diseases.eachWithIndex { DataClass disease, Integer index ->
+                    if (disease.ext[Metadata.WEBSITE_SKIP] == 'true') {
+                        monitor.onNext("Skipping $disease.name as it has ${Metadata.WEBSITE_SKIP} flag set")
+                        return
+                    }
                     monitor.onNext("Writing page detail file for ${disease.name} (${index + 1} of $size)")
                     writeDetailPage(it, disease)
                 }

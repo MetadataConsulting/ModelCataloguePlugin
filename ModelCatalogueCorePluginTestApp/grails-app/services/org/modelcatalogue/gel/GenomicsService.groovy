@@ -12,15 +12,6 @@ import org.modelcatalogue.core.publishing.changelog.ChangeLogDocxGenerator
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
-import CancerTypesCsvExporter
-import CancerTypesJsonExporter
-import DataModelChangeLogXlsExporter
-import RareDiseaseDisorderListCsvExporter
-import RareDiseaseEligibilityChangeLogXlsExporter
-import RareDiseasePhenotypeChangeLogXlsExporter
-import RareDiseasesDocExporter
-import RareDiseasesJsonExporter
-import RareDiseasesWebsiteExporter
 import org.modelcatalogue.gel.export.CancerTypesCsvExporter
 import org.modelcatalogue.gel.export.CancerTypesJsonExporter
 import org.modelcatalogue.gel.export.DataModelChangeLogXlsExporter
@@ -30,8 +21,6 @@ import org.modelcatalogue.gel.export.RareDiseasePhenotypeChangeLogXlsExporter
 import org.modelcatalogue.gel.export.RareDiseasesDocExporter
 import org.modelcatalogue.gel.export.RareDiseasesJsonExporter
 import org.modelcatalogue.gel.export.RareDiseasesWebsiteExporter
-
-import static RareDiseasesDocExporter.getStandardTemplate
 
 @Transactional
 class GenomicsService {
@@ -226,9 +215,9 @@ class GenomicsService {
                 eq('relationshipType', RelationshipType.hierarchyType)
                 destination {
                     or {
-                        ilike('name', '%Eligibility%')
-                        ilike('name', '%Phenotypes%')
-                        ilike('name', '%Clinical Tests%')
+                        ilike('name', '% Eligibility')
+                        ilike('name', '% Phenotypes')
+                        ilike('name', '% Clinical Tests')
                     }
                 }
             }
