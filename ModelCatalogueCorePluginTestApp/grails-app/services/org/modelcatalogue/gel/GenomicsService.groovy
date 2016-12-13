@@ -6,6 +6,7 @@ import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.PerformanceUtilService
 import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
 import org.modelcatalogue.core.publishing.changelog.ChangeLogDocxGenerator
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
@@ -220,6 +221,7 @@ class GenomicsService {
     ListWithTotalAndType<DataClass> findRareDiseases(Map<String, Object> params = [:], DataModel dataModel) {
         Lists.fromCriteria(params, DataClass) {
             eq('dataModel', dataModel)
+            ne('status', ElementStatus.DEPRECATED)
             outgoingRelationships {
                 eq('relationshipType', RelationshipType.hierarchyType)
                 destination {
