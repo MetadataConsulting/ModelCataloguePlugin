@@ -296,6 +296,9 @@ class BootStrap {
             creates link
             title { "Rare Diseases Static Website" }
             type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get('Rare Disease Report Available') == 'true' || dataModel.ext.get("All Rare Disease Conditions Reports") == 'true' || dataModel.ext.get(Metadata.ALL_RD_REPORTS) == 'true' || dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
             link controller: 'genomics', action: 'exportRareDiseasesWebsite', id: true
         }
     }
