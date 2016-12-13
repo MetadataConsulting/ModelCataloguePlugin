@@ -26,9 +26,9 @@
   <tbody>
   <g:each in="${diseases}" var="disease">
     <tr style="border-bottom:1px solid #aaaaaa;">
-      <td>${disease.latestVersionId ?: disease.id}</td>
+      <td>${disease.hasModelCatalogueId() && !disease.getModelCatalogueId().startsWith('http') ?  disease.getModelCatalogueId() : disease.latestVersionId ?: disease.id}</td>
       <td>${disease.name}</td>
-      <td><a href="${"${disease.latestVersionId ?: disease.id}.${disease.versionNumber}"}.html">details &#187;</a></td>
+      <td><a href="${disease.hasModelCatalogueId() && !disease.getModelCatalogueId().startsWith('http') ?  disease.getModelCatalogueId() : disease.latestVersionId ?: disease.id}.${disease.versionNumber}.html">details &#187;</a></td>
     </tr>
     </tbody>
   </g:each>
