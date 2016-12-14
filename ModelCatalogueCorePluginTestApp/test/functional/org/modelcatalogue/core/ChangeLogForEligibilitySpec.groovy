@@ -21,10 +21,10 @@ class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
             waitFor(120) { browser.title == 'Data Models' }
 
         when:
-            select 'Rare Disease Conditions' open 'Data Classes' select 'Rare Disease Conditions and Phenotypes'
+            select 'Rare Disease Conditions'
 
         then:
-            check Common.rightSideTitle contains 'Rare Disease Conditions and Phenotypes'
+            check Common.rightSideTitle contains 'Rare Disease Conditions'
     }
 
     def "download the change log as MS Excel spreadsheet"() {
