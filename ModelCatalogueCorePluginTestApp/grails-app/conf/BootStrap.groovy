@@ -159,7 +159,10 @@ class BootStrap {
             defaultName { "${it.name} changelog as MS Word Document" }
             depth 3
             includeMetadata true
-            type DataClass
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
             link controller: 'genomics', action: 'exportChangeLogDocument', id: true
         }
 
@@ -175,21 +178,30 @@ class BootStrap {
         reportsRegistry.register {
             creates link
             title { "Rare Diseases Disorder List (CSV)" }
-            type DataClass
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
             link controller: 'genomics', action: 'exportRareDiseaseDisorderListAsCsv', id: true
         }
 
         reportsRegistry.register {
             creates link
             title { "Rare Diseases Eligibility Criteria Report (Word Doc)" }
-            type DataClass
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
             link controller: 'genomics', action: 'exportRareDiseaseEligibilityDoc', id: true
         }
 
         reportsRegistry.register {
             creates link
             title { "Rare Diseases Phenotypes and Clinical Tests Report (Word Doc)" }
-            type DataClass
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
             link controller: 'genomics', action: 'exportRareDiseasePhenotypesAndClinicalTestsDoc', id: true
         }
 
@@ -197,9 +209,9 @@ class BootStrap {
             creates link
             title { "Rare Diseases HPO And Clinical Tests (JSON)" }
             defaultName { "${it.name} report as Json" }
-            type DataClass
-            when { DataClass dataClass ->
-                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
             }
             link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsJson', id: true
         }
@@ -208,9 +220,9 @@ class BootStrap {
             creates link
             title { "Rare Diseases Disorder List Only (JSON)" }
             defaultName { "${it.name} report as Json" }
-            type DataClass
-            when { DataClass dataClass ->
-                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
             }
             link controller: 'genomics', action: 'exportRareDiseaseListAsJson', id: true
         }
@@ -219,9 +231,9 @@ class BootStrap {
             creates link
             title { "Rare Diseases Eligibility Criteria (JSON)" }
             defaultName { "${it.name} report as Json" }
-            type DataClass
-            when { DataClass dataClass ->
-                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
             }
             link controller: 'genomics', action: 'exportRareDiseaseHPOEligibilityCriteriaAsJson', id: true
         }
@@ -229,9 +241,9 @@ class BootStrap {
         reportsRegistry.register {
             creates link
             title { "Rare Diseases HPO And Clinical Tests (CSV)" }
-            type DataClass
-            when { DataClass dataClass ->
-                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
             }
             link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsCsv', id: true
         }
@@ -239,9 +251,9 @@ class BootStrap {
         reportsRegistry.register {
             creates link
             title { "Rare Disease Eligibility Criteria Report (CSV)" }
-            type DataClass
-            when { DataClass dataClass ->
-                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
             }
             link controller: 'genomics', action: 'exportRareDiseaseEligibilityCsv', id: true
         }
@@ -249,9 +261,9 @@ class BootStrap {
         reportsRegistry.register {
             creates link
             title { "Cancer Types (JSON)" }
-            type DataClass
-            when { DataClass dataClass ->
-                dataClass.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
             }
             link controller: 'genomics', action: 'exportCancerTypesAsJson', id: true
         }
@@ -259,9 +271,9 @@ class BootStrap {
         reportsRegistry.register {
             creates link
             title { "Cancer Types (CSV)" }
-            type DataClass
-            when { DataClass dataClass ->
-                dataClass.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
             }
             link controller: 'genomics', action: 'exportCancerTypesAsCsv', id: true
         }
@@ -269,9 +281,9 @@ class BootStrap {
         reportsRegistry.register {
             creates link
             title { "Change Log for RD Phenotypes And Clinical Tests (Excel)" }
-            type DataClass
-            when { DataClass dataClass ->
-                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
             }
             link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsXls', id: true
         }
@@ -279,9 +291,9 @@ class BootStrap {
         reportsRegistry.register {
             creates link
             title { "Change Log for RD Eligibility (Excel)" }
-            type DataClass
-            when { DataClass dataClass ->
-                dataClass.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
             }
             link controller: 'genomics', action: 'exportRareDiseaseEligibilityChangeLogAsXls', id: true
         }
