@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.util.builder
 
+import com.google.common.collect.Maps
+import com.google.common.collect.Sets
 import grails.compiler.GrailsCompileStatic
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
@@ -458,19 +460,19 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
         DefaultCatalogueElementProxy<T> typedOther = other as DefaultCatalogueElementProxy<T>
 
-        typedOther.extensions.each { String key, String value ->
+        Maps.newLinkedHashMap(typedOther.extensions).each { String key, String value ->
             if (value != null) {
                 setExtension(key, value)
             }
         }
 
-        typedOther.parameters.each { String key, Object value ->
+        Maps.newLinkedHashMap(typedOther.parameters).each { String key, Object value ->
             if (value != null) {
                 setParameter(key, value)
             }
         }
 
-        typedOther.relationships.each { RelationshipProxy relationship ->
+        Sets.newLinkedHashSet(typedOther.relationships).each { RelationshipProxy relationship ->
             if (repository.equals(this, relationship.source)) {
                 RelationshipProxy relationshipProxy = new RelationshipProxy(relationship.relationshipTypeName, this, relationship.destination, relationship.extensions)
                 addToPendingRelationships(relationshipProxy)
@@ -484,7 +486,7 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
             }
         }
 
-        typedOther.policies.each {
+        Sets.newLinkedHashSet(typedOther.policies).each {
             policies << it
         }
 
