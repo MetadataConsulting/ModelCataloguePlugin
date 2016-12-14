@@ -28,10 +28,10 @@ class ValidationRuleController extends AbstractCatalogueElementController<Valida
 
         respond new Relationships(
             owner: element,
-            direction: RelationshipDirection.INCOMING,
+            direction: RelationshipDirection.OUTGOING,
             list: Lists.fromCriteria(params, Relationship, "/${resourceName}/${params.id}/content") {
-                join 'source'
-                eq 'destination', element
+                join 'destination'
+                eq 'source', element
                 inList 'relationshipType', [RelationshipType.involvednessType, RelationshipType.ruleContextType]
 
                 if (filter) {

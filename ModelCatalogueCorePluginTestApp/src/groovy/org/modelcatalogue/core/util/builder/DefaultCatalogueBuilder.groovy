@@ -161,7 +161,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         }
 
         context.withContextElement(ValidationRule) { ignored, Closure relConf ->
-            rel 'involvedness' from element, relConf
+            rel 'involvedness' to element, relConf
         }
 
         element
@@ -207,7 +207,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
 
         context.withNewContext validationRule, c
         context.withContextElement(DataClass) { ignored, Closure relConf ->
-            rel 'ruleContext' to validationRule, relConf
+            rel 'ruleContext' from validationRule, relConf
         }
 
         validationRule
