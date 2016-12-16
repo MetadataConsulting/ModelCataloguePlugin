@@ -98,7 +98,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
 
         TimeDuration elapsed = TimeCategory.minus(new Date(), timeStart)
         log.info "stats: export took=$elapsed itemcount=$itemCount visitedModels (excludes previously visited) ${visitedModels.size()} cached models ${cachedChanges.size()}"
-        log.info "Exported Rare Diseases as xls spreadsheet ${model.name} (${model.combinedVersion})"
+        log.info "Exported Rare Diseases as xls spreadsheet ${model.name} (${getDisplayVersion(model)})"
     }
 
 
@@ -112,7 +112,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
         cachedChanges = ArrayListMultimap.create()
         modelCreation = model.dataModel.dateCreated
 
-        log.info "Exporting Rare Diseases as xls ${model.name} (${model.combinedVersion})"
+        log.info "Exporting Rare Diseases as xls ${model.name} (${getDisplayVersion(model)})"
 
         descendModels(model, lines, level, groupDescriptions, exclusions)
 
@@ -125,7 +125,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
 
         switch (level) {
             case 1:
-                String groupDescription = "$model.name (${model.combinedVersion})"
+                String groupDescription = "$model.name (${getDisplayVersion(model)})"
                 log.debug("level$level $groupDescription")
                 groupDescriptions.put(2, EMPTY)     //pad for when no lower levels present
                 groupDescriptions.put(3, EMPTY)
@@ -138,7 +138,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
             case 3:
                 groupDescriptions.put(4, EMPTY)
             case 4:
-                String groupDescription = "$model.name (${model.combinedVersion})"
+                String groupDescription = "$model.name (${getDisplayVersion(model)})"
                 log.info "$level $model $groupDescription --- $model.dataModel"
                 groupDescriptions.put(level, groupDescription)
                 checkChangeLog(model, lines, groupDescriptions, level, DETAIL_CHANGE_TYPES)
@@ -230,7 +230,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
         List<String> changes = []
         int currLineCount = lines.size()
         levelIdStack.put(level, model.id)
-        levelNameStack.put(level,"$model.name (${model.combinedVersion})")
+        levelNameStack.put(level,"$model.name (${getDisplayVersion(model)})")
 
         // cache hit? use the cached changelog info
         if(cachedChanges.containsKey(model.id)) {
@@ -424,7 +424,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
                 changes << (subtype ?: EMPTY)
             }
 
-            changes << "$model.name (${model.combinedVersion})"           // Affected Data Item
+            changes << "$model.name (${getDisplayVersion(model)})"           // Affected Data Item
 
             changes << changeToRender.renderedText
 
@@ -480,7 +480,7 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
         }
 
         if (groupDescriptions.size() < 3) {   //DataModelChangelogs hierarchy Cancer/RD can be shallower than RD conditions
-            hierarchyChanges << "$model.name (${model.combinedVersion})"
+            hierarchyChanges << "$model.name (${getDisplayVersion(model)})"
         }
 
         if(subtype) {
@@ -626,19 +626,10 @@ abstract class RareDiseaseChangeLogXlsExporter extends AbstractChangeLogGenerato
                     }
                     if (destinationMap.classifiedName && destinationMap.classifiedName instanceof String) { // classifiedName acts as a filter
                         String name = "${destinationMap.name ?: ''}"
-                        String semanticVersion
-                        if(destinationMap.semanticVersion instanceof String) {
-                            semanticVersion = destinationMap.semanticVersion
-                        } else if(destinationMap.dataModel?.semanticVersion instanceof String) {
-                            semanticVersion = destinationMap.dataModel.semanticVersion
-                        } else {
-                            String version = destinationMap.versionNumber instanceof String ? destinationMap.versionNumber : "1"
-                            semanticVersion = "0.0.${version}"
-                        }
-                        String id = "${destinationMap.latestVersionId ?: ''}"
+                        String id = "${destinationMap.latestVersionId ?: destinationMap.id ?: ''}"
 
-                        if(name && id && semanticVersion) {
-                            elemName = "$name (${id}@${semanticVersion})"
+                        if(name && id) {
+                            elemName = "$name (${id})"
                         } else {
                             elemName = name
                         }
