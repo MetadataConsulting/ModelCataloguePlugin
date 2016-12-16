@@ -82,7 +82,7 @@ class CopyAssociationsAndRelationships {
                 return
             }
 
-            if (r.archived || r.inherited) {
+            if (r.archived) {
                 return
             }
 
@@ -105,6 +105,7 @@ class CopyAssociationsAndRelationships {
 
             definitionBuilder
                     .withArchived(r.archived)
+                    .withInherited(r.inherited)
                     .withDataModel(r.dataModel)
                     .withIncomingIndex(r.incomingIndex)
                     .withOutgoingIndex(r.outgoingIndex)
