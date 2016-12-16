@@ -203,65 +203,65 @@ class AbstractRareDiseasesExporterSpec extends AbstractIntegrationSpec {
 
     //this is painful...why did I make the test data so big?
     def findDataIds() {
-        level1_id = DataClass.findByName('Dataclass Top Level 1 Root').combinedVersion
-        level2_id_1 = DataClass.findByNameIlike("Disorder%1%Level2").combinedVersion
-        level2_id_2 = DataClass.findByNameIlike("Disorder%2%Level2").combinedVersion
+        level1_id = DataClass.findByName('Dataclass Top Level 1 Root').id
+        level2_id_1 = DataClass.findByNameIlike("Disorder%1%Level2").id
+        level2_id_2 = DataClass.findByNameIlike("Disorder%2%Level2").id
 
-        level3_id_1 = DataClass.findByNameIlike("Disorder%1%Level3%1").combinedVersion
-        level3_id_2 = DataClass.findByNameIlike("Disorder%1%Level3%2").combinedVersion
-        level3_id_3 = DataClass.findByNameIlike("Disorder%2%Level3%1").combinedVersion
-        level3_id_4 = DataClass.findByNameIlike("Disorder%2%Level3%2").combinedVersion
+        level3_id_1 = DataClass.findByNameIlike("Disorder%1%Level3%1").id
+        level3_id_2 = DataClass.findByNameIlike("Disorder%1%Level3%2").id
+        level3_id_3 = DataClass.findByNameIlike("Disorder%2%Level3%1").id
+        level3_id_4 = DataClass.findByNameIlike("Disorder%2%Level3%2").id
 
-        level4_id_1 = DataClass.findByNameIlike("Disorder%1%Level4%1").combinedVersion
-        level4_id_2 = DataClass.findByNameIlike("Disorder%1%Level4%2").combinedVersion
-        level4_id_3 = DataClass.findByNameIlike("Disorder%2%Level4%1").combinedVersion
-        level4_id_4 = DataClass.findByNameIlike("Disorder%2%Level4%2").combinedVersion
+        level4_id_1 = DataClass.findByNameIlike("Disorder%1%Level4%1").id
+        level4_id_2 = DataClass.findByNameIlike("Disorder%1%Level4%2").id
+        level4_id_3 = DataClass.findByNameIlike("Disorder%2%Level4%1").id
+        level4_id_4 = DataClass.findByNameIlike("Disorder%2%Level4%2").id
 
-        level5_id_1 = DataClass.findByNameIlike("Disorder%1%Level5%1").combinedVersion
-        level5_id_2 = DataClass.findByNameIlike("Disorder%1%Level5%2").combinedVersion
-        level5_id_3 = DataClass.findByNameIlike("Disorder%2%Level5%1").combinedVersion
-        level5_id_4 = DataClass.findByNameIlike("Disorder%2%Level5%2").combinedVersion
+        level5_id_1 = DataClass.findByNameIlike("Disorder%1%Level5%1").id
+        level5_id_2 = DataClass.findByNameIlike("Disorder%1%Level5%2").id
+        level5_id_3 = DataClass.findByNameIlike("Disorder%2%Level5%1").id
+        level5_id_4 = DataClass.findByNameIlike("Disorder%2%Level5%2").id
 
-        level5_guidanceid_1 = DataClass.findByName("Disorder >1< Guidance name 1 1").combinedVersion
-        level5_guidanceid_2 = DataClass.findByName("Disorder >1< Guidance name 1 2").combinedVersion
-        level5_guidanceid_3 = DataClass.findByName("Disorder >2< Guidance name 2 1").combinedVersion
-        level5_guidanceid_4 = DataClass.findByName("Disorder >2< Guidance name 2 2").combinedVersion
+        level5_guidanceid_1 = DataClass.findByName("Disorder >1< Guidance name 1 1").id
+        level5_guidanceid_2 = DataClass.findByName("Disorder >1< Guidance name 1 2").id
+        level5_guidanceid_3 = DataClass.findByName("Disorder >2< Guidance name 2 1").id
+        level5_guidanceid_4 = DataClass.findByName("Disorder >2< Guidance name 2 2").id
 
-        level6_inclusion_1 = DataClass.findByNameIlike("Inclusion%1 1").combinedVersion
-        level6_inclusion_2 = DataClass.findByNameIlike("Inclusion%1 2").combinedVersion
-        level6_inclusion_3 = DataClass.findByNameIlike("Inclusion%2 1").combinedVersion
-        level6_inclusion_4 = DataClass.findByNameIlike("Inclusion%2 2").combinedVersion
+        level6_inclusion_1 = DataClass.findByNameIlike("Inclusion%1 1").id
+        level6_inclusion_2 = DataClass.findByNameIlike("Inclusion%1 2").id
+        level6_inclusion_3 = DataClass.findByNameIlike("Inclusion%2 1").id
+        level6_inclusion_4 = DataClass.findByNameIlike("Inclusion%2 2").id
 
-        level6_exclusion_1 = DataClass.findByNameIlike("Exclusion%1 1").combinedVersion
-        level6_exclusion_2 = DataClass.findByNameIlike("Exclusion%1 2").combinedVersion
-        level6_exclusion_3 = DataClass.findByNameIlike("Exclusion%2 1").combinedVersion
-        level6_exclusion_4 = DataClass.findByNameIlike("Exclusion%2 2").combinedVersion
+        level6_exclusion_1 = DataClass.findByNameIlike("Exclusion%1 1").id
+        level6_exclusion_2 = DataClass.findByNameIlike("Exclusion%1 2").id
+        level6_exclusion_3 = DataClass.findByNameIlike("Exclusion%2 1").id
+        level6_exclusion_4 = DataClass.findByNameIlike("Exclusion%2 2").id
 
-        level6_priorGenetic_1 = DataClass.findByNameIlike("Prior%Genetic%1 1").combinedVersion
-        level6_priorGenetic_2 = DataClass.findByNameIlike("Prior%Genetic%1 2").combinedVersion
-        level6_priorGenetic_3 = DataClass.findByNameIlike("Prior%Genetic%2 1").combinedVersion
-        level6_priorGenetic_4 = DataClass.findByNameIlike("Prior%Genetic%2 2").combinedVersion
+        level6_priorGenetic_1 = DataClass.findByNameIlike("Prior%Genetic%1 1").id
+        level6_priorGenetic_2 = DataClass.findByNameIlike("Prior%Genetic%1 2").id
+        level6_priorGenetic_3 = DataClass.findByNameIlike("Prior%Genetic%2 1").id
+        level6_priorGenetic_4 = DataClass.findByNameIlike("Prior%Genetic%2 2").id
 
-        level6_prior_genes_1 = DataClass.findByNameIlike("Prior%genes%1 1").combinedVersion
-        level6_prior_genes_2 = DataClass.findByNameIlike("Prior%genes%1 2").combinedVersion
-        level6_prior_genes_3 = DataClass.findByNameIlike("Prior%genes%2 1").combinedVersion
-        level6_prior_genes_4 = DataClass.findByNameIlike("Prior%genes%2 2").combinedVersion
+        level6_prior_genes_1 = DataClass.findByNameIlike("Prior%genes%1 1").id
+        level6_prior_genes_2 = DataClass.findByNameIlike("Prior%genes%1 2").id
+        level6_prior_genes_3 = DataClass.findByNameIlike("Prior%genes%2 1").id
+        level6_prior_genes_4 = DataClass.findByNameIlike("Prior%genes%2 2").id
 
-        level6_closing_1 = DataClass.findByNameIlike("Closing%1 1").combinedVersion
-        level6_closing_2 = DataClass.findByNameIlike("Closing%1 2").combinedVersion
-        level6_closing_3 = DataClass.findByNameIlike("Closing%2 1").combinedVersion
-        level6_closing_4 = DataClass.findByNameIlike("Closing%2 2").combinedVersion
+        level6_closing_1 = DataClass.findByNameIlike("Closing%1 1").id
+        level6_closing_2 = DataClass.findByNameIlike("Closing%1 2").id
+        level6_closing_3 = DataClass.findByNameIlike("Closing%2 1").id
+        level6_closing_4 = DataClass.findByNameIlike("Closing%2 2").id
 
-        level6_guidance_1 = DataClass.findByNameIlike("Guidance%1 1").combinedVersion
-        level6_guidance_2 = DataClass.findByNameIlike("Guidance%1 2").combinedVersion
-        level6_guidance_3 = DataClass.findByNameIlike("Guidance%2 1").combinedVersion
-        level6_guidance_4 = DataClass.findByNameIlike("Guidance%2 2").combinedVersion
+        level6_guidance_1 = DataClass.findByNameIlike("Guidance%1 1").id
+        level6_guidance_2 = DataClass.findByNameIlike("Guidance%1 2").id
+        level6_guidance_3 = DataClass.findByNameIlike("Guidance%2 1").id
+        level6_guidance_4 = DataClass.findByNameIlike("Guidance%2 2").id
 
 
         for (int i in 1..2) {
             for (int j in 1..2) {
                     for (int k in 1..15) {
-                        def version = DataClass.findByName("Phenotype ($k) name $i $j").combinedVersion
+                        def version = DataClass.findByName("Phenotype ($k) name $i $j").id
                         phenotypeIds[i-1][j-1][k-1] = version
                     }
             }
@@ -269,38 +269,38 @@ class AbstractRareDiseasesExporterSpec extends AbstractIntegrationSpec {
         for (int i in 1..2) {
             for (int j in 1..2) {
                     for (int k in 1..5) {
-                        def version = DataClass.findByName("Clinical tests ($k) name $i $j").combinedVersion
+                        def version = DataClass.findByName("Clinical tests ($k) name $i $j").id
                         clinicalTestIds[i-1][j-1][k-1] = version
                     }
             }
         }
 
-        phenotypeLevel5Id_1 = DataClass.findByNameIlike("%Phenotypes Level5 Model 1 Data Element 1").combinedVersion
-        phenotypeLevel5Id_2 = DataClass.findByNameIlike("%Phenotypes Level5 Model 1 Data Element 2").combinedVersion
-        phenotypeLevel5Id_3 = DataClass.findByNameIlike("%Phenotypes Level5 Model 2 Data Element 1").combinedVersion
-        phenotypeLevel5Id_4 = DataClass.findByNameIlike("%Phenotypes Level5 Model 2 Data Element 2").combinedVersion
+        phenotypeLevel5Id_1 = DataClass.findByNameIlike("%Phenotypes Level5 Model 1 Data Element 1").id
+        phenotypeLevel5Id_2 = DataClass.findByNameIlike("%Phenotypes Level5 Model 1 Data Element 2").id
+        phenotypeLevel5Id_3 = DataClass.findByNameIlike("%Phenotypes Level5 Model 2 Data Element 1").id
+        phenotypeLevel5Id_4 = DataClass.findByNameIlike("%Phenotypes Level5 Model 2 Data Element 2").id
 
-        eligibLevel5Id_1 = DataClass.findByNameIlike("%Eligibility Level5 Model 1 Data Element 1").combinedVersion
-        eligibLevel5Id_2 = DataClass.findByNameIlike("%Eligibility Level5 Model 1 Data Element 2").combinedVersion
-        eligibLevel5Id_3 = DataClass.findByNameIlike("%Eligibility Level5 Model 2 Data Element 1").combinedVersion
-        eligibLevel5Id_4 = DataClass.findByNameIlike("%Eligibility Level5 Model 2 Data Element 2").combinedVersion
+        eligibLevel5Id_1 = DataClass.findByNameIlike("%Eligibility Level5 Model 1 Data Element 1").id
+        eligibLevel5Id_2 = DataClass.findByNameIlike("%Eligibility Level5 Model 1 Data Element 2").id
+        eligibLevel5Id_3 = DataClass.findByNameIlike("%Eligibility Level5 Model 2 Data Element 1").id
+        eligibLevel5Id_4 = DataClass.findByNameIlike("%Eligibility Level5 Model 2 Data Element 2").id
 
-        clinicalLevel5Id_1 = DataClass.findByNameIlike("%Clinical tests Level5 Model 1 Data Element 1").combinedVersion
-        clinicalLevel5Id_2 = DataClass.findByNameIlike("%Clinical tests Level5 Model 1 Data Element 2").combinedVersion
-        clinicalLevel5Id_3 = DataClass.findByNameIlike("%Clinical tests Level5 Model 2 Data Element 1").combinedVersion
-        clinicalLevel5Id_4 = DataClass.findByNameIlike("%Clinical tests Level5 Model 2 Data Element 2").combinedVersion
+        clinicalLevel5Id_1 = DataClass.findByNameIlike("%Clinical tests Level5 Model 1 Data Element 1").id
+        clinicalLevel5Id_2 = DataClass.findByNameIlike("%Clinical tests Level5 Model 1 Data Element 2").id
+        clinicalLevel5Id_3 = DataClass.findByNameIlike("%Clinical tests Level5 Model 2 Data Element 1").id
+        clinicalLevel5Id_4 = DataClass.findByNameIlike("%Clinical tests Level5 Model 2 Data Element 2").id
     }
 
     String getLevel2Id(def pos){
-        return DataClass.findByNameIlike("Disorder%$pos%Level2").combinedVersion
+        return DataClass.findByNameIlike("Disorder%$pos%Level2").id
     }
 
     String getLevel3Id(def level2pos, def level3pos){
-        return DataClass.findByNameIlike("Disorder%$level2pos%Level3%$level3pos").combinedVersion
+        return DataClass.findByNameIlike("Disorder%$level2pos%Level3%$level3pos").id
     }
 
     String getLevel4Id(def level2pos, def level3pos){
-        return DataClass.findByNameIlike("Disorder%$level2pos%Level4%$level3pos").combinedVersion
+        return DataClass.findByNameIlike("Disorder%$level2pos%Level4%$level3pos").id
     }
 
     String getLevel2Name(def pos){
