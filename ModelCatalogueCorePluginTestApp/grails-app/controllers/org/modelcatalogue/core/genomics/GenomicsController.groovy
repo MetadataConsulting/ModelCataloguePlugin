@@ -24,7 +24,7 @@ class GenomicsController {
             return
         }
 
-        DataClass dataClass = dataClassService.getTopLevelDataClasses(DataModelFilter.includes((DataModel) model)).items?.get(0)
+        DataClass dataClass = findRootClass(model)
 
         if (!dataClass) {
             respond status: HttpStatus.NOT_FOUND
@@ -45,7 +45,7 @@ class GenomicsController {
             return
         }
 
-        DataClass dataClass = dataClassService.getTopLevelDataClasses(DataModelFilter.includes((DataModel) model)).items?.get(0)
+        DataClass dataClass = findRootClass(model)
 
         if (!dataClass) {
             respond status: HttpStatus.NOT_FOUND
@@ -73,7 +73,7 @@ class GenomicsController {
             return
         }
 
-        DataClass dataClass = dataClassService.getTopLevelDataClasses(DataModelFilter.includes((DataModel) model)).items?.get(0)
+        DataClass dataClass = findRootClass(model)
 
         if (!dataClass) {
             respond status: HttpStatus.NOT_FOUND
@@ -98,7 +98,7 @@ class GenomicsController {
             return
         }
 
-        DataClass dClass = dataClassService.getTopLevelDataClasses(DataModelFilter.includes((DataModel) model)).items?.get(0)
+        DataClass dClass = findRootClass(model)
 
         if (!dClass) {
             respond status: HttpStatus.NOT_FOUND
@@ -119,7 +119,7 @@ class GenomicsController {
             return
         }
 
-        DataClass dClass = dataClassService.getTopLevelDataClasses(DataModelFilter.includes((DataModel) model)).items?.get(0)
+        DataClass dClass = findRootClass(model)
 
         if (!dClass) {
             respond status: HttpStatus.NOT_FOUND
@@ -130,6 +130,10 @@ class GenomicsController {
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
+    }
+
+    private DataClass findRootClass(DataModel model) {
+        dataClassService.getTopLevelDataClasses(DataModelFilter.includes((DataModel) model), [status: 'active']).items?.get(0)
     }
 
     def exportRareDiseaseEligibilityDoc() {
@@ -149,7 +153,7 @@ class GenomicsController {
             return
         }
 
-        DataClass dataClass = dataClassService.getTopLevelDataClasses(DataModelFilter.includes((DataModel) model)).items?.get(0)
+        DataClass dataClass = findRootClass(model)
 
         if (!dataClass) {
             respond status: HttpStatus.NOT_FOUND
@@ -184,7 +188,7 @@ class GenomicsController {
             return
         }
 
-        DataClass dataClass = dataClassService.getTopLevelDataClasses(DataModelFilter.includes((DataModel) model)).items?.get(0)
+        DataClass dataClass = findRootClass(model)
 
         if (!dataClass) {
             respond status: HttpStatus.NOT_FOUND
@@ -205,7 +209,7 @@ class GenomicsController {
             return
         }
 
-        DataClass dataClass = dataClassService.getTopLevelDataClasses(DataModelFilter.includes((DataModel) model)).items?.get(0)
+        DataClass dataClass = findRootClass(model)
 
         if (!dataClass) {
             respond status: HttpStatus.NOT_FOUND
@@ -226,7 +230,7 @@ class GenomicsController {
             return
         }
 
-        DataClass dataClass = dataClassService.getTopLevelDataClasses(DataModelFilter.includes((DataModel) model)).items?.get(0)
+        DataClass dataClass = findRootClass(model)
 
         if (!dataClass) {
             respond status: HttpStatus.NOT_FOUND
@@ -247,7 +251,7 @@ class GenomicsController {
             return
         }
 
-        DataClass dataClass = dataClassService.getTopLevelDataClasses(DataModelFilter.includes((DataModel) model)).items?.get(0)
+        DataClass dataClass = findRootClass(model)
 
         if (!dataClass) {
             respond status: HttpStatus.NOT_FOUND
@@ -267,7 +271,7 @@ class GenomicsController {
             return
         }
 
-        DataClass dataClass = dataClassService.getTopLevelDataClasses(DataModelFilter.includes((DataModel) model)).items?.get(0)
+        DataClass dataClass = findRootClass(model)
 
         if (!dataClass) {
             respond status: HttpStatus.NOT_FOUND
@@ -309,7 +313,7 @@ class GenomicsController {
         genomicsService.genDataSpecChangeLogAsXls(model)
 
         //Generate Class reports
-        DataClass dataClass = dataClassService.getTopLevelDataClasses(DataModelFilter.includes((DataModel) model)).items.get(0)
+        DataClass dataClass = findRootClass(model)
         genomicsService.genRareDiseaseHPOAndClinicalTestsAsXls(dataClass)
         genomicsService.genCancerTypesAsCsv(dataClass)
         genomicsService.genCancerTypesAsJson(dataClass)
@@ -341,7 +345,7 @@ class GenomicsController {
         genomicsService.genDataSpecChangeLogAsXls(model)
 
         //Generate Class reports
-        DataClass dataClass = dataClassService.getTopLevelDataClasses(DataModelFilter.includes((DataModel) model)).items.get(0)
+        DataClass dataClass = findRootClass(model)
         genomicsService.genCancerTypesAsCsv(dataClass)
         genomicsService.genCancerTypesAsJson(dataClass)
         genomicsService.genChangeLogDocument(dataClass,dataClass.name,3,true)
