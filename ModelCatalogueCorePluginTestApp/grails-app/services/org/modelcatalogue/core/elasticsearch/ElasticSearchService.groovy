@@ -391,7 +391,7 @@ class ElasticSearchService implements SearchCatalogue {
             }
         }
         if (CatalogueElement.isAssignableFrom(clazz) || Relationship.isAssignableFrom(clazz) || RelationshipType.isAssignableFrom(clazz)) {
-            unindexInternal(session, object)
+            return unindexInternal(session, object)
 
         }
         return just(false)
