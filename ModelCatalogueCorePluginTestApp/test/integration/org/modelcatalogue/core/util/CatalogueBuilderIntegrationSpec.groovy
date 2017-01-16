@@ -1317,11 +1317,15 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         then: "then every semantic version of the data model is imported"
             dataModel3
             dataModel2
-            dataModel1å
+            dataModel1
 
             dataModel1 != dataModel2
             dataModel1 != dataModel3
             dataModel2 != dataModel3
+
+            dataModel1.semanticVersion == semanticVersion1
+            dataModel2.semanticVersion == semanticVersion2
+            dataModel3.semanticVersion == semanticVersion3
 
 
         and: "the data types only exists in the data model where they were defined"

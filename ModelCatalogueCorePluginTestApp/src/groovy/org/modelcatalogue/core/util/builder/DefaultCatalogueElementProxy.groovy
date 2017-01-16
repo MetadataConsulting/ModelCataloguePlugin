@@ -334,6 +334,7 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
         return false
     }
 
+
     T findExisting() {
         if (modelCatalogueId) {
             T result = repository.findById(domain, modelCatalogueId)
@@ -359,6 +360,9 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
         if (name) {
             if (classification) {
                 return repository.tryFind(domain, classification, name, modelCatalogueId)
+            }
+            if (domain == DataModel && getParameter('semanticVersion')) {
+                return repository.tryFindDataModel(name, getParameter('semanticVersion')?.toString(), modelCatalogueId)
             }
             return repository.tryFindUnclassified(domain, name, modelCatalogueId)
         }

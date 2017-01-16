@@ -431,6 +431,28 @@ class CatalogueElementProxyRepository {
         tryFindWithClassification(type, null, name, id)
     }
 
+    DataModel tryFindDataModel(String name, String semanticVersion, String modelCatalogueId) {
+        if (!semanticVersion) {
+            return tryFindUnclassified(DataModel, name, modelCatalogueId)
+        }
+
+        if (modelCatalogueId) {
+            DataModel result = DataModel.findByModelCatalogueIdAndSemanticVersion(modelCatalogueId, semanticVersion)
+            if (result) {
+                return result
+            }
+        }
+
+        if (name) {
+            DataModel result =  DataModel.findByNameAndSemanticVersion(name, semanticVersion)
+            if (result) {
+                return result
+            }
+        }
+
+        return null
+    }
+
     protected <T extends CatalogueElement> T tryFindWithClassification(Class<T> type, List<DataModel> dataModels, Object name, Object id) {
         if (type in DATA_TYPE_CLASSES) {
             type = DataType
