@@ -1315,9 +1315,9 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
             final DataType dataType3In3 = DataType.findByNameAndDataModel(dataType3, dataModel3)
 
         then: "then every semantic version of the data model is imported"
-            dataModel1
-            dataModel2
             dataModel3
+            dataModel2
+            dataModel1å
 
             dataModel1 != dataModel2
             dataModel1 != dataModel3
@@ -1335,7 +1335,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
 
             !dataType1In3
-            dataType2In3
+            !dataType2In3
             dataType3In3
 
             dataModel2 in dataModel1.supersededBy

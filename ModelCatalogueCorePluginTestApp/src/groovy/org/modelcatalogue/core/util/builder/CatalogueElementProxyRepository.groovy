@@ -113,8 +113,8 @@ class CatalogueElementProxyRepository {
                     existing.merge(proxy)
                 }
             } else if (proxy.name) {
-                String fullName = getFullNameForProxy(proxy)
-                String genericName = getGenericNameForProxy(proxy)
+                String fullName = getFullNameForProxy(proxy, proxy.domain)
+                String genericName = getFullNameForProxy(proxy, CatalogueElement)
 
                 CatalogueElementProxy existing = byName[fullName]
 
@@ -335,16 +335,37 @@ class CatalogueElementProxyRepository {
         return DraftContext.importFriendly(elementsUnderControl)
     }
 
-    protected static String getGenericNameForProxy(CatalogueElementProxy proxy) {
-        "${CatalogueElement.simpleName}:${proxy.domain in HAS_UNIQUE_NAMES ? '*' : proxy.classification}:${proxy.name}"
-    }
+   /* protected static String getGenericNameForProxy(CatalogueElementProxy proxy) {
 
-    protected static String getFullNameForProxy(CatalogueElementProxy proxy) {
-        "${proxy.domain.simpleName}:${proxy.domain in HAS_UNIQUE_NAMES ? '*' : proxy.classification}:${proxy.name}"
+        if (proxy.domain == DataModel) {
+            String semanticVersion = proxy.getParameter("semanticVersion")
+            return "${proxy.domain.simpleName}:${semanticVersion}:${proxy.name}"
+        }
+        if (proxy.domain == MeasurementUnit) {
+            return "${proxy.domain.simpleName}:*:${proxy.name}"
+        }
+
+        return "${proxy.domain.simpleName}:${proxy.classification}:${proxy.name}"
+
+        "${CatalogueElement.simpleName}:${proxy.domain in HAS_UNIQUE_NAMES ? '*' : proxy.classification}:${proxy.name}"
+    }*/
+
+    protected static String getFullNameForProxy(CatalogueElementProxy proxy, Class domain) {
+
+        if (proxy.domain == DataModel) {
+            String semanticVersion = proxy.getParameter("semanticVersion")
+            return "${domain.simpleName}:${semanticVersion}:${proxy.name}"
+        }
+        if (proxy.domain == MeasurementUnit) {
+            return "${domain.simpleName}:*:${proxy.name}"
+        }
+
+        return "${domain.simpleName}:${proxy.classification}:${proxy.name}"
     }
 
     protected static String getGenericNameForDataModel(String name) {
         "${DataModel.simpleName}:*:${name}"
+
     }
 
     protected static String getFullNameForDataModel(String name) {
