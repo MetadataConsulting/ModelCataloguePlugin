@@ -85,7 +85,7 @@ class CatalogueElementProxyRepository {
             return false
         }
 
-        return a.classification == b.classification && a.name == b.name
+        return equals(a.classification, b.classification) && a.name == b.name
     }
 
     public Set<CatalogueElement> resolveAllProxies(boolean skipDirtyChecking) {
@@ -152,10 +152,10 @@ class CatalogueElementProxyRepository {
                 try {
                     String change = element.changed
                     if (change || element.getParameter('status') == ElementStatus.DRAFT) {
-                        if (element.domain == DataModel) {
+                        if (element.domain == DataModel && change != DefaultCatalogueElementProxy.CHANGE_NEW) {
                             draftRequiredDataModels.add(element)
                         } else if (element.classification) {
-                            draftRequiredDataModels.add(byName[getFullNameForDataModel(element.classification)] ?: byName[getGenericNameForDataModel(element.classification)] ?: createProxy(DataModel, [name: element.classification as Object]))
+                            draftRequiredDataModels.add(byName[getFullNameForProxy(element.classification, DataModel)] ?: byName[getFullNameForProxy(element.classification, CatalogueElement)] ?: element.classification)
                         } else {
                             logWarn "Cannot request draft for element without data model: $element"
                         }
@@ -360,7 +360,7 @@ class CatalogueElementProxyRepository {
             return "${domain.simpleName}:*:${proxy.name}"
         }
 
-        return "${domain.simpleName}:${proxy.classification}:${proxy.name}"
+        return "${domain.simpleName}:${proxy.classification?.name}:${proxy.name}"
     }
 
     protected static String getGenericNameForDataModel(String name) {
@@ -387,7 +387,9 @@ class CatalogueElementProxyRepository {
         if (parameters.id) {
             return createAbstractionById(domain, parameters.name?.toString(), parameters.id?.toString(), underControl)
         } else if (parameters.classification || parameters.dataModel) {
-            return createAbstractionByClassificationAndName(domain, (parameters.classification ?: parameters.dataModel)?.toString(), parameters.name?.toString(), underControl)
+            def dataModel = parameters.dataModel ?: parameters.classification
+            CatalogueElementProxy<DataModel> dataModelProxy = dataModel instanceof CatalogueElementProxy ? dataModel as CatalogueElementProxy : createAbstractionByName(DataModel, dataModel.toString(), false)
+            return createAbstractionByClassificationAndName(domain, dataModelProxy, parameters.name?.toString(), underControl)
         } else if (parameters.name) {
             return createAbstractionByName(domain, parameters.name?.toString(), underControl)
         }
@@ -399,8 +401,8 @@ class CatalogueElementProxyRepository {
         return new DefaultCatalogueElementProxy<T>(this, domain, id, null, name, underControl)
     }
 
-    private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionByClassificationAndName(Class<T> domain, String classificationName, String name, boolean underControl) {
-        return new DefaultCatalogueElementProxy<T>(this, domain, null, classificationName, name, underControl)
+    private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionByClassificationAndName(Class<T> domain, CatalogueElementProxy<DataModel> classification, String name, boolean underControl) {
+        return new DefaultCatalogueElementProxy<T>(this, domain, null, classification, name, underControl)
     }
 
     private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionByName(Class<T> domain, String name, boolean underControl) {
@@ -414,11 +416,15 @@ class CatalogueElementProxyRepository {
         } as T
     }
 
-    protected  <T extends CatalogueElement> T tryFind(Class<T> type, Object classificationName, Object name, Object id) {
+    protected  <T extends CatalogueElement> T tryFind(Class<T> type, CatalogueElementProxy<DataModel> dataModel, Object name, Object id) {
         if (type in HAS_UNIQUE_NAMES) {
             return tryFindWithClassification(type, null, name, id)
         }
-        tryFindWithClassification(type, DataModel.findAllByName(classificationName?.toString()), name, id)
+        String semanticVersion = dataModel.getParameter('semanticVersion')
+        if (semanticVersion) {
+               return tryFindWithClassification(type, DataModel.findAllByNameAndSemanticVersion(dataModel.name, semanticVersion), name, id)
+        }
+        tryFindWithClassification(type, DataModel.findAllByName(dataModel.name?.toString()), name, id)
     }
 
     protected <T extends CatalogueElement> T tryFindUnclassified(Class<T> type, Object name, Object id) {
