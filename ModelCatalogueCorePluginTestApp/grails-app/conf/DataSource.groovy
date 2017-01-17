@@ -14,28 +14,9 @@ environments {
             driverClassName = "org.h2.Driver"
             username = "sa"
             password = ""
-            dbCreate = "update" // one of 'create', 'create-drop', 'update', 'validate', ''
-            url = "jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
+            dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
+            url = "jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
         }
-        /*dataSource {
-            driverClassName = "com.mysql.jdbc.Driver"
-            dialect='org.hibernate.dialect.MySQL5InnoDBDialect'
-            url = "jdbc:mysql://localhost:3306/janPrague?autoReconnect=true&useUnicode=yes"
-            username = 'mdradmin'
-            password = "mdradmin123"
-            dbCreate = "update"
-            properties {
-                maxActive = -1
-                minEvictableIdleTimeMillis=1800000
-                timeBetweenEvictionRunsMillis=1800000
-                numTestsPerEvictionRun=3
-                testOnBorrow=true
-                testWhileIdle=true
-                testOnReturn=false
-                validationQuery="SELECT 1"
-                jdbcInterceptors="ConnectionState"
-            }
-        }*/
     }
     test {
         if (System.getenv('TRAVIS') && System.getenv('TEST_SUITE') == 'functional') {
