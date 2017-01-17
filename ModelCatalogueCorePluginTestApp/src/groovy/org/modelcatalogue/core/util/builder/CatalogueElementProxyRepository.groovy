@@ -25,6 +25,7 @@ class CatalogueElementProxyRepository {
     static final String MISSING_REFERENCE_ID = "http://www.modelcatalogue.org/builder/#missing_reference_id"
 
     private static final Map LATEST = [sort: 'versionNumber', order: 'desc', max: 1]
+    public static final String SEMANTIC_VERSION = "semanticVersion"
 
     private final DataModelService dataModelService
     private final ElementService elementService
@@ -77,6 +78,14 @@ class CatalogueElementProxyRepository {
         if (a.domain != b.domain) {
             return false
         }
+        if (a.domain == DataModel){
+            String a_SemanticVersion = a.getParameter(SEMANTIC_VERSION)
+            String b_SemanticVersion = b.getParameter(SEMANTIC_VERSION)
+            if(a_SemanticVersion && b_SemanticVersion && a_SemanticVersion != b_SemanticVersion){
+                return false
+            }
+        }
+
         if (a.domain in HAS_UNIQUE_NAMES) {
             return a.name == b.name
         }
@@ -353,14 +362,14 @@ class CatalogueElementProxyRepository {
     protected static String getFullNameForProxy(CatalogueElementProxy proxy, Class domain) {
 
         if (proxy.domain == DataModel) {
-            String semanticVersion = proxy.getParameter("semanticVersion")
+            String semanticVersion = proxy.getParameter(SEMANTIC_VERSION)
             return "${domain.simpleName}:${semanticVersion}:${proxy.name}"
         }
         if (proxy.domain == MeasurementUnit) {
             return "${domain.simpleName}:*:${proxy.name}"
         }
 
-        return "${domain.simpleName}:${proxy.classification?.name}:${proxy.name}"
+        return "${domain.simpleName}:${proxy.classification?.name}@${proxy.classification?.getParameter(SEMANTIC_VERSION)}:${proxy.name}"
     }
 
     protected static String getGenericNameForDataModel(String name) {
