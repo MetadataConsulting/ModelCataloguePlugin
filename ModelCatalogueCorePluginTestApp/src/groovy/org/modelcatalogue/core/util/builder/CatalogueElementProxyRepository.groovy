@@ -462,6 +462,14 @@ class CatalogueElementProxyRepository {
         return null
     }
 
+    public <T extends CatalogueElement> List<CatalogueElementProxy<T>> findExistingProxy(Class<T> domain, String name, String id) {
+
+        pendingProxies.findAll {
+            domain.isAssignableFrom(it.domain) && (it.name == name || it.modelCatalogueId == id)
+        } as List<CatalogueElementProxy<T>>
+
+    }
+
     protected <T extends CatalogueElement> T tryFindWithClassification(Class<T> type, List<DataModel> dataModels, Object name, Object id) {
         if (type in DATA_TYPE_CLASSES) {
             type = DataType

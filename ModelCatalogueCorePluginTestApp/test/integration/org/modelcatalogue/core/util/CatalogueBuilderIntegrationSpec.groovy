@@ -1342,6 +1342,10 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
             !dataType2In3
             dataType3In3
 
+
+            dataModel2 in dataModel1.supersededBy
+            dataModel3 in dataModel2.supersededBy
+
             dataModel1.latestVersionId
             dataModel2.latestVersionId
             dataModel3.latestVersionId
@@ -1353,8 +1357,6 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
             dataModel1.latestVersionId == dataModel2.latestVersionId
             dataModel2.latestVersionId == dataModel3.latestVersionId
 
-            dataModel2 in dataModel1.supersededBy
-            dataModel3 in dataModel2.supersededBy
 
     }
 }
