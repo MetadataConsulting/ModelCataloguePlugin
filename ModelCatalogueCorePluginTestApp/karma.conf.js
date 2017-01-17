@@ -29,7 +29,7 @@ module.exports = function(config) {
             'grails-app/assets/bower_components/blob-polyfill/Blob.js',
             'grails-app/assets/bower_components/file-saver.js/FileSaver.js',
             'grails-app/assets/bower_components/ace-builds/src-min-noconflict/ace.js',
-            'grails-app/assets/bower_components/vk-beautify/dist/vkbeautify.0.99.00.beta.js',
+            'grails-app/assets/bower_components/vkbeautify/vkbeautify.js',
             'grails-app/assets/bower_components/jquery/dist/jquery.js',
             'grails-app/assets/bower_components/angular/angular.js',
             'grails-app/assets/bower_components/angular-cookies/angular-cookies.js',

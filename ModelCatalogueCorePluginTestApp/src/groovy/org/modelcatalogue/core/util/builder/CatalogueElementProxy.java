@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.util.builder;
 
+import org.modelcatalogue.core.DataModel;
 import org.modelcatalogue.core.api.CatalogueElement;
 
 import java.util.Set;
@@ -22,7 +23,7 @@ public interface CatalogueElementProxy<T> extends CatalogueElement {
 
     String getName();
 
-    String getClassification();
+    CatalogueElementProxy<DataModel> getClassification();
 
     Object getParameter(String key);
 

@@ -127,6 +127,17 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
     void dataModel(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
         CatalogueElementProxy<DataModel> dataModel = createProxy(DataModel, parameters, null, true)
 
+        List<CatalogueElementProxy<DataModel>> proxies = repository.findExistingProxy(DataModel, dataModel.name, dataModel.modelCatalogueId).findAll {
+            !CatalogueElementProxyRepository.equals(dataModel, it)
+        }
+
+        if(proxies){
+            CatalogueElementProxy<DataModel> dataModelLast = proxies.last()
+            context.withNewContext dataModel, {
+                rel 'supersession' from dataModelLast
+            }
+        }
+
         context.withNewContext dataModel, c
 
         dataModel
@@ -166,6 +177,8 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
 
         element
     }
+
+
 
     /**
      * Creates new model, reuses the latest draft or creates new draft unless the exactly same model already exists

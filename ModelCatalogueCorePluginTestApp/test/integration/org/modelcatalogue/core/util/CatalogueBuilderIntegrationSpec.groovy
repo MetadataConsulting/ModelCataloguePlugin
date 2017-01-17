@@ -1275,4 +1275,88 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
             tomDT.dataModel == tom
     }
+
+    def "import multiple versions at once"() {
+        given:
+            final String dataModelName = "Test Import at Once"
+            final String semanticVersion1 = "v2005"
+            final String semanticVersion2 = "v2011"
+            final String semanticVersion3 = "v2017"
+            final String dataType1 = "TIAO 1"
+            final String dataType2 = "TIAO 2"
+            final String dataType3 = "TIAO 3"
+
+        when: "the builder is called with multiple versions of the data model"
+            build {
+                dataModel(name: dataModelName, semanticVersion: semanticVersion1) {
+                    dataType(name: dataType1)
+                }
+                dataModel(name: dataModelName, semanticVersion: semanticVersion2) {
+                    dataType(name: dataType1)
+                    dataType(name: dataType2)
+                    dataType(name: dataType3)
+                }
+                dataModel(name: dataModelName, semanticVersion: semanticVersion3) {
+                    dataType(name: dataType3)
+                }
+            }
+        and:
+            final DataModel dataModel1 = DataModel.findByNameAndSemanticVersion(dataModelName, semanticVersion1)
+            final DataModel dataModel2 = DataModel.findByNameAndSemanticVersion(dataModelName, semanticVersion2)
+            final DataModel dataModel3 = DataModel.findByNameAndSemanticVersion(dataModelName, semanticVersion3)
+            final DataType dataType1In1 = DataType.findByNameAndDataModel(dataType1, dataModel1)
+            final DataType dataType1In2 = DataType.findByNameAndDataModel(dataType1, dataModel2)
+            final DataType dataType1In3 = DataType.findByNameAndDataModel(dataType1, dataModel3)
+            final DataType dataType2In1 = DataType.findByNameAndDataModel(dataType2, dataModel1)
+            final DataType dataType2In2 = DataType.findByNameAndDataModel(dataType2, dataModel2)
+            final DataType dataType2In3 = DataType.findByNameAndDataModel(dataType2, dataModel3)
+            final DataType dataType3In1 = DataType.findByNameAndDataModel(dataType3, dataModel1)
+            final DataType dataType3In2 = DataType.findByNameAndDataModel(dataType3, dataModel2)
+            final DataType dataType3In3 = DataType.findByNameAndDataModel(dataType3, dataModel3)
+
+        then: "then every semantic version of the data model is imported"
+            dataModel3
+            dataModel2
+            dataModel1
+
+            dataModel1 != dataModel2
+            dataModel1 != dataModel3
+            dataModel2 != dataModel3
+
+            dataModel1.semanticVersion == semanticVersion1
+            dataModel2.semanticVersion == semanticVersion2
+            dataModel3.semanticVersion == semanticVersion3
+
+
+        and: "the data types only exists in the data model where they were defined"
+            dataType1In1
+            !dataType2In1
+            !dataType3In1
+
+            dataType1In2
+            dataType2In2
+            dataType3In2
+
+
+            !dataType1In3
+            !dataType2In3
+            dataType3In3
+
+
+            dataModel2 in dataModel1.supersededBy
+            dataModel3 in dataModel2.supersededBy
+
+            dataModel1.latestVersionId
+            dataModel2.latestVersionId
+            dataModel3.latestVersionId
+
+            dataModel1.latestVersionId == dataModel1.id
+            dataModel2.latestVersionId == dataModel1.id
+            dataModel3.latestVersionId == dataModel1.id
+
+            dataModel1.latestVersionId == dataModel2.latestVersionId
+            dataModel2.latestVersionId == dataModel3.latestVersionId
+
+
+    }
 }
