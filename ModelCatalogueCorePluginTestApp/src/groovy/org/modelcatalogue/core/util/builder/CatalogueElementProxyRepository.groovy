@@ -229,7 +229,7 @@ class CatalogueElementProxyRepository {
         }
         watch.stop()
 
-        // Step 4: resolve pending relationships
+        // Step 5: resolve pending relationships
         watch.start('resolving relationships')
         Set<Long> resolvedRelationships = []
         logInfo "(5/6) resolving relationships"
@@ -251,9 +251,7 @@ class CatalogueElementProxyRepository {
             }
         }
 
-        // TODO: collect the ids of relationships resolved and than do the same comparison like in the is relationship
-        // changed
-        if (!copyRelationships) {
+       if (!copyRelationships) {
             elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
                 if (!element.underControl) {
                     return
@@ -273,7 +271,7 @@ class CatalogueElementProxyRepository {
 
         watch.stop()
 
-        // Step 4: resolve state changes
+        // Step 6: resolve state changes
         watch.start('resolving state changes')
         logInfo "(6/6) resolving state changes"
         elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
@@ -589,6 +587,17 @@ class CatalogueElementProxyRepository {
 
 
         Relationship relationship = sourceElement.createLinkTo(destinationElement, type, archived: proxy.archived as Object, resetIndices: true, skipUniqueChecking: (proxy.source.new || proxy.destination.new) as Object)
+
+        if(relationship.relationshipType == RelationshipType.supersessionType) {
+            if(!relationship.source.latestVersionId){
+                relationship.source.latestVersionId = relationship.source.id
+                FriendlyErrors.failFriendlySave(relationship.source)
+            }
+            if(!relationship.destination.latestVersionId){
+                relationship.destination.latestVersionId = relationship.source.latestVersionId
+                FriendlyErrors.failFriendlySave(relationship.destination)
+            }
+        }
 
         createdRelationships[hash] = relationship
 
