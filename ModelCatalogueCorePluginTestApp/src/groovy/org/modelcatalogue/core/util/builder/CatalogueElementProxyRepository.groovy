@@ -188,7 +188,7 @@ class CatalogueElementProxyRepository {
             logInfo "(3/6) creating drafts"
 
             for (CatalogueElementProxy proxy in draftRequiredDataModels) {
-                DataModel dataModel = proxy.findExisting() as DataModel
+                DataModel dataModel = tryFindUnclassified(DataModel, proxy.name, proxy.modelCatalogueId) as DataModel
                 if (!dataModel) {
                     logWarn "Requested to create draft for Data Model '${proxy.name}' but it does not exist yet"
                     continue
@@ -315,7 +315,7 @@ class CatalogueElementProxyRepository {
                 return
             }
             try {
-                CatalogueElement e = it.findExisting() as CatalogueElement
+                CatalogueElement e = tryFindWithClassification(it.domain, it.classification ? DataModel.findAllByName(it.classification.name?.toString()) : [], it.name, it.modelCatalogueId)
 
                 if (e) {
                     if (e.getLatestVersionId()) {
