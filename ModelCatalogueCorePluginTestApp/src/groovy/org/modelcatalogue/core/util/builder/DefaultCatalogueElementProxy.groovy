@@ -323,6 +323,7 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
         if (underControl && !repository.isCopyRelationship()) {
             CatalogueElement existing = findExisting()
             if (!existing) {
+                // TODO: check if this can actually happened as the presence check preceeds the relationships check
                 return true
             }
             Set<Long> allRelationships = []
@@ -477,6 +478,8 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
         }
 
         Sets.newLinkedHashSet(typedOther.relationships).each { RelationshipProxy relationship ->
+            // TODO: is really necessary to distinguish between outgoing and incoming
+            // can we just copy the relationships over
             if (repository.equals(this, relationship.source)) {
                 RelationshipProxy relationshipProxy = new RelationshipProxy(relationship.relationshipTypeName, this, relationship.destination, relationship.extensions)
                 addToPendingRelationships(relationshipProxy)

@@ -99,6 +99,8 @@ class CatalogueElementProxyRepository {
 
     public Set<CatalogueElement> resolveAllProxies(boolean skipDirtyChecking) {
         StopWatch watch =  new StopWatch('catalogue proxy repository')
+
+        // FIXME: keeping all the created elements eats lot of memory
         Set<CatalogueElement> created = []
 
         List<CatalogueElement> lastElement = CatalogueElement.list(max: 1, sort: 'id', order: 'desc')
@@ -107,10 +109,12 @@ class CatalogueElementProxyRepository {
         watch.start('merging proxies')
         logInfo "(1/6) merging proxies"
 
+        // FIXME: move merging step to separate method
         Set<CatalogueElementProxy> elementProxiesToBeResolved     = []
         Map<String, CatalogueElementProxy> byID     = [:]
         Map<String, CatalogueElementProxy> byName   = [:]
 
+        // FIXME: remove the pending proxy from the map as soon as it's processed
         for (CatalogueElementProxy proxy in pendingProxies) {
             if (proxy.modelCatalogueId) {
                 CatalogueElementProxy existing = byID[proxy.modelCatalogueId]
@@ -164,6 +168,7 @@ class CatalogueElementProxyRepository {
                         if (element.domain == DataModel && change != DefaultCatalogueElementProxy.CHANGE_NEW) {
                             draftRequiredDataModels.add(element)
                         } else if (element.classification) {
+                            // FIXME: as long as classification is now proxy we don't need to get it from the map
                             draftRequiredDataModels.add(byName[getFullNameForProxy(element.classification, DataModel)] ?: byName[getFullNameForProxy(element.classification, CatalogueElement)] ?: element.classification)
                         } else {
                             logWarn "Cannot request draft for element without data model: $element"

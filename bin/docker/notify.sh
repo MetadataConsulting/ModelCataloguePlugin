@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -x
+
 #go to home and setup git
 cd $HOME
 git config --global user.email "travis@travis-ci.org"
