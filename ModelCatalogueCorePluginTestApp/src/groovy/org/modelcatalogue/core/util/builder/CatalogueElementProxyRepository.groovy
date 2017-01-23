@@ -5,6 +5,7 @@ import grails.gorm.DetachedCriteria
 import groovy.transform.CompileDynamic
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.PublishingContext
@@ -602,7 +603,27 @@ class CatalogueElementProxyRepository {
                 relationship.destination.latestVersionId = relationship.source.latestVersionId
                 FriendlyErrors.failFriendlySave(relationship.destination)
             }
+
+
+            if(HibernateHelper.getEntityClass(relationship.source) == DataModel){
+
+                // for each element which does the source data model declare
+                for (CatalogueElement element in (relationship.source as DataModel).declares) {
+                    if(!element.latestVersionId){
+                        element.latestVersionId = element.id
+                        FriendlyErrors.failFriendlySave(element)
+                    }
+
+                    CatalogueElement other = CatalogueElement.findByNameAndDataModel(element.name, relationship.destination)
+                    if (other && !other.latestVersionId) {
+                        other.latestVersionId = element.latestVersionId
+                        FriendlyErrors.failFriendlySave(other)
+                    }
+                }
+            }
         }
+
+
 
         createdRelationships[hash] = relationship
 
