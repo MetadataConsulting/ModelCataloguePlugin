@@ -40,6 +40,9 @@ abstract class AbstractChangeLogGenerator {
 
     abstract void generateChangelog(DataClass dataClass, OutputStream outputStream)
 
+    protected static String getDisplayVersion(CatalogueElement model) {
+        model.modelCatalogueId ?: model.latestVersionId ?: model.id
+    }
 
     protected List<DataClass> collectDataClasses(DataClass dataClass) {
         dataClassService.getInnerClasses(dataClass, depth).items
@@ -288,7 +291,7 @@ abstract class AbstractChangeLogGenerator {
             new RelationshipChangeItem()
         }
         for (CatalogueElement element in configuration.relations) {
-            String heading = "$element.name ($element.combinedVersion, $element.status)"
+            String heading = "$element.name (${getDisplayVersion(element)}, $element.status)"
 
             Set<Change> changes = configuration.getChanges(element)
             if (changes) {

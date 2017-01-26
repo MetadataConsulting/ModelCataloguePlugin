@@ -107,7 +107,7 @@ class RelationshipService {
                     if (relationshipInstance.ext != relationshipDefinition.metadata) {
                         relationshipInstance.ext = relationshipDefinition.metadata
                         if (relationshipDefinition.relationshipType == RelationshipType.baseType) {
-                            relationshipDefinition.source.addInheritedAssociations(relationshipDefinition.destination, relationshipDefinition.metadata)
+                            relationshipDefinition.destination.addInheritedAssociations(relationshipDefinition.source, relationshipDefinition.metadata)
                         }
                     }
                 }
@@ -210,19 +210,19 @@ class RelationshipService {
     }
 
     private void handleInheritance(RelationshipDefinition relationshipDefinition, Relationship relationshipInstance) {
-        for (Relationship relationship in new LinkedHashSet<Relationship>(relationshipDefinition.source.outgoingRelationships)) {
-            if (relationship.relationshipType.versionSpecific) {
+        for (Relationship relationship in new LinkedHashSet<Relationship>(relationshipDefinition.destination.outgoingRelationships)) {
+            if (relationship.relationshipType.versionSpecific && RelationshipType.baseType != relationship.relationshipType) {
                 RelationshipDefinition newDefinition = RelationshipDefinition.from(relationship)
-                newDefinition.source = relationshipDefinition.destination
+                newDefinition.source = relationshipDefinition.source
                 newDefinition.inherited = true
                 Relationship newRelationship = link newDefinition
                 if (newRelationship.hasErrors()) {
-                    relationshipInstance.errors.reject('unable.to.copy.from.parent', FriendlyErrors.printErrors("Unable to copy relationship $newDefinition from ${relationshipDefinition.source} to child ${relationshipDefinition.destination}", newRelationship.errors))
+                    relationshipInstance.errors.reject('unable.to.copy.from.parent', FriendlyErrors.printErrors("Unable to copy relationship $newDefinition from ${relationshipDefinition.destination} to child ${relationshipDefinition.destination}", newRelationship.errors))
                 }
             }
         }
-        relationshipDefinition.destination.ext.putAll relationshipDefinition.source.ext.subMap(relationshipDefinition.source.ext.keySet() - relationshipDefinition.destination.ext.keySet())
-        relationshipDefinition.source.addInheritedAssociations(relationshipDefinition.destination, relationshipDefinition.metadata)
+        relationshipDefinition.source.ext.putAll relationshipDefinition.destination.ext.subMap(relationshipDefinition.destination.ext.keySet() - relationshipDefinition.source.ext.keySet())
+        relationshipDefinition.destination.addInheritedAssociations(relationshipDefinition.source, relationshipDefinition.metadata)
     }
 
     Relationship findExistingRelationship(RelationshipDefinition definition) {
@@ -312,8 +312,8 @@ class RelationshipService {
 
             if (relationshipType == RelationshipType.baseType) {
                 Set<Long> destinations = new HashSet<Long>()
-                destinations.addAll(source.outgoingRelationships*.destination*.id)
-                for (Relationship relationship in new LinkedHashSet<Relationship>(destination.outgoingRelationships)) {
+                destinations.addAll(destination.outgoingRelationships*.destination*.id)
+                for (Relationship relationship in new LinkedHashSet<Relationship>(source.outgoingRelationships)) {
                     if (relationship.relationshipType.versionSpecific && relationship.inherited && relationship.destination.id in destinations) {
                         unlink relationship.source, relationship.destination, relationship.relationshipType, relationship.dataModel, true, relationship.ext
                     }
@@ -352,7 +352,7 @@ class RelationshipService {
             }
 
             if (relationshipType == RelationshipType.baseType) {
-                source.removeInheritedAssociations(destination, metadata)
+                source.removeInheritedAssociations(source, metadata)
             }
 
             if (relationshipType.bidirectional) {

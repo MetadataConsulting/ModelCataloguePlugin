@@ -21,12 +21,12 @@ class RareDiseasePhenotypeChangeLogXlsExporterSpec extends AbstractRareDiseasesE
         findDataIds()
         DataClass dataClass = DataClass.findByName('Dataclass Top Level 1 Root')
         makeChanges(dataClass)
-        new_guidance_id = DataClass.findByName("New Guidance class").combinedVersion
-        new_dataElement_id1 = DataElement.findByName("New Phenotype DataElement").combinedVersion
-        new_dataElement_id2 = DataElement.findByName("2nd New Phenotype DataElement").combinedVersion
-        nestedPheno_id1 = DataClass.findByName('Nested 1st level Phenotype').combinedVersion
-        nestedPheno_id2 = DataClass.findByName('Nested 2nd level Phenotype').combinedVersion
-        nestedPheno_id3 = DataClass.findByName('Nested 3rd level Phenotype').combinedVersion
+        new_guidance_id = DataClass.findByName("New Guidance class").id
+        new_dataElement_id1 = DataElement.findByName("New Phenotype DataElement").id
+        new_dataElement_id2 = DataElement.findByName("2nd New Phenotype DataElement").id
+        nestedPheno_id1 = DataClass.findByName('Nested 1st level Phenotype').id
+        nestedPheno_id2 = DataClass.findByName('Nested 2nd level Phenotype').id
+        nestedPheno_id3 = DataClass.findByName('Nested 3rd level Phenotype').id
 
         //test generated content
         List<String> rows = new RareDiseasePhenotypeChangeLogXlsExporter(auditService, dataClassService, performanceUtilService, 5, false).buildContentRows(dataClass)

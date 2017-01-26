@@ -27,7 +27,7 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
     String modelCatalogueId
     String name
-    String classification
+    CatalogueElementProxy<DataModel> classification
 
     boolean newlyCreated
     boolean underControl
@@ -44,7 +44,7 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
     private T resolved
     private String changed
 
-    DefaultCatalogueElementProxy(CatalogueElementProxyRepository repository, Class<T> domain, String id, String classification, String name, boolean underControl) {
+    DefaultCatalogueElementProxy(CatalogueElementProxyRepository repository, Class<T> domain, String id, CatalogueElementProxy<DataModel> classification, String name, boolean underControl) {
         if (!(domain in KNOWN_DOMAIN_CLASSES)) {
             throw new IllegalArgumentException("Only domain classes of $KNOWN_DOMAIN_CLASSES are supported as proxies")
         }
@@ -139,10 +139,10 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
         }
 
         if (key == 'dataModel' || key == 'classification') {
-            if (value instanceof String) {
-                classification = value
-            } else if (value instanceof org.modelcatalogue.core.api.CatalogueElement) {
-                classification = value.name
+            if (value instanceof CatalogueElementProxy) {
+                classification = value as CatalogueElementProxy<DataModel>
+            } else {
+                throw new IllegalArgumentException("Data model cannot be ${value?.class}. Please, create a proxy before setting the parameter: $value")
             }
         }
 
@@ -323,6 +323,7 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
         if (underControl && !repository.isCopyRelationship()) {
             CatalogueElement existing = findExisting()
             if (!existing) {
+                // TODO: check if this can actually happened as the presence check preceeds the relationships check
                 return true
             }
             Set<Long> allRelationships = []
@@ -333,6 +334,7 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
         return false
     }
+
 
     T findExisting() {
         if (modelCatalogueId) {
@@ -359,6 +361,9 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
         if (name) {
             if (classification) {
                 return repository.tryFind(domain, classification, name, modelCatalogueId)
+            }
+            if (domain == DataModel && getParameter('semanticVersion')) {
+                return repository.tryFindDataModel(name, getParameter('semanticVersion')?.toString(), modelCatalogueId)
             }
             return repository.tryFindUnclassified(domain, name, modelCatalogueId)
         }
@@ -434,7 +439,7 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
     @Override
     void addToPendingRelationships(RelationshipProxy relationshipProxy) {
         if (!classification && relationshipProxy.relationshipTypeName in [ 'classification', 'declaration' ] && repository.equals(this, relationshipProxy.destination)) {
-            classification = relationshipProxy.source.name
+            classification = relationshipProxy.source
         }
         relationships << relationshipProxy
     }
@@ -473,6 +478,8 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
         }
 
         Sets.newLinkedHashSet(typedOther.relationships).each { RelationshipProxy relationship ->
+            // TODO: is really necessary to distinguish between outgoing and incoming
+            // can we just copy the relationships over
             if (repository.equals(this, relationship.source)) {
                 RelationshipProxy relationshipProxy = new RelationshipProxy(relationship.relationshipTypeName, this, relationship.destination, relationship.extensions)
                 addToPendingRelationships(relationshipProxy)

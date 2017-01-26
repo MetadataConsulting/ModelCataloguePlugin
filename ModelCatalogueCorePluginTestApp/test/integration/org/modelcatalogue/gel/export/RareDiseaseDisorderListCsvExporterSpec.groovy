@@ -66,16 +66,16 @@ class RareDiseaseDisorderListCsvExporterSpec extends IntegrationSpec {
             }
         }
 
-        level2_group1_id = DataClass.findByName(LEVEL2_GROUP1).getCombinedVersion()
-        level3_1_group1_id =  DataClass.findByName(LEVEL3_1_GROUP1).getCombinedVersion()
-        level3_2_group1_id = DataClass.findByName(LEVEL3_2_GROUP1).getCombinedVersion()
-        level4_1_group1_id = DataClass.findByName(LEVEL4_1_GROUP1).getCombinedVersion()
-        level4_2_group1_id = DataClass.findByName(LEVEL4_2_GROUP1).getCombinedVersion()
-        level4_3_group1_id = DataClass.findByName(LEVEL4_3_GROUP1).getCombinedVersion()
-        level2_group2_id = DataClass.findByName(LEVEL2_GROUP2).getCombinedVersion()
-        level3_group2_id = DataClass.findByName(LEVEL3_GROUP2).getCombinedVersion()
-        level4_1_group2_id = DataClass.findByName(LEVEL4_1_GROUP2).getCombinedVersion()
-        level4_2_group2_id = DataClass.findByName(LEVEL4_2_GROUP2).getCombinedVersion()
+        level2_group1_id = DataClass.findByName(LEVEL2_GROUP1).id
+        level3_1_group1_id =  DataClass.findByName(LEVEL3_1_GROUP1).id
+        level3_2_group1_id = DataClass.findByName(LEVEL3_2_GROUP1).id
+        level4_1_group1_id = DataClass.findByName(LEVEL4_1_GROUP1).id
+        level4_2_group1_id = DataClass.findByName(LEVEL4_2_GROUP1).id
+        level4_3_group1_id = DataClass.findByName(LEVEL4_3_GROUP1).id
+        level2_group2_id = DataClass.findByName(LEVEL2_GROUP2).id
+        level3_group2_id = DataClass.findByName(LEVEL3_GROUP2).id
+        level4_1_group2_id = DataClass.findByName(LEVEL4_1_GROUP2).id
+        level4_2_group2_id = DataClass.findByName(LEVEL4_2_GROUP2).id
     }
 
     def "Export model to csv"() {

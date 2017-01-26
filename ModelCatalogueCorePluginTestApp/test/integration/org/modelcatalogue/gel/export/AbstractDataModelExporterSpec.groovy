@@ -115,46 +115,46 @@ class AbstractDataModelExporterSpec extends AbstractIntegrationSpec {
     }
 
     def findDataIds() {
-        level1_id = DataClass.findByName("Dataclass Top Level 1 Root").combinedVersion
-        level2_id_1 = DataClass.findByNameIlike("Info%1%Level2").combinedVersion
-        level2_id_2 = DataClass.findByNameIlike("Info%2%Level2").combinedVersion
+        level1_id = DataClass.findByName("Dataclass Top Level 1 Root").id
+        level2_id_1 = DataClass.findByNameIlike("Info%1%Level2").id
+        level2_id_2 = DataClass.findByNameIlike("Info%2%Level2").id
 
-        level3_id_1 = DataClass.findByNameIlike("Info%1%Level3%1").combinedVersion
-        level3_id_2 = DataClass.findByNameIlike("Info%1%Level3%2").combinedVersion
-        level3_id_3 = DataClass.findByNameIlike("Info%2%Level3%1").combinedVersion
-        level3_id_4 = DataClass.findByNameIlike("Info%2%Level3%2").combinedVersion
+        level3_id_1 = DataClass.findByNameIlike("Info%1%Level3%1").id
+        level3_id_2 = DataClass.findByNameIlike("Info%1%Level3%2").id
+        level3_id_3 = DataClass.findByNameIlike("Info%2%Level3%1").id
+        level3_id_4 = DataClass.findByNameIlike("Info%2%Level3%2").id
 
-        level4_id_1 = DataClass.findByNameIlike("Info%1%Level4%1").combinedVersion
-        level4_id_2 = DataClass.findByNameIlike("Info%1%Level4%2").combinedVersion
-        level4_id_3 = DataClass.findByNameIlike("Info%2%Level4%1").combinedVersion
-        level4_id_4 = DataClass.findByNameIlike("Info%2%Level4%2").combinedVersion
-        newParticipant_id = DataClass.findByName("New Participant Info class").combinedVersion
-        newParticipant_id2 = DataClass.findByName("New Participant Info class2").combinedVersion
+        level4_id_1 = DataClass.findByNameIlike("Info%1%Level4%1").id
+        level4_id_2 = DataClass.findByNameIlike("Info%1%Level4%2").id
+        level4_id_3 = DataClass.findByNameIlike("Info%2%Level4%1").id
+        level4_id_4 = DataClass.findByNameIlike("Info%2%Level4%2").id
+        newParticipant_id = DataClass.findByName("New Participant Info class").id
+        newParticipant_id2 = DataClass.findByName("New Participant Info class2").id
 
-        elem1_id = DataElement.findByName("Form Element 1").combinedVersion
-        elem2_id = DataElement.findByName("Form Element 2").combinedVersion
-        elem3_id = DataElement.findByName("Form Element 3").combinedVersion
-        elem4_id = DataElement.findByName("Form Element 4").combinedVersion
-        elem5_id = DataElement.findByName("Form Element 5").combinedVersion
-        elem6_id = DataElement.findByName("Form Element 6").combinedVersion
+        elem1_id = DataElement.findByName("Form Element 1").id
+        elem2_id = DataElement.findByName("Form Element 2").id
+        elem3_id = DataElement.findByName("Form Element 3").id
+        elem4_id = DataElement.findByName("Form Element 4").id
+        elem5_id = DataElement.findByName("Form Element 5").id
+        elem6_id = DataElement.findByName("Form Element 6").id
 
-        level5_id1 = DataClass.findByNameIlike(">>1<< Level5 Model Data Element 1").combinedVersion
-        level5_id2 = DataClass.findByNameIlike(">>1<< Level5 Model Data Element 2").combinedVersion
-        level5_id3 = DataClass.findByNameIlike(">>2<< Level5 Model Data Element 1").combinedVersion
-        level5_id4 = DataClass.findByNameIlike(">>2<< Level5 Model Data Element 2").combinedVersion
+        level5_id1 = DataClass.findByNameIlike(">>1<< Level5 Model Data Element 1").id
+        level5_id2 = DataClass.findByNameIlike(">>1<< Level5 Model Data Element 2").id
+        level5_id3 = DataClass.findByNameIlike(">>2<< Level5 Model Data Element 1").id
+        level5_id4 = DataClass.findByNameIlike(">>2<< Level5 Model Data Element 2").id
 
     }
 
     String getLevel2Id(def pos) {
-        return DataClass.findByNameIlike("Info%$pos%Level2").combinedVersion
+        return DataClass.findByNameIlike("Info%$pos%Level2").id
     }
 
     String getLevel3Id(def level2pos, def level3pos) {
-        return DataClass.findByNameIlike("Info%$level2pos%Level3%$level3pos").combinedVersion
+        return DataClass.findByNameIlike("Info%$level2pos%Level3%$level3pos").id
     }
 
     String getLevel4Id(def level2pos, def level3pos) {
-        return DataClass.findByNameIlike("Info%$level2pos%Level4%$level3pos").combinedVersion
+        return DataClass.findByNameIlike("Info%$level2pos%Level4%$level3pos").id
     }
 
     String getLevel2Name(def pos) {

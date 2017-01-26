@@ -10,7 +10,9 @@ if [ "$CIRCLECI" = "" ] ; then
     else
         echo "nvm is already installed on the system"
     fi
+    set +e
     . ~/.nvm/nvm.sh
+    set -e
     nvm install
     nvm use
 fi

@@ -41,20 +41,32 @@ class RareDiseaseCsvExporterSpec extends AbstractRareDiseasesExporterSpec {
         for (int i in 1..2) {
             for (int j in 1..2) {
                 eligibilityCSV += "\n"
-                eligibilityCSV += /${getLevel2Id(i)},${getLevel2Name(i)},${getLevel3Id(i, j)},${getLevel3Name(i, j)},${getLevel4Id(i, j)},${getLevel4Name(i, j)},$today,Inclusion criteria name $i $j,${DataClass.findByName("Inclusion criteria name $i $j").combinedVersion},"Inclusion criteria description  $i $j",/
+                eligibilityCSV += /${getLevel2Id(i)},${getLevel2Name(i)},${getLevel3Id(i, j)},${getLevel3Name(i, j)},${getLevel4Id(i, j)},${getLevel4Name(i, j)},$today,Inclusion criteria name $i $j,${DataClass.findByName("Inclusion criteria name $i $j").id},"Inclusion criteria description  $i $j",/
                 eligibilityCSV += "\n"
-                eligibilityCSV += /${getLevel2Id(i)},${getLevel2Name(i)},${getLevel3Id(i, j)},${getLevel3Name(i, j)},${getLevel4Id(i, j)},${getLevel4Name(i, j)},$today,Exclusion criteria name $i $j,${DataClass.findByName("Exclusion criteria name $i $j").combinedVersion},"Exclusion criteria description  $i $j",/
+                eligibilityCSV += /${getLevel2Id(i)},${getLevel2Name(i)},${getLevel3Id(i, j)},${getLevel3Name(i, j)},${getLevel4Id(i, j)},${getLevel4Name(i, j)},$today,Exclusion criteria name $i $j,${DataClass.findByName("Exclusion criteria name $i $j").id},"Exclusion criteria description  $i $j",/
                 eligibilityCSV += "\n"
-                eligibilityCSV += /${getLevel2Id(i)},${getLevel2Name(i)},${getLevel3Id(i, j)},${getLevel3Name(i, j)},${getLevel4Id(i, j)},${getLevel4Name(i, j)},$today,Prior Genetic testing name $i $j,${DataClass.findByName("Prior Genetic testing name $i $j").combinedVersion},"Prior Genetic testing description  $i $j",/
+                eligibilityCSV += /${getLevel2Id(i)},${getLevel2Name(i)},${getLevel3Id(i, j)},${getLevel3Name(i, j)},${getLevel4Id(i, j)},${getLevel4Name(i, j)},$today,Prior Genetic testing name $i $j,${DataClass.findByName("Prior Genetic testing name $i $j").id},"Prior Genetic testing description  $i $j",/
                 eligibilityCSV += "\n"
-                eligibilityCSV += /${getLevel2Id(i)},${getLevel2Name(i)},${getLevel3Id(i, j)},${getLevel3Name(i, j)},${getLevel4Id(i, j)},${getLevel4Name(i, j)},$today,Prior testing genes name $i $j,${DataClass.findByName("Prior testing genes name $i $j").combinedVersion},"Prior testing genes description  $i $j",/
+                eligibilityCSV += /${getLevel2Id(i)},${getLevel2Name(i)},${getLevel3Id(i, j)},${getLevel3Name(i, j)},${getLevel4Id(i, j)},${getLevel4Name(i, j)},$today,Prior testing genes name $i $j,${DataClass.findByName("Prior testing genes name $i $j").id},"Prior testing genes description  $i $j",/
                 eligibilityCSV += "\n"
-                eligibilityCSV += /${getLevel2Id(i)},${getLevel2Name(i)},${getLevel3Id(i, j)},${getLevel3Name(i, j)},${getLevel4Id(i, j)},${getLevel4Name(i, j)},$today,Closing statement name $i $j,${DataClass.findByName("Closing statement name $i $j").combinedVersion},"Closing statement description  $i $j",/
+                eligibilityCSV += /${getLevel2Id(i)},${getLevel2Name(i)},${getLevel3Id(i, j)},${getLevel3Name(i, j)},${getLevel4Id(i, j)},${getLevel4Name(i, j)},$today,Closing statement name $i $j,${DataClass.findByName("Closing statement name $i $j").id},"Closing statement description  $i $j",/
                 eligibilityCSV += "\n"
-                eligibilityCSV += /${getLevel2Id(i)},${getLevel2Name(i)},${getLevel3Id(i, j)},${getLevel3Name(i, j)},${getLevel4Id(i, j)},${getLevel4Name(i, j)},$today,Guidance name $i $j,${DataClass.findByName("Guidance name $i $j").combinedVersion},"Guidance description  $i $j",/
+                eligibilityCSV += /${getLevel2Id(i)},${getLevel2Name(i)},${getLevel3Id(i, j)},${getLevel3Name(i, j)},${getLevel4Id(i, j)},${getLevel4Name(i, j)},$today,Guidance name $i $j,${DataClass.findByName("Guidance name $i $j").id},"Guidance description  $i $j",/
             }
         }
 
+    }
+
+    String getLevel2Id(def pos){
+        return DataClass.findByNameIlike("Disorder%$pos%Level2").id
+    }
+
+    String getLevel3Id(def level2pos, def level3pos){
+        return DataClass.findByNameIlike("Disorder%$level2pos%Level3%$level3pos").id
+    }
+
+    String getLevel4Id(def level2pos, def level3pos){
+        return DataClass.findByNameIlike("Disorder%$level2pos%Level4%$level3pos").id
     }
 
     def "export HPO and clinical test data from RD model to csv"() {
