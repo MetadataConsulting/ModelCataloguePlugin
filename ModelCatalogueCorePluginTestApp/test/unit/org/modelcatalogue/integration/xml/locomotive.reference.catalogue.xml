@@ -11,7 +11,7 @@
                         <extension key="From">SI</extension>
                     </extensions>
                     <relationships>
-                        <from relationshipType="base" ref="http://www.example.com/types/Decimal" />
+                        <to relationshipType="base" ref="http://www.example.com/types/Decimal" />
                     </relationships>
                 </measurementUnit>
             </dataType>
