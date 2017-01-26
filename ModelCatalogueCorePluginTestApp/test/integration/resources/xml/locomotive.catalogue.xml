@@ -64,13 +64,13 @@
             <sourceToDestination label="parent of">Model can contain (be parent of) multiple models. Child models are finalized when parent model is finalized,</sourceToDestination>
             <destinationToSource label="child of">Model can be contained (be child model) in multiple models. When draft is created for child model drafts for parent models are created as well.</destinationToSource>
         </relationshipType>
-        <relationshipType name="involvedness" source="org.modelcatalogue.core.DataElement" destination="org.modelcatalogue.core.ValidationRule" versionSpecific="true">
-            <sourceToDestination label="is involved in">Data element can be involved in multiple validation rules</sourceToDestination>
-            <destinationToSource label="involves">Validation rule can involve multiple data elements</destinationToSource>
+        <relationshipType name="involvedness" source="org.modelcatalogue.core.ValidationRule" destination="org.modelcatalogue.core.DataElement" versionSpecific="true">
+            <sourceToDestination label="involves">Validation rule can involve multiple data elements</sourceToDestination>
+            <destinationToSource label="is involved in">Data element can be involved in multiple validation rules</destinationToSource>
         </relationshipType>
-        <relationshipType name="ruleContext" source="org.modelcatalogue.core.DataClass" destination="org.modelcatalogue.core.ValidationRule" versionSpecific="true">
-            <sourceToDestination label="provides context for">Data class can provide context for multiple validation rules</sourceToDestination>
-            <destinationToSource label="applied within context">Validation rule is applied within context of data class.</destinationToSource>
+        <relationshipType name="ruleContext" source="org.modelcatalogue.core.ValidationRule" destination="org.modelcatalogue.core.DataClass" versionSpecific="true">
+            <sourceToDestination label="applied within context">Validation rule is applied within context of data class.</sourceToDestination>
+            <destinationToSource label="provides context for">Data class can provide context for multiple validation rules</destinationToSource>
         </relationshipType>
     </relationshipTypes>
 </catalogue>
