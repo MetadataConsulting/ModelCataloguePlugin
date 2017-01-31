@@ -10,6 +10,9 @@ import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.modelcatalogue.core.util.test.TestDataHelper
 import org.modelcatalogue.integration.mc.ModelCatalogueLoader
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
+import org.springframework.core.io.ClassPathResource
+import org.springframework.core.io.support.EncodedResource
+import org.springframework.jdbc.datasource.init.ScriptUtils
 
 class InitCatalogueService {
 
@@ -187,6 +190,12 @@ class InitCatalogueService {
                 .create().load(inputStream)
 
         builder.created
+    }
+
+    void setupStoredProcedures(){
+
+        ScriptUtils.executeSqlScript(sessionFactory.currentSession.connection(), new EncodedResource(new ClassPathResource('mysql-procedures.sql', InitCatalogueService)), false, false, "--", '$$', "/*", "*/")
+
     }
 
 }

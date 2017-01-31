@@ -64,6 +64,7 @@ class BootStrap {
         }
 
         if (Environment.current == Environment.PRODUCTION) {
+            initCatalogueService.setupStoredProcedures()
             userService.inviteAdmins()
         }
 

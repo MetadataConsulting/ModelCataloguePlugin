@@ -15,6 +15,7 @@ import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 class DataModelController extends AbstractCatalogueElementController<DataModel> {
 
     DataClassService dataClassService
+    DataElementService dataElementService
 
 	DataModelController() {
 		super(DataModel, false)
@@ -106,7 +107,7 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
             List<Map> contentDescriptors = []
 
             contentDescriptors << createContentDescriptor(dataModel, 'Data Classes', DataClass, dataClasses.total)
-            contentDescriptors << createContentDescriptor(dataModel, 'Data Elements', DataElement, stats["totalDataElementCount"])
+            contentDescriptors << createContentDescriptor(dataModel, 'Data Elements', DataElement, dataElementService.findAllDataElementsInModel([:], dataModel).total)
             contentDescriptors << createContentDescriptor(dataModel, 'Data Types', DataType, stats["totalDataTypeCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Measurement Units', MeasurementUnit, stats["totalMeasurementUnitCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Business Rules', ValidationRule, stats["totalValidationRuleCount"])
