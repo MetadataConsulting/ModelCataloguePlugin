@@ -422,7 +422,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         respond items
     }
 
-    protected ListWithTotalAndType<T> getAllEffectiveItems(Integer max) {
+    protected ListWrapper<T> getAllEffectiveItems(Integer max) {
         if (params.status?.toLowerCase() == 'active') {
             if (modelCatalogueSecurityService.hasRole('VIEWER')){
                 return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {

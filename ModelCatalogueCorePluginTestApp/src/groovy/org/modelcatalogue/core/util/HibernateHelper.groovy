@@ -1,6 +1,11 @@
 package org.modelcatalogue.core.util
 
 import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsHibernateUtil
+import org.hibernate.SessionFactory
+import org.hibernate.engine.SessionFactoryImplementor
+import org.hibernate.persister.entity.EntityPersister
+import org.hibernate.persister.entity.JoinedSubclassEntityPersister
+import org.hibernate.persister.entity.SingleTableEntityPersister
 import org.hibernate.proxy.HibernateProxy
 
 class HibernateHelper {
@@ -30,5 +35,20 @@ class HibernateHelper {
             return GrailsHibernateUtil.unwrapIfProxy(published)
         }
         return published
+    }
+
+    static Integer getDiscriminatorValue(SessionFactory sessionFactory, Class<?> clazz) {
+        if (sessionFactory instanceof SessionFactoryImplementor) {
+            SessionFactoryImplementor implementor = (SessionFactoryImplementor) sessionFactory
+            EntityPersister persister = implementor.getEntityPersister(clazz.name)
+            if (persister instanceof JoinedSubclassEntityPersister) {
+                JoinedSubclassEntityPersister joinedSubclassEntityPersister = (JoinedSubclassEntityPersister) persister
+                if (joinedSubclassEntityPersister.discriminatorSQLValue) {
+                    return Integer.parseInt(joinedSubclassEntityPersister.discriminatorSQLValue, 10)
+                }
+            }
+        }
+
+        throw new IllegalArgumentException("Cannot determine discriminator value for $clazz")
     }
 }
