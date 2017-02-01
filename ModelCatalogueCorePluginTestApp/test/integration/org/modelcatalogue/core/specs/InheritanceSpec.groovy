@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.specs
 
-import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
@@ -14,39 +14,39 @@ import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.enumeration.Enumerations
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Inheritance
+import org.modelcatalogue.core.util.test.TestDataHelper
 import spock.lang.Ignore
 
-class InheritanceSpec extends IntegrationSpec  {
+class InheritanceSpec extends AbstractIntegrationSpec  {
 
-    public static final String DUMMY_DATA_CLASS_NAME = 'Dummy'
-    public static final String TEST_PARENT_DATA_CLASS_NAME = 'Test Parent Class'
-    public static final String TEST_DATA_ELEMENT_1_NAME = 'Test Data Element 1'
-    public static final String TEST_DATA_ELEMENT_2_NAME = 'Test Data Element 2'
-    public static final String TEST_DATA_ELEMENT_3_NAME = 'Test Data Element 3'
-    public static final String TEST_DATA_ELEMENT_4_NAME = 'Test Data Element 4'
-    public static final String METADATA_KEY_1 = 'one'
-    public static final String METADATA_KEY_2 = 'two'
-    public static final String METADATA_KEY_3 = 'three'
-    public static final String METADATA_KEY_4 = 'four'
-    public static final String METADATA_KEY_5 = 'five'
-    public static final String METADATA_VALUE_1 = '1'
-    public static final String METADATA_VALUE_2 = '2'
-    public static final String METADATA_VALUE_3 = '3'
-    public static final String METADATA_VALUE_4 = '4'
-    public static final String METADATA_VALUE_5 = '5'
-    public static final String METADATA_VALUE_5_ALT = 'V'
-    public static final String TEST_CHILD_DATA_CLASS_NAME = 'Test Child Class'
-    public static final String TEST_PARENT_VALUE_DOMAIN_NAME = 'Test Parent Value Domain'
-    public static final String TEST_CHILD_VALUE_DOMAIN_NAME = 'Test Child Value Domain'
-    public static final String TEST_DATA_TYPE_1_NAME = 'Test Data Type 1'
-    public static final String TEST_DATA_TYPE_2_NAME = 'Test Data Type 2'
-    public static final String TEST_ENUM_TYPE_1_NAME = 'Test Enum Type 1'
-    public static final String TEST_ENUM_TYPE_2_NAME = 'Test Enum Type 2'
-    public static final String TEST_ENUM_TYPE_3_NAME = 'Test Enum Type 3'
-    public static final String TEST_DATA_MODEL_1_NAME = 'Test Data Model 1'
-    public static final String TEST_DATA_MODEL_2_NAME = 'Test Data Model 2'
+    public static final String DUMMY_DATA_CLASS_NAME = 'IS Dummy'
+    public static final String TEST_PARENT_DATA_CLASS_NAME = 'IS Test Parent Class'
+    public static final String TEST_DATA_ELEMENT_1_NAME = 'IS Test Data Element 1'
+    public static final String TEST_DATA_ELEMENT_2_NAME = 'IS Test Data Element 2'
+    public static final String TEST_DATA_ELEMENT_3_NAME = 'IS Test Data Element 3'
+    public static final String TEST_DATA_ELEMENT_4_NAME = 'IS Test Data Element 4'
+    public static final String METADATA_KEY_1 = 'IS one'
+    public static final String METADATA_KEY_2 = 'IS two'
+    public static final String METADATA_KEY_3 = 'IS three'
+    public static final String METADATA_KEY_4 = 'IS four'
+    public static final String METADATA_KEY_5 = 'IS five'
+    public static final String METADATA_VALUE_1 = 'IS 1'
+    public static final String METADATA_VALUE_2 = 'IS 2'
+    public static final String METADATA_VALUE_3 = 'IS 3'
+    public static final String METADATA_VALUE_4 = 'IS 4'
+    public static final String METADATA_VALUE_5 = 'IS 5'
+    public static final String METADATA_VALUE_5_ALT = 'IS V'
+    public static final String TEST_CHILD_DATA_CLASS_NAME = 'IS Test Child Class'
+    public static final String TEST_PARENT_VALUE_DOMAIN_NAME = 'IS Test Parent Value Domain'
+    public static final String TEST_CHILD_VALUE_DOMAIN_NAME = 'IS Test Child Value Domain'
+    public static final String TEST_DATA_TYPE_1_NAME = 'IS Test Data Type 1'
+    public static final String TEST_DATA_TYPE_2_NAME = 'IS Test Data Type 2'
+    public static final String TEST_ENUM_TYPE_1_NAME = 'IS Test Enum Type 1'
+    public static final String TEST_ENUM_TYPE_2_NAME = 'IS Test Enum Type 2'
+    public static final String TEST_ENUM_TYPE_3_NAME = 'IS Test Enum Type 3'
+    public static final String TEST_DATA_MODEL_1_NAME = 'IS Test Data Model 1'
+    public static final String TEST_DATA_MODEL_2_NAME = 'IS Test Data Model 2'
 
-    InitCatalogueService initCatalogueService
     ElementService elementService
     CatalogueBuilder catalogueBuilder
 
@@ -68,44 +68,45 @@ class InheritanceSpec extends IntegrationSpec  {
     DataModel dataModel2
     Relationship baseClass
     Relationship baseElement
-    Relationship baseEnum
 
     def setup() {
-        initCatalogueService.initDefaultRelationshipTypes()
-        catalogueBuilder.build {
-            skip draft
-            dataModel name: TEST_DATA_MODEL_1_NAME, {
-                dataClass name: DUMMY_DATA_CLASS_NAME
-                dataClass name: TEST_PARENT_DATA_CLASS_NAME, {
-                    dataElement name: TEST_DATA_ELEMENT_1_NAME
-                    dataElement name: TEST_DATA_ELEMENT_2_NAME
-                    dataElement name: TEST_DATA_ELEMENT_3_NAME
-                    ext METADATA_KEY_1, METADATA_VALUE_1
-                    ext METADATA_KEY_2, METADATA_VALUE_2
-                    ext METADATA_KEY_3, METADATA_VALUE_3
-                    rel 'synonym' to dataClass called DUMMY_DATA_CLASS_NAME
-                }
-                dataElement name: TEST_PARENT_VALUE_DOMAIN_NAME, {
-                    dataType name: TEST_DATA_TYPE_1_NAME
-                }
-                dataElement name: TEST_CHILD_VALUE_DOMAIN_NAME
-                dataType name: TEST_DATA_TYPE_2_NAME
-                dataType name: TEST_ENUM_TYPE_1_NAME, enumerations: [
+        TestDataHelper.initFreshDb(sessionFactory, 'inheritanceSpec.sql') {
+            initRelationshipTypes()
+            catalogueBuilder.build {
+                skip draft
+                dataModel name: TEST_DATA_MODEL_1_NAME, {
+                    dataClass name: DUMMY_DATA_CLASS_NAME
+                    dataClass name: TEST_PARENT_DATA_CLASS_NAME, {
+                        dataElement name: TEST_DATA_ELEMENT_1_NAME
+                        dataElement name: TEST_DATA_ELEMENT_2_NAME
+                        dataElement name: TEST_DATA_ELEMENT_3_NAME
+                        ext METADATA_KEY_1, METADATA_VALUE_1
+                        ext METADATA_KEY_2, METADATA_VALUE_2
+                        ext METADATA_KEY_3, METADATA_VALUE_3
+                        rel 'synonym' to dataClass called DUMMY_DATA_CLASS_NAME
+                    }
+                    dataElement name: TEST_PARENT_VALUE_DOMAIN_NAME, {
+                        dataType name: TEST_DATA_TYPE_1_NAME
+                    }
+                    dataElement name: TEST_CHILD_VALUE_DOMAIN_NAME
+                    dataType name: TEST_DATA_TYPE_2_NAME
+                    dataType name: TEST_ENUM_TYPE_1_NAME, enumerations: [
                         'one': '1',
                         'two': '2',
                         'three': '3',
                         'four': '4',
                         'five': '5'
-                ]
+                    ]
 
-                dataType name: TEST_ENUM_TYPE_2_NAME, enumerations: [:]
-                dataType name: TEST_ENUM_TYPE_3_NAME, enumerations: [:]
-            }
+                    dataType name: TEST_ENUM_TYPE_2_NAME, enumerations: [:]
+                    dataType name: TEST_ENUM_TYPE_3_NAME, enumerations: [:]
+                }
 
-            dataModel name: TEST_DATA_MODEL_2_NAME, {
-                dataClass name: TEST_CHILD_DATA_CLASS_NAME, {
-                    dataElement name: TEST_DATA_ELEMENT_4_NAME
-                    ext METADATA_KEY_4, METADATA_VALUE_4
+                dataModel name: TEST_DATA_MODEL_2_NAME, {
+                    dataClass name: TEST_CHILD_DATA_CLASS_NAME, {
+                        dataElement name: TEST_DATA_ELEMENT_4_NAME
+                        ext METADATA_KEY_4, METADATA_VALUE_4
+                    }
                 }
             }
         }
@@ -244,12 +245,12 @@ class InheritanceSpec extends IntegrationSpec  {
     def "Inherit relationships"() {
         addBasedOn()
         expect: "version specific relationships are inherited"
-        parentClass.countContains() == 3
-        childClass.countContains() == 4
+        parentClass.contains.size() == 3
+        childClass.contains.size() == 4
 
         and: "semantic links aren't"
-        parentClass.countIsSynonymFor() == 1
-        childClass.countIsSynonymFor() == 0
+        parentClass.isSynonymFor.size() == 1
+        childClass.isSynonymFor.size() == 0
 
         when: "we remove relationships from parent"
         parentClass.removeFromContains dataElement1
@@ -459,12 +460,12 @@ class InheritanceSpec extends IntegrationSpec  {
 
     private void assertNothingInherited() {
         assert parentClass
-        assert parentClass.countIsSynonymFor() == 1
-        assert parentClass.countContains() == 3
+        assert parentClass.isSynonymFor.size() == 1
+        assert parentClass.contains.size() == 3
         assert parentClass.ext.size() == 3
 
         assert childClass
-        assert childClass.countContains() == 1
+        assert childClass.contains.size() == 1
         assert childClass.extensions.size() == 1
 
         assert dummyClass
@@ -612,14 +613,16 @@ class InheritanceSpec extends IntegrationSpec  {
 
         then:
         inherited
-        inherited.dataType
-        inherited.description == firstInheritedDescription
-        inherited.dataType.name == firstInheritedTypeName
-
         inheriting
+
+        inherited.dataType
         inheriting.dataType
-        inheriting.description == firstInheritedDescription
+
+        inherited.dataType.name == firstInheritedTypeName
         inheriting.dataType.name == firstInheritedTypeName
+
+        inherited.description == firstInheritedDescription
+        inheriting.description == firstInheritedDescription
 
         when:
         inherited.description = secondInheritedDescription

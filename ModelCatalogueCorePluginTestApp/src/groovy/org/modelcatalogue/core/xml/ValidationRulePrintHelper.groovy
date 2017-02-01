@@ -38,7 +38,7 @@ class ValidationRulePrintHelper extends CatalogueElementPrintHelper<ValidationRu
             mkp.notificationTarget rule.notificationTarget
         }
         for (Relationship rel in rule.involvesRelationships) {
-            printElement(mkp, rel.source, context, rel)
+            printElement(mkp, rel.destination, context, rel)
         }
     }
 }

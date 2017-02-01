@@ -6,7 +6,7 @@ import org.modelcatalogue.core.Relationship
 
 class Inheritance {
 
-    static void withAllChildren(CatalogueElement element, Set<CatalogueElement> processed = new HashSet<CatalogueElement>([element]),  @DelegatesTo(CatalogueElement) Closure closure) {
+    static void withAllParents(CatalogueElement element, Set<CatalogueElement> processed = new HashSet<CatalogueElement>([element]),  @DelegatesTo(CatalogueElement) Closure closure) {
         if (element == null) {
             return
         }
@@ -19,11 +19,11 @@ class Inheritance {
             }
             processed << relationship.destination
             withElementAndRelationship(closure, relationship.destination, relationship)
-            withAllChildren(relationship.destination, processed, closure)
+            withAllParents(relationship.destination, processed, closure)
         }
     }
 
-    static void withAllParents(CatalogueElement element, Set<CatalogueElement> processed = new HashSet<CatalogueElement>([element]),  @DelegatesTo(CatalogueElement) Closure closure) {
+    static void withAllChildren(CatalogueElement element, Set<CatalogueElement> processed = new HashSet<CatalogueElement>([element]),  @DelegatesTo(CatalogueElement) Closure closure) {
         if (element == null) {
             return
         }
@@ -36,11 +36,11 @@ class Inheritance {
             }
             processed << relationship.source
             withElementAndRelationship(closure, relationship.source, relationship)
-            withAllParents(relationship.source, processed, closure)
+            withAllChildren(relationship.source, processed, closure)
         }
     }
 
-    static void withChildren(CatalogueElement element, @DelegatesTo(CatalogueElement) Closure closure) {
+    static void withParents(CatalogueElement element, @DelegatesTo(CatalogueElement) Closure closure) {
         if (element == null) {
             return
         }
@@ -52,7 +52,7 @@ class Inheritance {
         }
     }
 
-    static void withParents(CatalogueElement element, @DelegatesTo(CatalogueElement) Closure closure) {
+    static void withChildren(CatalogueElement element, @DelegatesTo(CatalogueElement) Closure closure) {
         if (element == null) {
             return
         }

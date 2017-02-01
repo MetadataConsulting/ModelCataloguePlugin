@@ -150,7 +150,7 @@ class CatalogueXmlLoader {
             case 'extension': handleExtension(element) ; break
             case 'relatedTo': handleRelationship(element, true, 'relatedTo') ; break
             case 'synonym': handleRelationship(element, true, 'synonym') ; break
-            case 'basedOn': handleRelationship(element, false, 'base') ; break
+            case 'basedOn': handleRelationship(element, true, 'base') ; break
             case 'to': handleRelationship(element, true) ; break
             case 'from': handleRelationship(element, true) ; break
             case 'skipDraft': handleSkipDraft(element) ; break

@@ -407,7 +407,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
 
         ListWithTotalAndType<T> items = getAllEffectiveItems(max)
-
+        //TODO - review usage - is this used? and when?
         if (params.boolean('minimal') && items instanceof ListWithTotalAndTypeWrapper) {
             ListWithTotalAndTypeWrapper<T> listWrapper = items as ListWithTotalAndTypeWrapper<T>
 

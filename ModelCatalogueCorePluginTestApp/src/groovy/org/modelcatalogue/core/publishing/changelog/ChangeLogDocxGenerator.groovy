@@ -245,7 +245,7 @@ class ChangeLogDocxGenerator extends AbstractChangeLogGenerator{
         handleRelationshipChanges(builder, RelationshipChangesCheckConfiguration.create(dataClass, RelationshipType.containmentType, byDestinationsAndSources).withChangesSummaryHeading("Changed Data Elements").withNewRelationshipNote("New data element").withRemovedRelationshipNote("Data element removed").withDeep(true))
         handleRelationshipChanges(builder, RelationshipChangesCheckConfiguration.create(dataClass, RelationshipType.synonymType, byDestinationsAndSources).withChangesSummaryHeading("Changed Synonyms").withNewRelationshipNote("New synonym").withRemovedRelationshipNote("Synonym removed"))
         handleRelationshipChanges(builder, RelationshipChangesCheckConfiguration.create(dataClass, RelationshipType.relatedToType, byDestinationsAndSources).withChangesSummaryHeading("Changed Relations").withNewRelationshipNote("Newly related").withRemovedRelationshipNote("No longer related"))
-        handleRelationshipChanges(builder, RelationshipChangesCheckConfiguration.create(dataClass, RelationshipType.baseType, byDestinationsAndSources).withChangesSummaryHeading("Changed Bases").withNewRelationshipNote("Newly based on").withRemovedRelationshipNote("No longer based on").withIncoming(true))
+        handleRelationshipChanges(builder, RelationshipChangesCheckConfiguration.create(dataClass, RelationshipType.baseType, byDestinationsAndSources).withChangesSummaryHeading("Changed Bases").withNewRelationshipNote("Newly based on").withRemovedRelationshipNote("No longer based on"))
     }
 
     private void handleRelationshipChanges(Delayable<DocumentBuilder> builder, RelationshipChangesCheckConfiguration configuration) {

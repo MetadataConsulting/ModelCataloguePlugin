@@ -15,7 +15,7 @@ sed "s/ENV MC_VERSION.*/ENV MC_VERSION $TRAVIS_TAG/" Dockerfile > TemporaryDocke
 rm Dockerfile
 mv TemporaryDockerfile Dockerfile
 
-git add -A .
+git add -f Dockerfile
 git commit -m "Travis MetadataConsulting/ModelCataloguePlugin build $TRAVIS_BUILD_NUMBER pushed MetadataConsulting/registry"
 git tag "$TRAVIS_TAG"
 git push -fq origin 2.x > /dev/null
