@@ -63,8 +63,9 @@ class BootStrap {
             initSecurity(!System.getenv('MC_BLANK_DEV'))
         }
 
+        initCatalogueService.setupStoredProcedures()
+
         if (Environment.current == Environment.PRODUCTION) {
-            initCatalogueService.setupStoredProcedures()
             userService.inviteAdmins()
         }
 
