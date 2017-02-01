@@ -193,8 +193,9 @@ class InitCatalogueService {
     }
 
     void setupStoredProcedures(){
-
-        ScriptUtils.executeSqlScript(sessionFactory.currentSession.connection(), new EncodedResource(new ClassPathResource('mysql-procedures.sql', InitCatalogueService)), false, false, "--", '$$', "/*", "*/")
+        if (sessionFactory.currentSession.connection().metaData.databaseProductName == 'MySQL') {
+            ScriptUtils.executeSqlScript(sessionFactory.currentSession.connection(), new EncodedResource(new ClassPathResource('mysql-procedures.sql', InitCatalogueService)), false, false, "--", '$$', "/*", "*/")
+        }
 
     }
 
