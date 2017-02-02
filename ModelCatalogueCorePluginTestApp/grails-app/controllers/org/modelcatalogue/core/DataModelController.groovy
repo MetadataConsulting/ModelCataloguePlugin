@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import com.google.common.collect.ImmutableSet
 import grails.util.GrailsNameUtils
+import org.hibernate.SessionFactory
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
 import org.modelcatalogue.core.util.DataModelFilter
@@ -17,6 +18,7 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
     DataClassService dataClassService
     DataElementService dataElementService
     DataTypeService dataTypeService
+    SessionFactory sessionFactory
 
 	DataModelController() {
 		super(DataModel, false)
@@ -107,10 +109,11 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
         ListWithTotalAndType<Map> list = Lists.lazy(params, Map) {
             List<Map> contentDescriptors = []
 
+            boolean isMysql = sessionFactory.currentSession.connection().metaData.databaseProductName == 'MySQL'
+
             contentDescriptors << createContentDescriptor(dataModel, 'Data Classes', DataClass, dataClasses.total)
-            contentDescriptors << createContentDescriptor(dataModel, 'Data Elements', DataElement, dataElementService.findAllDataElementsInModel([:], dataModel).total)
-            contentDescriptors << createContentDescriptor(dataModel, 'Data Types', DataType, dataTypeService.findAllDataTypesInModel([:], dataModel).total)
-            //contentDescriptors << createContentDescriptor(dataModel, 'Data Types',DataType, stats["totalDataTypeCount"])
+            contentDescriptors << createContentDescriptor(dataModel, 'Data Elements', DataElement, isMysql ? dataElementService.findAllDataElementsInModel([:], dataModel).total : stats["totalDataElementCount"])
+            contentDescriptors << createContentDescriptor(dataModel, 'Data Types', DataType, isMysql ? dataTypeService.findAllDataTypesInModel([:], dataModel).total : stats["totalDataTypeCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Measurement Units', MeasurementUnit, stats["totalMeasurementUnitCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Business Rules', ValidationRule, stats["totalValidationRuleCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Assets', Asset, stats["totalAssetCount"])
