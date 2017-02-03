@@ -71,6 +71,8 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
         properties.push label: 'Property', value: -> element.property
         properties.push label: 'Old Value', value: -> if element.oldValue?.value then element.oldValue.value else element.oldValue
         properties.push label: 'New Value', value: -> if element.newValue?.value then element.newValue.value else element.newValue
+        if element.difference
+          properties.push label: 'Difference', value: -> element.difference
     properties
 
   getRowForElement = (element, oldRow) ->
