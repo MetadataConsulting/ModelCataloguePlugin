@@ -38,9 +38,6 @@ DETERMINISTIC
 
             SET queue_length = queue_length - 1;
 
-            call doLog(concat_ws(': ','front_id',  front_id));
-            call doLog(concat_ws(': ','processed',  processed));
-
             IF find_in_set(front_id, processed) = 0 THEN
                 SET processed = AddToSet(front_id, processed);
 
