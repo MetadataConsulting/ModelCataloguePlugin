@@ -38,7 +38,7 @@ DETERMINISTIC
 
             SET queue_length = queue_length - 1;
 
-            IF find_in_set(front_id, processed) = 0 THEN
+            IF IFNULL(find_in_set(front_id, processed), 0) <= 0 THEN
                 SET processed = AddToSet(front_id, processed);
 
                 SELECT IFNULL(qc,'') INTO queue_children
