@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.audit
 
+import com.google.common.collect.ImmutableList
 import grails.gorm.DetachedCriteria
 import grails.util.Holders
 import org.hibernate.SessionFactory
@@ -228,6 +229,26 @@ class AuditService {
         }
     }
 
+    ListWithTotalAndType<Change> getElementChanges(Map params, Long latestVersionId){
+        if (!params.sort) {
+            params.sort  = 'dateCreated'
+            params.order = 'desc'
+        }
+
+
+        Lists.fromCriteria(params, Change) {
+            eq 'latestVersionId', latestVersionId
+            isNull('parentId')
+            ne 'system', Boolean.TRUE
+            ne 'otherSide', Boolean.TRUE
+            not {
+                inList('type', ImmutableList.of(ChangeType.NEW_VERSION_CREATED, ChangeType.NEW_ELEMENT_CREATED, ChangeType.ELEMENT_DEPRECATED))
+            }
+
+        }
+
+    }
+
     CatalogueElement logNewVersionCreated(CatalogueElement element, Closure<CatalogueElement> createDraftBlock) {
         Long changeId = auditor.get().logNewVersionCreated(element, modelCatalogueSecurityService.currentUser?.id).toBlocking().first()
         CatalogueElement ce = withParentId(changeId, createDraftBlock)
@@ -265,6 +286,7 @@ class AuditService {
     CatalogueElement logExternalChange(CatalogueElement source, Long authorId, String message, Closure<CatalogueElement> createDraftBlock) {
         withDefaultAuthorAndParentAction(authorId ,auditor.get().logExternalChange(source, message, modelCatalogueSecurityService.currentUser?.id).toBlocking().first(), createDraftBlock)
     }
+
 
     void logNewMetadata(ExtensionValue extension) {
         auditor.get().logNewMetadata(extension, modelCatalogueSecurityService.currentUser?.id)

@@ -875,14 +875,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
         params.max = Math.min(max ?: 10, 100)
 
-        Map<String, Object> customParams = [:]
-        customParams.putAll params
 
-        customParams.sort = historySortProperty
-        customParams.order = historyOrderDirection
-
-
-        respond CatalogueElementService.getAllVersions(customParams, element)
+        respond Lists.wrap(params,  "/${resourceName}/${params.id}/history", auditService.getElementChanges(params, element.latestVersionId ?: element.id))
     }
 
 

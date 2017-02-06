@@ -7,7 +7,7 @@ safe = (fn, defaultValue) ->
     catch
       return defaultValue
 
-changes = angular.module('mc.core.changes', ['mc.core.ui.columns', 'mc.util.ui.actions', 'mc.core.catalogue','mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot', 'mc.util.names', 'mc.core.ui.catalogueElementProperties'])
+changes = angular.module('mc.core.changes', ['mc.core.ui.columns', 'mc.util.ui.actions', 'mc.core.catalogue','mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot', 'mc.util.names', 'mc.core.ui.catalogueElementProperties', 'diff-match-patch'])
 
 changes.run ['$templateCache', ($templateCache) ->
   $templateCache.put 'modelcatalogue/core/ui/catalogueElementView/history-tab.html', '''
@@ -19,7 +19,13 @@ changes.run ['$templateCache', ($templateCache) ->
 
 changes.config ['enhanceProvider', (enhanceProvider)->
   condition = (item) -> item.hasOwnProperty('elementType') and item.elementType is 'org.modelcatalogue.core.audit.Change'
-  factory   = ['modelCatalogueApiRoot', 'rest', '$rootScope', 'enhance', 'catalogueElementProperties', '$state', (modelCatalogueApiRoot, rest, $rootScope, enhance, catalogueElementProperties, $state) ->
+  factory   = ['modelCatalogueApiRoot', 'rest', '$rootScope', 'enhance', 'catalogueElementProperties', '$state', 'dmp', (modelCatalogueApiRoot, rest, $rootScope, enhance, catalogueElementProperties, $state, dmp) ->
+    printOrderedMap = (orderedMap)   ->
+      theMap = angular.fromJson(orderedMap)
+      enumerations = []
+      enumerations.push "#{enumeration.key}: #{enumeration.value}" for enumeration in theMap.values
+      enumerations.join('\n')
+
     getProperty = (name, catalogueElementProperties) ->
       propertyName = catalogueElementProperties.getConfigurationFor(name)?.label
       propertyName = names.getNaturalName(name) unless propertyName
@@ -87,6 +93,16 @@ changes.config ['enhanceProvider', (enhanceProvider)->
       element.refresh = -> {then: (callback) -> callback(element) }
       element.getIcon = -> getIconForChangeType(element)
 
+      if angular.isString(element.oldValue) and angular.isString(element.newValue) or angular.isString(element.oldValue?.value) and angular.isString(element.newValue?.value)
+        leftValue = element.oldValue?.value ? element.oldValue
+        rightValue = element.newValue?.value ? element.newValue
+
+        if leftValue.indexOf('"type":"orderedMap"') >= 0 and rightValue.indexOf('"type":"orderedMap"') >= 0
+          leftValue = printOrderedMap(leftValue)
+          rightValue = printOrderedMap(rightValue)
+
+        element.difference = dmp.createSemanticDiffHtml(leftValue, rightValue)
+
       element
   ]
 
@@ -127,28 +143,28 @@ changes.config ['catalogueProvider', (catalogueProvider)->
   catalogueProvider.setDefaultSort 'change', sort: 'dateCreated', order: 'desc'
 ]
 
-changes.config ['columnsProvider', 'names', (columnsProvider, names)->
+changes.config ['columnsProvider', 'names', 'catalogueElementPropertiesProvider', (columnsProvider, names, catalogueElementPropertiesProvider)->
 
   getIconForChangeType = (change) ->
     switch change.type
-      when 'EXTERNAL_UPDATE' then """<span title="External Change"><span class="#{change.changed.getIcon()} fa-fw text-success"></span> <span class="fa fa-upload fa-fw text-success"></span></span>"""
-      when 'NEW_ELEMENT_CREATED' then """<span title="New Element Created"><span class="#{change.changed.getIcon()} fa-fw text-success"></span> <span class="fa fa-plus fa-fw text-success"></span></span>"""
-      when 'NEW_VERSION_CREATED' then """<span title="New Version Created"><span class="#{change.changed.getIcon()} fa-fw text-success"></span> <span class="fa fa-arrow-circle-up fa-fw text-success"></span></span>"""
-      when 'PROPERTY_CHANGED' then """<span title="Property Changed"><span class="#{change.changed.getIcon()} fa-fw text-info"></span> <span class="fa fa-edit fa-fw text-info"></span></span>"""
-      when 'ELEMENT_DELETED' then """<span title="Element Deleted"><span class="#{change.changed.getIcon()} fa-fw text-danger"></span> <span class="fa fa-remove fa-fw text-danger"></span></span>"""
-      when 'ELEMENT_FINALIZED' then """<span title="Element Finalized"><span class="#{change.changed.getIcon()} fa-fw text-primary"></span> <span class="fa fa-check-square-o fa-fw text-primary"></span></span>"""
-      when 'ELEMENT_DEPRECATED' then """<span title="Element Deprecated"><span class="#{change.changed.getIcon()} fa-fw text-danger"></span> <span class="fa fa-ban fa-fw text-danger"></span></span>"""
-      when 'METADATA_CREATED' then """<span title="Metadata Created"><span class="fa fa-th-list fa-fw text-success"></span> <span class="fa fa-plus fa-fw text-success"></span></span>"""
-      when 'METADATA_UPDATED' then """<span title="Metadata Updated"><span class="fa fa-th-list fa-fw text-info"></span> <span class="fa fa-edit fa-fw text-info"></span></span>"""
-      when 'METADATA_DELETED' then """<span title="Metadata Deleted"><span class="fa fa-th-list fa-fw text-danger"></span> <span class="fa fa-remove fa-fw text-danger"></span></span>"""
-      when 'MAPPING_CREATED' then """<span title="Mapping Created"><span class="fa fa-superscript fa-fw text-success"></span> <span class="fa fa-plus fa-fw text-success"></span></span>"""
-      when 'MAPPING_UPDATED' then """<span title="Mapping Updated"><span class="fa fa-superscript fa-fw text-info"></span> <span class="fa fa-edit fa-fw text-info"></span></span>"""
-      when 'MAPPING_DELETED' then """<span title="Mapping Deleted"><span class="fa fa-superscript fa-fw text-danger"></span> <span class="fa fa-remove fa-fw text-danger"></span></span>"""
-      when 'RELATIONSHIP_CREATED' then """<span title="Relationship Created"><span class="fa fa-link fa-fw text-success"></span> <span class="fa fa-plus fa-fw text-success"></span></span>"""
-      when 'RELATIONSHIP_DELETED' then """<span title="Relationship Deleted"><span class="fa fa-link fa-fw text-danger"></span> <span class="fa fa-remove fa-fw text-danger"></span></span>"""
-      when 'RELATIONSHIP_METADATA_CREATED' then """<span title="Relationship Metadata Created"><span class="fa fa-list-ul fa-fw text-success"></span> <span class="fa fa-plus fa-fw text-success"></span></span>"""
-      when 'RELATIONSHIP_METADATA_UPDATED' then """<span title="Relationship Metadata Updated"><span class="fa fa-list-ul fa-fw text-info"></span> <span class="fa fa-edit fa-fw text-info"></span></span>"""
-      when 'RELATIONSHIP_METADATA_DELETED' then """<span title="Relationship Metadata Deleted"><span class="fa fa-list-ul fa-fw text-danger"></span> <span class="fa fa-remove fa-fw text-danger"></span></span>"""
+      when 'EXTERNAL_UPDATE' then """<br/>><span title="External Change"><span class="#{change.changed.getIcon()} fa-fw text-success"></span> <span class="fa fa-upload fa-fw text-success"></span></span>"""
+      when 'NEW_ELEMENT_CREATED' then """<br/><span title="New Element Created"><span class="#{change.changed.getIcon()} fa-fw text-success"></span> <span class="fa fa-plus fa-fw text-success"></span></span>"""
+      when 'NEW_VERSION_CREATED' then """<br/><span title="New Version Created"><span class="#{change.changed.getIcon()} fa-fw text-success"></span> <span class="fa fa-arrow-circle-up fa-fw text-success"></span></span>"""
+      when 'PROPERTY_CHANGED' then """<br/><span title="Property Changed"><span class="#{change.changed.getIcon()} fa-fw text-info"></span> <span class="fa fa-edit fa-fw text-info"></span></span>"""
+      when 'ELEMENT_DELETED' then """<br/><span title="Element Deleted"><span class="#{change.changed.getIcon()} fa-fw text-danger"></span> <span class="fa fa-remove fa-fw text-danger"></span></span>"""
+      when 'ELEMENT_FINALIZED' then """<br/><span title="Element Finalized"><span class="#{change.changed.getIcon()} fa-fw text-primary"></span> <span class="fa fa-check-square-o fa-fw text-primary"></span></span>"""
+      when 'ELEMENT_DEPRECATED' then """<br/><span title="Element Deprecated"><span class="#{change.changed.getIcon()} fa-fw text-danger"></span> <span class="fa fa-ban fa-fw text-danger"></span></span>"""
+      when 'METADATA_CREATED' then """<br/><span title="Metadata Created"><span class="fa fa-th-list fa-fw text-success"></span> <span class="fa fa-plus fa-fw text-success"></span></span>"""
+      when 'METADATA_UPDATED' then """<br/><span title="Metadata Updated"><span class="fa fa-th-list fa-fw text-info"></span> <span class="fa fa-edit fa-fw text-info"></span></span>"""
+      when 'METADATA_DELETED' then """<br/><span title="Metadata Deleted"><span class="fa fa-th-list fa-fw text-danger"></span> <span class="fa fa-remove fa-fw text-danger"></span></span>"""
+      when 'MAPPING_CREATED' then """<br/><span title="Mapping Created"><span class="fa fa-superscript fa-fw text-success"></span> <span class="fa fa-plus fa-fw text-success"></span></span>"""
+      when 'MAPPING_UPDATED' then """<br/><span title="Mapping Updated"><span class="fa fa-superscript fa-fw text-info"></span> <span class="fa fa-edit fa-fw text-info"></span></span>"""
+      when 'MAPPING_DELETED' then """<br/><span title="Mapping Deleted"><span class="fa fa-superscript fa-fw text-danger"></span> <span class="fa fa-remove fa-fw text-danger"></span></span>"""
+      when 'RELATIONSHIP_CREATED' then """<br/><span title="Relationship Created"><span class="fa fa-link fa-fw text-success"></span> <span class="fa fa-plus fa-fw text-success"></span></span>"""
+      when 'RELATIONSHIP_DELETED' then """<br/><span title="Relationship Deleted"><span class="fa fa-link fa-fw text-danger"></span> <span class="fa fa-remove fa-fw text-danger"></span></span>"""
+      when 'RELATIONSHIP_METADATA_CREATED' then """<br/><span title="Relationship Metadata Created"><span class="fa fa-list-ul fa-fw text-success"></span> <span class="fa fa-plus fa-fw text-success"></span></span>"""
+      when 'RELATIONSHIP_METADATA_UPDATED' then """<br/><span title="Relationship Metadata Updated"><span class="fa fa-list-ul fa-fw text-info"></span> <span class="fa fa-edit fa-fw text-info"></span></span>"""
+      when 'RELATIONSHIP_METADATA_DELETED' then """<br/><span title="Relationship Metadata Deleted"><span class="fa fa-list-ul fa-fw text-danger"></span> <span class="fa fa-remove fa-fw text-danger"></span></span>"""
 
   getLinkTo = (element) ->
     return "<code>null</code>" unless element
@@ -172,22 +188,22 @@ changes.config ['columnsProvider', 'names', (columnsProvider, names)->
       when 'EXTERNAL_UPDATE' then """#{change.property} (from #{getLinkTo(change.changed)})"""
       when 'NEW_ELEMENT_CREATED' then """#{getLinkTo(change.changed)} created"""
       when 'NEW_VERSION_CREATED' then """New version #{getLinkTo(change.changed)} created"""
-      when 'PROPERTY_CHANGED' then """Property #{getProperty(change.property, catalogueElementProperties)} of #{getLinkTo(change.changed)} changed from #{getValue(change.oldValue)} to #{getValue(change.newValue)} """
+      when 'PROPERTY_CHANGED' then """Property #{getProperty(change.property, catalogueElementProperties)} of #{getLinkTo(change.changed)} changed"""
       when 'ELEMENT_DELETED' then """#{getLinkTo(change.changed)} deleted"""
       when 'ELEMENT_FINALIZED' then """#{getLinkTo(change.changed)} finalized"""
       when 'ELEMENT_DEPRECATED' then """#{getLinkTo(change.changed)} deprecated"""
-      when 'METADATA_CREATED' then """Metadata <code>#{change.property}</code> of #{getLinkTo(change.changed)} created with value #{getValue(change.newValue)}"""
-      when 'METADATA_UPDATED' then """Metadata <code>#{change.property}</code> of #{getLinkTo(change.changed)} updated from value #{getValue(change.oldValue)} to #{getValue(change.newValue)}"""
-      when 'METADATA_DELETED' then """Metadata <code>#{change.property}</code> of #{getLinkTo(change.changed)} deleted value #{getValue(change.oldValue)}"""
-      when 'MAPPING_CREATED' then """Mapped #{getLinkTo(change.newValue.source)} to #{getLinkTo(change.newValue.destination)} with rule #{getValue(change.newValue.mapping)}"""
-      when 'MAPPING_UPDATED' then """Changed mapping from #{getLinkTo(change.newValue.source)} to #{getLinkTo(change.newValue.destination)} from #{getValue(change.oldValue)} to #{getValue(change.newValue.mapping)} """
-      when 'MAPPING_DELETED' then """Removed mapping from #{getLinkTo(change.oldValue.source)} to #{getLinkTo(change.oldValue.destination)} with rule #{getValue(change.oldValue.mapping)}"""
+      when 'METADATA_CREATED' then """Metadata <code>#{change.property}</code> of #{getLinkTo(change.changed)} created"""
+      when 'METADATA_UPDATED' then """Metadata <code>#{change.property}</code> of #{getLinkTo(change.changed)} updated"""
+      when 'METADATA_DELETED' then """Metadata <code>#{change.property}</code> of #{getLinkTo(change.changed)} deleted"""
+      when 'MAPPING_CREATED' then """Mapped #{getLinkTo(change.newValue.source)} to #{getLinkTo(change.newValue.destination)}"""
+      when 'MAPPING_UPDATED' then """Changed mapping from #{getLinkTo(change.newValue.source)} to #{getLinkTo(change.newValue.destination)}"""
+      when 'MAPPING_DELETED' then """Removed mapping from #{getLinkTo(change.oldValue.source)} to #{getLinkTo(change.oldValue.destination)}"""
       when 'RELATIONSHIP_CREATED' then """Created relationship #{getLinkTo(change.changed)} <code>#{change.property}</code> #{getLinkTo(if change.otherSide then change.newValue.source else change.newValue.destination)}"""
       when 'RELATIONSHIP_DELETED' then """Deleted relationship #{getLinkTo(change.changed)} <code>#{change.property}</code> #{getLinkTo(if change.otherSide then change.oldValue.source else change.oldValue.destination)}"""
 
-      when 'RELATIONSHIP_METADATA_CREATED' then """Relationship #{getLinkTo(change.changed)} <code>#{change.property}</code> #{getLinkTo(if change.otherSide then change.newValue.relationship.source else change.newValue.relationship.destination)} metadata <code>#{change.newValue.name}</code> created with value #{getValue(change.newValue.extensionValue)}"""
-      when 'RELATIONSHIP_METADATA_UPDATED' then """Relationship #{getLinkTo(change.changed)} <code>#{change.property}</code> #{getLinkTo(if change.otherSide then change.newValue.relationship.source else change.newValue.relationship.destination)} metadata <code>#{change.newValue.name}</code> updated from value #{getValue(change.oldValue)} to #{getValue(change.newValue.extensionValue)}"""
-      when 'RELATIONSHIP_METADATA_DELETED' then """Deleted relationship #{getLinkTo(change.changed)} <code>#{change.property}</code> #{getLinkTo(if change.otherSide then change.oldValue.relationship.source else change.oldValue.relationship.destination)} <code>#{change.oldValue.name}</code> with value #{getValue(change.oldValue.extensionValue)}"""
+      when 'RELATIONSHIP_METADATA_CREATED' then """Relationship #{getLinkTo(change.changed)} <code>#{change.property}</code> #{getLinkTo(if change.otherSide then change.newValue.relationship.source else change.newValue.relationship.destination)} metadata <code>#{change.newValue.name}</code> created"""
+      when 'RELATIONSHIP_METADATA_UPDATED' then """Relationship #{getLinkTo(change.changed)} <code>#{change.property}</code> #{getLinkTo(if change.otherSide then change.newValue.relationship.source else change.newValue.relationship.destination)} metadata <code>#{change.newValue.name}</code> updated"""
+      when 'RELATIONSHIP_METADATA_DELETED' then """Deleted relationship #{getLinkTo(change.changed)} <code>#{change.property}</code> #{getLinkTo(if change.otherSide then change.oldValue.relationship.source else change.oldValue.relationship.destination)} <code>#{change.oldValue.name}</code>"""
 
 
   getLinkToParent = (change) ->
@@ -217,8 +233,17 @@ changes.config ['columnsProvider', 'names', (columnsProvider, names)->
     {header: "Type"       , value: getIcon                   , classes: 'col-md-1' }
     {header: "Created"    , value: dateCreated               , classes: 'col-md-2' }
     {header: "Author"     , value: valueOrName('author')     , classes: 'col-md-2' }
-    {header: "Change"     , value: getChangeDescription      , classes: 'col-md-9' }
+    {header: "Change"     , value: getChangeDescription      , classes: 'col-md-7' }
   ]
+
+  catalogueElementPropertiesProvider.configureProperty 'history', {
+    columns: [
+      {header: "Type"       , value: getIcon                            , classes: 'col-md-1' }
+      {header: "Version"    , value: 'changed.dataModel.semanticVersion || changed.semanticVersion', classes: 'col-md-1' }
+      {header: "Author"     , value: valueOrName('author')              , classes: 'col-md-2' }
+      {header: "Change"     , value: getChangeDescription               , classes: 'col-md-8' }
+    ]
+  }
 ]
 
 changes.config ['catalogueElementPropertiesProvider', (catalogueElementPropertiesProvider)->
@@ -248,12 +273,6 @@ changes.config ['catalogueElementPropertiesProvider', (catalogueElementPropertie
       ]
       type:       'properties-pane-for-properties'
     }
-  ]
-
-  catalogueElementPropertiesProvider.configureProperty 'history', tabDefinition: ['$element', '$name', '$value', 'catalogueElementProperties', '$injector', ($element, $name, $value, catalogueElementProperties, $injector) ->
-    definition = $injector.invoke(catalogueElementProperties.getConfigurationFor('enhanced:listReference').tabDefinition, undefined, $element: $element, $name: $name, $value: $value)
-    definition.type = 'history-tab'
-    definition
   ]
 
 ]
