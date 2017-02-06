@@ -11,7 +11,7 @@
         data-value-for="{{property.label}}" ng-switch-when="element">
       <span ng-class="theValue.getIcon()" class="text-muted"></span>
       <a ng-click="theValue.show()">{{theValue.name}}</a>
-      <small><a ng-href="{{theValue.dataModel.href()}}" class="label"
+      <small ng-if="theValue.dataModel"><a ng-href="{{theValue.dataModel.href()}}" class="label"
                 ng-class="{'label-warning': theValue.getDataModelStatus() == 'DRAFT', 'label-info': theValue.getDataModelStatus() == 'PENDING', 'label-primary': theValue.getDataModelStatus() == 'FINALIZED', 'label-danger': theValue.getDataModelStatus() == 'DEPRECATED'}">
         {{theValue.getDataModelWithVersion()}}
       </a>
@@ -38,8 +38,32 @@
         </div>
       </div>
     </td>
+    <td class="pp-table-property-value-no-wrap col-md-8 pp-table-property-element-value"
+        data-value-for="{{property.label}}" ng-switch-when="relationship">
+      <span ng-class="theValue.getIcon()" class="text-muted"></span>
+      <a ng-href="{{theValue.source.href()}}"><span ng-class="theValue.source.getIcon()" class="text-muted"></span> {{theValue.source.name}}</a>
+      <small ng-if="theValue.source.dataModel"><a ng-href="{{theValue.source.dataModel.href()}}" class="label"
+                ng-class="{'label-warning': theValue.source.getDataModelStatus() == 'DRAFT', 'label-info': theValue.source.getDataModelStatus() == 'PENDING', 'label-primary': theValue.source.getDataModelStatus() == 'FINALIZED', 'label-danger': theValue.source.getDataModelStatus() == 'DEPRECATED'}">
+        {{theValue.source.getDataModelWithVersion()}}
+      </a>
+      </small>
+
+      {{theValue.type.name}}
+      <a ng-href="{{theValue.destination.href()}}"><span ng-class="theValue.destination.getIcon()" class="text-muted"></span> {{theValue.destination.name}}</a>
+      <small ng-if="theValue.destination.dataModel"><a ng-href="{{theValue.destination.dataModel.href()}}" class="label"
+                ng-class="{'label-warning': theValue.destination.getDataModelStatus() == 'DRAFT', 'label-info': theValue.destination.getDataModelStatus() == 'PENDING', 'label-primary': theValue.destination.getDataModelStatus() == 'FINALIZED', 'label-danger': theValue.destination.getDataModelStatus() == 'DEPRECATED'}">
+        {{theValue.destination.getDataModelWithVersion()}}
+      </a>
+      </small>
+    </td>
     <td class="pp-table-property-value col-md-8 pp-table-property-element-value" data-value-for="{{property.label}}"
         ng-switch-when="date">{{theValue | date:'short'}}
+    </td>
+    <td class="pp-table-property-value col-md-8 pp-table-property-element-value" data-value-for="{{property.label}}"
+        ng-switch-when="orderedMap">
+      <div class="preserve-new-lines">
+        <span ng-bind-html="printOrderedMap(theValue)"></span>
+      </div>
     </td>
     <td class="pp-table-property-value col-md-8 pp-table-property-element-value" data-value-for="{{property.label}}"
         ng-switch-when="elementArray">
@@ -47,7 +71,7 @@
         <a class="label with-pointer" ng-href="{{element.href()}}">
           <span ng-class="element.getIcon()"></span>
           {{element.name}}
-          <small>
+          <small <small ng-if="element.dataModel">>
             <a ng-href="{{element.dataModel.href()}}" class="label"
                ng-class="{'label-warning': element.getDataModelStatus() == 'DRAFT', 'label-info': element.getDataModelStatus() == 'PENDING', 'label-primary': element.getDataModelStatus() == 'FINALIZED', 'label-danger': element.getDataModelStatus() == 'DEPRECATED'}">
               {{element.getDataModelWithVersion()}}
@@ -64,7 +88,10 @@
       </span>
     </td>
     <td class="pp-table-property-value col-md-8 pp-table-property-element-value" data-value-for="{{property.label}}"
-        ng-switch-default ng-bind-html="theValue == null ? '' : ('' + theValue) | linky:'_blank'">
+        ng-switch-when="text" ng-bind-html="trustedHtml(theValue == null ? '' : ('' + theValue))">
+    </td>
+    <td class="pp-table-property-value col-md-8 pp-table-property-element-value" data-value-for="{{property.label}}"
+        ng-switch-default ng-bind-html="trustedHtml(theValue == null ? '' : ('' + theValue))">
     </td>
   </tr>
   </tbody>

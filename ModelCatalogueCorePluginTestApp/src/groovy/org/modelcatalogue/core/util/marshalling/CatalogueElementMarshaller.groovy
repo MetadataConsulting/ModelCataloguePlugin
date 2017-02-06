@@ -45,7 +45,7 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
                 versionNumber        : el.versionNumber,
                 status               : el.status.toString(),
                 versionCreated       : el.versionCreated,
-                history              : [count: el.countVersions(), itemType: type.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/history".toString()],
+                history              : [count: Integer.MAX_VALUE, itemType: type.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/history".toString()],
                 typeHierarchy        : [count: Integer.MAX_VALUE, itemType: type.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/typeHierarchy".toString()]
         ]
 

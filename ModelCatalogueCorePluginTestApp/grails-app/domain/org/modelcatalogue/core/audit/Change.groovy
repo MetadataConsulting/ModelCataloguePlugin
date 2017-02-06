@@ -51,6 +51,7 @@ class Change {
         version false
         newValue type: 'text'
         oldValue type: 'text'
+        latestVersionId index: 'change_idx_4'
     }
 
     @Override
