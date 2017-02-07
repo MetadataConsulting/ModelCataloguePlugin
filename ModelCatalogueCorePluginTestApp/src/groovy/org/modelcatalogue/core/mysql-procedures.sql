@@ -18,9 +18,13 @@ CREATE FUNCTION GetAllDestinations (InitialQueue MEDIUMTEXT, DescendType LONG, L
 DETERMINISTIC
     BEGIN
 
-        DECLARE rv,q,queue,queue_children,leaves, processed MEDIUMTEXT;
+        DECLARE rv,q,queue,queue_children,leaves, processed,data_models_with_containment MEDIUMTEXT;
         DECLARE queue_length,front_id,pos LONG;
 
+        SET data_models_with_containment = (select group_concat(DISTINCT src.data_model_id) from relationship r
+            join catalogue_element src on src.id = r.source_id
+            join catalogue_element dest on dest.id = r.destination_id
+            where r.relationship_type_id = LeafType or r.relationship_type_id = DescendType and src.data_model_id <> dest.data_model_id);
         SET rv = '';
         SET queue = InitialQueue;
         SET queue_length = LENGTH(InitialQueue) - LENGTH(REPLACE(InitialQueue, ',', '')) + 1;
@@ -42,12 +46,14 @@ DETERMINISTIC
                 SET processed = AddToSet(front_id, processed);
 
                 SELECT IFNULL(qc,'') INTO queue_children
-                FROM (SELECT GROUP_CONCAT(destination_id) qc
-                      FROM relationship WHERE source_id = front_id AND relationship_type_id = DescendType) A;
+                FROM (SELECT GROUP_CONCAT(r.destination_id) qc
+                      FROM relationship r JOIN catalogue_element ce ON r.destination_id = ce.id WHERE r.source_id = front_id AND r.relationship_type_id = DescendType AND (find_in_set(ce.data_model_id, InitialQueue) OR find_in_set(ce.data_model_id, data_models_with_containment))) A;
 
-                SELECT IFNULL(l,'') INTO leaves
-                FROM (SELECT GROUP_CONCAT(destination_id) l
-                      FROM relationship WHERE source_id = front_id AND relationship_type_id = LeafType) A;
+                SELECT IFNULL(qc,'') INTO leaves
+                FROM (SELECT GROUP_CONCAT(r.destination_id) qc
+                      FROM relationship r JOIN catalogue_element ce ON r.destination_id = ce.id WHERE r.source_id = front_id AND r.relationship_type_id = LeafType AND (find_in_set(ce.data_model_id, InitialQueue) OR find_in_set(ce.data_model_id, data_models_with_containment))) A;
+
+
 
                 IF LENGTH(queue_children) = 0 THEN
                     IF LENGTH(queue) = 0 THEN
