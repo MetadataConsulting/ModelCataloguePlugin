@@ -109,11 +109,9 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
         ListWithTotalAndType<Map> list = Lists.lazy(params, Map) {
             List<Map> contentDescriptors = []
 
-            boolean isMysql = sessionFactory.currentSession.connection().metaData.databaseProductName == 'MySQL'
-
             contentDescriptors << createContentDescriptor(dataModel, 'Data Classes', DataClass, dataClasses.total)
-            contentDescriptors << createContentDescriptor(dataModel, 'Data Elements', DataElement, isMysql ? dataElementService.findAllDataElementsInModel([:], dataModel).total : stats["totalDataElementCount"])
-            contentDescriptors << createContentDescriptor(dataModel, 'Data Types', DataType, isMysql ? dataTypeService.findAllDataTypesInModel([:], dataModel).total : stats["totalDataTypeCount"])
+            contentDescriptors << createContentDescriptor(dataModel, 'Data Elements', DataElement, Integer.MAX_VALUE)
+            contentDescriptors << createContentDescriptor(dataModel, 'Data Types', DataType, Integer.MAX_VALUE)
             contentDescriptors << createContentDescriptor(dataModel, 'Measurement Units', MeasurementUnit, stats["totalMeasurementUnitCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Business Rules', ValidationRule, stats["totalValidationRuleCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Assets', Asset, stats["totalAssetCount"])
