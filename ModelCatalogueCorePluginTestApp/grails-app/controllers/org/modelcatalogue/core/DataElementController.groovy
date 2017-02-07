@@ -35,7 +35,7 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
 
     @Override
     protected ListWrapper<DataElement> getAllEffectiveItems(Integer max) {
-        if (!params.boolean("dataModel") || sessionFactory.currentSession.connection().metaData.databaseProductName != 'MySQL') {
+        if (!params.long("dataModel") || sessionFactory.currentSession.connection().metaData.databaseProductName != 'MySQL') {
             return super.getAllEffectiveItems(max)
         }
         return Lists.wrap(params, "/${resourceName}/", dataElementService.findAllDataElementsInModel(params, DataModel.get(params.long('dataModel'))))

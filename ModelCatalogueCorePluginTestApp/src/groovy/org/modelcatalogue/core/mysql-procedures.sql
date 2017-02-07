@@ -2,7 +2,7 @@
 
 DROP FUNCTION IF EXISTS AddToSet $$
 
-CREATE FUNCTION AddToSet(NextValues TEXT, CurrentSet TEXT) RETURNS TEXT
+CREATE FUNCTION AddToSet(NextValues MEDIUMTEXT, CurrentSet MEDIUMTEXT) RETURNS MEDIUMTEXT
 DETERMINISTIC
     BEGIN
         IF LENGTH(CurrentSet) = 0 OR CurrentSet is NULL THEN
@@ -14,11 +14,11 @@ DETERMINISTIC
 
 DROP FUNCTION IF EXISTS GetAllDestinations $$
 
-CREATE FUNCTION GetAllDestinations (InitialQueue TEXT, DescendType LONG, LeafType LONG) RETURNS TEXT
+CREATE FUNCTION GetAllDestinations (InitialQueue MEDIUMTEXT, DescendType LONG, LeafType LONG) RETURNS MEDIUMTEXT
 DETERMINISTIC
     BEGIN
 
-        DECLARE rv,q,queue,queue_children,leaves, processed TEXT;
+        DECLARE rv,q,queue,queue_children,leaves, processed MEDIUMTEXT;
         DECLARE queue_length,front_id,pos LONG;
 
         SET rv = '';
@@ -38,7 +38,7 @@ DETERMINISTIC
 
             SET queue_length = queue_length - 1;
 
-            IF find_in_set(front_id, processed) = 0 THEN
+            IF IFNULL(find_in_set(front_id, processed), 0) <= 0 THEN
                 SET processed = AddToSet(front_id, processed);
 
                 SELECT IFNULL(qc,'') INTO queue_children
@@ -66,7 +66,7 @@ DETERMINISTIC
     END $$
 
 DROP FUNCTION IF EXISTS GetTopLevelDataClasses $$
-CREATE FUNCTION GetTopLevelDataClasses (DataModelId LONG, DescendType LONG) RETURNS TEXT
+CREATE FUNCTION GetTopLevelDataClasses (DataModelId LONG, DescendType LONG) RETURNS MEDIUMTEXT
 DETERMINISTIC
   BEGIN
     RETURN (

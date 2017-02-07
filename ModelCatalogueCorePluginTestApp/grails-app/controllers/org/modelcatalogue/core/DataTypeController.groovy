@@ -109,7 +109,7 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
    @Override
     protected ListWrapper<DataType> getAllEffectiveItems(Integer max) {
 
-       if (!params.boolean("dataModel") || sessionFactory.currentSession.connection().metaData.databaseProductName != 'MySQL'){
+       if (!params.long("dataModel") || sessionFactory.currentSession.connection().metaData.databaseProductName != 'MySQL'){
             return super.getAllEffectiveItems(max)
         }
 
