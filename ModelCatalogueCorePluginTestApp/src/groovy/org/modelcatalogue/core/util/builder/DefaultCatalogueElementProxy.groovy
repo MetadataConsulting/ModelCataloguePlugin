@@ -99,7 +99,7 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
                 log.debug "$this not found, creating new one"
 
                 newlyCreated = true
-                resolved = fill(domain.newInstance() as T)
+                resolved = fill(newDomainInstance())
             } catch (InstantiationException ignored) {
                 throw new ReferenceNotPresentInTheCatalogueException("Cannot create element from reference $this")
             }
@@ -110,6 +110,20 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
             throw new RuntimeException("Failed to resolve $this:\n\n$e", e)
         }
 
+    }
+
+    private T newDomainInstance() {
+        if (parameters.containsKey('enumerations')) {
+            return new EnumeratedType() as T;
+        }
+        if (parameters.containsKey('dataClass')) {
+            return new ReferenceType() as T;
+        }
+        if (parameters.containsKey('measurementUnit')) {
+            return new PrimitiveType() as T;
+        }
+
+        domain.newInstance()
     }
 
     @Override
@@ -136,6 +150,18 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
         if(key=='domain'){
             domain = value
+        }
+
+        if (key=='enumerations') {
+            domain = EnumeratedType
+        }
+
+        if (key=='dataClass') {
+            domain = ReferenceType
+        }
+
+        if (key=='measurementUnit') {
+            domain = PrimitiveType
         }
 
         if (key == 'dataModel' || key == 'classification') {
@@ -228,17 +254,17 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
                 return changed = CHANGE_TYPE
             }
 
-            if (domain == DataType && parameters.enumerations) {
+            if (parameters.containsKey('enumerations')) {
                 domain = EnumeratedType
                 return changed = CHANGE_TYPE
             }
 
-            if (domain == DataType && parameters.dataClass) {
+            if (parameters.containsKey('dataClass')) {
                 domain = ReferenceType
                 return changed = CHANGE_TYPE
             }
 
-            if (domain == DataType && parameters.measurementUnit) {
+            if (parameters.containsKey('measurementUnit')) {
                 domain = PrimitiveType
                 return changed = CHANGE_TYPE
             }
