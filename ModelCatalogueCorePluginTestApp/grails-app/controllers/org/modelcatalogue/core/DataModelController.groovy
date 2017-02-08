@@ -255,4 +255,37 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
     protected boolean allowDelete() {
         modelCatalogueSecurityService.hasRole('ADMIN')
     }
+
+    def history(Integer max) {
+        String name = getResourceName()
+        Class type = resource
+
+        params.max = Math.min(max ?: 10, 100)
+        CatalogueElement element = queryForResource(params.id)
+        if (!element) {
+            notFound()
+            return
+        }
+
+        Long id = element.id
+
+        if (!element.latestVersionId) {
+            respond Lists.wrap(params, "/${name}/${params.id}/history", Lists.lazy(params, type, {
+                [type.get(id)]
+            }, { 1 }))
+            return
+        }
+
+        Long latestVersionId = element.latestVersionId
+
+        def customParams = [:]
+        customParams.putAll params
+
+        customParams.sort = 'versionNumber'
+        customParams.order = 'desc'
+
+        respond Lists.fromCriteria(customParams, type, "/${name}/${params.id}/history") {
+            eq 'latestVersionId', latestVersionId
+        }
+    }
 }
