@@ -244,6 +244,15 @@ changes.config ['columnsProvider', 'names', 'catalogueElementPropertiesProvider'
       {header: "Change"     , value: getChangeDescription               , classes: 'col-md-8' }
     ]
   }
+
+
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataModel.history', {
+    columns: [
+      {header: "Version", value: 'semanticVersion', class: 'col-md-1', href: 'href()'}
+      {header: "Name", value: 'name', class: 'col-md-5', href: 'href()'}
+      {header: "Description", value: 'description', class: 'col-md-6'}
+    ]
+  }
 ]
 
 changes.config ['catalogueElementPropertiesProvider', (catalogueElementPropertiesProvider)->
