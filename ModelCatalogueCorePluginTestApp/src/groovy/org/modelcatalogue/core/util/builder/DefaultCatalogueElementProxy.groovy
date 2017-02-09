@@ -254,17 +254,17 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
                 return changed = CHANGE_TYPE
             }
 
-            if (parameters.containsKey('enumerations')) {
+            if (parameters.containsKey('enumerations') && domain != EnumeratedType) {
                 domain = EnumeratedType
                 return changed = CHANGE_TYPE
             }
 
-            if (parameters.containsKey('dataClass')) {
+            if (parameters.containsKey('dataClass') && domain != ReferenceType) {
                 domain = ReferenceType
                 return changed = CHANGE_TYPE
             }
 
-            if (parameters.containsKey('measurementUnit')) {
+            if (parameters.containsKey('measurementUnit') && domain != PrimitiveType) {
                 domain = PrimitiveType
                 return changed = CHANGE_TYPE
             }
