@@ -248,6 +248,7 @@ class DataModel extends CatalogueElement {
 
     @Override
     void afterDraftPersisted(CatalogueElement draft, PublishingContext context) {
+        super.afterDraftPersisted(draft, context)
         if (policies) {
             for(DataModelPolicy policy in policies) {
                 draft.addToPolicies(policy)
