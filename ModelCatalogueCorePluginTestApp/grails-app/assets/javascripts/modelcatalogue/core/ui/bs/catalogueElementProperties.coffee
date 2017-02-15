@@ -73,14 +73,6 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     {header: "Description", value: 'relation.description', class: 'col-md-7'}
   ]
 
-  catalogueElementPropertiesProvider.configureProperty 'history', {
-    columns: [
-      {header: "Version", value: 'versionNumber', class: 'col-md-1', href: 'href()'}
-      {header: "Name", value: 'name', class: 'col-md-5', href: 'href()'}
-      {header: "Description", value: 'description', class: 'col-md-6'}
-    ]
-  }
-
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Asset.history', {
     hidden: (security) ->
       !security.hasRole('CURATOR')

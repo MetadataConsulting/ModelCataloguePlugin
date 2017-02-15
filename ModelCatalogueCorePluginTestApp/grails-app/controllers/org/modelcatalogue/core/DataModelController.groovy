@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import com.google.common.collect.ImmutableSet
 import grails.util.GrailsNameUtils
+import org.hibernate.SessionFactory
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
 import org.modelcatalogue.core.util.DataModelFilter
@@ -15,6 +16,9 @@ import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 class DataModelController extends AbstractCatalogueElementController<DataModel> {
 
     DataClassService dataClassService
+    DataElementService dataElementService
+    DataTypeService dataTypeService
+    SessionFactory sessionFactory
 
 	DataModelController() {
 		super(DataModel, false)
@@ -107,6 +111,7 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
 
             contentDescriptors << createContentDescriptor(dataModel, 'Data Classes', DataClass, dataClasses.total)
             contentDescriptors << createDataElementsByTagDescriptor(dataModel)
+            contentDescriptors << createContentDescriptor(dataModel, 'Data Types', DataType, Integer.MAX_VALUE)
             contentDescriptors << createContentDescriptor(dataModel, 'Data Types', DataType, stats["totalDataTypeCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Measurement Units', MeasurementUnit, stats["totalMeasurementUnitCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Business Rules', ValidationRule, stats["totalValidationRuleCount"])
@@ -264,5 +269,38 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
     @Override
     protected boolean allowDelete() {
         modelCatalogueSecurityService.hasRole('ADMIN')
+    }
+
+    def history(Integer max) {
+        String name = getResourceName()
+        Class type = resource
+
+        params.max = Math.min(max ?: 10, 100)
+        CatalogueElement element = queryForResource(params.id)
+        if (!element) {
+            notFound()
+            return
+        }
+
+        Long id = element.id
+
+        if (!element.latestVersionId) {
+            respond Lists.wrap(params, "/${name}/${params.id}/history", Lists.lazy(params, type, {
+                [type.get(id)]
+            }, { 1 }))
+            return
+        }
+
+        Long latestVersionId = element.latestVersionId
+
+        def customParams = [:]
+        customParams.putAll params
+
+        customParams.sort = 'versionNumber'
+        customParams.order = 'desc'
+
+        respond Lists.fromCriteria(customParams, type, "/${name}/${params.id}/history") {
+            eq 'latestVersionId', latestVersionId
+        }
     }
 }

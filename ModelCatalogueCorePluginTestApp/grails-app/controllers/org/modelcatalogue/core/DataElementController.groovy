@@ -1,10 +1,16 @@
 package org.modelcatalogue.core
 
+import grails.util.Environment
+import org.hibernate.SessionFactory
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.lists.Lists
 
 class DataElementController extends AbstractCatalogueElementController<DataElement> {
+
+    DataElementService dataElementService
+    SessionFactory sessionFactory
 
     DataElementController() {
         super(DataElement, false)
@@ -28,47 +34,55 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
         respond Lists.wrap(params, "/${resourceName}/${params.id}/content", list)
     }
 
+//    @Override
+//    protected boolean hasAdditionalIndexCriteria() {
+//        return params.containsKey('tag')
+//    }
     @Override
-    protected boolean hasAdditionalIndexCriteria() {
-        return params.containsKey('tag')
+    protected ListWrapper<DataElement> getAllEffectiveItems(Integer max) {
+        if (!params.long("dataModel") || sessionFactory.currentSession.connection().metaData.databaseProductName != 'MySQL') {
+            return super.getAllEffectiveItems(max)
+        }
+        return Lists.wrap(params, "/${resourceName}/", dataElementService.findAllDataElementsInModel(params, DataModel.get(params.long('dataModel'))))
     }
 
-    @Override
-    protected Closure buildAdditionalIndexCriteria() {
-        if (!hasAdditionalIndexCriteria()) {
-            return super.buildAdditionalIndexCriteria()
-        }
 
-        if (params.tag in ['none', 'null', 'undefined']) {
-            // TODO: this is far to be optimal solution
-            return {
-                not {
-                  inList 'id', Relationship.where { relationshipType == RelationshipType.tagType }.distinct('destination').list()*.id
-                }
-            }
-        }
-
-        Long tagID = params.long('tag')
-
-        Tag tag = Tag.get(tagID)
-
-        if (!tag) {
-            return super.buildAdditionalIndexCriteria()
-        }
-
-        return {
-            incomingRelationships {
-                eq 'source', tag
-                eq 'relationshipType', RelationshipType.tagType
-            }
-        }
-    }
-
-    @Override
-    protected DataModelFilter getOverridableDataModelFilter() {
-        if (params.deep) {
-            return super.getOverridableDataModelFilter().withImports()
-        }
-        return super.getOverridableDataModelFilter()
-    }
+//    @Override
+//    protected Closure buildAdditionalIndexCriteria() {
+//        if (!hasAdditionalIndexCriteria()) {
+//            return super.buildAdditionalIndexCriteria()
+//        }
+//
+//        if (params.tag in ['none', 'null', 'undefined']) {
+//            // TODO: this is far to be optimal solution
+//            return {
+//                not {
+//                  inList 'id', Relationship.where { relationshipType == RelationshipType.tagType }.distinct('destination').list()*.id
+//                }
+//            }
+//        }
+//
+//        Long tagID = params.long('tag')
+//
+//        Tag tag = Tag.get(tagID)
+//
+//        if (!tag) {
+//            return super.buildAdditionalIndexCriteria()
+//        }
+//
+//        return {
+//            incomingRelationships {
+//                eq 'source', tag
+//                eq 'relationshipType', RelationshipType.tagType
+//            }
+//        }
+//    }
+//
+//    @Override
+//    protected DataModelFilter getOverridableDataModelFilter() {
+//        if (params.deep) {
+//            return super.getOverridableDataModelFilter().withImports()
+//        }
+//        return super.getOverridableDataModelFilter()
+//    }
 }

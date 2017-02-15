@@ -17,8 +17,14 @@ class GenomicsController {
     GenomicsService genomicsService
 
     def exportRareDiseaseHPOAndClinicalTestsAsJson() {
+        DataModel model = DataModel.get(params.id)
 
-        DataClass dataClass = DataClass.get(params.id)
+        if (!model) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        DataClass dataClass = findRootClass(model)
 
         if (!dataClass) {
             respond status: HttpStatus.NOT_FOUND
@@ -32,8 +38,14 @@ class GenomicsController {
     }
 
     def exportRareDiseaseListAsJson() {
+        DataModel model = DataModel.get(params.id)
 
-        DataClass dataClass = DataClass.get(params.id)
+        if (!model) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        DataClass dataClass = findRootClass(model)
 
         if (!dataClass) {
             respond status: HttpStatus.NOT_FOUND
@@ -54,8 +66,14 @@ class GenomicsController {
     }
 
     def exportRareDiseaseHPOEligibilityCriteriaAsJson() {
+        DataModel model = DataModel.get(params.id)
 
-        DataClass dataClass = DataClass.get(params.id)
+        if (!model) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        DataClass dataClass = findRootClass(model)
 
         if (!dataClass) {
             respond status: HttpStatus.NOT_FOUND
@@ -73,7 +91,14 @@ class GenomicsController {
     }
 
     def exportRareDiseaseCsv(def docType) {
-        DataClass dClass = DataClass.get(params.id)
+        DataModel model = DataModel.get(params.id)
+
+        if (!model) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        DataClass dClass = findRootClass(model)
 
         if (!dClass) {
             respond status: HttpStatus.NOT_FOUND
@@ -87,7 +112,14 @@ class GenomicsController {
     }
 
     def exportRareDiseaseDisorderListAsCsv() {
-        DataClass dClass = DataClass.get(params.id)
+        DataModel model = DataModel.get(params.id)
+
+        if (!model) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        DataClass dClass = findRootClass(model)
 
         if (!dClass) {
             respond status: HttpStatus.NOT_FOUND
@@ -100,31 +132,9 @@ class GenomicsController {
         redirect controller: 'asset', id: assetId, action: 'show'
     }
 
-//    def exportRareDiseaseHPOAndClinicalTests() {
-//        DataClass dataClass = DataClass.get(params.id)
-//
-//        if (!dataClass) {
-//            respond status: HttpStatus.NOT_FOUND
-//            return
-//        }
-//
-//        def assetId = genRareDiseaseHPOAndClinicalTestsJson(dataClass)
-//
-//        response.setHeader("X-Asset-ID", assetId.toString())
-//        redirect controller: 'asset', id: assetId, action: 'show'
-//    }
-
-//    long genRareDiseaseHPOAndClinicalTestsJson(DataClass dataClass){
-//        Long classId = dataClass.getId()
-//
-//        return assetService.storeReportAsAsset(dataClass.dataModel,
-//            name: "${dataClass.name} - HPO and Clinical Tests report (JSON)",
-//            originalFileName: "${dataClass.name}-${dataClass.status}-${dataClass.version}.json",
-//            contentType: "application/json",
-//        ) {
-//            new GelJsonExporter(it).printDiseaseOntology(DataClass.get(classId))
-//        }
-//    }
+    private DataClass findRootClass(DataModel model) {
+        dataClassService.getTopLevelDataClasses(DataModelFilter.includes((DataModel) model), [status: 'active']).items?.get(0)
+    }
 
     def exportRareDiseaseEligibilityDoc() {
         exportEligibilityOrPhenotypesAndTests(true)
@@ -136,7 +146,14 @@ class GenomicsController {
 
 
     private void exportEligibilityOrPhenotypesAndTests(boolean eligibilityMode) {
-        DataClass dataClass = DataClass.get(params.id)
+        DataModel model = DataModel.get(params.id)
+
+        if (!model) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        DataClass dataClass = findRootClass(model)
 
         if (!dataClass) {
             respond status: HttpStatus.NOT_FOUND
@@ -164,7 +181,14 @@ class GenomicsController {
     }
 
     def exportCancerTypesAsJson() {
-        DataClass dataClass = DataClass.get(params.id)
+        DataModel model = DataModel.get(params.id)
+
+        if (!model) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        DataClass dataClass = findRootClass(model)
 
         if (!dataClass) {
             respond status: HttpStatus.NOT_FOUND
@@ -178,7 +202,14 @@ class GenomicsController {
     }
 
     def exportCancerTypesAsCsv() {
-        DataClass dataClass = DataClass.get(params.id)
+        DataModel model = DataModel.get(params.id)
+
+        if (!model) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        DataClass dataClass = findRootClass(model)
 
         if (!dataClass) {
             respond status: HttpStatus.NOT_FOUND
@@ -192,8 +223,14 @@ class GenomicsController {
     }
 
     def exportRareDiseaseHPOAndClinicalTestsAsXls() {
+        DataModel model = DataModel.get(params.id)
 
-        DataClass dataClass = DataClass.get(params.id)
+        if (!model) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        DataClass dataClass = findRootClass(model)
 
         if (!dataClass) {
             respond status: HttpStatus.NOT_FOUND
@@ -207,14 +244,19 @@ class GenomicsController {
     }
 
     def exportRareDiseaseEligibilityChangeLogAsXls() {
+        DataModel model = DataModel.get(params.id)
 
-        DataClass dataClass = DataClass.get(params.id)
+        if (!model) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        DataClass dataClass = findRootClass(model)
 
         if (!dataClass) {
             respond status: HttpStatus.NOT_FOUND
             return
         }
-
         Long assetId = genomicsService.genRareDiseaseEligibilityChangeLogAsXls(dataClass)
 
         response.setHeader("X-Asset-ID", assetId.toString())
@@ -222,8 +264,14 @@ class GenomicsController {
     }
 
     def exportChangeLogDocument(String name, Integer depth, Boolean includeMetadata) {
+        DataModel model = DataModel.get(params.id)
 
-        DataClass dataClass = DataClass.get(params.id)
+        if (!model) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        DataClass dataClass = findRootClass(model)
 
         if (!dataClass) {
             respond status: HttpStatus.NOT_FOUND
@@ -265,7 +313,7 @@ class GenomicsController {
         genomicsService.genDataSpecChangeLogAsXls(model)
 
         //Generate Class reports
-        DataClass dataClass = dataClassService.getTopLevelDataClasses(DataModelFilter.includes((DataModel) model)).items.get(0)
+        DataClass dataClass = findRootClass(model)
         genomicsService.genRareDiseaseHPOAndClinicalTestsAsXls(dataClass)
         genomicsService.genCancerTypesAsCsv(dataClass)
         genomicsService.genCancerTypesAsJson(dataClass)
@@ -297,7 +345,7 @@ class GenomicsController {
         genomicsService.genDataSpecChangeLogAsXls(model)
 
         //Generate Class reports
-        DataClass dataClass = dataClassService.getTopLevelDataClasses(DataModelFilter.includes((DataModel) model)).items.get(0)
+        DataClass dataClass = findRootClass(model)
         genomicsService.genCancerTypesAsCsv(dataClass)
         genomicsService.genCancerTypesAsJson(dataClass)
         genomicsService.genChangeLogDocument(dataClass,dataClass.name,3,true)

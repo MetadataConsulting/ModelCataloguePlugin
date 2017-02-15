@@ -328,7 +328,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change1.property == 'is based on'
         change1.oldValue == initialValue
         change1.newValue == null
-        change1.otherSide
+        !change1.otherSide
 
         change2
         change2.latestVersionId == base.id
@@ -336,7 +336,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change2.property == 'is base for'
         change2.oldValue == initialValue
         change2.newValue == null
-        !change2.otherSide
+        change2.otherSide
     }
 
     def "adding relationship metadata is logged"() {

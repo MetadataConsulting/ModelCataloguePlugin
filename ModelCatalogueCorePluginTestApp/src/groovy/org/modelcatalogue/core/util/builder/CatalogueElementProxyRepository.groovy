@@ -5,6 +5,7 @@ import grails.gorm.DetachedCriteria
 import groovy.transform.CompileDynamic
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.PublishingContext
@@ -25,6 +26,7 @@ class CatalogueElementProxyRepository {
     static final String MISSING_REFERENCE_ID = "http://www.modelcatalogue.org/builder/#missing_reference_id"
 
     private static final Map LATEST = [sort: 'versionNumber', order: 'desc', max: 1]
+    public static final String SEMANTIC_VERSION = "semanticVersion"
 
     private final DataModelService dataModelService
     private final ElementService elementService
@@ -77,6 +79,14 @@ class CatalogueElementProxyRepository {
         if (a.domain != b.domain) {
             return false
         }
+        if (a.domain == DataModel){
+            String a_SemanticVersion = a.getParameter(SEMANTIC_VERSION)
+            String b_SemanticVersion = b.getParameter(SEMANTIC_VERSION)
+            if(a_SemanticVersion && b_SemanticVersion && a_SemanticVersion != b_SemanticVersion){
+                return false
+            }
+        }
+
         if (a.domain in HAS_UNIQUE_NAMES) {
             return a.name == b.name
         }
@@ -85,11 +95,13 @@ class CatalogueElementProxyRepository {
             return false
         }
 
-        return a.classification == b.classification && a.name == b.name
+        return equals(a.classification, b.classification) && a.name == b.name
     }
 
     public Set<CatalogueElement> resolveAllProxies(boolean skipDirtyChecking) {
         StopWatch watch =  new StopWatch('catalogue proxy repository')
+
+        // FIXME: keeping all the created elements eats lot of memory
         Set<CatalogueElement> created = []
 
         List<CatalogueElement> lastElement = CatalogueElement.list(max: 1, sort: 'id', order: 'desc')
@@ -98,10 +110,12 @@ class CatalogueElementProxyRepository {
         watch.start('merging proxies')
         logInfo "(1/6) merging proxies"
 
+        // FIXME: move merging step to separate method
         Set<CatalogueElementProxy> elementProxiesToBeResolved     = []
         Map<String, CatalogueElementProxy> byID     = [:]
         Map<String, CatalogueElementProxy> byName   = [:]
 
+        // FIXME: remove the pending proxy from the map as soon as it's processed
         for (CatalogueElementProxy proxy in pendingProxies) {
             if (proxy.modelCatalogueId) {
                 CatalogueElementProxy existing = byID[proxy.modelCatalogueId]
@@ -113,8 +127,8 @@ class CatalogueElementProxyRepository {
                     existing.merge(proxy)
                 }
             } else if (proxy.name) {
-                String fullName = getFullNameForProxy(proxy)
-                String genericName = getGenericNameForProxy(proxy)
+                String fullName = getFullNameForProxy(proxy, proxy.domain)
+                String genericName = getFullNameForProxy(proxy, CatalogueElement)
 
                 CatalogueElementProxy existing = byName[fullName]
 
@@ -152,10 +166,11 @@ class CatalogueElementProxyRepository {
                 try {
                     String change = element.changed
                     if (change || element.getParameter('status') == ElementStatus.DRAFT) {
-                        if (element.domain == DataModel) {
+                        if (element.domain == DataModel && change != DefaultCatalogueElementProxy.CHANGE_NEW) {
                             draftRequiredDataModels.add(element)
                         } else if (element.classification) {
-                            draftRequiredDataModels.add(byName[getFullNameForDataModel(element.classification)] ?: byName[getGenericNameForDataModel(element.classification)] ?: createProxy(DataModel, [name: element.classification as Object]))
+                            // FIXME: as long as classification is now proxy we don't need to get it from the map
+                            draftRequiredDataModels.add(byName[getFullNameForProxy(element.classification, DataModel)] ?: byName[getFullNameForProxy(element.classification, CatalogueElement)] ?: element.classification)
                         } else {
                             logWarn "Cannot request draft for element without data model: $element"
                         }
@@ -179,7 +194,7 @@ class CatalogueElementProxyRepository {
             logInfo "(3/6) creating drafts"
 
             for (CatalogueElementProxy proxy in draftRequiredDataModels) {
-                DataModel dataModel = proxy.findExisting() as DataModel
+                DataModel dataModel = tryFindUnclassified(DataModel, proxy.name, proxy.modelCatalogueId) as DataModel
                 if (!dataModel) {
                     logWarn "Requested to create draft for Data Model '${proxy.name}' but it does not exist yet"
                     continue
@@ -220,7 +235,7 @@ class CatalogueElementProxyRepository {
         }
         watch.stop()
 
-        // Step 4: resolve pending relationships
+        // Step 5: resolve pending relationships
         watch.start('resolving relationships')
         Set<Long> resolvedRelationships = []
         logInfo "(5/6) resolving relationships"
@@ -242,9 +257,7 @@ class CatalogueElementProxyRepository {
             }
         }
 
-        // TODO: collect the ids of relationships resolved and than do the same comparison like in the is relationship
-        // changed
-        if (!copyRelationships) {
+       if (!copyRelationships) {
             elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
                 if (!element.underControl) {
                     return
@@ -264,7 +277,7 @@ class CatalogueElementProxyRepository {
 
         watch.stop()
 
-        // Step 4: resolve state changes
+        // Step 6: resolve state changes
         watch.start('resolving state changes')
         logInfo "(6/6) resolving state changes"
         elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
@@ -308,7 +321,7 @@ class CatalogueElementProxyRepository {
                 return
             }
             try {
-                CatalogueElement e = it.findExisting() as CatalogueElement
+                CatalogueElement e = tryFindWithClassification(it.domain, it.classification ? DataModel.findAllByName(it.classification.name?.toString()) : [], it.name, it.modelCatalogueId)
 
                 if (e) {
                     if (e.getLatestVersionId()) {
@@ -335,16 +348,37 @@ class CatalogueElementProxyRepository {
         return DraftContext.importFriendly(elementsUnderControl)
     }
 
-    protected static String getGenericNameForProxy(CatalogueElementProxy proxy) {
-        "${CatalogueElement.simpleName}:${proxy.domain in HAS_UNIQUE_NAMES ? '*' : proxy.classification}:${proxy.name}"
-    }
+   /* protected static String getGenericNameForProxy(CatalogueElementProxy proxy) {
 
-    protected static String getFullNameForProxy(CatalogueElementProxy proxy) {
-        "${proxy.domain.simpleName}:${proxy.domain in HAS_UNIQUE_NAMES ? '*' : proxy.classification}:${proxy.name}"
+        if (proxy.domain == DataModel) {
+            String semanticVersion = proxy.getParameter("semanticVersion")
+            return "${proxy.domain.simpleName}:${semanticVersion}:${proxy.name}"
+        }
+        if (proxy.domain == MeasurementUnit) {
+            return "${proxy.domain.simpleName}:*:${proxy.name}"
+        }
+
+        return "${proxy.domain.simpleName}:${proxy.classification}:${proxy.name}"
+
+        "${CatalogueElement.simpleName}:${proxy.domain in HAS_UNIQUE_NAMES ? '*' : proxy.classification}:${proxy.name}"
+    }*/
+
+    protected static String getFullNameForProxy(CatalogueElementProxy proxy, Class domain) {
+
+        if (proxy.domain == DataModel) {
+            String semanticVersion = proxy.getParameter(SEMANTIC_VERSION)
+            return "${domain.simpleName}:${semanticVersion}:${proxy.name}"
+        }
+        if (proxy.domain == MeasurementUnit) {
+            return "${domain.simpleName}:*:${proxy.name}"
+        }
+
+        return "${domain.simpleName}:${proxy.classification?.name}@${proxy.classification?.getParameter(SEMANTIC_VERSION)}:${proxy.name}"
     }
 
     protected static String getGenericNameForDataModel(String name) {
         "${DataModel.simpleName}:*:${name}"
+
     }
 
     protected static String getFullNameForDataModel(String name) {
@@ -366,7 +400,9 @@ class CatalogueElementProxyRepository {
         if (parameters.id) {
             return createAbstractionById(domain, parameters.name?.toString(), parameters.id?.toString(), underControl)
         } else if (parameters.classification || parameters.dataModel) {
-            return createAbstractionByClassificationAndName(domain, (parameters.classification ?: parameters.dataModel)?.toString(), parameters.name?.toString(), underControl)
+            def dataModel = parameters.dataModel ?: parameters.classification
+            CatalogueElementProxy<DataModel> dataModelProxy = dataModel instanceof CatalogueElementProxy ? dataModel as CatalogueElementProxy : createAbstractionByName(DataModel, dataModel.toString(), false)
+            return createAbstractionByClassificationAndName(domain, dataModelProxy, parameters.name?.toString(), underControl)
         } else if (parameters.name) {
             return createAbstractionByName(domain, parameters.name?.toString(), underControl)
         }
@@ -378,8 +414,8 @@ class CatalogueElementProxyRepository {
         return new DefaultCatalogueElementProxy<T>(this, domain, id, null, name, underControl)
     }
 
-    private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionByClassificationAndName(Class<T> domain, String classificationName, String name, boolean underControl) {
-        return new DefaultCatalogueElementProxy<T>(this, domain, null, classificationName, name, underControl)
+    private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionByClassificationAndName(Class<T> domain, CatalogueElementProxy<DataModel> classification, String name, boolean underControl) {
+        return new DefaultCatalogueElementProxy<T>(this, domain, null, classification, name, underControl)
     }
 
     private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionByName(Class<T> domain, String name, boolean underControl) {
@@ -393,15 +429,49 @@ class CatalogueElementProxyRepository {
         } as T
     }
 
-    protected  <T extends CatalogueElement> T tryFind(Class<T> type, Object classificationName, Object name, Object id) {
+    protected  <T extends CatalogueElement> T tryFind(Class<T> type, CatalogueElementProxy<DataModel> dataModel, Object name, Object id) {
         if (type in HAS_UNIQUE_NAMES) {
             return tryFindWithClassification(type, null, name, id)
         }
-        tryFindWithClassification(type, DataModel.findAllByName(classificationName?.toString()), name, id)
+        String semanticVersion = dataModel.getParameter('semanticVersion')
+        if (semanticVersion) {
+               return tryFindWithClassification(type, DataModel.findAllByNameAndSemanticVersion(dataModel.name, semanticVersion), name, id)
+        }
+        tryFindWithClassification(type, DataModel.findAllByName(dataModel.name?.toString()), name, id)
     }
 
     protected <T extends CatalogueElement> T tryFindUnclassified(Class<T> type, Object name, Object id) {
         tryFindWithClassification(type, null, name, id)
+    }
+
+    DataModel tryFindDataModel(String name, String semanticVersion, String modelCatalogueId) {
+        if (!semanticVersion) {
+            return tryFindUnclassified(DataModel, name, modelCatalogueId)
+        }
+
+        if (modelCatalogueId) {
+            DataModel result = DataModel.findByModelCatalogueIdAndSemanticVersion(modelCatalogueId, semanticVersion)
+            if (result) {
+                return result
+            }
+        }
+
+        if (name) {
+            DataModel result =  DataModel.findByNameAndSemanticVersion(name, semanticVersion)
+            if (result) {
+                return result
+            }
+        }
+
+        return null
+    }
+
+    public <T extends CatalogueElement> List<CatalogueElementProxy<T>> findExistingProxy(Class<T> domain, String name, String id) {
+
+        pendingProxies.findAll {
+            domain.isAssignableFrom(it.domain) && (it.name == name || it.modelCatalogueId == id)
+        } as List<CatalogueElementProxy<T>>
+
     }
 
     protected <T extends CatalogueElement> T tryFindWithClassification(Class<T> type, List<DataModel> dataModels, Object name, Object id) {
@@ -523,6 +593,37 @@ class CatalogueElementProxyRepository {
 
 
         Relationship relationship = sourceElement.createLinkTo(destinationElement, type, archived: proxy.archived as Object, resetIndices: true, skipUniqueChecking: (proxy.source.new || proxy.destination.new) as Object)
+
+        if(relationship.relationshipType == RelationshipType.supersessionType) {
+            if(!relationship.source.latestVersionId){
+                relationship.source.latestVersionId = relationship.source.id
+                FriendlyErrors.failFriendlySave(relationship.source)
+            }
+            if(!relationship.destination.latestVersionId){
+                relationship.destination.latestVersionId = relationship.source.latestVersionId
+                FriendlyErrors.failFriendlySave(relationship.destination)
+            }
+
+
+            if(HibernateHelper.getEntityClass(relationship.source) == DataModel){
+
+                // for each element which does the source data model declare
+                for (CatalogueElement element in (relationship.source as DataModel).declares) {
+                    if(!element.latestVersionId){
+                        element.latestVersionId = element.id
+                        FriendlyErrors.failFriendlySave(element)
+                    }
+
+                    CatalogueElement other = CatalogueElement.findByNameAndDataModel(element.name, relationship.destination)
+                    if (other && !other.latestVersionId) {
+                        other.latestVersionId = element.latestVersionId
+                        FriendlyErrors.failFriendlySave(other)
+                    }
+                }
+            }
+        }
+
+
 
         createdRelationships[hash] = relationship
 

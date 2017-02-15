@@ -1,3 +1,4 @@
+<%@ page import="org.modelcatalogue.core.util.Metadata" %>
 <html>
 <head>
   <title>Genomics England - Rare Diseases Reference Data</title>
@@ -24,11 +25,11 @@
   </tr>
   </thead>
   <tbody>
-  <g:each in="${diseases}" var="disease">
+  <g:each in="${diseases.findAll{ it.ext[org.modelcatalogue.core.util.Metadata.WEBSITE_SKIP] != 'true'}}" var="disease">
     <tr style="border-bottom:1px solid #aaaaaa;">
-      <td>${disease.hasModelCatalogueId() && !disease.getModelCatalogueId().startsWith('http') ?  disease.getModelCatalogueId() : "${disease.latestVersionId ?: disease.id}.${disease.versionNumber}"}</td>
+      <td>${disease.hasModelCatalogueId() && !disease.getModelCatalogueId().startsWith('http') ?  disease.getModelCatalogueId() : disease.latestVersionId ?: disease.id}</td>
       <td>${disease.name}</td>
-      <td><a href="${disease.hasModelCatalogueId() && !disease.getModelCatalogueId().startsWith('http') ?  disease.getModelCatalogueId() : "${disease.latestVersionId ?: disease.id}.${disease.versionNumber}"}.html">details &#187;</a></td>
+      <td><a href="${disease.hasModelCatalogueId() && !disease.getModelCatalogueId().startsWith('http') ?  disease.getModelCatalogueId() : disease.latestVersionId ?: disease.id}.${disease.versionNumber}.html">details &#187;</a></td>
     </tr>
     </tbody>
   </g:each>

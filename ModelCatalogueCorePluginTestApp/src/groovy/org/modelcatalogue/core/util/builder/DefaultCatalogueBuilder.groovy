@@ -127,6 +127,17 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
     void dataModel(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
         CatalogueElementProxy<DataModel> dataModel = createProxy(DataModel, parameters, null, true)
 
+        List<CatalogueElementProxy<DataModel>> proxies = repository.findExistingProxy(DataModel, dataModel.name, dataModel.modelCatalogueId).findAll {
+            !CatalogueElementProxyRepository.equals(dataModel, it)
+        }
+
+        if(proxies){
+            CatalogueElementProxy<DataModel> dataModelLast = proxies.last()
+            context.withNewContext dataModel, {
+                rel 'supersession' from dataModelLast
+            }
+        }
+
         context.withNewContext dataModel, c
 
         dataModel
@@ -161,11 +172,13 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         }
 
         context.withContextElement(ValidationRule) { ignored, Closure relConf ->
-            rel 'involvedness' from element, relConf
+            rel 'involvedness' to element, relConf
         }
 
         element
     }
+
+
 
     /**
      * Creates new model, reuses the latest draft or creates new draft unless the exactly same model already exists
@@ -207,7 +220,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
 
         context.withNewContext validationRule, c
         context.withContextElement(DataClass) { ignored, Closure relConf ->
-            rel 'ruleContext' to validationRule, relConf
+            rel 'ruleContext' from validationRule, relConf
         }
 
         validationRule
@@ -343,7 +356,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      */
     void basedOn(String classification, String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         context.withContextElement(CatalogueElement) {
-            rel "base" from ModelCatalogueTypes.getType(it.domain) called classification, name, extensions
+            rel "base" to ModelCatalogueTypes.getType(it.domain) called classification, name, extensions
         }
     }
 
@@ -360,7 +373,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      */
     void basedOn(String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         context.withContextElement(CatalogueElement) {
-            rel "base" from ModelCatalogueTypes.getType(it.domain) called name, extensions
+            rel "base" to ModelCatalogueTypes.getType(it.domain) called name, extensions
         }
     }
 
@@ -375,7 +388,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @see #globalSearchFor(BuilderKeyword)
      */
     void basedOn(ApiCatalogueElement element, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
-        rel "base" from element, extensions
+        rel "base" to element, extensions
     }
 
     /**

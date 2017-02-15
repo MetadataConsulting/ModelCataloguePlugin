@@ -5,7 +5,7 @@ import org.modelcatalogue.core.export.inventory.DataClassToDocxExporter
 import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
 import org.modelcatalogue.core.publishing.changelog.ChangeLogDocxGenerator
 import org.modelcatalogue.core.util.DataModelFilter
-import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.Relationships
@@ -137,7 +137,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
     }
 
     @Override
-    protected ListWithTotalAndType<DataClass> getAllEffectiveItems(Integer max) {
+    protected ListWrapper<DataClass> getAllEffectiveItems(Integer max) {
         if (!params.boolean("toplevel")) {
             return super.getAllEffectiveItems(max)
         }

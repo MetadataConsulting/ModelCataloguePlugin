@@ -152,8 +152,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       icon: 'fa fa-fw fa-arrow-circle-up'
       type: 'primary'
       watches: ['element.status', 'element.archived']
-      disabled: $scope.element.archived || $scope.element.status == 'DRAFT' || $scope.element.status == 'PENDING' ||
-        $scope.element.history.total != $scope.element.versionNumber
+      disabled: $scope.element.archived || $scope.element.status == 'DRAFT' || $scope.element.status == 'PENDING'
       action:     ->
         messages.prompt(null, null, type: 'new-version', element: $scope.element)
     }

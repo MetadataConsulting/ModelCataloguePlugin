@@ -24,31 +24,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         }
     }
 
-    @Unroll
-    def "get json history: #no where max: #max offset: #offset\""() {
-        CatalogueElement first = CatalogueElement.get(loadItem.id)
-        createDraftVersions(first)
 
-        when:
-        controller.params.id = first.id
-        controller.params.offset = offset
-        controller.params.max = max
-        controller.response.format = "json"
-        controller.history(max)
-        def json = controller.response.json
-
-        recordResult "history$no", json
-
-
-        then:
-        checkJsonCorrectListValues(json, total, size, offset, max, next, previous)
-        json.itemType == itemTypeForHistory
-
-        // TODO: add more verification
-
-        where:
-        [no, size, max, offset, total, next, previous] << optimize(getHistoryPaginationParameters("/${getResourceNameForHistory()}/${loadItem.id}/history"))
-    }
 
     protected String getResourceNameForHistory() {
         resourceName

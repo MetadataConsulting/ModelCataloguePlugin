@@ -16,7 +16,7 @@ class DataModel extends CatalogueElement {
     String revisionNotes
 
     static constraints = {
-        name unique: 'versionNumber'
+        name unique: 'semanticVersion'
         semanticVersion size: 1..20, nullable: true
         revisionNotes maxSize: 2000, nullable: true
     }
@@ -248,6 +248,7 @@ class DataModel extends CatalogueElement {
 
     @Override
     void afterDraftPersisted(CatalogueElement draft, PublishingContext context) {
+        super.afterDraftPersisted(draft, context)
         if (policies) {
             for(DataModelPolicy policy in policies) {
                 draft.addToPolicies(policy)

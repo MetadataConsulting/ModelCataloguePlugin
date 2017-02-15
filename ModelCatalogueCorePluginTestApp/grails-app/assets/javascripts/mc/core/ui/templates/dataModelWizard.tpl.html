@@ -28,7 +28,7 @@
       </button>
     </li>
     <li>
-      <button id="step-finish" ng-disabled="!nameUnique || finishInProgress" ng-click="finish()"
+      <button id="step-finish" ng-disabled="!nameUnique || finishInProgress || classification.name.length &gt; 255" ng-click="finish()"
               class="btn btn-default btn-success">
         <span class="glyphicon glyphicon-ok"></span>
       </button>

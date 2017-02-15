@@ -407,7 +407,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
 
         ListWithTotalAndType<T> items = getAllEffectiveItems(max)
-
+        //TODO - review usage - is this used? and when?
         if (params.boolean('minimal') && items instanceof ListWithTotalAndTypeWrapper) {
             ListWithTotalAndTypeWrapper<T> listWrapper = items as ListWithTotalAndTypeWrapper<T>
 
@@ -422,7 +422,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         respond items
     }
 
-    protected ListWithTotalAndType<T> getAllEffectiveItems(Integer max) {
+    protected ListWrapper<T> getAllEffectiveItems(Integer max) {
         if (params.status?.toLowerCase() == 'active') {
             if (modelCatalogueSecurityService.hasRole('VIEWER')){
                 return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
@@ -875,14 +875,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
         params.max = Math.min(max ?: 10, 100)
 
-        Map<String, Object> customParams = [:]
-        customParams.putAll params
 
-        customParams.sort = historySortProperty
-        customParams.order = historyOrderDirection
-
-
-        respond CatalogueElementService.getAllVersions(customParams, element)
+        respond Lists.wrap(params,  "/${resourceName}/${params.id}/history", auditService.getElementChanges(params, element.latestVersionId ?: element.id))
     }
 
 

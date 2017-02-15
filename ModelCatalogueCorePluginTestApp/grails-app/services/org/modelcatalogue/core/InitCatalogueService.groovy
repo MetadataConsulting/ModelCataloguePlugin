@@ -10,6 +10,9 @@ import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.modelcatalogue.core.util.test.TestDataHelper
 import org.modelcatalogue.integration.mc.ModelCatalogueLoader
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
+import org.springframework.core.io.ClassPathResource
+import org.springframework.core.io.support.EncodedResource
+import org.springframework.jdbc.datasource.init.ScriptUtils
 
 class InitCatalogueService {
 
@@ -40,7 +43,7 @@ class InitCatalogueService {
 
         // first pass
         for (Resource resource in resolver.getResources('classpath*:**/*.mc')) {
-            if (resource.file.absolutePath.contains('/test/') || resource.file.absolutePath.contains('/docs/')) {
+            if (isTestResource(resource)) {
                 continue
             }
             try {
@@ -61,7 +64,7 @@ class InitCatalogueService {
 
         // load xml files
         for (Resource resource in resolver.getResources('classpath*:**/*.mc.xml')) {
-            if (resource.file.absolutePath.contains('/test/')) {
+            if (isTestResource(resource)) {
                 continue
             }
             try {
@@ -76,6 +79,10 @@ class InitCatalogueService {
         for (Resource resource in forSecondPass) {
             readXMLFile(resource.URI.toString(), resource.inputStream, failOnError)
         }
+    }
+
+    private boolean isTestResource(Resource resource) {
+        resource.file.absolutePath.contains('/test/') || resource.file.absolutePath.contains('/test-classes/') || resource.file.absolutePath.contains('/docs/')
     }
 
     void importXMLFromURLs(List<URL> urls, boolean failOnError, ProgressMonitor monitor = ProgressMonitor.NOOP) {
@@ -187,6 +194,13 @@ class InitCatalogueService {
                 .create().load(inputStream)
 
         builder.created
+    }
+
+    void setupStoredProcedures(){
+        if (sessionFactory.currentSession.connection().metaData.databaseProductName == 'MySQL') {
+            ScriptUtils.executeSqlScript(sessionFactory.currentSession.connection(), new EncodedResource(new ClassPathResource('mysql-procedures.sql', InitCatalogueService)), false, false, "--", '$$', "/*", "*/")
+        }
+
     }
 
 }

@@ -55,7 +55,7 @@ class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
             exportLinesAsXls DATA_SPEC_SHEET, lines, out
             TimeDuration elapsed = TimeCategory.minus(new Date(), timeStart)
             log.info "multiple dataClass stats: export took=$elapsed itemcount=$itemCount visitedModels (excludes previously visited) ${visitedModels.size()} cached models ${cachedChanges.size()}"
-            log.info "Exported ${dataModel.name} (${dataModel.combinedVersion}) as xls spreadsheet"
+            log.info "Exported ${dataModel.name} (${getDisplayVersion(dataModel)}) as xls spreadsheet"
 
             break;
         }
@@ -152,7 +152,7 @@ class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
     def descendModels(CatalogueElement model, lines, Object level, Map groupDescriptions, Object exclusions) {
         switch (level) {
             case 1:
-                String groupDescription = "$model.name (${model.combinedVersion})"
+                String groupDescription = "$model.name (${getDisplayVersion(model)})"
                 log.debug("level$level $groupDescription")
                 groupDescriptions.put(DATA_CATEGORY, EMPTY)     //pad for when no lower levels present
                 groupDescriptions.put(SECTION, EMPTY)
@@ -160,7 +160,7 @@ class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
                 break
 
             case DATA_CATEGORY:
-                String groupDescription = "$model.name (${model.combinedVersion})"
+                String groupDescription = "$model.name (${getDisplayVersion(model)})"
                 log.debug("level$level $groupDescription")
                 groupDescriptions.put(level, groupDescription)
                 groupDescriptions.put(SECTION, EMPTY)           //pad for when no lower levels present
@@ -168,7 +168,7 @@ class DataModelChangeLogXlsExporter extends RareDiseaseChangeLogXlsExporter {
                 break
 
             case SECTION:
-                String groupDescription = "$model.name (${model.combinedVersion})"
+                String groupDescription = "$model.name (${getDisplayVersion(model)})"
                 log.debug("level$level $groupDescription")
                 groupDescriptions.put(level, groupDescription)
                 checkChangeLog(model, lines, groupDescriptions, level, DETAIL_CHANGE_TYPES)

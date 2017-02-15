@@ -1,4 +1,4 @@
-#= require vk-beautify/dist/vkbeautify.0.99.00.beta
+#= require vkbeautify/vkbeautify
 #= require blob-polyfill/Blob
 #= require file-saver.js/FileSaver
 #= require ng-file-upload/ng-file-upload

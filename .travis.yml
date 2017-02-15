@@ -37,6 +37,7 @@ before_deploy: ./war.sh
 after_deploy: ./catalogue docker notify
 deploy:
   provider: releases
+  skip_cleanup: true
   api_key:
     secure: OwYHBvi8Mpb/VstwqmfPh+pvnA3xLx8ZSqtZSOTlCh6uzlP1To8Hv/mKAVjXSRrFrSL1udUais3K3yu29eX+AGAVpzZ+QYerSAY4oQWoNolBrE4O2Q6fINXk9jELJXdQU/xYiylt8WX3bYOKFsotXt2Bv3zyzsoUgaAHkk+Mp+8=
   file:

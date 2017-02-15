@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.publishing.PublishingChain
+
 class ValidationRule extends CatalogueElement {
 
     /** Component i.e. sample tracking, xml shredder, embassy etc. */
@@ -42,7 +44,7 @@ class ValidationRule extends CatalogueElement {
     }
 
     static relationships = [
-            incoming: [
+            outgoing: [
                 ruleContext: 'appliedWithin',
                 involvedness: 'involves'
             ]
@@ -51,5 +53,19 @@ class ValidationRule extends CatalogueElement {
     @Override
     Map<CatalogueElement, Object> manualDeleteRelationships(DataModel toBeDeleted) {
         return [:]
+    }
+
+    @Override
+    protected PublishingChain preparePublishChain(PublishingChain chain) {
+        super.preparePublishChain(chain)
+             .add(this.appliedWithin)
+             .add(this.involves)
+    }
+
+    List<CatalogueElement> collectExternalDependencies() {
+        List<CatalogueElement> ret = []
+        ret.addAll this.appliedWithin.findAll { it.dataModel != dataModel }
+        ret.addAll this.involves.findAll { it.dataModel != dataModel }
+        ret
     }
 }

@@ -3,7 +3,7 @@
     <dataType id="http://www.example.com/types/Integer" status="DRAFT" name="Integer">
         <description>A number with no fractional part.</description>
         <relationships>
-            <from relationshipType="base" ref="http://www.example.com/types/Decimal" />
+            <to relationshipType="base" ref="http://www.example.com/types/Decimal" />
         </relationships>
     </dataType>
     <relationshipTypes>

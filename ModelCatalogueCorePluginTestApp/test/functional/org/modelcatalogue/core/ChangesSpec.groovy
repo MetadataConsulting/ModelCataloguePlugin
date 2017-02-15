@@ -72,19 +72,6 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
 
         check { tab('activity') } displayed
         check { tab('history') } displayed
-
-        when:
-        selectTab 'history'
-
-        then: "the history tab contains treeview item which does not resize"
-        check { $('#history-tab .catalogue-element-treeview-list-container.no-resize') }
-        check { $('span.catalogue-element-treeview-name', text: startsWith("admin")) }
-
-        when:
-        selectInTree 'admin'
-
-        then:
-        check { $('span.catalogue-element-treeview-name', text: "admin [1] created") }
     }
 
     def "classifications have activity feed"() {

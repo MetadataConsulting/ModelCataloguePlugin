@@ -18,7 +18,7 @@ class RareDiseaseEligibilityChangeLogXlsExporterSpec extends AbstractRareDisease
         DataClass dataClass = DataClass.findByName('Dataclass Top Level 1 Root')
         makeChanges(dataClass)
 
-        new_guidance_id = DataClass.findByName("New Guidance class").combinedVersion
+        new_guidance_id = DataClass.findByName("New Guidance class").id
         //test generated content
         RareDiseaseEligibilityChangeLogXlsExporter exporter = new RareDiseaseEligibilityChangeLogXlsExporter(auditService, dataClassService, performanceUtilService, 5, false)
         List<String> rows = exporter.buildContentRows(dataClass)
