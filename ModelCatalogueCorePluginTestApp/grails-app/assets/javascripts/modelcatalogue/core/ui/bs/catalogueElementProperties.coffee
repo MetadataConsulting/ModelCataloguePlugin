@@ -53,6 +53,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'ext', label: 'Metadata'
   catalogueElementPropertiesProvider.configureProperty 'contextFor', label: 'Rules'
   catalogueElementPropertiesProvider.configureProperty 'involvedIn', label: 'Rules'
+  catalogueElementPropertiesProvider.configureProperty 'tags', label: 'Data Elements'
   catalogueElementPropertiesProvider.configureProperty 'childOf', label: 'Parents', columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'isContextFor', label: 'Data Classes', columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'containedIn', label: 'Data Classes', columns: nameAndIdAndMetadata()
@@ -240,6 +241,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'originalDataModels', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'internalModelCatalogueId', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'versionNumber', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'isTaggedBy', hidden: true
 
   catalogueElementPropertiesProvider.configureProperty '$$relationship', tabDefinition: [ '$element', '$name', ($element, $name) ->
 

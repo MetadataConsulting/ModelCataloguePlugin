@@ -22,7 +22,7 @@ class ModelCatalogueCorePluginUrlMappings {
 
         def legacyElements    = [model: 'dataClass', classification: 'dataModel']
         def resources         = ['batch', 'relationshipType', 'csvTransformation', 'dataModelPolicy' ]
-        def catalogueElements = ['asset', 'dataElement', 'dataClass', 'catalogueElement', 'dataType', 'enumeratedType', 'referenceType', 'primitiveType', 'measurementUnit', 'user', 'dataModel', 'classification', 'model', 'validationRule']
+        def catalogueElements = ['asset', 'dataElement', 'dataClass', 'catalogueElement', 'dataType', 'enumeratedType', 'referenceType', 'primitiveType', 'measurementUnit', 'user', 'dataModel', 'classification', 'model', 'validationRule', 'tag']
         def allElements       = catalogueElements + resources
 
         for (String elementName in allElements) {
@@ -30,6 +30,11 @@ class ModelCatalogueCorePluginUrlMappings {
             if (elementName in legacyElements.keySet()) {
                 controllerName = legacyElements[elementName]
             }
+
+            if (controllerName == 'tag') {
+                "/api/modelCatalogue/core/$elementName/forDataModel/$dataModelId"(controller: controllerName, action: 'forDataModel', method: HttpMethod.GET)
+            }
+
             "/api/modelCatalogue/core/$elementName" (controller: controllerName, action: 'index', method: HttpMethod.GET)
             "/api/modelCatalogue/core/$elementName" (controller: controllerName, action: 'save', method: HttpMethod.POST)
 

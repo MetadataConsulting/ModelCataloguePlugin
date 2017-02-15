@@ -12,6 +12,12 @@ angular.module('mc.core.ui.states.controllers.DataModelTreeCtrl', ['ui.router', 
 
       if element.resource
         if element.getDataModelId() == currentDataModel?.id
+          if element.tagId
+            if element.tagId == 'none'
+              $state.go 'mc.resource.list', dataModelId: currentDataModel?.id, resource: 'dataElement', status: 'active', tag: 'none'
+              return
+            $state.go 'mc.resource.show.property', dataModelId: currentDataModel?.id, resource: 'tag', id: element.tagId, property: 'tags'
+            return
           if element.resource == 'catalogueElement' && element.name == 'Deprecated Items'
             $state.go 'mc.resource.list', dataModelId: currentDataModel?.id, resource: element.resource, status: 'deprecated'
             return

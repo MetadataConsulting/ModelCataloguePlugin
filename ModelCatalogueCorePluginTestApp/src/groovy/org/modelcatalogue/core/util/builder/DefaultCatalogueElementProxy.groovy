@@ -15,7 +15,7 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 @GrailsCompileStatic
 @Log4j class DefaultCatalogueElementProxy<T extends CatalogueElement> implements CatalogueElementProxy<T>, org.modelcatalogue.core.api.CatalogueElement {
 
-    static final List<Class> KNOWN_DOMAIN_CLASSES = [Asset, CatalogueElement, DataModel, DataElement, DataType, EnumeratedType, ReferenceType, MeasurementUnit, DataClass, PrimitiveType, ValidationRule]
+    static final List<Class> KNOWN_DOMAIN_CLASSES = [Asset, CatalogueElement, DataModel, DataElement, DataType, EnumeratedType, ReferenceType, MeasurementUnit, DataClass, PrimitiveType, ValidationRule, Tag]
 
     static final String CHANGE_NEW = "Does Not Exist Yet"
     static final String CHANGE_TYPE = "Type Changed"

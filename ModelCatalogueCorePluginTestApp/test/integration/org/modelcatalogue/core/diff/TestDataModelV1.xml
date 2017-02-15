@@ -1,4 +1,4 @@
-<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.1/metadataregistry.xsd">
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry.xsd">
   <dataModel name="TestDataModel" status="FINALIZED" semanticVersion="1">
     <description>NHIC data model i.e. data classes used the NHIC project</description>
     <extensions>

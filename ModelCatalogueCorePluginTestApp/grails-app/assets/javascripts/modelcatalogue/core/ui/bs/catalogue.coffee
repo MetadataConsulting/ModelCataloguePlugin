@@ -27,6 +27,7 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setIcon 'mapping',            "fa fa-fw fa-superscript"
   catalogueProvider.setIcon 'validationRule',     "fa fa-fw fa-university"
   catalogueProvider.setIcon 'dataModelPolicy',    "fa fa-fw fa-check-square-o"
+  catalogueProvider.setIcon 'tag',                "fa fa-fw fa-tag"
 
   # this should be generated automatically in the future
 
@@ -44,6 +45,7 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setInstanceOf 'model',              'catalogueElement'
   catalogueProvider.setInstanceOf 'dataElement',        'catalogueElement'
   catalogueProvider.setInstanceOf 'validationRule',     'catalogueElement'
+  catalogueProvider.setInstanceOf 'tag',                'catalogueElement'
 
   catalogueProvider.setInstanceOf 'enumeratedType',     'dataType'
   catalogueProvider.setInstanceOf 'referenceType',      'dataType'
@@ -144,6 +146,14 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
     return 0 unless list.base
 
     return 0.5 if list.base.indexOf("/asset") >= 0
+
+    return 0
+  ]
+  catalogueProvider.addContainsCandidateTest ['list', 'element', 'extra', (list, newElement, extra) ->
+    return 0 unless list
+    return 0 unless list.base
+
+    return 0.5 if list.base.indexOf("/tag/forDataModel") >= 0 and newElement.isInstanceOf('dataElement')
 
     return 0
   ]

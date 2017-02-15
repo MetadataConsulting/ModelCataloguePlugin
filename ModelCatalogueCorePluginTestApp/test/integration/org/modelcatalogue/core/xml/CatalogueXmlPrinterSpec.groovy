@@ -34,7 +34,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
         StringWriter writer = new StringWriter()
         writable.writeTo(writer)
         expect:
-        writer.toString() == '''<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.1/metadataregistry.xsd">
+        writer.toString() == '''<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry.xsd">
   <dataType name="Test" id="http://example.com/specialchars" status="DRAFT">
     <description>diagnosis.&#402;&#8218;&#402;&#8218;&#402;&#8218;'&#8218;&#8220; e</description>
   </dataType>
@@ -244,12 +244,17 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
     private DataType getInteger() {
         decimal
 
-        build {
+        DataType dataType = build {
             dataType(name: "Integer", id: "http://www.example.com/types/Integer") {
                 basedOn 'Decimal'
                 description "A number with no fractional part."
             }
         }
+
+        assert dataType.isBasedOn
+        assert dataType.isBasedOn.any { it.name == 'Decimal'}
+
+        dataType
     }
 
     private DataType getGender() {

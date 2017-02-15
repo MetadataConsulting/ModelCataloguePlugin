@@ -4,6 +4,7 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.Tag
 import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.security.User
 
@@ -244,10 +245,10 @@ log4j.main = {
 //    debug 'org.springframework.security'
 //    debug 'org.grails.plugins.elasticsearch'
 
-    //if (Environment.current == Environment.DEVELOPMENT || Environment.current == Environment.CUSTOM) {
-  //      trace 'org.hibernate.type'
-  //     trace 'org.hibernate.stat'
-  //     debug 'org.hibernate.SQL'
+//    if (Environment.current == Environment.DEVELOPMENT || Environment.current == Environment.CUSTOM) {
+//        trace 'org.hibernate.type'
+//        trace 'org.hibernate.stat'
+//        debug 'org.hibernate.SQL'
 //    }
 
     info 'org.modelcatalogue'
@@ -434,4 +435,5 @@ modelcatalogue.defaults.relationshiptypes =  [
     [name: "classificationFilter", sourceToDestination: "used as filter by", destinationToSource: "filtered by", sourceClass: DataModel, destinationClass: User, system: true, sourceToDestinationDescription: "Classification can be used as filter by multiple users. This is done using the classification filter in bottom left corner.", destinationToSourceDescription: "User can filter by multiple classifications. To use exclusion filter instead of inclusion, set metadata \$exclude to any non-null value."],
     [name: "ruleContext", destinationToSource: "provides context for", sourceToDestination: "applied within context", sourceClass: ValidationRule, destinationClass: DataClass, versionSpecific: true, destinationToSourceDescription: "Data class can provide context for multiple validation rules", sourceToDestinationDescription: "Validation rule is applied within context of data class."],
     [name: "involvedness", destinationToSource: "is involved in", sourceToDestination: "involves", sourceClass: ValidationRule, destinationClass: DataElement, versionSpecific: true, destinationToSourceDescription: "Data element can be involved in multiple validation rules", sourceToDestinationDescription: "Validation rule can involve multiple data elements"],
+    [name: "tag", sourceToDestination: "tags", destinationToSource: "is tagged by", sourceClass: Tag, destinationClass: DataElement, versionSpecific: false, sourceToDestinationDescription: "Applies Tag on particular Data Element", destinationToSourceDescription: "Data Elements can be tagged by multiple Tags"],
 ]

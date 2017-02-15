@@ -110,11 +110,12 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
             List<Map> contentDescriptors = []
 
             contentDescriptors << createContentDescriptor(dataModel, 'Data Classes', DataClass, dataClasses.total)
-            contentDescriptors << createContentDescriptor(dataModel, 'Data Elements', DataElement, Integer.MAX_VALUE)
+            contentDescriptors << createDataElementsByTagDescriptor(dataModel)
             contentDescriptors << createContentDescriptor(dataModel, 'Data Types', DataType, Integer.MAX_VALUE)
             contentDescriptors << createContentDescriptor(dataModel, 'Measurement Units', MeasurementUnit, stats["totalMeasurementUnitCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Business Rules', ValidationRule, stats["totalValidationRuleCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Assets', Asset, stats["totalAssetCount"])
+            contentDescriptors << createContentDescriptor(dataModel, 'Tags', Tag, stats["totalTagCount"])
 
             if (dataModel.status != ElementStatus.DEPRECATED) {
                 Map deprecatedItems = createContentDescriptor(dataModel, 'Deprecated Items', CatalogueElement, stats["deprecatedCatalogueElementCount"])
@@ -146,6 +147,19 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
         respond dataModelService.findDependents(dataModel)
     }
 
+    private static Map createDataElementsByTagDescriptor(DataModel dataModel) {
+        String link = "/tag/forDataModel/${dataModel.getId()}?status=${dataModel.status != ElementStatus.DEPRECATED ? 'active' : ''}"
+        Map ret = [:]
+        ret.id = 'forDataModel'
+        ret.dataModels = [CatalogueElementMarshaller.minimalCatalogueElementJSON(dataModel)]
+        ret.elementType = DataElement.name
+        ret.name = 'Data Elements'
+        ret.content = [count: DataModelService.allTags(dataModel).size() + 2, itemType: Tag.name, link: link]
+        ret.link = link
+        ret.resource = GrailsNameUtils.getPropertyName(DataElement)
+        ret.status = dataModel.status.toString()
+        ret
+    }
 
     private static Map createContentDescriptor(DataModel dataModel, String name, Class clazz, long count) {
         String link = "/${GrailsNameUtils.getPropertyName(clazz)}?toplevel=true&dataModel=${dataModel.getId()}&status=${dataModel.status != ElementStatus.DEPRECATED ? 'active' : ''}"

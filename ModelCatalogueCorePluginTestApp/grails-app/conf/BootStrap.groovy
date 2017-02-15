@@ -50,7 +50,7 @@ class BootStrap {
         if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST] && !System.getenv('MC_BLANK_DEV')) {
             TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
                 initCatalogueService.initCatalogue(true)
-                initDataModelPolicies()
+                initPoliciesAndTags()
                 initSecurity(false)
                 setupStuff()
             }
@@ -59,7 +59,7 @@ class BootStrap {
             }
         } else {
             initCatalogueService.initDefaultRelationshipTypes()
-            initDataModelPolicies()
+            initPoliciesAndTags()
             initSecurity(!System.getenv('MC_BLANK_DEV'))
         }
 
@@ -417,7 +417,7 @@ class BootStrap {
 //        createRequestmapIfMissing('/api/modelCatalogue/core/relationshipTypes/**', 'ROLE_ADMIN')
     }
 
-    def initDataModelPolicies() {
+    def initPoliciesAndTags() {
         catalogueBuilder.build {
             dataModelPolicy(name: 'Unique of Kind') {
                 check dataClass property 'name' is 'unique'
@@ -438,6 +438,19 @@ class BootStrap {
                 check dataElement property 'name' is 'unique' otherwise 'Data element\'s name is not unique for {2}'
                 check dataType property 'name' is 'unique' otherwise 'Data type\'s name is not unique for {2}'
                 check dataType property 'name' apply regex: /[^_ -]+/ otherwise 'Name of {2} contains illegal characters ("_", "-" or " ")'
+            }
+            dataModel(name: 'Clinical Tags') {
+                tag(name: 'Registration, consent and demographic data essential for the management of the participant')
+                tag(name: 'Sample tracking data essential for processing and tracking the sample from collection through to sequencing')
+                tag(name: 'Clinical data essential for diagnostics purposes')
+                tag(name: 'Clinical data essential for research')
+                tag(name: 'Clinical data for research')
+                tag(name: 'Highly Sensitive PI data')
+                tag(name: 'Sensitive PI data')
+                tag(name: 'Highly Sensitive data')
+                tag(name: 'Sensitive data')
+                tag(name: 'Internal data')
+                tag(name: 'External data')
             }
         }
     }

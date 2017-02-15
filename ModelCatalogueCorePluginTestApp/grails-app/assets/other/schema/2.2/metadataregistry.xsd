@@ -299,8 +299,17 @@
         <xs:complexContent>
             <xs:extension base="mdr:CatalogueElement">
                 <xs:sequence>
+                    <xs:element name="tag"      type="mdr:Tag"    minOccurs="0" maxOccurs="unbounded"/>
                     <xs:element name="dataType" type="mdr:DataType"   minOccurs="0" />
                 </xs:sequence>
+                <xs:attribute name="type" use="prohibited"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="Tag">
+        <xs:complexContent>
+            <xs:extension base="mdr:CatalogueElement">
                 <xs:attribute name="type" use="prohibited"/>
             </xs:extension>
         </xs:complexContent>
@@ -352,6 +361,8 @@
                         <xs:element name="dataElement"      type="mdr:DataElement"     />
                         <xs:element name="dataType"         type="mdr:DataType"        />
                         <xs:element name="measurementUnit"  type="mdr:MeasurementUnit" />
+                        <xs:element name="validationRule"   type="mdr:ValidationRule" />
+                        <xs:element name="tag"              type="mdr:Tag" />
                     </xs:choice>
                 </xs:sequence>
                 <xs:attribute name="type" use="prohibited"/>
@@ -374,6 +385,8 @@
                 <xs:element name="measurementUnit"   type="mdr:MeasurementUnit" />
                 <xs:element name="relationshipTypes" type="mdr:RelationshipTypesDefinitions" />
                 <xs:element name="dataModelPolicies" type="mdr:DataModelPolicyDefinitions" />
+                <xs:element name="validationRule"    type="mdr:ValidationRule" />
+                <xs:element name="tag"               type="mdr:Tag" />
             </xs:choice>
         </xs:sequence>
     </xs:complexType>

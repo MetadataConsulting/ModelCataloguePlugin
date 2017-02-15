@@ -15,6 +15,7 @@ import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.Tag
 import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.actions.Action
 import org.modelcatalogue.core.actions.ActionParameter
@@ -199,6 +200,10 @@ import org.modelcatalogue.core.security.User
         User U_John = new User(name: "John", username: "John", password: "password", status: ElementStatus.FINALIZED).save(failOnError: true)
         User U_Kris = new User(name: "Kris", username: "Kris", password: "password", status: ElementStatus.FINALIZED).save(failOnError: true)
         User U_Lily = new User(name: "Lily", username: "Lily", password: "password", status: ElementStatus.FINALIZED).save(failOnError: true)
+
+        12.times {
+            new Tag(name: "Tag #${it}").save(failOnError: true)
+        }
     }
 
 }

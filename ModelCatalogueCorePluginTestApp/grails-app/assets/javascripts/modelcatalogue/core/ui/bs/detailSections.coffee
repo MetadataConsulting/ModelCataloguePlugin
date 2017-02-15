@@ -470,4 +470,59 @@ x in ['apple', 'banana', 'cherry']
         ]
     }
   }
+
+  detailSectionsProvider.register {
+    title: 'Tags'
+    position: 70
+    types: [
+      'dataElement'
+    ]
+    keys: []
+    template: '/mc/core/ui/detail-sections/tableData.html'
+    actions: [
+      {
+        label: 'Add Tag'
+        name: 'add'
+        icon: 'fa fa-plus-circle text-success'
+        action: (messages, element) ->
+          messages.prompt('Add Tag', '',
+            {
+              type: 'create-new-relationship'
+              element: element
+              relationshipTypeName: 'tag'
+              direction: "destinationToSource"
+            }
+          )
+      }
+    ]
+
+    getList: (element) ->
+      return @result if @result
+
+      @result =
+        base: element.isTaggedBy.base
+        itemType: element.isTaggedBy.itemType
+
+      element.isTaggedBy(null, max: LIST_MAX).then (list) =>
+        @result = list
+      return @result
+    reorder: reorderInDetail('isTaggedBy')
+    data: {
+      columns:
+        [
+          {
+            header: 'Name'
+            value: "ext.get('name') || ext.get('Name') || relation.name "
+            classes: 'col-md-6'
+            href: 'relation.href()'
+          }
+          {
+            header: 'Description'
+            value: "relation.description"
+            classes: 'col-md-6'
+            textEllipsis: true
+          }
+        ]
+    }
+  }
 ]

@@ -35,9 +35,9 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def "can supply status as parameter"() {
         expect:
-        elementService.list(status: 'DRAFT').size()                             == 26
+        elementService.list(status: 'DRAFT').size()                             == CatalogueElement.countByStatus(ElementStatus.DRAFT)
         elementService.list(status: 'DRAFT', max: 10).size()                    == 10
-        elementService.list(status: ElementStatus.DRAFT).size()                 == 26
+        elementService.list(status: ElementStatus.DRAFT).size()                 == CatalogueElement.countByStatus(ElementStatus.DRAFT)
         elementService.list(status: ElementStatus.DRAFT, max: 10).size()        == 10
         elementService.list(DataClass, status: 'DRAFT').size()                  == 7
         elementService.list(DataClass, status: ElementStatus.DRAFT).size()      == 7
@@ -45,8 +45,8 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         elementService.list(DataElement, status: ElementStatus.DRAFT).size()    == 5
         elementService.list(Asset, status: 'DRAFT').size()                      == 5
         elementService.list(Asset, status: ElementStatus.DRAFT).size()          == 5
-        elementService.count(status: 'DRAFT')                                   == 26L
-        elementService.count(status: ElementStatus.DRAFT)                       == 26L
+        elementService.count(status: 'DRAFT')                                   == CatalogueElement.countByStatus(ElementStatus.DRAFT)
+        elementService.count(status: ElementStatus.DRAFT)                       == CatalogueElement.countByStatus(ElementStatus.DRAFT)
         elementService.count(DataClass, status: 'DRAFT')                        == 7L
         elementService.count(DataClass, status: ElementStatus.DRAFT)            == 7L
         elementService.count(DataElement, status: 'DRAFT')                      == 5L
