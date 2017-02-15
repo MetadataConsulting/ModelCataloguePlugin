@@ -244,12 +244,17 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
     private DataType getInteger() {
         decimal
 
-        build {
+        DataType dataType = build {
             dataType(name: "Integer", id: "http://www.example.com/types/Integer") {
                 basedOn 'Decimal'
                 description "A number with no fractional part."
             }
         }
+
+        assert dataType.isBasedOn
+        assert dataType.isBasedOn.any { it.name == 'Decimal'}
+
+        dataType
     }
 
     private DataType getGender() {
