@@ -23,6 +23,7 @@ class DataModelService {
 
     def modelCatalogueSecurityService
     def grailsApplication
+    def sessionFactory
 
     private boolean legacyDataModels
 
@@ -185,4 +186,45 @@ class DataModelService {
     static List<Tag> allTags(DataModel dataModel) {
         Relationship.where { relationshipType == RelationshipType.tagType && destination.dataModel == dataModel }.distinct('source').list().sort { a, b -> a.name <=> b.name }
     }
+
+    List<Tag> allTagsMySQL(DataModel model){
+
+        long modelId = model.id
+        long hierarchyType = RelationshipType.hierarchyType.id
+        long containmentType = RelationshipType.containmentType.id
+        long tagTypeId = RelationshipType.tagType.id
+
+        String query = """SELECT DISTINCT  ce.* from catalogue_element ce
+            join tag t on t.id = ce.id
+            join relationship rel on t.id = rel.source_id and rel.relationship_type_id = :tagTypeId
+            join catalogue_element de on rel.destination_id = de.id
+            WHERE
+              de.data_model_id = :modelId
+              or find_in_set(de.id, GetAllDestinations(GetTopLevelDataClasses(:modelId, :hierarchytypeId), :hierarchytypeId, :containmentTypeId))
+            ORDER BY ce.name;"""
+
+        final session = sessionFactory.currentSession
+
+        // Create native SQL query.
+        final sqlQuery = session.createSQLQuery(query)
+
+        // Use Groovy with() method to invoke multiple methods
+        // on the sqlQuery object.
+        sqlQuery.with {
+            // Set domain class as entity.
+            // Properties in domain class id, name, level will
+            // be automatically filled.
+            addEntity(Tag)
+
+            // Set value for parameter startId.
+            setLong('modelId', modelId)
+            setLong('hierarchytypeId', hierarchyType)
+            setLong('containmentTypeId', containmentType)
+            setLong('tagTypeId', tagTypeId)
+
+            // Get all results.
+            list()
+        }
+    }
+
 }

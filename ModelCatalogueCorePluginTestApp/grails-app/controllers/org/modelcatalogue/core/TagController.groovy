@@ -1,15 +1,19 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
+import org.hibernate.SessionFactory
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.RelationshipDirection
+import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.lists.Relationships
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 
 class TagController extends AbstractCatalogueElementController<Tag> {
+
+    SessionFactory sessionFactory
 
     TagController() {
         super(Tag, false)
@@ -38,7 +42,7 @@ class TagController extends AbstractCatalogueElementController<Tag> {
 
         respond Lists.wrap(params, "/${resourceName}/forDataModel/${dataModelId}", Lists.lazy([:], Map, {
             DataModel model = DataModel.get(dataModelId)
-            List<Tag> tags = DataModelService.allTags(model)
+            List<Tag> tags =  sessionFactory.currentSession.connection().metaData.databaseProductName != 'MySQL' ? DataModelService.allTags(model) : dataModelService.allTagsMySQL(model)
 
             List<Map<String, Object>> ret = [createAllDataElementsDescriptor(model), createUntaggedDescriptor(model)]
 
@@ -87,7 +91,7 @@ class TagController extends AbstractCatalogueElementController<Tag> {
         ret.dataModels = [CatalogueElementMarshaller.minimalCatalogueElementJSON(dataModel)]
         ret.elementType = Tag.name
         ret.name = tag?.name ?: 'No Tag'
-        ret.content = [count: tag.tags.count { it.dataModel == dataModel }, itemType: DataElement.name, link: link]
+        ret.content = [count: Integer.MAX_VALUE, itemType: DataElement.name, link: link]
         ret.link = link
         ret.resource = GrailsNameUtils.getPropertyName(Tag)
         ret.status = dataModel.status.toString()

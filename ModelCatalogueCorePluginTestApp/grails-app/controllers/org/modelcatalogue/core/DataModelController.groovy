@@ -112,7 +112,6 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
             contentDescriptors << createContentDescriptor(dataModel, 'Data Classes', DataClass, dataClasses.total)
             contentDescriptors << createDataElementsByTagDescriptor(dataModel)
             contentDescriptors << createContentDescriptor(dataModel, 'Data Types', DataType, Integer.MAX_VALUE)
-            contentDescriptors << createContentDescriptor(dataModel, 'Data Types', DataType, stats["totalDataTypeCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Measurement Units', MeasurementUnit, stats["totalMeasurementUnitCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Business Rules', ValidationRule, stats["totalValidationRuleCount"])
             contentDescriptors << createContentDescriptor(dataModel, 'Assets', Asset, stats["totalAssetCount"])
