@@ -1000,5 +1000,21 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
             element.dataType == primitiveType
     }
 
+    def "keep the elements deprecated when creating new version"() {
+        DataModel model = new DataModel(name: "Test Keep Deprecated", status: ElementStatus.FINALIZED, semanticVersion: "1").save(failOnError: true)
+        DataClass dataClass = new DataClass(name: "Test Class", dataModel: model, status: ElementStatus.DEPRECATED).save(failOnError: true)
+
+        DraftContext context = DraftContext.userFriendly()
+
+        DataModel v2 = elementService.createDraftVersion(model, "2", context)
+
+        DataClass dcV2 = DataClass.findByNameAndDataModel(dataClass.name, v2)
+
+        expect:
+        v2
+        dcV2
+        dcV2.status == ElementStatus.DEPRECATED
+
+    }
 
 }

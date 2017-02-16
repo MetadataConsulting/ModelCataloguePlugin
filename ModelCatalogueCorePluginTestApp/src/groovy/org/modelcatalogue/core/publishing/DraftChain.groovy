@@ -83,6 +83,8 @@ class DraftChain extends PublishingChain {
             FriendlyErrors.failFriendlySave(element)
         }
 
+        ElementStatus originalStatus = element.status
+
         Class<? extends CatalogueElement> type = context.getNewType(element) ?: getEntityClass(element)
 
         GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(type.name) as GrailsDomainClass
@@ -90,6 +92,7 @@ class DraftChain extends PublishingChain {
         CatalogueElement draft = type.newInstance()
 
         draft.dataModel = draftDataModel
+
 
         for (prop in domainClass.persistentProperties) {
             if (!prop.association && element.hasProperty(prop.name) && prop.name != 'dataModel') {
@@ -131,7 +134,12 @@ class DraftChain extends PublishingChain {
             archiver.archive(element, true)
         }
 
-        draft.status = ElementStatus.DRAFT
+        if (originalStatus == ElementStatus.FINALIZED) {
+            draft.status = ElementStatus.DRAFT
+        } else {
+            draft.status = originalStatus
+        }
+
         draft.save(/*flush: true, */ deepValidate: false)
 
         context.addResolution(element, draft)
