@@ -59,8 +59,13 @@ class DraftChain extends PublishingChain {
 
         publishedDataModel.declares.eachWithIndex { CatalogueElement element, int index ->
             monitor.onNext("Creating draft [${(index + 2).toString().padLeft(5,'0')}/${(total + 1).toString().padLeft(5,'0')}]: $element")
-            createDraft(element, draftDataModel, publisher, monitor)
-            monitor.onNext(" - Created draft [${(index + 2).toString().padLeft(5,'0')}/${(total + 1).toString().padLeft(5,'0')}]: $element")
+            if (element.status == ElementStatus.DEPRECATED) {
+                monitor.onNext(" [${(index + 2).toString().padLeft(5,'0')}/${(total + 1).toString().padLeft(5,'0')}] Skiped draft for deprecated element: $element")
+            } else {
+                createDraft(element, draftDataModel, publisher, monitor)
+                monitor.onNext(" [${(index + 2).toString().padLeft(5,'0')}/${(total + 1).toString().padLeft(5,'0')}] Created draft: $element")
+            }
+
         }
 
 
@@ -83,17 +88,15 @@ class DraftChain extends PublishingChain {
             FriendlyErrors.failFriendlySave(element)
         }
 
-        ElementStatus originalStatus = element.status
-
         Class<? extends CatalogueElement> type = context.getNewType(element) ?: getEntityClass(element)
 
-        GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(type.name) as GrailsDomainClass
 
         CatalogueElement draft = type.newInstance()
 
         draft.dataModel = draftDataModel
 
 
+        GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(type.name) as GrailsDomainClass
         for (prop in domainClass.persistentProperties) {
             if (!prop.association && element.hasProperty(prop.name) && prop.name != 'dataModel') {
                 draft.setProperty(prop.name, element.getProperty(prop.name))
@@ -134,12 +137,7 @@ class DraftChain extends PublishingChain {
             archiver.archive(element, true)
         }
 
-        if (originalStatus == ElementStatus.FINALIZED) {
-            draft.status = ElementStatus.DRAFT
-        } else {
-            draft.status = originalStatus
-        }
-
+        draft.status = ElementStatus.DRAFT
         draft.save(/*flush: true, */ deepValidate: false)
 
         context.addResolution(element, draft)
