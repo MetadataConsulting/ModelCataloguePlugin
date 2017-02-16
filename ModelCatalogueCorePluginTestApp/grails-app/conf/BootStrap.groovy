@@ -424,6 +424,7 @@ class BootStrap {
                 check dataElement property 'name' is 'unique'
                 check dataType property 'name' is 'unique'
                 check validationRule property 'name' is 'unique'
+                check measurementUnit property 'name' is 'unique'
             }
             dataModelPolicy(name: 'Default Checks') {
                 check dataModel extension 'http://www.modelcatalogue.org/metadata/#authors' is 'required' otherwise 'Metadata "Authors" is missing for {2}'
