@@ -87,11 +87,11 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
           label: 'Delete'
           icon: 'fa fa-fw fa-times-circle'
           type: 'danger'
-          disabled: $scope.element.status != 'DRAFT'
+          disabled: $scope.element.status != 'DRAFT' and not security.hasRole('SUPERVISOR')
           action: ->
             messages.confirm("Do you really want to delete #{$scope.element.getElementTypeName()} #{$scope.element.name}?",
               "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be deleted permanently. " +
-                "This action cannot be undone. Be ware that only DRAFT can be deleted.")
+                (if not security.hasRole('SUPERVISOR') then "This action cannot be undone. Be ware that only DRAFT can be deleted." else "This action cannot be undone."))
             .then ->
               $scope.element.delete()
               .then ->
