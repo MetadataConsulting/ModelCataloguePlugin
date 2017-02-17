@@ -98,7 +98,7 @@ class GenomicsService {
         DataClass latestVersion = (DataClass) elementService.findByModelCatalogueId(DataClass, dClass.getDefaultModelCatalogueId(true))
 
         return assetService.storeReportAsAsset(latestVersion.dataModel,
-            name: "${latestVersion.name} report (CSV)",
+            name: "Eligibility Report: ${docType == RareDiseaseCsvExporter.HPO_AND_CLINICAL_TESTS ? RD_HPO_CSV_FILENAME : RD_ELIGIBILITY_CSV_FILENAME}",
             originalFileName: "${docType == RareDiseaseCsvExporter.HPO_AND_CLINICAL_TESTS ? RD_HPO_CSV_FILENAME : RD_ELIGIBILITY_CSV_FILENAME}",
             contentType: "text/csv",
         ) {

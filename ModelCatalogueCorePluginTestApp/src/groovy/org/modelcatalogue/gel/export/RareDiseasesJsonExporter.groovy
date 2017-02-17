@@ -24,7 +24,6 @@ class RareDiseasesJsonExporter {
 
     void exportEligibilityCriteriaAsJson(CatalogueElement model) {
         int depth = 6
-        def exclusions = ['Phenotype','Clinical Test','Closing Statement','Guidance']
 
         log.info "Exporting Rare Disease Eligibility Criteria as json ${model.name} (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id') ?: model.getModelCatalogueId() ?: model.getLatestVersionId() ?: model.getId()})"
 
@@ -37,7 +36,7 @@ class RareDiseasesJsonExporter {
         def levelTag6 = [tag1: 'id', tag2: 'name', tag3: 'description']
         def levelMetaData = [1: levelTag1, 2: levelTag2, 3: levelTag3, 4: levelTag4, 5: levelTag5, 6: levelTag6]
 
-        exportJson(model, depth, levelMetaData, exclusions)
+        exportJson(model, depth, levelMetaData)
 
         log.info "Rare Disease Eligibility Criteria exported as json ${model.name} (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id') ?: model.getModelCatalogueId() ?: model.getLatestVersionId() ?: model.getId()}) ."
     }
@@ -99,14 +98,14 @@ class RareDiseasesJsonExporter {
 
 
 
-    private void exportJson(model, depth, levelMetaData, exclusions) {
+    private void exportJson(model, depth, levelMetaData) {
         int level = 1
         def graphList = []
         def builder = new JsonBuilder()
 
-        log.info "depth $depth exclusions $exclusions \n levelMetaData $levelMetaData"
+        log.info "depth $depth \n levelMetaData $levelMetaData"
 
-        descendModels(model, level, graphList, depth, levelMetaData, exclusions)
+        descendModels(model, level, graphList, depth, levelMetaData)
 
         builder "${levelMetaData.get(LEVEL1).tag1}": graphList
 
@@ -114,7 +113,7 @@ class RareDiseasesJsonExporter {
     }
 
 
-    def descendModels(CatalogueElement model, level, graphList, depth, Map levelMetaData, exclusions) {
+    def descendModels(CatalogueElement model, level, graphList, depth, Map levelMetaData) {
         if (level > depth) return
 
         log.debug "descendModels level=$level model=$model"
@@ -154,23 +153,21 @@ class RareDiseasesJsonExporter {
         if(model instanceof DataElement) return
 
         model.contains.eachWithIndex { CatalogueElement child, i ->
-            recurseIfIncluded(i, child, level, modelList, depth, levelMetaData, exclusions)
+            recurseIfIncluded(i, child, level, modelList, depth, levelMetaData)
         }
         model.parentOf?.eachWithIndex { CatalogueElement child, i ->
-            recurseIfIncluded(i, child, level, modelList, depth, levelMetaData, exclusions)
+            recurseIfIncluded(i, child, level, modelList, depth, levelMetaData)
         }
 
     }
 
-    private void recurseIfIncluded(i, CatalogueElement child, level, modelList, depth, levelMetaData, exclusions) {
+    private void recurseIfIncluded(i, CatalogueElement child, level, modelList, depth, levelMetaData) {
         def include = true
-        exclusions.each { pattern ->
-            if (child.name.matches("(?i:.*$pattern.*)")) {
-                include = false
-            }
+        if(level==4 && !child.name.matches("(?i:.*Eligibility.*)")) {
+            include = false
         }
         if (include) {
-            descendModels(child, level + 1, modelList, depth, levelMetaData, exclusions)
+            descendModels(child, level + 1, modelList, depth, levelMetaData)
         }
     }
 
