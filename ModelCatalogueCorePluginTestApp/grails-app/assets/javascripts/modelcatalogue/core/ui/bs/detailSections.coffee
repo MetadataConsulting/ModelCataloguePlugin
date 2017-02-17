@@ -215,6 +215,7 @@ x in ['apple', 'banana', 'cherry']
       'dataClass'
     ]
     keys: []
+    hideInOverview: true
     template: '/mc/core/ui/detail-sections/tableData.html'
     actions: [
       {
@@ -277,6 +278,7 @@ x in ['apple', 'banana', 'cherry']
       'dataClass'
     ]
     keys: []
+    hideInOverview: true
     template: '/mc/core/ui/detail-sections/tableData.html'
     actions: [
       {
@@ -328,6 +330,7 @@ x in ['apple', 'banana', 'cherry']
       'dataType'
     ]
     keys: []
+    hideInOverview: true
     template: '/mc/core/ui/detail-sections/tableData.html'
     getList: (element) ->
       return @result if @result
@@ -365,6 +368,7 @@ x in ['apple', 'banana', 'cherry']
       'validationRule'
     ]
     keys: []
+    hideInOverview: true
     template: '/mc/core/ui/detail-sections/tableData.html'
     actions: [
       {
@@ -421,6 +425,7 @@ x in ['apple', 'banana', 'cherry']
       'validationRule'
     ]
     keys: []
+    hideInOverview: true
     template: '/mc/core/ui/detail-sections/tableData.html'
     actions: [
       {
@@ -478,6 +483,7 @@ x in ['apple', 'banana', 'cherry']
       'dataElement'
     ]
     keys: []
+    hideInOverview: true
     template: '/mc/core/ui/detail-sections/tableData.html'
     actions: [
       {
