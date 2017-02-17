@@ -39,7 +39,7 @@ class CatalogueXmlImportSpec extends AbstractIntegrationSpec {
         loader = new CatalogueXmlLoader(builder)
 
         when:
-            InputStream nhic = getClass().getResourceAsStream('grand_child.mc.xml')
+            InputStream nhic = getClass().getResourceAsStream('grand_child.catalogue.xml')
             loader.load(nhic)
 
             DataModel dataModel = DataModel.findByName(DATA_MODEL_NAME)

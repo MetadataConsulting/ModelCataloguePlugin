@@ -113,6 +113,22 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         MeasurementUnit.findByName('TestUnit').description == 'This is a test unit which is just for test purposes!'
     }
 
+    def "two measurement units problem" () {
+        when:
+        build {
+            dataModel (name: '2MUP 1') {
+                measurementUnit(name: '2MUP 1 MU', id: '123', symbol: "ng/ul")
+            }
+
+            measurementUnit(name: '2MUP 1 MU', id: '456', status: deprecated, dataModel: '2MUP 2', symbol: "ng/ul")
+
+        }
+
+        then:
+            noExceptionThrown()
+
+    }
+
     def "creates new validation rule"() {
         build {
             dataModel(name: 'TRDM') {

@@ -17,6 +17,10 @@ angular.module('mc.core.ui.states.dataModels', ['mc.core.ui.states.controllers.P
             if $stateParams.q
               return catalogueElementResource('dataModel').search($stateParams.q, status: $stateParams.status ? 'active', minimal: true, max: 25)
             return catalogueElementResource('dataModel').list(status: $stateParams.status ? 'active', max: 25)
+          if $stateParams.type == 'elements'
+            if $stateParams.q
+              return catalogueElementResource('catalogueElement').search($stateParams.q, status: $stateParams.status ? 'active', minimal: true, max: 25)
+            return catalogueElementResource('catalogueElement').list(status: $stateParams.status ? 'active', max: 25)
           if $stateParams.q
             return security.requireUser().then (user) ->
               enhance(rest(url: "#{modelCatalogueApiRoot}/user/#{user.id}/outgoing/favourite/search", params: {elementType: 'org.modelcatalogue.core.DataModel', search: $stateParams.q, status: $stateParams.status ? 'active'}))

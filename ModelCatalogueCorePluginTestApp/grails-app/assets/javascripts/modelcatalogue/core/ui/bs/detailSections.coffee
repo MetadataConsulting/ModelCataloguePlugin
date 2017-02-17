@@ -55,7 +55,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Description'
-    position: -50
+    position: 20
     types: [
       'catalogueElement'
     ]
@@ -65,7 +65,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Enumerations'
-    position: -40
+    position: 30
     types: [
       'enumeratedType'
     ]
@@ -87,7 +87,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Rule'
-    position: -30
+    position: 40
     types: [
       'dataType'
     ]
@@ -100,7 +100,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Data Type'
-    position: -30
+    position: 40
     types: [
       'dataElement'
     ]
@@ -112,7 +112,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Policies'
-    position: -10000
+    position: 10
     hideInOverview: true
     types: [
       'dataModel'
@@ -123,7 +123,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Metadata'
-    position: 5
+    position: 60
     types: [
       'dataModel'
       'dataClass'
@@ -148,7 +148,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Measurement Unit'
-    position: 10
+    position: 70
     types: [
       'primitiveType'
     ]
@@ -160,7 +160,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Data Class'
-    position: 10
+    position: 70
     types: [
       'referenceType'
     ]
@@ -172,7 +172,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Preview'
-    position: 20
+    position: 90
     types: [
       'asset'
     ]
@@ -182,7 +182,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Revision Notes'
-    position: 20
+    position: 90
     types: [
       'dataModel'
     ]
@@ -192,7 +192,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
      title: 'Namespace and Organization'
-     position: 30
+     position: 100
      types: [
        'dataModel'
      ]
@@ -210,7 +210,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Data Elements'
-    position: 60
+    position: 150
     types: [
       'dataClass'
     ]
@@ -272,7 +272,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Children'
-    position: 70
+    position: 200
     types: [
       'dataClass'
     ]
@@ -323,7 +323,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Inherited Rules'
-    position: -29
+    position: 45
     types: [
       'dataType'
     ]
@@ -360,7 +360,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Context Data Classes'
-    position: 60
+    position: 150
     types: [
       'validationRule'
     ]
@@ -416,7 +416,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Involved Data Elements'
-    position: 70
+    position: 200
     types: [
       'validationRule'
     ]
@@ -473,7 +473,7 @@ x in ['apple', 'banana', 'cherry']
 
   detailSectionsProvider.register {
     title: 'Tags'
-    position: 70
+    position: 200
     types: [
       'dataElement'
     ]
