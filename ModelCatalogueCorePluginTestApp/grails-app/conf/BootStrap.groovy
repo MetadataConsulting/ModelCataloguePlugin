@@ -116,15 +116,16 @@ class BootStrap {
             link controller: 'dataClass', action: 'inventorySpreadsheet', id: true
         }
 
-        reportsRegistry.register {
-            creates asset
-            title { "Changelog Document" }
-            defaultName { "${it.name} changelog as MS Word Document" }
-            depth 3
-            includeMetadata true
-            type DataClass
-            link controller: 'dataClass', action: 'changelogDoc', id: true
-        }
+//  needs more work
+//        reportsRegistry.register {
+//            creates asset
+//            title { "Changelog Document" }
+//            defaultName { "${it.name} changelog as MS Word Document" }
+//            depth 3
+//            includeMetadata true
+//            type DataClass
+//            link controller: 'dataClass', action: 'changelogDoc', id: true
+//        }
 
         reportsRegistry.register {
             creates link
@@ -155,18 +156,19 @@ class BootStrap {
             link controller: 'genomics', action: 'exportAllRareDiseaseReports', id: true
         }
 
-        reportsRegistry.register {
-            creates asset
-            title { "GEL Changelog (Word Doc)" }
-            defaultName { "${it.name} changelog as MS Word Document" }
-            depth 3
-            includeMetadata true
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
-            }
-            link controller: 'genomics', action: 'exportChangeLogDocument', id: true
-        }
+// needs more work
+//        reportsRegistry.register {
+//            creates asset
+//            title { "GEL Changelog (Word Doc)" }
+//            defaultName { "${it.name} changelog as MS Word Document" }
+//            depth 3
+//            includeMetadata true
+//            type DataModel
+//            when { DataModel dataModel ->
+//                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+//            }
+//            link controller: 'genomics', action: 'exportChangeLogDocument', id: true
+//        }
 
         reportsRegistry.register {
             creates asset
@@ -280,25 +282,26 @@ class BootStrap {
             link controller: 'genomics', action: 'exportCancerTypesAsCsv', id: true
         }
 
-        reportsRegistry.register {
-            creates link
-            title { "Change Log for RD Phenotypes And Clinical Tests (Excel)" }
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
-            }
-            link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsXls', id: true
-        }
-
-        reportsRegistry.register {
-            creates link
-            title { "Change Log for RD Eligibility (Excel)" }
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
-            }
-            link controller: 'genomics', action: 'exportRareDiseaseEligibilityChangeLogAsXls', id: true
-        }
+// needs work before we can release
+//        reportsRegistry.register {
+//            creates link
+//            title { "Change Log for RD Phenotypes And Clinical Tests (Excel)" }
+//            type DataModel
+//            when { DataModel dataModel ->
+//                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+//            }
+//            link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsXls', id: true
+//        }
+// needs work before we can release
+//        reportsRegistry.register {
+//            creates link
+//            title { "Change Log for RD Eligibility (Excel)" }
+//            type DataModel
+//            when { DataModel dataModel ->
+//                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+//            }
+//            link controller: 'genomics', action: 'exportRareDiseaseEligibilityChangeLogAsXls', id: true
+//        }
 
         reportsRegistry.register {
             creates link
@@ -306,6 +309,7 @@ class BootStrap {
             type DataModel
             link controller: 'genomics', action: 'exportDataSpecChangeLogAsXls', id: true
         }
+
         reportsRegistry.register {
             creates link
             title { "Rare Diseases Static Website" }
