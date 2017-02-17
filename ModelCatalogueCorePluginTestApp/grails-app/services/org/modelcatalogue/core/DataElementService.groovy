@@ -31,7 +31,7 @@ class DataElementService {
                     WHERE
                     ce.data_model_id = :modelId
                     or find_in_set(de.id, GetAllDestinations(GetTopLevelDataClasses(:modelId, :hierarchytypeId), :hierarchytypeId, :containmentTypeId))
-                    ORDER BY ce.name;
+                    ORDER BY ce.name
                 """) {
                         setLong('modelId', modelId)
                         setLong('hierarchytypeId', hierarchyType)
@@ -49,7 +49,7 @@ class DataElementService {
                   (ce.data_model_id = :modelId
                   or find_in_set(de.id, GetAllDestinations(GetTopLevelDataClasses(:modelId, :hierarchytypeId), :hierarchytypeId, :containmentTypeId)))
                   AND rel.id is null
-                ORDER BY ce.name;
+                ORDER BY ce.name
             """) {
                     setLong('modelId', modelId)
                     setLong('hierarchytypeId', hierarchyType)
@@ -67,7 +67,7 @@ class DataElementService {
               (ce.data_model_id = :modelId
               or find_in_set(de.id, GetAllDestinations(GetTopLevelDataClasses(:modelId, :hierarchytypeId), :hierarchytypeId, :containmentTypeId)))
               AND de.id in (select destination_id from relationship where relationship_type_id = :tagTypeId and source_id = :tagId)
-            ORDER BY ce.name;
+            ORDER BY ce.name
         """) {
             setLong('modelId', modelId)
             setLong('hierarchytypeId', hierarchyType)
@@ -78,7 +78,10 @@ class DataElementService {
     }
 
     private ListWithTotalAndType<DataElement>  buildDataElementsList(Map params, String query, @DelegatesTo(SQLQuery) Closure closure) {
-        Lists.lazy(params, DataElement, {
+        Closure queryClosure = {
+            def max = it?.max
+            def offset = it?.offset
+
             final session = sessionFactory.currentSession
 
             // Create native SQL query.
@@ -88,11 +91,24 @@ class DataElementService {
             // on the sqlQuery object.
             sqlQuery.addEntity(DataElement)
 
+            if (max) {
+                sqlQuery.setMaxResults(max as Integer)
+            }
+
+            if (offset) {
+                sqlQuery.setFirstResult(offset as Integer)
+            }
+
             sqlQuery.with closure
 
             // Get all results.
-            sqlQuery.list()
-        })
+            if (it instanceof Map) {
+                return sqlQuery.list()
+            }
+            return sqlQuery.list().size()
+        }
+
+        Lists.lazy(params, DataElement, queryClosure, queryClosure)
     }
 
 

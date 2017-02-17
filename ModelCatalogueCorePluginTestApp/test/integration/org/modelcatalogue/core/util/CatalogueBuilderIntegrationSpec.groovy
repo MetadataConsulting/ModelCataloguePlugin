@@ -170,31 +170,6 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         created.first().latestVersionId == unit.refresh().latestVersionId
     }
 
-    def "creates only one measurement unit as measurement unit name is unique"() {
-        new MeasurementUnit(name: 'ExistingUnit2', status: ElementStatus.DEPRECATED).save(failOnError: true, flush: true)
-
-        when:
-        build {
-            dataModel(name: "TestClassificationA") {
-                measurementUnit(name: 'ExistingUnit2', symbol: 'EU2') {
-                    description '''
-                        This is a test unit which is just for test purposes!
-                    '''
-                }
-            }
-            dataModel(name: "TestClassificationB") {
-                measurementUnit(name: 'ExistingUnit2', symbol: 'EU2') {
-                    description '''
-                        This is a test unit which is just for test purposes!
-                    '''
-                }
-            }
-        }
-
-        then:
-        MeasurementUnit.countByName('ExistingUnit2') == 1
-    }
-
     def "complain if measurement unit name is missing"() {
         when:
         build {

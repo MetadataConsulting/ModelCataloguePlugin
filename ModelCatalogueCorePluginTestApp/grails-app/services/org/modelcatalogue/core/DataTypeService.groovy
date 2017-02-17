@@ -19,7 +19,11 @@ class DataTypeService {
         long containmentType = RelationshipType.containmentType.id
 
 
-        Lists.lazy(params, DataType, {
+        Closure queryClosure = {
+
+            def max = it?.max
+            def offset = it?.offset
+            boolean itemsQuery = it instanceof Map
 
             String query = """select
                           ce.*,
@@ -55,11 +59,11 @@ class DataTypeService {
                                     join data_type dt on de.data_type_id = dt.id
                                         where find_in_set(de.id, GetAllDestinations(GetTopLevelDataClasses(:modelId, :hierarchytypeId), :hierarchytypeId, :containmentTypeId))
                                     )
-                                    ORDER BY ce.name;
+                                    ORDER BY ce.name
 
                         """
 
-             final session = sessionFactory.currentSession
+            final session = sessionFactory.currentSession
 
             // Create native SQL query.
             final sqlQuery = session.createSQLQuery(query)
@@ -82,12 +86,25 @@ class DataTypeService {
                 setLong('enumeratedTypeDiscriminator', HibernateHelper.getDiscriminatorValue(sessionFactory, EnumeratedType))
                 setLong('dataTypeDiscriminator', HibernateHelper.getDiscriminatorValue(sessionFactory, DataType))
 
+                if (max) {
+                    setMaxResults(max as Integer)
+                }
+
+                if (offset) {
+                    setFirstResult(offset as Integer)
+                }
+
                 // Get all results.
-                list()
+                if (itemsQuery) {
+                    return list()
+                }
+                return list().size()
             }
 
             results
-        })
+        }
+
+        Lists.lazy(params, DataType, queryClosure, queryClosure)
 
 
     }

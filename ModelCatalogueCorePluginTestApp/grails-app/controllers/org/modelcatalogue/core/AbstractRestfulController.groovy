@@ -223,21 +223,24 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
-        // only drafts can be deleted
-        def error = "Only elements with status of DRAFT can be deleted."
-        if (instance instanceof DataModel) {
-            if (instance.status != ElementStatus.DRAFT) {
-                response.status = FORBIDDEN.value()
-                respond errors: error
-                return
-            }
-        } else {
-            if ((instance.dataModel?.status ?: instance.status) != ElementStatus.DRAFT) {
-                response.status = FORBIDDEN.value()
-                respond errors: error
-                return
+        if (!modelCatalogueSecurityService.hasRole('SUPERVISOR')) {
+            // only drafts can be deleted
+            def error = "Only elements with status of DRAFT can be deleted."
+            if (instance instanceof DataModel) {
+                if (instance.status != ElementStatus.DRAFT) {
+                    response.status = FORBIDDEN.value()
+                    respond errors: error
+                    return
+                }
+            } else {
+                if ((instance.dataModel?.status ?: instance.status) != ElementStatus.DRAFT) {
+                    response.status = FORBIDDEN.value()
+                    respond errors: error
+                    return
+                }
             }
         }
+
 
         // find out if CatalogueElement can be deleted
         def manualDeleteRelationships = instance.manualDeleteRelationships(instance instanceof DataModel ? instance : null)
