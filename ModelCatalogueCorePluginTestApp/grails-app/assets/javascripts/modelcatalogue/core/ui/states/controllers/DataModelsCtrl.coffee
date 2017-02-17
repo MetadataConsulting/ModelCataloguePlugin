@@ -61,7 +61,9 @@ angular.module('mc.core.ui.states.controllers.DataModelsCtrl', ['ui.router', 'mc
     names.capitalize(($scope.status ? 'All').toLowerCase())
 
   $scope.getCurrentType = ->
-    names.capitalize(($scope.type ? 'My').toLowerCase())
+    return 'Catalogue Models' if $scope.type == 'catalogue'
+    return 'Catalogue Elements' if $scope.type == 'elements'
+    return 'My Models'
 
   $scope.showMyModels = ->
     $state.go '.', {type: 'my'}
@@ -70,6 +72,10 @@ angular.module('mc.core.ui.states.controllers.DataModelsCtrl', ['ui.router', 'mc
   $scope.showAllModels = ->
     $state.go '.', {type: 'catalogue'}
     $scope.type = 'catalogue'
+
+  $scope.showAllElements = ->
+    $state.go '.', {type: 'elements'}
+    $scope.type = 'elements'
 
   $scope.$watch 'q', (q) ->
     $state.go '.', {q: q}

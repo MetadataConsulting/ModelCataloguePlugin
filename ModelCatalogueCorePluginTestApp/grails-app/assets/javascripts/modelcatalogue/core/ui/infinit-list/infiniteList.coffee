@@ -7,7 +7,8 @@ angular.module('mc.core.ui.infiniteList').directive 'infiniteList', -> {
     itemHref: '&?'
     transform: '&?'
 
-  templateUrl: '/mc/core/ui/infinite-list/infinitePanels.html'
+  templateUrl: (el, attr) ->
+    if attr.type == 'short' then '/mc/core/ui/infinite-list/infinitePanelsShort.html' else '/mc/core/ui/infinite-list/infinitePanels.html'
 
   controller: ($scope, $animate, $window, $controller, $element, $attrs, detailSections) ->
     'ngInject'

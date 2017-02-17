@@ -6,7 +6,7 @@
           <div class="panel-heading">
             <div class="input-group input-group-lg">
               <span class="input-group-addon"><span class="fa fa-search"></span> </span>
-              <input type="text" placeholder="{{'Search ' + getCurrentType() + ' Models'}}" class="form-control"
+              <input type="text" placeholder="{{'Search ' + getCurrentType()}}" class="form-control"
                      ng-model="q" ng-model-options="{debounce: 500}" focus-me="true">
               <div class="input-group-btn">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
@@ -36,13 +36,16 @@
           <contextual-actions role="data-models" no-colors="true" size="sm"></contextual-actions>
         </div>
         <ul class="nav nav-tabs" role="tablist">
-          <li id="my-models" ng-class="{'active' : getCurrentType() == 'My'}" role="presentation">
+          <li id="my-models" ng-class="{'active' : getCurrentType() == 'My Models'}" role="presentation">
             <a href ng-click="showMyModels()">
               My Models
             </a>
           </li>
-          <li ng-class="{'active' : getCurrentType() == 'Catalogue'}" role="presentation">
+          <li ng-class="{'active' : getCurrentType() == 'Catalogue Models'}" role="presentation">
             <a href ng-click="showAllModels()">Catalogue Models</a>
+          </li>
+          <li ng-class="{'active' : getCurrentType() == 'Catalogue Elements'}" role="presentation">
+            <a href ng-click="showAllElements()">Catalogue Elements</a>
           </li>
         </ul>
         <div class="leave-10-before"></div>
@@ -63,10 +66,21 @@
             </p>
           </div>
         </div>
-        <infinite-list transform="dataModelOrDestination($element)"
-                       column-classes="'col-lg-12 col-sm-12 col-md-12'"
-                       list="list">
-        </infinite-list>
+
+        <div ng-if="type == 'elements'">
+          <infinite-list transform="dataModelOrDestination($element)"
+                         column-classes="'col-lg-12 col-sm-12 col-md-12'"
+                         type="short"
+                         list="list">
+          </infinite-list>
+        </div>
+
+        <div ng-if="type != 'elements'">
+          <infinite-list transform="dataModelOrDestination($element)"
+                         column-classes="'col-lg-12 col-sm-12 col-md-12'"
+                         list="list">
+          </infinite-list>
+        </div>
       </div>
     </div>
   </div>
