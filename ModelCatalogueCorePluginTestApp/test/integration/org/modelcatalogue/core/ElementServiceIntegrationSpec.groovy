@@ -1012,7 +1012,8 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         expect:
         v2
-        !dcV2
+        dcV2
+        dcV2.status == ElementStatus.DEPRECATED
 
     }
 
