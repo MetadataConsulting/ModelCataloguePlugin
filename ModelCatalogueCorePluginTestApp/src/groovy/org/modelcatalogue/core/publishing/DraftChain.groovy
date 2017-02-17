@@ -59,13 +59,8 @@ class DraftChain extends PublishingChain {
 
         publishedDataModel.declares.eachWithIndex { CatalogueElement element, int index ->
             monitor.onNext("Creating draft [${(index + 2).toString().padLeft(5,'0')}/${(total + 1).toString().padLeft(5,'0')}]: $element")
-            if (element.status == ElementStatus.DEPRECATED) {
-                monitor.onNext(" [${(index + 2).toString().padLeft(5,'0')}/${(total + 1).toString().padLeft(5,'0')}] Skiped draft for deprecated element: $element")
-            } else {
-                createDraft(element, draftDataModel, publisher, monitor)
-                monitor.onNext(" [${(index + 2).toString().padLeft(5,'0')}/${(total + 1).toString().padLeft(5,'0')}] Created draft: $element")
-            }
-
+            createDraft(element, draftDataModel, publisher, monitor)
+            monitor.onNext(" - Created draft [${(index + 2).toString().padLeft(5,'0')}/${(total + 1).toString().padLeft(5,'0')}]: $element")
         }
 
 
@@ -137,7 +132,7 @@ class DraftChain extends PublishingChain {
             archiver.archive(element, true)
         }
 
-        draft.status = ElementStatus.DRAFT
+        draft.status = element.status == ElementStatus.FINALIZED ? ElementStatus.DRAFT : element.status
         draft.save(/*flush: true, */ deepValidate: false)
 
         context.addResolution(element, draft)

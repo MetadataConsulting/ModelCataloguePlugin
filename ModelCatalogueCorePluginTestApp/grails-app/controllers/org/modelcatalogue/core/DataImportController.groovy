@@ -117,7 +117,7 @@ class DataImportController  {
             executeInBackground(id, "Imported from OBO") {
                 try {
                     OboLoader loader = new OboLoader(builder)
-                    loader.load(inputStream, name, idpattern)
+                    loader.load(inputStream, name)
                     finalizeAsset(id, (DataModel) (builder.created.find {it.instanceOf(DataModel)} ?: builder.created.find{it.dataModel}?.dataModel), userId)
                 } catch (Exception e) {
                     logError(id, e)

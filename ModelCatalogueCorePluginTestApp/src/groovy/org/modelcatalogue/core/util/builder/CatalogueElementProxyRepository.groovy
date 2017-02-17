@@ -160,7 +160,7 @@ class CatalogueElementProxyRepository {
             logInfo "(2/6) dirty checking"
 
             Set<CatalogueElementProxy> draftRequiredDataModels = new LinkedHashSet<CatalogueElementProxy>()
-            DraftContext context = createDraftContext(collectElementsUnderControl(elementProxiesToBeResolved)).forceNew()
+            DraftContext context = createDraftContext(collectElementsUnderControl(elementProxiesToBeResolved)).forceNew().withMonitor(new SubprocessMonitor(monitor))
 
             for (CatalogueElementProxy element in elementProxiesToBeResolved) {
                 try {
@@ -592,7 +592,7 @@ class CatalogueElementProxyRepository {
 
 
 
-        Relationship relationship = sourceElement.createLinkTo(destinationElement, type, archived: proxy.archived as Object, resetIndices: true, skipUniqueChecking: (proxy.source.new || proxy.destination.new) as Object)
+        Relationship relationship = sourceElement.createLinkTo(destinationElement, type, archived: proxy.archived as Object, resetIndices: true, skipUniqueChecking: (proxy.source.new || proxy.destination.new) as Object, ignoreRules: sourceElement.status == ElementStatus.DEPRECATED)
 
         if(relationship.relationshipType == RelationshipType.supersessionType) {
             if(!relationship.source.latestVersionId){
