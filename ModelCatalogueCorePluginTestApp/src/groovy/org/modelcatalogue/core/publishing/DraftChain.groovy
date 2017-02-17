@@ -78,8 +78,6 @@ class DraftChain extends PublishingChain {
     }
 
     private <T extends CatalogueElement> T createDraft(T element, DataModel draftDataModel, Publisher<CatalogueElement> archiver, Observer<String> monitor) {
-        ElementStatus originalStatus = element.status
-
         if (!element.latestVersionId) {
             element.latestVersionId = element.id
             FriendlyErrors.failFriendlySave(element)
@@ -130,11 +128,12 @@ class DraftChain extends PublishingChain {
 
         context.delayRelationshipCopying(draft, element)
 
+        draft.status = element.status == ElementStatus.FINALIZED ? ElementStatus.DRAFT : element.status
+
         if (element.status == ElementStatus.DRAFT) {
             archiver.archive(element, true)
         }
 
-        draft.status = originalStatus == ElementStatus.FINALIZED ? ElementStatus.DRAFT : element.status
         draft.save(/*flush: true, */ deepValidate: false)
 
         context.addResolution(element, draft)

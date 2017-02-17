@@ -1135,7 +1135,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
         expect:
         DataClass.countByName(dc1name) == 1
-        DataClass.findByName(dc1name).status == ElementStatus.DEPRECATED
+            DataClass.countByNameAndStatus(dc1name, ElementStatus.DEPRECATED) == 1
 
         when:
         build {
@@ -1150,9 +1150,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         noExceptionThrown()
         DataClass.countByName(dc1name) == 2
         // and the original deprecated
-        DataClass.findByNameAndStatus(dc1name, ElementStatus.DEPRECATED)
-        // there is one draft
-        DataClass.findByNameAndStatus(dc1name, ElementStatus.DRAFT)
+        DataClass.countByNameAndStatus(dc1name, ElementStatus.DEPRECATED) == 2
     }
 
     def "create data model with policy"() {
