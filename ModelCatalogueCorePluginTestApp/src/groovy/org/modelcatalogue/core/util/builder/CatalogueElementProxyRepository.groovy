@@ -17,7 +17,7 @@ import org.springframework.util.StopWatch
 class CatalogueElementProxyRepository {
 
 
-    static Set<Class> HAS_UNIQUE_NAMES = new LinkedHashSet<Class>([MeasurementUnit, DataModel])
+    static Set<Class> HAS_UNIQUE_NAMES = new LinkedHashSet<Class>([DataModel])
 
     static final Set<Class> DATA_TYPE_CLASSES = new LinkedHashSet<Class>([EnumeratedType, ReferenceType, DataType, PrimitiveType])
 
@@ -354,9 +354,6 @@ class CatalogueElementProxyRepository {
             String semanticVersion = proxy.getParameter("semanticVersion")
             return "${proxy.domain.simpleName}:${semanticVersion}:${proxy.name}"
         }
-        if (proxy.domain == MeasurementUnit) {
-            return "${proxy.domain.simpleName}:*:${proxy.name}"
-        }
 
         return "${proxy.domain.simpleName}:${proxy.classification}:${proxy.name}"
 
@@ -368,9 +365,6 @@ class CatalogueElementProxyRepository {
         if (proxy.domain == DataModel) {
             String semanticVersion = proxy.getParameter(SEMANTIC_VERSION)
             return "${domain.simpleName}:${semanticVersion}:${proxy.name}"
-        }
-        if (proxy.domain == MeasurementUnit) {
-            return "${domain.simpleName}:*:${proxy.name}"
         }
 
         return "${domain.simpleName}:${proxy.classification?.name}@${proxy.classification?.getParameter(SEMANTIC_VERSION)}:${proxy.name}"
