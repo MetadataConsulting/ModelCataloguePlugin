@@ -85,12 +85,13 @@ class DraftChain extends PublishingChain {
 
         Class<? extends CatalogueElement> type = context.getNewType(element) ?: getEntityClass(element)
 
-        GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(type.name) as GrailsDomainClass
 
         CatalogueElement draft = type.newInstance()
 
         draft.dataModel = draftDataModel
 
+
+        GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(type.name) as GrailsDomainClass
         for (prop in domainClass.persistentProperties) {
             if (!prop.association && element.hasProperty(prop.name) && prop.name != 'dataModel') {
                 draft.setProperty(prop.name, element.getProperty(prop.name))
@@ -127,11 +128,12 @@ class DraftChain extends PublishingChain {
 
         context.delayRelationshipCopying(draft, element)
 
+        draft.status = element.status == ElementStatus.FINALIZED ? ElementStatus.DRAFT : element.status
+
         if (element.status == ElementStatus.DRAFT) {
             archiver.archive(element, true)
         }
 
-        draft.status = ElementStatus.DRAFT
         draft.save(/*flush: true, */ deepValidate: false)
 
         context.addResolution(element, draft)
