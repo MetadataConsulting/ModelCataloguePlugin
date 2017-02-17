@@ -112,6 +112,10 @@ class CopyAssociationsAndRelationships {
                     .withMetadata(r.ext)
                     .withSkipUniqueChecking(true)
 
+            if (draft.status == ElementStatus.DEPRECATED) {
+                definitionBuilder.withIgnoreRules(true)
+            }
+
             Relationship created = relationshipService.link definitionBuilder.definition
 
             if (created.hasErrors()) {
