@@ -4,9 +4,11 @@ import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
 import org.modelcatalogue.core.geb.Common
+import spock.lang.Ignore
 import spock.lang.Stepwise
 
 @Stepwise
+@Ignore
 class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
 
     public static final CatalogueAction exportAction = CatalogueAction.runFirst('item', 'export')
@@ -26,7 +28,7 @@ class ChangeLogForEligibilitySpec extends AbstractModelCatalogueGebSpec {
         then:
             check Common.rightSideTitle contains 'Rare Disease Conditions'
     }
-
+    @Ignore
     def "download the change log as MS Excel spreadsheet"() {
 
         when:
