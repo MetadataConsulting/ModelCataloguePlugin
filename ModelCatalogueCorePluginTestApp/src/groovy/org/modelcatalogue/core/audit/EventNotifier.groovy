@@ -3,6 +3,7 @@ package org.modelcatalogue.core.audit
 import grails.converters.JSON
 import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException
+import org.hibernate.LazyInitializationException
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.util.HibernateHelper
@@ -63,6 +64,8 @@ class EventNotifier extends LoggingAuditor {
             StringWriter sw = new StringWriter()
             new JSON(element).render(sw)
             return sw.toString()
+        } catch (LazyInitializationException ex){
+            return render(element.attach())
         } catch (ConverterException ce) {
             throw new IllegalArgumentException("Unable to convert $element to JSON", ce)
         }
