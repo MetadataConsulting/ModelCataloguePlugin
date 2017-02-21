@@ -98,10 +98,10 @@ class GelJsonExporter {
 
         model.parentOf.each { DataClass dataClass ->
 
-            if (dataClass.name.matches("(?i:.*Phenotypes.*)") && !dataClass.name.matches("(?i:.*Eligibility.*)") && !dataClass.name.matches("(?i:.*Test.*)") && !dataClass.name.matches("(?i:.*Guidance.*)")) {
+            if (dataClass.name.matches("(?i:.*Phenotypes.*)") && !dataClass.name.matches("(?i:.*Eligibility.*)") && !dataClass.name.matches("(?i:.*Tests.*)") && !dataClass.name.matches("(?i:.*Guidance.*)")) {
                 phenotypeModel = dataClass
             }
-            if (!dataClass.name.matches("(?i:.*Phenotypes.*)") && !dataClass.name.matches("(?i:.*Eligibility.*)") && dataClass.name.matches("(?i:.*Test.*)") && !dataClass.name.matches("(?i:.*Guidance.*)")) {
+            if (!dataClass.name.matches("(?i:.*Phenotypes.*)") && !dataClass.name.matches("(?i:.*Eligibility.*)") && dataClass.name.matches("(?i:.*Tests.*)") && !dataClass.name.matches("(?i:.*Guidance.*)")) {
                 testModel = dataClass
             }
         }

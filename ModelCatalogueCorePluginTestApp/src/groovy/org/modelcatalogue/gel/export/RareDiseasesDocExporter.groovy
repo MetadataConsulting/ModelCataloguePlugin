@@ -162,7 +162,7 @@ class RareDiseasesDocExporter {
                 allVersionsOfDataClass.each { DataClass model ->
                     row {
                         cell "${model.dataModel.semanticVersion}", style: 'cell'
-                        cell model.dataModel.ext.get("http://www.modelcatalogue.org/metadata/#released")?:'', style: 'cell'
+                        cell model.dataModel.ext.get("http://www.modelcatalogue.org/metadata/#released")? Date.parse("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", model.dataModel.ext.get("http://www.modelcatalogue.org/metadata/#released")).format("dd/MM/yyyy"):'', style: 'cell'
                     }
                 }
             }
@@ -238,12 +238,11 @@ class RareDiseasesDocExporter {
     private void descendModels(DocumentBuilder builder, DataClass model, Integer level) {
         log.debug "descendModels level=$level count=" + this.modelCount
 
-        String modelName = model.name + " (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getCombinedVersion()})"
+        String modelName = model.name + " (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getLatestVersionId()})"
         levelNameDescriptions.put(level, modelName)
         levelModelDescriptions.put(level, model.description)
 
         if (level > 5) return   //don't go too deep, nothing for us down there...
-//        if (modelCount > 10) return   //don't use too many models for testing
 
         //don't re-examine previously seen models
         if (model.getId() in processedModels) {
@@ -269,24 +268,25 @@ class RareDiseasesDocExporter {
 
         log.debug "level $level model name $model.name"
 
-        for (DataClass child in model.parentOf) {
-            processedModels << model.getId()
 
-            if (child.name.matches("(?i:.*Eligibility.*)") && eligibilityMode) {
-                this.modelCount = this.modelCount + 1
-                printModel(builder, child, level + 1, false)
+            for (DataClass child in model.parentOf) {
+                processedModels << model.getId()
+                if(level==4) {
+                    if (child.name.matches("(?i:.*Eligibility.*)") && eligibilityMode) {
+                        this.modelCount = this.modelCount + 1
+                        printModel(builder, child, level + 1, false)
 
-            } else if (child.name.matches("(?i:.*Phenotype.*)") && !eligibilityMode) {
-                this.modelCount = this.modelCount + 1
-                printModel(builder, child, level + 1, true)
+                    } else if (child.name.matches("(?i:.*Phenotype.*)") && !eligibilityMode) {
+                        this.modelCount = this.modelCount + 1
+                        printModel(builder, child, level + 1, true)
 
-            } else if (child.name.matches("(?i:.*Clinical Test.*)") && !eligibilityMode) {
-                this.modelCount = this.modelCount + 1
-                printModel(builder, child, level + 1, false)
-
-            } else {
-                descendModels(builder, child, level + 1)
-            }
+                    } else if (child.name.matches("(?i:.*Clinical Test.*)") && !eligibilityMode) {
+                        this.modelCount = this.modelCount + 1
+                        printModel(builder, child, level + 1, false)
+                    }
+                } else {
+                    descendModels(builder, child, level + 1)
+                }
         }
     }
 
@@ -294,13 +294,13 @@ class RareDiseasesDocExporter {
 
     private void printModel(DocumentBuilder builder, DataClass model, Integer level, boolean phenotypeMode) {
         log.debug "printModel level=$level"
-        String modelName = model.name + " (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getCombinedVersion()})"
+        String modelName = model.name + " (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getLatestVersionId()})"
         levelNameDescriptions.put(level, modelName)
 
         builder.with {
 
             //4th sub-level heading - level 5
-            heading6 levelNameDescriptions.get(level)  //eligibility, phenotypes & tests
+            if(!eligibilityMode) heading6 levelNameDescriptions.get(level)  //eligibility, phenotypes & tests
 
             table(columns: [1,6], margin: [left: 20.px, right: 40.px], padding: 3.px, border: [size: 2.px]) {
 
@@ -350,7 +350,7 @@ class RareDiseasesDocExporter {
 
                     model.parentOf.each { DataClass child ->
                         if (child.name) {
-                            String childName = child.name + " (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getCombinedVersion()})"
+                            String childName = child.name
                             text CELL_TEXT_SECOND_BOLD, "\n$childName\n"
                         }
                         if (child.description) {

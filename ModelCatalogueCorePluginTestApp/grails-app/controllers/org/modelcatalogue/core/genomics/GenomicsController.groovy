@@ -308,24 +308,17 @@ class GenomicsController {
             return
         }
 
-        //Generate Model reports
-        genomicsService.genGelSpecification(model,3)
-        genomicsService.genDataSpecChangeLogAsXls(model)
-
         //Generate Class reports
         DataClass dataClass = findRootClass(model)
-        genomicsService.genRareDiseaseHPOAndClinicalTestsAsXls(dataClass)
-        genomicsService.genCancerTypesAsCsv(dataClass)
-        genomicsService.genCancerTypesAsJson(dataClass)
-        genomicsService.genChangeLogDocument(dataClass,dataClass.name,3,true)
+// remove potentially        genomicsService.genRareDiseaseHPOAndClinicalTestsAsXls(dataClass)
         genomicsService.genEligibilityOrPhenotypesAndTests(dataClass,true)
         genomicsService.genEligibilityOrPhenotypesAndTests(dataClass,false)
         genomicsService.genRareDiseaseCsv(dataClass,RareDiseaseCsvExporter.HPO_AND_CLINICAL_TESTS)
         genomicsService.genRareDiseaseCsv(dataClass,RareDiseaseCsvExporter.ELIGIBILITY)
         genomicsService.genRareDiseaseDisorderListAsCsv(dataClass)
-        genomicsService.genRareDiseaseEligibilityChangeLogAsXls(dataClass)
         genomicsService.genRareDiseaseHPOAndClinicalTestsAsJson(dataClass)
         genomicsService.genRareDiseaseHPOEligibilityCriteriaAsJson(dataClass)
+        genomicsService.genRareDiseaseWebsite(model)
 
         redirect uri: "/#/${model.id}/asset/all?status=active"
 

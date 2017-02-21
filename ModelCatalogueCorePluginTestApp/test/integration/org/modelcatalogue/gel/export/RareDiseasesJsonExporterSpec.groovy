@@ -1,10 +1,13 @@
 package org.modelcatalogue.gel.export
 
 import org.modelcatalogue.core.DataClass
+import spock.lang.Ignore
 
 /**
  * Created by rickrees on 10/03/2016.
  */
+@Ignore
+
 class RareDiseasesJsonExporterSpec extends AbstractRareDiseasesExporterSpec {
 
     def "export eligibility criteria to json"() {
