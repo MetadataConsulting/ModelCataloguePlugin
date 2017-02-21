@@ -344,11 +344,13 @@ class ElasticSearchService implements SearchCatalogue {
 
     @Override
     Observable<Boolean> index(Object object) {
+        // TODO: investigate why the object can be null
         index IndexingSession.create(), just(object)
     }
 
     @Override
     Observable<Boolean> index(Iterable<Object> resource) {
+        // TODO: investigate why the iterable can contain null values
         index IndexingSession.create(), from(resource)
     }
 
@@ -398,20 +400,25 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     private Observable<Boolean> unindexInternal(IndexingSession session, Object element) {
-        return from(getIndices(element)).flatMap { idx ->
-            indexExists(session, just(idx)).flatMap { response ->
-                if (response.exists) {
-                    return RxElastic.from(client.prepareDelete(idx, getTypeName(getEntityClass(element)), "${element.getId()}")).map {
-                        log.debug "Unindexed $element from $idx"
-                        it.found
-                    }.onErrorReturn { error ->
-                        log.debug "Exception unindexing $element: $error"
-                        return false
+        try {
+            return from(getIndices(element)).flatMap { idx ->
+                indexExists(session, just(idx)).flatMap { response ->
+                    if (response.exists) {
+                        return RxElastic.from(client.prepareDelete(idx, getTypeName(getEntityClass(element)), "${element.getId()}")).map {
+                            log.debug "Unindexed $element from $idx"
+                            it.found
+                        }.onErrorReturn { error ->
+                            log.debug "Exception unindexing $element: $error"
+                            return false
+                        }
                     }
+                    return just(true)
                 }
-                return just(true)
             }
+        } catch (UnsupportedOperationException e) {
+            return Observable.error(e)
         }
+
     }
 
     @Override
@@ -549,6 +556,7 @@ class ElasticSearchService implements SearchCatalogue {
             if (DataModelPolicy.isAssignableFrom(clazz)) {
                 return DataModelPolicy
             }
+            log.warn("Object $it doesn't belong to any group. Entity class resolved as Object")
             return clazz
         } flatMap { group ->
             if (group.key == CatalogueElement) {
@@ -562,7 +570,10 @@ class ElasticSearchService implements SearchCatalogue {
             if (group.key in [RelationshipType, DataModelPolicy]) {
                 return group
             }
-            throw new UnsupportedOperationException("Not Yet Implemented for '$group.key': ${group.toList().toBlocking().first()}")
+            if (group.key == Object) {
+                return Observable.empty()
+            }
+            return Observable.error(new UnsupportedOperationException("Not Yet Implemented for '$group.key': ${group.toList().toBlocking().first()}"))
         } flatMap { entity ->
             Class clazz = getEntityClass(entity)
             ImmutableSet<String> indices = getIndices(entity)
