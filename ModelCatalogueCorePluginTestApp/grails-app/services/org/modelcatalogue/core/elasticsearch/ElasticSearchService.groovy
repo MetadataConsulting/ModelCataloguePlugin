@@ -573,7 +573,7 @@ class ElasticSearchService implements SearchCatalogue {
             if (group.key == Object) {
                 return Observable.empty()
             }
-            return Observable.error(new UnsupportedOperationException("Not Yet Implemented for '$group.key': ${group.toList().toBlocking().first()}"))
+            return Observable.error(new UnsupportedOperationException("Not Yet Implemented for '$group.key'"))
         } flatMap { entity ->
             Class clazz = getEntityClass(entity)
             ImmutableSet<String> indices = getIndices(entity)
