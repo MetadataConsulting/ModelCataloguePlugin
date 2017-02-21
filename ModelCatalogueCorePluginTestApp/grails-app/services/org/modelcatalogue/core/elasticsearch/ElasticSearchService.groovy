@@ -520,7 +520,7 @@ class ElasticSearchService implements SearchCatalogue {
             // relationship copies relationship type mapping
             mapping[typeName].properties.data_model = getMapping(DataModel).data_model
         }
-
+        //Ignore date information NOT mapped as date
         if (toplevel) {
             mapping[typeName].date_detection = false
         }
@@ -633,10 +633,13 @@ class ElasticSearchService implements SearchCatalogue {
             if (response.exists) {
                 return just(response.index)
             }
+
+            //Create elastic serach builder
             CreateIndexRequestBuilder request = client.admin()
                     .indices()
                     .prepareCreate(response.index)
 
+            //add mappings for index
             for (Class type in supportedTypes) {
                 request.addMapping(getTypeName(type), getMapping(type, true))
             }
