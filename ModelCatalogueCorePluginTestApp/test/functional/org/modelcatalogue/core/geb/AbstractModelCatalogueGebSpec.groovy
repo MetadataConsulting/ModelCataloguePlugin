@@ -33,12 +33,6 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         }, false)
     }
 
-    def cleanupSpec() {
-        if (driver) {
-            driver.quit()
-        }
-    }
-
     DataModelNavigator select(String dataModelName, boolean latest = false) {
 
         for (int i = 0; i < 10; i++) {
