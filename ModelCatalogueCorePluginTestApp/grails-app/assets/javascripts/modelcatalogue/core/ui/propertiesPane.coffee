@@ -65,6 +65,7 @@ angular.module('mc.core.ui.propertiesPane', ['ngSanitize']).directive 'propertie
         return 'relationship' if angular.isObject(target) and target.source? and target.destination?
         return 'element'      if angular.isObject(target) and target.show? and angular.isFunction(target.show)
         return 'orderedMap'   if angular.isString(target) and target.indexOf('"type":"orderedMap"') >= 0
+        return 'extensionValue' if angular.isObject(target) and target.hasOwnProperty('extensionValue') and target.hasOwnProperty('name')
         return 'text'
 
       $scope.expandOrCollapse = (element) ->
