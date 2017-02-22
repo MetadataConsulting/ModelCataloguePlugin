@@ -25,13 +25,6 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         loginUser(user.username, user.password)
     }
 
-    def cleanup() {
-        LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
-        for (LogEntry entry : logEntries) {
-            println "${new Date(entry.getTimestamp())} ${entry.getLevel()} ${entry.getMessage()}"
-        }
-    }
-
     private void refreshIfConnectionLost() {
         noStale(1, true, {$('strong', text: contains('Connection lost'))}, {
             if (it.first().displayed) {
