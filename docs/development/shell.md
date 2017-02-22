@@ -17,3 +17,7 @@ Examples:
 Run `./catalogue` to get the list of commands available.
 
 Run `./catalogue <command> --help` to get help for specific command
+
+To run a production server locally the database is configured using the mc-config.groovy file, an example file 
+can be found here: 
+[Configuration](../deployment/production.adoc)

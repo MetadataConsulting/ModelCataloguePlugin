@@ -7,7 +7,7 @@ grails.serverURL = System.getenv('METADATA_SERVER_URL') ?:  "http://localhost:${
 // Data Source
 dataSource {
     driverClassName = "com.mysql.jdbc.Driver"
-    dialect='org.hibernate.dialect.MySQLDialect'
+    dialect='org.hibernate.dialect.MySQL5InnoDBDialect'
     url = System.getenv('METADATA_DB_NAME') ?: "jdbc:mysql://localhost:3306/${System.getProperty('mc.db.schema') ?: System.getenv('METADATA_DB_SCHEMA') ?: 'nhic'}?autoReconnect=true&useUnicode=yes"
     username = System.getenv('METADATA_DB_USERNAME')
     password = System.getenv('METADATA_DB_PASSWORD')
@@ -99,3 +99,13 @@ dataSource {
 // mc.storage.s3.bucket = 'your-bucket-name'
 // mc.storage.s3.key = 'key'
 // mc.storage.s3.secret = 'secret'
+
+// mc.welcome.jumbo = """
+// <h1>Company Name</h1>
+// <h2>Dataset Catalogue</h2>
+// <p>
+//
+// This catalogue contains dataset metadata  </p>
+// """
+//
+// mc.welcome.info = """<div></div>"""
