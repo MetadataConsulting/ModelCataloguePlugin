@@ -743,7 +743,9 @@ class CatalogueElementToXlsxExporter {
                     value dataType.name
                     styles Iterables.concat(withChangesHighlight('data-element', dataElementDiffs, 'dataType'), withChangesHighlight(null, dataClassDiffs, Diff.keyForRelationship(containsRelationship), Diff.keyForSelf(containsRelationship?.destination?.latestVersionId ?: containsRelationship?.destination?.id)))
                     colspan 2
-                    comment dataType.dataModelSemanticVersion
+                    // FIXME: put the comment back as soon as following is resolved
+                    // https://github.com/MetadataConsulting/spreadsheet-builder/issues/15
+                    // comment dataType.dataModelSemanticVersion
                 }
 
                 if (measurementUnit) {
