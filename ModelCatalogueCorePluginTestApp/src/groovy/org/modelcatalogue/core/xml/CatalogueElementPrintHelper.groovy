@@ -3,6 +3,7 @@ package org.modelcatalogue.core.xml
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.util.HibernateHelper
 
 abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
 
@@ -33,19 +34,19 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
     }
 
     static void printElement(theMkp, CatalogueElement element, PrintContext context, Relationship rel, String elementName = null) {
-        CatalogueElementPrintHelper helper = get(element.class)
+        CatalogueElementPrintHelper helper = get(HibernateHelper.getEntityClass(element))
         if (!elementName) {
             elementName = helper.topLevelName
         }
 
         if (element instanceof DataModel) {
-            if (context.currentClassification) {
+            if (context.currentDataModel) {
                 theMkp."${elementName}"(ref(element, context, true)) {
                     processRelationshipMetadata(theMkp, context, rel)
                 }
                 return
             }
-            context.currentClassification = element
+            context.currentDataModel = element
             context.typesUsed << 'declaration'
         }
 
@@ -62,8 +63,12 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             helper.processElements(theMkp, element, context, rel)
         }
 
+        if (context.repetitive) {
+            context.removeFromPrinted(element)
+        }
+
         if (element instanceof DataModel) {
-            context.currentClassification = null
+            context.currentDataModel = null
         }
     }
 
@@ -71,7 +76,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
     Map<String, Object> collectAttributes(E element, PrintContext context) {
         Map<String, Object> attrs = [name: element.name]
 
-        if (element.dataModel && context.currentClassification != element.dataModel) {
+        if (element.dataModel && context.currentDataModel != element.dataModel) {
             attrs.dataModel = element.dataModel.name
         }
 
@@ -188,13 +193,13 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
 
         if (element.dataModel) {
             if (includeDefaultId) {
-                if (context.currentClassification == element.dataModel) {
+                if (context.currentDataModel == element.dataModel) {
                     return [name: element.name, id: element.getDefaultModelCatalogueId(context.idIncludeVersion)]
                 } else {
                     return [name: element.name, dataModel: element.dataModel.name, id: element.getDefaultModelCatalogueId(context.idIncludeVersion)]
                 }
             }
-            if (context.currentClassification == element.dataModel) {
+            if (context.currentDataModel == element.dataModel) {
                 return [name: element.name]
             } else {
                 return [name: element.name, dataModel: element.dataModel.name]
