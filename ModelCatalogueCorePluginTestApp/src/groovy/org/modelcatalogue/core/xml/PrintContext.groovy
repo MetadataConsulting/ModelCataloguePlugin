@@ -31,7 +31,7 @@ class PrintContext {
     }
 
     void removeFromPrinted(CatalogueElement element) {
-        idsOfPrinted - element.id
+        idsOfPrinted.remove(element.id)
     }
 
     boolean wasPrinted(CatalogueElement element) {

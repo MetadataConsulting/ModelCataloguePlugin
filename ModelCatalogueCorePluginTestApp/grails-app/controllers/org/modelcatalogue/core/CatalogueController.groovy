@@ -39,6 +39,9 @@ class CatalogueController {
                 if (params.full != 'true') {
                     keepInside = element.instanceOf(DataModel) ? element : element.dataModel
                 }
+                if (params.repetitive == 'true') {
+                    repetitive = true
+                }
             }.writeTo(response.writer)
             return
         }
