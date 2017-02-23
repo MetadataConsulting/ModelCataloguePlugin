@@ -31,7 +31,7 @@ angular.module('mc.core.ui.states.controllers.XmlEditorCtrl', ['ui.ace', 'ngFile
         , 500
         )
 
-    $http.get("#{element.internalModelCatalogueId}?format=xml&full=true").then (resp) ->
+    $http.get("#{element.internalModelCatalogueId}?format=xml&full=true&repetitive=true").then (resp) ->
       $scope.xml = resp.data
 
     $http.get("#{security.contextPath}#{catalogue.getDefaultXslt(element.elementType) ? catalogue.getDefaultXslt('catalogueElement')}").then (resp) ->
