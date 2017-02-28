@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.apache.poi.poifs.filesystem.POIFSFileSystem
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
@@ -11,6 +12,9 @@ import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 import org.springframework.http.HttpStatus
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
+
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
 
 class DataImportController  {
 
@@ -25,7 +29,7 @@ class DataImportController  {
     def auditService
 
 
-    private static final CONTENT_TYPES = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream', 'application/xml', 'text/xml']
+    private static final CONTENT_TYPES = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream', 'application/xml', 'text/xml', 'application/zip']
     static responseFormats = ['json']
     static allowedMethods = [upload: "POST"]
 
@@ -81,6 +85,33 @@ class DataImportController  {
                 try {
                     ExcelLoader parser = new ExcelLoader(builder)
                     parser.importData(headersMap, inputStream)
+                    finalizeAsset(id, (DataModel) (builder.created.find {it.instanceOf(DataModel)} ?: builder.created.find{it.dataModel}?.dataModel), userId)
+                } catch (Exception e) {
+                    logError(id, e)
+                }
+            }
+            redirectToAsset(id)
+            return
+        }
+
+        if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".zip")) {
+            def asset = assetService.storeAsset(params, file, 'application/zip')
+            def id = asset.id
+            builder.monitor = BuildProgressMonitor.create("Importing archive $file.originalFilename", id)
+            InputStream inputStream = file.inputStream
+            executeInBackground(id, "Imported from XML ZIP") {
+                try {
+                    ZipInputStream zis = new ZipInputStream(inputStream)
+                    ZipEntry entry = zis.nextEntry
+                    while (entry) {
+                        if (!entry.directory && entry.name.endsWith('.xml')) {
+                            builder.monitor.onNext("Parsing $entry.name")
+                            CatalogueXmlLoader loader = new CatalogueXmlLoader(builder)
+                            loader.load(POIFSFileSystem.createNonClosingInputStream(zis))
+                        }
+
+                        entry = zis.nextEntry
+                    }
                     finalizeAsset(id, (DataModel) (builder.created.find {it.instanceOf(DataModel)} ?: builder.created.find{it.dataModel}?.dataModel), userId)
                 } catch (Exception e) {
                     logError(id, e)
