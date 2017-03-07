@@ -3,6 +3,7 @@ import grails.util.Environment
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
 import org.modelcatalogue.core.api.ElementStatus
@@ -429,6 +430,7 @@ class BootStrap {
                 check dataType property 'name' is 'unique'
                 check validationRule property 'name' is 'unique'
                 check measurementUnit property 'name' is 'unique'
+                check ModelCatalogueTypes.CATALOGUE_ELEMENT property 'modelCatalogueId' is 'unique'
             }
             dataModelPolicy(name: 'Default Checks') {
                 check dataModel extension 'http://www.modelcatalogue.org/metadata/#authors' is 'required' otherwise 'Metadata "Authors" is missing for {2}'
