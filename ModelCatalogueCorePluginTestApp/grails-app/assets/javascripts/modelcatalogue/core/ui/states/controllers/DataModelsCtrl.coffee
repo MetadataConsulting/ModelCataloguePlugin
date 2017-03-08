@@ -82,3 +82,9 @@ angular.module('mc.core.ui.states.controllers.DataModelsCtrl', ['ui.router', 'mc
 
   $scope.$on 'newVersionCreated', ->
     $state.go '.', type: undefined
+
+  $scope.showPreload = ->
+    return false if dataModelsForPreload.length == 0
+    return true if list.total > 1
+    return true if list.list.length > 0 and list.list[0].name is 'Clinical Tags'
+    return false
