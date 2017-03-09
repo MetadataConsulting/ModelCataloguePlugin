@@ -21,6 +21,6 @@ if [[ "$CIRCLE_NODE_TOTAL" != "" ]]; then
 fi
 
 if [[ "$TRAVIS" != "" ]] ; then
-    echo -e "\nTest Results will be available at\n\nhttp://mc-test-results.metadata.org.uk.s3-eu-west-1.amazonaws.com//index.html?prefix=MetadataConsulting/ModelCataloguePlugin/$TRAVIS_BUILD_NUMBER/$TRAVIS_JOB_NUMBER/home/travis/reports/\n\n"
+    echo -e "\nTest Results will be available at\n\nhttp://mc-test-results.metadata.org.uk.s3-website-eu-west-1.amazonaws.com/index.html?prefix=MetadataConsulting/ModelCataloguePlugin/$TRAVIS_BUILD_NUMBER/$TRAVIS_JOB_NUMBER/home/travis/reports/\n\n"
     MC_GEB_ENV="" #firefox is default
 fi
