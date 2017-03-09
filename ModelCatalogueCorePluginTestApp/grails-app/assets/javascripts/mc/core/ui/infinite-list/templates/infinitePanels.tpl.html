@@ -44,7 +44,10 @@
                             role="item-infinite-list"></contextual-actions>
       </div>
     </div>
-    <div ng-if="elements.length < total" class="infinite-scroll-item" ng-class="columnClasses">
+
+  </div>
+  <div class="row" ng-if="elements.length < total" >
+    <div class="infinite-scroll-item" ng-class="columnClasses">
       <div class="panel panel-default">
         <div class="panel-heading">
           <h3 class="panel-title"> Loading</h3>
