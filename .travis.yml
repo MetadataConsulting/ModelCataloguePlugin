@@ -10,7 +10,7 @@ cache:
   - $HOME/.grails/ivy-cache
   - $HOME/.grails/wrapper
 addons:
-  s3_region: us-east-1
+  s3_region: eu-west-1
   artifacts:
     paths:
     - $HOME/reports
