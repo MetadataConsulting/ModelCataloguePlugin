@@ -18,6 +18,7 @@ import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.publishing.PublishingContext
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.Legacy
 import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
@@ -170,11 +171,13 @@ class ElementService implements Publisher<CatalogueElement> {
                 }
                 if (version) {
                     dataModel {
-                        or {
-                            eq 'semanticVersion', version
-                            if (versionNumberFound) {
+                        if (versionNumberFound) {
+                            or {
+                                eq 'semanticVersion', version
                                 eq 'versionNumber', versionNumberFound
                             }
+                        } else {
+                            eq 'semanticVersion', version
                         }
                     }
                 }
@@ -184,18 +187,20 @@ class ElementService implements Publisher<CatalogueElement> {
                 return result
             }
 
-            if (resource == DataModel) {
+            if (resource == DataModel || resource == CatalogueElement && HibernateHelper.getEntityClass(CatalogueElement.findByLatestVersionId(urlId)) == DataModel) {
                 result = getLatestFromCriteria(new DetachedCriteria<CatalogueElement>(resource).build {
                     or {
                         eq 'latestVersionId', urlId
                         eq 'id', urlId
                     }
                     if (version) {
-                        or {
-                            eq 'semanticVersion', version
-                            if (versionNumberFound) {
+                        if (versionNumberFound) {
+                            or {
+                                eq 'semanticVersion', version
                                 eq 'versionNumber', versionNumberFound
                             }
+                        } else {
+                            eq 'semanticVersion', version
                         }
                     }
                 })
