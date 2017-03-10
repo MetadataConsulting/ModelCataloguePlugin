@@ -7,9 +7,9 @@ set -e
 
 date ; echo -e "\n"
 
-./setup-frontend.sh
-
 cd ModelCatalogueCorePluginTestApp
+
+./gradlew npmInstall bowerInstall
 
 ARG="$1"
 

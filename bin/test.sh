@@ -18,10 +18,9 @@ fi
 
 # please update sibling script /collect/reports.sh when you update this file
 
-# karma and functional tests needs to fetch the bower components
-./setup-frontend.sh
-
 cd ModelCatalogueCorePluginTestApp
+
+./gradlew npmInstall bowerInstall
 
 # local builds needs to run in clean environment
 if [ "$TEST_SUITE" = "" ] ; then

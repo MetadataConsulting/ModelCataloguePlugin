@@ -7,8 +7,6 @@ set -e
 
 date ; echo -e "\n"
 
-./setup-frontend.sh
-
 if test -f ".docker-ip" ; then
     DOCKER_IP=`cat ".docker-ip"`
     echo
@@ -43,6 +41,9 @@ if [ ! -e "$MC_CONFIG_LOCATION" ]; then
 fi
 
 cd ModelCatalogueCorePluginTestApp
+
+./gradlew npmInstall bowerInstall
+
 if [[ "$1" == "debug" ]]; then
     ./grailsw prod run-app --debug-fork -Dmc.config.location="$MC_CONFIG_LOCATION" -Dmc.search.elasticsearch.host="$DOCKER_IP"
 elif [[ "$1" == "offline" ]]; then

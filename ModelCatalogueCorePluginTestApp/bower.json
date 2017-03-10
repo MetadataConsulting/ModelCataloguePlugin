@@ -17,6 +17,7 @@
     "test",
     "tests"
   ],
+  "strict-ssl": false,
   "dependencies": {
     "bootstrap": "~3.3.4",
     "jquery-ui": "~1.11.4",
