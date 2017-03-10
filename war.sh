@@ -8,9 +8,9 @@ date ; echo -e "\n"
 
 mkdir -p build
 
-./gradlew npmInstall bowerInstall
-
 cd ModelCatalogueCorePluginTestApp
+
+./gradlew npmInstall bowerInstall
 ./grailsw war
 
 
