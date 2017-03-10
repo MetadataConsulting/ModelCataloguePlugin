@@ -51,5 +51,11 @@ task cleanUpBowerDependencies(type: Delete) {
     delete 'grails-app/assets/bower_components/sly-repeat/src'
 }
 
+task cleanIdeaFiles(type: Delete) {
+    delete '**/.idea'
+    delete '**/*.iml'
+}
+
+
 
 bowerInstall.finalizedBy cleanUpBowerDependencies

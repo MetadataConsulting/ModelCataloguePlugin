@@ -8,7 +8,7 @@ date ; echo -e "\n"
 
 mkdir -p build
 
-./setup-frontend.sh
+./gradlew npmInstall bowerInstall
 
 cd ModelCatalogueCorePluginTestApp
 ./grailsw war
