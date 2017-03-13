@@ -59,6 +59,8 @@ task cleanIdeaFiles(type: Delete) {
 }
 
 task runDev(type: Exec, dependsOn: bowerInstall) {
+    description = "Run MX in development environment"
+
     assertJava8()
     environment 'GRAILS_OPTS', "-Xmx1G -Xms512m -XX:MaxPermSize=512m -server"
 
@@ -80,8 +82,10 @@ task runDev(type: Exec, dependsOn: bowerInstall) {
     commandLine cmds
 }
 
-task javaVersion(type: Exec)  {
-    commandLine 'java', '-version'
+task stop(type: Exec) {
+    description = "Stops running MX application"
+
+    commandLine grailsw, 'stop-app'
 }
 
 
