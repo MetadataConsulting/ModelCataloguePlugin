@@ -9,9 +9,10 @@ node {
     // Version of npm to use.
     npmVersion = '3.8.6'
 
+    download = true
 }
 
-task npmCacheConfig(type: NpmTask) {
+task npmCacheConfig(type: NpmTask, dependsOn: nodeSetup) {
     description = "Configure the NPM cache"
     def npmCacheDir = "${gradle.getGradleUserHomeDir()}/caches/npm"
     outputs.files file(npmCacheDir)
