@@ -44,7 +44,6 @@ task cleanUpBowerDependencies(type: Delete) {
     delete 'grails-app/assets/bower_components/ace-builds/src-min'
     delete 'grails-app/assets/bower_components/ace-builds/src-noconflict'
     delete 'grails-app/assets/bower_components/ace-builds/textarea'
-    delete 'grails-app/assets/bower_components/ace-builds/*.html'
     delete 'grails-app/assets/bower_components/angular-file-saver/gulpfile.babel.js'
     delete 'grails-app/assets/bower_components/angular-file-saver/src'
     delete 'grails-app/assets/bower_components/angular-file-saver/docs'

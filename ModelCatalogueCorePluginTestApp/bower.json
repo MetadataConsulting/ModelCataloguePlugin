@@ -15,7 +15,10 @@
     "node_modules",
     "bower_components",
     "test",
-    "tests"
+    "tests",
+    ".nuget",
+    "editor.html",
+    "kitchen-sink.html"
   ],
   "strict-ssl": false,
   "dependencies": {
