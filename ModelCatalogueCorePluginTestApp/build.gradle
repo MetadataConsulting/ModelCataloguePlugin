@@ -1,3 +1,5 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 plugins {
     id "com.moowork.node" version "1.1.1"
 }
@@ -56,6 +58,43 @@ task cleanIdeaFiles(type: Delete) {
     delete '**/*.iml'
 }
 
+task runDev(type: Exec, dependsOn: bowerInstall) {
+    assertJava8()
+    environment 'GRAILS_OPTS', "-Xmx1G -Xms512m -XX:MaxPermSize=512m -server"
+
+    def cmds = [grailsw]
+
+    if (project.hasProperty('mc.blank')) {
+        environment 'MC_BLANK_DEV', "true"
+    }
+
+    if (project.hasProperty('mc.war')) {
+        cmds << 'run-war'
+    } else {
+        cmds << 'run-app'
+    }
+
+    if (project.hasProperty('mc.debug')) {
+        cmds << '--debug-fork'
+    }
+    commandLine cmds
+}
+
+task javaVersion(type: Exec)  {
+    commandLine 'java', '-version'
+}
 
 
 bowerInstall.finalizedBy cleanUpBowerDependencies
+
+
+private static String getGrailsw()  {
+   if (Os.isFamily(Os.FAMILY_WINDOWS))  {
+      return "grailsw.bat"
+   }
+    return "./grailsw"
+}
+
+private static void assertJava8()  {
+    assert org.gradle.internal.jvm.Jvm.current().javaVersion.java8Compatible
+}
