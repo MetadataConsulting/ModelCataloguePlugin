@@ -100,10 +100,9 @@ task ensureProductionConfig(type: Copy) {
     onlyIf {
         !new File(new File(System.getProperty('user.home'), '.grails'), 'mc-config.groovy').exists()
     }
-    from('grails-app/conf/mc-config.groovy.example') {
-        include 'mc-config.groovy.example'
+    from('../conf/docker') {
+        include 'mc-config.groovy'
     }
-    rename 'mc-config\\.groovy\\.example', 'mc-config.groovy'
     into "${System.getProperty('user.home')}/.grails"
 }
 
@@ -146,6 +145,9 @@ task startMySQLContainer(type: DockerStartContainer) {
         } else {
             throw e
         }
+    }
+    onComplete {
+        logger.lifecycle "MySQL is listening on ports 43306"
     }
 }
 
@@ -193,6 +195,9 @@ task startElasticsearchContainer(type: DockerStartContainer) {
             throw e
         }
     }
+    onComplete {
+        logger.lifecycle "Elasticsearch is listening on ports 49200 and 49300"
+    }
 }
 
 task stopElasticsearchContainer(type: DockerStopContainer) {
@@ -207,20 +212,77 @@ task stopElasticsearchContainer(type: DockerStopContainer) {
     }
 }
 
-task startContainers(dependsOn: [startElasticsearchContainer, startMySQLContainer]) {
+// -- Docker MailHog
+task pullMailHogImage(type: DockerPullImage) {
+    description = "Pull MailHog image in proper version used for MX"
+    repository = 'mailhog/mailhog'
+}
+
+task createMailHogContainer(type: DockerCreateContainer, dependsOn: pullMailHogImage) {
+    description = "Creates MailHog container for MX. Ignores if the container is already present."
+    containerName = 'mx-mailhog'
+    imageId = 'mailhog/mailhog'
+    portBindings = ['0.0.0.0:41025:1025', '0.0.0.0:48025:8025']
+    onError { e ->
+        if (e.class.simpleName == 'ConflictException') {
+            logger.lifecycle "Container already exists"
+        } else {
+            throw e
+        }
+    }
+}
+
+task startMailHogContainer(type: DockerStartContainer) {
+    description = "Starts MailHog container for MX. Ignores if the container is already running."
+    dependsOn createMailHogContainer
+    containerId = 'mx-mailhog'
+    onError { e ->
+        if (e.class.simpleName == 'NotModifiedException') {
+            logger.lifecycle "Container already started"
+        } else {
+            throw e
+        }
+    }
+    onComplete {
+        logger.lifecycle "Mailhog mail server is listening on port 41025 and the web UI is available at http://localhost:48025"
+    }
+}
+
+task stopMailHogContainer(type: DockerStopContainer) {
+    description = "Stops MailHog container for MX. Ignores if the container is not present or running."
+    containerId = 'mx-mailhog'
+    onError { e ->
+        if (e.class.simpleName == 'NotModifiedException') {
+            logger.lifecycle "Container already stopped"
+        } else {
+            throw e
+        }
+    }
+}
+
+task startContainers(dependsOn: [startElasticsearchContainer, startMySQLContainer, startMailHogContainer]) {
     description "Starts all containers required for running production environment"
 }
 
-task stopContainers(dependsOn: [stopElasticsearchContainer, stopMySQLContainer]) {
+task stopContainers(dependsOn: [stopElasticsearchContainer, stopMySQLContainer, stopMailHogContainer]) {
     description "Stops all containers required for running production environment"
 }
-
 
 task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, startContainers]) {
     description = "Run MX in production environment"
 
     assertJava8()
     environment 'GRAILS_OPTS', "-Xmx2G -Xms1G -XX:MaxPermSize=1G -server"
+    environment 'METADATA_HOST', "localhost"
+    environment 'METADATA_USERNAME', "metadata"
+    environment 'METADATA_PASSWORD', "metadata"
+    environment 'METADATA_JDBC_URL', "jdbc:mysql://localhost:43306/metadata?autoReconnect=true&useUnicode=yes&characterEncoding=UTF-8"
+    environment 'MC_ES_HOST', "localhost"
+    environment 'MC_ES_PORT', "49300"
+    environment 'MC_MAIL_FROM', "tester@metadata.org.uk"
+    environment 'MC_MAIL_HOST', "localhost"
+    environment 'MC_MAIL_PORT', "41025"
+    environment 'MC_ALLOW_SIGNUP', "true"
 
     def cmds = [grailsw, 'prod']
 
