@@ -7,8 +7,8 @@ class SandboxSpec extends GebSpec {
 
     void doLogin() {
         when:
-            WebDriver driver = browser.driver
-         driver.get("http://www.gebish.org/manual/current/api/")
+        WebDriver driver = browser.driver
+        driver.get("http://www.gebish.org/manual/current/api/")
 
 
         then:

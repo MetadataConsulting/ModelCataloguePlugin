@@ -1,11 +1,6 @@
 package org.modelcatalogue.core.sanityTestSuite
 
-<<<<<<< Updated upstream
-/**
- * Created by Berthe on 13/03/2017.
- */
-class ValidateRegistrationSpec {
-=======
+
 import geb.spock.GebSpec
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
@@ -38,5 +33,5 @@ class ValidateRegistrationSpec extends GebSpec {
         noExceptionThrown()
 
     }
->>>>>>> Stashed changes
+
 }
