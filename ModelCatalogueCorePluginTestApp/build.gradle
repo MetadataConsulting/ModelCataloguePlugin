@@ -82,6 +82,47 @@ task runDev(type: Exec, dependsOn: bowerInstall) {
     commandLine cmds
 }
 
+task ensureProductionConfig(type: Copy) {
+    description = "Ensures configuration for MX production environment exists"
+    onlyIf {
+        !new File(new File(System.getProperty('user.home'), '.grails'), 'mc-config.groovy').exists()
+    }
+    from('grails-app/conf/mc-config.groovy.example') {
+        include 'mc-config.groovy.example'
+    }
+    rename 'mc-config\\.groovy\\.example', 'mc-config.groovy'
+    into "${System.getProperty('user.home')}/.grails"
+}
+
+task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig]) {
+    description = "Run MX in production environment"
+
+    assertJava8()
+    environment 'GRAILS_OPTS', "-Xmx2G -Xms1G -XX:MaxPermSize=1G -server"
+
+    def cmds = [grailsw, 'prod']
+
+    if (project.hasProperty('mc.war')) {
+        cmds << 'run-war'
+    } else {
+        cmds << 'run-app'
+    }
+
+    if (project.hasProperty('mc.debug')) {
+        cmds << '--debug-fork'
+    }
+
+    if (project.hasProperty('mc.search.elasticsearch.host')) {
+        cmds << "-Dmc.search.elasticsearch.host=${project.getProperty('mc.search.elasticsearch.host')}"
+    }
+
+    if (project.hasProperty('mc.config.location')) {
+        cmds << "-Dmc.config.location=${project.getProperty('mc.config.location')}"
+    }
+
+    commandLine cmds
+}
+
 task stop(type: Exec) {
     description = "Stops running MX application"
 
