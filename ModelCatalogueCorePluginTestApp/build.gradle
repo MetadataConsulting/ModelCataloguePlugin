@@ -2,7 +2,6 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import com.bmuschko.gradle.docker.tasks.container.*
 import com.bmuschko.gradle.docker.tasks.image.*
 import com.bmuschko.gradle.docker.tasks.*
-// import com.github.dockerjava.api.exception.ConflictException
 
 plugins {
     id "com.moowork.node" version "1.1.1"
@@ -108,7 +107,116 @@ task ensureProductionConfig(type: Copy) {
     into "${System.getProperty('user.home')}/.grails"
 }
 
-task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig]) {
+
+
+// -- Docker MySQL
+task pullMySQLImage(type: DockerPullImage) {
+    description = "Pull MySQL image in proper version used for MX"
+    repository = 'mysql'
+    tag = '5.6'
+}
+
+task createMySQLContainer(type: DockerCreateContainer, dependsOn: pullMySQLImage) {
+    description = "Creates MySQL container for MX. Ignores if the container is already present."
+    containerName = 'mx-mysql'
+    imageId = 'mysql:5.6'
+    portBindings = ['0.0.0.0:43306:3306']
+    env = [
+        'MYSQL_ROOT_PASSWORD=pa$$w0rd',
+        'MYSQL_DATABASE=metadata',
+        'MYSQL_USER=metadata',
+        'MYSQL_PASSWORD=metadata',
+    ] as String[]
+    onError { e ->
+        if (e.class.simpleName == 'ConflictException') {
+            logger.lifecycle "Container already exists"
+        } else {
+            throw e
+        }
+    }
+}
+
+task startMySQLContainer(type: DockerStartContainer) {
+    description = "Starts MySQL container for MX. Ignores if the container is already running."
+    dependsOn createMySQLContainer
+    containerId = 'mx-mysql'
+    onError { e ->
+        if (e.class.simpleName == 'NotModifiedException') {
+            logger.lifecycle "Container already started"
+        } else {
+            throw e
+        }
+    }
+}
+
+task stopMySQLContainer(type: DockerStopContainer) {
+    description = "Stops MySQL container for MX. Ignores if the container is not present or running."
+    containerId = 'mx-mysql'
+    onError { e ->
+        if (e.class.simpleName == 'NotModifiedException') {
+            logger.lifecycle "Container already stopped"
+        } else {
+            throw e
+        }
+    }
+}
+
+// -- Docker ElasticSearch
+task pullElasticsearchImage(type: DockerPullImage) {
+    description = "Pull Elasticsearch image in proper version used for MX"
+    repository = 'metadata/registry-elasticsearch'
+    tag = '2'
+}
+
+task createElasticsearchContainer(type: DockerCreateContainer, dependsOn: pullElasticsearchImage) {
+    description = "Creates Elasticsearch container for MX. Ignores if the container is already present."
+    containerName = 'mx-es'
+    imageId = 'metadata/registry-elasticsearch:2'
+    portBindings = ['0.0.0.0:49200:9200', '0.0.0.0:49300:9300']
+    onError { e ->
+        if (e.class.simpleName == 'ConflictException') {
+            logger.lifecycle "Container already exists"
+        } else {
+            throw e
+        }
+    }
+}
+
+task startElasticsearchContainer(type: DockerStartContainer) {
+    description = "Starts Elasticseach container for MX. Ignores if the container is already running."
+    dependsOn createElasticsearchContainer
+    containerId = 'mx-es'
+    onError { e ->
+        if (e.class.simpleName == 'NotModifiedException') {
+            logger.lifecycle "Container already started"
+        } else {
+            throw e
+        }
+    }
+}
+
+task stopElasticsearchContainer(type: DockerStopContainer) {
+    description = "Stops MySQL container for MX. Ignores if the container is not present or running."
+    containerId = 'mx-es'
+    onError { e ->
+        if (e.class.simpleName == 'NotModifiedException') {
+            logger.lifecycle "Container already stopped"
+        } else {
+            throw e
+        }
+    }
+}
+
+task startContainers(dependsOn: [startElasticsearchContainer, startMySQLContainer]) {
+    description "Starts all containers required for running production environment"
+}
+
+task stopContainers(dependsOn: [stopElasticsearchContainer, stopMySQLContainer]) {
+    description "Stops all containers required for running production environment"
+}
+
+
+task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, startContainers]) {
     description = "Run MX in production environment"
 
     assertJava8()
@@ -137,60 +245,13 @@ task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig]) {
     commandLine cmds
 }
 
-task pullMySQLImage(type: DockerPullImage) {
-    repository = 'mysql'
-    tag = '5.6'
-}
-
-task createMySQLContainer(type: DockerCreateContainer, dependsOn: pullMySQLImage) {
-    containerName = 'mx-mysql'
-    imageId = 'mysql:5.6'
-    portBindings = ['3306:3306']
-    env = [
-        'MYSQL_ROOT_PASSWORD=pa$$w0rd',
-        'MYSQL_DATABASE=metadata',
-        'MYSQL_USER=metadata',
-        'MYSQL_PASSWORD=metadata',
-    ] as String[]
-    onError { e ->
-        if (e.class.simpleName == 'ConflictException') {
-            logger.lifecycle "Container already exists"
-        } else {
-            throw e
-        }
-    }
-}
-
-task startMySQLContainer(type: DockerStartContainer) {
-    dependsOn createMySQLContainer
-    containerId = 'mx-mysql'
-    onError { e ->
-        if (e.class.simpleName == 'NotModifiedException') {
-            logger.lifecycle "Container already started"
-        } else {
-            throw e
-        }
-    }
-}
-
-task stopMySQLContainer(type: DockerStopContainer) {
-    containerId = 'mx-mysql'
-    onError { e ->
-        if (e.class.simpleName == 'NotModifiedException') {
-            logger.lifecycle "Container already stopped"
-        } else {
-            throw e
-        }
-    }
-}
-
 task stop(type: Exec) {
     description = "Stops running MX application"
     commandLine grailsw, 'stop-app'
 }
 
 bowerInstall.finalizedBy cleanUpBowerDependencies
-stop.finalizedBy stopMySQLContainer
+stop.finalizedBy stopContainers
 
 private static String getGrailsw()  {
    if (Os.isFamily(Os.FAMILY_WINDOWS))  {
