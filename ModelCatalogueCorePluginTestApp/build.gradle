@@ -1,7 +1,12 @@
 import org.apache.tools.ant.taskdefs.condition.Os
+import com.bmuschko.gradle.docker.tasks.container.*
+import com.bmuschko.gradle.docker.tasks.image.*
+import com.bmuschko.gradle.docker.tasks.*
+// import com.github.dockerjava.api.exception.ConflictException
 
 plugins {
     id "com.moowork.node" version "1.1.1"
+    id "com.bmuschko.docker-remote-api" version "3.0.6"
 }
 
 node {
@@ -12,6 +17,15 @@ node {
     npmVersion = '3.8.6'
 
     download = true
+}
+
+docker {
+    if (System.getenv('DOCKER_HOST'))  {
+        url = System.getenv('DOCKER_HOST')
+    }
+    if (System.getenv('DOCKER_CERT_PATH'))  {
+        certPath = file(System.getenv('DOCKER_CERT_PATH'))
+    }
 }
 
 task npmCacheConfig(type: NpmTask, dependsOn: nodeSetup) {
@@ -123,15 +137,60 @@ task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig]) {
     commandLine cmds
 }
 
+task pullMySQLImage(type: DockerPullImage) {
+    repository = 'mysql'
+    tag = '5.6'
+}
+
+task createMySQLContainer(type: DockerCreateContainer, dependsOn: pullMySQLImage) {
+    containerName = 'mx-mysql'
+    imageId = 'mysql:5.6'
+    portBindings = ['3306:3306']
+    env = [
+        'MYSQL_ROOT_PASSWORD=pa$$w0rd',
+        'MYSQL_DATABASE=metadata',
+        'MYSQL_USER=metadata',
+        'MYSQL_PASSWORD=metadata',
+    ] as String[]
+    onError { e ->
+        if (e.class.simpleName == 'ConflictException') {
+            logger.lifecycle "Container already exists"
+        } else {
+            throw e
+        }
+    }
+}
+
+task startMySQLContainer(type: DockerStartContainer) {
+    dependsOn createMySQLContainer
+    containerId = 'mx-mysql'
+    onError { e ->
+        if (e.class.simpleName == 'NotModifiedException') {
+            logger.lifecycle "Container already started"
+        } else {
+            throw e
+        }
+    }
+}
+
+task stopMySQLContainer(type: DockerStopContainer) {
+    containerId = 'mx-mysql'
+    onError { e ->
+        if (e.class.simpleName == 'NotModifiedException') {
+            logger.lifecycle "Container already stopped"
+        } else {
+            throw e
+        }
+    }
+}
+
 task stop(type: Exec) {
     description = "Stops running MX application"
-
     commandLine grailsw, 'stop-app'
 }
 
-
 bowerInstall.finalizedBy cleanUpBowerDependencies
-
+stop.finalizedBy stopMySQLContainer
 
 private static String getGrailsw()  {
    if (Os.isFamily(Os.FAMILY_WINDOWS))  {
