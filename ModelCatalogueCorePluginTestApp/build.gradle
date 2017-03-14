@@ -71,6 +71,36 @@ task cleanIdeaFiles(type: Delete) {
     delete '**/*.iml'
 }
 
+task cleanData(type: Delete) {
+    Properties properties = new Properties()
+    properties.load(file('application.properties').newInputStream())
+    delete "${System.getProperty('java.io.tmpdir')}/ModelCatalogueCorePluginTestApp/${properties['app.version']}"
+}
+
+
+task cleanGrailsFolders(type: Delete) {
+    Properties properties = new Properties()
+    properties.load(file('application.properties').newInputStream())
+    delete 'target'
+    delete 'target-eclipse'
+    delete '**/*.gen.fixture.js'
+    delete "${System.getProperty('user.home')}/.grails/${properties['app.grails.version']}/ModelCatalogueCorePluginTestApp"
+}
+
+task cleanGrails(type: Exec, dependsOn: cleanGrailsFolders) {
+    commandLine grailsw, 'clean-all', '--stacktrace'
+
+}
+
+task refreshGrailsDependencies(type: Exec) {
+    commandLine grailsw, 'refresh-dependencies', '--stacktrace'
+    mustRunAfter cleanGrails
+}
+
+task cleanAll(type: Delete, dependsOn: [cleanData, cleanGrails, refreshGrailsDependencies]) {
+    delete '../build'
+}
+
 task runDev(type: Exec, dependsOn: bowerInstall) {
     description = "Run MX in development environment"
 
