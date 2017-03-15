@@ -27,9 +27,7 @@ docker {
     }
 }
 
-String localhost = dockerHost
-
-logger.lifecycle "Using Docker host: $localhost\n"
+String host = dockerHost
 
 task npmCacheConfig(type: NpmTask, dependsOn: nodeSetup) {
     description = "Configure the NPM cache"
@@ -293,7 +291,7 @@ task startMailHogContainer(type: DockerStartContainer) {
         }
     }
     onComplete {
-        logger.lifecycle "Mailhog mail server is listening on port 41025 and the web UI is available at http://${localhost}:48025"
+        logger.lifecycle "Mailhog mail server is listening on port 41025 and the web UI is available at http://${host}:48025"
     }
 }
 
@@ -322,14 +320,14 @@ task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, start
 
     assertJava8()
     environment 'GRAILS_OPTS', "-Xmx2G -Xms1G -XX:MaxPermSize=1G -server"
-    environment 'METADATA_HOST', localhost
+    environment 'METADATA_HOST', 'localhost' // this is localhost if you're using docker machine or not
     environment 'METADATA_USERNAME', "metadata"
     environment 'METADATA_PASSWORD', "metadata"
-    environment 'METADATA_JDBC_URL', "jdbc:mysql://${localhost}:43306/metadata?autoReconnect=true&useUnicode=yes&characterEncoding=UTF-8"
-    environment 'MC_ES_HOST', localhost
+    environment 'METADATA_JDBC_URL', "jdbc:mysql://${host}:43306/metadata?autoReconnect=true&useUnicode=yes&characterEncoding=UTF-8"
+    environment 'MC_ES_HOST', host
     environment 'MC_ES_PORT', "49300"
     environment 'MC_MAIL_FROM', "tester@metadata.org.uk"
-    environment 'MC_MAIL_HOST', localhost
+    environment 'MC_MAIL_HOST', host
     environment 'MC_MAIL_PORT', "41025"
     environment 'MC_ALLOW_SIGNUP', "true"
     environment 'MC_INDEX_PREFIX', "production"
@@ -346,6 +344,8 @@ task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, start
         cmds << '--debug-fork'
     }
 
+    cmds << ' --non-interactive'
+
     if (project.hasProperty('mc.search.elasticsearch.host')) {
         cmds << "-Dmc.search.elasticsearch.host=${project.getProperty('mc.search.elasticsearch.host')}"
     }
@@ -353,8 +353,6 @@ task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, start
     if (project.hasProperty('mc.config.location')) {
         cmds << "-Dmc.config.location=${project.getProperty('mc.config.location')}"
     }
-
-    cmds << ' --non-interactive'
 
     commandLine cmds
 }
@@ -367,7 +365,7 @@ task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initT
     environment 'DOCKERIZED_TESTS', "true"
     environment 'FILE_OPENER_SKIP', "true"
     environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
-    environment 'MC_DOCKER_HOST', localhost
+    environment 'MC_DOCKER_HOST', host
 
     commandLine grailsw, 'test-app', '-war', '--non-interactive'
 
@@ -420,7 +418,13 @@ private static String getGrailsw()  {
 
 private static String getDockerHost() {
     if (Os.isFamily(Os.FAMILY_WINDOWS))  {
-        return "docker-machine ip".execute().text
+        try {
+            return "docker-machine ip".execute().text.trim()
+        } catch(ignored) {
+            System.err.println "Cannot determine docker ip, falling back to 'localhost'"
+            return 'localhost'
+        }
+
     }
     return "localhost"
 }
