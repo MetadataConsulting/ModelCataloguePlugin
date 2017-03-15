@@ -23,7 +23,7 @@ environments {
             dataSource {
                 driverClassName = "com.mysql.jdbc.Driver"
                 dialect='org.hibernate.dialect.MySQL5InnoDBDialect'
-                url = "jdbc:mysql://localhost:43306/tester?autoReconnect=true&useUnicode=yes&characterEncoding=UTF-8"
+                url = "jdbc:mysql://${System.getenv('MC_DOCKER_HOST') ?: 'localhost'}:43306/tester?autoReconnect=true&useUnicode=yes&characterEncoding=UTF-8"
                 username = 'root'
                 password = 'pa$$w0rd'
                 dbCreate = "create-drop"

@@ -27,6 +27,10 @@ docker {
     }
 }
 
+String localhost = dockerHost
+
+logger.lifecycle "Using Docker host: $localhost\n"
+
 task npmCacheConfig(type: NpmTask, dependsOn: nodeSetup) {
     description = "Configure the NPM cache"
     def npmCacheDir = "${gradle.getGradleUserHomeDir()}/caches/npm"
@@ -184,10 +188,17 @@ task startMySQLContainer(type: DockerStartContainer) {
     }
 }
 
-//task initTestDatabaseInMysqlContainer(type: DockerExecContainer, dependsOn: startMySQLContainer) {
-//    containerId = 'mx-mysql'
-//    cmd = ['mysql', '-h', '127.0.0.1', '-u', 'root', '-ppa$$w0rd', '-e', "create user 'tester'@'%' identified by 'tester';create database tester;grant all privileges on tester.* to 'tester'@'%'"]
-//}
+task ensureMySQLRunning(type: DockerExecContainer,) {
+    containerId = 'mx-mysql'
+    cmd = ['/bin/sh', '-c', 'while ! mysqladmin ping -h localhost --silent; do sleep 1; done']
+}
+
+startMySQLContainer.finalizedBy ensureMySQLRunning
+
+task initTestDatabaseInMYSQLContainer(type: DockerExecContainer, dependsOn: startMySQLContainer) {
+    containerId = 'mx-mysql'
+    cmd = ['mysqladmin', 'create', 'tester']
+}
 
 task stopMySQLContainer(type: DockerStopContainer) {
     description = "Stops MySQL container for MX. Ignores if the container is not present or running."
@@ -282,7 +293,7 @@ task startMailHogContainer(type: DockerStartContainer) {
         }
     }
     onComplete {
-        logger.lifecycle "Mailhog mail server is listening on port 41025 and the web UI is available at http://localhost:48025"
+        logger.lifecycle "Mailhog mail server is listening on port 41025 and the web UI is available at http://${localhost}:48025"
     }
 }
 
@@ -311,14 +322,14 @@ task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, start
 
     assertJava8()
     environment 'GRAILS_OPTS', "-Xmx2G -Xms1G -XX:MaxPermSize=1G -server"
-    environment 'METADATA_HOST', "localhost"
+    environment 'METADATA_HOST', localhost
     environment 'METADATA_USERNAME', "metadata"
     environment 'METADATA_PASSWORD', "metadata"
-    environment 'METADATA_JDBC_URL', "jdbc:mysql://localhost:43306/metadata?autoReconnect=true&useUnicode=yes&characterEncoding=UTF-8"
-    environment 'MC_ES_HOST', "localhost"
+    environment 'METADATA_JDBC_URL', "jdbc:mysql://${localhost}:43306/metadata?autoReconnect=true&useUnicode=yes&characterEncoding=UTF-8"
+    environment 'MC_ES_HOST', localhost
     environment 'MC_ES_PORT', "49300"
     environment 'MC_MAIL_FROM', "tester@metadata.org.uk"
-    environment 'MC_MAIL_HOST', "localhost"
+    environment 'MC_MAIL_HOST', localhost
     environment 'MC_MAIL_PORT', "41025"
     environment 'MC_ALLOW_SIGNUP', "true"
     environment 'MC_INDEX_PREFIX', "production"
@@ -348,7 +359,7 @@ task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, start
     commandLine cmds
 }
 
-task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers/*, initTestDatabaseInMysqlContainer*/]) {
+task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initTestDatabaseInMYSQLContainer]) {
     description = "Run all Grails MX tests"
 
     assertJava8()
@@ -356,6 +367,7 @@ task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers/*, ini
     environment 'DOCKERIZED_TESTS', "true"
     environment 'FILE_OPENER_SKIP', "true"
     environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
+    environment 'MC_DOCKER_HOST', localhost
 
     commandLine grailsw, 'test-app', '-war', '--non-interactive'
 
@@ -404,6 +416,13 @@ private static String getGrailsw()  {
       return "grailsw.bat"
    }
     return "./grailsw"
+}
+
+private static String getDockerHost() {
+    if (Os.isFamily(Os.FAMILY_WINDOWS))  {
+        return "docker-machine ip".execute().text
+    }
+    return "localhost"
 }
 
 private static void assertJava8()  {
