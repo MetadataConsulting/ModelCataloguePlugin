@@ -186,7 +186,7 @@ task startMySQLContainer(type: DockerStartContainer) {
 
 task initTestDatabaseInMysqlContainer(type: DockerExecContainer, dependsOn: startMySQLContainer) {
     containerId = 'mx-mysql'
-    cmd = ['mysql', '-u', 'root', '-ppa$$w0rd', '-e', "create user 'tester'@'%' identified by 'tester';create database tester;grant all privileges on tester.* to 'tester'@'%'"]
+    cmd = ['mysql', '-h', 'localhost', '-u', 'root', '-ppa$$w0rd', '-e', "create user 'tester'@'%' identified by 'tester';create database tester;grant all privileges on tester.* to 'tester'@'%'"]
 }
 
 task stopMySQLContainer(type: DockerStopContainer) {
