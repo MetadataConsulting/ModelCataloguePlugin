@@ -6,6 +6,7 @@ cache:
   - node_modules
   - ModelCatalogueCorePluginTestApp/target/work/plugins
   - ModelCatalogueCorePluginTestApp/node_modules
+  - ModelCatalogueCorePluginTestApp/.gradle
   - $HOME/.m2
   - $HOME/.grails/ivy-cache
   - $HOME/.grails/wrapper
