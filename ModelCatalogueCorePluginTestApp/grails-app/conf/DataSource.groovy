@@ -24,8 +24,8 @@ environments {
                 driverClassName = "com.mysql.jdbc.Driver"
                 dialect='org.hibernate.dialect.MySQL5InnoDBDialect'
                 url = "jdbc:mysql://localhost:43306/tester?autoReconnect=true&useUnicode=yes&characterEncoding=UTF-8"
-                username = 'tester'
-                password = 'tester'
+                username = 'root'
+                password = 'pa$$w0rd'
                 dbCreate = "create-drop"
                 properties {
                     maxActive = -1

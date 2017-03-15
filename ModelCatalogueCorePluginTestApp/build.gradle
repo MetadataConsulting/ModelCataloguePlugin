@@ -184,10 +184,10 @@ task startMySQLContainer(type: DockerStartContainer) {
     }
 }
 
-task initTestDatabaseInMysqlContainer(type: DockerExecContainer, dependsOn: startMySQLContainer) {
-    containerId = 'mx-mysql'
-    cmd = ['mysql', '-h', '127.0.0.1', '-u', 'root', '-ppa$$w0rd', '-e', "create user 'tester'@'%' identified by 'tester';create database tester;grant all privileges on tester.* to 'tester'@'%'"]
-}
+//task initTestDatabaseInMysqlContainer(type: DockerExecContainer, dependsOn: startMySQLContainer) {
+//    containerId = 'mx-mysql'
+//    cmd = ['mysql', '-h', '127.0.0.1', '-u', 'root', '-ppa$$w0rd', '-e', "create user 'tester'@'%' identified by 'tester';create database tester;grant all privileges on tester.* to 'tester'@'%'"]
+//}
 
 task stopMySQLContainer(type: DockerStopContainer) {
     description = "Stops MySQL container for MX. Ignores if the container is not present or running."
@@ -348,7 +348,7 @@ task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, start
     commandLine cmds
 }
 
-task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initTestDatabaseInMysqlContainer]) {
+task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers/*, initTestDatabaseInMysqlContainer*/]) {
     description = "Run all Grails MX tests"
 
     assertJava8()
