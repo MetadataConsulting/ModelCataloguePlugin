@@ -22,6 +22,7 @@ ModelCatalogueCorePluginTestApp/test/integration/resources/rare_diseases_combine
 **/build/**/*
 **/node_modules/**
 **/bower_components/**
+**/.gradle/**
 
 .default-mc-config-location
 .docker-ip

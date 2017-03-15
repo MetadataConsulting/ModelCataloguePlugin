@@ -164,12 +164,24 @@ environments {
 
         grails.plugin.console.enabled = true
         grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}"
-        if (System.getenv('TRAVIS') && System.getenv('TEST_SUITE') == 'functional') {
-            mc.search.elasticsearch.host="127.0.0.1"
+        if (System.getenv('DOCKERIZED_TESTS') && System.properties["grails.test.phase"] == 'functional') {
+            mc.search.elasticsearch.host="localhost"
+            mc.search.elasticsearch.port=49300
+            // this must be set to be able to send any mails
+            grails.mail.default.from = 'tester@metadata.org.uk'
+            grails.plugin.springsecurity.ui.register.emailFrom = 'tester@metadata.org.uk'
+            grails.plugin.springsecurity.ui.forgotPassword.emailFrom = 'tester@metadata.org.uk'
+
+            grails {
+                mail {
+                    host = 'localhost'
+                    port = 41025
+                }
+            }
         } else {
             mc.search.elasticsearch.local="${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/es${System.currentTimeMillis()}"
+            grails.mail.disabled=true
         }
-        grails.mail.disabled=true
     }
     production {
         grails.logging.jul.usebridge = false

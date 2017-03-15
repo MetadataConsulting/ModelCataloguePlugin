@@ -88,12 +88,12 @@ task cleanGrailsFolders(type: Delete) {
 }
 
 task cleanGrails(type: Exec, dependsOn: cleanGrailsFolders) {
-    commandLine grailsw, 'clean-all', '--stacktrace'
+    commandLine grailsw, 'clean-all', '--stacktrace', '--non-interactive'
 
 }
 
 task refreshGrailsDependencies(type: Exec) {
-    commandLine grailsw, 'refresh-dependencies', '--stacktrace'
+    commandLine grailsw, 'refresh-dependencies', '--stacktrace', '--non-interactive'
     mustRunAfter cleanGrails
 }
 
@@ -122,6 +122,9 @@ task runDev(type: Exec, dependsOn: bowerInstall) {
     if (project.hasProperty('mc.debug')) {
         cmds << '--debug-fork'
     }
+
+    cmds << '--non-interactive'
+
     commandLine cmds
 }
 
@@ -179,6 +182,11 @@ task startMySQLContainer(type: DockerStartContainer) {
     onComplete {
         logger.lifecycle "MySQL is listening on ports 43306"
     }
+}
+
+task initTestDatabaseInMysqlContainer(type: DockerExecContainer, dependsOn: startMySQLContainer) {
+    containerId = 'mx-mysql'
+    cmd = ['mysql', '-u', 'root', '-ppa$$w0rd', '-e', "create user 'tester'@'%' identified by 'tester';create database tester;grant all privileges on tester.* to 'tester'@'%'"]
 }
 
 task stopMySQLContainer(type: DockerStopContainer) {
@@ -313,6 +321,7 @@ task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, start
     environment 'MC_MAIL_HOST', "localhost"
     environment 'MC_MAIL_PORT', "41025"
     environment 'MC_ALLOW_SIGNUP', "true"
+    environment 'MC_INDEX_PREFIX', "production"
 
     def cmds = [grailsw, 'prod']
 
@@ -334,12 +343,57 @@ task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, start
         cmds << "-Dmc.config.location=${project.getProperty('mc.config.location')}"
     }
 
+    cmds << ' --non-interactive'
+
     commandLine cmds
+}
+
+task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initTestDatabaseInMysqlContainer]) {
+    description = "Run all Grails MX tests"
+
+    assertJava8()
+    environment 'GRAILS_OPTS', "-Xmx2G -Xms1G -XX:MaxPermSize=1G -server"
+    environment 'DOCKERIZED_TESTS', "true"
+    environment 'FILE_OPENER_SKIP', "true"
+    environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
+
+    commandLine grailsw, 'test-app', '-war', '--non-interactive'
+
+    inputs.files files('grails-app')
+    inputs.files files('src')
+    inputs.files files('web-app')
+    inputs.files files('test/functional')
+    inputs.files files('test/integration')
+    inputs.files files('test/unit')
+
+    outputs.files file('target/test-reports/')
+}
+
+task runKarmaTests(type: NodeTask) {
+    description = "Runs Karma tests"
+    script = file('node_modules/karma/bin/karma')
+    args = [ 'start', '--single-run', '--browsers', 'Firefox']
+    inputs.files file('karma.conf.json')
+    inputs.files files('test/js')
+    inputs.files files('grails-app/assets')
+    outputs.files file('target/test-reports-js')
+    dependsOn([bowerInstall, runGrailsTests])
+}
+
+task collectTestReports(type: Copy) {
+    description = "Collects reports from Grails tests"
+    from('target') {
+        include 'geb-reports/**'
+        include 'test-reports/**'
+        include 'test-reports-js/**'
+        include 'assets/modelcatalogue/modelcatalogue-*.*'
+    }
+    into "${System.getProperty('user.home')}/reports/"
 }
 
 task stop(type: Exec) {
     description = "Stops running MX application"
-    commandLine grailsw, 'stop-app'
+    commandLine grailsw, 'stop-app','--non-interactive'
 }
 
 bowerInstall.finalizedBy cleanUpBowerDependencies
