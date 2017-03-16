@@ -1,9 +1,6 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
-import org.modelcatalogue.core.api.ElementStatus
-import spock.lang.Unroll
-
 
 class EnumeratedTypeControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
@@ -38,15 +35,6 @@ class EnumeratedTypeControllerIntegrationSpec extends AbstractCatalogueElementCo
         GrailsNameUtils.getLogicalPropertyName(getClass().getSimpleName(), "ControllerIntegrationSpec")
     }
 
-    @Override
-    protected String getResourceNameForHistory() {
-        'dataType'
-    }
-
-
-    protected String getItemTypeForHistory() {
-        DataType.name
-    }
 
     @Override
     EnumeratedType getLoadItem() {

@@ -50,14 +50,6 @@ class CatalogueElementControllerIntegrationSpec extends AbstractCatalogueElement
         MeasurementUnit.findByName("Degrees Celsius")
     }
 
-    protected String getResourceNameForHistory() {
-        'measurementUnit'
-    }
-
-    @Override
-    protected String getItemTypeForHistory() {
-        return MeasurementUnit.name
-    }
 
     @Override
     MeasurementUnit getAnotherLoadItem() {

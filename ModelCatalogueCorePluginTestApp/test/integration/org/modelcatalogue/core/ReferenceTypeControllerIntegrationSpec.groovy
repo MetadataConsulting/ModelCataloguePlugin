@@ -2,7 +2,6 @@ package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
-import spock.lang.Unroll
 
 class ReferenceTypeControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
@@ -65,12 +64,5 @@ class ReferenceTypeControllerIntegrationSpec extends AbstractCatalogueElementCon
 
     }
 
-    @Override
-    protected String getResourceNameForHistory() {
-        'dataType'
-    }
 
-    protected String getItemTypeForHistory() {
-        DataType.name
-    }
 }

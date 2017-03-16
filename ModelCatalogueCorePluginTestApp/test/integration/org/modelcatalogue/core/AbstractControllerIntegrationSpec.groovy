@@ -79,9 +79,6 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         resource.count()
     }
 
-    protected getTotalRowsExported() {
-        totalCount
-    }
 
     def "Show single existing item as JSON"() {
 

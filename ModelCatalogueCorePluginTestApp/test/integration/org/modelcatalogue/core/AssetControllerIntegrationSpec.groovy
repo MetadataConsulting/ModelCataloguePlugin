@@ -2,7 +2,6 @@ package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.plugins.testing.GrailsMockMultipartFile
-import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.OrderedMap
 import spock.lang.Unroll
 
@@ -151,8 +150,6 @@ class AssetControllerIntegrationSpec extends AbstractCatalogueElementControllerI
         return true
     }
 
-    @Override
-    protected getTotalRowsExported() { 7 }
 
     def getPaginationParameters(String baseLink) {
         [
