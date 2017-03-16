@@ -1,0 +1,4 @@
+Put initial SQL file into this directory to initialize the production environment.
+
+
+CAUTION: Be sure the script uses `metadata` database!

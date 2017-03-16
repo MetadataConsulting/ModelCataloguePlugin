@@ -86,6 +86,7 @@ task cleanGrailsFolders(type: Delete) {
     delete 'target'
     delete 'target-eclipse'
     delete '**/*.gen.fixture.js'
+    delete '**/*.gen.fixture.coffee'
     delete "${System.getProperty('user.home')}/.grails/${properties['app.grails.version']}/ModelCatalogueCorePluginTestApp"
 }
 
@@ -161,6 +162,11 @@ task createMySQLContainer(type: DockerCreateContainer, dependsOn: pullMySQLImage
         'MYSQL_USER=metadata',
         'MYSQL_PASSWORD=metadata',
     ] as String[]
+
+    binds = [
+        (file('prod-init-data').absolutePath): '/docker-entrypoint-initdb.d'
+    ]
+
     onError { e ->
         if (e.class.simpleName == 'ConflictException') {
             logger.lifecycle "Container already exists"
