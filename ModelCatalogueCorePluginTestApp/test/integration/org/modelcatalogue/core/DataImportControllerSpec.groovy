@@ -17,7 +17,7 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
         loadMarshallers()
         loadFixtures()
         recorder = DefaultResultRecorder.create(
-                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
+                "../ModelCatalogueCorePluginTestApp/test/js/modelcatalogue/core",
                 "Importer"
         )
     }
