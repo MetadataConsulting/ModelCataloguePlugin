@@ -164,7 +164,7 @@ task createMySQLContainer(type: DockerCreateContainer, dependsOn: pullMySQLImage
     ] as String[]
 
     binds = [
-        (file('prod-init-data').absolutePath): '/docker-entrypoint-initdb.d'
+        (getBindPath(file('prod-init-data'))): '/docker-entrypoint-initdb.d'
     ]
 
     onError { e ->
@@ -439,4 +439,11 @@ private static String getDockerHost() {
 
 private static void assertJava8()  {
     assert org.gradle.internal.jvm.Jvm.current().javaVersion.java8Compatible
+}
+
+private static String getBindPath(File file) {
+    if (Os.isFamily(Os.FAMILY_WINDOWS))  {
+        return "/${file.absolutePath.replaceAll('\\\\', '/').replaceAll('C:/', 'c/')}"
+    }
+    return file.absolutePath
 }

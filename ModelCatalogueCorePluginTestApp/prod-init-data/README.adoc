@@ -2,3 +2,5 @@ Put initial SQL file into this directory to initialize the production environmen
 
 
 CAUTION: Be sure the script uses `metadata` database!
+
+CAUTION: This feature is not yet supported when using Docker Machine!
