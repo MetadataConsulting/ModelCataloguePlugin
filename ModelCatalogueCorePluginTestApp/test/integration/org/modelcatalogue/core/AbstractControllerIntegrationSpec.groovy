@@ -32,7 +32,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         loadFixtures()
         if (record) {
             recorder = DefaultResultRecorder.create(
-                    "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
+                    "../ModelCatalogueCorePluginTestApp/test/js/modelcatalogue/core",
                     resourceName
             )
         } else {

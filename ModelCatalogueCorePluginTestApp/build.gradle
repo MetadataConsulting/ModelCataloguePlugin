@@ -320,7 +320,7 @@ task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, start
 
     assertJava8()
     environment 'GRAILS_OPTS', "-Xmx2G -Xms1G -XX:MaxPermSize=1G -server"
-    environment 'METADATA_HOST', 'localhost' // this is localhost if you're using docker machine or not
+    environment 'METADATA_HOST', 'localhost:8080' // this is localhost if you're using docker machine or not
     environment 'METADATA_USERNAME', "metadata"
     environment 'METADATA_PASSWORD', "metadata"
     environment 'METADATA_JDBC_URL', "jdbc:mysql://${host}:43306/metadata?autoReconnect=true&useUnicode=yes&characterEncoding=UTF-8"
@@ -331,6 +331,8 @@ task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, start
     environment 'MC_MAIL_PORT', "41025"
     environment 'MC_ALLOW_SIGNUP', "true"
     environment 'MC_INDEX_PREFIX', "production"
+    environment 'MC_ADMIN_EMAIL', "admin@metadata.org.uk"
+    environment 'MC_SUPERVISOR_EMAIL', "supervisor@metadata.org.uk"
 
     def cmds = [grailsw, 'prod']
 
