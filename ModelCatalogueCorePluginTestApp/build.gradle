@@ -417,6 +417,23 @@ task stop(type: Exec) {
 bowerInstall.finalizedBy cleanUpBowerDependencies
 stop.finalizedBy stopContainers
 
+
+task war(type: Exec, dependsOn: bowerInstall) {
+    description = "Build production war of MX application"
+    commandLine grailsw, 'war', '--non-interactive'
+}
+
+
+task copyWar(type: Copy) {
+    from 'target', {
+        include '*.war'
+        rename '.*\\.war', 'mc.war'
+    }
+    into '../build'
+}
+
+war.finalizedBy copyWar
+
 private static String getGrailsw()  {
    if (Os.isFamily(Os.FAMILY_WINDOWS))  {
       return "grailsw.bat"

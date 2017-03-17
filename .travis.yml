@@ -33,7 +33,7 @@ script:
 - ModelCatalogueCorePluginTestApp/gradlew -p ModelCatalogueCorePluginTestApp runGrailsTests runKarmaTests
 after_script:
 - ModelCatalogueCorePluginTestApp/gradlew -p ModelCatalogueCorePluginTestApp collectTestReports
-before_deploy: ./war.sh
+before_deploy: ModelCatalogueCorePluginTestApp/gradlew -p ModelCatalogueCorePluginTestApp war
 after_deploy: ./catalogue docker notify
 deploy:
   provider: releases
