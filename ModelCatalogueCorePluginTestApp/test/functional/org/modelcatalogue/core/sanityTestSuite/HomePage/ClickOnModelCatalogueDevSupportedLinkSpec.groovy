@@ -1,11 +1,6 @@
-package org.modelcatalogue.core.sanityTestSuite
+package org.modelcatalogue.core.sanityTestSuite.HomePage
 
-<<<<<<< Updated upstream
-/**
- * Created by Berthe on 13/03/2017.
- */
-class ClickOnModelCatalogueDevSupportedLinkSpec {
-=======
+
 import geb.spock.GebSpec
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
@@ -21,7 +16,7 @@ class ClickOnModelCatalogueDevSupportedLinkSpec extends GebSpec  {
         when:
         driver = browser.driver
         driver.manage().deleteAllCookies()
-        go("https://gel-mc-test.metadata.org.uk/#/")
+        go(baseUrl)
         // select the box containing model catalogue development supprot
         WebElement ModelDev= driver.findElement(By.cssSelector(model))
         List<WebElement> Image= ModelDev.findElements(By.tagName("img"))
@@ -46,8 +41,10 @@ class ClickOnModelCatalogueDevSupportedLinkSpec extends GebSpec  {
         assert $("button",class:"btn btn-large btn-primary").text()== "Login"
         System.println("I found it")
 
+        driver.quit()
+
     }
 
 
->>>>>>> Stashed changes
+
 }

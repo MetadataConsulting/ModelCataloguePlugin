@@ -1,11 +1,6 @@
-package org.modelcatalogue.core.sanityTestSuite
+package org.modelcatalogue.core.sanityTestSuite.Login
 
-<<<<<<< Updated upstream
-/**
- * Created by Berthe on 13/03/2017.
- */
-class LoginInSpec {
-=======
+
 import geb.spock.GebSpec
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
@@ -22,7 +17,7 @@ class LoginInAndClickOnCancelSpec extends GebSpec {
        // navigate to model catalogue
         driver = browser.driver
         driver.manage().deleteAllCookies()
-        go("https://gel-mc-test.metadata.org.uk/#/")
+        go(baseUrl)
         $("button.btn").click()
         then:
         // verification that login page open
@@ -40,5 +35,5 @@ class LoginInAndClickOnCancelSpec extends GebSpec {
         assert $("button",class:"btn btn-large btn-primary").text()== "Login"
 
     }
->>>>>>> Stashed changes
+
 }

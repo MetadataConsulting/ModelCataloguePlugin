@@ -21,7 +21,7 @@ class InvalidRegistrationSpec extends GebSpec {
         when:
         driver = browser.driver
         driver.manage().deleteAllCookies()
-        go("https://gel-mc-test.metadata.org.uk/#/")
+        go(baseUrl)
 
         // click on Sign Up
         $("a.btn").click()

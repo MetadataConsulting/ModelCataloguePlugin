@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.sanityTestSuite
+package org.modelcatalogue.core.sanityTestSuite.Login
 
 
 import geb.spock.GebSpec
@@ -17,7 +17,7 @@ class ValidateRegistrationSpec extends GebSpec {
         when:
         driver = browser.driver
         driver.manage().deleteAllCookies()
-        go("https://gel-mc-test.metadata.org.uk/#/")
+        go(baseUrl)
         $("a.btn").click()
         then:
         assert $("span",class:"mc-name").text()=="Model Catalogue"
