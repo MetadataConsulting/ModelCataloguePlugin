@@ -142,7 +142,10 @@ beans = {
     springConfig.addAlias('userDetailsService','gormWithEmailUserDetailsService')
     springConfig.addAlias('daoAuthenticationProvider','apiKeyDaoAuthenticationProvider')
 
-    if (System.getenv('MC_ES_DISABLED') != 'true' && (application.config.mc.search.elasticsearch.local || application.config.mc.search.elasticsearch.host || System.getProperty('mc.search.elasticsearch.host') || System.getProperty('mc.search.elasticsearch.local'))) {
+    if ((!System.properties["grails.test.phase"] || System.properties["grails.test.phase"] == 'functional')
+        &&
+        (application.config.mc.search.elasticsearch.local || application.config.mc.search.elasticsearch.host || System.getProperty('mc.search.elasticsearch.host') || System.getProperty('mc.search.elasticsearch.local'))
+    ) {
         springConfig.addAlias('modelCatalogueSearchService','elasticSearchService')
     }
 }

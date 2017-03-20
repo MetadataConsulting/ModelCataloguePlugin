@@ -15,7 +15,6 @@ options.addArguments("--disable-extensions")
 reportsDir = new File("target/geb-reports")
 reportOnTestFailureOnly = false
 baseUrl = 'http://localhost:8080/'
-cacheDriver = false
 
 ChromeDriverManager.getInstance().setup()
 

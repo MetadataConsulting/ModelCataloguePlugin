@@ -25,15 +25,6 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
 
-
-    protected String getResourceNameForHistory() {
-        resourceName
-    }
-
-    protected String getItemTypeForHistory() {
-        resource.name
-    }
-
     def getHistoryPaginationParameters(String baseLink) {
         [
                 // no,size, max , off. tot. next                           , previous

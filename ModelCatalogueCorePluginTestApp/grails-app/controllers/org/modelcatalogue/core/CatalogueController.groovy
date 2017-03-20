@@ -39,6 +39,9 @@ class CatalogueController {
                 if (params.full != 'true') {
                     keepInside = element.instanceOf(DataModel) ? element : element.dataModel
                 }
+                if (params.repetitive == 'true') {
+                    repetitive = true
+                }
             }.writeTo(response.writer)
             return
         }
@@ -77,6 +80,9 @@ class CatalogueController {
                 if (params.full != 'true') {
                     keepInside = element.instanceOf(DataModel) ? element : element.dataModel
                 }
+                if (params.repetitive == 'true') {
+                    repetitive = true
+                }
             }.writeTo(response.writer)
             return
         }
@@ -102,7 +108,7 @@ class CatalogueController {
 
     def dataModelsForPreload() {
         // only render data models for preload if there is no data model in the catalogue (very likely the first run)
-        if (DataModel.list(max: 1) || !modelCatalogueSecurityService.hasRole(UserService.ROLE_ADMIN)) {
+        if (DataModel.findByNameNotEqual('Clinical Tags') || !modelCatalogueSecurityService.hasRole(UserService.ROLE_ADMIN)) {
             render([] as JSON)
             return
 

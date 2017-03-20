@@ -60,6 +60,9 @@
         ng-switch-when="date">{{theValue | date:'short'}}
     </td>
     <td class="pp-table-property-value col-md-8 pp-table-property-element-value" data-value-for="{{property.label}}"
+        ng-switch-when="extensionValue">{{theValue.name}} : {{theValue.extensionValue}}
+    </td>
+    <td class="pp-table-property-value col-md-8 pp-table-property-element-value" data-value-for="{{property.label}}"
         ng-switch-when="orderedMap">
       <div class="preserve-new-lines">
         <span ng-bind-html="printOrderedMap(theValue)"></span>

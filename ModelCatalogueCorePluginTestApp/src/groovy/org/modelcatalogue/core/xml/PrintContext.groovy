@@ -12,8 +12,9 @@ class PrintContext {
 
     boolean idIncludeVersion
     boolean noHref
+    boolean repetitive
 
-    DataModel currentClassification
+    DataModel currentDataModel
     DataModel keepInside
     Set<Long> idsOfPrinted = []
 
@@ -27,6 +28,10 @@ class PrintContext {
 
     void markAsPrinted(CatalogueElement element) {
         idsOfPrinted << element.id
+    }
+
+    void removeFromPrinted(CatalogueElement element) {
+        idsOfPrinted.remove(element.id)
     }
 
     boolean wasPrinted(CatalogueElement element) {

@@ -23,6 +23,7 @@ class AuditService {
     def modelCatalogueSecurityService
     def dataModelService
     def executorService
+    def sessionFactory
     MessageSendingOperations brokerMessagingTemplate
 
     static Callable<Auditor> auditorFactory = { throw new IllegalStateException("Application is not initialized yet") }
@@ -235,18 +236,58 @@ class AuditService {
             params.order = 'desc'
         }
 
+        Closure queryClosure = {
 
-        Lists.fromCriteria(params, Change) {
-            eq 'latestVersionId', latestVersionId
-            isNull('parentId')
-            ne 'system', Boolean.TRUE
-            ne 'otherSide', Boolean.TRUE
-            not {
-                inList('type', ImmutableList.of(ChangeType.NEW_VERSION_CREATED, ChangeType.NEW_ELEMENT_CREATED, ChangeType.ELEMENT_DEPRECATED))
+            def max = it?.max
+            def offset = it?.offset
+            boolean itemsQuery = it instanceof Map
+
+            String query = """
+                select ch.* from `change` ch
+                left join `change` parent on parent.id = ch.parent_id
+                where ch.latest_version_id = :lvid
+                and ch.system <> true
+                and ch.other_side <> true
+                and (ch.parent_id is null or parent.type = 'EXTERNAL_UPDATE')
+                order by ch.date_created DESC 
+
+            """
+
+            final session = sessionFactory.currentSession
+
+            // Create native SQL query.
+            final sqlQuery = session.createSQLQuery(query)
+
+            // Use Groovy with() method to invoke multiple methods
+            // on the sqlQuery object.
+            final results = sqlQuery.with {
+                // Set domain class as entity.
+                // Properties in domain class id, name, level will
+                // be automatically filled.
+                addEntity(Change)
+
+                // Set value for parameter startId.
+                setLong('lvid', latestVersionId)
+
+                if (max) {
+                    setMaxResults(max as Integer)
+                }
+
+                if (offset) {
+                    setFirstResult(offset as Integer)
+                }
+
+                // Get all results.
+                if (itemsQuery) {
+                    return list()
+                }
+                return list().size()
             }
 
+            results
         }
 
+        Lists.lazy(params, Change, queryClosure, queryClosure)
     }
 
     CatalogueElement logNewVersionCreated(CatalogueElement element, Closure<CatalogueElement> createDraftBlock) {

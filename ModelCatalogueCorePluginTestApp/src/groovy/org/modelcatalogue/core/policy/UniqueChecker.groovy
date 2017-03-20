@@ -12,7 +12,13 @@ import static com.google.common.base.Preconditions.checkNotNull
 
     @Override
     def <T extends CatalogueElement & GroovyObject> void check(VerificationPhase phase, DataModel model, Class<T> resource, T item, String property, String ignored, String messageOverride, boolean errorsToItem) {
-        checkNotNull(property, 'Property must be set', new Object[0])
+        if (!model.id) {
+            return
+        }
+
+        if (property == null) {
+            return
+        }
 
         if (!item.hasProperty(property)) {
             return
@@ -28,8 +34,14 @@ import static com.google.common.base.Preconditions.checkNotNull
             DetachedCriteria<? extends T> criteria = new DetachedCriteria<? extends T>(resource)
             criteria.eq('dataModel', model).eq(property, value).ne('status', ElementStatus.DEPRECATED)
 
-            if (criteria.list().find { (it as CatalogueElement).getId() != item.getId() }) {
-                (errorsToItem ? item : model).errors.reject('uniqueChecker.duplicate', [model, ignored, item, property, ignored] as Object[], messageOverride ?: "Property {3} must be unique for every {2} within {0}")
+            if (item.id) {
+                if (criteria.list().find { (it as CatalogueElement).getId() != item.getId() }) {
+                    (errorsToItem ? item : model).errors.reject('uniqueChecker.duplicate', [model, ignored, item, property, ignored] as Object[], messageOverride ?: "Property {3} must be unique for every {2} within {0}")
+                }
+            } else {
+                if (criteria.count()) {
+                    (errorsToItem ? item : model).errors.reject('uniqueChecker.duplicate', [model, ignored, item, property, ignored] as Object[], messageOverride ?: "Property {3} must be unique for every {2} within {0}")
+                }
             }
         }
 

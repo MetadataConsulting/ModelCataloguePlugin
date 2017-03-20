@@ -35,14 +35,6 @@ class PrimitiveTypeControllerIntegrationSpec extends AbstractCatalogueElementCon
         GrailsNameUtils.getLogicalPropertyName(getClass().getSimpleName(), "ControllerIntegrationSpec")
     }
 
-    @Override
-    protected String getResourceNameForHistory() {
-        'dataType'
-    }
-
-    protected String getItemTypeForHistory() {
-        DataType.name
-    }
 
     @Override
     PrimitiveType getLoadItem() {

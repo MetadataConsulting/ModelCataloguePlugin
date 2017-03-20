@@ -49,7 +49,7 @@
           <!--</li>-->
         </ul>
         <div class="leave-10-before"></div>
-        <div ng-if="dataModelsForPreload.length &amp;&amp; !list.total">
+        <div ng-if="showPreload()">
           <div class="jumbotron">
             <h1>Welcome to Metadata Registry</h1>
             <p>
@@ -67,20 +67,23 @@
           </div>
         </div>
 
-        <div ng-if="type == 'elements'">
-          <infinite-list transform="dataModelOrDestination($element)"
-                         column-classes="'col-lg-12 col-sm-12 col-md-12'"
-                         type="short"
-                         list="list">
-          </infinite-list>
+        <div ng-if="!showPreload()">
+          <div ng-if="type == 'elements'">
+            <infinite-list transform="dataModelOrDestination($element)"
+                           column-classes="'col-lg-12 col-sm-12 col-md-12'"
+                           type="short"
+                           list="list">
+            </infinite-list>
+          </div>
+
+          <div ng-if="type != 'elements'">
+            <infinite-list transform="dataModelOrDestination($element)"
+                           column-classes="'col-lg-12 col-sm-12 col-md-12'"
+                           list="list">
+            </infinite-list>
+          </div>
         </div>
 
-        <div ng-if="type != 'elements'">
-          <infinite-list transform="dataModelOrDestination($element)"
-                         column-classes="'col-lg-12 col-sm-12 col-md-12'"
-                         list="list">
-          </infinite-list>
-        </div>
       </div>
     </div>
   </div>
