@@ -1,6 +1,6 @@
 Model Catalogue
 ===============
-[![Build Status](https://travis-ci.org/MetadataConsulting/ModelCataloguePlugin.svg?branch=2.x)](https://travis-ci.org/MetadataConsulting/ModelCataloguePlugin) [![Gitter](https://badges.gitter.im/Join Chat.svg)] (https://gitter.im/MetadataConsulting/ModelCataloguePlugin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/MetadataConsulting/ModelCataloguePlugin.svg?branch=2.x)](https://travis-ci.org/MetadataConsulting/ModelCataloguePlugin)
 
 ## Introduction
 The Model Catalogue Plugin (Mx) is a web-based toolkit for managing metadata.
