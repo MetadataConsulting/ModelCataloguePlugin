@@ -82,6 +82,9 @@
                                 <label for='password' class="control-label col-sm-3"><g:message code="springSecurity.login.password.label"/>:</label>
                                 <div class="col-sm-9">
                                     <input type='password' class='form-control' name='j_password' id='password'/>
+                                    <g:if test="${grailsApplication.config.grails.mail.host.asBoolean() || grailsApplication.config.grails.mc.can.reset.password.asBoolean()}">
+                                      <p class="help-block"><g:link action="forgotPassword" controller="register">Reset Password</g:link></p>
+                                    </g:if>
                                 </div>
                             </div>
 
