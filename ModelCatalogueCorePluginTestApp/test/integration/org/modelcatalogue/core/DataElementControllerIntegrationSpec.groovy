@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
-import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.OrderedMap
 
 class DataElementControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
@@ -66,8 +65,6 @@ class DataElementControllerIntegrationSpec extends AbstractCatalogueElementContr
         return true
     }
 
-    @Override
-    protected getTotalRowsExported() { 7 }
 
     def getPaginationParameters(String baseLink) {
         [

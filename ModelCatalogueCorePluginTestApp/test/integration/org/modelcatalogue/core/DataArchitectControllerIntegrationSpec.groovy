@@ -32,7 +32,7 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec {
     def "json get sub model elements"() {
         def controller = new DataArchitectController()
         ResultRecorder recorder = DefaultResultRecorder.create(
-                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
+                "../ModelCatalogueCorePluginTestApp/test/js/modelcatalogue/core",
                 "dataArchitect"
         )
 
@@ -60,7 +60,7 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec {
 
         def controller = new DataArchitectController()
         ResultRecorder recorder = DefaultResultRecorder.create(
-                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
+                "../ModelCatalogueCorePluginTestApp/test/js/modelcatalogue/core",
                 "dataArchitect"
         )
         when:
@@ -89,7 +89,7 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec {
 
         def controller = new DataArchitectController()
         ResultRecorder recorder = DefaultResultRecorder.create(
-                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
+                "../ModelCatalogueCorePluginTestApp/test/js/modelcatalogue/core",
                 "dataArchitect"
         )
         when:
@@ -117,7 +117,7 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec {
     def "find some elements and return just string for not found from elementsFromCSV"() {
         def controller = new DataArchitectController()
         ResultRecorder recorder = DefaultResultRecorder.create(
-                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
+                "../ModelCatalogueCorePluginTestApp/test/js/modelcatalogue/core",
                 "dataArchitect"
         )
 

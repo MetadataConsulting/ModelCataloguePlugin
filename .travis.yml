@@ -6,19 +6,18 @@ cache:
   - node_modules
   - ModelCatalogueCorePluginTestApp/target/work/plugins
   - ModelCatalogueCorePluginTestApp/node_modules
+  - ModelCatalogueCorePluginTestApp/.gradle
   - $HOME/.m2
   - $HOME/.grails/ivy-cache
   - $HOME/.grails/wrapper
+  - $HOME/.gradle
 addons:
   s3_region: eu-west-1
   artifacts:
     paths:
     - $HOME/reports
 services:
-  - mysql
-env:
-- TEST_SUITE=functional
-- TEST_SUITE=unit_and_integration
+  - docker
 jdk:
 - oraclejdk8
 before_install:
@@ -30,10 +29,11 @@ before_install:
 - sudo dpkg -i google-chrome*.deb
 - /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1980x1080x16
 script:
-- ./catalogue test
+- echo -e "\nTest Results will be available at\n\nhttp://mc-test-results.metadata.org.uk.s3-website-eu-west-1.amazonaws.com/index.html?prefix=MetadataConsulting/ModelCataloguePlugin/$TRAVIS_BUILD_NUMBER/$TRAVIS_JOB_NUMBER/home/travis/reports/\n\n"
+- ModelCatalogueCorePluginTestApp/gradlew -p ModelCatalogueCorePluginTestApp runGrailsTests runKarmaTests
 after_script:
-- ./catalogue collect reports
-before_deploy: ./war.sh
+- ModelCatalogueCorePluginTestApp/gradlew -p ModelCatalogueCorePluginTestApp collectTestReports
+before_deploy: ModelCatalogueCorePluginTestApp/gradlew -p ModelCatalogueCorePluginTestApp war
 after_deploy: ./catalogue docker notify
 deploy:
   provider: releases
@@ -45,7 +45,6 @@ deploy:
   - conf/docker/mc-config.groovy
   on:
     tags: true
-    condition: $TEST_SUITE = functional
 notifications:
   slack:
     secure: T234ojDb39JTjjtaNYICpTu3V0HNSwHb2LWq9cMrvDmoHjzKOOeudpel3ev1Am5/bI0WNKqQYBcIpgxJ6578425JDk0XmFR+AKJqMQdhTB9vDIvRI0p/vhoC6QbNF+Kdo6sXuOPAtqlU1L2CM/occnxbbI7mcxkjBADohmAlpbY=

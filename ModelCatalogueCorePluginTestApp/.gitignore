@@ -63,3 +63,4 @@ grails-app/assets/bower_components/*
 /grails-app/views/_version.gsp
 ModelCatalogueCorePluginTestApp.iml
 
+.gradle

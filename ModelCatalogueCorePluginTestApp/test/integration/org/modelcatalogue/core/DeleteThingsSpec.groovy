@@ -23,8 +23,8 @@ class DeleteThingsSpec extends IntegrationSpec{
         controller = new MeasurementUnitController()
         controllerName = "$controller.resourceName"
         recorder = DefaultResultRecorder.create(
-                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
-                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
+                "../ModelCatalogueCorePluginTestApp/target/xml-samples/modelcatalogue/core",
+                "../ModelCatalogueCorePluginTestApp/test/js/modelcatalogue/core",
                 controllerName
         )
     }
