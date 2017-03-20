@@ -97,8 +97,4 @@ class RelationshipTypeControllerIntegrationSpec extends AbstractControllerIntegr
     }
 
 
-    protected getTotalRowsExported() {
-        RelationshipType.countBySystem(false)
-    }
-
 }

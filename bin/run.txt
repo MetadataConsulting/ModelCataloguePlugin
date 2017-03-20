@@ -1,1 +1,0 @@
-Run the application either in development or a production environment

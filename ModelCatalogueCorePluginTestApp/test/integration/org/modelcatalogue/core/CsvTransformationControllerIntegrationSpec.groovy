@@ -2,9 +2,7 @@ package org.modelcatalogue.core
 
 import grails.rest.RestfulController
 import grails.util.GrailsNameUtils
-import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
-import org.modelcatalogue.core.util.CatalogueElementFinder
 
 /**
  * Created by adammilward on 27/02/2014.
@@ -79,12 +77,6 @@ class CsvTransformationControllerIntegrationSpec extends AbstractControllerInteg
                 [1, 1, 10, 0, 1, "", ""],
         ]
     }
-
-
-    protected getTotalRowsExported() {
-        1
-    }
-
 
 
 }

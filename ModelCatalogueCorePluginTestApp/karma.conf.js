@@ -13,11 +13,11 @@ module.exports = function(config) {
 
         coverageReporter: {
             type: 'lcovonly',
-            dir: 'target/reports/js/coverage/'
+            dir: 'target/test-reports-js/coverage/'
         },
 
         junitReporter: {
-            outputFile: 'target/reports/js/karma-test-results.xml',
+            outputDir: 'target/test-reports-js',
             suite: 'unit'
         },
 

@@ -32,7 +32,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         loadFixtures()
         if (record) {
             recorder = DefaultResultRecorder.create(
-                    "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
+                    "../ModelCatalogueCorePluginTestApp/test/js/modelcatalogue/core",
                     resourceName
             )
         } else {
@@ -79,9 +79,6 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         resource.count()
     }
 
-    protected getTotalRowsExported() {
-        totalCount
-    }
 
     def "Show single existing item as JSON"() {
 

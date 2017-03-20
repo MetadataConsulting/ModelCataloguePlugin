@@ -1,1 +1,0 @@
-Cleans all data, compile dependencies, JavaScript fixtures and cached Grails plugins

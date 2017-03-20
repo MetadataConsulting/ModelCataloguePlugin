@@ -56,3 +56,7 @@ eventTestCaseStart = { name ->
 eventTestCaseEnd = { name, err, out ->
     println "\n|$name : finished"
 }
+
+eventTestPhaseStart = { args ->
+    System.properties["grails.test.phase"] = args
+}

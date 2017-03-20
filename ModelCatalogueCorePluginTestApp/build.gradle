@@ -1,0 +1,466 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+import com.bmuschko.gradle.docker.tasks.container.*
+import com.bmuschko.gradle.docker.tasks.image.*
+import com.bmuschko.gradle.docker.tasks.*
+
+plugins {
+    id "com.moowork.node" version "1.1.1"
+    id "com.bmuschko.docker-remote-api" version "3.0.6"
+}
+
+node {
+    // Version of node to use.
+    version = '5.12.0'
+
+    // Version of npm to use.
+    npmVersion = '3.8.6'
+
+    download = true
+}
+
+docker {
+    if (System.getenv('DOCKER_HOST'))  {
+        url = System.getenv('DOCKER_HOST')
+    }
+    if (System.getenv('DOCKER_CERT_PATH'))  {
+        certPath = file(System.getenv('DOCKER_CERT_PATH'))
+    }
+}
+
+String host = dockerHost
+
+task npmCacheConfig(type: NpmTask, dependsOn: nodeSetup) {
+    description = "Configure the NPM cache"
+    def npmCacheDir = "${gradle.getGradleUserHomeDir()}/caches/npm"
+    outputs.files file(npmCacheDir)
+    args = [ 'config', 'set', 'cache', npmCacheDir ]
+}
+
+task npmPackages(type: NpmTask, dependsOn: npmCacheConfig) {
+    description = "Install Node.js packages"
+    args = [ 'install' ]
+    // inputs.files file('package.json')
+    outputs.files file('node_modules')
+}
+
+task bowerInstall(type: NodeTask) {
+    description = "Resolves Bower dependencies"
+    script = file('node_modules/bower/bin/bower')
+    args = ["--config.storage.cache=${gradle.getGradleUserHomeDir()}/caches/bower/cache",
+            "--config.storage.packages=${gradle.getGradleUserHomeDir()}/caches/bower/packages",
+            "--config.storage.registry=${gradle.getGradleUserHomeDir()}/caches/bower/registry",
+            'install']
+    // inputs.files file('bower.json')
+    outputs.files file('grails-app/assets/bower_components')
+    dependsOn npmPackages
+}
+
+task cleanUpBowerDependencies(type: Delete) {
+    delete 'grails-app/assets/bower_components/ace-builds/demo'
+    delete 'grails-app/assets/bower_components/ace-builds/src'
+    delete 'grails-app/assets/bower_components/ace-builds/src-min'
+    delete 'grails-app/assets/bower_components/ace-builds/src-noconflict'
+    delete 'grails-app/assets/bower_components/ace-builds/textarea'
+    delete 'grails-app/assets/bower_components/angular-file-saver/gulpfile.babel.js'
+    delete 'grails-app/assets/bower_components/angular-file-saver/src'
+    delete 'grails-app/assets/bower_components/angular-file-saver/docs'
+    delete 'grails-app/assets/bower_components/sly-repeat/scripts'
+    delete 'grails-app/assets/bower_components/sly-repeat/src'
+}
+
+task cleanIdeaFiles(type: Delete) {
+    delete '**/.idea'
+    delete '**/*.iml'
+}
+
+task cleanData(type: Delete) {
+    Properties properties = new Properties()
+    properties.load(file('application.properties').newInputStream())
+    delete "${System.getProperty('java.io.tmpdir')}/ModelCatalogueCorePluginTestApp/${properties['app.version']}"
+}
+
+
+task cleanGrailsFolders(type: Delete) {
+    Properties properties = new Properties()
+    properties.load(file('application.properties').newInputStream())
+    delete 'target'
+    delete 'target-eclipse'
+    delete '**/*.gen.fixture.js'
+    delete '**/*.gen.fixture.coffee'
+    delete "${System.getProperty('user.home')}/.grails/${properties['app.grails.version']}/ModelCatalogueCorePluginTestApp"
+}
+
+task cleanGrails(type: Exec, dependsOn: cleanGrailsFolders) {
+    commandLine grailsw, 'clean-all', '--stacktrace', '--non-interactive'
+
+}
+
+task refreshGrailsDependencies(type: Exec) {
+    commandLine grailsw, 'refresh-dependencies', '--stacktrace', '--non-interactive'
+    mustRunAfter cleanGrails
+}
+
+task cleanAll(type: Delete, dependsOn: [cleanData, cleanGrails, refreshGrailsDependencies]) {
+    delete '../build'
+}
+
+task runDev(type: Exec, dependsOn: bowerInstall) {
+    description = "Run MX in development environment"
+
+    assertJava8()
+    environment 'GRAILS_OPTS', "-Xmx1G -Xms512m -XX:MaxPermSize=512m -server"
+
+    def cmds = [grailsw]
+
+    if (project.hasProperty('mc.blank')) {
+        environment 'MC_BLANK_DEV', "true"
+    }
+
+    if (project.hasProperty('mc.war')) {
+        cmds << 'run-war'
+    } else {
+        cmds << 'run-app'
+    }
+
+    if (project.hasProperty('mc.debug')) {
+        cmds << '--debug-fork'
+    }
+
+    cmds << '--non-interactive'
+
+    commandLine cmds
+}
+
+task ensureProductionConfig(type: Copy) {
+    description = "Ensures configuration for MX production environment exists"
+    onlyIf {
+        !new File(new File(System.getProperty('user.home'), '.grails'), 'mc-config.groovy').exists()
+    }
+    from('../conf/docker') {
+        include 'mc-config.groovy'
+    }
+    into "${System.getProperty('user.home')}/.grails"
+}
+
+
+
+// -- Docker MySQL
+task pullMySQLImage(type: DockerPullImage) {
+    description = "Pull MySQL image in proper version used for MX"
+    repository = 'mysql'
+    tag = '5.6'
+}
+
+task createMySQLContainer(type: DockerCreateContainer, dependsOn: pullMySQLImage) {
+    description = "Creates MySQL container for MX. Ignores if the container is already present."
+    containerName = 'mx-mysql'
+    imageId = 'mysql:5.6'
+    portBindings = ['0.0.0.0:43306:3306']
+    env = [
+        'MYSQL_ROOT_PASSWORD=pa$$w0rd',
+        'MYSQL_DATABASE=metadata',
+        'MYSQL_USER=metadata',
+        'MYSQL_PASSWORD=metadata',
+    ] as String[]
+
+    binds = [
+        (getBindPath(file('prod-init-data'))): '/docker-entrypoint-initdb.d'
+    ]
+
+    onError { e ->
+        if (e.class.simpleName == 'ConflictException') {
+            logger.lifecycle "Container already exists"
+        } else {
+            throw e
+        }
+    }
+}
+
+task startMySQLContainer(type: DockerStartContainer) {
+    description = "Starts MySQL container for MX. Ignores if the container is already running."
+    dependsOn createMySQLContainer
+    containerId = 'mx-mysql'
+    onError { e ->
+        if (e.class.simpleName == 'NotModifiedException') {
+            logger.lifecycle "Container already started"
+        } else {
+            throw e
+        }
+    }
+    onComplete {
+        logger.lifecycle "MySQL is listening on ports 43306"
+    }
+}
+
+task ensureMySQLRunning(type: DockerExecContainer,) {
+    containerId = 'mx-mysql'
+    cmd = ['/bin/sh', '-c', 'while ! mysqladmin ping -h localhost --silent; do sleep 1; done']
+}
+
+startMySQLContainer.finalizedBy ensureMySQLRunning
+
+task initTestDatabaseInMYSQLContainer(type: DockerExecContainer, dependsOn: startMySQLContainer) {
+    containerId = 'mx-mysql'
+    cmd = ['mysqladmin', 'create', 'tester']
+}
+
+task stopMySQLContainer(type: DockerStopContainer) {
+    description = "Stops MySQL container for MX. Ignores if the container is not present or running."
+    containerId = 'mx-mysql'
+    onError { e ->
+        if (e.class.simpleName == 'NotModifiedException') {
+            logger.lifecycle "Container already stopped"
+        } else {
+            throw e
+        }
+    }
+}
+
+// -- Docker ElasticSearch
+task pullElasticsearchImage(type: DockerPullImage) {
+    description = "Pull Elasticsearch image in proper version used for MX"
+    repository = 'metadata/registry-elasticsearch'
+    tag = '2'
+}
+
+task createElasticsearchContainer(type: DockerCreateContainer, dependsOn: pullElasticsearchImage) {
+    description = "Creates Elasticsearch container for MX. Ignores if the container is already present."
+    containerName = 'mx-es'
+    imageId = 'metadata/registry-elasticsearch:2'
+    portBindings = ['0.0.0.0:49200:9200', '0.0.0.0:49300:9300']
+    onError { e ->
+        if (e.class.simpleName == 'ConflictException') {
+            logger.lifecycle "Container already exists"
+        } else {
+            throw e
+        }
+    }
+}
+
+task startElasticsearchContainer(type: DockerStartContainer) {
+    description = "Starts Elasticseach container for MX. Ignores if the container is already running."
+    dependsOn createElasticsearchContainer
+    containerId = 'mx-es'
+    onError { e ->
+        if (e.class.simpleName == 'NotModifiedException') {
+            logger.lifecycle "Container already started"
+        } else {
+            throw e
+        }
+    }
+    onComplete {
+        logger.lifecycle "Elasticsearch is listening on ports 49200 and 49300"
+    }
+}
+
+task stopElasticsearchContainer(type: DockerStopContainer) {
+    description = "Stops MySQL container for MX. Ignores if the container is not present or running."
+    containerId = 'mx-es'
+    onError { e ->
+        if (e.class.simpleName == 'NotModifiedException') {
+            logger.lifecycle "Container already stopped"
+        } else {
+            throw e
+        }
+    }
+}
+
+// -- Docker MailHog
+task pullMailHogImage(type: DockerPullImage) {
+    description = "Pull MailHog image in proper version used for MX"
+    repository = 'mailhog/mailhog'
+}
+
+task createMailHogContainer(type: DockerCreateContainer, dependsOn: pullMailHogImage) {
+    description = "Creates MailHog container for MX. Ignores if the container is already present."
+    containerName = 'mx-mailhog'
+    imageId = 'mailhog/mailhog'
+    portBindings = ['0.0.0.0:41025:1025', '0.0.0.0:48025:8025']
+    onError { e ->
+        if (e.class.simpleName == 'ConflictException') {
+            logger.lifecycle "Container already exists"
+        } else {
+            throw e
+        }
+    }
+}
+
+task startMailHogContainer(type: DockerStartContainer) {
+    description = "Starts MailHog container for MX. Ignores if the container is already running."
+    dependsOn createMailHogContainer
+    containerId = 'mx-mailhog'
+    onError { e ->
+        if (e.class.simpleName == 'NotModifiedException') {
+            logger.lifecycle "Container already started"
+        } else {
+            throw e
+        }
+    }
+    onComplete {
+        logger.lifecycle "Mailhog mail server is listening on port 41025 and the web UI is available at http://${host}:48025"
+    }
+}
+
+task stopMailHogContainer(type: DockerStopContainer) {
+    description = "Stops MailHog container for MX. Ignores if the container is not present or running."
+    containerId = 'mx-mailhog'
+    onError { e ->
+        if (e.class.simpleName == 'NotModifiedException') {
+            logger.lifecycle "Container already stopped"
+        } else {
+            throw e
+        }
+    }
+}
+
+task startContainers(dependsOn: [startElasticsearchContainer, startMySQLContainer, startMailHogContainer]) {
+    description "Starts all containers required for running production environment"
+}
+
+task stopContainers(dependsOn: [stopElasticsearchContainer, stopMySQLContainer, stopMailHogContainer]) {
+    description "Stops all containers required for running production environment"
+}
+
+task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, startContainers]) {
+    description = "Run MX in production environment"
+
+    assertJava8()
+    environment 'GRAILS_OPTS', "-Xmx2G -Xms1G -XX:MaxPermSize=1G -server"
+    environment 'METADATA_HOST', 'localhost:8080' // this is localhost if you're using docker machine or not
+    environment 'METADATA_USERNAME', "metadata"
+    environment 'METADATA_PASSWORD', "metadata"
+    environment 'METADATA_JDBC_URL', "jdbc:mysql://${host}:43306/metadata?autoReconnect=true&useUnicode=yes&characterEncoding=UTF-8"
+    environment 'MC_ES_HOST', host
+    environment 'MC_ES_PORT', "49300"
+    environment 'MC_MAIL_FROM', "tester@metadata.org.uk"
+    environment 'MC_MAIL_HOST', host
+    environment 'MC_MAIL_PORT', "41025"
+    environment 'MC_ALLOW_SIGNUP', "true"
+    environment 'MC_INDEX_PREFIX', "production"
+    environment 'MC_ADMIN_EMAIL', "admin@metadata.org.uk"
+    environment 'MC_SUPERVISOR_EMAIL', "supervisor@metadata.org.uk"
+
+    def cmds = [grailsw, 'prod']
+
+    if (project.hasProperty('mc.war')) {
+        cmds << 'run-war'
+    } else {
+        cmds << 'run-app'
+    }
+
+    if (project.hasProperty('mc.debug')) {
+        cmds << '--debug-fork'
+    }
+
+    cmds << ' --non-interactive'
+
+    if (project.hasProperty('mc.search.elasticsearch.host')) {
+        cmds << "-Dmc.search.elasticsearch.host=${project.getProperty('mc.search.elasticsearch.host')}"
+    }
+
+    if (project.hasProperty('mc.config.location')) {
+        cmds << "-Dmc.config.location=${project.getProperty('mc.config.location')}"
+    }
+
+    commandLine cmds
+}
+
+task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initTestDatabaseInMYSQLContainer]) {
+    description = "Run all Grails MX tests"
+
+    assertJava8()
+    environment 'GRAILS_OPTS', "-Xmx2G -Xms1G -XX:MaxPermSize=1G -server"
+    environment 'DOCKERIZED_TESTS', "true"
+    environment 'FILE_OPENER_SKIP', "true"
+    environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
+    environment 'MC_DOCKER_HOST', host
+
+    commandLine grailsw, 'test-app', '-war', '--non-interactive'
+
+    inputs.files files('grails-app')
+    inputs.files files('src')
+    inputs.files files('web-app')
+    inputs.files files('test/functional')
+    inputs.files files('test/integration')
+    inputs.files files('test/unit')
+
+    outputs.files file('target/test-reports/')
+}
+
+task runKarmaTests(type: NodeTask) {
+    description = "Runs Karma tests"
+    script = file('node_modules/karma/bin/karma')
+    args = [ 'start', '--single-run', '--browsers', 'Firefox']
+    inputs.files file('karma.conf.json')
+    inputs.files files('test/js')
+    inputs.files files('grails-app/assets')
+    outputs.files file('target/test-reports-js')
+    dependsOn([bowerInstall, runGrailsTests])
+}
+
+task collectTestReports(type: Copy) {
+    description = "Collects reports from Grails tests"
+    from('target') {
+        include 'geb-reports/**'
+        include 'test-reports/**'
+        include 'test-reports-js/**'
+        include 'assets/modelcatalogue/modelcatalogue-*.*'
+    }
+    into "${System.getProperty('user.home')}/reports/"
+}
+
+task stop(type: Exec) {
+    description = "Stops running MX application"
+    commandLine grailsw, 'stop-app','--non-interactive'
+}
+
+bowerInstall.finalizedBy cleanUpBowerDependencies
+stop.finalizedBy stopContainers
+
+
+task war(type: Exec, dependsOn: bowerInstall) {
+    description = "Build production war of MX application"
+    commandLine grailsw, 'war', '--non-interactive'
+}
+
+
+task copyWar(type: Copy) {
+    from 'target', {
+        include '*.war'
+        rename '.*\\.war', 'mc.war'
+    }
+    into '../build'
+}
+
+war.finalizedBy copyWar
+
+private static String getGrailsw()  {
+   if (Os.isFamily(Os.FAMILY_WINDOWS))  {
+      return "grailsw.bat"
+   }
+    return "./grailsw"
+}
+
+private static String getDockerHost() {
+    if (Os.isFamily(Os.FAMILY_WINDOWS))  {
+        try {
+            return "docker-machine ip".execute().text.trim()
+        } catch(ignored) {
+            System.err.println "Cannot determine docker ip, falling back to 'localhost'"
+            return 'localhost'
+        }
+
+    }
+    return "localhost"
+}
+
+private static void assertJava8()  {
+    assert org.gradle.internal.jvm.Jvm.current().javaVersion.java8Compatible
+}
+
+private static String getBindPath(File file) {
+    if (Os.isFamily(Os.FAMILY_WINDOWS))  {
+        return "/${file.absolutePath.replaceAll('\\\\', '/').replaceAll('C:/', 'c/')}"
+    }
+    return file.absolutePath
+}
