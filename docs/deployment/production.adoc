@@ -1,6 +1,6 @@
 = Configuration for Production
-You can create a production WAR by running `war.sh` script located at the root of the project directory. You can also
-run the catalogue in production environment for testing purposes on embedded Tomcat by running `run-war.sh` script.
+You can create a production WAR by running `./gradlew war` script located at the root of the project directory. You can also
+run the catalogue in production environment for testing purposes on embedded Tomcat by running `./gradlew runProd` task.
 Configuration of data source, Discourse integration and OAuth 2.0 security providers such as Google, Facebook or Twitter
 for production environment is externalized into file called `mc-config.groovy`.
 
@@ -11,8 +11,6 @@ otherwise the catalogue will not start.
 For local testing place your `mc-config.groovy` file into your `$USER_HOME/.grails/` directory.
 For running on Tomcat place your `mc-config.groovy` file into your Tomcat's `conf` directory (`$CATALINA_BASE/conf/`).
 
-NOTE: You can add the path to the config file as the first parameter to `run-prod.sh` to run against different
-production environment.
 
 == Database Configuration
 For detailed information about setting the data source, please, follow the instruction in
@@ -20,8 +18,7 @@ http://grails.github.io/grails-doc/2.4.3/guide/conf.html#dataSource[the DataSour
 Documentation.
 
 NOTE: Model Catalogue has been so far tested only using MySQL Database. Default configuration provides you the MySQL
-driver out of the box. To migrate your database when upgrading to newer version of the catalogue, you can use `migrate-db.sh`
-scripts which optionally takes the configuration file location as the first parameter.
+driver out of the box.
 
 .Sample MySQL Data Source Configuration
 ----
@@ -109,47 +106,6 @@ oauth {
 ----
 
 
-== Discourse Integration
-It is possible to enable catalogue to integrate with http://www.discourse.org/[Discourse] discussion forum. Purchase
-a hosted solution from their website or follow https://github.com/discourse/discourse/blob/master/docs/INSTALL-cloud.md[the
-instruction how to install Discourse on your own cloud server (or any other Ubuntu server)].
-
-Visit `/admin/api` admin page of your Discourse server when you have set it up successfully and generate new _API Key_.
-Also enable Single Sign-In on `/admin/site_settings/category/login`. You have to
-
- . Check _enable sso_ option
- . Check _enable sso provider_ option
- . Set _sso url_ input to `<your model catalogue website>/sso/discourse`
- . Set _sso secret_
-
-
-IMPORTANT: All catalogue users should have their emails set when the catalogue is integrated with Discourse.
-
-.Discourse configuration
-----
-discourse {
-    // URL where the discourse server is running
-    url = "http://discourse.example.com/"
-    api {
-        // API Key generated at /admin/api
-        key = "af9402ba45b8f4aff5a84bcdf6da85fc7548db746026c5095ed652d0f83fcd8b"
-        // user to be used as an author for automatically generated posts
-        user = "discourse"
-    }
-    users {
-        // set the fallback email in case the email is not set in the catalogue
-        // :username literal is replaced with the actual username
-        // if you're using GMail or Google Apps Email you can use following pattern
-        // as anything after plus sign is ignored
-        fallbackEmail = 'your.name+:username@gmail.com'
-    }
-    sso {
-        // sso key set at /admin/site_settings/category/login
-        key = "notasecret"
-    }
-}
-----
-
 == Home Page Customisation
 
 You can customize the text of the home page by setting HTML content into the `mc.welcome.jumbo` and `mc.welcome.info`
@@ -159,9 +115,4 @@ text under the big gray box.
 == Relationship Types Synchronization
 Relationship types are crutial part of the model catalogue. If you want to stay always synchronized with their
 expected values, set `mc.sync.relationshipTypes` config property to `true`.
-
-////
-== Known Issues
-=== Using Reverse Proxy to Map to Different Context Path
-////
 
