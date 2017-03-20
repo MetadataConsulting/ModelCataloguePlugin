@@ -90,8 +90,8 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             attrs.href = element.getDefaultModelCatalogueId(!context.idIncludeVersion)
         }
 
-        if (element.status != ElementStatus.FINALIZED) {
-            if (element.status in [ElementStatus.DRAFT, ElementStatus.DEPRECATED]) {
+        if (shouldPrintStatusForElement(element)) {
+            if (element.status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED, ElementStatus.DRAFT]) {
                 attrs.status = element.status
             } else {
                 throw new IllegalArgumentException("Cannot print ${element.getClass().simpleName} with status $element.status")
@@ -237,5 +237,8 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
 
     abstract String getTopLevelName()
 
+    protected boolean shouldPrintStatusForElement(CatalogueElement element) {
+        return HibernateHelper.getEntityClass(element) == DataModel || element.status == ElementStatus.DEPRECATED
+    }
 
 }

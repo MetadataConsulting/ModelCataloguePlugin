@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?><catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry.xsd">
-    <dataClass name="Locomotive" id="http://www.example.com/models/Locomotive" status="DRAFT">
-        <dataElement name="Factor of Adhesion" id="http://www.example.com/elements/Adhesion" status="DRAFT">
-            <dataType name="Force" id="http://www.example.com/domains/Force" status="DRAFT">
+    <dataClass name="Locomotive" id="http://www.example.com/models/Locomotive">
+        <dataElement name="Factor of Adhesion" id="http://www.example.com/elements/Adhesion">
+            <dataType name="Force" id="http://www.example.com/domains/Force">
                 <description>A force is a push or pull upon an object resulting from the object's interaction with another object.</description>
                 <dataType name="Decimal"
                           id="http://www.example.com/types/Decimal"
-                          status="DRAFT">
+                         >
                     <description>A number that uses a decimal point followed by digits that show a value smaller than one.</description>
                 </dataType>
                 <regex>\d+</regex>
-                <measurementUnit name="Newton" id="http://www.example.com/units/Newton" status="DRAFT" symbol="N">
+                <measurementUnit name="Newton" id="http://www.example.com/units/Newton" symbol="N">
                     <description>The newton (symbol: N) is the International System of Units (SI) derived unit of force.</description>
                     <extensions>
                         <extension key="From">SI</extension>
@@ -17,13 +17,13 @@
                 </measurementUnit>
             </dataType>
         </dataElement>
-        <dataClass name="Engine" id="http://www.example.com/models/Engine" status="DRAFT">
+        <dataClass name="Engine" id="http://www.example.com/models/Engine">
             <dataElement ref="http://www.example.com/elements/Adhesion">
                 <metadata>
                     <extension key="Min. Occurs">0</extension>
                 </metadata>
             </dataElement>
-            <validationRule name="Locomotives Rules" id="http://www.example.com/rules/LocomotivesRules" status="DRAFT">
+            <validationRule name="Locomotives Rules" id="http://www.example.com/rules/LocomotivesRules">
                 <component>Southeast Lines</component>
                 <ruleFocus>Focus on trains not cars</ruleFocus>
                 <trigger>When the new route is planned</trigger>

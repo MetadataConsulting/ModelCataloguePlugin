@@ -35,7 +35,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
         writable.writeTo(writer)
         expect:
         writer.toString() == '''<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry.xsd">
-  <dataType name="Test" id="http://example.com/specialchars" status="DRAFT">
+  <dataType name="Test" id="http://example.com/specialchars">
     <description>diagnosis.&#402;&#8218;&#402;&#8218;&#402;&#8218;'&#8218;&#8220; e</description>
   </dataType>
 </catalogue>'''

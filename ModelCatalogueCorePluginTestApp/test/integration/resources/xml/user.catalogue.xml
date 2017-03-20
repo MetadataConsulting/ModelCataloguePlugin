@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry.xsd">
-    <dataType name="User" id="http://www.example.com/types/User" status="DRAFT">
+    <dataType name="User" id="http://www.example.com/types/User">
         <description>Reference to the user</description>
-        <dataClass name="User" id="http://www.example.com/classes/User" status="DRAFT">
+        <dataClass name="User" id="http://www.example.com/classes/User">
             <description>The user of the system</description>
         </dataClass>
     </dataType>

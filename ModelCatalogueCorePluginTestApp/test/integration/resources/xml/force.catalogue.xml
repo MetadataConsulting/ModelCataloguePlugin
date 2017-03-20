@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry.xsd">
-    <dataType name="Force" id="http://www.example.com/domains/Force" status="DRAFT">
+    <dataType name="Force" id="http://www.example.com/domains/Force">
         <description>A force is a push or pull upon an object resulting from the object's interaction with another object.</description>
-        <dataType name="Decimal" id="http://www.example.com/types/Decimal" status="DRAFT">
+        <dataType name="Decimal" id="http://www.example.com/types/Decimal">
             <description>A number that uses a decimal point followed by digits that show a value smaller than one.</description>
         </dataType>
         <relatedTo ref="http://www.example.com/domains/Pressure">
@@ -11,7 +11,7 @@
             </metadata>
         </relatedTo>
         <regex>\d+</regex>
-        <measurementUnit name="Newton" id="http://www.example.com/units/Newton" status="DRAFT" symbol="N">
+        <measurementUnit name="Newton" id="http://www.example.com/units/Newton" symbol="N">
             <description>The newton (symbol: N) is the International System of Units (SI) derived unit of force.</description>
             <extensions>
                 <extension key="From">SI</extension>
