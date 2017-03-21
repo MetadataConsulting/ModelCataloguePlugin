@@ -2,35 +2,55 @@ package org.modelcatalogue.core.sanityTestSuite.Login
 
 
 import geb.spock.GebSpec
+import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 
 /**
  * Created by Berthe on 13/03/2017.
  */
-class ValidateRegistrationSpec extends GebSpec {
-    public static final String model ="div.panel-body>div"
+class ValidateRegistrationSpec extends  AbstractModelCatalogueGebSpec {
+    private static final String signUP="a.btn"
+    private static final String newUsername="input#username-new"
+    private static final String newEmail="input#email-new"
+    private static final String  password="input#password"
+    private static final String  password2="input#password2"
+    public static final String  createButton ="button.btn"
+    private static final String  header = "div.panel-heading"
+    private static final String  alert  ="div.alert"
     static WebDriver driver
 
     void goToRegistration(){
 
         when:
-        driver = browser.driver
-        driver.manage().deleteAllCookies()
-        go(baseUrl)
-        $("a.btn").click()
+            // open browser
+            driver = browser.driver
+            // maximize window
+            driver.manage().window().maximize()
+            go baseUrl
+             // click on sign up
+             click signUP
+
         then:
-        assert $("span",class:"mc-name").text()=="Model Catalogue"
+            // verify the page title
+            check( header).contains("Create a new account")
+
 
         when:
-        $("input#username-new").value("tatiana")
-        find(By.cssSelector("input#email-new")).value("berthe.kuatche@metadataconsulting.co.uk")
-        $("input#password").value("berthe32~~")
-        $("input#password2").value("berthe32~~")
-        $("button.btn").click()
+            //  enter new username
+            fill newUsername with("tatiana")
+           // type new email
+           fill(newEmail)with("berthe.kuatche@metadataconsulting.co.uk")
+           // type password
+            fill(password)with("berthe32~~")
+           // type the same password
+           fill(password2)with("berthe32~~")
+           // click pn create
+            click createButton
 
         then:
-        noExceptionThrown()
+            check alert displayed
+
 
     }
 

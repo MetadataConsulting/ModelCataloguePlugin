@@ -1,37 +1,25 @@
 package org.modelcatalogue.core.sanityTestSuite.Login
 
 import geb.spock.GebSpec
+import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.openqa.selenium.WebDriver
 
 /**
  * Created by Berthe on 13/03/2017.
  */
-class LoginSpec extends GebSpec {
+class LoginSpec extends AbstractModelCatalogueGebSpec {
+
+    private static final String models ="li#my-models>a"
 
     void doLoginAndClickCheckBox (){
        when:
-        WebDriver driver = browser.driver
-        go(baseUrl)
-        // click on login
-        $("button.btn").click()
-        then:
-        // verify that username or email present on the page
-       assert $("label",for:"username").text()=="Username or Email"
-
-        when:
-        // enter username , password and check remenber me
-        $("input#username").value("viewer")
-        $("input#password").value("viewer")
-        $("div.checkbox>label>input").click()
-        // click on login
-        $("button.btn-success").click()
-        Thread.sleep(1000L)
+           loginViewer()
 
         then:
+            check models is("My Models")
 
-      // assert $("//a[contains(text(),'My Models')]").text() ==" My Models"
-        noExceptionThrown()
-        driver.close()
+
+
 
     }
 }

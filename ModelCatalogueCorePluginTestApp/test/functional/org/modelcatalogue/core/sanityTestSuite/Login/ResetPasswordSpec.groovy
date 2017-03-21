@@ -1,47 +1,58 @@
 package org.modelcatalogue.core.sanityTestSuite.Login
 
-import geb.spock.GebSpec
-import org.openqa.selenium.By
+import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.openqa.selenium.WebDriver
 
 /**
  * Created by Berthe on 14/03/2017.
  */
-class ResetPasswordSpec extends GebSpec {
+class ResetPasswordSpec extends AbstractModelCatalogueGebSpec {
+    private static final String login ="button.btn"
+    private static final String resetPassword ="p.help-block>a"
+    private static final String email ="input#username-new"
+    private static final String resetMyPassword ="button.btn"
 
     void doResetPassword(){
         when:
-        // navigate to model catalogue
-        WebDriver driver = browser.driver
-        go(baseUrl)
-        // click on login
-        $("button.btn").click()
+             // navigate to model catalogue
+             WebDriver driver = browser.driver
+             go(baseUrl)
+             // click on login
+             click login
         then:
-        // verify that username or email present on the page
-        assert $("label",for:"username").text()=="Username or Email"
+             // verify that username or email present on the page
+              $("label",for:"username").text()=="Username or Email"
 
         when:
-        // click on reset password button
-        $("p.help-block>a").click()
-        find(By.cssSelector("input#username-new")).value("berthe.kuatche@metadataconsulting.co.uk")
-        find(By.cssSelector("button.btn")).click()
-
-
+             // click on reset password button
+             click resetPassword
         then:
-        // verify the error message
-        //assert title=="Model Catalogue"
-       //System.out.println( driver.getTitle())
-        assert $("div.alert-danger").text()=="No user was found with that username"
-        noExceptionThrown()
+             // verify header
+             $("div.panel-heading").text()=="Forgot Password"
 
         when:
-        // re- type the username
-        find(By.cssSelector("input#username-new")).value("viewer")
-        find(By.cssSelector("button.btn")).click()
+               // enter email address
+               fill(email)with("berthe.kuatche@metadataconsulting.co.uk")
+               // click on reset
+               click resetMyPassword
+
 
         then:
-        // verify the second error message
-        assert $("div.alert-danger").text()=="Given user doesn't have any email associated. Please, contact the administrator."
+             // verify the error message
+              $("div.alert-danger").text()=="No user was found with that username"
+
+
+        when:
+             // re- type the username
+             fill(email)with("viewer")
+            // click rest my password button
+            click resetMyPassword
+
+        then:
+             // verify the second error message
+            $("div.alert-danger").text()=="Given user doesn't have any email associated. Please, contact the administrator."
+
+
 
     }
 

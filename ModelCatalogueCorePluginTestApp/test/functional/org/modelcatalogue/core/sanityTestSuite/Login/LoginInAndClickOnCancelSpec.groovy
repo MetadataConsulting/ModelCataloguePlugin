@@ -13,20 +13,28 @@ class LoginInAndClickOnCancelSpec extends AbstractModelCatalogueGebSpec {
 
     private static final String cancel = "button.btn-warning"
     private static final String username="input#username"
-    private static final String password=""
+    private static final String password="input#password"
     private static final String login="button.btn"
+    private static final String primaryBtn="button.btn"
     void clickOnCancel() {
         when:
-        WebDriver driver = browser.driver
-        go(baseUrl)
-        click login
+            WebDriver driver = browser.driver
+            go(baseUrl)
+              click login
+        then:
+            $("a.btn-block").text()=="Login with Google"
 
-        // click on cancel
-        Thread.sleep(1000l)
-       click cancel
+       when:
+            // enter the username
+            fill(username)with("viewer")
+            // enter password
+            fill(password)with("viewer")
+            // click on cancel
+            click cancel
 
         then:
-        $("button",class:"btn btn-large btn-primary").text()== "Login"
+             check(primaryBtn)is("Login")
+
 
     }
 
