@@ -2,37 +2,31 @@ package org.modelcatalogue.core.sanityTestSuite.Login
 
 
 import geb.spock.GebSpec
+import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 
 /**
  * Created by Berthe on 13/03/2017.
  */
-class LoginInAndClickOnCancelSpec extends GebSpec {
-    public static final String model = "div.panel-body>div"
-    static WebDriver driver
+class LoginInAndClickOnCancelSpec extends AbstractModelCatalogueGebSpec {
 
+    private static final String cancel = "button.btn-warning"
+    private static final String username="input#username"
+    private static final String password=""
+    private static final String login="button.btn"
     void clickOnCancel() {
         when:
-       // navigate to model catalogue
-        driver = browser.driver
-        driver.manage().deleteAllCookies()
+        WebDriver driver = browser.driver
         go(baseUrl)
-        $("button.btn").click()
-        then:
-        // verification that login page open
-        assert $("div.modal-body>form>div:nth-child(1)>label").text()=="Username or Email"
+        click login
 
-        when:
-        // enter your username and password
-        $("input#username").value("viewer")
-        find(By.cssSelector("input#password")).value("viewer")
         // click on cancel
         Thread.sleep(1000l)
-        $("button.btn-warning").click()
+       click cancel
 
         then:
-        assert $("button",class:"btn btn-large btn-primary").text()== "Login"
+        $("button",class:"btn btn-large btn-primary").text()== "Login"
 
     }
 

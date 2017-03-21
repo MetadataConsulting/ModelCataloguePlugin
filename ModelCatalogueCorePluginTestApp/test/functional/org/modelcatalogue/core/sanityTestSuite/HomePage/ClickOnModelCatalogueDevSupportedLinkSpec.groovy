@@ -22,7 +22,9 @@ class ClickOnModelCatalogueDevSupportedLinkSpec extends GebSpec  {
         List<WebElement> Image= ModelDev.findElements(By.tagName("img"))
         // count image in the box
         int countImage = Image.size()
+        Thread.sleep(100000l)
         System.out.println(countImage)
+
         // loop to get alt of every images
         for(int i= 0 ; i<countImage; i++){
             //Image.get(i).getAttribute("atl")
@@ -38,6 +40,7 @@ class ClickOnModelCatalogueDevSupportedLinkSpec extends GebSpec  {
 
 
         then:
+        Thread.sleep(10000L)
         assert $("button",class:"btn btn-large btn-primary").text()== "Login"
         System.println("I found it")
 
