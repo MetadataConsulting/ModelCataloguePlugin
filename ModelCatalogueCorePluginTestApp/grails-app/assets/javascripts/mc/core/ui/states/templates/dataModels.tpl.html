@@ -7,20 +7,20 @@
             <div class="input-group input-group-lg">
               <span class="input-group-addon"><span class="fa fa-search"></span> </span>
               <input type="text" placeholder="{{'Search ' + getCurrentType()}}" class="form-control"
-                     ng-model="q" ng-model-options="{debounce: 500}" focus-me="true">
+                     ng-model="q" ng-model-options="{debounce: 500}" focus-me="true" id="data-model-search-box">
               <div class="input-group-btn">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false">
+                        aria-haspopup="true" aria-expanded="false" id="status-selector">
                   {{getCurrentStatus()}} <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right">
                   <li ng-class="{'active' : getCurrentStatus() == 'All'}">
-                    <a ng-click="changeStatus()">All</a>
+                    <a ng-click="changeStatus()" id="status-selector-all">All</a>
                   </li>
                   <li ng-class="{'active' : getCurrentStatus() == 'Draft'}">
-                    <a ng-click="changeStatus('draft')">Draft</a></li>
+                    <a ng-click="changeStatus('draft')" id="status-selector-draft">Draft</a></li>
                   <li ng-class="{'active' : getCurrentStatus() == 'Finalized'}">
-                    <a ng-click="changeStatus('finalized')">Finalized</a>
+                    <a ng-click="changeStatus('finalized')" id="status-selector-finalized">Finalized</a>
                   </li>
                 </ul>
               </div>

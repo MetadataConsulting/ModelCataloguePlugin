@@ -80,7 +80,6 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         }
 
         go "login/auth"
-        go "login/auth"
 
         $("#username").value(user)
         $("#password").value(pwd)
