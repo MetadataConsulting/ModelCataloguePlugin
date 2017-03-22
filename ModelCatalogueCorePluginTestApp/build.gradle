@@ -129,6 +129,7 @@ task runDev(type: Exec, dependsOn: bowerInstall) {
     cmds << '--non-interactive'
 
     commandLine cmds
+    mustRunAfter 'stop'
 }
 
 task ensureProductionConfig(type: Copy) {
@@ -363,6 +364,7 @@ task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, start
     }
 
     commandLine cmds
+    mustRunAfter 'stop'
 }
 
 task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initTestDatabaseInMYSQLContainer]) {
@@ -430,6 +432,10 @@ task copyWar(type: Copy) {
         rename '.*\\.war', 'mc.war'
     }
     into '../build'
+}
+
+task restartDev(dependsOn: [stop, runDev]) {
+
 }
 
 war.finalizedBy copyWar
