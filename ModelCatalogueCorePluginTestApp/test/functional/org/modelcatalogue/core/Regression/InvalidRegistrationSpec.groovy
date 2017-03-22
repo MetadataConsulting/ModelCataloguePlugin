@@ -1,7 +1,4 @@
 
-package org.modelcatalogue.core.RegressionTestSuite
-
-
 import geb.spock.GebSpec
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
