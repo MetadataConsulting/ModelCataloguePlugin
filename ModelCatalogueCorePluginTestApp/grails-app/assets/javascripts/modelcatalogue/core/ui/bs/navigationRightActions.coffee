@@ -391,4 +391,21 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   actionsProvider.registerChildAction 'import-data-models-screen', 'rare-disease-csv', rareDiseaseCsvImport
   actionsProvider.registerChildAction 'curator-menu', 'rare-disease-csv', rareDiseaseCsvImport
   actionsProvider.registerActionInRole 'global-import-csv', actionsProvider.ROLE_GLOBAL_ACTION, rareDiseaseCsvImport
+
+  actionsProvider.registerActionInRole 'connected', actionsProvider.ROLE_NAVIGATION_RIGHT, ($rootScope, messages, $window) ->
+    'ngInject'
+    if $rootScope.$$disconnected
+      return {
+        position:   -10000000
+        icon:       'fa fa-exclamation-triangle text-danger fa-fw fa-2x-if-wide'
+        label:      'Application is no longer receiving real-time updates from the server. Please, reload the page to reconnect.'
+        iconOnly:   true
+        action:     ->
+          messages.confirm(
+            'Application Disconnected',
+            'Application is disconnected and no longer accepts real-time updates from the server. Do you want to reload current page? All unsaved progress will be lost.'
+          ).then -> $window.location.reload()
+
+      }
+
 ]
