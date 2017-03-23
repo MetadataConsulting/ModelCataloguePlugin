@@ -265,11 +265,6 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
         'semanticVersion'
     }
 
-    @Override
-    protected boolean allowDelete() {
-        modelCatalogueSecurityService.hasRole('ADMIN')
-    }
-
     def history(Integer max) {
         String name = getResourceName()
         Class type = resource
