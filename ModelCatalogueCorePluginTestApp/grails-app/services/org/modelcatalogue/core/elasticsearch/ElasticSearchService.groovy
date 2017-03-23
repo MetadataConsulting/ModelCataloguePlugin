@@ -148,7 +148,7 @@ class ElasticSearchService implements SearchCatalogue {
             return Lists.emptyListWithTotalAndType(Relationship)
         }
 
-        String search = params.search?.toLowerCase()
+        String search = params.search
 
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
 
@@ -230,7 +230,7 @@ class ElasticSearchService implements SearchCatalogue {
 
     @Override
     public <T> ListWithTotalAndType<T> search(Class<T> resource, Map params) {
-        String search = params.search?.toLowerCase()
+        String search = params.search
         QueryBuilder qb
         List<String> indicies
 
@@ -255,7 +255,7 @@ class ElasticSearchService implements SearchCatalogue {
                 boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
             }
 
-            boolQuery.should(QueryBuilders.prefixQuery('name', search).boost(200))
+            boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
             boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.termQuery('ext.value', search)).boost(10))
 
             qb = boolQuery
@@ -268,7 +268,7 @@ class ElasticSearchService implements SearchCatalogue {
                 boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
             }
 
-            boolQuery.should(QueryBuilders.prefixQuery('name', search).boost(200))
+            boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
 
             qb = boolQuery
         } else if (DataModelPolicy.isAssignableFrom(resource)) {
@@ -280,7 +280,7 @@ class ElasticSearchService implements SearchCatalogue {
                 boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
             }
 
-            boolQuery.should(QueryBuilders.prefixQuery('name', search).boost(200))
+            boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
 
             qb = boolQuery
         } else {
