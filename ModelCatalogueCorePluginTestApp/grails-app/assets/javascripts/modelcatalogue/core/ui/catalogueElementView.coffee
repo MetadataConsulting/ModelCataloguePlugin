@@ -44,6 +44,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       $scope.rest = rest
       $scope.modelCatalogueApiRoot = modelCatalogueApiRoot
       $scope.globalMessages = messages
+      $scope.security = security
 
 
 
