@@ -127,6 +127,7 @@ task runDev(type: Exec, dependsOn: bowerInstall) {
     }
 
     cmds << '--non-interactive'
+    cmds << '--stacktrace'
 
     commandLine cmds
 }
@@ -352,7 +353,8 @@ task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, start
         cmds << '--debug-fork'
     }
 
-    cmds << ' --non-interactive'
+    cmds << '--non-interactive'
+    cmds << '--stacktrace'
 
     if (project.hasProperty('mc.search.elasticsearch.host')) {
         cmds << "-Dmc.search.elasticsearch.host=${project.getProperty('mc.search.elasticsearch.host')}"
@@ -375,7 +377,7 @@ task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initT
     environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
     environment 'MC_DOCKER_HOST', host
 
-    commandLine grailsw, 'test-app', '-war', '--non-interactive'
+    commandLine grailsw, 'test-app', '-war', '--non-interactive', '--stacktrace'
 
     inputs.files files('grails-app')
     inputs.files files('src')
@@ -411,7 +413,7 @@ task collectTestReports(type: Copy) {
 
 task stop(type: Exec) {
     description = "Stops running MX application"
-    commandLine grailsw, 'stop-app','--non-interactive'
+    commandLine grailsw, 'stop-app','--non-interactive', '--stacktrace'
 }
 
 bowerInstall.finalizedBy cleanUpBowerDependencies
@@ -420,7 +422,7 @@ stop.finalizedBy stopContainers
 
 task war(type: Exec, dependsOn: bowerInstall) {
     description = "Build production war of MX application"
-    commandLine grailsw, 'war', '--non-interactive'
+    commandLine grailsw, 'war', '--non-interactive', '--stacktrace'
 }
 
 
