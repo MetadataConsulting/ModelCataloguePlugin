@@ -29,8 +29,6 @@ class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
        then:
        noExceptionThrown()
         Thread.sleep(10000L)
-       driver.quit()
-
     }
 
   }

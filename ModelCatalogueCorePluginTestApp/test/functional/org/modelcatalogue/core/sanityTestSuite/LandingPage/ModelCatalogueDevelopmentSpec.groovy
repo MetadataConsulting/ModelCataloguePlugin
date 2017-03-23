@@ -41,7 +41,6 @@ class ModelCatalogueDevelopmentSpec extends AbstractModelCatalogueGebSpec {
         then:
        assert $("footer.row>div>div>div>div>div:nth-child(3)>p:nth-child(1)>a>img").size()==1
         Thread.sleep(10000L)
-        driver.quit()
     }
 
 }
