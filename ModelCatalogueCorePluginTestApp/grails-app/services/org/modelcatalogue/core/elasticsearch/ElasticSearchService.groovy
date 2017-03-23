@@ -148,7 +148,7 @@ class ElasticSearchService implements SearchCatalogue {
             return Lists.emptyListWithTotalAndType(Relationship)
         }
 
-        String search = params.search
+        String search = params.search?.toLowerCase()
 
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
 
@@ -230,7 +230,7 @@ class ElasticSearchService implements SearchCatalogue {
 
     @Override
     public <T> ListWithTotalAndType<T> search(Class<T> resource, Map params) {
-        String search = params.search
+        String search = params.search?.toLowerCase()
         QueryBuilder qb
         List<String> indicies
 
