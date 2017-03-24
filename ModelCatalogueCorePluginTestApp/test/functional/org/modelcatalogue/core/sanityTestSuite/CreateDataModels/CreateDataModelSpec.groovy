@@ -57,7 +57,9 @@ class CreateDataModelSpec extends AbstractModelCatalogueGebSpec {
 
         then:
             // please this unique for this data . change string data for your own data or use noexcep
-            check '#summary' is "Data Model $newModelName created"
+           // check '#summary' is "Data Model $newModelName created"
+             noExceptionThrown()
+
 
         cleanup:
             // click on close
