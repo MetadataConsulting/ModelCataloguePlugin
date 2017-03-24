@@ -1,5 +1,5 @@
 
-package org.modelcatalogue.core.RegressionTestSuite
+package org.modelcatalogue.core.Regression
 
 
 import geb.spock.GebSpec
@@ -20,7 +20,7 @@ class InvalidRegistrationSpec extends GebSpec {
 
         when:
         driver = browser.driver
-        driver.manage().deleteAllCookies()
+
         go(baseUrl)
 
         // click on Sign Up

@@ -18,7 +18,7 @@ class DataModelNavigatorSpec extends AbstractModelCatalogueGebSpec {
 
             when:
                  // login to model data
-                   loginViewer()
+                   loginCurator()
             then:
                  noExceptionThrown()
 
