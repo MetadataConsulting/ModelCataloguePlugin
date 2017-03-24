@@ -104,8 +104,6 @@ class MenuBarSpec extends AbstractModelCatalogueGebSpec {
        Thread.sleep(1000l)
        // verify login present
        assert $("button.btn").displayed
-       // close the windows
-       driver.close()
 
 
 

@@ -44,8 +44,6 @@ class ClickOnModelCatalogueDevSupportedLinkSpec extends GebSpec  {
         assert $("button",class:"btn btn-large btn-primary").text()== "Login"
         System.println("I found it")
 
-        driver.quit()
-
     }
 
 
