@@ -166,19 +166,6 @@ class GenomicsController {
         redirect controller: 'asset', id: assetId, action: 'show'
     }
 
-    def exportGelSpecification(Integer depth) {
-
-        DataModel model = DataModel.get(params.id)
-
-        if (!model) {
-            respond status: HttpStatus.NOT_FOUND
-            return
-        }
-        def assetId = genomicsService.genGelSpecification(model, depth)
-
-        response.setHeader("X-Asset-ID", assetId.toString())
-        redirect controller: 'asset', id: assetId, action: 'show'
-    }
 
     def exportCancerTypesAsJson() {
         DataModel model = DataModel.get(params.id)
