@@ -198,7 +198,7 @@ class DataModelToDocxExporter {
                 log.debug "found ${dataClasses.size()} top level dataClasses"
                 for (DataClass dClass in dataClasses) {
                     if(dClass.status!= ElementStatus.DEPRECATED) {
-                        docHelper.printModel(dClass, true, 1)
+                        docHelper.printClass(dClass, true, 1)
                     }
                 }
 
@@ -329,7 +329,7 @@ class DataModelToDocxExporter {
 
                 if(docHelper.rules) {
                     pageBreak()
-                    heading2 'Validation Rules'
+                    heading1 'Business Rules'
                     docHelper.printRules()
                 }
 
