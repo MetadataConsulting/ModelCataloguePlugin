@@ -43,7 +43,7 @@
                 {{view.title}}
               </span>
               <span ng-repeat="action in view.actions" class="btn" ng-class="action.icon"
-                    ng-hide="action.hide(element)"
+                    ng-hide="action.hide(element, security)"
                     ng-click="action.action(messages, element)" data-action-name="{{action.name}}">
               </span>
             </span>

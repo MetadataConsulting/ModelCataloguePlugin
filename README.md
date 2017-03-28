@@ -20,7 +20,6 @@ The Model Catalogue Plugin  allows users to define datasets as general platform-
  * [Using Grails Console in Production](docs/development/frameworks/grails_console.md)
 
 ## Development
- * [Running Model Catalogue in Development](docs/development/shell.md)
  * [Technology Stack](docs/development/frameworks/index.md)
  * [Migration from Version 1.x](docs/development/migration.adoc)
  * [Interacting with Model Catalogue using XML](docs/development/integration/xml.adoc)

@@ -44,6 +44,10 @@ catalogueElementPicker.directive 'catalogueElementPicker', ($compile, modelCatal
         })
         # create new catalogue element
         if (security.hasRole('CURATOR') &&
+          names.getPropertyNameFromType(value) != 'dataModelPolicy' &&
+          (messages.hasPromptFactory("create-#{names.getPropertyNameFromType(value)}") ||
+            messages.hasPromptFactory("edit-#{names.getPropertyNameFromType(value)}"))
+        ) || (security.hasRole('ADMIN') &&
           (messages.hasPromptFactory("create-#{names.getPropertyNameFromType(value)}") ||
             messages.hasPromptFactory("edit-#{names.getPropertyNameFromType(value)}"))
         )

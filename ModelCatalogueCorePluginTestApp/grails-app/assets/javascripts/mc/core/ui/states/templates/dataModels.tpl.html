@@ -7,7 +7,7 @@
             <div class="input-group input-group-lg">
               <span class="input-group-addon"><span class="fa fa-search"></span> </span>
               <input type="text" placeholder="{{'Search ' + getCurrentType()}}" class="form-control"
-                     ng-model="q" ng-model-options="{debounce: 500}" focus-me="true">
+                     ng-model="q" ng-model-options="{debounce: 1500}" focus-me="true" ng-disabled="loading">
               <div class="input-group-btn">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false">

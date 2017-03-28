@@ -143,9 +143,4 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
         }
         return Lists.wrap(params, "/${resourceName}/", dataClassService.getTopLevelDataClasses(overridableDataModelFilter, params))
     }
-
-    @Override
-    protected boolean allowDelete() {
-        modelCatalogueSecurityService.hasRole('ADMIN')
-    }
 }

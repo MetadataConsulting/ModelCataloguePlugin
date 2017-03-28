@@ -53,7 +53,7 @@ See [bower.json](../../../ModelCatalogueCorePlugin/bower.json) for information o
 ## Backend
 
 ### Frameworks and Libraries
-* [Grails 2.4.x](http://grails.github.io/grails-doc/2.4.5/) ecosystem
+* [Grails 2.5.x](http://grails.github.io/grails-doc/2.5.x/) ecosystem
 * [Grails Asset Pipeline](https://grails.org/plugin/asset-pipeline) for handling the frontend resources
 * [Grails Spring Security Core 2.0](https://grails.org/plugin/spring-security-core) for securing the application
 * [Grails Spring Security Core UI](https://grails.org/plugin/spring-security-ui) for managing the application users

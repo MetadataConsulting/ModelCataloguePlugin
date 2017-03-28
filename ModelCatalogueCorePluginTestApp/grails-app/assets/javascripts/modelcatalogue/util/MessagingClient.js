@@ -27,7 +27,9 @@
                     // $log.debug(message);
                 };
                 sockJS.onclose = function() {
-                  $rootScope.$broadcast('displayGlobalMessage', "Connection lost", "The application has been disconnected. Please, refresh the page.", 'error', true);
+                  $rootScope.$$disconnected = true;
+                  $rootScope.$broadcast('redrawContextualActions');
+                  $rootScope.$broadcast('messagingClientDisconnected');
                 };
             }
 
@@ -37,7 +39,9 @@
                     $interval.cancel(intervalPromise)
                 }
                 deferred.reject(err);
-                $rootScope.$broadcast('displayGlobalMessage', "Connection lost", "The application has been disconnected. Please, refresh the page.", 'error', true);
+                $rootScope.$$disconnected = true;
+                $rootScope.$broadcast('redrawContextualActions');
+                $rootScope.$broadcast('messagingClientDisconnected');
             });
 
             if (this.isConnected()) {
