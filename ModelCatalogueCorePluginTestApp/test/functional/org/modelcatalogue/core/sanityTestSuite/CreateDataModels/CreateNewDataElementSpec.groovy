@@ -2,54 +2,57 @@ package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 
+import static org.modelcatalogue.core.geb.Common.create
+import static org.modelcatalogue.core.geb.Common.description
+import static org.modelcatalogue.core.geb.Common.getRightSideTitle
+import static org.modelcatalogue.core.geb.Common.messages
+import static org.modelcatalogue.core.geb.Common.modalHeader
+import static org.modelcatalogue.core.geb.Common.modelCatalogueId
+import static org.modelcatalogue.core.geb.Common.nameLabel
+import static org.modelcatalogue.core.geb.Common.save
+
 
 class CreateNewDataElementSpec extends AbstractModelCatalogueGebSpec {
-   private static final String create ="a#role_data-models_create-data-modelBtn"
-    private static final String search_box="input#data-model-search-box"
-    private static final String MODEL="span.text-muted"
-    private static final String dataModel="a#role_item_catalogue-element-menu-item-link>span:nth-child(1)"
-    private static final String dataElement="a#catalogue-element-create-dataElement-menu-item-link>span:nth-child(3)"
-    private static final String createDataElement="div.modal-header>h4"
-    private static final String  name="input#name"
-    private static final String  catelogueId="input#modelCatalogueId"
-    private static final String  description="textarea#description"
-    private static final String  save="a#role_modal_modal-save-elementBtn>span:nth-child(2)"
-    private static final String  button ="div.content-row>div>div:nth-child(2)>div:nth-child(1)>div>div:nth-child(2)>div>div:nth-child(4)>div>div>div>div:nth-child(11)>div:nth-child(1)>div:nth-child(1)>h3>a>span:nth-child(1)"
+    private static final String OK ="button.btn-primary"
+    private static final String search="input#elements"
+    private static final String  dataType ="span.input-group-addon"
+    private static final String  addImport="div.search-lg>p>span>a:nth-child(3)"
+   // private static final String  create ="span.text-success"
+    private static final String  button ="div.input-group-addon"
     static String myName=" testind data element ${System.currentTimeMillis()}"
     static String myCatalogue="324${System.currentTimeMillis()}"
     static String myDescription=" hello there ${System.currentTimeMillis()}"
 
-    void createDataElement(){
-
+    def"login and navigate to Data Model"() {
         when:
-             // login as curator
-              loginCurator()
+             loginAdmin()
+             select 'Test 6'
+             selectInTree 'Data Elements'
         then:
-             // verify create button present
-              $(create).text()=="Create"
-
+            check rightSideTitle is 'Active Data Elements'
+    }
+    def" navigate to data element creation page"() {
         when:
-             // search for your model
-             click button
+             click create
         then:
-              noExceptionThrown()
+            check modalHeader contains 'Create Data Element'
+    }
+    def " fill the create data element form"(){
+        when:
+            fill nameLabel with myName
 
-        when:
-              // click on data model
-              click dataModel
-             // click on data element
-             click dataElement
-        then:
-             noExceptionThrown()
-        when:
-            // type name
-            fill(name)with(myName)
-            // type catalogue id
-             fill(catelogueId)with(myCatalogue)
-             // type description
-             fill(description)with(myDescription)
-             // click on save
-             click save
+             fill modelCatalogueId with myCatalogue
+
+             fill description with myDescription
+        and:
+            click dataType
+            click addImport
+            fill search with 'MET-523'
+            remove messages
+        and:
+            click OK
+            click button
+            click save
         then:
             noExceptionThrown()
 

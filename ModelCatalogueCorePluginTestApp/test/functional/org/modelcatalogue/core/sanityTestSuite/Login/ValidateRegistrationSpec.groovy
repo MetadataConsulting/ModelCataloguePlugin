@@ -49,7 +49,7 @@ class ValidateRegistrationSpec extends  AbstractModelCatalogueGebSpec {
             click createButton
 
         then:
-            check alert displayed
+           check(alert)displayed
 
 
     }

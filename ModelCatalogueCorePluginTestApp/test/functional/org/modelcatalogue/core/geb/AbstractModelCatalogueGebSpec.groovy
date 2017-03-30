@@ -73,6 +73,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     def loginUser(String user, String pwd) {
+        browser.driver.manage().window().maximize()
         go "logout"
 
         waitFor (120) {

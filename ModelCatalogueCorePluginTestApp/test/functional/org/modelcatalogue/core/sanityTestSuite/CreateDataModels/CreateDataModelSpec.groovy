@@ -6,9 +6,6 @@ import org.openqa.selenium.Keys
 import static org.modelcatalogue.core.geb.Common.*
 
 
-/**
- * Created by Berthe on 17/03/2017.
- */
 class CreateDataModelSpec extends AbstractModelCatalogueGebSpec {
     private static final CatalogueAction create = CatalogueAction.runFirst('data-models', 'create-data-model')
     private static final String name = "input#name"
@@ -48,7 +45,7 @@ class CreateDataModelSpec extends AbstractModelCatalogueGebSpec {
             check "button#step-imports" is "2. Imports"
 
         when:
-            // type c in the search box and select first item
+            // type c in the search box and selectRelation first item
             fill importData with text and pick first item
 
             // click on finish
@@ -69,7 +66,7 @@ class CreateDataModelSpec extends AbstractModelCatalogueGebSpec {
 
         where:
         newModelName                                | versionElement | catalogue                            | policy   | text
-        "my model ${System.currentTimeMillis()}"    | "2.1.28"       | "MT-${System.currentTimeMillis()}"   | "c"      | "c"
+        "my Test ${System.currentTimeMillis()}"    | "2.1.28${System.currentTimeMillis()}"| "MT-${System.currentTimeMillis()}"   | "c"      | "c"
 
 
 

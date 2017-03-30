@@ -43,7 +43,7 @@ class CreateDataModelAndCreatePolicesSpec extends AbstractModelCatalogueGebSpec 
                fill(catalogueId)with(catalogue)
                //click om more icon
                 click moreIcon
-                // select unique of kind
+                // selectRelation unique of kind
                click uniqueOfKind
                // enter policies
                fill(policies)with(mypolicies)

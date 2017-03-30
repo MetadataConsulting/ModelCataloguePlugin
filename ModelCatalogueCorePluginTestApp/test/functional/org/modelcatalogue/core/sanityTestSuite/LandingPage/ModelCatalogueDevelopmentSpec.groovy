@@ -23,11 +23,11 @@ class ModelCatalogueDevelopmentSpec extends AbstractModelCatalogueGebSpec {
         noExceptionThrown()
 
         when:
-        // select model catalogue development supported
+        // selectRelation model catalogue development supported
         WebElement DEV =driver.findElement(By.cssSelector(modelDevBox))
         // wait for one min
         Thread.sleep(1000L)
-        // select all the image on the box
+        // selectRelation all the image on the box
          List<WebElement> LIST= DEV.findElements(By.xpath("//a[@class='text-muted']"))
         Thread.sleep(1000L)
         // click on all the image

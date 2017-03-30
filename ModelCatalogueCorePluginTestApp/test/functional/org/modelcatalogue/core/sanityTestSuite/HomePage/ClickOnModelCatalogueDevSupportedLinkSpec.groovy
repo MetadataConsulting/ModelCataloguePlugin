@@ -17,7 +17,7 @@ class ClickOnModelCatalogueDevSupportedLinkSpec extends GebSpec  {
         driver = browser.driver
         driver.manage().deleteAllCookies()
         go(baseUrl)
-        // select the box containing model catalogue development supprot
+        // selectRelation the box containing model catalogue development supprot
         WebElement ModelDev= driver.findElement(By.cssSelector(model))
         List<WebElement> Image= ModelDev.findElements(By.tagName("img"))
         // count image in the box
