@@ -19,7 +19,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     // sauce labs connector for some reason fails with the six in the input
     def loginAdmin() { loginUser("admin", "admin") }
     def loginViewer() { loginUser("viewer", "viewer") }
-    def loginCurator() { loginUser("curator", "creator") }
+    def loginCurator() { loginUser("curator", "curator") }
 
     def login(ApplicationUser user) {
         loginUser(user.username, user.password)
@@ -73,6 +73,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     def loginUser(String user, String pwd) {
+        browser.driver.manage().window().maximize()
         go "logout"
 
         waitFor (120) {

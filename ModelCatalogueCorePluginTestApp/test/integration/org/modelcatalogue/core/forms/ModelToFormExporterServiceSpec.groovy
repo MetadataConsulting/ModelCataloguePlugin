@@ -44,7 +44,7 @@ class ModelToFormExporterServiceSpec extends AbstractIntegrationSpec {
     public static final String ITEM_RADIO_NAME = "Radio Item"
     public static final String ITEM_RADIO_NAME_NORMALIZED = "Form_1_Section_1_Radio_Item"
     public static final String ITEM_SINGLE_SELECT_NAME = "Single Select Name"
-    public static final String ITEM_SINGLE_SELECT_DEFAULT_VALUE = 'Please, select one!'
+    public static final String ITEM_SINGLE_SELECT_DEFAULT_VALUE = 'Please, selectRelation one!'
     public static final String ITEM_TEXT_NAME = "Stuff with Units"
     public static final String ITEM_TEXT_NAME_NORMALIZED = "Form_1_Section_1_Stuff_with_Units"
 
