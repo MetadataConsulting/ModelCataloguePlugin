@@ -53,15 +53,14 @@ DETERMINISTIC
                 FROM (SELECT GROUP_CONCAT(r.destination_id) qc
                       FROM relationship r JOIN catalogue_element ce ON r.destination_id = ce.id WHERE r.source_id = front_id AND r.relationship_type_id = LeafType AND (find_in_set(ce.data_model_id, InitialQueue) OR find_in_set(ce.data_model_id, data_models_with_containment))) A;
 
-
+                SET rv = AddToSet(rv, leaves);
+                SET queue = AddToSet(queue_children, queue);
 
                 IF LENGTH(queue_children) = 0 THEN
                     IF LENGTH(queue) = 0 THEN
                         SET queue_length = 0;
                     END IF;
                 ELSE
-                    SET rv = AddToSet(rv, leaves);
-                    SET queue = AddToSet(queue_children, queue);
                     SET queue_length = LENGTH(queue) - LENGTH(REPLACE(queue,',','')) + 1;
                 END IF;
             END IF;
