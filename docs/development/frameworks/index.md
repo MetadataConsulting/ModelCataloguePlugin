@@ -11,6 +11,14 @@ Following dependecies are managed automatically if using [Model Catalogue with D
 
 ## Frontend
 
+Description of frontend structure by James:
+
+Most of the front end is written in AngularJS. The thing is, Grails and Angular are both MVC frameworks in their own right, with their own dependency injection systems. So combining them is a bit of a nightmare. We use the Grails plugin, "Angular Asset Pipeline Plugin", its author Craig Burke describes an aspect of their combination: "By default the Asset Pipeline plugin will minify all the Javascript files in your project. This breaks the dependency injection used by AngularJS (which relies on specific parameter names)."
+
+The javascripts are contained in grails-app/assets/javascripts. There are two folders in javascripts, mc and modelcatalogue. mc of course stands for model catalogue, so this is a little bit confusing. mc is meant to contain most of the templates, which are managed by the Angular Template Asset Pipeline Plugin. Each template must have a corresponding angular module. These are declared in modelcatalogue.
+
+All the templates in mc are required by mc/index, which in turn is required by modelcatalogue/modelcatalogue, which defines a javascript variable, also called modelcatalogue, which is attached to the window. modelcatalogue/modelcatalogue is called by the Grails index view, at grails-app/views/index.gsp. All of its modules are used for the metadataCurator Angular module, which is registered to the main body of the index page. It appears to me that most of the app is in effect a "single-page app", although I am not sure of the details of how Grails controllers invoke this view.
+
 ### Tools
 * [NodeJS](https://nodejs.org/en/) ecosystem (tested with version 0.10.x)
 * [NPM](https://www.npmjs.com/) for managing tools dependencies
