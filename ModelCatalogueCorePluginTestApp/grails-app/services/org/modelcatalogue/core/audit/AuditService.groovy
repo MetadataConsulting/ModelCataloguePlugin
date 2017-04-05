@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.audit
 
-import com.google.common.collect.ImmutableList
 import grails.gorm.DetachedCriteria
 import grails.util.Holders
 import org.hibernate.SessionFactory
@@ -242,9 +241,22 @@ class AuditService {
             def offset = it?.offset
             boolean itemsQuery = it instanceof Map
 
+            final session = sessionFactory.currentSession
+
+            String tableName = 'change'
+
+            if (sessionFactory.currentSession.connection().metaData.databaseProductName == 'MySQL') {
+                tableName = "`change`"
+            } else if (sessionFactory.currentSession.connection().metaData.databaseProductName == 'H2') {
+                tableName = '"change"'
+            } else {
+                log.warn "Cannot quote the change table name properly, using backticks."
+                tableName = "`$tableName`"
+            }
+
             String query = """
-                select ch.* from `change` ch
-                left join `change` parent on parent.id = ch.parent_id
+                select ch.* from $tableName ch
+                left join $tableName parent on parent.id = ch.parent_id
                 where ch.latest_version_id = :lvid
                 and ch.system <> true
                 and ch.other_side <> true
@@ -252,8 +264,6 @@ class AuditService {
                 order by ch.date_created DESC 
 
             """
-
-            final session = sessionFactory.currentSession
 
             // Create native SQL query.
             final sqlQuery = session.createSQLQuery(query)
