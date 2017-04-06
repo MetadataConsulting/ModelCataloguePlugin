@@ -157,6 +157,9 @@
         modelcatalogue.welcome.info = "${grailsApplication.config.mc.welcome.info.encodeAsJSON()}";
 
         // create an app module based on registered modules
+        // The metadataCurator app module is based on all modules registered in 'modelcatalogue',
+        // which is defined in the javascripts folder. The modules registered should be
+        // only and all the modules defined in the javascripts folder.
         angular.module('metadataCurator', window.modelcatalogue.getModules()).run(['$state', function($state){
             // workaround https://github.com/angular-ui/ui-router/issues/2051
         }])
