@@ -3,33 +3,64 @@ package org.modelcatalogue.gel.export
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
-import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.*
-import org.modelcatalogue.core.export.inventory.ModelCatalogueStyles
+import org.modelcatalogue.core.util.Metadata
+import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.FileOpener
-import org.modelcatalogue.integration.xml.CatalogueXmlLoader
-import org.modelcatalogue.spreadsheet.query.api.Predicate
 import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
 import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
 
 class GridReportXlsxExporterSpec extends AbstractIntegrationSpec {
 
+    public static final String ROOT_DATA_CLASS_NAME = 'Registration GRDM'
     ElementService elementService
     DataModelService dataModelService
     DataClassService dataClassService
     GrailsApplication grailsApplication
-    CatalogueBuilder catalogueBuilder
-
-    DataModel dataModel
 
     @Rule TemporaryFolder temporaryFolder = new TemporaryFolder()
 
+    DataClass dataClass
+
     def setup() {
         initRelationshipTypes()
-        CatalogueXmlLoader loader = new CatalogueXmlLoader(catalogueBuilder)
-        loader.load(GridReportXlsxExporterSpec.getResourceAsStream('TestDataModelV1.xml'))
-        loader.load(GridReportXlsxExporterSpec.getResourceAsStream('TestDataModelV2.xml'))
-        dataModel = DataModel.findByNameAndSemanticVersion('TestDataModel', '2')
+        DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
+
+        builder.build {
+            dataModel (name: "Grid Report Data Model") {
+                dataClass(name: ROOT_DATA_CLASS_NAME) {
+                    dataClass(name: 'Essential Data') {
+                        dataClass(name: 'Registration and Consent') {
+                            dataClass(name: 'Patient Identifiers') {
+                                dataElement(name: 'Date of Birth') {
+                                    dataType(name: 'xs:date', dataModel: 'XMLSchema')
+                                    relationship {
+                                        ext Metadata.MIN_OCCURS, "1"
+                                        ext Metadata.MAX_OCCURS, "1"
+                                    }
+                                }
+                                dataElement(name: 'Fornames')
+                                dataElement(name: 'Surname')
+                                relationship {
+                                    ext Metadata.MIN_OCCURS, "1"
+                                    ext Metadata.MAX_OCCURS, "1"
+                                }
+                            }
+                            dataClass(name: 'Registration') {
+                                dataClass(name: 'Event Details') {
+                                    dataElement(name: 'Event Date') {
+                                        dataType(name: 'xs:date', dataModel: 'XMLSchema')
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        dataClass = DataClass.findByName(ROOT_DATA_CLASS_NAME)
+
     }
 
     def "export model to excel"() {
@@ -37,116 +68,12 @@ class GridReportXlsxExporterSpec extends AbstractIntegrationSpec {
         def file = temporaryFolder.newFile("${System.currentTimeMillis()}.xlsx")
 
         when:
-        GridReportXlsxExporter.forDataModel(dataModel, dataClassService, grailsApplication, Integer.MAX_VALUE).export(file.newOutputStream())
+        GridReportXlsxExporter.create(dataClass, dataClassService, grailsApplication, 5).export(file.newOutputStream())
         FileOpener.open(file)
 
         SpreadsheetCriteria query = PoiSpreadsheetQuery.FACTORY.forFile(file)
 
         then:
         noExceptionThrown()
-        query.exists {
-            sheet('Introduction') {
-                row {
-                    cell {
-                        value 'TestDataModel'
-                        style {
-                            font {
-                                size 22
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        query.exists {
-            sheet('Content') {
-                row {
-                    cell {
-                        value '1..10'
-                        style {
-                            foreground ModelCatalogueStyles.CHANGE_NEW_COLOR
-                        }
-                    }
-                }
-            }
-        }
-        query.exists {
-            sheet('Content') {
-                row {
-                    cell {
-                        value 'IMAGING'
-                        style {
-                            foreground ModelCatalogueStyles.CHANGE_NEW_COLOR
-                        }
-                    }
-                }
-            }
-        }
-        query.exists {
-            sheet('Content') {
-                row {
-                    cell {
-                        value 'DEMOGRAPHICS'
-                        style {
-                            foreground ModelCatalogueStyles.CHANGE_REMOVAL_COLOR
-                        }
-                    }
-                }
-            }
-        }
-        query.exists {
-            sheet(name(endsWith('Ovarian_Cancer'))) {
-                row {
-                    cell {
-                        value 'ORGANISATION CODE (CODE OF PROVIDER)'
-                        style {
-                            foreground ModelCatalogueStyles.CHANGE_NEW_COLOR
-        }   }   }   }   }
-        query.exists {
-            sheet(name(endsWith('Ovarian_Cancer'))) {
-                row {
-                    cell {
-                        value 'PERSON BIRTH DATE'
-                        style {
-                            foreground ModelCatalogueStyles.CHANGE_REMOVAL_COLOR
-        }   }   }   }   }
-        query.exists {
-            sheet(name(endsWith('Ovarian_Cancer'))) {
-                row {
-                    cell {
-                        value 'IMAGING'
-                        style {
-                            foreground ModelCatalogueStyles.CHANGE_NEW_COLOR
-        }   }   }   }   }
-        query.exists {
-            sheet(name(endsWith('Ovarian_Cancer'))) {
-                row {
-                    cell {
-                        value 'DEMOGRAPHICS'
-                        style {
-                            foreground ModelCatalogueStyles.CHANGE_REMOVAL_COLOR
-        }   }   }   }   }
-        query.exists {
-            sheet('Changes') {
-                row {
-                    cell {
-                        value 'Changes Summary'
-                        style {
-                            font {
-                                size 22
-                            }
-                        }
-                        colspan { it > 1 }
-                    }
-                }
-            }
-        }
-    }
-
-
-    private static Predicate<String> endsWith(String suffix) {
-        return { String s ->
-            s.endsWith(suffix)
-        } as Predicate<String>
     }
 }
