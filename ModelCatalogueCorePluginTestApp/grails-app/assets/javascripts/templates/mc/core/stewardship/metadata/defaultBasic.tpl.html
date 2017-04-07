@@ -1,0 +1,167 @@
+<div class="col-md-12 metadata-stewardship-item-content">
+
+    <!--
+    <div class="alert alert-warning" ng-if="editableForm.$visible">
+        The form metadata only applies on the root model of the form and is ignored for any nested models.
+    </div>
+    -->
+    <!--
+      "http://stewardship.modelcatalogue.org/stewardship#dataSteward" # name
+      "http://stewardship.modelcatalogue.org/stewardship#dataQualityAssessment" # name
+      "http://stewardship.modelcatalogue.org/stewardship#lastAudit" # date
+      "http://stewardship.modelcatalogue.org/stewardship#sensitivity" # sensitivity type
+      "http://stewardship.modelcatalogue.org/stewardship#databaseLocation" # url
+      "http://stewardship.modelcatalogue.org/stewardship#databaseAccessDetails" # string
+      -->
+    <table class="table table-condensed table-striped table-borderless table-no-margin small">
+        <tr ng-if="view.handlesKey('http://stewardship.modelcatalogue.org/stewardship#dataSteward')">
+            <th class="col-md-3">
+                Data Steward
+                <i class="fa fa-question"
+                   popover="The name of the data steward"
+                   popover-title="Data Steward"
+                   popover-trigger="mouseenter"></i>
+            </th>
+            <td class="full-width-editable">
+                <!-- presumably here is the meat of the data entry -->
+                <span editable-text="extAsMap['http://stewardship.modelcatalogue.org/stewardship#dataSteward']" class = "small">
+                    {{element.ext.get('http://stewardship.modelcatalogue.org/stewardship#dataSteward')}}
+                </span>
+            </td>
+        </tr>
+        <!-- I'd like to be able to generate these sort of automatically -->
+
+        <tr ng-if="view.handlesKey('http://forms.modelcatalogue.org/form#name')">
+            <th class="col-md-3">
+                Name
+                <!--
+                  TODO
+                  We cannot use popover-template as there is a bug in asset pipeline angular plugin
+                  https://github.com/craigburke/angular-template-asset-pipeline/issues/29
+                  - please consider to fix also other popovers as line breaks are not respected in result popover
+                -->
+                <i class="fa fa-question"
+                   popover="
+              Defines the name of the CRF as it will be displayed in the OpenClinica user interface. Defaults to
+              model's name. When a user is assigning CRFs to an event definition, they will be viewing this name.
+              A user performing data entry will identify the form by this name. Can contain up to 255 alphanumeric
+              characters."
+                   popover-title="Name"
+                   popover-trigger="mouseenter"></i>
+            </th>
+            <td class="full-width-editable">
+        <span editable-text="extAsMap['http://forms.modelcatalogue.org/form#name']" class="small" e-maxlength="255">
+          {{element.ext.get('http://forms.modelcatalogue.org/form#name')}}
+        </span>
+            </td>
+        </tr>
+
+        <tr ng-if="view.handlesKey('http://forms.modelcatalogue.org/form#version')">
+            <th class="col-md-3">
+                Version
+                <i class="fa fa-question"
+                   popover="
+              Defines the version of the CRF as it will be displayed in the OpenClinica user interface. Defaults to
+              model version number.
+
+              You cannot provide a value that has already been used in the OpenClinica instance unless it has not been
+              assigned to an event definition yet.  If a particular CRF version has not been used in an event definition,
+              you may overwrite it.
+
+              If this is a new version of a CRF that already exists, the CRF_NAME field must match the value of the form
+              already in OpenClinica.
+
+              A new version of a CRF would be needed due to a protocol change, adding or removing an item from a CRF, or
+              changing some of the questions.
+
+              Can contain up to 255 alphanumeric characters."
+                   popover-title="Version"
+                   popover-trigger="mouseenter"></i>
+            </th>
+            <td class="full-width-editable">
+        <span editable-text="extAsMap['http://forms.modelcatalogue.org/form#version']" class="small" e-maxlength="255">
+          {{element.ext.get('http://forms.modelcatalogue.org/form#version')}}
+        </span>
+            </td>
+        </tr>
+
+        <tr ng-if="view.handlesKey('http://forms.modelcatalogue.org/form#versionDescription')">
+            <th class="col-md-3">
+                Version Description
+                <i class="fa fa-question"
+                   popover="
+              This field is used for informational purposes to keep track of what this version of the CRF was created
+              for. Defaults to Model description or Generated from Model_Name.
+
+              This information appears as part of the CRF Metadata when the user clicks on View (original). This
+              information is not displayed during data entry.
+
+              Can contain up to 4000 alphanumeric characters."
+                   popover-title="Version Description"
+                   popover-trigger="mouseenter"></i>
+            </th>
+            <td class="full-width-editable">
+        <span editable-textarea="extAsMap['http://forms.modelcatalogue.org/form#versionDescription']" class="small"
+              e-maxlength="4000" e-rows="5">
+        {{element.ext.get('http://forms.modelcatalogue.org/form#versionDescription')}}
+      </span>
+            </td>
+        </tr>
+        <tr ng-if="view.handlesKey('http://forms.modelcatalogue.org/form#revisionNotes')">
+            <th class="col-md-3">
+                Revision Notes
+                <i class="fa fa-question"
+                   popover="
+              This field is used to keep track of the revisions you made to this particular CRF. Defaults to Generated
+              from Model_Name
+
+              This information appears as part of the CRF Metadata when the user clicks on View (original). This
+              information is not displayed during data entry.
+
+              If this is the first version of the CRF, you can simply state this is a brand new form.  Going forward,
+              as you make changes and update the versions you can provide information on what is different between the
+              first version and each subsequent version.
+
+              Can contain up to 255 alphanumeric characters."
+                   popover-title="Revision Notes"
+                   popover-trigger="mouseenter"></i>
+            </th>
+            <td class="full-width-editable">
+                <span editable-textarea="extAsMap['http://forms.modelcatalogue.org/form#revisionNotes']" class="small"
+                  e-maxlength="255" e-rows="5">
+              {{element.ext.get('http://forms.modelcatalogue.org/form#revisionNotes')}}
+                </span>
+            </td>
+        </tr>
+        <tr ng-if="view.handlesKey('http://forms.modelcatalogue.org/form#customizer')">
+            <th class="col-md-3">
+                Form Customization
+                <i class="fa fa-question"
+                   popover="Form customization Script"
+                   popover-title="Form Customization Script"
+                   popover-trigger="mouseenter"></i>
+            </th>
+            <td class="full-width-editable">
+        <span editable-textarea="extAsMap['http://forms.modelcatalogue.org/form#customizer']" class="small" e-rows="5">
+        {{element.ext.get('http://forms.modelcatalogue.org/form#customizer')}}
+      </span>
+            </td>
+        </tr>
+        <tr ng-if="view.handlesKey('http://forms.modelcatalogue.org/form#itemNames')">
+            <th class="col-md-3">
+                Item Names Override
+                <i class="fa fa-question"
+                   popover="
+              If some of the item names generated automatically by the exporter don't suite youre needs you can override
+              them by writing the generated names followed by equals sign and the new name, each name on separate line."
+                   popover-title="Item Names Override"
+                   popover-trigger="mouseenter"></i>
+            </th>
+            <td class="full-width-editable">
+        <span editable-textarea="extAsMap['http://forms.modelcatalogue.org/form#itemNames']" class="small" e-rows="5">
+        {{element.ext.get('http://forms.modelcatalogue.org/form#itemNames')}}
+      </span>
+            </td>
+        </tr>
+    </table>
+</div>
