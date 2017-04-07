@@ -1,6 +1,23 @@
 window.modelcatalogue.registerModule('mc.core.stewardship')
 
-stewardship = angular.module('mc.core.stewardship', ['mc.core.ui.detailSections'])
+angular.module('mc.core.stewardship.metadata', [])
+
+stewardship = angular.module('mc.core.stewardship',
+  ['mc.core.ui.detailSections',
+    'mc.core.stewardship.metadata' # Need to include this to use the templates under stewardship/metadata
+    # bootstrap for date picker?
+    #,'ui.bootstrap'
+  ])
+
+# List of levels to be selected for sensitivity
+stewardship.controller 'SelectSensitivity', ($scope) ->
+  $scope.sensitivityLevels = [
+    "Top Secret"
+    "Secret"
+    "Restricted"
+    "Unclassified"
+  ]
+
 stewardship.config ['detailSectionsProvider', (detailSectionsProvider)->
   detailSectionsProvider.register {
     title: 'Stewardship Metadata'
