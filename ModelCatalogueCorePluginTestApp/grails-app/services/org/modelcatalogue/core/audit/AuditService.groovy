@@ -14,6 +14,13 @@ import org.springframework.messaging.core.MessageSendingOperations
 import javax.annotation.PostConstruct
 import java.util.concurrent.Callable
 
+/**
+ * AuditService manages everything related to auditing in Metadata Exchange.
+ *
+ * This means that every creating, update or deletion of catalogue element, relationship or metadata of one of these
+ * is recorded. The AuditService delegates most of the notification methods to implementations of Auditor interface
+ * which for example records the changes into the database or sends notifications to the front end.
+ */
 class AuditService {
 
     static transactional = false
@@ -229,31 +236,49 @@ class AuditService {
         }
     }
 
+    /**
+     * Returns pageable list of changes which only applies for given element's versions.
+     * @param params incoming parameters such as page size and offset
+     * @param latestVersionId id of the very first version of the element
+     * @return pageable list of changes which only applies for given element's versions
+     */
     ListWithTotalAndType<Change> getElementChanges(Map params, Long latestVersionId){
         if (!params.sort) {
             params.sort  = 'dateCreated'
             params.order = 'desc'
         }
 
+        // closure is called in two roles - as list query factory (in that case it's called with argument of type Map)
+        // or as count query factory (in that case it's called without any argument)
         Closure queryClosure = {
 
             def max = it?.max
             def offset = it?.offset
+
+            // is true if we are searching for items themself not just their count
             boolean itemsQuery = it instanceof Map
 
             final session = sessionFactory.currentSession
 
+            // change is reserved word in SQL so it needs to be escaped properly
             String tableName = 'change'
 
             if (sessionFactory.currentSession.connection().metaData.databaseProductName == 'MySQL') {
+                // MySQL uses backticks to escape the keywords
                 tableName = "`change`"
             } else if (sessionFactory.currentSession.connection().metaData.databaseProductName == 'H2') {
+                // H2 uses double quotes to escape the keywords
                 tableName = '"change"'
             } else {
+                // if we cannot determine the database we use backtick which is used more often
                 log.warn "Cannot quote the change table name properly, using backticks."
                 tableName = "`$tableName`"
             }
 
+            // We are looking for all the changes which has the latest version id logged as the one passed into this
+            // method and which are not system or mirroring changes (e.g. they are destinations of relationships changed).
+            // We are only interested in the changes which has no parents (they are created directly by users) or they
+            // have been created as part of external change (import).
             String query = """
                 select ch.* from $tableName ch
                 left join $tableName parent on parent.id = ch.parent_id
