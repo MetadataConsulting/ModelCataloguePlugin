@@ -352,10 +352,10 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     return undefined if not security.hasRole('CURATOR')
     {
       position: 13005
-      label: "Import MC"
+      label: "Import Model Catalogue DSL File"
       icon:  'fa fa-upload fa-fw'
       action: ->
-        messages.prompt('Import MC (as DSL File)', '', type: 'new-mc-import')
+        messages.prompt('Import Model Catalogue DSL File', '', type: 'new-mc-import')
     }
   actionsProvider.registerChildAction 'new-import', 'import-mc', mcImport
   actionsProvider.registerChildAction 'import-data-models-screen', 'import-mc', mcImport
