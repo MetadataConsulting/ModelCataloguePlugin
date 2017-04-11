@@ -41,11 +41,11 @@ import static com.google.common.base.Preconditions.checkNotNull
 
             if (item.id) {
                 if (criteria.list().find { (it as CatalogueElement).getId() != item.getId() }) {
-                    (errorsToItem ? item : dataModel).errors.reject('uniqueChecker.duplicate', [HibernateHelper.ensureNoProxy(dataModel), ignored, item, property, ignored] as Object[], messageOverride ?: "Property {3} must be unique for every {2} within {0}")
+                    (errorsToItem ? item : model).errors.reject('uniqueChecker.duplicate', [HibernateHelper.ensureNoProxy(dataModel), ignored, item, property, ignored] as Object[], messageOverride ?: "Property {3} must be unique for every {2} within {0}")
                 }
             } else {
                 if (criteria.count()) {
-                    (errorsToItem ? item : dataModel).errors.reject('uniqueChecker.duplicate', [HibernateHelper.ensureNoProxy(dataModel), ignored, item, property, ignored] as Object[], messageOverride ?: "Property {3} must be unique for every {2} within {0}")
+                    (errorsToItem ? item : model).errors.reject('uniqueChecker.duplicate', [HibernateHelper.ensureNoProxy(dataModel), ignored, item, property, ignored] as Object[], messageOverride ?: "Property {3} must be unique for every {2} within {0}")
                 }
             }
         }
