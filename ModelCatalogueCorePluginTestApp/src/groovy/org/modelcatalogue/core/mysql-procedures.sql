@@ -7,6 +7,9 @@ DETERMINISTIC
     BEGIN
         IF LENGTH(CurrentSet) = 0 OR CurrentSet is NULL THEN
             RETURN NextValues;
+        ELSEIF LENGTH(NextValues) = 0 OR NextValues is NULL THEN
+            RETURN CurrentSet;
+            # AddToSet should be symmetrical
         ELSE
             RETURN CONCAT(CurrentSet,',',NextValues);
         END IF;
