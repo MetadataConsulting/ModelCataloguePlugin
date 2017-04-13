@@ -242,6 +242,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'internalModelCatalogueId', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'versionNumber', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'isTaggedBy', hidden: true
+  catalogueElementPropertiesProvider.configureProperty '__enhance__promise__', hidden: true
 
   catalogueElementPropertiesProvider.configureProperty '$$relationship', tabDefinition: [ '$element', '$name', ($element, $name) ->
 
