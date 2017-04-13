@@ -352,7 +352,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     return undefined if not security.hasRole('CURATOR')
     {
       position: 13005
-      label: "Import MC"
+      label: "Import Model Catalogue DSL File"
       icon:  'fa fa-upload fa-fw'
       action: ->
         messages.prompt('Import Model Catalogue DSL File', '', type: 'new-mc-import')
