@@ -285,6 +285,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
   ]
 
 
+
   loincImport = ($scope, messages, security) ->
     'ngInject'
     return undefined if not security.hasRole('CURATOR')
@@ -295,11 +296,11 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
       action: ->
         messages.prompt('Import Loinc File', '', type: 'new-loinc-import')
     }
-
-  actionsProvider.registerChildAction 'new-import', 'import-loinc', loincImport
-  actionsProvider.registerChildAction 'import-data-models-screen', 'import-loinc', loincImport
-  actionsProvider.registerChildAction 'curator-menu', 'import-loinc', loincImport
-  actionsProvider.registerActionInRole 'global-import-loinc', actionsProvider.ROLE_GLOBAL_ACTION, loincImport
+  if false # No longer provide LOINC import because it is only half-implemented and we don't use it anyway
+    actionsProvider.registerChildAction 'new-import', 'import-loinc', loincImport
+    actionsProvider.registerChildAction 'import-data-models-screen', 'import-loinc', loincImport
+    actionsProvider.registerChildAction 'curator-menu', 'import-loinc', loincImport
+    actionsProvider.registerActionInRole 'global-import-loinc', actionsProvider.ROLE_GLOBAL_ACTION, loincImport
 
   excelImport = ($scope, messages, security) ->
     'ngInject'
@@ -342,10 +343,11 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
       action: ->
         messages.prompt('Import Star Uml File', '', type: 'new-umlj-import')
     }
-  actionsProvider.registerChildAction 'new-import', 'import-umlj', umlImport
-  actionsProvider.registerChildAction 'import-data-models-screen', 'import-umlj', umlImport
-  actionsProvider.registerChildAction 'curator-menu', 'import-umlj', umlImport
-  actionsProvider.registerActionInRole 'global-import-uml', actionsProvider.ROLE_GLOBAL_ACTION, umlImport
+  if false # No longer provide Star UML import as it is an old thing from days of collaboration with Oxford
+    actionsProvider.registerChildAction 'new-import', 'import-umlj', umlImport
+    actionsProvider.registerChildAction 'import-data-models-screen', 'import-umlj', umlImport
+    actionsProvider.registerChildAction 'curator-menu', 'import-umlj', umlImport
+    actionsProvider.registerActionInRole 'global-import-uml', actionsProvider.ROLE_GLOBAL_ACTION, umlImport
 
   mcImport = ($scope, messages, security) ->
     'ngInject'
@@ -387,10 +389,12 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
       action: ->
         messages.prompt('Import Rare Disease Csv File', '', type: 'new-rare-disease-csv-import')
     }
-  actionsProvider.registerChildAction 'new-import', 'rare-disease-csv', rareDiseaseCsvImport
-  actionsProvider.registerChildAction 'import-data-models-screen', 'rare-disease-csv', rareDiseaseCsvImport
-  actionsProvider.registerChildAction 'curator-menu', 'rare-disease-csv', rareDiseaseCsvImport
-  actionsProvider.registerActionInRole 'global-import-csv', actionsProvider.ROLE_GLOBAL_ACTION, rareDiseaseCsvImport
+
+  if false # No longer provide Rare Disease CSV Import function
+    actionsProvider.registerChildAction 'new-import', 'rare-disease-csv', rareDiseaseCsvImport
+    actionsProvider.registerChildAction 'import-data-models-screen', 'rare-disease-csv', rareDiseaseCsvImport
+    actionsProvider.registerChildAction 'curator-menu', 'rare-disease-csv', rareDiseaseCsvImport
+    actionsProvider.registerActionInRole 'global-import-csv', actionsProvider.ROLE_GLOBAL_ACTION, rareDiseaseCsvImport
 
   actionsProvider.registerActionInRole 'connected', actionsProvider.ROLE_NAVIGATION_RIGHT, ($rootScope, messages, $window) ->
     'ngInject'
