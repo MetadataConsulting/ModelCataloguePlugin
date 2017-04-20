@@ -30,8 +30,8 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
     def"login to model catalogue and select business rules"(){
 
         when:
-        loginCurator()
-        select'TEST5'
+        loginAdmin()
+        select'Test 6' select 'Test 6'
         selectInTree "Business Rules"
 
         then:
