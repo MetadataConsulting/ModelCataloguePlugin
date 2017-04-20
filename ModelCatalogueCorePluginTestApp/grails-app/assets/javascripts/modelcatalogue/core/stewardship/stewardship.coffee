@@ -12,10 +12,11 @@ stewardship = angular.module('mc.core.stewardship',
 # List of levels to be selected for sensitivity
 stewardship.controller 'SelectSensitivity', ($scope) ->
   $scope.sensitivityLevels = [
-    "Top Secret"
-    "Secret"
-    "Restricted"
-    "Unclassified"
+    "Anonymous"
+    "Personal"
+    "Potentially Sensitive"
+    "Pseudonymous"
+    "Sensitive"
   ]
 
 stewardship.config ['detailSectionsProvider', (detailSectionsProvider)->
