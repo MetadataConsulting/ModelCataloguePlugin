@@ -16,13 +16,13 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
 /**
 * Catalogue Element - there are a number of catalogue elements that make up the model
- * catalogue (please see DataType, MeasurementUnit, Model,
+ * catalogue (please see DataType, MeasurementUnit, DataModel,
 * DataElement) they extend catalogue element which allows creation of incoming and outgoing
 * relationships between them. They also share a number of characteristics.
 * */
 abstract class  CatalogueElement implements Extendible<ExtensionValue>, Published<CatalogueElement>, ApiCatalogueElement, DataModelAware {
 
-    //// Dependencies:
+    ///// Dependencies:
 
     def grailsLinkGenerator
     def relationshipService
@@ -30,41 +30,54 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     def mappingService
     def elementService
 
-    //// Grails Domain properties and configuration:
+    ///// Grails domain properties and configuration:
 
-    // Note: Groovy will automatically create getDataModel method which is all that is needed to implement DataModelAware.
+    /** Note: Groovy will automatically create getDataModel method which is all that is needed to implement DataModelAware. */
     DataModel dataModel
 
     String name
     String description
 	String modelCatalogueId
 
-    //version number - this gets iterated every time a new version is created from a finalized version
+    /** version number - this gets iterated every time a new version is created from a finalized version */
     Integer versionNumber = 1
 
-    //status: once an object is finalized it cannot be changed
-    //it's version number is updated and any subsequent update will
-    //be mean that the element is superseded. We will provide a supersede function
-    //to do this
+    /**status: once an object is finalized it cannot be changed.
+     * Its version number is updated, and any subsequent update will
+     * be mean that the element is superseded. We will provide a supersede function
+     * to do this. */
     ElementStatus status = ElementStatus.DRAFT
 
     Date versionCreated = new Date()
 
-    // id of the latest version
-    // This is external id from imported models, as opposed to versionNumber which is a ModelCatalogue internal id.
-    // This is a misnomer, it should be called externalId or something. Misnomers abound...
+    /** id of the latest version
+     * This is external id from imported models, as opposed to versionNumber which is a ModelCatalogue internal id.
+     * This is a misnomer, it should be called externalId or something. Misnomers abound... */
     Long latestVersionId
 
-    // time stamping
+    /** time stamping */
     Date dateCreated
     Date lastUpdated
 
-    //stop null pointers (especially deleting new items)
+    /** stop null pointers (especially deleting new items) */
     Set<Relationship> incomingRelationships = []
     Set<Relationship> outgoingRelationships = []
-    // We don't seem to use this very much?
+    /** We don't seem to use this very much? */
     Set<Mapping> outgoingMappings = []
     Set<Mapping> incomingMappings = []
+
+    //// extensions mapping containing among other things metadata. Makes use of this being Extendible (see implementation below)
+    final Map<String, String> ext = new ExtensionsWrapper(this)
+
+    // add ext to this.ext.
+    void setExt(Map<String, String> ext) {
+        ext = OrderedMap.fromJsonMap(ext)
+        for (String key in this.ext.keySet() - ext.keySet()) {
+
+            this.ext.remove key
+        }
+        this.ext.putAll(ext)
+    }
 
     // what are these? What's the difference between relations and relationships?
     static transients = ['relations', 'info', 'archived', 'relations', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext', 'combinedVersion', 'inheritedAssociationsNames', 'modelCatalogueResourceName', 'dataModelSemanticVersion', 'legacyModelCatalogueId', 'link']
@@ -105,7 +118,173 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     static fetchMode = [dataModel: 'eager']
 
-    //// end of Grails domain configuration
+    ///// End of Grails domain properties and configuration
+
+    ///// Implementation of Interfaces
+
+    //// Implementation of Extendible<ExtensionValue>:
+
+    // because extensions is declared in hasMany, when it is accessed Grails will automatically scour the database for
+    // ExtensionValues which belong to this Element.
+    @Override
+    Set<ExtensionValue> listExtensions() {
+        extensions
+    }
+
+    // addExtension adds an extension to the database for this and all children (recursively).
+    @Override
+    ExtensionValue addExtension(String name, String value) {
+        if (getId() && isAttached()) {
+            ExtensionValue newOne = new ExtensionValue(name: name, extensionValue: value, element: this)
+            FriendlyErrors.failFriendlySaveWithoutFlush(newOne)
+            addToExtensions(newOne).save(validate: false)
+            auditService.logNewMetadata(newOne)
+            Inheritance.withChildren(this) {
+                if (!it.ext.containsKey(name)) {
+                    it.addExtension(name, value)
+                }
+            }
+            return newOne
+        }
+
+        throw new IllegalStateException("Cannot add extension before saving the element (id: ${getId()}, attached: ${isAttached()})")
+    }
+
+    @Override
+    void removeExtension(ExtensionValue extension) {
+        Inheritance.withChildren(this) {
+            ExtensionValue oldExt = it.findExtensionByName(extension.name)
+            if (oldExt && oldExt.extensionValue == extension.extensionValue) {
+                it.removeExtension(oldExt)
+            }
+        }
+        auditService.logMetadataDeleted(extension)
+        removeFromExtensions(extension).save(validate: false)
+        extension.delete(flush: true)
+    }
+
+    @Override
+    ExtensionValue findExtensionByName(String name) {
+        listExtensions()?.find { it.name == name }
+    }
+
+
+    @Override
+    int countExtensions() {
+        listExtensions()?.size() ?: 0
+    }
+
+    ExtensionValue updateExtension(ExtensionValue old, String value) {
+        Inheritance.withChildren(this) {
+            ExtensionValue oldExt = it.findExtensionByName(old.name)
+            if (oldExt && oldExt.extensionValue == old.extensionValue) {
+                it.updateExtension(oldExt, value)
+            }
+        }
+        old.orderIndex = System.currentTimeMillis()
+        if (old.extensionValue == value) {
+            FriendlyErrors.failFriendlySaveWithoutFlush(old)
+            return old
+        }
+        old.extensionValue = value
+        if (old.validate()) {
+            auditService.logMetadataUpdated(old)
+        }
+        FriendlyErrors.failFriendlySaveWithoutFlush(old)
+    }
+
+    /**
+     * Checks whether a certain extension presents in this catalogue element.
+     * @param shortName Short name of the extension. It is prefixed with <i>http://www.modelcatalogue.org/metadata/#</i>.
+     */
+    void checkExtensionPresence(String shortName) {
+        if (!ext.get("http://www.modelcatalogue.org/metadata/#$shortName"))
+            errors.rejectValue("ext", "catalogElement.ext.$shortName", "${shortName.capitalize()} must be specified!")
+    }
+
+    //// End Implementation of Extendible
+
+    //// Implementation of Published
+    boolean isReadyForQueries() {
+        isAttached() && !hasErrors()
+    }
+
+    @Override
+    final CatalogueElement publish(Publisher<CatalogueElement> publisher, Observer<String> monitor) {
+        preparePublishChain(PublishingChain.finalize(this)).run(publisher, monitor)
+    }
+
+    protected PublishingChain preparePublishChain(PublishingChain chain) { chain }
+
+    List<CatalogueElement> collectExternalDependencies() { Collections.emptyList() }
+
+    final CatalogueElement cloneElement(Publisher<CatalogueElement> publisher, CloningContext strategy) {
+        preparePublishChain(PublishingChain.clone(this, strategy)).run(publisher, strategy.monitor)
+    }
+
+    @Override
+    boolean isPublished() {
+        return status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED]
+    }
+
+    //// End Implementation of Published
+
+    //// Implementation of ApiCatalogueElement
+
+    @Override
+    List<org.modelcatalogue.core.api.Relationship> getIncomingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        getIncomingRelationshipsByType(type as RelationshipType)
+    }
+
+    @Override
+    List<org.modelcatalogue.core.api.Relationship> getOutgoingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        getOutgoingRelationshipsByType(type as RelationshipType)
+    }
+
+    @Override @Deprecated
+    List<org.modelcatalogue.core.api.Relationship> getRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        getRelationshipsByType(type as RelationshipType)
+    }
+
+    @Override
+    int countIncomingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        countIncomingRelationshipsByType(type as RelationshipType)
+    }
+
+    @Override
+    int countOutgoingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        countOutgoingRelationshipsByType(type as RelationshipType)
+    }
+
+    @Override @Deprecated
+    int countRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        countOutgoingRelationshipsByType(type as RelationshipType)
+    }
+
+    @Override
+    org.modelcatalogue.core.api.Relationship createLinkTo(Map<String, Object> parameters, org.modelcatalogue.core.api.CatalogueElement destination, org.modelcatalogue.core.api.RelationshipType type) {
+        createLinkTo(parameters, destination as CatalogueElement, type as RelationshipType)
+    }
+
+    @Override
+    org.modelcatalogue.core.api.Relationship createLinkFrom(Map<String, Object> parameters, org.modelcatalogue.core.api.CatalogueElement source, org.modelcatalogue.core.api.RelationshipType type) {
+        createLinkFrom(parameters, source as CatalogueElement, type as RelationshipType)
+    }
+
+    @Override
+    org.modelcatalogue.core.api.Relationship removeLinkTo(org.modelcatalogue.core.api.CatalogueElement destination, org.modelcatalogue.core.api.RelationshipType type) {
+        removeLinkTo(destination as CatalogueElement, type as RelationshipType)
+    }
+
+    @Override
+    org.modelcatalogue.core.api.Relationship removeLinkFrom(org.modelcatalogue.core.api.CatalogueElement source, org.modelcatalogue.core.api.RelationshipType type) {
+        removeLinkFrom(source as CatalogueElement, type as RelationshipType)
+    }
+
+    //// End Implementation of ApiCatalogueElement
+    ///// End Implementation of Interfaces
+
+
     /**
      * Functions for specifying relationships between catalogue elements using the
      * org.modelcatalogue.core.Relationship class
@@ -233,9 +412,15 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
             it.delete()
         }
     }
-    //// end of relationship methods
+    //// End of relationship methods
 
     //// Other utility methods:
+
+    /// GrailsNameUtils stuff
+
+    String getLink() {
+        "/${GrailsNameUtils.getPropertyName(getClass())}/${getId()}".toString()
+    }
 
     Map<String, Object> getInfo() {
         [
@@ -245,77 +430,8 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         ]
     }
 
-    boolean isArchived() {
-        if (!status) return false
-        !status.modificable
-    }
-
-    def beforeValidate() {
-        removeModelCatalogueIdIfDefault()
-    }
-
-    private void removeModelCatalogueIdIfDefault() {
-        if (modelCatalogueId) {
-            String defaultId = getDefaultModelCatalogueId(true)
-            if (defaultId && (modelCatalogueId.startsWith(defaultId) || modelCatalogueId.contains('//localhost'))) {
-                modelCatalogueId = null
-            }
-        }
-    }
-
-    def beforeDelete(){
-        auditService.logElementDeleted(this)
-    }
-
-    boolean hasModelCatalogueId() {
-        this.@modelCatalogueId != null
-    }
-
-    final Integer countVersions() {
-        elementService.countVersions(this)
-    }
-
-
     protected String getModelCatalogueResourceName() {
         fixResourceName GrailsNameUtils.getPropertyName(getEntityClass(this))
-    }
-
-    @Deprecated
-    String getLegacyModelCatalogueId(boolean withoutVersion = false) {
-        if (!grailsLinkGenerator) {
-            return null
-        }
-        String resourceName = getModelCatalogueResourceName()
-        if (withoutVersion) {
-            return grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${getLatestVersionId() ?: getId()}")
-        }
-        return grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${getLatestVersionId() ?: getId()}.${getVersionNumber()}")
-    }
-
-    String getDefaultModelCatalogueId(boolean withoutVersion = false) {
-        if (!grailsLinkGenerator) {
-            return null
-        }
-        String resourceName = getModelCatalogueResourceName()
-        if (withoutVersion) {
-            return grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${getLatestVersionId() ?: getId()}")
-        }
-        return grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${getCombinedVersion()}")
-    }
-
-    /**
-     * Called before the archived element is persisted to the data store.
-     */
-    void beforeDraftPersisted(PublishingContext context) {}
-
-    void afterDraftPersisted(CatalogueElement draft, PublishingContext context) {
-        draft.ext.putAll this.ext
-        for(Mapping mapping in outgoingMappings) {
-            mappingService.map(draft, context.resolve(mapping.destination), mapping.mapping)
-        }
-        for (Mapping mapping in incomingMappings) {
-            mappingService.map(context.resolve(mapping.source), draft, mapping.mapping)
-        }
     }
 
     static String fixResourceName(String resourceName) {
@@ -330,159 +446,33 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         resourceName
     }
 
-
-
-    final String toString() {
-        DataModel dataModel
-        try {
-            getDataModelId() ? DataModel.get(getDataModelId()) : null
-        } catch (ObjectNotFoundException ignored) {
-            dataModel = null
-        }
-
-        StringBuilder builder = new StringBuilder()
-
-        builder << name << " ["
-
-        if (getLatestVersionId()) {
-            builder << getLatestVersionId()
-        } else {
-            builder << getId()
-        }
-
-        builder << '@'
-
-        if (dataModel) {
-            builder << dataModel.getSemanticVersion()
-        } else if (HibernateProxyHelper.getClassWithoutInitializingProxy(this) == DataModel) {
-            builder << getProperty('semanticVersion')
-        } else {
-            builder << "0.0.${getVersionNumber()}"
-        }
-
-        builder << "] (" << getStatus() << ":" << getClass().getSimpleName() << ":" << getId() << ')'
-
-        if (dataModel) {
-            builder << ' in ' << dataModel.getName() << '@' <<  dataModel.getSemanticVersion()
-        }
-
-        builder.toString()
-    }
-    //// extensions mapping containing among other things metadata
-    final Map<String, String> ext = new ExtensionsWrapper(this)
-
-    // add ext to this.ext.
-    void setExt(Map<String, String> ext) {
-        ext = OrderedMap.fromJsonMap(ext)
-        for (String key in this.ext.keySet() - ext.keySet()) {
-
-            this.ext.remove key
-        }
-        this.ext.putAll(ext)
+    boolean isArchived() {
+        if (!status) return false
+        !status.modificable
     }
 
-    //// Implementation of Extendible<ExtensionValue>
-
-    // because extensions is declared in hasMany, when it is accessed Grails will automatically scour the database for
-    // ExtensionValues which belong to this Element.
-    @Override
-    Set<ExtensionValue> listExtensions() {
-        extensions
+    /// Business logic: before and after delete, validate, draft persisted, merge, insert, update
+    def beforeDelete(){
+        auditService.logElementDeleted(this)
+    }
+    def beforeValidate() {
+        removeModelCatalogueIdIfDefault()
     }
 
-    // addExtension adds an extension to the database for this and all children (recursively).
-    @Override
-    ExtensionValue addExtension(String name, String value) {
-        if (getId() && isAttached()) {
-            ExtensionValue newOne = new ExtensionValue(name: name, extensionValue: value, element: this)
-            FriendlyErrors.failFriendlySaveWithoutFlush(newOne)
-            addToExtensions(newOne).save(validate: false)
-            auditService.logNewMetadata(newOne)
-            Inheritance.withChildren(this) {
-                if (!it.ext.containsKey(name)) {
-                    it.addExtension(name, value)
-                }
-            }
-            return newOne
-        }
-
-        throw new IllegalStateException("Cannot add extension before saving the element (id: ${getId()}, attached: ${isAttached()})")
-    }
-
-    @Override
-    void removeExtension(ExtensionValue extension) {
-        Inheritance.withChildren(this) {
-            ExtensionValue oldExt = it.findExtensionByName(extension.name)
-            if (oldExt && oldExt.extensionValue == extension.extensionValue) {
-                it.removeExtension(oldExt)
-            }
-        }
-        auditService.logMetadataDeleted(extension)
-        removeFromExtensions(extension).save(validate: false)
-        extension.delete(flush: true)
-    }
-
-    @Override
-    ExtensionValue findExtensionByName(String name) {
-        listExtensions()?.find { it.name == name }
-    }
-
-
-    @Override
-    int countExtensions() {
-        listExtensions()?.size() ?: 0
-    }
-
-    ExtensionValue updateExtension(ExtensionValue old, String value) {
-        Inheritance.withChildren(this) {
-            ExtensionValue oldExt = it.findExtensionByName(old.name)
-            if (oldExt && oldExt.extensionValue == old.extensionValue) {
-                it.updateExtension(oldExt, value)
-            }
-        }
-        old.orderIndex = System.currentTimeMillis()
-        if (old.extensionValue == value) {
-            FriendlyErrors.failFriendlySaveWithoutFlush(old)
-            return old
-        }
-        old.extensionValue = value
-        if (old.validate()) {
-            auditService.logMetadataUpdated(old)
-        }
-        FriendlyErrors.failFriendlySaveWithoutFlush(old)
-    }
 
     /**
-     * Checks whether a certain extension presents in this catalogue element.
-     * @param shortName Short name of the extension. It is prefixed with <i>http://www.modelcatalogue.org/metadata/#</i>.
+     * Called before the archived element is persisted to the data store.
      */
-    void checkExtensionPresence(String shortName) {
-        if (!ext.get("http://www.modelcatalogue.org/metadata/#$shortName"))
-            errors.rejectValue("ext", "catalogElement.ext.$shortName", "${shortName.capitalize()} must be specified!")
-    }
+    void beforeDraftPersisted(PublishingContext context) {}
 
-    //// end of Extendible implementation
-
-    boolean isReadyForQueries() {
-        isAttached() && !hasErrors()
-    }
-
-    @Override
-    final CatalogueElement publish(Publisher<CatalogueElement> publisher, Observer<String> monitor) {
-        preparePublishChain(PublishingChain.finalize(this)).run(publisher, monitor)
-    }
-
-    protected PublishingChain preparePublishChain(PublishingChain chain) { chain }
-
-    List<CatalogueElement> collectExternalDependencies() { Collections.emptyList() }
-
-    final CatalogueElement cloneElement(Publisher<CatalogueElement> publisher, CloningContext strategy) {
-        preparePublishChain(PublishingChain.clone(this, strategy)).run(publisher, strategy.monitor)
-    }
-
-    @Override
-    boolean isPublished() {
-        return status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED]
+    void afterDraftPersisted(CatalogueElement draft, PublishingContext context) {
+        draft.ext.putAll this.ext
+        for(Mapping mapping in outgoingMappings) {
+            mappingService.map(draft, context.resolve(mapping.destination), mapping.mapping)
+        }
+        for (Mapping mapping in incomingMappings) {
+            mappingService.map(context.resolve(mapping.source), draft, mapping.mapping)
+        }
     }
 
     /**
@@ -536,62 +526,85 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         }
     }
 
+    /// End business logic
 
-    // -- API
+    /// stuff to do with ModelCatalogueId
 
-    @Override
-    List<org.modelcatalogue.core.api.Relationship> getIncomingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
-        getIncomingRelationshipsByType(type as RelationshipType)
+    private void removeModelCatalogueIdIfDefault() {
+        if (modelCatalogueId) {
+            String defaultId = getDefaultModelCatalogueId(true)
+            if (defaultId && (modelCatalogueId.startsWith(defaultId) || modelCatalogueId.contains('//localhost'))) {
+                modelCatalogueId = null
+            }
+        }
+    }
+    boolean hasModelCatalogueId() {
+        this.@modelCatalogueId != null
+    }
+    @Deprecated
+    String getLegacyModelCatalogueId(boolean withoutVersion = false) {
+        if (!grailsLinkGenerator) {
+            return null
+        }
+        String resourceName = getModelCatalogueResourceName()
+        if (withoutVersion) {
+            return grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${getLatestVersionId() ?: getId()}")
+        }
+        return grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${getLatestVersionId() ?: getId()}.${getVersionNumber()}")
     }
 
-    @Override
-    List<org.modelcatalogue.core.api.Relationship> getOutgoingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
-        getOutgoingRelationshipsByType(type as RelationshipType)
+    String getDefaultModelCatalogueId(boolean withoutVersion = false) {
+        if (!grailsLinkGenerator) {
+            return null
+        }
+        String resourceName = getModelCatalogueResourceName()
+        if (withoutVersion) {
+            return grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${getLatestVersionId() ?: getId()}")
+        }
+        return grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${getCombinedVersion()}")
     }
 
-    @Override @Deprecated
-    List<org.modelcatalogue.core.api.Relationship> getRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
-        getRelationshipsByType(type as RelationshipType)
+    Long getFirstParentId() {
+        if (getDataModel()) {
+            return getDataModel().getId()
+        }
+        return null
     }
 
-    @Override
-    int countIncomingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
-        countIncomingRelationshipsByType(type as RelationshipType)
-    }
+    /// End stuff to do with ModelCatalogueId
 
-    @Override
-    int countOutgoingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
-        countOutgoingRelationshipsByType(type as RelationshipType)
-    }
+    /// Version stuff
 
-    @Override @Deprecated
-    int countRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
-        countOutgoingRelationshipsByType(type as RelationshipType)
+    final Integer countVersions() {
+        elementService.countVersions(this)
     }
-
-    @Override
-    org.modelcatalogue.core.api.Relationship createLinkTo(Map<String, Object> parameters, org.modelcatalogue.core.api.CatalogueElement destination, org.modelcatalogue.core.api.RelationshipType type) {
-        createLinkTo(parameters, destination as CatalogueElement, type as RelationshipType)
-    }
-
-    @Override
-    org.modelcatalogue.core.api.Relationship createLinkFrom(Map<String, Object> parameters, org.modelcatalogue.core.api.CatalogueElement source, org.modelcatalogue.core.api.RelationshipType type) {
-        createLinkFrom(parameters, source as CatalogueElement, type as RelationshipType)
-    }
-
-    @Override
-    org.modelcatalogue.core.api.Relationship removeLinkTo(org.modelcatalogue.core.api.CatalogueElement destination, org.modelcatalogue.core.api.RelationshipType type) {
-        removeLinkTo(destination as CatalogueElement, type as RelationshipType)
-    }
-
-    @Override
-    org.modelcatalogue.core.api.Relationship removeLinkFrom(org.modelcatalogue.core.api.CatalogueElement source, org.modelcatalogue.core.api.RelationshipType type) {
-        removeLinkFrom(source as CatalogueElement, type as RelationshipType)
-    }
-
     String getCombinedVersion() {
         "${getLatestVersionId() ?: getId() ?: '<id not assigned yet>'}@${getDataModelSemanticVersion() ?: "0.0.${getVersionNumber()}"}"
     }
+
+    CatalogueElement findPreviousVersion() {
+        if (countSupersedes()) {
+            return supersedes.first()
+        }
+        if (latestVersionId) {
+            return CatalogueElement.findByLatestVersionIdAndVersionNumberLessThan(latestVersionId, versionNumber, [sort: 'versionNumber', order: 'desc'])
+        }
+        return null
+    }
+
+    String getDataModelSemanticVersion() {
+        if (HibernateProxyHelper.getClassWithoutInitializingProxy(this) == DataModel) {
+            return getProperty('semanticVersion')
+        }
+        return getDataModel()?.semanticVersion
+    }
+
+    /// End version stuff
+
+
+
+    /// Inherited stuff: mostly used in EnumeratedType, RelationshipService,
+    // getInheritedAssociationsNames is used in DataElement and Enum,Primitive, Reference Type
 
     final void addInheritedAssociations(CatalogueElement child, Map<String, String> metadata) {
         for (String propertyName in inheritedAssociationsNames) {
@@ -625,40 +638,49 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         return child.getProperty(propertyName) == getValueToBeInherited(child, propertyName, metadata, persistent)
     }
 
-
     protected Object getValueToBeInherited(CatalogueElement child, String propertyName, Map<String, String> metadata, boolean persistent) {
         return persistent ? getPersistentValue(propertyName) : getProperty(propertyName)
     }
 
     Iterable<String> getInheritedAssociationsNames() { ImmutableSet.of('description') }
 
-    String getDataModelSemanticVersion() {
-        if (HibernateProxyHelper.getClassWithoutInitializingProxy(this) == DataModel) {
-            return getProperty('semanticVersion')
-        }
-        return getDataModel()?.semanticVersion
-    }
+    /// End inherited stuff
 
-    String getLink() {
-        "/${GrailsNameUtils.getPropertyName(getClass())}/${getId()}".toString()
-    }
-
-    Long getFirstParentId() {
-        if (getDataModel()) {
-            return getDataModel().getId()
+    final String toString() {
+        DataModel dataModel
+        try {
+            getDataModelId() ? DataModel.get(getDataModelId()) : null
+        } catch (ObjectNotFoundException ignored) {
+            dataModel = null
         }
-        return null
-    }
 
-    CatalogueElement findPreviousVersion() {
-        if (countSupersedes()) {
-            return supersedes.first()
-        }
-        if (latestVersionId) {
-            return CatalogueElement.findByLatestVersionIdAndVersionNumberLessThan(latestVersionId, versionNumber, [sort: 'versionNumber', order: 'desc'])
-        }
-        return null
-    }
+        StringBuilder builder = new StringBuilder()
 
+        builder << name << " ["
+
+        if (getLatestVersionId()) {
+            builder << getLatestVersionId()
+        } else {
+            builder << getId()
+        }
+
+        builder << '@'
+
+        if (dataModel) {
+            builder << dataModel.getSemanticVersion()
+        } else if (HibernateProxyHelper.getClassWithoutInitializingProxy(this) == DataModel) {
+            builder << getProperty('semanticVersion')
+        } else {
+            builder << "0.0.${getVersionNumber()}"
+        }
+
+        builder << "] (" << getStatus() << ":" << getClass().getSimpleName() << ":" << getId() << ')'
+
+        if (dataModel) {
+            builder << ' in ' << dataModel.getName() << '@' <<  dataModel.getSemanticVersion()
+        }
+
+        builder.toString()
+    }
 
 }
