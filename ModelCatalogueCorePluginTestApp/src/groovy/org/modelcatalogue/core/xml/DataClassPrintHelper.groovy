@@ -3,6 +3,7 @@ package org.modelcatalogue.core.xml
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.Relationship
 
+@Singleton
 class DataClassPrintHelper extends CatalogueElementPrintHelper<DataClass> {
 
     @Override

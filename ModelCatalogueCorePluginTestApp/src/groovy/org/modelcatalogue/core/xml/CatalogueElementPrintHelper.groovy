@@ -5,30 +5,31 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.HibernateHelper
 
+/** Seems to implement the visitor pattern for printing */
 abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
 
     private static <E extends CatalogueElement> CatalogueElementPrintHelper<E> get(Class<E> type) {
-        // TODO: pool helpers as they are stateless
+        // Singleton instances of helpers for each type of catalogue element
         if (MeasurementUnit.isAssignableFrom(type)) {
-            return new MeasurementUnitPrintHelper() as CatalogueElementPrintHelper<E>
+            return MeasurementUnitPrintHelper.instance as CatalogueElementPrintHelper<E>
         }
         if (DataType.isAssignableFrom(type)) {
-            return new DataTypePrintHelper() as CatalogueElementPrintHelper<E>
+            return DataTypePrintHelper.instance as CatalogueElementPrintHelper<E>
         }
         if (DataElement.isAssignableFrom(type)) {
-            return new DataElementPrintHelper() as CatalogueElementPrintHelper<E>
+            return DataElementPrintHelper.instance as CatalogueElementPrintHelper<E>
         }
         if (DataClass.isAssignableFrom(type)) {
-            return new DataClassPrintHelper() as CatalogueElementPrintHelper<E>
+            return DataClassPrintHelper.instance as CatalogueElementPrintHelper<E>
         }
         if (DataModel.isAssignableFrom(type)) {
-            return new DataModelPrintHelper() as CatalogueElementPrintHelper<E>
+            return DataModelPrintHelper.instance as CatalogueElementPrintHelper<E>
         }
         if (Asset.isAssignableFrom(type)) {
-            return new AssetPrintHelper() as CatalogueElementPrintHelper<E>
+            return AssetPrintHelper.instance as CatalogueElementPrintHelper<E>
         }
         if (ValidationRule.isAssignableFrom(type)) {
-            return new ValidationRulePrintHelper() as CatalogueElementPrintHelper<E>
+            return ValidationRulePrintHelper.instance as CatalogueElementPrintHelper<E>
         }
         throw new IllegalArgumentException("Not yet implemented for $type")
     }

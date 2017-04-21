@@ -6,7 +6,7 @@ import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.enumeration.Enumeration
-
+@Singleton
 class DataTypePrintHelper extends CatalogueElementPrintHelper<DataType> {
 
     @Override

@@ -5,6 +5,7 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.DataModelFilter
 
+@Singleton
 class DataModelPrintHelper extends CatalogueElementPrintHelper<DataModel> {
 
     @Override
