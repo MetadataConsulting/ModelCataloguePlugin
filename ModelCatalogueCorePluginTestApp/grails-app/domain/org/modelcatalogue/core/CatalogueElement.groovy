@@ -66,10 +66,12 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     Set<Mapping> outgoingMappings = []
     Set<Mapping> incomingMappings = []
 
-    //// extensions mapping containing among other things metadata. Makes use of this being Extendible (see implementation below)
+    /** extensions mapping containing among other things metadata.
+     * Makes use of this being Extendible (see implementation below)
+     * Although it is final we can set it...*/
     final Map<String, String> ext = new ExtensionsWrapper(this)
 
-    // add ext to this.ext.
+    /** Set ext to this.ext */
     void setExt(Map<String, String> ext) {
         ext = OrderedMap.fromJsonMap(ext)
         for (String key in this.ext.keySet() - ext.keySet()) {
