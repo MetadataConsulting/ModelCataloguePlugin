@@ -82,10 +82,20 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     // what are these? What's the difference between relations and relationships?
-    static transients = ['relations', 'info', 'archived', 'relations', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext', 'combinedVersion', 'inheritedAssociationsNames', 'modelCatalogueResourceName', 'dataModelSemanticVersion', 'legacyModelCatalogueId', 'link']
+    static transients = ['relations',
+                         'incomingRelations', 'outgoingRelations',
+                         'defaultModelCatalogueId', 'legacyModelCatalogueId',
+                         'ext', 'info', 'archived', 'link'
+                         'combinedVersion', 'dataModelSemanticVersion',
+                         'inheritedAssociationsNames', 'modelCatalogueResourceName',
+                         ]
 
     // We want to get rid of hasMany sometime. Someway. See "hasMany considered harmful" by Burt Beckwith: https://www.youtube.com/watch?v=-nofscHeEuU
-    static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping, extensions: ExtensionValue]
+    static hasMany = [incomingRelationships: Relationship,
+                      outgoingRelationships: Relationship,
+                      outgoingMappings: Mapping,
+                      incomingMappings: Mapping,
+                      extensions: ExtensionValue]
 
     static relationships = [
             incoming: [base: 'isBaseFor', supersession: 'supersedes', favourite: 'isFavouriteOf', origin: 'isClonedFrom'],
