@@ -98,9 +98,9 @@ class ExtensionsWrapper implements Map<String, String> {
     }
 
     private Map<String, String> asReadOnlyMap() {
-        //def extensions = element.listExtensions()
-        if (!element.listExtensions()) return Collections.emptyMap()
-        Collections.unmodifiableMap(new LinkedHashSet(element.listExtensions()).collectEntries {
+        def extensions = element.listExtensions()
+        if (!extensions) return Collections.emptyMap()
+        Collections.unmodifiableMap(new LinkedHashSet(extensions).collectEntries {
             [it.name, it.extensionValue]
         })
     }
