@@ -3,6 +3,8 @@ Model Catalogue
 [![Build Status](https://travis-ci.org/MetadataConsulting/ModelCataloguePlugin.svg?branch=2.x)](https://travis-ci.org/MetadataConsulting/ModelCataloguePlugin)
 
 ## Introduction
+
+This introduction is taken from the [Wiki on Confluence](https://metadata.atlassian.net/wiki/display/ME/Metadata+Exchange+Home) which also includes instructions for users of the catalogue.
 The Model Catalogue Plugin (Mx) is a web-based toolkit for managing metadata.
 The Model Catalogue Plugin is designed to enable the easy conformance of information systems with prevailing data standards and best practise.
 It was originally an experimental metadata registry which was used to support an NHIC project in 2013, and later on to support clinicians at Genomics England in building and curating datasets. The Model Catalogue Plugin is an open source project, available under an Apache 2  license.  It has a modular architecture, and the core component is a dataset or "Models Catalogue", which provides a singular reference point for the creation and curation of datasets or data models.
