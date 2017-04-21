@@ -26,6 +26,8 @@ import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.transaction.TransactionStatus
 import rx.Observer
 
+
+/** Used in Finalization/Draft chain. */
 class ElementService implements Publisher<CatalogueElement> {
 
 
