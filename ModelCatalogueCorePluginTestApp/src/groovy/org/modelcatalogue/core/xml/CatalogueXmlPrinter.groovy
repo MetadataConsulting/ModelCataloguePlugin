@@ -12,7 +12,7 @@ import org.modelcatalogue.core.policy.Convention
 import org.modelcatalogue.core.policy.Conventions
 
 /** Somehow prints out some aspects of an element as XML. Which aspects? And how does it get them?
- * Does it have to do with Criteria?*/
+ * Does it have to do with Criteria? */
 class CatalogueXmlPrinter {
 
     static final String NAMESPACE_URL = 'http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry.xsd'
@@ -41,8 +41,6 @@ class CatalogueXmlPrinter {
             EscapeSpecialWriter escapeSpecialWriter = new EscapeSpecialWriter(writer)
             MarkupBuilder builder = new MarkupBuilder(escapeSpecialWriter)
             builder.doubleQuotes = true
-            // This is weird. MarkupBuilder is a built-in Groovy class which doesn't have a catalogue method.
-            // Was it dynamically added? Damn.
             builder.catalogue (ns) {
                 CatalogueElementPrintHelper.printElement(builder, element, context, null)
                 printRelationshipTypes(builder, context)

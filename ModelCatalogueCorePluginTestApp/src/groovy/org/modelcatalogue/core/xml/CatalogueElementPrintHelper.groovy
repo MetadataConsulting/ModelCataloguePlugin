@@ -8,6 +8,10 @@ import org.modelcatalogue.core.util.HibernateHelper
 /** Seems to implement the visitor pattern for printing */
 abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
 
+    /** Get the appropriate helper for writing a CatalogueElement of a particular class.
+     *
+     * @param type The class or type of the CatalogueElement to be written.
+     * @return The appropriate helper to write the CatalogueElement. */
     private static <E extends CatalogueElement> CatalogueElementPrintHelper<E> get(Class<E> type) {
         // Singleton instances of helpers for each type of catalogue element
         if (MeasurementUnit.isAssignableFrom(type)) {

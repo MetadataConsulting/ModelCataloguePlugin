@@ -5,9 +5,11 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.DataClassService
 
+/** What is this? */
 class PrintContext {
 
     DataModelService dataModelService
+    /** Seems like Data Classes used to be called Models? */
     DataClassService modelService
 
     boolean idIncludeVersion
