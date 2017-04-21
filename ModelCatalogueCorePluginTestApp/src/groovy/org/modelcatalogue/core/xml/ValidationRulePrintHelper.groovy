@@ -3,6 +3,7 @@ package org.modelcatalogue.core.xml
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.ValidationRule
 
+@Singleton
 class ValidationRulePrintHelper extends CatalogueElementPrintHelper<ValidationRule> {
 
     @Override
