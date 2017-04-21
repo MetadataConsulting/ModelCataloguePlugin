@@ -22,6 +22,12 @@ The Model Catalogue Plugin  allows users to define datasets as general platform-
  * [Using Grails Console in Production](docs/development/frameworks/grails_console.md)
 
 ## Development
+
+Note from James:
+
+There are a number of misnomers in this project, first of all the project itself being called ModelCataloguePlugin; secondly, the actual (Grails) app is in the subdirectory called ModelCatalogueCorePluginTestApp, and it is neither a test nor a plugin. All development, including gradle running, should be done in ModelCatalogueCorePluginTestApp.
+
+
  * [Technology Stack](docs/development/frameworks/index.md)
  * [Migration from Version 1.x](docs/development/migration.adoc)
  * [Interacting with Model Catalogue using XML](docs/development/integration/xml.adoc)

@@ -1,5 +1,6 @@
 angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'detailSections', ['catalogueProvider', (catalogueProvider) ->
-
+# detailSections gives a provider that relies on catalogueProvider
+  # are these providers dependency-injected?
   isMeetingRelationshipCriteria = (owner, criteria) ->
     match = criteria.match(/(\w+)?(?:=\[(\w+)\])?=>(\w+)?/)
     source = match[1]
@@ -80,12 +81,12 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
 
     # TODO should handle $$relationship
 
-    configuration.isAvailableFor = (owner) ->
+    configuration.isAvailableFor = (owner) -> # whether a particular element should use a particular configuration
       return false if not owner
       return false if not owner.ext
       return false if not owner.ext.type == 'orderedMap'
       for type in configuration.types
-        if type.indexOf('=>') > -1
+        if type.indexOf('=>') > -1 # if the type has => in it which means it's a relationship
           continue if not catalogueProvider.isInstanceOf(owner.elementType, 'relationship')
           return true if isMeetingRelationshipCriteria(owner, type)
         else if catalogueProvider.isInstanceOf(owner.elementType, type)
@@ -138,7 +139,7 @@ angular.module('mc.core.ui.detailSections', ['mc.core.catalogue']).provider 'det
             toggleTemplateHidden: (element) -> @templateHidden = not @isTemplateHidden(element)
 
           # assign values to the view
-          angular.forEach configuration, (value, key) ->
+          angular.forEach configuration, (value, key) -> # Isn't this the wrong way around? value, key?
             return unless angular.isFunction(value) and key isnt "isAvailableFor"
             view[key] = value
 

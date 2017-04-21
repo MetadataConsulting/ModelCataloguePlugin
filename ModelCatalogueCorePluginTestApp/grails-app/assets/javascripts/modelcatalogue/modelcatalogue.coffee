@@ -15,7 +15,8 @@
 #= require sly-repeat/scalyr.js
 #= require_self
 #= require_full_tree .
-#= require mc/index
+#= require templates/mc/index
+#mc/index loads the templates onto JS's template path.
 
 if !String.prototype.startsWith
   String.prototype.startsWith = (searchString, position) ->
