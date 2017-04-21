@@ -4,6 +4,7 @@ import rx.Observer;
 
 /**
  * Simple interface to decouple element service and domain classes
+ * ?? This is totally uninformative. Must ask Vlad.
  */
 public interface Published<T extends Published<T>> {
 

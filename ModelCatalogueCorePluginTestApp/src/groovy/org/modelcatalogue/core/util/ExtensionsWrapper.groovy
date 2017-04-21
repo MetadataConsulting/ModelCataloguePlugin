@@ -6,6 +6,7 @@ import org.modelcatalogue.core.Extension
 
 /**
  * Created by ladin on 12.02.14.
+ * Provides a Map interface to an element making use of the Extendible interface.
  */
 class ExtensionsWrapper implements Map<String, String> {
 
@@ -97,6 +98,7 @@ class ExtensionsWrapper implements Map<String, String> {
     }
 
     private Map<String, String> asReadOnlyMap() {
+        //def extensions = element.listExtensions()
         if (!element.listExtensions()) return Collections.emptyMap()
         Collections.unmodifiableMap(new LinkedHashSet(element.listExtensions()).collectEntries {
             [it.name, it.extensionValue]

@@ -17,6 +17,8 @@ import org.modelcatalogue.core.util.lists.Lists
 
 import javax.annotation.PostConstruct
 
+
+// What is this? What does it provide?
 class DataModelService {
 
     static transactional = false

@@ -18,9 +18,11 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 * Catalogue Element - there are a number of catalogue elements that make up the model
  * catalogue (please see DataType, MeasurementUnit, Model,
 * DataElement) they extend catalogue element which allows creation of incoming and outgoing
-* relationships between them. They also  share a number of characteristics.
+* relationships between them. They also share a number of characteristics.
 * */
 abstract class  CatalogueElement implements Extendible<ExtensionValue>, Published<CatalogueElement>, ApiCatalogueElement, DataModelAware {
+
+    //// Dependencies:
 
     def grailsLinkGenerator
     def relationshipService
@@ -28,6 +30,9 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     def mappingService
     def elementService
 
+    //// Grails Domain properties and configuration:
+
+    // Note: Groovy will automatically create getDataModel method which is all that is needed to implement DataModelAware.
     DataModel dataModel
 
     String name
@@ -46,6 +51,8 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     Date versionCreated = new Date()
 
     // id of the latest version
+    // This is external id from imported models, as opposed to versionNumber which is a ModelCatalogue internal id.
+    // This is a misnomer, it should be called externalId or something. Misnomers abound...
     Long latestVersionId
 
     // time stamping
@@ -55,11 +62,14 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     //stop null pointers (especially deleting new items)
     Set<Relationship> incomingRelationships = []
     Set<Relationship> outgoingRelationships = []
+    // We don't seem to use this very much?
     Set<Mapping> outgoingMappings = []
     Set<Mapping> incomingMappings = []
 
+    // what are these? What's the difference between relations and relationships?
     static transients = ['relations', 'info', 'archived', 'relations', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext', 'combinedVersion', 'inheritedAssociationsNames', 'modelCatalogueResourceName', 'dataModelSemanticVersion', 'legacyModelCatalogueId', 'link']
 
+    // We want to get rid of hasMany sometime. Someway. See "hasMany considered harmful" by Burt Beckwith: https://www.youtube.com/watch?v=-nofscHeEuU
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping, extensions: ExtensionValue]
 
     static relationships = [
@@ -95,6 +105,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     static fetchMode = [dataModel: 'eager']
 
+    //// end of Grails domain configuration
     /**
      * Functions for specifying relationships between catalogue elements using the
      * org.modelcatalogue.core.Relationship class
@@ -188,36 +199,6 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         relationshipService.unlink(source, this, type)
     }
 
-    Map<String, Object> getInfo() {
-        [
-                id: getId(),
-                name: name,
-                link: "/${GrailsNameUtils.getPropertyName(getClass())}/${getId()}"
-        ]
-    }
-
-    boolean isArchived() {
-        if (!status) return false
-        !status.modificable
-    }
-
-    def beforeValidate() {
-        removeModelCatalogueIdIfDefault()
-    }
-
-    private void removeModelCatalogueIdIfDefault() {
-        if (modelCatalogueId) {
-            String defaultId = getDefaultModelCatalogueId(true)
-            if (defaultId && (modelCatalogueId.startsWith(defaultId) || modelCatalogueId.contains('//localhost'))) {
-                modelCatalogueId = null
-            }
-        }
-    }
-
-    def beforeDelete(){
-        auditService.logElementDeleted(this)
-    }
-
     /**
      * List all relationships to this object which cannot be automatically deleted.
      * @param toBeDeleted If deleting whole {@link DataModel}, this should be specifies. Null if item to be deleted is
@@ -251,6 +232,39 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
             it.clearRelationships()
             it.delete()
         }
+    }
+    //// end of relationship methods
+
+    //// Other utility methods:
+
+    Map<String, Object> getInfo() {
+        [
+                id: getId(),
+                name: name,
+                link: "/${GrailsNameUtils.getPropertyName(getClass())}/${getId()}"
+        ]
+    }
+
+    boolean isArchived() {
+        if (!status) return false
+        !status.modificable
+    }
+
+    def beforeValidate() {
+        removeModelCatalogueIdIfDefault()
+    }
+
+    private void removeModelCatalogueIdIfDefault() {
+        if (modelCatalogueId) {
+            String defaultId = getDefaultModelCatalogueId(true)
+            if (defaultId && (modelCatalogueId.startsWith(defaultId) || modelCatalogueId.contains('//localhost'))) {
+                modelCatalogueId = null
+            }
+        }
+    }
+
+    def beforeDelete(){
+        auditService.logElementDeleted(this)
     }
 
     boolean hasModelCatalogueId() {
@@ -316,16 +330,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         resourceName
     }
 
-    final Map<String, String> ext = new ExtensionsWrapper(this)
 
-    void setExt(Map<String, String> ext) {
-        ext = OrderedMap.fromJsonMap(ext)
-        for (String key in this.ext.keySet() - ext.keySet()) {
-
-            this.ext.remove key
-        }
-        this.ext.putAll(ext)
-    }
 
     final String toString() {
         DataModel dataModel
@@ -363,12 +368,29 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
         builder.toString()
     }
+    //// extensions mapping containing among other things metadata
+    final Map<String, String> ext = new ExtensionsWrapper(this)
 
+    // add ext to this.ext.
+    void setExt(Map<String, String> ext) {
+        ext = OrderedMap.fromJsonMap(ext)
+        for (String key in this.ext.keySet() - ext.keySet()) {
+
+            this.ext.remove key
+        }
+        this.ext.putAll(ext)
+    }
+
+    //// Implementation of Extendible<ExtensionValue>
+
+    // because extensions is declared in hasMany, when it is accessed Grails will automatically scour the database for
+    // ExtensionValues which belong to this Element.
     @Override
     Set<ExtensionValue> listExtensions() {
         extensions
     }
 
+    // addExtension adds an extension to the database for this and all children (recursively).
     @Override
     ExtensionValue addExtension(String name, String value) {
         if (getId() && isAttached()) {
@@ -404,6 +426,42 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     ExtensionValue findExtensionByName(String name) {
         listExtensions()?.find { it.name == name }
     }
+
+
+    @Override
+    int countExtensions() {
+        listExtensions()?.size() ?: 0
+    }
+
+    ExtensionValue updateExtension(ExtensionValue old, String value) {
+        Inheritance.withChildren(this) {
+            ExtensionValue oldExt = it.findExtensionByName(old.name)
+            if (oldExt && oldExt.extensionValue == old.extensionValue) {
+                it.updateExtension(oldExt, value)
+            }
+        }
+        old.orderIndex = System.currentTimeMillis()
+        if (old.extensionValue == value) {
+            FriendlyErrors.failFriendlySaveWithoutFlush(old)
+            return old
+        }
+        old.extensionValue = value
+        if (old.validate()) {
+            auditService.logMetadataUpdated(old)
+        }
+        FriendlyErrors.failFriendlySaveWithoutFlush(old)
+    }
+
+    /**
+     * Checks whether a certain extension presents in this catalogue element.
+     * @param shortName Short name of the extension. It is prefixed with <i>http://www.modelcatalogue.org/metadata/#</i>.
+     */
+    void checkExtensionPresence(String shortName) {
+        if (!ext.get("http://www.modelcatalogue.org/metadata/#$shortName"))
+            errors.rejectValue("ext", "catalogElement.ext.$shortName", "${shortName.capitalize()} must be specified!")
+    }
+
+    //// end of Extendible implementation
 
     boolean isReadyForQueries() {
         isAttached() && !hasErrors()
@@ -478,38 +536,6 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         }
     }
 
-    @Override
-    int countExtensions() {
-        listExtensions()?.size() ?: 0
-    }
-
-    ExtensionValue updateExtension(ExtensionValue old, String value) {
-        Inheritance.withChildren(this) {
-            ExtensionValue oldExt = it.findExtensionByName(old.name)
-            if (oldExt && oldExt.extensionValue == old.extensionValue) {
-                it.updateExtension(oldExt, value)
-            }
-        }
-        old.orderIndex = System.currentTimeMillis()
-        if (old.extensionValue == value) {
-            FriendlyErrors.failFriendlySaveWithoutFlush(old)
-            return old
-        }
-        old.extensionValue = value
-        if (old.validate()) {
-            auditService.logMetadataUpdated(old)
-        }
-        FriendlyErrors.failFriendlySaveWithoutFlush(old)
-    }
-
-    /**
-     * Checks whether a certain extension presents in this catalogue element.
-     * @param shortName Short name of the extension. It is prefixed with <i>http://www.modelcatalogue.org/metadata/#</i>.
-     */
-    void checkExtensionPresence(String shortName) {
-        if (!ext.get("http://www.modelcatalogue.org/metadata/#$shortName"))
-            errors.rejectValue("ext", "catalogElement.ext.$shortName", "${shortName.capitalize()} must be specified!")
-    }
 
     // -- API
 
