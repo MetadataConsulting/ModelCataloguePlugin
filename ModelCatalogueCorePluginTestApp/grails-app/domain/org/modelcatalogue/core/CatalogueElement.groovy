@@ -62,7 +62,10 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     /** stop null pointers (especially deleting new items) */
     Set<Relationship> incomingRelationships = []
     Set<Relationship> outgoingRelationships = []
-    /** We don't seem to use this very much? */
+    /** We don't seem to use this very much?
+     * David: "For mapping between individual items. Not like an OWL ontology-level mapping."
+     * Vlad: "Only used between data types and not much at the moment.
+     * Can't remember any use case, have a feeling there was one once."*/
     Set<Mapping> outgoingMappings = []
     Set<Mapping> incomingMappings = []
 
@@ -85,12 +88,12 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     static transients = ['relations',
                          'incomingRelations', 'outgoingRelations',
                          'defaultModelCatalogueId', 'legacyModelCatalogueId',
-                         'ext', 'info', 'archived', 'link'
+                         'ext', 'info', 'archived', 'link',
                          'combinedVersion', 'dataModelSemanticVersion',
                          'inheritedAssociationsNames', 'modelCatalogueResourceName',
                          ]
 
-    // We want to get rid of hasMany sometime. Someway. See "hasMany considered harmful" by Burt Beckwith: https://www.youtube.com/watch?v=-nofscHeEuU
+    /** We want to get rid of hasMany sometime. Someway. See "hasMany considered harmful" by Burt Beckwith: https://www.youtube.com/watch?v=-nofscHeEuU */
     static hasMany = [incomingRelationships: Relationship,
                       outgoingRelationships: Relationship,
                       outgoingMappings: Mapping,
