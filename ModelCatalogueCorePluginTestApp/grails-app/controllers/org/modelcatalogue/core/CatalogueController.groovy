@@ -22,7 +22,12 @@ class CatalogueController {
     def modelCatalogueSecurityService
     def executorService
 
+    /** Does what? Must ask Vlad.
+     * Vlad: Used for cross-references or simple references.
+     * Creates XML for Export XML action,
+     * and Edit XSD action (which is only available for Data Classes) */
     def xref() {
+        // what is this magic? Somehow getting the currently looked at element.
         CatalogueElement element = elementService.findByModelCatalogueId(CatalogueElement, request.forwardURI.replace('/export', ''))
 
         if (!params.resource || !element) {
@@ -46,9 +51,17 @@ class CatalogueController {
             return
         }
 
+        // What is resource?
         redirect controller: params.resource, action: 'show', id: element.id
     }
 
+    /** Vlad: Did something similar to xref().
+     * In early times it was used to fetch element by extension (i.e. metadata).
+     * e.g. HPO elements could be fetched by /ext/HPO_ID/HP_123445.
+     * That is, if an element had metadata HPO_ID:HP_123445 it would be found by this method.
+     * And then it would be output in XML.
+     * It seemed like a nice feature to have but it's never been used.
+     * It could probably be removed without breaking anything.*/
     def ext() {
         String key = params.key
         String value = params.value
@@ -90,11 +103,12 @@ class CatalogueController {
         redirect url: "${grailsApplication.config.grails.serverURL}/catalogue/${GrailsNameUtils.getPropertyName(HibernateHelper.getEntityClass(element))}/${element.id}"
     }
 
-
+    /** Shows progress of importing catalogues or publishing/finalising drafts. */
     def feedback(String key) {
         render(BuildProgressMonitor.get(key) as JSON)
     }
 
+    /** Same as feedback but fetches all the feedback monitors? */
     def feedbacks() {
         if (params.max) {
             params.max = params.long('max')
@@ -106,6 +120,8 @@ class CatalogueController {
         }) as JSON)
     }
 
+    /** Presents options for preloading database from XML.
+     * Used when running blank catalogue. */
     def dataModelsForPreload() {
         // only render data models for preload if there is no data model in the catalogue (very likely the first run)
         if (DataModel.findByNameNotEqual('Clinical Tags') || !modelCatalogueSecurityService.hasRole(UserService.ROLE_ADMIN)) {
@@ -117,6 +133,7 @@ class CatalogueController {
         render((grailsApplication.config.mc.preload ?: []) as JSON)
     }
 
+    /** Actually performs the catalogue import from an XML file */
     def importFromUrl() {
         def urls = request.JSON.urls
 
