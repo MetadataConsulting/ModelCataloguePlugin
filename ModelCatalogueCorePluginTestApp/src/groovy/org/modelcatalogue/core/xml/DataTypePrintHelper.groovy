@@ -6,6 +6,8 @@ import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.enumeration.Enumeration
+
+/** Helper for printing Data Types */
 @Singleton
 class DataTypePrintHelper extends CatalogueElementPrintHelper<DataType> {
 

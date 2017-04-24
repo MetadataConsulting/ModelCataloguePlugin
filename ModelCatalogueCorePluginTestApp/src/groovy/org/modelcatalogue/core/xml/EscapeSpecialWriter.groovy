@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.xml
 
-/** Escapes what? */
+/** Escapes special characters */
 class EscapeSpecialWriter extends Writer {
 
     private final Writer delegate

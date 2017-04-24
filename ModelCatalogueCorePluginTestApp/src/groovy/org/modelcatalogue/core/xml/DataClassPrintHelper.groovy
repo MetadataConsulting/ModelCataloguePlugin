@@ -3,6 +3,7 @@ package org.modelcatalogue.core.xml
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.Relationship
 
+/** Helper for printing Data Classes */
 @Singleton
 class DataClassPrintHelper extends CatalogueElementPrintHelper<DataClass> {
 

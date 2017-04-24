@@ -5,7 +5,7 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.HibernateHelper
 
-/** Seems to implement the visitor pattern for printing */
+/** Seems to implement the visitor pattern, using the other <Resource>PrintHelpers for printing an element. */
 abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
 
     /** Get the appropriate helper for writing a CatalogueElement of a particular class.

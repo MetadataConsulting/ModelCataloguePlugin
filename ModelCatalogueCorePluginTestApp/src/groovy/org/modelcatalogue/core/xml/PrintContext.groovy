@@ -5,7 +5,7 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.DataClassService
 
-/** What is this? */
+/** PrintContext keeps track of printed elements and contains some settings for the printing.*/
 class PrintContext {
 
     DataModelService dataModelService
@@ -14,9 +14,11 @@ class PrintContext {
 
     boolean idIncludeVersion
     boolean noHref
+    /** Whether to print same elements more than once, as they appear in the structure explored */
     boolean repetitive
 
     DataModel currentDataModel
+    /** The data model within which to print */
     DataModel keepInside
     Set<Long> idsOfPrinted = []
 

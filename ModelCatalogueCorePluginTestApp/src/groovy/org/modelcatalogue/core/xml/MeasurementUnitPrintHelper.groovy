@@ -3,6 +3,7 @@ package org.modelcatalogue.core.xml
 import org.modelcatalogue.core.MeasurementUnit
 
 /**
+ * Helper for printing Measurement Units
  * Created by ladin on 15.01.15.
  */
 @Singleton

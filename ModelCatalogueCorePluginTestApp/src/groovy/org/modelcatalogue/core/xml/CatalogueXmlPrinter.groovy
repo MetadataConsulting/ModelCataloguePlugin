@@ -11,8 +11,10 @@ import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.policy.Convention
 import org.modelcatalogue.core.policy.Conventions
 
-/** Somehow prints out some aspects of an element as XML. Which aspects? And how does it get them?
- * Does it have to do with Criteria? */
+/** Uses CatalogueElementPrintHelper to print out some aspects of an element as XML. Which aspects? And how does it get them?
+ * Does it have to do with Criteria?
+ * @see groovy.xml.MarkupBuilder XML Markup Builder
+ * @see org.modelcatalogue.core.xml.CatalogueElementPrintHelper.*/
 class CatalogueXmlPrinter {
 
     static final String NAMESPACE_URL = 'http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry.xsd'
@@ -38,19 +40,22 @@ class CatalogueXmlPrinter {
         }
 
         return { Writer writer ->
+            // setup Builder upon Writer:
             EscapeSpecialWriter escapeSpecialWriter = new EscapeSpecialWriter(writer)
             MarkupBuilder builder = new MarkupBuilder(escapeSpecialWriter)
             builder.doubleQuotes = true
+
+            // The actual building:
             builder.catalogue (ns) {
                 CatalogueElementPrintHelper.printElement(builder, element, context, null)
                 printRelationshipTypes(builder, context)
                 printPolicies(builder, context)
             }
-
-            writer
-        } as Writable
+            writer // return writer
+        } as Writable // Writable is an interface with one method that takes a Writer and returns a Writer.
     }
 
+    /** Used in RelationshipsXmlRenderer */
     public <CE extends CatalogueElement> Writable bind(Iterable<CE> elements, @DelegatesTo(PrintContext) Closure contextConfigurer = {}) {
         PrintContext context = new PrintContext(dataModelService, modelService)
         context.with contextConfigurer

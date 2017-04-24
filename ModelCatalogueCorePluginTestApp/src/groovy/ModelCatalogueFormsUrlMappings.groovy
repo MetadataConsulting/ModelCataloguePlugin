@@ -1,5 +1,6 @@
 import org.springframework.http.HttpMethod
 
+/** What is this? */
 class ModelCatalogueFormsUrlMappings {
 
     static mappings = {
