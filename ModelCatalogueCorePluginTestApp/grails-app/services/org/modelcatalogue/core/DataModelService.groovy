@@ -18,7 +18,7 @@ import org.modelcatalogue.core.util.lists.Lists
 import javax.annotation.PostConstruct
 
 
-// What is this? What does it provide?
+/** What is this? */
 class DataModelService {
 
     static transactional = false
@@ -77,6 +77,7 @@ class DataModelService {
         model
     }
 
+    /** What is classified? What is it meant to do? Why are there so many of them? */
     public <T> ListWrapper<T> classified(ListWrapper<T> list, DataModelFilter modelFilter = dataModelFilter) {
         if (!(list instanceof ListWithTotalAndTypeWrapper)) {
             throw new IllegalArgumentException("Cannot classify list $list. Only ListWithTotalAndTypeWrapper is currently supported")
