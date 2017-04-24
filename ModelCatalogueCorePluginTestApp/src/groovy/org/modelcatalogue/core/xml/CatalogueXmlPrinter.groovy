@@ -20,8 +20,9 @@ class CatalogueXmlPrinter {
     static final String NAMESPACE_URL = 'http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry.xsd'
     static final String ASSETS_NAMESPACE_URL = 'http://www.metadataregistry.org.uk/assets/schema/2.0/metadataregistry_asset.xsd'
 
-    // These are used for ...
+    /** Given to the PrintContext */
     DataModelService dataModelService
+    /** Given to the PrintContext */
     DataClassService modelService
 
     CatalogueXmlPrinter(DataModelService dataModelService, DataClassService modelService) {
@@ -29,13 +30,25 @@ class CatalogueXmlPrinter {
         this.modelService = modelService
     }
 
+    /** Returns a Writable which will write an element as XML to a given writer.
+     * Makes use of the multi-element version below.
+     * @param element element to be written
+     * @param contextConfigurer configures the PrintContext */
     Writable bind(CatalogueElement element, @DelegatesTo(PrintContext) Closure contextConfigurer = {}) {
+        return bind([element], contextConfigurer)
+    }
+
+    /** Returns a Writable which will write a number of elements as XML to a given writer.
+     * Used directly in RelationshipsXmlRenderer, and indirectly to implement bind for a single element.
+     * @param elements elements to be written
+     * @param contextConfigurer configures the PrintContext
+     * */
+    public <CE extends CatalogueElement> Writable bind(Iterable<CE> elements, @DelegatesTo(PrintContext) Closure contextConfigurer = {}) {
         PrintContext context = new PrintContext(dataModelService, modelService)
         context.with contextConfigurer
 
         Map<String, String> ns = [xmlns : NAMESPACE_URL]
-
-        if (element.instanceOf(Asset)) {
+        if (elements.any {it.instanceOf(Asset)}) { // change namespace for assets. Originally in the single-element bind.
             ns.xmlns = ASSETS_NAMESPACE_URL
         }
 
@@ -47,33 +60,14 @@ class CatalogueXmlPrinter {
 
             // The actual building:
             builder.catalogue (ns) {
-                CatalogueElementPrintHelper.printElement(builder, element, context, null)
-                printRelationshipTypes(builder, context)
-                printPolicies(builder, context)
-            }
-            writer // return writer
-        } as Writable // Writable is an interface with one method that takes a Writer and returns a Writer.
-    }
-
-    /** Used in RelationshipsXmlRenderer */
-    public <CE extends CatalogueElement> Writable bind(Iterable<CE> elements, @DelegatesTo(PrintContext) Closure contextConfigurer = {}) {
-        PrintContext context = new PrintContext(dataModelService, modelService)
-        context.with contextConfigurer
-
-        return { Writer writer ->
-            EscapeSpecialWriter escapeSpecialWriter = new EscapeSpecialWriter(writer)
-            MarkupBuilder builder = new MarkupBuilder(escapeSpecialWriter)
-            builder.doubleQuotes = true
-            builder.catalogue (xmlns : NAMESPACE_URL) {
                 for (CE element in elements) {
                     CatalogueElementPrintHelper.printElement(builder, element, context, null)
                 }
                 printRelationshipTypes(builder, context)
                 printPolicies(builder, context)
             }
-
-            writer
-        } as Writable
+            writer // return writer
+        } as Writable // // Writable is an interface with one method that takes a Writer, does something with it, and returns a Writer (presumably the same one).
     }
 
     private static void printRelationshipTypes(MarkupBuilder builder, PrintContext context) {
