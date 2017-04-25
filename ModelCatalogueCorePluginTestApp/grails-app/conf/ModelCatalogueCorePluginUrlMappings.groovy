@@ -15,6 +15,7 @@ class ModelCatalogueCorePluginUrlMappings {
         "/catalogue/$resource/$id(.${version})?/export" (controller: 'catalogue', action: 'xref', method: HttpMethod.GET) {
             format = 'xml'
         }
+        "/catalogue/$resource/$id(.${version})/cytoscapeJsonExport" (controller: 'catalogue', action: 'cytoscape_json', method: HttpMethod.GET) // { format = 'json' }
 
         "/api/modelCatalogue/core/feedback"(controller: 'catalogue', action: 'feedbacks', method: HttpMethod.GET)
         "/api/modelCatalogue/core/feedback/$key"(controller: 'catalogue', action: 'feedback', method: HttpMethod.GET)

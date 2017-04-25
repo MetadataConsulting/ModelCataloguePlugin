@@ -4,13 +4,16 @@ import grails.converters.JSON
 import grails.gorm.DetachedCriteria
 import grails.util.Environment
 import grails.util.GrailsNameUtils
+import groovy.json.JsonBuilder
 import org.modelcatalogue.core.cache.CacheService
+import org.modelcatalogue.core.cytoscape.json.CatalogueCytoscapeJsonPrinter
 import org.modelcatalogue.core.security.UserService
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.xml.CatalogueXmlPrinter
+import org.modelcatalogue.core.xml.EscapeSpecialWriter
 import org.springframework.http.HttpStatus
 
 class CatalogueController {
@@ -37,9 +40,11 @@ class CatalogueController {
 
         if (params.format == 'xml') {
             response.contentType = 'application/xml'
+            // What is that regex?
+            // What are these special characters s: and s1:?
             response.setHeader("Content-disposition", "attachment; filename=\"${element.name.replaceAll(/\s+/, '_')}.mc.xml\"")
             CatalogueXmlPrinter printer = new CatalogueXmlPrinter(dataModelService, dataClassService)
-            printer.bind(element){
+            Writable w = printer.bind(element){ // bind element with the following as configuration for the PrintContext
                 idIncludeVersion = true
                 if (params.full != 'true') {
                     keepInside = element.instanceOf(DataModel) ? element : element.dataModel
@@ -47,10 +52,42 @@ class CatalogueController {
                 if (params.repetitive == 'true') {
                     repetitive = true
                 }
-            }.writeTo(response.writer)
+            }
+            w.writeTo(response.writer)
             return
         }
 
+        // What is resource?
+        redirect controller: params.resource, action: 'show', id: element.id
+    }
+
+    /** Method to create JSON file for cytoscape to display a graph of the element.
+     * Adapted from xref, using something similar to CatalogueXmlPrinter, etc.
+     * At the moment, simply finding the elements related by Hierarchy and Containment within a class,
+     * displaying those relations.
+     * Next step: metadata.*/
+    def cytoscape_json() {
+        // what is this magic? Somehow getting the currently looked at element.
+        CatalogueElement element = elementService.findByModelCatalogueId(CatalogueElement, request.forwardURI.replace('/cytoscapeJsonExport', ''))
+
+        if (!params.resource || !element) {
+            render status: HttpStatus.NOT_FOUND
+            return
+        }
+        response.contentType = 'application/json'
+        // What is that regex?
+        // What are these special characters s: and s1:? IDE-interpolated argument names.
+        response.setHeader("Content-disposition", "attachment; filename=\"${element.name.replaceAll(/\s+/, '_')}.mc.cytoscape.json\"")
+        CatalogueCytoscapeJsonPrinter printer = new CatalogueCytoscapeJsonPrinter(dataModelService, dataClassService)
+        JsonBuilder builder = printer.bind(element){ // bind element with the following as configuration for the PrintContext
+            idIncludeVersion = true
+            if (params.full != 'true') {
+                keepInside = element.instanceOf(DataModel) ? element : element.dataModel
+            }
+        }
+        EscapeSpecialWriter escapeSpecialWriter = new EscapeSpecialWriter(response.writer)
+        builder.writeTo(response.writer)
+        return
         // What is resource?
         redirect controller: params.resource, action: 'show', id: element.id
     }
