@@ -13,8 +13,8 @@ class DataClassPrintHelper extends CatalogueElementPrintHelper<DataClass> {
     }
 
     @Override
-    void processElements(Object markupBuilder, DataClass element, PrintContext context, Relationship relationship) {
-        super.processElements(markupBuilder, element, context, relationship)
+    void processElement(Object markupBuilder, DataClass element, PrintContext context, Relationship relationship) {
+        super.processElement(markupBuilder, element, context, relationship)
 
         /** But how can we get these relationships? These must be dynamic methods.
          *

@@ -24,7 +24,7 @@ class DataModelPrintHelper extends CatalogueElementPrintHelper<DataModel> {
     }
 
     @Override
-    void processElements(Object markupBuilder, DataModel dataModel, PrintContext context, Relationship rel) {
+    void processElement(Object markupBuilder, DataModel dataModel, PrintContext context, Relationship rel) {
         /**
          * if we are working in the context of a currentDataModel then just print this
          * Actually this stuff with currentDataModel seems to be implemented by
@@ -36,11 +36,11 @@ class DataModelPrintHelper extends CatalogueElementPrintHelper<DataModel> {
         }
         else {
 
-            context.typesUsed << 'declaration' //what's this?
+            context.relationshipTypesUsed << 'declaration' // describe
             // process everything in this data model with context.currentDataModel set.
             context.currentDataModel = dataModel
 
-            super.processElements(markupBuilder, dataModel, context, rel)
+            super.processElement(markupBuilder, dataModel, context, rel)
             if (dataModel.revisionNotes) {
                 markupBuilder.revisionNotes dataModel.revisionNotes
             }

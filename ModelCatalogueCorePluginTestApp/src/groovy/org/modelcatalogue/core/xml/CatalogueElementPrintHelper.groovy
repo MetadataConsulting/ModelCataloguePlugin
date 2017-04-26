@@ -9,7 +9,7 @@ import org.modelcatalogue.core.util.HibernateHelper
 abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
 
     /** Get the appropriate helper for writing a CatalogueElement of a particular class.
-     * It seems that these helpers override processElements but not printElement.
+     * It seems that these helpers override processElement but not printElement.
      * @param type The class or type of the CatalogueElement to be written.
      * @return The appropriate helper to write the CatalogueElement. */
     private static <E extends CatalogueElement> CatalogueElementPrintHelper<E> getHelperForType(Class<E> type) {
@@ -51,7 +51,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
      * processElement also does some printing.
      * printElement is not overridden by helper subclasses.
      * Helper subclasses call printElement to recurse on related elements
-     * e.g. DataModel's processElements calls printElement on top level DataClasses
+     * e.g. DataModel's processElement calls printElement on top level DataClasses
      * @param markupBuilder
      * @param element
      * @param context
@@ -64,25 +64,11 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         if (!elementTypeName) {
             elementTypeName = helper.topLevelName
         }
-        // Moved to DataModelPrintHelper
-        /*
-        if (element instanceof DataModel) {
 
-            if (context.currentDataModel) { // This would be null on first run through.
-                // If we come to a data model again, then we just do the following and stop.
-                markupBuilder."${elementTypeName}"(ref(element, context, true)) {
-                    processRelationshipMetadata(markupBuilder, context, rel)
-                }
-                return
-            }
-            else {
-                context.currentDataModel = element
-                context.typesUsed << 'declaration' //what's this?
-                // continue on
-            }
-        }
-        */
-
+        /**
+         * The following executes if the element has already been marked as printed,
+         * or if it is outside the model we want to keep inside.
+         */
         if (context.printOnlyReference(element)) {
             markupBuilder."${elementTypeName}"(ref(element, context, true)) {
                 processRelationshipMetadata(markupBuilder, context, rel)
@@ -90,11 +76,17 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             return
         }
 
+        /**
+         * We mark as printed before printing, which means if the element appears again
+         * "below" itself we will print only a reference.
+         */
         context.markAsPrinted(element) // Why do we mark as printed *before* processing?
 
-        // This is the main processing of the element, which may be recursive.
+        /** This is the main processing/printing of the element, which may be recursive.
+         *
+         */
         markupBuilder."${elementTypeName}"(helper.collectAttributes(element, context)) {
-            helper.processElements(markupBuilder, element, context, rel)
+            helper.processElement(markupBuilder, element, context, rel)
         }
         /**
          *  why not make this part of context? Or do we want to mark
@@ -104,14 +96,6 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             context.removeFromPrinted(element)
         }
 
-        /** This connects with the code at the top about DataModels.
-         * Arguably this should be in the dataModelHelper.
-        */
-        /*
-        if (element instanceof DataModel) {
-            context.currentDataModel = null
-        }
-        */
     }
 
 
@@ -144,24 +128,19 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
     }
 
     /**
-     * For the CatalogueElementPrintHelper class, processElements is not recursive,
+     * For the CatalogueElementPrintHelper class, processElement is not recursive,
      * that is it doesn't get to processing other elements via relationships. It prints:
-     * description of element,
-     * BasedOn relationships,
-     * RelatedTo relationships,
-     * SynonymFor relationships,
-     * metadata extensions,
-     * and other ingoing and outgoing relationships.
+     * description, BasedOn, RelatedTo, SynonymFor relationships,
+     * metadata extensions, and then the rest of the relationships.
      *
-     * Helper subclasses call this method
-     * by super at the beginning of their overrides. The overrides may recurse into
-     * processing other elements.
+     * Helper subclasses call this method by super at the beginning of their overrides.
+     * The overrides may recurse into processing other elements.
      * @param markupBuilder
      * @param element
      * @param context
      * @param relationship
      */
-    void processElements(markupBuilder, E element, PrintContext context, Relationship relationship) {
+    void processElement(markupBuilder, E element, PrintContext context, Relationship relationship) {
         processRelationshipMetadata(markupBuilder, context, relationship)
 
         if (element.description) {
@@ -223,7 +202,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         if (!rel) {
             return
         }
-        context.typesUsed << rel.relationshipType.name
+        context.relationshipTypesUsed << rel.relationshipType.name
         if (rel.ext) {
             markupBuilder.metadata {
                 for (Map.Entry<String, String> entry in rel.ext.entrySet()) {

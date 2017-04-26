@@ -14,17 +14,26 @@ class PrintContext {
     /** used for getTopLevelDataClasses method in DataModelPrintHelper */
     DataClassService dataClassService
 
+    /** used in ref and collectAttributes*/
     boolean idIncludeVersion
+    /** used in ref */
     boolean noHref
     /** Whether to print same elements more than once, as they appear in the structure explored */
     boolean repetitive
 
-    DataModel currentDataModel
-    /** The data model within which to print */
+
+    /** The data model within which to print. If this is set then
+     * only CatalogueElements in this model can be printed. */
     DataModel keepInside
+    /** Also in some way the data model within which to print!
+     * Used in ref and collectAttributes.
+     * Even if keepInside is null which means we want to print things other models in full,
+     * the way things are now, this would prevent a different model from being printed itself,
+     * although non-model CatalogueElements in a different model could be printed.*/
+    DataModel currentDataModel
     Set<Long> idsOfPrinted = []
 
-    Set<String> typesUsed = new TreeSet<String>()
+    Set<String> relationshipTypesUsed = new TreeSet<String>()
     Set<String> policiesUsed = new TreeSet<String>()
 
     PrintContext(DataModelService dataModelService, DataClassService dataClassService) {

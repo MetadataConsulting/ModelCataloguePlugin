@@ -13,8 +13,8 @@ class ValidationRulePrintHelper extends CatalogueElementPrintHelper<ValidationRu
     }
 
     @Override
-    void processElements(Object markupBuilder, ValidationRule rule, PrintContext context, Relationship relationship) {
-        super.processElements(markupBuilder, rule, context, relationship)
+    void processElement(Object markupBuilder, ValidationRule rule, PrintContext context, Relationship relationship) {
+        super.processElement(markupBuilder, rule, context, relationship)
         if (rule.component) {
             markupBuilder.component rule.component
         }

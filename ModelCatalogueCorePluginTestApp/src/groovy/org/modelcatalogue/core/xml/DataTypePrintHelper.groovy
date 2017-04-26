@@ -17,8 +17,8 @@ class DataTypePrintHelper extends CatalogueElementPrintHelper<DataType> {
     }
 
     @Override
-    void processElements(Object markupBuilder, DataType dataType, PrintContext context, Relationship rel) {
-        super.processElements(markupBuilder, dataType, context, rel)
+    void processElement(Object markupBuilder, DataType dataType, PrintContext context, Relationship rel) {
+        super.processElement(markupBuilder, dataType, context, rel)
         if (dataType.regexDef) {
             markupBuilder.regex dataType.regexDef
         } else if (dataType.rule) {

@@ -23,11 +23,11 @@ class CatalogueXmlPrinter {
     /** Given to the PrintContext */
     DataModelService dataModelService
     /** Given to the PrintContext */
-    DataClassService modelService
+    DataClassService dataClassService
 
-    CatalogueXmlPrinter(DataModelService dataModelService, DataClassService modelService) {
+    CatalogueXmlPrinter(DataModelService dataModelService, DataClassService dataClassService) {
         this.dataModelService = dataModelService
-        this.modelService = modelService
+        this.dataClassService = dataClassService
     }
 
     /** Returns a Writable which will write an element as XML to a given writer.
@@ -44,8 +44,8 @@ class CatalogueXmlPrinter {
      * @param contextConfigurer configures the PrintContext
      * */
     public <CE extends CatalogueElement> Writable bind(Iterable<CE> elements, @DelegatesTo(PrintContext) Closure contextConfigurer = {}) {
-        PrintContext context = new PrintContext(dataModelService, modelService)
-        context.with contextConfigurer
+        PrintContext context = new PrintContext(dataModelService, dataClassService)
+        context.with contextConfigurer // somewhat reverse: run Configurer with context as delegate
 
         Map<String, String> ns = [xmlns : NAMESPACE_URL]
         if (elements.any {it.instanceOf(Asset)}) { // change namespace for assets. Originally in the single-element bind.
@@ -63,6 +63,11 @@ class CatalogueXmlPrinter {
                 for (CE element in elements) {
                     CatalogueElementPrintHelper.printElement(builder, element, context, null)
                 }
+                /**
+                 * After the main printing above the context will have saved sets of
+                 * RelationshipTypes and Policies referred to in the main,
+                 * which are now printed.
+                 */
                 printRelationshipTypes(builder, context)
                 printPolicies(builder, context)
             }
@@ -71,12 +76,12 @@ class CatalogueXmlPrinter {
     }
 
     private static void printRelationshipTypes(MarkupBuilder builder, PrintContext context) {
-        if (!context.typesUsed) {
+        if (!context.relationshipTypesUsed) {
             return
         }
         builder.mkp.comment("Relationship types are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored! For non-admin users, the types are always imported as system ones and they need to be approved by the catalogue admin first.")
         builder.relationshipTypes {
-            for (String relationshipTypeName in context.typesUsed) {
+            for (String relationshipTypeName in context.relationshipTypesUsed) {
                 RelationshipType type = RelationshipType.readByName(relationshipTypeName)
                 relationshipType(collectRelationshipTypeAttrs(type)) {
                     sourceToDestination(label: type.sourceToDestination, type.sourceToDestinationDescription)
