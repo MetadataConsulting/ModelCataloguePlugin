@@ -174,7 +174,28 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
         )
     }
 
-
+    /**
+     * Containment, Involvedness, RuleContext are effectively
+     * "RelationshipTypeType"s. They are types or categories of RelationshipType.
+     * Originally there was only hierarchy which could be to either DataClasses or DataElements.
+     * Then David wanted to get rid of hierarchy and call it containment.
+     * But then it proved useful to have two sorts of relationships:
+     * one from Classes to Elements, the other from Classes to Classes.
+     * This was used in SQL procedures.
+     *
+     * Some of these are meant to be representing types of relationship in other
+     * modelling systems such as eCore and UML (but this hasn't been used).
+     *
+     * This is extremely meta and should probably be formalised and documented somewhere,
+     * what these RelationshipTypeTypes are.
+     *
+     * From DataClass we have
+     * RelationshipTypeType : RelationshipType
+     * containment: 'contains',
+     * hierarchy: 'parentOf'
+     * Any particular DataClass would have a number of 'parentOf' Relationships
+     * (Relationships with RelationshipType named 'parentOf') coming from it.
+     */
     static RelationshipType getContainmentType() {
         readByName("containment")
     }

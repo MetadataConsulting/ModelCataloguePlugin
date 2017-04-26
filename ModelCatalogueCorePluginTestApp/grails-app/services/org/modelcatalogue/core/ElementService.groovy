@@ -27,7 +27,7 @@ import org.springframework.transaction.TransactionStatus
 import rx.Observer
 
 
-/** Used in Finalization/Draft chain. */
+/** Used in draft/finalization chain. */
 class ElementService implements Publisher<CatalogueElement> {
 
 

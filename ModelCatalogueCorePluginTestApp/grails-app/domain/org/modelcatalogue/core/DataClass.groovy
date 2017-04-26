@@ -6,6 +6,12 @@ import org.modelcatalogue.core.util.Legacy
 
 class DataClass extends CatalogueElement {
 
+    /** Originally there was only hierarchy which could be to either DataClasses or DataElements.
+     * Then David wanted to get rid of hierarchy and call it containment.
+     * But then it proved useful to have two sorts of relationships:
+     * one from Classes to Elements, the other from Classes to Classes.
+     * This was used in SQL procedures.
+     */
     static relationships = [
             incoming: [hierarchy: 'childOf', ruleContext: 'contextFor'],
             outgoing: [containment: 'contains', hierarchy: 'parentOf']
