@@ -85,11 +85,13 @@ class CatalogueController {
                 keepInside = element.instanceOf(DataModel) ? element : element.dataModel
             }
         }
-        EscapeSpecialWriter escapeSpecialWriter = new EscapeSpecialWriter(response.writer)
-        builder.writeTo(response.writer)
+        // EscapeSpecialWriter escapeSpecialWriter = new EscapeSpecialWriter(response.writer)
+        response.writer.out.append(builder.toPrettyString())
+        // builder.writeTo(response.writer)
+        response.writer.flush()
         return
         // What is resource?
-        redirect controller: params.resource, action: 'show', id: element.id
+        // redirect controller: params.resource, action: 'show', id: element.id
     }
 
     /** Vlad: Did something similar to xref().

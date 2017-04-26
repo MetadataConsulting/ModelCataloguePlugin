@@ -55,7 +55,6 @@ class DataTypePrintHelper extends CatalogueElementPrintHelper<DataType> {
         }
     }
 
-    @Override
     protected void printBasedOn(Object markupBuilder, Relationship rel, PrintContext context) {
         printElement(markupBuilder, rel.destination, context, rel)
     }
