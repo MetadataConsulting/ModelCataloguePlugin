@@ -8,10 +8,11 @@ import org.modelcatalogue.core.DataClassService
 /** PrintContext keeps track of printed elements and contains some settings for the printing.*/
 class PrintContext {
 
-    /** used for classifed method in DataModelPrintHelper */
+    /** used for classified method in DataModelPrintHelper
+     * (model used to be a classification) */
     DataModelService dataModelService
     /** used for getTopLevelDataClasses method in DataModelPrintHelper */
-    DataClassService modelService
+    DataClassService dataClassService
 
     boolean idIncludeVersion
     boolean noHref
@@ -26,9 +27,9 @@ class PrintContext {
     Set<String> typesUsed = new TreeSet<String>()
     Set<String> policiesUsed = new TreeSet<String>()
 
-    PrintContext(DataModelService dataModelService, DataClassService modelService) {
+    PrintContext(DataModelService dataModelService, DataClassService dataClassService) {
         this.dataModelService = dataModelService
-        this.modelService = modelService
+        this.dataClassService = dataClassService
     }
 
     void markAsPrinted(CatalogueElement element) {
@@ -44,21 +45,13 @@ class PrintContext {
     }
 
     boolean printOnlyReference(CatalogueElement catalogueElement) {
-        if (wasPrinted(catalogueElement)) {
-            return true
-        }
-        if (!keepInside) {
-            return false
-        }
-        if (!catalogueElement.dataModel) {
-            return false
-        }
-        if (catalogueElement.dataModel == keepInside) {
-            return false
-        }
-        if (catalogueElement == keepInside) {
-            return false
-        }
-        return true
+        // && binds tighter than ||.
+        // print only a reference to the element rather than the full thing if...
+        return ( wasPrinted(catalogueElement) || // the element was printed or... (
+            keepInside && // we want to keep inside a model and
+            catalogueElement.dataModel && //  the element has a model and
+            catalogueElement.dataModel != keepInside && //  the two are different and
+            catalogueElement != keepInside)
+        // the element is itself not the model we want to keep inside.) This seems like a vacuous check since for a model catalogueElement.dataModel should equal catalogueElement.
     }
 }
