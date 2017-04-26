@@ -13,10 +13,10 @@ class DataElementPrintHelper extends CatalogueElementPrintHelper<DataElement> {
     }
 
     @Override
-    void processElements(Object mkp, DataElement element, PrintContext context, Relationship rel) {
-        super.processElements(mkp, element, context, rel)
+    void processElements(Object markupBuilder, DataElement element, PrintContext context, Relationship rel) {
+        super.processElements(markupBuilder, element, context, rel)
         if (element.dataType) {
-            printElement(mkp, element.dataType, context, null)
+            printElement(markupBuilder, element.dataType, context, null)
         }
     }
 }

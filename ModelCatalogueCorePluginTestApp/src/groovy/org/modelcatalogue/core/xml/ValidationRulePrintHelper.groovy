@@ -13,34 +13,34 @@ class ValidationRulePrintHelper extends CatalogueElementPrintHelper<ValidationRu
     }
 
     @Override
-    void processElements(Object mkp, ValidationRule rule, PrintContext context, Relationship relationship) {
-        super.processElements(mkp, rule, context, relationship)
+    void processElements(Object markupBuilder, ValidationRule rule, PrintContext context, Relationship relationship) {
+        super.processElements(markupBuilder, rule, context, relationship)
         if (rule.component) {
-            mkp.component rule.component
+            markupBuilder.component rule.component
         }
         if (rule.ruleFocus) {
-            mkp.ruleFocus rule.ruleFocus
+            markupBuilder.ruleFocus rule.ruleFocus
         }
         if (rule.trigger) {
-            mkp.trigger rule.trigger
+            markupBuilder.trigger rule.trigger
         }
         if (rule.rule) {
-            mkp.rule rule.rule
+            markupBuilder.rule rule.rule
         }
         if (rule.errorCondition) {
-            mkp.errorCondition rule.errorCondition
+            markupBuilder.errorCondition rule.errorCondition
         }
         if (rule.issueRecord) {
-            mkp.issueRecord rule.issueRecord
+            markupBuilder.issueRecord rule.issueRecord
         }
         if (rule.notification) {
-            mkp.notification rule.notification
+            markupBuilder.notification rule.notification
         }
         if (rule.notificationTarget) {
-            mkp.notificationTarget rule.notificationTarget
+            markupBuilder.notificationTarget rule.notificationTarget
         }
         for (Relationship rel in rule.involvesRelationships) {
-            printElement(mkp, rel.destination, context, rel)
+            printElement(markupBuilder, rel.destination, context, rel)
         }
     }
 }
