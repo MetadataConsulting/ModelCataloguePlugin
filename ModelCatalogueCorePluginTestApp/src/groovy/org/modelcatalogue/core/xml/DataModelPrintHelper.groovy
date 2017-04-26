@@ -38,7 +38,7 @@ class DataModelPrintHelper extends CatalogueElementPrintHelper<DataModel> {
 
             context.typesUsed << 'declaration' //what's this?
             // process everything in this data model with context.currentDataModel set.
-            context.currentDataModel = element
+            context.currentDataModel = dataModel
 
             super.processElements(markupBuilder, dataModel, context, rel)
             if (dataModel.revisionNotes) {
