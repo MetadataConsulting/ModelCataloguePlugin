@@ -139,7 +139,7 @@ class BootStrap {
 
         reportsRegistry.register {
             creates link
-            type DataModel
+            type DataModel, DataClass, DataElement
             title { "Export to Cytoscape JSON" }
             link { CatalogueElement element ->
                 [url: element.getDefaultModelCatalogueId(false) + '/cytoscapeJsonExport']
