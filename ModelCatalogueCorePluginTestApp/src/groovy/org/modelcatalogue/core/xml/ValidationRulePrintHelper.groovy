@@ -40,7 +40,7 @@ class ValidationRulePrintHelper extends CatalogueElementPrintHelper<ValidationRu
             markupBuilder.notificationTarget rule.notificationTarget
         }
         for (Relationship rel in rule.involvesRelationships) {
-            printElement(markupBuilder, rel.destination, context, rel)
+            dispatch(markupBuilder, rel.destination, context, rel)
         }
     }
 }

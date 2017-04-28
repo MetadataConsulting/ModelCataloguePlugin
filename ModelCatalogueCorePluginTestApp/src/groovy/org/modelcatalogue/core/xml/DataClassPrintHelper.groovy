@@ -17,14 +17,14 @@ class DataClassPrintHelper extends CatalogueElementPrintHelper<DataClass> {
         super.processElement(markupBuilder, element, context, relationship)
 
         /** But how can we get these relationships? These must be dynamic methods.
-         *
+         * Vlad: These are dynamic methods defined in core.util.CatalogueElementDynamicHelper.
          */
         /**
          * Contains relationships are DataClass to DataElement, so this prints the
          * DataElements contained in this class.
          */
         for (Relationship rel in element.containsRelationships) {
-            printElement(markupBuilder, rel.destination, context, rel)
+            dispatch(markupBuilder, rel.destination, context, rel)
         }
 
         /**
@@ -32,13 +32,13 @@ class DataClassPrintHelper extends CatalogueElementPrintHelper<DataClass> {
          * so this prints "subclasses" or something like that.
          */
         for (Relationship rel in element.parentOfRelationships) {
-            printElement(markupBuilder, rel.destination, context, rel)
+            dispatch(markupBuilder, rel.destination, context, rel)
         }
         /**
-         * Not sure what these relationships are.
+         * Context for a ValidationRule
          */
         for (Relationship rel in element.contextForRelationships) {
-            printElement(markupBuilder, rel.source, context, rel)
+            dispatch(markupBuilder, rel.source, context, rel)
         }
     }
 }

@@ -8,8 +8,7 @@ import org.modelcatalogue.core.DataClassService
 /** PrintContext keeps track of printed elements and contains some settings for the printing.*/
 class PrintContext {
 
-    /** used for classified method in DataModelPrintHelper
-     * (model used to be a classification) */
+    /** used for classified method in DataModelPrintHelper */
     DataModelService dataModelService
     /** used for getTopLevelDataClasses method in DataModelPrintHelper */
     DataClassService dataClassService

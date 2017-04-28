@@ -52,7 +52,7 @@ class DataModelPrintHelper extends CatalogueElementPrintHelper<DataModel> {
              * their child classes and child elements.
              */
             for (DataClass dataClass in context.dataClassService.getTopLevelDataClasses(DataModelFilter.includes(dataModel), [:]).items) {
-                super.printElement(markupBuilder, dataClass, context, null)
+                dispatch(markupBuilder, dataClass, context, null)
             }
 
             /**
@@ -61,7 +61,7 @@ class DataModelPrintHelper extends CatalogueElementPrintHelper<DataModel> {
             for (Class<? extends CatalogueElement> type in [DataClass, DataElement, DataType, MeasurementUnit]) {
                 for (CatalogueElement other in allClassified(type, dataModel, context)) {
                     if (!context.wasPrinted(other)) {
-                        printElement(markupBuilder, other, context, null)
+                        dispatch(markupBuilder, other, context, null)
                     }
                 }
             }

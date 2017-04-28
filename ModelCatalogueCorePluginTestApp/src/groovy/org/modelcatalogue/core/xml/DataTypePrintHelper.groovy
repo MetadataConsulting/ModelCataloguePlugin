@@ -45,17 +45,17 @@ class DataTypePrintHelper extends CatalogueElementPrintHelper<DataType> {
         }
         if (dataType instanceof ReferenceType && dataType.dataClass) {
             if (dataType.dataClass) {
-                printElement(markupBuilder, dataType.dataClass, context, null)
+                dispatch(markupBuilder, dataType.dataClass, context, null)
             }
         }
         if (dataType instanceof PrimitiveType && dataType.measurementUnit) {
             if (dataType.measurementUnit) {
-                printElement(markupBuilder, dataType.measurementUnit, context, null)
+                dispatch(markupBuilder, dataType.measurementUnit, context, null)
             }
         }
     }
 
     protected void printBasedOn(Object markupBuilder, Relationship rel, PrintContext context) {
-        printElement(markupBuilder, rel.destination, context, rel)
+        dispatch(markupBuilder, rel.destination, context, rel)
     }
 }

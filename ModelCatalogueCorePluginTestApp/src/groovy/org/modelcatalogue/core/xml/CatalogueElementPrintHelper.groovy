@@ -9,7 +9,7 @@ import org.modelcatalogue.core.util.HibernateHelper
 abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
 
     /** Get the appropriate helper for writing a CatalogueElement of a particular class.
-     * It seems that these helpers override processElement but not printElement.
+     * It seems that these helpers override processElement but not dispatch.
      * @param type The class or type of the CatalogueElement to be written.
      * @return The appropriate helper to write the CatalogueElement. */
     private static <E extends CatalogueElement> CatalogueElementPrintHelper<E> getHelperForType(Class<E> type) {
@@ -43,22 +43,20 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         if (ValidationRule.isAssignableFrom(type)) {
             return ValidationRulePrintHelper.instance as CatalogueElementPrintHelper<E>
         }
-        throw new IllegalArgumentException("Not yet implemented for $type")
+        throw new IllegalArgumentException("XMLPrintHelper not yet implemented for $type")
     }
 
     /**
-     * What is the difference between printElement and processElement?
-     * processElement also does some printing.
-     * printElement is not overridden by helper subclasses.
-     * Helper subclasses call printElement to recurse on related elements
-     * e.g. DataModel's processElement calls printElement on top level DataClasses
+     * dispatch is not overridden by helper subclasses.
+     * Helper subclasses call dispatch to recurse on related elements
+     * e.g. DataModel's processElement calls dispatch on top level DataClasses
      * @param markupBuilder
      * @param element
      * @param context
      * @param rel The relationship by which this element was found?
      * @param elementTypeName
      */
-    static void printElement(markupBuilder, CatalogueElement element, PrintContext context, Relationship rel, String elementTypeName = null) {
+    static void dispatch(markupBuilder, CatalogueElement element, PrintContext context, Relationship rel, String elementTypeName = null) {
         // This code is confusing. It has got lots of ifs and returns.
         CatalogueElementPrintHelper helper = getHelperForType(HibernateHelper.getEntityClass(element))
         if (!elementTypeName) {
@@ -82,15 +80,11 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
          */
         context.markAsPrinted(element) // Why do we mark as printed *before* processing?
 
-        /** This is the main processing/printing of the element, which may be recursive.
-         *
-         */
-        markupBuilder."${elementTypeName}"(helper.collectAttributes(element, context)) {
+        /** This is the main processing/printing of the element, which may be recursive. */        markupBuilder."${elementTypeName}"(helper.collectAttributes(element, context)) {
             helper.processElement(markupBuilder, element, context, rel)
         }
         /**
-         *  why not make this part of context? Or do we want to mark
-         *  element as printed only during the above step?
+         *  If context.repetitive apparently we still want to mark the element as printed– but only in the above step.
          */
         if (context.repetitive) {
             context.removeFromPrinted(element)

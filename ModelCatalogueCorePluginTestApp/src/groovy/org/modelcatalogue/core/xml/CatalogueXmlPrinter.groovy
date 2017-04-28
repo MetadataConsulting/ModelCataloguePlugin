@@ -61,7 +61,7 @@ class CatalogueXmlPrinter {
             // The actual building:
             builder.catalogue (ns) {
                 for (CE element in elements) {
-                    CatalogueElementPrintHelper.printElement(builder, element, context, null)
+                    CatalogueElementPrintHelper.dispatch(builder, element, context, null)
                 }
                 /**
                  * After the main printing above the context will have saved sets of
