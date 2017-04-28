@@ -11,6 +11,9 @@ class DataClass extends CatalogueElement {
      * But then it proved useful to have two sorts of relationships:
      * one from Classes to Elements, the other from Classes to Classes.
      * This was used in SQL procedures.
+     * It seems like "incoming" are also outgoing relationships that are
+     * the inverse of the real incoming relationships.
+     * contextFor is inverse of appliedWithin from ValidationRules.
      */
     static relationships = [
             incoming: [hierarchy: 'childOf', ruleContext: 'contextFor'],

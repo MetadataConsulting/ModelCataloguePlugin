@@ -18,7 +18,7 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
     def relationshipTypeService
     def modelCatalogueSearchService
 
-    //name of the relationship type i.e. parentChild  or synonym
+    //name of the relationship type i.e. hierarchy or synonym
     String name
 
     // system relationship types are not returned from the controller
@@ -27,13 +27,13 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
     // searchable relationships are index and reindex each time the source or destination changes
     Boolean searchable = false
 
-    //the both sides of the relationship ie. for parentChild this would be parent (for synonym this is synonym, so the same on both sides)
+    //the both sides of the relationship ie. for hierarchy this would be parent (for synonym this is synonym, so the same on both sides)
     String sourceToDestination
 
     // detailed explanation of the source to destination relationship
     String sourceToDestinationDescription
 
-    //the both sides of the relationship i.e. for parentChild this would be child (for synonym this is synonym, so the same on both sides)
+    //the both sides of the relationship i.e. for hierarchy this would be child (for synonym this is synonym, so the same on both sides)
     String destinationToSource
 
     // detailed explanation of the reversed relationship
@@ -175,8 +175,8 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
     }
 
     /**
-     * Containment, Involvedness, RuleContext are effectively
-     * "RelationshipTypeType"s. They are types or categories of RelationshipType.
+     * Containment, Involvedness, RuleContext are effectively subclasses
+     * of RelationshipType.
      * Originally there was only hierarchy which could be to either DataClasses or DataElements.
      * Then David wanted to get rid of hierarchy and call it containment.
      * But then it proved useful to have two sorts of relationships:
@@ -190,22 +190,35 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
      * what these RelationshipTypeTypes are.
      *
      * From DataClass we have
-     * RelationshipTypeType : RelationshipType
+     * RelationshipType name : Relationship name (though there isn't such a field)
      * containment: 'contains',
      * hierarchy: 'parentOf'
      * Any particular DataClass would have a number of 'parentOf' Relationships
      * (Relationships with RelationshipType named 'parentOf') coming from it.
      */
+    /**
+     * DataClass =containment:contains=> DataElement
+     * DataElement =containment:containedIn=> DataClass
+     * @return
+     */
     static RelationshipType getContainmentType() {
         readByName("containment")
     }
 
-
+    /**
+     * ValidationRule =involvedness:involves=> DataElement
+     * DataElement =involvedness:involvedIn=> ValidationRule
+     * @return
+     */
     static RelationshipType getInvolvednessType() {
         readByName("involvedness")
     }
 
-
+    /**
+     * ValidationRule =ruleContext:appliedWithin=> DataClass
+     * DataClass =ruleContext:contextFor=> ValidationRule
+     * @return
+     */
     static RelationshipType getRuleContextType() {
         readByName("ruleContext")
     }
@@ -216,40 +229,77 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
     static RelationshipType getDeclarationType() {
         readByName("declaration")
     }
-
+    /**
+     * CatalogueElement =favourite:isFavouriteOf/??=> User??
+     * @return
+     */
     static RelationshipType getFavouriteType() {
         readByName("favourite")
     }
 
+    /**
+     * CatalogueElement =synonym:isSynonymFor=> CatalogueElement
+     * (bidirectional)
+     * @return
+     */
     static RelationshipType getSynonymType() {
         readByName("synonym")
     }
-
+    /**
+     * CatalogueElement =relatedTo:relatedTo=> CatalogueElement
+     * (bidirectional)
+     * @return
+     */
     static RelationshipType getRelatedToType() {
         readByName("relatedTo")
     }
 
+    /**
+     * DataClass =hierarchy:parentOf=> DataClass
+     * DataClass =hierarchy:childOf=> DataClass
+     * @return
+     */
     static RelationshipType getHierarchyType() {
         readByName("hierarchy")
     }
 
+    /**
+     * CatalogueElement =supersession:supersedes/supersededBy=> CatalogueElement
+     * @return
+     */
     static RelationshipType getSupersessionType() {
         readByName("supersession")
     }
 
+    /**
+     * CatalogueElement =origin:isOriginFor/isClonedFrom=> CatalogueElement
+     * @return
+     */
     static RelationshipType getOriginType() {
         readByName("origin")
     }
 
+    /**
+     * CatalogueElement =base:isBasedOn/isBaseFor=> CatalogueElement
+     * @return
+     */
     static RelationshipType getBaseType() {
         readByName("base")
     }
 
+    /**
+     * DataModel =import:imports/importedBy=> DataModel
+     * @return
+     */
     static RelationshipType getImportType() {
         readByName("import")
     }
 
-
+    /**
+     * Tag =tag:tags=> DataElement
+     * DataElement =tag:isTaggedBy=> Tag
+     * @return
+     */
     static RelationshipType getTagType() {
         readByName("tag")
     }
