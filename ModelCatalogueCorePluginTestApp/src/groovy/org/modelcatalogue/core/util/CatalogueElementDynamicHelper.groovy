@@ -7,6 +7,8 @@ import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 
 /**
+ * Defines among other things dynamic  methods for getting an element's relationship
+ * by type name.
  * Created by ladin on 24.03.14.
  */
 @Log
@@ -16,6 +18,10 @@ class CatalogueElementDynamicHelper {
         types.each { addShortcuts(it) }
     }
 
+    /**
+     * So this is where the static relationships of a CatalogueElement is used!
+     * @param type
+     */
     static void addShortcuts(Class<? extends CatalogueElement> type) {
         if (type != CatalogueElement && type.superclass != CatalogueElement) addShortcuts(type.superclass)
         def transients      = GrailsClassUtils.getStaticFieldValue(type, 'transients')      ?: []

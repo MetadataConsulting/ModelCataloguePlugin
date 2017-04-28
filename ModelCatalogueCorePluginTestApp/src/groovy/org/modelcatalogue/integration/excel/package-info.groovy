@@ -1,2 +1,2 @@
-/** Loads a catalogue as excel */
+/** Loads a catalogue from excel */
 package org.modelcatalogue.integration.excel
