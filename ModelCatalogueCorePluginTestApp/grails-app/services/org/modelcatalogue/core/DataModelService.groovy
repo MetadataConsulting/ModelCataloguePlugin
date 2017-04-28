@@ -77,7 +77,8 @@ class DataModelService {
         model
     }
 
-    /** What is classified? What is it meant to do? Why are there so many of them? */
+    /** 1st Classified
+     * Calls the 2nd classified. Used in a few controllers */
     public <T> ListWrapper<T> classified(ListWrapper<T> list, DataModelFilter modelFilter = dataModelFilter) {
         if (!(list instanceof ListWithTotalAndTypeWrapper)) {
             throw new IllegalArgumentException("Cannot classify list $list. Only ListWithTotalAndTypeWrapper is currently supported")
@@ -106,6 +107,12 @@ class DataModelService {
         classified(criteria, dataModelFilter)
     }
 
+    /** The main classified method, which the others call after some type wrapping and checking
+     *
+     * @param criteria
+     * @param modelFilter
+     * @return
+     */
     public static <T> DetachedCriteria<T> classified(DetachedCriteria<T> criteria, DataModelFilter modelFilter) {
         if (criteria.persistentEntity.javaClass == DataModel) {
             return criteria

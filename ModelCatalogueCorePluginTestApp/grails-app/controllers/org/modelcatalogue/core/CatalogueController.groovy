@@ -46,6 +46,7 @@ class CatalogueController {
             CatalogueXmlPrinter printer = new CatalogueXmlPrinter(dataModelService, dataClassService)
             Writable w = printer.bind(element){ // bind element with the following as configuration for the PrintContext
                 idIncludeVersion = true
+                // if we don't want a full print we keep inside the data model.
                 if (params.full != 'true') {
                     keepInside = element.instanceOf(DataModel) ? element : element.dataModel
                 }
@@ -54,6 +55,7 @@ class CatalogueController {
                 }
             }
             w.writeTo(response.writer)
+            response.writer.flush()
             return
         }
 
@@ -80,15 +82,16 @@ class CatalogueController {
         response.setHeader("Content-disposition", "attachment; filename=\"${element.name.replaceAll(/\s+/, '_')}.mc.cytoscape.json\"")
         CatalogueCytoscapeJsonPrinter printer = new CatalogueCytoscapeJsonPrinter(dataModelService, dataClassService)
         JsonBuilder builder = printer.bind(element){ // bind element with the following as configuration for the PrintContext
-            idIncludeVersion = true
             if (params.full != 'true') {
                 keepInside = element.instanceOf(DataModel) ? element : element.dataModel
             }
         }
-        // EscapeSpecialWriter escapeSpecialWriter = new EscapeSpecialWriter(response.writer)
-        response.writer.out.append(builder.toPrettyString())
+        EscapeSpecialWriter escapeSpecialWriter = new EscapeSpecialWriter(response.writer)
+        //builder.writeTo(escapeSpecialWriter)
+        escapeSpecialWriter.append(builder.toPrettyString())
+        //escapeSpecialWriter.out.append(builder.toPrettyString())
         // builder.writeTo(response.writer)
-        response.writer.flush()
+        escapeSpecialWriter.flush()
         return
         // What is resource?
         // redirect controller: params.resource, action: 'show', id: element.id

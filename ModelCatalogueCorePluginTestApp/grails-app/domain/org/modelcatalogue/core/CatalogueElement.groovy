@@ -15,11 +15,11 @@ import rx.Observer
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 
 /**
-* Catalogue Element - there are a number of catalogue elements that make up the model
+ * Catalogue Element - there are a number of catalogue elements that make up the model
  * catalogue (please see DataType, MeasurementUnit, DataModel,
-* DataElement) they extend catalogue element which allows creation of incoming and outgoing
-* relationships between them. They also share a number of characteristics.
-* */
+ * DataElement) they extend catalogue element which allows creation of incoming and outgoing
+ * relationships between them. They also share a number of characteristics.
+ * */
 abstract class  CatalogueElement implements Extendible<ExtensionValue>, Published<CatalogueElement>, ApiCatalogueElement, DataModelAware {
 
     ///// Dependencies:
@@ -32,7 +32,10 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     ///// Grails domain properties and configuration:
 
-    /** Note: Groovy will automatically create getDataModel method which is all that is needed to implement DataModelAware. */
+    /** Note: Groovy will automatically create getDataModel
+     * method which is all that is needed to implement DataModelAware.
+     * Not all CatalogueElements would have a dataModel though,
+     * for example DataModels themselves. */
     DataModel dataModel
 
     String name
@@ -69,9 +72,11 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     Set<Mapping> outgoingMappings = []
     Set<Mapping> incomingMappings = []
 
-    /** extensions mapping containing among other things metadata.
+    /** Extensions mapping containing among other things metadata.
      * Makes use of this being Extendible (see implementation below)
-     * Although it is final we can set it...*/
+     * Although it is final we can set it...
+     * This is scary because now the data model can be defined elsewhere, ad-hoc, on the front-end in Angular modules.
+     * See for example grails-app/assets/javascripts/modelcatalogue/core/forms/forms.coffee.*/
     final Map<String, String> ext = new ExtensionsWrapper(this)
 
     /** Set ext to this.ext */

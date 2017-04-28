@@ -14,6 +14,7 @@ forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEdit
       'dataElement'
       'dataType'
     ]
+    ###* Define metadata entries which extend Catalogue Elements ###
     keys: [
       "http://forms.modelcatalogue.org/form#form"
       "http://forms.modelcatalogue.org/form#customizer"
