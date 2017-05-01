@@ -44,7 +44,7 @@ class CJPrintContext {
      */
     boolean printRecursively(CatalogueElement element) {
         return !keepInside || !element.dataModel ||
-            element.dataModel == keepInside || catalogueElement == keepInside
+            element.dataModel == keepInside || element == keepInside
     }
 
 }
