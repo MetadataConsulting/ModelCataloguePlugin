@@ -24,6 +24,7 @@ import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.test.TestDataHelper
 import org.springframework.http.HttpMethod
 
+/** Nothing to do with Javascript Bootstrap; this is sort of a DSL for (yet more) configuration starting up the app */
 class BootStrap {
 
     def initCatalogueService
