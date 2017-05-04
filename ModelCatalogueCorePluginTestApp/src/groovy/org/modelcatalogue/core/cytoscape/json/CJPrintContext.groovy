@@ -43,8 +43,10 @@ class CJPrintContext {
      * or if the element is in the model we want to keep inside.
      */
     boolean printRecursively(CatalogueElement element) {
-        return !keepInside || !element.dataModel ||
-            element.dataModel == keepInside || element == keepInside
+        return (!(!element.dataModel && keepInside) || element == keepInside) &&
+            // if element does not have a data model, and we have a model to keep inside, the element must itself be keepInside.
+            // Note !a || b is equivalent to a -> b, that is a implies b.
+            (!keepInside || element.dataModel == keepInside || element == keepInside)
     }
 
 }
