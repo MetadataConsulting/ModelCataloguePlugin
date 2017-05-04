@@ -8,6 +8,10 @@ import org.modelcatalogue.core.Tag
 import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.security.User
 
+/**
+ * Grails config file. Will look for mc-config.groovy for production mode in ~/.grails/.
+ */
+
 // locations to search for config files that get merged into the main config;
 // config files can be ConfigSlurper scripts, Java properties files, or classes
 // in the classpath in ConfigSlurper format
@@ -346,6 +350,7 @@ grails.plugin.springsecurity.basic.realmName = "Model Catalogue"
 grails.plugin.springsecurity.filterChain.chainMap = [
         '/catalogue/upload':                    'JOINED_FILTERS,-exceptionTranslationFilter',
         '/catalogue/*/*/export':                'JOINED_FILTERS,-exceptionTranslationFilter',
+        '/catalogue/*/*/cytoscapeJsonExport':   'JOINED_FILTERS,-exceptionTranslationFilter',
         '/user/current':                        'JOINED_FILTERS,-exceptionTranslationFilter',
         '/api/modelCatalogue/core/feedback/**': 'JOINED_FILTERS,-exceptionTranslationFilter',
         '/**':                                  'JOINED_FILTERS,-basicAuthenticationFilter,-basicExceptionTranslationFilter'
