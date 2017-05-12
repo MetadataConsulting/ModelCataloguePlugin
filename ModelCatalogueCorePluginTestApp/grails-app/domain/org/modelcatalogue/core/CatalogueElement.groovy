@@ -32,6 +32,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     String name
     String description
+    /** Actually is an external ID from other models. Misnomers abound... */
 	String modelCatalogueId
 
     //version number - this gets iterated every time a new version is created from a finalized version
@@ -45,7 +46,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     Date versionCreated = new Date()
 
-    // id of the latest version
+    /** Actually is the id of the first version. Misnomers abound... */
     Long latestVersionId
 
     // time stamping
