@@ -1,35 +1,57 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
-import com.mysql.jdbc.NotImplemented
-import geb.spock.GebSpec
-import groovy.transform.NotYetImplemented
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.openqa.selenium.By
-import org.openqa.selenium.WebDriver
+import spock.lang.Stepwise
+import static org.modelcatalogue.core.geb.Common.getCurator
+import static org.modelcatalogue.core.geb.Common.item
+import static org.modelcatalogue.core.geb.Common.modalHeader
+import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
+import static org.modelcatalogue.core.geb.Common.pick
 
-
+@Stepwise
 class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
+    private static final String  creates  = "a#role_data-models_create-data-modelBtn"
+    private static final String  user="#role_navigation-right_user-menu-menu-item-link"
+    private static final String  favouriteButton= "a#user-favorites-menu-item-link"
+    private static final String   catalogueID = "tr.inf-table-header-row>th:nth-child(1)"
+    private static final String    searchField= "input#value"
+    private static final String   firstRow ="tr.inf-table-item-row>td:nth-child(1)"
+    public static final String  greenButton ="#metadataCurator > div.container-fluid.container-main > div > div > div.ng-scope > ui-view > div > div > div > div.inf-table-body > table > tfoot > tr > td > table > tfoot > tr > td.text-center > span"
 
-    private static final String cancerModelsSelector = "full-width-link ng-binding"
-    private static final String showMore="div.content-row>div>div:nth-child(2)>div:nth-child(1)>div>div:nth-child(2)>div>div:nth-child(4)>div>div>div:nth-child(2)>div:nth-child(1)>div:nth-child(2)>form>div:nth-child(5)>p>span"
-    @NotYetImplemented
-    void addToFavorite(){
 
+    def " login to model catalogue "(){
         when:
-        loginViewer()
+        login curator
+
         then:
-        noExceptionThrown()
+        check creates displayed
 
-        when:
-        click showMore
 
-        Thread.sleep(1000l)
-       // $("a",id:"role_item-infinite-list_favorite-elementBtn").click()
-
-       then:
-       noExceptionThrown()
-        Thread.sleep(10000L)
     }
+    def "navigate to favourites"(){
+        when:
+        click user
+        click favouriteButton
+
+        then:
+        check catalogueID contains "Model Catalogue ID"
+    }
+     def" add data to favourite"(){
+         when:
+         click greenButton
+
+         then:
+         check modalHeader is "Add to Favourites"
+
+
+         when:
+         fill searchField with 'c' and pick first item
+         click modalPrimaryButton
+
+         then:
+         check firstRow displayed
+
+     }
 
   }
 
