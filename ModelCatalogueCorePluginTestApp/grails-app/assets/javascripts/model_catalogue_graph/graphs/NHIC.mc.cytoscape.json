@@ -1,0 +1,3387 @@
+{
+    "elements": {
+        "nodes": [
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataModel/73@0.0.1",
+                    "name": "NHIC",
+                    "type": "DataModel",
+                    "description": "NHIC conceptual domain i.e. value domains used the NHIC project",
+                    "metadata": {
+                        "http://www.modelcatalogue.org/metadata/#authors": "Matous Kucera",
+                        "http://www.modelcatalogue.org/metadata/#reviewers": "Adam Milward",
+                        "http://www.modelcatalogue.org/metadata/#owner": "Vladimir Orany",
+                        "http://www.modelcatalogue.org/metadata/#reviewed": "2016-03-30T11:46:30Z",
+                        "http://www.modelcatalogue.org/metadata/#approved": "2016-03-30T11:46:30Z",
+                        "http://www.modelcatalogue.org/metadata/#namespace": "Global Namespace",
+                        "http://www.modelcatalogue.org/metadata/#organization": "Metadata Consulting"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/74@0.0.1",
+                    "name": "NHIC Datasets",
+                    "type": "DataClass",
+                    "dataModel": "NHIC",
+                    "metadata": {
+                        
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/75@0.0.1",
+                    "name": "Ovarian Cancer",
+                    "type": "DataClass",
+                    "dataModel": "NHIC",
+                    "metadata": {
+                        
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/76@0.0.1",
+                    "name": "CUH",
+                    "type": "DataClass",
+                    "dataModel": "NHIC",
+                    "metadata": {
+                        
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/77@0.0.1",
+                    "name": "Round 1",
+                    "type": "DataClass",
+                    "dataModel": "NHIC",
+                    "metadata": {
+                        
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/78@0.0.1",
+                    "name": "MAIN",
+                    "type": "DataClass",
+                    "dataModel": "NHIC",
+                    "metadata": {
+                        
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/79@0.0.1",
+                    "name": "PATIENT IDENTITY DETAILS",
+                    "type": "DataClass",
+                    "dataModel": "NHIC",
+                    "metadata": {
+                        
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/81@0.0.1",
+                    "name": "NHS NUMBER*",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "*For linkage purposes NHS NUMBER\nand/or\n LOCAL PATIENT IDENTIFIER\nis required.\n\nThe NHS NUMBER, the primary identifier of a PERSON, is a unique identifier for aPATIENTwithin the NHS in England and Wales. This will not vary by any ORGANISATION of which a PERSON is a PATIENT.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_1",
+                        "Link_to_existing definition:": "NHS NUMBER",
+                        "Notes_from_GD_JCIS": "orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",
+                        "[Optional]_Local_Identifier": "XXXXXXX0010",
+                        "A": "2",
+                        "B": "2",
+                        "C": "3",
+                        "D": "1",
+                        "E": null,
+                        "F": "When Patient demographics entered.",
+                        "G": "GC 123",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "String",
+                    "type": "DataType",
+                    "dataModel": "NHIC",
+                    "metadata": {
+                        
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/82@0.0.1",
+                    "name": "LOCAL PATIENT IDENTIFIER*",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "*For linkage purposes NHS NUMBER\nand/or\n LOCAL PATIENT IDENTIFIER\nis required.\n\nThis is a number used to identify a PATIENT uniquely within a Health Care Provider. It may be different from the PATIENT's casenote number and may be assigned automatically by the computer system.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_2",
+                        "Link_to_existing definition:": "LOCAL PATIENT IDENTIFIER",
+                        "Notes_from_GD_JCIS": "orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",
+                        "[Optional]_Local_Identifier": "XXXXXXX0020",
+                        "A": "2",
+                        "B": "2",
+                        "C": "3",
+                        "D": "1",
+                        "E": "hard",
+                        "F": "When Patient demographics entered.",
+                        "G": "GC 124",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/84@0.0.1",
+                    "name": "nhsNumberStatusIndicatorCode",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "The NHS NUMBER STATUS  INDICATOR CODE indicates the verification status of the NHS number provided.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_3",
+                        "Link_to_existing definition:": "NHS NUMBER STATUS INDICATOR CODE",
+                        "Notes_from_GD_JCIS": "orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",
+                        "[Optional]_Local_Identifier": "XXXXXXX1350",
+                        "A": "2",
+                        "B": "2",
+                        "C": "1",
+                        "D": "1",
+                        "E": "1",
+                        "F": "When Patient demographics entered.",
+                        "G": "GC 125",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataType/83@0.0.1",
+                    "name": "nhsNumberStatusIndicatorCode",
+                    "type": "DataType",
+                    "dataModel": "NHIC",
+                    "metadata": {
+                        
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/85@0.0.1",
+                    "name": "PERSON BIRTH DATE",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "The date on which a PERSON was born or is officially deemed to have been born.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_4",
+                        "Link_to_existing definition:": "PERSON BIRTH DATE",
+                        "Notes_from_GD_JCIS": null,
+                        "[Optional]_Local_Identifier": "XXXXXXX0100",
+                        "A": "2",
+                        "B": "2",
+                        "C": "1",
+                        "D": "1",
+                        "E": "1",
+                        "F": "When Patient demographics entered.",
+                        "G": "GC 126",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/86@0.0.1",
+                    "name": "ORGANISATION CODE (CODE OF PROVIDER)",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "ORGANISATION CODE (CODE OF PROVIDER) is the ORGANISATION CODE of the ORGANISATION acting as a Health Care Provider.\n(an6 not applicable to COSD)",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_5",
+                        "Link_to_existing definition:": "ORGANISATION CODE (CODE OF PROVIDER)",
+                        "Notes_from_GD_JCIS": null,
+                        "[Optional]_Local_Identifier": "XXXXXXX0030",
+                        "A": "2",
+                        "B": "1",
+                        "C": "1",
+                        "D": "1",
+                        "E": "1",
+                        "F": "When referral details entered.",
+                        "G": "GC 127",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/87@0.0.1",
+                    "name": "DIAGNOSTIC DETAILS",
+                    "type": "DataClass",
+                    "dataModel": "NHIC",
+                    "metadata": {
+                        
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/88@0.0.1",
+                    "name": "PRIMARY DIAGNOSIS (ICD)",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "See DIAGNOSTIC CODING for details on coding and PRIMARY DIAGNOSES for the standardised definition of primary diagnosis.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_6",
+                        "Link_to_existing definition:": "PRIMARY DIAGNOSIS (ICD)",
+                        "Notes_from_GD_JCIS": null,
+                        "[Optional]_Local_Identifier": "XXXXXXX0370",
+                        "A": "1",
+                        "B": "1",
+                        "C": "1",
+                        "D": "1",
+                        "E": "1",
+                        "F": "MDT Meeting",
+                        "G": "GC 128",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/89@0.0.1",
+                    "name": "DATE OF DIAGNOSIS (CLINICALLY AGREED)*",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "*For linkage purposes DATE OF DIAGNOSIS ((CLINICALLY AGREED)\nor\n DATE OF RECURRENCE (CLINICALLY AGREED)\nis required as mandatory.\n\nRecord the date  where TESTcer was confirmed or diagnosis agreed (This will normally be  the date of the authorised  pathology report which confirms the TESTcer or if this is not available at the time it will be the date of the Multidisciplinary Team Meeting when the diagnosis was agreed)\n(This is may not be the same as Date of Diagnosis which is used for TESTcer Registration.)",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_7",
+                        "Link_to_existing definition:": "DATE OF DIAGNOSIS (TESTCER CLINICALLY AGREED)",
+                        "Notes_from_GD_JCIS": "orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",
+                        "[Optional]_Local_Identifier": "XXXXXXX2030",
+                        "A": "2",
+                        "B": "2",
+                        "C": "1",
+                        "D": "1",
+                        "E": "1",
+                        "F": "MDT Meeting - From MDT against which definitive diagnosis recorded, or final pre-treatment diagnosis recorded.",
+                        "G": "GC 129",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/90@0.0.1",
+                    "name": "DATE OF RECURRENCE (CLINICALLY AGREED)*",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "*For linkage purposes DATE OF DIAGNOSIS ((CLINICALLY AGREED)\nor\n DATE OF RECURRENCE (CLINICALLY AGREED)\nis required as mandatory.\n\n(Recurrences only.)\nRecord the date where TESTcer recurrence was confirmed or diagnosis of recurrence was agreed (This will normally be the  date of the authorised  pathology report which confirms the recurrence or if this is not available at the time it will be the date of the Multidisciplinary Team Meeting when the diagnosis of recurrence was agreed)\n(This is may not be the same as Date of Recurrence which is used for TESTcer Registration.)",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_8",
+                        "Link_to_existing definition:": "DATE OF RECURRENCE (TESTCER CLINICALLY AGREED)",
+                        "Notes_from_GD_JCIS": "orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",
+                        "[Optional]_Local_Identifier": "XXXXXXX0440",
+                        "A": "2",
+                        "B": "2",
+                        "C": "1",
+                        "D": "3",
+                        "E": "hard",
+                        "F": "MDT Meeting - From MDT against which definitive diagnosis recorded, or final pre-treatment diagnosis recorded. Recurrence radio button needs to be selected on MDT meeting / Diagnosis / Diagnosis tab or MDT D&S tab",
+                        "G": "GC 130",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "name": "DEMOGRAPHICS",
+                    "type": "DataClass",
+                    "dataModel": "NHIC",
+                    "metadata": {
+                        
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/92@0.0.1",
+                    "name": "PERSON FAMILY NAME",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "That part of a PERSON's name which is used to describe family, clan, tribal group, or marital association.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_9",
+                        "Link_to_existing definition:": "PERSON FAMILY NAME",
+                        "Notes_from_GD_JCIS": null,
+                        "[Optional]_Local_Identifier": "XXXXXXX0050",
+                        "A": "2",
+                        "B": "2",
+                        "C": "1",
+                        "D": "1",
+                        "E": "1",
+                        "F": "When Patient demographics entered.",
+                        "G": "GC 131",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/93@0.0.1",
+                    "name": "PERSON GIVEN NAME",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "The forename(s) or given name(s) of a PERSON.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_10",
+                        "Link_to_existing definition:": "PERSON GIVEN NAME",
+                        "Notes_from_GD_JCIS": null,
+                        "[Optional]_Local_Identifier": "XXXXXXX0060",
+                        "A": "2",
+                        "B": "2",
+                        "C": "1",
+                        "D": "1",
+                        "E": "1",
+                        "F": "When Patient demographics entered.",
+                        "G": "GC 132",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/94@0.0.1",
+                    "name": "PATIENT USUAL ADDRESS (AT DIAGNOSIS)",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "PATIENT USUAL ADDRESS (AT DIAGNOSIS) is the PATIENT USUAL ADDRESS of the PATIENT at the time of PATIENT DIAGNOSIS.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_11",
+                        "Link_to_existing definition:": "PATIENT USUAL ADDRESS (AT DIAGNOSIS)",
+                        "Notes_from_GD_JCIS": "orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",
+                        "[Optional]_Local_Identifier": "XXXXXXX0070",
+                        "A": "2",
+                        "B": "2",
+                        "C": "1",
+                        "D": "1",
+                        "E": "1",
+                        "F": "When Patient demographics entered.",
+                        "G": "GC 133",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/95@0.0.1",
+                    "name": "POSTCODE OF USUAL ADDRESS (AT DIAGNOSIS)",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "POSTCODE OF USUAL ADDRESS (AT DIAGNOSIS) is the POSTCODE OF USUAL ADDRESS of the PATIENT at the time of PATIENT DIAGNOSIS.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_12",
+                        "Link_to_existing definition:": "POSTCODE OF USUAL ADDRESS (AT DIAGNOSIS)",
+                        "Notes_from_GD_JCIS": "orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",
+                        "[Optional]_Local_Identifier": "XXXXXXX0080",
+                        "A": "2",
+                        "B": "2",
+                        "C": "3",
+                        "D": "1",
+                        "E": "1",
+                        "F": "When Patient demographics entered.",
+                        "G": "GC 134",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/97@0.0.1",
+                    "name": "personGenderCode(current)",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "A PERSON's gender currently.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_13",
+                        "Link_to_existing definition:": "PERSON GENDER CODE CURRENT",
+                        "Notes_from_GD_JCIS": null,
+                        "[Optional]_Local_Identifier": "XXXXXXX0090",
+                        "A": "1",
+                        "B": "1",
+                        "C": "1",
+                        "D": "1",
+                        "E": "1",
+                        "F": "When Patient demographics entered.",
+                        "G": "GC 135",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataType/96@0.0.1",
+                    "name": "personGenderCode(current)",
+                    "type": "DataType",
+                    "dataModel": "NHIC",
+                    "metadata": {
+                        
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/98@0.0.1",
+                    "name": "GENERAL MEDICAL PRACTITIONER (SPECIFIED)",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "GENERAL MEDICAL PRACTITIONER (SPECIFIED) is the code of the GENERAL MEDICAL PRACTITIONER specified by the PATIENT.\n\nThis GENERAL MEDICAL PRACTITIONER works within the General Medical Practitioner Practice with which the PATIENT is registered.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_14",
+                        "Link_to_existing definition:": "GENERAL MEDICAL PRACTITIONER (SPECIFIED)",
+                        "Notes_from_GD_JCIS": "orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",
+                        "[Optional]_Local_Identifier": "XXXXXXX0110",
+                        "A": "2",
+                        "B": "2",
+                        "C": "1",
+                        "D": "1",
+                        "E": "1",
+                        "F": "When Patient demographics entered. Name shown. Code available in JCIS tables.",
+                        "G": "GC 136",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/99@0.0.1",
+                    "name": "GENERAL MEDICAL PRACTICE CODE (PATIENT REGISTRATION)",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "The GENERAL MEDICAL PRACTICE CODE (PATIENT REGISTRATION) is an ORGANISATION CODE. This is the code of the GP Practice that the PATIENT is registered with.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_15",
+                        "Link_to_existing definition:": "GENERAL MEDICAL PRACTICE CODE (PATIENT REGISTRATION)",
+                        "Notes_from_GD_JCIS": "orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",
+                        "[Optional]_Local_Identifier": "XXXXXXX0120",
+                        "A": "1",
+                        "B": "1",
+                        "C": "1",
+                        "D": "1",
+                        "E": "1",
+                        "F": "When Patient demographics entered. Address shown. Code available in JCIS tables.",
+                        "G": "GC 137",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/100@0.0.1",
+                    "name": "PERSON FAMILY NAME (AT BIRTH)",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "The PATIENT's surname at birth.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_16",
+                        "Link_to_existing definition:": "PERSON FAMILY NAME (AT BIRTH)",
+                        "Notes_from_GD_JCIS": "orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",
+                        "[Optional]_Local_Identifier": "XXXXXXX0140",
+                        "A": "2",
+                        "B": "2",
+                        "C": "1",
+                        "D": "1",
+                        "E": "1",
+                        "F": "When Patient demographics entered. The HISS field is MaidenName (ie not strictly Surname at birth).",
+                        "G": "GC 138",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/102@0.0.1",
+                    "name": "ethnicCategory",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "The ethnicity of a PERSON, as specified by the PERSON.. The 16+1 ethnic data categories defined in the 2001 census is the national mandatory standard for the collection and analysis of ethnicity.\n(The Office for National Statistics has developed a further breakdown of the group from that given, which may be used locally.)",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_17",
+                        "Link_to_existing definition:": "ETHNIC CATEGORY",
+                        "Notes_from_GD_JCIS": "orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",
+                        "[Optional]_Local_Identifier": "XXXXXXX0150",
+                        "A": "1",
+                        "B": "1",
+                        "C": "1",
+                        "D": "1",
+                        "E": "1",
+                        "F": "Imported from HISS but not displayed.",
+                        "G": "GC 139",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataType/101@0.0.1",
+                    "name": "ethnicCategory",
+                    "type": "DataType",
+                    "dataModel": "NHIC",
+                    "metadata": {
+                        
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "name": "REFERRALS",
+                    "type": "DataClass",
+                    "dataModel": "NHIC",
+                    "metadata": {
+                        
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/105@0.0.1",
+                    "name": "sourceOfReferralForOutPatients",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "This identifies the source of referral of each Consultant Out-Patient Episode.\n(See User Guide for further details)",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_18",
+                        "Link_to_existing definition:": "SOURCE OF REFERRAL FOR OUT-PATIENTS",
+                        "Notes_from_GD_JCIS": "orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",
+                        "[Optional]_Local_Identifier": "XXXXXXX1600",
+                        "A": "1",
+                        "B": "1",
+                        "C": "1",
+                        "D": "1",
+                        "E": "1",
+                        "F": "When referral details entered.",
+                        "G": "GC 140",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataType/104@0.0.1",
+                    "name": "sourceOfReferralForOutPatients",
+                    "type": "DataType",
+                    "dataModel": "NHIC",
+                    "metadata": {
+                        
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/106@0.0.1",
+                    "name": "REFERRAL TO TREATMENT PERIOD START DATE",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "The start date of a REFERRAL TO TREATMENT PERIOD. Date that the initial referral to Secondary care was received for this diagnosis. This may be different from TESTCER REFERRAL TO TREATMENT PERIOD START DATE if initial referral was not to the TESTcer services teams.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_19",
+                        "Link_to_existing definition:": "REFERRAL TO TREATMENT PERIOD START DATE",
+                        "Notes_from_GD_JCIS": null,
+                        "[Optional]_Local_Identifier": "XXXXXXX1580",
+                        "A": "2",
+                        "B": "2",
+                        "C": "2",
+                        "D": "1",
+                        "E": "2",
+                        "F": "When referral details entered.",
+                        "G": "GC 141",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/107@0.0.1",
+                    "name": "DATE FIRST SEEN",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "This is the date that the PATIENT is first seen in the Trust that receives the first referral.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_20",
+                        "Link_to_existing definition:": "DATE FIRST SEEN",
+                        "Notes_from_GD_JCIS": null,
+                        "[Optional]_Local_Identifier": "XXXXXXX0230",
+                        "A": "2",
+                        "B": "2",
+                        "C": "2",
+                        "D": "1",
+                        "E": "2",
+                        "F": "When referral details entered.",
+                        "G": "GC 142",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/108@0.0.1",
+                    "name": "CONSULTANT CODE",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "A code uniquely identifying a CONSULTANT. (Referred to CONSULTANT CODE).",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_21",
+                        "Link_to_existing definition:": "CONSULTANT CODE",
+                        "Notes_from_GD_JCIS": "Imported activities do not have this field completed, but it TEST be derived from the Clinic code, which is imported. Check with VT.",
+                        "[Optional]_Local_Identifier": "XXXXXXX0210",
+                        "A": "2",
+                        "B": "2",
+                        "C": "4",
+                        "D": "4",
+                        "E": "2 - Backlog of consultant codes will need to be entered",
+                        "F": "Visit\neg Initial visit or Radiological visit used as first seen in wait time table.",
+                        "G": "GC 143",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/109@0.0.1",
+                    "name": "CARE PROFESSIONAL MAIN SPECIALTY CODE",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "A unique code identifying each MAIN SPECIALTY designated by Royal Colleges. This is the same as the OCCUPATION CODES desXXXXXXXibing specialties. (TEST be derived from consultant code).",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_22",
+                        "Link_to_existing definition:": "CARE PROFESSIONAL MAIN SPECIALTY CODE",
+                        "Notes_from_GD_JCIS": "NOT SHOWN ON JCIS\n(A field is available in Consultants table, but often empty)",
+                        "[Optional]_Local_Identifier": "XXXXXXX0220",
+                        "A": "4",
+                        "B": "4",
+                        "C": "4",
+                        "D": "4",
+                        "E": "3",
+                        "F": "NOT SHOWN ON JCIS\n(A field is available in Consultants table, but often empty)",
+                        "G": "GC 144",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/110@0.0.1",
+                    "name": "ORGANISATION SITE CODE (PROVIDER FIRST SEEN)",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "The  ORGANISATION SITE CODE of the Health Care Provider at the first contact with the PATIENT.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_23",
+                        "Link_to_existing definition:": "SITE CODE (OF PROVIDER FIRST SEEN)",
+                        "Notes_from_GD_JCIS": "Name shown. Code available in JCIS tables.",
+                        "[Optional]_Local_Identifier": "XXXXXXX1410",
+                        "A": "2",
+                        "B": "2",
+                        "C": "2",
+                        "D": "3",
+                        "E": "2",
+                        "F": "Visit\neg Initial visit or Radiological visit used as first seen in wait time table.",
+                        "G": "GC 145",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/111@0.0.1",
+                    "name": "DATE FIRST SEEN (TESTCER SPECIALIST)",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "This is the date that the PATIENT is first seen by the appropriate specialist for TESTcer care within a TESTcer Care Spell. This is the PERSON or PERSONS who are most able to progress the diagnosis of the primary tumour.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_24",
+                        "Link_to_existing definition:": "DATE FIRST SEEN (TESTCER SPECIALIST)",
+                        "Notes_from_GD_JCIS": "How TEST this be pinned down?",
+                        "[Optional]_Local_Identifier": "XXXXXXX1360",
+                        "A": "2",
+                        "B": "2",
+                        "C": "2",
+                        "D": "3",
+                        "E": "2",
+                        "F": "Visit\neg Initial visit or Radiological visit used as first seen in wait time table.",
+                        "G": "GC 146",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/112@0.0.1",
+                    "name": "ORGANISATION SITE CODE (PROVIDER FIRST TESTCER SPECIALIST)",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "The  ORGANISATION SITE CODE of the ORGANISATION acting as Health Care Provider where the PATIENT is first seen by an appropriate TESTcer specialist on the DATE FIRST SEEN (TESTCER SPECIALIST).",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_25",
+                        "Link_to_existing definition:": "SITE CODE (OF PROVIDER FIRST TESTCER SPECIALIST)",
+                        "Notes_from_GD_JCIS": "Name shown. Code available in JCIS tables.",
+                        "[Optional]_Local_Identifier": "XXXXXXX1400",
+                        "A": "2",
+                        "B": "2",
+                        "C": "2",
+                        "D": "3",
+                        "E": "2",
+                        "F": "Visit\neg Initial visit or Radiological visit used as first seen in wait time table.",
+                        "G": "GC 147",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/114@0.0.1",
+                    "name": "testcerOrSymptomaticBreastReferralPatientStatus",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "TESTCER OR SYMPTOMATIC BREAST REFERRAL PATIENT STATUS is recorded to enable tracking of the status of REFERRAL REQUESTS for PATIENTS referred with a suspected TESTcer, or referred with breast symptoms with TESTcer not originally suspected.\nFor COSD this TEST be used for all patients regardless of referral route.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_26",
+                        "Link_to_existing definition:": "TESTCER OR SYMPTOMATIC BREAST REFERRAL PATIENT STATUS",
+                        "Notes_from_GD_JCIS": null,
+                        "[Optional]_Local_Identifier": "XXXXXXX0270",
+                        "A": "TBA",
+                        "B": "TBA",
+                        "C": "TBA",
+                        "D": "TBA",
+                        "E": "3",
+                        "F": "When referral details entered.",
+                        "G": "GC 148",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataType/113@0.0.1",
+                    "name": "testcerOrSymptomaticBreastReferralPatientStatus",
+                    "type": "DataType",
+                    "dataModel": "NHIC",
+                    "metadata": {
+                        
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/115@0.0.1",
+                    "name": "TESTCER SYMPTOMS FIRST NOTED DATE",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "Record the time when the symptoms were first noted related to this diagnosis as agreed between the consultant and the patient.   Depending on the length of time this should normally include at least month and year. Day should also be included if known. If symptoms have been present for a long time then it may only be possible to record the year. This will normally be recorded by the consultant first seeing the patient in secondary care.\n\nIn these circumstances the Format/Length will be:\nDATE (including year, month and day) - CCYY-MM-DD\n    YEAR AND MONTH - YYYY-MM\n    Year only - YYYY.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_27",
+                        "Link_to_existing definition:": "TESTCER SYMPTOMS FIRST NOTED DATE",
+                        "Notes_from_GD_JCIS": "orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",
+                        "[Optional]_Local_Identifier": "XXXXXXX2000",
+                        "A": "TBA",
+                        "B": "TBA",
+                        "C": "TBA",
+                        "D": "TBA",
+                        "E": "4",
+                        "F": "Calculated from date of visit / duration of symptoms",
+                        "G": "GC 149",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "name": "IMAGING",
+                    "type": "DataClass",
+                    "dataModel": "NHIC",
+                    "metadata": {
+                        
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/117@0.0.1",
+                    "name": "SITE CODE (OF IMAGING)",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "This is the ORGANISATION SITE CODE of the Organisation  where the imaging took place.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_28",
+                        "Link_to_existing definition:": "SITE CODE (OF IMAGING)",
+                        "Notes_from_GD_JCIS": "orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",
+                        "[Optional]_Local_Identifier": "XXXXXXX0310",
+                        "A": "1",
+                        "B": "1",
+                        "C": "1",
+                        "D": "2",
+                        "E": "5",
+                        "F": "Name shown. Code available in JCIS tables.",
+                        "G": "GC 150",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/118@0.0.1",
+                    "name": "PROCEDURE DATE (TESTCER IMAGING)",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "The DATE the TESTcer Imaging was carried out.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_29",
+                        "Link_to_existing definition:": "PROCEDURE DATE (TESTCER IMAGING)",
+                        "Notes_from_GD_JCIS": null,
+                        "[Optional]_Local_Identifier": "XXXXXXX0320",
+                        "A": "1",
+                        "B": "2",
+                        "C": "2",
+                        "D": "2",
+                        "E": "6",
+                        "F": null,
+                        "G": "GC 151",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/119@0.0.1",
+                    "name": "IMAGING CODE (NICIP)*",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "*IMAGING CODE (NICIP)\nand/or\n (TESTCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING))\nis required.\n\nIMAGING CODE (NICIP) is the National Interim Clinical Imaging Procedure Code Set code which is used to identify both the test modality and body site of the test.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_30",
+                        "Link_to_existing definition:": "IMAGING CODE (NICIP)",
+                        "Notes_from_GD_JCIS": "orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",
+                        "[Optional]_Local_Identifier": "XXXXXXX1610",
+                        "A": "TBA",
+                        "B": "TBA",
+                        "C": "TBA",
+                        "D": "TBA",
+                        "E": "7",
+                        "F": "See also alternative  mandatory item for non-imported radiology activities\nIe  (TESTCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING))",
+                        "G": "GC 152",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/121@0.0.1",
+                    "name": "testcerImagingModality*",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "*IMAGING CODE (NICIP)\nand/or\n (TESTCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING))\nis required.\n\nThe type of imaging procedure used during an Imaging or Radiodiagnostic Event for a TESTcer Care Spell.\nNB: PET STEST also includes PET-CT STEST.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_31",
+                        "Link_to_existing definition:": "TESTCER IMAGING MODALITY",
+                        "Notes_from_GD_JCIS": "orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",
+                        "[Optional]_Local_Identifier": "XXXXXXX0330",
+                        "A": "2",
+                        "B": "2",
+                        "C": "3",
+                        "D": "3",
+                        "E": "8",
+                        "F": "Radiology - see title of activity",
+                        "G": "GC 153",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataType/120@0.0.1",
+                    "name": "testcerImagingModality*",
+                    "type": "DataType",
+                    "dataModel": "NHIC",
+                    "metadata": {
+                        
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/122@0.0.1",
+                    "name": "IMAGING ANATOMICAL SITE*",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "*IMAGING CODE (NICIP)\nand/or\n (TESTCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING))\nis required.\n\nA classification of the part of the body that is the subject of an Imaging Or Radiodiagnostic Event.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_32",
+                        "Link_to_existing definition:": "IMAGING ANATOMICAL SITE",
+                        "Notes_from_GD_JCIS": "orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",
+                        "[Optional]_Local_Identifier": "XXXXXXX0340",
+                        "A": "4",
+                        "B": "4",
+                        "C": "4",
+                        "D": "4",
+                        "E": "9",
+                        "F": "Typically not recorded.  Unless the ATM makes it clear what the site is, the site of imaging is not recorded. Exceptions are mammogram (site recorded as breast);BRT ultrasound - user has to record site.\n[Usage for UGI CT sTEST (recorded 4 times on Live patients) - is misleading usage of backend table as front end desXXXXXXXiption is 'Primary tumour location' on CT sTEST.Findings tab].\n\n(Findings site is recordable).",
+                        "G": "GC 154",
+                        "H": "NEO4J",
+                        "E2": "from source"
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/124@0.0.1",
+                    "name": "anatomicalSide(imaging)*",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "*IMAGING CODE (NICIP)\nand/or\n (TESTCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING))\nis required.\n\nThe side of the body that is the subject of an Imaging or Radiodiagnostic Event.",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_33",
+                        "Link_to_existing definition:": "ANATOMICAL SIDE (IMAGING)",
+                        "Notes_from_GD_JCIS": "orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",
+                        "[Optional]_Local_Identifier": "XXXXXXX3000",
+                        "A": "MAY BE REMOVED",
+                        "B": "MAY BE REMOVED",
+                        "C": "MAY BE REMOVED",
+                        "D": "MAY BE REMOVED",
+                        "E": "MAY BE REMOVED",
+                        "F": null,
+                        "G": null,
+                        "H": "NEO4J",
+                        "E2": null
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataType/123@0.0.1",
+                    "name": "anatomicalSide(imaging)*",
+                    "type": "DataType",
+                    "dataModel": "NHIC",
+                    "metadata": {
+                        
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/126@0.0.1",
+                    "name": "gender2",
+                    "type": "DataElement",
+                    "dataModel": "NHIC",
+                    "description": "gender test stuff",
+                    "metadata": {
+                        "NHIC_Identifier:": "TEST_GENDER",
+                        "Link_to_existing definition:": "GENDER2",
+                        "Notes_from_GD_JCIS": "orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent blandit erat id euismod gravida. Mauris tincidunt hendrerit mauris, in ullamcorper libero commodo id. Suspendisse potenti. Ut malesuada id metus sit amet semper. Praesent fermentum nulla lacus, vel semper diam rhoncus bibendum. Nulla tincidunt risus accumsan ornare pretium. Pellentesque suscipit tellus at pellentesque fermentum. Proin posuere urna vitae odio elementum, ut mattis justo varius. Aenean id neque odio. Mauris lobortis nisl eros, sed scelerisque nunc gravida in. Aenean elementu",
+                        "[Optional]_Local_Identifier": "asd",
+                        "A": "MAY BE REMOVED",
+                        "B": "MAY BE REMOVED",
+                        "C": "MAY BE REMOVED",
+                        "D": "MAY BE REMOVED",
+                        "E": "MAY BE REMOVED",
+                        "F": null,
+                        "G": null,
+                        "H": "NEO4J",
+                        "E2": null
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataType/125@0.0.1",
+                    "name": "gender2",
+                    "type": "DataType",
+                    "dataModel": "NHIC",
+                    "metadata": {
+                        
+                    }
+                },
+                "position": {
+                    "x": 0,
+                    "y": 0
+                }
+            }
+        ],
+        "edges": [
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/74@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/75@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/74@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/75@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/75@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/76@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/75@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/76@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/76@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/77@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/76@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/77@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/77@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/78@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/77@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/78@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/78@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/79@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/78@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/79@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/79@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/81@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/79@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/81@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/79@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/81@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/79@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/81@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/81@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/81@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/79@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/82@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/79@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/82@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/79@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/82@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/79@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/82@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/82@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/82@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/79@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/84@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/79@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/84@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/79@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/84@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/79@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/84@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/84@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/83@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/84@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/83@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/79@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/85@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/79@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/85@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/79@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/85@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/79@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/85@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/85@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/85@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/79@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/86@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/79@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/86@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/79@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/86@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/79@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/86@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/86@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/86@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/78@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/79@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/78@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/79@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/79@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/81@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/79@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/81@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/79@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/82@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/79@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/82@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/79@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/84@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/79@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/84@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/79@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/85@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/79@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/85@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/79@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/86@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/79@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/86@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/78@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/87@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/78@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/87@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/87@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/88@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/87@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/88@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/87@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/88@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/87@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/88@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/88@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/88@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/87@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/89@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/87@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/89@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/87@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/89@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/87@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/89@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/89@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/89@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/87@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/90@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/87@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/90@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/87@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/90@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/87@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/90@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/90@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/90@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/78@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/87@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/78@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/87@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/87@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/88@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/87@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/88@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/87@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/89@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/87@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/89@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/87@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/90@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/87@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/90@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/78@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/78@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/92@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/92@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/92@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/92@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/92@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/92@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/93@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/93@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/93@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/93@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/93@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/93@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/94@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/94@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/94@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/94@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/94@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/94@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/95@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/95@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/95@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/95@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/95@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/95@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/97@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/97@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/97@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/97@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/97@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/96@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/97@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/96@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/98@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/98@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/98@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/98@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/98@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/98@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/99@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/99@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/99@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/99@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/99@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/99@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/100@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/100@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/100@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/100@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/100@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/100@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/102@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/102@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/102@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/102@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/102@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/101@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/102@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/101@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/78@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/78@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/92@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/92@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/93@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/93@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/94@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/94@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/95@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/95@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/97@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/97@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/98@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/98@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/99@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/99@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/100@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/100@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/91@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/102@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/102@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/78@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/78@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/105@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/105@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/105@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/105@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/105@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/104@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/105@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/104@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/106@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/106@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/106@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/106@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/106@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/106@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/107@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/107@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/107@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/107@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/107@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/107@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/108@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/108@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/108@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/108@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/108@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/108@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/109@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/109@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/109@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/109@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/109@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/109@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/110@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/110@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/110@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/110@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/110@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/110@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/111@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/111@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/111@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/111@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/111@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/111@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/112@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/112@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/112@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/112@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/112@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/112@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/114@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/114@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/114@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/114@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/114@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/113@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/114@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/113@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/115@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/115@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/115@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/115@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/115@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/115@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/78@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/78@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/105@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/105@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/106@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/106@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/107@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/107@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/108@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/108@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/109@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/109@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/110@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/110@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/111@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/111@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/112@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/112@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/114@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/114@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/103@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/115@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/115@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/78@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/78@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/116@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/117@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/117@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/116@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/117@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/117@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/117@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/117@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/116@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/118@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/118@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/116@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/118@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/118@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/118@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/118@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/116@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/119@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/119@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/116@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/119@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/119@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/119@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/119@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/116@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/121@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/121@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/116@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/121@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/121@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/121@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/120@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/121@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/120@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/116@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/122@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/122@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/116@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/122@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/122@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/122@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/80@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/122@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/80@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/116@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/124@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/124@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/116@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/124@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/124@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/124@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/123@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/124@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/123@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/116@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/126@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/126@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/116@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/126@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/126@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataElement/126@0.0.1elementTypehttp://localhost:8080/catalogue/dataType/125@0.0.1",
+                    "name": "type",
+                    "type": "elementType",
+                    "source": "http://localhost:8080/catalogue/dataElement/126@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataType/125@0.0.1"
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/78@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/78@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/116@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/117@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/117@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/116@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/118@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/118@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/116@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/119@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/119@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/116@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/121@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/121@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/116@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/122@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/122@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/116@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/124@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/124@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/116@0.0.1containmenthttp://localhost:8080/catalogue/dataElement/126@0.0.1",
+                    "name": "contains",
+                    "type": "containment",
+                    "source": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataElement/126@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/77@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/78@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/77@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/78@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/78@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/79@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/78@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/79@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/78@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/87@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/78@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/87@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/78@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/78@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/91@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/78@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/78@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/103@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/78@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/78@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/116@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/76@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/77@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/76@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/77@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/77@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/78@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/77@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/78@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/75@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/76@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/75@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/76@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/76@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/77@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/76@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/77@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/74@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/75@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/74@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/75@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/75@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/76@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/75@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/76@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataClass/74@0.0.1hierarchyhttp://localhost:8080/catalogue/dataClass/75@0.0.1",
+                    "name": "parentOf",
+                    "type": "hierarchy",
+                    "source": "http://localhost:8080/catalogue/dataClass/74@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/75@0.0.1",
+                    "archived": false,
+                    "inherited": false,
+                    "metadata": {
+                        
+                    }
+                }
+            },
+            {
+                "data": {
+                    "id": "http://localhost:8080/catalogue/dataModel/73@0.0.1modelClasshttp://localhost:8080/catalogue/dataClass/74@0.0.1",
+                    "name": "hasClass",
+                    "type": "modelClass",
+                    "source": "http://localhost:8080/catalogue/dataModel/73@0.0.1",
+                    "target": "http://localhost:8080/catalogue/dataClass/74@0.0.1"
+                }
+            }
+        ]
+    }
+}

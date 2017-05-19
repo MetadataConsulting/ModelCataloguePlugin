@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+
+<title>Model Catalogue Graph</title>
+  <link rel="stylesheet" href="font-awesome-4.7.0/css/font-awesome.min.css"/>
+  <link rel="stylesheet" href="bootstrap-3.3.7-dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css" >
+  <link rel="shortcut icon" type="image/png" href="mdc_favicon.png">
+</head>
+<body>
+
+
+  <script src="fastclick.min.js"></script>
+  <script src="jquery.min.js"></script>
+
+  <script src="cytoscape.min.js"></script>
+
+  <script src="jquery.qtip.min.js"></script>
+  <link href="jquery.qtip.min.css" rel="stylesheet" type="text/css" />
+  <script src="cytoscape-qtip.js"></script>
+
+  <script src="bluebird.min.js"></script>
+  <script src="bootstrap.min.js"></script>
+  <script src="typeahead.bundle.js"></script>
+  <script src="handlebars.min.js"></script>
+  <script src="lodash.min.js"></script>
+  <script src="notify.min.js"></script>
+
+  <script src="model_catalogue_graph.js"></script>
+  <div id="nav"> <!-- left nav bar -->
+    <p><button id="get-model-list" class="btn btn-default"
+      data-loading-text="<i class='fa fa-spinner fa-pulse fa-fw'></i>
+      Loading Model List...">
+    <i class="fa fa-th-list"></i>   Get Model List</button></p>
+    <div class ="list-group" id="model-list">
+      <!-- will be populated in demo.js or on clicking get model list button -->
+    </div>
+  </div>
+  <div class="container">
+    <div id="cy"></div> <!-- element that cytoscape will display in -->
+
+    <div id="loading">
+      <span class="fa fa-refresh fa-spin"></span>
+    </div>
+
+    <div id="search-wrapper">
+      <input type="text" class="form-control" id="search" placeholder="&#xf002; Search">
+    </div>
+
+    <div id="info"><!--Displays information such as type of element, dataModel, description, metadata. --></div>
+    <button id="reset" class="btn btn-default"><i class="fa fa-arrows-h"></i></button>
+
+    <button id="filter" class="btn btn-default"><i class="fa fa-filter"></i></button>
+    <!--
+    <button id="about" class="btn btn-default"><i class="fa fa-info"></i></button>
+
+    <div id="about-content">
+      <p>This app was made using <a target="_blank" href="http://js.cytoscape.org">Cytoscape.js <i class="fa fa-external-link"></i></a>.</p>
+      <p><a target="_blank" href="http://www.wineandcheesemap.com"> Original work: Wine and Cheese map
+
+    </div>
+  -->
+    <div id="filters">
+      <div class="filterset-section-title">Type</div>
+
+      <div class="filtersets">
+        <div class="filterset">
+          <!--<div class="filterset-title">Type</div>-->
+          <span id="filter-DataModel"><input id="DataModel-checkbox" type="checkbox" checked></input><label for="DataModel-checkbox">Data Model</label></span><br/>
+          <span id="filter-DataClass"><input id="DataClass-checkbox" type="checkbox" checked></input><label for="DataClass-checkbox">Data Class</label></span><br/>
+          <span id="filter-DataElement"><input id="DataElement-checkbox" type="checkbox" checked></input><label for="DataElement-checkbox">Data Element</label></span><br/>
+          <span id="filter-DataType"><input id="DataType-checkbox" type="checkbox" checked></input><label for="DataType-checkbox">Data Type</label></span><br/>
+          <span id="filter-MeasurementUnit"><input id="MeasurementUnit-checkbox" type="checkbox" checked></input><label for="MeasurementUnit-checkbox">Measurement Unit</label></span><br/>
+          <span id="filter-ValidationRule"><input id="ValidationRule-checkbox" type="checkbox" checked></input><label for="ValidationRule-checkbox">Validation Rule</label></span><br/>
+
+          <!--
+          <input id="filter-DataModel" type="checkbox" checked></input><label for="DataModel">Data Model</label><br/>
+          <input id="filter-DataClass" type="checkbox" checked></input><label for="DataClass">Data Class</label><br/>
+          <input id="filter-DataElement" type="checkbox" checked></input><label for="DataElement">Data Element</label><br/>
+          <input id="filter-DataType" type="checkbox" checked></input><label for="DataType">Data Type</label><br/>
+          <input id="filter-MeasurementUnit" type="checkbox" checked></input><label for="MeasurementUnit">Measurement Unit</label><br/>
+          <input id="filter-ValidationRule" type="checkbox" checked></input><label for="ValidationRule">Validation Rule</label><br/>
+        -->
+          <!--<input id="soft" type="checkbox" checked></input><label for="soft">Soft</label><br />
+          <input id="semi-soft" type="checkbox" checked></input><label for="semi-soft">Semi-soft</label><br />
+          <input id="semi-hard" type="checkbox" checked></input><label for="semi-hard">Semi-hard</label><br />
+          <input id="hard" type="checkbox" checked></input><label for="hard">Hard</label><br />
+          <input id="na" type="checkbox" checked></input><label for="na">Other</label><br />-->
+        </div>
+        <!--
+        <div class="filterset right">
+          <div class="filterset-title">Country</div>
+          <input id="chs-en" type="checkbox" checked></input><label for="chs-en">England</label><br />
+          <input id="chs-fr" type="checkbox" checked></input><label for="chs-fr">France</label><br />
+          <input id="chs-it" type="checkbox" checked></input><label for="chs-it">Italy</label><br />
+          <input id="chs-usa" type="checkbox" checked></input><label for="chs-us">USA</label><br />
+          <input id="chs-es" type="checkbox" checked></input><label for="chs-es">Spain</label><br />
+          <input id="chs-ch" type="checkbox" checked></input><label for="chs-ch">Switzerland</label><br />
+          <input id="chs-euro" type="checkbox" checked></input><label for="chs-euro">Other Europe</label><br />
+          <input id="chs-nworld" type="checkbox" checked></input><label for="chs-nworld">Other New World</label><br />
+          <input id="chs-na" type="checkbox" checked></input><label for="chs-na">Other</label><br />
+        </div>
+      </div>
+    -->
+      <!--
+      <div class="filterset-section-title">Drink</div>
+
+        <div class="filtersets">
+          <div class="filterset">
+            <input id="white" type="checkbox" checked></input><label for="white">White wine</label><br />
+            <input id="red" type="checkbox" checked></input><label for="red">Red wine</label><br />
+            <input id="cider" type="checkbox" checked></input><label for="cider">Cider</label>
+          </div>
+        </div>
+      -->
+
+    </div>
+  </div>
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-155159-12', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+</body>
+</html>

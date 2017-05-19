@@ -351,6 +351,7 @@ grails.plugin.springsecurity.filterChain.chainMap = [
         '/catalogue/upload':                    'JOINED_FILTERS,-exceptionTranslationFilter',
         '/catalogue/*/*/export':                'JOINED_FILTERS,-exceptionTranslationFilter',
         '/catalogue/*/*/cytoscapeJsonExport':   'JOINED_FILTERS,-exceptionTranslationFilter',
+        '/catalogue/cytoscapeGraphView':   'JOINED_FILTERS,-exceptionTranslationFilter',
         '/user/current':                        'JOINED_FILTERS,-exceptionTranslationFilter',
         '/api/modelCatalogue/core/feedback/**': 'JOINED_FILTERS,-exceptionTranslationFilter',
         '/**':                                  'JOINED_FILTERS,-basicAuthenticationFilter,-basicExceptionTranslationFilter'

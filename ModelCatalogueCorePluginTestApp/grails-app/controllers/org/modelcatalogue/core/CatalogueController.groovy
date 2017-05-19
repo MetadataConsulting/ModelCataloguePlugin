@@ -97,6 +97,16 @@ class CatalogueController {
         // redirect controller: params.resource, action: 'show', id: element.id
     }
 
+    def display_cytoscape() {
+        if (!params.resource || ! params.id) {
+            render "Need to give parameters e.g. ?resource=dataModel&id=142"
+        }
+        else {
+            render(view: "model_catalogue_graph", model: [id: params.id, resource: params.resource] )
+        }
+
+    }
+
     /** Vlad: Did something similar to xref().
      * In early times it was used to fetch element by extension (i.e. metadata).
      * e.g. HPO elements could be fetched by /ext/HPO_ID/HP_123445.
