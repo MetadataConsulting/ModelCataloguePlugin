@@ -170,7 +170,7 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     {
       position:   1000
       icon:       'fa fa-flash fa-fw'
-      label:      'Actions'
+      label:      'Suggest Relations'
       action: ->
         $state.go 'simple.resource.list', resource: 'batch'
     }
