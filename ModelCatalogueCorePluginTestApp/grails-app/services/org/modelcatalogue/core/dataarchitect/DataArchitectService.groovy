@@ -22,9 +22,12 @@ class DataArchitectService {
     def dataModelService
 
     private Map<String,Runnable> suggestions = [
-            'Inline Models': this.&generateInlineModel,
-            'Merge Models': this.&generateMergeModels,
-            'Enum Duplicates and Synonyms': this.&generatePossibleEnumDuplicatesAndSynonyms
+            //'Inline Models': this.&generateInlineModel,
+           // 'Merge Models': this.&generateMergeModels,
+           // 'Enum Duplicates and Synonyms': this.&generatePossibleEnumDuplicatesAndSynonyms
+          'Element Exact Match':this&generateDataElementSuggestionsExact,
+          'Element and Type Exact Match':this&generateDataElementAndTypeSuggestionsExact,
+          'Element and Type Fuzzy Match':this&generateDataTElementAndTypeSuggestionsFuzzy
     ]
 
     Set<String> getSuggestionsNames() {
@@ -338,5 +341,15 @@ class DataArchitectService {
             batch.archived = false
             batch.save()
         }
+    }
+
+    private void generateDataElementSuggestionsExact(){
+
+    }
+    private void generateDataElementAndTypeSuggestionsExact(){
+
+    }
+    private void enerateDataTElementAndTypeSuggestionsFuzzy(){
+
     }
 }
