@@ -11,6 +11,14 @@ Following dependecies are managed automatically if using [Model Catalogue with D
 
 ## Frontend
 
+Description of frontend structure by James:
+
+Most of the front end is written in AngularJS. The thing is, Grails and Angular are both MVC frameworks in their own right, with their own dependency injection systems. So combining them is a bit of a nightmare. We use the Grails plugin, "Angular Asset Pipeline Plugin", its author Craig Burke describes an aspect of their combination: "By default the Asset Pipeline plugin will minify all the Javascript files in your project. This breaks the dependency injection used by AngularJS (which relies on specific parameter names)."
+
+The javascripts are contained in grails-app/assets/javascripts. There are two folders in javascripts, templates and modelcatalogue. templates of course holds most of the templates, which are managed by the Angular Template Asset Pipeline Plugin. Each template must have a corresponding angular module. These are declared in modelcatalogue. Within templates we might have a file such as mc/core/forms/ui/infiniteTable.tpl.html; which when loaded into the Angular template cache would be referred to as mc/core/forms/ui/infiniteTable.html
+
+All the templates in mc are required by mc/index, which in turn is required by modelcatalogue/modelcatalogue, which defines a javascript variable, also called modelcatalogue, which is attached to the window. modelcatalogue/modelcatalogue is called by the Grails index view, at grails-app/views/index.gsp. All of its modules are used for the metadataCurator Angular module, which is registered to the main body of the index page. It appears to me that most of the app is in effect a "single-page app", although I am not sure of the details of how Grails controllers invoke this view.
+
 ### Tools
 * [NodeJS](https://nodejs.org/en/) ecosystem (tested with version 0.10.x)
 * [NPM](https://www.npmjs.com/) for managing tools dependencies
@@ -53,7 +61,7 @@ See [bower.json](../../../ModelCatalogueCorePlugin/bower.json) for information o
 ## Backend
 
 ### Frameworks and Libraries
-* [Grails 2.4.x](http://grails.github.io/grails-doc/2.4.5/) ecosystem
+* [Grails 2.5.x](http://grails.github.io/grails-doc/2.5.x/) ecosystem
 * [Grails Asset Pipeline](https://grails.org/plugin/asset-pipeline) for handling the frontend resources
 * [Grails Spring Security Core 2.0](https://grails.org/plugin/spring-security-core) for securing the application
 * [Grails Spring Security Core UI](https://grails.org/plugin/spring-security-ui) for managing the application users

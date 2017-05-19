@@ -21,8 +21,8 @@ Daily backups are expected to enabled for the database.
 
 == Search
 
-Model Catalogue uses *Elasticsearch* server as a search engine. Currently the version `2.1.2` is in use and
-should be compatible to any newer release in `2.1.x` but not with the newer ones such as `2.2.x` or `2.3.x`. The version
+Model Catalogue uses *Elasticsearch* server as a search engine. Currently the version `2.3.5` is in use and
+should be compatible to any newer release in `2.3.x` but not with the newer ones. The version
 of the server should correspond the drivers used by the application. The best way to achieve this is to use
 https://hub.docker.com/r/metadata/registry-elasticsearch/[metadata/registry-elasticsearch] Docker image which is
 guaranteed to be synchronized with the main application image https://hub.docker.com/r/metadata/registry/[metadata/registry]

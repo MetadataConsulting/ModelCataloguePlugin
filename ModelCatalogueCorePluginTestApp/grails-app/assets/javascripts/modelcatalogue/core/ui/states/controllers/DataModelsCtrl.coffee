@@ -77,7 +77,8 @@ angular.module('mc.core.ui.states.controllers.DataModelsCtrl', ['ui.router', 'mc
     $state.go '.', {type: 'elements'}
     $scope.type = 'elements'
 
-  $scope.$watch 'q', (q) ->
+  $scope.$watch 'q', (q, oldQ) ->
+    $scope.loading = true if q isnt oldQ
     $state.go '.', {q: q}
 
   $scope.$on 'newVersionCreated', ->

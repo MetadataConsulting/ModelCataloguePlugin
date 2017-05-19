@@ -11,7 +11,7 @@ angular.module('mc.core.ui.bs.modalPromptDatModelPolicyEdit', ['mc.util.messages
         size: 'lg'
         template: '''
          <div class="modal-header">
-            <h4>''' + title + '''</h4>
+            <h4>''' + (title ? 'Create Data Policy') + '''</h4>
         </div>
         <div class="modal-body">
             <messages-panel messages="messages"></messages-panel>
