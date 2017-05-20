@@ -903,7 +903,7 @@ class ElementService implements Publisher<CatalogueElement> {
      * @return List
      */
     private List getDataElementsWithFuzzyMatches(Long dmAId, Long dmBId){
-        Map<Long, Set<Long>> fuzzyElementList
+        Map<Long, Set<Long>> fuzzyElementList = new HashMap<Long, Set<Long>>()
         String query2getAList = """SELECT DISTINCT catalogue_element.id, catalogue_element.name FROM catalogue_element, data_element WHERE data_model_id = ${dmAId}"""
         final session = sessionFactory.currentSession
         final sqlQuery = session.createSQLQuery(query2getAList)
@@ -928,8 +928,10 @@ class ElementService implements Publisher<CatalogueElement> {
                         def modelBName = it.name
                         def modelBId = it.id
                         int matchScore = getNameMetric(modelAName, modelBName)
-                        Set<Long> element = new HashSet<Long>(modelAId, modelBId)
-                        fuzzyElementList.put(element, matchScore)
+                        Set<Long> element = new HashSet<Long>()
+                        element.add(modelAId)
+                        element.add(modelBId)
+                        fuzzyElementList.put(matchScore,element)
                     }
                 }
 
