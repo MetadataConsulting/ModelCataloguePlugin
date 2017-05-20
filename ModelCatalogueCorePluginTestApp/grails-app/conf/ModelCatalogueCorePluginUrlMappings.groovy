@@ -102,6 +102,7 @@ class ModelCatalogueCorePluginUrlMappings {
                     "/api/modelCatalogue/core/$elementName/$id/content"(controller: controllerName, action: 'content', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/$id/newVersion"(controller: controllerName, action: 'newVersion', method: HttpMethod.POST)
                     "/api/modelCatalogue/core/$elementName/$id/inventorySpreadsheet"(controller: controllerName, action: 'inventorySpreadsheet', method: HttpMethod.GET)
+                    "/api/modelCatalogue/core/$elementName/$id/gridSpreadsheet"(controller: controllerName, action: 'gridSpreadsheet', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/$id/inventoryDoc"(controller: controllerName, action: 'inventoryDoc', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/$id/dependents"(controller: controllerName, action: 'dependents', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/$id/reindex"(controller: controllerName, action: 'reindex', method: HttpMethod.POST)
@@ -167,6 +168,7 @@ class ModelCatalogueCorePluginUrlMappings {
         }
 
         "/"(view:"index")
+        "/load"(view:"load")
         "/api/modelCatalogue/core/search/reindex" (controller:"search", action : 'reindex', method: HttpMethod.POST)
         "/api/modelCatalogue/core/search/$search?" (controller:"search", action : 'index', method: HttpMethod.GET)
         "/api/modelCatalogue/core/relationship/$id/restore" (controller:"relationship", action : 'restore', method: HttpMethod.POST)
