@@ -23,14 +23,15 @@ class DataArchitectService {
     def dataModelService
     def sessionFactory
 
+
     private Map<String,Runnable> suggestions = [
-            'Inline Models': this.&generateInlineModel,
-           'Merge Models': this.&generateMergeModels,
-          'Enum Duplicates and Synonyms': this.&generatePossibleEnumDuplicatesAndSynonyms,
-          'Data Element Exact Match':this.&generateDataElementSuggestionsExact,
-            'Data Element Exact Match':this.&generateDataElementSuggestionsFuzzy,
-          'Data Element and Type Exact Match':this.&generateDataElementAndTypeSuggestionsExact,
-          'Data Element and Type Fuzzy Match':this.&generateDataElementAndTypeSuggestionsFuzzy
+        'Inline Models': this.&generateInlineModel,
+        'Merge Models': this.&generateMergeModels,
+        'Enum Duplicates and Synonyms': this.&generatePossibleEnumDuplicatesAndSynonyms,
+        'Data Element Exact Match':this.&generateDataElementSuggestionsExact,
+        'Data Element Fuzzy Match':this.&generateDataElementSuggestionsFuzzy,
+        'Data Element and Type Exact Match':this.&generateDataElementAndTypeSuggestionsExact,
+        'Data Element and Type Fuzzy Match':this.&generateDataElementAndTypeSuggestionsFuzzy
     ]
 
     Set<String> getSuggestionsNames() {
@@ -352,7 +353,7 @@ class DataArchitectService {
     private void generateDataElementSuggestionsExact(){
 
         //List matchingDataElements = elementService.getDataElementsInCommon(1,2)
-        def matchingDataElements = elementService.findDuplicateDataElementSuggestions("HPO_TEST_ONE","HPO_TEST_TWO" )
+        def matchingDataElements = elementService.findDuplicateDataElementSuggestions("NHS_DATA_DICTIONARY","COSD" )
         matchingDataElements.each{
             println it
         }

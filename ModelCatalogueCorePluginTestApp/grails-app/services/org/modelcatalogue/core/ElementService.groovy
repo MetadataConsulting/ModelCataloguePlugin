@@ -846,13 +846,10 @@ class ElementService implements Publisher<CatalogueElement> {
 
     private Long getDataModelId(String dataModelName){
         Long dataModelId = 0
-
         String query = "SELECT catalogue_element.id FROM catalogue_element, data_model  " +
             "WHERE catalogue_element.id = data_model.id" +
             " AND catalogue_element.name = '${dataModelName}' ;"
-
         final session = sessionFactory.currentSession
-        // Create native SQL query.
         final sqlQuery = session.createSQLQuery(query)
         sqlQuery.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
         List results = sqlQuery.list()
@@ -862,7 +859,6 @@ class ElementService implements Publisher<CatalogueElement> {
             def mid = results[0]
             dataModelId = mid["id"] as Long
         }
-
         return dataModelId
     }
     /**
@@ -901,36 +897,45 @@ class ElementService implements Publisher<CatalogueElement> {
 
     /**
      * getDataElementsWithFuzzyMatches
+     * This will need to be streamed for large datasets
      * @param Long
      * @param Long
      * @return List
      */
     private List getDataElementsWithFuzzyMatches(Long dmAId, Long dmBId){
-
-
-        String query = """  SELECT  catalogue_element.name 
-              FROM catalogue_element, data_element 
-              WHERE (catalogue_element.id = data_element.id AND catalogue_element.data_model_id =  :dmA) 
-              AND catalogue_element.name IN 
-              (select  catalogue_element.name 
-              from catalogue_element, data_element 
-              where (catalogue_element.id = data_element.id AND catalogue_element.data_model_id =  :dmB))"""
-
+        Map<Long, Set<Long>> fuzzyElementList
+        String query2getAList = """SELECT DISTINCT catalogue_element.id, catalogue_element.name FROM catalogue_element, data_element WHERE data_model_id = ${dmAId}"""
         final session = sessionFactory.currentSession
+        final sqlQuery = session.createSQLQuery(query2getAList)
+        sqlQuery.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+        List aList = sqlQuery.list()
+        if(aList.size() == 0){
+            fuzzyElementList = null
+        }else{
+            aList.each{
+                def aListName = it.name
+                def aListId = it.id
+                String query2getBList = """SELECT DISTINCT catalogue_element.id, catalogue_element.name FROM catalogue_element, data_element WHERE data_model_id =  ${dmBId}"""
+                sqlQuery = session.createSQLQuery(query2getBList)
+                sqlQuery.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+                List bList = sqlQuery.list()
+                if(bList.size() == 0){
+                    fuzzyElementList = null
+                }else {
+                    bList.each {
+                        def modelAName = aListName
+                        def modelAId = aListId
+                        def modelBName = it.name
+                        def modelBId = it.id
+                        int matchScore = getNameMetric(modelAName, modelBName)
+                        Set<Long> element = new HashSet<Long>(modelAId, modelBId)
+                        fuzzyElementList.put(element, matchScore)
+                    }
+                }
 
-        // Create native SQL query.
-        final sqlQuery = session.createSQLQuery(query)
-
-        final results = sqlQuery.with {
-            // Set value for parameter startId.
-            setLong('dmA', dmAId)
-            setLong('dmB', dmBId)
-
-            // Get all results.
-            list()
+            }
         }
-
-        return results
+        return fuzzyElementList
     }
 
     /**
@@ -967,7 +972,7 @@ class ElementService implements Publisher<CatalogueElement> {
         int distance = levensteinDistance(str1,str2)
         int numberOfCharacters = str1.length()
         int metric = ((numberOfCharacters - distance)/numberOfCharacters) * 100
-        println  "metric=" + metric
+        return metric
     }
     /**
      * levensteinDistance
