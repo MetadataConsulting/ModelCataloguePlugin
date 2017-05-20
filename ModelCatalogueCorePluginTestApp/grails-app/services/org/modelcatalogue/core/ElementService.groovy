@@ -7,6 +7,7 @@ import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
+import org.hibernate.Criteria
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.cache.CacheService
@@ -37,6 +38,7 @@ class ElementService implements Publisher<CatalogueElement> {
     SecurityService modelCatalogueSecurityService
     def messageSource
     AuditService auditService
+    def sessionFactory
 
     List<CatalogueElement> list(Map params = [:]) {
         CatalogueElement.findAllByStatusInList(getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')), params)
@@ -750,6 +752,146 @@ class ElementService implements Publisher<CatalogueElement> {
             collector << base
             collectBases(base, collector)
         }
+    }
+
+
+    /**
+     * Return dataElement ids which are very likely to be duplicates.
+     * Enums are very likely duplicates if they have similar enum values.
+     * @return map with the enum id as key and set of ids of duplicate enums as value
+     */
+    Map<Long, Set<Long>> findDuplicateDataElementSuggestions(String dataModelA, String dataModelB) {
+        Long dataModelIdA = getDataModelId(dataModelA)
+        Long dataModelIdB = getDataModelId(dataModelB)
+        Map<Long, Set<Long>> elementSuggestions = new LinkedHashMap<Long, Set<Long>>()
+        def results = getDataElementsInCommon(dataModelIdA,dataModelIdB)
+        if(results.size() > 0){
+            results.each{
+                def dataElementName = it as String
+                Long ida =getDataElementId(dataElementName,dataModelIdA)
+                Long idb =getDataElementId(dataElementName,dataModelIdB)
+                elementSuggestions.put(ida,idb)
+            }
+        }
+        return elementSuggestions
+    }
+
+
+    private Long getDataElementId(String dataElementName, Long dataModelId){
+        Long dataElementId = 0
+
+        String query = """SELECT catalogue_element.id FROM catalogue_element, data_element   
+            WHERE catalogue_element.id = data_element.id
+            AND catalogue_element.name = '${dataElementName}'
+            AND catalogue_element.data_model_id = ${dataModelId};"""
+
+        final session = sessionFactory.currentSession
+        // Create native SQL query.
+        final sqlQuery = session.createSQLQuery(query)
+        sqlQuery.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+        List results = sqlQuery.list()
+        if(results.size() == 0){
+            dataElementId = 0
+        }else{
+            def mid = results[0]
+            dataElementId = mid["id"] as Long
+        }
+
+        return dataElementId
+    }
+
+    private Long getDataClassId(String dataClassName){
+        Long dataClassId = 0
+
+        String query = "SELECT catalogue_element.id FROM catalogue_element, data_class  " +
+            "WHERE catalogue_element.id = data_class.id" +
+            " AND catalogue_element.name = '${dataClassName}' ;"
+
+        final session = sessionFactory.currentSession
+        // Create native SQL query.
+        final sqlQuery = session.createSQLQuery(query)
+        sqlQuery.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+        List results = sqlQuery.list()
+        if(results.size() == 0){
+            dataClassId = 0
+        }else{
+            def mid = results[0]
+            dataClassId = mid["id"] as Long
+        }
+
+        return dataClassId
+    }
+
+    private Long getDataTypeId(String dataTypeName){
+        Long dataTypeId = 0
+
+        String query = "SELECT catalogue_element.id FROM catalogue_element, data_type  " +
+            "WHERE catalogue_element.id = data_type.id" +
+            " AND catalogue_element.name = '${dataTypeName}' ;"
+
+        final session = sessionFactory.currentSession
+        // Create native SQL query.
+        final sqlQuery = session.createSQLQuery(query)
+        sqlQuery.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+        List results = sqlQuery.list()
+        if(results.size() == 0){
+            dataTypeId = 0
+        }else{
+            def mid = results[0]
+            dataTypeId = mid["id"] as Long
+        }
+
+        return dataTypeId
+    }
+
+    private Long getDataModelId(String dataModelName){
+        Long dataModelId = 0
+
+        String query = "SELECT catalogue_element.id FROM catalogue_element, data_model  " +
+            "WHERE catalogue_element.id = data_model.id" +
+            " AND catalogue_element.name = '${dataModelName}' ;"
+
+        final session = sessionFactory.currentSession
+        // Create native SQL query.
+        final sqlQuery = session.createSQLQuery(query)
+        sqlQuery.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+        List results = sqlQuery.list()
+        if(results.size() == 0){
+            dataModelId = 0
+        }else{
+            def mid = results[0]
+            dataModelId = mid["id"] as Long
+        }
+
+        return dataModelId
+    }
+
+    private List getDataElementsInCommon(Long dmAId, Long dmBId){
+
+
+        String query = """  SELECT  catalogue_element.name 
+              FROM catalogue_element, data_element 
+              WHERE (catalogue_element.id = data_element.id AND catalogue_element.data_model_id =  :dmA) 
+              AND catalogue_element.name IN 
+              (select  catalogue_element.name 
+              from catalogue_element, data_element 
+              where (catalogue_element.id = data_element.id AND catalogue_element.data_model_id =  :dmB))"""
+
+        final session = sessionFactory.currentSession
+
+        // Create native SQL query.
+        final sqlQuery = session.createSQLQuery(query)
+
+        final results = sqlQuery.with {
+            // Set value for parameter startId.
+            setLong('dmA', dmAId)
+            setLong('dmB', dmBId)
+
+            // Get all results.
+            list()
+        }
+
+        return results
     }
 
 }
