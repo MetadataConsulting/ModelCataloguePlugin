@@ -25,11 +25,12 @@ class DataArchitectService {
 
     private Map<String,Runnable> suggestions = [
             'Inline Models': this.&generateInlineModel,
-            'Merge Models': this.&generateMergeModels,
-            'Enum Duplicates and Synonyms': this.&generatePossibleEnumDuplicatesAndSynonyms,
-            'Element Exact Match':this.&generateDataElementSuggestionsExact,
-            'Element and Type Exact Match':this.&generateDataElementAndTypeSuggestionsExact,
-            'Element and Type Fuzzy Match':this.&generateDataElementAndTypeSuggestionsFuzzy
+           'Merge Models': this.&generateMergeModels,
+          'Enum Duplicates and Synonyms': this.&generatePossibleEnumDuplicatesAndSynonyms,
+          'Data Element Exact Match':this.&generateDataElementSuggestionsExact,
+            'Data Element Exact Match':this.&generateDataElementSuggestionsFuzzy,
+          'Data Element and Type Exact Match':this.&generateDataElementAndTypeSuggestionsExact,
+          'Data Element and Type Fuzzy Match':this.&generateDataElementAndTypeSuggestionsFuzzy¯
     ]
 
     Set<String> getSuggestionsNames() {
@@ -357,7 +358,10 @@ class DataArchitectService {
             batch.save()
         }
     }
-
+    /**
+     * generateDataElementSuggestionsExact
+     *
+     */
     private void generateDataElementSuggestionsExact(){
 
         //List matchingDataElements = elementService.getDataElementsInCommon(1,2)
@@ -383,7 +387,7 @@ class DataArchitectService {
         Batch.findAllByNameIlike("Duplicate Candidates of Data Element  '%'").each reset
 
         matchingDataElements.each { first, other ->
-            dataElement enumeratedType = dataElement.get(first)
+            DataElement dataElement = DataElement.get(first)
             Batch batch = Batch.findOrSaveByName("Duplicate Candidates of dataElement Type '$dataElement.name'")
             other.each { otherId ->
                 Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.dataElement:$otherId", destination: "gorm://org.modelcatalogue.core.dataElement:$first"
@@ -397,10 +401,59 @@ class DataArchitectService {
 
     }
 
-
+    /**
+     * generateDataElementAndTypeSuggestionsExact
+     *
+     */
     private void generateDataElementAndTypeSuggestionsExact(){
 
     }
+
+    /**
+     * generateDataElementSuggestionsFuzzy
+     *
+     */
+    private void generateDataElementSuggestionsFuzzy(){
+
+        def fuzzyMatchingDataElements = elementService.findFuzzyDuplicateDataElementSuggestions("NHS_DATA_DICTIONARY","COSD" )
+        fuzzyMatchingDataElements.each{
+            println it
+        }
+        Batch.findAllByNameIlike("Create Synonyms for Data Element '%'").each reset
+        fuzzyMatchingDataElements.each { first, other ->
+            DataElement dataElement = DataElement.get(first)
+            Batch batch = Batch.findOrSaveByName("Create Synonyms for dataElement Type '$dataElement.name'")
+            RelationshipType type = RelationshipType.readByName("synonym")
+            other.each { otherId ->
+                Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.EnumeratedType:$otherId", destination: "gorm://org.modelcatalogue.core.dataElement:$first", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
+                if (action.hasErrors()) {
+                    log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
+                }
+            }
+            batch.archived = false
+            batch.save()
+        }
+
+        Batch.findAllByNameIlike("Duplicate Candidates of Data Element  '%'").each reset
+
+        fuzzyMatchingDataElements.each { first, other ->
+            DataElement dataElement = DataElement.get(first)
+            Batch batch = Batch.findOrSaveByName("Duplicate Candidates of dataElement Type '$dataElement.name'")
+            other.each { otherId ->
+                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.dataElement:$otherId", destination: "gorm://org.modelcatalogue.core.dataElement:$first"
+                if (action.hasErrors()) {
+                    log.error(FriendlyErrors.printErrors("Error generating merge model action", action.errors))
+                }
+            }
+            batch.archived = false
+            batch.save()
+        }
+    }
+
+    /**
+     * generateDataElementAndTypeSuggestionsFuzzy
+     *
+     */
     private void generateDataElementAndTypeSuggestionsFuzzy(){
 
     }

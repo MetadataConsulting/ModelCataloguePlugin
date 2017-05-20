@@ -865,7 +865,12 @@ class ElementService implements Publisher<CatalogueElement> {
 
         return dataModelId
     }
-
+    /**
+     * getDataElementsInCommon
+     * @param Long
+     * @param Long
+     * @return List
+     */
     private List getDataElementsInCommon(Long dmAId, Long dmBId){
 
 
@@ -892,6 +897,99 @@ class ElementService implements Publisher<CatalogueElement> {
         }
 
         return results
+    }
+
+    /**
+     * getDataElementsWithFuzzyMatches
+     * @param Long
+     * @param Long
+     * @return List
+     */
+    private List getDataElementsWithFuzzyMatches(Long dmAId, Long dmBId){
+
+
+        String query = """  SELECT  catalogue_element.name 
+              FROM catalogue_element, data_element 
+              WHERE (catalogue_element.id = data_element.id AND catalogue_element.data_model_id =  :dmA) 
+              AND catalogue_element.name IN 
+              (select  catalogue_element.name 
+              from catalogue_element, data_element 
+              where (catalogue_element.id = data_element.id AND catalogue_element.data_model_id =  :dmB))"""
+
+        final session = sessionFactory.currentSession
+
+        // Create native SQL query.
+        final sqlQuery = session.createSQLQuery(query)
+
+        final results = sqlQuery.with {
+            // Set value for parameter startId.
+            setLong('dmA', dmAId)
+            setLong('dmB', dmBId)
+
+            // Get all results.
+            list()
+        }
+
+        return results
+    }
+
+    /**
+     * Return dataElement ids which are very likely to be duplicates.
+     * Enums are very likely duplicates if they have similar enum values.
+     * @return map with the enum id as key and set of ids of duplicate enums as value
+     */
+    Map<Long, Set<Long>> findFuzzyDuplicateDataElementSuggestions(String dataModelA, String dataModelB) {
+        Long dataModelIdA = getDataModelId(dataModelA)
+        Long dataModelIdB = getDataModelId(dataModelB)
+        Map<Long, Set<Long>> elementSuggestions = new LinkedHashMap<Long, Set<Long>>()
+        def results = getDataElementsWithFuzzyMatches(dataModelIdA,dataModelIdB)
+        if(results.size() > 0){
+            results.each{
+                def dataElementName = it as String
+                Long ida =getDataElementId(dataElementName,dataModelIdA)
+                Long idb =getDataElementId(dataElementName,dataModelIdB)
+                elementSuggestions.put(ida,idb)
+            }
+        }
+        return elementSuggestions
+    }
+    /**
+     * getNameMetric
+     * This is a rather simplified metric which takes the Levenstein distance (essentially the
+     * number of characters needed to make the two words the same) and makes a percentage out of
+     * it. So if you have a word of 10 characters and 2 of them are different then this metric
+     * will have them as being 80% (similar)
+     * @param String str1
+     * @param String str1
+     * @return int
+     */
+    private static int getNameMetric(String str1, String str2){
+        int distance = levensteinDistance(str1,str2)
+        int numberOfCharacters = str1.length()
+        int metric = ((numberOfCharacters - distance)/numberOfCharacters) * 100
+        println  "metric=" + metric
+    }
+    /**
+     * levensteinDistance
+     * This is a measure of how alike 2 words or phrases are, it is a number which represents the number of changes
+     * you need to make to move from string 1 to string 2 - (essentially the
+     * number of characters needed to make the two words the same)
+     * @param String
+     * @param String
+     * @return int
+     */
+    private static int levensteinDistance(String str1, String str2) {
+        def str1_len = str1.length()
+        def str2_len = str2.length()
+        int[][] distance = new int[str1_len + 1][str2_len + 1]
+        (str1_len + 1).times { distance[it][0] = it }
+        (str2_len + 1).times { distance[0][it] = it }
+        (1..str1_len).each { i ->
+            (1..str2_len).each { j ->
+                distance[i][j] = [distance[i-1][j]+1, distance[i][j-1]+1, str1[i-1]==str2[j-1]?distance[i-1][j-1]:distance[i-1][j-1]+1].min()
+            }
+        }
+        distance[str1_len][str2_len]
     }
 
 }
