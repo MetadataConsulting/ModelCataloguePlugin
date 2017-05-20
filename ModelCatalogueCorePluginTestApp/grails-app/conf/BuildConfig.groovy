@@ -73,6 +73,8 @@ grails.project.dependency.resolution = {
         compile "org.modelcatalogue:mc-builder-api:$mcToolkitVersion"
         compile "org.modelcatalogue:mc-datatype-validation:$mcToolkitVersion"
 
+        compile 'me.xdrop:fuzzywuzzy:1.1.7'
+
         compile 'com.craigburke.document:word:0.5.0'
 
         compile 'org.jsoup:jsoup:1.8.3'
