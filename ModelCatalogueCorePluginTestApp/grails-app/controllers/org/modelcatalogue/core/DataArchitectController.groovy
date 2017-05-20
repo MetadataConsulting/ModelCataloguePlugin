@@ -118,4 +118,12 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
     }
 
 
+    def deleteSuggestions() {
+        executorService.execute {
+            dataArchitectService.deleteSuggestions()
+        }
+        respond status: HttpStatus.OK
+
+    }
+
 }

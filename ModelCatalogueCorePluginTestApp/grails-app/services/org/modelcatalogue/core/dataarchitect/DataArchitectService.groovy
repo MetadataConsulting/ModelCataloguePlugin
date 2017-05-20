@@ -25,11 +25,11 @@ class DataArchitectService {
 
     private Map<String,Runnable> suggestions = [
             'Inline Models': this.&generateInlineModel,
-           'Merge Models': this.&generateMergeModels,
-          'Enum Duplicates and Synonyms': this.&generatePossibleEnumDuplicatesAndSynonyms,
-          'Element Exact Match':this.&generateDataElementSuggestionsExact,
-          'Element and Type Exact Match':this.&generateDataElementAndTypeSuggestionsExact,
-          'Element and Type Fuzzy Match':this.&generateDataElementAndTypeSuggestionsFuzzy
+            'Merge Models': this.&generateMergeModels,
+            'Enum Duplicates and Synonyms': this.&generatePossibleEnumDuplicatesAndSynonyms,
+            'Element Exact Match':this.&generateDataElementSuggestionsExact,
+            'Element and Type Exact Match':this.&generateDataElementAndTypeSuggestionsExact,
+            'Element and Type Fuzzy Match':this.&generateDataElementAndTypeSuggestionsFuzzy
     ]
 
     Set<String> getSuggestionsNames() {
@@ -260,6 +260,19 @@ class DataArchitectService {
                 return
             }
             execute suggestion, runnable
+        }
+    }
+
+    def deleteSuggestions() {
+
+        def execute = { String label, Runnable cl ->
+            log.info "Deleting suggestions"
+            cl.run()
+            log.info "Suggestions deleted"
+        }
+
+        execute Batch.list().each{  btch ->
+            btch.delete()
         }
     }
 
