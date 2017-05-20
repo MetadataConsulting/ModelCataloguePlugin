@@ -879,16 +879,10 @@ class ElementService implements Publisher<CatalogueElement> {
               where (catalogue_element.id = data_element.id AND catalogue_element.data_model_id =  :dmB))"""
 
         final session = sessionFactory.currentSession
-
-        // Create native SQL query.
         final sqlQuery = session.createSQLQuery(query)
-
         final results = sqlQuery.with {
-            // Set value for parameter startId.
             setLong('dmA', dmAId)
             setLong('dmB', dmBId)
-
-            // Get all results.
             list()
         }
 
@@ -902,15 +896,15 @@ class ElementService implements Publisher<CatalogueElement> {
      * @param Long
      * @return List
      */
-    private List getDataElementsWithFuzzyMatches(Long dmAId, Long dmBId){
-        Map<Long, Set<Long>> fuzzyElementList = new HashMap<Long, Set<Long>>()
+    private Map getDataElementsWithFuzzyMatches(Long dmAId, Long dmBId){
+        Map<Long, Set<Long>> fuzzyElementMap = new HashMap<Long, Set<Long>>()
         String query2getAList = """SELECT DISTINCT catalogue_element.id, catalogue_element.name FROM catalogue_element, data_element WHERE data_model_id = ${dmAId}"""
         final session = sessionFactory.currentSession
         final sqlQuery = session.createSQLQuery(query2getAList)
         sqlQuery.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
         List aList = sqlQuery.list()
         if(aList.size() == 0){
-            fuzzyElementList = null
+            fuzzyElementMap = null
         }else{
             aList.each{
                 def aListName = it.name
@@ -920,24 +914,24 @@ class ElementService implements Publisher<CatalogueElement> {
                 sqlQuery.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
                 List bList = sqlQuery.list()
                 if(bList.size() == 0){
-                    fuzzyElementList = null
+                    fuzzyElementMap = null
                 }else {
                     bList.each {
                         def modelAName = aListName
                         def modelAId = aListId
                         def modelBName = it.name
                         def modelBId = it.id
-                        int matchScore = getNameMetric(modelAName, modelBName)
+                        Long matchScore = getNameMetric(modelAName, modelBName)
                         Set<Long> element = new HashSet<Long>()
                         element.add(modelAId)
                         element.add(modelBId)
-                        fuzzyElementList.put(matchScore,element)
+                        fuzzyElementMap.put(matchScore,element)
                     }
                 }
 
             }
         }
-        return fuzzyElementList
+        return fuzzyElementMap
     }
 
     /**
@@ -968,12 +962,12 @@ class ElementService implements Publisher<CatalogueElement> {
      * will have them as being 80% (similar)
      * @param String str1
      * @param String str1
-     * @return int
+     * @return Long
      */
-    private static int getNameMetric(String str1, String str2){
-        int distance = levensteinDistance(str1,str2)
-        int numberOfCharacters = str1.length()
-        int metric = ((numberOfCharacters - distance)/numberOfCharacters) * 100
+    private static Long getNameMetric(String str1, String str2){
+        Long distance = levensteinDistance(str1,str2)
+        Long numberOfCharacters = str1.length()
+        Long metric = Math.abs(((numberOfCharacters - distance)/numberOfCharacters) * 100)
         return metric
     }
     /**
