@@ -40,6 +40,11 @@ class ElementService implements Publisher<CatalogueElement> {
     AuditService auditService
     def sessionFactory
 
+    public static Long MATCH_SCORE_LEVEL_75 = 75
+    public static Long MATCH_SCORE_LEVEL_CLOSE = 95
+    public static Long MATCH_SCORE_LEVEL_EXACT = 100
+
+
     List<CatalogueElement> list(Map params = [:]) {
         CatalogueElement.findAllByStatusInList(getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')), params)
     }
@@ -846,13 +851,10 @@ class ElementService implements Publisher<CatalogueElement> {
 
     private Long getDataModelId(String dataModelName){
         Long dataModelId = 0
-
         String query = "SELECT catalogue_element.id FROM catalogue_element, data_model  " +
             "WHERE catalogue_element.id = data_model.id" +
             " AND catalogue_element.name = '${dataModelName}' ;"
-
         final session = sessionFactory.currentSession
-        // Create native SQL query.
         final sqlQuery = session.createSQLQuery(query)
         sqlQuery.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
         List results = sqlQuery.list()
@@ -862,7 +864,6 @@ class ElementService implements Publisher<CatalogueElement> {
             def mid = results[0]
             dataModelId = mid["id"] as Long
         }
-
         return dataModelId
     }
     /**
@@ -883,16 +884,10 @@ class ElementService implements Publisher<CatalogueElement> {
               where (catalogue_element.id = data_element.id AND catalogue_element.data_model_id =  :dmB))"""
 
         final session = sessionFactory.currentSession
-
-        // Create native SQL query.
         final sqlQuery = session.createSQLQuery(query)
-
         final results = sqlQuery.with {
-            // Set value for parameter startId.
             setLong('dmA', dmAId)
             setLong('dmB', dmBId)
-
-            // Get all results.
             list()
         }
 
@@ -901,36 +896,57 @@ class ElementService implements Publisher<CatalogueElement> {
 
     /**
      * getDataElementsWithFuzzyMatches
+     * This will need to be streamed for large datasets
      * @param Long
      * @param Long
      * @return List
      */
-    private List getDataElementsWithFuzzyMatches(Long dmAId, Long dmBId){
-
-
-        String query = """  SELECT  catalogue_element.name 
-              FROM catalogue_element, data_element 
-              WHERE (catalogue_element.id = data_element.id AND catalogue_element.data_model_id =  :dmA) 
-              AND catalogue_element.name IN 
-              (select  catalogue_element.name 
-              from catalogue_element, data_element 
-              where (catalogue_element.id = data_element.id AND catalogue_element.data_model_id =  :dmB))"""
-
+    private Map<Long, Set<Long>> getDataElementsWithFuzzyMatches(Long dmAId, Long dmBId){
+        Map<Long, Set<Long>> fuzzyElementMap = new HashMap<Long, Set<Long>>()
+        Set<Set<Long>> checkSet = new HashSet<Set<Long>>()
+        String query2getAList = """SELECT DISTINCT catalogue_element.id, catalogue_element.name FROM catalogue_element, data_element WHERE data_model_id = ${dmAId}"""
         final session = sessionFactory.currentSession
+        final sqlQuery = session.createSQLQuery(query2getAList)
+        sqlQuery.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+        List aList = sqlQuery.list()
+        if(aList.size() == 0){
+            fuzzyElementMap = null
+        }else{
+            aList.each{
+                def aListName = it.name
+                def aListId = it.id
+                String query2getBList = """SELECT DISTINCT catalogue_element.id, catalogue_element.name FROM catalogue_element, data_element WHERE data_model_id =  ${dmBId}"""
+                sqlQuery = session.createSQLQuery(query2getBList)
+                sqlQuery.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+                List bList = sqlQuery.list()
+                if(bList.size() == 0){
+                    fuzzyElementMap = null
+                }else {
+                    bList.each {
+                        def modelAName = aListName
+                        def modelAId = aListId
+                        def modelBName = it.name
+                        def modelBId = it.id
+                        //Long matchScore = getNameMetric(modelAName, modelBName)
+                        Set<Long> elementMatch = new HashSet<Long>()
+                        elementMatch.add(modelAId)
+                        elementMatch.add(modelBId)
+                        boolean matchAlreadyCaptured = checkSet.contains(elementMatch)
+                        if(!matchAlreadyCaptured) {
+                            checkSet.add(elementMatch)
+                            //we need not just the element match, but also the rating of the match
+                            Long matchScore = getNameMetric(modelAName, modelBName)
+                            //Only accept matches above pre-defined limit
+                            if(matchScore > MATCH_SCORE_LEVEL_75){
+                                fuzzyElementMap.put(matchScore, elementMatch)
+                            }
 
-        // Create native SQL query.
-        final sqlQuery = session.createSQLQuery(query)
-
-        final results = sqlQuery.with {
-            // Set value for parameter startId.
-            setLong('dmA', dmAId)
-            setLong('dmB', dmBId)
-
-            // Get all results.
-            list()
+                        }
+                    }
+                }
+            }
         }
-
-        return results
+        return fuzzyElementMap
     }
 
     /**
@@ -943,15 +959,16 @@ class ElementService implements Publisher<CatalogueElement> {
         Long dataModelIdB = getDataModelId(dataModelB)
         Map<Long, Set<Long>> elementSuggestions = new LinkedHashMap<Long, Set<Long>>()
         def results = getDataElementsWithFuzzyMatches(dataModelIdA,dataModelIdB)
-        if(results.size() > 0){
-            results.each{
-                def dataElementName = it as String
-                Long ida =getDataElementId(dataElementName,dataModelIdA)
-                Long idb =getDataElementId(dataElementName,dataModelIdB)
-                elementSuggestions.put(ida,idb)
-            }
-        }
-        return elementSuggestions
+//        if(results.size() > 0){
+//            results.each{k, v ->
+//                println "${k}:${v}"
+//                def dataElementName = it as String
+//                Long ida =getDataElementId(dataElementName,dataModelIdA)
+//                Long idb =getDataElementId(dataElementName,dataModelIdB)
+//                elementSuggestions.put(ida,idb)
+//            }
+//        }
+        return results
     }
     /**
      * getNameMetric
@@ -961,13 +978,13 @@ class ElementService implements Publisher<CatalogueElement> {
      * will have them as being 80% (similar)
      * @param String str1
      * @param String str1
-     * @return int
+     * @return Long
      */
-    private static int getNameMetric(String str1, String str2){
-        int distance = levensteinDistance(str1,str2)
-        int numberOfCharacters = str1.length()
-        int metric = ((numberOfCharacters - distance)/numberOfCharacters) * 100
-        println  "metric=" + metric
+    private static Long getNameMetric(String str1, String str2){
+        Long distance = levensteinDistance(str1,str2)
+        Long numberOfCharacters = str1.length()
+        Long metric = Math.abs(((numberOfCharacters - distance)/numberOfCharacters) * 100)
+        return metric
     }
     /**
      * levensteinDistance

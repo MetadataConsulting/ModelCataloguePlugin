@@ -23,14 +23,17 @@ class DataArchitectService {
     def dataModelService
     def sessionFactory
 
+
     private Map<String,Runnable> suggestions = [
-            'Inline Models': this.&generateInlineModel,
-           'Merge Models': this.&generateMergeModels,
-          'Enum Duplicates and Synonyms': this.&generatePossibleEnumDuplicatesAndSynonyms,
-          'Data Element Exact Match':this.&generateDataElementSuggestionsExact,
-            'Data Element Exact Match':this.&generateDataElementSuggestionsFuzzy,
-          'Data Element and Type Exact Match':this.&generateDataElementAndTypeSuggestionsExact,
-          'Data Element and Type Fuzzy Match':this.&generateDataElementAndTypeSuggestionsFuzzy¯
+
+        'Inline Models': this.&generateInlineModel,
+        'Merge Models': this.&generateMergeModels,
+        'Enum Duplicates and Synonyms': this.&generatePossibleEnumDuplicatesAndSynonyms,
+        'Data Element Exact Match':this.&generateDataElementSuggestionsExact,
+        'Data Element Fuzzy Match':this.&generateDataElementSuggestionsFuzzy,
+        'Data Element and Type Exact Match':this.&generateDataElementAndTypeSuggestionsExact,
+        'Data Element and Type Fuzzy Match':this.&generateDataElementAndTypeSuggestionsFuzzy
+
     ]
 
     Set<String> getSuggestionsNames() {
@@ -363,19 +366,24 @@ class DataArchitectService {
      *
      */
     private void generateDataElementSuggestionsExact(){
-
-        //List matchingDataElements = elementService.getDataElementsInCommon(1,2)
-        def matchingDataElements = elementService.findDuplicateDataElementSuggestions("HPO_TEST_ONE","HPO_TEST_TWO" )
+        String dataModelA = "NHS_DATA_DICTIONARY"
+        String dataModelB = "COSD"
+        def matchingDataElements = elementService.findDuplicateDataElementSuggestions(dataModelA,dataModelB)
         matchingDataElements.each{
             println it
         }
-        Batch.findAllByNameIlike("Create Synonyms for Data Element '%'").each reset
+        Batch.findAllByNameIlike("Suggested DataElement Synonyms for '${dataModelA}' and '${dataModelB}'").each reset
         matchingDataElements.each { first, other ->
             DataElement dataElement = DataElement.get(first)
-            Batch batch = Batch.findOrSaveByName("Create Synonyms for dataElement Type '$dataElement.name'")
+            Batch batch = Batch.findOrSaveByName("Suggested DataElement Synonyms for '${dataModelA}' and '${dataModelB}'")
             RelationshipType type = RelationshipType.readByName("synonym")
             other.each { otherId ->
-                Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.EnumeratedType:$otherId", destination: "gorm://org.modelcatalogue.core.dataElement:$first", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
+                Map<String, String> params = new HashMap<String,String>()
+                params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$otherId""")
+                params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$first""")
+                params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
+                Action action
+                action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
@@ -384,20 +392,20 @@ class DataArchitectService {
             batch.save()
         }
 
-        Batch.findAllByNameIlike("Duplicate Candidates of Data Element  '%'").each reset
-
-        matchingDataElements.each { first, other ->
-            DataElement dataElement = DataElement.get(first)
-            Batch batch = Batch.findOrSaveByName("Duplicate Candidates of dataElement Type '$dataElement.name'")
-            other.each { otherId ->
-                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.dataElement:$otherId", destination: "gorm://org.modelcatalogue.core.dataElement:$first"
-                if (action.hasErrors()) {
-                    log.error(FriendlyErrors.printErrors("Error generating merge model action", action.errors))
-                }
-            }
-            batch.archived = false
-            batch.save()
-        }
+//        Batch.findAllByNameIlike("Duplicate Candidates of Data Model '{dataModelA}'").each reset
+//
+//        matchingDataElements.each { first, other ->
+//            DataElement dataElement = DataElement.get(first)
+//            Batch batch = Batch.findOrSaveByName("Duplicate Candidates of Data Model '{dataModelA}'")
+//            other.each { otherId ->
+//                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.DataElement:$otherId", destination: "gorm://org.modelcatalogue.core.DataElement:$first"
+//                if (action.hasErrors()) {
+//                    log.error(FriendlyErrors.printErrors("Error generating merge model action", action.errors))
+//                }
+//            }
+//            batch.archived = false
+//            batch.save()
+//        }
 
     }
 
@@ -414,18 +422,27 @@ class DataArchitectService {
      *
      */
     private void generateDataElementSuggestionsFuzzy(){
-
-        def fuzzyMatchingDataElements = elementService.findFuzzyDuplicateDataElementSuggestions("NHS_DATA_DICTIONARY","COSD" )
+        String dataModelA = "NHS_DATA_DICTIONARY"
+        String dataModelB = "COSD"
+        Map<Long, Set<Long>> fuzzyMatchingDataElements = elementService.findFuzzyDuplicateDataElementSuggestions(dataModelA,dataModelB )
         fuzzyMatchingDataElements.each{
             println it
         }
-        Batch.findAllByNameIlike("Create Synonyms for Data Element '%'").each reset
+        Batch.findAllByNameIlike("Suggested Fuzzy Matches for DataElements in '${dataModelA}' and '${dataModelB}'").each reset
         fuzzyMatchingDataElements.each { first, other ->
-            DataElement dataElement = DataElement.get(first)
-            Batch batch = Batch.findOrSaveByName("Create Synonyms for dataElement Type '$dataElement.name'")
+            Batch batch = Batch.findOrSaveByName("Suggested Fuzzy Matches for DataElements in '${dataModelA}' and '${dataModelB}'")
             RelationshipType type = RelationshipType.readByName("synonym")
-            other.each { otherId ->
-                Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.EnumeratedType:$otherId", destination: "gorm://org.modelcatalogue.core.dataElement:$first", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
+            other.each {
+                def dataElementAId = other[0]
+                def dataElementBId = other[1]
+                Map<String, String> params = new HashMap<String,String>()
+                params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$dataElementAId""")
+                params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$dataElementBId""")
+                params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
+                //@todo : This is the match score which still needs to be handled
+                params.put("""matchScore""","""gorm://org.modelcatalogue.core.RelationshipType:$first""")
+                Action action
+                action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
@@ -434,20 +451,20 @@ class DataArchitectService {
             batch.save()
         }
 
-        Batch.findAllByNameIlike("Duplicate Candidates of Data Element  '%'").each reset
-
-        fuzzyMatchingDataElements.each { first, other ->
-            DataElement dataElement = DataElement.get(first)
-            Batch batch = Batch.findOrSaveByName("Duplicate Candidates of dataElement Type '$dataElement.name'")
-            other.each { otherId ->
-                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.dataElement:$otherId", destination: "gorm://org.modelcatalogue.core.dataElement:$first"
-                if (action.hasErrors()) {
-                    log.error(FriendlyErrors.printErrors("Error generating merge model action", action.errors))
-                }
-            }
-            batch.archived = false
-            batch.save()
-        }
+//        Batch.findAllByNameIlike("Duplicate Fuzzy Synonyms for Data Model ${dataModelA}").each reset
+//
+//        fuzzyMatchingDataElements.each { first, other ->
+//            DataElement dataElement = DataElement.get(first)
+//            Batch batch = Batch.findOrSaveByName("Duplicate Fuzzy Synonyms for Data Model ${dataModelA}")
+//            other.each { otherId ->
+//                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.dataElement:$otherId", destination: "gorm://org.modelcatalogue.core.dataElement:$first"
+//                if (action.hasErrors()) {
+//                    log.error(FriendlyErrors.printErrors("Error generating merge model action", action.errors))
+//                }
+//            }
+//            batch.archived = false
+//            batch.save()
+//        }
     }
 
     /**
