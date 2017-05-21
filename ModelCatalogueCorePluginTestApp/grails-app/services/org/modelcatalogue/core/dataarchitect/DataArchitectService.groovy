@@ -415,7 +415,6 @@ class DataArchitectService {
         }
         Batch.findAllByNameIlike("Create Fuzzy Synonyms for Data Model ${dataModelA}").each reset
         fuzzyMatchingDataElements.each { first, other ->
-            DataElement dataElement = DataElement.get(first)
             Batch batch = Batch.findOrSaveByName("Create Fuzzy Synonyms for Data Model ${dataModelA}")
             RelationshipType type = RelationshipType.readByName("synonym")
             other.each { dataElementAId, dataElementBId ->
