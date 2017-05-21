@@ -90,13 +90,25 @@ class BootStrap {
         reportsRegistry.register {
             creates asset
             title { "Inventory Report Spreadsheet" }
-            defaultName { "${it.name} report as MS Excel Document" }
+            defaultName { "${it.name} report as MS Excel Document Inventory" }
             depth 3
             type DataModel
             when { DataModel dataModel ->
                 dataModel.countDeclares() > 0
             }
             link controller: 'dataModel', action: 'inventorySpreadsheet', id: true
+        }
+
+        reportsRegistry.register {
+            creates asset
+            title { "Grid Report Spreadsheet" }
+            defaultName { "${it.name} report as MS Excel Document Grid" }
+            depth 3
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.countDeclares() > 0
+            }
+            link controller: 'dataModel', action: 'gridSpreadsheet', id: true
         }
 
         reportsRegistry.register {
@@ -395,6 +407,7 @@ class BootStrap {
                 '/login', '/login.*', '/login/*',
                 '/logout', '/logout.*', '/logout/*',
                 '/register/*', '/errors', '/errors/*',
+                '/load',
                 '/index.gsp'
         ]) {
             createRequestmapIfMissing(url, 'permitAll', null)

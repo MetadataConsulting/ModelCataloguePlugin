@@ -75,7 +75,7 @@ class CatalogueElementToXlsxExporter {
         return new CatalogueElementToXlsxExporter(element, dataClassService, grailsApplication,  depth)
     }
 
-    private CatalogueElementToXlsxExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3) {
+    public CatalogueElementToXlsxExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3) {
         this.elementId = element.getId()
         this.dataClassService = dataClassService
         this.grailsApplication = grailsApplication
