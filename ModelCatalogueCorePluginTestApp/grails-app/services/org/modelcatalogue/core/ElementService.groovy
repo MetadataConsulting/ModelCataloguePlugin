@@ -975,7 +975,7 @@ class ElementService implements Publisher<CatalogueElement> {
 //                                elementMatch.add(modelBId)
 //                                elementMatch.add(matchScore)
 
-                                fuzzyElementList.put(suggestedMatches)
+                                fuzzyElementList.add(suggestedMatches)
                                 println " Loading Match: ${suggestedMatches.dataElementAName} and ${suggestedMatches.dataElementBName} score is: ${matchScore}"
                             }
                         }

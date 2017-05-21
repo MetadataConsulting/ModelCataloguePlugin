@@ -436,20 +436,7 @@ class DataArchitectService {
             batch.save()
         }
 
-//        Batch.findAllByNameIlike("Duplicate Fuzzy Synonyms for Data Model ${dataModelA}").each reset
-//
-//        fuzzyMatchingDataElements.each { first, other ->
-//            DataElement dataElement = DataElement.get(first)
-//            Batch batch = Batch.findOrSaveByName("Duplicate Fuzzy Synonyms for Data Model ${dataModelA}")
-//            other.each { otherId ->
-//                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.dataElement:$otherId", destination: "gorm://org.modelcatalogue.core.dataElement:$first"
-//                if (action.hasErrors()) {
-//                    log.error(FriendlyErrors.printErrors("Error generating merge model action", action.errors))
-//                }
-//            }
-//            batch.archived = false
-//            batch.save()
-//        }
+
     }
 
     /**
