@@ -903,7 +903,7 @@ class ElementService implements Publisher<CatalogueElement> {
      */
     private Map<Long, Set<Long>> getDataElementsWithFuzzyMatches(Long dmAId, Long dmBId){
         Map<Long, Set<Long>> fuzzyElementMap = new HashMap<Long, Set<Long>>()
-        Set<Set<Long>> checkSet = new HashSet<Set<Long>>()
+        //Set<Set<Long>> checkSet = new HashSet<Set<Long>>()
         String query2getAList = """SELECT DISTINCT catalogue_element.id, catalogue_element.name FROM catalogue_element, data_element WHERE data_model_id = ${dmAId}"""
         final session = sessionFactory.currentSession
         final sqlQuery = session.createSQLQuery(query2getAList)
@@ -927,25 +927,20 @@ class ElementService implements Publisher<CatalogueElement> {
                         def modelAId = aListId
                         def modelBName = it.name
                         def modelBId = it.id
-                        //Long matchScore = getNameMetric(modelAName, modelBName)
-                        Set<Long> elementMatch = new HashSet<Long>()
-                        elementMatch.add(modelAId)
-                        elementMatch.add(modelBId)
-                        boolean matchAlreadyCaptured = checkSet.contains(elementMatch)
-                        if(!matchAlreadyCaptured) {
-                            checkSet.add(elementMatch)
                             //we need not just the element match, but also the rating of the match
                             Long matchScore = getNameMetric(modelAName, modelBName)
                             //Only accept matches above pre-defined limit
-                            if(matchScore > MATCH_SCORE_LEVEL_75){
-                                fuzzyElementMap.put(matchScore, elementMatch)
+                            if(matchScore > 80){
+                                Set<Long> elementMatch = new HashSet<Long>()
+                                elementMatch.add(modelBId)
+                                elementMatch.add(matchScore)
+                                fuzzyElementMap.put(modelAId, elementMatch)
+                                println " Comparing: ${modelAName} and ${modelBName} score is: ${matchScore}"
                             }
-
                         }
                     }
                 }
             }
-        }
         return fuzzyElementMap
     }
 
@@ -959,15 +954,7 @@ class ElementService implements Publisher<CatalogueElement> {
         Long dataModelIdB = getDataModelId(dataModelB)
         Map<Long, Set<Long>> elementSuggestions = new LinkedHashMap<Long, Set<Long>>()
         def results = getDataElementsWithFuzzyMatches(dataModelIdA,dataModelIdB)
-//        if(results.size() > 0){
-//            results.each{k, v ->
-//                println "${k}:${v}"
-//                def dataElementName = it as String
-//                Long ida =getDataElementId(dataElementName,dataModelIdA)
-//                Long idb =getDataElementId(dataElementName,dataModelIdB)
-//                elementSuggestions.put(ida,idb)
-//            }
-//        }
+
         return results
     }
     /**
@@ -982,7 +969,7 @@ class ElementService implements Publisher<CatalogueElement> {
      */
     private static Long getNameMetric(String str1, String str2){
         Long distance = levensteinDistance(str1,str2)
-        Long numberOfCharacters = str1.length()
+        Long numberOfCharacters = Math.max(str1.length(), str2.length())
         Long metric = Math.abs(((numberOfCharacters - distance)/numberOfCharacters) * 100)
         return metric
     }

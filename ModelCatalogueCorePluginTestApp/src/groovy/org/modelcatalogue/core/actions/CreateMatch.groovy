@@ -28,7 +28,35 @@ class CreateMatch extends AbstractActionRunner {
             matchScore: shows a metric on the degree of closeness of the two items
     """
 
+
+//    String destClass = GrailsNameUtils.getPropertyName(decodeEntity(parameters.destination)?.class)
+//    String destId = decodeEntity(parameters.destination)?.id
+//    String destName = GrailsNameUtils.getNaturalName(decodeEntity(parameters.destination)?.class)?.simpleName
+//    String className = CatalogueElementMarshaller.getClassifiedName(decodeEntity(parameters.destination))
+
     String getMessage() {
+//
+//        def destination = decodeEntity(parameters.destination)
+//        def source = decodeEntity(parameters.source)
+//
+//        String destClass = GrailsNameUtils.getPropertyName(destination.class)
+//        String destId = destination.id as String
+//        String destName = GrailsNameUtils.getNaturalName(destination)
+//        String destClassifiedName = CatalogueElementMarshaller.getClassifiedName(destination)
+//
+//        String sourceClass = GrailsNameUtils.getPropertyName(source.class)
+//        String sourceId =       source.id
+//        String sourceName =      GrailsNameUtils.getNaturalName(source)
+//        String sourceClassName = CatalogueElementMarshaller.getClassifiedName(source)
+//
+//        String type = decodeEntity(parameters.type)
+//        String typeSrc2Dest = type?.sourceToDestination
+//
+//        String srclink = """<a href='#/catalogue/${sourceClass}/${sourceId}'> ${sourceName} '${sourceClassName}'</a>"""
+//        String join =  """ ${typeSrc2Dest}"""
+//        String destLink = """<a href='#/catalogue/${GrailsNameUtils.getPropertyName(decodeEntity(parameters.destination)?.class)}/${decodeEntity(parameters.destination)?.id}'> ${GrailsNameUtils.getNaturalName(decodeEntity(parameters.destination)?.class?.simpleName)} '${CatalogueElementMarshaller.getClassifiedName(decodeEntity(parameters.destination))}'</a>"""
+
+
         normalizeDescription """
             Create new relationship '   <a href='#/catalogue/${GrailsNameUtils.getPropertyName(decodeEntity(parameters.source)?.class)}/${decodeEntity(parameters.source)?.id}'> ${GrailsNameUtils.getNaturalName(decodeEntity(parameters.source)?.class?.simpleName)} '${CatalogueElementMarshaller.getClassifiedName(decodeEntity(parameters.source))}'</a>  ${decodeEntity(parameters.type)?.sourceToDestination} <a href='#/catalogue/${GrailsNameUtils.getPropertyName(decodeEntity(parameters.destination)?.class)}/${decodeEntity(parameters.destination)?.id}'> ${GrailsNameUtils.getNaturalName(decodeEntity(parameters.destination)?.class?.simpleName)} '${CatalogueElementMarshaller.getClassifiedName(decodeEntity(parameters.destination))}'</a> with following parameters:
 
