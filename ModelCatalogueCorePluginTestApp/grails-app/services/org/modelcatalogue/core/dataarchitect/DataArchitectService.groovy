@@ -422,6 +422,7 @@ class DataArchitectService {
                 params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$dataElementAId.[1]""")
                 params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$dataElementBId.[0]""")
                 params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
+                //@todo : This is the match score which still needs to be handled
                 params.put("""matchScore""","""gorm://org.modelcatalogue.core.RelationshipType:$first""")
                 Action action
                 action = actionService.create(params, batch, CreateMatch)

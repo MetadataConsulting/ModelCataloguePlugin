@@ -40,6 +40,11 @@ class ElementService implements Publisher<CatalogueElement> {
     AuditService auditService
     def sessionFactory
 
+    public static Long MATCH_SCORE_LEVEL_75 = 75
+    public static Long MATCH_SCORE_LEVEL_CLOSE = 95
+    public static Long MATCH_SCORE_LEVEL_EXACT = 100
+
+
     List<CatalogueElement> list(Map params = [:]) {
         CatalogueElement.findAllByStatusInList(getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')), params)
     }
@@ -930,8 +935,12 @@ class ElementService implements Publisher<CatalogueElement> {
                         if(!matchAlreadyCaptured) {
                             checkSet.add(elementMatch)
                             //we need not just the element match, but also the rating of the match
-                            Long matchScore = getNameMetric(modelAName, modelBName)
-                            fuzzyElementMap.put(matchScore, elementMatch)
+                            Long matchScore = getNameMetric(modelAName, modelBName)75
+                            //Only accept matches above pre-defined limit
+                            if(matchScore > MATCH_SCORE_LEVEL_75){
+                                fuzzyElementMap.put(matchScore, elementMatch)
+                            }
+
                         }
                     }
                 }
