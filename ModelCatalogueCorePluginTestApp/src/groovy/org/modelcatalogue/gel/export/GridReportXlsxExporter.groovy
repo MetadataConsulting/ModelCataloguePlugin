@@ -206,7 +206,7 @@ class GridReportXlsxExporter  {
         DataElement dataElement = dataElementRelationship.destination
         rowDefinition.with {
             cell(depth + 3) {
-                value "${dataElementRelationship.ext.get("match_score") ?: 'NA'}"
+                value "${dataElementRelationship.ext.get("match") ?: 'NA'}"
             }
             cell {
                 value "$dataElement.name ($dataElement.dataModel.name)"
