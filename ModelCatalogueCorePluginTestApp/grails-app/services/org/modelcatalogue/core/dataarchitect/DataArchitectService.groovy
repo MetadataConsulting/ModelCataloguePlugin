@@ -352,6 +352,7 @@ class DataArchitectService {
                 params.put("""destination""","""gorm://org.modelcatalogue.core.DataType:$first""")
                 params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
                 params.put("""matchScore""","""$matchScore""")
+                params.put("""matchOn""","""TypeEnums""")
                 Action action
                 action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {
@@ -404,6 +405,7 @@ class DataArchitectService {
                 params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$first""")
                 params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
                 params.put("""matchScore""","""$matchScore""")
+                params.put("""matchOn""","""ElementName""")
                 Action action
                 action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {
@@ -462,6 +464,7 @@ class DataArchitectService {
                 params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
                 //@todo : This is the match score which still needs to be stored in extension
                 params.put("""matchScore""","""$matchScore""")
+                params.put("""matchOn""","""fuzzyName""")
                 Action action
                 action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {
