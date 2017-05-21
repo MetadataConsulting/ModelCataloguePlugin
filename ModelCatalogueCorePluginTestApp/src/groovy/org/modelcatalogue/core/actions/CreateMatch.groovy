@@ -33,8 +33,8 @@ class CreateMatch extends AbstractActionRunner {
 //
         def destination = decodeEntity(parameters.destination)
         def source = decodeEntity(parameters.source)
-        def matchScore =  (parameters.matchScore).split(/:\w+:(\w+)/)
-        //matchScore = matchScore[-3,-1].replace(':','')
+        def matchScore =  (parameters.matchScore).split(":")
+        matchScore[2]
 
 
 
@@ -63,7 +63,7 @@ class CreateMatch extends AbstractActionRunner {
                       </tr>
                       <tr>
                         <td class="tg-6k2t">${srclink}</td>
-                        <td class="tg-6k2t">${matchScore}</td>
+                        <td class="tg-6k2t">${matchScore[2]}%</td>
                         <td class="tg-6k2t">${destLink}</td>
                       </tr>
                     </table>  """
@@ -157,7 +157,8 @@ class CreateMatch extends AbstractActionRunner {
     }
 
     def getMatchScore() {
-        (parameters.matchScore).split(/:\w+:(\w+)/)
+        (parameters.matchScore).split(":")
+        matchScore[2]
     }
 
     /**

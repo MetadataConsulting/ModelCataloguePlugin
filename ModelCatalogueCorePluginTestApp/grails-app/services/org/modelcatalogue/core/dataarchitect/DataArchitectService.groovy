@@ -10,6 +10,7 @@ import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.lists.ListWithTotal
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.SecuredRuleExecutor
+import org.modelcatalogue.core.util.MatchResult
 
 class DataArchitectService {
 
@@ -409,29 +410,28 @@ class DataArchitectService {
     private void generateDataElementSuggestionsFuzzy(){
         String dataModelA = "NHS_DATA_DICTIONARY"
         String dataModelB = "COSD"
-        Map<Long, Set<Long>> fuzzyMatchingDataElements = elementService.findFuzzyDuplicateDataElementSuggestions(dataModelA,dataModelB )
+        List<MatchResult> fuzzyMatchingDataElements = elementService.findFuzzyDuplicateDataElementSuggestions(dataModelA,dataModelB )
         fuzzyMatchingDataElements.each{
             println it
         }
         Batch.findAllByNameIlike("Suggested Fuzzy Matches for DataElements in '${dataModelA}' and '${dataModelB}'").each reset
-        fuzzyMatchingDataElements.each { first, other ->
+        fuzzyMatchingDataElements.each { matchResult ->
             Batch batch = Batch.findOrSaveByName("Suggested Fuzzy Matches for DataElements in '${dataModelA}' and '${dataModelB}'")
-            RelationshipType type = RelationshipType.readByName("relatedTo")
-            other.each {
-                def dataElementBId = other[0]
-                def matchScore = other[1]
+            RelationshipType type = RelationshipType.readByName("synonym")
+            //other.each {
+
                 Map<String, String> params = new HashMap<String,String>()
-                params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$first""")
-                params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$dataElementBId""")
+                params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$matchResult.dataElementAName""")
+                params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$matchResult.dataElementBName""")
                 params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
                 //@todo : This is the match score which still needs to be stored in extension
-                params.put("""matchScore""","""gorm://org.modelcatalogue.core.RelationshipType:$matchScore""")
+                params.put("""matchScore""","""gorm://org.modelcatalogue.core.RelationshipType:$matchResult.matchScore""")
                 Action action
                 action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
-            }
+            //}
             batch.archived = false
             batch.save()
         }

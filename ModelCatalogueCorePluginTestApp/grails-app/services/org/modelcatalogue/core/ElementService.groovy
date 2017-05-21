@@ -24,6 +24,7 @@ import org.modelcatalogue.core.util.Legacy
 import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
+import org.modelcatalogue.core.util.MatchResult
 import org.springframework.transaction.TransactionStatus
 import rx.Observer
 
@@ -901,16 +902,16 @@ class ElementService implements Publisher<CatalogueElement> {
      * @param Long
      * @return List
      */
-    private Map<Long, Set<Long>> getDataElementsWithFuzzyMatches(Long dmAId, Long dmBId){
-        Map<Long, Set<Long>> fuzzyElementMap = new HashMap<Long, Set<Long>>()
-        //Set<Set<Long>> checkSet = new HashSet<Set<Long>>()
+    private List<MatchResult> getDataElementsWithFuzzyMatches(Long dmAId, Long dmBId){
+        //Map<Long, Set<Long>> fuzzyElementMap = new HashMap<Long, Set<Long>>()
+        List<MatchResult> fuzzyElementList = new ArrayList<MatchResult>()
         String query2getAList = """SELECT DISTINCT catalogue_element.id, catalogue_element.name FROM catalogue_element, data_element WHERE data_model_id = ${dmAId}"""
         final session = sessionFactory.currentSession
         final sqlQuery = session.createSQLQuery(query2getAList)
         sqlQuery.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
         List aList = sqlQuery.list()
         if(aList.size() == 0){
-            fuzzyElementMap = null
+            fuzzyElementList = null
         }else{
             aList.each{
                 def aListName = it.name
@@ -920,28 +921,31 @@ class ElementService implements Publisher<CatalogueElement> {
                 sqlQuery.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
                 List bList = sqlQuery.list()
                 if(bList.size() == 0){
-                    fuzzyElementMap = null
+                    fuzzyElementList = null
                 }else {
                     bList.each {
-                        def modelAName = aListName
-                        def modelAId = aListId
-                        def modelBName = it.name
-                        def modelBId = it.id
+                        MatchResult suggestedMatches = new MatchResult()
+                        suggestedMatches.setDataElementAName(aListName)
+                        suggestedMatches.setDataElementAId(aListId)
+                        suggestedMatches.setDataElementBName(it.name)
+                        suggestedMatches.setDataElementBId(it.id)
+
                             //we need not just the element match, but also the rating of the match
-                            Long matchScore = getNameMetric(modelAName, modelBName)
+                            Long matchScore = getNameMetric(suggestedMatches.dataElementAName, suggestedMatches.dataElementBName)
                             //Only accept matches above pre-defined limit
-                            if((matchScore > 80)&&(matchScore <= 100)){
-                                Set<Long> elementMatch = new HashSet<Long>()
-                                elementMatch.add(modelBId)
-                                elementMatch.add(matchScore)
-                                fuzzyElementMap.put(modelAId, elementMatch)
-                                println " Comparing: ${modelAName} and ${modelBName} score is: ${matchScore}"
+                            if((matchScore > 80)&(matchScore <= 100)){
+//                                Set<Long> elementMatch = new HashSet<Long>()
+//                                elementMatch.add(modelBId)
+//                                elementMatch.add(matchScore)
+
+                                fuzzyElementList.put(suggestedMatches)
+                                println " Loading Match: ${suggestedMatches.dataElementAName} and ${suggestedMatches.dataElementBName} score is: ${matchScore}"
                             }
                         }
                     }
                 }
             }
-        return fuzzyElementMap
+        return fuzzyElementList
     }
 
     /**
@@ -949,11 +953,12 @@ class ElementService implements Publisher<CatalogueElement> {
      * Enums are very likely duplicates if they have similar enum values.
      * @return map with the enum id as key and set of ids of duplicate enums as value
      */
-    Map<Long, Set<Long>> findFuzzyDuplicateDataElementSuggestions(String dataModelA, String dataModelB) {
+    List<MatchResult> findFuzzyDuplicateDataElementSuggestions(String dataModelA, String dataModelB) {
         Long dataModelIdA = getDataModelId(dataModelA)
         Long dataModelIdB = getDataModelId(dataModelB)
-        Map<Long, Set<Long>> elementSuggestions = new LinkedHashMap<Long, Set<Long>>()
-        def results = getDataElementsWithFuzzyMatches(dataModelIdA,dataModelIdB)
+        //Map<Long, Set<Long>> elementSuggestions = new LinkedHashMap<Long, Set<Long>>()
+        //List<MatchResult> elementSuggestions = new ArrayList<MatchResult>()
+        List<MatchResult> results = getDataElementsWithFuzzyMatches(dataModelIdA,dataModelIdB)
 
         return results
     }
