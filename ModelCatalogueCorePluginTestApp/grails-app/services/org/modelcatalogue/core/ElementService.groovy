@@ -935,7 +935,7 @@ class ElementService implements Publisher<CatalogueElement> {
                         if(!matchAlreadyCaptured) {
                             checkSet.add(elementMatch)
                             //we need not just the element match, but also the rating of the match
-                            Long matchScore = getNameMetric(modelAName, modelBName)75
+                            Long matchScore = getNameMetric(modelAName, modelBName)
                             //Only accept matches above pre-defined limit
                             if(matchScore > MATCH_SCORE_LEVEL_75){
                                 fuzzyElementMap.put(matchScore, elementMatch)

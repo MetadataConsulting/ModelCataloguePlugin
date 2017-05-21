@@ -357,10 +357,10 @@ class DataArchitectService {
         matchingDataElements.each{
             println it
         }
-        Batch.findAllByNameIlike("Create Synonyms for Data Elements '${dataModelA}'").each reset
+        Batch.findAllByNameIlike("Suggested DataElement Synonyms for '${dataModelA}' and '${dataModelB}'").each reset
         matchingDataElements.each { first, other ->
             DataElement dataElement = DataElement.get(first)
-            Batch batch = Batch.findOrSaveByName("Create Synonyms for Data Elements '${dataModelA}'")
+            Batch batch = Batch.findOrSaveByName("Suggested DataElement Synonyms for '${dataModelA}' and '${dataModelB}'")
             RelationshipType type = RelationshipType.readByName("synonym")
             other.each { otherId ->
                 Map<String, String> params = new HashMap<String,String>()
@@ -377,20 +377,20 @@ class DataArchitectService {
             batch.save()
         }
 
-        Batch.findAllByNameIlike("Duplicate Candidates of Data Model '{dataModelA}'").each reset
-
-        matchingDataElements.each { first, other ->
-            DataElement dataElement = DataElement.get(first)
-            Batch batch = Batch.findOrSaveByName("Duplicate Candidates of Data Model '{dataModelA}'")
-            other.each { otherId ->
-                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.DataElement:$otherId", destination: "gorm://org.modelcatalogue.core.DataElement:$first"
-                if (action.hasErrors()) {
-                    log.error(FriendlyErrors.printErrors("Error generating merge model action", action.errors))
-                }
-            }
-            batch.archived = false
-            batch.save()
-        }
+//        Batch.findAllByNameIlike("Duplicate Candidates of Data Model '{dataModelA}'").each reset
+//
+//        matchingDataElements.each { first, other ->
+//            DataElement dataElement = DataElement.get(first)
+//            Batch batch = Batch.findOrSaveByName("Duplicate Candidates of Data Model '{dataModelA}'")
+//            other.each { otherId ->
+//                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.DataElement:$otherId", destination: "gorm://org.modelcatalogue.core.DataElement:$first"
+//                if (action.hasErrors()) {
+//                    log.error(FriendlyErrors.printErrors("Error generating merge model action", action.errors))
+//                }
+//            }
+//            batch.archived = false
+//            batch.save()
+//        }
 
     }
 
@@ -413,14 +413,16 @@ class DataArchitectService {
         fuzzyMatchingDataElements.each{
             println it
         }
-        Batch.findAllByNameIlike("Create Fuzzy Synonyms for Data Model ${dataModelA}").each reset
+        Batch.findAllByNameIlike("Suggested Fuzzy Matches for DataElements in '${dataModelA}' and '${dataModelB}'").each reset
         fuzzyMatchingDataElements.each { first, other ->
-            Batch batch = Batch.findOrSaveByName("Create Fuzzy Synonyms for Data Model ${dataModelA}")
+            Batch batch = Batch.findOrSaveByName("Suggested Fuzzy Matches for DataElements in '${dataModelA}' and '${dataModelB}'")
             RelationshipType type = RelationshipType.readByName("synonym")
-            other.each { dataElementAId, dataElementBId ->
+            other.each {
+                def dataElementAId = other[0]
+                def dataElementBId = other[1]
                 Map<String, String> params = new HashMap<String,String>()
-                params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$dataElementAId.[1]""")
-                params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$dataElementBId.[0]""")
+                params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$dataElementAId""")
+                params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$dataElementBId""")
                 params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
                 //@todo : This is the match score which still needs to be handled
                 params.put("""matchScore""","""gorm://org.modelcatalogue.core.RelationshipType:$first""")
@@ -434,20 +436,20 @@ class DataArchitectService {
             batch.save()
         }
 
-        Batch.findAllByNameIlike("Duplicate Fuzzy Synonyms for Data Model ${dataModelA}").each reset
-
-        fuzzyMatchingDataElements.each { first, other ->
-            DataElement dataElement = DataElement.get(first)
-            Batch batch = Batch.findOrSaveByName("Duplicate Fuzzy Synonyms for Data Model ${dataModelA}")
-            other.each { otherId ->
-                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.dataElement:$otherId", destination: "gorm://org.modelcatalogue.core.dataElement:$first"
-                if (action.hasErrors()) {
-                    log.error(FriendlyErrors.printErrors("Error generating merge model action", action.errors))
-                }
-            }
-            batch.archived = false
-            batch.save()
-        }
+//        Batch.findAllByNameIlike("Duplicate Fuzzy Synonyms for Data Model ${dataModelA}").each reset
+//
+//        fuzzyMatchingDataElements.each { first, other ->
+//            DataElement dataElement = DataElement.get(first)
+//            Batch batch = Batch.findOrSaveByName("Duplicate Fuzzy Synonyms for Data Model ${dataModelA}")
+//            other.each { otherId ->
+//                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.dataElement:$otherId", destination: "gorm://org.modelcatalogue.core.dataElement:$first"
+//                if (action.hasErrors()) {
+//                    log.error(FriendlyErrors.printErrors("Error generating merge model action", action.errors))
+//                }
+//            }
+//            batch.archived = false
+//            batch.save()
+//        }
     }
 
     /**
