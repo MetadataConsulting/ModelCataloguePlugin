@@ -33,7 +33,10 @@ class CreateMatch extends AbstractActionRunner {
 //
         def destination = decodeEntity(parameters.destination)
         def source = decodeEntity(parameters.source)
-        def matchScore =  parameters[matchScore]
+        def matchScore =  (parameters.matchScore)
+        matchScore = matchScore[-3,-1].replace(':','')
+
+
 
         String destClass = GrailsNameUtils.getPropertyName(destination.class)
         String destId = destination.id as String

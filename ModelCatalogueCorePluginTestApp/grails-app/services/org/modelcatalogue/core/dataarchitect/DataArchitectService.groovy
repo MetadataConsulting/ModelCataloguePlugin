@@ -416,7 +416,7 @@ class DataArchitectService {
         Batch.findAllByNameIlike("Suggested Fuzzy Matches for DataElements in '${dataModelA}' and '${dataModelB}'").each reset
         fuzzyMatchingDataElements.each { first, other ->
             Batch batch = Batch.findOrSaveByName("Suggested Fuzzy Matches for DataElements in '${dataModelA}' and '${dataModelB}'")
-            RelationshipType type = RelationshipType.readByName("synonym")
+            RelationshipType type = RelationshipType.readByName("relatedTo")
             other.each {
                 def dataElementBId = other[0]
                 def matchScore = other[1]
@@ -424,7 +424,7 @@ class DataArchitectService {
                 params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$first""")
                 params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$dataElementBId""")
                 params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
-                //@todo : This is the match score which still needs to be handled
+                //@todo : This is the match score which still needs to be stored in extension
                 params.put("""matchScore""","""gorm://org.modelcatalogue.core.RelationshipType:$matchScore""")
                 Action action
                 action = actionService.create(params, batch, CreateMatch)
