@@ -464,14 +464,14 @@ class DataArchitectService {
             Batch batch = Batch.findOrSaveByName("Suggested Fuzzy Matches for DataElements in '${dataModelA}' and '${dataModelB}'")
             RelationshipType type = RelationshipType.readByName("synonym")
             other.each {
-                def dataElementAId = other[0]
-                def dataElementBId = other[1]
+                def dataElementBId = other[0]
+                def matchScore = other[1]
                 Map<String, String> params = new HashMap<String,String>()
-                params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$dataElementAId""")
+                params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$first""")
                 params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$dataElementBId""")
                 params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
                 //@todo : This is the match score which still needs to be handled
-                params.put("""matchScore""","""gorm://org.modelcatalogue.core.RelationshipType:$first""")
+                params.put("""matchScore""","""gorm://org.modelcatalogue.core.RelationshipType:$matchScore""")
                 Action action
                 action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {
