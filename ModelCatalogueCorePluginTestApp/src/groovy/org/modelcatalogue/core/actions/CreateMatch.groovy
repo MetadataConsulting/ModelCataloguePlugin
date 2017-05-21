@@ -33,8 +33,8 @@ class CreateMatch extends AbstractActionRunner {
 //
         def destination = decodeEntity(parameters.destination)
         def source = decodeEntity(parameters.source)
-        def matchScore =  (parameters.matchScore)
-        matchScore = matchScore[-3,-1].replace(':','')
+        def matchScore =  (parameters.matchScore).split(/:\w+:(\w+)/)
+        //matchScore = matchScore[-3,-1].replace(':','')
 
 
 
@@ -157,7 +157,7 @@ class CreateMatch extends AbstractActionRunner {
     }
 
     def getMatchScore() {
-        decodeEntity(parameters.matchScore)
+        (parameters.matchScore).split(/:\w+:(\w+)/)
     }
 
     /**
@@ -167,6 +167,7 @@ class CreateMatch extends AbstractActionRunner {
     Relationship link() {
         if (source && destination && type) {
             relationshipService.link(source as CatalogueElement, destination as CatalogueElement, type as RelationshipType)
+            //relationshipService.setExtension()
         } else {
             throw new IllegalStateException("The action wasn't initialized yet with the valid parameters")
         }
