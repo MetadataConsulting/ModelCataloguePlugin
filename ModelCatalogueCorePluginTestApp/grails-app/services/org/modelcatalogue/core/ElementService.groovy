@@ -638,13 +638,15 @@ class ElementService implements Publisher<CatalogueElement> {
      * Enums are very likely duplicates if they have similar enum values.
      * @return map with the enum id as key and set of ids of duplicate enums as value
      */
-    Map<Long, Set<Long>> findDuplicateEnumerationsSuggestions() {
+    Map<Long, Set<Long>> findDuplicateEnumerationsSuggestions(Long dataModelIdA, Long dataModelIdB) {
+
         Object[][] results = EnumeratedType.executeQuery """
             select e.id, e.enumAsString
             from EnumeratedType e
-            where e.status in :states
+            where e.status in :states 
+            and e.dataModel.id = :dataModelIdA or e.dataModel.id = :dataModelIdB
             order by e.name
-        """, [states: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.FINALIZED]]
+        """, [states: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.FINALIZED], dataModelIdA: dataModelIdA, dataModelIdB:dataModelIdB]
 
 
         Map<String, Set<Long>> enums = [:].withDefault { [] as TreeSet<Long> }

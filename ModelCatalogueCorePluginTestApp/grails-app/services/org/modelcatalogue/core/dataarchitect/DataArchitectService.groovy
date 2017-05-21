@@ -329,15 +329,42 @@ class DataArchitectService {
     }
 
     private void generatePossibleEnumDuplicatesAndSynonyms() {
-        def possibleDuplicateEnums = elementService.findDuplicateEnumerationsSuggestions()
+//        def possibleDuplicateEnums = elementService.findDuplicateEnumerationsSuggestions()
 
-        Batch.findAllByNameIlike("Create Synonyms for Enumerated Type '%'").each reset
-        possibleDuplicateEnums.each { first, other ->
-            EnumeratedType enumeratedType = EnumeratedType.get(first)
-            Batch batch = Batch.findOrSaveByName("Create Synonyms for Enumerated Type '$enumeratedType.name'")
-            RelationshipType type = RelationshipType.readByName("synonym")
+//        Batch.findAllByNameIlike("Create Synonyms for Enumerated Type '%'").each reset
+//        possibleDuplicateEnums.each { first, other ->
+//            EnumeratedType enumeratedType = EnumeratedType.get(first)
+//            Batch batch = Batch.findOrSaveByName("Create Synonyms for Enumerated Type '$enumeratedType.name'")
+//            RelationshipType type = RelationshipType.readByName("synonym")
+//            other.each { otherId ->
+//                Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.EnumeratedType:$otherId", destination: "gorm://org.modelcatalogue.core.EnumeratedType:$first", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
+//                if (action.hasErrors()) {
+//                    log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
+//                }
+//            }
+//            batch.archived = false
+//            batch.save()
+//        }
+
+
+        String dataModelA = "NHS Data Dictionary"
+        String dataModelB = "Cancer Outcomes and Services Dataset"
+        def matchingDataElements = elementService.findDuplicateEnumerationsSuggestions(120,68111)
+        matchingDataElements.each{
+            println it
+        }
+        Batch.findAllByNameIlike("Suggested DataElement and Type Synonyms for '${dataModelA}' and '${dataModelB}'").each reset
+        matchingDataElements.each { first, other ->
+            DataType dataType = DataType.get(first)
+            Batch batch = Batch.findOrSaveByName("Suggested DataType Synonyms for '${dataModelA}' and '${dataModelB}'")
+            RelationshipType type = RelationshipType.readByName("relatedTo")
             other.each { otherId ->
-                Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.EnumeratedType:$otherId", destination: "gorm://org.modelcatalogue.core.EnumeratedType:$first", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
+                Map<String, String> params = new HashMap<String,String>()
+                params.put("""source""","""gorm://org.modelcatalogue.core.DataType:$otherId""")
+                params.put("""destination""","""gorm://org.modelcatalogue.core.DataType:$first""")
+                params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
+                Action action
+                action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
@@ -346,36 +373,41 @@ class DataArchitectService {
             batch.save()
         }
 
-        Batch.findAllByNameIlike("Duplicate Candidates of Enumerated Type  '%'").each reset
 
-        possibleDuplicateEnums.each { first, other ->
-            EnumeratedType enumeratedType = EnumeratedType.get(first)
-            Batch batch = Batch.findOrSaveByName("Duplicate Candidates of Enumerated Type '$enumeratedType.name'")
-            other.each { otherId ->
-                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.EnumeratedType:$otherId", destination: "gorm://org.modelcatalogue.core.EnumeratedType:$first"
-                if (action.hasErrors()) {
-                    log.error(FriendlyErrors.printErrors("Error generating merge model action", action.errors))
-                }
-            }
-            batch.archived = false
-            batch.save()
-        }
+
+
+
+//        Batch.findAllByNameIlike("Duplicate Candidates of Enumerated Type  '%'").each reset
+//
+//        possibleDuplicateEnums.each { first, other ->
+//            EnumeratedType enumeratedType = EnumeratedType.get(first)
+//            Batch batch = Batch.findOrSaveByName("Duplicate Candidates of Enumerated Type '$enumeratedType.name'")
+//            other.each { otherId ->
+//                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.EnumeratedType:$otherId", destination: "gorm://org.modelcatalogue.core.EnumeratedType:$first"
+//                if (action.hasErrors()) {
+//                    log.error(FriendlyErrors.printErrors("Error generating merge model action", action.errors))
+//                }
+//            }
+//            batch.archived = false
+//            batch.save()
+//        }
     }
     /**
      * generateDataElementSuggestionsExact
      *
      */
     private void generateDataElementSuggestionsExact(){
-        String dataModelA = "NHS_DATA_DICTIONARY"
-        String dataModelB = "COSD"
+        String dataModelA = "NHS Data Dictionary"
+        String dataModelB = "Cancer Outcomes and Services Dataset"
         def matchingDataElements = elementService.findDuplicateDataElementSuggestions(dataModelA,dataModelB)
         matchingDataElements.each{
             println it
         }
-        Batch.findAllByNameIlike("Suggested DataElement Synonyms for '${dataModelA}' and '${dataModelB}'").each reset
+        Batch.findAllByNameIlike("Suggested DataElement Relations for '${dataModelA}' and '${dataModelB}'").each reset
+
         matchingDataElements.each { first, other ->
             DataElement dataElement = DataElement.get(first)
-            Batch batch = Batch.findOrSaveByName("Suggested DataElement Synonyms for '${dataModelA}' and '${dataModelB}'")
+            Batch batch = Batch.findOrSaveByName("Suggested DataElement and Type Synonyms for '${dataModelA}' and '${dataModelB}'")
             RelationshipType type = RelationshipType.readByName("synonym")
             other.each { otherId ->
                 Map<String, String> params = new HashMap<String,String>()
@@ -391,7 +423,6 @@ class DataArchitectService {
             batch.archived = false
             batch.save()
         }
-
 //        Batch.findAllByNameIlike("Duplicate Candidates of Data Model '{dataModelA}'").each reset
 //
 //        matchingDataElements.each { first, other ->
@@ -422,8 +453,8 @@ class DataArchitectService {
      *
      */
     private void generateDataElementSuggestionsFuzzy(){
-        String dataModelA = "NHS_DATA_DICTIONARY"
-        String dataModelB = "COSD"
+        String dataModelA = "NHS Data Dictionary"
+        String dataModelB = "Cancer Outcomes and Services Dataset"
         Map<Long, Set<Long>> fuzzyMatchingDataElements = elementService.findFuzzyDuplicateDataElementSuggestions(dataModelA,dataModelB )
         fuzzyMatchingDataElements.each{
             println it

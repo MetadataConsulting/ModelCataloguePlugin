@@ -438,11 +438,11 @@ class ElasticSearchService implements SearchCatalogue {
         ) concatWith (
             // we still want to index deprecated data models in case of someone wants to search inside these data models
             // yet the indexing may happen in much slower fashion
-            rxService.from(DataModel.where{ status == ElementStatus.DEPRECATED }, sort: 'lastUpdated', order: 'desc', true, ELEMENTS_PER_BATCH, 10 * DELAY_AFTER_BATCH)
+            rxService.from(DataModel.where{ status == ElementStatus.DEPRECATED }, sort: 'lastUpdated', order: 'desc', true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH)
         ) flatMap {
             return getDataModelWithDeclaredElements(it)
         } concatWith (
-            rxService.from(dataModelService.classified(CatalogueElement, DataModelFilter.create(true)), true, 10 * ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH)
+            rxService.from(dataModelService.classified(CatalogueElement, DataModelFilter.create(true)), true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH)
         ) concatWith (
             rxService.from(RelationshipType.where {})
         ) concatWith (
