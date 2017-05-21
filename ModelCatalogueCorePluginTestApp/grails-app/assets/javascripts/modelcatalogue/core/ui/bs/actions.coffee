@@ -258,6 +258,24 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
       }
   ]
 
+  actionsProvider.registerActionInRole 'delete-suggestions', actionsProvider.ROLE_LIST_ACTION, ['$scope', 'security',
+    'catalogue', 'modelCatalogueApiRoot', 'enhance', 'rest', 'messages', '$state',
+    ($scope, security, catalogue, modelCatalogueApiRoot, enhance, rest, messages, $state)->
+      return undefined unless security.isUserLoggedIn()
+      return undefined unless $scope.list
+      return undefined unless catalogue.isInstanceOf($scope.list.itemType, 'batch')
+      {
+        position: 100
+        label: 'Delete Suggestions'
+        icon: 'fa fa-flash'
+        type: 'primary'
+        action: ->
+          messages.prompt('Delete Merged Batch', "Delete current list of suggestions", {type: 'delete-suggestions'}).then ->
+            $state.go('.', {page: undefined}, {reload: true})
+
+      }
+  ]
+
   actionsProvider.registerActionInRole 'refresh-batches', actionsProvider.ROLE_LIST_ACTION, ['$state', '$scope',
     'security', 'catalogue', ($state, $scope, security, catalogue)->
       return undefined unless security.isUserLoggedIn()

@@ -132,7 +132,7 @@ class BatchController extends AbstractRestfulController<Batch> {
 
         ActionState state = params.state ? ActionState.valueOf(params.state.toString().toUpperCase()) : null
 
-        respond Lists.wrap(params, "/${resourceName}/${batch.id}/actions/${params.state ?: ''}", actionService.list(params, batch, state))
+        respond Lists.wrap(params, "/${resourceName}/${batch.id}/actions/${params?.state ?: ''}", actionService.list(params, batch, state))
     }
 
     def dismiss() {

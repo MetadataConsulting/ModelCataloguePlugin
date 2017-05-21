@@ -639,34 +639,71 @@ class ElementService implements Publisher<CatalogueElement> {
      * Enums are very likely duplicates if they have similar enum values.
      * @return map with the enum id as key and set of ids of duplicate enums as value
      */
-    Map<Long, Set<Long>> findDuplicateEnumerationsSuggestions() {
+    Map<Long, Set<Long>> findDuplicateEnumerationsSuggestions(Long dataModelIdA, Long dataModelIdB) {
+
         Object[][] results = EnumeratedType.executeQuery """
             select e.id, e.enumAsString
             from EnumeratedType e
-            where e.status in :states
+            where e.status in :states 
+            and e.dataModel.id = :dataModelIdA
             order by e.name
-        """, [states: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.FINALIZED]]
+        """, [states: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.FINALIZED], dataModelIdA: dataModelIdA]
+
+        Object[][] results2 = EnumeratedType.executeQuery """
+            select e.id, e.enumAsString
+            from EnumeratedType e
+            where e.status in :states 
+            and e.dataModel.id = :dataModelIdB
+            order by e.name
+        """, [states: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.FINALIZED], dataModelIdB: dataModelIdB]
 
 
         Map<String, Set<Long>> enums = [:].withDefault { [] as TreeSet<Long> }
+        Map<String, Set<Long>> enums2 = [:].withDefault { [] as TreeSet<Long> }
 
         for (Object[] row in results) {
             enums[getNormalizedEnumValues(Enumerations.from(row[1]))] << row[0]
         }
 
-        enums.findAll { String key, Set<Long> values -> values.size() > 1 }.collectEntries { String key, Set<Long> values ->
-            def valuesAsList = values.asList()
-            [valuesAsList.first(), valuesAsList[1..-1]]
+        for (Object[] row in results2) {
+            enums2[getNormalizedEnumValues(Enumerations.from(row[1]))] << row[0]
         }
+
+        Map<Long, Set<Long>>  matches = [:]
+
+        enums.each{ String key, Set<Long> values ->
+            def found = enums2.get(key)
+            if(found) {
+                if (!key.contains("yes") && !key.contains("no") && !key.contains("YES") && !key.contains("NO")) {
+                    values.each { val ->
+                        matches.put(val, found.asList())
+                    }
+                }
+            }
+        }
+
+//        enums.findAll { String key, Set<Long> values ->
+//            values.size() > 1
+//        }.collectEntries { String key, Set<Long> values ->
+//            def valuesAsList = values.asList()
+//            [valuesAsList.first(), valuesAsList[1..-1]]
+//        }        enums.findAll { String key, Set<Long> values ->
+//            values.size() > 1
+//        }.collectEntries { String key, Set<Long> values ->
+//            def valuesAsList = values.asList()
+//            [valuesAsList.first(), valuesAsList[1..-1]]
+//        }
+
+        matches
 
     }
 
     String getNormalizedEnumValues(Map<String, String> enumValues) {
-        enumValues.keySet().collect {
-            if (it ==~ /\d+/) {
-                return "" + Long.parseLong(it, 10)
+        enumValues.collect { k, v ->
+            if (k ==~ /\d+/) {
+                return "" + k + v
             }
-            return it
+            return k + v
         }.sort().join(':')
     }
 

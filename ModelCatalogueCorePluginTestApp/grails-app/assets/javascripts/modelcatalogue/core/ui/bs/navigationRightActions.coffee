@@ -176,6 +176,8 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     }
   ]
 
+
+
   userLastSeen = [
     '$scope', 'names','security', '$state', 'messages',
     ($scope ,  names , security ,  $state ,  messages) ->
