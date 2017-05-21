@@ -31,10 +31,9 @@ class CreateMatch extends AbstractActionRunner {
 
     String getMessage() {
 //
-        def destination = decodeEntity(parameters.destination)
-        def source = decodeEntity(parameters.source)
-        def matchScore =  (parameters.matchScore)
-        matchScore = matchScore[-3,-1].replace(':','')
+        def destination = decodeEntity(parameters?.destination)
+        def source = decodeEntity(parameters?.source)
+        def matchScore =  (parameters?.matchScore)?:''
 
 
 
@@ -55,16 +54,16 @@ class CreateMatch extends AbstractActionRunner {
        // String join =  """ ${typeSrc2Dest}"""
         String destLink = """<a href='#/catalogue/${destClass}/${destId}'> ${destName} '${destClassifiedName}'</a>"""
 
-        String desc = """  <table class="tg">
+        String desc = """  <table class="table">
                       <tr>
-                        <th class="tg-baqh">COSD</th>
-                        <th class="tg-yw4l">Match</th>
-                        <th class="tg-yw4l">NHS DD</th>
+                        <th>COSD</th>
+                        <th>Match</th>
+                        <th>NHS DD</th>
                       </tr>
                       <tr>
-                        <td class="tg-6k2t">${srclink}</td>
-                        <td class="tg-6k2t">${matchScore}</td>
-                        <td class="tg-6k2t">${destLink}</td>
+                        <td>${srclink}</td>
+                        <td>${matchScore}</td>
+                        <td>${destLink}</td>
                       </tr>
                     </table>  """
         normalizeDescription(desc)
@@ -129,11 +128,14 @@ class CreateMatch extends AbstractActionRunner {
         CatalogueElement theSource = getSource() as CatalogueElement
         CatalogueElement theDestination = getDestination() as CatalogueElement
         RelationshipType theType = getType() as RelationshipType
-        Long matchScore = getMatchScore() as Long
-
-
         Relationship relationship = link()
         if (!relationship.hasErrors()) {
+            String match = parameters?.matchScore
+            if(match){
+                relationship.addExtension("match", "$match")
+                relationship.save()
+            }
+
             out << "<a href='#/catalogue/${GrailsNameUtils.getPropertyName(theSource.class)}/${theSource.id}'>${GrailsNameUtils.getNaturalName(theSource.class.simpleName)} '$theSource.name'</a> now <a href='#/catalogue/${GrailsNameUtils.getPropertyName(theType.class)}/${theType.id}'>$theType.sourceToDestination</a> <a href='#/catalogue/${GrailsNameUtils.getPropertyName(theDestination.class)}/${theDestination.id}'>${GrailsNameUtils.getNaturalName(theDestination.class.simpleName)} '$theDestination.name'</a>"
             result = encodeEntity relationship
         } else {

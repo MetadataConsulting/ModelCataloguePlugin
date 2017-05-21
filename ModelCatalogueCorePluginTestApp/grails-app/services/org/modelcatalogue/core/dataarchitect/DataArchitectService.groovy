@@ -345,11 +345,13 @@ class DataArchitectService {
             DataType dataType = DataType.get(first)
             Batch batch = Batch.findOrSaveByName("Suggested DataType Synonyms for '${dataModelA}' and '${dataModelB}'")
             RelationshipType type = RelationshipType.readByName("relatedTo")
+            def matchScore = 100
             other.each { otherId ->
                 Map<String, String> params = new HashMap<String,String>()
                 params.put("""source""","""gorm://org.modelcatalogue.core.DataType:$otherId""")
                 params.put("""destination""","""gorm://org.modelcatalogue.core.DataType:$first""")
                 params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
+                params.put("""matchScore""","""$matchScore""")
                 Action action
                 action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {
@@ -391,7 +393,7 @@ class DataArchitectService {
             println it
         }
         Batch.findAllByNameIlike("Suggested DataElement Relations for '${dataModelA}' and '${dataModelB}'").each reset
-
+        def matchScore = 100
         matchingDataElements.each { first, other ->
             DataElement dataElement = DataElement.get(first)
             Batch batch = Batch.findOrSaveByName("Suggested DataElement and Type Synonyms for '${dataModelA}' and '${dataModelB}'")
@@ -401,6 +403,7 @@ class DataArchitectService {
                 params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$otherId""")
                 params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$first""")
                 params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
+                params.put("""matchScore""","""$matchScore""")
                 Action action
                 action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {
@@ -458,7 +461,7 @@ class DataArchitectService {
                 params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$dataElementBId""")
                 params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
                 //@todo : This is the match score which still needs to be stored in extension
-                params.put("""matchScore""","""gorm://org.modelcatalogue.core.RelationshipType:$matchScore""")
+                params.put("""matchScore""","""$matchScore""")
                 Action action
                 action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {

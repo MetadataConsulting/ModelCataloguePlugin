@@ -672,13 +672,13 @@ class ElementService implements Publisher<CatalogueElement> {
 
         enums.each{ String key, Set<Long> values ->
             def found = enums2.get(key)
-            if(found){
-                if(!key.contains("yes") && !key.contains("no")&& !key.contains("YES")&& !key.contains("YES"))
-                values.each{ val ->
-                    matches.put(val, found.asList())
+            if(found) {
+                if (!key.contains("yes") && !key.contains("no") && !key.contains("YES") && !key.contains("NO")) {
+                    values.each { val ->
+                        matches.put(val, found.asList())
+                    }
                 }
             }
-
         }
 
 //        enums.findAll { String key, Set<Long> values ->
