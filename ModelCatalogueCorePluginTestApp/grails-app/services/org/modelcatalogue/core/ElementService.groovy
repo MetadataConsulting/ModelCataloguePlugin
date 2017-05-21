@@ -926,9 +926,9 @@ class ElementService implements Publisher<CatalogueElement> {
                     bList.each {
                         MatchResult suggestedMatches = new MatchResult()
                         suggestedMatches.setDataElementAName(aListName)
-                        suggestedMatches.setDataElementAId(aListId)
+                        //suggestedMatches.setDataElementAId(aListId as Long)
                         suggestedMatches.setDataElementBName(it.name)
-                        suggestedMatches.setDataElementBId(it.id)
+                        //suggestedMatches.setDataElementBId(it.id as Long)
 
                             //we need not just the element match, but also the rating of the match
                             Long matchScore = getNameMetric(suggestedMatches.dataElementAName, suggestedMatches.dataElementBName)
