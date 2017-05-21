@@ -930,7 +930,7 @@ class ElementService implements Publisher<CatalogueElement> {
                             //we need not just the element match, but also the rating of the match
                             Long matchScore = getNameMetric(modelAName, modelBName)
                             //Only accept matches above pre-defined limit
-                            if(matchScore > 80){
+                            if((matchScore > 80)&&(matchScore <= 100)){
                                 Set<Long> elementMatch = new HashSet<Long>()
                                 elementMatch.add(modelBId)
                                 elementMatch.add(matchScore)
