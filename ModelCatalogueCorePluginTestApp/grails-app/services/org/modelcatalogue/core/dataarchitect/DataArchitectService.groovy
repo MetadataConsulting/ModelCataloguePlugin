@@ -351,19 +351,24 @@ class DataArchitectService {
      *
      */
     private void generateDataElementSuggestionsExact(){
-
-        //List matchingDataElements = elementService.getDataElementsInCommon(1,2)
-        def matchingDataElements = elementService.findDuplicateDataElementSuggestions("NHS_DATA_DICTIONARY","COSD" )
+        String dataModelA = "NHS_DATA_DICTIONARY"
+        String dataModelB = "COSD"
+        def matchingDataElements = elementService.findDuplicateDataElementSuggestions(dataModelA,dataModelB)
         matchingDataElements.each{
             println it
         }
-        Batch.findAllByNameIlike("Create Synonyms for Data Element '%'").each reset
+        Batch.findAllByNameIlike("Create Synonyms for Data Elements '${dataModelA}'").each reset
         matchingDataElements.each { first, other ->
             DataElement dataElement = DataElement.get(first)
-            Batch batch = Batch.findOrSaveByName("Create Synonyms for dataElement Type '$dataElement.name'")
+            Batch batch = Batch.findOrSaveByName("Create Synonyms for Data Elements '${dataModelA}'")
             RelationshipType type = RelationshipType.readByName("synonym")
             other.each { otherId ->
-                Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.EnumeratedType:$otherId", destination: "gorm://org.modelcatalogue.core.dataElement:$first", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
+                Map<String, String> params = new HashMap<String,String>()
+                params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$otherId""")
+                params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$first""")
+                params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
+                Action action
+                action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
@@ -372,13 +377,13 @@ class DataArchitectService {
             batch.save()
         }
 
-        Batch.findAllByNameIlike("Duplicate Candidates of Data Element  '%'").each reset
+        Batch.findAllByNameIlike("Duplicate Candidates of Data Model '{dataModelA}'").each reset
 
         matchingDataElements.each { first, other ->
             DataElement dataElement = DataElement.get(first)
-            Batch batch = Batch.findOrSaveByName("Duplicate Candidates of dataElement Type '$dataElement.name'")
+            Batch batch = Batch.findOrSaveByName("Duplicate Candidates of Data Model '{dataModelA}'")
             other.each { otherId ->
-                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.dataElement:$otherId", destination: "gorm://org.modelcatalogue.core.dataElement:$first"
+                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.DataElement:$otherId", destination: "gorm://org.modelcatalogue.core.DataElement:$first"
                 if (action.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Error generating merge model action", action.errors))
                 }
@@ -402,18 +407,25 @@ class DataArchitectService {
      *
      */
     private void generateDataElementSuggestionsFuzzy(){
-
-        def fuzzyMatchingDataElements = elementService.findFuzzyDuplicateDataElementSuggestions("NHS_DATA_DICTIONARY","COSD" )
+        String dataModelA = "NHS_DATA_DICTIONARY"
+        String dataModelB = "COSD"
+        Map<Long, Set<Long>> fuzzyMatchingDataElements = elementService.findFuzzyDuplicateDataElementSuggestions(dataModelA,dataModelB )
         fuzzyMatchingDataElements.each{
             println it
         }
-        Batch.findAllByNameIlike("Create Fuzzy Synonyms for Data Element '%'").each reset
+        Batch.findAllByNameIlike("Create Fuzzy Synonyms for Data Model ${dataModelA}").each reset
         fuzzyMatchingDataElements.each { first, other ->
             DataElement dataElement = DataElement.get(first)
-            Batch batch = Batch.findOrSaveByName("Create Fuzzy Synonyms for Data Element '$dataElement.name'")
+            Batch batch = Batch.findOrSaveByName("Create Fuzzy Synonyms for Data Model ${dataModelA}")
             RelationshipType type = RelationshipType.readByName("synonym")
-            other.each { otherId ->
-                Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.EnumeratedType:$otherId", destination: "gorm://org.modelcatalogue.core.dataElement:$first", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
+            other.each { dataElementAId, dataElementBId ->
+                Map<String, String> params = new HashMap<String,String>()
+                params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$dataElementAId.[1]""")
+                params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$dataElementBId.[0]""")
+                params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
+                params.put("""matchScore""","""gorm://org.modelcatalogue.core.RelationshipType:$first""")
+                Action action
+                action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
@@ -422,11 +434,11 @@ class DataArchitectService {
             batch.save()
         }
 
-        Batch.findAllByNameIlike("Duplicate - Fuzzy Candidates of Data Element  '%'").each reset
+        Batch.findAllByNameIlike("Duplicate Fuzzy Synonyms for Data Model ${dataModelA}").each reset
 
         fuzzyMatchingDataElements.each { first, other ->
             DataElement dataElement = DataElement.get(first)
-            Batch batch = Batch.findOrSaveByName("Duplicate - Fuzzy Candidates of Data Element  '$dataElement.name'")
+            Batch batch = Batch.findOrSaveByName("Duplicate Fuzzy Synonyms for Data Model ${dataModelA}")
             other.each { otherId ->
                 Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.dataElement:$otherId", destination: "gorm://org.modelcatalogue.core.dataElement:$first"
                 if (action.hasErrors()) {
