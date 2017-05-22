@@ -408,8 +408,8 @@ class DataArchitectService {
      *
      */
     private void generateDataElementSuggestionsFuzzy(){
-        String dataModelA = "NHS_DATA_DICTIONARY"
-        String dataModelB = "COSD"
+        String dataModelA = "NHS Data Dictionary"
+        String dataModelB = "Cancer Outcomes and Services Dataset"
         List<MatchResult> fuzzyMatchingDataElements = elementService.findFuzzyDuplicateDataElementSuggestions(dataModelA,dataModelB )
         fuzzyMatchingDataElements.each{
             println it
@@ -421,8 +421,8 @@ class DataArchitectService {
             //other.each {
 
                 Map<String, String> params = new HashMap<String,String>()
-                params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$matchResult.dataElementAName""")
-                params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$matchResult.dataElementBName""")
+                params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$matchResult.dataElementAId""")
+                params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$matchResult.dataElementBId""")
                 params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
                 //@todo : This is the match score which still needs to be stored in extension
                 params.put("""matchScore""","""gorm://org.modelcatalogue.core.RelationshipType:$matchResult.matchScore""")

@@ -33,7 +33,7 @@ class CreateMatch extends AbstractActionRunner {
 //
         def destination = decodeEntity(parameters?.destination)
         def source = decodeEntity(parameters?.source)
-        def matchScore =  (parameters?.matchScore)?:''
+        def matchScore =  (parameters?.matchScore).split(":")
 
 
 
@@ -48,10 +48,8 @@ class CreateMatch extends AbstractActionRunner {
         String sourceClassName = CatalogueElementMarshaller.getClassifiedName(source)
 
         String type = decodeEntity(parameters.type)
-        //String typeSrc2Dest = type?.sourceToDestination
 
         String srclink = """<a href='#/catalogue/${sourceClass}/${sourceId}'> ${sourceName} '${sourceClassName}'</a>"""
-       // String join =  """ ${typeSrc2Dest}"""
         String destLink = """<a href='#/catalogue/${destClass}/${destId}'> ${destName} '${destClassifiedName}'</a>"""
 
         String desc = """  <table class="table">
@@ -62,7 +60,7 @@ class CreateMatch extends AbstractActionRunner {
                       </tr>
                       <tr>
                         <td>${srclink}</td>
-                        <td>${matchScore}</td>
+                        <td>${matchScore[2]}%</td>
                         <td>${destLink}</td>
                       </tr>
                     </table>  """

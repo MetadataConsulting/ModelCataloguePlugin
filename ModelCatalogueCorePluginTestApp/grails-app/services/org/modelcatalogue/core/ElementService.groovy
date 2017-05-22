@@ -963,18 +963,15 @@ class ElementService implements Publisher<CatalogueElement> {
                     bList.each {
                         MatchResult suggestedMatches = new MatchResult()
                         suggestedMatches.setDataElementAName(aListName)
-                        //suggestedMatches.setDataElementAId(aListId as Long)
+                        suggestedMatches.setDataElementAId(aListId as Long)
                         suggestedMatches.setDataElementBName(it.name)
-                        //suggestedMatches.setDataElementBId(it.id as Long)
+                        suggestedMatches.setDataElementBId(it.id as Long)
 
                             //we need not just the element match, but also the rating of the match
                             Long matchScore = getNameMetric(suggestedMatches.dataElementAName, suggestedMatches.dataElementBName)
                             //Only accept matches above pre-defined limit
                             if((matchScore > 80)&(matchScore <= 100)){
-//                                Set<Long> elementMatch = new HashSet<Long>()
-//                                elementMatch.add(modelBId)
-//                                elementMatch.add(matchScore)
-
+                                suggestedMatches.setMatchScore(matchScore)
                                 fuzzyElementList.add(suggestedMatches)
                                 println " Loading Match: ${suggestedMatches.dataElementAName} and ${suggestedMatches.dataElementBName} score is: ${matchScore}"
                             }

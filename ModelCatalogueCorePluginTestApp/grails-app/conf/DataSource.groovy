@@ -12,10 +12,10 @@ environments {
       dataSource {
         driverClassName = "com.mysql.jdbc.Driver"
         dialect='org.hibernate.dialect.MySQL5InnoDBDialect'
-        url = "jdbc:mysql://localhost:3306/testdb1?autoReconnect=true&useUnicode=yes&characterEncoding=UTF-8"
+        url = "jdbc:mysql://localhost:3306/nhsreference?autoReconnect=true&useUnicode=yes&characterEncoding=UTF-8"
         username = 'mdradmin'
         password = 'mdradmin123'
-        dbCreate = "create"
+        dbCreate = "update"
         properties {
             maxActive = -1
             minEvictableIdleTimeMillis=1800000
