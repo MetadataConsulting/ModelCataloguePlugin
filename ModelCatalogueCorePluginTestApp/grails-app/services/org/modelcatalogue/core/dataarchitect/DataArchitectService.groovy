@@ -352,8 +352,8 @@ class DataArchitectService {
      *
      */
     private void generateDataElementSuggestionsExact(){
-        String dataModelA = "NHS_DATA_DICTIONARY"
-        String dataModelB = "COSD"
+        String dataModelA = "NHS Data Dictionary"
+        String dataModelB = "Cancer Outcomes and Services Dataset"
         def matchingDataElements = elementService.findDuplicateDataElementSuggestions(dataModelA,dataModelB)
         matchingDataElements.each{
             println it
@@ -368,6 +368,7 @@ class DataArchitectService {
                 params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$otherId""")
                 params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$first""")
                 params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
+                params.put("""matchScore""","""gorm://org.modelcatalogue.core.RelationshipType:100""")
                 Action action
                 action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {

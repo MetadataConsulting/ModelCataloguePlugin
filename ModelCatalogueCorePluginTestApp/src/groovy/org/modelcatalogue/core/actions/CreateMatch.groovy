@@ -33,7 +33,12 @@ class CreateMatch extends AbstractActionRunner {
 //
         def destination = decodeEntity(parameters?.destination)
         def source = decodeEntity(parameters?.source)
-        def matchScore =  (parameters?.matchScore).split(":")
+        def matchScore =  parameters?.matchScore
+        //If no matchscore then we assume this is being used by the exactMatch routine so insert 100
+        if(!matchScore){
+            matchScore = """gorm://org.modelcatalogue.core.RelationshipType:100"""
+        }
+        matchScore = matchScore.split(":")
 
 
 
