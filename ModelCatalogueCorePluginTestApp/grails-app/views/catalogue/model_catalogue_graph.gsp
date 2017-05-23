@@ -1,41 +1,16 @@
+<!-- View for cytoscape graph display. Access at e.g. /catalogue/cytoscapeGraphView?resource=dataModel&id=2943 -->
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset=utf-8 />
+    <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, user-scalable=no" />
 
     <title>Model Catalogue Graph</title>
-    <asset:stylesheet href="model_catalogue_graph/font-awesome-4.7.0/css/font-awesome.min.css"/>
-    <asset:stylesheet href="model_catalogue_graph/bootstrap-3.3.7-dist/css/bootstrap.min.css"/>
-    <asset:stylesheet href="model_catalogue_graph/style.css"/>
-    <asset:stylesheet href="model_catalogue_graph/jquery.qtip.min.css"/>
+
+    <asset:stylesheet href="model_catalogue_graph_manifest.css"/>
 </head>
 <body>
 
-
-    <asset:javascript src="model_catalogue_graph/fastclick.min.js"/>
-    <asset:javascript src="model_catalogue_graph/jquery.min.js"/>
-
-    <asset:javascript src="model_catalogue_graph/cytoscape.min.js"/>
-
-    <asset:javascript src="model_catalogue_graph/jquery.qtip.min.js"/>
-
-    <asset:javascript src="model_catalogue_graph/cytoscape-qtip.js"/>
-
-    <asset:javascript src="model_catalogue_graph/bluebird.min.js"/>
-    <asset:javascript src="model_catalogue_graph/bootstrap.min.js"/>
-    <asset:javascript src="model_catalogue_graph/typeahead.bundle.js"/>
-    <asset:javascript src="model_catalogue_graph/handlebars.min.js"/>
-    <asset:javascript src="model_catalogue_graph/lodash.min.js"/>
-    <asset:javascript src="model_catalogue_graph/notify.min.js"/>
-    <script>  // get exported json from cytoscape desktop via ajax
-        var graphP = $.ajax({
-            url: '/catalogue/${resource}/${id}/cytoscapeJsonExport',
-            type: 'GET',
-            dataType: 'json'
-        });
-    </script>
-    <asset:javascript src="model_catalogue_graph/model_catalogue_graph.js"/>
     <div id="nav"> <!-- left nav bar -->
         <p><button id="get-model-list" class="btn btn-default"
                    data-loading-text="<i class='fa fa-spinner fa-pulse fa-fw'></i>
@@ -90,6 +65,12 @@
         ga('send', 'pageview');
 
     </script>
+    <script>
+        var modelCatalogueGraphUrl = '/catalogue/${resource}/${id}/cytoscapeJsonExport'
+        var modelCatalogueGraphStyleUrl = '${assetPath(src: 'style.cycss')}'
+    </script>
+    <asset:javascript src="model_catalogue_graph_manifest.js"/>
+    <asset:deferredScripts/>
 
 </body>
 </html>

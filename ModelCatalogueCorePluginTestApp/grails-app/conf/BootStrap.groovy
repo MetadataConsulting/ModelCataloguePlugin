@@ -146,6 +146,15 @@ class BootStrap {
                 [url: element.getDefaultModelCatalogueId(false) + '/cytoscapeJsonExport']
             }
         }
+        reportsRegistry.register {
+            creates link
+            type DataModel
+            title {"View Cytoscape Graph"}
+            link { CatalogueElement element ->
+                [url: "catalogue/cytoscapeGraphView?resource=dataModel&id=${element.getLatestVersionId()}"]
+
+            }
+        }
 
         reportsRegistry.register {
             creates link

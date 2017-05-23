@@ -10,10 +10,16 @@ $(function(){
 
   var cy;
 
+  // get exported json from cytoscape desktop via ajax
+  var graphP = $.ajax({
+      url: modelCatalogueGraphUrl,
+      type: 'GET',
+      dataType: 'json'
+  });
 
   // also get style via ajax
   var styleP = $.ajax({ //an asynchronous call
-    url: './style.cycss', // wine-and-cheese-style.cycss
+    url: modelCatalogueGraphStyleUrl, // wine-and-cheese-style.cycss
     type: 'GET',
     dataType: 'text'
   });

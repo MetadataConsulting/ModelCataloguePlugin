@@ -1,0 +1,6 @@
+/* Grails Asset Pipeline manifest
+*= require-tree font-awesome-4.7.0
+*= require-tree bootstrap-3.3.7-dist
+*= require style.css
+*= require jquery.qtip.min.css
+*/
