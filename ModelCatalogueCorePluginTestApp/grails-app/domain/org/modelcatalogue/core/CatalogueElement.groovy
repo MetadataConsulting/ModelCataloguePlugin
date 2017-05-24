@@ -46,7 +46,18 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     Date versionCreated = new Date()
 
-    /** Actually is the id of the first version. Misnomers abound... */
+    /** Actually is the id of the first version. Misnomers abound... see the following conversation:
+     * [12/05/2017, 14:19:20] David Milward: Hi Vlad,
+     [12/05/2017, 14:19:58] David Milward: I have a question for you - what does the latest_version_id column do in catalogue_elements? because it appears to point at previous versions of the same element
+     [12/05/2017, 14:20:12] David Milward: which is very strange
+     [12/05/2017, 14:21:06] Vladimír Oraný: it points to very first version of the element
+     [12/05/2017, 14:21:54] David Milward: why is it called latest_version_id then? I would expect the opposite
+     [12/05/2017, 14:22:08] David Milward: what is it used for ?
+     [12/05/2017, 14:22:12] Vladimír Oraný: so every element having the same latestVersionId was created by draft/finalize
+     [12/05/2017, 14:22:27] Vladimír Oraný: I think we discussed this many times that this is a wrong naming
+     [12/05/2017, 14:22:33] Vladimír Oraný: you're right
+     [12/05/2017, 14:22:51] Vladimír Oraný: to determine previous/next versions of the element
+     [12/05/2017, 14:22:55] Vladimír Oraný: e.g. build history tab */
     Long latestVersionId
 
     // time stamping
