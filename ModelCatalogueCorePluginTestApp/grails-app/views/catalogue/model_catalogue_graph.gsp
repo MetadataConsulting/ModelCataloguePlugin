@@ -5,7 +5,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, user-scalable=no" />
 
-    <title>Model Catalogue Graph</title>
+    <title>Model Catalogue Graph (beta) </title>
 
     <asset:stylesheet href="model_catalogue_graph_manifest.css"/>
 </head>
@@ -35,7 +35,11 @@
         <button id="reset" class="btn btn-default"><i class="fa fa-arrows-h"></i></button>
 
         <button id="filter" class="btn btn-default"><i class="fa fa-filter"></i></button>
+        <button id="about" class="btn btn-default"><i class="fa fa-info"></i></button>
 
+        <div id="about-content">
+            This is the Model Catalogue Graph view. It is currently in beta (loading large data sets does not work).
+        </div>
         <div id="filters">
             <div class="filterset-section-title">Type</div>
 

@@ -720,7 +720,7 @@ $(function(){
 
     content: $('#filters')
   });
-  /*
+
   $('#about').qtip({
     position: {
       my: 'bottom center',
@@ -749,5 +749,5 @@ $(function(){
     },
 
     content: $('#about-content')
-  });*/
+  });
 });
