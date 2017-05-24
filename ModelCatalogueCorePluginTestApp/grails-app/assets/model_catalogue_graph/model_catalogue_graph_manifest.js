@@ -1,4 +1,4 @@
-// Grails Asset Pipeline Manifest
+// Grails Asset Pipeline Manifest– just use this in GSP views to load all the javascripts required.
 //= require fastclick.min.js
 //= require jquery.min.js
 //= require cytoscape.min.js

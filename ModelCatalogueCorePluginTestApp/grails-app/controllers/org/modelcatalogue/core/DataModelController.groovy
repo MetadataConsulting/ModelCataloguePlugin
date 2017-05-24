@@ -23,6 +23,15 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
 	DataModelController() {
 		super(DataModel, false)
 	}
+    def idModelMap(Integer max) {
+        ListWithTotalAndType<DataModel> models = getAllEffectiveItems(max)
+        def idModelMap = models.getItems().collectEntries {
+            //[(it.modelCatalogueId): it.name]
+            [(it.latestVersionId): it.name]
+        }
+        response.status=200
+        respond idModelMap // as JSON
+    }
 
     def inventorySpreadsheet(String name, Integer depth) {
         DataModel dataModel = DataModel.get(params.id)

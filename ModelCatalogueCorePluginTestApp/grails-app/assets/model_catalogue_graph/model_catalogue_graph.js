@@ -481,7 +481,9 @@ $(function(){
 
   $('#get-model-list').on('click', function () {
     var $btn = $(this); // the button in jquery wrapper
-    $btn.button('loading'); // set button state to loading
+    var originalButtonText = $btn.html();
+    $btn.disable(true);
+    $btn.html($btn.attr('data-loading-text'));
     var idModelMapP = $.ajax({
       url: hostname+"catalogue/getIdModelMap",
       headers: {
@@ -494,12 +496,14 @@ $(function(){
       console.log("Succeeded with:")
       console.log(idModelMapP);
       populateModelList(idModelMap);
-      $btn.button('reset');
+      $btn.disable(false);
+      $btn.html(originalButtonText);
       $btn.notify("List loaded!", "success");
     }, function(failReason){ // in case ajax failed
       console.log("Failed with:");
       console.log(failReason);
-      $btn.button('reset');
+      $btn.disable(false);
+      $btn.html(originalButtonText);
       $btn.notify("Get Model List failed with status "+failReason.status+": "+failReason.statusText,
       "error");
     })
@@ -548,6 +552,7 @@ $(function(){
     })})
 
   };
+  /*
   initialIdModelMap = {
     '4': 'SI',
     '24': 'Java',
@@ -571,6 +576,26 @@ $(function(){
     '43807': 'Genomics England Shared',
     '44468': 'Interim Rare Disease Model for Scotland and Northern Ireland'};
   populateModelList(initialIdModelMap);
+  */
+  // initialise from catalogue:
+  (function () {
+      var idModelMapP = $.ajax({
+          url: hostname+"catalogue/getIdModelMap",
+          headers: {
+              "Authorization": "Basic " + btoa(mcUserPass[0] + ":" + mcUserPass[1])
+          },
+          type: 'GET',
+          dataType: 'json'
+      });
+      idModelMapP.then(function(idModelMap) { // in case ajax succeeded
+          console.log("Succeeded with:")
+          console.log(idModelMapP);
+          populateModelList(idModelMap);
+      }, function(failReason){ // in case ajax failed
+          console.log("Failed with:");
+          console.log(failReason);
+      })
+  })();
 
   /// Search bar and button on event behaviour:
   $('#search').typeahead({

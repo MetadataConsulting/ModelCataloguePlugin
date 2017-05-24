@@ -66,6 +66,7 @@
 
     </script>
     <script>
+        <%-- prepare graph and graph style urls for javascript to get via AJAX --%>
         var modelCatalogueGraphUrl = '/catalogue/${resource}/${id}/cytoscapeJsonExport'
         var modelCatalogueGraphStyleUrl = '${assetPath(src: 'style.cycss')}'
     </script>

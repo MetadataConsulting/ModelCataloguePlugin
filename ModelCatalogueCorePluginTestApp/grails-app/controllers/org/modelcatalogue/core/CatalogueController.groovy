@@ -63,13 +63,15 @@ class CatalogueController {
         redirect controller: params.resource, action: 'show', id: element.id
     }
 
+    /// Cytoscape stuff. Could be put in a separate controller? Perhaps not necessary for now.
+
     /** Method to create JSON file for cytoscape to display a graph of the element.
      * Adapted from xref, using something similar to CatalogueXmlPrinter, etc.
      * At the moment, simply finding the elements related by Hierarchy and Containment within a class,
      * displaying those relations.
      * Next step: metadata.*/
     def cytoscape_json() {
-        // what is this magic? Somehow getting the currently looked at element.
+        // Gets the current element from the URL which is of form "/catalogue/$resource/$id(.${version})/cytoscapeJsonExport"
         CatalogueElement element = elementService.findByModelCatalogueId(CatalogueElement, request.forwardURI.replace('/cytoscapeJsonExport', ''))
 
         if (!params.resource || !element) {
@@ -77,8 +79,7 @@ class CatalogueController {
             return
         }
         response.contentType = 'application/json'
-        // What is that regex?
-        // What are these special characters s: and s1:? IDE-interpolated argument names.
+        // The regex below replaces whitespace with underscore.
         response.setHeader("Content-disposition", "attachment; filename=\"${element.name.replaceAll(/\s+/, '_')}.mc.cytoscape.json\"")
         CatalogueCytoscapeJsonPrinter printer = new CatalogueCytoscapeJsonPrinter(dataModelService, dataClassService)
         JsonBuilder builder = printer.bind(element){ // bind element with the following as configuration for the PrintContext
@@ -87,13 +88,9 @@ class CatalogueController {
             }
         }
         EscapeSpecialWriter escapeSpecialWriter = new EscapeSpecialWriter(response.writer)
-        //builder.writeTo(escapeSpecialWriter)
         escapeSpecialWriter.append(builder.toPrettyString())
-        //escapeSpecialWriter.out.append(builder.toPrettyString())
-        // builder.writeTo(response.writer)
         escapeSpecialWriter.flush()
         return
-        // What is resource?
         // redirect controller: params.resource, action: 'show', id: element.id
     }
 

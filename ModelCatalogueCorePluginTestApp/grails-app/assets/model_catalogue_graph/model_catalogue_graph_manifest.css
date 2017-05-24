@@ -1,6 +1,6 @@
-/* Grails Asset Pipeline manifest
-*= require-tree font-awesome-4.7.0
-*= require-tree bootstrap-3.3.7-dist
+/* Grails Asset Pipeline manifest– just use this in the GSP view to load all required styling
+*= require font-awesome-4.7.0/css/font-awesome.min.css
+*= require bootstrap-3.3.7-dist/css/bootstrap.css
 *= require style.css
 *= require jquery.qtip.min.css
 */
