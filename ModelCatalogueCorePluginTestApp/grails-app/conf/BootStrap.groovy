@@ -70,6 +70,7 @@ class BootStrap {
             userService.inviteAdmins()
         }
 
+
         //register custom json Marshallers
         //ctx.domainModellerService.modelDomains()
         grailsApplication.mainContext.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()

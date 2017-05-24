@@ -302,7 +302,7 @@ class DataArchitectService {
         duplicateModelsSuggestions.each { destId, sources ->
             DataClass model = DataClass.get(destId)
             Batch batch = Batch.findOrSaveByName("Create Synonyms for Data Class '$model.name'")
-            RelationshipType type = RelationshipType.readByName("synonym")
+            RelationshipType type = RelationshipType.readByName("relatedTo")
             sources.each { srcId ->
                 Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.DataClass:$srcId", destination: "gorm://org.modelcatalogue.core.DataClass:$destId", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
                 if (action.hasErrors()) {
@@ -336,7 +336,7 @@ class DataArchitectService {
 
         Batch.findAllByNameIlike("Suggested DataElement and Type Synonyms for '${dataModelA}' and '${dataModelB}'").each reset
 
-        def matchingDataElements = elementService.findDuplicateEnumerationsSuggestions(120,68111)
+        def matchingDataElements = elementService.findDuplicateEnumerationsSuggestions(68111, 120)
         matchingDataElements.each{
             println it
         }
@@ -398,7 +398,7 @@ class DataArchitectService {
         matchingDataElements.each { first, other ->
             DataElement dataElement = DataElement.get(first)
             Batch batch = Batch.findOrSaveByName("Suggested DataElement and Type Synonyms for '${dataModelA}' and '${dataModelB}'")
-            RelationshipType type = RelationshipType.readByName("synonym")
+            RelationshipType type = RelationshipType.readByName("relatedTo")
             other.each { otherId ->
                 Map<String, String> params = new HashMap<String,String>()
                 params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$otherId""")
@@ -445,8 +445,8 @@ class DataArchitectService {
      *
      */
     private void generateDataElementSuggestionsFuzzy(){
-        String dataModelA = "NHS Data Dictionary"
-        String dataModelB = "Cancer Outcomes and Services Dataset"
+        String dataModelA = "Cancer Outcomes and Services Dataset"
+        String dataModelB =  "NHS Data Dictionary"
         Map<Long, Set<Long>> fuzzyMatchingDataElements = elementService.findFuzzyDuplicateDataElementSuggestions(dataModelA,dataModelB )
         fuzzyMatchingDataElements.each{
             println it

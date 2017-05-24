@@ -166,7 +166,8 @@ class GridReportXlsxExporter  {
 
     void printDataElement(RowDefinition rowDefinition, Relationship dataElementRelationship) {
         DataElement dataElement = dataElementRelationship.destination
-        Collection<Relationship> relatedTo = dataElement.getRelationshipsByType(RelationshipType.synonymType)
+        Collection<Relationship> relatedTo = dataElement.getRelationshipsByType(RelationshipType.relatedToType)
+        if(relatedTo.empty) relatedTo = dataElement?.dataType.getRelationshipsByType(RelationshipType.relatedToType)
         rowDefinition.with {
             cell(depth + 1) {
                 value dataElement.name
@@ -187,7 +188,7 @@ class GridReportXlsxExporter  {
 //                    wrap text
 //                }
 //            }
-            if(relatedTo){
+            if(relatedTo && relatedTo.head()?.destination?.dataModel?.id == 68111){
                 cell{
                     value "MATCHED"
                 }
@@ -203,17 +204,17 @@ class GridReportXlsxExporter  {
     }
 
     void printMatches(RowDefinition rowDefinition, Relationship dataElementRelationship) {
-        DataElement dataElement = dataElementRelationship.destination
+        CatalogueElement element = dataElementRelationship.destination
         rowDefinition.with {
             cell(depth + 3) {
                 value "${dataElementRelationship.ext.get("match") ?: 'NA'}"
             }
             cell {
-                value "$dataElement.name ($dataElement.dataModel.name)"
-                link to url "${dataElement.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataElement.defaultModelCatalogueId}"
+                value "$element.name ($element.dataModel.name)"
+                link to url "${element.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + element.defaultModelCatalogueId}"
             }
             cell {
-                value "${dataElementRelationship.ext.get("matched_on") ?: 'MANUAL'}"
+                value "${dataElementRelationship.ext.get("matchOn") ?: 'MANUAL'}"
             }
 
 //            cell {
