@@ -2,10 +2,9 @@
 
 == Database
 
-Model Catalogue is currently tested and deployed against *MySQL* database server with InnoDB
+The Model Catalogue is currently tested and deployed against a *MySQL* database server, which uses InnoDB
 storage engine. The application was tested with versions `5.6.x` and `5.7.x`. The database
-schema is created automatically yet if the database is created automatically following
-indexes are not present but highly recommended:
+schema is created automatically by Grails. It is highly recommended to add the following indexes (for some reason):
 
 [source,SQL]
 ----
@@ -14,32 +13,30 @@ CREATE INDEX change_idx_2 ON `change` (parent_id, system, other_side, changed_id
 CREATE INDEX change_idx_3 ON `change` (author_id, other_side, system, date_created);
 ----
 
-The expected load are lower tens of users so the CPU and memory can be rather small (`db.t2.micro` or `db.t2.micro`
-equivalent). Average database can take consume about 2 GB of disk space.
+The expected load is in the tens of users so the CPU and memory can be rather small (`db.t2.micro` or `db.t2.micro`
+equivalent). An average database can consume about 2 GB of disk space.
 
 Daily backups are expected to enabled for the database.
 
 == Search
 
-Model Catalogue uses *Elasticsearch* server as a search engine. Currently the version `2.3.5` is in use and
-should be compatible to any newer release in `2.3.x` but not with the newer ones. The version
-of the server should correspond the drivers used by the application. The best way to achieve this is to use
+The Model Catalogue uses *Elasticsearch* server as a search engine. Currently version `2.3.5` is in use and
+the Catalogue should be compatible with any `2.3.x` release but there is no guarantee for later releases e.g. `2.4.x`. The version of the Elastic Search server should correspond to the drivers used by the Catalogue application. The best way to achieve this is to use the
 https://hub.docker.com/r/metadata/registry-elasticsearch/[metadata/registry-elasticsearch] Docker image which is
 guaranteed to be synchronized with the main application image https://hub.docker.com/r/metadata/registry/[metadata/registry]
 and expected Elasticsearch settings.
 
-The search indicies can be rebuild from the database yet the docker container should be run with `-v /path/to/es/backup:/usr/share/elasticsearch/data`
-to retain the indicies between the potential container restarts and upgrades.
+The search indices can be rebuilt from the database, but to retain indices between container restarts and upgrades, docker container should be run with `-v [backup-path]:/usr/share/elasticsearch/data`
 
-When the main application is not running on the same docker engine then the port `9300` needs to be published with `-p 9300:9300`.
+If the main Catalogue application and the Elastic Search server are not running on the same Docker engine,, then the port `9300` needs to be published with `-p 9300:9300`.
 
-To achieve the best performance 4 GB of system memory is recommended. You can achieve this by running the container with
-`--memory="4g" -e ES_HEAP_SIZE=2g` parameters.
+To achieve the best performance 4 GB of system memory is recommended. You can achieve this by running the container with the parameters
+`--memory="4g" -e ES_HEAP_SIZE=2g`.
 
 See https://www.elastic.co/blog/how-to-make-a-dockerfile-for-elasticsearch[How to Make a Dockerfile for Elasticsearch] for
 further information.
 
-Here's the summary of recommended `docker run` parameters (the port setting is omited as running within the same engine is recommended):
+Here's the summary of recommended `docker run` parameters (the port setting is omitted as running within the same engine is recommended):
 
 ----
 docker run -d --restart="always" --name=mc-es -v "$PWD/esdata":/usr/share/elasticsearch/data --memory="4g" -e ES_HEAP_SIZE=2g metadata/registry-elasticsearch:2
@@ -47,12 +44,12 @@ docker run -d --restart="always" --name=mc-es -v "$PWD/esdata":/usr/share/elasti
 
 == Application
 
-Model Catalogue is Java web application running on Tomcat 8 and JDK 8. It is distributed as Docker image https://hub.docker.com/r/metadata/registry/[metadata/registry]
+The Model Catalogue is a Java web application running on Tomcat 8 and JDK 8. It is distributed as Docker image https://hub.docker.com/r/metadata/registry/[metadata/registry]
 which contains the application deployed as ROOT application and the link:production.adoc[Model Catalogue configuration file]
-enabled to get important configuration from the environmental variables. You can find reference of all the environmental variables at the end of this section.
+enabled to get important configuration from the environmental variables. You can find reference for all the environmental variables at the end of this section.
 
-The average memory consumption of the application is under 2 GB but some of the processes such as search reindexing or
-some of the reports may require more memory to run. Because of this the recommended memory setting for production environment is 8 GB.
+The average memory consumption of the application is under 2 GB, but some of the processes such as search reindexing or
+producing some of the reports may require more memory to run. Because of this the recommended memory setting for production environment is 8 GB.
 
 CPU consumption is usually low.
 
@@ -63,8 +60,8 @@ Mail server configuration is needed to enable user self-registration and sending
 
 Users can log in with their Google accounts if Google API key and secret is set.
 
-As the number of environmental variable is high the best way how to supply it to the docker command is with environment file `--env-file mc.env`. The file
-contains variable declaration in `ENV_VAR=value` format on each line.
+As the number of environmental variables is high the best way to supply it to the docker command is with an environment file: `--env-file mc.env`. The file
+should contain variable declarations in the format `ENV_VAR=value` on each line.
 
 For most secure communication with the Elasticsearch server run the Elasticsearch container within the same docker engine and link it with `--link mc-es:mc-es`.
 
