@@ -15,7 +15,7 @@ environments {
         url = "jdbc:mysql://localhost:3306/testdb1?autoReconnect=true&useUnicode=yes&characterEncoding=UTF-8"
         username = 'mdradmin'
         password = 'mdradmin123'
-        dbCreate = "create"
+        dbCreate = "update"
         properties {
             maxActive = -1
             minEvictableIdleTimeMillis=1800000

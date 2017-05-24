@@ -7,6 +7,7 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.MatchResult
 import org.modelcatalogue.core.util.lists.ListWithTotal
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.SecuredRuleExecutor
@@ -445,9 +446,10 @@ class DataArchitectService {
      *
      */
     private void generateDataElementSuggestionsFuzzy(){
-        String dataModelA = "Cancer Outcomes and Services Dataset"
-        String dataModelB =  "NHS Data Dictionary"
-        Map<Long, Set<Long>> fuzzyMatchingDataElements = elementService.findFuzzyDuplicateDataElementSuggestions(dataModelA,dataModelB )
+
+        String dataModelA = "NHS Data Dictionary"
+        String dataModelB = "Cancer Outcomes and Services Dataset"
+        List<MatchResult> fuzzyMatchingDataElements = elementService.findFuzzyDuplicateDataElementSuggestions(dataModelA,dataModelB )
         fuzzyMatchingDataElements.each{
             println it
         }
@@ -459,8 +461,8 @@ class DataArchitectService {
                 def dataElementBId = other[0]
                 def matchScore = other[1]
                 Map<String, String> params = new HashMap<String,String>()
-                params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$first""")
-                params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$dataElementBId""")
+                params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$matchResult.dataElementAId""")
+                params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$matchResult.dataElementBId""")
                 params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
                 //@todo : This is the match score which still needs to be stored in extension
                 params.put("""matchScore""","""$matchScore""")
