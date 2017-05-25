@@ -2,15 +2,16 @@ window.modelcatalogue.registerModule 'mc.core.forms'
 
 angular.module('mc.core.forms.metadataEditors', [])
 angular.module('mc.core.forms.metadata', [])
+# Angular modules declared in anticipation of the templates
 forms = angular.module('mc.core.forms', ['mc.core.ui.metadataEditors', 'mc.core.forms.actions',
   'mc.core.ui.detailSections', 'mc.core.forms.metadata', 'mc.core.forms.metadataEditors'])
-
+# core/ui/metadataEditors doesn't even exist, it's called metadata-editor
 forms.config ['metadataEditorsProvider', 'detailSectionsProvider', (metadataEditorsProvider, detailSectionsProvider)->
   detailSectionsProvider.register {
     title: 'Form Metadata'
     position: 50
     types: [
-      'dataClass'
+      'dataClass' # this detailSection applies to these types
       'dataElement'
       'dataType'
     ]

@@ -111,6 +111,18 @@ class BootStrap {
 
         reportsRegistry.register {
             creates asset
+            title { "Inventory Report Document" }
+            defaultName { "${it.name} report as MS Excel Document" }
+            depth 3
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.countDeclares() > 0
+            }
+            link controller: 'dataModel', action: 'inventoryDoc', id: true
+        }
+
+        reportsRegistry.register {
+            creates asset
             title { "Inventory Report Spreadsheet" }
             defaultName { "${it.name} report as MS Excel Document" }
             depth 3
@@ -190,14 +202,14 @@ class BootStrap {
 //            link controller: 'genomics', action: 'exportChangeLogDocument', id: true
 //        }
 
-        reportsRegistry.register {
-            creates asset
-            title { "GEL Data Specification Report (Word Doc)" }
-            defaultName { "${it.name} report as MS Word Document" }
-            depth 3
-            type DataModel
-            link controller: 'genomics', action: 'exportGelSpecification', id: true
-        }
+//        reportsRegistry.register {
+//            creates asset
+//            title { "GEL Data Specification Report (Word Doc)" }
+//            defaultName { "${it.name} report as MS Word Document" }
+//            depth 3
+//            type DataModel
+//            link controller: 'genomics', action: 'exportGelSpecification', id: true
+//        }
 
         reportsRegistry.register {
             creates link
@@ -282,26 +294,27 @@ class BootStrap {
             link controller: 'genomics', action: 'exportRareDiseaseEligibilityCsv', id: true
         }
 
-        reportsRegistry.register {
-            creates link
-            title { "Cancer Types (JSON)" }
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
-            }
-            link controller: 'genomics', action: 'exportCancerTypesAsJson', id: true
-        }
 
-        reportsRegistry.register {
-            creates link
-            title { "Cancer Types (CSV)" }
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
-            }
-            link controller: 'genomics', action: 'exportCancerTypesAsCsv', id: true
-        }
-
+// needs work before we can release
+//        reportsRegistry.register {
+//            creates link
+//            title { "Cancer Types (JSON)" }
+//            type DataModel
+//            when { DataModel dataModel ->
+//                dataModel.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
+//            }
+//            link controller: 'genomics', action: 'exportCancerTypesAsJson', id: true
+//        }
+//
+//        reportsRegistry.register {
+//            creates link
+//            title { "Cancer Types (CSV)" }
+//            type DataModel
+//            when { DataModel dataModel ->
+//                dataModel.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
+//            }
+//            link controller: 'genomics', action: 'exportCancerTypesAsCsv', id: true
+//        }
 // needs work before we can release
 //        reportsRegistry.register {
 //            creates link
@@ -322,13 +335,13 @@ class BootStrap {
 //            }
 //            link controller: 'genomics', action: 'exportRareDiseaseEligibilityChangeLogAsXls', id: true
 //        }
-
-        reportsRegistry.register {
-            creates link
-            title { "GEL Data Specification Change Log (Excel)" }
-            type DataModel
-            link controller: 'genomics', action: 'exportDataSpecChangeLogAsXls', id: true
-        }
+//// needs work before we can release
+//        reportsRegistry.register {
+//            creates link
+//            title { "GEL Data Specification Change Log (Excel)" }
+//            type DataModel
+//            link controller: 'genomics', action: 'exportDataSpecChangeLogAsXls', id: true
+//        }
 
         reportsRegistry.register {
             creates link

@@ -1,15 +1,25 @@
 # Technology Stack
-Following listing can help you find the documentation for the tools, frameworks and libraries in use.
+The following listing can help you find the documentation for the tools, frameworks and libraries in use.
 
 ## Dependencies
-Following dependecies are managed automatically if using [Model Catalogue with Docker]((https://github.com/MetadataRegistry/registry/)) (except Discourse)
+The following dependecies are managed automatically if using [Model Catalogue with Docker]((https://github.com/MetadataRegistry/registry/)) (except Discourse)
 * [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 * [Tomcat 8.x](https://tomcat.apache.org/download-80.cgi)
 * [MySQL 5.6+](https://www.mysql.com/)
 * [ElasticSearch 2.0+](https://www.elastic.co/products/elasticsearch) ([additional notes](../../deployment/elasticsearch.md))
 * [Discourse](https://www.discourse.org/) (optional for comments)
 
+James: Vlad has implemented Docker so that we can run the catalogue in containers. The continuous integration setup makes a docker image out of our catalogue. However we (David and I) are not sure about Docker because it is still an experimental/immature technology. It sometimes does strange things on Windows. The containers are opaque to inspection.
+
 ## Frontend
+
+Description of frontend structure by James:
+
+Most of the front end is written in AngularJS. The thing is, Grails and Angular are both MVC frameworks in their own right, with their own dependency injection systems. So combining them is a bit of a nightmare. We use the Grails plugin, "Angular Asset Pipeline Plugin", its author Craig Burke describes an aspect of their combination: "By default the Asset Pipeline plugin will minify all the Javascript files in your project. This breaks the dependency injection used by AngularJS (which relies on specific parameter names)."
+
+The javascripts are contained in grails-app/assets/javascripts. There are two folders in javascripts, templates and modelcatalogue. templates of course holds most of the templates, which are managed by the Angular Template Asset Pipeline Plugin. Each template must have a corresponding angular module. These are declared in modelcatalogue. Within templates we might have a file such as mc/core/forms/ui/infiniteTable.tpl.html; which when loaded into the Angular template cache would be referred to as mc/core/forms/ui/infiniteTable.html
+
+All the templates in mc are required by mc/index, which in turn is required by modelcatalogue/modelcatalogue, which defines a javascript variable, also called modelcatalogue, which is attached to the window. modelcatalogue/modelcatalogue is called by the Grails index view, at grails-app/views/index.gsp. All of its modules are used for the metadataCurator Angular module, which is registered to the main body of the index page. It appears to me that most of the app is in effect a "single-page app", although I am not sure of the details of how Grails controllers invoke this view.
 
 ### Tools
 * [NodeJS](https://nodejs.org/en/) ecosystem (tested with version 0.10.x)

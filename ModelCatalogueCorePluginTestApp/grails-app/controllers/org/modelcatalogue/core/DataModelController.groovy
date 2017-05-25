@@ -5,6 +5,7 @@ import grails.util.GrailsNameUtils
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
+import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -12,6 +13,7 @@ import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.lists.Relationships
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
+import org.springframework.http.HttpStatus
 
 class DataModelController extends AbstractCatalogueElementController<DataModel> {
 
@@ -33,10 +35,37 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
         respond idModelMap // as JSON
     }
 
+    //can be used in the future
+    static final String DOC_IMAGE_PATH = ""
+
+    //custom template is better than the default inventory report - so using it
+    static Closure customTemplate = {
+        'document' font: [family: 'Calibri', size: 11], margin: [left: 20, right: 10]
+        'paragraph.title' font: [color: '#1F497D', size: 32.pt, bold: true], margin: [top: 150.pt, bottom: 10.pt]
+        'paragraph.subtitle' font: [color: '#1F497D', size: 36.pt], margin: [top: 0.pt]
+        'paragraph.description' font: [color: '#13D4CA', size: 16.pt, italic: true], margin: [left: 30, right: 30]
+        'heading1' font: [size: 18, bold: true]
+        'heading2' font: [size: 18, bold: true]
+        'heading3' font: [size: 16, bold: true]
+        'heading4' font: [size: 16, bold: true]
+        'heading5' font: [size: 15]
+        'heading6' font: [size: 14]
+        'table.row.cell.headerCell' font: [color: '#FFFFFF', size: 12.pt, bold: true], background: '#1F497D'
+        'table.row.cell' font: [size: 10.pt]
+        'paragraph.headerImage' height: 1.366.inches, width: 2.646.inches
+    }
+
+
     def inventorySpreadsheet(String name, Integer depth) {
         DataModel dataModel = DataModel.get(params.id)
 
         def dataModelId = dataModel.id
+
+        if (!dataModel) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
         def assetId = assetService.storeReportAsAsset(
                 dataModel,
                 name: name ? name : "${dataModel.name} report as MS Excel Document",
@@ -46,6 +75,31 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
             // reload domain class as this is called in separate thread
             CatalogueElementToXlsxExporter.forDataModel(DataModel.get(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
         }
+
+        response.setHeader("X-Asset-ID", assetId.toString())
+        redirect controller: 'asset', id: assetId, action: 'show'
+    }
+
+    def inventoryDoc(String name, Integer depth) {
+
+        DataModel dataModel = DataModel.get(params.id)
+
+        def modelId = dataModel.id
+
+        if (!dataModel) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+            def assetId =  assetService.storeReportAsAsset(
+                    dataModel,
+                    name: name ? name : "${dataModel.name} report as MS Excel Document",
+                    originalFileName: "${dataModel.name}-${dataModel.status}-${dataModel.version}.docx",
+                    contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            ) { OutputStream out ->
+                new DataModelToDocxExporter(DataModel.get(modelId), dataClassService, elementService, customTemplate, DOC_IMAGE_PATH, depth).export(out)
+            }
+
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
