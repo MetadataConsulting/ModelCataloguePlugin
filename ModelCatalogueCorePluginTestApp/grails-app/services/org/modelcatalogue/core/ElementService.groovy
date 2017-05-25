@@ -539,13 +539,13 @@ class ElementService implements Publisher<CatalogueElement> {
     }
 
 
-    Map<Long, Long> findModelsToBeInlined() {
+    Map<Long, Long> findClassesToBeInlined() {
         if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST]) {
             // does not work with H2 database
             log.warn "Trying to find inlined models in development mode. This feature does not work with H2 database"
             return [:]
         }
-        List<DataClass> models = DataClass.executeQuery("""
+        List<DataClass> dataClasses = DataClass.executeQuery("""
             select m
             from DataClass m left join m.incomingRelationships inc
             group by m.name
@@ -555,9 +555,9 @@ class ElementService implements Publisher<CatalogueElement> {
 
         Map<Long, Long> ret = [:]
 
-        for (DataClass model in models) {
-            if (model.ext.from == 'xs:element') {
-                ret[model.id] = model.isBasedOn[0].id
+        for (DataClass dataClass in dataClasses) {
+            if (dataClass.ext.from == 'xs:element') {
+                ret[dataClass.id] = dataClass.isBasedOn[0].id
             }
         }
 
@@ -570,32 +570,32 @@ class ElementService implements Publisher<CatalogueElement> {
      * elements. If so return their id and the set of ids of similar models.
      * @return map with the model id as key and set of ids of duplicate models as value
      */
-    Map<Long, Set<Long>> findDuplicateModelsSuggestions() {
+    Map<Long, Set<Long>> findDuplicateClassesSuggestions() {
         // TODO: create test
         Object[][] results = DataClass.executeQuery """
-            select m.id, m.name, rel.relationshipType.name,  rel.destination.name
-            from DataClass m join m.outgoingRelationships as rel
+            select class.id, class.name, rel.relationshipType.name,  rel.destination.name
+            from DataClass class join class.outgoingRelationships as rel
             where
-                m.name in (
-                    select model.name from DataClass model
-                    where model.status in :states
-                    group by model.name
-                    having count(model.id) > 1
+                class.name in (
+                    select class2.name from DataClass class2
+                    where class2.status in :states
+                    group by class2.name
+                    having count(class2.id) > 1
                 )
             and
-                m.status in :states
+                class.status in :states
             and
                 rel.archived = false
             and
                 (rel.relationshipType = :containment or rel.relationshipType = :hierarchy)
-            order by m.name asc, m.dateCreated asc, rel.destination.name asc
+            order by class.name asc, class.dateCreated asc, rel.destination.name asc
         """, [states: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.FINALIZED], containment: RelationshipType.readByName('containment'), hierarchy: RelationshipType.readByName('hierarchy')]
 
 
-        Map<Long, Map<String, Object>> models = new LinkedHashMap<Long, Map<String, Object>>().withDefault { [id: it, elementNames: new TreeSet<String>(), childrenNames: new TreeSet<String>()] }
+        Map<Long, Map<String, Object>> classes = new LinkedHashMap<Long, Map<String, Object>>().withDefault { [id: it, elementNames: new TreeSet<String>(), childrenNames: new TreeSet<String>()] }
 
         for (Object[] row in results) {
-            def info = models[row[0] as Long]
+            def info = classes[row[0] as Long]
             info.name = row[1]
             if (row[2] == 'containment') {
                 info.elementNames << row[3].toString()
@@ -611,7 +611,7 @@ class ElementService implements Publisher<CatalogueElement> {
 
         def current = null
 
-        models.each { id, info ->
+        classes.each { id, info ->
             if (!current) {
                 current = info
             } else {

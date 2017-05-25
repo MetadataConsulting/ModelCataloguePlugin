@@ -22,8 +22,8 @@ class DataArchitectService {
     def dataModelService
 
     private Map<String,Runnable> suggestions = [
-            'Inline Models': this.&generateInlineModel,
-            'Merge Models': this.&generateMergeModels,
+            'Inline Classes': this.&generateInlineClass,
+            'Merge Classes': this.&generateMergeClasses,
             'Enum Duplicates and Synonyms': this.&generatePossibleEnumDuplicatesAndSynonyms
     ]
 
@@ -258,12 +258,12 @@ class DataArchitectService {
         }
     }
 
-    private void generateInlineModel() {
+    private void generateInlineClass() {
         Batch.findAllByNameIlike("Inline Data Class '%'").each reset
-        elementService.findModelsToBeInlined().each { sourceId, destId ->
-            DataClass model = DataClass.get(sourceId)
-            Batch batch = Batch.findOrSaveByName("Inline Data Class '$model.name'")
-            batch.description = """Data Class '$model.name' was created from XML Schema element but it is actually used only in one place an can be replaced by its type"""
+        elementService.findClassesToBeInlined().each { sourceId, destId ->
+            DataClass dataClass = DataClass.get(sourceId)
+            Batch batch = Batch.findOrSaveByName("Inline Data Class '$dataClass.name'")
+            batch.description = """Data Class '$dataClass.name' was created from XML Schema element but it is actually used only in one place an can be replaced by its type"""
             Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.DataClass:$sourceId", destination: "gorm://org.modelcatalogue.core.DataClass:$destId"
             if (action.hasErrors()) {
                 log.error(FriendlyErrors.printErrors("Error generating merge data class action", action.errors))
@@ -273,13 +273,13 @@ class DataArchitectService {
         }
     }
 
-    private void generateMergeModels() {
-        def duplicateModelsSuggestions = elementService.findDuplicateModelsSuggestions()
+    private void generateMergeClasses() {
+        def duplicateClassesSuggestions = elementService.findDuplicateClassesSuggestions()
 
         Batch.findAllByNameIlike("Create Synonyms for Data Class '%'").each reset
-        duplicateModelsSuggestions.each { destId, sources ->
-            DataClass model = DataClass.get(destId)
-            Batch batch = Batch.findOrSaveByName("Create Synonyms for Data Class '$model.name'")
+        duplicateClassesSuggestions.each { destId, sources ->
+            DataClass dataClass = DataClass.get(destId)
+            Batch batch = Batch.findOrSaveByName("Create Synonyms for Data Class '$dataClass.name'")
             RelationshipType type = RelationshipType.readByName("synonym")
             sources.each { srcId ->
                 Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.DataClass:$srcId", destination: "gorm://org.modelcatalogue.core.DataClass:$destId", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
@@ -292,9 +292,9 @@ class DataArchitectService {
         }
 
         Batch.findAllByNameIlike("Merge Data Class '%'").each reset
-        duplicateModelsSuggestions.each { destId, sources ->
-            DataClass model = DataClass.get(destId)
-            Batch batch = Batch.findOrSaveByName("Merge Data Class '$model.name'")
+        duplicateClassesSuggestions.each { destId, sources ->
+            DataClass dataClass = DataClass.get(destId)
+            Batch batch = Batch.findOrSaveByName("Merge Data Class '$dataClass.name'")
             sources.each { srcId ->
                 Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.DataClass:$srcId", destination: "gorm://org.modelcatalogue.core.DataClass:$destId"
                 if (action.hasErrors()) {
