@@ -22,9 +22,9 @@ class DataArchitectService {
     def dataModelService
 
     private Map<String,Runnable> suggestions = [
-            'Inline Classes': this.&generateInlineClass,
-            'Merge Classes': this.&generateMergeClasses,
-            'Enum Duplicates and Synonyms': this.&generatePossibleEnumDuplicatesAndSynonyms
+            'Find Classes to Inline': this.&generateInlineClass,
+            'Find Classes to Merge': this.&generateMergeClasses,
+            'Find Duplicate and Synonymous Enumerations': this.&generatePossibleEnumDuplicatesAndSynonyms
     ]
 
     Set<String> getSuggestionsNames() {
