@@ -1,3 +1,4 @@
+###* Defines user actions ###
 angular.module('mc.util.ui.actions', []).provider 'actions', ->
 
   actionsRolesById          = {}

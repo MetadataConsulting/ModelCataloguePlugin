@@ -2,6 +2,8 @@ package org.modelcatalogue.core;
 
 import java.util.Set;
 
+/* For storing metadata
+ */
 public interface Extendible<E extends Extension> {
 
     Set<E> listExtensions();

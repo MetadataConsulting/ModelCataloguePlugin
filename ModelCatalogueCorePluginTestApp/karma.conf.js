@@ -1,4 +1,4 @@
-// an example karma.conf.js
+// an example karma.conf.js. Karma is a JS library for testing
 module.exports = function(config) {
     config.set({
         basePath: '.',

@@ -887,8 +887,9 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        respond new PathFinder().findPath(element)
+        respond new PathFinder().findPath(element) // This is a single method in a single class in a package which seems a bit silly.
     }
+
 
     protected String getHistoryOrderDirection() {
         'desc'

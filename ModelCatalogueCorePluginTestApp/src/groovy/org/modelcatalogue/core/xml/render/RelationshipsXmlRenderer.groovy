@@ -14,6 +14,7 @@ import org.modelcatalogue.core.util.lists.Relationships
 import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 import org.springframework.beans.factory.annotation.Autowired
 
+/** Renders relationships as XML using CatalogueXmlPrinter */
 class RelationshipsXmlRenderer extends AbstractRenderer<Relationships> {
 
     @Autowired DataModelService dataModelService

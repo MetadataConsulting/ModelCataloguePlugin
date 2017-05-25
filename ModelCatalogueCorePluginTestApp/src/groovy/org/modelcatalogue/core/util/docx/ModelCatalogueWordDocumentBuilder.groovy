@@ -3,7 +3,7 @@ package org.modelcatalogue.core.util.docx
 import com.craigburke.document.builder.BasicDocumentPartTypes
 import com.craigburke.document.builder.WordDocumentBuilder
 import com.craigburke.document.core.Document
-
+/** Generates a Word document. Used in a number of places: export.inventory, publishing.changelog, gel.export. */
 class ModelCatalogueWordDocumentBuilder extends WordDocumentBuilder {
 
     ModelCatalogueWordDocumentBuilder(OutputStream outputStream) {

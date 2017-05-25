@@ -6,10 +6,17 @@ import org.modelcatalogue.core.Relationship
 
 class Inheritance {
 
+
+    // baseType is children -> parents.
+    // withAllParents and withAllChildren recursively find parents/children and call "withElementAndRelationship" on each of them.
+    // withParents and withChildren only go one level up or down.
+
     static void withAllParents(CatalogueElement element, Set<CatalogueElement> processed = new HashSet<CatalogueElement>([element]),  @DelegatesTo(CatalogueElement) Closure closure) {
+        // stop if element is null...
         if (element == null) {
             return
         }
+        // ... or if it has no parents
         if (!element.countOutgoingRelationshipsByType(RelationshipType.baseType)) {
             return
         }
@@ -63,6 +70,9 @@ class Inheritance {
             withElementAndRelationship(closure, relationship.source, relationship)
         }
     }
+
+    // apply a cloned version of closure to either to (element, relationship) or just element, depending on number of arguments,
+    // with the delegate set to element.
 
     private static void withElementAndRelationship(Closure closure, CatalogueElement element, Relationship relationship) {
         if (element == null || relationship == null) {

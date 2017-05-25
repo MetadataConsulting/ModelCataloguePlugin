@@ -24,6 +24,7 @@ import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.test.TestDataHelper
 import org.springframework.http.HttpMethod
 
+/** Nothing to do with Javascript Bootstrap; this is sort of a DSL for (yet more) configuration starting up the app */
 class BootStrap {
 
     def initCatalogueService
@@ -146,6 +147,24 @@ class BootStrap {
             title { "Export to Catalogue XML" }
             link { CatalogueElement element ->
                 [url: element.getDefaultModelCatalogueId(false) + '?format=xml']
+            }
+        }
+
+        reportsRegistry.register {
+            creates link
+            type DataModel, DataClass, DataElement
+            title { "Export to Cytoscape JSON" }
+            link { CatalogueElement element ->
+                [url: element.getDefaultModelCatalogueId(false) + '/cytoscapeJsonExport']
+            }
+        }
+        reportsRegistry.register {
+            creates link
+            type DataModel
+            title {"View Cytoscape Graph"}
+            link { CatalogueElement element ->
+                [url: "catalogue/cytoscapeGraphView?resource=dataModel&id=${element.getLatestVersionId()}"]
+
             }
         }
 

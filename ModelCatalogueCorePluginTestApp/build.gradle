@@ -3,11 +3,13 @@ import com.bmuschko.gradle.docker.tasks.container.*
 import com.bmuschko.gradle.docker.tasks.image.*
 import com.bmuschko.gradle.docker.tasks.*
 
+
 plugins {
-    id "com.moowork.node" version "1.1.1"
+    id "com.moowork.node" version "1.1.1" // Allows to use Node without installing local version
     id "com.bmuschko.docker-remote-api" version "3.0.6"
 }
 
+// configuration of node plugin:
 node {
     // Version of node to use.
     version = '5.12.0'
@@ -18,6 +20,7 @@ node {
     download = true
 }
 
+// configuration of docker plugin:
 docker {
     if (System.getenv('DOCKER_HOST'))  {
         url = System.getenv('DOCKER_HOST')
@@ -29,7 +32,10 @@ docker {
 
 String host = dockerHost
 
+/// Node tasks:
+
 task npmCacheConfig(type: NpmTask, dependsOn: nodeSetup) {
+    group = 'Node'
     description = "Configure the NPM cache"
     def npmCacheDir = "${gradle.getGradleUserHomeDir()}/caches/npm"
     outputs.files file(npmCacheDir)
@@ -37,6 +43,7 @@ task npmCacheConfig(type: NpmTask, dependsOn: nodeSetup) {
 }
 
 task npmPackages(type: NpmTask, dependsOn: npmCacheConfig) {
+    group = 'Node'
     description = "Install Node.js packages"
     args = [ 'install' ]
     // inputs.files file('package.json')
@@ -44,6 +51,7 @@ task npmPackages(type: NpmTask, dependsOn: npmCacheConfig) {
 }
 
 task bowerInstall(type: NodeTask) {
+    group = 'Node'
     description = "Resolves Bower dependencies"
     script = file('node_modules/bower/bin/bower')
     args = ["--config.storage.cache=${gradle.getGradleUserHomeDir()}/caches/bower/cache",
@@ -56,6 +64,7 @@ task bowerInstall(type: NodeTask) {
 }
 
 task cleanUpBowerDependencies(type: Delete) {
+    group = 'Clean'
     delete 'grails-app/assets/bower_components/ace-builds/demo'
     delete 'grails-app/assets/bower_components/ace-builds/src'
     delete 'grails-app/assets/bower_components/ace-builds/src-min'
@@ -67,83 +76,10 @@ task cleanUpBowerDependencies(type: Delete) {
     delete 'grails-app/assets/bower_components/sly-repeat/scripts'
     delete 'grails-app/assets/bower_components/sly-repeat/src'
 }
-
-task cleanIdeaFiles(type: Delete) {
-    delete '**/.idea'
-    delete '**/*.iml'
-}
-
-task cleanData(type: Delete) {
-    Properties properties = new Properties()
-    properties.load(file('application.properties').newInputStream())
-    delete "${System.getProperty('java.io.tmpdir')}/ModelCatalogueCorePluginTestApp/${properties['app.version']}"
-}
+bowerInstall.finalizedBy cleanUpBowerDependencies
 
 
-task cleanGrailsFolders(type: Delete) {
-    Properties properties = new Properties()
-    properties.load(file('application.properties').newInputStream())
-    delete 'target'
-    delete 'target-eclipse'
-    delete '**/*.gen.fixture.js'
-    delete '**/*.gen.fixture.coffee'
-    delete "${System.getProperty('user.home')}/.grails/${properties['app.grails.version']}/ModelCatalogueCorePluginTestApp"
-}
-
-task cleanGrails(type: Exec, dependsOn: cleanGrailsFolders) {
-    commandLine grailsw, 'clean-all', '--stacktrace', '--non-interactive'
-
-}
-
-task refreshGrailsDependencies(type: Exec) {
-    commandLine grailsw, 'refresh-dependencies', '--stacktrace', '--non-interactive'
-    mustRunAfter cleanGrails
-}
-
-task cleanAll(type: Delete, dependsOn: [cleanData, cleanGrails, refreshGrailsDependencies]) {
-    delete '../build'
-}
-
-task runDev(type: Exec, dependsOn: bowerInstall) {
-    description = "Run MX in development environment"
-
-    assertJava8()
-    environment 'GRAILS_OPTS', "-Xmx1G -Xms512m -XX:MaxPermSize=512m -server"
-
-    def cmds = [grailsw]
-
-    if (project.hasProperty('mc.blank')) {
-        environment 'MC_BLANK_DEV', "true"
-    }
-
-    if (project.hasProperty('mc.war')) {
-        cmds << 'run-war'
-    } else {
-        cmds << 'run-app'
-    }
-
-    if (project.hasProperty('mc.debug')) {
-        cmds << '--debug-fork'
-    }
-
-    cmds << '--non-interactive'
-
-    commandLine cmds
-    mustRunAfter 'stop'
-}
-
-task ensureProductionConfig(type: Copy) {
-    description = "Ensures configuration for MX production environment exists"
-    onlyIf {
-        !new File(new File(System.getProperty('user.home'), '.grails'), 'mc-config.groovy').exists()
-    }
-    from('../conf/docker') {
-        include 'mc-config.groovy'
-    }
-    into "${System.getProperty('user.home')}/.grails"
-}
-
-
+/// Docker tasks
 
 // -- Docker MySQL
 task pullMySQLImage(type: DockerPullImage) {
@@ -315,14 +251,106 @@ task stopMailHogContainer(type: DockerStopContainer) {
 }
 
 task startContainers(dependsOn: [startElasticsearchContainer, startMySQLContainer, startMailHogContainer]) {
+    group = 'Docker'
     description "Starts all containers required for running production environment"
 }
 
 task stopContainers(dependsOn: [stopElasticsearchContainer, stopMySQLContainer, stopMailHogContainer]) {
+    group = 'Docker'
     description "Stops all containers required for running production environment"
 }
 
+
+/// Clean tasks:
+
+task cleanIdeaFiles(type: Delete) {
+    group = 'Clean'
+    delete '**/.idea'
+    delete '**/*.iml'
+}
+
+task cleanData(type: Delete) {
+    group = 'Clean'
+    Properties properties = new Properties()
+    properties.load(file('application.properties').newInputStream())
+    delete "${System.getProperty('java.io.tmpdir')}/ModelCatalogueCorePluginTestApp/${properties['app.version']}"
+}
+
+
+task cleanGrailsFolders(type: Delete) {
+    group = 'Clean'
+    Properties properties = new Properties()
+    properties.load(file('application.properties').newInputStream())
+    delete 'target'
+    delete 'target-eclipse'
+    delete '**/*.gen.fixture.js'
+    delete '**/*.gen.fixture.coffee'
+    delete "${System.getProperty('user.home')}/.grails/${properties['app.grails.version']}/ModelCatalogueCorePluginTestApp"
+}
+
+task cleanGrails(type: Exec, dependsOn: cleanGrailsFolders) {
+    group = 'Clean'
+    commandLine grailsw, 'clean-all', '--stacktrace', '--non-interactive'
+
+}
+
+task refreshGrailsDependencies(type: Exec) {
+    group = 'Clean'
+    commandLine grailsw, 'refresh-dependencies', '--stacktrace', '--non-interactive'
+    mustRunAfter cleanGrails
+}
+
+task cleanAll(type: Delete, dependsOn: [cleanData, cleanGrails, refreshGrailsDependencies]) {
+    group = 'Clean'
+    delete '../build'
+}
+
+
+/// Run tasks
+
+task runDev(type: Exec, dependsOn: bowerInstall) {
+    group = 'Run'
+    description = "Run MX in development environment"
+
+    assertJava8()
+    environment 'GRAILS_OPTS', "-Xmx1G -Xms512m -XX:MaxPermSize=512m -server"
+
+    def cmds = [grailsw]
+
+    if (project.hasProperty('mc.blank')) {
+        environment 'MC_BLANK_DEV', "true"
+    }
+
+    if (project.hasProperty('mc.war')) {
+        cmds << 'run-war'
+    } else {
+        cmds << 'run-app'
+    }
+
+    if (project.hasProperty('mc.debug')) {
+        cmds << '--debug-fork'
+    }
+
+    cmds << '--non-interactive'
+
+    commandLine cmds
+    mustRunAfter 'stop'
+}
+
+task ensureProductionConfig(type: Copy) {
+    group = 'Run'
+    description = "Ensures configuration for MX production environment exists"
+    onlyIf {
+        !new File(new File(System.getProperty('user.home'), '.grails'), 'mc-config.groovy').exists()
+    }
+    from('../conf/docker') {
+        include 'mc-config.groovy'
+    }
+    into "${System.getProperty('user.home')}/.grails"
+}
+
 task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, startContainers]) {
+    group = 'Run'
     description = "Run MX in production environment"
 
     assertJava8()
@@ -367,7 +395,20 @@ task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, start
     mustRunAfter 'stop'
 }
 
+
+task stop(type: Exec) {
+    group = 'Run'
+    description = "Stops running MX application"
+    commandLine grailsw, 'stop-app','--non-interactive'
+}
+
+task restartDev(dependsOn: [stop, runDev]) {
+    group = 'Run'
+    description = "Restart development mode"
+}
+
 task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initTestDatabaseInMYSQLContainer]) {
+    group = 'Test'
     description = "Run all Grails MX tests"
 
     assertJava8()
@@ -390,6 +431,7 @@ task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initT
 }
 
 task runKarmaTests(type: NodeTask) {
+    group = 'Test'
     description = "Runs Karma tests"
     script = file('node_modules/karma/bin/karma')
     args = [ 'start', '--single-run', '--browsers', 'Firefox']
@@ -401,6 +443,7 @@ task runKarmaTests(type: NodeTask) {
 }
 
 task collectTestReports(type: Copy) {
+    group = 'Test'
     description = "Collects reports from Grails tests"
     from('target') {
         include 'geb-reports/**'
@@ -411,31 +454,25 @@ task collectTestReports(type: Copy) {
     into "${System.getProperty('user.home')}/reports/"
 }
 
-task stop(type: Exec) {
-    description = "Stops running MX application"
-    commandLine grailsw, 'stop-app','--non-interactive'
-}
 
-bowerInstall.finalizedBy cleanUpBowerDependencies
 stop.finalizedBy stopContainers
 
 
 task war(type: Exec, dependsOn: bowerInstall) {
+    group = 'War'
     description = "Build production war of MX application"
     commandLine grailsw, 'war', '--non-interactive'
 }
 
 
 task copyWar(type: Copy) {
+    group = 'War'
+    description = "Copy wars from target to build"
     from 'target', {
         include '*.war'
         rename '.*\\.war', 'mc.war'
     }
     into '../build'
-}
-
-task restartDev(dependsOn: [stop, runDev]) {
-
 }
 
 war.finalizedBy copyWar

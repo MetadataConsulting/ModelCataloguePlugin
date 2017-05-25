@@ -5,71 +5,91 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.HibernateHelper
 
+/** Seems to implement the visitor pattern, using the other <Resource>PrintHelpers for printing an element. */
 abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
 
-    private static <E extends CatalogueElement> CatalogueElementPrintHelper<E> get(Class<E> type) {
-        // TODO: pool helpers as they are stateless
+    /** Get the appropriate helper for writing a CatalogueElement of a particular class.
+     * It seems that these helpers override processElement but not dispatch.
+     * @param type The class or type of the CatalogueElement to be written.
+     * @return The appropriate helper to write the CatalogueElement. */
+    private static <E extends CatalogueElement> CatalogueElementPrintHelper<E> getHelperForType(Class<E> type) {
+        // Singleton instances of helpers for each type of catalogue element
         if (MeasurementUnit.isAssignableFrom(type)) {
-            return new MeasurementUnitPrintHelper() as CatalogueElementPrintHelper<E>
+            /** Does not recurse. */
+            return MeasurementUnitPrintHelper.instance as CatalogueElementPrintHelper<E>
         }
         if (DataType.isAssignableFrom(type)) {
-            return new DataTypePrintHelper() as CatalogueElementPrintHelper<E>
+            /**
+             * May recurse to MeasurementUnit (as Primitive Type)
+             * or DataClass (as Reference Type)
+             */
+            return DataTypePrintHelper.instance as CatalogueElementPrintHelper<E>
         }
         if (DataElement.isAssignableFrom(type)) {
-            return new DataElementPrintHelper() as CatalogueElementPrintHelper<E>
+            /** May recurse to DataType. */
+            return DataElementPrintHelper.instance as CatalogueElementPrintHelper<E>
         }
         if (DataClass.isAssignableFrom(type)) {
-            return new DataClassPrintHelper() as CatalogueElementPrintHelper<E>
+            /** May recurse to DataClass, DataElement */
+            return DataClassPrintHelper.instance as CatalogueElementPrintHelper<E>
         }
         if (DataModel.isAssignableFrom(type)) {
-            return new DataModelPrintHelper() as CatalogueElementPrintHelper<E>
+            /** May recurse to DataClass, DataElement, DataType, MeasurementUnit. */
+            return DataModelPrintHelper.instance as CatalogueElementPrintHelper<E>
         }
         if (Asset.isAssignableFrom(type)) {
-            return new AssetPrintHelper() as CatalogueElementPrintHelper<E>
+            return AssetPrintHelper.instance as CatalogueElementPrintHelper<E>
         }
         if (ValidationRule.isAssignableFrom(type)) {
-            return new ValidationRulePrintHelper() as CatalogueElementPrintHelper<E>
+            return ValidationRulePrintHelper.instance as CatalogueElementPrintHelper<E>
         }
-        throw new IllegalArgumentException("Not yet implemented for $type")
+        throw new IllegalArgumentException("XMLPrintHelper not yet implemented for $type")
     }
 
-    static void printElement(theMkp, CatalogueElement element, PrintContext context, Relationship rel, String elementName = null) {
-        CatalogueElementPrintHelper helper = get(HibernateHelper.getEntityClass(element))
-        if (!elementName) {
-            elementName = helper.topLevelName
+    /**
+     * dispatch is not overridden by helper subclasses.
+     * Helper subclasses call dispatch to recurse on related elements
+     * e.g. DataModel's processElement calls dispatch on top level DataClasses
+     * @param markupBuilder
+     * @param element
+     * @param context
+     * @param rel The relationship by which this element was found?
+     * @param elementTypeName
+     */
+    static void dispatch(markupBuilder, CatalogueElement element, PrintContext context, Relationship rel, String elementTypeName = null) {
+        // This code is confusing. It has got lots of ifs and returns.
+        CatalogueElementPrintHelper helper = getHelperForType(HibernateHelper.getEntityClass(element))
+        if (!elementTypeName) {
+            elementTypeName = helper.topLevelName
         }
 
-        if (element instanceof DataModel) {
-            if (context.currentDataModel) {
-                theMkp."${elementName}"(ref(element, context, true)) {
-                    processRelationshipMetadata(theMkp, context, rel)
-                }
-                return
-            }
-            context.currentDataModel = element
-            context.typesUsed << 'declaration'
-        }
-
+        /**
+         * The following executes if the element has already been marked as printed,
+         * or if it is outside the model we want to keep inside.
+         */
         if (context.printOnlyReference(element)) {
-            theMkp."${elementName}"(ref(element, context, true)) {
-                processRelationshipMetadata(theMkp, context, rel)
+            markupBuilder."${elementTypeName}"(ref(element, context, true)) {
+                processRelationshipMetadata(markupBuilder, context, rel)
             }
             return
         }
 
-        context.markAsPrinted(element)
+        /**
+         * We mark as printed before printing, which means if the element appears again
+         * "below" itself we will print only a reference.
+         */
+        context.markAsPrinted(element) // Why do we mark as printed *before* processing?
 
-        theMkp."${elementName}"(helper.collectAttributes(element, context)) {
-            helper.processElements(theMkp, element, context, rel)
+        /** This is the main processing/printing of the element, which may be recursive. */        markupBuilder."${elementTypeName}"(helper.collectAttributes(element, context)) {
+            helper.processElement(markupBuilder, element, context, rel)
         }
-
+        /**
+         *  If context.repetitive apparently we still want to mark the element as printed– but only in the above step.
+         */
         if (context.repetitive) {
             context.removeFromPrinted(element)
         }
 
-        if (element instanceof DataModel) {
-            context.currentDataModel = null
-        }
     }
 
 
@@ -101,29 +121,44 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         attrs
     }
 
-    void processElements(theMkp, E element, PrintContext context, Relationship relationship) {
-        processRelationshipMetadata(theMkp, context, relationship)
+    /**
+     * For the CatalogueElementPrintHelper class, processElement is not recursive,
+     * that is it doesn't get to processing other elements via relationships. It prints:
+     * description, BasedOn, RelatedTo, SynonymFor relationships,
+     * metadata extensions, and then the rest of the relationships.
+     *
+     * Helper subclasses call this method by super at the beginning of their overrides.
+     * The overrides may recurse into processing other elements.
+     * @param markupBuilder
+     * @param element
+     * @param context
+     * @param relationship
+     */
+    void processElement(markupBuilder, E element, PrintContext context, Relationship relationship) {
+        processRelationshipMetadata(markupBuilder, context, relationship)
 
         if (element.description) {
-            theMkp.description element.description
+            markupBuilder.description element.description
         }
         for (Relationship rel in element.isBasedOnRelationships) {
-            printBasedOn(theMkp, rel, context)
+            markupBuilder.basedOn(ref(rel.destination, context)) {
+                processRelationshipMetadata(markupBuilder, context, rel)
+            }
         }
         for (Relationship rel in element.relatedToRelationships) {
             CatalogueElement other = rel.source == element ? rel.destination : rel.source
-            theMkp.relatedTo(ref(other, context)) {
-                processRelationshipMetadata(theMkp, context, rel)
+            markupBuilder.relatedTo(ref(other, context)) {
+                processRelationshipMetadata(markupBuilder, context, rel)
             }
         }
         for (Relationship rel in element.isSynonymForRelationships) {
             CatalogueElement other = rel.source == element ? rel.destination : rel.source
-            theMkp.synonym(ref(other, context)){
-                processRelationshipMetadata(theMkp, context, rel)
+            markupBuilder.synonym(ref(other, context)){
+                processRelationshipMetadata(markupBuilder, context, rel)
             }
         }
         if (element.ext) {
-            theMkp.extensions {
+            markupBuilder.extensions {
                 for (Map.Entry<String, String> entry in element.ext.entrySet()) {
                     extension(key: entry.key, entry.value)
                 }
@@ -134,45 +169,46 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         List<Relationship> incoming = restOfRelationships(Relationship.where { destination == element  && relationshipType.system != true}).list()
 
         if (outgoing || incoming) {
-            theMkp.relationships {
+            markupBuilder.relationships {
                 for (Relationship rel in outgoing){
                     to(relationshipAttrs(rel, true, context)) {
-                        processRelationshipMetadata(theMkp, context, rel)
+                        processRelationshipMetadata(markupBuilder, context, rel)
                     }
                 }
 
                 for (Relationship rel in incoming){
                     from(relationshipAttrs(rel, false, context)) {
-                        processRelationshipMetadata(theMkp, context, rel)
+                        processRelationshipMetadata(markupBuilder, context, rel)
                     }
                 }
             }
         }
     }
+    // removed isBasedOn method since it is only used once
 
-    protected void printBasedOn(theMkp, Relationship rel, PrintContext context) {
-        theMkp.basedOn(ref(rel.destination, context)) {
-            processRelationshipMetadata(theMkp, context, rel)
-        }
-    }
-
-    static void processRelationshipMetadata(theMkp, PrintContext context, Relationship rel) {
+    /**
+     * Write the metadata for the relationship rel to markupBuilder.
+     * @param markupBuilder
+     * @param context
+     * @param rel
+     */
+    static void processRelationshipMetadata(markupBuilder, PrintContext context, Relationship rel) {
         if (!rel) {
             return
         }
-        context.typesUsed << rel.relationshipType.name
+        context.relationshipTypesUsed << rel.relationshipType.name
         if (rel.ext) {
-            theMkp.metadata {
+            markupBuilder.metadata {
                 for (Map.Entry<String, String> entry in rel.ext.entrySet()) {
                     extension(key: entry.key, entry.value)
                 }
             }
         }
         if (rel.archived) {
-            theMkp.archived true
+            markupBuilder.archived true
         }
         if (rel.inherited) {
-            theMkp.inherited true
+            markupBuilder.inherited true
         }
     }
 
@@ -183,31 +219,30 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         criteria.'eq' 'archived', false
     }
 
+    /** Returns a map used for XML attributes which describe references to (way of identifying) an element. */
     static Map<String, Object> ref(CatalogueElement element, PrintContext context, boolean includeDefaultId = false) {
         if (element.hasModelCatalogueId()) {
-            if (context.noHref) {
-                return [ref: element.modelCatalogueId]
-            }
-            return [ref: element.modelCatalogueId, href: element.getDefaultModelCatalogueId(!context.idIncludeVersion)]
+            return context.noHref ?
+                [ref:element.modelCatalogueId]
+                : [ref: element.modelCatalogueId,
+                   href: element.getDefaultModelCatalogueId(!context.idIncludeVersion)]
         }
 
-        if (element.dataModel) {
+        else if (element.dataModel) {
+            def map = [name: element.name]
+            if (context.currentDataModel != element.dataModel) {
+                map['dataModel'] = element.dataModel.name
+            }
             if (includeDefaultId) {
-                if (context.currentDataModel == element.dataModel) {
-                    return [name: element.name, id: element.getDefaultModelCatalogueId(context.idIncludeVersion)]
-                } else {
-                    return [name: element.name, dataModel: element.dataModel.name, id: element.getDefaultModelCatalogueId(context.idIncludeVersion)]
-                }
+                map ['id']= element.getDefaultModelCatalogueId(!context.idIncludeVersion)
             }
-            if (context.currentDataModel == element.dataModel) {
-                return [name: element.name]
-            } else {
-                return [name: element.name, dataModel: element.dataModel.name]
-            }
+            return map
         }
 
+        else {
+            return [ref: element.getDefaultModelCatalogueId(!context.idIncludeVersion)]
+        }
 
-        return [ref: element.getDefaultModelCatalogueId(!context.idIncludeVersion)]
     }
 
     static Map<String, Object> relationshipAttrs(Relationship relationship, boolean outgoing, PrintContext context) {
