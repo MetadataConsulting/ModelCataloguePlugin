@@ -19,6 +19,8 @@ class ValidationRuleCJPrintHelper extends CatalogueElementCJPrintHelper<Validati
                       boolean recursively = true) {
 
         super.printElement(validationRule, context, this.typeName, relationship, recursively)
+        // The following comment block is code from the XML Printer. It should be adapted for JSON printing.
+        // TODO: adapt rule fields for JSON printing.
         /*
         if (rule.component) {
             markupBuilder.component rule.component

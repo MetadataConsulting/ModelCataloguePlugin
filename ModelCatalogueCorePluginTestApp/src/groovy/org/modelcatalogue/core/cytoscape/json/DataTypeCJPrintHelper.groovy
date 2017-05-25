@@ -22,6 +22,8 @@ class DataTypeCJPrintHelper extends CatalogueElementCJPrintHelper<DataType> {
                       boolean recursively = true) {
 
         super.printElement(dataType, context, this.typeName, relationship, recursively)
+        // The following block comes from the XML printer and should be adapted for JSON printing.
+        // TODO: Adapt printing of dataType.regexDef, dataType.rule, and a big one: dataType.enumerations
         /*if (dataType.regexDef) {
             markupBuilder.regex dataType.regexDef
         } else if (dataType.rule) {
