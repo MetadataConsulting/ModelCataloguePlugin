@@ -6,6 +6,9 @@ import groovy.json.JsonSlurper
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsClass
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse
+import org.elasticsearch.action.admin.indices.get.GetIndexRequest
 import org.elasticsearch.action.bulk.BulkItemResponse
 import org.elasticsearch.action.bulk.BulkRequestBuilder
 import org.elasticsearch.action.bulk.BulkResponse
@@ -13,6 +16,8 @@ import org.elasticsearch.action.search.SearchRequestBuilder
 import org.elasticsearch.action.support.IndicesOptions
 import org.elasticsearch.client.Client
 import org.elasticsearch.client.transport.TransportClient
+import org.elasticsearch.cluster.metadata.IndexMetaData
+import org.elasticsearch.common.collect.ImmutableOpenMap
 import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.common.transport.InetSocketTransportAddress
 import org.elasticsearch.common.util.concurrent.EsRejectedExecutionException
@@ -432,7 +437,27 @@ class ElasticSearchService implements SearchCatalogue {
 
     @Override
     Observable<Boolean> reindex(boolean soft) {
+
+        println("test")
+
+        def indexList = client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().concreteAllIndices()
+
+        for (String index : indexList) {
+            if (index.contains("mc")) {
+                IndicesExistsResponse res = client.admin().indices().prepareExists(index).execute().actionGet();
+                if (res.isExists()) {
+                    DeleteIndexRequestBuilder delIdx = client.admin().indices().prepareDelete(index);
+                    delIdx.execute().actionGet();
+                }
+            }
+        }
+
         IndexingSession session = IndexingSession.create()
+
+
+
+
+
 
         Observable<Object> elements = rxService.from(DataModel.where{ status != ElementStatus.DEPRECATED }, sort: 'lastUpdated', order: 'desc', true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH
         ) concatWith (

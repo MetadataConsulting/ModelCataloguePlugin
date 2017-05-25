@@ -36,9 +36,8 @@ class CreateMatch extends AbstractActionRunner {
         def matchScore =  parameters?.matchScore
         //If no matchscore then we assume this is being used by the exactMatch routine so insert 100
         if(!matchScore){
-            matchScore = """gorm://org.modelcatalogue.core.RelationshipType:100"""
+            matchScore = """100"""
         }
-        matchScore = matchScore.split(":")
 
 
 
@@ -65,7 +64,7 @@ class CreateMatch extends AbstractActionRunner {
                       </tr>
                       <tr>
                         <td>${srclink}</td>
-                        <td>${matchScore[2]}%</td>
+                        <td>${matchScore}%</td>
                         <td>${destLink}</td>
                       </tr>
                     </table>  """

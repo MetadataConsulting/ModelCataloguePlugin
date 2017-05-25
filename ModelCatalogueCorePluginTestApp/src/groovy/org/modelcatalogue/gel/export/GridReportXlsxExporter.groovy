@@ -68,18 +68,10 @@ class GridReportXlsxExporter  {
                     }
                     cell {
                         value 'Data Element'
-//                        colspan 2
                         width auto
                         style H1
                     }
-//                    cell {
-//                        value 'Data type'
-//                        width auto
-//                    }
-//                    cell {
-//                        value 'Validation Rule'
-//                        width auto
-//                    }
+
                     cell {
                         value 'Matched'
                         width auto
@@ -100,14 +92,7 @@ class GridReportXlsxExporter  {
                         width auto
                         style H1
                     }
-//                    cell {
-//                        value 'Match Type'
-//                        width auto
-//                    }
-//                    cell {
-//                        value 'Match Rule'
-//                        width auto
-//                    }
+
 
                 }
 
@@ -173,21 +158,7 @@ class GridReportXlsxExporter  {
                 value dataElement.name
                 link to url "${dataElement.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataElement.defaultModelCatalogueId}"
             }
-//            cell {
-//                value "${dataElementRelationship.ext[Metadata.MIN_OCCURS] ?: '0'}..${dataElementRelationship.ext[Metadata.MAX_OCCURS] ?: '*'}"
-//            }
-//            cell {
-//                value "${(dataElement?.dataType) ? printDataType(dataElement?.dataType) : ""}"
-//                style {
-//                    wrap text
-//                }
-//            }
-//            cell {
-//                value "${(dataElement?.dataType.rule) ? dataElement?.dataType.rule : ""}"
-//                style {
-//                    wrap text
-//                }
-//            }
+
             if(relatedTo && relatedTo.head()?.destination?.dataModel?.id == 68111){
                 cell{
                     value "MATCHED"
@@ -217,18 +188,6 @@ class GridReportXlsxExporter  {
                 value "${dataElementRelationship.ext.get("matchOn") ?: 'MANUAL'}"
             }
 
-//            cell {
-//                value "${(dataElement?.dataType) ? printDataType(dataElement?.dataType) : ""}"
-//                style {
-//                    wrap text
-//                }
-//            }
-//            cell {
-//                value "${(dataElement?.dataType.rule) ? dataElement?.dataType.rule : ""}"
-//                style {
-//                    wrap text
-//                }
-//            }
         }
     }
 

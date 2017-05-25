@@ -59,16 +59,16 @@ class BootStrap {
 //                System.out.println "Reindexed"
 //            }
 //        } else {
-//            initCatalogueService.initDefaultRelationshipTypes()
+            initCatalogueService.initDefaultRelationshipTypes()
 //            initPoliciesAndTags()
-//            initSecurity(!System.getenv('MC_BLANK_DEV'))
+            initSecurity(!System.getenv('MC_BLANK_DEV'))
 //        }
 //
-//        initCatalogueService.setupStoredProcedures()
-//
-//        if (Environment.current == Environment.PRODUCTION) {
-//            userService.inviteAdmins()
-//        }
+        initCatalogueService.setupStoredProcedures()
+
+        if (Environment.current == Environment.PRODUCTION) {
+            userService.inviteAdmins()
+        }
 
 
         //register custom json Marshallers
