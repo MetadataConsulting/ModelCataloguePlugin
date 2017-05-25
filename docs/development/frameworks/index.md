@@ -1,13 +1,15 @@
 # Technology Stack
-Following listing can help you find the documentation for the tools, frameworks and libraries in use.
+The following listing can help you find the documentation for the tools, frameworks and libraries in use.
 
 ## Dependencies
-Following dependecies are managed automatically if using [Model Catalogue with Docker]((https://github.com/MetadataRegistry/registry/)) (except Discourse)
+The following dependecies are managed automatically if using [Model Catalogue with Docker]((https://github.com/MetadataRegistry/registry/)) (except Discourse)
 * [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 * [Tomcat 8.x](https://tomcat.apache.org/download-80.cgi)
 * [MySQL 5.6+](https://www.mysql.com/)
 * [ElasticSearch 2.0+](https://www.elastic.co/products/elasticsearch) ([additional notes](../../deployment/elasticsearch.md))
 * [Discourse](https://www.discourse.org/) (optional for comments)
+
+James: Vlad has implemented Docker so that we can run the catalogue in containers. The continuous integration setup makes a docker image out of our catalogue. However we (David and I) are not sure about Docker because it is still an experimental/immature technology. It sometimes does strange things on Windows. The containers are opaque to inspection.
 
 ## Frontend
 
