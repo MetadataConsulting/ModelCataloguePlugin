@@ -98,6 +98,10 @@ class ElasticSearchService implements SearchCatalogue {
     Node node
     Client client
 
+    /*
+    *
+    * */
+
     @PostConstruct
     private void init() {
         if (grailsApplication.config.mc.search.elasticsearch.host || System.getProperty('mc.search.elasticsearch.host')) {
@@ -349,11 +353,24 @@ class ElasticSearchService implements SearchCatalogue {
         return true
     }
 
+    /*
+     * Index for single object rather than set of objects
+     * Returns an observable - should return true if the index is successful, returns false if unsuccessful
+     * */
+
     @Override
     Observable<Boolean> index(Object object) {
         // TODO: investigate why the object can be null
         index IndexingSession.create(), just(object)
     }
+
+
+    /*
+    * Index for multiple object rather than set of objects
+    * Returns an observable - should return true if the index is successful, returns false if unsuccessful
+    * delegates to top
+    * */
+
 
     @Override
     Observable<Boolean> index(Iterable<Object> resource) {
@@ -361,10 +378,62 @@ class ElasticSearchService implements SearchCatalogue {
         index IndexingSession.create(), from(resource)
     }
 
-    Observable<Boolean> index(IndexingSession session, Observable<Object> entities) {
-        toSimpleIndexRequests(session, entities).buffer(3, TimeUnit.SECONDS, ELEMENTS_PER_BATCH).flatMap ({
-            bulkIndex(it)
-        },5) flatMap { bulkResponse ->
+    /*
+    * Index for multiple object rather than set of objects
+    * Returns an observable - should return true if the index is successful, returns false if unsuccessful
+    * delegates to top
+    * */
+
+//    Observable<Boolean> index(IndexingSession session, Observable<Object> entities) {
+//        /*
+//        * need to make this sequential
+//        * */
+//        toSimpleIndexRequests(session, entities).buffer(3, TimeUnit.SECONDS, ELEMENTS_PER_BATCH).flatMap ({
+//            bulkIndex(it)
+//        },5) flatMap { bulkResponse ->
+//            from(bulkResponse.items)
+//        } map { bulkResponseItem ->
+//            if (bulkResponseItem.failure) {
+//                log.warn "Failed to index ${bulkResponseItem.type}:${bulkResponseItem.id} to ${bulkResponseItem.index}"
+//            } else {
+//                log.debug "Indexed ${bulkResponseItem.type}:${bulkResponseItem.id} to ${bulkResponseItem.index}"
+//            }
+//            SimpleIndexResponse.from(bulkResponseItem)
+//        } all {
+//           it.ok
+//        }
+//    }
+
+    //pass the toSimple index request into here
+    //do these one by one in batches so all data models etc.
+
+
+//    Observable<Boolean> index(Observable<SimpleIndexRequest> indexRequests) {
+//        indexRequests.buffer(3, TimeUnit.SECONDS, ELEMENTS_PER_BATCH).flatMap ({
+//            bulkIndex(it)
+//        },5) flatMap { bulkResponse ->
+//            from(bulkResponse.items)
+//        } map { bulkResponseItem ->
+//            if (bulkResponseItem.failure) {
+//                log.warn "Failed to index ${bulkResponseItem.type}:${bulkResponseItem.id} to ${bulkResponseItem.index}"
+//            } else {
+//                log.debug "Indexed ${bulkResponseItem.type}:${bulkResponseItem.id} to ${bulkResponseItem.index}"
+//            }
+//            SimpleIndexResponse.from(bulkResponseItem)
+//        } all {
+//            it.ok
+//        }
+//    }
+
+//NEW METHOD - SEND THE INDEXES IN BATCHES
+    //i.e. [26/05/2017, 09:59:02] Vladimír Oraný: Observable<SimpleIndexRequest> osir = Observable.just(sigleRequest)
+//    [26/05/2017, 09:59:40] Vladimír Oraný: index(osir).toBlocking()
+
+
+
+
+    Observable<Boolean> index(List<SimpleIndexRequest> indexRequests) {
+        bulkIndex(indexRequests).flatMap { bulkResponse ->
             from(bulkResponse.items)
         } map { bulkResponseItem ->
             if (bulkResponseItem.failure) {
@@ -374,9 +443,10 @@ class ElasticSearchService implements SearchCatalogue {
             }
             SimpleIndexResponse.from(bulkResponseItem)
         } all {
-           it.ok
+            it.ok
         }
     }
+
 
     @Override
     Observable<Boolean> unindex(Object object) {
@@ -440,16 +510,13 @@ class ElasticSearchService implements SearchCatalogue {
     @Override
     Observable<Boolean> reindex(boolean soft) {
 
-
-
-
         def indexList = client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().concreteAllIndices()
 
         for (String index : indexList) {
             if (index.contains("mc")) {
                 IndicesExistsResponse res = client.admin().indices().prepareExists(index).execute().actionGet();
                 if (res.isExists()) {
-                    DeleteIndexRequestBuilder delIdx = client.admin().indices().prepareDelete(index);
+                    DeleteIndexRequestBuilder delIdx = client.admin().indices().prepareDelete(index)
                     delIdx.execute().actionGet();
                 }
             }
@@ -457,31 +524,59 @@ class ElasticSearchService implements SearchCatalogue {
 
         IndexingSession session = IndexingSession.create()
 
+//TODO: make this part sequential
+        //index these Data Model take 10 then do some more
+        //[26/05/2017, 09:59:02] Vladimír Oraný: Observable<SimpleIndexRequest> osir = Observable.just(sigleRequest)
+        //[26/05/2017, 09:59:40] Vladimír Oraný: index(osir).toBlocking()
 
-        Observable<Object> elements = rxService.from(DataModel.where{ status != ElementStatus.DEPRECATED }, sort: 'lastUpdated', order: 'desc', true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH
-        ) concatWith (
-            // we still want to index deprecated data models in case of someone wants to search inside these data models
-            // yet the indexing may happen in much slower fashion
-            rxService.from(DataModel.where{ status == ElementStatus.DEPRECATED }, sort: 'lastUpdated', order: 'desc', true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH)
-        ) flatMap {
-            return getDataModelWithDeclaredElements(it)
-        } concatWith (
-            rxService.from(dataModelService.classified(CatalogueElement, DataModelFilter.create(true)), true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH)
-        ) concatWith (
-            rxService.from(RelationshipType.where {})
-        ) concatWith (
-            rxService.from(DataModelPolicy.where {})
+
+        //    toSimpleIndexRequests(session, entities).buffer(3, TimeUnit.SECONDS, ELEMENTS_PER_BATCH).flatMap ({
+//            bulkIndex(it)
+//        }
+
+        Observable<Object> elements = rxService.from(
+                DataModel.where{ status != ElementStatus.DEPRECATED },
+                sort: 'lastUpdated', order: 'desc', true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH
         )
 
-        if (soft) {
-            return  index(session, elements).doOnError {
-                log.error "Exception reindexing catalogue: ${it.getClass()}", it
+
+        elements.eachWithIndex{ el, ind ->
+
+
+            if(ind.mod(25)){
+                index(session, toSimpleIndexRequests(session, elements)).toBlocking().doOnError {
+                    log.error "Exception reindexing catalogue: ${it.getClass()}", it
+                }
+
             }
+
+
         }
 
-        return RxElastic.from(client.admin().indices().prepareDelete("${MC_PREFIX}*")).map { it.acknowledged }.concatWith(index(session, elements)).doOnError {
-            log.error "Exception reindexing catalogue: ${it.getClass()}", it
-        }
+
+//        concatWith (
+//            // we still want to index deprecated data models in case of someone wants to search inside these data models
+//            // yet the indexing may happen in much slower fashion
+//            rxService.from(DataModel.where{ status == ElementStatus.DEPRECATED }, sort: 'lastUpdated', order: 'desc', true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH)
+//        ) flatMap {
+//            return getDataModelWithDeclaredElements(it)
+//        } concatWith (
+//            rxService.from(dataModelService.classified(CatalogueElement, DataModelFilter.create(true)), true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH)
+//        ) concatWith (
+//            rxService.from(RelationshipType.where {})
+//        ) concatWith (
+//            rxService.from(DataModelPolicy.where {})
+//        )
+//
+//        if (soft) {
+//            return  index(session, elements).doOnError {
+//                log.error "Exception reindexing catalogue: ${it.getClass()}", it
+//            }
+//        }
+
+//        return RxElastic.from(client.admin().indices().prepareDelete("${MC_PREFIX}*")).map { it.acknowledged }.concatWith(index(session, elements)).doOnError {
+//            log.error "Exception reindexing catalogue: ${it.getClass()}", it
+//        }
 
     }
 
@@ -561,7 +656,20 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
 
+
+    /*
+    *
+    * Creates the simple index requests i.e. the index that applies to each element and the document that is sent to elasticsearch
+    * see SimpleIndexRequest.groovy, Document.groovy
+    * */
+
+
+    // maybe replace this with a foreach loop
+
     private Observable<SimpleIndexRequest> toSimpleIndexRequests(IndexingSession session, Observable<Object> entities) {
+
+        //group the entities so that you can handle them differently
+
         entities.groupBy {
             // XXX: shouldn't the change in data model trigger reindexing everything in the data model?
             Class clazz = getEntityClass(it)
@@ -582,23 +690,31 @@ class ElasticSearchService implements SearchCatalogue {
             }
             log.warn("Object $it doesn't belong to any group. Entity class resolved as Object")
             return clazz
-        } flatMap ({ group ->
+        } flatMap { group ->
+            //for each group do something
+            //create simpleIndex request for CatalogueElements
+            //TODO: look at buffer and time etc.
+            // still working with Hibernate
             if (group.key == CatalogueElement) {
+                //take elements per batch flatten them and then prepares the simple
                 return group.buffer(ELEMENTS_PER_BATCH).flatMap { elements ->
                     from(elements).concatWith(rxService.from(Relationship.where { (source in elements || destination in elements) && relationshipType.searchable == true }, true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH))
                 }
             }
+            //create simpleIndex request for Relationship
             if (group.key == Relationship) {
                 return group.flatMap { entity -> getRelationshipWithSourceAndDestination(entity as Relationship) }
             }
+            //create simpleIndex request for
             if (group.key in [RelationshipType, DataModelPolicy]) {
                 return group
             }
+            //create simpleIndex request for
             if (group.key == Object) {
                 return Observable.empty()
             }
             return Observable.error(new UnsupportedOperationException("Not Yet Implemented for '$group.key'"))
-        },5 )flatMap ({ entity ->
+        } flatMap { entity ->
             Class clazz = getEntityClass(entity)
             ImmutableSet<String> indices = getIndices(entity)
             ImmutableSet<Class> mappedClasses = ImmutableSet.of(clazz)
@@ -606,7 +722,7 @@ class ElasticSearchService implements SearchCatalogue {
             ensureIndexExists(session, from(indices), mappedClasses).map {
                 new SimpleIndexRequest(indices,  document)
             }
-        },5)
+        }
     }
 
     private Observable<CatalogueElement> getDataModelWithDeclaredElements(DataModel element) {
@@ -618,7 +734,7 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     private Observable<BulkResponse> bulkIndex(List<SimpleIndexRequest> documents) {
-        RxElastic.from { buildBulkIndexRequest(documents) }.flatMap ({
+        RxElastic.from { buildBulkIndexRequest(documents) }.flatMap {
             for (BulkItemResponse response in it.items) {
                 if (response.failed) {
                     if (response.failure.cause instanceof VersionConflictEngineException) {
@@ -629,7 +745,7 @@ class ElasticSearchService implements SearchCatalogue {
                 }
             }
             return just(it)
-        }, 5).retryWhen(RxService.withDelay(RxElastic.DEFAULT_RETRIES, RxElastic.DEFAULT_DELAY, [
+        }.retryWhen(RxService.withDelay(RxElastic.DEFAULT_RETRIES, RxElastic.DEFAULT_DELAY, [
             EsRejectedExecutionException,
             IndexNotFoundException // sometimes by race condition
         ] as Set))
