@@ -95,7 +95,7 @@ class DataClassToDocxExporter {
                 pageBreak()
 
                 for (DataClass dataClass in rootDataClass.parentOf) {
-                    printModel(builder, helper, dataClass, 1)
+                    printDataClass(builder, helper, dataClass, 1)
                 }
 
                 if (helper.usedDataTypes) {
@@ -236,7 +236,7 @@ class DataClassToDocxExporter {
     }
 
 
-    private void printModel(DocumentBuilder builder, DocxSpecificationDataHelper helper, DataClass dataClass, int level) {
+    private void printDataClass(DocumentBuilder builder, DocxSpecificationDataHelper helper, DataClass dataClass, int level) {
         if (level > depth) {
             return
         }
@@ -343,7 +343,7 @@ class DataClassToDocxExporter {
             if (!(dataClass.getId() in processedDataClasses)) {
                 if (dataClass.countParentOf()) {
                     for (DataClass child in dataClass.parentOf) {
-                        printModel(builder, helper, child, level + 1)
+                        printDataClass(builder, helper, child, level + 1)
                     }
                 }
             }
