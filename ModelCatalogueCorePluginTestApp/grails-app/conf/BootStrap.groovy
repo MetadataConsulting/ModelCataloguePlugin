@@ -55,14 +55,16 @@ class BootStrap {
 //                initSecurity(false)
 //                setupStuff()
 //            }
-//            modelCatalogueSearchService.reindex(true).all { it }.toBlocking().subscribe {
-//                System.out.println "Reindexed"
-//            }
+
 //        } else {
             initCatalogueService.initDefaultRelationshipTypes()
 //            initPoliciesAndTags()
             initSecurity(!System.getenv('MC_BLANK_DEV'))
 //        }
+
+        modelCatalogueSearchService.reindex(true).all { it }.toBlocking().subscribe {
+            System.out.println "Reindexed"
+        }
 //
         initCatalogueService.setupStoredProcedures()
 

@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.elasticsearch
 
+import com.amazonaws.services.elastictranscoder.model.TimeSpan
 import com.google.common.collect.ImmutableSet
 import grails.util.GrailsNameUtils
 import groovy.json.JsonSlurper
@@ -45,6 +46,7 @@ import rx.Observable
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
+import java.util.concurrent.TimeUnit
 
 import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 import static rx.Observable.from
@@ -55,8 +57,8 @@ class ElasticSearchService implements SearchCatalogue {
     static transactional = false
 
 
-    private static final int ELEMENTS_PER_BATCH = readFromEnv('MC_ES_ELEMENTS_PER_BATCH', 10)
-    private static final int DELAY_AFTER_BATCH = readFromEnv('MC_ES_DELAY_AFTER_BATCH', 25)
+    private static final int ELEMENTS_PER_BATCH = readFromEnv('MC_ES_ELEMENTS_PER_BATCH', 50)
+    private static final int DELAY_AFTER_BATCH = readFromEnv('MC_ES_DELAY_AFTER_BATCH', 50)
 
     private static int readFromEnv(String envName, int defaultValue) {
         int ret = defaultValue
@@ -360,9 +362,9 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     Observable<Boolean> index(IndexingSession session, Observable<Object> entities) {
-        toSimpleIndexRequests(session, entities).buffer(ELEMENTS_PER_BATCH).flatMap {
+        toSimpleIndexRequests(session, entities).buffer(3, TimeUnit.SECONDS, ELEMENTS_PER_BATCH).flatMap ({
             bulkIndex(it)
-        } flatMap { bulkResponse ->
+        },5) flatMap { bulkResponse ->
             from(bulkResponse.items)
         } map { bulkResponseItem ->
             if (bulkResponseItem.failure) {
@@ -438,7 +440,8 @@ class ElasticSearchService implements SearchCatalogue {
     @Override
     Observable<Boolean> reindex(boolean soft) {
 
-        println("test")
+
+
 
         def indexList = client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().concreteAllIndices()
 
@@ -453,10 +456,6 @@ class ElasticSearchService implements SearchCatalogue {
         }
 
         IndexingSession session = IndexingSession.create()
-
-
-
-
 
 
         Observable<Object> elements = rxService.from(DataModel.where{ status != ElementStatus.DEPRECATED }, sort: 'lastUpdated', order: 'desc', true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH
@@ -583,7 +582,7 @@ class ElasticSearchService implements SearchCatalogue {
             }
             log.warn("Object $it doesn't belong to any group. Entity class resolved as Object")
             return clazz
-        } flatMap { group ->
+        } flatMap ({ group ->
             if (group.key == CatalogueElement) {
                 return group.buffer(ELEMENTS_PER_BATCH).flatMap { elements ->
                     from(elements).concatWith(rxService.from(Relationship.where { (source in elements || destination in elements) && relationshipType.searchable == true }, true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH))
@@ -599,7 +598,7 @@ class ElasticSearchService implements SearchCatalogue {
                 return Observable.empty()
             }
             return Observable.error(new UnsupportedOperationException("Not Yet Implemented for '$group.key'"))
-        } flatMap { entity ->
+        },5 )flatMap ({ entity ->
             Class clazz = getEntityClass(entity)
             ImmutableSet<String> indices = getIndices(entity)
             ImmutableSet<Class> mappedClasses = ImmutableSet.of(clazz)
@@ -607,7 +606,7 @@ class ElasticSearchService implements SearchCatalogue {
             ensureIndexExists(session, from(indices), mappedClasses).map {
                 new SimpleIndexRequest(indices,  document)
             }
-        }
+        },5)
     }
 
     private Observable<CatalogueElement> getDataModelWithDeclaredElements(DataModel element) {
@@ -619,7 +618,7 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     private Observable<BulkResponse> bulkIndex(List<SimpleIndexRequest> documents) {
-        RxElastic.from { buildBulkIndexRequest(documents) }.flatMap {
+        RxElastic.from { buildBulkIndexRequest(documents) }.flatMap ({
             for (BulkItemResponse response in it.items) {
                 if (response.failed) {
                     if (response.failure.cause instanceof VersionConflictEngineException) {
@@ -630,7 +629,7 @@ class ElasticSearchService implements SearchCatalogue {
                 }
             }
             return just(it)
-        }.retryWhen(RxService.withDelay(RxElastic.DEFAULT_RETRIES, RxElastic.DEFAULT_DELAY, [
+        }, 5).retryWhen(RxService.withDelay(RxElastic.DEFAULT_RETRIES, RxElastic.DEFAULT_DELAY, [
             EsRejectedExecutionException,
             IndexNotFoundException // sometimes by race condition
         ] as Set))
@@ -718,13 +717,18 @@ class ElasticSearchService implements SearchCatalogue {
 
         if (Relationship.isAssignableFrom(clazz)) {
             Relationship rel = object as Relationship
-
+            if(!rel.isAttached()) {
+                return ImmutableSet.of()
+            }
             try {
                 return ImmutableSet.builder()
                                    .add(rel.source.dataModel ? getDataModelIndex(rel.source.dataModel, Relationship) : getGlobalIndexName(Relationship))
                                    .add(rel.destination.dataModel ? getDataModelIndex(rel.destination.dataModel, Relationship) : getGlobalIndexName(Relationship))
                                    .build()
             } catch (ObjectNotFoundException ignored) {
+                return ImmutableSet.of()
+            } catch (Error e){
+                println("error $e")
                 return ImmutableSet.of()
             }
         }

@@ -9,7 +9,7 @@ import rx.functions.Func1;
 import java.util.concurrent.Callable;
 
 /**
- * Unility service to simplify working with Rx
+ * Utility service to simplify working with Rx
  */
 public class RxElastic {
     public RxElastic() {}
@@ -27,7 +27,7 @@ public class RxElastic {
         return Observable.create(new ActionRequestBuilderAdapter<Request, Response, RequestBuilder>(requestBuilder));
     }
 
-    /**
+    /**ß
      * Creates new observable from given request builder factory.
      *
      * This guaranties that the builder will be recreated each time exception happens and retry is requested.
