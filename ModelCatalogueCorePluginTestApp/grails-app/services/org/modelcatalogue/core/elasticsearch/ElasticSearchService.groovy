@@ -38,6 +38,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.elasticsearch.rx.RxElastic
 import org.modelcatalogue.core.rx.RxService
+import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -57,7 +58,7 @@ class ElasticSearchService implements SearchCatalogue {
     static transactional = false
 
 
-    private static final int ELEMENTS_PER_BATCH = readFromEnv('MC_ES_ELEMENTS_PER_BATCH', 50)
+    private static final int ELEMENTS_PER_BATCH = readFromEnv('MC_ES_ELEMENTS_PER_BATCH', 30)
     private static final int DELAY_AFTER_BATCH = readFromEnv('MC_ES_DELAY_AFTER_BATCH', 50)
 
     private static int readFromEnv(String envName, int defaultValue) {
@@ -384,25 +385,25 @@ class ElasticSearchService implements SearchCatalogue {
     * delegates to top
     * */
 
-//    Observable<Boolean> index(IndexingSession session, Observable<Object> entities) {
-//        /*
-//        * need to make this sequential
-//        * */
-//        toSimpleIndexRequests(session, entities).buffer(3, TimeUnit.SECONDS, ELEMENTS_PER_BATCH).flatMap ({
-//            bulkIndex(it)
-//        },5) flatMap { bulkResponse ->
-//            from(bulkResponse.items)
-//        } map { bulkResponseItem ->
-//            if (bulkResponseItem.failure) {
-//                log.warn "Failed to index ${bulkResponseItem.type}:${bulkResponseItem.id} to ${bulkResponseItem.index}"
-//            } else {
-//                log.debug "Indexed ${bulkResponseItem.type}:${bulkResponseItem.id} to ${bulkResponseItem.index}"
-//            }
-//            SimpleIndexResponse.from(bulkResponseItem)
-//        } all {
-//           it.ok
-//        }
-//    }
+    Observable<Boolean> index(IndexingSession session, Observable<Object> entities) {
+        /*
+        * need to make this sequential
+        * */
+        toSimpleIndexRequests(session, entities).buffer(3, TimeUnit.SECONDS, ELEMENTS_PER_BATCH).flatMap ({
+            bulkIndex(it)
+        },5) flatMap { bulkResponse ->
+            from(bulkResponse.items)
+        } map { bulkResponseItem ->
+            if (bulkResponseItem.failure) {
+                log.warn "Failed to index ${bulkResponseItem.type}:${bulkResponseItem.id} to ${bulkResponseItem.index}"
+            } else {
+                log.debug "Indexed ${bulkResponseItem.type}:${bulkResponseItem.id} to ${bulkResponseItem.index}"
+            }
+            SimpleIndexResponse.from(bulkResponseItem)
+        } all {
+           it.ok
+        }
+    }
 
     //pass the toSimple index request into here
     //do these one by one in batches so all data models etc.
@@ -534,24 +535,194 @@ class ElasticSearchService implements SearchCatalogue {
 //            bulkIndex(it)
 //        }
 
-        Observable<Object> elements = rxService.from(
-                DataModel.where{ status != ElementStatus.DEPRECATED },
-                sort: 'lastUpdated', order: 'desc', true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH
-        )
+        List<Observable> singleRequests = []
 
-
-        elements.eachWithIndex{ el, ind ->
-
-
-            if(ind.mod(25)){
-                index(session, toSimpleIndexRequests(session, elements)).toBlocking().doOnError {
-                    log.error "Exception reindexing catalogue: ${it.getClass()}", it
-                }
-
+        //index Data Models
+        DataModel.list().eachWithIndex{ DataModel dm, i ->
+            Class clazz = getEntityClass(dm)
+            ImmutableSet<String> indices = getIndices(dm)
+            ImmutableSet<Class> mappedClasses = ImmutableSet.of(clazz)
+            Document document = session.getDocument(dm)
+            ensureIndexExists(session, indices, mappedClasses)
+            singleRequests.add(new SimpleIndexRequest(indices,  document))
+            if(i%ELEMENTS_PER_BATCH==0){
+                def last = index(singleRequests).toBlocking().last()
+                singleRequests.clear()
             }
-
-
         }
+        //Index Data Classes
+
+        DataClass.list().eachWithIndex{ DataClass dm, i ->
+            Class clazz = getEntityClass(dm)
+            ImmutableSet<String> indices = getIndices(dm)
+            ImmutableSet<Class> mappedClasses = ImmutableSet.of(clazz)
+            Document document = session.getDocument(dm)
+            ensureIndexExists(session, indices, mappedClasses)
+            singleRequests.add(new SimpleIndexRequest(indices,  document))
+            if(i%ELEMENTS_PER_BATCH==0){
+                def last = index(singleRequests).toBlocking().last()
+                singleRequests.clear()
+            }
+        }
+
+        //Index Data Classes
+
+        DataElement.list().eachWithIndex{ DataElement dm, i ->
+            Class clazz = getEntityClass(dm)
+            ImmutableSet<String> indices = getIndices(dm)
+            ImmutableSet<Class> mappedClasses = ImmutableSet.of(clazz)
+            Document document = session.getDocument(dm)
+            ensureIndexExists(session, indices, mappedClasses)
+            singleRequests.add(new SimpleIndexRequest(indices,  document))
+            if(i%ELEMENTS_PER_BATCH==0){
+                def last = index(singleRequests).toBlocking().last()
+                singleRequests.clear()
+            }
+        }
+
+        //Index Data Types
+
+        DataType.list().eachWithIndex{ DataType dm, i ->
+            Class clazz = getEntityClass(dm)
+            ImmutableSet<String> indices = getIndices(dm)
+            ImmutableSet<Class> mappedClasses = ImmutableSet.of(clazz)
+            Document document = session.getDocument(dm)
+            ensureIndexExists(session, indices, mappedClasses)
+            singleRequests.add(new SimpleIndexRequest(indices,  document))
+            if(i%ELEMENTS_PER_BATCH==0){
+                def last = index(singleRequests).toBlocking().last()
+                singleRequests.clear()
+            }
+        }
+
+        //Index Measurement Units
+
+        MeasurementUnit.list().eachWithIndex{ MeasurementUnit dm, i ->
+            Class clazz = getEntityClass(dm)
+            ImmutableSet<String> indices = getIndices(dm)
+            ImmutableSet<Class> mappedClasses = ImmutableSet.of(clazz)
+            Document document = session.getDocument(dm)
+            ensureIndexExists(session, indices, mappedClasses)
+            singleRequests.add(new SimpleIndexRequest(indices,  document))
+            if(i%ELEMENTS_PER_BATCH==0){
+                def last = index(singleRequests).toBlocking().last()
+                singleRequests.clear()
+            }
+        }
+
+        //Index Tags
+
+        Tag.list().eachWithIndex{ Tag dm, i ->
+            Class clazz = getEntityClass(dm)
+            ImmutableSet<String> indices = getIndices(dm)
+            ImmutableSet<Class> mappedClasses = ImmutableSet.of(clazz)
+            Document document = session.getDocument(dm)
+            ensureIndexExists(session, indices, mappedClasses)
+            singleRequests.add(new SimpleIndexRequest(indices,  document))
+            if(i%ELEMENTS_PER_BATCH==0){
+                def last = index(singleRequests).toBlocking().last()
+                singleRequests.clear()
+            }
+        }
+
+
+
+        //Index DataModelPolicy
+
+        DataModelPolicy.list().eachWithIndex{ DataModelPolicy dm, i ->
+            Class clazz = getEntityClass(dm)
+            ImmutableSet<String> indices = getIndices(dm)
+            ImmutableSet<Class> mappedClasses = ImmutableSet.of(clazz)
+            Document document = session.getDocument(dm)
+            ensureIndexExists(session, indices, mappedClasses)
+            singleRequests.add(new SimpleIndexRequest(indices,  document))
+            if(i%ELEMENTS_PER_BATCH==0){
+                def last = index(singleRequests).toBlocking().last()
+                singleRequests.clear()
+            }
+        }
+
+
+        //Index Asset
+
+        Asset.list().eachWithIndex{ Asset dm, i ->
+            Class clazz = getEntityClass(dm)
+            ImmutableSet<String> indices = getIndices(dm)
+            ImmutableSet<Class> mappedClasses = ImmutableSet.of(clazz)
+            Document document = session.getDocument(dm)
+            ensureIndexExists(session, indices, mappedClasses)
+            singleRequests.add(new SimpleIndexRequest(indices,  document))
+            if(i%ELEMENTS_PER_BATCH==0){
+                def last = index(singleRequests).toBlocking().last()
+                singleRequests.clear()
+            }
+        }
+
+        //Index RelationshipType
+
+
+//        if (group.key == CatalogueElement) {
+//            //take elements per batch flatten them and then prepares the simple
+//            return group.buffer(ELEMENTS_PER_BATCH).flatMap { elements ->
+//                from(elements).concatWith(rxService.from(Relationship.where { (source in elements || destination in elements) && relationshipType.searchable == true }, true, ELEMENTS_PER_BATCH, DELAY_AFTER_BATCH))
+//            }
+//        }
+//        //create simpleIndex request for Relationship
+//        if (group.key == Relationship) {
+//            return group.flatMap { entity -> getRelationshipWithSourceAndDestination(entity as Relationship) }
+//        }
+
+
+
+        RelationshipType.list().eachWithIndex{ RelationshipType dm, i ->
+            Class clazz = getEntityClass(dm)
+            ImmutableSet<String> indices = getIndices(dm)
+            ImmutableSet<Class> mappedClasses = ImmutableSet.of(clazz)
+            Document document = session.getDocument(dm)
+            ensureIndexExists(session, indices, mappedClasses)
+            singleRequests.add(new SimpleIndexRequest(indices,  document))
+            if(i%ELEMENTS_PER_BATCH==0){
+                def last = index(singleRequests).toBlocking().last()
+                singleRequests.clear()
+            }
+        }
+
+
+        //Index Users
+
+        User.list().eachWithIndex{ User dm, i ->
+            Class clazz = getEntityClass(dm)
+            ImmutableSet<String> indices = getIndices(dm)
+            ImmutableSet<Class> mappedClasses = ImmutableSet.of(clazz)
+            Document document = session.getDocument(dm)
+            ensureIndexExists(session, indices, mappedClasses)
+            singleRequests.add(new SimpleIndexRequest(indices,  document))
+            if(i%ELEMENTS_PER_BATCH==0){
+                def last = index(singleRequests).toBlocking().last()
+                singleRequests.clear()
+            }
+        }
+
+
+        def query = Relationship.where { (relationshipType.searchable == true) }
+        def relationships = query.list()
+
+        relationships.eachWithIndex{ Relationship fav, i ->
+            Class clazz = getEntityClass(fav)
+            ImmutableSet<String> indices = getIndices(fav)
+            ImmutableSet<Class> mappedClasses = ImmutableSet.of(clazz)
+            Document document = session.getDocument(fav)
+            ensureIndexExists(session, indices, mappedClasses)
+            singleRequests.add(new SimpleIndexRequest(indices,  document))
+            if(i%ELEMENTS_PER_BATCH==0){
+                def last = index(singleRequests).toBlocking().last()
+                singleRequests.clear()
+            }
+        }
+
+
+        return Observable.just(true)
+
 
 
 //        concatWith (
@@ -577,6 +748,7 @@ class ElasticSearchService implements SearchCatalogue {
 //        return RxElastic.from(client.admin().indices().prepareDelete("${MC_PREFIX}*")).map { it.acknowledged }.concatWith(index(session, elements)).doOnError {
 //            log.error "Exception reindexing catalogue: ${it.getClass()}", it
 //        }
+
 
     }
 
@@ -778,6 +950,44 @@ class ElasticSearchService implements SearchCatalogue {
             }
         }
     }
+
+
+
+
+    private void ensureIndexExists(IndexingSession session, ImmutableSet<String> indices, Iterable<Class> supportedTypes) {
+
+
+        indices.each{ index ->
+            SimpleIndicesExistsResponse response
+
+            if (session.indexExist(index)) {
+                response = new SimpleIndicesExistsResponse(exists: true, index: index)
+            } else{
+                IndicesExistsResponse it = client.admin().indices().prepareExists(index).execute().actionGet()
+                session.indexExist(index, it.exists)
+                response = new SimpleIndicesExistsResponse(exists: it.exists, index: index)
+            }
+
+
+            if (!response.exists) {
+
+            //Create elastic search builder
+            CreateIndexRequestBuilder request = client.admin()
+                    .indices()
+                    .prepareCreate(response.index)
+
+            //add mappings for index
+            for (Class type in supportedTypes) {
+                request.addMapping(getTypeName(type), getMapping(type, true))
+            }
+
+            //create the index
+            request.execute().actionGet()
+
+            }
+        }
+    }
+
 
     private Observable<String> ensureIndexExists(IndexingSession session, Observable<String> indices, Iterable<Class> supportedTypes) {
         return indexExists(session, indices).flatMap { response ->
