@@ -53,8 +53,8 @@ class CreateMatch extends AbstractActionRunner {
 
         String type = decodeEntity(parameters.type)
 
-        String srclink = """<a href='#/catalogue/${sourceClass}/${sourceId}'> ${sourceName} '${sourceClassName}'</a>"""
-        String destLink = """<a href='#/catalogue/${destClass}/${destId}'> ${destName} '${destClassifiedName}'</a>"""
+        String srclink = """<a target="_blank" href='#/catalogue/${sourceClass}/${sourceId}'> ${sourceName} '${sourceClassName}'</a>"""
+        String destLink = """<a target="_blank" href='#/catalogue/${destClass}/${destId}'> ${destName} '${destClassifiedName}'</a>"""
 
         String desc = """  <table class="table">
                       <tr>

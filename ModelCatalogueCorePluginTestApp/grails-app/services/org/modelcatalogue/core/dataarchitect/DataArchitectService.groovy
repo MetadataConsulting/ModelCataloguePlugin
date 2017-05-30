@@ -336,7 +336,7 @@ class DataArchitectService {
         String dataModelA = "NHS Data Dictionary"
         String dataModelB = "Cancer Outcomes and Services Dataset"
 
-        Batch.findAllByNameIlike("Suggested DataElement and Type Synonyms for '${dataModelA}' and '${dataModelB}'").each reset
+        Batch.findAllByNameIlike("Suggested DataType Synonyms for '${dataModelA}' and '${dataModelB}'").each reset
 
         def matchingDataElements = elementService.findDuplicateEnumerationsSuggestions(68111, 120)
         matchingDataElements.each{
