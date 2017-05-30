@@ -18,6 +18,7 @@ import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.publishing.PublishingContext
+import org.modelcatalogue.core.util.ElasticMatchResult
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.Legacy
@@ -40,6 +41,7 @@ class ElementService implements Publisher<CatalogueElement> {
     def messageSource
     AuditService auditService
     def sessionFactory
+    def elasticSearchService
 
     public static Long MATCH_SCORE_LEVEL_75 = 75
     public static Long MATCH_SCORE_LEVEL_CLOSE = 95
@@ -816,6 +818,50 @@ class ElementService implements Publisher<CatalogueElement> {
                 elementSuggestions.put(ida,idb)
             }
         }
+        return elementSuggestions
+    }
+
+    /**
+     * Return dataElement ids which are very likely to be synonyms using elasticsearch fuzzy matching.
+     * @return map with the enum id as key and set of ids of duplicate enums as value
+     */
+    Set<MatchResult> findFuzzyDataElementSuggestions(String dataModelA, String dataModelB) {
+        Long dataModelIdA = getDataModelId(dataModelA)
+        Long dataModelIdB = getDataModelId(dataModelB)
+        Set<MatchResult> elementSuggestions = []
+        Map searchParams = [:]
+
+        //iterate through the COSD models
+        def elementsToMatch = DataElement.findAllByDataModel(DataModel.get(dataModelIdB))
+
+        elementsToMatch.each{ DataElement de ->
+            //set params map
+            searchParams.dataModel = dataModelIdA
+            searchParams.search = de.name
+            def match = elasticSearchService.fuzzySearch(DataElement, searchParams)
+            match.getItemsWithScore().each{ item, score ->
+                //need to pull this method out
+                if(!de.relatedTo && !de.relatedTo.contains(item)) {
+
+                    def matchResult = new ElasticMatchResult(dataElementA: item, dataElementB: de, matchScore: score)
+                    elementSuggestions.add(matchResult)
+                }else{
+                    println("already put relationship in for $de.name")
+                }
+            }
+        }
+
+
+//        def results =
+//                //getDataElementsInCommon(dataModelIdA,dataModelIdB)
+//        if(results.size() > 0){
+//            results.each{
+//                def dataElementName = it as String
+//                Long ida =getDataElementId(dataElementName,dataModelIdA)
+//                Long idb =getDataElementId(dataElementName,dataModelIdB)
+//                elementSuggestions.put(ida,idb)
+//            }
+//        }
         return elementSuggestions
     }
 

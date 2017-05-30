@@ -6,6 +6,7 @@ import org.hibernate.Criteria;
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.util.ElasticMatchResult
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.MatchResult
 import org.modelcatalogue.core.util.lists.ListWithTotal
@@ -391,9 +392,6 @@ class DataArchitectService {
         String dataModelA = "NHS Data Dictionary"
         String dataModelB = "Cancer Outcomes and Services Dataset"
         def matchingDataElements = elementService.findDuplicateDataElementSuggestions(dataModelA,dataModelB)
-        matchingDataElements.each{
-            println it
-        }
         Batch.findAllByNameIlike("Suggested DataElement Relations for '${dataModelA}' and '${dataModelB}'").each reset
         def matchScore = 100
         matchingDataElements.each { first, other ->
@@ -416,20 +414,6 @@ class DataArchitectService {
             batch.archived = false
             batch.save()
         }
-//        Batch.findAllByNameIlike("Duplicate Candidates of Data Model '{dataModelA}'").each reset
-//
-//        matchingDataElements.each { first, other ->
-//            DataElement dataElement = DataElement.get(first)
-//            Batch batch = Batch.findOrSaveByName("Duplicate Candidates of Data Model '{dataModelA}'")
-//            other.each { otherId ->
-//                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.DataElement:$otherId", destination: "gorm://org.modelcatalogue.core.DataElement:$first"
-//                if (action.hasErrors()) {
-//                    log.error(FriendlyErrors.printErrors("Error generating merge model action", action.errors))
-//                }
-//            }
-//            batch.archived = false
-//            batch.save()
-//        }
 
     }
 
@@ -449,32 +433,54 @@ class DataArchitectService {
 
         String dataModelA = "NHS Data Dictionary"
         String dataModelB = "Cancer Outcomes and Services Dataset"
-        List<MatchResult> fuzzyMatchingDataElements = elementService.findFuzzyDuplicateDataElementSuggestions(dataModelA,dataModelB )
-        fuzzyMatchingDataElements.each{
-            println it
-        }
-        Batch.findAllByNameIlike("Suggested Fuzzy Matches for DataElements in '${dataModelA}' and '${dataModelB}'").each reset
-        fuzzyMatchingDataElements.each { first, other ->
-            Batch batch = Batch.findOrSaveByName("Suggested Fuzzy Matches for DataElements in '${dataModelA}' and '${dataModelB}'")
+        def matchingDataElements = elementService.findFuzzyDataElementSuggestions(dataModelA,dataModelB)
+        Batch.findAllByNameIlike("Suggested Fuzzy DataElement Relations for '${dataModelA}' and '${dataModelB}'").each reset
+        matchingDataElements.each { ElasticMatchResult match ->
+            Batch batch = Batch.findOrSaveByName("Suggested Fuzzy DataElement Relations for '${dataModelA}' and '${dataModelB}'")
             RelationshipType type = RelationshipType.readByName("relatedTo")
-            other.each {
-                def dataElementBId = other[0]
-                def matchScore = other[1]
-                Map<String, String> params = new HashMap<String,String>()
-                params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$matchResult.dataElementAId""")
-                params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$matchResult.dataElementBId""")
-                params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
-                //@todo : This is the match score which still needs to be stored in extension
-                params.put("""matchScore""","""$matchScore""")
-                params.put("""matchOn""","""fuzzyName""")
-                Action action
-                action = actionService.create(params, batch, CreateMatch)
-                if (action.hasErrors()) {
-                    log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
-                }
+            Map<String, String> params = new HashMap<String, String>()
+            params.put("""source""", """gorm://org.modelcatalogue.core.DataElement:$match.dataElementA.id""")
+            params.put("""destination""", """gorm://org.modelcatalogue.core.DataElement:$match.dataElementB.id""")
+            params.put("""type""", """gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
+            params.put("""matchScore""", """${(match.matchScore) ? match.matchScore*100 : 0}""")
+            params.put("""matchOn""", """ElementName""")
+            Action action
+            action = actionService.create(params, batch, CreateMatch)
+            if (action.hasErrors()) {
+                log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
             }
             batch.archived = false
             batch.save()
+        }
+
+//        String dataModelA = "NHS Data Dictionary"
+//        String dataModelB = "Cancer Outcomes and Services Dataset"
+//        List<MatchResult> fuzzyMatchingDataElements = elementService.findFuzzyDuplicateDataElementSuggestions(dataModelA,dataModelB )
+//        fuzzyMatchingDataElements.each{
+//            println it
+//        }
+//        Batch.findAllByNameIlike("Suggested Fuzzy Matches for DataElements in '${dataModelA}' and '${dataModelB}'").each reset
+//        fuzzyMatchingDataElements.each { first, other ->
+//            Batch batch = Batch.findOrSaveByName("Suggested Fuzzy Matches for DataElements in '${dataModelA}' and '${dataModelB}'")
+//            RelationshipType type = RelationshipType.readByName("relatedTo")
+//            other.each {
+//                def dataElementBId = other[0]
+//                def matchScore = other[1]
+//                Map<String, String> params = new HashMap<String,String>()
+//                params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$matchResult.dataElementAId""")
+//                params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$matchResult.dataElementBId""")
+//                params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
+//                //@todo : This is the match score which still needs to be stored in extension
+//                params.put("""matchScore""","""$matchScore""")
+//                params.put("""matchOn""","""fuzzyName""")
+//                Action action
+//                action = actionService.create(params, batch, CreateMatch)
+//                if (action.hasErrors()) {
+//                    log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
+//                }
+//            }
+//            batch.archived = false
+//            batch.save()
         }
 
 //        Batch.findAllByNameIlike("Duplicate Fuzzy Synonyms for Data Model ${dataModelA}").each reset
@@ -491,7 +497,7 @@ class DataArchitectService {
 //            batch.archived = false
 //            batch.save()
 //        }
-    }
+
 
     /**
      * generateDataElementAndTypeSuggestionsFuzzy
@@ -501,3 +507,4 @@ class DataArchitectService {
 
     }
 }
+

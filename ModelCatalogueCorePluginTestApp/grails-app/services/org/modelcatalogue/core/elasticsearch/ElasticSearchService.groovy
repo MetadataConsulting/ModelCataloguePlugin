@@ -26,6 +26,7 @@ import org.elasticsearch.index.IndexNotFoundException
 import org.elasticsearch.index.VersionType
 import org.elasticsearch.index.engine.VersionConflictEngineException
 import org.elasticsearch.index.query.BoolQueryBuilder
+import org.elasticsearch.index.query.FuzzyQueryBuilder
 import org.elasticsearch.index.query.QueryBuilder
 import org.elasticsearch.index.query.QueryBuilders
 import org.elasticsearch.indices.IndexAlreadyExistsException
@@ -312,7 +313,8 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
 
-    public <T> ListWithTotalAndType<T> fuzzySearch(Class<T> resource, Map params) {
+    //not used yet (just using plain old match with auto fuzziness)
+    public <T> ElasticSearchQueryList<T> fuzzySearch(Class<T> resource, Map params) {
         String search = params.search
         QueryBuilder qb
         List<String> indicies
@@ -321,6 +323,7 @@ class ElasticSearchService implements SearchCatalogue {
             indicies = resource == DataModel ? [getGlobalIndexName(DataModel)] : collectDataModelIndicies(params, elementService.collectSubclasses(resource))
 
             BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
+
 
             if (search != '*') {
                 boolQuery.minimumNumberShouldMatch(1)
@@ -377,7 +380,7 @@ class ElasticSearchService implements SearchCatalogue {
                 .setTypes(collectTypes(resource) as String[])
                 .setIndicesOptions(IndicesOptions.lenientExpandOpen())
                 .setQuery(qb)
-
+                .setMinScore(0.2)
 
         return ElasticSearchQueryList.search(params,resource, request)
     }
@@ -1090,7 +1093,13 @@ class ElasticSearchService implements SearchCatalogue {
 
     private DataModelFilter getOverridableDataModelFilter(Map params) {
         if (params.dataModel) {
-            DataModel dataModel = DataModel.get(params.long('dataModel'))
+            Long dataModelId
+            if(params.get('dataModel') instanceof Long){
+                dataModelId = params.get('dataModel')
+            }else{
+                dataModelId = params.long('dataModel')
+            }
+            DataModel dataModel = DataModel.get(dataModelId)
             if (dataModel) {
                 return DataModelFilter.includes(dataModel).withImports()
             }
