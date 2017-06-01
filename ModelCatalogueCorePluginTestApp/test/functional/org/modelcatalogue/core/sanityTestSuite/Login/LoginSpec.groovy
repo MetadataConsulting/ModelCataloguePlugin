@@ -7,17 +7,31 @@ import org.openqa.selenium.WebDriver
 
 class LoginSpec extends AbstractModelCatalogueGebSpec {
 
-    private static final String models ="li#my-models>a"
+    private static final String createButton = 'a#role_data-models_create-data-modelBtn'
+    private static final String adminTag = 'span.fa-cog'
 
     void doLoginAndClickCheckBox (){
        when:
            loginViewer()
 
         then:
-            check models is("My Models")
+            check createButton isMissing()
+    }
+    def"login to model catalogue as a curator"(){
 
+        when:
+        loginCurator()
 
+        then:
+        check adminTag isMissing()
+    }
 
+    def"login to model catalogue as an admin"(){
 
+        when:
+        loginAdmin()
+
+        then:
+        check adminTag isDisplayed()
     }
 }
