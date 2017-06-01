@@ -26,10 +26,10 @@ class RelationshipIsImportedBy extends AbstractModelCatalogueGebSpec{
 
         when:
         loginAdmin()
-        select'TEST 7'
+        select'Test 3'
 
         then:'verify title of the page '
-        check rightSideTitle contains 'TEST 7'
+        check rightSideTitle contains 'Test 3'
     }
     def"navigate to the top menu and select create relationship "(){
 

@@ -2,16 +2,12 @@ package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
-import org.openqa.selenium.Keys
 import static org.modelcatalogue.core.geb.Common.*
 
 
 @Stepwise
 class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
-    private static final String dataModel="a#role_item_catalogue-element-menu-item-link>span:nth-child(3"
-    private static final String businessRule="a#catalogue-element-create-validationRule-menu-item-link>span:nth-child(3)"
-    private static final String  name="input#name"
-    private static final String  title="div.modal-header>h4"
+
     private static final String  component="input#component"
     private static final String  focus="input#ruleFocus"
     private static final String  trigger="input#trigger"
@@ -20,9 +16,13 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
     private static final String  issueRecord="input#issueRecord"
     private static final String  notification="input#notification"
     private static final String  target="input#notificationTarget"
-    private static final String  catologueId="input#modelCatalogueId"
     private static final String  ICON="div.modal-body>form>div:nth-child(5)>span>span"
     private static final String SEARCH="input#value"
+    private static final String modelCatalogue="span.mc-name"
+    private static final String table ="td.col-md-4"
+    private static final String businessRule ="td.col-md-4>span>span>a"
+    private static final String validationRuleButton ="a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
+    private static final String deleteButton ="a#delete-menu-item-link>span:nth-child(3)"
 
 
 
@@ -31,7 +31,7 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         loginAdmin()
-        select'Test 6' select 'Test 6'
+        select'Test 3' select 'Business Rules'
         selectInTree "Business Rules"
 
         then:
@@ -39,31 +39,58 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
     }
      def" Navigate to business rules page"(){
          when:
-              click create
+         click create
          then:
-              check modalHeader is "New Validation Rule"
+         check modalHeader is "New Validation Rule"
      }
     def" fill the form and save business rule"() {
         when:
-             fill nameLabel with "my validation Rule ${System.currentTimeMillis()}"
-             fill component with "component ${System.currentTimeMillis()}"
-             fill focus with "make life better${System.currentTimeMillis()}"
-             click ICON
-             fill SEARCH  with "data" and pick first item
-             fill trigger with "trigger"
-             fill rule  with "my first rule"
-             fill errorCondition  with "this error 12 ${System.currentTimeSeconds()}"
-             fill issueRecord  with "no issue"
-             fill notification with "2 week"
-             fill target with "1 week"
-             fill description with "rare disease"
-             fill modelCatalogueId with "MET -${System.currentTimeSeconds()}"
-             click save
+        fill nameLabel with "my validation Rule ${System.currentTimeMillis()}"
+        fill component with "component ${System.currentTimeMillis()}"
+        fill focus with "make life better${System.currentTimeMillis()}"
+        click ICON
+        fill SEARCH with "data" and pick first item
+        fill trigger with "trigger"
+        fill rule with "my first rule"
+        fill errorCondition with "this error 12 ${System.currentTimeSeconds()}"
+        fill issueRecord with "no issue"
+        fill notification with "2 week"
+        fill target with "1 week"
+        fill description with "rare disease"
+        fill modelCatalogueId with "MET -${System.currentTimeSeconds()}"
+        click save
 
         then:
-             noExceptionThrown()
+        check table contains 'my validation Rule'
 
+    }
+    def"delete the validation rules from the data model "(){
 
+        when:
+        click modelCatalogue
+
+        and:
+        select'Test 3' select 'Business Rules'
+        selectInTree "Business Rules"
+
+        then:
+        check rightSideTitle  contains 'Active Validation Rules'
+
+        when:
+        click businessRule
+
+        and:'navigate to the top menu and click on the validation button'
+        click validationRuleButton
+
+        and:
+        click deleteButton
+
+        and:'confirm the deletion'
+        click modalPrimaryButton
+
+        then:
+        Thread.sleep(2000L)
+        check table gone
 
     }
 

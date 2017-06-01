@@ -3,9 +3,11 @@ package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
 import org.openqa.selenium.Keys
+import spock.lang.Stepwise
+
 import static org.modelcatalogue.core.geb.Common.*
 
-
+@Stepwise
 class CreateDataModelSpec extends AbstractModelCatalogueGebSpec {
     private static final CatalogueAction create = CatalogueAction.runFirst('data-models', 'create-data-model')
     private static final String name = "input#name"
@@ -14,15 +16,16 @@ class CreateDataModelSpec extends AbstractModelCatalogueGebSpec {
     private static final String policies = "input#dataModelPolicy"
     private static final String importData = "input#name"
     private static final String finish = "button#step-finish"
+    private static final String deleteButton = "a#delete-menu-item-link>span:nth-child(3)"
+    private static final String dataModelButton ="a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
 
     def "do create data model"() {
 
         when:
-            // enter username , password
             login curator
 
         then:
-            noExceptionThrown()
+            check create displayed
 
         when:
             // click on create
@@ -53,8 +56,6 @@ class CreateDataModelSpec extends AbstractModelCatalogueGebSpec {
 
 
         then:
-            // please this unique for this data . change string data for your own data or use noexcep
-           // check '#summary' is "Data Model $newModelName created"
              noExceptionThrown()
 
 
@@ -65,10 +66,27 @@ class CreateDataModelSpec extends AbstractModelCatalogueGebSpec {
 
 
         where:
-        newModelName                                | versionElement | catalogue                            | policy   | text
-        "my Test ${System.currentTimeMillis()}"    | "2.1.28${System.currentTimeMillis()}"| "MT-${System.currentTimeMillis()}"   | "c"      | "c"
+        newModelName                | versionElement | catalogue | policy   | text
+        "TESTING_DATA_MODEL"    | "2.1.28"| "MT-234"   | "c"      | "c"
 
+    }
+    def"delete the created data model "(){
 
+        when:
+        refresh browser
+        Thread.sleep(4000L)
+        select 'TESTING_DATA_MODEL'
 
+        and:' navigate to the top menu and click on the data model button'
+        click dataModelButton
+
+        and:'select the delete button'
+        click deleteButton
+
+        and:'confirm'
+        click modalPrimaryButton
+
+        then:
+        noExceptionThrown()
     }
 }

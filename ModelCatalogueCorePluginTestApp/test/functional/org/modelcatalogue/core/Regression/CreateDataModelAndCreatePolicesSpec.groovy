@@ -1,64 +1,75 @@
 package org.modelcatalogue.core.Regression
 
-import geb.spock.GebSpec
+import groovy.transform.NotYetImplemented
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.openqa.selenium.By
-import org.openqa.selenium.WebDriver
+
+import static org.modelcatalogue.core.geb.Common.description
+
 
 class CreateDataModelAndCreatePolicesSpec extends AbstractModelCatalogueGebSpec {
-    private static final String create="a#role_data-models_create-data-modelBtn>span:nth-child(2)"
-    private static final String name="input#name"
-    private static final String version="input#semanticVersion"
-    private static final String catalogueId="input#modelCatalogueId"
-    private static final String policies="input#dataModelPolicy"
-    private static final String moreIcon="span.search-for-more-icon"
-    private static final String uniqueOfKind ="div.list-group>a:nth-child(2)"
-    private static final String createNew="a.create-new-cep-item"
-    private static final String nameP="div.basic-edit-modal-prompt>div>div>div:nth-child(2)>form>div:nth-child(1)>input"
-    private static final String policyText="textarea#policyText"
-    private static final String save ="a#role_modal_modal-save-elementBtn"
-    private static String models  ="My First Test ${System.currentTimeMillis()}"
-    private static String VERSION="2.1.0"
-    private static String  catalogue ="333 ${System.currentTimeMillis()}"
-    private static String mypolicies=" my rule"
-    private static String nameP2   = "My Test ${System.currentTimeMillis()}"
-    private static String POLICYTEXT="SOME POLICY TEXT"
+
+    private static final String create = "a#role_data-models_create-data-modelBtn>span:nth-child(2)"
+    private static final String name = "input#name"
+    private static final String createPolicy = "a.create-new-cep-item"
+    private static final String version = "input#semanticVersion"
+    private static final String catalogueId = "input#modelCatalogueId"
+    private static final String icon = "span.search-for-more-icon"
+    private static final String importedButton = "button#step-imports"
+    private static final String search = "input#dataModelPolicy"
+    private static final String savePolicy = "a#role_modal_modal-save-elementBtn"
+    private static
+    final String allDataElement = "div.basic-edit-modal-prompt>div>div>div:nth-child(2)>form>div:nth-child(2)>p>a:nth-child(4)"
+    private static
+    final String regularExpression = "div.basic-edit-modal-prompt>div>div>div:nth-child(2)>form>div:nth-child(2)>p>a:nth-child(5)"
+    final String policyName = "#name"
+    private static final String finishButton = "button#step-finish"
+    private static String models = "My First Test"
+    private static String VERSION = "0.0.1"
+    private static String catalogue = "MET-89765}"
 
 
-    void addPolicies(){
-        when:
-             // login to model catalogue
-             loginCurator()
+    void addPolicies() {
+
+        when: 'login to model catalogue'
+        loginAdmin()
         then:
-             noExceptionThrown()
+        check create isDisplayed()
 
-        when:
-              // click on create
-               click create
-               // type a name . please change value
-               fill(name)with(models)
-               // type a version
-               fill(version)with(VERSION)
-               // type a id
-               fill(catalogueId)with(catalogue)
-               //click om more icon
-                click moreIcon
-                // selectRelation unique of kind
-               click uniqueOfKind
-               // enter policies
-               fill(policies)with(mypolicies)
-               // Select create new
-              click createNew
-              // type policy name
-              fill(nameP)with(nameP2)
-             // type policy
-              fill(policyText)with(POLICYTEXT)
-               // CLICK ON SAVE
-                click save
+        when: 'click on create and fill form'
+        click create
+        fill name with models
+        fill version with VERSION
 
+        and:
+        fill catalogueId with catalogue
+        fill search with 'tester'
+        click createPolicy
+
+        and: 'create data policy'
+        Thread.sleep(3000L)
+        fill policyName with 'TESTING_POLICY'
+
+        and:
+        click allDataElement
+        click regularExpression
+
+        and:
+        click savePolicy
+
+        and:
+        fill description with 'Testing_policy'
+        click importedButton
+
+        and:
+        click icon
+        Thread.sleep(3000L)
+
+        and:
+        selectInSearch(2)
+        click finishButton
 
         then:
-             noExceptionThrown()
+        noExceptionThrown()
 
 
     }

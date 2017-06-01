@@ -2,11 +2,13 @@ package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
-import static org.modelcatalogue.core.geb.Common.getCurator
+
+import static org.modelcatalogue.core.geb.Common.admin
 import static org.modelcatalogue.core.geb.Common.item
 import static org.modelcatalogue.core.geb.Common.modalHeader
 import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
 import static org.modelcatalogue.core.geb.Common.pick
+import static org.modelcatalogue.core.geb.Common.rightSideTitle
 
 @Stepwise
 class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
@@ -16,12 +18,14 @@ class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
     private static final String   catalogueID = "tr.inf-table-header-row>th:nth-child(1)"
     private static final String    searchField= "input#value"
     private static final String   firstRow ="tr.inf-table-item-row>td:nth-child(1)"
+    private static final String   removeFavourite ="span.fa-star-o"
+    private static final String   favouriteModel ="tr.inf-table-item-row>td:nth-child(2)>a"
     public static final String  greenButton ="#metadataCurator > div.container-fluid.container-main > div > div > div.ng-scope > ui-view > div > div > div > div.inf-table-body > table > tfoot > tr > td > table > tfoot > tr > td.text-center > span"
 
 
     def " login to model catalogue "(){
         when:
-        login curator
+        login admin
 
         then:
         check creates displayed
@@ -45,13 +49,33 @@ class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
 
 
          when:
-         fill searchField with 'c' and pick first item
+         fill searchField with 'Ovarian Cancer (NHIC 0.0.1)' and pick first item
          click modalPrimaryButton
 
          then:
          check firstRow displayed
 
      }
+
+    def" remove favourite data model"(){
+
+        when:
+        click favouriteModel
+
+        then:
+        check rightSideTitle contains 'Ovarian Cancer'
+
+
+        when:
+        click removeFavourite
+
+        and:
+        click user
+        click favouriteButton
+
+        then:
+        check firstRow isGone()
+    }
 
   }
 

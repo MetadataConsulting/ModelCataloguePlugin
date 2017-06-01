@@ -1,50 +1,48 @@
 package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
-import org.openqa.selenium.Keys
+import spock.lang.Ignore
 
 import static org.modelcatalogue.core.geb.Common.getModalCloseButton
+import static org.modelcatalogue.core.geb.Common.item
+import static org.modelcatalogue.core.geb.Common.pick
 
 class SearchMoreOptionPolicySpec extends AbstractModelCatalogueGebSpec{
+
     private static final String create="a#role_data-models_create-data-modelBtn>span:nth-child(2)"
     private static final String name="input#name"
     private static final String policies="input#dataModelPolicy"
-    private static final String searchMore="a.show-more-cep-item"
     private static final String  searchForData="input#value"
     private static final String button_x="div.input-group-addon"
     private static final String exit="button#exit-wizard>span:nth-child(1)"
+    private static final String modelCatalogue="span.mc-name"
     private static String my_name ="first test"
     private static String policyText="tester"
-    private static String  searchData="My new rule"
+    private static String  searchData="TESTING_POLICY"
 
-    def" search option"(){
-
-        when:
-             loginCurator()
-        then:
-             noExceptionThrown()
+    @Ignore
+    def " search option"() {
 
         when:
-             // click on create
-               click create
-              // type a name . please change value
-               fill(name)with(my_name)
-                // TYPE POLICY
-              fill(policies)with(policyText)
-             // selectRelation search more
-               click searchMore
-               fill(searchForData)with(searchData)
-                // click on X
-                click button_x
-               // click on exit
-                click exit
+         loginAdmin()
+        then:
+        check modelCatalogue displayed
+
+        when:'click on create and fill the form'
+        click create
+        fill name with my_name
+        fill policies  with policyText and pick first item
+
+        and:'search for a policy'
+        fill searchForData  with searchData and pick first item
+
+        and:''
+        click button_x
+        click exit
+        click modalCloseButton
 
         then:
-             noExceptionThrown()
-            click modalCloseButton
-
-
-
+        check modelCatalogue displayed
 
 
     }

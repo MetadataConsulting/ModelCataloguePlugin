@@ -3,7 +3,7 @@ package org.modelcatalogue.core.sanityTestSuite.LandingPage
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
 
-import static org.modelcatalogue.core.geb.Common.getAdmin
+import static org.modelcatalogue.core.geb.Common.curator
 import static org.modelcatalogue.core.geb.Common.rightSideTitle
 
 @Stepwise
@@ -18,8 +18,8 @@ class EditDataElementSpec extends AbstractModelCatalogueGebSpec {
 
     def" login to model catalogue and select a draft model"(){
 
-        login admin
-        select 'Test1' open 'Data Elements'
+        login curator
+        select 'Test 3' open 'Data Elements'
 
         expect:
         check rightSideTitle is 'Active Data Elements'
@@ -41,6 +41,7 @@ class EditDataElementSpec extends AbstractModelCatalogueGebSpec {
         Thread.sleep(3000l)
         fill description with '.i am describe my action'
         fill dataType with "var ${System.currentTimeMillis()}"
+
 
         and:'save '
         click submit

@@ -9,6 +9,10 @@ import static org.modelcatalogue.core.geb.Common.*
 class CreateMeasurementUnitSpec extends AbstractModelCatalogueGebSpec{
     private static final String name="input#name"
     private static final String symbol="input#symbol"
+    private static final String  table="td.col-md-2"
+    private static final String  deleteButton="a#delete-menu-item-link>span:nth-child(3)"
+    private static final String  measurementUnit="td.col-md-4>a"
+    private static final String  measurementUnitButton="a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
 
 
 
@@ -16,7 +20,7 @@ class CreateMeasurementUnitSpec extends AbstractModelCatalogueGebSpec{
     def"login to model catalogue and navigate to the model"(){
         when:
               loginCurator()
-              select'TEST5'
+              select'Test 3'
               selectInTree 'Measurement Units'
         then:
               check rightSideTitle contains 'Active Measurement Units'
@@ -31,15 +35,33 @@ class CreateMeasurementUnitSpec extends AbstractModelCatalogueGebSpec{
     }
     def" create Measurement unit"(){
         when:
-             fill name with("My measurement${System.currentTimeSeconds()}")
+             fill name with("TESTING_KILOGRAM")
              fill symbol with("kilogram")
-             fill modelCatalogueId with("METT-${System.currentTimeSeconds()}")
+             fill modelCatalogueId with("METT-1000")
              fill description with(" this is my measurement ${System.currentTimeSeconds()}")
              click save
 
         then:
-             noExceptionThrown()
+            check table contains 'kilogram'
 
+    }
+
+    def" remove the created measurement"(){
+
+        when:'click on the created  measurement unit'
+        click measurementUnit
+
+        and:'navigate to the top menu and click on the measurement unit button'
+        click measurementUnitButton
+
+        and:
+        click deleteButton
+
+        and:'confirmation'
+        click modalPrimaryButton
+
+        then:
+        check table gone
 
     }
 

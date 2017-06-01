@@ -13,6 +13,7 @@ import static org.modelcatalogue.core.geb.Common.getPick
 import static org.modelcatalogue.core.geb.Common.getRightSideTitle
 import static org.modelcatalogue.core.geb.Common.getSave
 import static org.modelcatalogue.core.geb.Common.messages
+import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
 
 @Stepwise
 class CreateDataTypeAndSelectReferenceSpec extends AbstractModelCatalogueGebSpec {
@@ -22,13 +23,17 @@ class CreateDataTypeAndSelectReferenceSpec extends AbstractModelCatalogueGebSpec
     private static final String  search ="input#elements"
     private static final String OK = "div.messages-modal-prompt>div>div>div:nth-child(3)>button:nth-child(1)"
     private static final String clickX ="div.input-group-addon"
+    private static final String table ="tr.inf-table-item-row>td:nth-child(1)"
+    private static final String referenceType="a#role_item_catalogue-element-menu-item-link"
+    private static final String deleteButton="a#delete-menu-item-link>span:nth-child(3)"
+    private static final String dataType="tr.inf-table-item-row>td:nth-child(1)>span>span>a"
 
 
 
     def"login to Model Catalogue and select Model"(){
         when:
                loginCurator()
-              select 'Test 6'
+              select 'Test 3'
               selectInTree 'Data Types'
 
         then:
@@ -42,29 +47,47 @@ class CreateDataTypeAndSelectReferenceSpec extends AbstractModelCatalogueGebSpec
     }
     def " fill the create data type form"(){
         when:
-             fill nameLabel with "my data type ${System.currentTimeMillis()}"
+        fill nameLabel with "TESTING_DATA_TYPE"
 
-             fill modelCatalogueId with "${UUID.randomUUID().toString()}"
+        fill modelCatalogueId with "MET-333"
 
-             fill description with "my description of data type${System.currentTimeMillis()}"
+        fill description with "my description of data type${System.currentTimeMillis()}"
 
-        and:'select references button and save'
-              click reference
-              click dataClass
-        and:'import a data'
-               click addImport
-              fill search with("clinical Tags 0.0.1")
-              remove messages
+        and: 'select references button and save'
+        click reference
+        click dataClass
 
-              click OK
+        and: 'import a data'
+        click addImport
+        fill search with("clinical Tags 0.0.1")
+        remove messages
 
-              click clickX
+        and:
+        click OK
+        click clickX
 
-                click save
+        and:
+        click save
+
         then:
-              noExceptionThrown()
+        check table contains 'TESTING_DATA_TYPE'
 
+    }
+    def"delete the created data type"(){
 
+        when:'click on the created data type'
+        click dataType
 
+        and:'navigate to the top menu and click on the reference type button'
+        click referenceType
+
+        and:
+        click deleteButton
+
+        and:'confirmation'
+        click modalPrimaryButton
+
+        then:
+        check table gone
     }
 }

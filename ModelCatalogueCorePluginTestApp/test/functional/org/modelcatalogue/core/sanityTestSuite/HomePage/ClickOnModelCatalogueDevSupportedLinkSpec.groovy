@@ -2,14 +2,14 @@ package org.modelcatalogue.core.sanityTestSuite.HomePage
 
 
 import geb.spock.GebSpec
+import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
 
-/**
- * Created by Berthe on 13/03/2017.
- */
-class ClickOnModelCatalogueDevSupportedLinkSpec extends GebSpec  {
+
+class ClickOnModelCatalogueDevSupportedLinkSpec extends AbstractModelCatalogueGebSpec  {
+
     public static final String model ="div.panel-body>div"
      static WebDriver driver
     void modelDevelopmentLinks(){
@@ -42,7 +42,7 @@ class ClickOnModelCatalogueDevSupportedLinkSpec extends GebSpec  {
         then:
         Thread.sleep(10000L)
         assert $("button",class:"btn btn-large btn-primary").text()== "Login"
-        System.println("I found it")
+
 
     }
 
