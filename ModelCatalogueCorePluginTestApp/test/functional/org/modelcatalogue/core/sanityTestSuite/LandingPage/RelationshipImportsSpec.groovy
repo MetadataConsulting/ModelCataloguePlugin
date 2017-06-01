@@ -7,6 +7,7 @@ import static org.modelcatalogue.core.geb.Common.getItem
 import static org.modelcatalogue.core.geb.Common.getModalPrimaryButton
 import static org.modelcatalogue.core.geb.Common.getPick
 import static org.modelcatalogue.core.geb.Common.getRightSideTitle
+import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
 
 @Stepwise
 class RelationshipImportsSpec extends AbstractModelCatalogueGebSpec{
@@ -16,7 +17,11 @@ class RelationshipImportsSpec extends AbstractModelCatalogueGebSpec{
     private static final String  destination ="h3.panel-title"
     private static final String  destinationIcon="span.input-group-addon"
     private static final String   imports ="#type > option:nth-child(7)"
+    private static final String   plusButton ="span.fa-plus-square-o"
     private static final String  search ="input#value"
+    private static final String  tableImport ="td.col-md-5"
+    private static final String  modelCatalogue ="span.mc-name"
+    private static final String  removeImportedModel ="a#role_item_remove-relationshipBtn"
     private static final String  table ="#activity-changes > div.inf-table-body > table > tbody > tr:nth-child(1) > td.inf-table-item-cell.ng-scope.col-md-7 > span > span > code"
 
 
@@ -25,10 +30,10 @@ class RelationshipImportsSpec extends AbstractModelCatalogueGebSpec{
 
         when:
         loginAdmin()
-        select'TEST 7'
+        select'Test 3'
 
         then:'verify title of the page '
-        check rightSideTitle contains 'TEST 7'
+        check rightSideTitle contains 'Test 3'
     }
     def"navigate to the top menu and select create relationship "(){
 
@@ -53,6 +58,27 @@ class RelationshipImportsSpec extends AbstractModelCatalogueGebSpec{
         then:'verify that imports is displayed inside table'
         check table contains "imports"
 
+    }
+
+    def"delete the imported data model"(){
+
+        when:
+        click modelCatalogue
+
+        and:
+        select 'Test 3' open 'Imported Data Models'
+
+        and:
+        click plusButton
+
+        and:
+        click removeImportedModel
+
+        and:
+        click modalPrimaryButton
+
+        then:
+        check tableImport isGone()
 
     }
 }

@@ -25,9 +25,11 @@ class RelationshipIsBaseForSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         loginAdmin()
-        select 'TEST 7'
+        select 'NHIC'
         then:'verify  title of the page '
-        check rightSideTitle contains 'TEST 7'
+        check rightSideTitle contains 'NHIC'
+        and:
+        Thread.sleep(2000l)
 
     }
     def"Navigate to the top menu and select create relationship"(){
@@ -45,12 +47,15 @@ class RelationshipIsBaseForSpec extends AbstractModelCatalogueGebSpec {
         click isBaseFor
         and: ' select destination'
         click destinationIcon
-        fill search with "Test 1" and pick first item
+        fill search with "Cancer Model" and pick first item
+        Thread.sleep(2000l)
         click cancel
+        Thread.sleep(2000L)
         click modalPrimaryButton
 
 
         then:'check that alert message is displayed'
+        Thread.sleep(2000l)
         check alert displayed
 
 

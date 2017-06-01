@@ -1,13 +1,11 @@
 package org.modelcatalogue.core.sanityTestSuite.LandingPage
 
+
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
-
 import static org.modelcatalogue.core.geb.Common.item
-import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
-
-
 import static org.modelcatalogue.core.geb.Common.getRightSideTitle
+import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
 import static org.modelcatalogue.core.geb.Common.pick
 
 
@@ -22,6 +20,7 @@ class RelationshipIsBasedOnSpec extends AbstractModelCatalogueGebSpec{
     private static final String   cancel = "div.messages-modal-confirm>div>div>div:nth-child(3)>form>button:nth-child(3)"
     private static final String  search ="input#value"
     private static final String  alert ="div.alert"
+    private static final String  primaryButton ="button.btn-primary"
 
 
 
@@ -29,33 +28,43 @@ class RelationshipIsBasedOnSpec extends AbstractModelCatalogueGebSpec{
 
         when:
         loginAdmin()
-        select'TEST 7'
+        select 'SACT'
         then:
-        check rightSideTitle contains 'TEST 7'
+        check rightSideTitle contains 'SACT'
     }
 
     def"navigate to the top menu and select create relationship "(){
 
-        when:
+        when: 'navigate to the top menu and click on the data model button'
         click dataModel
+
+        and: 'select create relationship'
         click createRelationship
 
         then:
         check destination displayed
 
     }
+
     def"select based on,destination and create relationship"(){
 
         when: 'select relation'
         click isBasedOn
+
         and: ' select destination'
+
         click destinationIcon
-        fill search with "Test 1" and pick first item
+        Thread.sleep(2000L)
+        fill search with "Clinical Tags"
+        selectInSearch(2)
+
+        and: 'click on the cancel button'
         click cancel
+
+        and: 'click on the create relationship'
         click modalPrimaryButton
 
-
-        then:
+        then: 'verify that alert is displayed'
         check alert displayed
 
 

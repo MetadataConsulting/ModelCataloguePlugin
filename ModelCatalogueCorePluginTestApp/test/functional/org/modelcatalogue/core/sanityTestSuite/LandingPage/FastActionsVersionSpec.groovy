@@ -36,7 +36,7 @@ class FastActionsVersionSpec extends AbstractModelCatalogueGebSpec{
     def "verify the Model Catalogue Version"(){
 
         expect:
-        check version contains "2.1.30-rc3"
+        check version contains "Version"
         click modalPrimaryButton
     }
 }

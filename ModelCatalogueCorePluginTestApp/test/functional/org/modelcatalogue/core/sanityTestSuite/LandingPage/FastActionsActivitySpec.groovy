@@ -3,7 +3,7 @@ package org.modelcatalogue.core.sanityTestSuite.LandingPage
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import spock.lang.Stepwise
 
-import static org.modelcatalogue.core.geb.Common.getAdmin
+import static org.modelcatalogue.core.geb.Common.admin
 import static org.modelcatalogue.core.geb.Common.modalHeader
 import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
 
@@ -25,7 +25,7 @@ class FastActionsActivitySpec extends AbstractModelCatalogueGebSpec{
     }
 
     def " select fast actions and click on the activity "(){
-
+        Thread.sleep(2000L)
         click fastActions
         click activity
 
@@ -36,6 +36,7 @@ class FastActionsActivitySpec extends AbstractModelCatalogueGebSpec{
     def "verify the most recent active users"(){
 
        expect:
+       Thread.sleep(3000L)
        check user displayed
         click modalPrimaryButton
     }
