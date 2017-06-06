@@ -157,7 +157,7 @@ class AssetService {
         }
     }
 
-    void storeAssetWithSteam(Asset asset, String contentType, Closure withOutputStream) {
+    void storeAssetWithStream(Asset asset, String contentType, Closure withOutputStream) {
         if (!asset) throw new IllegalArgumentException("Please, provide valid asset.")
         MessageDigest md5 = MessageDigest.getInstance('MD5')
         modelCatalogueStorageService.store('assets', "${asset.id}", contentType) { OutputStream it ->
@@ -226,7 +226,7 @@ class AssetService {
                 Asset updated = Asset.getWithRetries(id)
                 try {
                     //do the hard work
-                    storeAssetWithSteam(updated, assetParams.contentType?.toString(), worker)
+                    storeAssetWithStream(updated, assetParams.contentType?.toString(), worker)
 
                     updated.status = ElementStatus.FINALIZED
                     updated.description = "Your report is ready. Use Download button to download it."
