@@ -65,7 +65,7 @@ class FormGeneratorController {
                     }
 
                     log.info "Storing form for $theModel"
-                    assetService.storeAssetWithSteam(updated, CatalogueElementToXlsxExporter.EXCEL.name) {
+                    assetService.storeAssetWithStream(updated, CatalogueElementToXlsxExporter.EXCEL.name) {
                         CaseReportFormSerializer serializer = new CaseReportFormSerializer(form)
                         serializer.write(it)
                     }

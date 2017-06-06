@@ -1,3 +1,6 @@
+###
+  Must have something to do with the tree displayed on the left...
+###
 angular.module('mc.core.ui.states.controllers.DataModelTreeCtrl', ['ui.router', 'mc.util.ui']).controller('mc.core.ui.states.controllers.DataModelTreeCtrl', [
   '$scope', 'currentDataModel', 'lastSelectedElementHolder', 'enhance', '$state' , 'names'
   ($scope ,  currentDataModel ,  lastSelectedElementHolder ,  enhance ,  $state  ,  names) ->

@@ -49,13 +49,12 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
 
     def inventorySpreadsheet(String name, Integer depth) {
         DataModel dataModel = DataModel.get(params.id)
-
-        def dataModelId = dataModel.id
-
         if (!dataModel) {
             respond status: HttpStatus.NOT_FOUND
             return
         }
+        def dataModelId = dataModel.id
+
 
         def assetId = assetService.storeReportAsAsset(
                 dataModel,
@@ -72,24 +71,22 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
     }
 
     def inventoryDoc(String name, Integer depth) {
-
         DataModel dataModel = DataModel.get(params.id)
-
-        def modelId = dataModel.id
-
         if (!dataModel) {
             respond status: HttpStatus.NOT_FOUND
             return
         }
+        def modelId = dataModel.id
 
-            def assetId =  assetService.storeReportAsAsset(
-                    dataModel,
-                    name: name ? name : "${dataModel.name} report as MS Excel Document",
-                    originalFileName: "${dataModel.name}-${dataModel.status}-${dataModel.version}.docx",
-                    contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            ) { OutputStream out ->
-                new DataModelToDocxExporter(DataModel.get(modelId), dataClassService, elementService, customTemplate, DOC_IMAGE_PATH, depth).export(out)
-            }
+
+        def assetId =  assetService.storeReportAsAsset(
+                dataModel,
+                name: name ? name : "${dataModel.name} report as MS Excel Document",
+                originalFileName: "${dataModel.name}-${dataModel.status}-${dataModel.version}.docx",
+                contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        ) { OutputStream outputStream ->
+            new DataModelToDocxExporter(DataModel.get(modelId), dataClassService, elementService, customTemplate, DOC_IMAGE_PATH, depth).export(outputStream)
+        }
 
 
         response.setHeader("X-Asset-ID", assetId.toString())
