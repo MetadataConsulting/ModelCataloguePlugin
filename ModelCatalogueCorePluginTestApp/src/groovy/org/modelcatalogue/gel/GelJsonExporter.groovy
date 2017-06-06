@@ -45,7 +45,7 @@ class GelJsonExporter {
     def descendModels(CatalogueElement model, level, graphList, depth, Map levelMetaData, exclusions) {
         if (level > depth) return
         //TODO - comment out for prod
-//        if (modelCount > 2) return
+//        if (dataClassCount > 2) return
 
         log.debug "descendModels level=$level graghList=$graphList model=$model"
 

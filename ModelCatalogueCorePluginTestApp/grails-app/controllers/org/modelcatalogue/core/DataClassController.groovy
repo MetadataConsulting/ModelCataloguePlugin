@@ -85,16 +85,16 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
     }
 
     def inventoryDoc(String name, Integer depth) {
-        DataClass model = DataClass.get(params.id)
+        DataClass dataClass = DataClass.get(params.id)
 
-        Long modelId = model.id
+        Long dataClassId = dataClass.id
         def assetId= assetService.storeReportAsAsset(
-                model.dataModel,
-                name: name ? name : "${model.name} report as MS Word Document",
-                originalFileName: "${model.name}-${model.status}-${model.version}.docx",
+                dataClass.dataModel,
+                name: name ? name : "${dataClass.name} report as MS Word Document",
+                originalFileName: "${dataClass.name}-${dataClass.status}-${dataClass.version}.docx",
                 contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )  { OutputStream out ->
-            new DataClassToDocxExporter(DataClass.get(modelId), dataClassService, depth, elementService).export(out)
+            new DataClassToDocxExporter(DataClass.get(dataClassId), dataClassService, depth, elementService).export(out)
         }
 
         response.setHeader("X-Asset-ID",assetId.toString())
@@ -102,16 +102,16 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
     }
 
     def inventorySpreadsheet(String name, Integer depth) {
-        DataClass model = DataClass.get(params.id)
+        DataClass dataClass = DataClass.get(params.id)
 
-        Long modelId = model.id
+        Long dataClassId = dataClass.id
         def assetId= assetService.storeReportAsAsset(
-                model.dataModel,
-                name: name ? name : "${model.name} report as MS Excel Document",
-                originalFileName: "${model.name}-${model.status}-${model.version}.xlsx",
+                dataClass.dataModel,
+                name: name ? name : "${dataClass.name} report as MS Excel Document",
+                originalFileName: "${dataClass.name}-${dataClass.status}-${dataClass.version}.xlsx",
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )  { OutputStream out ->
-            CatalogueElementToXlsxExporter.forDataClass(DataClass.get(modelId), dataClassService, grailsApplication, depth).export(out)
+            CatalogueElementToXlsxExporter.forDataClass(DataClass.get(dataClassId), dataClassService, grailsApplication, depth).export(out)
         }
 
         response.setHeader("X-Asset-ID",assetId.toString())
@@ -119,17 +119,17 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
     }
 
     def changelogDoc(String name, Integer depth, Boolean includeMetadata) {
-        DataClass model = DataClass.get(params.id)
+        DataClass dataClass = DataClass.get(params.id)
 
-        Long modelId = model.id
+        Long dataClassId = dataClass.id
         def assetId = assetService.storeReportAsAsset(
-                model.dataModel,
-                name: name ? name : "${model.name} changelog as MS Word Document",
-                originalFileName: "${model.name}-${model.status}-${model.version}-changelog.docx",
+                dataClass.dataModel,
+                name: name ? name : "${dataClass.name} changelog as MS Word Document",
+                originalFileName: "${dataClass.name}-${dataClass.status}-${dataClass.version}-changelog.docx",
                 contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ) { OutputStream out ->
             new ChangeLogDocxGenerator(auditService, dataClassService, performanceUtilService , depth, includeMetadata)
-                .generateChangelog(DataClass.get(modelId), out)
+                .generateChangelog(DataClass.get(dataClassId), out)
         }
 
         response.setHeader("X-Asset-ID",assetId.toString())

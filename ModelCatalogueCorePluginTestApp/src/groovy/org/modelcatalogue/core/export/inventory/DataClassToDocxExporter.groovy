@@ -35,22 +35,22 @@ class DataClassToDocxExporter {
     final ElementService elementService
     final Long dataClassId
     final Integer depth
-    final Set<Long> processedModels = new HashSet<Long>()
+    final Set<Long> processedDataClasses = new HashSet<Long>()
 
 
-    DataClassToDocxExporter(DataClass model, DataClassService dataClassService, Integer depth = 3, ElementService elementService) {
-        this.dataClassId = model.getId()
+    DataClassToDocxExporter(DataClass dataClass, DataClassService dataClassService, Integer depth = 3, ElementService elementService) {
+        this.dataClassId = dataClass.getId()
         this.dataClassService = dataClassService
         this.elementService = elementService
         this.depth = depth
     }
 
     void export(OutputStream outputStream) {
-        processedModels.clear()
+        processedDataClasses.clear()
 
-        DataClass rootModel = DataClass.get(dataClassId)
+        DataClass rootDataClass = DataClass.get(dataClassId)
 
-        log.info "Exporting data class $rootModel to Word Document"
+        log.info "Exporting data class $rootDataClass to Word Document"
 
         DocumentBuilder builder = new ModelCatalogueWordDocumentBuilder(outputStream)
 
@@ -81,21 +81,21 @@ class DataClassToDocxExporter {
 
         builder.create {
             document(template: customTemplate) {
-                paragraph rootModel.name, style: 'title',  align: 'center'
+                paragraph rootDataClass.name, style: 'title',  align: 'center'
                 paragraph(style: 'subtitle', align: 'center') {
-                    text "${rootModel.status}"
+                    text "${rootDataClass.status}"
                     lineBreak()
                     text SimpleDateFormat.dateInstance.format(new Date())
                 }
-                if (rootModel.description) {
+                if (rootDataClass.description) {
                     paragraph(style: 'classification.description', margin: [left: 50, right: 50]) {
-                        text rootModel.description
+                        text rootDataClass.description
                     }
                 }
                 pageBreak()
 
-                for (DataClass model in rootModel.parentOf) {
-                    printModel(builder, helper, model, 1)
+                for (DataClass dataClass in rootDataClass.parentOf) {
+                    printDataClass(builder, helper, dataClass, 1)
                 }
 
                 if (helper.usedDataTypes) {
@@ -228,7 +228,7 @@ class DataClassToDocxExporter {
             }
         }
 
-        log.debug "Data Model $rootModel exported to Word Document"
+        log.debug "Data Model $rootDataClass exported to Word Document"
     }
 
     private boolean hasExtraInformation(DataType dataType) {
@@ -236,35 +236,35 @@ class DataClassToDocxExporter {
     }
 
 
-    private void printModel(DocumentBuilder builder, DocxSpecificationDataHelper helper, DataClass model, int level) {
+    private void printDataClass(DocumentBuilder builder, DocxSpecificationDataHelper helper, DataClass dataClass, int level) {
         if (level > depth) {
             return
         }
 
-        log.debug "Exporting data class $model to Word Document"
+        log.debug "Exporting data class $dataClass to Word Document"
 
         builder.with {
-            if (model.getId() in processedModels) {
-                "heading${Math.min(level + 1, 6)}" model.name
+            if (dataClass.getId() in processedDataClasses) {
+                "heading${Math.min(level + 1, 6)}" dataClass.name
             } else {
-                "heading${Math.min(level + 1, 6)}" model.name, ref: "${model.getId()}"
+                "heading${Math.min(level + 1, 6)}" dataClass.name, ref: "${dataClass.getId()}"
             }
 
             paragraph {
-                if (model.description) {
-                    text model.description
+                if (dataClass.description) {
+                    text dataClass.description
                 } else {
-                    text "${model.name} data class does not have any description yet.", font: [italic: true]
+                    text "${dataClass.name} data class does not have any description yet.", font: [italic: true]
                 }
             }
 
-            if (!model.countContains() && !model.countParentOf()) {
+            if (!dataClass.countContains() && !dataClass.countParentOf()) {
                 paragraph {
-                    text "${model.name} data class does not have any inner data classes or data elements yet.", font: [italic: true]
+                    text "${dataClass.name} data class does not have any inner data classes or data elements yet.", font: [italic: true]
                 }
             }
 
-            if (model.countContains()) {
+            if (dataClass.countContains()) {
                 table(padding: 1, border: [size: 1, color: '#D2D2D2'], columns: [2, 3, 2, 2, 3]) {
                     row {
                         cell HEADER_CELL, {
@@ -283,10 +283,10 @@ class DataClassToDocxExporter {
                             text HEADER_CELL_TEXT, 'Same As'
                         }
                     }
-                    for (Relationship dataElementRelationship in model.containsRelationships) {
+                    for (Relationship dataElementRelationship in dataClass.containsRelationships) {
                         DataElement dataElement = dataElementRelationship.destination
                         if (dataElement.dataType) {
-                            helper.usedDataTypes.put(dataElement.dataType, model)
+                            helper.usedDataTypes.put(dataElement.dataType, dataClass)
                         }
                         row {
                             cell {
@@ -340,15 +340,15 @@ class DataClassToDocxExporter {
                 }
             }
 
-            if (!(model.getId() in processedModels)) {
-                if (model.countParentOf()) {
-                    for (DataClass child in model.parentOf) {
-                        printModel(builder, helper, child, level + 1)
+            if (!(dataClass.getId() in processedDataClasses)) {
+                if (dataClass.countParentOf()) {
+                    for (DataClass child in dataClass.parentOf) {
+                        printDataClass(builder, helper, child, level + 1)
                     }
                 }
             }
 
-            processedModels << model.getId()
+            processedDataClasses << dataClass.getId()
         }
     }
 

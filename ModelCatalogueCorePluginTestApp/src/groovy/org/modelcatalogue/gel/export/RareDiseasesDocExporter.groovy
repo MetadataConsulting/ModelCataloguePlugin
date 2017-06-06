@@ -34,11 +34,11 @@ class RareDiseasesDocExporter {
     public static final String CLINICAL_TESTS_SIDEBAR = "Clinical Tests"
     public static final String TABLE_ENTRIES_TEXT = "Entries ordered left to right in table"
 
-    DataClass rootModel
-    private final Set<Long> processedModels = new HashSet<Long>()
+    DataClass rootDataClass
+    private final Set<Long> processedDataClasses = new HashSet<Long>()
     private final Map<String, String> levelNameDescriptions = new HashMap<>()
-    private final Map<String, String> levelModelDescriptions = new HashMap<>()
-    private Integer modelCount = 0
+    private final Map<String, String> levelDataClassDescriptions = new HashMap<>()
+    private Integer dataClassCount = 0
 
     // determines whether the Eligibility Criteria OR Phenotypes & Clinical Tests report is produced
     private boolean eligibilityMode = true;
@@ -63,8 +63,8 @@ class RareDiseasesDocExporter {
         'paragraph.headerImage' height: 1.366.inches, width: 2.646.inches
     }
 
-    RareDiseasesDocExporter(DataClass rootModel, Closure customTemplate, String imagePath, boolean eligibilityMode) {
-        this.rootModel = rootModel
+    RareDiseasesDocExporter(DataClass rootDataClass, Closure customTemplate, String imagePath, boolean eligibilityMode) {
+        this.rootDataClass = rootDataClass
         this.customTemplate = customTemplate
         if(imagePath) this.imagePath = imagePath
         this.eligibilityMode = eligibilityMode
@@ -80,7 +80,7 @@ class RareDiseasesDocExporter {
 
 
     void export(OutputStream outputStream) {
-        log.info "Exporting Data Model ${rootModel.name} (${rootModel.dataModel.semanticVersion}) to inventory document."
+        log.info "Exporting Data Model ${rootDataClass.name} (${rootDataClass.dataModel.semanticVersion}) to inventory document."
 
         DocumentBuilder builder = new ModelCatalogueWordDocumentBuilder(outputStream)
 
@@ -89,34 +89,34 @@ class RareDiseasesDocExporter {
 
                 createDocumentFrontPages(builder)
 
-                if (rootModel.name) {
-//                    heading3 rootModel.name   // using document name as it seems clearer than model name but leave commented for the moment
+                if (rootDataClass.name) {
+//                    heading3 rootDataClass.name   // using document name as it seems clearer than model name but leave commented for the moment
                     heading2 documentName(eligibilityMode)
                 }
 
                 Integer level = 1
-                levelNameDescriptions.put(level, rootModel.name)
-                levelModelDescriptions.put(level, rootModel.description)
-                descendModels(builder, rootModel, level)
+                levelNameDescriptions.put(level, rootDataClass.name)
+                levelDataClassDescriptions.put(level, rootDataClass.description)
+                descendDataClasses(builder, rootDataClass, level)
 
             }
 
         }
 
-        log.info "data dataModel ${documentName(eligibilityMode)} (${rootModel.dataModel.semanticVersion}}) exported to inventory document."
+        log.info "data dataModel ${documentName(eligibilityMode)} (${rootDataClass.dataModel.semanticVersion}}) exported to inventory document."
     }
 
 
     private void createDocumentFrontPages(DocumentBuilder builder) {
 
-        List<DataClass> allVersionsOfDataClass = getAllVersionsOfDataClass(rootModel, [rootModel])
+        List<DataClass> allVersionsOfDataClass = getAllVersionsOfDataClass(rootDataClass, [rootDataClass])
 
         builder.with {
 
-            DataModel rootModelModel = rootModel.dataModel
-            def thisOwner = rootModelModel.ext.get(Metadata.OWNER) ?: EMPTY_STRING
-            def reviewers = rootModelModel.ext.get(Metadata.REVIEWERS)
-            def authors = rootModelModel.ext.get(Metadata.AUTHORS)
+            DataModel rootDataClassModel = rootDataClass.dataModel
+            def thisOwner = rootDataClassModel.ext.get(Metadata.OWNER) ?: EMPTY_STRING
+            def reviewers = rootDataClassModel.ext.get(Metadata.REVIEWERS)
+            def authors = rootDataClassModel.ext.get(Metadata.AUTHORS)
 
             byte[] imageData
             if (imagePath) imageData = new URL(imagePath).bytes
@@ -136,7 +136,7 @@ class RareDiseasesDocExporter {
             }
 
             paragraph(style: 'document', margin: [top: 120]) {
-                text "Version ${rootModelModel.semanticVersion} ${rootModelModel.status}"
+                text "Version ${rootDataClassModel.semanticVersion} ${rootDataClassModel.status}"
                 lineBreak()
                 text SimpleDateFormat.dateInstance.format(new Date())
             }
@@ -159,10 +159,10 @@ class RareDiseasesDocExporter {
                     cell 'Date', style: 'cell.headerCell'
                 }
 
-                allVersionsOfDataClass.each { DataClass model ->
+                allVersionsOfDataClass.each { DataClass dataClass ->
                     row {
-                        cell "${model.dataModel.semanticVersion}", style: 'cell'
-                        cell model.dataModel.ext.get("http://www.modelcatalogue.org/metadata/#released")? Date.parse("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", model.dataModel.ext.get("http://www.modelcatalogue.org/metadata/#released")).format("dd/MM/yyyy"):'', style: 'cell'
+                        cell "${dataClass.dataModel.semanticVersion}", style: 'cell'
+                        cell dataClass.dataModel.ext.get("http://www.modelcatalogue.org/metadata/#released")? Date.parse("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", dataClass.dataModel.ext.get("http://www.modelcatalogue.org/metadata/#released")).format("dd/MM/yyyy"):'', style: 'cell'
                     }
                 }
             }
@@ -235,18 +235,18 @@ class RareDiseasesDocExporter {
     }
 
 
-    private void descendModels(DocumentBuilder builder, DataClass model, Integer level) {
-        log.debug "descendModels level=$level count=" + this.modelCount
+    private void descendDataClasses(DocumentBuilder builder, DataClass dataClass, Integer level) {
+        log.debug "descendDataClasses level=$level count=" + this.dataClassCount
 
-        String modelName = model.name + " (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getLatestVersionId()})"
-        levelNameDescriptions.put(level, modelName)
-        levelModelDescriptions.put(level, model.description)
+        String dataClassName = dataClass.name + " (${dataClass.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:dataClass.getLatestVersionId()})"
+        levelNameDescriptions.put(level, dataClassName)
+        levelDataClassDescriptions.put(level, dataClass.description)
 
         if (level > 5) return   //don't go too deep, nothing for us down there...
 
-        //don't re-examine previously seen models
-        if (model.getId() in processedModels) {
-            log.debug "found model id $model.id in processedModels $processedModels"
+        //don't re-examine previously seen dataClasses
+        if (dataClass.getId() in processedDataClasses) {
+            log.debug "found dataClass id $dataClass.id in processedDataClasses $processedDataClasses"
             return
         }
 
@@ -266,36 +266,36 @@ class RareDiseasesDocExporter {
             }
         }
 
-        log.debug "level $level model name $model.name"
+        log.debug "level $level dataClass name $dataClass.name"
 
 
-            for (DataClass child in model.parentOf) {
-                processedModels << model.getId()
+            for (DataClass child in dataClass.parentOf) {
+                processedDataClasses << dataClass.getId()
                 if(level==4) {
                     if (child.name.matches("(?i:.*Eligibility.*)") && eligibilityMode) {
-                        this.modelCount = this.modelCount + 1
-                        printModel(builder, child, level + 1, false)
+                        this.dataClassCount = this.dataClassCount + 1
+                        printDataClass(builder, child, level + 1, false)
 
                     } else if (child.name.matches("(?i:.*Phenotype.*)") && !eligibilityMode) {
-                        this.modelCount = this.modelCount + 1
-                        printModel(builder, child, level + 1, true)
+                        this.dataClassCount = this.dataClassCount + 1
+                        printDataClass(builder, child, level + 1, true)
 
                     } else if (child.name.matches("(?i:.*Clinical Test.*)") && !eligibilityMode) {
-                        this.modelCount = this.modelCount + 1
-                        printModel(builder, child, level + 1, false)
+                        this.dataClassCount = this.dataClassCount + 1
+                        printDataClass(builder, child, level + 1, false)
                     }
                 } else {
-                    descendModels(builder, child, level + 1)
+                    descendDataClasses(builder, child, level + 1)
                 }
         }
     }
 
 
 
-    private void printModel(DocumentBuilder builder, DataClass model, Integer level, boolean phenotypeMode) {
-        log.debug "printModel level=$level"
-        String modelName = model.name + " (${model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getLatestVersionId()})"
-        levelNameDescriptions.put(level, modelName)
+    private void printDataClass(DocumentBuilder builder, DataClass dataClass, Integer level, boolean phenotypeMode) {
+        log.debug "printDataClass level=$level"
+        String dataClassName = dataClass.name + " (${dataClass.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:dataClass.getLatestVersionId()})"
+        levelNameDescriptions.put(level, dataClassName)
 
         builder.with {
 
@@ -323,9 +323,9 @@ class RareDiseasesDocExporter {
                 }
 
                 if (eligibilityMode) {
-                    createPlainContentRows(builder, model)
+                    createPlainContentRows(builder, dataClass)
                 } else {
-                    createNestedTableRows(builder, model, phenotypeMode)
+                    createNestedTableRows(builder, dataClass, phenotypeMode)
                 }
 
             }
@@ -335,7 +335,7 @@ class RareDiseasesDocExporter {
     }
 
     // this is a text panel (cell) with multiple paragraphs for the Eligibility Criteria
-    private void createPlainContentRows(DocumentBuilder builder, DataClass model) {
+    private void createPlainContentRows(DocumentBuilder builder, DataClass dataClass) {
         builder.with {
             row {
                 cell(background: '#BED6ED') {
@@ -343,12 +343,12 @@ class RareDiseasesDocExporter {
                 }
                 cell {
 
-                    String description = model.description ?: EMPTY_STRING
+                    String description = dataClass.description ?: EMPTY_STRING
                     if (description) {
                         text CELL_TEXT_SECOND, description + '\n'
                     }
 
-                    model.parentOf.each { DataClass child ->
+                    dataClass.parentOf.each { DataClass child ->
                         if (child.name) {
                             String childName = child.name
                             text CELL_TEXT_SECOND_BOLD, "\n$childName\n"
@@ -364,11 +364,11 @@ class RareDiseasesDocExporter {
     }
 
     // this is a cell with an inner table containing the Phenotypes or Clinical Test names
-    private void createNestedTableRows(DocumentBuilder builder, DataClass model, boolean phenotypeMode) {
+    private void createNestedTableRows(DocumentBuilder builder, DataClass dataClass, boolean phenotypeMode) {
         List<String> cellTexts = new ArrayList<>();
         String childName = '';
 
-        model.parentOf.each { DataClass child ->
+        dataClass.parentOf.each { DataClass child ->
             if (child.name) {
                 if (phenotypeMode) {
                     childName = child.name + " (" + (child.ext.get("OBO ID") ?: EMPTY_STRING) + ")"
@@ -391,8 +391,8 @@ class RareDiseasesDocExporter {
         int maxCols = 3;
 
         if(maxRows == 0) {
-            println "found maxRows= $maxRows at $model.name"
-            println modelCount
+            println "found maxRows= $maxRows at $dataClass.name"
+            println dataClassCount
         }
         builder.with {
             row {
@@ -401,7 +401,7 @@ class RareDiseasesDocExporter {
                     text EMPTY_STRING + "\n\n"
                 }
                 cell {
-                    if (!phenotypeMode) text CELL_TEXT_THIRD, (levelModelDescriptions.get(4))? levelModelDescriptions.get(4) + "\n\n" : EMPTY_STRING
+                    if (!phenotypeMode) text CELL_TEXT_THIRD, (levelDataClassDescriptions.get(4))? levelDataClassDescriptions.get(4) + "\n\n" : EMPTY_STRING
                     text TABLE_ENTRIES_TEXT, font: [size: 8, family: 'Calibri Light', color: '#000000']
                     table(padding: 1, border: [size: 1, color: '#D2D2D2']) {
                         //inner table should be up to 3 cols wide
