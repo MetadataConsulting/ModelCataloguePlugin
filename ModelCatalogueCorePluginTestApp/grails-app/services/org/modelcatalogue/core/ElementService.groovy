@@ -541,7 +541,7 @@ class ElementService implements Publisher<CatalogueElement> {
     Map<Long, Long> findClassesToBeInlined() {
         if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST]) {
             // does not work with H2 database
-            log.warn "Trying to find inlined models in development mode. This feature does not work with H2 database"
+            log.warn "Trying to find inlined classes in development mode. This feature does not work with H2 database"
             return [:]
         }
         List<DataClass> dataClasses = DataClass.executeQuery("""
@@ -564,10 +564,10 @@ class ElementService implements Publisher<CatalogueElement> {
     }
 
     /**
-     * Return models which are very likely to be duplicates.
-     * For models having same name as at least one other Model check if they contains same child models and data
-     * elements. If so return their id and the set of ids of similar models.
-     * @return map with the model id as key and set of ids of duplicate models as value
+     * Return classes which are very likely to be duplicates.
+     * For classes having same name as at least one other class check if they contains same child classes and data
+     * elements. If so return their id and the set of ids of similar classes.
+     * @return map with the class id as key and set of ids of duplicate classes as value
      */
     Map<Long, Set<Long>> findDuplicateClassesSuggestions() {
         // TODO: create test
