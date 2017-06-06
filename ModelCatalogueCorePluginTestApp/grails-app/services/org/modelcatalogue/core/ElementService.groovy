@@ -24,7 +24,6 @@ import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.transaction.TransactionStatus
-import rx.Observer
 
 class ElementService implements Publisher<CatalogueElement> {
 
@@ -573,22 +572,22 @@ class ElementService implements Publisher<CatalogueElement> {
     Map<Long, Set<Long>> findDuplicateClassesSuggestions() {
         // TODO: create test
         Object[][] results = DataClass.executeQuery """
-            select class.id, class.name, rel.relationshipType.name,  rel.destination.name
-            from DataClass class join class.outgoingRelationships as rel
+            select class1.id, class1.name, rel.relationshipType.name,  rel.destination.name
+            from DataClass class1 join class1.outgoingRelationships as rel
             where
-                class.name in (
+                class1.name in (
                     select class2.name from DataClass class2
                     where class2.status in :states
                     group by class2.name
                     having count(class2.id) > 1
                 )
             and
-                class.status in :states
+                class1.status in :states
             and
                 rel.archived = false
             and
                 (rel.relationshipType = :containment or rel.relationshipType = :hierarchy)
-            order by class.name asc, class.dateCreated asc, rel.destination.name asc
+            order by class1.name asc, class1.dateCreated asc, rel.destination.name asc
         """, [states: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.FINALIZED], containment: RelationshipType.readByName('containment'), hierarchy: RelationshipType.readByName('hierarchy')]
 
 
