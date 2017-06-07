@@ -21,6 +21,10 @@ names = {
     simpleName = simpleName[0].toLowerCase() + simpleName[1..-1]
     propertyNamesFromTypes[type] = simpleName
 
+  ###
+  This function is the identity on urls beginning with http
+  Otherwise it returns the substring after the last '.' in type.
+  ###
   getPropertyNameFromQualifier: (type) ->
     return null if not type
     return type if type.indexOf('http') == 0

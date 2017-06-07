@@ -95,15 +95,13 @@ class DataModelToDocxExporter {
 
         List<DataModel> allVersionsOfModel = getAllVersionsOfModel(rootModel, [rootModel])
 
-
-
         builder.create {
             document(template: customTemplate) {
 
-                def thisOrganisation = rootModel.ext.get(Metadata.ORGANISATION)
-                def thisOwner = rootModel.ext.get(Metadata.OWNER)
-                def reviewers = rootModel.ext.get(Metadata.REVIEWERS)
-                def authors = rootModel.ext.get(Metadata.AUTHORS)
+                def thisOrganisation = rootModel.ext.get(Metadata.ORGANISATION)?:""
+                def thisOwner = rootModel.ext.get(Metadata.OWNER)?:""
+                def reviewers = rootModel.ext.get(Metadata.REVIEWERS)?:""
+                def authors = rootModel.ext.get(Metadata.AUTHORS)?:""
 
                 byte[] imageData
                 if(imagePath) imageData = new URL(imagePath).bytes
@@ -198,7 +196,7 @@ class DataModelToDocxExporter {
                 log.debug "found ${dataClasses.size()} top level dataClasses"
                 for (DataClass dClass in dataClasses) {
                     if(dClass.status!= ElementStatus.DEPRECATED) {
-                        docHelper.printModel(dClass, true, 1)
+                        docHelper.printClass(dClass, true, 1)
                     }
                 }
 
@@ -206,130 +204,137 @@ class DataModelToDocxExporter {
                     pageBreak()
                     heading1 'Data Types'
 
-                    for (DataType dataType in docHelper.usedDataTypes.keySet()) {
-
-                        log.debug "Exporting data type $dataType to Word Document"
-
-                        Map<String, Object> attrs = [ref: "${dataType.id}", style: 'heading2']
-                        attrs.putAll(DOMAIN_NAME)
-
-                        paragraph attrs, dataType.name
-
-                        if (dataType.dataModel) {
-                            paragraph {
-                                text DOMAIN_CLASSIFICATION_NAME, "(${dataType.dataModel.name})"
-                            }
+                    if(!docHelper.usedDataTypes.size()){
+                        paragraph {
+                            text "Model has no data type yet.", font: [italic: true]
                         }
+                    }else {
 
-                        if (dataType.description) {
-                            paragraph {
-                                text dataType.description
+                        for (DataType dataType in docHelper.usedDataTypes.keySet()) {
+
+                            log.debug "Exporting data type $dataType to Word Document"
+
+                            Map<String, Object> attrs = [ref: "${dataType.id}", style: 'heading2']
+                            attrs.putAll(DOMAIN_NAME)
+
+                            paragraph attrs, dataType.name
+
+                            if (dataType.dataModel) {
+                                paragraph {
+                                    text DOMAIN_CLASSIFICATION_NAME, "(${dataType.dataModel.name})"
+                                }
                             }
-                        }
-                        if (hasExtraInformation(dataType)) {
-                            table(columns: [1, 4], border: [size: 0], font: [color: '#5C5C5C']) {
-                                if (dataType.instanceOf(PrimitiveType) && dataType.measurementUnit) {
-                                    row {
-                                        cell 'Unit of Measure'
-                                        cell {
-                                            text dataType.measurementUnit.name
-                                            if (dataType.measurementUnit.description) {
-                                                text ' ('
-                                                text dataType.measurementUnit.description
-                                                ')'
+
+                            if (dataType.description) {
+                                paragraph {
+                                    text dataType.description
+                                }
+                            }
+                            if (hasExtraInformation(dataType)) {
+                                table(columns: [1, 4], border: [size: 0], font: [color: '#5C5C5C']) {
+                                    if (dataType.instanceOf(PrimitiveType) && dataType.measurementUnit) {
+                                        row {
+                                            cell 'Unit of Measure'
+                                            cell {
+                                                text dataType.measurementUnit.name
+                                                if (dataType.measurementUnit.description) {
+                                                    text ' ('
+                                                    text dataType.measurementUnit.description
+                                                    ')'
+                                                }
                                             }
                                         }
                                     }
-                                }
 
-                                if (dataType.instanceOf(ReferenceType) && dataType.dataClass) {
-                                    row {
-                                        cell 'Data Class'
-                                        cell {
-                                            text dataType.dataClass.name
-                                            if (dataType.dataClass.description) {
-                                                text ' ('
-                                                text dataType.dataClass.description
-                                                ')'
+                                    if (dataType.instanceOf(ReferenceType) && dataType.dataClass) {
+                                        row {
+                                            cell 'Data Class'
+                                            cell {
+                                                text dataType.dataClass.name
+                                                if (dataType.dataClass.description) {
+                                                    text ' ('
+                                                    text dataType.dataClass.description
+                                                    ')'
+                                                }
                                             }
                                         }
                                     }
-                                }
 
-                                if (dataType.regexDef) {
-                                    row {
-                                        cell 'Regular Expression'
-                                        cell dataType.regexDef
-                                    }
-                                } else if (dataType.rule) {
-                                    row {
-                                        cell 'Rule'
-                                        cell dataType.rule
-                                    }
-                                }
-
-                                getBaseRules(dataType).each { parent ->
-                                    if (parent.regexDef) {
+                                    if (dataType.regexDef) {
                                         row {
-                                            cell "Regular Expression based on\n ${CatalogueElementMarshaller.getClassifiedName(parent)} "
-                                            cell parent.regexDef
+                                            cell 'Regular Expression'
+                                            cell dataType.regexDef
                                         }
-                                    } else if (parent.rule) {
+                                    } else if (dataType.rule) {
                                         row {
-                                            cell "Rule based on\n ${CatalogueElementMarshaller.getClassifiedName(parent)}"
-                                            cell parent.rule
-                                        }
-                                    } else {
-                                        row {
-                                            cell "Based On"
-                                            cell CatalogueElementMarshaller.getClassifiedName(parent)
+                                            cell 'Rule'
+                                            cell dataType.rule
                                         }
                                     }
-                                }
 
-                            }
-
-                            if (dataType?.instanceOf(EnumeratedType)) {
-
-                                table(border: [size: 1, color: '#D2D2D2']) {
-                                    row(background: '#F2F2F2') {
-                                        cell ENUM_HEADER_CELL_TEXT, 'Code'
-                                        cell ENUM_HEADER_CELL_TEXT, 'Description'
-                                    }
-                                    Enumerations enumerations = dataType.enumerationsObject
-                                    for (Enumeration entry in enumerations) {
-                                        if (entry.deprecated) {
-                                            row(DEPRECATED_ENUM_CELL_TEXT) {
-                                                cell entry.key
-                                                cell entry.value
+                                    getBaseRules(dataType).each { parent ->
+                                        if (parent.regexDef) {
+                                            row {
+                                                cell "Regular Expression based on\n ${CatalogueElementMarshaller.getClassifiedName(parent)} "
+                                                cell parent.regexDef
+                                            }
+                                        } else if (parent.rule) {
+                                            row {
+                                                cell "Rule based on\n ${CatalogueElementMarshaller.getClassifiedName(parent)}"
+                                                cell parent.rule
                                             }
                                         } else {
                                             row {
-                                                cell entry.key
-                                                cell entry.value
+                                                cell "Based On"
+                                                cell CatalogueElementMarshaller.getClassifiedName(parent)
                                             }
                                         }
+                                    }
 
+                                }
+
+                                if (dataType?.instanceOf(EnumeratedType)) {
+
+                                    table(border: [size: 1, color: '#D2D2D2']) {
+                                        row(background: '#F2F2F2') {
+                                            cell ENUM_HEADER_CELL_TEXT, 'Code'
+                                            cell ENUM_HEADER_CELL_TEXT, 'Description'
+                                        }
+                                        Enumerations enumerations = dataType.enumerationsObject
+                                        for (Enumeration entry in enumerations) {
+                                            if (entry.deprecated) {
+                                                row(DEPRECATED_ENUM_CELL_TEXT) {
+                                                    cell entry.key
+                                                    cell entry.value
+                                                }
+                                            } else {
+                                                row {
+                                                    cell entry.key
+                                                    cell entry.value
+                                                }
+                                            }
+
+                                        }
                                     }
                                 }
                             }
-                        }
 
 
-                        paragraph style: 'heading4', margin: [bottom: 0], font: [size: 11, bold: true, color: '#999999'], "Usages"
-                        for (DataClass backref in docHelper.usedDataTypes.get(dataType)) {
-                            paragraph(margin: [top: 0, bottom: 0]) {
-                                link url: "#${backref.id}", style: 'heading4', font: [size: 9, color: '#29BDCA'], backref.name
+                            paragraph style: 'heading4', margin: [bottom: 0], font: [size: 11, bold: true, color: '#999999'], "Usages"
+                            for (DataClass backref in docHelper.usedDataTypes.get(dataType)) {
+                                paragraph(margin: [top: 0, bottom: 0]) {
+                                    link url: "#${backref.id}", style: 'heading4', font: [size: 9, color: '#29BDCA'], backref.name
+                                }
+
                             }
 
                         }
-
                     }
                 }
 
                 if(docHelper.rules) {
                     pageBreak()
-                    heading2 'Validation Rules'
+                    heading1 'Business Rules'
                     docHelper.printRules()
                 }
 
@@ -345,7 +350,6 @@ class DataModelToDocxExporter {
 
     private Set getBaseRules(DataType dataType, Set basedOn = []){
         elementService.getTypeHierarchy([:], dataType).items.each{ DataType type ->
-            println(type)
             basedOn.add(type)
             basedOn.addAll(getBaseRules(type, basedOn))
         }
