@@ -54,7 +54,7 @@ class BootStrap {
                 initCatalogueService.initCatalogue(true)
                 initPoliciesAndTags()
                 initSecurity(false)
-                setupStuff()
+                setupDevTestStuff()
             }
             modelCatalogueSearchService.reindex(true).all { it }.toBlocking().subscribe {
                 System.out.println "Reindexed"
@@ -494,7 +494,7 @@ class BootStrap {
         }
     }
 
-    def setupStuff(){
+    def setupDevTestStuff(){
         actionService.resetAllRunningActions()
         try {
 
