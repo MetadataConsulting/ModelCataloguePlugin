@@ -47,6 +47,6 @@ public class RxElastic {
         });
     }
 
-    public static final int DEFAULT_RETRIES = 10;
+    public static final int DEFAULT_RETRIES = 3;
     public static final int DEFAULT_DELAY = 1000;
 }
