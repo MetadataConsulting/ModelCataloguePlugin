@@ -32,7 +32,7 @@ class InvalidRegistrationSpec extends GebSpec {
         and:'type the password'
         $("input#password").value("berthe32~~")
         $("input#password2").value("berthe32~~")
-        // CLICK ON CREATE
+        // CLICK ON menuButton
         $("button.btn").click()
         // WAIT FOR 1 MIN
         Thread.sleep(1000L)
