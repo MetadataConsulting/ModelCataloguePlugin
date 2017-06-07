@@ -52,7 +52,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
       }
 
   actionsProvider.registerActionInRoles 'favorite-element',
-    [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INIFINITE_LIST],
+    [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INFINITE_LIST],
     ($scope, messages, $state, security, catalogueElementResource, modelCatalogueApiRoot, enhance, rest, $rootScope) ->
       'ngInject'
       elementPresent = $scope.element and angular.isFunction($scope.element.getResourceName) and
