@@ -306,7 +306,7 @@ class InheritanceSpec extends AbstractIntegrationSpec  {
         then: "error is returned"
         rc3.errors.errorCount > 0
 
-        and: "the children still contain the data element"
+        and: "the children still contains the data element"
         dataElement3 in childClass.contains
 
         when: "we try to add relationship which is already inherited"

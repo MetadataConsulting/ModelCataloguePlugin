@@ -60,7 +60,7 @@ class ExtendibleElementExtensionsWrapperSpec extends IntegrationSpec {
 
         then:
         IllegalArgumentException e = thrown()
-        e.message == "Invalid key: . The key must be contain at least one character! (value = something)"
+        e.message == "Invalid key: . The key must be contains at least one character! (value = something)"
 
 
         when:
