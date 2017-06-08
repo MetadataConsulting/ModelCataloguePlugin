@@ -63,7 +63,7 @@ class AddDataInToFavouritesSpec extends AbstractModelCatalogueGebSpec {
         click favouriteModel
 
         then:
-        check rightSideTitle contains 'Ovarian Cancer'
+        check rightSideTitle contains 'Cancer'
 
 
         when:
