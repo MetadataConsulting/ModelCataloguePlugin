@@ -131,7 +131,7 @@ class ElasticSearchServiceSpec extends AbstractIntegrationSpec {
         when: "search with the content of item name in relationships"
         ListWithTotalAndType<Relationship> foundRelationships = elasticSearchService.search(dataModel, RelationshipType.hierarchyType, RelationshipDirection.OUTGOING,[search: 'test'])
 
-        then: "there are no results if the related item does not contain the search term"
+        then: "there are no results if the related item does not contains the search term"
         foundRelationships.total == 0L
 
         when:
