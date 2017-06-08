@@ -63,7 +63,7 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
         else
           angular.forEach element.ext, (value, key) ->
             properties.push label: names.getNaturalName(key), value: -> value
-      if security.hasRole('ADMIN') and element and element.changed and element.latestVersion
+      if element and element.changed and element.latestVersion
         properties.push label: 'Type', value: -> element.type
         properties.push label: 'Changed Element', value: -> element.changed
         properties.push label: 'Root Element', value: -> element.latestVersion
