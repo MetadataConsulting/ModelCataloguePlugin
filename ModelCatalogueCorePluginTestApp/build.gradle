@@ -379,7 +379,7 @@ task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initT
     environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
     environment 'MC_DOCKER_HOST', host
 
-    commandLine grailsw, 'test-app', '-war', '--non-interactive', '--stacktrace'
+    commandLine grailsw, 'test-app', '-war', '--non-interactive', '--stacktrace', '-integration', '-unit'
 
     inputs.files files('grails-app')
     inputs.files files('src')
