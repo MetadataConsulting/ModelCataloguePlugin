@@ -368,7 +368,7 @@ task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, start
 }
 
 task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initTestDatabaseInMYSQLContainer]) {
-    description = "Run all Grails MX tests"
+    description = "Run all Grails MX tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
 
     assertJava8()
     environment 'GRAILS_OPTS', "-Xmx2G -Xms1G -XX:MaxPermSize=1G -server"
@@ -377,7 +377,11 @@ task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initT
     environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
     environment 'MC_DOCKER_HOST', host
 
-    commandLine grailsw, 'test-app', '-war', '--non-interactive'
+    def cmds = [grailsw, 'test-app', '-war', '--non-interactive']
+    if (project.hasProperty('testArgs')) { // get arguments for grails test-app
+        cmds.addAll(testArgs.split(' '))
+    }
+    commandLine cmds
 
     inputs.files files('grails-app')
     inputs.files files('src')
