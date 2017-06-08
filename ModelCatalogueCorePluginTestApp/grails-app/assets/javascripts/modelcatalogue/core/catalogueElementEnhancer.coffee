@@ -179,8 +179,7 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
               semver = @semanticVersion
               versionNumber = @versionNumber
             else
-              ret = 'None'
-              semver = '0.0.0'
+              return null
 
             semver = "rev#{versionNumber}" unless semver
 
@@ -205,6 +204,7 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
             return semver
 
           self.getVersionAndId = ->
+            return null unless @getExternalId()
             "#{@getExternalId()}@#{@getSemanticVersion()}"
 
           self.getExternalId = ->

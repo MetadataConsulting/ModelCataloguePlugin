@@ -168,13 +168,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       return undefined if not angular.isFunction $scope.element.isInstanceOf
 
     {
-      show:       true
       position:   0
       label:      names.getNaturalName(names.getPropertyNameFromQualifier($scope.element.elementType))
       icon:       catalogue.getIcon($scope.element.elementType)
       type:       'primary'
       watches:    ['element.elementType', 'element.status']
-      expandToLeft: true
+      abstract:   true
     }
   ]
 
