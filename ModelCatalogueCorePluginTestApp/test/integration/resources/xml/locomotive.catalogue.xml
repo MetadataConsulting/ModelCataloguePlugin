@@ -39,13 +39,13 @@
     <!-- Relationship types are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored! For non-admin users, the types are always imported as system ones and they need to be approved by the catalogue admin first. -->
     <relationshipTypes>
         <relationshipType name="base" source="org.modelcatalogue.core.CatalogueElement" destination="org.modelcatalogue.core.CatalogueElement" versionSpecific="true">
-            <sourceToDestination label="is based on">Any catalogue element can be based on multiple elements of the same type. Value domains will first use rules of the base value domains and than their owns when validating input values.</sourceToDestination>
-            <destinationToSource label="is base for">Any catalogue element can be base for multiple elements of the same type.</destinationToSource>
+            <sourceToDestination label="is based on">A Catalogue Element can be based on multiple Catalogue Elements of the same type. Value domains will first use rules of the base value domains and than their owns when validating input values.</sourceToDestination>
+            <destinationToSource label="is base for">A Catalogue Element can be base for multiple Catalogue Elements of the same type.</destinationToSource>
             <rule>isSameClass()</rule>
         </relationshipType>
         <relationshipType name="containment" source="org.modelcatalogue.core.DataClass" destination="org.modelcatalogue.core.DataElement" versionSpecific="true">
-            <sourceToDestination label="contains">Model can contain multiple data elements. Contained data elements are finalized when the model is finalized.</sourceToDestination>
-            <destinationToSource label="contained in">Data element can be contained in multiple models. When new draft of the data element is created then drafts for all containing models are created as well.</destinationToSource>
+            <sourceToDestination label="contains">A Data Class can contain multiple Data Elements. Contained Data Elements are finalized when the Class is finalized.</sourceToDestination>
+            <destinationToSource label="contained in">A Data Element can be contained in multiple Data Classes. When a new draft of a Data Element is created, then drafts for all containing Data Classes are created as well.</destinationToSource>
             <rule>String minOccursString = ext['Min Occurs']
                 String maxOccursString = ext['Max Occurs']
 
@@ -65,16 +65,16 @@
                 return true</rule>
         </relationshipType>
         <relationshipType name="hierarchy" source="org.modelcatalogue.core.DataClass" destination="org.modelcatalogue.core.DataClass" versionSpecific="true">
-            <sourceToDestination label="parent of">Model can contain (be parent of) multiple models. Child models are finalized when parent model is finalized,</sourceToDestination>
-            <destinationToSource label="child of">Model can be contained (be child model) in multiple models. When draft is created for child model drafts for parent models are created as well.</destinationToSource>
+            <sourceToDestination label="parent of">A Class can contain (be parent of) multiple Classes. Child Classes are finalized when parent Class is finalized.</sourceToDestination>
+            <destinationToSource label="child of">A Class can be contained (be child Class of) in multiple Classes. When a draft is created for child Class, drafts for parent Classes are created as well.</destinationToSource>
         </relationshipType>
         <relationshipType name="involvedness" source="org.modelcatalogue.core.ValidationRule" destination="org.modelcatalogue.core.DataElement" versionSpecific="true">
-            <sourceToDestination label="involves">Validation rule can involve multiple data elements</sourceToDestination>
-            <destinationToSource label="is involved in">Data element can be involved in multiple validation rules</destinationToSource>
+            <sourceToDestination label="involves">A Validation Rule can involve multiple Data Elements</sourceToDestination>
+            <destinationToSource label="is involved in">A Data Element can be involved in multiple Validation Rules</destinationToSource>
         </relationshipType>
         <relationshipType name="ruleContext" source="org.modelcatalogue.core.ValidationRule" destination="org.modelcatalogue.core.DataClass" versionSpecific="true">
-            <sourceToDestination label="applied within context">Validation rule is applied within context of data class.</sourceToDestination>
-            <destinationToSource label="provides context for">Data class can provide context for multiple validation rules</destinationToSource>
+            <sourceToDestination label="applied within context">A Validation rule is applied within the context of a Data Class.</sourceToDestination>
+            <destinationToSource label="provides context for">A Data Class can provide the context for multiple validation rules</destinationToSource>
         </relationshipType>
     </relationshipTypes>
 </catalogue>

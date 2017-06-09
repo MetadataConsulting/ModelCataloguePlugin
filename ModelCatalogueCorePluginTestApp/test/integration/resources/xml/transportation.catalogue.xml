@@ -27,13 +27,13 @@
     <!-- Relationship types are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored! For non-admin users, the types are always imported as system ones and they need to be approved by the catalogue admin first. -->
     <relationshipTypes>
         <relationshipType name="base" source="org.modelcatalogue.core.CatalogueElement" destination="org.modelcatalogue.core.CatalogueElement" versionSpecific="true">
-            <sourceToDestination label="is based on">Any catalogue element can be based on multiple elements of the same type. Value domains will first use rules of the base value domains and than their owns when validating input values.</sourceToDestination>
-            <destinationToSource label="is base for">Any catalogue element can be base for multiple elements of the same type.</destinationToSource>
+            <sourceToDestination label="is based on">A Catalogue Element can be based on multiple Catalogue Elements of the same type. Value domains will first use rules of the base value domains and than their owns when validating input values.</sourceToDestination>
+            <destinationToSource label="is base for">A Catalogue Element can be base for multiple Catalogue Elements of the same type.</destinationToSource>
             <rule>isSameClass()</rule>
         </relationshipType>
         <relationshipType name="containment" source="org.modelcatalogue.core.DataClass" destination="org.modelcatalogue.core.DataElement" versionSpecific="true">
-            <sourceToDestination label="contains">Model can contain multiple data elements. Contained data elements are finalized when the model is finalized.</sourceToDestination>
-            <destinationToSource label="contained in">Data element can be contained in multiple models. When new draft of the data element is created then drafts for all containing models are created as well.</destinationToSource>
+            <sourceToDestination label="contains">A Data Class can contain multiple Data Elements. Contained Data Elements are finalized when the Class is finalized.</sourceToDestination>
+            <destinationToSource label="contained in">A Data Element can be contained in multiple Data Classes. When a new draft of a Data Element is created, then drafts for all containing Data Classes are created as well.</destinationToSource>
             <rule>String minOccursString = ext['Min Occurs']
                 String maxOccursString = ext['Max Occurs']
 
@@ -53,8 +53,8 @@
                 return true</rule>
         </relationshipType>
         <relationshipType name="declaration" source="org.modelcatalogue.core.DataModel" destination="org.modelcatalogue.core.CatalogueElement" system="true" versionSpecific="true">
-            <sourceToDestination label="declares">Data models can declare multiple elements. Based on this relationship you can narrow the elements shown in the catalogue using the data model filter in the bottom left corner. When data model is finalized all defined elements are finalized as well.</sourceToDestination>
-            <destinationToSource label="declared within">Any element can be declared within multiple data models. When new draft of the element is created then drafts for data models are created as well.</destinationToSource>
+            <sourceToDestination label="declares">Data Models can declare multiple Catalogue Elements. Based on this relationship you can narrow the Catalogue Elements shown in the Catalogue using the Data Model filter in the bottom left corner. When Data Model is finalized all defined Elements are finalized as well.</sourceToDestination>
+            <destinationToSource label="declared within">A Catalogue Element can be declared within multiple Data Models. When new draft of the Catalogue Element is created then drafts for Data Models are created as well.</destinationToSource>
         </relationshipType>
     </relationshipTypes>
     <!-- Policies are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored! -->

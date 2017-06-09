@@ -21,12 +21,12 @@
     <!-- Relationship types are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored! For non-admin users, the types are always imported as system ones and they need to be approved by the catalogue admin first. -->
     <relationshipTypes>
         <relationshipType name="base" source="org.modelcatalogue.core.CatalogueElement" destination="org.modelcatalogue.core.CatalogueElement" versionSpecific="true">
-            <sourceToDestination label="is based on">Any catalogue element can be based on multiple elements of the same type. Value domains will first use rules of the base value domains and than their owns when validating input values.</sourceToDestination>
-            <destinationToSource label="is base for">Any catalogue element can be base for multiple elements of the same type.</destinationToSource>
+            <sourceToDestination label="is based on">A Catalogue Element can be based on multiple Catalogue Elements of the same type. Value domains will first use rules of the base value domains and than their owns when validating input values.</sourceToDestination>
+            <destinationToSource label="is base for">A Catalogue Element can be base for multiple Catalogue Elements of the same type.</destinationToSource>
             <rule>isSameClass()</rule>
         </relationshipType>
         <relationshipType name="relatedTo" source="org.modelcatalogue.core.CatalogueElement" destination="org.modelcatalogue.core.CatalogueElement" bidirectional="true">
-            <sourceToDestination label="related to">Any element can be related to multiple elements. This relationship has no specific meaning.</sourceToDestination>
+            <sourceToDestination label="related to">A Catalogue Element can be related to multiple Catalogue Elements. This relationship has no specific meaning, but may carry metadata to further specify it.</sourceToDestination>
             <destinationToSource label="related to"/>
         </relationshipType>
     </relationshipTypes>

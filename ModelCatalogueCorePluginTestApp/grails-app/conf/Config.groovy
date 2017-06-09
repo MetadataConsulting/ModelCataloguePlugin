@@ -449,7 +449,7 @@ modelcatalogue.defaults.relationshiptypes =  [
      destinationClass: CatalogueElement,
      rule: "isSameClass()",
      versionSpecific: true,
-     sourceToDestinationDescription: "A Catalogue Element can be based on multiple Catalogue Elements of the same type. Value domains will first use rules of the base value domains and than their owns when validating input values.",
+     sourceToDestinationDescription: "A Catalogue Element can be based on multiple Catalogue Elements of the same type. Value domains will first use rules of the base value domains and then their own when validating input values.",
      destinationToSourceDescription: "A Catalogue Element can be base for multiple Catalogue Elements of the same type."],
     [name: "attachment",
      sourceToDestination: "has attachment of",
