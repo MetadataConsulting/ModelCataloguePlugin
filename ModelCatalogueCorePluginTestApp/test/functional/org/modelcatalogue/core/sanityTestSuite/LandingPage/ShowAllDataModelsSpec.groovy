@@ -1,0 +1,38 @@
+package org.modelcatalogue.core.sanityTestSuite.LandingPage
+
+import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Stepwise
+
+import static org.modelcatalogue.core.geb.Common.curator
+
+
+
+@Stepwise
+class ShowAllDataModelsSpec  extends AbstractModelCatalogueGebSpec {
+
+    private static final String  create  = "a#role_data-models_create-data-modelBtn"
+    private static final String  fastActions="a#role_navigation-right_fast-action-menu-item-link>span:nth-child(1)"
+    private static final String  showAllModels="div.modal-body>div:nth-child(2)>div>a:nth-child(10)"
+
+    def "login to model catalogue"() {
+
+        login curator
+
+        expect:
+        check create displayed
+    }
+
+    def "navigate to the top menu and select fast action"(){
+
+        click fastActions
+        click  showAllModels
+
+        expect:
+        check create displayed
+
+
+    }
+
+
+}
+

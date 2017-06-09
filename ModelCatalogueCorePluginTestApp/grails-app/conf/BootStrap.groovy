@@ -53,11 +53,11 @@ class BootStrap {
                 initCatalogueService.initCatalogue(true)
                 initPoliciesAndTags()
                 initSecurity(false)
-                setupStuff()
+                setupDevTestStuff()
             }
-            modelCatalogueSearchService.reindex(true).all { it }.toBlocking().subscribe {
-                System.out.println "Reindexed"
-            }
+//            modelCatalogueSearchService.reindex(true).all { it }.toBlocking().subscribe {
+//                System.out.println "Reindexed"
+//            }
         } else {
             initCatalogueService.initDefaultRelationshipTypes()
             initPoliciesAndTags()
@@ -475,7 +475,7 @@ class BootStrap {
         }
     }
 
-    def setupStuff(){
+    def setupDevTestStuff(){
         actionService.resetAllRunningActions()
         try {
 

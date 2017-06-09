@@ -157,7 +157,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
         messages.prompt(null, null, type: 'new-version', element: $scope.element)
     }
   actionsProvider.registerChildActionInRole 'catalogue-element', 'create-new-version', actionsProvider.ROLE_ITEM_ACTION, newVersionAction
-  actionsProvider.registerActionInRoles 'create-new-version-tiny', [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INIFINITE_LIST], newVersionAction
+  actionsProvider.registerActionInRoles 'create-new-version-tiny', [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INFINITE_LIST], newVersionAction
 
 
 
@@ -168,13 +168,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       return undefined if not angular.isFunction $scope.element.isInstanceOf
 
     {
-      show:       true
       position:   0
       label:      names.getNaturalName(names.getPropertyNameFromQualifier($scope.element.elementType))
       icon:       catalogue.getIcon($scope.element.elementType)
       type:       'primary'
       watches:    ['element.elementType', 'element.status']
-      expandToLeft: true
+      abstract:   true
     }
   ]
 
@@ -769,4 +768,4 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
 
   actionsProvider.registerChildActionInRole 'catalogue-element', 'upload-new-asset-version', actionsProvider.ROLE_ITEM_ACTION, newAssetVersion
-  actionsProvider.registerActionInRoles 'upload-new-asset-version-tiny', [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INIFINITE_LIST], newAssetVersion
+  actionsProvider.registerActionInRoles 'upload-new-asset-version-tiny', [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INFINITE_LIST], newAssetVersion
