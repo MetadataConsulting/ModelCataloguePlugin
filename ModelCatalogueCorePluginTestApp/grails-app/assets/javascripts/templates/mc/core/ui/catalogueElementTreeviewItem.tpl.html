@@ -1,10 +1,18 @@
 <li class="catalogue-element-treeview-item">
   <div class="catalogue-element-treeview-text-content"
        ng-class="{'active': node.active, 'archived': element.$$archived}">
+    <!--
+     The following displays a "total" number of children of a node in the treeview.
+     It doesn't seem to display what we want for certain elements such as the Data Model. It does seem to be useful for Data Classes and Data Element Tags.
+     At the top level numberOfChildren seems to come from DataModelController's "content" method. (descend="content").
+     We're turning it off for now since we don't understand how to fine-tune it. --James 7 June 2017
+     -->
+    <!--
     <span class="badge pull-right" ng-if="node.numberOfChildren" ng-switch="node.numberOfChildren">
       <span ng-switch-default>{{::node.numberOfChildren}}</span>
       <span ng-switch-when="2147483647" class="fa fa-question fa-inverse"></span>
     </span>
+    -->
     <span class="catalogue-element-treeview-labels">
       <span ng-if="::!element.elementType">
         <a class="catalogue-element-treeview-icon btn btn-link">
