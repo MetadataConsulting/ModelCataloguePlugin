@@ -56,9 +56,9 @@ class BootStrap {
                 initSecurity(false)
                 setupDevTestStuff()
             }
-            modelCatalogueSearchService.reindex(true).all { it }.toBlocking().subscribe {
-                System.out.println "Reindexed"
-            }
+//            modelCatalogueSearchService.reindex(true).all { it }.toBlocking().subscribe {
+//                System.out.println "Reindexed"
+//            }
         } else {
             initCatalogueService.initDefaultRelationshipTypes()
             initPoliciesAndTags()

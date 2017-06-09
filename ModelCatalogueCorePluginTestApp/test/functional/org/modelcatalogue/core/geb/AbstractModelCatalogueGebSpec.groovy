@@ -4,8 +4,10 @@ import geb.Browser
 import geb.navigator.Navigator
 import geb.spock.GebReportingSpec
 import geb.waiting.WaitTimeoutException
+import org.openqa.selenium.By
 import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.StaleElementReferenceException
+import org.openqa.selenium.WebElement
 import org.openqa.selenium.logging.LogEntries
 import org.openqa.selenium.logging.LogEntry
 import org.openqa.selenium.logging.LogType
@@ -19,7 +21,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     // sauce labs connector for some reason fails with the six in the input
     def loginAdmin() { loginUser("admin", "admin") }
     def loginViewer() { loginUser("viewer", "viewer") }
-    def loginCurator() { loginUser("curator", "creator") }
+    def loginCurator() { loginUser("curator", "curator") }
 
     def login(ApplicationUser user) {
         loginUser(user.username, user.password)
@@ -73,6 +75,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     def loginUser(String user, String pwd) {
+        browser.driver.manage().window().maximize()
         go "logout"
 
         waitFor (120) {
@@ -483,5 +486,12 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
     void pressKey(String selector = "body", Keys keys = Keys.ENTER) {
         $(selector) << keys
+    }
+
+    void selectInSearch (int element){
+        $("div.list-group>a:nth-child($element)").click()
+    }
+    void selectTreeView (String names){
+        $("ul.catalogue-element-treeview-list-root>li>ul>li:nth-child($names)>div>span:nth-child(2)>span").click()
     }
 }

@@ -62,7 +62,7 @@ task bowerInstall(type: NodeTask) {
     outputs.files file('grails-app/assets/bower_components')
     dependsOn npmPackages
 }
-
+bowerInstall.finalizedBy cleanUpBowerDependencies
 task cleanUpBowerDependencies(type: Delete) {
     group = 'Clean'
     delete 'grails-app/assets/bower_components/ace-builds/demo'
@@ -76,7 +76,85 @@ task cleanUpBowerDependencies(type: Delete) {
     delete 'grails-app/assets/bower_components/sly-repeat/scripts'
     delete 'grails-app/assets/bower_components/sly-repeat/src'
 }
-bowerInstall.finalizedBy cleanUpBowerDependencies
+
+
+
+
+task cleanIdeaFiles(type: Delete) {
+    delete '**/.idea'
+    delete '**/*.iml'
+}
+
+task cleanData(type: Delete) {
+    Properties properties = new Properties()
+    properties.load(file('application.properties').newInputStream())
+    delete "${System.getProperty('java.io.tmpdir')}/ModelCatalogueCorePluginTestApp/${properties['app.version']}"
+}
+
+
+task cleanGrailsFolders(type: Delete) {
+    Properties properties = new Properties()
+    properties.load(file('application.properties').newInputStream())
+    delete 'target'
+    delete 'target-eclipse'
+    delete '**/*.gen.fixture.js'
+    delete '**/*.gen.fixture.coffee'
+    delete "${System.getProperty('user.home')}/.grails/${properties['app.grails.version']}/ModelCatalogueCorePluginTestApp"
+}
+
+task cleanGrails(type: Exec, dependsOn: cleanGrailsFolders) {
+    commandLine grailsw, 'clean-all', '--stacktrace', '--non-interactive'
+
+}
+
+task refreshGrailsDependencies(type: Exec) {
+    commandLine grailsw, 'refresh-dependencies', '--stacktrace', '--non-interactive'
+    mustRunAfter cleanGrails
+}
+
+task cleanAll(type: Delete, dependsOn: [cleanData, cleanGrails, refreshGrailsDependencies]) {
+    delete '../build'
+}
+
+task runDev(type: Exec, dependsOn: bowerInstall) {
+    description = "Run MX in development environment"
+
+    assertJava8()
+    environment 'GRAILS_OPTS', "-Xmx1G -Xms512m -XX:MaxPermSize=512m -server"
+
+    def cmds = [grailsw]
+
+    if (project.hasProperty('mc.blank')) {
+        environment 'MC_BLANK_DEV', "true"
+    }
+
+    if (project.hasProperty('mc.war')) {
+        cmds << 'run-war'
+    } else {
+        cmds << 'run-app'
+    }
+
+    if (project.hasProperty('mc.debug')) {
+        cmds << '--debug-fork'
+    }
+
+    cmds << '--non-interactive'
+    cmds << '--stacktrace'
+
+    commandLine cmds
+    mustRunAfter 'stop'
+}
+
+task ensureProductionConfig(type: Copy) {
+    description = "Ensures configuration for MX production environment exists"
+    onlyIf {
+        !new File(new File(System.getProperty('user.home'), '.grails'), 'mc-config.groovy').exists()
+    }
+    from('../conf/docker') {
+        include 'mc-config.groovy'
+    }
+    into "${System.getProperty('user.home')}/.grails"
+}
 
 
 /// Docker tasks
@@ -381,7 +459,8 @@ task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, start
         cmds << '--debug-fork'
     }
 
-    cmds << ' --non-interactive'
+    cmds << '--non-interactive'
+    cmds << '--stacktrace'
 
     if (project.hasProperty('mc.search.elasticsearch.host')) {
         cmds << "-Dmc.search.elasticsearch.host=${project.getProperty('mc.search.elasticsearch.host')}"
@@ -418,7 +497,7 @@ task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initT
     environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
     environment 'MC_DOCKER_HOST', host
 
-    commandLine grailsw, 'test-app', '-war', '--non-interactive'
+    commandLine grailsw, 'test-app', '-war', '--non-interactive', '--stacktrace', '-integration', '-unit'
 
     inputs.files files('grails-app')
     inputs.files files('src')
@@ -455,13 +534,18 @@ task collectTestReports(type: Copy) {
 }
 
 
+task stop(type: Exec) {
+    description = "Stops running MX application"
+    commandLine grailsw, 'stop-app','--non-interactive', '--stacktrace'
+}
+
 stop.finalizedBy stopContainers
 
 
 task war(type: Exec, dependsOn: bowerInstall) {
     group = 'War'
     description = "Build production war of MX application"
-    commandLine grailsw, 'war', '--non-interactive'
+    commandLine grailsw, 'war', '--non-interactive', '--stacktrace'
 }
 
 

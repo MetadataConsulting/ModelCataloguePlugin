@@ -63,6 +63,7 @@ class ExtendibleElementExtensionsWrapperSpec extends IntegrationSpec {
         e.message == "Invalid key: . The key must be contain at least one character! (value = something)"
 
 
+
         when:
         element.ext.putAll(one: "1", two: "2")
 
