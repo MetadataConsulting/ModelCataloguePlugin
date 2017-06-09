@@ -127,6 +127,7 @@ task runDev(type: Exec, dependsOn: bowerInstall) {
     }
 
     cmds << '--non-interactive'
+    cmds << '--stacktrace'
 
     commandLine cmds
     mustRunAfter 'stop'
@@ -353,7 +354,8 @@ task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, start
         cmds << '--debug-fork'
     }
 
-    cmds << ' --non-interactive'
+    cmds << '--non-interactive'
+    cmds << '--stacktrace'
 
     if (project.hasProperty('mc.search.elasticsearch.host')) {
         cmds << "-Dmc.search.elasticsearch.host=${project.getProperty('mc.search.elasticsearch.host')}"
@@ -377,7 +379,8 @@ task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initT
     environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
     environment 'MC_DOCKER_HOST', host
 
-    def cmds = [grailsw, 'test-app', '-war', '--non-interactive']
+
+    def cmds = [grailsw, 'test-app', '-war', '--non-interactive', '--stacktrace', '-integration', '-unit']
     if (project.hasProperty('testArgs')) { // get arguments for grails test-app
         cmds.addAll(testArgs.split(' '))
     }
@@ -386,7 +389,8 @@ task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initT
     inputs.files files('grails-app')
     inputs.files files('src')
     inputs.files files('web-app')
-    inputs.files files('test/functional')
+    // we are not doing functional tests until they work robustly and independently of each other.
+    //inputs.files files('test/functional')
     inputs.files files('test/integration')
     inputs.files files('test/unit')
 
@@ -417,7 +421,7 @@ task collectTestReports(type: Copy) {
 
 task stop(type: Exec) {
     description = "Stops running MX application"
-    commandLine grailsw, 'stop-app','--non-interactive'
+    commandLine grailsw, 'stop-app','--non-interactive', '--stacktrace'
 }
 
 bowerInstall.finalizedBy cleanUpBowerDependencies
@@ -426,7 +430,7 @@ stop.finalizedBy stopContainers
 
 task war(type: Exec, dependsOn: bowerInstall) {
     description = "Build production war of MX application"
-    commandLine grailsw, 'war', '--non-interactive'
+    commandLine grailsw, 'war', '--non-interactive', '--stacktrace'
 }
 
 

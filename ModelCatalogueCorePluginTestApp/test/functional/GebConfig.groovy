@@ -15,6 +15,7 @@ options.addArguments("--disable-extensions")
 reportsDir = new File("target/geb-reports")
 reportOnTestFailureOnly = false
 baseUrl = 'http://localhost:8080/'
+//baseUrl = 'https://gel-mc-test.metadata.org.uk/'
 
 ChromeDriverManager.getInstance().setup()
 
