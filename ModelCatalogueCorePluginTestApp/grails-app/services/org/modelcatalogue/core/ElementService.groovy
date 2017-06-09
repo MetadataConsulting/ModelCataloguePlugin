@@ -24,7 +24,7 @@ import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.transaction.TransactionStatus
-import rx.Observer
+import rx.Observer as RxObserver
 
 class ElementService implements Publisher<CatalogueElement> {
 
@@ -310,14 +310,14 @@ class ElementService implements Publisher<CatalogueElement> {
         }
     }
 
-    public DataModel finalizeDataModel(DataModel draft, String version, String revisionNotes, Observer<String> monitor = ProgressMonitor.NOOP) {
+    public DataModel finalizeDataModel(DataModel draft, String version, String revisionNotes, RxObserver<String> monitor = ProgressMonitor.NOOP) {
         return finalizeDataModel(draft, version, revisionNotes, false, monitor)
     }
 
     /**
      * @deprecated skipping the eligibility is only available for tests
      */
-    public DataModel finalizeDataModel(DataModel draft, String version, String revisionNotes, boolean skipEligibility, Observer<String> monitor = ProgressMonitor.NOOP) {
+    public DataModel finalizeDataModel(DataModel draft, String version, String revisionNotes, boolean skipEligibility, RxObserver<String> monitor = ProgressMonitor.NOOP) {
         // check eligibility for finalization
         if (!skipEligibility) {
             draft.checkFinalizeEligibility(version, revisionNotes)
@@ -347,7 +347,7 @@ class ElementService implements Publisher<CatalogueElement> {
     /**
      * @deprecated finalization should only happen on the data model level
      */
-    public <E extends CatalogueElement> E finalizeElement(E draft, Observer<String> monitor = ProgressMonitor.NOOP) {
+    public <E extends CatalogueElement> E finalizeElement(E draft, RxObserver<String> monitor = ProgressMonitor.NOOP) {
         return (E) CatalogueElement.withTransaction { TransactionStatus status ->
             auditService.logElementFinalized(draft) {
                 E finalized = draft.publish(this, monitor) as E
@@ -539,13 +539,13 @@ class ElementService implements Publisher<CatalogueElement> {
     }
 
 
-    Map<Long, Long> findModelsToBeInlined() {
+    Map<Long, Long> findClassesToBeInlined() {
         if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST]) {
             // does not work with H2 database
-            log.warn "Trying to find inlined models in development mode. This feature does not work with H2 database"
+            log.warn "Trying to find inlined classes in development mode. This feature does not work with H2 database"
             return [:]
         }
-        List<DataClass> models = DataClass.executeQuery("""
+        List<DataClass> dataClasses = DataClass.executeQuery("""
             select m
             from DataClass m left join m.incomingRelationships inc
             group by m.name
@@ -555,9 +555,9 @@ class ElementService implements Publisher<CatalogueElement> {
 
         Map<Long, Long> ret = [:]
 
-        for (DataClass model in models) {
-            if (model.ext.from == 'xs:element') {
-                ret[model.id] = model.isBasedOn[0].id
+        for (DataClass dataClass in dataClasses) {
+            if (dataClass.ext.from == 'xs:element') {
+                ret[dataClass.id] = dataClass.isBasedOn[0].id
             }
         }
 
@@ -565,37 +565,37 @@ class ElementService implements Publisher<CatalogueElement> {
     }
 
     /**
-     * Return models which are very likely to be duplicates.
-     * For models having same name as at least one other Model check if they contains same child models and data
-     * elements. If so return their id and the set of ids of similar models.
-     * @return map with the model id as key and set of ids of duplicate models as value
+     * Return classes which are very likely to be duplicates.
+     * For classes having same name as at least one other class check if they contains same child classes and data
+     * elements. If so return their id and the set of ids of similar classes.
+     * @return map with the class id as key and set of ids of duplicate classes as value
      */
-    Map<Long, Set<Long>> findDuplicateModelsSuggestions() {
+    Map<Long, Set<Long>> findDuplicateClassesSuggestions() {
         // TODO: create test
         Object[][] results = DataClass.executeQuery """
-            select m.id, m.name, rel.relationshipType.name,  rel.destination.name
-            from DataClass m join m.outgoingRelationships as rel
+            select class1.id, class1.name, rel.relationshipType.name,  rel.destination.name
+            from DataClass class1 join class1.outgoingRelationships as rel
             where
-                m.name in (
-                    select model.name from DataClass model
-                    where model.status in :states
-                    group by model.name
-                    having count(model.id) > 1
+                class1.name in (
+                    select class2.name from DataClass class2
+                    where class2.status in :states
+                    group by class2.name
+                    having count(class2.id) > 1
                 )
             and
-                m.status in :states
+                class1.status in :states
             and
                 rel.archived = false
             and
                 (rel.relationshipType = :containment or rel.relationshipType = :hierarchy)
-            order by m.name asc, m.dateCreated asc, rel.destination.name asc
+            order by class1.name asc, class1.dateCreated asc, rel.destination.name asc
         """, [states: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.FINALIZED], containment: RelationshipType.readByName('containment'), hierarchy: RelationshipType.readByName('hierarchy')]
 
 
-        Map<Long, Map<String, Object>> models = new LinkedHashMap<Long, Map<String, Object>>().withDefault { [id: it, elementNames: new TreeSet<String>(), childrenNames: new TreeSet<String>()] }
+        Map<Long, Map<String, Object>> classes = new LinkedHashMap<Long, Map<String, Object>>().withDefault { [id: it, elementNames: new TreeSet<String>(), childrenNames: new TreeSet<String>()] }
 
         for (Object[] row in results) {
-            def info = models[row[0] as Long]
+            def info = classes[row[0] as Long]
             info.name = row[1]
             if (row[2] == 'containment') {
                 info.elementNames << row[3].toString()
@@ -611,7 +611,7 @@ class ElementService implements Publisher<CatalogueElement> {
 
         def current = null
 
-        models.each { id, info ->
+        classes.each { id, info ->
             if (!current) {
                 current = info
             } else {

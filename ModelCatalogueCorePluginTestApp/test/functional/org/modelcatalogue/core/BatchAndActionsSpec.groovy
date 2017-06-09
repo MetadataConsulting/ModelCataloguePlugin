@@ -1,10 +1,8 @@
 package org.modelcatalogue.core
 
-import geb.waiting.WaitTimeoutException
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
 import org.modelcatalogue.core.geb.CatalogueContent
-import org.modelcatalogue.core.geb.Common
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.*
@@ -22,7 +20,7 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
 
     private static final CatalogueContent linkToTestBatch   = CatalogueContent.create('td.inf-table-item-cell a', text: 'Test Batch')
     private static final CatalogueContent linkToRename      = CatalogueContent.create('td.inf-table-item-cell a', text: 'Create Synonyms for Enumerated Type \'personGenderCode(current)\'')
-    private static final CatalogueAction generateMerge      = CatalogueAction.runFirst('list', 'generate-merge-models')
+    private static final CatalogueAction generateSuggestions = CatalogueAction.runFirst('list', 'generate-suggestions')
     private static final CatalogueAction refreshList        = CatalogueAction.runFirst('list', 'refresh-batches')
     private static final CatalogueAction reloadActions      = CatalogueAction.runFirst('item', 'reload-actions')
 
@@ -39,7 +37,7 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
         check backdrop gone
 
         when:
-        click generateMerge
+        click generateSuggestions
 
         then:
         check modalDialog displayed
