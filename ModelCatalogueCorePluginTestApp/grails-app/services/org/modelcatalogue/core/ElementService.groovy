@@ -24,6 +24,7 @@ import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.transaction.TransactionStatus
+import rx.Observer as RxObserver
 
 class ElementService implements Publisher<CatalogueElement> {
 
@@ -309,14 +310,14 @@ class ElementService implements Publisher<CatalogueElement> {
         }
     }
 
-    public DataModel finalizeDataModel(DataModel draft, String version, String revisionNotes, Observer<String> monitor = ProgressMonitor.NOOP) {
+    public DataModel finalizeDataModel(DataModel draft, String version, String revisionNotes, RxObserver<String> monitor = ProgressMonitor.NOOP) {
         return finalizeDataModel(draft, version, revisionNotes, false, monitor)
     }
 
     /**
      * @deprecated skipping the eligibility is only available for tests
      */
-    public DataModel finalizeDataModel(DataModel draft, String version, String revisionNotes, boolean skipEligibility, Observer<String> monitor = ProgressMonitor.NOOP) {
+    public DataModel finalizeDataModel(DataModel draft, String version, String revisionNotes, boolean skipEligibility, RxObserver<String> monitor = ProgressMonitor.NOOP) {
         // check eligibility for finalization
         if (!skipEligibility) {
             draft.checkFinalizeEligibility(version, revisionNotes)
@@ -346,7 +347,7 @@ class ElementService implements Publisher<CatalogueElement> {
     /**
      * @deprecated finalization should only happen on the data model level
      */
-    public <E extends CatalogueElement> E finalizeElement(E draft, Observer<String> monitor = ProgressMonitor.NOOP) {
+    public <E extends CatalogueElement> E finalizeElement(E draft, RxObserver<String> monitor = ProgressMonitor.NOOP) {
         return (E) CatalogueElement.withTransaction { TransactionStatus status ->
             auditService.logElementFinalized(draft) {
                 E finalized = draft.publish(this, monitor) as E
