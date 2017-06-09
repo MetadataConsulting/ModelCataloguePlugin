@@ -1,3 +1,5 @@
+/** Not used; was for when we had a plugin structure and the ModelCataloguePlugin was actually trying to be a plugin. */
+
 log4j = {
     // Example of changing the log pattern for the default console
     // appender:

@@ -16,6 +16,14 @@ class ModelCatalogueCorePluginUrlMappings {
             format = 'xml'
         }
 
+        /// cytoscape stuff:
+        // JSON export for cytoscape graph
+        "/catalogue/$resource/$id(.${version})/cytoscapeJsonExport" (controller: 'catalogue', action: 'cytoscape_json', method: HttpMethod.GET) // { format = 'json' }
+        // view graph as catalogue
+        "/catalogue/cytoscapeGraphView" (controller: 'catalogue', 'action': 'display_cytoscape', method: HttpMethod.GET)
+        // get ID-model map for model_catalogue_graph's get model list function
+        "/catalogue/getIdModelMap" (controller: 'dataModel', action: 'idModelMap', method: HttpMethod.GET) { format = 'json' } // to get data model list as Json
+
         "/api/modelCatalogue/core/feedback"(controller: 'catalogue', action: 'feedbacks', method: HttpMethod.GET)
         "/api/modelCatalogue/core/feedback/$key"(controller: 'catalogue', action: 'feedback', method: HttpMethod.GET)
         "/api/modelCatalogue/core/logs"(controller: 'logging', action: 'logsToAssets', method: HttpMethod.GET)

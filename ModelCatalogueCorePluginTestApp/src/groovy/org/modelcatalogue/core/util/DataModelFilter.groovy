@@ -23,6 +23,10 @@ class DataModelFilter {
     }
 
     private DataModelFilter(boolean unclassifiedOnly) {
+        /** Unclassified means those CatalogueElements with no data model.
+         * Even though CatalogueElements should in principle have
+         * a data model. For example, DataModels themselves do not have DataModels
+         * they are part of, and they are not part of themselves.*/
         this.unclassifiedOnly = unclassifiedOnly
         this.includes = ImmutableSet.of()
         this.excludes = ImmutableSet.of()

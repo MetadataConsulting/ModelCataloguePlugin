@@ -1,0 +1,151 @@
+{
+    "elements" : {
+	"nodes" : [
+	    {"data" : {
+		"id" : "http://metadata.org.uk/ontologies/cancer#Diagnosis",
+		"name" : "Diagnosis"
+	    },
+	     "position" : {
+		 "x" : 0,
+		 "y" : 0
+	     }},
+	    {"data" : {
+		"id" : "http://metadata.org.uk/ontologies/cancer#Participant",
+		"name" : "Participant"
+	    },
+	     "position" : {
+		 "x" : 200,
+		 "y" : 0
+	     }},
+	    {"data" : {
+		"id" : "http://www.metadata.org.uk/ontologies/cosd/bod#BasisOfDiagnosis",
+		"name" : "BasisOfDiagnosis"
+	    },
+	     "position" : {
+		 "x" : 0,
+		 "y" : 100
+	     }},
+	    {"data" : {
+		"id" : "http://www.metadata.org.uk/ontologies/cosd/crcpi#CancerRecurrenceCarePlanIndicator",
+		"name" : "CancerRecurrenceCarePlanIndicator"
+	    },
+	     "position" : {
+		 "x" : 71,
+		 "y" : 71
+	     }},
+	    {"data" : {
+		"id" : "http://www.metadata.org.uk/ontologies/cosd/god#GradeOfDifferentiation",
+		"name" : "GradeOfDifferentiation"
+	    },
+	     "position" : {
+		 "x" : 100,
+		 "y" : 0
+	     }},
+	    {"data" : {
+		"id" : "http://www.metadata.org.uk/ontologies/cosd/icd#ICDCode",
+		"name" : "ICDCode"
+	    },
+	     "position" : {
+		 "x" : 71,
+		 "y" : -71
+	     }},
+	    {"data" : {
+		"id" : "http://www.metadata.org.uk/ontologies/cosd/mtst#MetastaticSite",
+		"name" : "MetastaticSite"
+	    },
+	     "position" : {
+		 "x" : -71,
+		 "y" : 71
+	     }},
+	    {"data" : {
+		"id" : "http://www.metadata.org.uk/ontologies/cosd/snm#SNOMEDCode",
+		"name" : "SNOMEDCode"
+	    },
+	     "position" : {
+		 "x" : -100,
+		 "y" : 0
+	     }},
+	    {"data" : {
+		"id" : "http://www.metadata.org.uk/ontologies/cosd/tml#TumorLaterality",
+		"name" : "TumorLaterality"
+	    },
+	     "position" : {
+		 "x" : -71,
+		 "y" : -71
+	     }},
+	    {"data" : {
+		"id" : "http://www.metadata.org.uk/ontologies/metadata#EntityMetadata",
+		"name" : "EntityMetadata"
+	    },
+	     "position" : {
+		 "x" : 0,
+		 "y" : -100
+	     }},
+	    {"data" : {
+		"id" : "xsd:string",
+		"name" : "String literal"
+	    },
+	     "position" : {
+		 "x" : 200,
+		 "y" : -50
+	     }}
+	],
+	"edges" : [
+	    {"data" : {
+		"id" : "http://metadata.org.uk/ontologies/cancer#hasBasisOfDiagnosis",
+		"name" : "hasBasisOfDiagnosis",
+		"source" : "http://metadata.org.uk/ontologies/cancer#Diagnosis",
+		"target" : "http://www.metadata.org.uk/ontologies/cosd/bod#BasisOfDiagnosis"}},
+	    {"data" : {
+		"id" : "http://metadata.org.uk/ontologies/cancer#hasCancerRecurrenceCarePlanIndicator",
+		"name" : "hasCancerRecurrenceCarePlanIndicator",
+		"source" : "http://metadata.org.uk/ontologies/cancer#Diagnosis",
+		"target" : "http://www.metadata.org.uk/ontologies/cosd/crcpi#CancerRecurrenceCarePlanIndicator"}},
+	    {"data" : {
+		"id" : "http://metadata.org.uk/ontologies/cancer#hasGradeOfDifferentiationAtDiagnosis",
+		"name" : "hasGradeOfDifferentiationAtDiagnosis",
+		"source" : "http://metadata.org.uk/ontologies/cancer#Diagnosis",
+		"target" : "http://www.metadata.org.uk/ontologies/cosd/god#GradeOfDifferentiation"}},
+	    {"data" : {
+		"id" : "http://metadata.org.uk/ontologies/cancer#hasICDCode",
+		"name" : "hasICDCode",
+		"source" : "http://metadata.org.uk/ontologies/cancer#Diagnosis",
+		"target" : "http://www.metadata.org.uk/ontologies/cosd/icd#ICDCode"}},
+	    {"data" : {
+		"id" : "http://metadata.org.uk/ontologies/cancer#hasMetadataGraph",
+		"name" : "hasMetadataGraph",
+		"source" : "http://metadata.org.uk/ontologies/cancer#Diagnosis",
+		"target" : "http://www.metadata.org.uk/ontologies/metadata#EntityMetadata"}},
+	    {"data" : {
+		"id" : "http://metadata.org.uk/ontologies/cancer#hasMetastaticSite",
+		"name" : "hasMetastaticSite",
+		"source" : "http://metadata.org.uk/ontologies/cancer#Diagnosis",
+		"target" : "http://www.metadata.org.uk/ontologies/cosd/mtst#MetastaticSite"}},
+	    {"data" : {
+		"id" : "http://metadata.org.uk/ontologies/cancer#hasSNOMEDCode",
+		"name" : "hasSNOMEDCode",
+		"source" : "http://metadata.org.uk/ontologies/cancer#Diagnosis",
+		"target" : "http://www.metadata.org.uk/ontologies/cosd/snm#SNOMEDCode"}},
+	    {"data" : {
+		"id" : "http://metadata.org.uk/ontologies/cancer#hasTumorLaterality",
+		"name" : "hasTumorLaterality",
+		"source" : "http://metadata.org.uk/ontologies/cancer#Diagnosis",
+		"target" : "http://www.metadata.org.uk/ontologies/cosd/tml#TumorLaterality"}},
+	    {"data" : {
+		"id" : "http://metadata.org.uk/ontologies/cancer#hasParticipantID",
+		"name" : "hasParticipantID",
+		"source" : "http://metadata.org.uk/ontologies/cancer#Participant",
+		"target" : "xsd:string"}}
+		
+	]
+    },
+    "style" : [
+	{
+	    "selector" : "edge",
+	    "style" : {
+		"label" : "data(name)"
+	    }
+	}
+    ]
+    
+}

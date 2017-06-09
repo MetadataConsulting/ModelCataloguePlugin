@@ -25,6 +25,15 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
 	DataModelController() {
 		super(DataModel, false)
 	}
+    def idModelMap(Integer max) {
+        ListWithTotalAndType<DataModel> models = getAllEffectiveItems(max)
+        def idModelMap = models.getItems().collectEntries {
+            //[(it.modelCatalogueId): it.name]
+            [(it.latestVersionId): it.name]
+        }
+        response.status=200
+        respond idModelMap // as JSON
+    }
 
     //can be used in the future
     static final String DOC_IMAGE_PATH = ""

@@ -4,7 +4,7 @@
     window.onSaxonLoad = function() {
         Saxon = window.Saxon
     };
-
+    // Misnomers abound! The file is xmlTransformer, the angular module is xsltTransformer!
     angular.module("mc.util.xsltTransformer", []).factory('xsltTransformer', function($q, $log, $window, vkbeautify) {
 
         function XsltTransformer() {

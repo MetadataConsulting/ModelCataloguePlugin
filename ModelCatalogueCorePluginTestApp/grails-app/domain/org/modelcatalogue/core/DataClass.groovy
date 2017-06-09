@@ -6,6 +6,15 @@ import org.modelcatalogue.core.util.Legacy
 
 class DataClass extends CatalogueElement {
 
+    /** Originally there was only hierarchy which could be to either DataClasses or DataElements.
+     * Then David wanted to get rid of hierarchy and call it containment.
+     * But then it proved useful to have two sorts of relationships:
+     * one from Classes to Elements, the other from Classes to Classes.
+     * This was used in SQL procedures.
+     * It seems like "incoming" are also outgoing relationships that are
+     * the inverse of the real incoming relationships.
+     * contextFor is inverse of appliedWithin from ValidationRules.
+     */
     static relationships = [
             incoming: [hierarchy: 'childOf', ruleContext: 'contextFor'],
             outgoing: [containment: 'contains', hierarchy: 'parentOf']

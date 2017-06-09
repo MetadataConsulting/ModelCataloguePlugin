@@ -11,70 +11,77 @@ import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.policy.Convention
 import org.modelcatalogue.core.policy.Conventions
 
+/** Uses CatalogueElementPrintHelper to print out some aspects of an element as XML. Which aspects? And how does it get them?
+ * Does it have to do with Criteria?
+ * @see groovy.xml.MarkupBuilder XML Markup Builder
+ * @see org.modelcatalogue.core.xml.CatalogueElementPrintHelper.*/
 class CatalogueXmlPrinter {
 
     static final String NAMESPACE_URL = 'http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry.xsd'
     static final String ASSETS_NAMESPACE_URL = 'http://www.metadataregistry.org.uk/assets/schema/2.0/metadataregistry_asset.xsd'
 
+    /** Given to the PrintContext */
     DataModelService dataModelService
-    DataClassService modelService
+    /** Given to the PrintContext */
+    DataClassService dataClassService
 
-    CatalogueXmlPrinter(DataModelService dataModelService, DataClassService modelService) {
+    CatalogueXmlPrinter(DataModelService dataModelService, DataClassService dataClassService) {
         this.dataModelService = dataModelService
-        this.modelService = modelService
+        this.dataClassService = dataClassService
     }
 
+    /** Returns a Writable which will write an element as XML to a given writer.
+     * Makes use of the multi-element version below.
+     * @param element element to be written
+     * @param contextConfigurer configures the PrintContext */
     Writable bind(CatalogueElement element, @DelegatesTo(PrintContext) Closure contextConfigurer = {}) {
-        PrintContext context = new PrintContext(dataModelService, modelService)
-        context.with contextConfigurer
+        return bind([element], contextConfigurer)
+    }
+
+    /** Returns a Writable which will write a number of elements as XML to a given writer.
+     * Used directly in RelationshipsXmlRenderer, and indirectly to implement bind for a single element.
+     * @param elements elements to be written
+     * @param contextConfigurer configures the PrintContext
+     * */
+    public <CE extends CatalogueElement> Writable bind(Iterable<CE> elements, @DelegatesTo(PrintContext) Closure contextConfigurer = {}) {
+        PrintContext context = new PrintContext(dataModelService, dataClassService)
+        context.with contextConfigurer // somewhat reverse: run Configurer with context as delegate
 
         Map<String, String> ns = [xmlns : NAMESPACE_URL]
-
-        if (element.instanceOf(Asset)) {
+        if (elements.any {it.instanceOf(Asset)}) { // change namespace for assets. Originally in the single-element bind.
             ns.xmlns = ASSETS_NAMESPACE_URL
         }
 
         return { Writer writer ->
+            // setup Builder upon Writer:
             EscapeSpecialWriter escapeSpecialWriter = new EscapeSpecialWriter(writer)
             MarkupBuilder builder = new MarkupBuilder(escapeSpecialWriter)
             builder.doubleQuotes = true
+
+            // The actual building:
             builder.catalogue (ns) {
-                CatalogueElementPrintHelper.printElement(builder, element, context, null)
-                printRelationshipTypes(builder, context)
-                printPolicies(builder, context)
-            }
-
-            writer
-        } as Writable
-    }
-
-    public <CE extends CatalogueElement> Writable bind(Iterable<CE> elements, @DelegatesTo(PrintContext) Closure contextConfigurer = {}) {
-        PrintContext context = new PrintContext(dataModelService, modelService)
-        context.with contextConfigurer
-
-        return { Writer writer ->
-            EscapeSpecialWriter escapeSpecialWriter = new EscapeSpecialWriter(writer)
-            MarkupBuilder builder = new MarkupBuilder(escapeSpecialWriter)
-            builder.doubleQuotes = true
-            builder.catalogue (xmlns : NAMESPACE_URL) {
                 for (CE element in elements) {
-                    CatalogueElementPrintHelper.printElement(builder, element, context, null)
+                    CatalogueElementPrintHelper.dispatch(builder, element, context, null)
                 }
+                /**
+                 * After the main printing above the context will have saved sets of
+                 * RelationshipTypes and Policies referred to in the main,
+                 * which are now printed.
+                 */
                 printRelationshipTypes(builder, context)
                 printPolicies(builder, context)
             }
-
-            writer
-        } as Writable
+            writer // return writer
+        } as Writable // // Writable is an interface with one method that takes a Writer, does something with it, and returns a Writer (presumably the same one).
     }
 
     private static void printRelationshipTypes(MarkupBuilder builder, PrintContext context) {
-        if (!context.typesUsed) {
+        if (!context.relationshipTypesUsed) {
             return
         }
         builder.mkp.comment("Relationship types are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored! For non-admin users, the types are always imported as system ones and they need to be approved by the catalogue admin first.")
         builder.relationshipTypes {
-            for (String relationshipTypeName in context.typesUsed) {
+            for (String relationshipTypeName in context.relationshipTypesUsed) {
                 RelationshipType type = RelationshipType.readByName(relationshipTypeName)
                 relationshipType(collectRelationshipTypeAttrs(type)) {
                     sourceToDestination(label: type.sourceToDestination, type.sourceToDestinationDescription)
