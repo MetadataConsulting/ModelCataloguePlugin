@@ -152,14 +152,14 @@ task pullMySQLImage(type: DockerPullImage) {
     repository = 'mysql'
     tag = '5.6'
 }
-
+def mySQLRootPassword = 'pa$$w0rd'
 task createMySQLContainer(type: DockerCreateContainer, dependsOn: pullMySQLImage) {
     description = "Creates MySQL container for MX. Ignores if the container is already present."
     containerName = 'mx-mysql'
     imageId = 'mysql:5.6'
     portBindings = ['0.0.0.0:43306:3306']
     env = [
-        'MYSQL_ROOT_PASSWORD=pa$$w0rd',
+        "MYSQL_ROOT_PASSWORD=${mySQLRootPassword}",
         'MYSQL_DATABASE=metadata',
         'MYSQL_USER=metadata',
         'MYSQL_PASSWORD=metadata',
@@ -201,9 +201,9 @@ task ensureMySQLRunning(type: DockerExecContainer,) {
 
 startMySQLContainer.finalizedBy ensureMySQLRunning
 
-task initTestDatabaseInMYSQLContainer(type: DockerExecContainer, dependsOn: startMySQLContainer) {
+task initTestDatabaseInMySQLContainer(type: DockerExecContainer, dependsOn: startMySQLContainer) {
     containerId = 'mx-mysql'
-    cmd = ['mysqladmin', 'create', 'tester']
+    cmd = ['mysqladmin', 'create', 'tester', "--password=${mySQLRootPassword}"]
 }
 
 task stopMySQLContainer(type: DockerStopContainer) {
@@ -369,8 +369,8 @@ task runProd(type: Exec, dependsOn: [bowerInstall, ensureProductionConfig, start
     mustRunAfter 'stop'
 }
 
-task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initTestDatabaseInMYSQLContainer]) {
-    description = "Run all Grails MX tests"
+task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initTestDatabaseInMySQLContainer]) {
+    description = "Run all Grails MX tests. Can pass args to Grails test-app, e.g.: -PtestArgs='unit:spock PostController'"
 
     assertJava8()
     environment 'GRAILS_OPTS', "-Xmx2G -Xms1G -XX:MaxPermSize=1G -server"
@@ -379,12 +379,18 @@ task runGrailsTests(type: Exec, dependsOn: [bowerInstall, startContainers, initT
     environment 'MC_INDEX_PREFIX', "test_${System.currentTimeMillis()}"
     environment 'MC_DOCKER_HOST', host
 
-    commandLine grailsw, 'test-app', '-war', '--non-interactive', '--stacktrace', '-integration', '-unit'
+
+    def cmds = [grailsw, 'test-app', '-war', '--non-interactive', '--stacktrace', '-integration', '-unit']
+    if (project.hasProperty('testArgs')) { // get arguments for grails test-app
+        cmds.addAll(testArgs.split(' '))
+    }
+    commandLine cmds
 
     inputs.files files('grails-app')
     inputs.files files('src')
     inputs.files files('web-app')
-    inputs.files files('test/functional')
+    // we are not doing functional tests until they work robustly and independently of each other.
+    //inputs.files files('test/functional')
     inputs.files files('test/integration')
     inputs.files files('test/unit')
 
