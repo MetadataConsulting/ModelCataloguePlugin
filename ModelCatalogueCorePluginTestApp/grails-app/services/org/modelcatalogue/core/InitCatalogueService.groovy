@@ -159,7 +159,9 @@ class InitCatalogueService {
                 }
             } else if (grailsApplication.config.mc.sync.relationshipTypes) {
                 existing.properties = definition
-                FriendlyErrors.failFriendlySave(existing)
+                existing.save(failOnError: true, flush: true, validate: true)
+                // The following didn't actually save properly:
+                //FriendlyErrors.failFriendlySave(existing)
             } else {
                 if (definition.rule && definition.rule.replaceAll(/\s+/, ' ').trim() != existing.rule?.replaceAll(/\s+/, ' ')?.trim()) {
                     log.warn("""
