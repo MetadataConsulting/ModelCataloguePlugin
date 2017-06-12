@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.util.builder
 
+import grails.transaction.Transactional
 import grails.util.GrailsNameUtils
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -670,18 +671,25 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         }
     }
 
-    @Override @CompileDynamic
+    // I wonder if this should be @Transactional...
+    @Override @CompileDynamic @Transactional
     void dataModelPolicy(Map<String, Object> parameters, @DelegatesTo(DataModelPolicyBuilder.class) Closure configuration) {
         DataModelPolicy policy = DataModelPolicy.findByName(parameters.name?.toString())
-        if (policy) {
+        if (policy && !parameters.overwrite) { // return (do nothing) if policy already exists and we're not overwriting
             return
         }
 
         PolicyBuilder builder = PolicyBuilder.create()
         new DefaultDataModelPolicyBuilder(builder).with configuration
         Policy builtPolicy = builder.createPolicy()
+        if (policy && parameters.overwrite) {
+            policy.policyText = builtPolicy.toString()
+            FriendlyErrors.failFriendlySave(policy)
+        }
+        else {
+            FriendlyErrors.failFriendlySave(new DataModelPolicy(name: parameters.name?.toString(), policyText: builtPolicy.toString()))
 
-        FriendlyErrors.failFriendlySave(new DataModelPolicy(name: parameters.name?.toString(), policyText: builtPolicy.toString()))
+        }
     }
 
     @CompileDynamic
