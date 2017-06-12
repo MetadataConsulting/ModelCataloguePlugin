@@ -672,7 +672,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
     }
 
     // I wonder if this should be @Transactional...
-    @Override @CompileDynamic @Transactional
+    @Override @CompileDynamic
     void dataModelPolicy(Map<String, Object> parameters, @DelegatesTo(DataModelPolicyBuilder.class) Closure configuration) {
         DataModelPolicy policy = DataModelPolicy.findByName(parameters.name?.toString())
         if (policy && !parameters.overwrite) { // return (do nothing) if policy already exists and we're not overwriting
