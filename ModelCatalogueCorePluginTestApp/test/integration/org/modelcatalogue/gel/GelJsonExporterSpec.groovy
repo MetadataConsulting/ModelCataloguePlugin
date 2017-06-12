@@ -81,27 +81,27 @@ class GelJsonExporterSpec extends IntegrationSpec {
 
     private static String getExpectedJSON() {
         final String TODAY = new Date().format("yyyy-MM-dd")
-        final String NESTED_LEVEL_1_DATA_CLASS_NAME_ID = DataClass.findByName(NESTED_LEVEL_1_DATA_CLASS_NAME).getCombinedVersion()
-        final String NESTED_LEVEL_2_DATA_CLASS_NAME_ID = DataClass.findByName(NESTED_LEVEL_2_DATA_CLASS_NAME).getCombinedVersion()
-        final String NESTED_LEVEL_3_DATA_CLASS_NAME_ID = DataClass.findByName(NESTED_LEVEL_3_DATA_CLASS_NAME).getCombinedVersion()
-        final String clinical_test1_id = DataClass.findByName('clinical test1').getCombinedVersion()
-        final String clinical_test2_id = DataClass.findByName('clinical test2').getCombinedVersion()
-        final String clinical_test3_id = DataClass.findByName('clinical test3').getCombinedVersion()
-        final String clinical_test4_id = DataClass.findByName('clinical test4').getCombinedVersion()
+        final String NESTED_LEVEL_1_DATA_CLASS_NAME_ID = DataClass.findByName(NESTED_LEVEL_1_DATA_CLASS_NAME).getLatestVersionId() ?: DataClass.findByName(NESTED_LEVEL_1_DATA_CLASS_NAME).getId()
+        final String NESTED_LEVEL_2_DATA_CLASS_NAME_ID = DataClass.findByName(NESTED_LEVEL_2_DATA_CLASS_NAME).getLatestVersionId() ?: DataClass.findByName(NESTED_LEVEL_2_DATA_CLASS_NAME).getId()
+        final String NESTED_LEVEL_3_DATA_CLASS_NAME_ID = DataClass.findByName(NESTED_LEVEL_3_DATA_CLASS_NAME).getLatestVersionId() ?: DataClass.findByName(NESTED_LEVEL_3_DATA_CLASS_NAME).getId()
+        final String clinical_test1_id = DataClass.findByName('clinical test1').getCombinedVersion()  ?: DataClass.findByName('clinical test1').getId()
+        final String clinical_test2_id = DataClass.findByName('clinical test2').getCombinedVersion()  ?: DataClass.findByName('clinical test2').getId()
+        final String clinical_test3_id = DataClass.findByName('clinical test3').getCombinedVersion()  ?: DataClass.findByName('clinical test3').getId()
+        final String clinical_test4_id = DataClass.findByName('clinical test4').getCombinedVersion()  ?: DataClass.findByName('clinical test4').getId()
 
         return """
             {
                "DiseaseGroups":[
                   {
-                     "id":"$NESTED_LEVEL_1_DATA_CLASS_NAME_ID",
+                     "id":$NESTED_LEVEL_1_DATA_CLASS_NAME_ID,
                      "name":"rare disease subgroup 1.1",
                      "subGroups":[
                         {
-                           "id":"$NESTED_LEVEL_2_DATA_CLASS_NAME_ID",
+                           "id":$NESTED_LEVEL_2_DATA_CLASS_NAME_ID,
                            "name":"rare disease disorder 1.1.1",
                            "specificDisorders":[
                               {
-                                 "id":"$NESTED_LEVEL_3_DATA_CLASS_NAME_ID",
+                                 "id":$NESTED_LEVEL_3_DATA_CLASS_NAME_ID,
                                  "name":"rare disease 1.1.1.1",
                                  "eligibilityQuestion":{
                                     "date":"$TODAY",
