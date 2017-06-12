@@ -437,7 +437,7 @@ class BootStrap {
 
     def initPoliciesAndTags() {
         catalogueBuilder.build {
-            dataModelPolicy(name: 'Unique of Kind') {
+            dataModelPolicy(name: 'Unique of Kind', overwrite: true) {
                 check dataClass property 'name' is 'unique'
                 check dataElement property 'name' is 'unique'
                 check dataType property 'name' is 'unique'
