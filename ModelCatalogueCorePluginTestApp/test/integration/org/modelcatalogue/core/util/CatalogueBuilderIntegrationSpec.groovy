@@ -169,6 +169,27 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         expect:
         created.first().latestVersionId == unit.refresh().latestVersionId
     }
+    /*
+    This test doesn't seem to work. It passes whether or not we check uniqueness in the DataModelPolicy
+    Unique Of Kind.
+    TODO: write a test that works to distinguish unique measurement units within data model.
+    def "create only one measurement unit with given name within data model"() {
+        //new MeasurementUnit(name: 'ExistingUnit2', status: ElementStatus.DEPRECATED).save(failOnError: true, flush: true)
+
+        when:
+        build {
+            dataModel(name: "TestClassificationA") {
+                measurementUnit(name: 'ExistingUnit2') {description: "A"}
+                measurementUnit(name: 'ExistingUnit2') {description: "B"}
+            }
+        }
+
+        then:
+        MeasurementUnit.countByName('ExistingUnit2') == 1
+    }
+    */
+
+    // TODO: Write a test for ModelCatalogueId unique within data model
 
     def "complain if measurement unit name is missing"() {
         when:
@@ -1135,7 +1156,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
             dataModel(name:  DATA_MODEL_NAME) {
                 policy POLICY_NAME
             }
-            dataModelPolicy(name: POLICY_NAME) {
+            dataModelPolicy(name: POLICY_NAME, overwrite: false) {
                 check dataType property 'name' apply regex: '[a-zA-Z0-9]+'
                 check dataClass property 'name' apply regex: '[a-zA-Z0-9]+'
             }
