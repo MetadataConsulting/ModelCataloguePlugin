@@ -59,21 +59,21 @@ class GelJsonExporter {
         if (level == 2) {
             modelCount = modelCount + 1
             // resolves to something concrete like - higherMap.put('id', "$model.id")
-            map.put(levelMetaData.get(level).tag1, model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getCombinedVersion())
+            map.put(levelMetaData.get(level).tag1, model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:(model.getLatestVersionId() ?: model.getId()))
             map.put(levelMetaData.get(level).tag2, model.name)
             map.put(levelMetaData.get(level).tag3, modelList)
 
             graphList << map
         }
         if (level == 3) {
-            map.put(levelMetaData.get(level).tag1, model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getCombinedVersion())
+            map.put(levelMetaData.get(level).tag1, model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:(model.getLatestVersionId() ?: model.getId()))
             map.put(levelMetaData.get(level).tag2, model.name)
             map.put(levelMetaData.get(level).tag3, modelList)
 
             graphList << map
         }
         if (level == 4) {
-            map.put(levelMetaData.get(level).tag1, model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:model.getCombinedVersion())
+            map.put(levelMetaData.get(level).tag1, model.ext.get('http://www.modelcatalogue.org/metadata/genomics/#gel-id')?:(model.getLatestVersionId() ?: model.getId()))
             map.put(levelMetaData.get(level).tag2, model.name)
 
             def miniMap = [:]
