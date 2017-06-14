@@ -111,7 +111,7 @@ class BootStrap {
         reportsRegistry.register {
             creates asset
             title { "Inventory Report Document" }
-            defaultName { "${it.name} report as MS Excel Document" }
+            defaultName { "${it.name} report as MS Word Document" }
             depth 3
             type DataModel
             when { DataModel dataModel ->
