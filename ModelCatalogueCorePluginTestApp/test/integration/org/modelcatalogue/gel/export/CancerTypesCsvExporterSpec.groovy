@@ -25,7 +25,7 @@ class CancerTypesCsvExporterSpec extends AbstractCancerTypesExporterSpec {
     }
 
 
-    //note SOME_CANCER_SUBTYPE_21 has a dataType that is not an enum so it's intentionally omitted
+    //note SOME_CANCER_SUBTYPE_21 has a dataTypes that is not an enum so it's intentionally omitted
     private String getExpectedCancerTypesCsv() {
         return """Id,Cancer Types,Presentations,Id SubTypes,Cancer SubTypes,Id Enum,Enum SubType
 $cancer_type_1_adult_glioma_combined_id,"Adult Glioma",,$cancer_type_1_adult_subType_combined_id,"Adult Glioma subtypes 1.1",$cancer_type_1_adult_glioma_enum_combined_id,"one"

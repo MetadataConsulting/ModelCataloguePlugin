@@ -29,17 +29,17 @@ class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {
         assertRestForwardUrlMapping(method, "/api/modelCatalogue/core$url".toString(), controller: controller, action: action, paramsAssertions)
 
         where:
-        [method, url, controller, action, paramsAssertions] << generateAssertionsForCatalogueElementControllers('dataElement', 'dataType', 'enumeratedType', 'measurementUnit', 'dataClass')
+        [method, url, controller, action, paramsAssertions] << generateAssertionsForCatalogueElementControllers('dataElement', 'dataTypes', 'enumeratedType', 'measurementUnit', 'dataClass')
     }
 
     def "value domain extra mappings mehtod #method maps and url #url maps to action #action"() {
         expect:
-        assertRestForwardUrlMapping(method, url.toString(), controller: "dataType", action: action, paramsToCheck)
+        assertRestForwardUrlMapping(method, url.toString(), controller: "dataTypes", action: action, paramsToCheck)
         where:
         method      | action             | url                                                  | paramsToCheck
-        "GET"       | "mappings"         | "/api/modelCatalogue/core/dataType/1/mapping"     | {id = "1"}
-        "POST"      | "addMapping"       | "/api/modelCatalogue/core/dataType/1/mapping/2"   | {id = "1" ; destination = "2"}
-        "DELETE"    | "removeMapping"    | "/api/modelCatalogue/core/dataType/1/mapping/2"   | {id = "1" ; destination = "2"}
+        "GET"       | "mappings"         | "/api/modelCatalogue/core/dataTypes/1/mapping"     | {id = "1"}
+        "POST"      | "addMapping"       | "/api/modelCatalogue/core/dataTypes/1/mapping/2"   | {id = "1" ; destination = "2"}
+        "DELETE"    | "removeMapping"    | "/api/modelCatalogue/core/dataTypes/1/mapping/2"   | {id = "1" ; destination = "2"}
     }
 
     def "for method #method and url /api/modelCatalogue/core#url there should be no mappings found"() {

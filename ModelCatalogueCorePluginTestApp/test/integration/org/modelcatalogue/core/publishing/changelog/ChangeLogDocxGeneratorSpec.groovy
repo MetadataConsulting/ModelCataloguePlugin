@@ -137,7 +137,7 @@ class ChangeLogDocxGeneratorSpec extends AbstractIntegrationSpec {
             create DataType called 'New Data Type'
 
             create draft of 'Data Class 1 Inner Data Class 2 Data Element 1'
-            update 'dataType' of 'Data Class 1 Inner Data Class 2 Data Element 1' to 'New Data Type'
+            update 'dataTypes' of 'Data Class 1 Inner Data Class 2 Data Element 1' to 'New Data Type'
 
             finalize 'C4C'
 

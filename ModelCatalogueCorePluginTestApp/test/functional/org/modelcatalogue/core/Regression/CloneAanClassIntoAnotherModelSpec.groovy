@@ -16,7 +16,7 @@ import static org.modelcatalogue.core.geb.Common.rightSideTitle
 class CloneAanClassIntoAnotherModelSpec extends AbstractModelCatalogueGebSpec{
 
     private static final String  createButton='a#role_data-models_create-data-modelBtn'
-    private static final String  cloneButton='a#clone-menu-item-link>span:nth-child(3)'
+    private static final String  cloneButton='a#cloneButton-menu-item-link>span:nth-child(3)'
     private static final String  dataClassButton='a#role_item_catalogue-element-menu-item-link>span:nth-child(3)'
     private static final String  finishButton='button#step-finish'
     private static final String  modelCatalogue='span.mc-name'
@@ -79,13 +79,13 @@ class CloneAanClassIntoAnotherModelSpec extends AbstractModelCatalogueGebSpec{
         select 'MET-523' open 'Data Classes' select 'MET-523.M1'
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
-        and: 'navigate to the top menu and select data class and clone '
+        and: 'navigate to the top menu and select data class and cloneButton '
         click dataClassButton
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
         click cloneButton
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
-        and: 'clone the data class to another data model '
+        and: 'cloneButton the data class to another data model '
         fill search with 'TESTING_DATA_MODEL' and pick first item
         click('button.btn-primary')
         Thread.sleep(10000l)
