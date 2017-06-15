@@ -22,6 +22,6 @@
 
   }
 
-  angular.module('mc.util.ui.treeview.DescendPath', [])
+  angular.module('mc.core.ui.catalogueElementTreeview.model')
     .constant('DescendPath', DescendPath)
 })(window, angular);

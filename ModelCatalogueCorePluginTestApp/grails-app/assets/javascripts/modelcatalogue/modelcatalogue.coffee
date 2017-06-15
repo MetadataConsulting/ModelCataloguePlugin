@@ -15,6 +15,7 @@
 #= require sly-repeat/scalyr.js
 #= require_self
 #= require_full_tree .
+#= require_full_tree components
 #= require templates/mc/index
 #mc/index loads the templates onto JS's template path.
 

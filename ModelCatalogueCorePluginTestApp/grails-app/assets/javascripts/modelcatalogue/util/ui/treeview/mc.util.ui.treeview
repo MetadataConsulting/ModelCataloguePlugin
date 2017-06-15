@@ -1,4 +1,0 @@
-angular.module('mc.util.ui.treeview', [
-   'mc.util.ui.treeview.TreeviewNode',
-   'mc.util.ui.treeview.DescendPath'
-]);

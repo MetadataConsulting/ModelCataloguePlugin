@@ -67,7 +67,9 @@
         cached[symbols.item] = item;
         return cached;
       }
-      return cache[id] = new TreeviewNode(id, item);
+      else {
+        return cache[id] = new TreeviewNode(id, item);
+      }
     }
 
     static get(id) {
@@ -75,6 +77,6 @@
     }
   }
 
-  angular.module('mc.util.ui.treeview.TreeviewNode', [])
+  angular.module('mc.core.ui.catalogueElementTreeview.model')
     .constant('TreeviewNodeFactory', TreeviewNodeFactory)
 })(window, angular);

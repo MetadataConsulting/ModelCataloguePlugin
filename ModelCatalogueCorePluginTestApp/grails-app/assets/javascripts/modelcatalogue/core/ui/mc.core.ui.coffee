@@ -10,7 +10,6 @@ angular.module('mc.core.ui', [
   'mc.core.ui.catalogueElementView'
   'mc.core.ui.csvTransformationView'
   'mc.core.ui.batchView'
-  'mc.core.ui.catalogueElementTreeviewItem'
   'mc.core.ui.catalogueElementTreeview'
   'mc.core.ui.catalogueElementIcon'
   'mc.core.ui.catalogueElementPicker'
