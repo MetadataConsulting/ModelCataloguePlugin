@@ -62,99 +62,7 @@ task bowerInstall(type: NodeTask) {
     outputs.files file('grails-app/assets/bower_components')
     dependsOn npmPackages
 }
-bowerInstall.finalizedBy cleanUpBowerDependencies
-task cleanUpBowerDependencies(type: Delete) {
-    group = 'Clean'
-    delete 'grails-app/assets/bower_components/ace-builds/demo'
-    delete 'grails-app/assets/bower_components/ace-builds/src'
-    delete 'grails-app/assets/bower_components/ace-builds/src-min'
-    delete 'grails-app/assets/bower_components/ace-builds/src-noconflict'
-    delete 'grails-app/assets/bower_components/ace-builds/textarea'
-    delete 'grails-app/assets/bower_components/angular-file-saver/gulpfile.babel.js'
-    delete 'grails-app/assets/bower_components/angular-file-saver/src'
-    delete 'grails-app/assets/bower_components/angular-file-saver/docs'
-    delete 'grails-app/assets/bower_components/sly-repeat/scripts'
-    delete 'grails-app/assets/bower_components/sly-repeat/src'
-}
 
-
-
-
-task cleanIdeaFiles(type: Delete) {
-    delete '**/.idea'
-    delete '**/*.iml'
-}
-
-task cleanData(type: Delete) {
-    Properties properties = new Properties()
-    properties.load(file('application.properties').newInputStream())
-    delete "${System.getProperty('java.io.tmpdir')}/ModelCatalogueCorePluginTestApp/${properties['app.version']}"
-}
-
-
-task cleanGrailsFolders(type: Delete) {
-    Properties properties = new Properties()
-    properties.load(file('application.properties').newInputStream())
-    delete 'target'
-    delete 'target-eclipse'
-    delete '**/*.gen.fixture.js'
-    delete '**/*.gen.fixture.coffee'
-    delete "${System.getProperty('user.home')}/.grails/${properties['app.grails.version']}/ModelCatalogueCorePluginTestApp"
-}
-
-task cleanGrails(type: Exec, dependsOn: cleanGrailsFolders) {
-    commandLine grailsw, 'clean-all', '--stacktrace', '--non-interactive'
-
-}
-
-task refreshGrailsDependencies(type: Exec) {
-    commandLine grailsw, 'refresh-dependencies', '--stacktrace', '--non-interactive'
-    mustRunAfter cleanGrails
-}
-
-task cleanAll(type: Delete, dependsOn: [cleanData, cleanGrails, refreshGrailsDependencies]) {
-    delete '../build'
-}
-
-task runDev(type: Exec, dependsOn: bowerInstall) {
-    description = "Run MX in development environment"
-
-    assertJava8()
-    environment 'GRAILS_OPTS', "-Xmx1G -Xms512m -XX:MaxPermSize=512m -server"
-
-    def cmds = [grailsw]
-
-    if (project.hasProperty('mc.blank')) {
-        environment 'MC_BLANK_DEV', "true"
-    }
-
-    if (project.hasProperty('mc.war')) {
-        cmds << 'run-war'
-    } else {
-        cmds << 'run-app'
-    }
-
-    if (project.hasProperty('mc.debug')) {
-        cmds << '--debug-fork'
-    }
-
-    cmds << '--non-interactive'
-    cmds << '--stacktrace'
-
-    commandLine cmds
-    mustRunAfter 'stop'
-}
-
-task ensureProductionConfig(type: Copy) {
-    description = "Ensures configuration for MX production environment exists"
-    onlyIf {
-        !new File(new File(System.getProperty('user.home'), '.grails'), 'mc-config.groovy').exists()
-    }
-    from('../conf/docker') {
-        include 'mc-config.groovy'
-    }
-    into "${System.getProperty('user.home')}/.grails"
-}
 
 
 /// Docker tasks
@@ -340,6 +248,24 @@ task stopContainers(dependsOn: [stopElasticsearchContainer, stopMySQLContainer, 
 
 
 /// Clean tasks:
+
+task cleanUpBowerDependencies(type: Delete) {
+    group = 'Clean'
+    delete 'grails-app/assets/bower_components/ace-builds/demo'
+    delete 'grails-app/assets/bower_components/ace-builds/src'
+    delete 'grails-app/assets/bower_components/ace-builds/src-min'
+    delete 'grails-app/assets/bower_components/ace-builds/src-noconflict'
+    delete 'grails-app/assets/bower_components/ace-builds/textarea'
+    delete 'grails-app/assets/bower_components/angular-file-saver/gulpfile.babel.js'
+    delete 'grails-app/assets/bower_components/angular-file-saver/src'
+    delete 'grails-app/assets/bower_components/angular-file-saver/docs'
+    delete 'grails-app/assets/bower_components/sly-repeat/scripts'
+    delete 'grails-app/assets/bower_components/sly-repeat/src'
+}
+
+bowerInstall.finalizedBy cleanUpBowerDependencies
+
+
 
 task cleanIdeaFiles(type: Delete) {
     group = 'Clean'
@@ -533,11 +459,6 @@ task collectTestReports(type: Copy) {
     into "${System.getProperty('user.home')}/reports/"
 }
 
-
-task stop(type: Exec) {
-    description = "Stops running MX application"
-    commandLine grailsw, 'stop-app','--non-interactive', '--stacktrace'
-}
 
 stop.finalizedBy stopContainers
 
