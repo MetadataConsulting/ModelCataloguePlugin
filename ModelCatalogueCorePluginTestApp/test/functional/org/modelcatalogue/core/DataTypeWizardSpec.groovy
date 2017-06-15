@@ -32,7 +32,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     public static final CatalogueAction convert = CatalogueAction.runLast('item', 'catalogue-element', 'convert')
     public static final CatalogueAction removeRelationship = CatalogueAction.runLast('item', 'remove-relationship')
     public static final CatalogueAction removeMapping = CatalogueAction.runLast('item', 'remove-mapping')
-    public static final String dataType = 'dataType'
+    public static final String dataType = 'dataTypes'
     public static final String mapping = 'mapping'
     public static final String modalPrimaryButton = 'div.modal button.btn-primary, div.modal a.btn-primary'
     public static final String value = 'value'

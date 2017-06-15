@@ -14,7 +14,7 @@ import spock.lang.Unroll
  * Data elements are instantiated by value domains
  * i.e. if we have a value domain with an enumerated list of subjects [science, history, politics] that we want
  * to apply to to a data element we can instantiate the data element
- * i.e. <subject dataType="subjects"> xxxxxxxxx </subject> and know what type of data to expect between the tags.
+ * i.e. <subject dataTypes="subjects"> xxxxxxxxx </subject> and know what type of data to expect between the tags.
  * DataElements can be instantiated by different value domains depending on the context (see context relationship type)
  * i.e.
  * <book conceptualDomain="libraryA"><subject type="politicalSubjects"></subject></book>
