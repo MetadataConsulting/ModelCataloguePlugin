@@ -10,7 +10,8 @@ stewardship = angular.module('mc.core.stewardship',
   ])
 
 # List of levels to be selected for sensitivity
-stewardship.controller 'SelectSensitivity', ($scope) ->
+
+angular.module('mc.core.stewardship').controller 'SelectSensitivity', ($scope) ->
   $scope.sensitivityLevels = [
     "Anonymous"
     "Personal"

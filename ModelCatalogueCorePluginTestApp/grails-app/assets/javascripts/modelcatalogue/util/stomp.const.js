@@ -1,4 +1,3 @@
-
 (function(window){
     angular.module("mc.util.Stomp", [])
         .constant('SockJSURL', window.SockJSURL)

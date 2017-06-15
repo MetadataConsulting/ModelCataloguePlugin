@@ -20,7 +20,7 @@ angular.module 'mc.core', [
   'mc.core.orderedMapEnhancer'
   'mc.core.serverPushUpdates'
 ]
-
+angular.module('mc.core.modelCatalogueApiRoot', []).value 'modelCatalogueApiRoot', '/api/modelCatalogue/core'
 angular.module('mc.core').config(
   ['$animateProvider', ($animateProvider) ->
     $animateProvider.classNameFilter(/^((?!(fa-spinner)).)*$/)

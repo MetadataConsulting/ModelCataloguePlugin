@@ -1,1 +1,0 @@
-angular.module('mc.core.modelCatalogueApiRoot', []).value 'modelCatalogueApiRoot', '/api/modelCatalogue/core'

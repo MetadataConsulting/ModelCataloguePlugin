@@ -1,4 +1,4 @@
-metadataEditors = angular.module('mc.core.ui.bs.detailSections', ['mc.core.ui.detailSections'])
+detailSections = angular.module('mc.core.ui.bs.detailSections', ['mc.core.ui.detailSections'])
 
 
 ###
@@ -8,7 +8,7 @@ metadataEditors = angular.module('mc.core.ui.bs.detailSections', ['mc.core.ui.de
   <span class="fa fa-question-circle text-muted" tooltip="These are the authors of the data model"></span>
 ###
 
-metadataEditors.config ['detailSectionsProvider', (detailSectionsProvider)->
+detailSections.config ['detailSectionsProvider', (detailSectionsProvider)->
   REGEX_EXAMPLE = """// value is decimal number
 x ==~ /\\d+(\\.\\d+)?/
 """
