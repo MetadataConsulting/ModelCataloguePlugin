@@ -1,3 +1,4 @@
+#= require catalogueElementTreeviewItem.tpl.coffee
 nodeid = 0
 
 angular.module('mc.core.ui.catalogueElementTreeview.item')
@@ -8,101 +9,18 @@ angular.module('mc.core.ui.catalogueElementTreeview.item')
     restrict: 'E'
     replace: true
     scope:
-      element:  '='
+      element:  '=' # bidirectional binding
       treeview: '='
-      extraParameters: '=?'
+      extraParameters: '=?' # bidirectional optional binding
 
-    templateUrl: '''<li class="catalogue-element-treeview-item">
-  <div class="catalogue-element-treeview-text-content"
-       ng-class="{'active': node.active, 'archived': element.$$archived}">
-    <!--
-     The following displays a "total" number of children of a node in the treeview.
-     It doesn't seem to display what we want for certain elements such as the Data Model. It does seem to be useful for Data Classes and Data Element Tags.
-     At the top level numberOfChildren seems to come from DataModelController's "content" method. (descend="content").
-     We're turning it off for now since we don't understand how to fine-tune it. --James 7 June 2017
-     -->
-    <!--
-    <span class="badge pull-right" ng-if="node.numberOfChildren" ng-switch="node.numberOfChildren">
-      <span ng-switch-default>{{::node.numberOfChildren}}</span>
-      <span ng-switch-when="2147483647" class="fa fa-question fa-inverse"></span>
-    </span>
-    -->
-    <span class="catalogue-element-treeview-labels">
-      <span ng-if="::!element.elementType">
-        <a class="catalogue-element-treeview-icon btn btn-link">
-          <span class="fa fa-fw fa-ban"></span>
-        </a>
-        No Data
-      </span>
-      <a ng-if="::element.elementType" class="catalogue-element-treeview-icon  btn btn-link"
-         ng-click="select(node)">
-        <span ng-if="!extraParameters.prefetch &amp;&amp; node.numberOfChildren &amp;&amp; !node.loadingChildren">
-          <span class="fa fa-fw fa-caret-right text-muted" ng-if="node.collapsed">
-          </span>
-          <span class="fa fa-fw fa-caret-down text-muted" ng-if="!node.collapsed">
-          </span>
-        </span>
-
-        <span class="fa fa-fw fa-refresh text-muted" ng-if="node.loadingChildren"></span>
-        <span class="fa fa-fw text-muted" ng-if="extraParameters.prefetch"></span>
-        <span class="fa fa-fw" ng-if="!node.numberOfChildren && !node.loadingChildren"></span>
-      </a>
-      <span class="catalogue-element-treeview-name"
-            ng-class="{
-              'text-warning': element.status == 'DRAFT',
-              'text-info': element.status == 'PENDING',
-              'text-danger': (element.status == 'DEPRECATED' || element.undone)
-            }"
-            ng-click="select(node)">
-        <span ng-class="node.icon" class="text-muted"></span>
-        {{node.name}}
-        <span class="text-muted">
-          {{node.metadataOccurrencesToAsterisk}}
-        </span>
-        <small class="text-muted" ng-if="element.$$localName">{{element.name}}</small>
-        <small class="text-muted">
-          <span ng-if="::element.latestVersionId"
-                class="catalogue-element-treeview-version-number">
-            {{node.dataModelWithVersion}}
-          </span>
-        </small>
-      </span>
-      <small class="text-muted" ng-if="::node.href">
-        <a class="catalogue-element-treeview-link"
-           ng-href="{{::node.href}}"
-           title="{{node.name}}"
-           target="_blank">
-          <span class="fa fa-external-link text-muted"></span>
-        </a>
-      </small>
-    </span>
-  </div>
-  <ul ng-if="node.children" ng-hide="node.collapsed" class="catalogue-element-treeview-list">
-    <catalogue-element-treeview-item treeview="::treeview" sly-repeat="child in node.children"
-                                     extra-parameters="::{'path': path, 'descendPath': extraParameters.descendPath.concat(child.id)}"
-                                     element="child">
-    </catalogue-element-treeview-item>
-    <li ng-if="node.numberOfChildren > node.children.length" class="catalogue-element-treeview-item">
-      <span class="catalogue-element-treeview-labels" ng-click="node.showMore()">
-        <a class="catalogue-element-treeview-icon btn btn-link catalogue-element-treeview-show-more"
-           ng-class="'show-more-' + nodeid">
-          <span class="fa fa-fw fa-chevron-down"></span>
-        </a>
-        <a class="text-muted">
-          Show more
-        </a>
-      </span>
-    </li>
-  </ul>
-</li>
-'''
+    templateUrl: 'modelcatalogue/core/ui/catalogueElementTreeview/item.html'
 
     compile: recursiveCompile.compile
 
     controller: ($scope, $rootScope, $element, catalogue, TreeviewNodeFactory) ->
       $scope.nodeid = nodeid++
       $scope.path = {segments: []}
-
+      ## Controller internal methods:
       startsWithSegment = (element, segments) ->
         return false unless element
         return false unless element.link
@@ -115,6 +33,8 @@ angular.module('mc.core.ui.catalogueElementTreeview.item')
         return true if element.id == 'all' and element.link.indexOf(firstSegment.substring(0, firstSegment.lastIndexOf('/all'))) == 0
         return true if element.link.indexOf(firstSegment) >= 0
         return false
+
+      isForCurrentElement = (data) -> data[1].link is $scope.element.link
 
       getLocalName = (item) ->
         return undefined if not item
@@ -262,7 +182,19 @@ angular.module('mc.core.ui.catalogueElementTreeview.item')
 
         if $scope.extraParameters?.prefetch or startsWithSegment($scope.element, $scope.extraParameters?.path?.segments)
           $scope.node.loadChildren()
+      reloadChildrenOnChange = (_, result, url) ->
+        if result.link == $scope.element.link
+          $scope.element.updateFrom result
+          $scope.node.loadChildren()
+          return
+        if catalogue.isContentCandidate($scope.element[$scope.treeview.getDescend()], result, owner: $scope.element, url: url)
+          $scope.node.loadChildren()
 
+      doReloadChildrenOnChange = (data) ->
+        reloadChildrenOnChange(data[0], data[1])
+
+
+      ## Scope methods:
       $scope.collapseOrExpand = ->
         return if $scope.extraParameters?.prefetch
         return if $scope.node.loadingChildren
@@ -277,23 +209,16 @@ angular.module('mc.core.ui.catalogueElementTreeview.item')
 
         $scope.node.loadChildren()
 
-
-      $scope.$watch 'element', onElementUpdate
-
-      onElementUpdate($scope.element)
-
-      # event broadcasters and listeners
       $scope.select = (element) ->
         $scope.collapseOrExpand()
         $scope.treeview.select(element, $scope.extraParameters?.descendPath)
 
-      reloadChildrenOnChange = (_, result, url) ->
-        if result.link == $scope.element.link
-          $scope.element.updateFrom result
-          $scope.node.loadChildren()
-          return
-        if catalogue.isContentCandidate($scope.element[$scope.treeview.getDescend()], result, owner: $scope.element, url: url)
-          $scope.node.loadChildren()
+      ## Event handling:
+      DEBOUNCE_TIME = 100
+
+      $scope.$eventToObservable('catalogueElementCreated').debounce(DEBOUNCE_TIME).subscribe doReloadChildrenOnChange
+      $scope.$eventToObservable('catalogueElementUpdated').filter(isForCurrentElement).debounce(DEBOUNCE_TIME)
+      .subscribe doReloadChildrenOnChange
 
       $scope.$on 'catalogueElementDeleted', (event, element) ->
         indexesToRemove = []
@@ -309,19 +234,11 @@ angular.module('mc.core.ui.catalogueElementTreeview.item')
 
         reloadChildrenOnChange event, element
 
-      doReloadChildrenOnChange = (data) ->
-        reloadChildrenOnChange(data[0], data[1])
-
-      isForCurrentElement = (data) -> data[1].link is $scope.element.link
-
-      DEBOUNCE_TIME = 100
-
-      $scope.$eventToObservable('catalogueElementCreated').debounce(DEBOUNCE_TIME).subscribe doReloadChildrenOnChange
-      $scope.$eventToObservable('catalogueElementUpdated').filter(isForCurrentElement).debounce(DEBOUNCE_TIME)
-      .subscribe doReloadChildrenOnChange
-
       $scope.$on 'listReferenceReordered', (ignored, listReference) ->
         reloadChildrenOnChange(ignored, listReference, listReference?.link)
+
+      $scope.$watch 'element', onElementUpdate
+      onElementUpdate($scope.element)
 
       $scope.$watch 'extraParameters.path.segments', (segments) ->
         if startsWithSegment($scope.element, segments)
