@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.simpleObjectEditor', ['mc.core.ui.simpleObjectEditor']).run [ '$templateCache', ($templateCache) ->
+angular.module('mc.core.ui.simpleObjectEditor').run [ '$templateCache', ($templateCache) ->
     $templateCache.put 'modelcatalogue/core/ui/simpleObjectEditor.html', '''
       <table class="soe-table table">
         <thead ng-if="::(title || valueTitle)">

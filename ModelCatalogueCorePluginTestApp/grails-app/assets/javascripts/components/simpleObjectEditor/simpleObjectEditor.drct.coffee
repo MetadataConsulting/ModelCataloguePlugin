@@ -1,4 +1,5 @@
-angular.module('mc.core.ui.simpleObjectEditor', []).directive 'simpleObjectEditor',  [-> {
+#= require simpleObjectEditor.tpl.coffee
+angular.module('mc.core.ui.simpleObjectEditor').directive 'simpleObjectEditor',  [-> {
     restrict: 'E'
     replace: true
     scope:
