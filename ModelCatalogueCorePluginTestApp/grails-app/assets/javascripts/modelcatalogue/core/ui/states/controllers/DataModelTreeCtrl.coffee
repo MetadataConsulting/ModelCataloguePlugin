@@ -19,19 +19,22 @@ angular.module('mc.core.ui.states.controllers.DataModelTreeCtrl', ['ui.router', 
             if element.tagId == 'none'
               $state.go 'mc.resource.list', dataModelId: currentDataModel?.id, resource: 'dataElement', status: 'active', tag: 'none'
               return
-            $state.go 'mc.resource.show.property', dataModelId: currentDataModel?.id, resource: 'tag', id: element.tagId, property: 'tags'
-            return
-          if element.resource == 'catalogueElement' && element.name == 'Deprecated Items'
+            else
+              $state.go 'mc.resource.show.property', dataModelId: currentDataModel?.id, resource: 'tag', id: element.tagId, property: 'tags'
+              return
+          else if element.resource == 'catalogueElement' && element.name == 'Deprecated Items'
             $state.go 'mc.resource.list', dataModelId: currentDataModel?.id, resource: element.resource, status: 'deprecated'
             return
 
-          $state.go 'mc.resource.list', dataModelId: currentDataModel?.id, resource: element.resource, status: 'active'
+          else
+            $state.go 'mc.resource.list', dataModelId: currentDataModel?.id, resource: element.resource, status: 'active'
+            return
+
+        else
+          $state.go 'mc.resource.list-imported', dataModelId: currentDataModel?.id, otherDataModelId: element.getDataModelId(), resource: element.resource, status: undefined
           return
 
-        $state.go 'mc.resource.list-imported', dataModelId: currentDataModel?.id, otherDataModelId: element.getDataModelId(), resource: element.resource, status: undefined
-        return
-
-      if element.elementType and element.id
+      else if element.elementType and element.id
         type = names.getPropertyNameFromType(element.elementType)
         params =
           dataModelId: currentDataModel?.id
