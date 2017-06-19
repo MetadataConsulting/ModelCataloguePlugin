@@ -1,22 +1,23 @@
+### This is a template for recursive directive catalogue-element-treeview-item.
+It assumes the directive is called within a ul element. ###
 angular.module('mc.core.ui.catalogueElementTreeview.item').run [ '$templateCache', ($templateCache) ->
   $templateCache.put 'modelcatalogue/core/ui/catalogueElementTreeview/item.html', '''
-    <!-- This is a template for a recursive directive catalogue-element-treeview-item. It assumes the directive
-          is called within a ul element. -->
     <li class="catalogue-element-treeview-item">
       <!-- Content of the node itself -->
       <div class="catalogue-element-treeview-text-content"
-           ng-class="{'active': node.active, 'archived': element.$$archived}">
+           ng-class="{'active': node.active,
+                      'archived': catalogueElement.$$archived}">
 
         <span class="catalogue-element-treeview-labels">
           <!-- if element has no type say no data -->
-          <span ng-if="::!element.elementType">
+          <span ng-if="::!catalogueElement.elementType">
             <a class="catalogue-element-treeview-icon btn btn-link">
               <span class="fa fa-fw fa-ban"></span>
             </a>
             No Data
           </span>
           <!-- if element has type ... -->
-          <a ng-if="::element.elementType" class="catalogue-element-treeview-icon  btn btn-link"
+          <a ng-if="::catalogueElement.elementType" class="catalogue-element-treeview-icon  btn btn-link"
              ng-click="select(node)">
             <!-- carets depending on node.collapsed -->
             <span ng-if="!extraParameters.prefetch &amp;&amp; node.numberOfChildren &amp;&amp; !node.loadingChildren">
@@ -33,9 +34,9 @@ angular.module('mc.core.ui.catalogueElementTreeview.item').run [ '$templateCache
 
           <span class="catalogue-element-treeview-name"
                 ng-class="{
-                  'text-warning': element.status == 'DRAFT',
-                  'text-info': element.status == 'PENDING',
-                  'text-danger': (element.status == 'DEPRECATED' || element.undone)
+                  'text-warning': catalogueElement.status == 'DRAFT',
+                  'text-info': catalogueElement.status == 'PENDING',
+                  'text-danger': (catalogueElement.status == 'DEPRECATED' || catalogueElement.undone)
                 }"
                 ng-click="select(node)">
             <span ng-class="node.icon" class="text-muted"></span>
@@ -43,9 +44,9 @@ angular.module('mc.core.ui.catalogueElementTreeview.item').run [ '$templateCache
             <span class="text-muted">
               {{node.metadataOccurrencesToAsterisk}}
             </span>
-            <small class="text-muted" ng-if="element.$$localName">{{element.name}}</small>
+            <small class="text-muted" ng-if="catalogueElement.$$localName">{{catalogueElement.name}}</small>
             <small class="text-muted">
-              <span ng-if="::element.latestVersionId"
+              <span ng-if="::catalogueElement.latestVersionId"
                     class="catalogue-element-treeview-version-number">
                 {{node.dataModelWithVersion}}
               </span>
@@ -66,7 +67,7 @@ angular.module('mc.core.ui.catalogueElementTreeview.item').run [ '$templateCache
         <!-- recursive call to catalogue-element-treeview-item for each child node -->
         <catalogue-element-treeview-item treeview="::treeview" sly-repeat="child in node.children"
                                          extra-parameters="::{'path': path, 'descendPath': extraParameters.descendPath.concat(child.id)}"
-                                         element="child">
+                                         catalogue-element="child">
         </catalogue-element-treeview-item>
         <!-- show more -->
         <li ng-if="node.numberOfChildren > node.children.length" class="catalogue-element-treeview-item">

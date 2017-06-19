@@ -9,9 +9,9 @@ angular.module('mc.core.ui.catalogueElementTreeview.item')
     restrict: 'E'
     replace: true
     scope:
-      # Note: do not confuse element with $element which is the Angular passed in HTML element.
-      # element is a catalogue element.
-      element:  '=' # bidirectional binding
+      # The particular catalogue element shown by this directive
+      catalogueElement:  '=' # bidirectional binding
+      # Reference to the entire treeview
       treeview: '='
       extraParameters: '=?' # bidirectional optional binding
 
@@ -24,18 +24,18 @@ angular.module('mc.core.ui.catalogueElementTreeview.item')
       $scope.path = {segments: []}
       ## Controller internal methods:
       # Whether element url starts with the first segment of segments
-      startsWithSegment = (element, segments) ->
-        return false unless element && element.link && element.id &&
+      startsWithSegment = (catalogueElement, segments) ->
+        return false unless catalogueElement && catalogueElement.link && catalogueElement.id &&
           segments && segments.length > 0
 
         firstSegment = segments[0]
 
-        return (element.id == 'all' and
-          element.link.indexOf(firstSegment.substring(0, firstSegment.lastIndexOf('/all'))) == 0) or
-          element.link.indexOf(firstSegment) >= 0
+        return (catalogueElement.id == 'all' and
+          catalogueElement.link.indexOf(firstSegment.substring(0, firstSegment.lastIndexOf('/all'))) == 0) or
+          catalogueElement.link.indexOf(firstSegment) >= 0
 
       # Whether a broadcast event is for this element
-      isForCurrentElement = (data) -> data[1].link is $scope.element.link
+      isForCurrentCatalogueElement = (data) -> data[1].link is $scope.catalogueElement.link
 
       getLocalName = (item) ->
         return undefined if not item
@@ -126,12 +126,12 @@ angular.module('mc.core.ui.catalogueElementTreeview.item')
 
           root.off 'scroll', loadMoreIfNeeded
 
-      metadataOccurrencesToAsterisk = (element) ->
+      metadataOccurrencesToAsterisk = (catalogueElement) ->
         # only Data Element and Data Class with some metadata and defined relationship
-        if (angular.isFunction(element.isInstanceOf) && (element.isInstanceOf('dataElement') || element.isInstanceOf('dataClass'))) && element.$$metadata?.values? && element.$$relationship
+        if (angular.isFunction(catalogueElement.isInstanceOf) && (catalogueElement.isInstanceOf('dataElement') || catalogueElement.isInstanceOf('dataClass'))) && catalogueElement.$$metadata?.values? && catalogueElement.$$relationship
           min = '0'
           max = '*'
-          for row in element.$$metadata.values
+          for row in catalogueElement.$$metadata.values
             if (row.key == 'Min Occurs')
               min = row.value
             else if (row.key == 'Max Occurs')
@@ -140,17 +140,17 @@ angular.module('mc.core.ui.catalogueElementTreeview.item')
         else
           return ""
 
-      onElementUpdate = (element) ->
+      onCatalogueElementUpdate = (catalogueElement) ->
 
-        $scope.node = TreeviewNodeFactory.create($scope.treeview.getNodeId("#{$scope.extraParameters?.root}:#{element.link}"), element)
+        $scope.node = TreeviewNodeFactory.create($scope.treeview.getNodeId("#{$scope.extraParameters?.root}:#{catalogueElement.link}"), catalogueElement)
 
-        $scope.descendFun = $scope.element[$scope.treeview.getDescend()]
+        $scope.descendFun = $scope.catalogueElement[$scope.treeview.getDescend()]
 
-        $scope.node.metadataOccurrencesToAsterisk = metadataOccurrencesToAsterisk(element)
+        $scope.node.metadataOccurrencesToAsterisk = metadataOccurrencesToAsterisk(catalogueElement)
 
         $scope.node.reset = ->
           if $scope.node.item[$scope.treeview.getDescend()]
-            $scope.node.numberOfChildren = $scope.element[$scope.treeview.getDescend()].total
+            $scope.node.numberOfChildren = $scope.catalogueElement[$scope.treeview.getDescend()].total
             $scope.node.loadingChildren = false
           else
             $scope.node.numberOfChildren = 0
@@ -181,14 +181,14 @@ angular.module('mc.core.ui.catalogueElementTreeview.item')
           $scope.descendFun(null, onlyImportant($scope.extraParameters)).then(loadNewChildren).finally ->
             $scope.node.loadingChildren = false
 
-        if $scope.extraParameters?.prefetch or startsWithSegment($scope.element, $scope.extraParameters?.path?.segments)
+        if $scope.extraParameters?.prefetch or startsWithSegment($scope.catalogueElement, $scope.extraParameters?.path?.segments)
           $scope.node.loadChildren()
       reloadChildrenOnChange = (_, result, url) ->
-        if result.link == $scope.element.link
-          $scope.element.updateFrom result
+        if result.link == $scope.catalogueElement.link
+          $scope.catalogueElement.updateFrom result
           $scope.node.loadChildren()
           return
-        if catalogue.isContentCandidate($scope.element[$scope.treeview.getDescend()], result, owner: $scope.element, url: url)
+        if catalogue.isContentCandidate($scope.catalogueElement[$scope.treeview.getDescend()], result, owner: $scope.catalogueElement, url: url)
           $scope.node.loadChildren()
       # Making use of some "data" "broadcasted" from RootScope
       doReloadChildrenOnChange = (data) ->
@@ -210,24 +210,24 @@ angular.module('mc.core.ui.catalogueElementTreeview.item')
 
         $scope.node.loadChildren()
 
-      $scope.select = (element) ->
+      $scope.select = (catalogueElement) ->
         $scope.collapseOrExpand()
-        $scope.treeview.select(element, $scope.extraParameters?.descendPath)
+        $scope.treeview.select(catalogueElement, $scope.extraParameters?.descendPath)
 
       ## Event handling:
       DEBOUNCE_TIME = 100
 
       $scope.$eventToObservable('catalogueElementCreated').debounce(DEBOUNCE_TIME).subscribe doReloadChildrenOnChange
-      $scope.$eventToObservable('catalogueElementUpdated').filter(isForCurrentElement).debounce(DEBOUNCE_TIME)
+      $scope.$eventToObservable('catalogueElementUpdated').filter(isForCurrentCatalogueElement).debounce(DEBOUNCE_TIME)
       .subscribe doReloadChildrenOnChange
 
       $scope.$on 'catalogueElementDeleted', (event, deletedElement) ->
         indexesToRemove = []
-        if $scope.element.$$relationship == deletedElement
-          delete $scope.element.$$relationship
-        for item, i in $scope.node.children
-          if deletedElement.relation and item.link == deletedElement.relation.link or deletedElement.link == item.link
-            indexesToRemove.push i
+        if $scope.catalogueElement.$$relationship == deletedElement
+          delete $scope.catalogueElement.$$relationship
+        for child, index in $scope.node.children
+          if deletedElement.relation and child.link == deletedElement.relation.link or deletedElement.link == child.link
+            indexesToRemove.push index
 
         for index, i in indexesToRemove
           $scope.node.children.splice index - i, 1
@@ -238,11 +238,11 @@ angular.module('mc.core.ui.catalogueElementTreeview.item')
       $scope.$on 'listReferenceReordered', (ignored, listReference) ->
         reloadChildrenOnChange(ignored, listReference, listReference.link)
 
-      $scope.$watch 'element', onElementUpdate
-      onElementUpdate($scope.element)
+      $scope.$watch 'catalogueElement', onCatalogueElementUpdate
+      onCatalogueElementUpdate($scope.catalogueElement)
 
       $scope.$watch 'extraParameters.path.segments', (segments) ->
-        if startsWithSegment($scope.element, segments)
+        if startsWithSegment($scope.catalogueElement, segments)
           $scope.node.loadChildren()
           $scope.path.segments = segments.slice(1) if segments.length > 1
   }
