@@ -33,6 +33,7 @@ angular.module('mc.core.listReferenceEnhancer', ['mc.util.rest', 'mc.util.enhanc
 
         url = "#{link}#{if tail? then '/' + tail else ''}"
         enhance(rest(method: 'DELETE', url: url, data: payload)).then (result)->
+          # Why are result, url, payload in a different order to Created!?
           $rootScope.$broadcast 'catalogueElementDeleted', payload, result, url
           result
 
