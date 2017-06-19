@@ -51,6 +51,7 @@ angular.module('mc.core.ui.catalogueElementTreeview').directive 'catalogueElemen
 
       listEnhancer = enhance.getEnhancer('list')
 
+      # Collect element from List
       $scope.mode = if $scope.element then 'element' else 'list'
       $scope.id = null  if !$scope.id
       $scope.list ?= listEnhancer.createEmptyList()

@@ -9,6 +9,8 @@ angular.module('mc.core.ui.catalogueElementTreeview.item')
     restrict: 'E'
     replace: true
     scope:
+      # Note: do not confuse element with $element which is the Angular passed in HTML element.
+      # element is a catalogue element.
       element:  '=' # bidirectional binding
       treeview: '='
       extraParameters: '=?' # bidirectional optional binding
@@ -21,19 +23,18 @@ angular.module('mc.core.ui.catalogueElementTreeview.item')
       $scope.nodeid = nodeid++
       $scope.path = {segments: []}
       ## Controller internal methods:
+      # Whether element url starts with the first segment of segments
       startsWithSegment = (element, segments) ->
-        return false unless element
-        return false unless element.link
-        return false unless element.id
-        return false unless segments
-        return false unless segments.length > 0
+        return false unless element && element.link && element.id &&
+          segments && segments.length > 0
 
         firstSegment = segments[0]
 
-        return true if element.id == 'all' and element.link.indexOf(firstSegment.substring(0, firstSegment.lastIndexOf('/all'))) == 0
-        return true if element.link.indexOf(firstSegment) >= 0
-        return false
+        return (element.id == 'all' and
+          element.link.indexOf(firstSegment.substring(0, firstSegment.lastIndexOf('/all'))) == 0) or
+          element.link.indexOf(firstSegment) >= 0
 
+      # Whether a broadcast event is for this element
       isForCurrentElement = (data) -> data[1].link is $scope.element.link
 
       getLocalName = (item) ->
@@ -189,7 +190,7 @@ angular.module('mc.core.ui.catalogueElementTreeview.item')
           return
         if catalogue.isContentCandidate($scope.element[$scope.treeview.getDescend()], result, owner: $scope.element, url: url)
           $scope.node.loadChildren()
-
+      # Making use of some "data" "broadcasted" from RootScope
       doReloadChildrenOnChange = (data) ->
         reloadChildrenOnChange(data[0], data[1])
 
@@ -220,22 +221,22 @@ angular.module('mc.core.ui.catalogueElementTreeview.item')
       $scope.$eventToObservable('catalogueElementUpdated').filter(isForCurrentElement).debounce(DEBOUNCE_TIME)
       .subscribe doReloadChildrenOnChange
 
-      $scope.$on 'catalogueElementDeleted', (event, element) ->
+      $scope.$on 'catalogueElementDeleted', (event, deletedElement) ->
         indexesToRemove = []
-        if $scope.element.$$relationship == element
+        if $scope.element.$$relationship == deletedElement
           delete $scope.element.$$relationship
         for item, i in $scope.node.children
-          if element.relation and item.link == element.relation.link or element.link == item.link
+          if deletedElement.relation and item.link == deletedElement.relation.link or deletedElement.link == item.link
             indexesToRemove.push i
 
         for index, i in indexesToRemove
           $scope.node.children.splice index - i, 1
           $scope.node.numberOfChildren--
 
-        reloadChildrenOnChange event, element
+        reloadChildrenOnChange event, deletedElement
 
       $scope.$on 'listReferenceReordered', (ignored, listReference) ->
-        reloadChildrenOnChange(ignored, listReference, listReference?.link)
+        reloadChildrenOnChange(ignored, listReference, listReference.link)
 
       $scope.$watch 'element', onElementUpdate
       onElementUpdate($scope.element)
