@@ -1,5 +1,3 @@
-detailSections = angular.module('mc.core.ui.bs.detailSections', ['mc.core.ui.detailSections'])
-
 
 ###
   If you need to put more explanation for certain title put following snippet after the label's strong element and
@@ -7,8 +5,8 @@ detailSections = angular.module('mc.core.ui.bs.detailSections', ['mc.core.ui.det
 
   <span class="fa fa-question-circle text-muted" tooltip="These are the authors of the data model"></span>
 ###
-
-detailSections.config ['detailSectionsProvider', (detailSectionsProvider)->
+#= require detailSections.prvd.coffee
+angular.module('mc.core.ui.detailSections').config ['detailSectionsProvider', (detailSectionsProvider)->
   REGEX_EXAMPLE = """// value is decimal number
 x ==~ /\\d+(\\.\\d+)?/
 """

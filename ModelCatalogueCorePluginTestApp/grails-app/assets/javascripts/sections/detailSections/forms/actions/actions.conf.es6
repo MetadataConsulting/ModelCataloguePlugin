@@ -1,4 +1,4 @@
-angular.module('mc.core.forms.actions', ['mc.util.ui.actions']).config(function (actionsProvider) {
+angular.module('mc.core.forms.actions').config(function (actionsProvider) {
   "ngInject"
 
   actionsProvider.registerChildActionInRoles('export', 'export-crf', [actionsProvider.ROLE_LIST_ACTION,
