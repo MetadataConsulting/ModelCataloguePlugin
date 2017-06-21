@@ -16,6 +16,8 @@
 #= require_self
 #= require_full_tree .
 #= require_full_tree components
+#= require_full_tree sections
+#= require_full_tree services
 #= require templates/mc/index
 #mc/index loads the templates onto JS's template path.
 
