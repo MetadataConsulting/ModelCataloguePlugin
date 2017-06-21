@@ -10,6 +10,9 @@
 
     constructor(id, item) {
       this.collapsed = true;
+      /** Number of children: Not the same as children.length. This is some
+      /* calculated true number of children in the database, whereas
+      /* this.children contains only the children currently loaded from the database.*/
       this.numberOfChildren = 2147483647; // integer max number
       this.loadingChildren = false;
       this[symbols.item] = item;
