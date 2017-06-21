@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.elasticsearch
 
-import com.amazonaws.services.elastictranscoder.model.TimeSpan
+
 import com.google.common.collect.ImmutableSet
 import grails.util.GrailsNameUtils
 import groovy.json.JsonSlurper
@@ -9,7 +9,6 @@ import org.codehaus.groovy.grails.commons.GrailsClass
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse
-import org.elasticsearch.action.admin.indices.get.GetIndexRequest
 import org.elasticsearch.action.bulk.BulkItemResponse
 import org.elasticsearch.action.bulk.BulkRequestBuilder
 import org.elasticsearch.action.bulk.BulkResponse
@@ -17,8 +16,6 @@ import org.elasticsearch.action.search.SearchRequestBuilder
 import org.elasticsearch.action.support.IndicesOptions
 import org.elasticsearch.client.Client
 import org.elasticsearch.client.transport.TransportClient
-import org.elasticsearch.cluster.metadata.IndexMetaData
-import org.elasticsearch.common.collect.ImmutableOpenMap
 import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.common.transport.InetSocketTransportAddress
 import org.elasticsearch.common.util.concurrent.EsRejectedExecutionException
@@ -26,7 +23,6 @@ import org.elasticsearch.index.IndexNotFoundException
 import org.elasticsearch.index.VersionType
 import org.elasticsearch.index.engine.VersionConflictEngineException
 import org.elasticsearch.index.query.BoolQueryBuilder
-import org.elasticsearch.index.query.FuzzyQueryBuilder
 import org.elasticsearch.index.query.QueryBuilder
 import org.elasticsearch.index.query.QueryBuilders
 import org.elasticsearch.indices.IndexAlreadyExistsException
@@ -35,7 +31,6 @@ import org.elasticsearch.node.NodeBuilder
 import org.elasticsearch.threadpool.ThreadPool
 import org.hibernate.ObjectNotFoundException
 import org.modelcatalogue.core.*
-import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.cache.CacheService
 import org.modelcatalogue.core.elasticsearch.rx.RxElastic
 import org.modelcatalogue.core.rx.RxService

@@ -45,7 +45,7 @@ class ExtensionsWrapper implements Map<String, String> {
     String put(String key, String value) {
         if (!key || key.length() < 1) {
             if (value) {
-                throw new IllegalArgumentException("Invalid key: $key. The key must be contain at least one character! (value = $value)")
+                throw new IllegalArgumentException("Invalid key: $key. The key must contain at least one character! (value = $value)")
             }
             return value
         }

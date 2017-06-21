@@ -170,13 +170,11 @@ angular.module('mc.core.ui.bs.navigationRightActions', ['mc.util.ui.actions', 'm
     {
       position:   1000
       icon:       'fa fa-flash fa-fw'
-      label:      'Suggest Relations'
+      label:      'Action Batches'
       action: ->
         $state.go 'simple.resource.list', resource: 'batch'
     }
   ]
-
-
 
   userLastSeen = [
     '$scope', 'names','security', '$state', 'messages',

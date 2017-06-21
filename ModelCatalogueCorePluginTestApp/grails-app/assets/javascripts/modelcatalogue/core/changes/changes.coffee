@@ -1,5 +1,9 @@
 window.modelcatalogue.registerModule 'mc.core.changes'
 
+###
+  safe (fn, defaultValue) returns a multi-variable function which tries to apply fn and returns
+  defaultValue if it fails.
+###
 safe = (fn, defaultValue) ->
   ->
     try
@@ -9,6 +13,9 @@ safe = (fn, defaultValue) ->
 
 changes = angular.module('mc.core.changes', ['mc.core.ui.columns', 'mc.util.ui.actions', 'mc.core.catalogue','mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot', 'mc.util.names', 'mc.core.ui.catalogueElementProperties', 'diff-match-patch'])
 
+###
+Insert history-tab into template cache
+###
 changes.run ['$templateCache', ($templateCache) ->
   $templateCache.put 'modelcatalogue/core/ui/catalogueElementView/history-tab.html', '''
       <div class="history-tab">
@@ -16,7 +23,9 @@ changes.run ['$templateCache', ($templateCache) ->
       </div>
     '''
 ]
-
+###
+  Configure Enhance Provider
+###
 changes.config ['enhanceProvider', (enhanceProvider)->
   condition = (item) -> item.hasOwnProperty('elementType') and item.elementType is 'org.modelcatalogue.core.audit.Change'
   factory   = ['modelCatalogueApiRoot', 'rest', '$rootScope', 'enhance', 'catalogueElementProperties', '$state', 'dmp', (modelCatalogueApiRoot, rest, $rootScope, enhance, catalogueElementProperties, $state, dmp) ->
@@ -109,6 +118,9 @@ changes.config ['enhanceProvider', (enhanceProvider)->
   enhanceProvider.registerEnhancerFactory('change', condition, factory)
 ]
 
+###
+  Configure Actions Provider
+###
 changes.config ['actionsProvider', (actionsProvider)->
 
   actionsProvider.registerActionInRoles 'undo-change',[actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'messages', 'security', '$http', 'modelCatalogueApiRoot', '$state', ($scope, messages, security, $http, modelCatalogueApiRoot, $state) ->
@@ -138,11 +150,15 @@ changes.config ['actionsProvider', (actionsProvider)->
     }
   ]
 ]
-
+###
+  Configure Catalogue Provider
+###
 changes.config ['catalogueProvider', (catalogueProvider)->
   catalogueProvider.setDefaultSort 'change', sort: 'dateCreated', order: 'desc'
 ]
-
+###
+  Configure Columns Provider, CatalogueElementProperties Provider,
+###
 changes.config ['columnsProvider', 'names', 'catalogueElementPropertiesProvider', (columnsProvider, names, catalogueElementPropertiesProvider)->
 
   getIconForChangeType = (change) ->
@@ -254,7 +270,9 @@ changes.config ['columnsProvider', 'names', 'catalogueElementPropertiesProvider'
     ]
   }
 ]
-
+###
+  Configure CatalogueElementPropertiesProvider
+###
 changes.config ['catalogueElementPropertiesProvider', (catalogueElementPropertiesProvider)->
 
   catalogueElementPropertiesProvider.configureProperty 'changes', hidden: true

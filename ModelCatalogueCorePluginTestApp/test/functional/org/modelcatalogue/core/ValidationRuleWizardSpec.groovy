@@ -12,7 +12,7 @@ class ValidationRuleWizardSpec extends AbstractModelCatalogueGebSpec {
         login admin
 
         when:
-        select 'Test 2' select "Business Rules"
+        select 'Test 3' select "Business Rules"
 
         then:
         check rightSideTitle is 'Active Validation Rules'

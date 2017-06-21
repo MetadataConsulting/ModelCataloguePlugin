@@ -12,10 +12,10 @@
                 title="{{getDeprecationWarning()}}">
           </span>
           <span editable-text="copy.name" e-name="name">{{element.name}}</span>
-          <small class="text-muted" editable-text="copy.modelCatalogueId" e-name="modelCatalogueId">
+          <small class="text-muted" editable-text="copy.modelCatalogueId" e-name="modelCatalogueId" ng-if="element.getVersionAndId()">
               {{element.getVersionAndId()}}
           </small>
-          <small>
+          <small ng-if="element.getDataModelWithVersion()">
             <a ng-href="{{element.dataModel.href()}}"
                class="label"
                ng-class="{

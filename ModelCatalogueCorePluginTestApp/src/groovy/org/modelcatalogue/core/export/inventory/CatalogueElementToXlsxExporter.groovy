@@ -45,6 +45,12 @@ import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHAN
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H2
 
+/**
+ * For the Inventory Report.
+ * Compares a Data Model or a Data Class with its previous version and produces an Excel spreadsheet detailing
+ * the differences.
+ * Uses CatalogueElementDiffs in the base case to compare two elements.
+ */
 @Log4j
 class CatalogueElementToXlsxExporter {
 

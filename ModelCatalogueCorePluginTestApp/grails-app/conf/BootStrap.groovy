@@ -48,6 +48,7 @@ class BootStrap {
             null
         }
 
+<<<<<<< HEAD
 //        if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST] && !System.getenv('MC_BLANK_DEV')) {
 //            TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
 //                initCatalogueService.initCatalogue(true)
@@ -57,6 +58,19 @@ class BootStrap {
 //            }
 //
 //        } else {
+=======
+        if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST] && !System.getenv('MC_BLANK_DEV')) {
+            TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
+                initCatalogueService.initCatalogue(true)
+                initPoliciesAndTags()
+                initSecurity(false)
+                setupDevTestStuff()
+            }
+//            modelCatalogueSearchService.reindex(true).all { it }.toBlocking().subscribe {
+//                System.out.println "Reindexed"
+//            }
+        } else {
+>>>>>>> master
             initCatalogueService.initDefaultRelationshipTypes()
             initSecurity(!System.getenv('MC_BLANK_DEV'))
 //        }
@@ -125,7 +139,7 @@ class BootStrap {
         reportsRegistry.register {
             creates asset
             title { "Inventory Report Document" }
-            defaultName { "${it.name} report as MS Excel Document" }
+            defaultName { "${it.name} report as MS Word Document" }
             depth 3
             type DataModel
             when { DataModel dataModel ->
@@ -450,7 +464,7 @@ class BootStrap {
 
     def initPoliciesAndTags() {
         catalogueBuilder.build {
-            dataModelPolicy(name: 'Unique of Kind') {
+            dataModelPolicy(name: 'Unique of Kind', overwrite: true) {
                 check dataClass property 'name' is 'unique'
                 check dataElement property 'name' is 'unique'
                 check dataType property 'name' is 'unique'
@@ -488,7 +502,7 @@ class BootStrap {
         }
     }
 
-    def setupStuff(){
+    def setupDevTestStuff(){
         actionService.resetAllRunningActions()
         try {
 
