@@ -6,14 +6,15 @@ dataModel(name: 'XMLSchema') {
     id 'http://www.w3.org/2001/XMLSchema'
     description 'XML Schema provides standard types for describing your own XML formats'
 
-    dataType(name: 'xs:boolean',enumerations: [
-           '0':    'False',
-           '1':    'True',
-           true:   'True',
-           false:  'False'
-        ]) {
+    dataType name: 'xs:boolean', {
         id 'http://www.w3.org/2001/XMLSchema#boolean'
         description 'Binary-valued logic legal literals'
+        enumerations: [
+                   '0':    'False',
+                   '1':    'True',
+                   true:   'True',
+                   false:  'False'
+                ]
     }
 
     dataType name: 'xs:base64Binary', {

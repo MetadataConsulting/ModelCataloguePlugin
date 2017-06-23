@@ -48,33 +48,20 @@ class BootStrap {
             null
         }
 
-<<<<<<< HEAD
+
 //        if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST] && !System.getenv('MC_BLANK_DEV')) {
 //            TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
 //                initCatalogueService.initCatalogue(true)
 //                initPoliciesAndTags()
 //                initSecurity(false)
-//                setupStuff()
+//                setupDevTestStuff()
 //            }
 //
 //        } else {
-=======
-        if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST] && !System.getenv('MC_BLANK_DEV')) {
-            TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
-                initCatalogueService.initCatalogue(true)
-                initPoliciesAndTags()
-                initSecurity(false)
-                setupDevTestStuff()
-            }
-//            modelCatalogueSearchService.reindex(true).all { it }.toBlocking().subscribe {
-//                System.out.println "Reindexed"
-//            }
-        } else {
->>>>>>> master
             initCatalogueService.initDefaultRelationshipTypes()
             initSecurity(!System.getenv('MC_BLANK_DEV'))
 //        }
-//
+
 //        modelCatalogueSearchService.reindex(true).all { it }.toBlocking().subscribe {
 //            System.out.println "Reindexed"
 //        }
@@ -558,6 +545,9 @@ class BootStrap {
                 dataModel(name: 'Test 1') {
                     policy 'Unique of Kind'
                     dataElement(name: 'Test Element 1') {
+                        dataType(name: 'Same Name')
+                    }
+                    dataElement(name: 'Test Element 2') {
                         dataType(name: 'Same Name')
                     }
                 }

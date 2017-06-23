@@ -676,25 +676,13 @@ class ElementService implements Publisher<CatalogueElement> {
         enums.each{ String key, Set<Long> values ->
             def found = enums2.get(key)
             if(found) {
-                if (!key.contains("yes") && !key.contains("no") && !key.contains("YES") && !key.contains("NO")) {
+                if (!key.contains("yes") && !key.contains("no") && !key.contains("YES") && !key.contains("NO")&& !key.contains("Yes") && !key.contains("No")) {
                     values.each { val ->
                         matches.put(val, found.asList())
                     }
                 }
             }
         }
-
-//        enums.findAll { String key, Set<Long> values ->
-//            values.size() > 1
-//        }.collectEntries { String key, Set<Long> values ->
-//            def valuesAsList = values.asList()
-//            [valuesAsList.first(), valuesAsList[1..-1]]
-//        }        enums.findAll { String key, Set<Long> values ->
-//            values.size() > 1
-//        }.collectEntries { String key, Set<Long> values ->
-//            def valuesAsList = values.asList()
-//            [valuesAsList.first(), valuesAsList[1..-1]]
-//        }
 
         matches
 
@@ -805,16 +793,14 @@ class ElementService implements Publisher<CatalogueElement> {
      * Enums are very likely duplicates if they have similar enum values.
      * @return map with the enum id as key and set of ids of duplicate enums as value
      */
-    Map<Long, Set<Long>> findDuplicateDataElementSuggestions(String dataModelA, String dataModelB) {
-        Long dataModelIdA = getDataModelId(dataModelA)
-        Long dataModelIdB = getDataModelId(dataModelB)
+    Map<Long, Set<Long>> findDuplicateDataElementSuggestions(DataModel dataModelA, DataModel dataModelB) {
         Map<Long, Set<Long>> elementSuggestions = new LinkedHashMap<Long, Set<Long>>()
-        def results = getDataElementsInCommon(dataModelIdA,dataModelIdB)
+        def results = getDataElementsInCommon(dataModelA.id,dataModelB.id)
         if(results.size() > 0){
             results.each{
                 def dataElementName = it as String
-                Long ida =getDataElementId(dataElementName,dataModelIdA)
-                Long idb =getDataElementId(dataElementName,dataModelIdB)
+                Long ida =getDataElementId(dataElementName,dataModelA.id)
+                Long idb =getDataElementId(dataElementName,dataModelB.id)
                 elementSuggestions.put(ida,idb)
             }
         }
@@ -825,9 +811,7 @@ class ElementService implements Publisher<CatalogueElement> {
      * Return dataElement ids which are very likely to be synonyms using elasticsearch fuzzy matching.
      * @return map with the enum id as key and set of ids of duplicate enums as value
      */
-    Set<MatchResult> findFuzzyDataElementSuggestions(String dataModelA, String dataModelB) {
-        Long dataModelIdA = getDataModelId(dataModelA)
-        Long dataModelIdB = getDataModelId(dataModelB)
+    Set<MatchResult> findFuzzyDataElementSuggestions(Long dataModelIdA, Long dataModelIdB) {
         Set<MatchResult> elementSuggestions = []
         Map searchParams = [:]
 
@@ -842,26 +826,12 @@ class ElementService implements Publisher<CatalogueElement> {
             match.getItemsWithScore().each{ item, score ->
                 //need to pull this method out
                 if(!de.relatedTo && !de.relatedTo.contains(item)) {
-
                     def matchResult = new ElasticMatchResult(dataElementA: item, dataElementB: de, matchScore: score)
                     elementSuggestions.add(matchResult)
-                }else{
-                    println("already put relationship in for $de.name")
                 }
             }
         }
 
-
-//        def results =
-//                //getDataElementsInCommon(dataModelIdA,dataModelIdB)
-//        if(results.size() > 0){
-//            results.each{
-//                def dataElementName = it as String
-//                Long ida =getDataElementId(dataElementName,dataModelIdA)
-//                Long idb =getDataElementId(dataElementName,dataModelIdB)
-//                elementSuggestions.put(ida,idb)
-//            }
-//        }
         return elementSuggestions
     }
 

@@ -43,24 +43,22 @@ class CreateMatch extends AbstractActionRunner {
 
         String destClass = GrailsNameUtils.getPropertyName(destination.class)
         String destId = destination.id as String
-        String destName = GrailsNameUtils.getNaturalName(destination.name)
         String destClassifiedName = CatalogueElementMarshaller.getClassifiedName(destination)
 
         String sourceClass = GrailsNameUtils.getPropertyName(source.class)
         String sourceId =       source.id
-        String sourceName =      GrailsNameUtils.getNaturalName(source.name)
         String sourceClassName = CatalogueElementMarshaller.getClassifiedName(source)
 
         String type = decodeEntity(parameters.type)
 
-        String srclink = """<a target="_blank" href='#/catalogue/${sourceClass}/${sourceId}'> ${sourceName} '${sourceClassName}'</a>"""
-        String destLink = """<a target="_blank" href='#/catalogue/${destClass}/${destId}'> ${destName} '${destClassifiedName}'</a>"""
+        String srclink = """<a target="_blank" href='#/catalogue/${sourceClass}/${sourceId}'> '${sourceClassName}'</a>"""
+        String destLink = """<a target="_blank" href='#/catalogue/${destClass}/${destId}'> '${destClassifiedName}'</a>"""
 
         String desc = """  <table class="table">
                       <tr>
-                        <th>COSD</th>
+                        <th>Data Model 1</th>
                         <th>Match</th>
-                        <th>NHS DD</th>
+                        <th>Data Model 2</th>
                       </tr>
                       <tr>
                         <td>${srclink}</td>
