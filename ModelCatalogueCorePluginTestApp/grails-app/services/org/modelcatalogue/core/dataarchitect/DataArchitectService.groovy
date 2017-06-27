@@ -26,6 +26,9 @@ class DataArchitectService {
     def sessionFactory
 
 
+    //commented out the functions that are no longer relevant or don't work
+    //TODO: finish these functions
+
     private Map<String,Runnable> suggestions = [
 //        'Inline Models': this.&generateInlineModel,
         'Enum Duplicates and Synonyms': this.&generatePossibleEnumDuplicatesAndSynonyms,
@@ -287,15 +290,23 @@ class DataArchitectService {
 
     def deleteSuggestions() {
 
-        def execute = { String label, Runnable cl ->
+        def execute = { Runnable cl ->
             log.info "Deleting suggestions"
             cl.run()
             log.info "Suggestions deleted"
         }
 
-        execute Batch.list().each{  btch ->
-            btch.delete()
+        def batchList = Batch.list()
+
+        Runnable runnable = new Runnable() {
+            void run() {
+                batchList.each{ Batch btch ->
+                    btch.delete()
+                }
+            }
         }
+
+        execute runnable
     }
 
     private void generateInlineModel() {
@@ -352,11 +363,12 @@ class DataArchitectService {
     private void generatePossibleEnumDuplicatesAndSynonyms(String dataModelAID, String dataModelBID){
         DataModel dataModelA = DataModel.get(dataModelAID)
         DataModel dataModelB = DataModel.get(dataModelBID)
-        Batch.findAllByNameIlike("Suggested DataType Synonyms for '${dataModelA.name}' and '${dataModelB.name}'").each reset
+        Batch.findAllByNameIlike("Suggested DataType Synonyms for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
+        Batch batch = Batch.findOrSaveByName("Generating Suggested DataType Synonyms for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
         def matchingDataElements = elementService.findDuplicateEnumerationsSuggestions(dataModelA.id, dataModelB.id)
+        batch.name = "Processing Suggested DataType Synonyms for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        batch.save()
         matchingDataElements.each { first, other ->
-            DataType dataType = DataType.get(first)
-            Batch batch = Batch.findOrSaveByName("Suggested DataType Synonyms for '${dataModelA.name}' and '${dataModelB.name}'")
             RelationshipType type = RelationshipType.readByName("relatedTo")
             def matchScore = 100
             other.each { otherId ->
@@ -375,6 +387,8 @@ class DataArchitectService {
             batch.archived = false
             batch.save()
         }
+        batch.name = "Suggested DataType Synonyms for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        batch.save()
 
     }
     /**
@@ -384,12 +398,13 @@ class DataArchitectService {
     private void generateDataElementSuggestionsExact(String dataModelAID, String dataModelBID){
         DataModel dataModelA = DataModel.get(dataModelAID)
         DataModel dataModelB = DataModel.get(dataModelBID)
+        Batch.findAllByNameIlike("Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
+        Batch batch = Batch.findOrSaveByName("Generating Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
         def matchingDataElements = elementService.findDuplicateDataElementSuggestions(dataModelA,dataModelB)
-        Batch.findAllByNameIlike("Suggested DataElement Relations for '${dataModelA.name}' and '${dataModelB.name}'").each reset
+        batch.name = "Processing DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        batch.save()
         def matchScore = 100
         matchingDataElements.each { first, other ->
-            DataElement dataElement = DataElement.get(first)
-            Batch batch = Batch.findOrSaveByName("Suggested DataElement and Type Synonyms for '${dataModelA.name}' and '${dataModelB.name}'")
             RelationshipType type = RelationshipType.readByName("relatedTo")
             other.each { otherId ->
                 Map<String, String> params = new HashMap<String,String>()
@@ -407,6 +422,8 @@ class DataArchitectService {
             batch.archived = false
             batch.save()
         }
+        batch.name = "Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        batch.save()
 
     }
 
@@ -416,21 +433,24 @@ class DataArchitectService {
      * generateDataElementSuggestionsFuzzy
      *
      */
+
     private void generateDataElementSuggestionsFuzzy(String dataModelAID, String dataModelBID){
         DataModel dataModelA = DataModel.get(dataModelAID)
         DataModel dataModelB = DataModel.get(dataModelBID)
-
-        def matchingDataElements = elementService.findFuzzyDataElementSuggestions(dataModelA.id,dataModelB.id)
-        Batch.findAllByNameIlike("Suggested Fuzzy DataElement Relations for '${dataModelA}' and '${dataModelB}'").each reset
+        Batch.findAllByNameIlike("Suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
+        Batch batch = Batch.findOrSaveByName("Generating suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
+        def matchingDataElements = elementService.findFuzzyDataElementSuggestions(dataModelA,dataModelB)
+        batch.name = "Processing suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        batch.save()
         matchingDataElements.each { ElasticMatchResult match ->
-            Batch batch = Batch.findOrSaveByName("Suggested Fuzzy DataElement Relations for '${dataModelA.name}' and '${dataModelB.name}'")
             RelationshipType type = RelationshipType.readByName("relatedTo")
             Map<String, String> params = new HashMap<String, String>()
             params.put("""source""", """gorm://org.modelcatalogue.core.DataElement:$match.dataElementA.id""")
             params.put("""destination""", """gorm://org.modelcatalogue.core.DataElement:$match.dataElementB.id""")
             params.put("""type""", """gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
-            params.put("""matchScore""", """${(match.matchScore) ? match.matchScore*100 : 0}""")
+            params.put("""matchScore""", """${(match.matchScore) ? match.matchScore : 0}""")
             params.put("""matchOn""", """ElementName""")
+            params.put("""message""", """$match.message""")
             Action action
             action = actionService.create(params, batch, CreateMatch)
             if (action.hasErrors()) {
@@ -439,6 +459,8 @@ class DataArchitectService {
             batch.archived = false
             batch.save()
         }
+        batch.name = "Suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        batch.save()
 
         }
 

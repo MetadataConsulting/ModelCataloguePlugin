@@ -33,11 +33,12 @@ class CreateMatch extends AbstractActionRunner {
 //
         def destination = decodeEntity(parameters?.destination)
         def source = decodeEntity(parameters?.source)
-        def matchScore =  parameters?.matchScore
+        def matchScore = parameters?.matchScore
         //If no matchscore then we assume this is being used by the exactMatch routine so insert 100
         if(!matchScore){
             matchScore = """100"""
         }
+        def additionalMessage = parameters?.message
 
 
 
@@ -65,7 +66,11 @@ class CreateMatch extends AbstractActionRunner {
                         <td>${matchScore}%</td>
                         <td>${destLink}</td>
                       </tr>
-                    </table>  """
+                    </table> 
+                     """
+        if(additionalMessage){
+            desc = desc + """<p>$additionalMessage</p>"""
+        }
         normalizeDescription(desc)
 //        normalizeDescription """
 //            Create new relationship '   <a href='#/catalogue/${GrailsNameUtils.getPropertyName(decodeEntity(parameters.source)?.class)}/${decodeEntity(parameters.source)?.id}'> ${GrailsNameUtils.getNaturalName(decodeEntity(parameters.source)?.class?.simpleName)} '${CatalogueElementMarshaller.getClassifiedName(decodeEntity(parameters.source))}'</a>  ${decodeEntity(parameters.type)?.sourceToDestination} <a href='#/catalogue/${GrailsNameUtils.getPropertyName(decodeEntity(parameters.destination)?.class)}/${decodeEntity(parameters.destination)?.id}'> ${GrailsNameUtils.getNaturalName(decodeEntity(parameters.destination)?.class?.simpleName)} '${CatalogueElementMarshaller.getClassifiedName(decodeEntity(parameters.destination))}'</a> with following parameters:

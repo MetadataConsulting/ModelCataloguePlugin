@@ -334,8 +334,7 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
 
-    // not used yet (just using plain old match with auto fuzziness set)
-    // may want to build on these query at a later date
+    // may want to build on this query at a later date
     public <T> ElasticSearchQueryList<T> fuzzySearch(Class<T> resource, Map params) {
         String search = params.search
         QueryBuilder qb

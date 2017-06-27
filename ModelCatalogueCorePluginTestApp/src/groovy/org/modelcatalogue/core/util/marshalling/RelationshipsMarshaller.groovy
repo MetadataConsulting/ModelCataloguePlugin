@@ -18,7 +18,7 @@ class RelationshipsMarshaller extends ListWrapperMarshaller {
         ret.list = relationsList.items.grep().collect {
             [id: it.id, type: it.relationshipType, ext: OrderedMap.toJsonMap(it.ext), element: CatalogueElementMarshaller.minimalCatalogueElementJSON(relationsList.direction.getElement(relationsList.owner, it)),  relation: relationsList.direction.getRelation(relationsList.owner, it), direction: relationsList.direction.getDirection(relationsList.owner, it), removeLink: getDeleteLink(relationsList.owner, it), archived: it.archived, inherited: it.inherited, elementType: Relationship.name, classification: CatalogueElementMarshaller.minimalCatalogueElementJSON(it.dataModel)]
         }
-        ret.total = relationsList.items.size() - relationsList.items.grep().size()
+        ret.total -= relationsList.items.size() - relationsList.items.grep().size()
         ret
     }
 

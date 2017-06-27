@@ -676,7 +676,9 @@ class ElementService implements Publisher<CatalogueElement> {
         enums.each{ String key, Set<Long> values ->
             def found = enums2.get(key)
             if(found) {
-                if (!key.contains("yes") && !key.contains("no") && !key.contains("YES") && !key.contains("NO")&& !key.contains("Yes") && !key.contains("No")) {
+                //as this is a data type only match,
+                //if the enumeration contains yes / no then we probably don't want to match it, otherwise we get loads of matches that aren't relevant
+                if (!key.toLowerCase().contains("yes")) {
                     values.each { val ->
                         matches.put(val, found.asList())
                     }
@@ -811,28 +813,38 @@ class ElementService implements Publisher<CatalogueElement> {
      * Return dataElement ids which are very likely to be synonyms using elasticsearch fuzzy matching.
      * @return map with the enum id as key and set of ids of duplicate enums as value
      */
-    Set<MatchResult> findFuzzyDataElementSuggestions(Long dataModelIdA, Long dataModelIdB) {
+    Set<MatchResult> findFuzzyDataElementSuggestions(DataModel dataModelA, DataModel dataModelB, Long minimumScore = 5) {
         Set<MatchResult> elementSuggestions = []
         Map searchParams = [:]
-
-        //iterate through the COSD models
-        def elementsToMatch = DataElement.findAllByDataModel(DataModel.get(dataModelIdB))
-
+        //iterate through the data model a
+        def elementsToMatch = DataElement.findAllByDataModel(dataModelA)
         elementsToMatch.each{ DataElement de ->
             //set params map
-            searchParams.dataModel = dataModelIdA
+            searchParams.dataModel = dataModelB.id
             searchParams.search = de.name
-            def match = elasticSearchService.fuzzySearch(DataElement, searchParams)
-            match.getItemsWithScore().each{ item, score ->
-                //need to pull this method out
-                if(!de.relatedTo && !de.relatedTo.contains(item)) {
-                    def matchResult = new ElasticMatchResult(dataElementA: item, dataElementB: de, matchScore: score)
-                    elementSuggestions.add(matchResult)
+            def matches = elasticSearchService.fuzzySearch(DataElement, searchParams)
+            String message = checkRelatedTo(de, dataModelB)
+            matches.getItemsWithScore().each{ item, score ->
+                if(!de.relatedTo.contains(item)) {
+                    score  = score*100
+                    if(score>minimumScore) {
+                        elementSuggestions.add(new ElasticMatchResult(dataElementA: de, dataElementB: item , matchScore: score.round(2), message: message))
+                    }
                 }
             }
         }
 
         return elementSuggestions
+    }
+
+    private String checkRelatedTo(DataElement de, DataModel proposedModel){
+        String modelRelatedItems = ""
+        de.relatedTo.each{ ce ->
+            if(ce.dataModel == proposedModel){
+                modelRelatedItems = modelRelatedItems + "Note: $de.name already related to: $ce.name \n "
+            }
+        }
+        modelRelatedItems
     }
 
 

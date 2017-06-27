@@ -9,4 +9,5 @@ class ElasticMatchResult {
     DataElement dataElementA
     DataElement dataElementB
     Float matchScore
+    String message
 }
