@@ -76,7 +76,7 @@ import org.modelcatalogue.core.security.User
             new ValidationRule(name:"rule$i", description: "some random rule $i", status: i <=6 ? ElementStatus.FINALIZED : ElementStatus.DRAFT).save(failOnError: true)
         }
 
-        DataModel CL_dataSet1 = new DataModel(name: "data set 1", status: ElementStatus.FINALIZED, description: "test data set").save(failOnError: true)
+        DataModel CL_dataSet1 = new DataModel(name: "data set a", status: ElementStatus.FINALIZED, description: "test data set").save(failOnError: true)
         DataModel CL_dataSet10 = new DataModel(name: "data set 10", status: ElementStatus.FINALIZED, description: "test data set").save(failOnError: true)
         DataModel CL_dataSet11 = new DataModel(name: "data set 11", status: ElementStatus.FINALIZED, description: "test data set").save(failOnError: true)
         DataModel CL_dataSet12 = new DataModel(name: "data set 12", status: ElementStatus.FINALIZED, description: "test data set").save(failOnError: true)
@@ -104,8 +104,8 @@ import org.modelcatalogue.core.security.User
         DataElement DE_author = new DataElement(name:"DE_author", description: "the DE_author of the book", status: ElementStatus.FINALIZED).save(failOnError: true)
         DataElement DE_author1 = new DataElement(name:"DE_author1", description: "the DE_author of the book", status: ElementStatus.FINALIZED).save(failOnError: true)
         DataElement DE_author2 = new DataElement(name:"AUTHOR", description: "the DE_author of the book", status: ElementStatus.FINALIZED).save(failOnError: true)
-        DataElement DE_author3 = new DataElement(name:"auth", description: "the DE_author of the book", status: ElementStatus.FINALIZED).save(failOnError: true)
-        DataElement DE_author4 = new DataElement(name:"auth4", description: "the DE_author of the book", status: ElementStatus.FINALIZED).save(failOnError: true)
+        DataElement DE_author3 = new DataElement(name:"auth", description: "the DE_author of the book", status: ElementStatus.FINALIZED, dataModel: CL_dataSet2).save(failOnError: true)
+        DataElement DE_author4 = new DataElement(name:"auth4", description: "the DE_author of the book", status: ElementStatus.FINALIZED, dataModel: CL_dataSet1).save(failOnError: true)
         DataElement DE_author5 = new DataElement(name:"auth5", description: "the DE_author of the book", status: ElementStatus.FINALIZED).save(failOnError: true)
         DataElement DE_opel = new DataElement(name:"speed of Opel", description: "speed of your Opel car", dataType: DT_test3).save(failOnError: true)
         DataElement DE_patient_temperature_uk = new DataElement(name:"patient temperature uk", description: "Patient's Temperature in the UK", status: ElementStatus.FINALIZED, dataType: DT_test1).save(failOnError: true)

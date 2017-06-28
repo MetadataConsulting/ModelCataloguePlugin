@@ -401,7 +401,7 @@ class ElasticSearchService implements SearchCatalogue {
                 .setTypes(collectTypes(resource) as String[])
                 .setIndicesOptions(IndicesOptions.lenientExpandOpen())
                 .setQuery(qb)
-                .setMinScore(0.2)
+//                .setMinScore(0.2)
 
         return ElasticSearchQueryList.search(params,resource, request)
     }
