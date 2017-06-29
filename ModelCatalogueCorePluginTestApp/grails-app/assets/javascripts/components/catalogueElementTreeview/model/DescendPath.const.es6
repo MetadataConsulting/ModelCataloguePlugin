@@ -1,3 +1,4 @@
+//= require _mc.core.ui.catalogueElementTreeview.model
 (function (window, angular) {
   const symbols = {
     path: Symbol('path')

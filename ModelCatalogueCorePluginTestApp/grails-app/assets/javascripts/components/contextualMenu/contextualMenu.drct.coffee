@@ -10,12 +10,6 @@ angular.module('mc.util.ui.contextualMenu').directive 'contextualMenu',  ['$comp
   templateUrl: 'modelcatalogue/util/ui/contextualMenu.html'
 
   link: ($scope, $element) ->
-
-    updateActions()
-    $scope.$on 'userLoggedIn', updateActions
-    $scope.$on 'userLoggedOut', updateActions
-    $scope.$on 'redrawContextualActions', updateActions
-
     getTemplate = (action) ->
       $templateCache.get(if action.children?.length or action.abstract then 'modelcatalogue/util/ui/menuItemDropdown.html' else 'modelcatalogue/util/ui/menuItemSingle.html')
 
@@ -23,12 +17,12 @@ angular.module('mc.util.ui.contextualMenu').directive 'contextualMenu',  ['$comp
 
     $scope.$$actionWatcherToBeRemoved = $scope.$$actionWatcherToBeRemoved ? []
 
-    removeWatchers = ($scope) ->
+    removeWatchers =  ($scope) ->
       fn() for fn in $scope.$$actionWatcherToBeRemoved
       $scope.$$actionWatcherToBeRemoved = []
 
 
-    collectWatchers = (action, watches = []) ->
+    collectWatchers =  (action, watches = []) ->
       if angular.isArray(action.watches)
         for w in action.watches
           if w and watches.indexOf(w) == -1
@@ -43,7 +37,8 @@ angular.module('mc.util.ui.contextualMenu').directive 'contextualMenu',  ['$comp
 
       watches
 
-    updateActions = ->
+
+    updateActions =  ->
       removeWatchers($scope)
       scope.$destroy() for scope in scopes
       scopes = []
@@ -84,6 +79,12 @@ angular.module('mc.util.ui.contextualMenu').directive 'contextualMenu',  ['$comp
             ))
             newScope.$on '$destroy', ->
               removeWatchers($scope)
+
+    updateActions()
+    $scope.$on 'userLoggedIn', updateActions
+    $scope.$on 'userLoggedOut', updateActions
+    $scope.$on 'redrawContextualActions', updateActions
+
 
 
 }]

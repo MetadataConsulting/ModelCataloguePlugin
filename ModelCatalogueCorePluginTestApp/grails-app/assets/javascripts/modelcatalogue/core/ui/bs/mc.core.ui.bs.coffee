@@ -2,7 +2,6 @@ angular.module('mc.core.ui.bs', [
   # depends on
   'mc.core.ui'
   'mc.util.ui'
-  'mc.util.ui.bs'
   'mc.core.ui.general'
   'mc.core.ui.metadataEditor'
   'mc.core.ui.modals'
@@ -52,7 +51,6 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalSearchForCatalogueElement'
   'mc.core.ui.bs.modalSearchForActions'
   'mc.core.ui.bs.modalPromptForCatalogueElements'
-  'mc.core.ui.bs.simpleObjectEditor'
   'mc.core.ui.bs.modalPromptAssetEdit'
   'mc.core.ui.bs.modalPromptLogin'
   'mc.core.ui.bs.modalPromptBasicEdit'
@@ -77,7 +75,6 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.diffTable'
   'mc.core.ui.bs.withClassificationCtrlMixin'
   'mc.core.ui.bs.metadataEditors'
-  'mc.core.ui.bs.detailSections'
   'mc.core.ui.bs.navigationRightActions'
   'mc.core.ui.bs.modalOptions'
 ]).run ['messages', '$rootScope', '$log', (messages, $rootScope, $log) ->

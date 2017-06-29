@@ -26,4 +26,5 @@ angular.module('mc.core.ui', [
   'mc.core.ui.detailSections'
   'mc.core.ui.detailSections.metadata'
   'mc.core.ui.metadataEditor'
+  'mc.core.ui.simpleObjectEditor'
 ])

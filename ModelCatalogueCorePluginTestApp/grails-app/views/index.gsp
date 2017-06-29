@@ -70,7 +70,7 @@
 
         <!-- code -->
         <asset:stylesheet href="modelcatalogue.css"/>
-        <asset:javascript src="modelcatalogue/modelcatalogue.js"/>
+        <asset:javascript src="modelcatalogue.js"/>
     </g:if>
     <g:else>
         <asset:stylesheet href="bootstrap/dist/css/bootstrap.css"/>
@@ -90,7 +90,7 @@
         <asset:javascript src="angular-sanitize/angular-sanitize.js"/>
         <asset:javascript src="angular-animate/angular-animate.js"/>
         <asset:javascript src="angular-rx/dist/rx.angular.js"/>
-        <asset:javascript src="modelcatalogue/modelcatalogue.js"/>
+        <asset:javascript src="modelcatalogue.js"/>
         <asset:javascript src="urijs/src/URI.js"/>
     </g:else>
     <g:set var="configurationProvider" bean="frontendConfigurationProviderRegistry"/>
@@ -160,6 +160,7 @@
         // The metadataCurator app module is based on all modules registered in 'modelcatalogue',
         // which is defined in the javascripts folder. The modules registered should be
         // only and all the modules defined in the javascripts folder.
+        console.log(window.modelcatalogue.getModules())
         angular.module('metadataCurator', window.modelcatalogue.getModules()).run(['$state', function($state){
             // workaround https://github.com/angular-ui/ui-router/issues/2051
         }])
