@@ -17,6 +17,7 @@ import org.modelcatalogue.gel.export.CancerTypesJsonExporter
 import org.modelcatalogue.gel.export.DataModelChangeLogXlsExporter
 import org.modelcatalogue.gel.export.RareDiseaseDisorderListCsvExporter
 import org.modelcatalogue.gel.export.RareDiseaseEligibilityChangeLogXlsExporter
+import org.modelcatalogue.gel.export.RareDiseaseMaintenanceSplitDocsExporter
 import org.modelcatalogue.gel.export.RareDiseasePhenotypeChangeLogXlsExporter
 import org.modelcatalogue.gel.export.RareDiseasesDocExporter
 import org.modelcatalogue.gel.export.RareDiseasesJsonExporter
@@ -131,6 +132,29 @@ class GenomicsService {
         ) { OutputStream out ->
             new RareDiseasesDocExporter(DataClass.get(classId), org.modelcatalogue.gel.export.RareDiseasesDocExporter.standardTemplate, DOC_IMAGE_PATH, eligibilityMode).export(out)
         }
+    }
+
+
+    long genRareDiseaseSplitDocs(DataClass dataClass) {
+
+        //iterate through the child of the top level maintenance class
+        // then create documents for each of the children
+        dataClass.parentOf.each{ DataClass child ->
+
+            String documentName = "Rare Disease Eligibility and Phenotypes for $child.name"
+
+            return assetService.storeReportAsAsset(
+                    child.dataModel,
+                    name: "${documentName} report (MS Word Document)",
+                    originalFileName: "${documentName}-${child.status}-${child.version}.docx",
+                    contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            ) { OutputStream out ->
+                new RareDiseaseMaintenanceSplitDocsExporter(child, org.modelcatalogue.gel.export.RareDiseasesDocExporter.standardTemplate, DOC_IMAGE_PATH).export(out)
+            }
+
+        }
+
+
     }
 
 
