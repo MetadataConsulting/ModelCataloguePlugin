@@ -157,7 +157,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
         messages.prompt(null, null, type: 'new-version', element: $scope.element)
     }
   actionsProvider.registerChildActionInRole 'catalogue-element', 'create-new-version', actionsProvider.ROLE_ITEM_ACTION, newVersionAction
-  actionsProvider.registerActionInRoles 'create-new-version-tiny', [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INIFINITE_LIST], newVersionAction
+  actionsProvider.registerActionInRoles 'create-new-version-tiny', [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INFINITE_LIST], newVersionAction
 
 
 
@@ -358,7 +358,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     }
 
   ]
-
+  ###
+  # remove compare action until properly implemented
   actionsProvider.registerChildActionInRoles 'catalogue-element', 'compare-catalogue-element',[actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'messages', '$state', ($scope, messages, $state) ->
     elementPresent = $scope.element and angular.isFunction($scope.element.getResourceName) and angular.isFunction($scope.element.getElementTypeName) and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('catalogueElement')
     diffView = $state.current.name == 'mc.resource.diff'
@@ -379,6 +380,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
             $state.go 'mc.resource.diff', dataModelId: element.dataModel.id, resource: element.getResourceName(), ids: ids.concat([toBeCompared.id]).join('|')
     }
   ]
+  ###
 
 
   actionsProvider.registerChildActionInRoles 'catalogue-element', 'create-new-mapping',[actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
@@ -766,4 +768,4 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
 
 
   actionsProvider.registerChildActionInRole 'catalogue-element', 'upload-new-asset-version', actionsProvider.ROLE_ITEM_ACTION, newAssetVersion
-  actionsProvider.registerActionInRoles 'upload-new-asset-version-tiny', [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INIFINITE_LIST], newAssetVersion
+  actionsProvider.registerActionInRoles 'upload-new-asset-version-tiny', [actionsProvider.ROLE_ITEM_DETAIL_ACTION, actionsProvider.ROLE_ITEM_INFINITE_LIST], newAssetVersion

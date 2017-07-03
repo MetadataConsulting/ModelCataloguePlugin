@@ -133,17 +133,6 @@ class GenomicsService {
         }
     }
 
-    long genGelSpecification(DataModel model, Integer depth){
-        Long modelId = model.id
-        return assetService.storeReportAsAsset(
-            model,
-            name: "${model.name} - Data Specification Report (MS Word Document)",
-            originalFileName: "${model.name}-${model.status}-${model.version}.docx",
-            contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        ) { OutputStream out ->
-            new DataModelToDocxExporter(DataModel.get(modelId), dataClassService, elementService, customTemplate, DOC_IMAGE_PATH, depth).export(out)
-        }
-    }
 
     long genCancerTypesAsJson(DataClass dataClass){
         return assetService.storeReportAsAsset(dataClass.dataModel,

@@ -1,12 +1,12 @@
 angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView',  'mc.core.ui.propertiesPane', 'mc.core.ui.simpleObjectEditor', 'ui.bootstrap', 'ngSanitize']).run [ '$templateCache', ($templateCache) ->
     $templateCache.put 'modelcatalogue/core/ui/batchView.html', '''
     <div>
-      <h3 class="ce-name">{{batch.name}} <small ng-show="batch.getElementTypeName()"><span class="label" ng-show="batch.archived" ng-class="{'label-danger': batch.archived}">{{batch.status}}</span> (created {{batch.dateCreated | date:'short'}})</small></h3>
+      <h3 class="ce-name">{{batch.name}} <small ng-show="batch.getElementTypeName()"><span class="label" ng-show="batch.archived" ng-class="{'label-danger': batch.archived}">{{batch.status}}</span> (created {{batch.dateCreated | date:'short'}}, last updated {{batch.lastUpdated | date: 'short'}})</small></h3>
       <blockquote class="ce-description" ng-show="batch.description" ng-bind-html="'' + batch.description | linky:'_blank'"></blockquote>
       <div class="row">
         <div class="col-md-6 pending-actions">
           <h4>Pending Actions</h4>
-          <div uib-alert class="alert alert-info" ng-hide="loading || pendingActions.length > 0">There no pending actions</div>
+          <div uib-alert class="alert alert-info" ng-hide="loading || pendingActions.length > 0">There are no pending actions</div>
           <div uib-alert type="{{getType(action)}}" ng-repeat="action in pendingActions" id="action-{{action.id}}">
             <div class="action-header">
               <div class="pull-right">

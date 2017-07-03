@@ -6,7 +6,7 @@ import spock.lang.Unroll
  * Created by adammilward on 05/02/2014.
  *
  * Models are like xml complex types
- * They contain data elements
+ * They contains data elements
  */
 
 class DataClassSpec extends IntegrationSpec {

@@ -2,5 +2,10 @@ Put initial SQL file into this directory to initialize the production environmen
 
 
 CAUTION: Be sure the script uses `metadata` database!
+have line
+USE `metadata`
+in at the top of the SQL script.
 
 CAUTION: This feature is not yet supported when using Docker Machine!
+
+If mc-config.groovy does not exist, gradle will set up a default one which sets up a MySQL container using this SQL file, along with mail server settings.

@@ -1,0 +1,115 @@
+<div class="modal-header">
+  <button type="button" class="close" id="exit-wizard" ng-click="dismiss()">
+    <span aria-hidden="true">&times;</span>
+    <span class="sr-only">Cancel</span>
+  </button>
+  <h4>Data Model Wizard</h4>
+  <ul class="tutorial-steps">
+    <li>
+      <button id="step-previous" ng-disabled="step == 'classification'" ng-click="previous()" class="btn btn-default">
+        <span class="glyphicon glyphicon-chevron-left"></span>
+      </button>
+    </li>
+    <li>
+      <button id="step-classification" ng-click="select('classification')" class="btn btn-default"
+              ng-class="{'btn-primary': step == 'classification'}">
+        1. Data Model
+      </button>
+    </li>
+    <li>
+      <button id="step-imports" ng-disabled="!nameUnique" ng-click="select('imports')" class="btn btn-default"
+              ng-class="{'btn-primary': step == 'imports'}">
+        2. Imports
+      </button>
+    </li>
+    <li>
+      <button id="step-next" ng-disabled="!nameUnique || step == 'imports'" ng-click="next()" class="btn btn-default">
+        <span class="glyphicon glyphicon-chevron-right"></span>
+      </button>
+    </li>
+    <li>
+      <button id="step-finish" ng-disabled="!nameUnique || finishInProgress || classification.name.length &gt; 255" ng-click="finish()"
+              class="btn btn-default btn-success">
+        <span class="glyphicon glyphicon-ok"></span>
+      </button>
+    </li>
+  </ul>
+</div>
+<div class="modal-body" ng-switch="step">
+  <messages-panel messages="messages"></messages-panel>
+  <div ng-switch-when="classification" id="classification">
+    <form role="form" ng-submit="select('imports')">
+      <div class="form-group">
+        <label for="name" class="">Name</label>
+        <input type="text" class="form-control" id="name" placeholder="Name (Required)" ng-model="classification.name"
+               focus-me="step=='classification'" required ng-model-options="{debounce: 500}"/>
+        <p class="help-block">
+          Please, keep the name short. It will be displayed next to the declared elements' names.
+        </p>
+      </div>
+      <div class="form-group">
+        <label for="semanticVersion" class="">Semantic Version</label>
+        <input type="text" class="form-control" id="semanticVersion" placeholder="Semantic Version (e.g. 1.0.0)"
+               ng-model="classification.semanticVersion"/>
+        <p class="help-block">
+          You will be able to change semantic version when the data model will be published
+        </p>
+      </div>
+      <div class="form-group">
+        <label for="name" class="">Catalogue ID</label>
+        <input type="text" class="form-control" id="modelCatalogueId"
+               placeholder="e.g. external ID, namespace (leave blank for generated)"
+               ng-model="classification.modelCatalogueId"/>
+      </div>
+      <div class="form-group">
+        <label for="name" class="">Policies</label>
+        <elements-as-tags elements="classification.policies"></elements-as-tags>
+        <input type="text" global="true" id="dataModelPolicy" placeholder="Data Model Policy"
+               ng-model="copy.dataModelPolicy" catalogue-element-picker="dataModelPolicy" label="el.name"
+               typeahead-on-select="classification.policies.push(copy.dataModelPolicy);copy.dataModelPolicy = null">
+      </div>
+      <div class="form-group">
+        <label for="description" class="">Description</label>
+        <textarea rows="10" ng-model="classification.description" placeholder="Description (Optional)"
+                  class="form-control" id="description" ng-keydown="navigateOnKey($event, 9, 'imports')"></textarea>
+      </div>
+      <fake-submit-button/>
+    </form>
+  </div>
+  <div ng-switch-when="imports" id="imports">
+    <br/>
+    <form role="form">
+      <div class="form-group">
+        <label for="name" class="">Import Existing Data Models</label>
+        <elements-as-tags elements="imports"></elements-as-tags>
+        <div class="input-group">
+          <input type="text" class="form-control" id="name" placeholder="Name" ng-model="import.element"
+                 focus-me="step=='imports'" catalogue-element-picker="dataModel" status="finalized"
+                 typeahead-on-select="push('imports', 'import')"/>
+          <span class="input-group-btn">
+            <button class="btn btn-success" ng-click="push('imports', 'import')"
+                    ng-disabled="isEmpty(import.element)"><span class="glyphicon glyphicon-plus"></span>
+            </button>
+          </span>
+        </div>
+        <p class="help-block">
+          Import data models already contained in the catalogue for use within your new data model. You can import
+          only finalized data models.
+        </p>
+      </div>
+    </form>
+  </div>
+  <div ng-switch-when="summary" id="summary">
+    <h4 ng-show="classification.name && finished">
+      Data Model <strong>{{classification.name}} created</strong>
+    </h4>
+  </div>
+</div>
+<div class="modal-footer" ng-if="step == 'summary'">
+  <button ng-disabled="!finished" class="btn btn-success" ng-click="reset()">
+    <span class="glyphicon glyphicon-plus"></span> Create Another
+  </button>
+  <button ng-disabled="!finished" class="btn btn-default" ng-click="$dismiss()">
+    <span class="glyphicon glyphicon-remove"></span> Close
+  </button>
+</div>
