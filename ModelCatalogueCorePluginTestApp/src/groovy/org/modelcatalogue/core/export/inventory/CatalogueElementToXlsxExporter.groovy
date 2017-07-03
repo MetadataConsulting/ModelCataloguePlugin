@@ -833,7 +833,7 @@ class CatalogueElementToXlsxExporter {
 
         }
 
-        if (typeHierarchy.items.any { it.rule } || dataType.rule) {
+        if (typeHierarchy.items.any { it?.rule } || dataType?.rule) {
             sheet.row {
                 cell("F") {
                     text 'Rules', {
@@ -855,7 +855,7 @@ class CatalogueElementToXlsxExporter {
                             }
                         }
                         cell { CellDefinition cell ->
-                            text(type.rule ?: (dataTypeWithRuleDiffs.get('rule') ? dataTypeWithRuleDiffs.get('rule').first().otherValue?.toString() : null))
+                            text(type?.rule ?: (dataTypeWithRuleDiffs.get('rule') ? dataTypeWithRuleDiffs.get('rule').first().otherValue?.toString() : null))
                             styles withChangesHighlight(ModelCatalogueStyles.DESCRIPTION, dataTypeWithRuleDiffs, 'rule')
                         }
                     }
@@ -961,10 +961,10 @@ class CatalogueElementToXlsxExporter {
             }
         }
 
-        int ruleCount = typeHierarchy.items.count { it.rule }
-        if (ruleCount > 0 || dataType.rule) {
+        int ruleCount = typeHierarchy.items.count { it?.rule }
+        if (ruleCount > 0 || dataType?.rule) {
             rowspan += 1 + ruleCount
-            if (dataType.rule) {
+            if (dataType?.rule) {
                 rowspan += 1
             }
         }

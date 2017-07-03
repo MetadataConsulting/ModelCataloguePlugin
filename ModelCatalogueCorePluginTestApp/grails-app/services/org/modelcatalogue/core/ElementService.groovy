@@ -822,6 +822,7 @@ class ElementService implements Publisher<CatalogueElement> {
             //set params map
             searchParams.dataModel = dataModelB.id
             searchParams.search = de.name
+            searchParams.minScore = minimumScore/100
             def matches = elasticSearchService.fuzzySearch(DataElement, searchParams)
             String message = checkRelatedTo(de, dataModelB)
             matches.getItemsWithScore().each{ item, score ->

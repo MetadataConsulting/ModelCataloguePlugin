@@ -298,10 +298,10 @@ class DocxSpecificationDataHelper {
                                 row {
                                     cell {
                                         Map<String, Object> attrs = [url: "#${vr.id}", font: [bold: true]]
-                                        link attrs, vr.name
+                                        link attrs, vr?.name
                                     }
                                     cell {
-                                        text vr.description
+                                        text vr?.description
                                     }
                                 }
                                 if (!(vr in rules)) rules << vr
@@ -347,7 +347,7 @@ class DocxSpecificationDataHelper {
                 Map<String, Object> attrs = [ref: "${vr.id}", style: 'heading2']
 
 
-                heading3 attrs, vr.name
+                heading3 attrs, vr?.name
 
                 table(border: [size: 1, color: '#D2D2D2']) {
                     row {
@@ -358,7 +358,7 @@ class DocxSpecificationDataHelper {
                         cell "Classes Applied Within"
                         cell(TITLE_COLUMN_CELL){
                             vr.appliedWithin.each{ DataClass cls ->
-                                text cls.name
+                                text cls?.name
                                 lineBreak()
                             }
                         }
@@ -367,54 +367,54 @@ class DocxSpecificationDataHelper {
                         cell "Data Elements Involved"
                         cell(TITLE_COLUMN_CELL){
                             vr.involves.each{ DataElement de ->
-                                text de.name
+                                text de?.name
                                 lineBreak()
                             }
                         }
                     }
                     row {
                         cell "Component"
-                        cell TITLE_COLUMN_CELL, vr.component
+                        cell TITLE_COLUMN_CELL, vr?.component
                     }
                     row {
                         cell "Rule Focus"
-                        cell TITLE_COLUMN_CELL, vr.ruleFocus
+                        cell TITLE_COLUMN_CELL, vr?.ruleFocus
                     }
                     row {
                         cell "Trigger"
-                        cell TITLE_COLUMN_CELL, vr.trigger
+                        cell TITLE_COLUMN_CELL, vr?.trigger
                     }
                     row {
                         cell "Rule"
-                        cell TITLE_COLUMN_CELL, vr.rule
+                        cell TITLE_COLUMN_CELL, vr?.rule
                     }
                     row {
                         cell "Error Condition"
-                        cell TITLE_COLUMN_CELL, vr.errorCondition
+                        cell TITLE_COLUMN_CELL, vr?.errorCondition
                     }
                     row {
                         cell "Issue Record"
-                        cell TITLE_COLUMN_CELL, vr.issueRecord
+                        cell TITLE_COLUMN_CELL, vr?.issueRecord
                     }
                     row {
                         cell "Notification"
-                        cell TITLE_COLUMN_CELL, vr.notification
+                        cell TITLE_COLUMN_CELL, vr?.notification
                     }
                     row {
                         cell "Notification Target"
-                        cell TITLE_COLUMN_CELL, vr.notificationTarget
+                        cell TITLE_COLUMN_CELL, vr?.notificationTarget
                     }
                     row {
                         cell "Last Updated"
-                        cell TITLE_COLUMN_CELL, vr.lastUpdated.format("yyyy-MM-dd")
+                        cell TITLE_COLUMN_CELL, vr?.lastUpdated.format("yyyy-MM-dd")
                     }
                     row {
                         cell "Version Created"
-                        cell TITLE_COLUMN_CELL, vr.versionCreated.format("yyyy-MM-dd")
+                        cell TITLE_COLUMN_CELL, vr?.versionCreated.format("yyyy-MM-dd")
                     }
                     row {
                         cell "Status"
-                        cell TITLE_COLUMN_CELL, vr.status.toString()
+                        cell TITLE_COLUMN_CELL, vr?.status.toString()
                     }
                 }
             }

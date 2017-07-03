@@ -63,7 +63,7 @@ class CreateMatch extends AbstractActionRunner {
                       </tr>
                       <tr>
                         <td>${srclink}</td>
-                        <td>${matchScore}%</td>
+                        <td>${matchScore}</td>
                         <td>${destLink}</td>
                       </tr>
                     </table> 

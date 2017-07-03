@@ -55,7 +55,6 @@ class ElasticSearchService implements SearchCatalogue {
 
 
     private static final int ELEMENTS_PER_BATCH = readFromEnv('MC_ES_ELEMENTS_PER_BATCH', 30)
-    private static final int DELAY_AFTER_BATCH = readFromEnv('MC_ES_DELAY_AFTER_BATCH', 50)
 
     private static int readFromEnv(String envName, int defaultValue) {
         int ret = defaultValue
@@ -337,6 +336,7 @@ class ElasticSearchService implements SearchCatalogue {
     // may want to build on this query at a later date
     public <T> ElasticSearchQueryList<T> fuzzySearch(Class<T> resource, Map params) {
         String search = params.search
+        Double minScore = params.minScore
         QueryBuilder qb
         List<String> indicies
 
@@ -401,7 +401,7 @@ class ElasticSearchService implements SearchCatalogue {
                 .setTypes(collectTypes(resource) as String[])
                 .setIndicesOptions(IndicesOptions.lenientExpandOpen())
                 .setQuery(qb)
-//                .setMinScore(0.2)
+                .setMinScore(minScore.toFloat())
 
         return ElasticSearchQueryList.search(params,resource, request)
     }

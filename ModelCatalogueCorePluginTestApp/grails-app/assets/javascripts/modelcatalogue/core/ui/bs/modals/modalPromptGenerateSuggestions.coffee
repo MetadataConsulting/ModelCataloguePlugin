@@ -33,6 +33,13 @@ angular.module('mc.core.ui.bs.modalPromptGenerateSuggestions', ['mc.util.message
               </div>
             </form>
 
+          <form role="form">
+              <div class="form-group">
+                <label for="min-score"> Min Search Score (default is 10) </label>
+                    <input type="number " class="form-control" max="90" id="min-score" placeholder="Min Score: 10" ng-model="minScore" >
+              </div>
+            </form>
+
         </div>
         <div class="modal-footer">
             <button class="btn btn-primary" ng-click="close()" ng-disabled="isEmpty(dataModel1)||isEmpty(dataModel2)||isEmpty(suggestion)">OK</button>
@@ -46,7 +53,7 @@ angular.module('mc.core.ui.bs.modalPromptGenerateSuggestions', ['mc.util.message
         controller: ['$scope', 'suggestionsNames', '$uibModalInstance', 'rest', 'modelCatalogueApiRoot', 'messages', ($scope, suggestionsNames, $uibModalInstance, rest, modelCatalogueApiRoot, messages) ->
           $scope.suggestionsNames = suggestionsNames
           $scope.close = ->
-            rest(method: 'POST', url: "#{modelCatalogueApiRoot}/dataArchitect/generateSuggestions", params: {suggestion: $scope.suggestion, dataModel1: $scope.dataModel1.id, dataModel2: $scope.dataModel2.id}).then ->
+            rest(method: 'POST', url: "#{modelCatalogueApiRoot}/dataArchitect/generateSuggestions", params: {suggestion: $scope.suggestion, dataModel1: $scope.dataModel1.id, dataModel2: $scope.dataModel2.id, minScore: $scope.minScore}).then ->
               messages.success "Suggestions are generating in the background. Refresh batch list to see the generated results."
               $uibModalInstance.close()
           $scope.isEmpty = (object) ->

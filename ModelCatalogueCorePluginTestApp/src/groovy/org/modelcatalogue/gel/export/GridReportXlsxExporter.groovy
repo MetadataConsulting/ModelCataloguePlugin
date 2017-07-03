@@ -152,7 +152,7 @@ class GridReportXlsxExporter  {
     void printDataElement(RowDefinition rowDefinition, Relationship dataElementRelationship) {
         DataElement dataElement = dataElementRelationship.destination
         Collection<Relationship> relatedTo = dataElement.getRelationshipsByType(RelationshipType.relatedToType)
-        if(relatedTo.empty) relatedTo = dataElement?.dataType.getRelationshipsByType(RelationshipType.relatedToType)
+        if(relatedTo.empty && dataElement?.dataType) relatedTo = dataElement?.dataType.getRelationshipsByType(RelationshipType.relatedToType)
         rowDefinition.with {
             cell(depth + 1) {
                 value dataElement.name

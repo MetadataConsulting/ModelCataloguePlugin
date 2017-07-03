@@ -252,7 +252,7 @@ class DataArchitectService {
         suggestions[label] = suggestionGenerator
     }
 
-    def generateSuggestions(String suggestion = null, String dataModel1ID, String dataModel2ID) {
+    def generateSuggestions(String suggestion = null, String dataModel1ID, String dataModel2ID, String minScore) {
 
         def execute = { String label, Runnable cl ->
             log.info "Creating suggestions '$label'"
@@ -267,7 +267,7 @@ class DataArchitectService {
                         generatePossibleEnumDuplicatesAndSynonyms(dataModel1ID, dataModel2ID)
                         break
                     case 'Data Element Fuzzy Match':
-                        generateDataElementSuggestionsFuzzy(dataModel1ID, dataModel2ID)
+                        generateDataElementSuggestionsFuzzy(dataModel1ID, dataModel2ID, minScore)
                         break
                     case 'Data Element Exact Match':
                         generateDataElementSuggestionsExact(dataModel1ID, dataModel2ID)
@@ -434,12 +434,14 @@ class DataArchitectService {
      *
      */
 
-    private void generateDataElementSuggestionsFuzzy(String dataModelAID, String dataModelBID){
+    private void generateDataElementSuggestionsFuzzy(String dataModelAID, String dataModelBID, String minScore){
         DataModel dataModelA = DataModel.get(dataModelAID)
         DataModel dataModelB = DataModel.get(dataModelBID)
         Batch.findAllByNameIlike("Suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
         Batch batch = Batch.findOrSaveByName("Generating suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
-        def matchingDataElements = elementService.findFuzzyDataElementSuggestions(dataModelA,dataModelB)
+        def score
+        try{ score  = Long.parseLong( minScore ) }catch(Exception e){ score  = 10}
+        def matchingDataElements = elementService.findFuzzyDataElementSuggestions(dataModelA,dataModelB, score)
         batch.name = "Processing suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
         batch.save()
         matchingDataElements.each { ElasticMatchResult match ->
