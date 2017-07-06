@@ -6,6 +6,8 @@ import grails.util.GrailsNameUtils
 import groovy.json.JsonSlurper
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsClass
+import org.codehaus.groovy.grails.commons.GrailsDomainClass
+import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse
@@ -566,43 +568,45 @@ class ElasticSearchService implements SearchCatalogue {
         IndexingSession session = IndexingSession.create()
 
         //index Data Models
-        indexSimpleIndexRequestsInBatches(session, DataModel.list())
+        indexDomains(DataModel, session)
 
-        //Index Data Classes
-        indexSimpleIndexRequestsInBatches(session, DataClass.list())
+
+        //index DataClasses
+        indexDomains(DataClass, session)
 
         //Index Data Element
-        indexSimpleIndexRequestsInBatches(session, DataElement.list())
+        indexDomains(DataElement, session)
 
         //Index Data Types
-        indexSimpleIndexRequestsInBatches(session, DataType.list())
+        indexDomains(DataType, session)
 
         //Index Measurement Units
-        indexSimpleIndexRequestsInBatches(session, MeasurementUnit.list())
+        indexDomains(MeasurementUnit, session)
 
         //Index Tags
-        indexSimpleIndexRequestsInBatches(session, Tag.list())
+        indexDomains(Tag, session)
 
         //Index DataModelPolicy
-        indexSimpleIndexRequestsInBatches(session, DataModelPolicy.list())
+        indexDomains(DataModelPolicy, session)
 
         //Index Asset
-        indexSimpleIndexRequestsInBatches(session, Asset.list())
+        indexDomains(Asset, session)
 
         //Index RelationshipType
-        indexSimpleIndexRequestsInBatches(session, RelationshipType.list())
+        indexDomains(RelationshipType, session)
 
         //Index Users
-        indexSimpleIndexRequestsInBatches(session, User.list())
+        indexDomains(User, session)
 
         //index relationships that are searchable i.e. favourites
         def query = Relationship.where { (relationshipType.searchable == true) }
         indexSimpleIndexRequestsInBatches(session, query.list())
 
-
         return Observable.just(true)
 
     }
+
+
 
     private void deleteIndexes(){
         def indexList = client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().concreteAllIndices()
@@ -616,9 +620,22 @@ class ElasticSearchService implements SearchCatalogue {
                 }
             }
         }
+
+
     }
 
 
+    private void indexDomains(Class domainClass, IndexingSession session){
+
+        def count = domainClass.count()
+        def i = 0
+        while(i<=(count + 5000)){
+            //Index Data Classes
+            indexSimpleIndexRequestsInBatches(session, domainClass.list(offset: i, max: 5000))
+            i = i + 5000
+        }
+        DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP.get().clear()
+    }
 
     private void indexSimpleIndexRequestsInBatches(IndexingSession session, Iterable<Object> batch) {
 
@@ -635,6 +652,7 @@ class ElasticSearchService implements SearchCatalogue {
             }
         }
 
+        singleRequests.clear()
 
     }
 

@@ -68,6 +68,7 @@ class CatalogueElementToXlsxExporter {
     final Integer depth
 
     boolean printMetadata
+    static inSubsection
 
     private Map<Long, DataClass> dataClassesProcessedInOutline = [:]
     private Set<String> namesPrinted = new HashSet<String>()
@@ -364,6 +365,7 @@ class CatalogueElementToXlsxExporter {
     }
 
     private void buildSheets(DataClass dataClassForDetail, Relationship relationship, CatalogueElement elementForDiff, Multimap<String, Diff> parentDiffs, WorkbookDefinition workbook, SheetDefinition sheet, boolean terminal, int level = 0, Set<Long> processed = new HashSet<Long>()) {
+
         if (dataClassForDetail.id in processed) {
             log.info "${' ' * level}- skipping ${dataClassForDetail.name} as it is already processed"
             return
@@ -385,8 +387,9 @@ class CatalogueElementToXlsxExporter {
 
 
 
-        // always render subsections on the new sheet
+        // always render on the new sheet
         if (isSubsection(dataClassForDetail, relationship)) {
+            inSubsection = false
             if (dataClassForDetail.id in sheetsPrinted) {
                 return
             }
@@ -410,6 +413,7 @@ class CatalogueElementToXlsxExporter {
         // inside subsection use existing sheet
         if (sheet) {
             log.info "${' ' * level}- printing ${dataClassForDetail.name} on existing sheet"
+            inSubsection = true
             buildDataClassDetail(sheet, dataClassForDetail, relationship, elementForDiff, diffs, parentDiffs)
             if (!terminal) {
                 buildDataClassesDetailsWithRelationships(dataClassForDetail.parentOfRelationships, elementForDiff, diffs, workbook, sheet, false, level + 1, processed)
@@ -428,6 +432,7 @@ class CatalogueElementToXlsxExporter {
         workbook.sheet(getSafeSheetName(dataClassForDetail)) { SheetDefinition s ->
             buildBackToContentLink(s)
             log.info "${' ' * level}- printing ${dataClassForDetail.name} on new sheet"
+            inSubsection = false
             buildDataClassDetail(s, dataClassForDetail, relationship, elementForDiff, diffs, parentDiffs)
             // force top level sheets for children
             if (!terminal) {
@@ -536,9 +541,11 @@ class CatalogueElementToXlsxExporter {
                     width 100
                 }
             }
+
+
             row {
                 cell {
-                    value dataClass.name
+                    value "$dataClass.name (${getModelCatalogueIdToPrint(dataClass)})"
 
                     String ref = getRef(sheet, dataClass)
 
@@ -550,40 +557,85 @@ class CatalogueElementToXlsxExporter {
                     colspan 7
                 }
             }
-            row {
-                 if (dataClass.description) {
-                    cell {
-                        value dataClass.description
-                        height 100
-
-                        styles 'description'
-                        colspan 7
-                    }
-                 }
-            }
 
             row {
                 cell {
-                    value 'Data Model'
-                    style 'property-title'
+                    value 'Path'
+                    style 'inner-table-header'
                     colspan 2
                 }
                 cell {
-                    value dataClass.dataModel?.name
-                    style 'property-value'
+                    value "${(inSubsection)?(relationship?.source?.name)? "$relationship.source.name -> $dataClass.name" : "$dataClass.name": ""}"
+                    style 'description'
                     colspan 3
                 }
                 cell {
-                    value 'ID'
-                    style 'property-title'
+                    value 'Multiplicity'
+                    style 'inner-table-header'
                 }
                 cell {
-                    value getModelCatalogueIdToPrint(dataClass)
-                    style 'property-value'
+                    value "${ (!inSubsection) ? "See Content Tab" : getMultiplicity(relationship) }"
+                    style 'description'
+                }
+
+            }
+
+// I don't think we need this but I'm going to leave it in whilst we test it with users
+//            row {
+//                cell {
+//                    value 'Data Model'
+//                    style 'property-title'
+//                    colspan 2
+//                }
+//                cell {
+//                    value dataClass.dataModel?.name
+//                    style 'property-value'
+//                    colspan 5
+//                }
+//            }
+
+                row {
+                    cell {
+                        value 'Children'
+                        style 'inner-table-header'
+                        colspan 2
+                        height 50
+                    }
+                    cell {
+                        value "${(dataClass.parentOf.size > 0) ? (getIfChoiceText(dataClass)) ? "${getIfChoiceText(dataClass)} \r ${dataClass.parentOf.collect { it.name }.join(", \r ")} " : "${dataClass.parentOf.collect { it.name }.join(", \r ")} " : "None"}"
+                        style 'description'
+                        colspan 3
+                    }
+
+                    cell {
+                        value 'Link'
+                        style 'inner-table-header'
+                    }
+
+                    cell {
+                        value "${dataClass.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataClass.defaultModelCatalogueId}"
+                        style 'description'
+                        link to url "${dataClass.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataClass.defaultModelCatalogueId}"
+                    }
+
+
+
+                }
+
+
+             if (dataClass?.description && dataClass?.description.matches(".*\\w.*") || getIfChoiceText(dataClass)) {
+                 row {
+                    cell {
+                        value (getIfChoiceText(dataClass))? "$dataClass.description \r ${getIfChoiceText(dataClass)}" : dataClass.description
+                        height 100
+                        styles 'description'
+                        colspan 7
+                    }
                 }
             }
 
             if (dataClass.countContains()) {
+
                 buildContainedElements(it, dataClass, elementForDiff, diffs)
             }
         }
@@ -629,7 +681,7 @@ class CatalogueElementToXlsxExporter {
         sheet.with {
             row {
                 cell {
-                    value 'All Contained Data Elements'
+                    value "${(dataClass.ext.get("http://xsd.modelcatalogue.org/section#type") == "choice")? "Choice of Data Elements" : "Contained Data Elements" }"
                     style 'h2'
                     colspan 7
                 }
@@ -673,9 +725,21 @@ class CatalogueElementToXlsxExporter {
                 }
             }
 
-
+            int i
             for (Relationship containsRelationship in dataClass.containsRelationships) {
                 buildDataElement(sheet, containsRelationship, elementForDiff, dataClassDiffs)
+                if(i++ != dataClass.containsRelationships.size()-1) {
+                    if (dataClass.ext.get("http://xsd.modelcatalogue.org/section#type") == "choice") {
+                        row {
+                            cell {
+                                value 'OR'
+                                style 'inner-table-header'
+                                colspan 7
+                                height 50
+                            }
+                        }
+                    }
+                }
             }
             for (Relationship deleted in findDeleted(dataClass, dataClassDiffs, RelationshipType.containmentType)) {
                 buildDataElement(sheet, deleted, elementForDiff, dataClassDiffs)
@@ -1092,9 +1156,12 @@ class CatalogueElementToXlsxExporter {
             return
         }
 
-        if (dataClass.getId() in dataClassesProcessedInOutline.keySet()) {
-            return
-        }
+        // I don't believe this code is needed
+        //it's quite nice to be able to see the subsections with a path
+
+//        if (dataClass.getId() in dataClassesProcessedInOutline.keySet()) {
+//            return
+//        }
 
         dataClassesProcessedInOutline.put(dataClass.getId(), dataClass)
 
@@ -1114,9 +1181,6 @@ class CatalogueElementToXlsxExporter {
     }
 
     private static DataClass nextSheetOwner(Relationship child, Relationship relationship, DataClass dataClass, DataClass sheetOwner) {
-        if (isSubsection(dataClass, relationship)) {
-            return dataClass
-        }
 
         return dataClass == sheetOwner ? child.destination as DataClass : sheetOwner
     }
@@ -1144,5 +1208,13 @@ class CatalogueElementToXlsxExporter {
         }
 
         return String.valueOf(o)
+    }
+
+    private static String getIfChoiceText(DataClass dataClass){
+        if (dataClass.ext.get("http://xsd.modelcatalogue.org/section#type") == "choice") {
+            // this is set to determine if the child classes are choices i.e. one or the other of the children
+            return  "A choice of one of the following can be submitted together with each $dataClass.name report:"
+        }
+        return ""
     }
 }

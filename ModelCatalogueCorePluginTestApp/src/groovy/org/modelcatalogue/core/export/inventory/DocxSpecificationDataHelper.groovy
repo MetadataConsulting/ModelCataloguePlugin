@@ -8,11 +8,15 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
+import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.EnumeratedType
+import org.modelcatalogue.core.PrimitiveType
+import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.enumeration.Enumeration
 import org.modelcatalogue.core.enumeration.Enumerations
+import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 
 /**
  * Prints data specification using the DocumentBuilder library
@@ -27,6 +31,12 @@ class DocxSpecificationDataHelper {
     private static final Map<String, Object> CELL_TEXT = [font: [size: 10, family: 'Calibri']]
     private static final Map<String, Object> CELL_TEXT_FIRST = [font: [size: 10, family: 'Calibri', bold: true]]
     private static final def TITLE_COLUMN_CELL = [font: [bold: true]]
+    private static final Map<String, Object> ENUM_HEADER_CELL_TEXT =  [font: [size: 12, bold: true]]
+    private static final Map<String, Object> DOMAIN_NAME =  [font: [color: '#29BDCA', size: 14, bold: true]]
+    private static final Map<String, Object> DOMAIN_CLASSIFICATION_NAME =  [font: [color: '#999999', size: 12, bold: true]]
+    static final Map<String, Object> DEPRECATED_ENUM_CELL_TEXT = [font: [color: '#999999', italic: true]]
+
+
 
     private static final <T extends CatalogueElement> Comparator<T> compareByName(Class<T> type) {
         [compare: { T a, T b ->
@@ -36,6 +46,8 @@ class DocxSpecificationDataHelper {
 
     private DocumentBuilder builder
     int depth = 3
+    final ElementService elementService
+
 
 
     /**
@@ -44,99 +56,14 @@ class DocxSpecificationDataHelper {
      * @param args Not used
      */
 
-    DocxSpecificationDataHelper(DocumentBuilder builder, Integer depth) {
+    DocxSpecificationDataHelper(DocumentBuilder builder, Integer depth, ElementService elementService) {
         this.builder = builder
         this.depth = depth
+        this.elementService = elementService
     }
 
     final SetMultimap<DataType, DataClass> usedDataTypes = TreeMultimap.create(compareByName(DataType), compareByName(DataClass))
 
-
-    /**
-     * This method gets the text that appears within a section of the document to describe the mulitplicity of the section to non-technical
-     * users i.e. if the multiplicity is 1..1 then you must include the section within the context of the parent
-     *
-     * @param args Not used
-     */
-
-
-    def getMultiplicityText(String minOccurs, String maxOccurs, String parentName, String childName){
-
-        String multiplicityText = ""
-
-
-        // if max occurs and min occurs aren't integers then do not add any text because it doesn't mean anything
-        if(!maxOccurs.isInteger() || !minOccurs.isInteger()){
-            return multiplicityText
-        }
-
-
-        switch (minOccurs) {
-
-            case "0": // if there is min occurs and it is 0 then the section is optional and evaluate max occurs
-                switch(maxOccurs){
-                    case "0": //0..0 error
-                        multiplicityText = "error: please check constraints in data model - cannot have 0..0"
-                        break
-                    case "1": //0..1 text
-                        multiplicityText = "One report containing $childName can be submitted together with each $parentName report."
-                        break
-                    case "*": //0..* text
-                        multiplicityText = "Multiple reports containing $childName can be submitted together with each $parentName report."
-                        break
-                    default: //0..? text
-                        multiplicityText = "Up to $maxOccurs reports containing $childName can be submitted together with each $parentName report."
-                        break;
-                }
-                break;
-
-            case "1": // if there is min occurs is 1 then the section is mandatory and evaluate max occurs
-
-                switch(maxOccurs){
-
-                    case "0": // 1..0 error
-                        multiplicityText = "error: please check constraints in data model - cannot have 1..0"
-                        break
-                    case "1": // 1..1 text
-                        multiplicityText = "One report containing $childName must be submitted with each $parentName report."
-                        break
-                    case "*": // 1..* text
-                        multiplicityText = "One or more reports containing $childName must be submitted together with each $parentName report."
-                        break
-                    default: // 1..? text
-                        multiplicityText = "One report containing $childName must be submitted together with each $parentName report. Up to $maxOccurs reports may be submitted."
-                        break;
-                }
-                break;
-
-
-            default: // if there is min occurs is an integer and not 0 or 1 then evaluate the max occurs
-
-                switch(maxOccurs){
-
-                    case "0": // error
-                        multiplicityText = "error: please check constraints"
-                        break
-
-                    case "1": // error
-                        multiplicityText = "error: please check constraints"
-                        break
-
-                    case "*": // ?..* text
-                        multiplicityText = "$minOccurs or more reports containing $childName must be submitted together with each $parentName report."
-                        break
-
-                    default:  //?..? text i.e 5..17
-                        multiplicityText = "$minOccurs reports containing $childName must be submitted together with each $parentName report. Up to $maxOccurs reports may be submitted."
-                        break
-                }
-
-                break;
-        }
-
-        //return human readable non-technical multiplicity text
-        multiplicityText
-    }
 
 
     /**
@@ -340,6 +267,146 @@ class DocxSpecificationDataHelper {
     }
 
 
+    //print data types
+    def printTypes(){
+
+        builder.with {
+
+            pageBreak()
+            heading1 'Data Types'
+
+            if(!usedDataTypes.size()){
+                paragraph {
+                    text "Model has no data type yet.", font: [italic: true]
+                }
+            }else {
+
+                for (DataType dataType in usedDataTypes.keySet()) {
+
+                    log.debug "Exporting data type $dataType to Word Document"
+
+                    Map<String, Object> attrs = [ref: "${dataType.id}", style: 'heading2']
+                    attrs.putAll(DOMAIN_NAME)
+
+                    paragraph attrs, dataType.name
+
+                    if (dataType.dataModel) {
+                        paragraph {
+                            text DOMAIN_CLASSIFICATION_NAME, "(${dataType.dataModel.name})"
+                        }
+                    }
+
+                    if (dataType.description) {
+                        paragraph {
+                            text dataType.description
+                        }
+                    }
+                    if (hasExtraInformation(dataType)) {
+                        table(columns: [1, 4], border: [size: 0], font: [color: '#5C5C5C']) {
+                            if (dataType.instanceOf(PrimitiveType) && dataType.measurementUnit) {
+                                row {
+                                    cell 'Unit of Measure'
+                                    cell {
+                                        text dataType.measurementUnit.name
+                                        if (dataType.measurementUnit.description) {
+                                            text ' ('
+                                            text dataType.measurementUnit.description
+                                            ')'
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (dataType.instanceOf(ReferenceType) && dataType.dataClass) {
+                                row {
+                                    cell 'Data Class'
+                                    cell {
+                                        text dataType.dataClass.name
+                                        if (dataType.dataClass.description) {
+                                            text ' ('
+                                            text dataType.dataClass.description
+                                            ')'
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (dataType.regexDef) {
+                                row {
+                                    cell 'Regular Expression'
+                                    cell dataType.regexDef
+                                }
+                            } else if (dataType.rule) {
+                                row {
+                                    cell 'Rule'
+                                    cell dataType.rule
+                                }
+                            }
+
+                            getBaseRules(dataType).each { parent ->
+                                if (parent.regexDef) {
+                                    row {
+                                        cell "Regular Expression based on\n ${CatalogueElementMarshaller.getClassifiedName(parent)} "
+                                        cell parent.regexDef
+                                    }
+                                } else if (parent.rule) {
+                                    row {
+                                        cell "Rule based on\n ${CatalogueElementMarshaller.getClassifiedName(parent)}"
+                                        cell parent.rule
+                                    }
+                                } else {
+                                    row {
+                                        cell "Based On"
+                                        cell CatalogueElementMarshaller.getClassifiedName(parent)
+                                    }
+                                }
+                            }
+
+                        }
+
+                        if (dataType?.instanceOf(EnumeratedType)) {
+
+                            table(border: [size: 1, color: '#D2D2D2']) {
+                                row(background: '#F2F2F2') {
+                                    cell ENUM_HEADER_CELL_TEXT, 'Code'
+                                    cell ENUM_HEADER_CELL_TEXT, 'Description'
+                                }
+                                Enumerations enumerations = dataType.enumerationsObject
+                                for (Enumeration entry in enumerations) {
+                                    if (entry.deprecated) {
+                                        row(DEPRECATED_ENUM_CELL_TEXT) {
+                                            cell entry.key
+                                            cell entry.value
+                                        }
+                                    } else {
+                                        row {
+                                            cell entry.key
+                                            cell entry.value
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+
+
+                    paragraph style: 'heading4', margin: [bottom: 0], font: [size: 11, bold: true, color: '#999999'], "Usages"
+                    for (DataClass backref in usedDataTypes.get(dataType)) {
+                        paragraph(margin: [top: 0, bottom: 0]) {
+                            link url: "#${backref.id}", style: 'heading4', font: [size: 9, color: '#29BDCA'], backref.name
+                        }
+
+                    }
+
+                }
+            }
+
+        }
+
+    }
+
+
     //print the business rules at the end of the document
     def printRules() {
         builder.with {
@@ -420,5 +487,114 @@ class DocxSpecificationDataHelper {
             }
         }
     }
+
+    private boolean hasExtraInformation(DataType dataType) {
+        (dataType.instanceOf(PrimitiveType) && dataType.measurementUnit) || dataType.instanceOf(EnumeratedType) || (dataType.instanceOf(ReferenceType) && dataType.dataClass) || dataType.rule || dataType.isBasedOn
+    }
+
+    private Set getBaseRules(DataType dataType, Set basedOn = []){
+        elementService.getTypeHierarchy([:], dataType).items.each{ DataType type ->
+            basedOn.add(type)
+            basedOn.addAll(getBaseRules(type, basedOn))
+        }
+        basedOn
+    }
+
+
+    /**
+     * This method gets the text that appears within a section of the document to describe the mulitplicity of the section to non-technical
+     * users i.e. if the multiplicity is 1..1 then you must include the section within the context of the parent
+     *
+     * @param args Not used
+     */
+
+
+    def getMultiplicityText(String minOccurs, String maxOccurs, String parentName, String childName){
+
+        String multiplicityText = ""
+
+
+        // if max occurs and min occurs aren't integers then do not add any text because it doesn't mean anything
+        if(!maxOccurs.isInteger() || !minOccurs.isInteger()){
+            return multiplicityText
+        }
+
+
+        switch (minOccurs) {
+
+            case "0": // if there is min occurs and it is 0 then the section is optional and evaluate max occurs
+                switch(maxOccurs){
+                    case "0": //0..0 error
+                        multiplicityText = "error: please check constraints in data model - cannot have 0..0"
+                        break
+                    case "1": //0..1 text
+                        multiplicityText = "One report containing $childName can be submitted together with each $parentName report."
+                        break
+                    case "*": //0..* text
+                        multiplicityText = "Multiple reports containing $childName can be submitted together with each $parentName report."
+                        break
+                    default: //0..? text
+                        multiplicityText = "Up to $maxOccurs reports containing $childName can be submitted together with each $parentName report."
+                        break;
+                }
+                break;
+
+            case "1": // if there is min occurs is 1 then the section is mandatory and evaluate max occurs
+
+                switch(maxOccurs){
+
+                    case "0": // 1..0 error
+                        multiplicityText = "error: please check constraints in data model - cannot have 1..0"
+                        break
+                    case "1": // 1..1 text
+                        multiplicityText = "One report containing $childName must be submitted with each $parentName report."
+                        break
+                    case "*": // 1..* text
+                        multiplicityText = "One or more reports containing $childName must be submitted together with each $parentName report."
+                        break
+                    default: // 1..? text
+                        multiplicityText = "One report containing $childName must be submitted together with each $parentName report. Up to $maxOccurs reports may be submitted."
+                        break;
+                }
+                break;
+
+
+            default: // if there is min occurs is an integer and not 0 or 1 then evaluate the max occurs
+
+                switch(maxOccurs){
+
+                    case "0": // error
+                        multiplicityText = "error: please check constraints"
+                        break
+
+                    case "1": // error
+                        multiplicityText = "error: please check constraints"
+                        break
+
+                    case "*": // ?..* text
+                        multiplicityText = "$minOccurs or more reports containing $childName must be submitted together with each $parentName report."
+                        break
+
+                    default:  //?..? text i.e 5..17
+                        multiplicityText = "$minOccurs reports containing $childName must be submitted together with each $parentName report. Up to $maxOccurs reports may be submitted."
+                        break
+                }
+
+                break;
+        }
+
+        //return human readable non-technical multiplicity text
+        multiplicityText
+    }
+
+
+
+    private static String getSameAs(CatalogueElement element) {
+        if (!element.dataModel) {
+            return "${element.name}"
+        }
+        "${element.name} (${element.ext['Data Item No'] ? "${element.ext['Data Item No']} from " : ''}${element.dataModel.name})"
+    }
+
 
 }

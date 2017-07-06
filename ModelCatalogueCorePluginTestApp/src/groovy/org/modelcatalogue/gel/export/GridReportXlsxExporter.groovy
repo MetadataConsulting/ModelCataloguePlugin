@@ -11,6 +11,7 @@ import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.diff.CatalogueElementDiffs
 import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
 import org.modelcatalogue.core.export.inventory.ModelCatalogueStyles
@@ -73,27 +74,50 @@ class GridReportXlsxExporter  {
                     }
 
                     cell {
-                        value 'Matched'
+                        value 'Data Type'
                         width auto
                         style H1
                     }
                     cell {
-                        value '% Match'
+                        value 'Validation Rule'
                         width auto
                         style H1
                     }
                     cell {
-                        value 'Matched Name'
+                        value 'Business Rule'
                         width auto
                         style H1
                     }
                     cell {
-                        value 'Matched On'
+                        value 'Labkey Field Name'
                         width auto
                         style H1
                     }
-
-
+                    cell {
+                        value 'Labkey View'
+                        width auto
+                        style H1
+                    }
+                    cell {
+                        value 'Mandatory / Conditional'
+                        width auto
+                        style H1
+                    }
+                    cell {
+                        value 'Additional review'
+                        width auto
+                        style H1
+                    }
+                    cell {
+                        value 'Additional Rule'
+                        width auto
+                        style H1
+                    }
+                    cell {
+                        value 'Additional Rule Dependency'
+                        width auto
+                        style H1
+                    }
                 }
 
                 dataClasses.each{ dataClass->
@@ -126,11 +150,19 @@ class GridReportXlsxExporter  {
     private Integer printClass(DataClass child, SheetDefinition sheet, int columnDepth, int rowDepth, int childrenSize) {
 
         Collection<Relationship> dataElements = child.getOutgoingRelationshipsByType(RelationshipType.containmentType)
+
         sheet.with { SheetDefinition sheetDefinition ->
             row(rowDepth) { RowDefinition rowDefinition ->
                 cell(columnDepth) {
                     value child.name
                     link to url "${child.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + child.defaultModelCatalogueId}"
+                    style {
+                        wrap text
+                        border top, left, {
+                            color black
+                            style medium
+                        }
+                    }
                 }
                 if (dataElements) {
                     printDataElement(rowDefinition, dataElements.head())
@@ -144,7 +176,7 @@ class GridReportXlsxExporter  {
                     }
                 }
             }
-            rowDepth = buildRows(sheetDefinition, child.getOutgoingRelationshipsByType(RelationshipType.hierarchyType), columnDepth + 1, (childrenSize > 1 || dataElements.size() > 1) ? (rowDepth + 1) : rowDepth)
+            rowDepth = buildRows(sheetDefinition, child.getOutgoingRelationshipsByType(RelationshipType.hierarchyType), columnDepth + 1, /*(childrenSize > 1 || dataElements.size() > 1) ? (rowDepth + 1) : */ rowDepth)
             rowDepth
         }
     }
@@ -159,38 +191,50 @@ class GridReportXlsxExporter  {
                 link to url "${dataElement.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataElement.defaultModelCatalogueId}"
             }
 
-            if(relatedTo && relatedTo.head()?.destination?.dataModel?.id == 68111){
-                cell{
-                    value "MATCHED"
+            cell{
+                value "${(dataElement?.dataType) ? printDataType(dataElement?.dataType) : ""}"
+                style {
+                    wrap text
                 }
-                printMatches(rowDefinition, relatedTo.head())
-            }else{
-                cell{
-                    value "NO MATCH"
+
+            }
+
+            cell{
+                value "${(dataElement?.dataType?.rule) ? dataElement?.dataType?.rule : ""}"
+                style {
+                    wrap text
                 }
             }
 
+            cell{
+                value "${(dataElement?.involvedIn) ? printBusRule(dataElement?.involvedIn): "" }"
+                style {
+                    wrap text
+                }
+            }
+
+            cell{
+                value "${(dataElement?.ext.get("LabKey Field Name")) ? dataElement?.ext.get("LabKey Field Name") : ""}"
+            }
+
+            cell{
+                value "${(dataElement?.ext.get("Mandatory / Conditional"))? dataElement?.ext.get("Mandatory / Conditional") : "" }"
+            }
+
+            cell{
+                value "${(dataElement?.ext.get("Additional Review"))? dataElement?.ext.get("Additional Review") : ""}"
+            }
+
+            cell{
+                value "${(dataElement?.ext.get("Additional Rule"))? dataElement?.ext.get("Additional Rule") : ""}"
+            }
+
+            cell{
+                value "${(dataElement?.ext.get("Additional Rule Dependency"))? dataElement?.ext.get("Additional Rule Dependency") : ""}"
+            }
 
         }
     }
-
-    void printMatches(RowDefinition rowDefinition, Relationship dataElementRelationship) {
-        CatalogueElement element = dataElementRelationship.destination
-        rowDefinition.with {
-            cell(depth + 3) {
-                value "${dataElementRelationship.ext.get("match") ?: 'NA'}"
-            }
-            cell {
-                value "$element.name ($element.dataModel.name)"
-                link to url "${element.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + element.defaultModelCatalogueId}"
-            }
-            cell {
-                value "${dataElementRelationship.ext.get("matchOn") ?: 'MANUAL'}"
-            }
-
-        }
-    }
-
 
 
     String printDataType(DataType dataType){
@@ -201,6 +245,10 @@ class GridReportXlsxExporter  {
 
         return dataType.name
 
+    }
+
+    String printBusRule(List<ValidationRule> rules){
+        return rules.collect{ it.name }.join('\n')
     }
 
 }
