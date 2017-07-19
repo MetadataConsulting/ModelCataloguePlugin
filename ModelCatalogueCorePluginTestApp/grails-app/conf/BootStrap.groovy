@@ -285,26 +285,6 @@ class BootStrap {
 // needs work before we can release
 //        reportsRegistry.register {
 //            creates link
-//            title { "Cancer Types (JSON)" }
-//            type DataModel
-//            when { DataModel dataModel ->
-//                dataModel.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
-//            }
-//            link controller: 'genomics', action: 'exportCancerTypesAsJson', id: true
-//        }
-//
-//        reportsRegistry.register {
-//            creates link
-//            title { "Cancer Types (CSV)" }
-//            type DataModel
-//            when { DataModel dataModel ->
-//                dataModel.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
-//            }
-//            link controller: 'genomics', action: 'exportCancerTypesAsCsv', id: true
-//        }
-// needs work before we can release
-//        reportsRegistry.register {
-//            creates link
 //            title { "Change Log for RD Phenotypes And Clinical Tests (Excel)" }
 //            type DataModel
 //            when { DataModel dataModel ->

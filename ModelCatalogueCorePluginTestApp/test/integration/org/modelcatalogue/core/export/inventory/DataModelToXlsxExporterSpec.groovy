@@ -113,7 +113,7 @@ class DataModelToXlsxExporterSpec extends AbstractIntegrationSpec {
             sheet(name(endsWith('Ovarian_Cancer'))) {
                 row {
                     cell {
-                        value 'IMAGING (231@2)'
+                        value 'IMAGING'
                         style {
                             foreground ModelCatalogueStyles.CHANGE_NEW_COLOR
         }   }   }   }   }
@@ -121,7 +121,7 @@ class DataModelToXlsxExporterSpec extends AbstractIntegrationSpec {
             sheet(name(endsWith('Ovarian_Cancer'))) {
                 row {
                     cell {
-                        value 'DEMOGRAPHICS (162@1)'
+                        value 'DEMOGRAPHICS'
                         style {
                             foreground ModelCatalogueStyles.CHANGE_REMOVAL_COLOR
         }   }   }   }   }

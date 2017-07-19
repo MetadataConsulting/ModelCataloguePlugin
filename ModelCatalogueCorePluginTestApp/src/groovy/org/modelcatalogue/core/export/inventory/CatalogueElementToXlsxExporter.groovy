@@ -545,7 +545,7 @@ class CatalogueElementToXlsxExporter {
 
             row {
                 cell {
-                    value "$dataClass.name (${getModelCatalogueIdToPrint(dataClass)})"
+                    value "$dataClass.name"
 
                     String ref = getRef(sheet, dataClass)
 

@@ -158,7 +158,7 @@ class ElasticSearchServiceSpec extends AbstractIntegrationSpec {
 
         then:
         policyIndexed.get()
-        retry (10, 100) { elasticSearchService.search(DataModelPolicy, [search: 'test policy', max: '1']).total == 1L }
+        retry (10, 300) { elasticSearchService.search(DataModelPolicy, [search: 'test policy', max: '1']).total == 1L }
     }
 
     def "index user"() {
