@@ -193,6 +193,10 @@ class BootStrap {
             link controller: 'genomics', action: 'exportRareDiseaseEligibilityDoc', id: true
         }
 
+
+
+
+
         reportsRegistry.register {
             creates link
             title { "Rare Diseases Phenotypes and Clinical Tests Report (Word Doc)" }
@@ -201,6 +205,17 @@ class BootStrap {
                 dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
             }
             link controller: 'genomics', action: 'exportRareDiseasePhenotypesAndClinicalTestsDoc', id: true
+        }
+
+
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases Eligibility Phenotypes Split Docs" }
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseaseSplitDocs', id: true
         }
 
         reportsRegistry.register {

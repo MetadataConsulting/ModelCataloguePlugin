@@ -66,6 +66,27 @@ class DocxSpecificationDataHelper {
 
 
 
+
+    String getHeadingText(String name, String minOccurs, String maxOccurs, int level){
+
+        if((minOccurs||maxOccurs) && level < 7) {
+
+            return name + " [$minOccurs..$maxOccurs]"
+
+        }else if((minOccurs||maxOccurs) && level > 6) {
+
+            return name + " [$minOccurs..$maxOccurs] (note: heading level $level, > 6 not supported, please change manually)"
+
+        }else if(level > 6) {
+
+            return name + " (note: heading level $level, > 6 not supported, please change manually)"
+        }
+
+        name
+
+    }
+
+
     /**
      * Print the data class information in the word document
      * - recurses through the data class and prints all child classes and data elements
@@ -82,25 +103,16 @@ class DocxSpecificationDataHelper {
         builder.with {
 
 
-
-            if(minOccurs||maxOccurs) { // if min occurs and max occurs then add multiplicity information as part of heading
-
-                "heading${Math.min(level, 6)}" dataClass.name + " [$minOccurs..$maxOccurs]", ref: dataClass.id
+                "heading${Math.min(level, 6)}" getHeadingText(dataClass.name, minOccurs, maxOccurs, level), ref: dataClass.id
 
                 paragraph {
                     text getMultiplicityText(minOccurs, maxOccurs, parentName, dataClass.name), font: [italic: true]
                 }
 
-            }else{ // otherwise do not include multiplicity information as part of heading
-
-                "heading${Math.min(level, 6)}" dataClass.name , ref: dataClass.id
-
-            }
-
 
             if (dataClass.description) { //print description if there is one
                 paragraph {
-                    text dataClass.description
+                    text dataClass?.description
                 }
             }
 
@@ -164,7 +176,7 @@ class DocxSpecificationDataHelper {
                                     text CELL_TEXT_FIRST, "${dataElement.name} (${(dataElement.ext.get("http://www.modelcatalogue.org/metadata/genomics/#gel-id")) ? dataElement.ext.get("http://www.modelcatalogue.org/metadata/genomics/#gel-id") + "@" + dataElement.getDataModelSemanticVersion() : dataElement.getCombinedVersion()}  )"
                                 }
                                 cell { //print description
-                                    text CELL_TEXT, dataElement.description ?: ''
+                                    text CELL_TEXT, dataElement?.description ?: ''
                                 }
                                 cell { //print multiplicity x..x
                                     text CELL_TEXT, getMultiplicity(dataElementRelationship)
@@ -224,11 +236,11 @@ class DocxSpecificationDataHelper {
                         dataClass.contextFor.each { ValidationRule vr ->
                                 row {
                                     cell {
-                                        Map<String, Object> attrs = [url: "#${vr.id}", font: [bold: true]]
-                                        link attrs, vr?.name
+                                        Map<String, Object> attrs = [url: "#${vr?.id}", font: [bold: true]]
+                                        link attrs, "${vr?.name ?: ''}"
                                     }
                                     cell {
-                                        text vr?.description
+                                        text "${vr?.description ?: ''}"
                                     }
                                 }
                                 if (!(vr in rules)) rules << vr
@@ -296,9 +308,9 @@ class DocxSpecificationDataHelper {
                         }
                     }
 
-                    if (dataType.description) {
+                    if (dataType?.description) {
                         paragraph {
-                            text dataType.description
+                            text dataType?.description
                         }
                     }
                     if (hasExtraInformation(dataType)) {
@@ -308,9 +320,9 @@ class DocxSpecificationDataHelper {
                                     cell 'Unit of Measure'
                                     cell {
                                         text dataType.measurementUnit.name
-                                        if (dataType.measurementUnit.description) {
+                                        if (dataType.measurementUnit?.description) {
                                             text ' ('
-                                            text dataType.measurementUnit.description
+                                            text dataType.measurementUnit?.description
                                             ')'
                                         }
                                     }
@@ -322,9 +334,9 @@ class DocxSpecificationDataHelper {
                                     cell 'Data Class'
                                     cell {
                                         text dataType.dataClass.name
-                                        if (dataType.dataClass.description) {
+                                        if (dataType.dataClass?.description) {
                                             text ' ('
-                                            text dataType.dataClass.description
+                                            text dataType.dataClass?.description
                                             ')'
                                         }
                                     }
@@ -419,7 +431,7 @@ class DocxSpecificationDataHelper {
                 table(border: [size: 1, color: '#D2D2D2']) {
                     row {
                         cell "Description"
-                        cell TITLE_COLUMN_CELL, vr.description
+                        cell TITLE_COLUMN_CELL, vr?.description
                     }
                     row {
                         cell "Classes Applied Within"

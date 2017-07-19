@@ -5,12 +5,14 @@ import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.actions.Batch
+import org.modelcatalogue.core.actions.CreateMatch
 import org.modelcatalogue.core.util.lists.ListWithTotal
 
 class DataArchitectServiceSpec extends AbstractIntegrationSpec {
 
-    def dataArchitectService, relationshipService, de1, de2, de3, de4, de5, md, dm1, dm2
+    def dataArchitectService, relationshipService, de1, de2, de3, de4, de5, md, dm1, dm2, actionService
 
 
     def setup() {
@@ -107,14 +109,23 @@ class DataArchitectServiceSpec extends AbstractIntegrationSpec {
             test = true
         }
 
-
-
         expect:
         !test
 
         when:
             dataArchitectService.generateSuggestions("Data Element Fuzzy Match", "$dm1.id", "$dm2.id")
             Batch batch = Batch.findByName("Suggested Fuzzy DataElement Relations for '${dm1.name} (${dm1.dataModelSemanticVersion})' and '${dm2.name} (${dm2.dataModelSemanticVersion})'")
+            Map<String, String> params = new HashMap<String, String>()
+            RelationshipType type = RelationshipType.readByName("relatedTo")
+            params.put("""source""", """gorm://org.modelcatalogue.core.DataElement:$de1.id""")
+            params.put("""destination""", """gorm://org.modelcatalogue.core.DataElement:$de2.id""")
+            params.put("""type""", """gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
+            params.put("""matchScore""", """98""")
+            params.put("""matchOn""", """ElementName""")
+            params.put("""message""", """test match""")
+
+
+            actionService.create(params, batch, CreateMatch)
         then:
             batch
             batch.actions

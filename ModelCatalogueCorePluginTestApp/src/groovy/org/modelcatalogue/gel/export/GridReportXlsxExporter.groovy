@@ -72,7 +72,11 @@ class GridReportXlsxExporter  {
                         width auto
                         style H1
                     }
-
+                    cell {
+                        value 'Multiplicity'
+                        width auto
+                        style H1
+                    }
                     cell {
                         value 'Data Type'
                         width auto
@@ -95,11 +99,6 @@ class GridReportXlsxExporter  {
                     }
                     cell {
                         value 'Labkey View'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Mandatory / Conditional'
                         width auto
                         style H1
                     }
@@ -135,27 +134,103 @@ class GridReportXlsxExporter  {
      * @param children data classes to be rendered
      * @param currentDepth the current depth starting with one
      */
-    private Integer buildRows(SheetDefinition sheet, Collection<Relationship> children, int columnDepth, int rowDepth) {
+    private Integer buildRows(SheetDefinition sheet, Collection<Relationship> children, int columnDepth, int rowDepth, List outline = []) {
         if (columnDepth > depth) {
             return rowDepth
         }
         children.each { Relationship relationship ->
             CatalogueElement child = relationship.destination
-            rowDepth = printClass(child, sheet, columnDepth, rowDepth, children.size())
+            rowDepth = printClass(child, sheet, columnDepth, rowDepth, children.size(), outline)
+            outline.removeElement(columnDepth)
         }
         rowDepth
     }
 
 
-    private Integer printClass(DataClass child, SheetDefinition sheet, int columnDepth, int rowDepth, int childrenSize) {
+    private Integer printClass(DataClass child, SheetDefinition sheet, int columnDepth, int rowDepth, int childrenSize, List outline = []) {
 
         Collection<Relationship> dataElements = child.getOutgoingRelationshipsByType(RelationshipType.containmentType)
-
         sheet.with { SheetDefinition sheetDefinition ->
             row(rowDepth) { RowDefinition rowDefinition ->
-                cell(columnDepth) {
-                    value child.name
-                    link to url "${child.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + child.defaultModelCatalogueId}"
+                (1..depth).each{
+                    if(it==columnDepth){
+                        cell(columnDepth) {
+                            value child.name
+                            link to url "${child.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + child.defaultModelCatalogueId}"
+                            style {
+                                wrap text
+                                border top, left, {
+                                    color black
+                                    style medium
+                                }
+                            }
+                        }
+                        outline.add(it)
+                    }else if (!outline.contains(it)){
+                       cell(it){
+                           style {
+                               wrap text
+                               border top, {
+                                   color black
+                                   style medium
+                               }
+                           }
+                       }
+
+                    }
+                }
+                if (dataElements) {
+                    printDataElement(rowDefinition, dataElements.head(), outline)
+                }else{
+                    outline.each {
+                            cell(it) {
+                                style {
+                                    wrap text
+                                    border left, {
+                                        color black
+                                        style medium
+                                    }
+                                }
+                            }
+                    }
+                }
+            }
+            if (dataElements.size() > 1) {
+                for (Relationship dataElementRelationship in dataElements.tail()) {
+                    rowDepth++
+                    row(rowDepth) { RowDefinition rowDefinition ->
+                        printDataElement(rowDefinition, dataElementRelationship, outline)
+                    }
+                }
+            }
+            rowDepth = buildRows(sheetDefinition, child.getOutgoingRelationshipsByType(RelationshipType.hierarchyType), columnDepth + 1, (dataElements.size() > 1)?(rowDepth + 1):rowDepth, outline)
+            rowDepth
+        }
+    }
+
+    void printDataElement(RowDefinition rowDefinition, Relationship dataElementRelationship, List outline = []) {
+        DataElement dataElement = dataElementRelationship.destination
+        Collection<Relationship> relatedTo = dataElement.getRelationshipsByType(RelationshipType.relatedToType)
+        if(relatedTo.empty && dataElement?.dataType) relatedTo = dataElement?.dataType.getRelationshipsByType(RelationshipType.relatedToType)
+        rowDefinition.with {
+
+                outline.each{
+
+                    cell(it){
+                        style {
+                            wrap text
+                            border left, {
+                                color black
+                                style medium
+                            }
+                        }
+                    }
+
+                }
+
+                cell(depth + 1) {
+                    value dataElement.name
+                    link to url "${dataElement.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataElement.defaultModelCatalogueId}"
                     style {
                         wrap text
                         border top, left, {
@@ -164,77 +239,100 @@ class GridReportXlsxExporter  {
                         }
                     }
                 }
-                if (dataElements) {
-                    printDataElement(rowDefinition, dataElements.head())
-                }
-            }
-            if (dataElements.size() > 1) {
-                for (Relationship dataElementRelationship in dataElements.tail()) {
-                    rowDepth++
-                    row(rowDepth) { RowDefinition rowDefinition ->
-                        printDataElement(rowDefinition, dataElementRelationship)
+
+                cell {
+                    value "${getMultiplicity(dataElementRelationship)}"
+                    style {
+                        wrap text
+                        border top,  {
+                            color black
+                            style medium
+                        }
                     }
                 }
+
+                cell {
+                    value "${(dataElement?.dataType) ? printDataType(dataElement?.dataType) : ""}"
+                    style {
+                        wrap text
+                        border top, {
+                            color black
+                            style medium
+                        }
+                    }
+
+                }
+
+                cell {
+                    value "${(dataElement?.dataType?.rule) ? dataElement?.dataType?.rule : ""}"
+                    style {
+                        wrap text
+                        border top, {
+                            color black
+                            style medium
+                        }
+                    }
+                }
+
+                cell {
+                    value "${(dataElement?.involvedIn) ? printBusRule(dataElement?.involvedIn) : ""}"
+                    style {
+                        wrap text
+                        border top, {
+                            color black
+                            style medium
+                        }
+                    }
+                }
+
+                cell {
+                    value "${(dataElement?.ext.get("LabKey Field Name")) ? dataElement?.ext.get("LabKey Field Name") : ""}"
+                    style {
+                        wrap text
+                        border top,  {
+                            color black
+                            style medium
+                        }
+                    }
+                }
+
+
+                cell {
+                    value "${(dataElement?.ext.get("Additional Review")) ? dataElement?.ext.get("Additional Review") : ""}"
+                    style {
+                        wrap text
+                        border top,  {
+                            color black
+                            style medium
+                        }
+                    }
+                }
+
+                cell {
+                    value "${(dataElement?.ext.get("Additional Rule")) ? dataElement?.ext.get("Additional Rule") : ""}"
+                    style {
+                        wrap text
+                        border top,  {
+                            color black
+                            style medium
+                        }
+                    }
+                }
+
+                cell {
+                    value "${(dataElement?.ext.get("Additional Rule Dependency")) ? dataElement?.ext.get("Additional Rule Dependency") : ""}"
+                    style {
+                        wrap text
+                        border top,  {
+                            color black
+                            style medium
+                        }
+                    }
+                }
+
             }
-            rowDepth = buildRows(sheetDefinition, child.getOutgoingRelationshipsByType(RelationshipType.hierarchyType), columnDepth + 1, /*(childrenSize > 1 || dataElements.size() > 1) ? (rowDepth + 1) : */ rowDepth)
-            rowDepth
         }
-    }
 
-    void printDataElement(RowDefinition rowDefinition, Relationship dataElementRelationship) {
-        DataElement dataElement = dataElementRelationship.destination
-        Collection<Relationship> relatedTo = dataElement.getRelationshipsByType(RelationshipType.relatedToType)
-        if(relatedTo.empty && dataElement?.dataType) relatedTo = dataElement?.dataType.getRelationshipsByType(RelationshipType.relatedToType)
-        rowDefinition.with {
-            cell(depth + 1) {
-                value dataElement.name
-                link to url "${dataElement.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataElement.defaultModelCatalogueId}"
-            }
-
-            cell{
-                value "${(dataElement?.dataType) ? printDataType(dataElement?.dataType) : ""}"
-                style {
-                    wrap text
-                }
-
-            }
-
-            cell{
-                value "${(dataElement?.dataType?.rule) ? dataElement?.dataType?.rule : ""}"
-                style {
-                    wrap text
-                }
-            }
-
-            cell{
-                value "${(dataElement?.involvedIn) ? printBusRule(dataElement?.involvedIn): "" }"
-                style {
-                    wrap text
-                }
-            }
-
-            cell{
-                value "${(dataElement?.ext.get("LabKey Field Name")) ? dataElement?.ext.get("LabKey Field Name") : ""}"
-            }
-
-            cell{
-                value "${(dataElement?.ext.get("Mandatory / Conditional"))? dataElement?.ext.get("Mandatory / Conditional") : "" }"
-            }
-
-            cell{
-                value "${(dataElement?.ext.get("Additional Review"))? dataElement?.ext.get("Additional Review") : ""}"
-            }
-
-            cell{
-                value "${(dataElement?.ext.get("Additional Rule"))? dataElement?.ext.get("Additional Rule") : ""}"
-            }
-
-            cell{
-                value "${(dataElement?.ext.get("Additional Rule Dependency"))? dataElement?.ext.get("Additional Rule Dependency") : ""}"
-            }
-
-        }
-    }
 
 
     String printDataType(DataType dataType){
@@ -245,6 +343,36 @@ class GridReportXlsxExporter  {
 
         return dataType.name
 
+    }
+
+    String getMultiplicity(Relationship dataElementRelationship){
+        String multiplicityText = " "
+
+        if(dataElementRelationship?.ext.get("Min Occurs")=="0"){
+            multiplicityText += "Optional "
+        }else if(dataElementRelationship?.ext.get("Min Occurs")=="1"){
+            multiplicityText += "Mandatory "
+        }else if(dataElementRelationship?.ext.get("Min Occurs")){
+            multiplicityText += "Min: ${dataElementRelationship?.ext.get("Min Occurs")} "
+        }
+
+        if(dataElementRelationship?.ext.get("Max Occurs")=="*"){
+            multiplicityText += "Multiple "
+        }else if(dataElementRelationship?.ext.get("Max Occurs")!="1"){
+            multiplicityText += "Max: ${dataElementRelationship?.ext.get("Max Occurs")} "
+        }
+
+
+        if(dataElementRelationship.source.ext.get("http://xsd.modelcatalogue.org/section#type")=="choice"){
+            multiplicityText += " CHOICE "
+        }
+
+        if(dataElementRelationship?.ext.get("Max Occurs") && dataElementRelationship?.ext.get("Min Occurs")){
+         multiplicityText += "(" + dataElementRelationship?.ext.get("Min Occurs") + ".." + dataElementRelationship?.ext.get("Max Occurs") + ")"
+        }
+
+
+        multiplicityText
     }
 
     String printBusRule(List<ValidationRule> rules){

@@ -113,7 +113,7 @@ class DataModelToDocxExporter {
                 }
 
                 paragraph(style: 'document', margin: [top: 120]) {
-                    text "Version ${rootModel.semanticVersion} ${rootModel.status}"
+                    text "Version ${rootModel?.semanticVersion} ${rootModel?.status}"
                     lineBreak()
                     text SimpleDateFormat.dateInstance.format(new Date())
                 }
@@ -138,9 +138,9 @@ class DataModelToDocxExporter {
                     }
                     allVersionsOfModel.each { DataModel model ->
                         row {
-                            cell "${model.semanticVersion}", style: 'cell'
-                            cell model.lastUpdated, style: 'cell'
-                            cell "${model.revisionNotes}", style:'cell'
+                            cell "${model?.semanticVersion}", style: 'cell'
+                            cell model?.lastUpdated, style: 'cell'
+                            cell "${model?.revisionNotes}", style:'cell'
                         }
                     }
                 }
@@ -178,7 +178,7 @@ class DataModelToDocxExporter {
                 }
 
                 if (rootModel.description) {
-                    paragraph(style: 'classification.description', margin: [left: 50, right: 50]) {
+                    paragraph(style: 'classification.description') {
                         text rootModel.description
                     }
                 }

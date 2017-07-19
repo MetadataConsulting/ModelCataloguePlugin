@@ -12,7 +12,7 @@ import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
 
 class GridReportXlsxExporterSpec extends AbstractIntegrationSpec {
 
-    public static final String ROOT_DATA_CLASS_NAME = 'Registration GRDM'
+    public static final String ROOT_DATA_MODEL_NAME = 'Grid Report Data Model'
     ElementService elementService
     DataModelService dataModelService
     DataClassService dataClassService
@@ -20,15 +20,15 @@ class GridReportXlsxExporterSpec extends AbstractIntegrationSpec {
 
     @Rule TemporaryFolder temporaryFolder = new TemporaryFolder()
 
-    DataClass dataClass
+    DataModel dataModel
 
     def setup() {
         initRelationshipTypes()
         DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
 
         builder.build {
-            dataModel (name: "Grid Report Data Model") {
-                dataClass(name: ROOT_DATA_CLASS_NAME) {
+            dataModel (name: ROOT_DATA_MODEL_NAME) {
+                dataClass(name: "Registration GRDM") {
                     dataClass(name: 'Essential Data') {
                         dataClass(name: 'Registration and Consent') {
                             dataClass(name: 'Patient Identifiers') {
@@ -47,19 +47,35 @@ class GridReportXlsxExporterSpec extends AbstractIntegrationSpec {
                                 }
                             }
                             dataClass(name: 'Registration') {
-                                dataClass(name: 'Event Details') {
-                                    dataElement(name: 'Event Date') {
+                                dataClass(name: 'Event Details 2') {
+
+                                    dataElement(name: 'Event Date 1232') {
                                         dataType(name: 'xs:date', dataModel: 'XMLSchema')
                                     }
                                 }
                             }
                         }
                     }
+                    dataClass(name: 'Patient Identifiers 2') {
+                        dataElement(name: 'Date of Birth') {
+                            dataType(name: 'xs:date', dataModel: 'XMLSchema')
+                            relationship {
+                                ext Metadata.MIN_OCCURS, "1"
+                                ext Metadata.MAX_OCCURS, "1"
+                            }
+                        }
+                        dataElement(name: 'Fornames 12')
+                        dataElement(name: 'Surname3 ')
+                        relationship {
+                            ext Metadata.MIN_OCCURS, "1"
+                            ext Metadata.MAX_OCCURS, "1"
+                        }
+                    }
                 }
             }
         }
 
-        dataClass = DataClass.findByName(ROOT_DATA_CLASS_NAME)
+        dataModel = DataModel.findByName(ROOT_DATA_MODEL_NAME)
 
     }
 
@@ -68,7 +84,7 @@ class GridReportXlsxExporterSpec extends AbstractIntegrationSpec {
         def file = temporaryFolder.newFile("${System.currentTimeMillis()}.xlsx")
 
         when:
-        GridReportXlsxExporter.create(dataClass, dataClassService, grailsApplication, 5).export(file.newOutputStream())
+        GridReportXlsxExporter.create(dataModel, dataClassService, grailsApplication, 5).export(file.newOutputStream())
         FileOpener.open(file)
 
         SpreadsheetCriteria query = PoiSpreadsheetQuery.FACTORY.forFile(file)

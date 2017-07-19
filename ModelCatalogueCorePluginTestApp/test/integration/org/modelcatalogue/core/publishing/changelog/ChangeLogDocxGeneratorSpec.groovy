@@ -18,6 +18,13 @@ import org.modelcatalogue.core.ddl.DataDefinitionLanguage
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 
+
+/*
+*
+* THE CHANGE LOG STUFF DOESN'T REALLY WORK SO NOT SURE IT's worth fixing this test
+*
+* */
+
 class ChangeLogDocxGeneratorSpec extends AbstractIntegrationSpec {
 
     AuditService auditService
@@ -36,9 +43,9 @@ class ChangeLogDocxGeneratorSpec extends AbstractIntegrationSpec {
         DataClass draft = buildTestDataClass()
 
         when:
-        File file = tmp.newFile('changelog.docx')
+        File file = tmp.newFile('changelog1.docx')
 
-        ChangeLogDocxGenerator generator = new ChangeLogDocxGenerator(auditService, dataClassService, performanceUtilService)
+        ChangeLogDocxGenerator generator = new ChangeLogDocxGenerator(auditService, dataClassService, performanceUtilService, elementService)
 
         generator.generateChangelog(draft, file.newOutputStream())
 

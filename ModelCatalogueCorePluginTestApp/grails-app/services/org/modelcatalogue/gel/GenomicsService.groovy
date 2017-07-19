@@ -135,25 +135,17 @@ class GenomicsService {
     }
 
 
-    long genRareDiseaseSplitDocs(DataClass dataClass) {
-
-        //iterate through the child of the top level maintenance class
-        // then create documents for each of the children
-        dataClass.parentOf.each{ DataClass child ->
-
-            String documentName = "Rare Disease Eligibility and Phenotypes for $child.name"
-
-            return assetService.storeReportAsAsset(
-                    child.dataModel,
-                    name: "${documentName} report (MS Word Document)",
-                    originalFileName: "${documentName}-${child.status}-${child.version}.docx",
-                    contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            ) { OutputStream out ->
-                new RareDiseaseMaintenanceSplitDocsExporter(child, org.modelcatalogue.gel.export.RareDiseasesDocExporter.standardTemplate, DOC_IMAGE_PATH).export(out)
-            }
-
+    long genSplitDocAsset(DataClass dataClass){
+        String documentName = "Rare Disease Eligibility, Phenotypes and Clinical Tests for $dataClass.name"
+        Long classId = dataClass.id
+        return assetService.storeReportAsAsset(
+                dataClass.dataModel,
+                name: "${documentName} report (MS Word Document)",
+                originalFileName: "${documentName}-${dataClass.status}-${dataClass.version}.docx",
+                contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        ) { OutputStream out ->
+            new RareDiseaseMaintenanceSplitDocsExporter(DataClass.get(classId), org.modelcatalogue.gel.export.RareDiseaseMaintenanceSplitDocsExporter.standardTemplate, DOC_IMAGE_PATH, 2).export(out)
         }
-
 
     }
 

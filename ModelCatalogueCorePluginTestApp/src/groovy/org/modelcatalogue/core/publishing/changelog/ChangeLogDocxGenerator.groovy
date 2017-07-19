@@ -8,6 +8,7 @@ import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataClassService
+import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.PerformanceUtilService
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.audit.AuditService
@@ -28,6 +29,7 @@ class ChangeLogDocxGenerator extends AbstractChangeLogGenerator{
     PerformanceUtilService performanceUtilService
     public static final int CLEAN_UP_GORM_FREQUENCY = 10    //tuned for speed
     String imagePath
+    ElementService elementService
 
     DocxSpecificationDataHelper docHelper
 
@@ -53,11 +55,12 @@ class ChangeLogDocxGenerator extends AbstractChangeLogGenerator{
 
     }
 
-    ChangeLogDocxGenerator(AuditService auditService, DataClassService dataClassService, PerformanceUtilService performanceUtilService, Integer depth = 3, Boolean includeMetadata = true, Closure customTemplate = defaultTemplate, String imagePath = null) {
+    ChangeLogDocxGenerator(AuditService auditService, DataClassService dataClassService, PerformanceUtilService performanceUtilService, ElementService elementService, Integer depth = 3, Boolean includeMetadata = true, Closure customTemplate = defaultTemplate, String imagePath = null) {
         super(auditService, dataClassService, depth, includeMetadata)
         this.customTemplate=customTemplate
         this.imagePath=imagePath
         this.performanceUtilService = performanceUtilService
+        this.elementService = elementService
     }
 
     @Override
@@ -65,7 +68,7 @@ class ChangeLogDocxGenerator extends AbstractChangeLogGenerator{
         log.info "Generating changelog for data class $dataClass.name ($dataClass.combinedVersion)"
         DocumentBuilder builder = new ModelCatalogueWordDocumentBuilder(outputStream)
 
-        docHelper = new DocxSpecificationDataHelper(builder, depth)
+        docHelper = new DocxSpecificationDataHelper(builder, depth, elementService)
 
         Delayable<DocumentBuilder> delayable = new Delayable<>(builder)
 
