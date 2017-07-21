@@ -204,14 +204,19 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     def "updating parent propagates to child and grandchild"() {
         when:
         refresh browser
+        Thread.sleep(3000)
         select 'Test 1' open 'Data Types' select 'Enumeration 1'
 
+        Thread.sleep(3000)
         3.times { scroll up }
         click inlineEdit
+        Thread.sleep(3000)
         click removeEnumerationOne
+        Thread.sleep(3000)
         click inlineEditSubmit
 
         refresh browser
+        Thread.sleep(3000)
         select 'Test 1' open 'Data Types' select 'Enumeration 3'
         then:
 

@@ -13,6 +13,7 @@ import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.lists.Relationships
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
+import org.modelcatalogue.gel.export.GridReportXlsxExporter
 import org.springframework.http.HttpStatus
 
 class DataModelController extends AbstractCatalogueElementController<DataModel> {
@@ -64,6 +65,32 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
         ) { OutputStream outputStream ->
             // reload domain class as this is called in separate thread
             CatalogueElementToXlsxExporter.forDataModel(DataModel.get(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
+        }
+
+        response.setHeader("X-Asset-ID", assetId.toString())
+        redirect controller: 'asset', id: assetId, action: 'show'
+    }
+
+    //produce a grid report spreadsheet where the whole data set is diaplyed as a grid with metadata and relationships (rather then tabs)
+
+    def gridSpreadsheet(String name, Integer depth) {
+        DataModel dataModel = DataModel.get(params.id)
+
+        def dataModelId = dataModel.id
+
+        if (!dataModel) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        def assetId = assetService.storeReportAsAsset(
+                dataModel,
+                name: name ? name : "${dataModel.name} report as MS Excel Document",
+                originalFileName: "${dataModel.name}-${dataModel.status}-${dataModel.version}.xlsx",
+                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        ) { OutputStream outputStream ->
+            // reload domain class as this is called in separate thread
+            GridReportXlsxExporter.create(DataModel.get(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())

@@ -76,22 +76,12 @@ class DataModelToDocxExporter {
         this.depth = depth
     }
 
-    ArrayList getAllVersionsOfModel(DataModel model, List<DataModel> models) {
-        def oldModel = model.supersedes
-        if (oldModel && !models.contains(oldModel.first())) {
-            models.add(0, oldModel.first())
-            getAllVersionsOfModel(oldModel.first(), models)
-        } else {
-            return models
-        }
-    }
-
     void export(OutputStream outputStream) {
         log.info "Exporting Data Model ${rootModel.name} (${rootModel.combinedVersion}) to inventory document."
 
         def dataClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.includes(rootModel)).items
         def builder = new ModelCatalogueWordDocumentBuilder(outputStream)
-        def docHelper = new DocxSpecificationDataHelper(builder, depth + 1)
+        def docHelper = new DocxSpecificationDataHelper(builder, depth + 1, elementService)
 
         List<DataModel> allVersionsOfModel = getAllVersionsOfModel(rootModel, [rootModel])
 
@@ -123,7 +113,7 @@ class DataModelToDocxExporter {
                 }
 
                 paragraph(style: 'document', margin: [top: 120]) {
-                    text "Version ${rootModel.semanticVersion} ${rootModel.status}"
+                    text "Version ${rootModel?.semanticVersion} ${rootModel?.status}"
                     lineBreak()
                     text SimpleDateFormat.dateInstance.format(new Date())
                 }
@@ -148,9 +138,9 @@ class DataModelToDocxExporter {
                     }
                     allVersionsOfModel.each { DataModel model ->
                         row {
-                            cell "${model.semanticVersion}", style: 'cell'
-                            cell model.lastUpdated, style: 'cell'
-                            cell "${model.revisionNotes}", style:'cell'
+                            cell "${model?.semanticVersion}", style: 'cell'
+                            cell model?.lastUpdated, style: 'cell'
+                            cell "${model?.revisionNotes}", style:'cell'
                         }
                     }
                 }
@@ -188,7 +178,7 @@ class DataModelToDocxExporter {
                 }
 
                 if (rootModel.description) {
-                    paragraph(style: 'classification.description', margin: [left: 50, right: 50]) {
+                    paragraph(style: 'classification.description') {
                         text rootModel.description
                     }
                 }
@@ -201,135 +191,7 @@ class DataModelToDocxExporter {
                 }
 
                 if (docHelper.usedDataTypes) {
-                    pageBreak()
-                    heading1 'Data Types'
-
-                    if(!docHelper.usedDataTypes.size()){
-                        paragraph {
-                            text "Model has no data type yet.", font: [italic: true]
-                        }
-                    }else {
-
-                        for (DataType dataType in docHelper.usedDataTypes.keySet()) {
-
-                            log.debug "Exporting data type $dataType to Word Document"
-
-                            Map<String, Object> attrs = [ref: "${dataType.id}", style: 'heading2']
-                            attrs.putAll(DOMAIN_NAME)
-
-                            paragraph attrs, dataType.name
-
-                            if (dataType.dataModel) {
-                                paragraph {
-                                    text DOMAIN_CLASSIFICATION_NAME, "(${dataType.dataModel.name})"
-                                }
-                            }
-
-                            if (dataType.description) {
-                                paragraph {
-                                    text dataType.description
-                                }
-                            }
-                            if (hasExtraInformation(dataType)) {
-                                table(columns: [1, 4], border: [size: 0], font: [color: '#5C5C5C']) {
-                                    if (dataType.instanceOf(PrimitiveType) && dataType.measurementUnit) {
-                                        row {
-                                            cell 'Unit of Measure'
-                                            cell {
-                                                text dataType.measurementUnit.name
-                                                if (dataType.measurementUnit.description) {
-                                                    text ' ('
-                                                    text dataType.measurementUnit.description
-                                                    ')'
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    if (dataType.instanceOf(ReferenceType) && dataType.dataClass) {
-                                        row {
-                                            cell 'Data Class'
-                                            cell {
-                                                text dataType.dataClass.name
-                                                if (dataType.dataClass.description) {
-                                                    text ' ('
-                                                    text dataType.dataClass.description
-                                                    ')'
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    if (dataType.regexDef) {
-                                        row {
-                                            cell 'Regular Expression'
-                                            cell dataType.regexDef
-                                        }
-                                    } else if (dataType.rule) {
-                                        row {
-                                            cell 'Rule'
-                                            cell dataType.rule
-                                        }
-                                    }
-
-                                    getBaseRules(dataType).each { parent ->
-                                        if (parent.regexDef) {
-                                            row {
-                                                cell "Regular Expression based on\n ${CatalogueElementMarshaller.getClassifiedName(parent)} "
-                                                cell parent.regexDef
-                                            }
-                                        } else if (parent.rule) {
-                                            row {
-                                                cell "Rule based on\n ${CatalogueElementMarshaller.getClassifiedName(parent)}"
-                                                cell parent.rule
-                                            }
-                                        } else {
-                                            row {
-                                                cell "Based On"
-                                                cell CatalogueElementMarshaller.getClassifiedName(parent)
-                                            }
-                                        }
-                                    }
-
-                                }
-
-                                if (dataType?.instanceOf(EnumeratedType)) {
-
-                                    table(border: [size: 1, color: '#D2D2D2']) {
-                                        row(background: '#F2F2F2') {
-                                            cell ENUM_HEADER_CELL_TEXT, 'Code'
-                                            cell ENUM_HEADER_CELL_TEXT, 'Description'
-                                        }
-                                        Enumerations enumerations = dataType.enumerationsObject
-                                        for (Enumeration entry in enumerations) {
-                                            if (entry.deprecated) {
-                                                row(DEPRECATED_ENUM_CELL_TEXT) {
-                                                    cell entry.key
-                                                    cell entry.value
-                                                }
-                                            } else {
-                                                row {
-                                                    cell entry.key
-                                                    cell entry.value
-                                                }
-                                            }
-
-                                        }
-                                    }
-                                }
-                            }
-
-
-                            paragraph style: 'heading4', margin: [bottom: 0], font: [size: 11, bold: true, color: '#999999'], "Usages"
-                            for (DataClass backref in docHelper.usedDataTypes.get(dataType)) {
-                                paragraph(margin: [top: 0, bottom: 0]) {
-                                    link url: "#${backref.id}", style: 'heading4', font: [size: 9, color: '#29BDCA'], backref.name
-                                }
-
-                            }
-
-                        }
-                    }
+                    docHelper.printTypes()
                 }
 
                 if(docHelper.rules) {
@@ -344,16 +206,16 @@ class DataModelToDocxExporter {
         log.info "data dataModel ${rootModel.name} (${rootModel.combinedVersion}) exported to inventory document."
     }
 
-    private boolean hasExtraInformation(DataType dataType) {
-        (dataType.instanceOf(PrimitiveType) && dataType.measurementUnit) || dataType.instanceOf(EnumeratedType) || (dataType.instanceOf(ReferenceType) && dataType.dataClass) || dataType.rule || dataType.isBasedOn
+
+    ArrayList getAllVersionsOfModel(DataModel model, List<DataModel> models) {
+        def oldModel = model.supersedes
+        if (oldModel && !models.contains(oldModel.first())) {
+            models.add(0, oldModel.first())
+            getAllVersionsOfModel(oldModel.first(), models)
+        } else {
+            return models
+        }
     }
 
-    private Set getBaseRules(DataType dataType, Set basedOn = []){
-        elementService.getTypeHierarchy([:], dataType).items.each{ DataType type ->
-            basedOn.add(type)
-            basedOn.addAll(getBaseRules(type, basedOn))
-        }
-        basedOn
-    }
 
 }

@@ -24,6 +24,8 @@ class ModelCatalogueGenomicsUrlMappings {
         "/api/modelCatalogue/core/genomics/exportAllCancerReports/$id" (controller: 'genomics', action: 'exportAllCancerReports', method: HttpMethod.GET)
         "/api/modelCatalogue/core/genomics/exportAllRareDiseaseReports/$id" (controller: 'genomics', action: 'exportAllRareDiseaseReports', method: HttpMethod.GET)
         "/api/modelCatalogue/core/genomics/exportRareDiseasesWebsite/$id" (controller: 'genomics', action: 'exportRareDiseasesWebsite', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/genomics/exportRareDiseaseSplitDocs/$id" (controller: 'genomics', action: 'exportRareDiseaseSplitDocs', method: HttpMethod.GET)
+
     }
 
 }

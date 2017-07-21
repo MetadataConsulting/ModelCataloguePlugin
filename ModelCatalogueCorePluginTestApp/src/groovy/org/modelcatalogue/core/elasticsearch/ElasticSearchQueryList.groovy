@@ -90,6 +90,21 @@ class ElasticSearchQueryList<T> implements JsonAwareListWithTotalAndType<T> {
         }
     }
 
+    Map getItemsWithScore() {
+        Map  results = [:]
+        if (!response) {
+            try {
+                response = initializeResponse()
+            } catch (Exception ignored) {
+                return []
+            }
+        }
+        response.hits.hits.each { SearchHit hit ->
+            results.put(type.get(hit.field('entity_id')?.toLong() ?: hit.id().toLong()), hit.score)
+        }
+        return results
+    }
+
     @Override
     List<Object> getJsonItems() {
         if (!response) {
