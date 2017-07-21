@@ -8,6 +8,7 @@ import org.hibernate.StaleStateException
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.DraftContext
+import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.dao.ConcurrencyFailureException
@@ -306,7 +307,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
      * @return Returns true if user role is CURATOR, false otherwise.
      */
     protected boolean allowSaveAndEdit() {
-        modelCatalogueSecurityService.hasRole('CURATOR')
+        modelCatalogueSecurityService.hasRole('CURATOR') && isSubscribed()
     }
 
     /**
@@ -314,7 +315,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
      * @return Returns true if user role is ADMIN, false otherwise.
      */
     protected boolean allowDelete() {
-        modelCatalogueSecurityService.hasRole('CURATOR')
+        modelCatalogueSecurityService.hasRole('CURATOR') && isSubscribed()
     }
 
     protected boolean isFavoriteAfterUpdate() {
@@ -430,4 +431,22 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     protected void methodNotAllowed() { render status: METHOD_NOT_ALLOWED }
 
     protected void notAcceptable() { render status: NOT_ACCEPTABLE }
+
+    protected Set<User> getSubscriptions(){
+        Set<User> subscriptions = new HashSet()
+        if(resource!=DataModel){
+            subscriptions = (resource.get(params.id)?.dataModel?.subscriptions)
+        }else{
+            subscriptions = (resource.get(params.id)?.subscriptions)
+        }
+        subscriptions
+    }
+
+    protected Boolean isSubscribed(List<User> subscriptions){
+        if(subscriptions && subscriptions.contains(modelCatalogueSecurityService.getCurrentUser())){
+            return true
+        }
+        false
+    }
+
 }

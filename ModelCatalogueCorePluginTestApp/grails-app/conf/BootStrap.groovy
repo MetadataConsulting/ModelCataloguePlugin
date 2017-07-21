@@ -49,12 +49,12 @@ class BootStrap {
         }
 
         if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST] && !System.getenv('MC_BLANK_DEV')) {
-            TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
-                initCatalogueService.initCatalogue(true)
+//            TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
+                initCatalogueService.initCatalogue(false)
                 initPoliciesAndTags()
                 initSecurity(false)
                 setupDevTestStuff()
-            }
+//            }
 //            modelCatalogueSearchService.reindex(true).all { it }.toBlocking().subscribe {
 //                System.out.println "Reindexed"
 //            }

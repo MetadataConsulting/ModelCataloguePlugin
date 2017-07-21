@@ -5,6 +5,7 @@ import com.google.common.collect.Iterables
 import org.modelcatalogue.core.policy.Convention
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.publishing.PublishingContext
+import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Legacy
 
@@ -24,7 +25,7 @@ class DataModel extends CatalogueElement {
     static transients = ['namespace', 'dataModelPolicies']
 
     static relationships = [
-        outgoing: [classificationFilter: 'usedAsFilterBy', 'import': 'imports'],
+        outgoing: [classificationFilter: 'usedAsFilterBy', 'import': 'imports', 'subscription':'subscriptions'],
         incoming: ['import': 'importedBy']
     ]
 
