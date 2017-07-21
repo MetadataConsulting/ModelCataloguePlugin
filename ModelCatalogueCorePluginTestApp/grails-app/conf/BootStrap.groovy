@@ -546,12 +546,20 @@ class BootStrap {
                     }
                 }
 
+            }
+
+            catalogueBuilder.build {
                 dataModel(name: 'Test 2') {
+                    automatic dataType
                     policy 'Unique of Kind'
                     dataElement(name: 'Test Element 2') {
                         dataType(name: 'Same Name')
                     }
                 }
+            }
+
+            catalogueBuilder.build {
+                automatic dataType
                 dataModel(name: 'Test 3') {
                     dataElement(name: "data element with orphaned data type")
                 }

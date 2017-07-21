@@ -17,7 +17,6 @@ import static org.modelcatalogue.core.geb.Common.rightSideTitle
 class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
 
     private static final String quickSearch="#role_navigation-right_search-menu-menu-item-link > span.ng-scope.fa.fa-search"
-    private static final String  create  = "a#role_data-models_create-data-modelBtn"
     private static final String modelCatalogue = "span.mc-name"
     private static final String   search = "input#value"
     private static final String   createButton = "span.text-success"
@@ -51,6 +50,8 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
         then:
         check { infTableCell(1, 1) } contains 'TESTING Validation Rule'
     }
+
+
     def "NAVIGATE BACK TO THE HOME PAGE"() {
         when:
         click modelCatalogue
@@ -78,6 +79,8 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
         check infiniteTableRow displayed
 
     }
+
+
     def "navigate to quick search and search a data model"(){
 
         when:
@@ -92,7 +95,7 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
     }
     def"navigate to the quick search and search for a data class"(){
 
-        driver.navigate().back()
+        click modelCatalogue
         click quickSearch
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
         fill search with "NHIC Datasets" and pick first item
@@ -106,48 +109,49 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
     def" navigate to quick search and search for a data element"(){
 
         when:
-        driver.navigate().back()
+        click modelCatalogue
         click quickSearch
 
         and:
-        fill search with " MET-523.M1.DE1" and pick first item
+        fill search with "Test Element 1" and pick first item
 
         then:
-        check rightSideTitle contains "MET-523.M1.DE1"
+        check rightSideTitle contains "Test Element 1"
 
     }
     def" quick search a data type"(){
 
         when:
-        driver.navigate().back()
+        click modelCatalogue
         click quickSearch
 
         and:
-        fill search with "MET-523.M1.VD1" and pick first item
+        fill search with "xs:string" and pick first item
 
         then:
-        check rightSideTitle contains'MET-523.M1.VD1'
+        check rightSideTitle contains'xs:strin'
 
     }
+
     def"quick search a Measurement unit"(){
 
         when:
-        driver.navigate().back()
+        click modelCatalogue
         click quickSearch
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
         and:
-        fill search with "MET-523.MU1" and pick first item
+        fill search with "second" and pick first item
 
         then:
-        check rightSideTitle contains "MET-523.MU1"
+        check rightSideTitle contains "second"
 
     }
 
     def"quick search a business rule"(){
 
         when:
-        driver.navigate().back()
+        click modelCatalogue
         click quickSearch
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
@@ -163,7 +167,7 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
     def"quick search an asset"(){
 
         when:
-        driver.navigate().back()
+        click modelCatalogue
         click quickSearch
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
