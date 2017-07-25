@@ -43,8 +43,8 @@ class CatalogueElementDocumentSerializer<T extends CatalogueElement> implements 
 
         for (Map.Entry<String, String> entry in ext) {
             ImmutableMap.Builder<String, String> mapBuilder = ImmutableMap.builder()
-            safePut(mapBuilder, 'key', entry.key)
-            safePut(mapBuilder, 'value', entry.value)
+            safePut(mapBuilder, 'key', entry.key.toString())
+            safePut(mapBuilder, 'value', entry.value.toString())
             listBuilder.add(mapBuilder.build())
         }
 

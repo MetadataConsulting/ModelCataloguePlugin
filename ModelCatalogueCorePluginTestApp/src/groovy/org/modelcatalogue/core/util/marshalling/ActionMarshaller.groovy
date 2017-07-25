@@ -48,7 +48,7 @@ class ActionMarshaller extends AbstractMarshaller {
             ret.requiredParameters  = runner.requiredParameters
         }
 
-        ret.putAll parameters: el.ext
+        ret.putAll parameters: el?.ext
 
 
         ret

@@ -6,6 +6,8 @@ import spock.lang.Stepwise
 import static org.modelcatalogue.core.geb.Common.create
 import static org.modelcatalogue.core.geb.Common.delete
 import static org.modelcatalogue.core.geb.Common.description
+import static org.modelcatalogue.core.geb.Common.getItem
+import static org.modelcatalogue.core.geb.Common.getPick
 import static org.modelcatalogue.core.geb.Common.modalHeader
 import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
 import static org.modelcatalogue.core.geb.Common.modelCatalogueId
@@ -40,6 +42,21 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
     private static final String exitButton= 'button#exit-wizard'
     private static final String deleteBtton = 'a#delete-menu-item-link>span:nth-child(3)'
     private static final String dataClassButton = 'a#role_item_catalogue-element-menu-item-link>span:nth-child(3)'
+    private static final String   greenButton='div#isBasedOn-changes>div:nth-child(3)>table>tfoot>tr>td>table>tfoot>tr>td:nth-child(1)>span'
+    private static final String  destinationTable='div#isBasedOn-changes>div:nth-child(3)>table>tbody>tr>td:nth-child(2)'
+    private static final String   type='div#isBasedOn-changes>div:nth-child(3)>table>tbody>tr>td:nth-child(3)'
+    private static final String  dataClassCreated='tbody.ng-scope>tr:nth-child(2)>td:nth-child(1)>span>span>a'
+    private static final int TIME_TO_REFRESH_SEARCH_RESULTS = 3000
+    private static final String  dataWizard ='div.alert'
+    private static final String  delete ='a#delete-menu-item-link>span:nth-child(3)'
+    private static final String  isBasedOnTag='ul.nav-tabs>li:nth-child(3)>a>span:nth-child(1)'
+    private static final String   search='input#element'
+    private static final String  closeButton='div.modal-footer>button:nth-child(2)'
+
+
+
+
+
 
     def "login and navigate to the model "() {
 
@@ -113,10 +130,74 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
         click finishButton
         Thread.sleep(2000L)
         click exitButton
+        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
         then:
 
         check wizardSummary contains "NEW_TESTING_MODEL"
+
+        cleanup:
+        click exitButton
+
+
+    }
+
+    def" create a data class and create a relationship is based on"(){
+
+
+        when:
+        selectInTree 'Data Classes'
+
+        then:
+        check rightSideTitle is 'Active Data Classes'
+
+        when:
+        click create
+
+        then:'check the title of the page'
+        check modalHeader is 'Data Class Wizard'
+
+        when: 'fill the data class form'
+        fill nameLabel with'TESTING_CLASS'
+        fill modelCatalogueId with 'ME-34567'
+        fill description with 'THIS IS MY TESTING DATA CLASS'
+
+        and:
+        click finishButton
+        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
+
+        then:
+        check dataWizard contains 'TESTING_CLASS'
+
+        when:
+        click exitButton
+
+        and:
+        selectInTree 'Data Classes'
+        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
+
+        then:
+        $(dataClassCreated).text().contains('TESTING_CLASS')
+
+
+        when:'select the created data class and created a relationship based on'
+        click dataClassCreated
+        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
+
+        and:
+        click isBasedOnTag
+
+        and:
+        click greenButton
+        fill search with 'NEW_TESTING_MODEL' and Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS) and pick first item
+        click modalPrimaryButton
+
+        then:
+        check destinationTable contains 'NEW_TESTING_MODEL'
+
+        and:
+        check type is 'Data Class'
+        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
     }
 

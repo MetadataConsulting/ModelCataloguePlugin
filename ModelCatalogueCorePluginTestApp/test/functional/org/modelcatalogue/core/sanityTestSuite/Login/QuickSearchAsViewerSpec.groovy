@@ -28,12 +28,14 @@ class QuickSearchAsViewerSpec extends AbstractModelCatalogueGebSpec{
 
         when:
         click quickSearch
+        Thread.sleep(1000)
 
         and:'search for an element'
         fill search with 'Clinical trial' and pick first  item
+        Thread.sleep(1000)
 
         then:
-        check rightSideTitle contains 'Clinical trial'
+        check rightSideTitle contains 'Clinical'
 
     }
 }

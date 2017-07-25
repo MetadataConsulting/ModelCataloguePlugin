@@ -70,6 +70,7 @@ class CreateDataModelSpec extends AbstractModelCatalogueGebSpec {
         "TESTING_DATA_MODEL"    | "2.1.28"| "MT-234"   | "c"      | "c"
 
     }
+
     def"delete the created data model "(){
 
         when:
