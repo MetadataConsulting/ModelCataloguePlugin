@@ -2,10 +2,13 @@ package org.modelcatalogue.core.dataarchitect
 
 import au.com.bytecode.opencsv.CSVReader
 import au.com.bytecode.opencsv.CSVWriter
+import org.hibernate.Criteria;
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.util.ElasticMatchResult
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.MatchResult
 import org.modelcatalogue.core.util.lists.ListWithTotal
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.SecuredRuleExecutor
@@ -20,11 +23,20 @@ class DataArchitectService {
     def elementService
     def actionService
     def dataModelService
+    def sessionFactory
+
+
+    //commented out the functions that are no longer relevant or don't work
+    //TODO: finish these functions
 
     private Map<String,Runnable> suggestions = [
-            'Find Classes to Inline': this.&generateInlineClass,
-            'Find Classes to Merge': this.&generateMergeClasses,
-            'Find Duplicate and Synonymous Enumerations': this.&generatePossibleEnumDuplicatesAndSynonyms
+//        'Inline Models': this.&generateInlineModel,
+        'Enum Duplicates and Synonyms': this.&generatePossibleEnumDuplicatesAndSynonyms,
+        'Data Element Exact Match':this.&generateDataElementSuggestionsExact,
+        'Data Element Fuzzy Match':this.&generateDataElementSuggestionsFuzzy,
+//        'Data Element and Type Exact Match':this.&generateDataElementAndTypeSuggestionsExact,
+//        'Data Element and Type Fuzzy Match':this.&generateDataElementAndTypeSuggestionsFuzzy
+
     ]
 
     Set<String> getSuggestionsNames() {
@@ -240,25 +252,64 @@ class DataArchitectService {
         suggestions[label] = suggestionGenerator
     }
 
-    def generateSuggestions(String suggestion = null) {
+    def generateSuggestions(String suggestion = null, String dataModel1ID, String dataModel2ID, String minScore = 10) {
+
         def execute = { String label, Runnable cl ->
             log.info "Creating suggestions '$label'"
             cl.run()
             log.info "Suggestions '$label' created"
         }
-        if (!suggestion) {
-            suggestions.each execute
-        } else {
-            Runnable runnable = suggestions[suggestion]
-            if (!runnable) {
-                log.warn("Trying to run unknown suggestion '$suggestion'")
-                return
+
+        Runnable runnable = new Runnable() {
+            void run() {
+                switch (suggestion) {
+                    case 'Enum Duplicates and Synonyms':
+                        generatePossibleEnumDuplicatesAndSynonyms(dataModel1ID, dataModel2ID)
+                        break
+                    case 'Data Element Fuzzy Match':
+                        generateDataElementSuggestionsFuzzy(dataModel1ID, dataModel2ID, minScore)
+                        break
+                    case 'Data Element Exact Match':
+                        generateDataElementSuggestionsExact(dataModel1ID, dataModel2ID)
+                        break
+                    default:
+                        generateDataElementSuggestionsExact(dataModel1ID, dataModel2ID)
+                        break
+                }
             }
-            execute suggestion, runnable
         }
+
+        if (suggestion) {
+            execute suggestion, runnable
+        }else{
+            log.warn("Trying to run unknown suggestion '$suggestion'")
+            return
+        }
+
     }
 
-    private void generateInlineClass() {
+    def deleteSuggestions() {
+
+        def execute = { Runnable cl ->
+            log.info "Deleting suggestions"
+            cl.run()
+            log.info "Suggestions deleted"
+        }
+
+        def batchList = Batch.list()
+
+        Runnable runnable = new Runnable() {
+            void run() {
+                batchList.each{ Batch btch ->
+                    btch.delete()
+                }
+            }
+        }
+
+        execute runnable
+    }
+
+    private void generateInlineModel() {
         Batch.findAllByNameIlike("Inline Data Class '%'").each reset
         elementService.findClassesToBeInlined().each { sourceId, destId ->
             DataClass dataClass = DataClass.get(sourceId)
@@ -274,13 +325,16 @@ class DataArchitectService {
     }
 
     private void generateMergeClasses() {
+
         def duplicateClassesSuggestions = elementService.findDuplicateClassesSuggestions()
 
         Batch.findAllByNameIlike("Create Synonyms for Data Class '%'").each reset
+
         duplicateClassesSuggestions.each { destId, sources ->
-            DataClass dataClass = DataClass.get(destId)
-            Batch batch = Batch.findOrSaveByName("Create Synonyms for Data Class '$dataClass.name'")
-            RelationshipType type = RelationshipType.readByName("synonym")
+            DataClass model = DataClass.get(destId)
+            Batch batch = Batch.findOrSaveByName("Create Synonyms for Data Class '$model.name'")
+            RelationshipType type = RelationshipType.readByName("relatedTo")
+
             sources.each { srcId ->
                 Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.DataClass:$srcId", destination: "gorm://org.modelcatalogue.core.DataClass:$destId", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
                 if (action.hasErrors()) {
@@ -306,16 +360,26 @@ class DataArchitectService {
         }
     }
 
-    private void generatePossibleEnumDuplicatesAndSynonyms() {
-        def possibleDuplicateEnums = elementService.findDuplicateEnumerationsSuggestions()
-
-        Batch.findAllByNameIlike("Create Synonyms for Enumerated Type '%'").each reset
-        possibleDuplicateEnums.each { first, other ->
-            EnumeratedType enumeratedType = EnumeratedType.get(first)
-            Batch batch = Batch.findOrSaveByName("Create Synonyms for Enumerated Type '$enumeratedType.name'")
-            RelationshipType type = RelationshipType.readByName("synonym")
+    private void generatePossibleEnumDuplicatesAndSynonyms(String dataModelAID, String dataModelBID){
+        DataModel dataModelA = DataModel.get(dataModelAID)
+        DataModel dataModelB = DataModel.get(dataModelBID)
+        Batch.findAllByNameIlike("Suggested DataType Synonyms for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
+        Batch batch = Batch.findOrSaveByName("Generating Suggested DataType Synonyms for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
+        def matchingDataElements = elementService.findDuplicateEnumerationsSuggestions(dataModelA.id, dataModelB.id)
+        batch.name = "Processing Suggested DataType Synonyms for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        batch.save()
+        matchingDataElements.each { first, other ->
+            RelationshipType type = RelationshipType.readByName("relatedTo")
+            def matchScore = 100
             other.each { otherId ->
-                Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.EnumeratedType:$otherId", destination: "gorm://org.modelcatalogue.core.EnumeratedType:$first", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
+                Map<String, String> params = new HashMap<String,String>()
+                params.put("""source""","""gorm://org.modelcatalogue.core.DataType:$otherId""")
+                params.put("""destination""","""gorm://org.modelcatalogue.core.DataType:$first""")
+                params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
+                params.put("""matchScore""","""$matchScore""")
+                params.put("""matchOn""","""TypeEnums""")
+                Action action
+                action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
@@ -323,20 +387,100 @@ class DataArchitectService {
             batch.archived = false
             batch.save()
         }
+        batch.name = "Suggested DataType Synonyms for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        batch.save()
 
-        Batch.findAllByNameIlike("Duplicate Candidates of Enumerated Type  '%'").each reset
-
-        possibleDuplicateEnums.each { first, other ->
-            EnumeratedType enumeratedType = EnumeratedType.get(first)
-            Batch batch = Batch.findOrSaveByName("Duplicate Candidates of Enumerated Type '$enumeratedType.name'")
+    }
+    /**
+     * generateDataElementSuggestionsExact
+     *
+     */
+    private void generateDataElementSuggestionsExact(String dataModelAID, String dataModelBID){
+        DataModel dataModelA = DataModel.get(dataModelAID)
+        DataModel dataModelB = DataModel.get(dataModelBID)
+        Batch.findAllByNameIlike("Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
+        Batch batch = Batch.findOrSaveByName("Generating Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
+        def matchingDataElements = elementService.findDuplicateDataElementSuggestions(dataModelA,dataModelB)
+        batch.name = "Processing DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        batch.save()
+        def matchScore = 100
+        matchingDataElements.each { first, other ->
+            RelationshipType type = RelationshipType.readByName("relatedTo")
             other.each { otherId ->
-                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.EnumeratedType:$otherId", destination: "gorm://org.modelcatalogue.core.EnumeratedType:$first"
+                Map<String, String> params = new HashMap<String,String>()
+                params.put("""source""","""gorm://org.modelcatalogue.core.DataElement:$otherId""")
+                params.put("""destination""","""gorm://org.modelcatalogue.core.DataElement:$first""")
+                params.put("""type""","""gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
+                params.put("""matchScore""","""$matchScore""")
+                params.put("""matchOn""","""ElementName""")
+                Action action
+                action = actionService.create(params, batch, CreateMatch)
                 if (action.hasErrors()) {
-                    log.error(FriendlyErrors.printErrors("Error generating merge model action", action.errors))
+                    log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
             }
             batch.archived = false
             batch.save()
         }
+        batch.name = "Suggested DataElement Exact Matches for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        batch.save()
+
+    }
+
+
+
+    /**
+     * generateDataElementSuggestionsFuzzy
+     *
+     */
+
+    private void generateDataElementSuggestionsFuzzy(String dataModelAID, String dataModelBID, String minScore){
+        DataModel dataModelA = DataModel.get(dataModelAID)
+        DataModel dataModelB = DataModel.get(dataModelBID)
+        Batch.findAllByNameIlike("Suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'").each reset
+        Batch batch = Batch.findOrSaveByName("Generating suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'")
+        def score
+        try{ score  = Long.parseLong( minScore ) }catch(Exception e){ score  = 10}
+        def matchingDataElements = elementService.findFuzzyDataElementSuggestions(dataModelA,dataModelB, score)
+        batch.name = "Processing suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        batch.save()
+        matchingDataElements.each { ElasticMatchResult match ->
+            RelationshipType type = RelationshipType.readByName("relatedTo")
+            Map<String, String> params = new HashMap<String, String>()
+            params.put("""source""", """gorm://org.modelcatalogue.core.DataElement:$match.dataElementA.id""")
+            params.put("""destination""", """gorm://org.modelcatalogue.core.DataElement:$match.dataElementB.id""")
+            params.put("""type""", """gorm://org.modelcatalogue.core.RelationshipType:$type.id""")
+            params.put("""matchScore""", """${(match.matchScore) ? match.matchScore : 0}""")
+            params.put("""matchOn""", """ElementName""")
+            params.put("""message""", """$match.message""")
+            Action action
+            action = actionService.create(params, batch, CreateMatch)
+            if (action.hasErrors()) {
+                log.error(FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
+            }
+            batch.archived = false
+            batch.save()
+        }
+        batch.name = "Suggested Fuzzy DataElement Relations for '${dataModelA.name} (${dataModelA.dataModelSemanticVersion})' and '${dataModelB.name} (${dataModelB.dataModelSemanticVersion})'"
+        batch.save()
+
+        }
+
+    /**
+     * generateDataElementAndTypeSuggestionsExact
+     *
+     */
+    private void generateDataElementAndTypeSuggestionsExact(){
+
+    }
+
+
+    /**
+     * generateDataElementAndTypeSuggestionsFuzzy
+     *
+     */
+    private void generateDataElementAndTypeSuggestionsFuzzy(){
+
     }
 }
+

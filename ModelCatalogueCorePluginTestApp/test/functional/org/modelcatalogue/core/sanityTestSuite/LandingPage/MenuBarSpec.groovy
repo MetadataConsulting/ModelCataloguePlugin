@@ -51,6 +51,7 @@ class MenuBarSpec extends AbstractModelCatalogueGebSpec {
          Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
          and: 'select activity'
          click activity
+         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
          then: 'verify the text present'
          check activeUsers contains 'Most Recent Active Users'
@@ -64,6 +65,7 @@ class MenuBarSpec extends AbstractModelCatalogueGebSpec {
 
          and: 'click on the favourite tag'
          click favoriteButton
+         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
          then:
          check catalogueID displayed
@@ -75,6 +77,7 @@ class MenuBarSpec extends AbstractModelCatalogueGebSpec {
 
          and: 'select api'
          click apiKey
+         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
          then:
          check modalHeader contains 'API Key'
@@ -89,6 +92,7 @@ class MenuBarSpec extends AbstractModelCatalogueGebSpec {
 
         when: 'click on the cancel button'
         click cancel
+        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
         and:'navigate back to the top menu'
         click userMenu
@@ -96,7 +100,7 @@ class MenuBarSpec extends AbstractModelCatalogueGebSpec {
 
         and:'click on the logout button'
         click logOut
-
+        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
        then:' verify that the login button is displayed'
        check login displayed

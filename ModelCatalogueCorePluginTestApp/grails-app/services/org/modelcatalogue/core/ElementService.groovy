@@ -7,6 +7,7 @@ import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
+import org.hibernate.Criteria
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.cache.CacheService
@@ -17,12 +18,14 @@ import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.publishing.PublishingContext
+import org.modelcatalogue.core.util.ElasticMatchResult
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.Legacy
 import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
+import org.modelcatalogue.core.util.MatchResult
 import org.springframework.transaction.TransactionStatus
 import rx.Observer as RxObserver
 
@@ -37,6 +40,13 @@ class ElementService implements Publisher<CatalogueElement> {
     SecurityService modelCatalogueSecurityService
     def messageSource
     AuditService auditService
+    def sessionFactory
+    def elasticSearchService
+
+    public static Long MATCH_SCORE_LEVEL_75 = 75
+    public static Long MATCH_SCORE_LEVEL_CLOSE = 95
+    public static Long MATCH_SCORE_LEVEL_EXACT = 100
+
 
     List<CatalogueElement> list(Map params = [:]) {
         CatalogueElement.findAllByStatusInList(getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')), params)
@@ -631,34 +641,61 @@ class ElementService implements Publisher<CatalogueElement> {
      * Enums are very likely duplicates if they have similar enum values.
      * @return map with the enum id as key and set of ids of duplicate enums as value
      */
-    Map<Long, Set<Long>> findDuplicateEnumerationsSuggestions() {
+    Map<Long, Set<Long>> findDuplicateEnumerationsSuggestions(Long dataModelIdA, Long dataModelIdB) {
+
         Object[][] results = EnumeratedType.executeQuery """
             select e.id, e.enumAsString
             from EnumeratedType e
-            where e.status in :states
+            where e.status in :states 
+            and e.dataModel.id = :dataModelIdA
             order by e.name
-        """, [states: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.FINALIZED]]
+        """, [states: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.FINALIZED], dataModelIdA: dataModelIdA]
+
+        Object[][] results2 = EnumeratedType.executeQuery """
+            select e.id, e.enumAsString
+            from EnumeratedType e
+            where e.status in :states 
+            and e.dataModel.id = :dataModelIdB
+            order by e.name
+        """, [states: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.FINALIZED], dataModelIdB: dataModelIdB]
 
 
         Map<String, Set<Long>> enums = [:].withDefault { [] as TreeSet<Long> }
+        Map<String, Set<Long>> enums2 = [:].withDefault { [] as TreeSet<Long> }
 
         for (Object[] row in results) {
             enums[getNormalizedEnumValues(Enumerations.from(row[1]))] << row[0]
         }
 
-        enums.findAll { String key, Set<Long> values -> values.size() > 1 }.collectEntries { String key, Set<Long> values ->
-            def valuesAsList = values.asList()
-            [valuesAsList.first(), valuesAsList[1..-1]]
+        for (Object[] row in results2) {
+            enums2[getNormalizedEnumValues(Enumerations.from(row[1]))] << row[0]
         }
+
+        Map<Long, Set<Long>>  matches = [:]
+
+        enums.each{ String key, Set<Long> values ->
+            def found = enums2.get(key)
+            if(found) {
+                //as this is a data type only match,
+                //if the enumeration contains yes / no then we probably don't want to match it, otherwise we get loads of matches that aren't relevant
+                if (!key.toLowerCase().contains("yes")) {
+                    values.each { val ->
+                        matches.put(val, found.asList())
+                    }
+                }
+            }
+        }
+
+        matches
 
     }
 
     String getNormalizedEnumValues(Map<String, String> enumValues) {
-        enumValues.keySet().collect {
-            if (it ==~ /\d+/) {
-                return "" + Long.parseLong(it, 10)
+        enumValues.collect { k, v ->
+            if (k ==~ /\d+/) {
+                return "" + k + v
             }
-            return it
+            return k + v
         }.sort().join(':')
     }
 
@@ -750,6 +787,281 @@ class ElementService implements Publisher<CatalogueElement> {
             collector << base
             collectBases(base, collector)
         }
+    }
+
+
+    /**
+     * Return dataElement ids which are very likely to be duplicates.
+     * Enums are very likely duplicates if they have similar enum values.
+     * @return map with the enum id as key and set of ids of duplicate enums as value
+     */
+    Map<Long, Set<Long>> findDuplicateDataElementSuggestions(DataModel dataModelA, DataModel dataModelB) {
+        Map<Long, Set<Long>> elementSuggestions = new LinkedHashMap<Long, Set<Long>>()
+        def results = getDataElementsInCommon(dataModelA.id,dataModelB.id)
+        if(results.size() > 0){
+            results.each{
+                def dataElementName = it as String
+                Long ida =getDataElementId(dataElementName,dataModelA.id)
+                Long idb =getDataElementId(dataElementName,dataModelB.id)
+                elementSuggestions.put(ida,idb)
+            }
+        }
+        return elementSuggestions
+    }
+
+    /**
+     * Return dataElement ids which are very likely to be synonyms using elasticsearch fuzzy matching.
+     * @return map with the enum id as key and set of ids of duplicate enums as value
+     */
+    Set<MatchResult> findFuzzyDataElementSuggestions(DataModel dataModelA, DataModel dataModelB, Long minimumScore = 1) {
+        Set<MatchResult> elementSuggestions = []
+        Map searchParams = [:]
+        //iterate through the data model a
+        def elementsToMatch = DataElement.findAllByDataModel(dataModelA)
+        elementsToMatch.each{ DataElement de ->
+            //set params map
+            searchParams.dataModel = dataModelB.id
+            searchParams.search = de.name
+            searchParams.minScore = minimumScore/100
+            def matches = elasticSearchService.fuzzySearch(DataElement, searchParams)
+            String message = checkRelatedTo(de, dataModelB)
+            matches.getItemsWithScore().each{ item, score ->
+                if(!de.relatedTo.contains(item)) {
+                    score  = score*100
+                    if(score>minimumScore) {
+                        elementSuggestions.add(new ElasticMatchResult(dataElementA: de, dataElementB: item , matchScore: score.round(2), message: message))
+                    }
+                }
+            }
+        }
+
+        return elementSuggestions
+    }
+
+    private String checkRelatedTo(DataElement de, DataModel proposedModel){
+        String modelRelatedItems = ""
+        de.relatedTo.each{ ce ->
+            if(ce.dataModel == proposedModel){
+                modelRelatedItems = modelRelatedItems + "Note: $de.name already related to: $ce.name \n "
+            }
+        }
+        modelRelatedItems
+    }
+
+
+    private Long getDataElementId(String dataElementName, Long dataModelId){
+        Long dataElementId = 0
+
+        String query = """SELECT catalogue_element.id FROM catalogue_element, data_element   
+            WHERE catalogue_element.id = data_element.id
+            AND catalogue_element.name = '${dataElementName}'
+            AND catalogue_element.data_model_id = ${dataModelId};"""
+
+        final session = sessionFactory.currentSession
+        // Create native SQL query.
+        final sqlQuery = session.createSQLQuery(query)
+        sqlQuery.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+        List results = sqlQuery.list()
+        if(results.size() == 0){
+            dataElementId = 0
+        }else{
+            def mid = results[0]
+            dataElementId = mid["id"] as Long
+        }
+
+        return dataElementId
+    }
+
+    private Long getDataClassId(String dataClassName){
+        Long dataClassId = 0
+
+        String query = "SELECT catalogue_element.id FROM catalogue_element, data_class  " +
+            "WHERE catalogue_element.id = data_class.id" +
+            " AND catalogue_element.name = '${dataClassName}' ;"
+
+        final session = sessionFactory.currentSession
+        // Create native SQL query.
+        final sqlQuery = session.createSQLQuery(query)
+        sqlQuery.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+        List results = sqlQuery.list()
+        if(results.size() == 0){
+            dataClassId = 0
+        }else{
+            def mid = results[0]
+            dataClassId = mid["id"] as Long
+        }
+
+        return dataClassId
+    }
+
+    private Long getDataTypeId(String dataTypeName){
+        Long dataTypeId = 0
+
+        String query = "SELECT catalogue_element.id FROM catalogue_element, data_type  " +
+            "WHERE catalogue_element.id = data_type.id" +
+            " AND catalogue_element.name = '${dataTypeName}' ;"
+
+        final session = sessionFactory.currentSession
+        // Create native SQL query.
+        final sqlQuery = session.createSQLQuery(query)
+        sqlQuery.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+        List results = sqlQuery.list()
+        if(results.size() == 0){
+            dataTypeId = 0
+        }else{
+            def mid = results[0]
+            dataTypeId = mid["id"] as Long
+        }
+
+        return dataTypeId
+    }
+
+    private Long getDataModelId(String dataModelName){
+        Long dataModelId = 0
+        String query = "SELECT catalogue_element.id FROM catalogue_element, data_model  " +
+            "WHERE catalogue_element.id = data_model.id" +
+            " AND catalogue_element.name = '${dataModelName}' ;"
+        final session = sessionFactory.currentSession
+        final sqlQuery = session.createSQLQuery(query)
+        sqlQuery.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+        List results = sqlQuery.list()
+        if(results.size() == 0){
+            dataModelId = 0
+        }else{
+            def mid = results[0]
+            dataModelId = mid["id"] as Long
+        }
+        return dataModelId
+    }
+    /**
+     * getDataElementsInCommon
+     * @param Long
+     * @param Long
+     * @return List
+     */
+    private List getDataElementsInCommon(Long dmAId, Long dmBId){
+
+
+        String query = """  SELECT  catalogue_element.name 
+              FROM catalogue_element, data_element 
+              WHERE (catalogue_element.id = data_element.id AND catalogue_element.data_model_id =  :dmA) 
+              AND catalogue_element.name IN 
+              (select  catalogue_element.name 
+              from catalogue_element, data_element 
+              where (catalogue_element.id = data_element.id AND catalogue_element.data_model_id =  :dmB))"""
+
+        final session = sessionFactory.currentSession
+        final sqlQuery = session.createSQLQuery(query)
+        final results = sqlQuery.with {
+            setLong('dmA', dmAId)
+            setLong('dmB', dmBId)
+            list()
+        }
+
+        return results
+    }
+
+    /**
+     * getDataElementsWithFuzzyMatches
+     * This will need to be streamed for large datasets
+     * @param Long
+     * @param Long
+     * @return List
+     */
+    private List<MatchResult> getDataElementsWithFuzzyMatches(Long dmAId, Long dmBId){
+        //Map<Long, Set<Long>> fuzzyElementMap = new HashMap<Long, Set<Long>>()
+        List<MatchResult> fuzzyElementList = new ArrayList<MatchResult>()
+        String query2getAList = """SELECT DISTINCT catalogue_element.id, catalogue_element.name FROM catalogue_element, data_element WHERE data_model_id = ${dmAId}"""
+        final session = sessionFactory.currentSession
+        final sqlQuery = session.createSQLQuery(query2getAList)
+        sqlQuery.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+        List aList = sqlQuery.list()
+        if(aList.size() == 0){
+            fuzzyElementList = null
+        }else{
+            aList.each{
+                def aListName = it.name
+                def aListId = it.id
+                String query2getBList = """SELECT DISTINCT catalogue_element.id, catalogue_element.name FROM catalogue_element, data_element WHERE data_model_id =  ${dmBId}"""
+                sqlQuery = session.createSQLQuery(query2getBList)
+                sqlQuery.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP)
+                List bList = sqlQuery.list()
+                if(bList.size() == 0){
+                    fuzzyElementList = null
+                }else {
+                    bList.each {
+                        MatchResult suggestedMatches = new MatchResult()
+                        suggestedMatches.setDataElementAName(aListName)
+                        suggestedMatches.setDataElementAId(aListId as Long)
+                        suggestedMatches.setDataElementBName(it.name)
+                        suggestedMatches.setDataElementBId(it.id as Long)
+
+                            //we need not just the element match, but also the rating of the match
+                            Long matchScore = getNameMetric(suggestedMatches.dataElementAName, suggestedMatches.dataElementBName)
+                            //Only accept matches above pre-defined limit
+                            if((matchScore > 80)&(matchScore <= 100)){
+                                suggestedMatches.setMatchScore(matchScore)
+                                fuzzyElementList.add(suggestedMatches)
+                                println " Loading Match: ${suggestedMatches.dataElementAName} and ${suggestedMatches.dataElementBName} score is: ${matchScore}"
+                            }
+                        }
+                    }
+                }
+            }
+        return fuzzyElementList
+    }
+
+    /**
+     * Return dataElement ids which are very likely to be duplicates.
+     * Enums are very likely duplicates if they have similar enum values.
+     * @return map with the enum id as key and set of ids of duplicate enums as value
+     */
+    List<MatchResult> findFuzzyDuplicateDataElementSuggestions(String dataModelA, String dataModelB) {
+        Long dataModelIdA = getDataModelId(dataModelA)
+        Long dataModelIdB = getDataModelId(dataModelB)
+        //Map<Long, Set<Long>> elementSuggestions = new LinkedHashMap<Long, Set<Long>>()
+        //List<MatchResult> elementSuggestions = new ArrayList<MatchResult>()
+        List<MatchResult> results = getDataElementsWithFuzzyMatches(dataModelIdA,dataModelIdB)
+
+        return results
+    }
+    /**
+     * getNameMetric
+     * This is a rather simplified metric which takes the Levenstein distance (essentially the
+     * number of characters needed to make the two words the same) and makes a percentage out of
+     * it. So if you have a word of 10 characters and 2 of them are different then this metric
+     * will have them as being 80% (similar)
+     * @param String str1
+     * @param String str1
+     * @return Long
+     */
+    private static Long getNameMetric(String str1, String str2){
+        Long distance = levensteinDistance(str1,str2)
+        Long numberOfCharacters = Math.max(str1.length(), str2.length())
+        Long metric = Math.abs(((numberOfCharacters - distance)/numberOfCharacters) * 100)
+        return metric
+    }
+    /**
+     * levensteinDistance
+     * This is a measure of how alike 2 words or phrases are, it is a number which represents the number of changes
+     * you need to make to move from string 1 to string 2 - (essentially the
+     * number of characters needed to make the two words the same)
+     * @param String
+     * @param String
+     * @return int
+     */
+    private static int levensteinDistance(String str1, String str2) {
+        def str1_len = str1.length()
+        def str2_len = str2.length()
+        int[][] distance = new int[str1_len + 1][str2_len + 1]
+        (str1_len + 1).times { distance[it][0] = it }
+        (str2_len + 1).times { distance[0][it] = it }
+        (1..str1_len).each { i ->
+            (1..str2_len).each { j ->
+                distance[i][j] = [distance[i-1][j]+1, distance[i][j-1]+1, str1[i-1]==str2[j-1]?distance[i-1][j-1]:distance[i-1][j-1]+1].min()
+            }
+        }
+        distance[str1_len][str2_len]
     }
 
 }
