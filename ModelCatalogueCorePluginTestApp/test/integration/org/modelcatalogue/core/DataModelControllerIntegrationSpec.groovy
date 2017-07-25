@@ -40,12 +40,12 @@ class DataModelControllerIntegrationSpec extends AbstractCatalogueElementControl
 
     @Override
     DataModel getLoadItem() {
-        DataModel.findByName("data set 1")
+        DataModel.findByName("data set 2")
     }
 
     @Override
     DataModel getAnotherLoadItem() {
-        DataModel.findByName("data set 2")
+        DataModel.findByName("data set 3")
     }
 
     def getPaginationClassifiesParameters(baseLink){

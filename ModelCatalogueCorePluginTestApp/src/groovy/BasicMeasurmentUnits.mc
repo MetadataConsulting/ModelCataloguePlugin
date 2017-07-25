@@ -1,8 +1,5 @@
 skip draft
 
-measurementUnit name: "celsius", description: "degrees celsius", symbol: "°C"
-measurementUnit name: "fahrenheit", description: "degrees fahrenheit", symbol: "°F"
-measurementUnit name: "newtons", description: "measurement of force", symbol: "N"
 
 dataModel name: 'SI', {
     // the units are already there but unclassified
@@ -121,21 +118,23 @@ dataModel name: 'SI', {
             Note that since N(X) is dimensionless, and n(X) has the SI unit mole, the Avogadro constant has the coherent SI unit reciprocal mole.
         '''
     }
-
+    measurementUnit name: "celsius", description: "degrees celsius", symbol: "°C"
+    measurementUnit name: "fahrenheit", description: "degrees fahrenheit", symbol: "°F"
+    measurementUnit name: "newtons", description: "measurement of force", symbol: "N"
+    measurementUnit name: 'area', description: 'square meter', symbol: 'm2'
+    measurementUnit name: 'volume', description: 'cubic meter', symbol: 'm3'
+    measurementUnit name: 'speed, velocity', description: 'meter per second', symbol: 'm/s'
+    measurementUnit name: 'acceleration', description: 'meter per second squared  ', symbol: 'm/s2'
+    measurementUnit name: 'wave number', description: 'reciprocal meter', symbol: 'm-1'
+    measurementUnit name: 'mass density', description: 'kilogram per cubic meter', symbol: 'kg/m3'
+    measurementUnit name: 'specific volume', description: 'cubic meter per kilogram', symbol: 'm3/kg'
+    measurementUnit name: 'current density', description: 'ampere per square meter', symbol: 'A/m2'
+    measurementUnit name: 'magnetic field strength  ', description: 'ampere per meter', symbol: 'A/m'
+    measurementUnit name: 'amount-of-substance concentration', description: 'mole per cubic meter', symbol: 'mol/m3'
+    measurementUnit name: 'luminance', description: 'candela per square meter', symbol: 'cd/m2'
+    measurementUnit name: 'mass fraction', description: 'kilogram per kilogram', symbol: 'kg/kg = 1'
 
 }
 
 
-// other units, unclassified
-measurementUnit name: 'area', description: 'square meter', symbol: 'm2'
-measurementUnit name: 'volume', description: 'cubic meter', symbol: 'm3'
-measurementUnit name: 'speed, velocity', description: 'meter per second', symbol: 'm/s'
-measurementUnit name: 'acceleration', description: 'meter per second squared  ', symbol: 'm/s2'
-measurementUnit name: 'wave number', description: 'reciprocal meter', symbol: 'm-1'
-measurementUnit name: 'mass density', description: 'kilogram per cubic meter', symbol: 'kg/m3'
-measurementUnit name: 'specific volume', description: 'cubic meter per kilogram', symbol: 'm3/kg'
-measurementUnit name: 'current density', description: 'ampere per square meter', symbol: 'A/m2'
-measurementUnit name: 'magnetic field strength  ', description: 'ampere per meter', symbol: 'A/m'
-measurementUnit name: 'amount-of-substance concentration', description: 'mole per cubic meter', symbol: 'mol/m3'
-measurementUnit name: 'luminance', description: 'candela per square meter', symbol: 'cd/m2'
-measurementUnit name: 'mass fraction', description: 'kilogram per kilogram', symbol: 'kg/kg = 1'
+

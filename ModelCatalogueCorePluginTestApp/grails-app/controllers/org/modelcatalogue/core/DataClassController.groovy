@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.export.inventory.DataClassToDocxExporter
 import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
+import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
 import org.modelcatalogue.core.publishing.changelog.ChangeLogDocxGenerator
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.lists.ListWrapper
@@ -86,15 +87,13 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
 
     def inventoryDoc(String name, Integer depth) {
         DataClass dataClass = DataClass.get(params.id)
-
-        Long dataClassId = dataClass.id
-        def assetId= assetService.storeReportAsAsset(
+        def assetId =  assetService.storeReportAsAsset(
                 dataClass.dataModel,
-                name: name ? name : "${dataClass.name} report as MS Word Document",
+                name: name ? name : "${dataClass.name} report as MS Excel Document",
                 originalFileName: "${dataClass.name}-${dataClass.status}-${dataClass.version}.docx",
                 contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        )  { OutputStream out ->
-            new DataClassToDocxExporter(DataClass.get(dataClassId), dataClassService, depth, elementService).export(out)
+        ) { OutputStream outputStream ->
+            new DataClassToDocxExporter(dataClass, dataClassService, depth, elementService).export(outputStream)
         }
 
         response.setHeader("X-Asset-ID",assetId.toString())
