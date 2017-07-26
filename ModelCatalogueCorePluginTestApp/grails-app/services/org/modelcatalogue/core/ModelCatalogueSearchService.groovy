@@ -30,7 +30,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     ListWithTotalAndType<Relationship> search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
         String query = "%$params.search%"
 
-        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')), getOverridableDataModelFilter(params))
+        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, ElementService.getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/), getOverridableDataModelFilter(params))
 
         if (query != '%*%') {
             switch (direction) {
@@ -57,7 +57,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
     public <T> ListWithTotalAndType<T> search(Class<T> resource, Map params) {
         // if the user doesn't have at least VIEWER role, don't return other elements than finalized
-        if (!params.status && !modelCatalogueSecurityService.hasRole('VIEWER')) {
+        if (!params.status && !false /*modelCatalogueSecurityService.hasRole('VIEWER')*/) {
             params.status = 'FINALIZED'
         }
 
@@ -71,7 +71,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                 ilike('modelCatalogueId', query)
             }
             if (params.status) {
-                criteria.'in'('status', ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')))
+                criteria.'in'('status', ElementService.getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/))
             }
             return Lists.fromCriteria(params, criteria).customize {
                 it.collect { item -> CatalogueElementMarshaller.minimalCatalogueElementJSON(item) }

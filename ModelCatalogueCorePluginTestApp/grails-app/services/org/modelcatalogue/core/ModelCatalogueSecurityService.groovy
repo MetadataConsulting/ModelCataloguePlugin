@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 
 /**
@@ -20,6 +21,11 @@ class ModelCatalogueSecurityService implements SecurityService, LogoutListeners 
     }
 
     @Override
+    boolean hasRole(String role, DataModel dataModel) {
+        return true
+    }
+
+    @Override
     String encodePassword(String password) {
         return password
     }
@@ -35,5 +41,15 @@ class ModelCatalogueSecurityService implements SecurityService, LogoutListeners 
     }
 
     @Override
+    boolean isSubscribed(DataModel dataModel) {
+        return true
+    }
+
+    @Override
     void logout(String username) {}
+
+    @Override
+    Set getRoles(String dataModelId) {
+        return ['VIEWER', 'CURATOR', 'ADMIN', 'SUPERVISOR'].toSet()
+    }
 }

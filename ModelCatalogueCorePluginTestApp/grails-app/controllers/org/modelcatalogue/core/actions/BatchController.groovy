@@ -11,7 +11,7 @@ class BatchController extends AbstractRestfulController<Batch> {
 
     @Override
     protected boolean allowSaveAndEdit() {
-        modelCatalogueSecurityService.hasRole('ADMIN')
+        modelCatalogueSecurityService.hasRole('ADMIN', getDataModel())
     }
 
     BatchController() {
@@ -19,7 +19,7 @@ class BatchController extends AbstractRestfulController<Batch> {
     }
 
     def archive() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())) {
             unauthorized()
             return
         }
@@ -42,7 +42,7 @@ class BatchController extends AbstractRestfulController<Batch> {
     }
 
     def runAll() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())) {
             unauthorized()
             return
         }
@@ -68,7 +68,7 @@ class BatchController extends AbstractRestfulController<Batch> {
 
     @Override
     def index(Integer max) {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())) {
             unauthorized()
             return
         }
@@ -81,7 +81,7 @@ class BatchController extends AbstractRestfulController<Batch> {
 
     def updateActionParameters() {
 
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())) {
             unauthorized()
             return
         }
@@ -112,7 +112,7 @@ class BatchController extends AbstractRestfulController<Batch> {
     }
 
     def listActions(Integer max) {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())) {
             unauthorized()
             return
         }
@@ -136,7 +136,7 @@ class BatchController extends AbstractRestfulController<Batch> {
     }
 
     def dismiss() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())) {
             unauthorized()
             return
         }
@@ -158,7 +158,7 @@ class BatchController extends AbstractRestfulController<Batch> {
     }
 
     def reactivate() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())) {
             unauthorized()
             return
         }
@@ -180,7 +180,7 @@ class BatchController extends AbstractRestfulController<Batch> {
 
 
     def run() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())) {
             unauthorized()
             return
         }
@@ -202,7 +202,7 @@ class BatchController extends AbstractRestfulController<Batch> {
     }
 
     def addDependency() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())) {
             unauthorized()
             return
         }
@@ -239,7 +239,7 @@ class BatchController extends AbstractRestfulController<Batch> {
     }
 
     def removeDependency() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())) {
             unauthorized()
             return
         }

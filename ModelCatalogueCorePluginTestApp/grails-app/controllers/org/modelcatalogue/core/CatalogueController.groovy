@@ -106,9 +106,10 @@ class CatalogueController {
         }) as JSON)
     }
 
+    //TODO: Remove/find out why this is needed
     def dataModelsForPreload() {
         // only render data models for preload if there is no data model in the catalogue (very likely the first run)
-        if (DataModel.findByNameNotEqual('Clinical Tags') || !modelCatalogueSecurityService.hasRole(UserService.ROLE_ADMIN)) {
+        if (DataModel.findByNameNotEqual('Clinical Tags') /*|| !modelCatalogueSecurityService.hasRole(UserService.ROLE_ADMIN)*/) {
             render([] as JSON)
             return
 

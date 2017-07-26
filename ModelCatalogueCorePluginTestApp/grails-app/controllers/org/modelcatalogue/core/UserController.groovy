@@ -34,7 +34,7 @@ class UserController extends AbstractCatalogueElementController<User> {
 
     @Override
     protected boolean allowSaveAndEdit() {
-        modelCatalogueSecurityService.hasRole('ADMIN')
+        modelCatalogueSecurityService.hasRole('ADMIN', getDataModel())
     }
 
     def classifications() {
@@ -59,14 +59,14 @@ class UserController extends AbstractCatalogueElementController<User> {
         render([
                 success: true,
                 username: modelCatalogueSecurityService.currentUser.username,
-                roles: modelCatalogueSecurityService.currentUser.authorities*.authority,
+                roles: modelCatalogueSecurityService.getRoles(params?.dataModelId),
                 id: modelCatalogueSecurityService.currentUser.hasProperty('id') ? modelCatalogueSecurityService.currentUser.id : null,
                 dataModels: filter.toMap()
         ] as JSON)
     }
 
     def lastSeen() {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
+        if (!modelCatalogueSecurityService.hasRole('ADMIN', getDataModel())) {
             notFound()
             return
         }
@@ -90,7 +90,7 @@ class UserController extends AbstractCatalogueElementController<User> {
     }
 
     def role() {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
+        if (!modelCatalogueSecurityService.hasRole('ADMIN', getDataModel())) {
             notFound()
             return
         }
@@ -112,6 +112,7 @@ class UserController extends AbstractCatalogueElementController<User> {
 
         respond user
     }
+
 
     def apiKey(Boolean regenerate) {
         if (!modelCatalogueSecurityService.isUserLoggedIn()) {

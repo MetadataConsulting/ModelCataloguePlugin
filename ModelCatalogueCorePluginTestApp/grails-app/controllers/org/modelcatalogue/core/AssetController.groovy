@@ -29,7 +29,7 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
     }
 
     def upload() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())) {
             unauthorized()
             return
         }

@@ -48,7 +48,7 @@ class DataImportController  {
     }
 
     def upload() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())) {
             render status: HttpStatus.UNAUTHORIZED
             return
         }
@@ -69,7 +69,7 @@ class DataImportController  {
             return
         }
         def confType = file.getContentType()
-        boolean isAdmin = modelCatalogueSecurityService.hasRole('ADMIN')
+        boolean isAdmin = modelCatalogueSecurityService.hasRole('ADMIN', getDataModel())
 
         DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService, isAdmin)
 

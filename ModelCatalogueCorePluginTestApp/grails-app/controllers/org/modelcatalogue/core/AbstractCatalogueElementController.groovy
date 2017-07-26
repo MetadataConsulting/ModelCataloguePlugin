@@ -45,9 +45,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         println "Tracing action ${actionUri}, tracing resource ${resource}"
         if(params.id && resource!=User) {
 
-            Set<User> subscriptions = getSubscriptions()
-
-            if(subscriptions && subscriptions.contains(modelCatalogueSecurityService.getCurrentUser())){
+            if(modelCatalogueSecurityService.isSubscribed(getDataModel())){
                 println("authorised")
             }else{
                 println("not authorised")
@@ -95,7 +93,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
     private reorderInternal(RelationshipDirection direction, Long id, String type) {
         // begin sanity checks
-        if ((!modelCatalogueSecurityService.hasRole('CURATOR') || !isSubscribed()) /*&& !modelCatalogueSecurityService.hasRole('SUPERVISOR')*/) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel()) ) {
             unauthorized()
             return
         }
@@ -148,7 +146,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
     private void removeRelation(Long id, String type, boolean outgoing, String minRole = 'CURATOR') {
         withRetryingTransaction {
-            if (!modelCatalogueSecurityService.hasRole(minRole)) {
+            if (!modelCatalogueSecurityService.hasRole(minRole, getDataModel())) {
                 unauthorized()
                 return
             }
@@ -201,7 +199,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
     private void addRelation(Long id, String type, boolean outgoing, String minRole = 'CURATOR') {
         withRetryingTransaction {
-            if (minRole && !modelCatalogueSecurityService.hasRole(minRole)) {
+            if (minRole && !modelCatalogueSecurityService.hasRole(minRole, getDataModel())) {
                 unauthorized()
                 return
             }
@@ -262,7 +260,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
             definition.withDataModel(dataModel).withMetadata(OrderedMap.fromJsonMap(objectToBind.metadata ?: [:]))
 
-            if (modelCatalogueSecurityService.hasRole('SUPERVISOR')) {
+            if (modelCatalogueSecurityService.hasRole('SUPERVISOR', getDataModel())) {
                 definition.withIgnoreRules(true)
             }
 
@@ -370,7 +368,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
     private addOrRemoveMapping(boolean add) {
         withRetryingTransaction {
-            if ((!modelCatalogueSecurityService.hasRole('CURATOR') || !isSubscribed()) /*&& !modelCatalogueSecurityService.hasRole('SUPERVISOR')*/) {
+            if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel()) ) {
                 unauthorized()
                 return
             }
@@ -420,7 +418,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     def index(Integer max) {
         handleParams(max)
 
-        if(params.status && !(params.status.toLowerCase() in ['finalized', 'deprecated', 'active']) && !modelCatalogueSecurityService.hasRole('VIEWER')) {
+        if(params.status && !(params.status.toLowerCase() in ['finalized', 'deprecated', 'active']) && !modelCatalogueSecurityService.hasRole('VIEWER', getDataModel())) {
             unauthorized()
             return
         }
@@ -444,7 +442,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
     protected ListWrapper<T> getAllEffectiveItems(Integer max) {
         if (params.status?.toLowerCase() == 'active') {
-            if (modelCatalogueSecurityService.hasRole('VIEWER')){
+            if (modelCatalogueSecurityService.hasRole('VIEWER', getDataModel())){
                 return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
                     'in' 'status', [ElementStatus.FINALIZED, ElementStatus.DRAFT, ElementStatus.PENDING]
                 }), overridableDataModelFilter)
@@ -456,7 +454,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
         if (params.status) {
             return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
-                'in' 'status', ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER'))
+                'in' 'status', ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER', getDataModel()))
             }), overridableDataModelFilter)
         }
 
@@ -501,7 +499,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        if (!modelCatalogueSecurityService.hasRole('VIEWER') && !(element.status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED])) {
+        if (!modelCatalogueSecurityService.hasRole('VIEWER', getDataModel()) && !(element.status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED])) {
             unauthorized()
             return
         }
@@ -515,7 +513,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      */
     @Transactional
     def update() {
-        if ((!modelCatalogueSecurityService.hasRole('CURATOR') || !isSubscribed()) /*&& !modelCatalogueSecurityService.hasRole('SUPERVISOR')*/) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel()) ) {
             unauthorized()
             return
         }
@@ -606,7 +604,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      */
     @Transactional
     def newVersion() {
-        if ((!modelCatalogueSecurityService.hasRole('CURATOR') || !isSubscribed()) /*&& !modelCatalogueSecurityService.hasRole('SUPERVISOR')*/) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel()) ) {
             notAuthorized()
             return
         }
@@ -653,7 +651,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     @Transactional
     def merge() {
 
-        if ((!modelCatalogueSecurityService.hasRole('CURATOR') || !isSubscribed()) /*&& !modelCatalogueSecurityService.hasRole('SUPERVISOR')*/) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel()) ) {
             unauthorized()
             return
         }
@@ -690,7 +688,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      */
     def finalizeElement() {
         // TODO: this should be moved to DataModelController
-        if ((!modelCatalogueSecurityService.hasRole('CURATOR') || !isSubscribed()) /*&& !modelCatalogueSecurityService.hasRole('SUPERVISOR')*/) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel()) ) {
             unauthorized()
             return
         }
@@ -753,7 +751,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      */
     @Transactional
     def cloneElement() {
-        if ((!modelCatalogueSecurityService.hasRole('CURATOR') || !isSubscribed()) /*&& !modelCatalogueSecurityService.hasRole('SUPERVISOR')*/) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel()) ) {
             unauthorized()
             return
         }
@@ -805,7 +803,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     @Transactional
     def archive() {
         // TODO: this should be moved to DataModelController
-        if ((!modelCatalogueSecurityService.hasRole('CURATOR') || !isSubscribed()) /*&& !modelCatalogueSecurityService.hasRole('SUPERVISOR')*/) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel()) ) {
             unauthorized()
             return
         }
@@ -838,7 +836,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     @Transactional
     def restore() {
         // TODO: this should be moved to DataModelController
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
+        if (!modelCatalogueSecurityService.hasRole('ADMIN', getDataModel())) {
             unauthorized()
             return
         }

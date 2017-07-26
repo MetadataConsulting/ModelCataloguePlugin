@@ -21,7 +21,7 @@ class CsvTransformationController extends AbstractRestfulController<CsvTransform
             notFound()
         }
 
-        if (!modelCatalogueSecurityService.hasRole('USER')) {
+        if (!modelCatalogueSecurityService.hasRole('USER', getDataModel())) {
             unauthorized()
             return
         }

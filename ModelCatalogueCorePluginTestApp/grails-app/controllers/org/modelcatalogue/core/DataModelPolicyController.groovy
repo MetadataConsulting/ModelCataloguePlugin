@@ -4,7 +4,7 @@ class DataModelPolicyController extends AbstractRestfulController<DataModelPolic
 
     @Override
     protected boolean allowSaveAndEdit() {
-        modelCatalogueSecurityService.hasRole('ADMIN')
+        modelCatalogueSecurityService.hasRole('ADMIN', getDataModel())
     }
 
     DataModelPolicyController() {

@@ -30,7 +30,7 @@ class TestDataHelper {
 
         String scriptLocation = "${System.getProperty('java.io.tmpdir')}/${Metadata.getCurrent().getApplicationName()}/${Metadata.getCurrent().getApplicationVersion()}/${tempSqlFileName}"
 
-        if (new File(scriptLocation).exists()) {
+        if (new File(scriptLocation).exists() && !drop) {
             long start = System.currentTimeMillis()
             new Sql(sessionFactory.currentSession.connection()).execute("RUNSCRIPT FROM ${scriptLocation}")
             sessionFactory.currentSession.clear()

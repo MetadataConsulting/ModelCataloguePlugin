@@ -49,19 +49,20 @@ class BootStrap {
         }
 
         if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST] && !System.getenv('MC_BLANK_DEV')) {
-//            TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
+            TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
                 initCatalogueService.initCatalogue(false)
                 initPoliciesAndTags()
                 initSecurity(false)
                 setupDevTestStuff()
-//            }
-//            modelCatalogueSearchService.reindex(true).all { it }.toBlocking().subscribe {
-//                System.out.println "Reindexed"
-//            }
+            }
         } else {
             initCatalogueService.initDefaultRelationshipTypes()
             initPoliciesAndTags()
             initSecurity(!System.getenv('MC_BLANK_DEV'))
+        }
+
+        modelCatalogueSearchService.reindex(true).all { it }.toBlocking().subscribe {
+            System.out.println "Reindexed"
         }
 
         initCatalogueService.setupStoredProcedures()
@@ -337,18 +338,30 @@ class BootStrap {
 
     private static void initSecurity(boolean production) {
         def roleUser = Role.findByAuthority('ROLE_USER') ?: new Role(authority: 'ROLE_USER').save(failOnError: true)
+        def roleUser2 = Role.findByAuthority('ROLE_USER_2') ?: new Role(authority: 'ROLE_USER_2').save(failOnError: true)
         def roleAdmin = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
+        def roleAdmin2 = Role.findByAuthority('ROLE_ADMIN_2') ?: new Role(authority: 'ROLE_ADMIN_2').save(failOnError: true)
         def roleSupervisor = Role.findByAuthority('ROLE_SUPERVISOR') ?: new Role(authority: 'ROLE_SUPERVISOR').save(failOnError: true)
         def roleStacktrace = Role.findByAuthority('ROLE_STACKTRACE') ?: new Role(authority: 'ROLE_STACKTRACE').save(failOnError: true)
         def metadataCurator = Role.findByAuthority('ROLE_METADATA_CURATOR') ?: new Role(authority: 'ROLE_METADATA_CURATOR').save(failOnError: true)
+        def metadataCurator2 = Role.findByAuthority('ROLE_METADATA_CURATOR_2') ?: new Role(authority: 'ROLE_METADATA_CURATOR_2').save(failOnError: true)
 
         Role.findByAuthority('ROLE_REGISTERED') ?: new Role(authority: 'ROLE_REGISTERED').save(failOnError: true)
+
+        def dm1 = new DataModel(name: "data model 1", status: ElementStatus.DRAFT).save()
+
+        def dm2 = new DataModel(name: "data model 2", status: ElementStatus.DRAFT).save()
+        def de2 = new DataElement(name: "test de", dataModel: dm2).save()
+
 
         if (!production || System.getenv("METADATA_DEMO")) {
             def supervisor = User.findByNameOrUsername('supervisor', 'supervisor') ?: new User(name: 'supervisor', username: 'supervisor', enabled: true, password: System.getenv('MC_SUPERVISOR_PASSWORD') ?: 'supervisor', email: System.getenv(UserService.ENV_SUPERVISOR_EMAIL), apiKey: 'supervisorabcdef123456').save(failOnError: true)
             def admin = User.findByNameOrUsername('admin', 'admin') ?: new User(name: 'admin', username: 'admin', enabled: true, password: 'admin', email: System.getenv('MC_ADMIN_EMAIL'), apiKey: 'adminabcdef123456').save(failOnError: true)
             def viewer = User.findByNameOrUsername('viewer', 'viewer') ?: new User(name: 'viewer', username: 'viewer', enabled: true, password: 'viewer', apiKey: 'viewerabcdef123456').save(failOnError: true)
             def curator = User.findByNameOrUsername('curator', 'curator') ?: new User(name: 'curator', username: 'curator', enabled: true, password: 'curator', apiKey: 'curatorabcdef123456').save(failOnError: true)
+            def admin2 = User.findByNameOrUsername('admin2', 'admin2') ?: new User(name: 'admin2', username: 'admin2', enabled: true, password: 'admin2', email: System.getenv('MC_ADMIN_EMAIL'), apiKey: 'adminabcdef123456').save(failOnError: true)
+            def viewer2 = User.findByNameOrUsername('viewer2', 'viewer2') ?: new User(name: 'viewer2', username: 'viewer2', enabled: true, password: 'viewer2', apiKey: 'viewerabcdef123456').save(failOnError: true)
+            def curator2 = User.findByNameOrUsername('curator2', 'curator2') ?: new User(name: 'curator2', username: 'curator2', enabled: true, password: 'curator2', apiKey: 'curatorabcdef123456').save(failOnError: true)
             User.findByNameOrUsername('registered', 'registered') ?: new User(name: 'registered', username: 'registered', enabled: true, password: 'registered', apiKey: 'registeredabcdef123456').save(failOnError: true)
 
 
@@ -361,19 +374,36 @@ class BootStrap {
             }
 
             if (!admin.authorities.contains(roleAdmin)) {
-                UserRole.create admin, roleUser
-                UserRole.create admin, metadataCurator
+                UserRole.create admin, roleUser, dm1
+                UserRole.create admin, metadataCurator, dm1
                 UserRole.create admin, roleStacktrace
-                UserRole.create admin, roleAdmin, true
+                UserRole.create admin, roleAdmin, dm1, true
+                UserRole.create admin, roleUser, dm2, true
             }
 
             if (!curator.authorities.contains(metadataCurator)) {
-                UserRole.create curator, roleUser
-                UserRole.create curator, metadataCurator
+                UserRole.create curator, roleUser, dm1
+                UserRole.create curator, metadataCurator, dm1
             }
 
             if (!viewer.authorities.contains(viewer)) {
-                UserRole.create viewer, roleUser
+                UserRole.create viewer, roleUser, dm1
+            }
+
+            if (!admin2.authorities.contains(roleAdmin2)) {
+                UserRole.create admin2, roleUser2, dm2
+                UserRole.create admin2, metadataCurator2, dm2
+                UserRole.create admin2, roleStacktrace
+                UserRole.create admin2, roleAdmin2, true
+            }
+
+            if (!curator2.authorities.contains(metadataCurator)) {
+                UserRole.create curator2, roleUser2, dm2
+                UserRole.create curator2, metadataCurator2, dm2
+            }
+
+            if (!viewer2.authorities.contains(viewer)) {
+                UserRole.create viewer2, roleUser2, dm2
             }
         }
 
@@ -433,6 +463,12 @@ class BootStrap {
 //        createRequestmapIfMissing('/api/modelCatalogue/core/dataType/**', 'ROLE_USER')
 //        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR')
 //        createRequestmapIfMissing('/api/modelCatalogue/core/relationshipTypes/**', 'ROLE_ADMIN')
+
+   //create some test models etc. for dev
+   //TODO: remove this and replace with a functional test
+
+
+
     }
 
     def initPoliciesAndTags() {
@@ -460,11 +496,6 @@ class BootStrap {
                 check dataType property 'name' apply regex: /[^_ -]+/ otherwise 'Name of {2} contains illegal characters ("_", "-" or " ")'
             }
             dataModel(name: 'Clinical Tags') {
-                tag(name: 'Registration, consent and demographic data essential for the management of the participant')
-                tag(name: 'Sample tracking data essential for processing and tracking the sample from collection through to sequencing')
-                tag(name: 'Clinical data essential for diagnostics purposes')
-                tag(name: 'Clinical data essential for research')
-                tag(name: 'Clinical data for research')
                 tag(name: 'Highly Sensitive PI data')
                 tag(name: 'Sensitive PI data')
                 tag(name: 'Highly Sensitive data')
@@ -481,14 +512,14 @@ class BootStrap {
 
             println 'Running post init job'
             println 'Finalizing all published elements'
-            CatalogueElement.findAllByStatus(ElementStatus.DRAFT).each {
-                if (it instanceof DataClass) {
-                    elementService.finalizeElement(it)
-                } else {
-                    it.status = ElementStatus.FINALIZED
-                    it.save failOnError: true
-                }
-            }
+//            CatalogueElement.findAllByStatus(ElementStatus.DRAFT).each {
+//                if (it instanceof DataClass) {
+//                    elementService.finalizeElement(it)
+//                } else {
+//                    it.status = ElementStatus.FINALIZED
+//                    it.save failOnError: true
+//                }
+//            }
 
 
             println "Creating some actions"

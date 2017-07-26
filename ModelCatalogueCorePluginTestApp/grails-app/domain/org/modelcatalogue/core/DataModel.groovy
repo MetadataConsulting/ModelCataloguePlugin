@@ -25,7 +25,7 @@ class DataModel extends CatalogueElement {
     static transients = ['namespace', 'dataModelPolicies']
 
     static relationships = [
-        outgoing: [classificationFilter: 'usedAsFilterBy', 'import': 'imports', 'subscription':'subscriptions'],
+        outgoing: [classificationFilter: 'usedAsFilterBy', 'import': 'imports'],
         incoming: ['import': 'importedBy']
     ]
 

@@ -19,7 +19,7 @@ class DataClassService {
         getTopLevelDataClasses(dataModelService.dataModelFilter, params)
     }
 
-    ListWithTotalAndType<DataClass> getTopLevelDataClasses(DataModelFilter dataModelFilter, Map params = [:], boolean canViewDrafts = modelCatalogueSecurityService.hasRole('VIEWER')) {
+    ListWithTotalAndType<DataClass> getTopLevelDataClasses(DataModelFilter dataModelFilter, Map params = [:], boolean canViewDrafts = false /*modelCatalogueSecurityService.hasRole('VIEWER')*/) {
         RelationshipType hierarchy = RelationshipType.hierarchyType
         List<ElementStatus> status = ElementService.getStatusFromParams(params, canViewDrafts)
 

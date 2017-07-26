@@ -20,13 +20,16 @@ angular.module('mc.core.ui.states.mc', ['mc.core.ui.states.controllers.DataModel
     resolve:
       currentDataModel: ['catalogue', '$rootScope', '$stateParams', '$q', 'catalogueElementResource',
         (catalogue, $rootScope, $stateParams, $q, catalogueElementResource) ->
+
           deferred = $q.defer()
 
           catalogueElementResource('dataModel').get($stateParams.dataModelId).then (dataModel) ->
             deferred.resolve(dataModel)
 
           deferred.promise
+
       ]
+
 
       lastSelectedElementHolder: -> {element: null}
   }

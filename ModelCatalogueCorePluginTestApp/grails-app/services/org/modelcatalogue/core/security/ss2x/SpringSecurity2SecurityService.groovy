@@ -5,9 +5,12 @@ import com.google.common.cache.CacheBuilder
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.util.Holders
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.LogoutListeners
 import org.modelcatalogue.core.SecurityService
+import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.security.UserRole
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.logout.LogoutHandler
 
@@ -25,6 +28,14 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
 
     boolean isUserLoggedIn() {
         return springSecurityService.isLoggedIn()
+    }
+
+    boolean hasRole(String authority, DataModel dataModel) {
+        if (!authority) {
+            return true
+        }
+        Role role = Role.findByAuthority(authority)
+        return isAuthorised(dataModel, role)
     }
 
     boolean hasRole(String role) {
@@ -74,4 +85,39 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
     void logout(String username) {
         Holders.applicationContext.getBean('userCache').removeUserFromCache(username)
     }
+
+    boolean isSubscribed(DataModel dataModel) {
+        if(!dataModel) return true
+        UserRole userRole = UserRole.findByUserAndDataModel(getCurrentUser(), dataModel)
+
+        if(userRole && dataModel){
+            return true
+        }
+
+        return false
+    }
+
+    boolean isAuthorised(DataModel dataModel, Role role) {
+        if(!dataModel) return true
+        UserRole userRole = UserRole.findAllByUserAndDataModelAndRole(getCurrentUser(), dataModel, role)
+        println(userRole)
+        if(userRole){
+            return true
+        }
+        return false
+    }
+
+    Set getRoles(String dataModelId){
+
+        DataModel dataModel = DataModel.get(dataModelId)
+        //TODO: this should be in a service
+        if(dataModel){
+            Set<UserRole> userRoles = UserRole.findAllByUserAndDataModel(getCurrentUser(), dataModel)
+            return userRoles.collect{it.role.authority}
+        }
+
+        currentUser.authorities*.authority
+
+    }
+
 }

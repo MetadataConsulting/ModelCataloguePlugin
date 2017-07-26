@@ -9,6 +9,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.security.UserRole
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.dao.ConcurrencyFailureException
@@ -224,7 +225,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
-        if (!modelCatalogueSecurityService.hasRole('SUPERVISOR')) {
+        if (!modelCatalogueSecurityService.hasRole('SUPERVISOR', getDataModel())) {
             // only drafts can be deleted
             def error = "Only elements with status of DRAFT can be deleted."
             if (instance instanceof DataModel) {
@@ -307,7 +308,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
      * @return Returns true if user role is CURATOR, false otherwise.
      */
     protected boolean allowSaveAndEdit() {
-        modelCatalogueSecurityService.hasRole('CURATOR') && isSubscribed()
+        modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())
     }
 
     /**
@@ -315,7 +316,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
      * @return Returns true if user role is ADMIN, false otherwise.
      */
     protected boolean allowDelete() {
-        modelCatalogueSecurityService.hasRole('CURATOR') && isSubscribed()
+        modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())
     }
 
     protected boolean isFavoriteAfterUpdate() {
@@ -432,21 +433,16 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
     protected void notAcceptable() { render status: NOT_ACCEPTABLE }
 
-    protected Set<User> getSubscriptions(){
-        Set<User> subscriptions = new HashSet()
+//TODO: REMOVE PUT INTO SERVICE AND CLASSES
+    protected DataModel getDataModel(){
+        DataModel dataModel
         if(resource!=DataModel){
-            subscriptions = (resource.get(params.id)?.dataModel?.subscriptions)
+            dataModel = (resource.get(params.id)?.dataModel)
         }else{
-            subscriptions = (resource.get(params.id)?.subscriptions)
+            dataModel = (resource.get(params.id))
         }
-        subscriptions
+        dataModel
     }
 
-    protected Boolean isSubscribed(List<User> subscriptions){
-        if(subscriptions && subscriptions.contains(modelCatalogueSecurityService.getCurrentUser())){
-            return true
-        }
-        false
-    }
 
 }

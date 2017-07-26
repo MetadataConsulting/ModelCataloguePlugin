@@ -5,7 +5,6 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages',
       isUserLoggedIn: -> true
       getCurrentUser: defaultUser
       hasRole: -> true
-      hasRole: -> true
       login: (username, password, rememberMe = false) -> security.getCurrentUser()
       logout: -> $log.info "Logout requested on default security service"
       refreshUserData: defaultUser
@@ -120,14 +119,15 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages',
             if result.data?.success
               return security.getCurrentUser()
             $q.reject result
+
         requireRole: (role) ->
           security.requireUser().then ->
             if security.hasRole(role)
               return security.getCurrentUser()
             $q.reject security.getCurrentUser()
 
-        refreshUserData: ->
-          currentUserPromise = $http(method: 'GET', url: userUrl)
+        refreshUserData: (dataModelId = '1') ->
+          currentUserPromise = $http(method: 'GET', url: userUrl, params: {dataModelId: dataModelId})
 
           currentUserPromise.then(handleUserResponse).then ->
             if currentUser

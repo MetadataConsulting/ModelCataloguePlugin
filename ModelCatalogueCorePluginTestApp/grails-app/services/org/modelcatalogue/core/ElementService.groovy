@@ -49,19 +49,19 @@ class ElementService implements Publisher<CatalogueElement> {
 
 
     List<CatalogueElement> list(Map params = [:]) {
-        CatalogueElement.findAllByStatusInList(getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')), params)
+        CatalogueElement.findAllByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/), params)
     }
 
     public <E extends CatalogueElement> List<E> list(params = [:], Class<E> resource) {
-        resource.findAllByStatusInList(getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')), params)
+        resource.findAllByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/), params)
     }
 
     Long count(params = [:]) {
-        CatalogueElement.countByStatusInList(getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')))
+        CatalogueElement.countByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/))
     }
 
     public <E extends CatalogueElement> Long count(params = [:], Class<E> resource) {
-        resource.countByStatusInList(getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')))
+        resource.countByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/))
     }
 
     public DataModel createDraftVersion(DataModel dataModel, String newSemanticVersion, DraftContext context) {

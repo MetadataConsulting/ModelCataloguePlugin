@@ -27,7 +27,7 @@ class RareDiseaseImportController {
     static allowedMethods = [upload: "POST"]
 
     def upload() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())) {
             render status: HttpStatus.UNAUTHORIZED
             return
         }
@@ -46,7 +46,7 @@ class RareDiseaseImportController {
             return
         }
 
-        def builder = new DefaultCatalogueBuilder(dataModelService, elementService, modelCatalogueSecurityService.hasRole('ADMIN'))
+        def builder = new DefaultCatalogueBuilder(dataModelService, elementService, modelCatalogueSecurityService.hasRole('ADMIN', getDataModel()))
 
         if (CONTENT_TYPES.contains(file.contentType) && file.originalFilename.contains(".csv")) {
             def asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
@@ -109,5 +109,15 @@ class RareDiseaseImportController {
         executorService.submit {
             auditService.logExternalChange(Asset.get(assetId), userId, message, code)
         }
+    }
+
+    protected DataModel getDataModel(){
+        DataModel dataModel
+        if(resource!=DataModel){
+            dataModel = (resource.get(params.id)?.dataModel)
+        }else{
+            dataModel = (resource.get(params.id))
+        }
+        dataModel
     }
 }
