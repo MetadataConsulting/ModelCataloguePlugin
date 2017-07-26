@@ -80,7 +80,7 @@ class ElasticSearchServiceSpec extends AbstractIntegrationSpec {
 
 
         when:
-        BlockingVariables results = new BlockingVariables(60)
+        BlockingVariables results = new BlockingVariables(120)
 
         elasticSearchService.unindex(dataModel).subscribe {
             results.dataModelUnindexed = true
