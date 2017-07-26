@@ -38,16 +38,17 @@ class EditDataElementSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         click editButton
-        Thread.sleep(3000l)
+        Thread.sleep(3000)
         fill description with '.i am describe my action'
-        fill dataType with "var ${System.currentTimeMillis()}"
+        fill dataType with "var 1234"
 
 
         and:'save '
         click submit
+        Thread.sleep(3000)
 
         then:
-        check change contains"Data Type"
+        $('span.unit-name').text() == "var 1234 "
 
 
     }

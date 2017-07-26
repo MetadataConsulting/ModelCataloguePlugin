@@ -323,7 +323,10 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
         ListWithTotalAndType<Relationship> results =  modelCatalogueSearchService.search(element, relationshipType, direction, params)
 
-        respond new Relationships(owner: element, direction: direction, type: relationshipType, list: Lists.wrap(params, "/${resourceName}/${params.id}/${direction.actionName}" + (type ? "/${type}" : "") + "/search?search=${params.search?.encodeAsURL() ?: ''}", results))
+        respond new Relationships(owner: element,
+                direction: direction,
+                type: relationshipType,
+                list: Lists.wrap(params, "/${resourceName}/${params.id}/${direction.actionName}" + (type ? "/${type}" : "") + "/search?search=${params.search?.encodeAsURL() ?: ''}", results))
     }
 
 

@@ -110,12 +110,24 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
 
     def generateSuggestions() {
         String suggestion = params.suggestion
+        String dataModel1ID = params.dataModel1
+        String dataModel2ID = params.dataModel2
+        String minScore = params.minScore
+
         executorService.execute {
-            dataArchitectService.generateSuggestions(suggestion)
+            dataArchitectService.generateSuggestions(suggestion, dataModel1ID, dataModel2ID, minScore)
         }
         respond status: HttpStatus.OK
 
     }
 
+
+    def deleteSuggestions() {
+        executorService.execute {
+            dataArchitectService.deleteSuggestions()
+        }
+        respond status: HttpStatus.OK
+
+    }
 
 }

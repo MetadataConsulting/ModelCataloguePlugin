@@ -30,7 +30,7 @@ class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
     private static final String   removeButton ='#role_item_remove-relationshipBtn'
     private static final String   plusButton ='span.fa-plus-square-o'
     private static final String   deprecatedTable ='tr.inf-table-item-row>td:nth-child(2)'
-    private static final String  createdTag='ul.catalogue-element-treeview-list-root>li>ul>li:nth-child(2)>ul>li:nth-child(3)>div>span:nth-child(2)>span'
+    private static final String  createdTag='ul.catalogue-element-treeview-list-root>li>ul>li:nth-child(2)>ul>li:nth-child(3)>div>span>span'
     private static final String  createdDataElement='tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)>span>span>a'
     public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 2000
 

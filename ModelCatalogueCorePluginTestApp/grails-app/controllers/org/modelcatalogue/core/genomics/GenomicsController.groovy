@@ -167,6 +167,37 @@ class GenomicsController {
     }
 
 
+    def exportRareDiseaseSplitDocs() {
+
+        DataModel model = DataModel.get(params.id)
+
+        if (!model) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        DataClass dataClass = findRootClass(model)
+
+        if (!dataClass) {
+            respond status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        def  assetId
+
+        //iterate through the child of the top level maintenance class
+        // then create documents for each of the children
+
+        dataClass.parentOf.eachWithIndex{ DataClass child, idx ->
+            String documentName = "Rare Disease Eligibility and Phenotypes for $child.name"
+            genomicsService.genSplitDocAsset(child)
+        }
+
+        response.setHeader("X-Asset-ID", assetId.toString())
+        redirect controller: 'asset', id: assetId, action: 'show'
+    }
+
+
     def exportCancerTypesAsJson() {
         DataModel model = DataModel.get(params.id)
 

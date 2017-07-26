@@ -7,16 +7,15 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.PerformanceUtilService
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
 import org.modelcatalogue.core.publishing.changelog.ChangeLogDocxGenerator
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
-import org.modelcatalogue.gel.export.CancerTypesCsvExporter
-import org.modelcatalogue.gel.export.CancerTypesJsonExporter
+
 import org.modelcatalogue.gel.export.DataModelChangeLogXlsExporter
 import org.modelcatalogue.gel.export.RareDiseaseDisorderListCsvExporter
 import org.modelcatalogue.gel.export.RareDiseaseEligibilityChangeLogXlsExporter
+import org.modelcatalogue.gel.export.RareDiseaseMaintenanceSplitDocsExporter
 import org.modelcatalogue.gel.export.RareDiseasePhenotypeChangeLogXlsExporter
 import org.modelcatalogue.gel.export.RareDiseasesDocExporter
 import org.modelcatalogue.gel.export.RareDiseasesJsonExporter
@@ -134,25 +133,20 @@ class GenomicsService {
     }
 
 
-    long genCancerTypesAsJson(DataClass dataClass){
-        return assetService.storeReportAsAsset(dataClass.dataModel,
-            name: "${dataClass.name} - Cancer Types report (JSON)",
-            originalFileName: "${dataClass.name}-${dataClass.status}-${dataClass.version}.json",
-            contentType: "application/json",
-        ) {
-            new CancerTypesJsonExporter(it).exportCancerTypesAsJson(dataClass)
+    long genSplitDocAsset(DataClass dataClass){
+        String documentName = "Rare Disease Eligibility, Phenotypes and Clinical Tests for $dataClass.name"
+        Long classId = dataClass.id
+        return assetService.storeReportAsAsset(
+                dataClass.dataModel,
+                name: "${documentName} report (MS Word Document)",
+                originalFileName: "${documentName}-${dataClass.status}-${dataClass.version}.docx",
+                contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        ) { OutputStream out ->
+            new RareDiseaseMaintenanceSplitDocsExporter(DataClass.get(classId), org.modelcatalogue.gel.export.RareDiseaseMaintenanceSplitDocsExporter.standardTemplate, DOC_IMAGE_PATH, 2).export(out)
         }
+
     }
 
-    long genCancerTypesAsCsv(DataClass dataClass){
-        return assetService.storeReportAsAsset(dataClass.dataModel,
-            name: "${dataClass.name} - Cancer Types report (CSV)",
-            originalFileName: "${dataClass.name}-${dataClass.status}-${dataClass.version}.csv",
-            contentType: "text/csv",
-        ) {
-            new CancerTypesCsvExporter(it).exportCancerTypesAsCsv(dataClass)
-        }
-    }
 
     long genRareDiseaseHPOAndClinicalTestsAsXls(DataClass dataClass) {
         assetService.storeReportAsAsset(dataClass.dataModel,
