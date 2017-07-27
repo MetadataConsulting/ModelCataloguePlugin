@@ -1,31 +1,16 @@
-package org.modelcatalogue.gel.export
+package org.modelcatalogue.nt.export
 
 import com.google.common.collect.ImmutableMap
 import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.DataClass
-import org.modelcatalogue.core.DataClassService
-import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.DataType
-import org.modelcatalogue.core.EnumeratedType
-import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipType
-import org.modelcatalogue.core.ValidationRule
-import org.modelcatalogue.core.diff.CatalogueElementDiffs
-import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
+import org.modelcatalogue.core.*
 import org.modelcatalogue.core.export.inventory.ModelCatalogueStyles
 import org.modelcatalogue.core.util.DataModelFilter
-
 import org.modelcatalogue.spreadsheet.builder.api.RowDefinition
 import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
 import org.modelcatalogue.spreadsheet.builder.api.SpreadsheetBuilder
 import org.modelcatalogue.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
-import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHANGE_NEW
-import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHANGE_REMOVAL
-
 
 /**
  * GridReportXlsxExporter.groovy
@@ -34,19 +19,19 @@ import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHAN
  * @author Adam Milward
  * @version 31/03/2017
  */
-class GridReportXlsxExporter  {
+class SummaryReportXlsxExporter {
 
     final CatalogueElement element
     final DataClassService dataClassService
     final GrailsApplication grailsApplication
     final int depth
 
-    static GridReportXlsxExporter create(DataModel element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3) {
-        return new GridReportXlsxExporter(element, dataClassService, grailsApplication,  depth)
+    static SummaryReportXlsxExporter create(DataModel element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3) {
+        return new SummaryReportXlsxExporter(element, dataClassService, grailsApplication,  depth)
     }
 
 
-    private GridReportXlsxExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3){
+    private SummaryReportXlsxExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3){
         this.element = element
         this.dataClassService = dataClassService
         this.grailsApplication = grailsApplication
