@@ -40,6 +40,7 @@ stewardship.config ['detailSectionsProvider', (detailSectionsProvider)->
       "Data Completeness" # name
       "Estimated Quality" # name
       "Timely" # name
+      "Comments" # name
 
     ]
     hideByDefault: true

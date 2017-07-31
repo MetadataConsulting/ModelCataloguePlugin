@@ -212,6 +212,7 @@ class SummaryReportXlsxExporterSpec extends AbstractIntegrationSpec {
                     ext  "Data Completeness" , "70%"
                     ext "Estimated Quality" , "90%"
                     ext "Timely" , "no"
+                    ext "Comments" , "lbah blah blah"
                 }
                 dataElement(name: 'P.Test Element 12') {
                     dataType(name: 'Same Name')

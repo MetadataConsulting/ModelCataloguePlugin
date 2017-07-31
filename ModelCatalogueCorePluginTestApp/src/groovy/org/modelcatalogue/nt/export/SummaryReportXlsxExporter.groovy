@@ -55,6 +55,11 @@ class SummaryReportXlsxExporter {
                         style H1
                     }
                     cell {
+                        value 'ID'
+                        width auto
+                        style H1
+                    }
+                    cell {
                         value 'Data Element'
                         width auto
                         style H1
@@ -149,6 +154,11 @@ class SummaryReportXlsxExporter {
                         width auto
                         style H1
                     }
+                    cell {
+                        value 'Comments'
+                        width auto
+                        style H1
+                    }
                 }
 
                 dataClasses.each { dataClass ->
@@ -193,6 +203,12 @@ class SummaryReportXlsxExporter {
         sheet.with { SheetDefinition sheetDefinition ->
 
             row{
+                cell {
+                    value 'ID'
+                    width auto
+                    style H1
+                }
+
                 cell {
                     value 'Data Element'
                     width auto
@@ -270,6 +286,11 @@ class SummaryReportXlsxExporter {
                 }
                 cell {
                     value 'Timely'
+                    width auto
+                    style H1
+                }
+                cell {
+                    value 'Comments'
                     width auto
                     style H1
                 }
@@ -517,6 +538,17 @@ class SummaryReportXlsxExporter {
                 }
 
                 cell(depth + 1) {
+                    value "${(dataElement.modelCatalogueId)?:(dataElement.getLatestVersionId()) ?: dataElement.getId()}.${dataElement.getVersionNumber()}"
+                    style {
+                        wrap text
+                        border top, left, {
+                            color black
+                            style medium
+                        }
+                    }
+                }
+
+                cell() {
                     value dataElement.name
                     link to url "${getLoadURL(dataElement)}"
                     style {
@@ -726,6 +758,16 @@ class SummaryReportXlsxExporter {
                         }
                     }
                 }
+                cell {
+                    value "${printSystemMetadata(relatedTo, 'Comments')}"
+                    style {
+                        wrap text
+                        border top,  {
+                            color black
+                            style medium
+                        }
+                    }
+                }
 
             }
         }
@@ -734,6 +776,17 @@ class SummaryReportXlsxExporter {
 
     void printSystemDataElement(RowDefinition rowDefinition, DataElement dataElement){
         rowDefinition.with {
+
+            cell() {
+                value "${(dataElement.modelCatalogueId)?:(dataElement.getLatestVersionId()) ?: dataElement.getId()}.${dataElement.getVersionNumber()}"
+                style {
+                    wrap text
+                    border top, left, {
+                        color black
+                        style medium
+                    }
+                }
+            }
 
             cell() {
                 value dataElement.name
@@ -904,6 +957,16 @@ class SummaryReportXlsxExporter {
             }
             cell {
                 value "${printSystemMetadata([dataElement], 'Timely')}"
+                style {
+                    wrap text
+                    border top,  {
+                        color black
+                        style medium
+                    }
+                }
+            }
+            cell {
+                value "${printSystemMetadata([dataElement], 'Comments')}"
                 style {
                     wrap text
                     border top,  {

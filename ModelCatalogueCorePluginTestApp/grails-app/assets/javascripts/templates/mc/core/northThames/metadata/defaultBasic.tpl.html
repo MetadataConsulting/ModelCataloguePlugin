@@ -204,5 +204,20 @@
               </span>
             </td>
         </tr>
+        <tr ng-if="view.handlesKey('Comments')">
+            <th class="col-md-3">
+                Comments
+                <i class="fa fa-question"
+                   popover="Comments"
+                   popover-title="Comments"
+                   popover-trigger="mouseenter"></i>
+            </th>
+            <td class="full-width-editable">
+
+              <span editable-text="extAsMap['Comments']" class = "small">
+                        {{element.ext.get('Comments')}}
+              </span>
+            </td>
+        </tr>
     </table>
 </div>
