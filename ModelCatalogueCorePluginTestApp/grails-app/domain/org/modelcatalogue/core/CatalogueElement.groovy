@@ -117,7 +117,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     @Deprecated
     List getRelations() {
-        getOutgoingRelations() + getIncomingRelations()
+        [getOutgoingRelations(), getIncomingRelations()].flatten().unique()
     }
 
     List getIncomingRelations() {
@@ -147,7 +147,7 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     @Deprecated
     List getRelationsByType(RelationshipType type) {
-        [getOutgoingRelationsByType(type), getIncomingRelationsByType(type)].flatten()
+        [getOutgoingRelationsByType(type), getIncomingRelationsByType(type)].flatten().unique()
     }
 
     List<Relationship> getIncomingRelationshipsByType(RelationshipType type) {

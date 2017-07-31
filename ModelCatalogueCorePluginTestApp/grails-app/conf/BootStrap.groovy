@@ -61,9 +61,7 @@ class BootStrap {
             initSecurity(!System.getenv('MC_BLANK_DEV'))
         }
 
-        modelCatalogueSearchService.reindex(true).all { it }.toBlocking().subscribe {
-            System.out.println "Reindexed"
-        }
+        modelCatalogueSearchService.reindex(true)
 
         initCatalogueService.setupStoredProcedures()
 
@@ -111,6 +109,19 @@ class BootStrap {
                 dataModel.countDeclares() > 0
             }
             link controller: 'dataModel', action: 'gridSpreadsheet', id: true
+        }
+
+
+        reportsRegistry.register {
+            creates asset
+            title { "North Thames Summary Report" }
+            defaultName { "${it.name} report as MS Excel Document Grid" }
+            depth 3
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.countDeclares() > 0
+            }
+            link controller: 'northThames', action: 'northThamesSummaryReport', id: true
         }
 
         reportsRegistry.register {

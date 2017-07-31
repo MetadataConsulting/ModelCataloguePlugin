@@ -25,13 +25,15 @@ class SummaryReportXlsxExporter {
     final DataClassService dataClassService
     final GrailsApplication grailsApplication
     final int depth
+    Map systemsMap = [:]
+    Map metadataCompletion = [:]
 
     static SummaryReportXlsxExporter create(DataModel element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3) {
-        return new SummaryReportXlsxExporter(element, dataClassService, grailsApplication,  depth)
+        return new SummaryReportXlsxExporter(element, dataClassService, grailsApplication, depth)
     }
 
 
-    private SummaryReportXlsxExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3){
+    private SummaryReportXlsxExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3) {
         this.element = element
         this.dataClassService = dataClassService
         this.grailsApplication = grailsApplication
@@ -45,7 +47,7 @@ class SummaryReportXlsxExporter {
 
         builder.build(outputStream) {
             apply ModelCatalogueStyles
-            sheet("$element.name $element.dataModelSemanticVersion" ) { SheetDefinition sheetDefinition ->
+            sheet("$element.name $element.dataModelSemanticVersion") { SheetDefinition sheetDefinition ->
                 row {
                     cell {
                         value 'Class Hierarchy'
@@ -78,39 +80,268 @@ class SummaryReportXlsxExporter {
                         style H1
                     }
                     cell {
-                        value 'Labkey Field Name'
+                        value 'Source System'
                         width auto
                         style H1
                     }
                     cell {
-                        value 'Labkey View'
+                        value 'Source Attribute'
                         width auto
                         style H1
                     }
                     cell {
-                        value 'Additional review'
+                        value 'Column Name'
                         width auto
                         style H1
                     }
                     cell {
-                        value 'Additional Rule'
+                        value 'Known Issue'
                         width auto
                         style H1
                     }
                     cell {
-                        value 'Additional Rule Dependency'
+                        value 'Semantic Matching'
+                        width auto
+                        style H1
+                    }
+                    cell {
+                        value 'Data Completeness'
+                        width auto
+                        style H1
+                    }
+                    cell {
+                        value 'Data Quality'
                         width auto
                         style H1
                     }
                 }
 
-                dataClasses.each{ dataClass->
+                dataClasses.each { dataClass ->
                     buildRows(sheetDefinition, dataClass.getOutgoingRelationshipsByType(RelationshipType.hierarchyType), 1, 2)
                 }
 
             }
+
+
+
+            sheet("Analysis") { SheetDefinition sheet ->
+
+                buildAnalysis(sheet)
+            }
+
+            systemsMap.each { k, v ->
+
+
+                sheet(k) { SheetDefinition sheet ->
+                    buildCompletionTab(sheet, k)
+                }
+
+            }
+
+
         }
 
+
+    }
+
+
+    /**
+     * Renders analysis
+     * @param sheet the current sheet
+     * @param systems - the systems that are referenced in the report
+     */
+
+
+    private void buildCompletionTab(SheetDefinition sheet, String system) {
+
+
+        sheet.with { SheetDefinition sheetDefinition ->
+
+            row{
+                cell {
+                    value 'Data Element'
+                    width auto
+                    style H1
+                }
+                cell {
+                    value 'Data Type'
+                    width auto
+                    style H1
+                }
+                cell {
+                    value 'Validation Rule'
+                    width auto
+                    style H1
+                }
+                cell {
+                    value 'Business Rule'
+                    width auto
+                    style H1
+                }
+                cell {
+                    value 'System Attribute'
+                    width auto
+                    style H1
+                }
+                cell {
+                    value 'Known Issue'
+                    width auto
+                    style H1
+                }
+                cell {
+                    value 'Semantic Matching'
+                    width auto
+                    style H1
+                }
+                cell {
+                    value 'Data Completeness'
+                    width auto
+                    style H1
+                }
+                cell {
+                    value 'Data Quality'
+                    width auto
+                    style H1
+                }
+            }
+
+            systemsMap.get(system).each{ de ->
+                row() { RowDefinition rowDefinition ->
+                    printSystemDataElement(rowDefinition, de)
+                }
+            }
+
+
+        }
+
+    }
+
+
+
+
+    /**
+     * Renders analysis
+     * @param sheet the current sheet
+     * @param systems - the systems that are referenced in the report
+     */
+
+
+
+    private void buildAnalysis(SheetDefinition sheet){
+        sheet.with { SheetDefinition sheetDefinition ->
+
+
+            //source system breakdown
+            row {
+                cell {
+                    value "Source Identified"
+                    colspan 5
+                    style H1
+                }
+            }
+
+            row {
+                cell {
+                    value "System"
+                    colspan 4
+                    style {
+                        align center center
+                        font {
+                            make bold
+                            size 16
+                            color black
+                        }
+                    }
+                }
+                cell {
+                    value "Count"
+                    width auto
+                    style {
+                        align center center
+                        font {
+                            make bold
+                            size 16
+                            color black
+                        }
+                    }
+                }
+            }
+
+            systemsMap.each{ k, v ->
+
+                row {
+                    cell {
+                        value "$k"
+                        colspan 4
+                    }
+                    cell {
+                        value "${v.size()}"
+                        width auto
+                    }
+                }
+            }
+
+            //metadata completion breakdown
+
+//source system breakdown
+
+            row {
+                cell {
+                    value " "
+                    colspan 4
+                }
+            }
+
+            row {
+                cell {
+                    value "Metadata Completion"
+                    colspan 5
+                    style H1
+                }
+            }
+
+            row {
+                cell {
+                    value "Metadata"
+                    colspan 4
+                    style {
+                        align center center
+                        font {
+                            make bold
+                            size 16
+                            color black
+                        }
+                    }
+                }
+                cell {
+                    value "Completion"
+                    width auto
+                    style {
+                        align center center
+                        font {
+                            make bold
+                            size 16
+                            color black
+                        }
+                    }
+                }
+            }
+
+            metadataCompletion.each{ k, v ->
+
+                row {
+                    cell {
+                        value "$k"
+                        colspan 4
+                    }
+                    cell {
+                        value "${ Math.round(v.get("completed") / v.get("total") * 100) } %"
+                        width auto
+                    }
+                }
+            }
+
+        }
     }
 
     /**
@@ -195,8 +426,10 @@ class SummaryReportXlsxExporter {
 
     void printDataElement(RowDefinition rowDefinition, Relationship dataElementRelationship, List outline = []) {
         DataElement dataElement = dataElementRelationship.destination
-        Collection<Relationship> relatedTo = dataElement.getRelationshipsByType(RelationshipType.relatedToType)
-        if(relatedTo.empty && dataElement?.dataType) relatedTo = dataElement?.dataType.getRelationshipsByType(RelationshipType.relatedToType)
+        List relatedTo  = []
+        relatedTo = dataElement.relatedTo.findAll{ it.dataModel.ext.get('organisation') == "UCL" }
+        addToSystemsMap(relatedTo, dataElement)
+
         rowDefinition.with {
 
                 outline.each{
@@ -215,7 +448,7 @@ class SummaryReportXlsxExporter {
 
                 cell(depth + 1) {
                     value dataElement.name
-                    link to url "${dataElement.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataElement.defaultModelCatalogueId}"
+                    link to url "${getLoadURL(dataElement)}"
                     style {
                         wrap text
                         border top, left, {
@@ -271,19 +504,7 @@ class SummaryReportXlsxExporter {
                 }
 
                 cell {
-                    value "${(dataElement?.ext.get("LabKey Field Name")) ? dataElement?.ext.get("LabKey Field Name") : ""}"
-                    style {
-                        wrap text
-                        border top,  {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-
-
-                cell {
-                    value "${(dataElement?.ext.get("Additional Review")) ? dataElement?.ext.get("Additional Review") : ""}"
+                    value "${getRelatedToModel(relatedTo)}"
                     style {
                         wrap text
                         border top,  {
@@ -294,7 +515,20 @@ class SummaryReportXlsxExporter {
                 }
 
                 cell {
-                    value "${(dataElement?.ext.get("Additional Rule")) ? dataElement?.ext.get("Additional Rule") : ""}"
+                    value "${(relatedTo) ? ((relatedTo.size()==1) ? relatedTo[0]?.name : "Multiple sources identified, please see catalogue") : "No source identified"}"
+                    if (relatedTo && relatedTo.size()==1) link to url "${ getLoadURL(relatedTo[0]) }"
+                    style {
+                        wrap text
+                        border top, {
+                            color black
+                            style medium
+                        }
+                    }
+                }
+
+
+                cell {
+                    value "${ printSystemMetadata(relatedTo, 'System Column')}"
                     style {
                         wrap text
                         border top,  {
@@ -305,7 +539,40 @@ class SummaryReportXlsxExporter {
                 }
 
                 cell {
-                    value "${(dataElement?.ext.get("Additional Rule Dependency")) ? dataElement?.ext.get("Additional Rule Dependency") : ""}"
+                    value "${printSystemMetadata(relatedTo, 'Known Issues')}"
+                    style {
+                        wrap text
+                        border top,  {
+                            color black
+                            style medium
+                        }
+                    }
+                }
+
+                cell {
+                    value "${printSystemMetadata(relatedTo, 'Semantic Matching')}"
+                    style {
+                        wrap text
+                        border top,  {
+                            color black
+                            style medium
+                        }
+                    }
+                }
+
+                cell {
+                    value "${printSystemMetadata(relatedTo, 'Data Completeness')}"
+                    style {
+                        wrap text
+                        border top,  {
+                            color black
+                            style medium
+                        }
+                    }
+                }
+
+                cell {
+                    value "${printSystemMetadata(relatedTo, 'Data Quality')}"
                     style {
                         wrap text
                         border top,  {
@@ -319,6 +586,178 @@ class SummaryReportXlsxExporter {
         }
 
 
+
+    void printSystemDataElement(RowDefinition rowDefinition, DataElement dataElement){
+        rowDefinition.with {
+
+            cell() {
+                value dataElement.name
+                link to url "${dataElement.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataElement.defaultModelCatalogueId}"
+                style {
+                    wrap text
+                    border top, left, {
+                        color black
+                        style medium
+                    }
+                }
+            }
+
+
+            cell {
+                value "${(dataElement?.dataType) ? printDataType(dataElement?.dataType) : ""}"
+                style {
+                    wrap text
+                    border top, {
+                        color black
+                        style medium
+                    }
+                }
+
+            }
+
+            cell {
+                value "${(dataElement?.dataType?.rule) ? dataElement?.dataType?.rule : ""}"
+                style {
+                    wrap text
+                    border top, {
+                        color black
+                        style medium
+                    }
+                }
+            }
+
+            cell {
+                value "${(dataElement?.involvedIn) ? printBusRule(dataElement?.involvedIn) : ""}"
+                style {
+                    wrap text
+                    border top, {
+                        color black
+                        style medium
+                    }
+                }
+            }
+
+
+            cell {
+                value "${ printSystemMetadata([dataElement], 'System Column')}"
+                style {
+                    wrap text
+                    border top,  {
+                        color black
+                        style medium
+                    }
+                }
+            }
+
+            cell {
+                value "${printSystemMetadata([dataElement], 'Known Issues')}"
+                style {
+                    wrap text
+                    border top,  {
+                        color black
+                        style medium
+                    }
+                }
+            }
+
+            cell {
+                value "${printSystemMetadata([dataElement], 'Semantic Matching')}"
+                style {
+                    wrap text
+                    border top,  {
+                        color black
+                        style medium
+                    }
+                }
+            }
+
+            cell {
+                value "${printSystemMetadata([dataElement], 'Data Completeness')}"
+                style {
+                    wrap text
+                    border top,  {
+                        color black
+                        style medium
+                    }
+                }
+            }
+
+            cell {
+                value "${printSystemMetadata([dataElement], 'Data Quality')}"
+                style {
+                    wrap text
+                    border top,  {
+                        color black
+                        style medium
+                    }
+                }
+            }
+        }
+    }
+
+
+    String printSystemMetadata(List relatedTo, String metadata){
+
+        Map score = metadataCompletion.get(metadata) ?: [:]
+        Integer completed = score.get("completed")?:0
+        Integer total = score.get("total")?:0
+
+        if(relatedTo.size()==1){
+            if(relatedTo[0].ext.get("$metadata")){
+                score.put("completed", completed + 1)
+                score.put("total", total + 1)
+                metadataCompletion.put(metadata, score)
+                return relatedTo[0].ext.get("$metadata")
+            }else{
+                score.put("total", total + 1)
+                metadataCompletion.put(metadata, score)
+                return 'Source identified, metadata not recorded'
+            }
+        }else if(relatedTo.size()>1){
+
+            relatedTo.each{ rel ->
+                if(rel.ext.get("$metadata")){
+                    score.put("completed", completed + 1)
+                    score.put("total", total + 1)
+                }else{
+                    score.put("completed", completed + 1)
+                }
+            }
+            return "Multiple sources identified, please see entries in the online catalogue"
+        }else{
+            return "No source identified"
+        }
+
+
+
+    }
+
+    void addToSystemsMap(List relatedTo, DataElement sourceElement){
+
+        if(relatedTo.size()>0){
+            relatedTo.each{ de ->
+                String dmname = de.dataModel.name
+                List elements =  (systemsMap.get(dmname))?:[]
+                elements.add(de)
+                systemsMap.put(dmname, elements)
+            }
+        }else{
+            List elements =  (systemsMap.get("No source identified"))?:[]
+            elements.add(sourceElement)
+            systemsMap.put("No source identified", elements)
+        }
+
+    }
+
+    String getRelatedToModel(List relatedTo){
+        if(relatedTo.size()==1){
+            "${relatedTo[0].dataModel.name}"
+        }else if(relatedTo.size()>1){
+            "Multiple sources identified, please see entries in the online catalogue"
+        }else{
+            "No source identified"
+        }
+    }
 
     String printDataType(DataType dataType){
 
@@ -355,8 +794,15 @@ class SummaryReportXlsxExporter {
         multiplicityText
     }
 
+
+
     String printBusRule(List<ValidationRule> rules){
         return rules.collect{ it.name }.join('\n')
+    }
+
+
+    String getLoadURL(CatalogueElement ce){
+        ce?.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + ce.defaultModelCatalogueId
     }
 
 }
