@@ -1,0 +1,208 @@
+<div class="col-md-12 metadata-northThames-item-content">
+
+    <!--
+    <div class="alert alert-warning" ng-if="editableForm.$visible">
+        The form metadata only applies on the root model of the form and is ignored for any nested models.
+    </div>
+    -->
+    <!--
+      "http://stewardship.modelcatalogue.org/stewardship#registrationAuthority" # name
+      "http://stewardship.modelcatalogue.org/stewardship#dataSteward" # name
+      "http://stewardship.modelcatalogue.org/stewardship#dataQualityAssessment" # name
+      "http://stewardship.modelcatalogue.org/stewardship#effectiveFrom" # date
+      "http://stewardship.modelcatalogue.org/stewardship#effectiveTo" # date
+      "http://stewardship.modelcatalogue.org/stewardship#lastAudit" # date
+      "http://stewardship.modelcatalogue.org/stewardship#sensitivity" # sensitivity type
+      "http://stewardship.modelcatalogue.org/stewardship#databaseLocation" # url
+      "http://stewardship.modelcatalogue.org/stewardship#databaseAccessDetails" # string
+      "http://stewardship.modelcatalogue.org/stewardship#databaseAdministrator" # name
+
+      -->
+    <table class="table table-condensed table-striped table-borderless table-no-margin small">
+        <tr ng-if="view.handlesKey('Semantic Matching')">
+            <th class="col-md-3">
+                Semantic Matching
+                <i class="fa fa-question"
+                   popover="Semantic Matching"
+                   popover-title="Semantic Matching"
+                   popover-trigger="mouseenter"></i>
+            </th>
+            <td class="full-width-editable">
+                <div ng-controller="SelectYesNoUnk">
+                    <span editable-select="extAsMap['Semantic Matching']"
+                          e-ng-options="s for s in yesNoUnknown"
+                          class = "small">
+                        {{element.ext.get('Semantic Matching')}}
+                    </span>
+                </div>
+            </td>
+        </tr>
+        <tr ng-if="view.handlesKey('Known Issue')">
+            <th class="col-md-3">
+                Known Issue
+                <i class="fa fa-question"
+                   popover="Are there any known issues with this data point?"
+                   popover-title="Known Issue"
+                   popover-trigger="mouseenter"></i>
+            </th>
+            <td class="full-width-editable">
+                <span editable-text="extAsMap['Known Issue']" class = "small">
+                    {{element.ext.get('Known Issue')}}
+                </span>
+            </td>
+        </tr>
+        <!-- I'd like to be able to generate these sort of automatically -->
+        <tr ng-if="view.handlesKey('Immediate Solution')">
+            <th class="col-md-3">
+                Immediate Solution
+                <i class="fa fa-question"
+                   popover="What is the immediate solution for collection"
+                   popover-title="Immediate Solution"
+                   popover-trigger="mouseenter"></i>
+            </th>
+            <td class="full-width-editable">
+                    <span editable-text="extAsMap['Immediate Solution']" class = "small">
+                        {{element.ext.get('Immediate Solution')}}
+                    </span>
+            </td>
+        </tr>
+        <tr ng-if="view.handlesKey('Immediate Solution Owner')">
+          <th class="col-md-3">
+              Immediate Solution Owner
+            <i class="fa fa-question"
+               popover="Who is the immediate Solution Owner"
+               popover-title="Immediate Solution Owner"
+               popover-trigger="mouseenter"></i>
+          </th>
+          <td class="full-width-editable">
+
+              <span editable-text="extAsMap['Immediate Solution Owner']" class = "small">
+                        {{element.ext.get('Immediate Solution Owner')}}
+              </span>
+          </td>
+        </tr>
+        <tr ng-if="view.handlesKey('Long Term Solution')">
+            <th class="col-md-3">
+                Long Term Solution
+                <i class="fa fa-question"
+                   popover="Long Term Solution"
+                   popover-title="Long Term Solution"
+                   popover-trigger="mouseenter"></i>
+            </th>
+            <td class="full-width-editable">
+
+              <span editable-text="extAsMap['Long Term Solution']" class = "small">
+                        {{element.ext.get('Long Term Solution')}}
+              </span>
+            </td>
+        </tr>
+        <tr ng-if="view.handlesKey('Long Term Solution Owner')">
+            <th class="col-md-3">
+                Long Term Solution Owner
+                <i class="fa fa-question"
+                   popover="Long Term Solution Owner"
+                   popover-title="Long Term Solution Owner"
+                   popover-trigger="mouseenter"></i>
+            </th>
+            <td class="full-width-editable">
+
+              <span editable-text="extAsMap['Long Term Solution Owner']" class = "small">
+                        {{element.ext.get('Long Term Solution Owner')}}
+              </span>
+            </td>
+        </tr>
+        <tr ng-if="view.handlesKey('Data Item Unique Code')">
+            <th class="col-md-3">
+                Data Item Unique Code
+                <i class="fa fa-question"
+                   popover="Data Item Unique Code"
+                   popover-title="Data Item Unique Code"
+                   popover-trigger="mouseenter"></i>
+            </th>
+            <td class="full-width-editable">
+
+              <span editable-text="extAsMap['Data Item Unique Code']" class = "small">
+                        {{element.ext.get('Data Item Unique Code')}}
+              </span>
+            </td>
+        </tr>
+        <tr ng-if="view.handlesKey('Related To')">
+            <th class="col-md-3">
+                Related To
+                <i class="fa fa-question"
+                   popover="Related To"
+                   popover-title="Related To"
+                   popover-trigger="mouseenter"></i>
+            </th>
+            <td class="full-width-editable">
+
+              <span editable-text="extAsMap['Related To']" class = "small">
+                        {{element.ext.get('Related To')}}
+              </span>
+            </td>
+        </tr>
+        <tr ng-if="view.handlesKey('Part Of Standard Data Set')">
+            <th class="col-md-3">
+                Part Of Standard Data Set
+                <i class="fa fa-question"
+                   popover="Part Of Standard Data Set"
+                   popover-title="Part Of Standard Data Set"
+                   popover-trigger="mouseenter"></i>
+            </th>
+            <td class="full-width-editable">
+                <div ng-controller="SelectYesNoUnk">
+                    <span editable-select="extAsMap['Part Of Standard Data Set']"
+                          e-ng-options="s for s in yesNoUnknown"
+                          class = "small">
+                        {{element.ext.get('Part Of Standard Data Set')}}
+                    </span>
+                </div>
+            </td>
+        </tr>
+        <tr ng-if="view.handlesKey('Data Completeness')">
+            <th class="col-md-3">
+                Data Completeness
+                <i class="fa fa-question"
+                   popover="Data Completeness"
+                   popover-title="Data Completeness"
+                   popover-trigger="mouseenter"></i>
+            </th>
+            <td class="full-width-editable">
+
+              <span editable-text="extAsMap['Data Completeness']" class = "small">
+                        {{element.ext.get('Data Completeness')}}
+              </span>
+            </td>
+        </tr>
+        <tr ng-if="view.handlesKey('Estimated Quality')">
+            <th class="col-md-3">
+                Estimated Quality
+                <i class="fa fa-question"
+                   popover="Estimated Quality"
+                   popover-title="Estimated Quality"
+                   popover-trigger="mouseenter"></i>
+            </th>
+            <td class="full-width-editable">
+
+              <span editable-text="extAsMap['Estimated Quality']" class = "small">
+                        {{element.ext.get('Estimated Quality')}}
+              </span>
+            </td>
+        </tr>
+        <tr ng-if="view.handlesKey('Timely')">
+            <th class="col-md-3">
+                Timely
+                <i class="fa fa-question"
+                   popover="Timely"
+                   popover-title="Timely"
+                   popover-trigger="mouseenter"></i>
+            </th>
+            <td class="full-width-editable">
+
+              <span editable-text="extAsMap['Timely']" class = "small">
+                        {{element.ext.get('Timely')}}
+              </span>
+            </td>
+        </tr>
+    </table>
+</div>

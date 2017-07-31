@@ -39,133 +39,233 @@ class SummaryReportXlsxExporterSpec extends AbstractIntegrationSpec {
 
             dataModel(name: 'ARIA') {
 
-                ext 'organisation', 'UCL'
+                ext 'http://www.modelcatalogue.org/metadata/#organization', 'UCL'
 
                 dataElement(name: 'P.Test Element 1') {
-                    ext 'System Column', 'BLAH asdfs'
-                    ext 'Known Issue', 'test issue'
-                    ext 'Semantic Matching', 'yes'
-                    ext 'Data Completeness', '80%'
-                    ext 'Data Quality', '100%'
+                    ext  "Semantic Matching", "yes"
+                    ext "Known Issue" , "no"
+                    ext "Immediate Solution", "this"
+                    ext "Immediate Solution Owner" , "Mr Orange"
+                    ext "Long Term Solution" , "that"
+                    ext  "Long Term Solution Owner" , "Mr Pink"
+                    ext  "Data Item Unique Code" , "X34DD"
+                    ext  "Related To" , "unknown"
+                    ext  "Part Of Standard Data Set" , "no"
+                    ext  "Data Completeness" , "60%"
+                    ext "Estimated Quality" , "100%"
+                    ext "Timely" , "no"
                     dataType(name: 'Same Name')
                 }
                 dataElement(name: 'P.Test Element 2') {
                     dataType(name: 'Same Name')
-                    ext 'System Column', 'BLAH asdfs'
-                    ext 'Known Issue', 'test issue'
-                    ext 'Data Quality', '100%'
+                    ext  "Semantic Matching", "no"
+                    ext "Known Issue" , "s"
+                    ext "Immediate Solution", "this s"
+                    ext "Immediate Solution Owner" , "Mr Orange 1"
+                    ext "Long Term Solution" , "that"
+                    ext  "Long Term Solution Owner" , "Mr Pink 2"
+                    ext  "Data Item Unique Code" , "X454DD"
+                    ext  "Related To" , "test"
+                    ext  "Part Of Standard Data Set" , "yes"
+                    ext  "Data Completeness" , "70%"
+                    ext "Estimated Quality" , "90%"
+                    ext "Timely" , "no"
                 }
                 dataElement(name: 'P.Test Element 3') {
                     dataType(name: 'Same Name')
-                    ext 'System Column', 'BLAH asdfs'
-                    ext 'Semantic Matching', 'yes'
-                    ext 'Data Completeness', '80%'
-                    ext 'Data Quality', '100%'
+                    ext  "Semantic Matching", "no"
+                    ext "Known Issue" , "s"
+                    ext "Immediate Solution", "this s"
+                    ext "Immediate Solution Owner" , "Mr Orange 1"
+                    ext "Long Term Solution" , "that"
+                    ext  "Data Completeness" , "70%"
+                    ext "Estimated Quality" , "90%"
+                    ext "Timely" , "no"
                 }
                 dataElement(name: 'P.Test Element 4') {
                     dataType(name: 'Same Name')
-                    ext 'System Column', 'BLAH asdfs'
-                    ext 'Known Issue', 'test issue'
-                    ext 'Semantic Matching', 'yes'
-                    ext 'Data Completeness', '80%'
-                    ext 'Data Quality', '100%'
+                    ext  "Semantic Matching", "no"
+                    ext "Known Issue" , "s"
+                    ext "Immediate Solution", "this s"
+                    ext "Immediate Solution Owner" , "Mr Orange 1"
+                    ext "Long Term Solution" , "that"
+                    ext  "Long Term Solution Owner" , "Mr Pink 2"
+                    ext  "Data Item Unique Code" , "X454DD"
+                    ext  "Related To" , "test"
+                    ext  "Part Of Standard Data Set" , "yes"
+                    ext  "Data Completeness" , "70%"
+                    ext "Estimated Quality" , "90%"
+                    ext "Timely" , "no"
                 }
                 dataElement(name: 'P.Test Element 5') {
                     dataType(name: 'Same Name')
                     ext 'System Column', 'BLAH asdfs'
-                    ext 'Known Issue', 'test issue'
-                    ext 'Semantic Matching', 'no'
-                    ext 'Data Completeness', '80%'
-                    ext 'Data Quality', '100%'
+                    ext  "Semantic Matching", "no"
+                    ext "Known Issue" , "s"
+                    ext "Immediate Solution", "this s"
+                    ext "Immediate Solution Owner" , ""
+                    ext "Long Term Solution" , ""
+                    ext  "Long Term Solution Owner" , ""
+                    ext  "Data Item Unique Code" , ""
+                    ext  "Related To" , ""
+                    ext  "Part Of Standard Data Set" , ""
+                    ext  "Data Completeness" , ""
+                    ext "Estimated Quality" , ""
+                    ext "Timely" , ""
                 }
             }
 
 
             dataModel(name: 'CDR') {
-                ext 'organisation', 'UCL'
+                ext 'http://www.modelcatalogue.org/metadata/#organization', 'UCL'
                 dataElement(name: 'P.Test Element 6') {
                     dataType(name: 'Same Name')
-                    ext 'System Column', 'BLAH 14s casdfs'
-                    ext 'Known Issue', 'test issue'
-                    ext 'Semantic Matching', 'yes'
-                    ext 'Data Completeness', '80%'
-                    ext 'Data Quality', '100%'
+                    ext  "Semantic Matching", "yes"
+                    ext "Known Issue" , "sdsafadfs"
+                    ext "Immediate Solution", "this sdf"
+                    ext "Immediate Solution Owner" , "Mr Blue 1"
+                    ext "Long Term Solution" , "that"
+                    ext  "Long Term Solution Owner" , "Mr Red 2"
+                    ext  "Data Item Unique Code" , "X1254DD"
+                    ext  "Related To" , "another one"
+                    ext  "Part Of Standard Data Set" , "Unknown"
+                    ext  "Data Completeness" , "70%"
+                    ext "Estimated Quality" , "90%"
+                    ext "Timely" , "no"
                 }
                 dataElement(name: 'P.Test Element 7') {
                     dataType(name: 'Same Name')
-                    ext 'System Column', 'BLAH 52 asdfs'
-                    ext 'Known Issue', 'test issue'
-                    ext 'Semantic Matching', 'yes'
-                    ext 'Data Completeness', '80%'
-                    ext 'Data Quality', '100%'
+                    ext  "Semantic Matching", "yes"
+                    ext "Known Issue" , "sdsafadfs"
+                    ext "Immediate Solution", "this sdf"
+                    ext "Immediate Solution Owner" , "Mr Blue 1"
+                    ext "Long Term Solution" , "that"
+                    ext  "Long Term Solution Owner" , "Mr Red 2"
+                    ext  "Data Item Unique Code" , "X1254DD"
+                    ext  "Related To" , "another one"
+                    ext  "Part Of Standard Data Set" , "Unknown"
+                    ext  "Data Completeness" , "70%"
+                    ext "Estimated Quality" , "90%"
+                    ext "Timely" , "no"
                 }
                 dataElement(name: 'P.Test Element 8') {
                     dataType(name: 'Same Name')
-                    ext 'System Column', 'BLAH asdfs'
-                    ext 'Known Issue', 'test asdf issue'
-                    ext 'Semantic Matching', 'yes'
-                    ext 'Data Completeness', '80%'
-                    ext 'Data Quality', '100%'
+                    ext  "Semantic Matching", "yes"
+                    ext "Known Issue" , "sdsafadfs"
+                    ext "Immediate Solution", "this sdf"
+                    ext "Immediate Solution Owner" , "Mr Blue 1"
+                    ext "Long Term Solution" , "that"
+                    ext  "Long Term Solution Owner" , "Mr Red 2"
+                    ext  "Data Item Unique Code" , "X1254DD"
+                    ext  "Related To" , "another one"
+                    ext  "Part Of Standard Data Set" , "Unknown"
+                    ext  "Data Completeness" , "70%"
+                    ext "Estimated Quality" , "90%"
+                    ext "Timely" , "no"
                 }
                 dataElement(name: 'P.Test Element 9') {
                     dataType(name: 'Same Name')
-                    ext 'System Column', 'BLAH a2sdfs'
-                    ext 'Known Issue', 'test  123issue'
-                    ext 'Semantic Matching', 'yes'
-                    ext 'Data Completeness', '80%'
-                    ext 'Data Quality', '100%'
+                    ext  "Semantic Matching", "yes"
+                    ext "Known Issue" , "sdsafadfs"
+                    ext "Immediate Solution", "this sdf"
+                    ext "Immediate Solution Owner" , "Mr Blue 1"
+                    ext "Long Term Solution" , "that"
+                    ext  "Long Term Solution Owner" , "Mr Red 2"
+                    ext  "Data Item Unique Code" , "X1254DD"
+                    ext  "Related To" , "another one"
+                    ext  "Part Of Standard Data Set" , "Unknown"
+                    ext  "Data Completeness" , "70%"
+                    ext "Estimated Quality" , "90%"
+                    ext "Timely" , "no"
                 }
                 dataElement(name: 'P.Test Element 10') {
                     dataType(name: 'Same Name')
-                    ext 'System Column', 'BLAH asdfs 1'
-                    ext 'Known Issue', 'test issue asd'
-                    ext 'Semantic Matching', 'no'
-                    ext 'Data Completeness', '64%'
-                    ext 'Data Quality', '90%'
+                    ext  "Semantic Matching", "yes"
+                    ext "Known Issue" , "sdsafadfs"
+                    ext "Immediate Solution", "this sdf"
+                    ext "Immediate Solution Owner" , "Mr Blue 1"
+                    ext "Long Term Solution" , "that"
+                    ext  "Long Term Solution Owner" , "Mr Red 2"
+                    ext  "Data Item Unique Code" , "X1254DD"
+                    ext  "Related To" , "another one"
+                    ext  "Part Of Standard Data Set" , "Unknown"
+                    ext  "Data Completeness" , "70%"
+                    ext "Estimated Quality" , "90%"
+                    ext "Timely" , "no"
                 }
             }
 
 
             dataModel(name: 'SNOMED') {
-                ext 'organisation', 'UCL'
+                ext 'http://www.modelcatalogue.org/metadata/#organization', 'UCL'
                 dataElement(name: 'P.Test Element 11') {
                     dataType(name: 'Same Name')
-                    ext 'System Column', 'BLAH asdfs 1'
-                    ext 'Semantic Matching', 'no'
-                    ext 'Data Completeness', '64%'
-                    ext 'Data Quality', '90%'
+                    ext  "Semantic Matching", "yes"
+                    ext "Known Issue" , "sdsafadfs"
+                    ext "Immediate Solution", "this sdf"
+                    ext "Immediate Solution Owner" , "Mr Blue 1"
+                    ext "Long Term Solution" , "that"
+                    ext  "Long Term Solution Owner" , "Mr Red 2"
+                    ext  "Data Item Unique Code" , "X1254DD"
+                    ext  "Related To" , "another one"
+                    ext  "Part Of Standard Data Set" , "Unknown"
+                    ext  "Data Completeness" , "70%"
+                    ext "Estimated Quality" , "90%"
+                    ext "Timely" , "no"
                 }
                 dataElement(name: 'P.Test Element 12') {
                     dataType(name: 'Same Name')
-                    ext 'System Column', 'BLAH asdfs 1'
-                    ext 'Known Issue', 'test issue asd'
-                    ext 'Semantic Matching', 'no'
-                    ext 'Data Completeness', '64%'
-                    ext 'Data Quality', '90%'
+                    ext  "Semantic Matching", "yes"
+                    ext "Known Issue" , "sdsafadfs"
+                    ext "Immediate Solution", "this sdf"
+                    ext "Immediate Solution Owner" , "Mr Blue 1"
+                    ext "Long Term Solution" , "that"
+                    ext  "Long Term Solution Owner" , "Mr Red 2"
+                    ext  "Data Item Unique Code" , "X1254DD"
+                    ext  "Related To" , "another one"
+                    ext  "Part Of Standard Data Set" , "Unknown"
+                    ext  "Data Completeness" , "70%"
+                    ext "Estimated Quality" , "90%"
+                    ext "Timely" , "no"
                 }
                 dataElement(name: 'P.Test Element 13') {
                     dataType(name: 'Same Name')
-                    ext 'System Column', 'BLAH asdfs 1'
-                    ext 'Known Issue', 'test issue asd'
-                    ext 'Semantic Matching', 'no'
-                    ext 'Data Completeness', '74%'
-                    ext 'Data Quality', '90%'
+                    ext  "Semantic Matching", "yes"
+                    ext "Known Issue" , "sdsafadfs"
+                    ext "Immediate Solution", "this sdf"
+                    ext "Immediate Solution Owner" , "Mr Blue 1"
+                    ext  "Data Item Unique Code" , "X1254DD"
+                    ext  "Related To" , "another one"
+                    ext  "Part Of Standard Data Set" , "Unknown"
+                    ext  "Data Completeness" , "70%"
+                    ext "Estimated Quality" , "90%"
+                    ext "Timely" , "no"
                 }
                 dataElement(name: 'P.Test Element 14') {
                     dataType(name: 'Same Name')
-                    ext 'System Column', 'BLAH3 asdfs 1'
-                    ext 'Known Issue', 'test issue asd'
-                    ext 'Semantic Matching', 'no'
-                    ext 'Data Completeness', '54%'
-                    ext 'Data Quality', '92%'
+                    ext  "Semantic Matching", "yes"
+                    ext "Known Issue" , ""
+                    ext "Immediate Solution", "this sdf"
+                    ext "Immediate Solution Owner" , "Mr Blue 1"
+                    ext "Long Term Solution" , "that"
+                    ext  "Long Term Solution Owner" , "Mr Red 2"
+                    ext  "Data Item Unique Code" , "X1254DD"
+                    ext  "Related To" , "another one"
+                    ext  "Part Of Standard Data Set" , "Unknown"
+                    ext  "Data Completeness" , "70%"
+                    ext "Estimated Quality" , "90%"
+                    ext "Timely" , "no"
                 }
                 dataElement(name: 'P.Test Element 15') {
                     dataType(name: 'Same Name')
-                    ext 'System Column', 'BL2AH asdfs 1'
-                    ext 'Known Issue', 'test issue asd'
-                    ext 'Semantic Matching', 'no'
-                    ext 'Data Completeness', '23%'
-                    ext 'Data Quality', '64%'
+                    ext  "Semantic Matching", "yes"
+                    ext "Known Issue" , "sdsafadfs"
+                    ext "Immediate Solution", "this sdf"
+                    ext "Immediate Solution Owner" , "Mr Blue 1"
+                    ext  "Part Of Standard Data Set" , "Unknown"
+                    ext  "Data Completeness" , "70%"
+                    ext "Estimated Quality" , "90%"
+                    ext "Timely" , "no"
 
                 }
             }

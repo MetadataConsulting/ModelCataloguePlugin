@@ -80,22 +80,12 @@ class SummaryReportXlsxExporter {
                         style H1
                     }
                     cell {
+                        value 'Related To'
+                        width auto
+                        style H1
+                    }
+                    cell {
                         value 'Source System'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Source Attribute'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Column Name'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Known Issue'
                         width auto
                         style H1
                     }
@@ -105,12 +95,57 @@ class SummaryReportXlsxExporter {
                         style H1
                     }
                     cell {
+                        value 'Known Issue'
+                        width auto
+                        style H1
+                    }
+                    cell {
+                        value 'Immediate Solution'
+                        width auto
+                        style H1
+                    }
+                    cell {
+                        value 'Immediate Solution Owner'
+                        width auto
+                        style H1
+                    }
+                    cell {
+                        value 'Long Term Solution'
+                        width auto
+                        style H1
+                    }
+                    cell {
+                        value 'Long Term Solution Owner'
+                        width auto
+                        style H1
+                    }
+                    cell {
+                        value 'Data Item Unique Code'
+                        width auto
+                        style H1
+                    }
+                    cell {
+                        value 'Related To Metadata'
+                        width auto
+                        style H1
+                    }
+                    cell {
+                        value 'Part Of Standard Data Set'
+                        width auto
+                        style H1
+                    }
+                    cell {
                         value 'Data Completeness'
                         width auto
                         style H1
                     }
                     cell {
-                        value 'Data Quality'
+                        value 'Estimated Quality'
+                        width auto
+                        style H1
+                    }
+                    cell {
+                        value 'Timely'
                         width auto
                         style H1
                     }
@@ -179,7 +214,7 @@ class SummaryReportXlsxExporter {
                     style H1
                 }
                 cell {
-                    value 'System Attribute'
+                    value 'Semantic Matching'
                     width auto
                     style H1
                 }
@@ -189,7 +224,37 @@ class SummaryReportXlsxExporter {
                     style H1
                 }
                 cell {
-                    value 'Semantic Matching'
+                    value 'Immediate Solution'
+                    width auto
+                    style H1
+                }
+                cell {
+                    value 'Immediate Solution Owner'
+                    width auto
+                    style H1
+                }
+                cell {
+                    value 'Long Term Solution'
+                    width auto
+                    style H1
+                }
+                cell {
+                    value 'Long Term Solution Owner'
+                    width auto
+                    style H1
+                }
+                cell {
+                    value 'Data Item Unique Code'
+                    width auto
+                    style H1
+                }
+                cell {
+                    value 'Related To Metadata'
+                    width auto
+                    style H1
+                }
+                cell {
+                    value 'Part Of Standard Data Set'
                     width auto
                     style H1
                 }
@@ -199,7 +264,12 @@ class SummaryReportXlsxExporter {
                     style H1
                 }
                 cell {
-                    value 'Data Quality'
+                    value 'Estimated Quality'
+                    width auto
+                    style H1
+                }
+                cell {
+                    value 'Timely'
                     width auto
                     style H1
                 }
@@ -335,7 +405,7 @@ class SummaryReportXlsxExporter {
                         colspan 4
                     }
                     cell {
-                        value "${ Math.round(v.get("completed") / v.get("total") * 100) } %"
+                        value "${ (v.get("completed") && v.get("total")) ? Math.round(v.get("completed") / v.get("total") * 100) : "0"} %"
                         width auto
                     }
                 }
@@ -427,7 +497,7 @@ class SummaryReportXlsxExporter {
     void printDataElement(RowDefinition rowDefinition, Relationship dataElementRelationship, List outline = []) {
         DataElement dataElement = dataElementRelationship.destination
         List relatedTo  = []
-        relatedTo = dataElement.relatedTo.findAll{ it.dataModel.ext.get('organisation') == "UCL" }
+        relatedTo = dataElement.relatedTo.findAll{ it.dataModel.ext.get('http://www.modelcatalogue.org/metadata/#organization') == "UCL" }
         addToSystemsMap(relatedTo, dataElement)
 
         rowDefinition.with {
@@ -528,7 +598,7 @@ class SummaryReportXlsxExporter {
 
 
                 cell {
-                    value "${ printSystemMetadata(relatedTo, 'System Column')}"
+                    value "${ printSystemMetadata(relatedTo, 'Semantic Matching')}"
                     style {
                         wrap text
                         border top,  {
@@ -539,7 +609,7 @@ class SummaryReportXlsxExporter {
                 }
 
                 cell {
-                    value "${printSystemMetadata(relatedTo, 'Known Issues')}"
+                    value "${printSystemMetadata(relatedTo, 'Known Issue')}"
                     style {
                         wrap text
                         border top,  {
@@ -550,7 +620,73 @@ class SummaryReportXlsxExporter {
                 }
 
                 cell {
-                    value "${printSystemMetadata(relatedTo, 'Semantic Matching')}"
+                    value "${printSystemMetadata(relatedTo, 'Immediate Solution')}"
+                    style {
+                        wrap text
+                        border top,  {
+                            color black
+                            style medium
+                        }
+                    }
+                }
+
+                cell {
+                    value "${printSystemMetadata(relatedTo, 'Immediate Solution Owner')}"
+                    style {
+                        wrap text
+                        border top,  {
+                            color black
+                            style medium
+                        }
+                    }
+                }
+
+                cell {
+                    value "${printSystemMetadata(relatedTo, 'Long Term Solution')}"
+                    style {
+                        wrap text
+                        border top,  {
+                            color black
+                            style medium
+                        }
+                    }
+                }
+
+                cell {
+                    value "${printSystemMetadata(relatedTo, 'Long Term Solution Owner')}"
+                    style {
+                        wrap text
+                        border top,  {
+                            color black
+                            style medium
+                        }
+                    }
+                }
+
+                cell {
+                    value "${printSystemMetadata(relatedTo, 'Data Item Unique Code')}"
+                    style {
+                        wrap text
+                        border top,  {
+                            color black
+                            style medium
+                        }
+                    }
+                }
+
+                cell {
+                    value "${printSystemMetadata(relatedTo, 'Related To')}"
+                    style {
+                        wrap text
+                        border top,  {
+                            color black
+                            style medium
+                        }
+                    }
+                }
+
+                cell {
+                    value "${printSystemMetadata(relatedTo, 'Part Of Standard Data Set')}"
                     style {
                         wrap text
                         border top,  {
@@ -570,9 +706,18 @@ class SummaryReportXlsxExporter {
                         }
                     }
                 }
-
                 cell {
-                    value "${printSystemMetadata(relatedTo, 'Data Quality')}"
+                    value "${printSystemMetadata(relatedTo, 'Estimated Quality')}"
+                    style {
+                        wrap text
+                        border top,  {
+                            color black
+                            style medium
+                        }
+                    }
+                }
+                cell {
+                    value "${printSystemMetadata(relatedTo, 'Timely')}"
                     style {
                         wrap text
                         border top,  {
@@ -639,7 +784,7 @@ class SummaryReportXlsxExporter {
 
 
             cell {
-                value "${ printSystemMetadata([dataElement], 'System Column')}"
+                value "${ printSystemMetadata([dataElement], 'Semantic Matching')}"
                 style {
                     wrap text
                     border top,  {
@@ -650,7 +795,7 @@ class SummaryReportXlsxExporter {
             }
 
             cell {
-                value "${printSystemMetadata([dataElement], 'Known Issues')}"
+                value "${printSystemMetadata([dataElement], 'Known Issue')}"
                 style {
                     wrap text
                     border top,  {
@@ -661,7 +806,73 @@ class SummaryReportXlsxExporter {
             }
 
             cell {
-                value "${printSystemMetadata([dataElement], 'Semantic Matching')}"
+                value "${printSystemMetadata([dataElement], 'Immediate Solution')}"
+                style {
+                    wrap text
+                    border top,  {
+                        color black
+                        style medium
+                    }
+                }
+            }
+
+            cell {
+                value "${printSystemMetadata([dataElement], 'Immediate Solution Owner')}"
+                style {
+                    wrap text
+                    border top,  {
+                        color black
+                        style medium
+                    }
+                }
+            }
+
+            cell {
+                value "${printSystemMetadata([dataElement], 'Long Term Solution')}"
+                style {
+                    wrap text
+                    border top,  {
+                        color black
+                        style medium
+                    }
+                }
+            }
+
+            cell {
+                value "${printSystemMetadata([dataElement], 'Long Term Solution Owner')}"
+                style {
+                    wrap text
+                    border top,  {
+                        color black
+                        style medium
+                    }
+                }
+            }
+
+            cell {
+                value "${printSystemMetadata([dataElement], 'Data Item Unique Code')}"
+                style {
+                    wrap text
+                    border top,  {
+                        color black
+                        style medium
+                    }
+                }
+            }
+
+            cell {
+                value "${printSystemMetadata([dataElement], 'Related To')}"
+                style {
+                    wrap text
+                    border top,  {
+                        color black
+                        style medium
+                    }
+                }
+            }
+
+            cell {
+                value "${printSystemMetadata([dataElement], 'Part Of Standard Data Set')}"
                 style {
                     wrap text
                     border top,  {
@@ -681,9 +892,18 @@ class SummaryReportXlsxExporter {
                     }
                 }
             }
-
             cell {
-                value "${printSystemMetadata([dataElement], 'Data Quality')}"
+                value "${printSystemMetadata([dataElement], 'Estimated Quality')}"
+                style {
+                    wrap text
+                    border top,  {
+                        color black
+                        style medium
+                    }
+                }
+            }
+            cell {
+                value "${printSystemMetadata([dataElement], 'Timely')}"
                 style {
                     wrap text
                     border top,  {
