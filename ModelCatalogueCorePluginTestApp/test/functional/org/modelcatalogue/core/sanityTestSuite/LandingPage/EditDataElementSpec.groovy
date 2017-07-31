@@ -68,10 +68,9 @@ class EditDataElementSpec extends AbstractModelCatalogueGebSpec {
         Thread.sleep(3000l)
         fill 'metadataStep-organization' with 'MetaData Consulting Limited'
         fill 'metadataStep-namespace' with 'xString'
-
-
         and:'save '
         click submit
+        Thread.sleep(3000)
 
         then:
         check "input[name='name']" gone

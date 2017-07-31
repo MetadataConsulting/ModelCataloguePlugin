@@ -132,6 +132,9 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
         return notNull(DataModel.findByName(COMPLEX_MODEL_NAME))
     }
 
+
+
+
     public <T> T notNull(T item) {
         assert item
         item

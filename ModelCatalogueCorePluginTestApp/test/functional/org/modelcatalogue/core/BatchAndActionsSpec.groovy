@@ -19,10 +19,15 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
     private static final CatalogueContent nameProperty      = CatalogueContent.create('td.soe-table-property-value input', 'data-for-property': 'name')
 
     private static final CatalogueContent linkToTestBatch   = CatalogueContent.create('td.inf-table-item-cell a', text: 'Test Batch')
-    private static final CatalogueContent linkToRename      = CatalogueContent.create('td.inf-table-item-cell a', text: 'Create Synonyms for Enumerated Type \'personGenderCode(current)\'')
+    private static final CatalogueContent linkToRename      = CatalogueContent.create('td.inf-table-item-cell a', text: "Suggested DataElement Exact Matches for 'Test 1 (0.0.1)' and 'Test 2 (0.0.1)'")
     private static final CatalogueAction generateSuggestions = CatalogueAction.runFirst('list', 'generate-suggestions')
     private static final CatalogueAction refreshList        = CatalogueAction.runFirst('list', 'refresh-batches')
     private static final CatalogueAction reloadActions      = CatalogueAction.runFirst('item', 'reload-actions')
+    private static final String  search1 ="input#data-model-1"
+    private static final String  search2 ="input#data-model-2"
+    private static final String  dropdown ="select.form-control"
+    private static final String  minScore ="input#min-score"
+
 
     def "see test batch in action "() {
         loginAdmin()
@@ -43,6 +48,13 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog displayed
 
         when:
+        fill search1 with "test 1" and pick first item
+        fill search2 with "test 2" and pick first item
+        click dropdown
+        $(dropdown).find('option').find{it.value() =='string:Data Element Exact Match'}.click()
+
+        fill minScore with "10"
+
         click modalPrimaryButton
 
         while (check(linkToRename).missing) {

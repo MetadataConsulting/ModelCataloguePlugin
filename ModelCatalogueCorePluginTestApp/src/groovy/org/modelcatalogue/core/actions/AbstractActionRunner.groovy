@@ -109,8 +109,10 @@ abstract class AbstractActionRunner implements ActionRunner {
         }
         def match = encoded =~ /gorm:\/\/(.*):(\d+)/
         if (match) {
+            String className = match[0][1] as String
+            Long id = match[0][2] as Long
             try {
-                def entity = Class.forName(match[0][1]).get(match[0][2] as Long)
+                def entity = Class.forName(className).get(id)
                 if (entity) {
                     autowireCapableBeanFactory.autowireBean(entity)
                 }

@@ -94,14 +94,18 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         and: 'the element is selected'
         fill 'data-element' with 'nhs'
         selectCepItemIfExists()
+        Thread.sleep(3000)
 
         and: 'finish is clicked'
         click stepFinish
+        Thread.sleep(5000)
 
         then: 'the data class is saved'
         check wizardSummary is "Data Class ${NEW_DATA_CLASS_NAME} created"
 
         when:
+        Thread.sleep(3000)
+        //add timeout
         click exitButton
 
         and:
@@ -125,6 +129,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 
         and: 'finish is clicked'
         click stepFinish
+        Thread.sleep(3000)
 
         then: 'the data class is saved'
         check wizardSummary is "Data Class Another New created"
@@ -150,10 +155,12 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         click modalPrimaryButton
 
         then: 'the number of children of Another New must be 1'
+
            check 'td.col-md-5' contains'DEMOGRAPHICS 241@0.0.1'
 //        check {
 //            $('span.catalogue-element-treeview-name', text: startsWith("Another New")).parent().parent().find('.badge')
 //        } is '1'
+
     }
 
     def "edit child data class"() {
@@ -164,8 +171,10 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         fill nameLabel with 'Changed Name'
-
+        Thread.sleep(3000)
         click inlineEditSubmit
+        Thread.sleep(3000)
+        remove messages
 
         then: "same number of children are still shown"
         remove messages
@@ -174,6 +183,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 //        check {
 //         $('span.catalogue-element-treeview-name', text: startsWith("Changed Name")).parent().parent().find('.badge')
 //         } contains  '1'
+
 
     }
 

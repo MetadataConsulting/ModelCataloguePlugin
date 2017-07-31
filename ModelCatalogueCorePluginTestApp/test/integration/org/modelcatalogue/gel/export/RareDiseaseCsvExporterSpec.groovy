@@ -15,7 +15,6 @@ class RareDiseaseCsvExporterSpec extends AbstractRareDiseasesExporterSpec {
 
         buildTestModel(true)
         findDataIds()
-
         generateCSVs()
 
     }

@@ -55,13 +55,14 @@ class BootStrap {
                 initSecurity(false)
                 setupDevTestStuff()
             }
-//            modelCatalogueSearchService.reindex(true).all { it }.toBlocking().subscribe {
-//                System.out.println "Reindexed"
-//            }
+
         } else {
             initCatalogueService.initDefaultRelationshipTypes()
-            initPoliciesAndTags()
             initSecurity(!System.getenv('MC_BLANK_DEV'))
+        }
+
+        modelCatalogueSearchService.reindex(true).all { it }.toBlocking().subscribe {
+            System.out.println "Reindexed"
         }
 
         initCatalogueService.setupStoredProcedures()
@@ -69,6 +70,7 @@ class BootStrap {
         if (Environment.current == Environment.PRODUCTION) {
             userService.inviteAdmins()
         }
+
 
         //register custom json Marshallers
         //ctx.domainModellerService.modelDomains()
@@ -90,13 +92,25 @@ class BootStrap {
         reportsRegistry.register {
             creates asset
             title { "Inventory Report Spreadsheet" }
-            defaultName { "${it.name} report as MS Excel Document" }
+            defaultName { "${it.name} report as MS Excel Document Inventory" }
             depth 3
             type DataModel
             when { DataModel dataModel ->
                 dataModel.countDeclares() > 0
             }
             link controller: 'dataModel', action: 'inventorySpreadsheet', id: true
+        }
+
+        reportsRegistry.register {
+            creates asset
+            title { "Grid Report Spreadsheet" }
+            defaultName { "${it.name} report as MS Excel Document Grid" }
+            depth 3
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.countDeclares() > 0
+            }
+            link controller: 'dataModel', action: 'gridSpreadsheet', id: true
         }
 
         reportsRegistry.register {
@@ -111,7 +125,7 @@ class BootStrap {
         reportsRegistry.register {
             creates asset
             title { "Inventory Report Document" }
-            defaultName { "${it.name} report as MS Excel Document" }
+            defaultName { "${it.name} report as MS Word Document" }
             depth 3
             type DataModel
             when { DataModel dataModel ->
@@ -129,16 +143,6 @@ class BootStrap {
             link controller: 'dataClass', action: 'inventorySpreadsheet', id: true
         }
 
-//  needs more work
-//        reportsRegistry.register {
-//            creates asset
-//            title { "Changelog Document" }
-//            defaultName { "${it.name} changelog as MS Word Document" }
-//            depth 3
-//            includeMetadata true
-//            type DataClass
-//            link controller: 'dataClass', action: 'changelogDoc', id: true
-//        }
 
         reportsRegistry.register {
             creates link
@@ -169,29 +173,6 @@ class BootStrap {
             link controller: 'genomics', action: 'exportAllRareDiseaseReports', id: true
         }
 
-// needs more work
-//        reportsRegistry.register {
-//            creates asset
-//            title { "GEL Changelog (Word Doc)" }
-//            defaultName { "${it.name} changelog as MS Word Document" }
-//            depth 3
-//            includeMetadata true
-//            type DataModel
-//            when { DataModel dataModel ->
-//                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
-//            }
-//            link controller: 'genomics', action: 'exportChangeLogDocument', id: true
-//        }
-
-//        reportsRegistry.register {
-//            creates asset
-//            title { "GEL Data Specification Report (Word Doc)" }
-//            defaultName { "${it.name} report as MS Word Document" }
-//            depth 3
-//            type DataModel
-//            link controller: 'genomics', action: 'exportGelSpecification', id: true
-//        }
-
         reportsRegistry.register {
             creates link
             title { "Rare Diseases Disorder List (CSV)" }
@@ -212,6 +193,10 @@ class BootStrap {
             link controller: 'genomics', action: 'exportRareDiseaseEligibilityDoc', id: true
         }
 
+
+
+
+
         reportsRegistry.register {
             creates link
             title { "Rare Diseases Phenotypes and Clinical Tests Report (Word Doc)" }
@@ -220,6 +205,17 @@ class BootStrap {
                 dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
             }
             link controller: 'genomics', action: 'exportRareDiseasePhenotypesAndClinicalTestsDoc', id: true
+        }
+
+
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases Eligibility Phenotypes Split Docs" }
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseaseSplitDocs', id: true
         }
 
         reportsRegistry.register {
@@ -275,27 +271,17 @@ class BootStrap {
             link controller: 'genomics', action: 'exportRareDiseaseEligibilityCsv', id: true
         }
 
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases Static Website" }
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get('Rare Disease Report Available') == 'true' || dataModel.ext.get("All Rare Disease Conditions Reports") == 'true' || dataModel.ext.get(Metadata.ALL_RD_REPORTS) == 'true' || dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseasesWebsite', id: true
+        }
 
-// needs work before we can release
-//        reportsRegistry.register {
-//            creates link
-//            title { "Cancer Types (JSON)" }
-//            type DataModel
-//            when { DataModel dataModel ->
-//                dataModel.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
-//            }
-//            link controller: 'genomics', action: 'exportCancerTypesAsJson', id: true
-//        }
-//
-//        reportsRegistry.register {
-//            creates link
-//            title { "Cancer Types (CSV)" }
-//            type DataModel
-//            when { DataModel dataModel ->
-//                dataModel.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
-//            }
-//            link controller: 'genomics', action: 'exportCancerTypesAsCsv', id: true
-//        }
+
 // needs work before we can release
 //        reportsRegistry.register {
 //            creates link
@@ -323,16 +309,42 @@ class BootStrap {
 //            type DataModel
 //            link controller: 'genomics', action: 'exportDataSpecChangeLogAsXls', id: true
 //        }
+        //  needs more work
+//        reportsRegistry.register {
+//            creates asset
+//            title { "Changelog Document" }
+//            defaultName { "${it.name} changelog as MS Word Document" }
+//            depth 3
+//            includeMetadata true
+//            type DataClass
+//            link controller: 'dataClass', action: 'changelogDoc', id: true
+//        }
 
-        reportsRegistry.register {
-            creates link
-            title { "Rare Diseases Static Website" }
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.ext.get('Rare Disease Report Available') == 'true' || dataModel.ext.get("All Rare Disease Conditions Reports") == 'true' || dataModel.ext.get(Metadata.ALL_RD_REPORTS) == 'true' || dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
-            }
-            link controller: 'genomics', action: 'exportRareDiseasesWebsite', id: true
-        }
+// needs more work
+//        reportsRegistry.register {
+//            creates asset
+//            title { "GEL Changelog (Word Doc)" }
+//            defaultName { "${it.name} changelog as MS Word Document" }
+//            depth 3
+//            includeMetadata true
+//            type DataModel
+//            when { DataModel dataModel ->
+//                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+//            }
+//            link controller: 'genomics', action: 'exportChangeLogDocument', id: true
+//        }
+
+//        reportsRegistry.register {
+//            creates asset
+//            title { "GEL Data Specification Report (Word Doc)" }
+//            defaultName { "${it.name} report as MS Word Document" }
+//            depth 3
+//            type DataModel
+//            link controller: 'genomics', action: 'exportGelSpecification', id: true
+//        }
+
+
+
     }
 
     private static void initSecurity(boolean production) {
@@ -395,6 +407,7 @@ class BootStrap {
                 '/login', '/login.*', '/login/*',
                 '/logout', '/logout.*', '/logout/*',
                 '/register/*', '/errors', '/errors/*',
+                '/load',
                 '/index.gsp'
         ]) {
             createRequestmapIfMissing(url, 'permitAll', null)
@@ -428,11 +441,6 @@ class BootStrap {
         createRequestmapIfMissing('/monitoring/**',                         'ROLE_SUPERVISOR')
         createRequestmapIfMissing('/plugins/console-1.5.0/**',              'ROLE_SUPERVISOR')
 
-//        createRequestmapIfMissing('/api/modelCatalogue/core/dataClass/**', 'IS_AUTHENTICATED_ANONYMOUSLY')
-//        createRequestmapIfMissing('/api/modelCatalogue/core/dataElement/**', 'ROLE_METADATA_CURATOR')
-//        createRequestmapIfMissing('/api/modelCatalogue/core/dataType/**', 'ROLE_USER')
-//        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR')
-//        createRequestmapIfMissing('/api/modelCatalogue/core/relationshipTypes/**', 'ROLE_ADMIN')
     }
 
     def initPoliciesAndTags() {
@@ -533,14 +541,25 @@ class BootStrap {
                     dataElement(name: 'Test Element 1') {
                         dataType(name: 'Same Name')
                     }
+                    dataElement(name: 'Test Element 2') {
+                        dataType(name: 'Same Name')
+                    }
                 }
 
+            }
+
+            catalogueBuilder.build {
                 dataModel(name: 'Test 2') {
+                    automatic dataType
                     policy 'Unique of Kind'
                     dataElement(name: 'Test Element 2') {
                         dataType(name: 'Same Name')
                     }
                 }
+            }
+
+            catalogueBuilder.build {
+                automatic dataType
                 dataModel(name: 'Test 3') {
                     dataElement(name: "data element with orphaned data type")
                 }
