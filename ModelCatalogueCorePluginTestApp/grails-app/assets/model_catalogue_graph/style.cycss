@@ -11,7 +11,7 @@ edge {
 
 	text-wrap: wrap;
 	font-size: 15;
-	curve-style: bezier; /* bezier may be expensive; haystack will be simpler */
+	curve-style: haystack; /* bezier may be expensive; haystack will be simpler */
   haystack-radius: 0;
 	opacity: 1;
 	width: 2;
