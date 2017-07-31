@@ -29,7 +29,7 @@ class ElasticSearchServiceSpec extends AbstractIntegrationSpec {
     def "play with elasticsearch"() {
         catalogueBuilder.build {
             skip draft
-            dataModel(name: "ES Test Model") {
+            dataModel(name: "ES FirstTestSpec Model") {
                 ext 'date_in_model_metadata', '2014-06-06T06:34:24Z'
                 policy 'TEST POLICY'
                 dataClass(name: "Foo") {
@@ -39,7 +39,7 @@ class ElasticSearchServiceSpec extends AbstractIntegrationSpec {
                     relationship {
                        //  ext 'date_in_relationship_metadata', '2014-06-06T06:34:24Z'
                     }
-                    validationRule(name: 'Test Rule') {
+                    validationRule(name: 'FirstTestSpec Rule') {
                         rule 'IF this THEN that'
                     }
                     dataElement(name: 'nested data element') {
@@ -49,12 +49,12 @@ class ElasticSearchServiceSpec extends AbstractIntegrationSpec {
                     }
                 }
 
-                dataType(name: 'Test Primitive Data Type') {
-                    dataClass(name: 'Test Primitive Data Type Data Class')
+                dataType(name: 'FirstTestSpec Primitive Data Type') {
+                    dataClass(name: 'FirstTestSpec Primitive Data Type Data Class')
                 }
 
-                dataType(name: 'Test Primitive Data Type Relation') {
-                    rel 'relatedTo' to 'Test Primitive Data Type'
+                dataType(name: 'FirstTestSpec Primitive Data Type Relation') {
+                    rel 'relatedTo' to 'FirstTestSpec Primitive Data Type'
                 }
             }
 
@@ -62,7 +62,7 @@ class ElasticSearchServiceSpec extends AbstractIntegrationSpec {
                 check dataType property 'name' is 'unique'
             }
         }
-        DataModel dataModel = DataModel.findByName("ES Test Model")
+        DataModel dataModel = DataModel.findByName("ES FirstTestSpec Model")
         DataClass element = DataClass.findByName("Foo")
         MeasurementUnit unit = MeasurementUnit.findByName('unit of measure 123456')
         DataModelPolicy policy = DataModelPolicy.findByName('TEST POLICY')

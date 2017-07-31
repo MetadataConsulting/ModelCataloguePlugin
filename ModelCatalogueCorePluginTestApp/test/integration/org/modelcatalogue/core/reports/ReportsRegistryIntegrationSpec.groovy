@@ -16,7 +16,7 @@ import spock.lang.Stepwise
 class ReportsRegistryIntegrationSpec extends IntegrationSpec {
 
     def "returns reports for the given element"() {
-        DataClass model                 = new DataClass(name: "Test")
+        DataClass model                 = new DataClass(name: "FirstTestSpec")
         model.id                    = 1
 
         LinkGenerator linkGenerator = applicationContext.getBean(LinkGenerator)

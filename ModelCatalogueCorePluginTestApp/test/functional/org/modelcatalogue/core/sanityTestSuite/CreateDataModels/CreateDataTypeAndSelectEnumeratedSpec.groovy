@@ -84,17 +84,17 @@ class CreateDataTypeAndSelectEnumeratedSpec extends AbstractModelCatalogueGebSpe
 
     }
     @Unroll
-    def"check that the enumerations have been saved properly"(  int row , String colunm){
+    def"check that the enumerations have been saved properly"(  int row , String column){
 
         expect:
-        $("div.split-view-right.data-model-detail-pane > ui-view > ui-view > div > div > div > div > form > div:nth-child(5) > div > ng-include > div > div:nth-child(2) > div > table > tbody > tr:nth-child($row) > th > small").text() == colunm
+        $("div.split-view-right.data-model-detail-pane > ui-view > ui-view > div > div > div > div > form > div:nth-child(5) > div > ng-include > div > div:nth-child(2) > div > table > tbody > tr:nth-child($row) > th > small").text() == column
 
         Thread.sleep(3000l)
 
 
 
         where:
-        row      || colunm
+        row      || column
         1        || '01'
         2        || '02'
         3        || '03'
@@ -103,16 +103,16 @@ class CreateDataTypeAndSelectEnumeratedSpec extends AbstractModelCatalogueGebSpe
 
     }
     @Unroll
-    def"check that enumeration are saved"(int row,String colunm){
+    def"check that enumeration are saved"(int row,String column){
 
 
         expect:
 
-        $("div.split-view-right.data-model-detail-pane > ui-view > ui-view > div > div > div > div > form > div:nth-child(5) > div > ng-include > div > div:nth-child(2) > div > table > tbody > tr:nth-child($row) > td:nth-child(2) > small").text()==colunm
+        $("div.split-view-right.data-model-detail-pane > ui-view > ui-view > div > div > div > div > form > div:nth-child(5) > div > ng-include > div > div:nth-child(2) > div > table > tbody > tr:nth-child($row) > td:nth-child(2) > small").text()==column
         Thread.sleep(3000L)
 
         where:
-        row      || colunm
+        row      || column
         1        || 'one'
         2        || 'two'
         3        || 'three'

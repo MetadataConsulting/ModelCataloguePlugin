@@ -22,13 +22,13 @@ class CreateNewVersionFromFinalisedToDraftSpec extends AbstractModelCatalogueGeb
     private static final String  delete ='a#delete-menu-item-link>span:nth-child(3)'
     static final String wizardName = 'div.create-classification-wizard #name'
     private static final String  createButton='a#role_data-models_create-data-modelBtn'
-    private static final String  versionsTreeViews='ul.catalogue-element-treeview-list-root>li>ul>li:nth-child(10)>div>span:nth-child(2)>span'
+    private static final String  versionsTreeViews='ul.catalogue-element-treeview-list-root>li>ul>li:nth-child(10)>div>span>span'
     private static final String  closeButton='div.modal-footer>button:nth-child(2)'
     private static final String  isBasedOnTag='ul.nav-tabs>li:nth-child(3)>a>span:nth-child(1)'
     private static final String  finishButton='button#step-finish'
     private static final String   search='input#element'
-    private static final String   dataClasses='ul.catalogue-element-treeview-list-root>li>ul>li:nth-child(1)>div>span:nth-child(2)>span'
-    private static final String   createdVersion='tr.warning>td:nth-child(1)>a:nth-child(2)'
+    private static final String   dataClasses='ul.catalogue-element-treeview-list-root>li>ul>li:nth-child(1)>div>span>span'
+    private static final String   createdVersion='tr.warning>td:nth-child(2)>a'
     private static final String   createdDataClass='td.col-md-4>span>span>a'
     private static final String   finalize='a#finalize-menu-item-link'
     private static final String   createNewVersion='a#role_modal_modal-create-new-versionBtn'
@@ -206,14 +206,14 @@ class CreateNewVersionFromFinalisedToDraftSpec extends AbstractModelCatalogueGeb
 
         expect:
 
-        $("#data-elements-changes > div.inf-table-body > table > tbody > tr:nth-child($location) > td:nth-child(1) > a.preserve-new-lines.ng-binding.ng-scope").text()== dataElement
+        $("#data-elements-changes > div.inf-table-body > table > tbody > tr:nth-child($location) > td:nth-child(1) > a.preserve-new-lines.ng-binding.ng-scope").text().contains( dataElement)
           Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
         where:
         location || dataElement
-        1        || 'MET-523.M3.DE1'
-        2        || 'MET-523.M3.DE2'
-        3        || 'MET-523.M3.DE3'
+        1        || 'MET-523.M3.DE'
+        2        || 'MET-523.M3.DE'
+        3        || 'MET-523.M3.DE'
 
 
 

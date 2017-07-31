@@ -161,7 +161,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     /**
-     * @deprecated may produce stale element reference exceptions
+     * @deprecatedAndRestore may produce stale element reference exceptions
      */
     NavigatorCondition check(Navigator navigator) {
         new NavigatorCondition(this, { navigator })
@@ -191,7 +191,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     /**
-     * @deprecated may produce stale references
+     * @deprecatedAndRestore may produce stale references
      */
     @Deprecated
     void click(Navigator navigator) {
@@ -373,7 +373,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
     /**
-     * Fills the metadata with the new values
+     * Fills the metadataStep with the new values
      * @param newMetadata
      */
     void fillMetadata(Map newMetadata, Navigator parent = null) {

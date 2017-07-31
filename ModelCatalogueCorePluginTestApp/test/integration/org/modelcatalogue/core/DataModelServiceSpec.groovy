@@ -26,9 +26,9 @@ class DataModelServiceSpec extends AbstractIntegrationSpec {
 
     def setup() {
         initRelationshipTypes()
-        model1 = new DataModel(name: "Test Classification 1 ${System.currentTimeMillis()}").save(failOnError: true)
-        model2 = new DataModel(name: "Test Classification 2 ${System.currentTimeMillis()}").save(failOnError: true)
-        model3 = new DataModel(name: "Test Classification 3 ${System.currentTimeMillis()}").save(failOnError: true)
+        model1 = new DataModel(name: "FirstTestSpec Classification 1 ${System.currentTimeMillis()}").save(failOnError: true)
+        model2 = new DataModel(name: "FirstTestSpec Classification 2 ${System.currentTimeMillis()}").save(failOnError: true)
+        model3 = new DataModel(name: "FirstTestSpec Classification 3 ${System.currentTimeMillis()}").save(failOnError: true)
         class0 = new DataClass(name: "Not Classified", status: ElementStatus.FINALIZED).save(failOnError: true)
         class1 = new DataClass(dataModel: model1, name: "Classified 1", status: ElementStatus.FINALIZED).save(failOnError: true)
         class2 = new DataClass(dataModel: model2, name: "Classified 2 ", status: ElementStatus.FINALIZED).save(failOnError: true)
@@ -69,7 +69,7 @@ class DataModelServiceSpec extends AbstractIntegrationSpec {
     }
 
     def "does not fail when there are no results"() {
-        new DataType(name: "Test Domain", dataModel: model1).save(failOnError: true)
+        new DataType(name: "FirstTestSpec Domain", dataModel: model1).save(failOnError: true)
         DetachedCriteria<DataType> criteria = dataModelService.classified(DataType, DataModelFilter.create(true))
 
         expect:

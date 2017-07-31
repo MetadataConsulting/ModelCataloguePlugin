@@ -59,7 +59,7 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
         params.measurementUnitName = "measurement"
         params.measurementSymbol = "MeasurementSymbol"
         params.classification = "Classification"
-        params.metadata = "metadata"
+        params.metadata = "metadataStep"
 
         HeadersMap headersMap = HeadersMap.create(params)
         expect:
@@ -76,7 +76,7 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
         headersMap.measurementUnitName == "measurement"
         headersMap.measurementSymbol == "MeasurementSymbol"
         headersMap.classification == "Classification"
-        headersMap.metadata == "metadata"
+        headersMap.metadata == "metadataStep"
 
     }
 

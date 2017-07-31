@@ -28,14 +28,14 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
 
 
     def "replace special chars"() {
-        Writable writable = printer.bind(new DataType(name: 'Test', description: "diagnosis.ƒ‚ƒ‚ƒ‚'‚“ e", modelCatalogueId: 'http://example.com/specialchars').save()) {
+        Writable writable = printer.bind(new DataType(name: 'FirstTestSpec', description: "diagnosis.ƒ‚ƒ‚ƒ‚'‚“ e", modelCatalogueId: 'http://example.com/specialchars').save()) {
             noHref = true
         }
         StringWriter writer = new StringWriter()
         writable.writeTo(writer)
         expect:
         writer.toString() == '''<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry.xsd">
-  <dataTypes name="Test" id="http://example.com/specialchars">
+  <dataTypes name="FirstTestSpec" id="http://example.com/specialchars">
     <description>diagnosis.&#402;&#8218;&#402;&#8218;&#402;&#8218;'&#8218;&#8220; e</description>
   </dataTypes>
 </catalogue>'''

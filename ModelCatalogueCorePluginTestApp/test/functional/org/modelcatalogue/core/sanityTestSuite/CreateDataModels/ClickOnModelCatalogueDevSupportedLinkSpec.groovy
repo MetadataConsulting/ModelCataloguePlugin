@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.sanityTestSuite.HomePage
+package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
 
 import geb.spock.GebSpec

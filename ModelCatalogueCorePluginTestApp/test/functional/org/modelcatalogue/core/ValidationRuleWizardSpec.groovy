@@ -26,12 +26,12 @@ class ValidationRuleWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog displayed
 
         when:
-        fill 'name' with 'Test Validation Rule'
+        fill 'name' with 'FirstTestSpec Validation Rule'
 
         click save
 
         then:
-        check { infTableCell(1, 1) } contains 'Test Validation Rule'
+        check { infTableCell(1, 1) } contains 'FirstTestSpec Validation Rule'
     }
 
     def "check the unit shows up with own detail page"(){
@@ -39,7 +39,7 @@ class ValidationRuleWizardSpec extends AbstractModelCatalogueGebSpec {
         click { infTableCell(1, 1).find('a:not(.inf-cell-expand)') }
 
         expect:
-        check rightSideTitle contains 'Test Validation Rule'
+        check rightSideTitle contains 'FirstTestSpec Validation Rule'
     }
 
 }

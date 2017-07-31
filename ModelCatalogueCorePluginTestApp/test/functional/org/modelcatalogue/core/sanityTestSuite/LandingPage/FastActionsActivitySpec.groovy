@@ -13,7 +13,7 @@ class FastActionsActivitySpec extends AbstractModelCatalogueGebSpec{
 
     private static final String create="a#role_data-models_create-data-modelBtn"
     private static final String  fastActions="a#role_navigation-right_fast-action-menu-item-link>span:nth-child(1)"
-    private static final String  activity ="div.modal-body>div:nth-child(2)>div>a:nth-child(2)"
+    private static final String  activity ="div.modal-body>div:nth-child(2)>div>a:nth-child(2)>h4"
     private static final String  user = "td.col-md-8"
 
 

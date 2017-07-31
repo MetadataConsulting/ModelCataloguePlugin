@@ -643,7 +643,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     def "update and set metadata"() {
         if (controller.readOnly) return
         Map props = new HashMap(newInstance)
-        props.name = "Test ${UUID.randomUUID()}"
+        props.name = "FirstTestSpec ${UUID.randomUUID()}"
         CatalogueElement another        =  resource.newInstance()
         another.properties = props
         another.save(failOnError: true)
@@ -696,14 +696,14 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     /**
-     * @deprecated use dataModelForSpec instead
+     * @deprecatedAndRestore use dataModelForSpec instead
      */
     def getDataModelsForSpec() {
         [dataModelForSpec]
     }
 
     def getDataModelForSpec() {
-        new DataModel(name: "Test ${System.nanoTime()}").save(failOnError: true)
+        new DataModel(name: "FirstTestSpec ${System.nanoTime()}").save(failOnError: true)
     }
 
     protected  getBadNameJSON() {

@@ -170,7 +170,8 @@ class MaxOccursIsShowingInHistorySpec extends AbstractModelCatalogueGebSpec{
 
 
 
-        and:'click on the metadata and select occurrence'
+        and:'click on the metadataStep and select occurrence'
+        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
         click metadataButton
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
         click occurrence

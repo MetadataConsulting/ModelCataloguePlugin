@@ -4,7 +4,7 @@ import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.gel.RareDiseaseCsvExporter
 
 /**
- * Test for RD reports class using test model with similar format to expected data.
+ * FirstTestSpec for RD reports class using test model with similar format to expected data.
  */
 class RareDiseaseCsvExporterSpec extends AbstractRareDiseasesExporterSpec {
 
@@ -23,7 +23,7 @@ class RareDiseaseCsvExporterSpec extends AbstractRareDiseasesExporterSpec {
     private void generateCSVs() {
         def today = new Date().format("yyyy-MM-dd")
 
-        hpoAndClinicalTestsCSV = """id,Level 2 Disease Group,id,Level 3 Disease Subgroup,id,Level 4 Specific Disorder,Last Updated,Phenotype,Phenotype ID,Test,Test ID"""
+        hpoAndClinicalTestsCSV = """id,Level 2 Disease Group,id,Level 3 Disease Subgroup,id,Level 4 Specific Disorder,Last Updated,Phenotype,Phenotype ID,FirstTestSpec,FirstTestSpec ID"""
         for (int i in 1..2) {
             for (int j in 1..2) {
                 for (int k in 1..15) {

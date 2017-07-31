@@ -15,13 +15,14 @@ import spock.lang.Stepwise
 class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
     static final String classificationWizzard = 'div.create-classification-wizard'
+    static final String  metadataLink = 'form.ng-pristine>div:nth-child(7)>p>span>span:nth-child(1)'
     static final String wizardName = 'div.create-classification-wizard #name'
     static final String description ='div.create-classification-wizard #description'
     static final String modelCatalogueId ='div.create-classification-wizard #modelCatalogueId'
     static final String stepImports = "#step-imports"
     static final String stepFinish = "#step-finish"
     static final String exitButton = "#exit-wizard"
-    static final CatalogueContent metadataReviewed = CatalogueContent.create('*[name=metadata-reviewed]')
+    static final CatalogueContent metadataReviewed = CatalogueContent.create('*[name=metadata-reviewers]')
     static final CatalogueContent metadataApproved = CatalogueContent.create('*[name=metadata-approved]')
     static final CatalogueAction modalFinalize = CatalogueAction.runLast('modal', 'modal-finalize-data-modal')
     static final CatalogueAction modalCreateNewVersion = CatalogueAction.runLast('modal', 'modal-create-new-version')
@@ -82,17 +83,20 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "finalize element"() {
         check backdrop gone
+        Thread.sleep(2000l)
 
         setup: "fill required data for finalization"
         click inlineEdit
-        click Common.detailSectionMetadata.find('.title .btn')
+        Thread.sleep(3000L)
+        click metadataLink
+        Thread.sleep(3000l)
         fill 'metadata-authors' with 'Neville Chamberlain'
         fill 'metadata-reviewers' with 'Édouard Daladier'
         fill 'metadata-owner' with 'Jan Hus'
         fill metadataReviewed with '29/04/2016'
         fill metadataApproved with '29/04/2016'
-        fill 'metadata-namespace' with 'Namespace'
-        fill 'metadata-organization' with 'Organization'
+        fill 'metadata-organization' with 'Namespace'
+        fill 'metadata-namespace' with 'Organization'
         3.times { scroll up }
         click inlineEditSubmit
         check "input[name='name']" gone
@@ -155,7 +159,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         when: "ok is clicked"
         click OK
 
-        then: "the element is now deprecated"
+        then: "the element is now deprecatedAndRestore"
         check status has 'label-danger'
 
     }

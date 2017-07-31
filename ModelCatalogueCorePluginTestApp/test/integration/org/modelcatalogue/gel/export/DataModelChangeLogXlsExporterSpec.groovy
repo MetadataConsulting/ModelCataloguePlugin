@@ -9,7 +9,7 @@ import static junit.framework.Assert.assertEquals
 import static org.modelcatalogue.core.util.test.FileOpener.open
 
 /**
- * Test for Data Spec change log reports class.
+ * TestSpec for Data Spec change log reports class.
  */
 class DataModelChangeLogXlsExporterSpec extends AbstractDataModelExporterSpec {
 

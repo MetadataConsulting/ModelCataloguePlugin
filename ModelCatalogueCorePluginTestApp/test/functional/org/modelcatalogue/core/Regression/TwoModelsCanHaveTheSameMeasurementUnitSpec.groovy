@@ -15,7 +15,7 @@ import static org.modelcatalogue.core.geb.Common.rightSideTitle
 import static org.modelcatalogue.core.geb.Common.save
 
 @Stepwise
-@See("https://metadata.atlassian.net/browse/MET-1398")
+@See("https://metadataStep.atlassian.net/browse/MET-1398")
 class TwoModelsCanHaveTheSameMeasurementUnitSpec extends  AbstractModelCatalogueGebSpec{
 
 

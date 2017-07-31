@@ -35,7 +35,8 @@ class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
 
         when:
         loginAdmin()
-        select "Test 3" select "Assets"
+        select "Test 1"
+        selectInTree"Assets"
 
         then:
         check rightSideTitle is 'Active Assets'
@@ -66,10 +67,10 @@ class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
         click modelCatalogue
 
         and:
-        select 'Test 3'
+        select 'Test 1'
 
         then:
-        check rightSideTitle contains 'Test 3'
+        check rightSideTitle contains 'Test 1'
     }
     def"navigate to the top menu and select create relationship "(){
 
@@ -87,6 +88,7 @@ class RelationshipHasAttachmentOfSpec extends AbstractModelCatalogueGebSpec{
         click hasAttachmentOf
         and: ' select destination'
         click destinationIcon
+        Thread.sleep(2000L)
         fill search with "example TESTING" and pick first item
         click ModalPrimaryButton
 

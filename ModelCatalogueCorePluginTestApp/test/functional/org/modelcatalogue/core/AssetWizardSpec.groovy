@@ -124,6 +124,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check modalDialog displayed
 
         when:
+        Thread.sleep(2000l)
         fill asset with file('MET-522.xlsx')
         click '.modal-footer .btn-success'
 

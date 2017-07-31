@@ -9,7 +9,7 @@ import static org.modelcatalogue.core.geb.Common.*
 @Stepwise
 class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
 
-    static final String detailSectionFormItemContent = ".metadata-form-item-content"
+    static final String detailSectionFormItemContent = ".metadataStep-form-item-content"
 
     def "login and select Data Element"() {
         login admin
@@ -49,15 +49,5 @@ class DataElementWizardSpec extends AbstractModelCatalogueGebSpec {
         check rightSideTitle contains 'NewDE1'
     }
 
-    def "Check Form (Item) detail section is present and collapsed"() {
-        expect:
-        check Common.detailSectionFormMetadata present once
-        check detailSectionFormItemContent gone
 
-        when: "Click the title"
-        click Common.detailSectionFormMetadata.find('.title .btn')
-
-        then: "Content is displayed"
-        check detailSectionFormItemContent displayed
-    }
 }

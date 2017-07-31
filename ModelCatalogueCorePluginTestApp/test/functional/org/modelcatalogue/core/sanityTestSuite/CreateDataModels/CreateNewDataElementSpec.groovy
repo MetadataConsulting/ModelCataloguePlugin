@@ -21,7 +21,7 @@ class CreateNewDataElementSpec extends AbstractModelCatalogueGebSpec {
     private static final String  delete = "a#delete-menu-item-link"
     private static final String  modelCatalogue = "span.mc-name"
     private static final String  saveElement = "a#role_modal_modal-save-elementBtn"
-    private static final String search = "input#dataTypes"
+    private static final String search = 'input#dataType'
     private static final String dataElement = "a#role_item_catalogue-element-menu-item-link"
     private static final String table = "td.col-md-4"
     private static final String  myElement = "td.col-md-4>span>span>a"

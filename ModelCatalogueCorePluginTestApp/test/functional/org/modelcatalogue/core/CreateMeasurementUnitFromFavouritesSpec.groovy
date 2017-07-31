@@ -1,6 +1,7 @@
-package org.modelcatalogue.core.sanityTestSuite.Favourites
+package org.modelcatalogue.core
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.geb.Common
 import org.modelcatalogue.core.geb.ScrollDirection
 import spock.lang.Stepwise
 
@@ -13,7 +14,7 @@ class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebS
     private static final String user = "a#role_navigation-right_user-menu-menu-item-link>span:nth-child(1)"
     private static final String favourites_menu = "a#user-favorites-menu-item-link>span:nth-child(3)"
     private static final String Model_Catalogue_ID = "tr.inf-table-header-row>th:nth-child(1)>span"
-    private static final String plus_button = "tbody.ng-scope>tr:nth-child(4)>td:nth-child(1)>a:nth-child(1)>span"
+    private static final String plus_button = "tr.warning>td:nth-child(1)>a:nth-child(1)>span"
     private static final String data_model = "button#role_item_catalogue-elementBtn"
     public static final String measurement_button = "a#catalogue-element-create-measurementUnitBtn>span:nth-child(2)"
     private static final String name = "input#name"
@@ -34,6 +35,7 @@ class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebS
         loginAdmin()
         select 'Test 3'
         click favourite
+        Thread.sleep(2000l)
 
         then:
         check modelCatalogue displayed
@@ -42,7 +44,7 @@ class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebS
     def "navigate to favourite tag ,click on plus button and click  on data model"() {
 
         when:
-        remove messages
+        remove Common.messages
         click user
         Thread.sleep(2000l)
         click favourites_menu
@@ -63,22 +65,22 @@ class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebS
 
 
         then:
-        check modalHeader contains('Create Measurement Unit')
+        check Common.modalHeader contains('Create Measurement Unit')
     }
 
     def" create Measurement unit"(){
         when:
         click icon
         Thread.sleep(3000L)
-        fill search with("Test 3")
+        fill search with("Test 1")
         Thread.sleep(1000L)
          selectInSearch(2)
         Thread.sleep(2000L)
         fill name with("MEASUREMENT FROM FAVOURITE ")
         fill symbol with("kilogram")
-        fill modelCatalogueId with("METT-902")
-        fill description with(" this is my measurement ${System.currentTimeSeconds()}")
-        click save
+        fill Common.modelCatalogueId with("METT-902")
+        fill Common.description with(" this is my measurement ${System.currentTimeSeconds()}")
+        click Common.save
 
          then:
          check model_link displayed
@@ -91,11 +93,11 @@ class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebS
         click modelCatalogue
 
         and:
-        select 'Test 3'
+        select 'Test 1'
         selectInTree 'Measurement Units'
 
         then:
-        check rightSideTitle contains 'Active Measurement Units'
+        check Common.rightSideTitle contains 'Active Measurement Units'
 
         when:
         click createdMeasurement
@@ -105,7 +107,7 @@ class CreateMeasurementUnitFromFavouritesSpec extends AbstractModelCatalogueGebS
 
         and:
         click deleteButton
-        click modalPrimaryButton
+        click Common.modalPrimaryButton
 
         then:
         Thread.sleep(2000L)

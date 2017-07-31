@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.Regression
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import spock.lang.Ignore
 import spock.lang.Stepwise
 
 import static org.modelcatalogue.core.geb.Common.create
@@ -21,18 +22,18 @@ class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
     private static final String menuButton ='a#role_item_catalogue-element-menu-item-link>span:nth-child(3)'
     private static final String  modelCatalogue='span.mc-name'
     private static final String  dataElement='td.col-md-4>span>span>a'
-    private static final String  dataElementTable='td.col-md-4'
+    private static final String  tagDeprecated='tbody.ng-scope>tr:nth-child(1)>td:nth-child(2)>a'
     private static final String  addTags='span.fa-plus-circle'
     private static final String  search='input#element'
-    private static final String  deleteButton='a#delete-menu-item-link>span:nth-child(3)'
+    private static final String  Tags='ul.catalogue-element-treeview-list-root>li>ul>li:nth-child(7)>div>span>span'
     private static final String  archiveButton='a#archive-menu-item-link>span:nth-child(3)'
     private static final String   tag ='tr.warning>td:nth-child(1)'
-    private static final String   removeButton ='#role_item_remove-relationshipBtn'
-    private static final String   plusButton ='span.fa-plus-square-o'
+    private static final String   removeButton ='a#role_item_remove-relationshipBtn'
+    private static final String   plusButton ='tr.warning>td:nth-child(1)>a:nth-child(2)>span'
     private static final String   deprecatedTable ='tr.inf-table-item-row>td:nth-child(2)'
-    private static final String  createdTag='ul.catalogue-element-treeview-list-root>li>ul>li:nth-child(2)>ul>li:nth-child(3)>div>span:nth-child(2)>span'
-    private static final String  createdDataElement='tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)>span>span>a'
-    public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 2000
+    private static final String  createdTag='ul.catalogue-element-treeview-list-root>li>ul>li:nth-child(2)>ul>li:nth-child(3)>div>span>span'
+    private static final String  createdDataElement='td.col-md-4>span>span>a'
+    public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 4000
 
 
     def " login to model catalogue and select a draft data model"() {
@@ -44,7 +45,7 @@ class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
 
         then:
         check rightSideTitle contains 'Active Tags'
-        noExceptionThrown()
+
 
         when:
         click create
@@ -96,7 +97,7 @@ class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
         then:
-        check dataElement is 'TESTING_ELEMENT'
+        check { infTableCell(1, 1) } contains 'TESTING_ELEMENT'
 
     }
 
@@ -129,9 +130,12 @@ class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
         then:
         check rightSideTitle contains ' Active Data Elements'
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
+        click createdTag
 
         and:
-        check createdTag contains 'TESTING_TAG'
+        check rightSideTitle contains 'TESTING_TAG MET-002@0.0.1'
+        and:
+        check { infTableCell(1, 2) } contains 'TESTING_ELEMENT (Test 3 0.0.1)'
 
 
     }
@@ -142,27 +146,45 @@ class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
         click modelCatalogue
 
         and:
-        select 'Test 3' open 'Data Elements' select 'TESTING_TAG'
+        select 'Test 3'
+        selectInTree 'Data Elements'
+
+        then:
+        check rightSideTitle is 'Active Data Elements'
+
+        when:
+        click createdDataElement
+
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
         then:
-        check rightSideTitle contains 'TESTING_TAG'
+        check { infTableCell(1, 1) } contains 'TESTING_TAG'
+
 
         when:
         click plusButton
 
         and:
         click removeButton
+        then:
+        check modalHeader is 'Remove Relationship'
+
+        when:
         click modalPrimaryButton
 
         then:
         check table isGone()
 
         when:
-        click modelCatalogue
+        click Tags
+        then:
+        check rightSideTitle is 'Active Tags'
+         and:
+         check { infTableCell(1, 2) } contains 'TESTING_TAG'
 
-        and:
-        select 'Test 3' open 'Tags' select 'TESTING_TAG'
+
+        when:
+        click  tagDeprecated
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
         then:
@@ -179,44 +201,16 @@ class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
         click modalPrimaryButton
 
         and:
-        select 'Test 3' open 'Deprecated Items'
+        select 'Test 3'
+        selectInTree  'Deprecated Items'
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
         then:
         check rightSideTitle contains 'Deprecated Catalogue Elements'
 
         and:
-        check deprecatedTable contains 'TESTING_TAG'
+        check { infTableCell(1, 2) } contains 'TESTING_TAG'
 
     }
 
-    def "delete the created data model"() {
-
-        when:
-        click modelCatalogue
-
-        and:
-        select 'Test 3' select 'Data Elements'
-
-        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-        click createdDataElement
-
-        then:
-        check rightSideTitle contains 'TESTING_ELEMENT'
-
-        when:
-        click menuButton
-
-        and:
-        click deleteButton
-
-        and:
-        click modalPrimaryButton
-
-        then:
-
-        check dataElementTable isGone()
-
-
-    }
 }

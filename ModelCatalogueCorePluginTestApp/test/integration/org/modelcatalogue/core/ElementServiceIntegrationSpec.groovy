@@ -516,7 +516,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         type << [PrimitiveType, EnumeratedType, ReferenceType]
     }
 
-    @Issue("https://metadata.atlassian.net/browse/MET-732")
+    @Issue("https://metadataStep.atlassian.net/browse/MET-732")
     def "can un-deprecate element if conditions are met"() {
         DataType dataType = new DataType(name: 'VD4MET-732', status: ElementStatus.FINALIZED, dataModel: new DataModel(name: 'MET-732', semanticVersion: '0.0.1', status: ElementStatus.FINALIZED).save(failOnError: true)).save(failOnError: true, flush: true)
 
@@ -832,7 +832,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         when:
         DataModel anotherDataModelDraft = elementService.createDraftVersion(anotherDataModel, '0.0.2', DraftContext.userFriendly())
 
-        final String dataModelModelCatalogueId = "catalogue/dataModel/$anotherDataModelDraft.latestVersionId@0.0.2"
+        final String dataModelModelCatalogueId = "catalogue/dataModelMenuBar/$anotherDataModelDraft.latestVersionId@0.0.2"
 
         CatalogueElement anotherDataModelFound = elementService.findByModelCatalogueId(CatalogueElement, dataModelModelCatalogueId)
 
@@ -982,8 +982,8 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def "change type"() {
         given:
-            DataModel dataModel = new DataModel(name: 'Test Change Type').save(failOnError: true)
-            EnumeratedType type = new EnumeratedType(name: 'Test Change Type Enum', enumerations: [a: 'b'], dataModel: dataModel).save(failOnError: true)
+            DataModel dataModel = new DataModel(name: 'FirstTestSpec Change Type').save(failOnError: true)
+            EnumeratedType type = new EnumeratedType(name: 'FirstTestSpec Change Type Enum', enumerations: [a: 'b'], dataModel: dataModel).save(failOnError: true)
             DataElement element = new DataElement(name: 'Data Element for Testing Change Type', dataModel: dataModel, dataType: type).save(failOnError: true)
         expect:
             type
@@ -1001,8 +1001,8 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
     }
 
     def "keep the elements deprecated when creating new version"() {
-        DataModel model = new DataModel(name: "Test Keep Deprecated", status: ElementStatus.FINALIZED, semanticVersion: "1").save(failOnError: true)
-        DataClass dataClass = new DataClass(name: "Test Class", dataModel: model, status: ElementStatus.DEPRECATED).save(failOnError: true)
+        DataModel model = new DataModel(name: "FirstTestSpec Keep Deprecated", status: ElementStatus.FINALIZED, semanticVersion: "1").save(failOnError: true)
+        DataClass dataClass = new DataClass(name: "FirstTestSpec Class", dataModel: model, status: ElementStatus.DEPRECATED).save(failOnError: true)
 
         DraftContext context = DraftContext.userFriendly()
 

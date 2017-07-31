@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.Regression
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import org.modelcatalogue.core.geb.CatalogueContent
 import spock.lang.See
 import spock.lang.Stepwise
 
@@ -14,7 +15,7 @@ import static org.modelcatalogue.core.geb.Common.pick
 import static org.modelcatalogue.core.geb.Common.rightSideTitle
 import static org.modelcatalogue.core.geb.Common.save
 
-@Stepwise @See("https://metadata.atlassian.net/browse/MET-1412")
+@Stepwise @See("https://metadataStep.atlassian.net/browse/MET-1412")
 class ModelCatalogueIdShouldBeUniqueWithinModelSpec extends AbstractModelCatalogueGebSpec {
 
     private static final String createdModel ='a#role_data-models_create-data-modelBtn'
@@ -25,16 +26,14 @@ class ModelCatalogueIdShouldBeUniqueWithinModelSpec extends AbstractModelCatalog
     private static final String  closeButton='div.modal-footer>button:nth-child(2)'
     private static final String  summary='div#summary>h4'
     private static final String  dataClasses='ul.catalogue-element-treeview-list-root>li>ul>li:nth-child(1)>div>span>span'
-    private static final String   dataElements='ul.catalogue-element-treeview-list-root>li>ul>li:nth-child(2)>div>span:nth-child(2)>span'
+    private static final String   dataElements='ul.catalogue-element-treeview-list-root>li>ul>li:nth-child(2)>div>span>span'
     private static final String  stepFinish='button#step-finish'
     private static final String  exitWizard='button#exit-wizard'
-    private static final String   search='input#dataTypes'
-    private static final String cloneButton ='form.ng-pristine>button:nth-child(1)'
-    private static final String   cloneDataType ='tr.inf-table-item-row>td:nth-child(1)>span>span>a'
-    private static final String dataTypes ='ul.catalogue-element-treeview-list-root>li>ul>li:nth-child(3)>div>span:nth-child(2)>span'
-
-
-
+    private static final String   search='input#dataType'
+    private static final String  cloneButton ='form.ng-pristine>button:nth-child(1)'
+    private static final String  cancelButton ='a#role_modal_modal-cancelBtn'
+    private static final String  anotherButton ='a#role_modal_modal-save-and-add-anotherBtn'
+    private static final String  measurementUnit ='ul.catalogue-element-treeview-list-root>li>ul>li:nth-child(4)>div>span>span'
 
 
 
@@ -143,14 +142,16 @@ class ModelCatalogueIdShouldBeUniqueWithinModelSpec extends AbstractModelCatalog
         check 'div.alert' isDisplayed()
 
         and:
-        check 'div.alert' contains 'Property modelCatalogueId must be unique for every DATA_CLASS_2 [null@0.0.1] (DRAFT:DataClass:null) within DATA_MODEL'
+        check 'div.alert' contains 'Property modelCatalogueId must be unique'
+        click 'button#exit-wizard'
 
     }
 
-    def"create two data elements with the same catalogue id"(){
+    def"create two data elements with the same catalogue id"() {
 
         when:
         click dataElements
+
         then:
         check rightSideTitle contains 'Active Data Elements'
 
@@ -162,8 +163,8 @@ class ModelCatalogueIdShouldBeUniqueWithinModelSpec extends AbstractModelCatalog
 
         when:
         fill nameLabel with 'TEST_DATA_ELEMENT_1'
-        fill modelCatalogueId  with 'MET-12'
-        fill  description with 'TESTING CATALOGUE ID'
+        fill modelCatalogueId with 'MET-12'
+        fill description with 'TESTING CATALOGUE ID'
         fill search with 'Boolean' and pick first item
 
         then:
@@ -176,16 +177,73 @@ class ModelCatalogueIdShouldBeUniqueWithinModelSpec extends AbstractModelCatalog
         then:
         check 'td.col-md-4' contains 'TEST_DATA_ELEMENT_1'
 
+
         when:
-        click dataTypes
+        click create
 
         then:
-        check cloneDataType is 'Boolean'
+        check modalHeader contains 'Create Data Element'
+
+        when:
+        fill nameLabel with 'TEST_DATA_ELEMENT_2'
+        fill modelCatalogueId with 'MET-12'
+        fill description with 'TESTING CATALOGUE ID'
+        fill search with 'START DATE (SYSTEMIC ANTI-CANCER DRUG CYCLE)' and pick first item
+
+        then:
+        check modalHeader is 'Import or Clone'
+
+        when:
+        click cloneButton
+        click save
+
+        then:
+        check 'div.alert' contains 'Property modelCatalogueId must be unique for every'
+        click cancelButton
 
 
 
     }
+    def"create two Measurements Units with the same catalogue id"(){
+
+        when:
+        click measurementUnit
+
+        then:
+        check rightSideTitle is'Active Measurement Units'
+
+        when:
+        click create
+
+        then:
+        check modalHeader is 'Create Measurement Unit'
 
 
+        when:
+        fill nameLabel with 'Kilogram'
+        fill 'input#symbol' with 'KG'
+        fill modelCatalogueId with 'MET-13'
+        fill description with'TESTING ELEMENT'
+
+        and:
+        click anotherButton
+
+        then:
+        check modalHeader is 'Create Measurement Unit'
+
+
+        when:
+        fill nameLabel with 'Little'
+        fill 'input#symbol' with 'L'
+        fill modelCatalogueId with 'MET-13'
+        fill description with 'TESTING ELEMENT'
+
+        and:
+        click save
+
+        then:
+        check 'div.alert' contains 'Property modelCatalogueId must be unique for every'
+
+    }
 
 }

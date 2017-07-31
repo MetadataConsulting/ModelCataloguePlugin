@@ -16,7 +16,7 @@ import static org.modelcatalogue.core.geb.Common.rightSideTitle
 class CloneAanClassIntoAnotherModelSpec extends AbstractModelCatalogueGebSpec{
 
     private static final String  createButton='a#role_data-models_create-data-modelBtn'
-    private static final String  cloneButton='a#cloneButton-menu-item-link>span:nth-child(3)'
+    private static final String  cloneButton='a#clone-menu-item-link>span:nth-child(3)'
     private static final String  dataClassButton='a#role_item_catalogue-element-menu-item-link>span:nth-child(3)'
     private static final String  finishButton='button#step-finish'
     private static final String  modelCatalogue='span.mc-name'
@@ -25,7 +25,7 @@ class CloneAanClassIntoAnotherModelSpec extends AbstractModelCatalogueGebSpec{
     private static final String  closeButton='div.modal-footer>button:nth-child(2)'
     private static final String  cloneDataClass='td.col-md-4>span>span>a'
     private static final String   search='input#value'
-    private static final int TIME_TO_REFRESH_SEARCH_RESULTS = 2000
+    private static final int TIME_TO_REFRESH_SEARCH_RESULTS = 3000
     static final String stepImports = "#step-imports"
     static final String wizardName = 'div.create-classification-wizard #name'
 
@@ -115,15 +115,16 @@ class CloneAanClassIntoAnotherModelSpec extends AbstractModelCatalogueGebSpec{
     @Unroll
     def" check that the data element of the clone data class is(#dataElement)"( int location,String dataElement) {
 
+        $("#data-elements-changes > div.inf-table-body > table > tbody > tr:nth-child($location) > td:nth-child(1) > a.preserve-new-lines.ng-binding.ng-scope").text().contains(dataElement)
         expect:
-        $("#data-elements-changes > div.inf-table-body > table > tbody > tr:nth-child($location) > td:nth-child(1) > a.preserve-new-lines.ng-binding.ng-scope").text()== dataElement
-        Thread.sleep(3000L)
+
+        Thread.sleep(4000L)
 
         where:
         location || dataElement
-        1        || 'MET-523.M1.DE1'
-        2        || 'MET-523.M1.DE2'
-        3        || 'MET-523.M1.DE3'
+        1        || 'MET-523.M1.DE'
+        2        || 'MET-523.M1.DE'
+
 
 
     }
@@ -133,14 +134,14 @@ class CloneAanClassIntoAnotherModelSpec extends AbstractModelCatalogueGebSpec{
 
         expect:
 
-        $("#data-elements-changes > div.inf-table-body > table > tbody > tr:nth-child($position) > td.inf-table-item-cell.ng-scope.col-md-3 > span > span").text()==dataType
-         Thread.sleep(3000L)
+        $("#data-elements-changes > div.inf-table-body > table > tbody > tr:nth-child($position) > td.inf-table-item-cell.ng-scope.col-md-3 > span > span").text().contains(dataType)
+         Thread.sleep(4000L)
 
         where:
         position || dataType
-        1        || 'MET-523.M1.VD1'
-        2        || 'MET-523.M1.VD2'
-        3        || 'MET-523.M1.VD3'
+        1        || 'MET-523.M1.VD'
+        2        || 'MET-523.M1.VD'
+
 
 
     }

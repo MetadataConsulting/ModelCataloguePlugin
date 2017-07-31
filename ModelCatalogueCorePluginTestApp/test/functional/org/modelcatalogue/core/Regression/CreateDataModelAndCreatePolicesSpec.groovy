@@ -17,13 +17,11 @@ class CreateDataModelAndCreatePolicesSpec extends AbstractModelCatalogueGebSpec 
     private static final String importedButton = "button#step-imports"
     private static final String search = "input#dataModelPolicy"
     private static final String savePolicy = "a#role_modal_modal-save-elementBtn"
-    private static
-    final String allDataElement = "div.basic-edit-modal-prompt>div>div>div:nth-child(2)>form>div:nth-child(2)>p>a:nth-child(4)"
-    private static
-    final String regularExpression = "div.basic-edit-modal-prompt>div>div>div:nth-child(2)>form>div:nth-child(2)>p>a:nth-child(5)"
+    private static final String allDataElement = "div.basic-edit-modal-prompt>div>div>div:nth-child(2)>form>div:nth-child(2)>p>a:nth-child(4)"
+    private static final String regularExpression = "div.basic-edit-modal-prompt>div>div>div:nth-child(2)>form>div:nth-child(2)>p>a:nth-child(5)"
     final String policyName = "#name"
     private static final String finishButton = "button#step-finish"
-    private static String models = "My First Test"
+    private static String models = "My First FirstTestSpec"
     private static String VERSION = "0.0.1"
     private static String catalogue = "MET-89765}"
 
@@ -73,4 +71,5 @@ class CreateDataModelAndCreatePolicesSpec extends AbstractModelCatalogueGebSpec 
 
 
     }
+
 }

@@ -18,7 +18,7 @@ class RelationshipIsBasedOnSpec extends AbstractModelCatalogueGebSpec{
     private static final String  destinationIcon="span.input-group-addon"
     private static final String   isBasedOn ="#type > option:nth-child(2)"
     private static final String   cancel = "div.messages-modal-confirm>div>div>div:nth-child(3)>form>button:nth-child(3)"
-    private static final String  search ="input#value"
+    private static final String  search ="input#element"
     private static final String  alert ="div.alert"
     private static final String  primaryButton ="button.btn-primary"
 
@@ -55,14 +55,15 @@ class RelationshipIsBasedOnSpec extends AbstractModelCatalogueGebSpec{
 
         click destinationIcon
         Thread.sleep(2000L)
-        fill search with "Clinical Tags"
-        selectInSearch(2)
+        fill search with "Clinical Tags" and pick first item
+        //selectInSearch(2)
 
         and: 'click on the cancel button'
         click cancel
+        Thread.sleep(2000l)
 
         and: 'click on the create relationship'
-        click modalPrimaryButton
+        click 'button.btn-primary'
 
         then: 'verify that alert is displayed'
         check alert displayed

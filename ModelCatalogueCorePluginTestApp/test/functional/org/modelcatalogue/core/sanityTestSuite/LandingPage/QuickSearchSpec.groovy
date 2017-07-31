@@ -23,7 +23,7 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
     private static final String   createButton = "span.text-success"
     public static final String infiniteTableRow = '.inf-table tbody .inf-table-item-row'
     public static final String asset = 'asset'
-    public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 2000
+    public static final int TIME_TO_REFRESH_SEARCH_RESULTS = 3000
 
 
     def "go to login"() {

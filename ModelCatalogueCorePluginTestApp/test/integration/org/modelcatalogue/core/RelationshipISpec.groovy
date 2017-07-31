@@ -136,7 +136,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
         then:
         info == [
-                [name: classification.name, id: classification.id, elementType: DataModel.name, link: "/dataModel/${classification.id}", status: 'DRAFT']
+                [name: classification.name, id: classification.id, elementType: DataModel.name, link: "/dataModelMenuBar/${classification.id}", status: 'DRAFT']
         ]
 
         cleanup:

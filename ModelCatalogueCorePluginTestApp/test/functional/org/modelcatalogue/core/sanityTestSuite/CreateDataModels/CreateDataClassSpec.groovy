@@ -19,7 +19,7 @@ import static org.modelcatalogue.core.geb.Common.modalSuccessButton
 
 @Stepwise
 class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
-    private static final String metadataStep ="button#step-metadata"
+    private static final String metadataStep ="button#step-metadataStep"
     private static final String finishButton ="button#step-finish"
     private static final String parentStep ="button#step-parents"
     private static final String formSection='ul.nav-pills>li:nth-child(1)>a'
@@ -69,7 +69,7 @@ class CreateDataClassSpec extends AbstractModelCatalogueGebSpec{
         then:
         check metadataStep enabled
 
-        when: 'fill metadata step'
+        when: 'fill metadataStep step'
         click metadataStep
         fillMetadata foo: 'one', bar: 'two', baz: 'three', fubor: 'four'
 
