@@ -80,6 +80,6 @@
     }
   }
 
-  angular.module('mc.core.ui.catalogueElementTreeview.model')
+  angular.module('modelcatalogue.core.components.catalogueElementTreeview.model')
     .constant('TreeviewNodeFactory', TreeviewNodeFactory)
 })(window, angular);
