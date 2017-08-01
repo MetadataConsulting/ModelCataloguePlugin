@@ -1,1 +1,1 @@
-angular.module('mc.core.ui.detailSections', ['mc.core.catalogue'])
+angular.module('modelcatalogue.core.sections.detailSections', ['mc.core.catalogue'])

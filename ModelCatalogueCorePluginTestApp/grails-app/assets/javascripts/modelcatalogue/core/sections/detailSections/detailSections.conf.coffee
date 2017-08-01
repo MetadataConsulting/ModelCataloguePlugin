@@ -6,7 +6,7 @@
   <span class="fa fa-question-circle text-muted" tooltip="These are the authors of the data model"></span>
 ###
 #= require detailSections.prvd.coffee
-angular.module('mc.core.ui.detailSections').config ['detailSectionsProvider', (detailSectionsProvider)->
+angular.module('modelcatalogue.core.sections.detailSections').config ['detailSectionsProvider', (detailSectionsProvider)->
   REGEX_EXAMPLE = """// value is decimal number
 x ==~ /\\d+(\\.\\d+)?/
 """
@@ -58,7 +58,7 @@ x in ['apple', 'banana', 'cherry']
       'catalogueElement'
     ]
     keys: []
-    template: '/mc/core/ui/detail-sections/description.html'
+    template: '/modelcatalogue/core/sections/detailSections/description.html'
   }
 
   detailSectionsProvider.register {
@@ -68,7 +68,7 @@ x in ['apple', 'banana', 'cherry']
       'enumeratedType'
     ]
     keys: ['http://www.modelcatalogue.org/metadata/enumerateType#subset']
-    template: '/mc/core/ui/detail-sections/enumerations.html'
+    template: '/modelcatalogue/core/sections/detailSections/enumerations.html'
     setDeprecated: (enumeration, deprecated, globalMessages, element, rest, modelCatalogueApiRoot) ->
       title = "Do you want to mark enumeration #{enumeration.key} as deprecated?"
       message = "The enumeration #{enumeration.key} will be marked as deprecated."
@@ -90,7 +90,7 @@ x in ['apple', 'banana', 'cherry']
       'dataType'
     ]
     keys: []
-    template: '/mc/core/ui/detail-sections/rule.html'
+    template: '/modelcatalogue/core/sections/detailSections/rule.html'
 
     showRegexExample: (copy, messages) -> showExample(copy, messages, REGEX_EXAMPLE)
     showSetExample: (copy, messages) -> showExample(copy, messages, SET_EXAMPLE)
@@ -103,7 +103,7 @@ x in ['apple', 'banana', 'cherry']
       'dataElement'
     ]
     keys: []
-    template: '/mc/core/ui/detail-sections/dataType.html'
+    template: '/modelcatalogue/core/sections/detailSections/dataType.html'
     autoSave:
       dataType: 'dataType'
   }
@@ -116,7 +116,7 @@ x in ['apple', 'banana', 'cherry']
       'dataModel'
     ]
     keys: []
-    template: '/mc/core/ui/detail-sections/dataModelPolicies.html'
+    template: '/modelcatalogue/core/sections/detailSections/dataModelPolicies.html'
   }
 
   detailSectionsProvider.register {
@@ -133,7 +133,7 @@ x in ['apple', 'banana', 'cherry']
     ]
     keys: []
     hideByDefault: true
-    template: '/mc/core/ui/detail-sections/metadata.html'
+    template: '/modelcatalogue/core/sections/detailSections/metadata.html'
     toHumanReadableSize: (size) ->
       GIGA = 1024 * 1024 * 1024
       MEGA = 1024 * 1024
@@ -151,7 +151,7 @@ x in ['apple', 'banana', 'cherry']
       'primitiveType'
     ]
     keys: []
-    template: '/mc/core/ui/detail-sections/measurementUnit.html'
+    template: '/modelcatalogue/core/sections/detailSections/measurementUnit.html'
     autoSave:
       measurementUnit: 'measurementUnit'
   }
@@ -163,7 +163,7 @@ x in ['apple', 'banana', 'cherry']
       'referenceType'
     ]
     keys: []
-    template: '/mc/core/ui/detail-sections/dataClass.html'
+    template: '/modelcatalogue/core/sections/detailSections/dataClass.html'
     autoSave:
       dataClass: 'dataClass'
   }
@@ -175,7 +175,7 @@ x in ['apple', 'banana', 'cherry']
       'asset'
     ]
     keys: []
-    template: '/mc/core/ui/detail-sections/assetPreview.html'
+    template: '/modelcatalogue/core/sections/detailSections/assetPreview.html'
   }
 
   detailSectionsProvider.register {
@@ -185,7 +185,7 @@ x in ['apple', 'banana', 'cherry']
       'dataModel'
     ]
     keys: []
-    template: '/mc/core/ui/detail-sections/revisionNotes.html'
+    template: '/modelcatalogue/core/sections/detailSections/revisionNotes.html'
   }
 
   detailSectionsProvider.register {
@@ -198,7 +198,7 @@ x in ['apple', 'banana', 'cherry']
        'http://www.modelcatalogue.org/metadata/#namespace'
        'http://www.modelcatalogue.org/metadata/#organization'
      ]
-     template: '/mc/core/ui/detail-sections/organization.html'
+     template: '/modelcatalogue/core/sections/detailSections/organization.html'
   }
 
   reorderInDetail = (relationName) ->
@@ -214,7 +214,7 @@ x in ['apple', 'banana', 'cherry']
     ]
     keys: []
     hideInOverview: true
-    template: '/mc/core/ui/detail-sections/tableData.html'
+    template: '/modelcatalogue/core/sections/detailSections/tableData.html'
     actions: [
       {
         label: 'New Data Element'
@@ -277,7 +277,7 @@ x in ['apple', 'banana', 'cherry']
     ]
     keys: []
     hideInOverview: true
-    template: '/mc/core/ui/detail-sections/tableData.html'
+    template: '/modelcatalogue/core/sections/detailSections/tableData.html'
     actions: [
       {
         label: 'New Data Class'
@@ -329,7 +329,7 @@ x in ['apple', 'banana', 'cherry']
     ]
     keys: []
     hideInOverview: true
-    template: '/mc/core/ui/detail-sections/tableData.html'
+    template: '/modelcatalogue/core/sections/detailSections/tableData.html'
     getList: (element) ->
       return @result if @result
 
@@ -367,7 +367,7 @@ x in ['apple', 'banana', 'cherry']
     ]
     keys: []
     hideInOverview: true
-    template: '/mc/core/ui/detail-sections/tableData.html'
+    template: '/modelcatalogue/core/sections/detailSections/tableData.html'
     actions: [
       {
         label: 'Context Data Class'
@@ -424,7 +424,7 @@ x in ['apple', 'banana', 'cherry']
     ]
     keys: []
     hideInOverview: true
-    template: '/mc/core/ui/detail-sections/tableData.html'
+    template: '/modelcatalogue/core/sections/detailSections/tableData.html'
     actions: [
       {
         label: 'Involved Data Elements'
@@ -482,7 +482,7 @@ x in ['apple', 'banana', 'cherry']
     ]
     keys: []
     hideInOverview: true
-    template: '/mc/core/ui/detail-sections/tableData.html'
+    template: '/modelcatalogue/core/sections/detailSections/tableData.html'
     actions: [
       {
         label: 'Add Tag'

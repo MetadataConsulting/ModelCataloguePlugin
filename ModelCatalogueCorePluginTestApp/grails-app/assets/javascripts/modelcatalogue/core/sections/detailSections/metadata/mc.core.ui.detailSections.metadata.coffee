@@ -1,1 +1,1 @@
-angular.module('mc.core.ui.detailSections.metadata', [])
+angular.module('modelcatalogue.core.sections.detailSections.metadata', [])
