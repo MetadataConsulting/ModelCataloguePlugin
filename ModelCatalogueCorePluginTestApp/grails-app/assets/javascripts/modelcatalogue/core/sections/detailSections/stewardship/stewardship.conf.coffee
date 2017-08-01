@@ -1,5 +1,5 @@
 
-angular.module('mc.core.stewardship').config ['detailSectionsProvider', (detailSectionsProvider)->
+angular.module('modelcatalogue.core.sections.detailSections.stewardship').config ['detailSectionsProvider', (detailSectionsProvider)->
     detailSectionsProvider.register {
         title: 'Stewardship Metadata'
         position: 50
@@ -23,6 +23,6 @@ angular.module('mc.core.stewardship').config ['detailSectionsProvider', (detailS
 
         ]
         hideByDefault: true
-        template: '/mc/core/stewardship/stewardshipMetadata.html'
+        template: '/modelcatalogue/core/sections/detailSections/stewardship/stewardshipMetadata.html'
     }
   ]

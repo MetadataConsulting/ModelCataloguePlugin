@@ -1,4 +1,4 @@
-angular.module('mc.core.forms.actions').config(function (actionsProvider) {
+angular.module('modelcatalogue.core.sections.detailSections.forms.actions').config(function (actionsProvider) {
   "ngInject"
 
   actionsProvider.registerChildActionInRoles('export', 'export-crf', [actionsProvider.ROLE_LIST_ACTION,
@@ -19,7 +19,7 @@ angular.module('mc.core.forms.actions').config(function (actionsProvider) {
         action: function () {
           $uibModal.open(
             {
-              templateUrl: '/mc/core/forms/actions/exportCrf.html',
+              templateUrl: '/modelcatalogue/core/sections/detailSections/forms/actions/exportCrf.html',
               controller: function ($scope, $uibModalInstance) {
                 "ngInject"
                 $scope.assetName = `${element.name} Case Report Form`;

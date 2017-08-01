@@ -1,5 +1,5 @@
 #= require sensitivityLevels.val.coffee
-angular.module('mc.core.stewardship').controller('stewardshipCtrl', [
+angular.module('modelcatalogue.core.sections.detailSections.stewardship').controller('stewardshipCtrl', [
   'sensitivityLevels', '$scope',
   (sensitivityLevels, $scope) ->
     $scope.sensitivityLevels = sensitivityLevels

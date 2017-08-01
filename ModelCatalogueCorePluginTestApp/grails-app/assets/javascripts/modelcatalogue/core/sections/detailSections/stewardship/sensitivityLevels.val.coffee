@@ -1,4 +1,4 @@
-angular.module('mc.core.stewardship')
+angular.module('modelcatalogue.core.sections.detailSections.stewardship')
     .value('sensitivityLevels',
     [
         "Anonymous",

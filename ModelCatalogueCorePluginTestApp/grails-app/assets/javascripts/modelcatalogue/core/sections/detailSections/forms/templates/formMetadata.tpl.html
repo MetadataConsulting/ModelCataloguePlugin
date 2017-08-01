@@ -2,26 +2,26 @@
 <div ng-if="element.isInstanceOf('dataClass')"
      class="col-md-12">
   <h5>Form Metadata</h5>
-  <div ng-include="'/mc/core/forms/metadata/defaultBasic.html'"></div>
+  <div ng-include="'/modelcatalogue/core/sections/detailSections/forms/metadata/defaultBasic.html'"></div>
 </div>
 
 <!-- Form Section -->
 <div ng-if="element.isInstanceOf('dataClass')"
      class="col-md-12">
   <h5>Form Section</h5>
-  <div ng-include="'/mc/core/forms/metadata/formSection.html'"></div>
+  <div ng-include="'/modelcatalogue/core/sections/detailSections/forms/metadata/formSection.html'"></div>
 </div>
 
 <!-- Form Grid -->
 <div ng-if="element.isInstanceOf('dataClass')"
      class="col-md-12">
   <h5>Form Grid</h5>
-  <div ng-include="'/mc/core/forms/metadata/formGrid.html'"></div>
+  <div ng-include="'/modelcatalogue/core/sections/detailSections/forms/metadata/formGrid.html'"></div>
 </div>
 
 <!-- Form Item -->
 <div ng-if="element.isInstanceOf('dataElement') || element.isInstanceOf('dataType')"
      class="col-md-12">
   <h5>Form Item</h5>
-  <div ng-include="'/mc/core/forms/metadata/formItem.html'"></div>
+  <div ng-include="'/modelcatalogue/core/sections/detailSections/forms/metadata/formItem.html'"></div>
 </div>

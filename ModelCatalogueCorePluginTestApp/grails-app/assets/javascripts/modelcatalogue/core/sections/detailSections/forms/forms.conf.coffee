@@ -1,10 +1,10 @@
-window.modelcatalogue.registerModule 'mc.core.forms'
+window.modelcatalogue.registerModule 'modelcatalogue.core.sections.detailSections.forms'
 
 
 # Angular modules declared in anticipation of the templates
 
 # core/ui/metadataEditors doesn't even exist, it's called metadata-editor
-angular.module('mc.core.forms')
+angular.module('modelcatalogue.core.sections.detailSections.forms')
   .config [
     'metadataEditorsProvider', 'detailSectionsProvider',
     (metadataEditorsProvider, detailSectionsProvider)->
@@ -69,7 +69,7 @@ angular.module('mc.core.forms')
           ]
         }
         hideByDefault: true
-        template: '/mc/core/forms/formMetadata.html'
+        template: '/modelcatalogue/core/sections/detailSections/forms/formMetadata.html'
       }
 
       metadataEditorsProvider.register {
@@ -89,7 +89,7 @@ angular.module('mc.core.forms')
           "http://forms.modelcatalogue.org/section#pageNumber"
         ]
         hideIfNoData: true
-        template: '/mc/core/forms/metadataEditors/formSection.html'
+        template: '/modelcatalogue/core/sections/detailSections/forms/metadataEditors/formSection.html'
       }
 
       metadataEditorsProvider.register {
@@ -105,7 +105,7 @@ angular.module('mc.core.forms')
           "http://forms.modelcatalogue.org/group#repeatMax"
         ]
         hideIfNoData: true
-        template: '/mc/core/forms/metadataEditors/formGrid.html'
+        template: '/modelcatalogue/core/sections/detailSections/forms/metadataEditors/formGrid.html'
       }
 
       metadataEditorsProvider.register {
@@ -134,6 +134,6 @@ angular.module('mc.core.forms')
           "http://forms.modelcatalogue.org/item#regexpErrorMessage"
           "http://forms.modelcatalogue.org/item#dataType"
         ]
-        template: '/mc/core/forms/metadataEditors/formItemDataElement.html'
+        template: '/modelcatalogue/core/sections/detailSections/forms/metadataEditors/formItemDataElement.html'
       }
   ]
