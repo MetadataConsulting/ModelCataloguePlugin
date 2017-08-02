@@ -43,26 +43,23 @@ class ElementService implements Publisher<CatalogueElement> {
     def sessionFactory
     def elasticSearchService
 
-    public static Long MATCH_SCORE_LEVEL_75 = 75
-    public static Long MATCH_SCORE_LEVEL_CLOSE = 95
-    public static Long MATCH_SCORE_LEVEL_EXACT = 100
 
-
-    List<CatalogueElement> list(Map params = [:]) {
-        CatalogueElement.findAllByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/), params)
-    }
-
-    public <E extends CatalogueElement> List<E> list(params = [:], Class<E> resource) {
-        resource.findAllByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/), params)
-    }
-
-    Long count(params = [:]) {
-        CatalogueElement.countByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/))
-    }
-
-    public <E extends CatalogueElement> Long count(params = [:], Class<E> resource) {
-        resource.countByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/))
-    }
+//    NONE OF THESE ARE USED OR IMPLEMENTED - Commenting them out - will remove
+//    List<CatalogueElement> list(Map params = [:]) {
+//        CatalogueElement.findAllByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/), params)
+//    }
+//
+//    public <E extends CatalogueElement> List<E> list(params = [:], Class<E> resource) {
+//        resource.findAllByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/), params)
+//    }
+//
+//    Long count(params = [:]) {
+//        CatalogueElement.countByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/))
+//    }
+//
+//    public <E extends CatalogueElement> Long count(params = [:], Class<E> resource) {
+//        resource.countByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/))
+//    }
 
     public DataModel createDraftVersion(DataModel dataModel, String newSemanticVersion, DraftContext context) {
         dataModel.checkNewSemanticVersion(newSemanticVersion)

@@ -5,6 +5,7 @@ import com.google.common.cache.CacheBuilder
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.util.Holders
+import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.LogoutListeners
 import org.modelcatalogue.core.SecurityService
@@ -87,7 +88,7 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
     }
 
     boolean isSubscribed(DataModel dataModel) {
-        if(!dataModel) return true
+        if(!dataModel) return false
         UserRole userRole = UserRole.findByUserAndDataModel(getCurrentUser(), dataModel)
 
         if(userRole && dataModel){
@@ -97,20 +98,59 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         return false
     }
 
+
+    boolean isSubscribed(Set<Long> dataModelIds) {
+
+        Boolean subscribed = false
+        if(!dataModelIds) return subscribed
+
+        dataModelIds.each{ dataModelId ->
+            DataModel dataModel = DataModel.get(dataModelId)
+            UserRole userRole
+            if(dataModel) userRole = UserRole.findByUserAndDataModel(getCurrentUser(), dataModel)
+            if(userRole && dataModel){
+                subscribed = true
+            }
+        }
+
+        return subscribed
+    }
+
+    boolean isSubscribed(CatalogueElement ce){
+        if(!ce?.dataModel) return false
+        UserRole userRole = UserRole.findByUserAndDataModel(getCurrentUser(), ce?.dataModel)
+
+        if(userRole && ce?.dataModel){
+            return true
+        }
+
+        return false
+    }
+
     boolean isAuthorised(DataModel dataModel, Role role) {
         if(!dataModel) return true
         UserRole userRole = UserRole.findAllByUserAndDataModelAndRole(getCurrentUser(), dataModel, role)
-        println(userRole)
+
         if(userRole){
             return true
         }
         return false
     }
 
+
+    List<DataModel> getSubscribed(){
+
+        List<UserRole> userRoles = UserRole.findAllByUser(getCurrentUser())
+        List<DataModel> dataModels = []
+        dataModels = userRoles.findResults{it.dataModel}
+        return dataModels
+
+    }
+
     Set getRoles(String dataModelId){
 
         DataModel dataModel = DataModel.get(dataModelId)
-        //TODO: this should be in a service
+
         if(dataModel){
             Set<UserRole> userRoles = UserRole.findAllByUserAndDataModel(getCurrentUser(), dataModel)
             return userRoles.collect{it.role.authority}

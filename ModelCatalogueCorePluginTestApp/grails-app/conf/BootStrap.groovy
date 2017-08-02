@@ -61,9 +61,7 @@ class BootStrap {
             initSecurity(!System.getenv('MC_BLANK_DEV'))
         }
 
-        modelCatalogueSearchService.reindex(true).all { it }.toBlocking().subscribe {
-            System.out.println "Reindexed"
-        }
+        modelCatalogueSearchService.reindex(true)
 
         initCatalogueService.setupStoredProcedures()
 
@@ -317,7 +315,7 @@ class BootStrap {
 //            }
 //            link controller: 'genomics', action: 'exportRareDiseaseEligibilityChangeLogAsXls', id: true
 //        }
-//// needs work before we can release
+// needs work before we can release
 //        reportsRegistry.register {
 //            creates link
 //            title { "GEL Data Specification Change Log (Excel)" }

@@ -26,11 +26,16 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         return false
     }
 
+    //Search relationships
+    // i.e. search for anything that is a favourite on the home screen
+
     @Override
     ListWithTotalAndType<Relationship> search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
         String query = "%$params.search%"
 
-        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, ElementService.getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/), getOverridableDataModelFilter(params))
+        Set<DataModel> subscribedModels = modelCatalogueSecurityService.getSubscribed()
+
+        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, ElementService.getStatusFromParams(params, modelCatalogueSecurityService.isSubscribed(element)), getOverridableDataModelFilter(params, subscribedModels))
 
         if (query != '%*%') {
             switch (direction) {
@@ -56,20 +61,30 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     }
 
     public <T> ListWithTotalAndType<T> search(Class<T> resource, Map params) {
+
+        //find the data models that the user is subscribed to and only search those
+        Set<DataModel> subscribedModels = modelCatalogueSecurityService.getSubscribed()
+
+
         // if the user doesn't have at least VIEWER role, don't return other elements than finalized
-        if (!params.status && !false /*modelCatalogueSecurityService.hasRole('VIEWER')*/) {
-            params.status = 'FINALIZED'
-        }
+//        if (!params.status && !false /*modelCatalogueSecurityService.hasRole('VIEWER')*/) {
+//            params.status = 'FINALIZED'
+//        }
 
         String query = "%$params.search%"
 
-        if (DataModel.isAssignableFrom(resource) || MeasurementUnit.isAssignableFrom(resource) || Tag.isAssignableFrom(resource)) {
+        //TODO: check why measurement unit is included here
+
+        if (DataModel.isAssignableFrom(resource) || /* MeasurementUnit.isAssignableFrom(resource) ||*/ Tag.isAssignableFrom(resource)) {
             DetachedCriteria<T> criteria = new DetachedCriteria(resource)
             criteria.or {
                 ilike('name', query)
                 ilike('description', query)
                 ilike('modelCatalogueId', query)
             }
+
+            criteria.'in'('id', subscribedModels.collect{it.id})
+
             if (params.status) {
                 criteria.'in'('status', ElementService.getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/))
             }
@@ -79,7 +94,8 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         }
 
         if (CatalogueElement.isAssignableFrom(resource)) {
-            DataModelFilter dataModels = getOverridableDataModelFilter(params).withImports()
+            DataModelFilter dataModels = getOverridableDataModelFilter(params, subscribedModels).withImports(subscribedModels)
+
 
             String alias = resource.simpleName[0].toLowerCase()
             String listQuery = """
@@ -165,6 +181,9 @@ class ModelCatalogueSearchService implements SearchCatalogue {
             or {
                 ilike 'name', query
             }
+            and {
+                'dataModel' in subscribedModels
+            }
         }
     }
 
@@ -194,14 +213,22 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         Observable.just(true)
     }
 
-    protected DataModelFilter getOverridableDataModelFilter(Map params) {
+    protected DataModelFilter getOverridableDataModelFilter(Map params, List<DataModel> subscribedModels) {
         if (params.dataModel) {
-            DataModel dataModel = DataModel.get(params.long('dataModel'))
-            if (dataModel) {
-                return DataModelFilter.includes(dataModel)
+            if(subscribedModels.find{it.id}==params.dataModel) {
+                DataModel dataModel = DataModel.get(params.long('dataModel'))
+                if (dataModel) {
+                    return DataModelFilter.includes(dataModel)
+                }
             }
+        }else{
+            return DataModelFilter.includes(subscribedModels)
         }
         dataModelService.dataModelFilter
+    }
+
+    void deleteIndexes(){
+        log.info "Using database search, reindexing not needed!"
     }
 
 

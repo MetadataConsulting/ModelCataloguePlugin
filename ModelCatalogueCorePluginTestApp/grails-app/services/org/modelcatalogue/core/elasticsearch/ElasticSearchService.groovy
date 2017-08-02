@@ -72,7 +72,6 @@ class ElasticSearchService implements SearchCatalogue {
     }
 
     private static final String ENV_MC_ES_PREFIX = 'MC_INDEX_PREFIX'
-
     private static final String MC_PREFIX = "${System.getenv(ENV_MC_ES_PREFIX) ?:  System.getProperty(ENV_MC_ES_PREFIX) ?: ''}mc_"
     private static final String GLOBAL_PREFIX = "${MC_PREFIX}global_"
     private static final String DATA_MODEL_PREFIX = "${MC_PREFIX}data_model_"
@@ -191,8 +190,11 @@ class ElasticSearchService implements SearchCatalogue {
         List<String> states = []
 
         //if the role is viewer, don't return elements that they shouldn't see i.e. drafts .
+
+        //TODO: NEED TO REMOVE THIS????????
+
         if (params.status) {
-            states = ElementService.getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/)*.toString()
+            states = ElementService.getStatusFromParams(params, true)*.toString()
         }
 
         List<String> types = []
@@ -421,7 +423,7 @@ class ElasticSearchService implements SearchCatalogue {
 
     //get all of the indicies associated with a data model
     private List<String> collectDataModelIndicies(Map params, List<Class> types) {
-        DataModelFilter filter = getOverridableDataModelFilter(params)
+        DataModelFilter filter = getOverridableDataModelFilter(params, modelCatalogueSecurityService.getSubscribed())
 
         if (!filter) {
             return types.collect { ElasticSearchService.getGlobalIndexName(it) }
@@ -433,7 +435,14 @@ class ElasticSearchService implements SearchCatalogue {
 
         if (filter.includes) {
             // excludes are ignored if there are includes
-            return filter.includes.collect { types.collect { type -> ElasticSearchService.getDataModelIndex(it, getTypeName(type)) } }.flatten()
+            List<String> indices
+            indices =  filter.includes.collect { types.collect { type -> ElasticSearchService.getDataModelIndex(it, getTypeName(type)) } }.flatten()
+
+            //add favourite relationships index - i.e. if you have favourited something it should appear
+            // if access is taken away then you won't be able to navigate to it and will only have the basic info
+            if(types.contains(Relationship) && params?.type=="favourite")indices.add(ElasticSearchService.getGlobalIndexName(Relationship))
+
+            return indices
         }
 
         if (filter.excludes) {
@@ -608,7 +617,7 @@ class ElasticSearchService implements SearchCatalogue {
 
 
 
-    private void deleteIndexes(){
+    void deleteIndexes(){
         def indexList = client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().concreteAllIndices()
 
         for (String index : indexList) {
@@ -891,20 +900,28 @@ class ElasticSearchService implements SearchCatalogue {
         return current
     }
 
-    private DataModelFilter getOverridableDataModelFilter(Map params) {
+    private DataModelFilter getOverridableDataModelFilter(Map params, List<DataModel> subscribedModels) {
         if (params.dataModel) {
             Long dataModelId
-            if(params.get('dataModel') instanceof Long){
-                dataModelId = params.get('dataModel')
-            }else{
-                dataModelId = params.long('dataModel')
-            }
-            DataModel dataModel = DataModel.get(dataModelId)
-            if (dataModel) {
-                return DataModelFilter.includes(dataModel).withImports()
-            }
+                if(params.get('dataModel') instanceof Long){
+                    dataModelId = params.get('dataModel')
+                }else{
+                    dataModelId = params.long('dataModel')
+                }
+
+                if (dataModelId) {
+                    if(subscribedModels.findResults{it.id}.contains(dataModelId)){
+                        DataModel dataModel = DataModel.get(dataModelId)
+                        if (dataModel) {
+                            return DataModelFilter.includes(dataModel)
+                        }
+                    }
+                }
+        }else{
+            return DataModelFilter.includes(subscribedModels)
         }
-        dataModelService.dataModelFilter.withImports()
+
+        dataModelService.dataModelFilter.withImports(subscribedModels)
     }
 
     List<String> collectTypes(Class<?> resource) {

@@ -46,6 +46,21 @@ class ModelCatalogueSecurityService implements SecurityService, LogoutListeners 
     }
 
     @Override
+    boolean isSubscribed(Set<Long> dataModelIds) {
+        return true
+    }
+
+    @Override
+    boolean isSubscribed(CatalogueElement ce) {
+        return true
+    }
+
+    @Override
+    List<DataModel> getSubscribed() {
+        return []
+    }
+
+    @Override
     void logout(String username) {}
 
     @Override

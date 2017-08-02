@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.util.marshalling
 
+import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
@@ -37,28 +38,19 @@ class RelationshipsMarshaller extends ListWrapperMarshaller {
         List list = []
         relationsList.items.each{ item ->
             CatalogueElement relation = relationsList.direction.getRelation(relationsList.owner, item)
-            if(isSubscribed(relation)){
-                list.add([id: item.id, type: item.relationshipType, ext: OrderedMap.toJsonMap(item.ext), element: CatalogueElementMarshaller.minimalCatalogueElementJSON(relationsList.direction.getElement(relationsList.owner, item)),  relation: relationsList.direction.getRelation(relationsList.owner, item), direction: relationsList.direction.getDirection(relationsList.owner, item), removeLink: getDeleteLink(relationsList.owner, item), archived: item.archived, inherited: item.inherited, elementType: Relationship.name, classification: CatalogueElementMarshaller.minimalCatalogueElementJSON(item.dataModel)])
+            if(modelCatalogueSecurityService.isSubscribed(relation)){
+                list.add([id: item.id, type: item.relationshipType, ext: OrderedMap.toJsonMap(item.ext), element: CatalogueElementMarshaller.minimalCatalogueElementJSON(relationsList.direction.getElement(relationsList.owner, item)),  relation: relation, direction: relationsList.direction.getDirection(relationsList.owner, item), removeLink: getDeleteLink(relationsList.owner, item), archived: item.archived, inherited: item.inherited, elementType: Relationship.name, classification: CatalogueElementMarshaller.minimalCatalogueElementJSON(item.dataModel)])
             }else{
-                // TODO : FIX THE AUTHENTICATED BIT  - CREATE A SPECIAL CLASS THAT IS AN UNAUTHENTICATED ITEM ->need to render it in the ui
-
-                list.add([id: item.id, type: item.relationshipType, element: CatalogueElementMarshaller.minimalCatalogueElementJSON(relationsList.direction.getElement(relationsList.owner, item)), relation: new DataElement(name: "not authenticated"), direction: relationsList.direction.getDirection(relationsList.owner, item), removeLink: getDeleteLink(relationsList.owner, item), archived: item.archived, inherited: item.inherited, elementType: Relationship.name, classification: CatalogueElementMarshaller.minimalCatalogueElementJSON(item.dataModel)])
+                list.add([id: item.id, type: item.relationshipType, element: CatalogueElementMarshaller.minimalCatalogueElementJSON(relationsList.direction.getElement(relationsList.owner, item)), relation: getUnAuthenticatedElement(relation), direction: relationsList.direction.getDirection(relationsList.owner, item), removeLink: getDeleteLink(relationsList.owner, item), archived: item.archived, inherited: item.inherited, elementType: Relationship.name, classification: CatalogueElementMarshaller.minimalCatalogueElementJSON(item.dataModel)])
             }
         }
         list
     }
 
-
-    //TODO move code to seperate service (this is replicated in the abstract restful controller
-
-
-
-    protected Boolean isSubscribed(CatalogueElement ce){
-        Set subscriptions = new HashSet<>()
-        subscriptions = ce?.dataModel?.subscriptions
-        if(subscriptions && subscriptions.contains(modelCatalogueSecurityService.getCurrentUser())){
-            return true
-        }
-        false
+    protected Map<String, String> getUnAuthenticatedElement(CatalogueElement element){
+        [dateCreated: "", versionCreated: "", lastUpdated: "", internalModelCatalogueId: element.defaultModelCatalogueId, modelCatalogueId: element.modelCatalogueId, name: "Not authorised to view this element. Please contact your system administrator to give you access to this model.", classifiedName: "Not authorised to view this element. Please contact your system administrator to give you access to this element's model.", id: element.id, description: "", elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id".toString(), status: "${element.status}".toString(), versionNumber: "", latestVersionId: element.latestVersionId ?: element.id, dataType: ""]
     }
+
+
+
 }

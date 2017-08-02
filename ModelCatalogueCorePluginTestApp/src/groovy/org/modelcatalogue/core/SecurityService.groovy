@@ -73,6 +73,43 @@ public interface SecurityService {
      */
     boolean isSubscribed(DataModel dataModel)
 
+    /**
+     * Returns true if the user is subscribed to a particular model or it doesn't matter if she has any role.
+     *
+     * Following roles are supported by the core plugin: VIEWER, CURATOR, ADMIN. Any
+     * service implementations should map to these roles as well.
+     *
+     * @param role the role to be tested
+     * @return true if the user has particular role or it doesn't matter if she has any role
+     */
+
+    boolean isSubscribed(Set<Long> dataModelIds)
+
+
+
+    /**
+     * Returns true if the user is subscribed to a particular model or it doesn't matter if she has any role.
+     *
+     * Following roles are supported by the core plugin: VIEWER, CURATOR, ADMIN. Any
+     * service implementations should map to these roles as well.
+     *
+     * @param role the role to be tested
+     * @return true if the user has particular role or it doesn't matter if she has any role
+     */
+    boolean isSubscribed(CatalogueElement ce)
+
+
+    /**
+     * Returns set of models associated with a user
+     * service implementations should map to these roles as well.
+     *
+     * @param role the role to be tested
+     * @return true if the user has particular role or it doesn't matter if she has any role
+     */
+
+
+    List<DataModel> getSubscribed()
+
 
     /**
      * Returns set of roles associated with a user based on the models they are subscribed to
