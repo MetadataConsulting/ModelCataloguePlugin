@@ -1,3 +1,10 @@
+###
+  None of the messages defined here seem to be triggered:
+  messagesProvider.setPromptFactory 'edit-classification', factory
+  messagesProvider.setPromptFactory 'edit-dataModel', factory
+  messagesProvider.setPromptFactory 'edit-batch', factory
+  messagesProvider.setPromptFactory 'edit-csvTransformation', factory
+###
 angular.module('mc.core.ui.bs.modalPromptBasicEdit', ['mc.util.messages', 'mc.core.ui.bs.saveAndCreateAnotherCtrlMixin']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$uibModal', '$q', 'messages', ($uibModal, $q, messages) ->
     (title, body, args) ->
