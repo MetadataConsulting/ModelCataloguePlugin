@@ -31,11 +31,11 @@
         <tr class="soe-table-property-row" ng-repeat="property in object.values"
             ng-class="{'has-error': !isKeyUnique(property.key)}">
           <td><span class="handle fa fa-ellipsis-v fa-fw text-muted with-move"></span></td>
-          <th class="soe-table-property-key col-md-5 col-sm-5">
+          <td class="soe-table-property-key col-md-5 col-sm-5">
             <input type="text" ng-model="property.key" class="form-control"
                    placeholder="{{valuePlaceholder ? keyPlaceholder : 'Key'}}"
                    ng-disabled="handledKeys.indexOf(property.key) > -1">
-          </th>
+          </td>
           <td class="soe-table-property-value col-md-5 col-sm-5">
             <input type="text" ng-model="property.value"
                    class="form-control"

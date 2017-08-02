@@ -23,8 +23,8 @@ angular.module('mc.core.ui', [
   'mc.core.ui.elementsAsTags'
   'mc.core.ui.diffTable'
   'mc.core.ui.metadataEditors'
-  'mc.core.ui.detailSections'
-  'mc.core.ui.detailSections.metadata'
-  'mc.core.ui.metadataEditor'
+  'modelcatalogue.core.sections.detailSections'
+  'modelcatalogue.core.sections.detailSections.metadata'
+  'modelcatalogue.core.components.metadataEditor'
   'mc.core.ui.simpleObjectEditor'
 ])

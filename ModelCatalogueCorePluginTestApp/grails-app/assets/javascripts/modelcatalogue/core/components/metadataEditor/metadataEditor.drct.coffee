@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.metadataEditor', ['mc.core.ui.metadataEditors']).directive 'metadataEditor',  [-> {
+angular.module('modelcatalogue.core.components.metadataEditor').directive 'metadataEditor',  [-> {
     restrict: 'E'
     replace: true
     scope:
@@ -8,7 +8,7 @@ angular.module('mc.core.ui.metadataEditor', ['mc.core.ui.metadataEditors']).dire
       keyPlaceholder:     '@?'
       valuePlaceholder:   '@?'
       owner:              '=?' # required for metadata editors
-    templateUrl: '/mc/core/ui/metadata-editor/metadataEditor.html'
+    templateUrl: '/modelcatalogue/core/components/metadataEditor/metadataEditor.html'
 
     controller: ['$scope', 'enhance', '$log', 'metadataEditors', '$timeout', ($scope, enhance, $log, metadataEditors, $timeout) ->
       isOrderedMap = (object)->

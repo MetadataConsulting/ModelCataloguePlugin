@@ -3,7 +3,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui'
   'mc.util.ui'
   'mc.core.ui.general'
-  'mc.core.ui.metadataEditor'
+  'modelcatalogue.core.components.metadataEditor'
   'mc.core.ui.modals'
   'mc.core.ui.utils'
   'ui.bootstrap'
