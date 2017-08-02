@@ -1,6 +1,4 @@
-metadataEditors = angular.module('mc.core.ui.bs.metadataEditors', ['mc.core.ui.metadataEditors'])
-
-metadataEditors.config (metadataEditorsProvider) ->
+angular.module('modelcatalogue.core.sections.metadataEditors').config (metadataEditorsProvider) ->
   'ngInject'
 
   metadataEditorsProvider.register {
@@ -10,7 +8,7 @@ metadataEditors.config (metadataEditorsProvider) ->
       '=[hierarchy]=>'
     ]
     keys: ['Min Occurs', 'Max Occurs']
-    template: '/mc/core/ui/metadata-editor/occurrence.html'
+    template: '/modelcatalogue/core/sections/metadataEditor/occurrence.html'
   }
 
   metadataEditorsProvider.register {
@@ -20,7 +18,7 @@ metadataEditors.config (metadataEditorsProvider) ->
       '=[hierarchy]=>'
     ]
     keys: ['Name']
-    template: '/mc/core/ui/metadata-editor/appearance.html'
+    template: '/modelcatalogue/core/sections/metadataEditor/appearance.html'
   }
 
   metadataEditorsProvider.register {
@@ -29,5 +27,5 @@ metadataEditors.config (metadataEditorsProvider) ->
       'EnumeratedType=[base]=>EnumeratedType'
     ]
     keys: ['http://www.modelcatalogue.org/metadata/enumerateType#subset']
-    template: '/mc/core/ui/metadata-editor/subset.html'
+    template: '/modelcatalogue/core/sections/metadataEditor/subset.html'
   }

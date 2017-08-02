@@ -1,1 +1,1 @@
-angular.module('mc.core.ui.utils', ['mc.core.ui.metadataEditors'])
+angular.module('mc.core.ui.utils', ['modelcatalogue.core.sections.metadataEditors'])

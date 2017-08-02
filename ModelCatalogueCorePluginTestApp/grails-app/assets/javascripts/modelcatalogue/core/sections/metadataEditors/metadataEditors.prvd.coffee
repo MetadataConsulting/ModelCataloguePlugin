@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.metadataEditors', ['mc.core.catalogue']).provider 'metadataEditors', ['catalogueProvider', (catalogueProvider) ->
+angular.module('modelcatalogue.core.sections.metadataEditors').provider 'metadataEditors', ['catalogueProvider', (catalogueProvider) ->
   isMeetingRelationshipCriteria = (owner, criteria) ->
     match = criteria.match(/(\w+)?(?:=\[(\w+)\])?=>(\w+)?/)
     source = match[1]
