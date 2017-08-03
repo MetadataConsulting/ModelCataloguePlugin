@@ -8,7 +8,7 @@ angular.module('modelcatalogue.core.sections.metadataEditors').config (metadataE
       '=[hierarchy]=>'
     ]
     keys: ['Min Occurs', 'Max Occurs']
-    template: '/modelcatalogue/core/sections/metadataEditor/occurrence.html'
+    template: '/modelcatalogue/core/sections/metadataEditors/occurrence.html'
   }
 
   metadataEditorsProvider.register {
@@ -18,7 +18,7 @@ angular.module('modelcatalogue.core.sections.metadataEditors').config (metadataE
       '=[hierarchy]=>'
     ]
     keys: ['Name']
-    template: '/modelcatalogue/core/sections/metadataEditor/appearance.html'
+    template: '/modelcatalogue/core/sections/metadataEditors/appearance.html'
   }
 
   metadataEditorsProvider.register {
@@ -27,5 +27,5 @@ angular.module('modelcatalogue.core.sections.metadataEditors').config (metadataE
       'EnumeratedType=[base]=>EnumeratedType'
     ]
     keys: ['http://www.modelcatalogue.org/metadata/enumerateType#subset']
-    template: '/modelcatalogue/core/sections/metadataEditor/subset.html'
+    template: '/modelcatalogue/core/sections/metadataEditors/subset.html'
   }
