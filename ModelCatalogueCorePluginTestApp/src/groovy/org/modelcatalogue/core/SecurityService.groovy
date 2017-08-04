@@ -140,8 +140,7 @@ public interface SecurityService {
      * Following roles are supported by the core plugin: VIEWER, CURATOR, ADMIN, SUPERVISOR. Any
      * service implementations should map to these roles as well.
      *
-     * @param role the role to be tested
-     * @return true if the user has particular role or it doesn't matter if she has any role
+     * @param the role, the user and data model to be removed
      */
     void removeUserRoleModel(User user, Role role, DataModel model)
 
@@ -152,9 +151,14 @@ public interface SecurityService {
      * Following roles are supported by the core plugin: VIEWER, CURATOR, ADMIN, SUPERVISOR. Any
      * service implementations should map to these roles as well.
      *
-     * @param role the role to be tested
-     * @return true if the user has particular role or it doesn't matter if she has any role
+     * @param the user and data model for all roles to be to be removed
      */
 
     void removeAllUserRoleModel(User user, DataModel model)
+
+/**
+ * Checks if the current user is a supervisor
+ * @return true if the user has particular role or it doesn't matter if she has any role
+ */
+    boolean isSupervisor()
 }

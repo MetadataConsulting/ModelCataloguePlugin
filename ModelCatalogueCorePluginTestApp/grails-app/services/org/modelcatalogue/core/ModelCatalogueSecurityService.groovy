@@ -76,4 +76,9 @@ class ModelCatalogueSecurityService implements SecurityService, LogoutListeners 
     Set getRoles(String dataModelId) {
         return ['VIEWER', 'CURATOR', 'ADMIN', 'SUPERVISOR'].toSet()
     }
+
+    @Override
+    boolean isSupervisor(){
+        return true
+    }
 }

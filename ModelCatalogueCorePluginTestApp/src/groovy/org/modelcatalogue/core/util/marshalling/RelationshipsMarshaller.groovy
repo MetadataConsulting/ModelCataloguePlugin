@@ -37,11 +37,13 @@ class RelationshipsMarshaller extends ListWrapperMarshaller {
     protected List getList(Object relationsList){
         List list = []
         relationsList.items.each{ item ->
-            CatalogueElement relation = relationsList.direction.getRelation(relationsList.owner, item)
-            if(modelCatalogueSecurityService.isSubscribed(relation)){
-                list.add([id: item.id, type: item.relationshipType, ext: OrderedMap.toJsonMap(item.ext), element: CatalogueElementMarshaller.minimalCatalogueElementJSON(relationsList.direction.getElement(relationsList.owner, item)),  relation: relation, direction: relationsList.direction.getDirection(relationsList.owner, item), removeLink: getDeleteLink(relationsList.owner, item), archived: item.archived, inherited: item.inherited, elementType: Relationship.name, classification: CatalogueElementMarshaller.minimalCatalogueElementJSON(item.dataModel)])
-            }else{
-                list.add([id: item.id, type: item.relationshipType, element: CatalogueElementMarshaller.minimalCatalogueElementJSON(relationsList.direction.getElement(relationsList.owner, item)), relation: getUnAuthenticatedElement(relation), direction: relationsList.direction.getDirection(relationsList.owner, item), removeLink: getDeleteLink(relationsList.owner, item), archived: item.archived, inherited: item.inherited, elementType: Relationship.name, classification: CatalogueElementMarshaller.minimalCatalogueElementJSON(item.dataModel)])
+            if(item) {
+                CatalogueElement relation = relationsList.direction.getRelation(relationsList.owner, item)
+                if (modelCatalogueSecurityService.isSubscribed(relation)) {
+                    list.add([id: item.id, type: item.relationshipType, ext: OrderedMap.toJsonMap(item.ext), element: CatalogueElementMarshaller.minimalCatalogueElementJSON(relationsList.direction.getElement(relationsList.owner, item)), relation: relation, direction: relationsList.direction.getDirection(relationsList.owner, item), removeLink: getDeleteLink(relationsList.owner, item), archived: item.archived, inherited: item.inherited, elementType: Relationship.name, classification: CatalogueElementMarshaller.minimalCatalogueElementJSON(item.dataModel)])
+                } else {
+                    list.add([id: item.id, type: item.relationshipType, element: CatalogueElementMarshaller.minimalCatalogueElementJSON(relationsList.direction.getElement(relationsList.owner, item)), relation: getUnAuthenticatedElement(relation), direction: relationsList.direction.getDirection(relationsList.owner, item), removeLink: getDeleteLink(relationsList.owner, item), archived: item.archived, inherited: item.inherited, elementType: Relationship.name, classification: CatalogueElementMarshaller.minimalCatalogueElementJSON(item.dataModel)])
+                }
             }
         }
         list
