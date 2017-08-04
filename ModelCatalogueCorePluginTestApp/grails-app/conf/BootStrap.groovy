@@ -47,8 +47,14 @@ class BootStrap {
         JSONObject.Null.metaClass.getId = {->
             null
         }
+        if (Environment.current in [Environment.DEVELOPMENT]){
 
-        if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST] && !System.getenv('MC_BLANK_DEV')) {
+            initCatalogueService.initDefaultRelationshipTypes()
+            initPoliciesAndTags()
+            initSecurity(false)
+        }
+
+        if (Environment.current in [Environment.TEST] && !System.getenv('MC_BLANK_DEV')) {
             TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
                 initCatalogueService.initCatalogue(true)
                 initPoliciesAndTags()
@@ -61,7 +67,9 @@ class BootStrap {
             initSecurity(!System.getenv('MC_BLANK_DEV'))
         }
 
-        modelCatalogueSearchService.reindex(true)
+//        modelCatalogueSearchService.reindex(true).all { it }.toBlocking().subscribe {
+//            System.out.println "Reindexed"
+//        }
 
         initCatalogueService.setupStoredProcedures()
 

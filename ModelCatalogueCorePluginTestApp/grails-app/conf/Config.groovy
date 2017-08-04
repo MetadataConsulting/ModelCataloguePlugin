@@ -380,25 +380,27 @@ mc.welcome.jumbo = """
 """
 
 mc.welcome.info = """
-<div class="col-sm-4">
-<h2>Data Quality</h2>
-<p>Build up datasets using existing data elements from existing datasets and add them to new data elements to compose new data models.</p>
-<p>
+        <div class="lead" style="text-align: center">
+            <h2>North Thames Metadata Sandbox</h2>
+            
+            <p width=50% style="text-align: center" >This is a sandbox instance of the metadata exchange, in short we are aiming to do the following: </p>
+                <li>Import site specific mappings from current spreadsheets</li>
+                <li>Create models for each system and placeholder within the catalogue for each site including site specific metadata</li>
+                <li>Assign dataset owners and users</li>
+                <li>Update missing metadata (where possible)</li>
+                <li>Track progress of metadata integration using summary reports</li>
+            </p>
+            <p>User documentation is available <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages">here</a>:
 
-</p>
-</div>
-<div class="col-sm-4">
-<h2>Dataset Curation</h2>
-<p>Link and compose data-sets to create uniquely identified and versioned "metadata-sets", thus ensuring preservation of data semantics between applications</p>
-<p>
+            </p>
+            <p>...probably the best place to start is <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages/32997386/Starting+Out+-+A+quick+look+around">here</a>
 
-</p>
-</div>
-      <div class="col-sm-4">
-<h2>Dataset Comparison</h2>
-<p>Discover synonyms, hyponyms and duplicate data elements within datasets, and compare data elements from differing datasets.</p>
-<p></p>
-</div>
+            </p>
+            <p>and <a href="https://metadata.atlassian.net/wiki/spaces/ME/pages/45419911/Editing+Metadata">here</a>
+
+            </p>
+            <p></p>
+         </div>
 """
 
 grails.plugin.springsecurity.ui.register.defaultRoleNames = [] // no roles

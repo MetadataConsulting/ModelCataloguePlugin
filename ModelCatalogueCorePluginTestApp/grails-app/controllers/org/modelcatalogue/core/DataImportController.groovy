@@ -1,12 +1,14 @@
 package org.modelcatalogue.core
 
 import org.apache.poi.poifs.filesystem.POIFSFileSystem
+import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.integration.excel.ExcelLoader
 import org.modelcatalogue.integration.excel.HeadersMap
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
+import org.modelcatalogue.integration.excel.nt.uclh.UCLHExcelLoader
 import org.modelcatalogue.integration.obo.OboLoader
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 import org.springframework.http.HttpStatus
@@ -80,11 +82,14 @@ class DataImportController  {
             def id = asset.id
             builder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             InputStream inputStream = file.inputStream
-            HeadersMap headersMap = HeadersMap.create(request.JSON.headersMap ?: [:])
+            HeadersMap headersMap = HeadersMap.createForStandardExcelLoader(request.JSON.headersMap ?: [:])
             executeInBackground(id, "Imported from Excel") {
                 try {
-                    ExcelLoader parser = new ExcelLoader(builder)
-                    parser.importData(headersMap, inputStream)
+//                    ExcelLoader parser = new ExcelLoader(builder)
+//                    parser.buildXmlFromWorkbook(headersMap, inputStream)
+                    UCLHExcelLoader parser = new UCLHExcelLoader()
+                    parser.buildXmlFromWorkbookSheet(WorkbookFactory.create(inputStream), builder)
+
                     finalizeAsset(id, (DataModel) (builder.created.find {it.instanceOf(DataModel)} ?: builder.created.find{it.dataModel}?.dataModel), userId)
                 } catch (Exception e) {
                     logError(id, e)

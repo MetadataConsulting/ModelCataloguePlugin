@@ -1,15 +1,17 @@
 package org.modelcatalogue.integration.excel
 
+import org.apache.poi.ss.usermodel.WorkbookFactory
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.custommonkey.xmlunit.DetailedDiff
 import org.custommonkey.xmlunit.Diff
 import org.custommonkey.xmlunit.XMLUnit
-import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
 class ExcelLoaderSpec extends Specification {
-
+    @Shared String resourcePath = (new File("test/unit/resources/org/modelcatalogue/integration/excel")).getAbsolutePath()
     StringWriter stringWriter
     XmlCatalogueBuilder builder
     ExcelLoader loader
@@ -20,35 +22,52 @@ class ExcelLoaderSpec extends Specification {
         XMLUnit.ignoreAttributeOrder = true
         stringWriter = new StringWriter()
         builder = new XmlCatalogueBuilder(stringWriter, true)
-        loader = new ExcelLoader(builder)
+        loader = new ExcelLoader()
     }
 
 
     @Unroll
     def "test expected output for #file"() {
         expect:
-        similar file, 'test.catalogue.xml'
+        similar standardExcelLoaderXmlResult(file,
+            HeadersMap.createForStandardExcelLoader()),
+            (new FileInputStream (new File (resourcePath + '/test.catalogue.xml'))).text
+            //getClass().getResourceAsStream('test.catalogue.xml').text
 
         where:
         file << ['test.xlsx', 'legacy.xlsx']
 
     }
+    String standardExcelLoaderXmlResult(String sampleFile, Map<String,String> headersMap, int index = 0) {
+        loader.buildXmlFromStandardWorkbookSheet(headersMap,
+            WorkbookFactory.create(
+                (new FileInputStream(resourcePath + '/' + sampleFile))),
+                //getClass().getResourceAsStream(sampleFile)),
+            builder,
+            index)
+        return stringWriter.toString()
+
+    }
+
+    String excelLoaderXmlResult(String sampleFile, int index=0) {
+        loader.buildXmlFromWorkbookSheet(
+             new XSSFWorkbook(
+            getClass().getResourceAsStream(sampleFile)),
+            builder,
+            index)
+        return stringWriter.toString()
+    }
 
 
-    boolean similar(String sampleFile, String xmlReference) {
-        loader.importData(HeadersMap.create(), getClass().getResourceAsStream(sampleFile))
-        String xml = stringWriter.toString()
-        String expected = getClass().getResourceAsStream(xmlReference).text
+    boolean similar(String sampleXml, String expectedXml) {
 
         println "==ACTUAL=="
-        println xml
+        println sampleXml
 
         println "==EXPECTED=="
-        println expected
+        println expectedXml
 
-
-
-        Diff diff = new Diff(xml, expected)
+        Diff diff = new Diff(sampleXml, expectedXml)
         DetailedDiff detailedDiff = new DetailedDiff(diff)
 
         assert detailedDiff.similar(), detailedDiff.toString()

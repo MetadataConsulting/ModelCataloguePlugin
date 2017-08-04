@@ -28,32 +28,33 @@ class HeadersMap {
 
     private HeadersMap(){}
 
-    static HeadersMap create(Map<String, Object> params = [:]){
-        HeadersMap headersMap = new HeadersMap()
-        headersMap.dataElementCode = params.dataElementCode ?: "Data Item Unique Code"
-        headersMap.dataElementName = params.dataElementName ?: "Data Item Name"
-        headersMap.dataElementDescription = params.dataElementDescription ?: "Data Item Description"
-        headersMap.dataTypeName = params.dataTypeName ?: "Data Type"
-        headersMap.dataTypeClassification = params.dataTypeClassification ?: "Data Type Classification"
-        headersMap.dataTypeDataModel = params.dataTypeDataModel ?: "Data Type Data Model"
-        headersMap.dataTypeCode = params.dataTypeCode ?: "Data Type Unique Code"
-        headersMap.valueDomainName = params.valueDomainName ?: "Value Domain"
-        headersMap.valueDomainClassification = params.valueDomainClassification ?: "Value Domain Classification"
-        headersMap.valueDomainDataModel = params.valueDomainDataModel ?: "Value Domain Classification"
-        headersMap.valueDomainCode = params.valueDomainCode ?: "Value Domain Unique Code"
-        headersMap.parentModelName = params.parentModelName ?: "Parent Model"
-        headersMap.parentDataClassName = params.parentDataClassName ?: "Parent Data Class"
-        headersMap.parentModelCode = params.parentModelCode ?: "Parent Model Unique Code"
-        headersMap.parentDataClassCode = params.parentDataClassCode ?: "Parent Data Class Unique Code"
-        headersMap.containingModelName = params.containingModelName ?: "Model"
-        headersMap.containingDataClassName = params.containingDataClassName ?: "Data Class"
-        headersMap.containingModelCode = params.containingModelCode ?: "Model Unique Code"
-        headersMap.containingDataClassCode = params.containingDataClassCode ?: "Data Class Unique Code"
-        headersMap.measurementUnitName = params.measurementUnitName ?: "Measurement Unit"
-        headersMap.measurementSymbol = params.measurementSymbol ?: "Measurement Unit Symbol"
-        headersMap.classification = params.classification ?: "Classification"
-        headersMap.dataModel = params.dataModel ?: "Data Model"
-        headersMap.metadata = params.metadata ?: "Metadata"
+    static Map<String,String> createForStandardExcelLoader(Map<String, Object> params = [:]){
+        Map<String,String> headersMap = new LinkedHashMap<String,String>()
+        headersMap.put('dataElementCode', params.dataElementCode ?: "Data Item Unique Code")
+        headersMap.put('dataElementName', params.dataElementName ?: "Data Item Name")
+        headersMap.put('dataElementDescription', params.dataElementDescription ?: "Data Item Description")
+        headersMap.put('dataTypeName', params.dataTypeName ?: "Data Type")
+        headersMap.put('dataTypeClassification', params.dataTypeClassification ?: "Data Type Classification")
+        headersMap.put('dataTypeDataModel', params.dataTypeDataModel ?: "Data Type Data Model")
+        headersMap.put('dataTypeCode', params.dataTypeCode ?: "Data Type Unique Code")
+        headersMap.put('valueDomainName', params.valueDomainName ?: "Value Domain")
+        headersMap.put('valueDomainClassification', params.valueDomainClassification ?: "Value Domain Classification")
+        headersMap.put('valueDomainDataModel', params.valueDomainDataModel ?: "Value Domain Classification")
+        headersMap.put('valueDomainCode', params.valueDomainCode ?: "Value Domain Unique Code")
+        headersMap.put('parentModelName', params.parentModelName ?: "Parent Model")
+        headersMap.put('parentDataClassName', params.parentDataClassName ?: "Parent Data Class")
+        headersMap.put('parentModelCode', params.parentModelCode ?: "Parent Model Unique Code")
+        headersMap.put('parentDataClassCode', params.parentDataClassCode ?: "Parent Data Class Unique Code")
+        headersMap.put('containingModelName', params.containingModelName ?: "Model")
+        headersMap.put('containingDataClassName', params.containingDataClassName ?: "Data Class")
+        headersMap.put('containingModelCode', params.containingModelCode ?: "Model Unique Code")
+        headersMap.put('containingDataClassCode', params.containingDataClassCode ?: "Data Class Unique Code")
+        headersMap.put('measurementUnitName', params.measurementUnitName ?: "Measurement Unit")
+        headersMap.put('measurementSymbol', params.measurementSymbol ?: "Measurement Unit Symbol")
+        headersMap.put('classification', params.classification ?: "Classification")
+        headersMap.put('dataModel', params.dataModel ?: "Data Model")
+        headersMap.put('metadata', params.metadata ?: "Metadata")
         return headersMap
     }
+
 }

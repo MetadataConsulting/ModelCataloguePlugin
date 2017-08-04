@@ -1,18 +1,31 @@
 package org.modelcatalogue.integration.excel
 
 import org.apache.poi.ss.usermodel.*
+import org.apache.poi.ss.usermodel.Row
 import org.modelcatalogue.builder.api.CatalogueBuilder
 
 class ExcelLoader {
 
-    final CatalogueBuilder builder
-
-    public ExcelLoader(CatalogueBuilder builder) {
-        this.builder = builder
+    protected Map<String, String> createRowMap(Row row, List<String> headers) {
+        Map<String, String> rowMap = [:]
+        for (Cell cell : row) {
+            rowMap = updateRowMap(rowMap, cell, headers)
+        }
+        return rowMap
+    }
+    /**
+     * getCatalogueElementDtoFromRow
+     * @param Cell cell
+     * @param List rowData
+     * @return CatalogueElementDto
+     */
+    protected Map<String, String> updateRowMap(Map<String,String> rowMap, Cell cell,  List<String> headers) {
+        def colIndex = cell.getColumnIndex()
+        rowMap[headers[colIndex]] = valueHelper(cell)
+        rowMap
     }
 
-
-	def static getRowData(Row row) {
+	static List<String> getRowData(Row row) {
 		def data = []
 		for (Cell cell : row) {
 			getValue(cell, data)
@@ -20,13 +33,12 @@ class ExcelLoader {
 		data
 	}
 
-	static getValue(Cell cell, List data) {
+	static void getValue(Cell cell, List<String> data) {
 		def colIndex = cell.getColumnIndex()
 		data[colIndex] = valueHelper(cell)
-		data
 	}
 
-    static valueHelper(Cell cell){
+    static String valueHelper(Cell cell){
         switch (cell.getCellType()) {
             case Cell.CELL_TYPE_STRING:
                 return cell.getRichStringCellValue().getString().trim();
@@ -43,73 +55,83 @@ class ExcelLoader {
         return ""
     }
 	private static final QUOTED_CHARS = ["\\": "&#92;", ":" : "&#58;", "|" : "&#124;", "%" : "&#37;"]
+    /**
+     * In the future other ExcelLoaders which inherit from this one will override this method and not the "standard" one.
+     * @param headers
+     * @param workbook
+     * @param catalogueBuilder
+     * @param index
+     */
+    void buildXmlFromWorkbookSheet(List<String> headers, Workbook workbook, CatalogueBuilder catalogueBuilder, int index=0) {}
+    /**
+     * "Standard" refers to an old way of importing excel files...
+     * This thing with headersMap is done in a particular way to generically handle a few excel formats regardless of the order of the headers.. in future we will prefer to use a list of headers which exactly matches the headers in the file
+     * @param headersMap
+     * @param workbook
+     * @param catalogueBuilder
+     * @param index
+     */
+	void buildXmlFromStandardWorkbookSheet(Map<String, String> headersMap, Workbook workbook, CatalogueBuilder catalogueBuilder, int index=0) {
 
-	void importData(HeadersMap headersMap, InputStream stream) {
-		Workbook wb = WorkbookFactory.create(stream);
-		if(!wb) {
+		if(!workbook) {
 			throw new IllegalArgumentException("Excel file contains no worksheet!")
 		}
-		Sheet sheet = wb.getSheetAt(0);
+		Sheet sheet = workbook.getSheetAt(index);
 
 		Iterator<Row> rowIt = sheet.rowIterator()
-		Row row = rowIt.next()
-		def headers = getRowData(row)
+		List<String> headers = getRowData(rowIt.next())
 
-		def rows = []
+		List<List<String>> rowDataLists = []
 		while(rowIt.hasNext()) {
-			row = rowIt.next()
-			def data =getRowData(row)
+			List<String> rowDataList =getRowData(rowIt.next())
 
-			def canBeInserted = false;
-			data.eachWithIndex { def entry, int i ->
-				if(entry!=null && entry!="")
-					canBeInserted= true;
-			}
-			if(canBeInserted)
-				rows << data
+			/*boolean canBeInserted = rowDataList.inject(true) {acc, entry ->
+                acc && (entry != null) && (entry != '')
+            }
+			if(canBeInserted)*/
+            rowDataLists << rowDataList
 		}
-
 		//get indexes of the appropriate sections
-		def dataItemNameIndex = headers.indexOf(headersMap.dataElementName)
-		def dataItemCodeIndex = headers.indexOf(headersMap.dataElementCode)
-		def dataItemDescriptionIndex = headers.indexOf(headersMap.dataElementDescription)
-		def parentModelIndex = Math.max(headers.indexOf(headersMap.parentModelName), headers.indexOf(headersMap.parentDataClassName))
-		def modelIndex = Math.max(headers.indexOf(headersMap.containingModelName), headers.indexOf(headersMap.containingDataClassName))
-		def parentModelCodeIndex = Math.max(headers.indexOf(headersMap.parentModelCode), headers.indexOf(headersMap.parentDataClassCode))
-		def modelCodeIndex = Math.max(headers.indexOf(headersMap.containingModelCode), headers.indexOf(headersMap.containingDataClassCode))
-		def unitsIndex = headers.indexOf(headersMap.measurementUnitName)
-		def symbolsIndex = headers.indexOf(headersMap.measurementSymbol)
-		def classificationsIndex = Math.max(headers.indexOf(headersMap.classification), headers.indexOf(headersMap.dataModel))
-		def dataTypeNameIndex = headers.indexOf(headersMap.dataTypeName)
-		def dataTypeClassificationIndex = Math.max(headers.indexOf(headersMap.dataTypeClassification), headers.indexOf(headersMap.dataTypeDataModel))
-		def dataTypeCodeIndex = headers.indexOf(headersMap.dataTypeCode)
-		def valueDomainNameIndex = headers.indexOf(headersMap.valueDomainName)
-		def valueDomainClassificationIndex = Math.max(headers.indexOf(headersMap.valueDomainClassification), headers.indexOf(headersMap.valueDomainDataModel))
-		def valueDomainCodeIndex = headers.indexOf(headersMap.valueDomainCode)
-		def metadataStartIndex = headers.indexOf(headersMap.metadata) + 1
+		def dataItemNameIndex = headers.indexOf(headersMap.get('dataElementName'))
+		def dataItemCodeIndex = headers.indexOf(headersMap.get('dataElementCode'))
+		def dataItemDescriptionIndex = headers.indexOf(headersMap.get('dataElementDescription'))
+		def parentModelIndex = Math.max(headers.indexOf(headersMap.get('parentModelName')), headers.indexOf(headersMap.get('parentDataClassName')))
+		def modelIndex = Math.max(headers.indexOf(headersMap.get('containingModelName')), headers.indexOf(headersMap.get('containingDataClassName')))
+		def parentModelCodeIndex = Math.max(headers.indexOf(headersMap.get('parentModelCode')), headers.indexOf(headersMap.get('parentDataClassCode')))
+		def modelCodeIndex = Math.max(headers.indexOf(headersMap.get('containingModelCode')), headers.indexOf(headersMap.get('containingDataClassCode')))
+		def unitsIndex = headers.indexOf(headersMap.get('measurementUnitName'))
+		def symbolsIndex = headers.indexOf(headersMap.get('measurementSymbol'))
+		def classificationsIndex = Math.max(headers.indexOf(headersMap.get('classification')), headers.indexOf(headersMap.get('dataModel')))
+		def dataTypeNameIndex = headers.indexOf(headersMap.get('dataTypeName'))
+		def dataTypeClassificationIndex = Math.max(headers.indexOf(headersMap.get('dataTypeClassification')), headers.indexOf(headersMap.get('dataTypeDataModel')))
+		def dataTypeCodeIndex = headers.indexOf(headersMap.get('dataTypeCode'))
+		def valueDomainNameIndex = headers.indexOf(headersMap.get('valueDomainName'))
+		def valueDomainClassificationIndex = Math.max(headers.indexOf(headersMap.get('valueDomainClassification')), headers.indexOf(headersMap.get('valueDomainDataModel')))
+		def valueDomainCodeIndex = headers.indexOf(headersMap.get('valueDomainCode'))
+		def metadataStartIndex = headers.indexOf(headersMap.get('metadata')) + 1
 		def metadataEndIndex = headers.size() - 1
 
-		if (dataItemNameIndex == -1) throw new Exception("Can not find '${headersMap.dataElementName}' column")
+		if (dataItemNameIndex == -1) throw new Exception("Can not find '${headersMap.get('dataElementName')}' column")
 		//iterate through the rows and import each line
-		builder.build {
+		catalogueBuilder.build {
 			copy relationships
-			rows.eachWithIndex { def aRow, int i ->
-				dataModel(name: getRowValue(aRow,classificationsIndex)) {
+			rowDataLists.eachWithIndex { List<String> rowDataList, int i ->
+				dataModel(name: getRowValue(rowDataList,classificationsIndex)) {
 					globalSearchFor dataType
 
 					def createChildModel = {
 						def createDataElement = {
-							if(getRowValue(aRow,dataItemNameIndex)) {
-								dataElement(name: getRowValue(aRow, dataItemNameIndex), description: getRowValue(aRow, dataItemDescriptionIndex), id: getRowValue(aRow, dataItemCodeIndex)) {
-									if (getRowValue(aRow, unitsIndex) || getRowValue(aRow, dataTypeNameIndex)) {
-										if (getRowValue(aRow, dataTypeNameIndex) || getRowValue(aRow, unitsIndex))
-											importDataTypes(builder, getRowValue(aRow, dataItemNameIndex), getRowValue(aRow, dataTypeNameIndex), getRowValue(aRow, dataTypeCodeIndex), getRowValue(aRow, dataTypeClassificationIndex), getRowValue(aRow, unitsIndex), getRowValue(aRow, symbolsIndex))
+							if(getRowValue(rowDataList,dataItemNameIndex)) {
+								dataElement(name: getRowValue(rowDataList, dataItemNameIndex), description: getRowValue(rowDataList, dataItemDescriptionIndex), id: getRowValue(rowDataList, dataItemCodeIndex)) {
+									if (getRowValue(rowDataList, unitsIndex) || getRowValue(rowDataList, dataTypeNameIndex)) {
+										if (getRowValue(rowDataList, dataTypeNameIndex) || getRowValue(rowDataList, unitsIndex))
+											importDataTypes(catalogueBuilder, getRowValue(rowDataList, dataItemNameIndex), getRowValue(rowDataList, dataTypeNameIndex), getRowValue(rowDataList, dataTypeCodeIndex), getRowValue(rowDataList, dataTypeClassificationIndex), getRowValue(rowDataList, unitsIndex), getRowValue(rowDataList, symbolsIndex))
 									}
 
 									int counter = metadataStartIndex
 									while (counter <= metadataEndIndex) {
 										String key = headers[counter].toString()
-										String value = (aRow[counter] != null) ? aRow[counter].toString() : ""
+										String value = (rowDataList[counter] != null) ? rowDataList[counter].toString() : ""
 										if (key != "" && key != "null") {
 											ext(key, value?.take(2000)?.toString() ?: '')
 										}
@@ -120,22 +142,22 @@ class ExcelLoader {
 						}
 
 
-						def modelName = getRowValue(aRow, modelIndex)
-						def modelId = getRowValue(aRow, modelCodeIndex)
+						def modelName = getRowValue(rowDataList, modelIndex)
+						def modelId = getRowValue(rowDataList, modelCodeIndex)
 
 						if (modelName || modelId) {
 							dataClass(name: modelName, id: modelId, createDataElement)
 						} else {
-							builder.with createDataElement
+							catalogueBuilder.with createDataElement
 						}
 					}
 
-					def parentModelName = getRowValue(aRow, parentModelIndex)
-					def parentModelCode = getRowValue(aRow, parentModelCodeIndex)
+					def parentModelName = getRowValue(rowDataList, parentModelIndex)
+					def parentModelCode = getRowValue(rowDataList, parentModelCodeIndex)
 					if (parentModelName || parentModelCode) {
 						dataClass(name: parentModelName, id: parentModelCode, createChildModel)
 					} else {
-						builder.with createChildModel
+						catalogueBuilder.with createChildModel
 					}
 
 				}
@@ -143,8 +165,8 @@ class ExcelLoader {
 		}
 	}
 
-	def static getRowValue(row, index){
-		(index!=-1)?row[index]:null
+	static String getRowValue(List<String> rowDataList, index){
+		(index!=-1)?rowDataList[index]:null
 	}
 
 

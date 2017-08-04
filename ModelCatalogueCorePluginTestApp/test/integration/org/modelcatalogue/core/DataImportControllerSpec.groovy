@@ -23,7 +23,7 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
     }
 
     def testHeaderSetup(){
-        HeadersMap headersMap = HeadersMap.create()
+        HeadersMap headersMap = HeadersMap.createForStandardExcelLoader()
         expect:
         headersMap.dataElementCode == "Data Item Unique Code"
         headersMap.dataElementName == "Data Item Name"
@@ -61,7 +61,7 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
         params.classification = "Classification"
         params.metadata = "metadata"
 
-        HeadersMap headersMap = HeadersMap.create(params)
+        HeadersMap headersMap = HeadersMap.createForStandardExcelLoader(params)
         expect:
         headersMap.dataElementCode == "Data Item UC"
         headersMap.dataElementName == "DataI Name"

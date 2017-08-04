@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry.xsd">
+    <dataModel name="ARIA">
+        <dataElement name="Prescription_ph" />
+        <dataElement name="Plan_ph" />
+        <dataElement name="External Beam Type_ph" />
+        <dataElement name="19.0" />
+    </dataModel>
+</catalogue>

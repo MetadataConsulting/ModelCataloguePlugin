@@ -164,7 +164,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
             StringWriter sw = new StringWriter()
             CatalogueBuilder builder = new XmlCatalogueBuilder(sw)
             ExcelLoader parser = new ExcelLoader(builder)
-            parser.importData(HeadersMap.create(), new ByteArrayInputStream(downloadBytes("api/modelCatalogue/core/asset/${currentId}/download")))
+            parser.buildXmlFromWorkbook(HeadersMap.createForStandardExcelLoader(), new ByteArrayInputStream(downloadBytes("api/modelCatalogue/core/asset/${currentId}/download")))
 
             assert sw.toString().count('<dataElement') == 5
         })
