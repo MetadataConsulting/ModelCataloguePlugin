@@ -336,13 +336,10 @@ class BootStrap {
 
     private static void initSecurity(boolean production) {
         def roleUser = Role.findByAuthority('ROLE_USER') ?: new Role(authority: 'ROLE_USER').save(failOnError: true)
-        def roleUser2 = Role.findByAuthority('ROLE_USER_2') ?: new Role(authority: 'ROLE_USER_2').save(failOnError: true)
         def roleAdmin = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
-        def roleAdmin2 = Role.findByAuthority('ROLE_ADMIN_2') ?: new Role(authority: 'ROLE_ADMIN_2').save(failOnError: true)
         def roleSupervisor = Role.findByAuthority('ROLE_SUPERVISOR') ?: new Role(authority: 'ROLE_SUPERVISOR').save(failOnError: true)
         def roleStacktrace = Role.findByAuthority('ROLE_STACKTRACE') ?: new Role(authority: 'ROLE_STACKTRACE').save(failOnError: true)
         def metadataCurator = Role.findByAuthority('ROLE_METADATA_CURATOR') ?: new Role(authority: 'ROLE_METADATA_CURATOR').save(failOnError: true)
-        def metadataCurator2 = Role.findByAuthority('ROLE_METADATA_CURATOR_2') ?: new Role(authority: 'ROLE_METADATA_CURATOR_2').save(failOnError: true)
 
         Role.findByAuthority('ROLE_REGISTERED') ?: new Role(authority: 'ROLE_REGISTERED').save(failOnError: true)
 
@@ -357,9 +354,6 @@ class BootStrap {
             def admin = User.findByNameOrUsername('admin', 'admin') ?: new User(name: 'admin', username: 'admin', enabled: true, password: 'admin', email: System.getenv('MC_ADMIN_EMAIL'), apiKey: 'adminabcdef123456').save(failOnError: true)
             def viewer = User.findByNameOrUsername('viewer', 'viewer') ?: new User(name: 'viewer', username: 'viewer', enabled: true, password: 'viewer', apiKey: 'viewerabcdef123456').save(failOnError: true)
             def curator = User.findByNameOrUsername('curator', 'curator') ?: new User(name: 'curator', username: 'curator', enabled: true, password: 'curator', apiKey: 'curatorabcdef123456').save(failOnError: true)
-            def admin2 = User.findByNameOrUsername('admin2', 'admin2') ?: new User(name: 'admin2', username: 'admin2', enabled: true, password: 'admin2', email: System.getenv('MC_ADMIN_EMAIL'), apiKey: 'adminabcdef123456').save(failOnError: true)
-            def viewer2 = User.findByNameOrUsername('viewer2', 'viewer2') ?: new User(name: 'viewer2', username: 'viewer2', enabled: true, password: 'viewer2', apiKey: 'viewerabcdef123456').save(failOnError: true)
-            def curator2 = User.findByNameOrUsername('curator2', 'curator2') ?: new User(name: 'curator2', username: 'curator2', enabled: true, password: 'curator2', apiKey: 'curatorabcdef123456').save(failOnError: true)
             User.findByNameOrUsername('registered', 'registered') ?: new User(name: 'registered', username: 'registered', enabled: true, password: 'registered', apiKey: 'registeredabcdef123456').save(failOnError: true)
 
 
@@ -388,21 +382,8 @@ class BootStrap {
                 UserRole.create viewer, roleUser, dm1
             }
 
-            if (!admin2.authorities.contains(roleAdmin2)) {
-                UserRole.create admin2, roleUser2, dm2
-                UserRole.create admin2, metadataCurator2, dm2
-                UserRole.create admin2, roleStacktrace
-                UserRole.create admin2, roleAdmin2, true
-            }
 
-            if (!curator2.authorities.contains(metadataCurator)) {
-                UserRole.create curator2, roleUser2, dm2
-                UserRole.create curator2, metadataCurator2, dm2
-            }
 
-            if (!viewer2.authorities.contains(viewer)) {
-                UserRole.create viewer2, roleUser2, dm2
-            }
         }
 
         //permit all for assets and initial pages

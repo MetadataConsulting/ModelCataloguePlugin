@@ -160,4 +160,16 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
 
     }
 
+    void addUserRoleModel(User user, Role role, DataModel model){
+        UserRole.create user, role, model
+    }
+
+    void removeUserRoleModel(User user, Role role, DataModel model){
+        UserRole.remove user, role, model
+    }
+
+    void removeAllUserRoleModel(User user, DataModel model){
+        UserRole.executeUpdate 'DELETE FROM UserRole WHERE user=:user AND dataModel=:dataModel', [user: user, dataModel: model]
+    }
+
 }

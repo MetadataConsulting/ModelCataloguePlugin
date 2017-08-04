@@ -9,6 +9,8 @@ import org.hibernate.proxy.HibernateProxyHelper
 import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.*
+import org.modelcatalogue.core.security.Role
+import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.*
 import rx.Observer
 
@@ -22,11 +24,12 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
 * */
 abstract class  CatalogueElement implements Extendible<ExtensionValue>, Published<CatalogueElement>, ApiCatalogueElement, DataModelAware {
 
-    def grailsLinkGenerator
-    def relationshipService
-    def auditService
-    def mappingService
-    def elementService
+    transient grailsLinkGenerator
+    transient relationshipService
+    transient auditService
+    transient mappingService
+    transient elementService
+    transient modelCatalogueSecurityService
 
     DataModel dataModel
 
@@ -227,6 +230,13 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
     }
 
     def beforeDelete(){
+        User currentUser = modelCatalogueSecurityService.getCurrentUser()
+        //if this is a data model add this data model, otherwise add the data model of the class.
+        if(this.instanceOf(DataModel) && currentUser) {
+            modelCatalogueSecurityService.removeAllUserRoleModel(currentUser, this)
+        }else if(this.dataModel && currentUser){
+            modelCatalogueSecurityService.removeAllUserRoleModel(currentUser, this.dataModel)
+        }
         auditService.logElementDeleted(this)
     }
 
@@ -449,6 +459,15 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
 
     void afterInsert() {
         auditService.logElementCreated(this)
+        User currentUser = modelCatalogueSecurityService.getCurrentUser()
+        Role metadataCuratorRole = Role.findByAuthority('ROLE_METADATA_CURATOR')
+        //if this is a data model add this data model, otherwise add the data model of the class.
+        if(this.instanceOf(DataModel) && currentUser && metadataCuratorRole) {
+            modelCatalogueSecurityService.addUserRoleModel(currentUser, metadataCuratorRole, this)
+        }else if(this.dataModel && currentUser && metadataCuratorRole){
+            modelCatalogueSecurityService.addUserRoleModel(currentUser, metadataCuratorRole, this.dataModel)
+        }
+
     }
 
     void beforeInsert() {

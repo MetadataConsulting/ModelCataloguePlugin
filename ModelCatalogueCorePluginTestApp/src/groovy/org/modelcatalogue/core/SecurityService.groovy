@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 
 /**
@@ -122,4 +123,38 @@ public interface SecurityService {
 
     Set getRoles(String dataModelId)
 
+    /**
+     * Adds a user with a particular role to a data model. This gives them access to the particular model
+     * Following roles are supported by the core plugin: VIEWER, CURATOR, ADMIN, SUPERVISOR. Any
+     * service implementations should map to these roles as well.
+     *
+     * @param role the role to be tested
+     * @return true if the user has particular role or it doesn't matter if she has any role
+     */
+
+    void addUserRoleModel(User user, Role role, DataModel model)
+
+
+    /**
+     * Removes a user with a particular role from a data model. This gives them access to the particular model
+     * Following roles are supported by the core plugin: VIEWER, CURATOR, ADMIN, SUPERVISOR. Any
+     * service implementations should map to these roles as well.
+     *
+     * @param role the role to be tested
+     * @return true if the user has particular role or it doesn't matter if she has any role
+     */
+    void removeUserRoleModel(User user, Role role, DataModel model)
+
+
+    /**
+     * Removes all the userroles for a user for a data model. This removes all their access to a particular data model
+     * useful when deleting a data model or revoking all access to a data model for a particular user
+     * Following roles are supported by the core plugin: VIEWER, CURATOR, ADMIN, SUPERVISOR. Any
+     * service implementations should map to these roles as well.
+     *
+     * @param role the role to be tested
+     * @return true if the user has particular role or it doesn't matter if she has any role
+     */
+
+    void removeAllUserRoleModel(User user, DataModel model)
 }
