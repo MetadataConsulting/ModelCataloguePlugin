@@ -343,10 +343,6 @@ class BootStrap {
 
         Role.findByAuthority('ROLE_REGISTERED') ?: new Role(authority: 'ROLE_REGISTERED').save(failOnError: true)
 
-        def dm1 = new DataModel(name: "data model 1", status: ElementStatus.DRAFT).save()
-
-        def dm2 = new DataModel(name: "data model 2", status: ElementStatus.DRAFT).save()
-        def de2 = new DataElement(name: "test de", dataModel: dm2).save()
 
 
         if (!production || System.getenv("METADATA_DEMO")) {
@@ -362,24 +358,23 @@ class BootStrap {
                 UserRole.create supervisor, metadataCurator
                 UserRole.create supervisor, roleStacktrace
                 UserRole.create supervisor, roleAdmin
-                UserRole.create supervisor, roleSupervisor, true
+                UserRole.create supervisor, roleSupervisor
             }
 
             if (!admin.authorities.contains(roleAdmin)) {
-                UserRole.create admin, roleUser, dm1
-                UserRole.create admin, metadataCurator, dm1
+                UserRole.create admin, roleUser
+                UserRole.create admin, metadataCurator
                 UserRole.create admin, roleStacktrace
-                UserRole.create admin, roleAdmin, dm1, true
-                UserRole.create admin, roleUser, dm2, true
+                UserRole.create admin, roleAdmin
             }
 
             if (!curator.authorities.contains(metadataCurator)) {
-                UserRole.create curator, roleUser, dm1
-                UserRole.create curator, metadataCurator, dm1
+                UserRole.create curator, roleUser
+                UserRole.create curator, metadataCurator
             }
 
             if (!viewer.authorities.contains(viewer)) {
-                UserRole.create viewer, roleUser, dm1
+                UserRole.create viewer, roleUser
             }
 
 
