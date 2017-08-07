@@ -126,7 +126,7 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages',
               return security.getCurrentUser()
             $q.reject security.getCurrentUser()
 
-        refreshUserData: (dataModelId = '1') ->
+        refreshUserData: (dataModelId) ->
           currentUserPromise = $http(method: 'GET', url: userUrl, params: {dataModelId: dataModelId})
 
           currentUserPromise.then(handleUserResponse).then ->

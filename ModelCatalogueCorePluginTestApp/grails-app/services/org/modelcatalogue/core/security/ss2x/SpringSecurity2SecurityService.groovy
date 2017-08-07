@@ -175,7 +175,7 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         if(isSupervisor()) return true
 
         //if there isn't a data model they cannot be authorised
-        if(!dataModel) return true
+        if(!dataModel) return false
 
         //see if a user has the right authorisation for the model
         UserRole userRole = UserRole.findAllByUserAndDataModelAndRole(getCurrentUser(), dataModel, role)
@@ -188,6 +188,9 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
 
     //get all the data models that this user is subscribed to regardless of the role
     List<DataModel> getSubscribed(){
+
+        if(isSupervisor()) return DataModel.list()
+
         //get all the user roles for the user
         List<UserRole> userRoles = UserRole.findAllByUser(getCurrentUser())
 
@@ -203,6 +206,9 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
     // the front end angular interface
     Set getRoles(String dataModelId){
 
+        //check if the user is a supervisor - if they are, they are subscribed to everything
+        if(isSupervisor()) return Role.list().collect{it.authority}
+
         DataModel dataModel = DataModel.get(dataModelId)
 
         //if there is a data model then return the roles for that data model
@@ -216,8 +222,8 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
 
     }
 
-    void addUserRoleModel(User user, Role role, DataModel model){
-        UserRole.create user, role, model
+    void addUserRoleModel(User user, Role role, DataModel model, boolean flush = false){
+        UserRole.create user, role, model, flush
     }
 
     void removeUserRoleModel(User user, Role role, DataModel model){
@@ -226,6 +232,15 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
 
     void removeAllUserRoleModel(User user, DataModel model){
         UserRole.executeUpdate 'DELETE FROM UserRole WHERE user=:user AND dataModel=:dataModel', [user: user, dataModel: model]
+    }
+
+    void copyUserRoles(DataModel sourceModel, DataModel destinationModel){
+
+        List<UserRole> userRolesSourceModel = UserRole.findAllByDataModel(sourceModel)
+        userRolesSourceModel.each{ UserRole userRole ->
+            addUserRoleModel userRole.user, userRole.role, destinationModel
+        }
+
     }
 
 }

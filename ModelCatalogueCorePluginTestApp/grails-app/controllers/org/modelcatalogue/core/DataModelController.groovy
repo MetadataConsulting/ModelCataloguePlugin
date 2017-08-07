@@ -10,13 +10,14 @@ import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
+import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.util.lists.Relationships
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import org.modelcatalogue.gel.export.GridReportXlsxExporter
 import org.springframework.http.HttpStatus
 
-class DataModelController extends AbstractCatalogueElementController<DataModel> {
+class DataModelController<T extends CatalogueElement> extends AbstractCatalogueElementController<DataModel> {
 
     DataClassService dataClassService
     DataElementService dataElementService
@@ -375,4 +376,27 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
             eq 'latestVersionId', latestVersionId
         }
     }
+
+    //override the abstract get all effective items for data models i.e. we can view the basic info of data models that we aren't subscribed to
+    protected ListWrapper<T> getAllEffectiveItems(Integer max) {
+        if (params.status?.toLowerCase() == 'active') {
+            if (modelCatalogueSecurityService.hasRole('VIEWER')){
+                return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+                    'in' 'status', [ElementStatus.FINALIZED, ElementStatus.DRAFT, ElementStatus.PENDING]
+                }), overridableDataModelFilter)
+            }
+            return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+                'eq' 'status', ElementStatus.FINALIZED
+            }), overridableDataModelFilter)
+        }
+
+        if (params.status) {
+            return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+                'in' 'status', ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER'))
+            }), overridableDataModelFilter)
+        }
+
+        return dataModelService.classified(withAdditionalIndexCriteria(Lists.all(params, resource, "/${resourceName}/")), overridableDataModelFilter)
+    }
+
 }

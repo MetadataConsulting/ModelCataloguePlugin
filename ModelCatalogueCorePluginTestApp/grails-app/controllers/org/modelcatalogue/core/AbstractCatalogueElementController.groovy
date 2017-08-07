@@ -43,12 +43,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
     def beforeInterceptor = {
         println "Tracing action ${actionUri}, tracing resource ${resource}"
-        if(params.id && resource!=User) {
-
-            if(modelCatalogueSecurityService.isSubscribed(getDataModel())){
-                println("authorised")
-            }else{
-                println("not authorised")
+        if(resource!=User && getDataModel()) {
+            if(!modelCatalogueSecurityService.isSubscribed(getDataModel())){
                 unauthorized()
                 return
             }
@@ -426,6 +422,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
         ListWithTotalAndType<T> items = getAllEffectiveItems(max)
         //TODO - review usage - is this used? and when?
+
         if (params.boolean('minimal') && items instanceof ListWithTotalAndTypeWrapper) {
             ListWithTotalAndTypeWrapper<T> listWrapper = items as ListWithTotalAndTypeWrapper<T>
 

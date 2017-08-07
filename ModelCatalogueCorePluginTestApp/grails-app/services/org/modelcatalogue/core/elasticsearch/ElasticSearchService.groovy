@@ -190,11 +190,10 @@ class ElasticSearchService implements SearchCatalogue {
         List<String> states = []
 
         //if the role is viewer, don't return elements that they shouldn't see i.e. drafts .
-
         //TODO: NEED TO REMOVE THIS????????
 
         if (params.status) {
-            states = ElementService.getStatusFromParams(params, true)*.toString()
+            states = ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER'))*.toString()
         }
 
         List<String> types = []
@@ -281,7 +280,7 @@ class ElasticSearchService implements SearchCatalogue {
             }
 
             if (params.status) {
-                boolQuery.must(QueryBuilders.termsQuery('status', ElementService.getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/)*.toString()))
+                boolQuery.must(QueryBuilders.termsQuery('status', ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER'))*.toString()))
             }
 
             if (params.contentType) {
@@ -355,7 +354,7 @@ class ElasticSearchService implements SearchCatalogue {
             }
 
             if (params.status) {
-                boolQuery.must(QueryBuilders.termsQuery('status', ElementService.getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/)*.toString()))
+                boolQuery.must(QueryBuilders.termsQuery('status', ElementService.getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER'))*.toString()))
             }
 
             if (params.contentType) {
@@ -578,7 +577,6 @@ class ElasticSearchService implements SearchCatalogue {
 
         //index Data Models
         indexDomains(DataModel, session)
-
 
         //index DataClasses
         indexDomains(DataClass, session)

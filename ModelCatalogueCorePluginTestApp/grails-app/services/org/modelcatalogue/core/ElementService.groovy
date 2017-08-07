@@ -18,6 +18,7 @@ import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.publishing.PublishingContext
+import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.util.ElasticMatchResult
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.HibernateHelper
@@ -81,6 +82,9 @@ class ElementService implements Publisher<CatalogueElement> {
 
                 // TODO: better target the changes
                 CacheService.VERSION_COUNT_CACHE.invalidateAll()
+
+                //add all the userRoles from the old version to the new version
+                modelCatalogueSecurityService.copyUserRoles(dataModel, draft)
 
                 return draft
             }

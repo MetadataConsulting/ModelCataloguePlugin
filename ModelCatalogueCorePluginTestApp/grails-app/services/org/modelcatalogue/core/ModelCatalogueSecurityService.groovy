@@ -81,4 +81,6 @@ class ModelCatalogueSecurityService implements SecurityService, LogoutListeners 
     boolean isSupervisor(){
         return true
     }
+
+    void copyUserRoles(DataModel sourceModel, DataModel destinationModel){}
 }

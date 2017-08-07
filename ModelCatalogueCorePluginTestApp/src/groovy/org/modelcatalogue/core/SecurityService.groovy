@@ -128,8 +128,7 @@ public interface SecurityService {
      * Following roles are supported by the core plugin: VIEWER, CURATOR, ADMIN, SUPERVISOR. Any
      * service implementations should map to these roles as well.
      *
-     * @param role the role to be tested
-     * @return true if the user has particular role or it doesn't matter if she has any role
+     * @param the user to be added, role the role to be added, data model that data model the user and role applies to
      */
 
     void addUserRoleModel(User user, Role role, DataModel model)
@@ -161,4 +160,11 @@ public interface SecurityService {
  * @return true if the user has particular role or it doesn't matter if she has any role
  */
     boolean isSupervisor()
+
+
+/**
+ * Copies the user roles from one model to another.
+ * Useful when creating a new model version
+ */
+    void copyUserRoles(DataModel sourceModel, DataModel destinationModel)
 }
