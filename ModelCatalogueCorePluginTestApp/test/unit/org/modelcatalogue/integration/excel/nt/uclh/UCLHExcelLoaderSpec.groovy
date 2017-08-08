@@ -2,7 +2,7 @@ package org.modelcatalogue.integration.excel.nt.uclh
 
 import org.custommonkey.xmlunit.XMLUnit
 import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
-import org.modelcatalogue.integration.excel.ExcelLoaderSpec
+import org.modelcatalogue.core.dataimport.excel.ExcelLoaderSpec
 
 /**
  * Created by david on 04/08/2017.

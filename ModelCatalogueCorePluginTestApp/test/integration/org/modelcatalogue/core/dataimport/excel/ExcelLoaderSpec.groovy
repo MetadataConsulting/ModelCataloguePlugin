@@ -1,4 +1,4 @@
-package org.modelcatalogue.integration.excel
+package org.modelcatalogue.core.dataimport.excel
 
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
@@ -6,6 +6,8 @@ import org.custommonkey.xmlunit.DetailedDiff
 import org.custommonkey.xmlunit.Diff
 import org.custommonkey.xmlunit.XMLUnit
 import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
+import org.modelcatalogue.integration.excel.ExcelLoader
+import org.modelcatalogue.integration.excel.HeadersMap
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
