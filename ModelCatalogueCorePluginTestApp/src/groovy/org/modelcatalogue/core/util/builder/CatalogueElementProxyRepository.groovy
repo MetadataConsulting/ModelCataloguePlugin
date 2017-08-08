@@ -209,9 +209,10 @@ class CatalogueElementProxyRepository {
         // Step 3: resolve elements (set properties, update metadata)
         watch.start('resolving elements')
         logInfo "(4/6) resolving elements"
-        int elNumberOfPositions = Math.floor(Math.log10(elementProxiesToBeResolved.size())).intValue() + 2
+        int numCatalogueElementProxies = elementProxiesToBeResolved.size()
+        int elNumberOfPositions = Math.floor(Math.log10(numCatalogueElementProxies)).intValue() + 2
         elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
-            logDebug "[${(i + 1).toString().padLeft(elNumberOfPositions, '0')}/${elementProxiesToBeResolved.size().toString().padLeft(elNumberOfPositions, '0')}] Resolving $element"
+            logDebug "[${(i + 1).toString().padLeft(elNumberOfPositions, '0')}/${numCatalogueElementProxies.toString().padLeft(elNumberOfPositions, '0')}] Resolving $element"
             try {
                 CatalogueElement resolved = element.resolve() as CatalogueElement
                 created.add(resolved)
@@ -280,19 +281,19 @@ class CatalogueElementProxyRepository {
         // Step 6: resolve state changes
         watch.start('resolving state changes')
         logInfo "(6/6) resolving state changes"
-        elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
-            logDebug "[${(i + 1).toString().padLeft(elNumberOfPositions, '0')}/${elementProxiesToBeResolved.size().toString().padLeft(elNumberOfPositions, '0')}] Resolving status changes for $element"
+        elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy catalogueElementProxy, i ->
+            logDebug "[${(i + 1).toString().padLeft(elNumberOfPositions, '0')}/${elementProxiesToBeResolved.size().toString().padLeft(elNumberOfPositions, '0')}] Resolving status changes for $catalogueElementProxy"
 
-            ElementStatus status = element.getParameter('status') as ElementStatus
+            ElementStatus desiredStatus = catalogueElementProxy.getParameter('status') as ElementStatus
 
             try {
-                CatalogueElement catalogueElement = element.resolve() as CatalogueElement
+                CatalogueElement catalogueElement = catalogueElementProxy.resolve() as CatalogueElement
 
-                if (status && catalogueElement.status != status) {
-                    if (status == ElementStatus.FINALIZED) {
+                if (desiredStatus && catalogueElement.status != desiredStatus) {
+                    if (desiredStatus == ElementStatus.FINALIZED) {
                         elementService.finalizeElement(catalogueElement)
                         logDebug "... finalized $catalogueElement"
-                    } else if (status == ElementStatus.DEPRECATED) {
+                    } else if (desiredStatus == ElementStatus.DEPRECATED) {
                         elementService.archive(catalogueElement, true)
                         logDebug "... deprecated $catalogueElement"
                     }

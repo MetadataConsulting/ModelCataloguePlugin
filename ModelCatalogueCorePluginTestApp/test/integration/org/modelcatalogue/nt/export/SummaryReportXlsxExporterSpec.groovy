@@ -19,14 +19,13 @@ class SummaryReportXlsxExporterSpec extends AbstractIntegrationSpec {
     DataModelService dataModelService
     DataClassService dataClassService
     GrailsApplication grailsApplication
-
     @Rule TemporaryFolder temporaryFolder = new TemporaryFolder()
+
 
     DataModel dataModel
     CatalogueBuilder catalogueBuilder
 
-    def setup() {
-        initRelationshipTypes()
+    def setup() {initRelationshipTypes()
         DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
 
         CatalogueXmlLoader loader = new CatalogueXmlLoader(builder)

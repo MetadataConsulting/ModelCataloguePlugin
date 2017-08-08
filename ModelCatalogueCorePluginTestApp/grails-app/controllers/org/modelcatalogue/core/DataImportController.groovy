@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.apache.commons.lang3.tuple.Pair
 import org.apache.poi.poifs.filesystem.POIFSFileSystem
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.modelcatalogue.core.api.ElementStatus
@@ -87,9 +88,9 @@ class DataImportController  {
                 try {
 //                    ExcelLoader parser = new ExcelLoader(builder)
 //                    parser.buildXmlFromWorkbook(headersMap, inputStream)
-                    UCLHExcelLoader parser = new UCLHExcelLoader()
-                    parser.buildXmlFromWorkbookSheet(WorkbookFactory.create(inputStream), builder)
-
+                    UCLHExcelLoader parser = new UCLHExcelLoader(true) //test=true randomizing model names
+                    Pair<String, List<String>> xmlAndDataModelNames = parser.buildXmlFromWorkbookSheet(WorkbookFactory.create(inputStream), builder)
+                    parser.addRelationshipsToModels('Cancer Model', xmlAndDataModelNames.right)
                     finalizeAsset(id, (DataModel) (builder.created.find {it.instanceOf(DataModel)} ?: builder.created.find{it.dataModel}?.dataModel), userId)
                 } catch (Exception e) {
                     logError(id, e)

@@ -1,20 +1,24 @@
-package org.modelcatalogue.integration.excel
+package org.modelcatalogue.core.dataimport.excel
 
+import org.apache.commons.lang3.tuple.Pair
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.custommonkey.xmlunit.DetailedDiff
 import org.custommonkey.xmlunit.Diff
 import org.custommonkey.xmlunit.XMLUnit
 import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
+import org.modelcatalogue.core.AbstractIntegrationSpec
+import org.modelcatalogue.integration.excel.ExcelLoader
+import org.modelcatalogue.integration.excel.HeadersMap
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
-class ExcelLoaderSpec extends Specification {
-    @Shared String resourcePath = (new File("test/unit/resources/org/modelcatalogue/integration/excel")).getAbsolutePath()
+class ExcelLoaderSpec extends AbstractIntegrationSpec {
+    @Shared String standardExcelLoaderResourcePath = (new File("test/unit/resources/org/modelcatalogue/integration/excel")).getAbsolutePath()
     StringWriter stringWriter
     XmlCatalogueBuilder builder
-    ExcelLoader loader
+    ExcelLoader excelLoader
 
     def setup() {
         XMLUnit.ignoreWhitespace = true
@@ -22,7 +26,7 @@ class ExcelLoaderSpec extends Specification {
         XMLUnit.ignoreAttributeOrder = true
         stringWriter = new StringWriter()
         builder = new XmlCatalogueBuilder(stringWriter, true)
-        loader = new ExcelLoader()
+        excelLoader = new ExcelLoader()
     }
 
 
@@ -31,7 +35,7 @@ class ExcelLoaderSpec extends Specification {
         expect:
         similar standardExcelLoaderXmlResult(file,
             HeadersMap.createForStandardExcelLoader()),
-            (new FileInputStream (new File (resourcePath + '/test.catalogue.xml'))).text
+            (new FileInputStream (new File (standardExcelLoaderResourcePath + '/test.catalogue.xml'))).text
             //getClass().getResourceAsStream('test.catalogue.xml').text
 
         where:
@@ -39,9 +43,9 @@ class ExcelLoaderSpec extends Specification {
 
     }
     String standardExcelLoaderXmlResult(String sampleFile, Map<String,String> headersMap, int index = 0) {
-        loader.buildXmlFromStandardWorkbookSheet(headersMap,
+        excelLoader.buildXmlFromStandardWorkbookSheet(headersMap,
             WorkbookFactory.create(
-                (new FileInputStream(resourcePath + '/' + sampleFile))),
+                (new FileInputStream(standardExcelLoaderResourcePath + '/' + sampleFile))),
                 //getClass().getResourceAsStream(sampleFile)),
             builder,
             index)
@@ -49,13 +53,11 @@ class ExcelLoaderSpec extends Specification {
 
     }
 
-    String excelLoaderXmlResult(String sampleFile, int index=0) {
-        loader.buildXmlFromWorkbookSheet(
+    Pair<String, List<String>> excelLoaderXmlResult(String sampleFile, int index=0) {
+        excelLoader.buildXmlFromWorkbookSheet(
              new XSSFWorkbook(
             getClass().getResourceAsStream(sampleFile)),
-            builder,
             index)
-        return stringWriter.toString()
     }
 
 
