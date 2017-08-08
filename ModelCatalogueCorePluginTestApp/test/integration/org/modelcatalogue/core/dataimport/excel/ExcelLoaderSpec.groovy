@@ -23,7 +23,7 @@ class ExcelLoaderSpec extends Specification {
         XMLUnit.ignoreComments = true
         XMLUnit.ignoreAttributeOrder = true
         stringWriter = new StringWriter()
-        builder = new XmlCatalogueBuilder(stringWriter, true)
+        //builder = new XmlCatalogueBuilder(stringWriter, true)
         loader = new ExcelLoader()
     }
 
@@ -55,7 +55,6 @@ class ExcelLoaderSpec extends Specification {
         loader.buildXmlFromWorkbookSheet(
              new XSSFWorkbook(
             getClass().getResourceAsStream(sampleFile)),
-            builder,
             index)
         return stringWriter.toString()
     }

@@ -26,7 +26,7 @@ class UCLHExcelLoaderSpec extends ExcelLoaderSpec {
      */
     def "test expected output for UCLH #file"() {
         expect:
-        similar excelLoaderXmlResult(file),getClass().getResourceAsStream('UCLHAriaTestExpected.xml').text
+        similar excelLoaderXmlResult(file), getClass().getResourceAsStream('UCLHAriaTestExpected.xml').text
         where:
         file << ['UCLHAriaTest.xlsx']
 
