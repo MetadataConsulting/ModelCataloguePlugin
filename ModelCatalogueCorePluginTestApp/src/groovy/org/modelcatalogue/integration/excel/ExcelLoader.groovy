@@ -1,5 +1,6 @@
 package org.modelcatalogue.integration.excel
 
+import org.apache.commons.lang3.tuple.Pair
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.ss.usermodel.Row
 import org.modelcatalogue.builder.api.CatalogueBuilder
@@ -62,7 +63,7 @@ class ExcelLoader {
      * @param catalogueBuilder
      * @param index
      */
-    void buildXmlFromWorkbookSheet(List<String> headers, Workbook workbook, CatalogueBuilder catalogueBuilder, int index=0) {}
+    Pair<String, List<String>> buildXmlFromWorkbookSheet(Workbook workbook, int index=0) {}
     /**
      * "Standard" refers to an old way of importing excel files...
      * This thing with headersMap is done in a particular way to generically handle a few excel formats regardless of the order of the headers.. in future we will prefer to use a list of headers which exactly matches the headers in the file
