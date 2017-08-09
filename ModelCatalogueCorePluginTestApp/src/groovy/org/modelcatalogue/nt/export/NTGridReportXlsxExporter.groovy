@@ -5,6 +5,7 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.export.inventory.ModelCatalogueStyles
 import org.modelcatalogue.core.util.DataModelFilter
+import org.modelcatalogue.gel.export.GridReportXlsxExporter
 import org.modelcatalogue.spreadsheet.builder.api.RowDefinition
 import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
 import org.modelcatalogue.spreadsheet.builder.api.SpreadsheetBuilder
@@ -19,7 +20,7 @@ import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
  * @author Adam Milward
  * @version 31/03/2017
  */
-class NTGridReportXlsxExporter {
+class NTGridReportXlsxExporter extends GridReportXlsxExporter {
 
     final CatalogueElement element
     final DataClassService dataClassService
@@ -39,8 +40,10 @@ class NTGridReportXlsxExporter {
         this.grailsApplication = grailsApplication
         this.depth = depth
     }
-
+    protected List<String> excelHeaders = ['ID', 'Data Element', 'Multiplicity', 'Data Type', 'Validation Rule', 'Business Rule', 'Related To', 'Source System', 'Semantic Matching', 'Known Issue', 'Immediate Solution', 'Immediate Solution Owner', 'Long Term Solution', 'Long Term Solution Owner', 'Data Item Unique Code', 'Related To Metadata', 'Part Of Standard Data Set', 'Data Completeness', 'Estimated Quality', 'Timely', 'Comments']
+    @Override
     void export(OutputStream outputStream) {
+        /*
         SpreadsheetBuilder builder = new PoiSpreadsheetBuilder()
         List<DataClass> dataClasses = Collections.emptyList()
         dataClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.includes(element as DataModel), ImmutableMap.of('status', 'active'), true).items
@@ -54,111 +57,14 @@ class NTGridReportXlsxExporter {
                         colspan depth
                         style H1
                     }
-                    cell {
-                        value 'ID'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Data Element'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Multiplicity'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Data Type'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Validation Rule'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Business Rule'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Related To'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Source System'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Semantic Matching'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Known Issue'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Immediate Solution'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Immediate Solution Owner'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Long Term Solution'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Long Term Solution Owner'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Data Item Unique Code'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Related To Metadata'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Part Of Standard Data Set'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Data Completeness'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Estimated Quality'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Timely'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Comments'
-                        width auto
-                        style H1
-                    }
+                    excelHeaders.each
+                        { header ->
+                            cell {
+                                value header
+                                width auto
+                                style H1
+                            }
+                        }
                 }
 
                 dataClasses.each { dataClass ->
@@ -166,9 +72,9 @@ class NTGridReportXlsxExporter {
                 }
 
             }
-
-
-
+        }*/
+        super.export(outputStream) // does the normal stuff on the first sheet with current class's excelHeaders
+        (new PoiSpreadsheetBuilder()).build(outputStream) {
             sheet("Analysis") { SheetDefinition sheet ->
 
                 buildAnalysis(sheet)
@@ -182,11 +88,7 @@ class NTGridReportXlsxExporter {
                 }
 
             }
-
-
         }
-
-
     }
 
 

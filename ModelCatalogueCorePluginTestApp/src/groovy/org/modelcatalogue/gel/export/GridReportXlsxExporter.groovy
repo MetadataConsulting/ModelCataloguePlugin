@@ -52,7 +52,7 @@ class GridReportXlsxExporter  {
         this.grailsApplication = grailsApplication
         this.depth = depth
     }
-
+    protected List<String> excelHeaders = ['Data Element', 'Multiplicity', 'Data Type', 'Validation Rule', 'Business Rule', 'Labkey Field Name', 'Labkey View', 'Additional review', 'Additional Rule']
     void export(OutputStream outputStream) {
         SpreadsheetBuilder builder = new PoiSpreadsheetBuilder()
         List<DataClass> dataClasses = Collections.emptyList()
@@ -67,58 +67,15 @@ class GridReportXlsxExporter  {
                         colspan depth
                         style H1
                     }
-                    cell {
-                        value 'Data Element'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Multiplicity'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Data Type'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Validation Rule'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Business Rule'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Labkey Field Name'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Labkey View'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Additional review'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Additional Rule'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Additional Rule Dependency'
-                        width auto
-                        style H1
+
+                    excelHeaders.each{ header ->
+                        cell {
+                            value header
+                            width auto
+                            style H1
+                        }
                     }
                 }
-
                 dataClasses.each{ dataClass->
                     buildRows(sheetDefinition, dataClass.getOutgoingRelationshipsByType(RelationshipType.hierarchyType), 1, 2)
                 }
@@ -239,6 +196,7 @@ class GridReportXlsxExporter  {
                         }
                     }
                 }
+
 
                 cell {
                     value "${getMultiplicity(dataElementRelationship)}"

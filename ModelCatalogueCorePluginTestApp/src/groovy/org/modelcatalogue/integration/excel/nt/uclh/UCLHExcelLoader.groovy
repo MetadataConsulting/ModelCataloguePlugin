@@ -44,7 +44,7 @@ class UCLHExcelLoader extends ExcelLoader{
         return id
     }
 
-    }
+
     String getNTElementName(Map<String,String> rowMap){
         String alias = getElementFromGelName(rowMap) + "_ph"
         String name = rowMap['Data Item Unique Code']?:alias
