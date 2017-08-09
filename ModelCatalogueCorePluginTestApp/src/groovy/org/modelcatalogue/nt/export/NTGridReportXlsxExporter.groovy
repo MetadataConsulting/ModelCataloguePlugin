@@ -22,10 +22,6 @@ import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
  */
 class NTGridReportXlsxExporter extends GridReportXlsxExporter {
 
-    final CatalogueElement element
-    final DataClassService dataClassService
-    final GrailsApplication grailsApplication
-    final int depth
     Map systemsMap = [:]
     Map metadataCompletion = [:]
 
@@ -34,59 +30,110 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
     }
 
 
-    private NTGridReportXlsxExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3) {
-        this.element = element
-        this.dataClassService = dataClassService
-        this.grailsApplication = grailsApplication
-        this.depth = depth
+    NTGridReportXlsxExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3) {
+        super(element, dataClassService, grailsApplication, depth)
+
     }
-    protected List<String> excelHeaders = ['ID', 'Data Element', 'Multiplicity', 'Data Type', 'Validation Rule', 'Business Rule', 'Related To', 'Source System', 'Semantic Matching', 'Known Issue', 'Immediate Solution', 'Immediate Solution Owner', 'Long Term Solution', 'Long Term Solution Owner', 'Data Item Unique Code', 'Related To Metadata', 'Part Of Standard Data Set', 'Data Completeness', 'Estimated Quality', 'Timely', 'Comments']
+
+    private Closure analysisStyle = {
+        align center center
+        font {
+            make bold
+            size 16
+            color black
+        }
+    }
+
+    private List<String> ntElementMetadataHeaders = ['Semantic Matching', 'Known Issue', 'Immediate Solution', 'Immediate Solution Owner', 'Long Term Solution', 'Long Term Solution Owner', 'Data Item Unique Code', 'Related To Metadata', 'Part Of Standard Data Set', 'Data Completeness', 'Estimated Quality', 'Timely', 'Comments']
+    private List<String> ntElementMetadataKeys = ntElementMetadataHeaders.collect{
+        it.replace(/Related To Metadata/, 'Related To')}
+    protected List<String> excelHeaders = ['ID', 'Data Element', 'Multiplicity', 'Data Type', 'Validation Rule', 'Business Rule', 'Related To', 'Source System'] + ntElementMetadataHeaders
+
+
     @Override
-    void export(OutputStream outputStream) {
-        /*
-        SpreadsheetBuilder builder = new PoiSpreadsheetBuilder()
-        List<DataClass> dataClasses = Collections.emptyList()
-        dataClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.includes(element as DataModel), ImmutableMap.of('status', 'active'), true).items
+    Map<String, Closure> sheetsAfterMainSheetExport() {
+        Map<String, Closure> sheets =
+            ['Analysis': {SheetDefinition sheet -> buildAnalysis(sheet)} as Closure] +
+            systemsMap.collectEntries {name, v ->
+                [(name), {SheetDefinition sheet -> buildCompletionTab(sheet, name)} as Closure]
+            }
+        println "Sheets: ${sheets}"
+        return sheets
+    }
+    // export will do as it normally does, with new headers, and a different printDataElement, and then do sheetsAfterMainSheetExport at the end.
 
-        builder.build(outputStream) {
-            apply ModelCatalogueStyles
-            sheet("$element.name $element.dataModelSemanticVersion") { SheetDefinition sheetDefinition ->
-                row {
-                    cell {
-                        value 'Class Hierarchy'
-                        colspan depth
-                        style H1
-                    }
-                    excelHeaders.each
-                        { header ->
-                            cell {
-                                value header
-                                width auto
-                                style H1
-                            }
+    @Override
+    void printDataElement(RowDefinition rowDefinition, Relationship dataElementRelationship, List outline = []) {
+        DataElement dataElement = dataElementRelationship.destination
+        List relatedTo  = []
+        relatedTo = dataElement.relatedTo.findAll{ it.dataModel.ext.get('http://www.modelcatalogue.org/metadata/#organization') == "UCL" }
+        addToSystemsMap(relatedTo, dataElement)
+
+        rowDefinition.with {
+
+            outline.each{
+
+                cell(it){
+                    style {
+                        wrap text
+                        border left, {
+                            color black
+                            style medium
                         }
-                }
-
-                dataClasses.each { dataClass ->
-                    buildRows(sheetDefinition, dataClass.getOutgoingRelationshipsByType(RelationshipType.hierarchyType), 1, 2)
+                    }
                 }
 
             }
-        }*/
-        super.export(outputStream) // does the normal stuff on the first sheet with current class's excelHeaders
-        (new PoiSpreadsheetBuilder()).build(outputStream) {
-            sheet("Analysis") { SheetDefinition sheet ->
 
-                buildAnalysis(sheet)
+            cell(depth + 1) {
+                value "${(dataElement.modelCatalogueId)?:(dataElement.getLatestVersionId()) ?: dataElement.getId()}.${dataElement.getVersionNumber()}"
+                style {
+                    wrap text
+                    border top, left, {
+                        color black
+                        style medium
+                    }
+                }
             }
 
-            systemsMap.each { k, v ->
-
-
-                sheet(k) { SheetDefinition sheet ->
-                    buildCompletionTab(sheet, k)
+            cell() {
+                value dataElement.name
+                link to url "${getLoadURL(dataElement)}"
+                style {
+                    wrap text
+                    border top, left, {
+                        color black
+                        style medium
+                    }
                 }
+            }
+            [ "${getMultiplicity(dataElementRelationship)}",
+              "${(dataElement?.dataType) ? printDataType(dataElement?.dataType) : ""}",
+              "${(dataElement?.dataType?.rule) ?: ""}",
+              "${(dataElement?.involvedIn) ? printBusRule(dataElement?.involvedIn) : ""}"].each{
+                cellValue ->
+                    cell {
+                        value cellValue
+                        style standardCellStyle
+                    }
+            }
+            cell {
+                value "${(relatedTo) ? ((relatedTo.size()==1) ? relatedTo[0]?.name : "Multiple sources identified, please see catalogue") : "No source identified"}"
+                if (relatedTo && relatedTo.size()==1) link to url "${ getLoadURL(relatedTo[0]) }"
+                style standardCellStyle
+            }
 
+
+            cell {
+                value "${getRelatedToModel(relatedTo)}"
+                style standardCellStyle
+            }
+
+            ntElementMetadataKeys.each{metadataKey ->
+                cell {
+                    value "${printSystemMetadata(relatedTo, metadataKey)}"
+                    style standardCellStyle
+                }
             }
         }
     }
@@ -105,96 +152,13 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
         sheet.with { SheetDefinition sheetDefinition ->
 
             row{
-                cell {
-                    value 'ID'
-                    width auto
-                    style H1
-                }
-
-                cell {
-                    value 'Data Element'
-                    width auto
-                    style H1
-                }
-                cell {
-                    value 'Data Type'
-                    width auto
-                    style H1
-                }
-                cell {
-                    value 'Validation Rule'
-                    width auto
-                    style H1
-                }
-                cell {
-                    value 'Business Rule'
-                    width auto
-                    style H1
-                }
-                cell {
-                    value 'Semantic Matching'
-                    width auto
-                    style H1
-                }
-                cell {
-                    value 'Known Issue'
-                    width auto
-                    style H1
-                }
-                cell {
-                    value 'Immediate Solution'
-                    width auto
-                    style H1
-                }
-                cell {
-                    value 'Immediate Solution Owner'
-                    width auto
-                    style H1
-                }
-                cell {
-                    value 'Long Term Solution'
-                    width auto
-                    style H1
-                }
-                cell {
-                    value 'Long Term Solution Owner'
-                    width auto
-                    style H1
-                }
-                cell {
-                    value 'Data Item Unique Code'
-                    width auto
-                    style H1
-                }
-                cell {
-                    value 'Related To Metadata'
-                    width auto
-                    style H1
-                }
-                cell {
-                    value 'Part Of Standard Data Set'
-                    width auto
-                    style H1
-                }
-                cell {
-                    value 'Data Completeness'
-                    width auto
-                    style H1
-                }
-                cell {
-                    value 'Estimated Quality'
-                    width auto
-                    style H1
-                }
-                cell {
-                    value 'Timely'
-                    width auto
-                    style H1
-                }
-                cell {
-                    value 'Comments'
-                    width auto
-                    style H1
+                excelHeaders.minus(['Multiplicity', 'Related To', 'Source System']).each {
+                    cellValue ->
+                        cell {
+                            value cellValue
+                            width auto
+                            style H1
+                        }
                 }
             }
 
@@ -207,6 +171,56 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
 
         }
 
+    }
+
+    private void printSystemDataElement(RowDefinition rowDefinition, DataElement dataElement){
+        rowDefinition.with {
+
+            cell() {
+                value "${(dataElement.modelCatalogueId)?:(dataElement.getLatestVersionId()) ?: dataElement.getId()}.${dataElement.getVersionNumber()}"
+                style {
+                    wrap text
+                    border top, left, {
+                        color black
+                        style medium
+                    }
+                }
+            }
+
+            cell() {
+                value dataElement.name
+                link to url "${getLoadURL(dataElement)}"
+                style {
+                    wrap text
+                    border top, left, {
+                        color black
+                        style medium
+                    }
+                }
+            }
+
+            ["${(dataElement?.dataType) ? printDataType(dataElement?.dataType) : ""}",
+             "${(dataElement?.dataType?.rule) ?: ""}",
+             "${(dataElement?.involvedIn) ? printBusRule(dataElement?.involvedIn) : ""}"].each{
+                cellValue ->
+                    cell {
+                        value cellValue
+                        style standardCellStyle
+                    }
+            }
+            ntElementMetadataKeys.each{metadataKey ->
+                cell {
+                    value "${printSystemMetadata([dataElement], metadataKey)}"
+                    style {
+                        wrap text
+                        border top, {
+                            color black
+                            style medium
+                        }
+                    }
+                }
+            }
+        }
     }
 
 
@@ -237,26 +251,12 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
                 cell {
                     value "System"
                     colspan 4
-                    style {
-                        align center center
-                        font {
-                            make bold
-                            size 16
-                            color black
-                        }
-                    }
+                    style analysisStyle
                 }
                 cell {
                     value "Count"
                     width auto
-                    style {
-                        align center center
-                        font {
-                            make bold
-                            size 16
-                            color black
-                        }
-                    }
+                    style analysisStyle
                 }
             }
 
@@ -297,26 +297,12 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
                 cell {
                     value "Metadata"
                     colspan 4
-                    style {
-                        align center center
-                        font {
-                            make bold
-                            size 16
-                            color black
-                        }
-                    }
+                    style analysisStyle
                 }
                 cell {
                     value "Completion"
                     width auto
-                    style {
-                        align center center
-                        font {
-                            make bold
-                            size 16
-                            color black
-                        }
-                    }
+                    style analysisStyle
                 }
             }
 
@@ -328,7 +314,9 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
                         colspan 4
                     }
                     cell {
-                        value "${ (v.get("completed") && v.get("total")) ? Math.round(v.get("completed") / v.get("total") * 100) : "0"} %"
+                        value "${ (v.get("completed") && v.get("total")) ?
+                            Math.round(v.get("completed") / v.get("total") * 100) :
+                            "0"} %"
                         width auto
                     }
                 }
@@ -337,548 +325,6 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
         }
     }
 
-    /**
-     * Renders rows for each data class passed in children collection.
-     * @param sheet the current sheet
-     * @param children data classes to be rendered
-     * @param currentDepth the current depth starting with one
-     */
-    private Integer buildRows(SheetDefinition sheet, Collection<Relationship> children, int columnDepth, int rowDepth, List outline = []) {
-        if (columnDepth > depth) {
-            return rowDepth
-        }
-        children.each { Relationship relationship ->
-            CatalogueElement child = relationship.destination
-            rowDepth = printClass(child, sheet, columnDepth, rowDepth, children.size(), outline)
-            outline.removeElement(columnDepth)
-        }
-        rowDepth
-    }
-
-
-    private Integer printClass(DataClass child, SheetDefinition sheet, int columnDepth, int rowDepth, int childrenSize, List outline = []) {
-
-        Collection<Relationship> dataElements = child.getOutgoingRelationshipsByType(RelationshipType.containmentType)
-        sheet.with { SheetDefinition sheetDefinition ->
-            row(rowDepth) { RowDefinition rowDefinition ->
-                (1..depth).each{
-                    if(it==columnDepth){
-                        cell(columnDepth) {
-                            value child.name
-                            link to url "${child.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + child.defaultModelCatalogueId}"
-                            style {
-                                wrap text
-                                border top, left, {
-                                    color black
-                                    style medium
-                                }
-                            }
-                        }
-                        outline.add(it)
-                    }else if (!outline.contains(it)){
-                       cell(it){
-                           style {
-                               wrap text
-                               border top, {
-                                   color black
-                                   style medium
-                               }
-                           }
-                       }
-
-                    }
-                }
-                if (dataElements) {
-                    printDataElement(rowDefinition, dataElements.head(), outline)
-                }else{
-                    outline.each {
-                            cell(it) {
-                                style {
-                                    wrap text
-                                    border left, {
-                                        color black
-                                        style medium
-                                    }
-                                }
-                            }
-                    }
-                }
-            }
-            if (dataElements.size() > 1) {
-                for (Relationship dataElementRelationship in dataElements.tail()) {
-                    rowDepth++
-                    row(rowDepth) { RowDefinition rowDefinition ->
-                        printDataElement(rowDefinition, dataElementRelationship, outline)
-                    }
-                }
-            }
-            rowDepth = buildRows(sheetDefinition, child.getOutgoingRelationshipsByType(RelationshipType.hierarchyType), columnDepth + 1, (dataElements.size() > 1)?(rowDepth + 1):rowDepth, outline)
-            rowDepth
-        }
-    }
-
-    void printDataElement(RowDefinition rowDefinition, Relationship dataElementRelationship, List outline = []) {
-        DataElement dataElement = dataElementRelationship.destination
-        List relatedTo  = []
-        relatedTo = dataElement.relatedTo.findAll{ it.dataModel.ext.get('http://www.modelcatalogue.org/metadata/#organization') == "UCL" }
-        addToSystemsMap(relatedTo, dataElement)
-
-        rowDefinition.with {
-
-                outline.each{
-
-                    cell(it){
-                        style {
-                            wrap text
-                            border left, {
-                                color black
-                                style medium
-                            }
-                        }
-                    }
-
-                }
-
-                cell(depth + 1) {
-                    value "${(dataElement.modelCatalogueId)?:(dataElement.getLatestVersionId()) ?: dataElement.getId()}.${dataElement.getVersionNumber()}"
-                    style {
-                        wrap text
-                        border top, left, {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-
-                cell() {
-                    value dataElement.name
-                    link to url "${getLoadURL(dataElement)}"
-                    style {
-                        wrap text
-                        border top, left, {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-
-                cell {
-                    value "${getMultiplicity(dataElementRelationship)}"
-                    style {
-                        wrap text
-                        border top,  {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-
-                cell {
-                    value "${(dataElement?.dataType) ? printDataType(dataElement?.dataType) : ""}"
-                    style {
-                        wrap text
-                        border top, {
-                            color black
-                            style medium
-                        }
-                    }
-
-                }
-
-                cell {
-                    value "${(dataElement?.dataType?.rule) ? dataElement?.dataType?.rule : ""}"
-                    style {
-                        wrap text
-                        border top, {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-
-                cell {
-                    value "${(dataElement?.involvedIn) ? printBusRule(dataElement?.involvedIn) : ""}"
-                    style {
-                        wrap text
-                        border top, {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-
-                cell {
-                    value "${getRelatedToModel(relatedTo)}"
-                    style {
-                        wrap text
-                        border top,  {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-
-                cell {
-                    value "${(relatedTo) ? ((relatedTo.size()==1) ? relatedTo[0]?.name : "Multiple sources identified, please see catalogue") : "No source identified"}"
-                    if (relatedTo && relatedTo.size()==1) link to url "${ getLoadURL(relatedTo[0]) }"
-                    style {
-                        wrap text
-                        border top, {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-
-
-                cell {
-                    value "${ printSystemMetadata(relatedTo, 'Semantic Matching')}"
-                    style {
-                        wrap text
-                        border top,  {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-
-                cell {
-                    value "${printSystemMetadata(relatedTo, 'Known Issue')}"
-                    style {
-                        wrap text
-                        border top,  {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-
-                cell {
-                    value "${printSystemMetadata(relatedTo, 'Immediate Solution')}"
-                    style {
-                        wrap text
-                        border top,  {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-
-                cell {
-                    value "${printSystemMetadata(relatedTo, 'Immediate Solution Owner')}"
-                    style {
-                        wrap text
-                        border top,  {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-
-                cell {
-                    value "${printSystemMetadata(relatedTo, 'Long Term Solution')}"
-                    style {
-                        wrap text
-                        border top,  {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-
-                cell {
-                    value "${printSystemMetadata(relatedTo, 'Long Term Solution Owner')}"
-                    style {
-                        wrap text
-                        border top,  {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-
-                cell {
-                    value "${printSystemMetadata(relatedTo, 'Data Item Unique Code')}"
-                    style {
-                        wrap text
-                        border top,  {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-
-                cell {
-                    value "${printSystemMetadata(relatedTo, 'Related To')}"
-                    style {
-                        wrap text
-                        border top,  {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-
-                cell {
-                    value "${printSystemMetadata(relatedTo, 'Part Of Standard Data Set')}"
-                    style {
-                        wrap text
-                        border top,  {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-
-                cell {
-                    value "${printSystemMetadata(relatedTo, 'Data Completeness')}"
-                    style {
-                        wrap text
-                        border top,  {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-                cell {
-                    value "${printSystemMetadata(relatedTo, 'Estimated Quality')}"
-                    style {
-                        wrap text
-                        border top,  {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-                cell {
-                    value "${printSystemMetadata(relatedTo, 'Timely')}"
-                    style {
-                        wrap text
-                        border top,  {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-                cell {
-                    value "${printSystemMetadata(relatedTo, 'Comments')}"
-                    style {
-                        wrap text
-                        border top,  {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-
-            }
-        }
-
-
-
-    void printSystemDataElement(RowDefinition rowDefinition, DataElement dataElement){
-        rowDefinition.with {
-
-            cell() {
-                value "${(dataElement.modelCatalogueId)?:(dataElement.getLatestVersionId()) ?: dataElement.getId()}.${dataElement.getVersionNumber()}"
-                style {
-                    wrap text
-                    border top, left, {
-                        color black
-                        style medium
-                    }
-                }
-            }
-
-            cell() {
-                value dataElement.name
-                link to url "${dataElement.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataElement.defaultModelCatalogueId}"
-                style {
-                    wrap text
-                    border top, left, {
-                        color black
-                        style medium
-                    }
-                }
-            }
-
-
-            cell {
-                value "${(dataElement?.dataType) ? printDataType(dataElement?.dataType) : ""}"
-                style {
-                    wrap text
-                    border top, {
-                        color black
-                        style medium
-                    }
-                }
-
-            }
-
-            cell {
-                value "${(dataElement?.dataType?.rule) ? dataElement?.dataType?.rule : ""}"
-                style {
-                    wrap text
-                    border top, {
-                        color black
-                        style medium
-                    }
-                }
-            }
-
-            cell {
-                value "${(dataElement?.involvedIn) ? printBusRule(dataElement?.involvedIn) : ""}"
-                style {
-                    wrap text
-                    border top, {
-                        color black
-                        style medium
-                    }
-                }
-            }
-
-
-            cell {
-                value "${ printSystemMetadata([dataElement], 'Semantic Matching')}"
-                style {
-                    wrap text
-                    border top,  {
-                        color black
-                        style medium
-                    }
-                }
-            }
-
-            cell {
-                value "${printSystemMetadata([dataElement], 'Known Issue')}"
-                style {
-                    wrap text
-                    border top,  {
-                        color black
-                        style medium
-                    }
-                }
-            }
-
-            cell {
-                value "${printSystemMetadata([dataElement], 'Immediate Solution')}"
-                style {
-                    wrap text
-                    border top,  {
-                        color black
-                        style medium
-                    }
-                }
-            }
-
-            cell {
-                value "${printSystemMetadata([dataElement], 'Immediate Solution Owner')}"
-                style {
-                    wrap text
-                    border top,  {
-                        color black
-                        style medium
-                    }
-                }
-            }
-
-            cell {
-                value "${printSystemMetadata([dataElement], 'Long Term Solution')}"
-                style {
-                    wrap text
-                    border top,  {
-                        color black
-                        style medium
-                    }
-                }
-            }
-
-            cell {
-                value "${printSystemMetadata([dataElement], 'Long Term Solution Owner')}"
-                style {
-                    wrap text
-                    border top,  {
-                        color black
-                        style medium
-                    }
-                }
-            }
-
-            cell {
-                value "${printSystemMetadata([dataElement], 'Data Item Unique Code')}"
-                style {
-                    wrap text
-                    border top,  {
-                        color black
-                        style medium
-                    }
-                }
-            }
-
-            cell {
-                value "${printSystemMetadata([dataElement], 'Related To')}"
-                style {
-                    wrap text
-                    border top,  {
-                        color black
-                        style medium
-                    }
-                }
-            }
-
-            cell {
-                value "${printSystemMetadata([dataElement], 'Part Of Standard Data Set')}"
-                style {
-                    wrap text
-                    border top,  {
-                        color black
-                        style medium
-                    }
-                }
-            }
-
-            cell {
-                value "${printSystemMetadata([dataElement], 'Data Completeness')}"
-                style {
-                    wrap text
-                    border top,  {
-                        color black
-                        style medium
-                    }
-                }
-            }
-            cell {
-                value "${printSystemMetadata([dataElement], 'Estimated Quality')}"
-                style {
-                    wrap text
-                    border top,  {
-                        color black
-                        style medium
-                    }
-                }
-            }
-            cell {
-                value "${printSystemMetadata([dataElement], 'Timely')}"
-                style {
-                    wrap text
-                    border top,  {
-                        color black
-                        style medium
-                    }
-                }
-            }
-            cell {
-                value "${printSystemMetadata([dataElement], 'Comments')}"
-                style {
-                    wrap text
-                    border top,  {
-                        color black
-                        style medium
-                    }
-                }
-            }
-        }
-    }
 
 
     String printSystemMetadata(List relatedTo, String metadata){
@@ -944,50 +390,7 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
         }
     }
 
-    String printDataType(DataType dataType){
-
-        if(dataType.instanceOf(EnumeratedType)){
-            return dataType.prettyPrint()
-        }
-
-        return dataType.name
-
-    }
-
-    String getMultiplicity(Relationship dataElementRelationship){
-        String multiplicityText = " "
-
-        if(dataElementRelationship?.ext.get("Min Occurs")=="0"){
-            multiplicityText += "Optional "
-        }else if(dataElementRelationship?.ext.get("Min Occurs")=="1"){
-            multiplicityText += "Mandatory "
-        }
-
-        if(dataElementRelationship?.ext.get("Max Occurs")=="*"){
-            multiplicityText += "Multiple "
-        }
-
-        if(dataElementRelationship.source.ext.get("http://xsd.modelcatalogue.org/section#type")=="choice"){
-            multiplicityText += " CHOICE "
-        }
-
-        if(dataElementRelationship?.ext.get("Max Occurs") && dataElementRelationship?.ext.get("Min Occurs")){
-         multiplicityText += "(" + dataElementRelationship?.ext.get("Min Occurs") + ".." + dataElementRelationship?.ext.get("Max Occurs") + ")"
-        }
 
 
-        multiplicityText
-    }
-
-
-
-    String printBusRule(List<ValidationRule> rules){
-        return rules.collect{ it.name }.join('\n')
-    }
-
-
-    String getLoadURL(CatalogueElement ce){
-        ce?.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + ce.defaultModelCatalogueId
-    }
 
 }
