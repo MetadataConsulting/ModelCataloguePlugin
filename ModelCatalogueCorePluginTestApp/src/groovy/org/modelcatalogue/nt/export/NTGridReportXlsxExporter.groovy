@@ -19,7 +19,7 @@ import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
  * @author Adam Milward
  * @version 31/03/2017
  */
-class SummaryReportXlsxExporter {
+class NTGridReportXlsxExporter {
 
     final CatalogueElement element
     final DataClassService dataClassService
@@ -28,12 +28,12 @@ class SummaryReportXlsxExporter {
     Map systemsMap = [:]
     Map metadataCompletion = [:]
 
-    static SummaryReportXlsxExporter create(DataModel element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3) {
-        return new SummaryReportXlsxExporter(element, dataClassService, grailsApplication, depth)
+    static NTGridReportXlsxExporter create(DataModel element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3) {
+        return new NTGridReportXlsxExporter(element, dataClassService, grailsApplication, depth)
     }
 
 
-    private SummaryReportXlsxExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3) {
+    private NTGridReportXlsxExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3) {
         this.element = element
         this.dataClassService = dataClassService
         this.grailsApplication = grailsApplication
