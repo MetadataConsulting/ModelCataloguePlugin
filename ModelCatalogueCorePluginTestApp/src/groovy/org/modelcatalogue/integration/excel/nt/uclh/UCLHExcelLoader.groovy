@@ -7,6 +7,8 @@ import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
+import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.integration.excel.ExcelLoader
 import org.apache.commons.lang.WordUtils
 import org.apache.commons.lang3.tuple.Pair
@@ -105,6 +107,19 @@ class UCLHExcelLoader extends ExcelLoader{
             }
         }
         return Pair.of(stringWriter.toString(), modelNames)
+    }
+
+    @Override
+    void addRelationshipsToModels(DataModel sourceDataModel, List<String> destinationModelNames){
+        for (String destinationModelName: destinationModelNames) {
+            DataModel dataModel = DataModel.findByName(destinationModelName)
+            List<DataElement> importedUCLHelements = dataModel.getDataElements()
+            for (DataElement destinationDataElement: importedUCLHelements) {
+                String mcID = destinationDataElement.ext.get('represents')
+                DataElement sourceDataElement = DataElement.findByModelCatalogueIdAndDataModel(mcID, sourceDataModel) // and sourceDataModel?
+                if(sourceDataElement) sourceDataElement.addToRelatedTo(destinationDataElement)
+            }
+        }
     }
 
 
