@@ -67,7 +67,15 @@ class UCLHExcelLoaderSpec extends ExcelLoaderSpec {
         file << testFiles
 
     }
-    def "export model to excel"() {
+    /**
+     * The TestDataModelV2 file has been modified to include data elements, with model catalogue ids which are
+     * referenced in the UCLHAriaTest excel file, in the "source data model",
+     * so that relationships are created between those elements and their representatives in the
+     * imported model based on UCLHAriaTest.
+     * The created NTGridReport should have entries for Prescription, Plan, External Beam Type which
+     * have data source ARIA_UCLH.
+     */
+    def "import model from excel, create relationships, export NTGridReport"() {
         setup:
         File tempFile = temporaryFolder.newFile("ntSummaryReport${System.currentTimeMillis()}.xlsx")
 

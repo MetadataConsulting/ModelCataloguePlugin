@@ -7,6 +7,11 @@ import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
 import org.modelcatalogue.core.DataModel
 
+/**
+ * This used to be a class for one purpose ("importData", now called "buildXmlFromStandardWorkbookSheet"), but now we have made it a parent class of
+ * future NT Excel Loaders, so that they can access similar methods.
+ * This may not be the best way
+ */
 class ExcelLoader {
 
     protected Map<String, String> createRowMap(Row row, List<String> headers) {
@@ -68,7 +73,8 @@ class ExcelLoader {
     Pair<String, List<String>> buildXmlFromWorkbookSheet(Workbook workbook, int index=0) {}
 
     /**
-     * Add relationships from sourceDataModel to models with destinationModelNames via some metadata in the destination model elements that indicates which source element to relate
+     * Add relationships from sourceDataModel to models with destinationModelNames
+     * via some metadata in the destination model elements that indicates which source element to relate
      * @param sourceDataModel
      * @param destinationModelNames
      */
@@ -76,7 +82,8 @@ class ExcelLoader {
     /**
      * "Standard" refers to an old way of importing excel files...
      * This thing with headersMap is done in a particular way to generically handle a few excel formats
-     * regardless of the order of the headers.. in future we will prefer to use a list of headers which exactly matches the headers in the file
+     * regardless of the order of the headers.. and handle legacy "Classifications/Models" instead of "Data Models/Data Classes"
+     * in future we will prefer to use a list of headers which exactly matches the headers in the file
      * @param headersMap
      * @param workbook
      * @param catalogueBuilder
