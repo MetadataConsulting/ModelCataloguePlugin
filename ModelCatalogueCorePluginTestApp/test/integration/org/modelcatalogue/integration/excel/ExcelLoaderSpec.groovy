@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.dataimport.excel
+package org.modelcatalogue.integration.excel
 
 import org.apache.commons.lang3.tuple.Pair
 import org.apache.poi.ss.usermodel.WorkbookFactory
@@ -8,13 +8,11 @@ import org.custommonkey.xmlunit.Diff
 import org.custommonkey.xmlunit.XMLUnit
 import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
 import org.modelcatalogue.core.AbstractIntegrationSpec
-import org.modelcatalogue.integration.excel.ExcelLoader
-import org.modelcatalogue.integration.excel.HeadersMap
 import spock.lang.Shared
 import spock.lang.Unroll
 
 class ExcelLoaderSpec extends AbstractIntegrationSpec {
-    @Shared String resourcePath = (new File("test/unit/resources/org/modelcatalogue/integration/excel")).getAbsolutePath()
+    @Shared String resourcePath = (new File("test/integration/resources/org/modelcatalogue/integration/excel")).getAbsolutePath()
     StringWriter stringWriter
     XmlCatalogueBuilder builder
     ExcelLoader excelLoader

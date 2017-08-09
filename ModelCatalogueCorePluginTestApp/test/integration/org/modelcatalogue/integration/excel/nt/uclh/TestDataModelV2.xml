@@ -35,6 +35,9 @@
                     <extension key="Min Occurs">1</extension>
                     <extension key="Max Occurs">10</extension>
                 </metadata>
+                <dataElement name="Prescription" id="14976"></dataElement>
+                <dataElement name="Plan" id="14975"></dataElement>
+                <dataElement name="External Beam Type" id="14978"></dataElement>
                 <dataElement name="NHS NUMBER*">
                   <description>
 *For linkage purposes NHS NUMBER

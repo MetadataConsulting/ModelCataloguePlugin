@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.dataimport.excel.nt.uclh
+package org.modelcatalogue.integration.excel.nt.uclh
 
 import org.apache.commons.lang3.tuple.Pair
 import org.codehaus.groovy.grails.commons.GrailsApplication
@@ -9,13 +9,11 @@ import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
-import org.modelcatalogue.core.dataimport.excel.ExcelLoaderSpec
-import org.modelcatalogue.core.export.inventory.DataModelToXlsxExporterSpec
+import org.modelcatalogue.integration.excel.ExcelLoaderSpec
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.FileOpener
-import org.modelcatalogue.integration.excel.nt.uclh.UCLHExcelLoader
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
-import org.modelcatalogue.nt.export.SummaryReportXlsxExporter
+import org.modelcatalogue.nt.export.NTGridReportXlsxExporter
 import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
 import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
 import spock.lang.Shared
@@ -44,8 +42,8 @@ class UCLHExcelLoaderSpec extends ExcelLoaderSpec {
       defaultCatalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
       catalogueXmlLoader = new CatalogueXmlLoader(defaultCatalogueBuilder)
 
-      catalogueXmlLoader.load(DataModelToXlsxExporterSpec.getResourceAsStream('TestDataModelV1.xml'))
-      catalogueXmlLoader.load(DataModelToXlsxExporterSpec.getResourceAsStream('TestDataModelV2.xml'))
+      catalogueXmlLoader.load(getClass().getResourceAsStream('TestDataModelV1.xml'))
+      catalogueXmlLoader.load(getClass().getResourceAsStream('TestDataModelV2.xml'))
       sourceDataModel = DataModel.findByNameAndSemanticVersion('TestDataModel', '2')
   }
 
@@ -79,7 +77,7 @@ class UCLHExcelLoaderSpec extends ExcelLoaderSpec {
         excelLoader.addRelationshipsToModels(sourceDataModel, xmlAndDataModelNames.right)
 
 
-        SummaryReportXlsxExporter.create(sourceDataModel, dataClassService, grailsApplication, 5).export(tempFile.newOutputStream())
+        NTGridReportXlsxExporter.create(sourceDataModel, dataClassService, grailsApplication, 5).export(tempFile.newOutputStream())
         FileOpener.open(tempFile)
 
         SpreadsheetCriteria query = PoiSpreadsheetQuery.FACTORY.forFile(tempFile)

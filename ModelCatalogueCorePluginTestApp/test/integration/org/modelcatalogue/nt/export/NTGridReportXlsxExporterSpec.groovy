@@ -12,7 +12,7 @@ import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
 import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
 
-class SummaryReportXlsxExporterSpec extends AbstractIntegrationSpec {
+class NTGridReportXlsxExporterSpec extends AbstractIntegrationSpec {
 
     public static final String ROOT_DATA_MODEL_NAME = 'Grid Report Data Model'
     ElementService elementService
@@ -294,7 +294,7 @@ class SummaryReportXlsxExporterSpec extends AbstractIntegrationSpec {
         def file = temporaryFolder.newFile("${System.currentTimeMillis()}.xlsx")
 
         when:
-        SummaryReportXlsxExporter.create(dataModel, dataClassService, grailsApplication, 5).export(file.newOutputStream())
+        NTGridReportXlsxExporter.create(dataModel, dataClassService, grailsApplication, 5).export(file.newOutputStream())
         FileOpener.open(file)
 
         SpreadsheetCriteria query = PoiSpreadsheetQuery.FACTORY.forFile(file)
