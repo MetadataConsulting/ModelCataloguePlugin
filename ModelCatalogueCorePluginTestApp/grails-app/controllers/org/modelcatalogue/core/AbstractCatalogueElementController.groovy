@@ -580,7 +580,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     def typeHierarchy(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         CatalogueElement element = queryForResource(params.id)
-               id (!element) {
+         if(!element) {
             notFound()
             return
         }

@@ -91,7 +91,6 @@ class ElasticSearchService implements SearchCatalogue {
     DataModelService dataModelService
     ElementService elementService
     SecurityService modelCatalogueSecurityService
-    RxService rxService
     Node node
     Client client
 
@@ -654,8 +653,12 @@ class ElasticSearchService implements SearchCatalogue {
             //split indexing into batches
             if ((i + 1) % ELEMENTS_PER_BATCH == 0 || (i + 1) == count) {
                 //TODO: can we get rid of placeholder for last
-                indexSimpleIndexRequests(singleRequests).toBlocking().last()
-                singleRequests.clear()
+                try {
+                    indexSimpleIndexRequests(singleRequests).toBlocking().last()
+                    singleRequests.clear()
+                }catch(Error e){
+                    log.error e
+                }
             }
         }
 
