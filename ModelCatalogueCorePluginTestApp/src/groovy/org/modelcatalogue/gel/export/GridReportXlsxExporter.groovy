@@ -46,12 +46,23 @@ class GridReportXlsxExporter  {
     }
 
 
-    private GridReportXlsxExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3){
+    GridReportXlsxExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3){
         this.element = element
         this.dataClassService = dataClassService
         this.grailsApplication = grailsApplication
         this.depth = depth
     }
+
+    protected Closure standardCellStyle = {
+        wrap text
+        border top, {
+            color black
+            style medium
+        }
+    }
+    protected List<String> excelHeaders = ['Data Element', 'Multiplicity', 'Data Type', 'Validation Rule', 'Business Rule', 'Labkey Field Name', 'Labkey View', 'Additional review', 'Additional Rule']
+
+    Map<String, Closure> sheetsAfterMainSheetExport() {}
 
     void export(OutputStream outputStream) {
         SpreadsheetBuilder builder = new PoiSpreadsheetBuilder()
@@ -67,62 +78,22 @@ class GridReportXlsxExporter  {
                         colspan depth
                         style H1
                     }
-                    cell {
-                        value 'Data Element'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Multiplicity'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Data Type'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Validation Rule'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Business Rule'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Labkey Field Name'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Labkey View'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Additional review'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Additional Rule'
-                        width auto
-                        style H1
-                    }
-                    cell {
-                        value 'Additional Rule Dependency'
-                        width auto
-                        style H1
+
+                    excelHeaders.each{ header ->
+                        cell {
+                            value header
+                            width auto
+                            style H1
+                        }
                     }
                 }
-
                 dataClasses.each{ dataClass->
                     buildRows(sheetDefinition, dataClass.getOutgoingRelationshipsByType(RelationshipType.hierarchyType), 1, 2)
                 }
 
+            }
+            sheetsAfterMainSheetExport().each{name, closure ->
+                sheet(name, closure)
             }
         }
 
@@ -230,7 +201,7 @@ class GridReportXlsxExporter  {
 
                 cell(depth + 1) {
                     value dataElement.name
-                    link to url "${dataElement.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataElement.defaultModelCatalogueId}"
+                    link to url "${getLoadURL(dataElement)}"
                     style {
                         wrap text
                         border top, left, {
@@ -240,95 +211,21 @@ class GridReportXlsxExporter  {
                     }
                 }
 
-                cell {
-                    value "${getMultiplicity(dataElementRelationship)}"
-                    style {
-                        wrap text
-                        border top,  {
-                            color black
-                            style medium
+                [ "${getMultiplicity(dataElementRelationship)}",
+                  "${(dataElement?.dataType) ? printDataType(dataElement?.dataType) : ""}",
+                  "${(dataElement?.dataType?.rule) ? dataElement?.dataType?.rule : ""}",
+                  "${(dataElement?.involvedIn) ? printBusRule(dataElement?.involvedIn) : ""}",
+                  "${(dataElement?.ext.get("LabKey Field Name")) ?: ""}",
+                  "${(dataElement?.ext.get("Additional Review")) ?: ""}",
+                  "${(dataElement?.ext.get("Additional Rule")) ?: ""}",
+                  "${(dataElement?.ext.get("Additional Rule Dependency")) ?: ""}"].
+                    each{cellValue ->
+                        cell {
+                            value cellValue
+                            style standardCellStyle
                         }
+
                     }
-                }
-
-                cell {
-                    value "${(dataElement?.dataType) ? printDataType(dataElement?.dataType) : ""}"
-                    style {
-                        wrap text
-                        border top, {
-                            color black
-                            style medium
-                        }
-                    }
-
-                }
-
-                cell {
-                    value "${(dataElement?.dataType?.rule) ? dataElement?.dataType?.rule : ""}"
-                    style {
-                        wrap text
-                        border top, {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-
-                cell {
-                    value "${(dataElement?.involvedIn) ? printBusRule(dataElement?.involvedIn) : ""}"
-                    style {
-                        wrap text
-                        border top, {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-
-                cell {
-                    value "${(dataElement?.ext.get("LabKey Field Name")) ? dataElement?.ext.get("LabKey Field Name") : ""}"
-                    style {
-                        wrap text
-                        border top,  {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-
-
-                cell {
-                    value "${(dataElement?.ext.get("Additional Review")) ? dataElement?.ext.get("Additional Review") : ""}"
-                    style {
-                        wrap text
-                        border top,  {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-
-                cell {
-                    value "${(dataElement?.ext.get("Additional Rule")) ? dataElement?.ext.get("Additional Rule") : ""}"
-                    style {
-                        wrap text
-                        border top,  {
-                            color black
-                            style medium
-                        }
-                    }
-                }
-
-                cell {
-                    value "${(dataElement?.ext.get("Additional Rule Dependency")) ? dataElement?.ext.get("Additional Rule Dependency") : ""}"
-                    style {
-                        wrap text
-                        border top,  {
-                            color black
-                            style medium
-                        }
-                    }
-                }
 
             }
         }
@@ -373,5 +270,7 @@ class GridReportXlsxExporter  {
     String printBusRule(List<ValidationRule> rules){
         return rules.collect{ it.name }.join('\n')
     }
-
+    String getLoadURL(CatalogueElement ce){
+        ce?.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + ce.defaultModelCatalogueId
+    }
 }

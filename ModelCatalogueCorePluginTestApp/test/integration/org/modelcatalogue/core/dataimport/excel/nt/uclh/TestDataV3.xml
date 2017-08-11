@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry.xsd">
+    <dataModel name="TestDataModel" status="FINALIZED" semanticVersion="2">
+        <description>NHIC conceptual domain i.e. value domains used the NHIC project</description>
+        <extensions>
+            <extension key="http://www.modelcatalogue.org/metadata/#authors">David Milward</extension>
+            <extension key="http://www.modelcatalogue.org/metadata/#reviewers">Adam Milward</extension>
+            <extension key="http://www.modelcatalogue.org/metadata/#owner">James Dai</extension>
+            <extension key="http://www.modelcatalogue.org/metadata/#reviewed">2017-03-30T11:46:30Z</extension>
+            <extension key="http://www.modelcatalogue.org/metadata/#approved">2017-03-30T11:46:30Z</extension>
+            <extension key="http://www.modelcatalogue.org/metadata/#namespace">Global Namespace</extension>
+            <extension key="http://www.modelcatalogue.org/metadata/#organization">Metadata Consulting</extension>
+        </extensions>
+        <dataClass name="Radiotherapy" id="14972" href="https://nt.metadataexchange.org.uk/catalogue/dataClass/3677@3.2.0">
+            <metadata>
+                <extension key="Min Occurs">0</extension>
+                <extension key="Max Occurs">*</extension>
+            </metadata>
+            <description>For each course of radiotherapy, in addition to the core intervention data items, the following are required:</description>
+            <extensions>
+                <extension key="http://www.modelcatalogue.org/metadata/genomics/#gel-id">14972</extension>
+            </extensions>
+            <dataElement name="Radiotherapy Site" id="14973" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/3678@3.2.0">
+                <metadata>
+                    <extension key="Min Occurs">1</extension>
+                    <extension key="Max Occurs">1</extension>
+                </metadata>
+                <description>OPCS code for site. A classification of part of the body to which the RADIOTHERAPY ACTUAL DOSE is administered.</description>
+                <relatedTo ref="14406" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/1058@6.0.0" />
+                <relatedTo ref="68841" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/68841@0.0.1" />
+                <relatedTo ref="68841" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/68841@0.0.1" />
+                <extensions>
+                    <extension key="http://www.modelcatalogue.org/metadata/genomics/#gel-id">14973</extension>
+                </extensions>
+            </dataElement>
+            <dataElement name="Dose" id="14974" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/3679@3.2.0">
+                <metadata>
+                    <extension key="Min Occurs">1</extension>
+                    <extension key="Max Occurs">1</extension>
+                </metadata>
+                <description>The total prescribed absorbed radiation dose, measured in Grays, given to the ICRU Reference Point for the whole prescription. http://www.icru.org/home/reports/prescribing-recording-and-reporting-photon-beam-therapy-report-62</description>
+                <relatedTo ref="14424" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/548@6.0.0" />
+                <relatedTo ref="68842" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/68842@0.0.1" />
+                <relatedTo ref="68842" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/68842@0.0.1" />
+                <extensions>
+                    <extension key="http://www.modelcatalogue.org/metadata/genomics/#gel-id">14974</extension>
+                </extensions>
+                 </dataElement>
+            <dataElement name="Radiotherapy Intent" id="29103" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/3682@3.2.0">
+                <metadata>
+                    <extension key="Max Occurs">1</extension>
+                    <extension key="Min Occurs">0</extension>
+                </metadata>
+                <description>Intent of radiotherapy</description>
+                <relatedTo ref="14402" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/546@6.0.0" />
+                <relatedTo ref="68845" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/68845@0.0.1" />
+                <relatedTo ref="68845" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/68845@0.0.1" />
+                <extensions>
+                    <extension key="http://www.modelcatalogue.org/metadata/genomics/#gel-id">29103</extension>
+                </extensions>
+                <dataType ref="14401" href="https://nt.metadataexchange.org.uk/catalogue/dataType/545@6.0.0" />
+            </dataElement>
+            <dataElement ref="29100" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/3668@1.2.0">
+                <metadata>
+                    <extension key="Min Occurs">0</extension>
+                    <extension key="Max Occurs">1</extension>
+                </metadata>
+            </dataElement>
+            <dataElement ref="42230" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/42230@3.2.0">
+                <metadata>
+                    <extension key="Min Occurs">1</extension>
+                    <extension key="Max Occurs">*</extension>
+                </metadata>
+            </dataElement>
+            <dataClass ref="40374" href="https://nt.metadataexchange.org.uk/catalogue/dataClass/40374@1.2.0">
+                <metadata>
+                    <extension key="Min Occurs">1</extension>
+                    <extension key="Max Occurs">1</extension>
+                </metadata>
+            </dataClass>
+            <dataClass ref="40377" href="https://nt.metadataexchange.org.uk/catalogue/dataClass/40377@3.2.0">
+                <metadata>
+                    <extension key="Min Occurs">1</extension>
+                    <extension key="Max Occurs">1</extension>
+                </metadata>
+            </dataClass>
+            <dataClass name="Radiotherapy Details" id="41986" href="https://nt.metadataexchange.org.uk/catalogue/dataClass/41986@3.2.0">
+                <metadata>
+                    <extension key="Min Occurs">1</extension>
+                    <extension key="Max Occurs">1</extension>
+                </metadata>
+                <extensions>
+                    <extension key="http://xsd.modelcatalogue.org/section#type">choice</extension>
+                    <extension key="http://www.modelcatalogue.org/metadata/genomics/#gel-id">41986</extension>
+                </extensions>
+                <dataClass name="Brachytherapy" id="41987" href="https://nt.metadataexchange.org.uk/catalogue/dataClass/41987@3.2.0">
+                    <metadata>
+                        <extension key="Min Occurs">1</extension>
+                        <extension key="Max Occurs">1</extension>
+                    </metadata>
+                    <relatedTo ref="68846" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/68846@0.0.1" />
+                    <relatedTo ref="68846" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/68846@0.0.1" />
+                    <extensions>
+                        <extension key="http://www.modelcatalogue.org/metadata/genomics/#gel-id">41987</extension>
+                    </extensions>
+                    <dataElement name="Brachytherapy Type" id="14977" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/3683@3.2.0">
+                        <metadata>
+                            <extension key="Min Occurs">1</extension>
+                            <extension key="Max Occurs">1</extension>
+                        </metadata>
+                        <description>The type of Brachytherapy Treatment Course being used, if applicable.</description>
+                        <relatedTo ref="13172" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/542@6.0.0" />
+                        <extensions>
+                            <extension key="http://www.modelcatalogue.org/metadata/genomics/#gel-id">14977</extension>
+                        </extensions>
+                        <dataType ref="13171" href="https://nt.metadataexchange.org.uk/catalogue/dataType/541@6.0.0" />
+                    </dataElement>
+                </dataClass>
+                <dataClass name="External Beam" id="41988" href="https://nt.metadataexchange.org.uk/catalogue/dataClass/41988@3.2.0">
+                    <metadata>
+                        <extension key="Min Occurs">1</extension>
+                        <extension key="Max Occurs">1</extension>
+                    </metadata>
+                    <extensions>
+                        <extension key="http://www.modelcatalogue.org/metadata/genomics/#gel-id">41988</extension>
+                    </extensions>
+                    <dataElement name="External Beam Type" id="14978" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/3685@3.2.0">
+                        <metadata>
+                            <extension key="Min Occurs">1</extension>
+                            <extension key="Max Occurs">1</extension>
+                        </metadata>
+                        <description>Type of external beam, if applicable. The prescribed type of beam for a Teletherapy Treatment/ Exposure</description>
+                        <relatedTo ref="68847" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/68847@0.0.1" />
+                        <relatedTo ref="68847" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/68847@0.0.1" />
+                        <extensions>
+                            <extension key="http://www.modelcatalogue.org/metadata/genomics/#gel-id">14978</extension>
+                        </extensions>
+                        <dataType name="externalBeamType" id="14980" href="https://nt.metadataexchange.org.uk/catalogue/dataType/3684@3.2.0">
+                            <description>External Beam Type</description>
+                            <extensions>
+                                <extension key="http://www.modelcatalogue.org/metadata/genomics/#gel-id">14980</extension>
+                            </extensions>
+                            <enumerations>
+                                <enumeration value="imrt" id="1">IMRT</enumeration>
+                                <enumeration value="stereotactic" id="2">Stereotactic</enumeration>
+                                <enumeration value="2dxrt" id="3">2DXRT</enumeration>
+                                <enumeration value="3dxrt" id="4">3DXRT</enumeration>
+                                <enumeration value="4dxrt" id="5">4DXRT</enumeration>
+                                <enumeration value="electrons" id="6">Electrons</enumeration>
+                                <enumeration value="protons" id="7">Protons</enumeration>
+                            </enumerations>
+                        </dataType>
+                    </dataElement>
+                    <dataElement name="Fractions" id="14981" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/3686@3.2.0">
+                        <metadata>
+                            <extension key="Min Occurs">1</extension>
+                            <extension key="Max Occurs">1</extension>
+                        </metadata>
+                        <description>Dose fractions, if external beam therapy. The total number of Fractions or hyperfraction delivered as part of a RADIOTHERAPY PRESCRIPTION.</description>
+                        <relatedTo ref="14426" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/550@6.0.0" />
+                        <relatedTo ref="68848" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/68848@0.0.1" />
+                        <relatedTo ref="68848" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/68848@0.0.1" />
+                        <extensions>
+                            <extension key="http://www.modelcatalogue.org/metadata/genomics/#gel-id">14981</extension>
+                        </extensions>
+                        <dataType ref="14425" href="https://nt.metadataexchange.org.uk/catalogue/dataType/549@6.0.0" />
+                    </dataElement>
+                </dataClass>
+            </dataClass>
+        </dataClass>
+
+
+    </dataModel>
+</catalogue>

@@ -55,6 +55,8 @@ class DataModelFilter {
         new DataModelFilter(ImmutableSet.of(), ImmutableSet.copyOf(excludes.collect { it.id }), true)
     }
 
+
+
     static DataModelFilter from(Map<String, Object> json) {
         if (json.unclassifiedOnly) {
             return create(true)
@@ -144,7 +146,7 @@ class DataModelFilter {
         ]
     }
 
-    DataModelFilter withImports() {
+    DataModelFilter withImports(Set <DataModel> subscribedModels) {
         if (includesImports || unclassifiedOnly) {
             return this
         }
@@ -153,7 +155,7 @@ class DataModelFilter {
         for (DataModel model in this.includes.collect { Long id -> DataModel.get(id) }) {
             includes.add(model.getId())
             for (Relationship imported in model.importsRelationships) {
-                includes.add(imported.getDestination().getId())
+                if(subscribedModels.find{it.id == imported.getDestination().getId()}) includes.add(imported.getDestination().getId())
             }
         }
 

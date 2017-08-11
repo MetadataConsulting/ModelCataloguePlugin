@@ -4,8 +4,14 @@ import org.apache.commons.lang3.tuple.Pair
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.ss.usermodel.Row
 import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
 import org.modelcatalogue.core.DataModel
 
+/**
+ * This used to be a class for one purpose ("importData", now called "buildXmlFromStandardWorkbookSheet"), but now we have made it a parent class of
+ * future NT Excel Loaders, so that they can access similar methods.
+ * This may not be the best way
+ */
 class ExcelLoader {
     static String getOwnerFromFileName(String sampleFile, String bitInBetween) {
         sampleFile.find(/(.*)$bitInBetween.*/){ match, firstcapture ->
@@ -68,18 +74,30 @@ class ExcelLoader {
      * @param catalogueBuilder
      * @param index
      */
+
     Pair<String, List<String>> buildXmlFromWorkbookSheet(Workbook workbook, int index=0, String owner='') {}
+
+    /**
+     * Add relationships from sourceDataModel to models with destinationModelNames
+     * via some metadata in the destination model elements that indicates which source element to relate
+     * @param sourceDataModel
+     * @param destinationModelNames
+     */
     void addRelationshipsToModels(DataModel sourceDataModel, List<String> destinationModelNames) {}
     /**
      * "Standard" refers to an old way of importing excel files...
-     * This thing with headersMap is done in a particular way to generically handle a few excel formats regardless of the order of the headers.. in future we will prefer to use a list of headers which exactly matches the headers in the file
+     * This thing with headersMap is done in a particular way to generically handle a few excel formats
+     * regardless of the order of the headers.. and handle legacy "Classifications/Models" instead of "Data Models/Data Classes"
+     * in future we will prefer to use a list of headers which exactly matches the headers in the file
      * @param headersMap
      * @param workbook
      * @param catalogueBuilder
      * @param index
      */
-	void buildXmlFromStandardWorkbookSheet(Map<String, String> headersMap, Workbook workbook, CatalogueBuilder catalogueBuilder, int index=0) {
+	String buildXmlFromStandardWorkbookSheet(Map<String, String> headersMap, Workbook workbook, int index=0) {
 
+        Writer stringWriter = new StringWriter()
+        CatalogueBuilder catalogueBuilder = new XmlCatalogueBuilder(stringWriter, true)
 		if(!workbook) {
 			throw new IllegalArgumentException("Excel file contains no worksheet!")
 		}
@@ -170,6 +188,7 @@ class ExcelLoader {
 				}
 			}
 		}
+        return stringWriter.toString()
 	}
 
 	static String getRowValue(List<String> rowDataList, index){

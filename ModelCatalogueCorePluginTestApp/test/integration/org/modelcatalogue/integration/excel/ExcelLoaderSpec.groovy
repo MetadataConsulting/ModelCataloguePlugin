@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.dataimport.excel
+package org.modelcatalogue.integration.excel
 
 import org.apache.commons.lang3.tuple.Pair
 import org.apache.poi.ss.usermodel.WorkbookFactory
@@ -8,14 +8,11 @@ import org.custommonkey.xmlunit.Diff
 import org.custommonkey.xmlunit.XMLUnit
 import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
 import org.modelcatalogue.core.AbstractIntegrationSpec
-import org.modelcatalogue.integration.excel.ExcelLoader
-import org.modelcatalogue.integration.excel.HeadersMap
 import spock.lang.Shared
-import spock.lang.Specification
 import spock.lang.Unroll
 
 class ExcelLoaderSpec extends AbstractIntegrationSpec {
-    @Shared String standardExcelLoaderResourcePath = (new File("test/unit/resources/org/modelcatalogue/integration/excel")).getAbsolutePath()
+    @Shared String resourcePath = (new File("test/integration/resources/org/modelcatalogue/integration/excel")).getAbsolutePath()
     StringWriter stringWriter
     XmlCatalogueBuilder builder
     ExcelLoader excelLoader
@@ -25,7 +22,7 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
         XMLUnit.ignoreComments = true
         XMLUnit.ignoreAttributeOrder = true
         stringWriter = new StringWriter()
-        builder = new XmlCatalogueBuilder(stringWriter, true)
+        //builder = new XmlCatalogueBuilder(stringWriter, true)
         excelLoader = new ExcelLoader()
     }
 
@@ -36,7 +33,7 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
         expect:
         similar standardExcelLoaderXmlResult(file,
             HeadersMap.createForStandardExcelLoader()),
-            (new FileInputStream (new File (standardExcelLoaderResourcePath + '/test.catalogue.xml'))).text
+            (new FileInputStream (new File (resourcePath + '/test.catalogue.xml'))).text
             //getClass().getResourceAsStream('test.catalogue.xml').text
 
         where:
@@ -44,24 +41,27 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
 
     }
     String standardExcelLoaderXmlResult(String sampleFile, Map<String,String> headersMap, int index = 0) {
-        excelLoader.buildXmlFromStandardWorkbookSheet(headersMap,
+        return excelLoader.buildXmlFromStandardWorkbookSheet(headersMap,
             WorkbookFactory.create(
-                (new FileInputStream(standardExcelLoaderResourcePath + '/' + sampleFile))),
+                (new FileInputStream(resourcePath + '/' + sampleFile))),
                 //getClass().getResourceAsStream(sampleFile)),
-            builder,
             index)
-        return stringWriter.toString()
-
     }
 
 
     Pair<String, List<String>> excelLoaderXmlResult(String sampleFile, int index=0) {
+<<<<<<< HEAD:ModelCatalogueCorePluginTestApp/test/integration/org/modelcatalogue/core/dataimport/excel/ExcelLoaderSpec.groovy
         excelLoader.buildXmlFromWorkbookSheet(
              new XSSFWorkbook(
             getClass().getResourceAsStream(sampleFile)),
             index,
             ExcelLoader.getOwnerFromFileName(sampleFile, '_nt_rawimport')
             )
+=======
+        return excelLoader.buildXmlFromWorkbookSheet(
+            new XSSFWorkbook(getClass().getResourceAsStream(sampleFile)),
+            index)
+>>>>>>> origin/nt-reports:ModelCatalogueCorePluginTestApp/test/integration/org/modelcatalogue/integration/excel/ExcelLoaderSpec.groovy
     }
 
 

@@ -85,8 +85,8 @@ task cleanGrailsFolders(type: Delete) {
     properties.load(file('application.properties').newInputStream())
     delete 'target'
     delete 'target-eclipse'
-    delete '**/*.gen.fixture.js'
-    delete '**/*.gen.fixture.coffee'
+    //delete  '**/*.gen.fixture.js'//fileTree.matching{include='*.gen.fixture.js'}//'**/*.gen.fixture.js'
+    //delete '**/*.gen.fixture.coffee'
     delete "${System.getProperty('user.home')}/.grails/${properties['app.grails.version']}/ModelCatalogueCorePluginTestApp"
 }
 

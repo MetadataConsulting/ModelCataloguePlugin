@@ -32,11 +32,11 @@ class DataImportController  {
     def auditService
 
 
-    private static final CONTENT_TYPES = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream', 'application/xml', 'text/xml', 'application/zip']
+    private static final List<String> CONTENT_TYPES = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream', 'application/xml', 'text/xml', 'application/zip']
     static responseFormats = ['json']
     static allowedMethods = [upload: "POST"]
 
-    protected static getErrors(Map params, MultipartFile file) {
+    protected static List<String> getErrors(Map params, MultipartFile file) {
         def errors = []
         if (file && !params.name) {
             params.name = file.originalFilename
@@ -56,31 +56,29 @@ class DataImportController  {
             return
         }
 
-
         if (!(request instanceof MultipartHttpServletRequest)) {
             respond "errors": [message: 'No file selected']
             return
         }
 
-        def errors = []
-
         MultipartFile file = request.getFile("file")
-        errors.addAll(getErrors(params, file))
 
+        List<String> errors = getErrors(params, file)
         if (errors) {
             respond("errors": errors)
             return
         }
-        def confType = file.getContentType()
-        boolean isAdmin = modelCatalogueSecurityService.hasRole('ADMIN')
 
+        String confType = file.getContentType()
+
+        boolean isAdmin = modelCatalogueSecurityService.hasRole('ADMIN')
         DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService, isAdmin)
 
         Long userId = modelCatalogueSecurityService.currentUser?.id
 
 
 
-        if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains("nt_rawimport.xls")) {
+        if (checkFileNameContainsAndType(file,"nt_rawimport.xls")) {
             def asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
             def id = asset.id
             builder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
@@ -99,8 +97,9 @@ class DataImportController  {
             return
         }
 
-        if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xls")) {
-            def asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
+        if (checkFileNameContainsAndType(file, '.xls')) {
+            Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
+             origin/nt-reports
             def id = asset.id
             builder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             InputStream inputStream = file.inputStream
@@ -108,9 +107,9 @@ class DataImportController  {
             executeInBackground(id, "Imported from Excel") {
                 try {
 //                    ExcelLoader parser = new ExcelLoader(builder)
-//                    parser.buildXmlFromWorkbook(headersMap, inputStream)
+//                    parser.buildXmlFromWorkbook(headersMap, WorkbookFactory.create(inputStream))
                     UCLHExcelLoader parser = new UCLHExcelLoader(true) //test=true randomizing model names
-                    Pair<String, List<String>> xmlAndDataModelNames = parser.buildXmlFromWorkbookSheet(WorkbookFactory.create(inputStream), builder)
+                    Pair<String, List<String>> xmlAndDataModelNames = parser.buildXmlFromWorkbookSheet(WorkbookFactory.create(inputStream))
                     parser.addRelationshipsToModels('Cancer Model', xmlAndDataModelNames.right)
                     finalizeAsset(id, (DataModel) (builder.created.find {it.instanceOf(DataModel)} ?: builder.created.find{it.dataModel}?.dataModel), userId)
                 } catch (Exception e) {
@@ -121,8 +120,8 @@ class DataImportController  {
             return
         }
 
-        if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".zip")) {
-            def asset = assetService.storeAsset(params, file, 'application/zip')
+        if (checkFileNameContainsAndType(file, '.zip')) {
+            Asset asset = assetService.storeAsset(params, file, 'application/zip')
             def id = asset.id
             builder.monitor = BuildProgressMonitor.create("Importing archive $file.originalFilename", id)
             InputStream inputStream = file.inputStream
@@ -148,8 +147,8 @@ class DataImportController  {
             return
         }
 
-        if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xml")) {
-            def asset = assetService.storeAsset(params, file, 'application/xml')
+        if (checkFileNameContainsAndType(file, '.xml')) {
+            Asset asset = assetService.storeAsset(params, file, 'application/xml')
             def id = asset.id
             builder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             InputStream inputStream = file.inputStream
@@ -166,8 +165,8 @@ class DataImportController  {
             return
         }
 
-        if (file.size > 0 && file.originalFilename.endsWith(".obo")) {
-            def asset = assetService.storeAsset(params, file, 'text/obo')
+        if (checkFileNameEndsWith('.obo')) {
+            Asset asset = assetService.storeAsset(params, file, 'text/obo')
             def id = asset.id
             builder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             InputStream inputStream = file.inputStream
@@ -186,8 +185,8 @@ class DataImportController  {
             return
         }
 
-        if (file.size > 0 && file.originalFilename.endsWith("c.csv")) {
-            def asset = assetService.storeAsset(params, file, 'application/model-catalogue')
+        if (checkFileNameEndsWith('c.csv')) {
+            Asset asset = assetService.storeAsset(params, file, 'application/model-catalogue')
             def id = asset.id
             builder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             InputStream inputStream = file.inputStream
@@ -205,8 +204,8 @@ class DataImportController  {
             return
         }
 
-        if (file.size > 0 && file.originalFilename.endsWith(".mc")) {
-            def asset = assetService.storeAsset(params, file, 'application/model-catalogue')
+        if (checkFileNameEndsWith('.mc')) {
+            Asset asset = assetService.storeAsset(params, file, 'application/model-catalogue')
             def id = asset.id
             builder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             InputStream inputStream = file.inputStream
@@ -224,8 +223,8 @@ class DataImportController  {
             return
         }
 
-        if (file.size > 0 && file.originalFilename.endsWith(".umlj")) {
-            def asset = assetService.storeAsset(params, file, 'text/umlj')
+        if (checkFileNameEndsWith('.umlj')) {
+            Asset asset = assetService.storeAsset(params, file, 'text/umlj')
             def id = asset.id
             builder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             InputStream inputStream = file.inputStream
@@ -259,7 +258,15 @@ class DataImportController  {
         if (!CONTENT_TYPES.contains(confType)) errors.add("input should be an Excel, XML, MC, OBO, UML or LOINC file but uploaded content is ${confType}")
         respond "errors": errors
     }
+    protected static boolean checkFileNameEndsWith(MultipartFile file, String suffix) {
 
+        file.size > 0 && file.originalFilename.endsWith(suffix)
+    }
+    protected static boolean checkFileNameContainsAndType(MultipartFile file, String suffix) {
+        CONTENT_TYPES.contains(file.getContentType()) &&
+            file.size > 0 &&
+            file.originalFilename.contains(suffix)
+    }
     protected static Asset finalizeAsset(Long id, DataModel dataModel, Long userId){
         BuildProgressMonitor.get(id)?.onCompleted()
 
