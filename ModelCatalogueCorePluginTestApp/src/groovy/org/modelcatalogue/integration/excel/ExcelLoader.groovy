@@ -7,7 +7,11 @@ import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.DataModel
 
 class ExcelLoader {
-
+    static String getOwnerFromFileName(String sampleFile, String bitInBetween) {
+        sampleFile.find(/(.*)$bitInBetween.*/){ match, firstcapture ->
+            firstcapture
+        }.toUpperCase()
+    }
     protected Map<String, String> createRowMap(Row row, List<String> headers) {
         Map<String, String> rowMap = [:]
         for (Cell cell : row) {
@@ -64,7 +68,7 @@ class ExcelLoader {
      * @param catalogueBuilder
      * @param index
      */
-    Pair<String, List<String>> buildXmlFromWorkbookSheet(Workbook workbook, int index=0) {}
+    Pair<String, List<String>> buildXmlFromWorkbookSheet(Workbook workbook, int index=0, String owner='') {}
     void addRelationshipsToModels(DataModel sourceDataModel, List<String> destinationModelNames) {}
     /**
      * "Standard" refers to an old way of importing excel files...

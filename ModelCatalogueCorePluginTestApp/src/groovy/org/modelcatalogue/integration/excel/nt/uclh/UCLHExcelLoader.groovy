@@ -20,11 +20,17 @@ class UCLHExcelLoader extends ExcelLoader{
     ElementService elementService
     DataModelService dataModelService
 
-    String suffix = '_UCLH'
+    String ownerSuffix = ''
+    String randomSuffix = ''
     UCLHExcelLoader(boolean test = false) {
         if (test) {
-            suffix = '_UCLH_' + ((new Random()).nextInt(200) + 1) as String
+            randomSuffix = '_' + ((new Random()).nextInt(200) + 1) as String
         }
+    }
+
+
+    String getOwnerSuffixWithRandom(){
+        return ownerSuffix+randomSuffix
     }
     String getNTElementName(Map<String,String> rowMap){
         String alias = getElementFromGelName(rowMap) + "_ph"
@@ -60,7 +66,14 @@ class UCLHExcelLoader extends ExcelLoader{
      * @return
      */
     @Override
-    Pair<String, List<String>> buildXmlFromWorkbookSheet(Workbook workbook, int index=0) {
+    Pair<String, List<String>> buildXmlFromWorkbookSheet(Workbook workbook, int index=0, String owner='') {
+
+        if (owner == '') {
+            ownerSuffix = ''
+        }
+        else {
+            ownerSuffix = '_' + owner
+        }
         Writer stringWriter = new StringWriter()
         CatalogueBuilder catalogueBuilder = new XmlCatalogueBuilder(stringWriter, true)
         if (!workbook) {
@@ -78,7 +91,7 @@ class UCLHExcelLoader extends ExcelLoader{
             Map<String, String> rowMap = createRowMap(row, headers)
             rowMaps << rowMap
         }
-        String modelName = rowMaps[0]['Current Paper Document  or system name']+suffix // at the moment we are dealing with just one UCLH data source, so there will be just one model
+        String modelName = rowMaps[0]['Current Paper Document  or system name']+getOwnerSuffixWithRandom() // at the moment we are dealing with just one UCLH data source, so there will be just one model
         List<String> modelNames = [modelName]
 
         Map<String, String> metadataHeaders = ['Semantic Matching',	'Known issue',	'Immediate solution', 'Immediate solution Owner',	'Long term solution',	'Long term solution owner',	'Data Item', 'Unique Code',	'Related To',	'Part of standard data set',	'Data Completeness',	'Estimated quality',	'Timely?', 'Comments'].collectEntries {

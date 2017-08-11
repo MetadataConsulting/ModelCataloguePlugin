@@ -30,6 +30,7 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
     }
 
 
+
     @Unroll
     def "test expected output for #file"() {
         expect:
@@ -53,11 +54,14 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
 
     }
 
+
     Pair<String, List<String>> excelLoaderXmlResult(String sampleFile, int index=0) {
         excelLoader.buildXmlFromWorkbookSheet(
              new XSSFWorkbook(
             getClass().getResourceAsStream(sampleFile)),
-            index)
+            index,
+            ExcelLoader.getOwnerFromFileName(sampleFile, '_nt_rawimport')
+            )
     }
 
 

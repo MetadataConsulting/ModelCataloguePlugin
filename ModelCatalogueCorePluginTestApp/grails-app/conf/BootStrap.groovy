@@ -1,5 +1,6 @@
 import grails.rest.render.RenderContext
 import grails.util.Environment
+import groovy.util.logging.Log
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -24,6 +25,7 @@ import org.modelcatalogue.core.util.lists.ListWrapper
 import org.modelcatalogue.core.util.test.TestDataHelper
 import org.springframework.http.HttpMethod
 
+@Log
 class BootStrap {
 
     def initCatalogueService
@@ -37,8 +39,9 @@ class BootStrap {
     GrailsApplication grailsApplication
 
     def init = { servletContext ->
+        log.info "BootStrap:addExtensionModules()"
         ExtensionModulesLoader.addExtensionModules()
-
+        log.info "BootStrap:addExtensionModules():complete"
         grailsApplication.domainClasses.each { GrailsDomainClass it ->
             if (CatalogueElement.isAssignableFrom(it.clazz)) {
                 CatalogueElementDynamicHelper.addShortcuts(it.clazz)
@@ -47,43 +50,46 @@ class BootStrap {
         JSONObject.Null.metaClass.getId = {->
             null
         }
-        if (Environment.current in [Environment.DEVELOPMENT]){
 
-            initCatalogueService.initDefaultRelationshipTypes()
-            initPoliciesAndTags()
-            initSecurity(false)
-        }
-
-        if (Environment.current in [Environment.TEST] && !System.getenv('MC_BLANK_DEV')) {
+        if (Environment.current in [ Environment.TEST] && !System.getenv('MC_BLANK_DEV')) {
             TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
-                initCatalogueService.initCatalogue(true)
+                initCatalogueService.initCatalogue(false)
                 initPoliciesAndTags()
                 initSecurity(false)
                 setupDevTestStuff()
             }
-
         } else {
             initCatalogueService.initDefaultRelationshipTypes()
+            initPoliciesAndTags()
             initSecurity(!System.getenv('MC_BLANK_DEV'))
         }
-
-//        modelCatalogueSearchService.reindex(true).all { it }.toBlocking().subscribe {
-//            System.out.println "Reindexed"
-//        }
+        println 'completed:initCatalogueService'
+        log.info "completed:initCatalogueService"
+        //modelCatalogueSearchService.reindex(true)
 
         initCatalogueService.setupStoredProcedures()
+        println 'completed:setupStoredProcedures'
+        log.info "completed:setupStoredProcedures"
 
         if (Environment.current == Environment.PRODUCTION) {
             userService.inviteAdmins()
+            println 'completed:inviteAdmins'
+            log.info "completed:inviteAdmins"
         }
-
 
         //register custom json Marshallers
         //ctx.domainModellerService.modelDomains()
         grailsApplication.mainContext.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
+        println 'completed:register'
+        log.info "completed:inviteAdmins"
 
         ReportsRegistry reportsRegistry = grailsApplication.mainContext.getBean(ReportsRegistry)
+        setUpReports(reportsRegistry)
+        log.info "completed:inviteAdmins"
 
+    }
+
+    private static void setUpReports(ReportsRegistry reportsRegistry){
         reportsRegistry.register {
             creates asset
             title { "Export All Elements of ${it.name} to Excel XSLX" }
@@ -98,38 +104,13 @@ class BootStrap {
         reportsRegistry.register {
             creates asset
             title { "Inventory Report Spreadsheet" }
-            defaultName { "${it.name} report as MS Excel Document Inventory" }
+            defaultName { "${it.name} report as MS Excel Document" }
             depth 3
             type DataModel
             when { DataModel dataModel ->
                 dataModel.countDeclares() > 0
             }
             link controller: 'dataModel', action: 'inventorySpreadsheet', id: true
-        }
-
-        reportsRegistry.register {
-            creates asset
-            title { "Grid Report Spreadsheet" }
-            defaultName { "${it.name} report as MS Excel Document Grid" }
-            depth 3
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.countDeclares() > 0
-            }
-            link controller: 'dataModel', action: 'gridSpreadsheet', id: true
-        }
-
-
-        reportsRegistry.register {
-            creates asset
-            title { "North Thames Summary Report" }
-            defaultName { "${it.name} report as MS Excel Document Grid" }
-            depth 3
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.countDeclares() > 0
-            }
-            link controller: 'northThames', action: 'northThamesSummaryReport', id: true
         }
 
         reportsRegistry.register {
@@ -162,6 +143,16 @@ class BootStrap {
             link controller: 'dataClass', action: 'inventorySpreadsheet', id: true
         }
 
+//  needs more work
+//        reportsRegistry.register {
+//            creates asset
+//            title { "Changelog Document" }
+//            defaultName { "${it.name} changelog as MS Word Document" }
+//            depth 3
+//            includeMetadata true
+//            type DataClass
+//            link controller: 'dataClass', action: 'changelogDoc', id: true
+//        }
 
         reportsRegistry.register {
             creates link
@@ -192,6 +183,29 @@ class BootStrap {
             link controller: 'genomics', action: 'exportAllRareDiseaseReports', id: true
         }
 
+// needs more work
+//        reportsRegistry.register {
+//            creates asset
+//            title { "GEL Changelog (Word Doc)" }
+//            defaultName { "${it.name} changelog as MS Word Document" }
+//            depth 3
+//            includeMetadata true
+//            type DataModel
+//            when { DataModel dataModel ->
+//                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+//            }
+//            link controller: 'genomics', action: 'exportChangeLogDocument', id: true
+//        }
+
+//        reportsRegistry.register {
+//            creates asset
+//            title { "GEL Data Specification Report (Word Doc)" }
+//            defaultName { "${it.name} report as MS Word Document" }
+//            depth 3
+//            type DataModel
+//            link controller: 'genomics', action: 'exportGelSpecification', id: true
+//        }
+
         reportsRegistry.register {
             creates link
             title { "Rare Diseases Disorder List (CSV)" }
@@ -212,10 +226,6 @@ class BootStrap {
             link controller: 'genomics', action: 'exportRareDiseaseEligibilityDoc', id: true
         }
 
-
-
-
-
         reportsRegistry.register {
             creates link
             title { "Rare Diseases Phenotypes and Clinical Tests Report (Word Doc)" }
@@ -224,17 +234,6 @@ class BootStrap {
                 dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
             }
             link controller: 'genomics', action: 'exportRareDiseasePhenotypesAndClinicalTestsDoc', id: true
-        }
-
-
-        reportsRegistry.register {
-            creates link
-            title { "Rare Diseases Eligibility Phenotypes Split Docs" }
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
-            }
-            link controller: 'genomics', action: 'exportRareDiseaseSplitDocs', id: true
         }
 
         reportsRegistry.register {
@@ -290,17 +289,27 @@ class BootStrap {
             link controller: 'genomics', action: 'exportRareDiseaseEligibilityCsv', id: true
         }
 
-        reportsRegistry.register {
-            creates link
-            title { "Rare Diseases Static Website" }
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.ext.get('Rare Disease Report Available') == 'true' || dataModel.ext.get("All Rare Disease Conditions Reports") == 'true' || dataModel.ext.get(Metadata.ALL_RD_REPORTS) == 'true' || dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
-            }
-            link controller: 'genomics', action: 'exportRareDiseasesWebsite', id: true
-        }
 
-
+// needs work before we can release
+//        reportsRegistry.register {
+//            creates link
+//            title { "Cancer Types (JSON)" }
+//            type DataModel
+//            when { DataModel dataModel ->
+//                dataModel.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
+//            }
+//            link controller: 'genomics', action: 'exportCancerTypesAsJson', id: true
+//        }
+//
+//        reportsRegistry.register {
+//            creates link
+//            title { "Cancer Types (CSV)" }
+//            type DataModel
+//            when { DataModel dataModel ->
+//                dataModel.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
+//            }
+//            link controller: 'genomics', action: 'exportCancerTypesAsCsv', id: true
+//        }
 // needs work before we can release
 //        reportsRegistry.register {
 //            creates link
@@ -321,52 +330,27 @@ class BootStrap {
 //            }
 //            link controller: 'genomics', action: 'exportRareDiseaseEligibilityChangeLogAsXls', id: true
 //        }
-//// needs work before we can release
+// needs work before we can release
 //        reportsRegistry.register {
 //            creates link
 //            title { "GEL Data Specification Change Log (Excel)" }
 //            type DataModel
 //            link controller: 'genomics', action: 'exportDataSpecChangeLogAsXls', id: true
 //        }
-        //  needs more work
-//        reportsRegistry.register {
-//            creates asset
-//            title { "Changelog Document" }
-//            defaultName { "${it.name} changelog as MS Word Document" }
-//            depth 3
-//            includeMetadata true
-//            type DataClass
-//            link controller: 'dataClass', action: 'changelogDoc', id: true
-//        }
 
-// needs more work
-//        reportsRegistry.register {
-//            creates asset
-//            title { "GEL Changelog (Word Doc)" }
-//            defaultName { "${it.name} changelog as MS Word Document" }
-//            depth 3
-//            includeMetadata true
-//            type DataModel
-//            when { DataModel dataModel ->
-//                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
-//            }
-//            link controller: 'genomics', action: 'exportChangeLogDocument', id: true
-//        }
-
-//        reportsRegistry.register {
-//            creates asset
-//            title { "GEL Data Specification Report (Word Doc)" }
-//            defaultName { "${it.name} report as MS Word Document" }
-//            depth 3
-//            type DataModel
-//            link controller: 'genomics', action: 'exportGelSpecification', id: true
-//        }
-
-
-
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases Static Website" }
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get('Rare Disease Report Available') == 'true' || dataModel.ext.get("All Rare Disease Conditions Reports") == 'true' || dataModel.ext.get(Metadata.ALL_RD_REPORTS) == 'true' || dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseasesWebsite', id: true
+        }
     }
 
     private static void initSecurity(boolean production) {
+        final def var = log.info("start:initSecurity")
         def roleUser = Role.findByAuthority('ROLE_USER') ?: new Role(authority: 'ROLE_USER').save(failOnError: true)
         def roleAdmin = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
         def roleSupervisor = Role.findByAuthority('ROLE_SUPERVISOR') ?: new Role(authority: 'ROLE_SUPERVISOR').save(failOnError: true)
@@ -374,6 +358,8 @@ class BootStrap {
         def metadataCurator = Role.findByAuthority('ROLE_METADATA_CURATOR') ?: new Role(authority: 'ROLE_METADATA_CURATOR').save(failOnError: true)
 
         Role.findByAuthority('ROLE_REGISTERED') ?: new Role(authority: 'ROLE_REGISTERED').save(failOnError: true)
+
+
 
         if (!production || System.getenv("METADATA_DEMO")) {
             def supervisor = User.findByNameOrUsername('supervisor', 'supervisor') ?: new User(name: 'supervisor', username: 'supervisor', enabled: true, password: System.getenv('MC_SUPERVISOR_PASSWORD') ?: 'supervisor', email: System.getenv(UserService.ENV_SUPERVISOR_EMAIL), apiKey: 'supervisorabcdef123456').save(failOnError: true)
@@ -388,14 +374,14 @@ class BootStrap {
                 UserRole.create supervisor, metadataCurator
                 UserRole.create supervisor, roleStacktrace
                 UserRole.create supervisor, roleAdmin
-                UserRole.create supervisor, roleSupervisor, true
+                UserRole.create supervisor, roleSupervisor
             }
 
             if (!admin.authorities.contains(roleAdmin)) {
                 UserRole.create admin, roleUser
                 UserRole.create admin, metadataCurator
                 UserRole.create admin, roleStacktrace
-                UserRole.create admin, roleAdmin, true
+                UserRole.create admin, roleAdmin
             }
 
             if (!curator.authorities.contains(metadataCurator)) {
@@ -406,6 +392,9 @@ class BootStrap {
             if (!viewer.authorities.contains(viewer)) {
                 UserRole.create viewer, roleUser
             }
+
+
+
         }
 
         //permit all for assets and initial pages
@@ -426,7 +415,6 @@ class BootStrap {
                 '/login', '/login.*', '/login/*',
                 '/logout', '/logout.*', '/logout/*',
                 '/register/*', '/errors', '/errors/*',
-                '/load',
                 '/index.gsp'
         ]) {
             createRequestmapIfMissing(url, 'permitAll', null)
@@ -460,9 +448,22 @@ class BootStrap {
         createRequestmapIfMissing('/monitoring/**',                         'ROLE_SUPERVISOR')
         createRequestmapIfMissing('/plugins/console-1.5.0/**',              'ROLE_SUPERVISOR')
 
+//        createRequestmapIfMissing('/api/modelCatalogue/core/dataClass/**', 'IS_AUTHENTICATED_ANONYMOUSLY')
+//        createRequestmapIfMissing('/api/modelCatalogue/core/dataElement/**', 'ROLE_METADATA_CURATOR')
+//        createRequestmapIfMissing('/api/modelCatalogue/core/dataType/**', 'ROLE_USER')
+//        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR')
+//        createRequestmapIfMissing('/api/modelCatalogue/core/relationshipTypes/**', 'ROLE_ADMIN')
+
+   //create some test models etc. for dev
+   //TODO: remove this and replace with a functional test
+        final def var1 = log.info("completed:initSecurity")
+
+
     }
 
     def initPoliciesAndTags() {
+        log.info "start:initPoliciesAndTags"
+
         catalogueBuilder.build {
             dataModelPolicy(name: 'Unique of Kind', overwrite: true) {
                 check dataClass property 'name' is 'unique'
@@ -487,11 +488,6 @@ class BootStrap {
                 check dataType property 'name' apply regex: /[^_ -]+/ otherwise 'Name of {2} contains illegal characters ("_", "-" or " ")'
             }
             dataModel(name: 'Clinical Tags') {
-                tag(name: 'Registration, consent and demographic data essential for the management of the participant')
-                tag(name: 'Sample tracking data essential for processing and tracking the sample from collection through to sequencing')
-                tag(name: 'Clinical data essential for diagnostics purposes')
-                tag(name: 'Clinical data essential for research')
-                tag(name: 'Clinical data for research')
                 tag(name: 'Highly Sensitive PI data')
                 tag(name: 'Sensitive PI data')
                 tag(name: 'Highly Sensitive data')
@@ -499,6 +495,7 @@ class BootStrap {
                 tag(name: 'Internal data')
                 tag(name: 'External data')
             }
+            log.info "complete:initPoliciesAndTags"
         }
     }
 
@@ -508,14 +505,14 @@ class BootStrap {
 
             println 'Running post init job'
             println 'Finalizing all published elements'
-            CatalogueElement.findAllByStatus(ElementStatus.DRAFT).each {
-                if (it instanceof DataClass) {
-                    elementService.finalizeElement(it)
-                } else {
-                    it.status = ElementStatus.FINALIZED
-                    it.save failOnError: true
-                }
-            }
+//            CatalogueElement.findAllByStatus(ElementStatus.DRAFT).each {
+//                if (it instanceof DataClass) {
+//                    elementService.finalizeElement(it)
+//                } else {
+//                    it.status = ElementStatus.FINALIZED
+//                    it.save failOnError: true
+//                }
+//            }
 
 
             println "Creating some actions"
@@ -560,23 +557,18 @@ class BootStrap {
                     dataElement(name: 'Test Element 1') {
                         dataType(name: 'Same Name')
                     }
-                    dataElement(name: 'Test Element 2') {
-                        dataType(name: 'Same Name')
-                    }
                 }
 
             }
-
             catalogueBuilder.build {
+                automatic dataType
                 dataModel(name: 'Test 2') {
-                    automatic dataType
                     policy 'Unique of Kind'
                     dataElement(name: 'Test Element 2') {
                         dataType(name: 'Same Name')
                     }
                 }
             }
-
             catalogueBuilder.build {
                 automatic dataType
                 dataModel(name: 'Test 3') {

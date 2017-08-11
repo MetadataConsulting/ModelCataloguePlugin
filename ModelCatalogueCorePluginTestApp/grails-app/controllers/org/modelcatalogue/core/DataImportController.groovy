@@ -78,6 +78,27 @@ class DataImportController  {
 
         Long userId = modelCatalogueSecurityService.currentUser?.id
 
+
+
+        if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains("nt_rawimport.xls")) {
+            def asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
+            def id = asset.id
+            builder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
+            InputStream inputStream = file.inputStream
+            executeInBackground(id, "Imported from Excel") {
+                try {
+                    UCLHExcelLoader parser = new UCLHExcelLoader(true) //test=true randomizing model names
+                    Pair<String, List<String>> xmlAndDataModelNames = parser.buildXmlFromWorkbookSheet(WorkbookFactory.create(inputStream), 0, ExcelLoader.getOwnerFromFileName(file.originalFilename, '_nt_rawimport'))
+                    parser.addRelationshipsToModels('Cancer Model', xmlAndDataModelNames.right)
+                    finalizeAsset(id, (DataModel) (builder.created.find {it.instanceOf(DataModel)} ?: builder.created.find{it.dataModel}?.dataModel), userId)
+                } catch (Exception e) {
+                    logError(id, e)
+                }
+            }
+            redirectToAsset(id)
+            return
+        }
+
         if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xls")) {
             def asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
             def id = asset.id
@@ -279,6 +300,12 @@ class DataImportController  {
         Long userId = modelCatalogueSecurityService.currentUser?.id
         executorService.submit {
             auditService.logExternalChange(Asset.get(assetId), userId, message, code)
+        }
+    }
+
+    protected String getOwnerFromFileName(String sampleFile){
+        sampleFile.find(/(.*)_nt_rawimport.*/){match,firstcapture ->
+            firstcapture
         }
     }
 }
