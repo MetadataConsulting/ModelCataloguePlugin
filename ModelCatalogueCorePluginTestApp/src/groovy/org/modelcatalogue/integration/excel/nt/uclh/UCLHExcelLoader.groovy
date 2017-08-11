@@ -34,12 +34,7 @@ class UCLHExcelLoader extends ExcelLoader{
     String getOwnerSuffixWithRandom(){
         return ownerSuffix+randomSuffix
     }
-    String getNTElementName(Map<String,String> rowMap){
-        String alias = getElementFromGelName(rowMap) + "_ph"
-        String name = rowMap['Data Item Unique Code']?:alias
-        return name
-    }
-     origin/nt-reports
+
 
     Long getMCIdFromSpreadSheet(Map<String,String> rowMap) {
         Long id = 0
