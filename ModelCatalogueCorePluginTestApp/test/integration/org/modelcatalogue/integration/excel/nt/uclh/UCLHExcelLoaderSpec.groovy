@@ -30,7 +30,7 @@ class UCLHExcelLoaderSpec extends ExcelLoaderSpec {
     @Shared DataClassService dataClassService
     @Shared GrailsApplication grailsApplication
 
-    @Shared List<String> testFiles = ['UCLHAriaTest.xlsx']
+    @Shared List<String> testFiles = ['UCLH_nt_rawimport_AriaTest.xlsx']
 
     @Rule TemporaryFolder temporaryFolder = new TemporaryFolder()
     @Shared DefaultCatalogueBuilder defaultCatalogueBuilder

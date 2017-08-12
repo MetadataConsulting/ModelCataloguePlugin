@@ -13,6 +13,7 @@ import org.modelcatalogue.core.DataModel
  * This may not be the best way
  */
 class ExcelLoader {
+
     static String getOwnerFromFileName(String sampleFile, String bitInBetween) {
         sampleFile.find(/(.*)$bitInBetween.*/){ match, firstcapture ->
             firstcapture

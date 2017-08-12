@@ -83,10 +83,22 @@ class DataImportController  {
             def id = asset.id
             builder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             InputStream inputStream = file.inputStream
+
+                    String test1 = "TEST MESSAGE"
+                    println test1
+                    ExcelLoader ldr1 = new ExcelLoader()
+                    UCLHExcelLoader loader1 = new UCLHExcelLoader(false)
+
+
             executeInBackground(id, "Imported from Excel") {
                 try {
-                    UCLHExcelLoader parser = new UCLHExcelLoader(true) //test=true randomizing model names
-                    Pair<String, List<String>> xmlAndDataModelNames = parser.buildXmlFromWorkbookSheet(WorkbookFactory.create(inputStream), 0, ExcelLoader.getOwnerFromFileName(file.originalFilename, '_nt_rawimport'))
+                    String test = "TEST MESSAGE"
+                    println test
+                    ExcelLoader ldr = new ExcelLoader()
+                    UCLHExcelLoader loader = new UCLHExcelLoader(false)
+
+                    //UCLHExcelLoader parser = new UCLHExcelLoader(false) //test=true randomizing model names
+                    Pair<String, List<String>> xmlAndDataModelNames = loader.buildXmlFromWorkbookSheet(WorkbookFactory.create(inputStream), 0, ExcelLoader.getOwnerFromFileName(file.originalFilename, '_nt_rawimport'))
                     parser.addRelationshipsToModels('Cancer Model', xmlAndDataModelNames.right)
                     finalizeAsset(id, (DataModel) (builder.created.find {it.instanceOf(DataModel)} ?: builder.created.find{it.dataModel}?.dataModel), userId)
                 } catch (Exception e) {
@@ -99,7 +111,6 @@ class DataImportController  {
 
         if (checkFileNameContainsAndType(file, '.xls')) {
             Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
-             origin/nt-reports
             def id = asset.id
             builder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             InputStream inputStream = file.inputStream
@@ -108,7 +119,7 @@ class DataImportController  {
                 try {
 //                    ExcelLoader parser = new ExcelLoader(builder)
 //                    parser.buildXmlFromWorkbook(headersMap, WorkbookFactory.create(inputStream))
-                    UCLHExcelLoader parser = new UCLHExcelLoader(true) //test=true randomizing model names
+                    UCLHExcelLoader parser = new UCLHExcelLoader(false) //test=true randomizing model names
                     Pair<String, List<String>> xmlAndDataModelNames = parser.buildXmlFromWorkbookSheet(WorkbookFactory.create(inputStream))
                     parser.addRelationshipsToModels('Cancer Model', xmlAndDataModelNames.right)
                     finalizeAsset(id, (DataModel) (builder.created.find {it.instanceOf(DataModel)} ?: builder.created.find{it.dataModel}?.dataModel), userId)
@@ -229,7 +240,6 @@ class DataImportController  {
             builder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             InputStream inputStream = file.inputStream
             String name = params?.name
-
             executeInBackground(id, "Imported from Style UML")  {
                 try {
                     DataModel dataModel = DataModel.findByName(name)

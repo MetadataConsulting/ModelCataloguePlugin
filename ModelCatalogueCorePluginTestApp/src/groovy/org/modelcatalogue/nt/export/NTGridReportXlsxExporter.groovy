@@ -314,12 +314,13 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
                         colspan 4
                     }
                     cell {
-                        value "${ (v.get("completed") && v.get("total")) ?
-                            Math.round(v.get("completed") / v.get("total") * 100) :
-                            "0"} %"
+                        value "${ (v.get("completed") && v.get("total")) ? Math.round(v.get("completed") / v.get("total") * 100) : "0"} %"
                         width auto
                     }
                 }
+
+
+
             }
 
         }

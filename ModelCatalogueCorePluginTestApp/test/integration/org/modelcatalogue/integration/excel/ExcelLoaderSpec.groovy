@@ -50,18 +50,12 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
 
 
     Pair<String, List<String>> excelLoaderXmlResult(String sampleFile, int index=0) {
-<<<<<<< HEAD:ModelCatalogueCorePluginTestApp/test/integration/org/modelcatalogue/core/dataimport/excel/ExcelLoaderSpec.groovy
         excelLoader.buildXmlFromWorkbookSheet(
              new XSSFWorkbook(
             getClass().getResourceAsStream(sampleFile)),
             index,
             ExcelLoader.getOwnerFromFileName(sampleFile, '_nt_rawimport')
             )
-=======
-        return excelLoader.buildXmlFromWorkbookSheet(
-            new XSSFWorkbook(getClass().getResourceAsStream(sampleFile)),
-            index)
->>>>>>> origin/nt-reports:ModelCatalogueCorePluginTestApp/test/integration/org/modelcatalogue/integration/excel/ExcelLoaderSpec.groovy
     }
 
 

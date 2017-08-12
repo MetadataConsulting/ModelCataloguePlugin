@@ -77,7 +77,7 @@ class UCLHExcelLoader extends ExcelLoader{
             ownerSuffix = '_' + owner
         }
 
-        origin/nt-reports
+
         Writer stringWriter = new StringWriter()
         CatalogueBuilder catalogueBuilder = new XmlCatalogueBuilder(stringWriter, true)
 
@@ -100,7 +100,7 @@ class UCLHExcelLoader extends ExcelLoader{
         }
 
         String modelName = rowMaps[0]['Current Paper Document  or system name']+getOwnerSuffixWithRandom() // at the moment we are dealing with just one            UCLH data source, so there will be just one model
-        origin/nt-reports
+
         List<String> modelNames = [modelName]
 
         Map<String, String> metadataHeaders = ['Semantic Matching',	'Known issue',	'Immediate solution', 'Immediate solution Owner',
