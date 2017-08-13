@@ -127,7 +127,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
     @Transactional
     def newVersion() {
         if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel()) ) {
-            notAuthorized()
+            unauthorized()
             return
         }
 
@@ -178,6 +178,12 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
  */
 
     def containsOrImports() {
+
+        if(!modelCatalogueSecurityService.isSubscribed(getDataModel())){
+            unauthorized()
+            return
+        }
+
         DataModel dataModel = DataModel.get(params.id)
         if (!dataModel) {
             notFound()
@@ -216,6 +222,15 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
  */
 
     def reindex() {
+
+        if (!allowSaveAndEdit()) {
+            unauthorized()
+            return
+        }
+        if (handleReadOnly()) {
+            return
+        }
+
         DataModel dataModel = DataModel.get(params.id)
         if (!dataModel) {
             notFound()
@@ -352,6 +367,15 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
 
 
     def inventorySpreadsheet(String name, Integer depth) {
+
+        if (!allowSaveAndEdit()) {
+            unauthorized()
+            return
+        }
+        if (handleReadOnly()) {
+            return
+        }
+
         DataModel dataModel = DataModel.get(params.id)
         if (!dataModel) {
             respond status: HttpStatus.NOT_FOUND
@@ -380,6 +404,15 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
      */
 
     def gridSpreadsheet(String name, Integer depth) {
+
+        if (!allowSaveAndEdit()) {
+            unauthorized()
+            return
+        }
+        if (handleReadOnly()) {
+            return
+        }
+
         DataModel dataModel = DataModel.get(params.id)
 
         def dataModelId = dataModel.id
@@ -410,6 +443,15 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
      */
 
     def inventoryDoc(String name, Integer depth) {
+
+        if (!allowSaveAndEdit()) {
+            unauthorized()
+            return
+        }
+        if (handleReadOnly()) {
+            return
+        }
+
         DataModel dataModel = DataModel.get(params.id)
         if (!dataModel) {
             respond status: HttpStatus.NOT_FOUND
@@ -542,6 +584,15 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
      */
 
     protected bindRelations(DataModel instance, boolean newVersion, Object objectToBind) {
+
+        if (!allowSaveAndEdit()) {
+            unauthorized()
+            return
+        }
+        if (handleReadOnly()) {
+            return
+        }
+
 		if (objectToBind.declares != null) {
 			for (domain in instance.declares.findAll { !(it.id in objectToBind.declares*.id) }) {
 				domain.dataModel = null

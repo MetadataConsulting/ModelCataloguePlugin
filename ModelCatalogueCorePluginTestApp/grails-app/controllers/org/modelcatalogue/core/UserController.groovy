@@ -22,6 +22,12 @@ class UserController extends AbstractCatalogueElementController<User> {
      * @return The rendered resource or a 404 if it doesn't exist
      */
     def show() {
+
+        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
+            notFound()
+            return
+        }
+
         User element = queryForResource(params.id)
 
         if (!element) {
@@ -34,7 +40,7 @@ class UserController extends AbstractCatalogueElementController<User> {
 
     @Override
     protected boolean allowSaveAndEdit() {
-        modelCatalogueSecurityService.hasRole('ADMIN', getDataModel())
+        modelCatalogueSecurityService.hasRole('SUPERVISOR')
     }
 
     def classifications() {
@@ -66,7 +72,7 @@ class UserController extends AbstractCatalogueElementController<User> {
     }
 
     def lastSeen() {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN', getDataModel())) {
+        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
             notFound()
             return
         }
@@ -74,11 +80,11 @@ class UserController extends AbstractCatalogueElementController<User> {
     }
 
     def addFavourite(Long id) {
-        addRelation(id, 'favourite', true, null)
+        addRelation(id, 'favourite', true)
     }
 
     def removeFavourite(Long id) {
-        removeRelation(id, 'favourite', true, null)
+        removeRelation(id, 'favourite', true)
     }
 
     def enable() {
@@ -90,7 +96,7 @@ class UserController extends AbstractCatalogueElementController<User> {
     }
 
     def role() {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN', getDataModel())) {
+        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
             notFound()
             return
         }
@@ -124,7 +130,7 @@ class UserController extends AbstractCatalogueElementController<User> {
     }
 
     private switchEnabled(boolean enabled) {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
+        if (!modelCatalogueSecurityService.hasRole('SUPERVISOR')) {
             notFound()
             return
         }

@@ -109,6 +109,15 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
     }
 
     def generateSuggestions() {
+
+        if (!allowSaveAndEdit()) {
+            unauthorized()
+            return
+        }
+        if (handleReadOnly()) {
+            return
+        }
+
         String suggestion = params.suggestion
         String dataModel1ID = params.dataModel1
         String dataModel2ID = params.dataModel2
@@ -123,6 +132,15 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
 
 
     def deleteSuggestions() {
+
+        if (!allowSaveAndEdit()) {
+            unauthorized()
+            return
+        }
+        if (handleReadOnly()) {
+            return
+        }
+
         executorService.execute {
             dataArchitectService.deleteSuggestions()
         }

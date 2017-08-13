@@ -12,7 +12,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
 
     @Override
     protected boolean allowSaveAndEdit() {
-        modelCatalogueSecurityService.hasRole('ADMIN', getDataModel())
+        modelCatalogueSecurityService.hasRole('SUPERVISOR')
     }
 
     RelationshipTypeController() {
@@ -55,7 +55,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
     @Override
     @Transactional
     def update() {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN', getDataModel())) {
+        if (!modelCatalogueSecurityService.hasRole('SUPERVISOR', getDataModel())) {
             unauthorized()
             return
         }

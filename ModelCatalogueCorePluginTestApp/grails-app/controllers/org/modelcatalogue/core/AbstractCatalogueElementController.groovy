@@ -49,7 +49,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      */
 
     def beforeInterceptor = {
-        //println "Tracing action ${actionUri}, tracing resource ${resource}"
+//        println "Tracing action ${actionUri}, tracing resource ${resource}"
         if(resource!=User && getDataModel()) {
             if(!modelCatalogueSecurityService.isSubscribed(getDataModel())){
                 unauthorized()
@@ -679,10 +679,10 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     //general remove any relation from a catalogue element based on the relationship type
     // used by the directional remove relation methods
 
-    private void removeRelation(Long id, String type, boolean outgoing, String minRole = 'CURATOR') {
+    private void removeRelation(Long id, String type, boolean outgoing) {
         withRetryingTransaction {
             //check the user has the minimum role needed
-            if (!modelCatalogueSecurityService.hasRole(minRole, getDataModel())) {
+            if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())) {
                 unauthorized()
                 return
             }
@@ -738,9 +738,10 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     //general add any relation from a catalogue element based on the relationship type
     // used by the directional add relation methods
 
-    private void addRelation(Long id, String type, boolean outgoing, String minRole = 'CURATOR') {
+    private void addRelation(Long id, String type, boolean outgoing) {
+
         withRetryingTransaction {
-            if (minRole && !modelCatalogueSecurityService.hasRole(minRole, getDataModel())) {
+            if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())) {
                 unauthorized()
                 return
             }
@@ -1007,6 +1008,15 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     //TODO: not sure what this does
     // classifications are marshalled with the published element so no need for special method to fetch them
     protected bindRelations(T instance, boolean newVersion, Object objectToBind) {
+
+        if (!allowSaveAndEdit()) {
+            unauthorized()
+            return
+        }
+        if (handleReadOnly()) {
+            return
+        }
+
         if (!instance.readyForQueries) {
             return
         }

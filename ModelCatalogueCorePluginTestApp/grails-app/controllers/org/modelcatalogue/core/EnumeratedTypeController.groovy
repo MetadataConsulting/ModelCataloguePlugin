@@ -43,6 +43,15 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
     }
 
     def setDeprecated() {
+
+        if (!allowSaveAndEdit()) {
+            unauthorized()
+            return
+        }
+        if (handleReadOnly()) {
+            return
+        }
+
         def jsonPayload = request.JSON
         def enumeratedType = EnumeratedType.get(params.id)
 

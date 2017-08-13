@@ -41,9 +41,17 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         if (!authority) {
             return false
         }
-        Role role = Role.findByAuthority(authority)
-        //find if the user has a role for a model, i.e. if they are authorised
-        return isAuthorised(dataModel, role)
+        String translated = getRolesFromAuthority(authority)
+        Set<Role> roles = []
+        translated.split(",").each{
+            Role role = Role.findByAuthority(it)
+            if(role) roles.add(role)
+        }
+
+        if(roles.size()==0) false
+
+        //find if the user has a role for a model, i.e. if they are authorised, for any of the roles
+        return isAuthorised(dataModel, roles)
     }
 
     //check if a user a general role
@@ -54,6 +62,11 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         if (!authority) {
             return false
         }
+        String translated = getRolesFromAuthority(authority)
+        return SpringSecurityUtils.ifAnyGranted(translated)
+    }
+
+    private String getRolesFromAuthority(String authority){
         String translated = authority
         if (authority == "VIEWER") {
             translated = "ROLE_USER,ROLE_METADATA_CURATOR,ROLE_ADMIN,ROLE_SUPERVISOR"
@@ -66,7 +79,7 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         } else if (!translated.startsWith('ROLE_')) {
             translated = "ROLE_${translated}"
         }
-        return SpringSecurityUtils.ifAnyGranted(translated)
+        translated
     }
 
     String encodePassword(String password) {
@@ -169,7 +182,7 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
 
 
     //check if a user has the a specific role for a data model
-    boolean isAuthorised(DataModel dataModel, Role role) {
+    boolean isAuthorised(DataModel dataModel, Set<Role> roles) {
 
         //check if the user is a supervisor - if they are, they are authorised to do everything
         if(isSupervisor()) return true
@@ -177,13 +190,16 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         //if there isn't a data model they cannot be authorised
         if(!dataModel) return false
 
-        //see if a user has the right authorisation for the model
-        UserRole userRole = UserRole.findAllByUserAndDataModelAndRole(getCurrentUser(), dataModel, role)
 
-        // if a user role exists with the role, user and data model they are authorised
-        if(userRole) return true
-
-        return false
+        // if a user has any of the roles included then they are authorised
+        boolean hasRole = false
+        roles.any { Role role ->
+            if (UserRole.findAllByUserAndDataModelAndRole(getCurrentUser(), dataModel, role)) {
+                hasRole = true
+                return true
+            }
+        }
+        return hasRole
     }
 
     //get all the data models that this user is subscribed to regardless of the role
@@ -218,7 +234,8 @@ class SpringSecurity2SecurityService implements SecurityService, LogoutListeners
         }
 
         //if not just return the general roles
-        currentUser.authorities*.authority
+        Set<UserRole> userRoles = UserRole.findAllByUserAndDataModelIsNull(getCurrentUser())
+        return userRoles.collect{it.role.authority}
 
     }
 
