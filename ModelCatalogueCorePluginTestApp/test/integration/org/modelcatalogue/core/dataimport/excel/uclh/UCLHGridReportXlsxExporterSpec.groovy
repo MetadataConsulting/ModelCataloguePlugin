@@ -1,4 +1,4 @@
-package org.modelcatalogue.integration.excel.nt.uclh
+package org.modelcatalogue.core.dataimport.excel.uclh
 
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.junit.Rule

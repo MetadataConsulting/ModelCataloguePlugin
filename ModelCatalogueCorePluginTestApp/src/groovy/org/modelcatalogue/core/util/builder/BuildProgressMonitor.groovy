@@ -82,6 +82,7 @@ class BuildProgressMonitor implements Serializable, ProgressMonitor {
     void onError(Throwable th) {
         lastUpdated = System.currentTimeMillis()
         StringWriter sw = printException(th)
+        th.printStackTrace(new PrintWriter(sw))
         onNext(sw.toString())
         status = BuildProgressMonitorStatus.FAILED
         onNext("\n\n<strong class='text-danger'> JOB $name FAILED</strong>\n")

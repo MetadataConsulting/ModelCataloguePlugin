@@ -6,10 +6,12 @@ import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
-import org.modelcatalogue.integration.excel.ExcelLoader
-import org.modelcatalogue.integration.excel.HeadersMap
+import org.modelcatalogue.core.dataimport.excel.ExcelLoader
+import org.modelcatalogue.core.dataimport.excel.HeadersMap
+import org.modelcatalogue.core.dataimport.excel.TextLoader
+import org.modelcatalogue.core.dataimport.excel.uclh.UCLHTestLoader
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
-import org.modelcatalogue.integration.excel.nt.uclh.UCLHExcelLoader
+import org.modelcatalogue.core.dataimport.excel.uclh.UCLHExcelLoader
 import org.modelcatalogue.integration.obo.OboLoader
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 import org.springframework.http.HttpStatus
@@ -86,6 +88,8 @@ class DataImportController  {
 
                     String test1 = "TEST MESSAGE"
                     println test1
+                TextLoader tl = new TextLoader()
+                UCLHTestLoader uclh = new UCLHTestLoader()
                     ExcelLoader ldr1 = new ExcelLoader()
                     UCLHExcelLoader loader1 = new UCLHExcelLoader(false)
 
@@ -94,6 +98,7 @@ class DataImportController  {
                 try {
                     String test = "TEST MESSAGE"
                     println test
+
                     ExcelLoader ldr = new ExcelLoader()
                     UCLHExcelLoader loader = new UCLHExcelLoader(false)
 

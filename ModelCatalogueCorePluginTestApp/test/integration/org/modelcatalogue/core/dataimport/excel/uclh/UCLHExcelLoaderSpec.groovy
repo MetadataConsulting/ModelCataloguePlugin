@@ -1,4 +1,4 @@
-package org.modelcatalogue.integration.excel.nt.uclh
+package org.modelcatalogue.core.dataimport.excel.uclh
 
 import org.apache.commons.lang3.tuple.Pair
 import org.codehaus.groovy.grails.commons.GrailsApplication
@@ -9,7 +9,7 @@ import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
-import org.modelcatalogue.integration.excel.ExcelLoaderSpec
+import org.modelcatalogue.core.dataimport.excel.ExcelLoaderSpec
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.FileOpener
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader

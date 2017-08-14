@@ -1,4 +1,4 @@
-package org.modelcatalogue.integration.excel
+package org.modelcatalogue.core.dataimport.excel
 
 import org.apache.commons.lang3.tuple.Pair
 import org.apache.poi.ss.usermodel.*

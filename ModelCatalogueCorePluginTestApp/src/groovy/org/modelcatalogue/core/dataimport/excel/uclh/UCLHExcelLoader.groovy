@@ -1,7 +1,5 @@
-package org.modelcatalogue.integration.excel.nt.uclh
+package org.modelcatalogue.core.dataimport.excel.uclh
 
-import org.apache.commons.lang.WordUtils
-import org.apache.commons.lang3.tuple.Pair
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
@@ -12,7 +10,7 @@ import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.integration.excel.ExcelLoader
+import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.apache.commons.lang.WordUtils
 import org.apache.commons.lang3.tuple.Pair
 

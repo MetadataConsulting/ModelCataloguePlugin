@@ -6,8 +6,8 @@ import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueAction
-import org.modelcatalogue.integration.excel.ExcelLoader
-import org.modelcatalogue.integration.excel.HeadersMap
+import org.modelcatalogue.core.dataimport.excel.ExcelLoader
+import org.modelcatalogue.core.dataimport.excel.HeadersMap
 import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Stepwise

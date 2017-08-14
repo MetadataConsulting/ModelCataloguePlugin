@@ -1,4 +1,4 @@
-package org.modelcatalogue.integration.excel
+package org.modelcatalogue.core.dataimport.excel
 
 class HeadersMap {
     String dataElementCode
