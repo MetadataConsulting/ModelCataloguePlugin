@@ -84,6 +84,7 @@ grails.project.dependency.resolution = {
         compile 'org.apache.poi:poi:3.13'
         compile 'org.apache.poi:poi-ooxml:3.13'
         compile 'org.apache.poi:ooxml-schemas:1.1'
+        compile 'org.apache.commons:commons-lang3:3.0'
 
         compile 'net.sourceforge.owlapi:owlapi-oboformat:3.5.1'
         compile 'net.sourceforge.owlapi:owlapi-api:3.5.1'
