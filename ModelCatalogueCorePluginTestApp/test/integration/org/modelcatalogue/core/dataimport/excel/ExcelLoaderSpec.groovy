@@ -53,6 +53,7 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
         excelLoader.buildXmlFromWorkbookSheet(
              new XSSFWorkbook(
             getClass().getResourceAsStream(sampleFile)),
+            builder,
             index,
             ExcelLoader.getOwnerFromFileName(sampleFile, '_nt_rawimport')
             )

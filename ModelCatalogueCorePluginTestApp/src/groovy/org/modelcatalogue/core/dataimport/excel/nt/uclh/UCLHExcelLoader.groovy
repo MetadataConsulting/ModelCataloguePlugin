@@ -1,11 +1,9 @@
-package org.modelcatalogue.core.dataimport.excel.uclh
+package org.modelcatalogue.core.dataimport.excel.nt.uclh
 
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.modelcatalogue.builder.api.CatalogueBuilder
-import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
-
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.DataElement
@@ -58,7 +56,7 @@ class UCLHExcelLoader extends ExcelLoader{
 
     String getElementFromGelName(Map<String,String> rowMap){
 
-        String sName = rowMap['Name']  //we need to put this into a form to use on the db
+        String sName = rowMap['Name']?:'blankcell' //we need to put this into a form to use on the db
         List<String> tokens = sName.tokenize('(') //grab bit before the bracket - Event Reference (14858.3)
         return tokens[0].trim()
 
@@ -66,7 +64,7 @@ class UCLHExcelLoader extends ExcelLoader{
 
 
     @Override
-    Pair<String, List<String>> buildXmlFromWorkbookSheet(Workbook workbook, int index=0, String owner='') {
+    Pair<String, List<String>> buildXmlFromWorkbookSheet(Workbook workbook, CatalogueBuilder catalogueBuilder, int index=0, String owner='') {
 
         if (owner == '') {
             ownerSuffix = ''
@@ -77,7 +75,7 @@ class UCLHExcelLoader extends ExcelLoader{
 
 
         Writer stringWriter = new StringWriter()
-        CatalogueBuilder catalogueBuilder = new XmlCatalogueBuilder(stringWriter, true)
+        //CatalogueBuilder catalogueBuilder = new XmlCatalogueBuilder(stringWriter, true)
 
         if (!workbook) {
             throw new IllegalArgumentException("Excel file contains no worksheet!")
@@ -114,13 +112,15 @@ class UCLHExcelLoader extends ExcelLoader{
             dataModel('name': modelName) {
                 ext 'http://www.modelcatalogue.org/metadata/#organization', 'UCL'
                 rowMaps.each { Map<String, String> rowMap ->
-                    dataElement(name: getNTElementName(rowMap)) {
-                        metadataHeaders.each {k, v ->
-                            ext v, (rowMap[k] ?: defaultMetadataValue)
+                    String dename = getNTElementName(rowMap)
+                        if(!dename.equalsIgnoreCase('blankcell_ph')) {
+                            dataElement(name: dename) {
+                                metadataHeaders.each { k, v ->
+                                    ext v, (rowMap[k] ?: defaultMetadataValue)
+                                }
+                                ext 'represents', "${getMCIdFromSpreadSheet(rowMap)}"
+                            }
                         }
-                        ext 'represents', "${getMCIdFromSpreadSheet(rowMap)}"
-                        //id('mcID1000')
-                    }
                 }
             }
         }

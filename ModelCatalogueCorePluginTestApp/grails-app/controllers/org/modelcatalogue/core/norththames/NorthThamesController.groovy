@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.norththames
 
 import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.dataimport.excel.uclh.UCLHGridReportXlsxExporter
+import org.modelcatalogue.core.dataimport.excel.nt.uclh.UCLHGridReportXlsxExporter
 import org.springframework.http.HttpStatus
 
 /**

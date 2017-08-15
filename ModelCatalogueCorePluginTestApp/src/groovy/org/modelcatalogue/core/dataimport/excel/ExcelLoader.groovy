@@ -76,7 +76,7 @@ class ExcelLoader {
      * @param index
      */
 
-    Pair<String, List<String>> buildXmlFromWorkbookSheet(Workbook workbook, int index=0, String owner='') {}
+    Pair<String, List<String>> buildXmlFromWorkbookSheet(Workbook workbook, CatalogueBuilder catalogueBuilder, int index=0, String owner='') {}
 
     /**
      * Add relationships from sourceDataModel to models with destinationModelNames
