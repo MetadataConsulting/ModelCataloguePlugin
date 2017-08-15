@@ -8,8 +8,6 @@ import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.modelcatalogue.core.dataimport.excel.HeadersMap
-import org.modelcatalogue.core.dataimport.excel.TextLoader
-import org.modelcatalogue.core.dataimport.excel.uclh.UCLHTestLoader
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.dataimport.excel.uclh.UCLHExcelLoader
 import org.modelcatalogue.integration.obo.OboLoader
@@ -86,23 +84,10 @@ class DataImportController  {
             builder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
             InputStream inputStream = file.inputStream
 
-                    String test1 = "TEST MESSAGE"
-                    println test1
-                TextLoader tl = new TextLoader()
-                UCLHTestLoader uclh = new UCLHTestLoader()
-                    ExcelLoader ldr1 = new ExcelLoader()
-                    UCLHExcelLoader loader1 = new UCLHExcelLoader(false)
-
 
             executeInBackground(id, "Imported from Excel") {
                 try {
-                    String test = "TEST MESSAGE"
-                    println test
-
-                    ExcelLoader ldr = new ExcelLoader()
                     UCLHExcelLoader loader = new UCLHExcelLoader(false)
-
-                    //UCLHExcelLoader parser = new UCLHExcelLoader(false) //test=true randomizing model names
                     Pair<String, List<String>> xmlAndDataModelNames = loader.buildXmlFromWorkbookSheet(WorkbookFactory.create(inputStream), 0, ExcelLoader.getOwnerFromFileName(file.originalFilename, '_nt_rawimport'))
                     parser.addRelationshipsToModels('Cancer Model', xmlAndDataModelNames.right)
                     finalizeAsset(id, (DataModel) (builder.created.find {it.instanceOf(DataModel)} ?: builder.created.find{it.dataModel}?.dataModel), userId)
