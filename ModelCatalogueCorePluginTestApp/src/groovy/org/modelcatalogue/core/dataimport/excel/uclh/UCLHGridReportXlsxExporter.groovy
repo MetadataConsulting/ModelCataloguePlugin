@@ -10,8 +10,10 @@ import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
 
 /**
  * GridReportXlsxExporter.groovy
- * Purpose: Generate an excel report from a data model, including metadata using the required format
- *
+ * Generates a report from a source data model which, as in GridReportXlsxExporter, shows its data classes in a hierarchy and
+ * lists its data elements; furthermore, some of the data elements are linked to a representative placeholder in GMC data models
+ * which represent data sources of particular hospitals in a GMC; and the placeholders have associated metadata;
+ * the placeholders and their metadata are listed with the data elements.
  * @author Adam Milward
  * @version 31/03/2017
  */
