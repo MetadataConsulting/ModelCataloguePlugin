@@ -115,7 +115,9 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages',
             $state.go 'landing'
 
         requireUser: ->
-          $http(method: 'GET', url: userUrl).then(handleUserResponse).then (result)->
+          dataModelId = null
+          if $rootScope.currentDataModel then dataModelId = $rootScope.currentDataModel.id
+          $http(method: 'GET', url: userUrl, params: {dataModelId: dataModelId }).then(handleUserResponse).then (result)->
             if result.data?.success
               return security.getCurrentUser()
             $q.reject result

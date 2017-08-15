@@ -50,7 +50,7 @@ class RelationshipsMarshaller extends ListWrapperMarshaller {
     }
 
     protected Map<String, String> getUnAuthenticatedElement(CatalogueElement element){
-        [dateCreated: "", versionCreated: "", lastUpdated: "", internalModelCatalogueId: element.defaultModelCatalogueId, modelCatalogueId: element.modelCatalogueId, name: "$element.name (Not authorised to view details)", classifiedName: "$element.name (Not authorised to view details)", id: element.id, description: "Not authorised to view element details. Please contact your system administrator to give you access to model ${element?.dataModel?.name} (${element?.dataModel?.semanticVersion}).", elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id".toString(), status: "${element.status}".toString(), versionNumber: "", latestVersionId: element.latestVersionId ?: element.id, dataType: ""]
+        [dateCreated: "", versionCreated: "", lastUpdated: "", internalModelCatalogueId: element.defaultModelCatalogueId, modelCatalogueId: element.modelCatalogueId, name: "$element.name (Not authorised to view details)", classifiedName: "Not authorised to view details", id: element.id, description: "Not authorised to view element details. Please contact your system administrator to give you access to model ${element?.dataModel?.name} (${element?.dataModel?.semanticVersion}).", elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id".toString(), status: "${element.status}".toString(), versionNumber: "", latestVersionId: element.latestVersionId ?: element.id, dataType: ""]
     }
 
 

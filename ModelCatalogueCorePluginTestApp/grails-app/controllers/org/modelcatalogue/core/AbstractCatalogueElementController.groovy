@@ -15,6 +15,8 @@ import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.lists.*
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import org.modelcatalogue.core.util.marshalling.RelationshipsMarshaller
+import org.modelcatalogue.core.xml.CatalogueXmlPrinter
+
 import javax.servlet.http.HttpServletResponse
 import java.util.concurrent.ExecutorService
 
@@ -23,14 +25,15 @@ import static org.springframework.http.HttpStatus.OK
 abstract class AbstractCatalogueElementController<T extends CatalogueElement> extends AbstractRestfulController<T> {
 
     static responseFormats = ['json', 'xml']
-    static allowedMethods = [outgoing: "GET", incoming: "GET", addIncoming: "POST", addOutgoing: "POST", removeIncoming: "DELETE", removeOutgoing: "DELETE", mappings: "GET", removeMapping: "DELETE", addMapping: "POST"]
+    static allowedMethods = [outgoing: "GET", incoming: "GET", addIncoming: "POST", addOutgoing: "POST", removeIncoming: "DELETE", removeOutgoing: "DELETE", mappings: "GET", removeMapping: "DELETE", addMapping: "POST", update: "PUT"]
 
     def relationshipService
     def mappingService
     def auditService
     def dataModelService
+    def dataClassService
 
-    //used to run reports in backgorund thread
+    //used to run reports in background thread
     ExecutorService executorService
 
     AbstractCatalogueElementController(Class<T> resource, boolean readOnly) {
@@ -45,15 +48,15 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
     /**
      * All requests are intercepted and the users role is checked against the required data model
-     * if they do not have the correct access thye are requested to login
+     * if they do not have the correct access they are requested to loginurl
      */
 
     def beforeInterceptor = {
-//        println "Tracing action ${actionUri}, tracing resource ${resource}"
-        if(resource!=User && getDataModel()) {
+        println "Tracing action ${actionUri}, tracing resource ${resource}"
+       if(resource!=User && getDataModel()) {
             if(!modelCatalogueSecurityService.isSubscribed(getDataModel())){
-                unauthorized()
-                return
+                response.sendError HttpServletResponse.SC_UNAUTHORIZED
+                return false
             }
         }
     }
@@ -260,6 +263,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      * @return The rendered resource or a 404 if it doesn't exist
      */
     def show() {
+
         T element = queryForResource(params.id)
 
         if (!element) {
@@ -267,11 +271,24 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        //before interceptor deals with this security - this is only applicable to data models and users
-        if (!modelCatalogueSecurityService.hasRole('VIEWER', getDataModel()) && !(element.status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED])) {
-            unauthorized()
+
+        if (params.format == 'xml') {
+
+            response.contentType = 'application/xml'
+            response.setHeader("Content-disposition", "attachment; filename=\"${element.name.replaceAll(/\s+/, '_')}.mc.xml\"")
+            CatalogueXmlPrinter printer = new CatalogueXmlPrinter(dataModelService, dataClassService)
+            printer.bind(element){
+                idIncludeVersion = true
+                if (params.full != 'true') {
+                    keepInside = element.instanceOf(DataModel) ? element : element.dataModel
+                }
+                if (params.repetitive == 'true') {
+                    repetitive = true
+                }
+            }.writeTo(response.writer)
             return
         }
+
 
         respond element
     }
@@ -866,7 +883,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
     //TODO: this should all go into a service
     private searchWithinRelationshipsInternal(Integer max, String type, RelationshipDirection direction){
-        CatalogueElement element = queryForResource(params.id)
+        CatalogueElement element = queryForResource(params?.id)
 
         if (!element) {
             notFound()

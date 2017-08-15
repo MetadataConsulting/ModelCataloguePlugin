@@ -9,6 +9,6 @@ angular.module('mc.core.ui.states.controllers.DataModelCtrl', ['ui.router', 'mc.
 
     $q.when(MessagingClient.connect()).then ->
       $rootScope.$security.refreshUserData(currentDataModel.id)
-      $scope.currentDataModel  = currentDataModel
+      $rootScope.currentDataModel  = currentDataModel
 
 ])

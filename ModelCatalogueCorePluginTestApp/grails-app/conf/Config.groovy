@@ -290,6 +290,7 @@ grails.plugin.springsecurity.authority.className = 'org.modelcatalogue.core.secu
 grails.plugin.springsecurity.requestMap.className = 'org.modelcatalogue.core.testapp.Requestmap'
 grails.plugin.springsecurity.securityConfigType = 'Requestmap'
 
+
 // this doesn't work properly, only reliable way is to his in setup-frontend.sh script
 def assetExcludes = [
         "bootstrap/**/*.*",

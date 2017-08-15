@@ -16,6 +16,7 @@ class UserController extends AbstractCatalogueElementController<User> {
         super(User, false)
     }
 
+
     /**
      * Shows a single resource
      * @param id The id of the resource

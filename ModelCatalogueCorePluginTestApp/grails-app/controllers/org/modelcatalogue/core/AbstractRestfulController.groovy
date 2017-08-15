@@ -309,7 +309,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
      */
     protected boolean allowSaveAndEdit() {
         //if the user is a "general" curator they can create data models
-        if(resource == DataModel) return modelCatalogueSecurityService.hasRole('CURATOR')
+//        if(resource == DataModel) return modelCatalogueSecurityService.hasRole('CURATOR')
         //but if they are trying to create something within the context of a data model they must have curator access to the specific model (not just general curator access)
         modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())
     }
@@ -439,14 +439,14 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 //TODO: REMOVE PUT INTO SERVICE AND CLASSES
     protected DataModel getDataModel(){
         DataModel dataModel
-        if(resource!=DataModel && params?.id){
+        if(resource!=DataModel && resource && params?.id){
             dataModel = (resource.get(params.id)?.dataModel)
+        }else if(resource == DataModel && params?.id){
+            dataModel = (resource.get(params.id))
         }else if(getObjectToBind()?.dataModels){
             dataModel = DataModel.get(getObjectToBind().dataModels.first()?.id)
         }else if(params?.dataModel){
             dataModel = DataModel.get(params.dataModel)
-        }else{
-            dataModel = (resource.get(params.id))
         }
         dataModel
     }

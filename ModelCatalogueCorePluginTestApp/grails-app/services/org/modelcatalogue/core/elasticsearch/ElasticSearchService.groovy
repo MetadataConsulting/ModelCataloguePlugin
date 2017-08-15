@@ -914,7 +914,7 @@ class ElasticSearchService implements SearchCatalogue {
                     if(subscribedModels.findResults{it.id}.contains(dataModelId)){
                         DataModel dataModel = DataModel.get(dataModelId)
                         if (dataModel) {
-                            return DataModelFilter.includes(dataModel)
+                            return DataModelFilter.includes(dataModel).withImports(subscribedModels)
                         }
                     }
                 }
@@ -922,7 +922,6 @@ class ElasticSearchService implements SearchCatalogue {
             return DataModelFilter.includes(subscribedModels)
         }
 
-        dataModelService.dataModelFilter.withImports(subscribedModels)
     }
 
     List<String> collectTypes(Class<?> resource) {

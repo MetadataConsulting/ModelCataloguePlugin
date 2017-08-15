@@ -174,5 +174,6 @@ class ModelCatalogueCorePluginUrlMappings {
         "/api/modelCatalogue/core/search/$search?" (controller:"search", action : 'index', method: HttpMethod.GET)
         "/api/modelCatalogue/core/relationship/$id/restore" (controller:"relationship", action : 'restore', method: HttpMethod.POST)
 
+
 	}
 }

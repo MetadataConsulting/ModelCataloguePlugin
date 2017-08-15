@@ -7,6 +7,7 @@ import org.hibernate.SessionFactory
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
 import org.modelcatalogue.core.export.inventory.DataModelToDocxExporter
+import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
@@ -19,7 +20,9 @@ import org.modelcatalogue.core.util.lists.Relationships
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import org.modelcatalogue.gel.export.GridReportXlsxExporter
 import org.springframework.http.HttpStatus
+import org.springframework.validation.Errors
 
+import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
 
 class DataModelController<T extends CatalogueElement> extends AbstractCatalogueElementController<DataModel> {
@@ -52,6 +55,82 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
         'table.row.cell' font: [size: 10.pt]
         'paragraph.headerImage' height: 1.366.inches, width: 2.646.inches
     }
+
+
+
+    /**
+     * Saves a resource
+     * Overrides the base method - there is a slightly different security model
+     */
+    @Transactional
+    def save() {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            unauthorized()
+            return
+        }
+        if (handleReadOnly()) {
+            return
+        }
+        def instance = createResource()
+
+        instance.validate()
+
+        if (!params.skipPolicies) {
+            validatePolicies(VerificationPhase.PROPERTY_CHECK, instance, objectToBind)
+        }
+
+        if (instance.hasErrors()) {
+            if (!hasUniqueName() || getObjectToBind().size() > 1 || !getObjectToBind().containsKey('name')) {
+                respond instance.errors
+                return
+            }
+
+            Errors errors = instance.errors
+
+            if (errors.getFieldError('name').any { it.code == 'unique' }) {
+                T found = resource.findByName(getObjectToBind().name, [sort: 'versionNumber', order: 'desc'])
+                if (found) {
+                    if (!found.instanceOf(CatalogueElement)) {
+                        respond found
+                        return
+                    }
+                    if (found.status != ElementStatus.DRAFT) {
+                        found = elementService.createDraftVersion(found, DraftContext.userFriendly())
+                    }
+                    respond found
+                    return
+                }
+            }
+
+            respond errors
+            return
+        }
+
+        cleanRelations(instance)
+
+        instance.save flush: true
+
+        bindRelations(instance, false)
+
+        instance.save flush: true
+
+        if (!params.skipPolicies) {
+            validatePolicies(VerificationPhase.EXTENSIONS_CHECK, instance, objectToBind)
+        }
+
+        if (instance.hasErrors()) {
+            respond instance.errors
+            return
+        }
+
+        if (favoriteAfterUpdate && modelCatalogueSecurityService.userLoggedIn && instance) {
+            modelCatalogueSecurityService.currentUser?.createLinkTo(instance, RelationshipType.favouriteType)
+        }
+
+
+        respond instance, [status: CREATED]
+    }
+
 
 
 
@@ -396,6 +475,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
+        return
     }
 
     /**
@@ -434,6 +514,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
+        return
     }
 
 
@@ -472,6 +553,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
 
         response.setHeader("X-Asset-ID", assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
+        return
     }
 
 
