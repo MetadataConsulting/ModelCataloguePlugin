@@ -2,6 +2,7 @@ package org.modelcatalogue.core.xml
 
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 import spock.lang.Shared
@@ -64,7 +65,7 @@ class CatalogueXmlImportSpec extends AbstractIntegrationSpec {
             dataModel.dataElements.findAll {dataElement ->
                 dataElement.name == 'DE1'
             }.size() == 1 // a DM1 data model has a DE1 data element
-        when: "models updated 1st time"
+        when: "models updated 1st time (trying to 'move' DE1 to DM2)"
             catalogueXmlLoader.load(getClass().getResourceAsStream('test_update_models_update1.catalogue.xml'))
         then:
             List<DataModel> dataModelsDM1U1 = DataModel.findAllByName('DM1')
@@ -79,17 +80,22 @@ class CatalogueXmlImportSpec extends AbstractIntegrationSpec {
 
             /**
              * There are now two DM2: the previous, now deprecated, and the current, a draft.
-             * And 'DM2' data model has 'DE1' element with extension 'EXT1' value 'EXTVAL2'
+             * And draft 'DM2' data model has 'DE1' element, and still has 'DE2' element.
              */
             List<DataModel> dataModelDM2s = DataModel.findAllByName('DM2')
             dataModelDM2s.size() == 2
+            dataModelDM2s[0].status == ElementStatus.DEPRECATED
             DataModel dataModelDM2Current = dataModelDM2s[1]
             DataElement dm2de1 =
                 dataModelDM2Current.dataElements.find {dataElement ->
                     dataElement.name == 'DE1'
                 }
-            dm2de1.ext.get('EXT1') == 'EXTVAL2'
-        when: "models updated 2nd time"
+            dm2de1.ext.get('EXT1') == 'EXTVAL1'
+            DataElement dm2de2 =
+            dataModelDM2Current.dataElements.find {dataElement ->
+                dataElement.name == 'DE2'
+            }
+        when: "models updated 2nd time (just changing DE1's metadata in DM1)"
             catalogueXmlLoader.load(getClass().getResourceAsStream('test_update_models_update2.catalogue.xml'))
         then:
             List<DataModel> dataModelsDM1U2 = DataModel.findAllByName('DM1')

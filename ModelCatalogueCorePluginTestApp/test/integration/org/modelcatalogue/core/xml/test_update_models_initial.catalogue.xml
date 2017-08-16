@@ -8,5 +8,6 @@
         </dataElement>
     </dataModel>
     <dataModel name="DM2">
+        <dataElement name="DE2"></dataElement>
     </dataModel>
 </catalogue>

@@ -5,8 +5,7 @@
     <dataModel name="DM2">
         <dataElement name="DE1">
             <extensions>
-                <extension key="EXT1">EXTVAL2</extension>
-                <extension key="EXT2">EXTVAL3</extension>
+                <extension key="EXT1">EXTVAL1</extension>
             </extensions>
         </dataElement>
     </dataModel>
