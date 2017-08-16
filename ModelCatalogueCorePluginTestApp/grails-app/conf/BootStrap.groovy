@@ -61,8 +61,6 @@ class BootStrap {
             initSecurity(!System.getenv('MC_BLANK_DEV'))
         }
 
-        modelCatalogueSearchService.reindex(true)
-
         initCatalogueService.setupStoredProcedures()
 
         if (Environment.current == Environment.PRODUCTION) {
