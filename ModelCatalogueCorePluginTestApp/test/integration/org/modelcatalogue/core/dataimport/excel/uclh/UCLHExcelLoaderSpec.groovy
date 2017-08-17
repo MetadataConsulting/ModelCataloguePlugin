@@ -10,7 +10,7 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.dataimport.excel.ExcelLoaderSpec
-import org.modelcatalogue.core.dataimport.excel.gmcGrid.GMCGridReportXlsxExporter
+import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportXlsxExporter
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.FileOpener
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader

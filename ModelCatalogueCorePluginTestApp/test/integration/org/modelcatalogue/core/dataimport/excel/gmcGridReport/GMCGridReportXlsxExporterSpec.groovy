@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.dataimport.excel.gmcGrid
+package org.modelcatalogue.core.dataimport.excel.gmcGridReport
 
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.junit.Rule

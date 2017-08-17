@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.dataimport.excel.gmcGrid
+package org.modelcatalogue.core.dataimport.excel.gmcGridReport
 
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.core.*
@@ -47,18 +47,9 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
             color black
         }
     }
-
-    private List<String> ntElementMetadataHeaders =
-        ['Semantic Matching', 'Known Issue', 'Immediate Solution', 'Immediate Solution Owner',
-         'Long Term Solution', 'Long Term Solution Owner', 'Data Item Unique Code',
-         'Related To Metadata', 'Part Of Standard Data Set', 'Data Completeness',
-         'Estimated Quality', 'Timely', 'Comments']
-    private List<String> ntElementMetadataKeys = ntElementMetadataHeaders.collect{
-        it.replace(/Related To Metadata/, 'Related To')}
-    protected List<String> excelHeaders =
-        ['ID', 'Data Element', 'Multiplicity', 'Data Type',
-         'Validation Rule', 'Business Rule', 'Related To', 'Source System', 'Previously In Source System'] + ntElementMetadataHeaders
-
+    static List<String> ntElementMetadataHeaders = GMCGridReportHeaders.ntElementMetadataHeaders
+    static List<String> ntElementMetadataKeys = GMCGridReportHeaders.ntElementMetadataKeys
+    static List<String> excelHeaders = GMCGridReportHeaders.excelHeaders
 
     @Override
     Map<String, Closure> sheetsAfterMainSheetExport() {
