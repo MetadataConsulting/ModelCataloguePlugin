@@ -37,15 +37,15 @@ class UCLHExcelLoaderSpec extends ExcelLoaderSpec {
 
     @Shared CatalogueXmlLoader catalogueXmlLoader
     @Shared DataModel sourceDataModel
-  def setupSpec(){
-      initRelationshipTypes()
-      defaultCatalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
-      catalogueXmlLoader = new CatalogueXmlLoader(defaultCatalogueBuilder)
+    def setupSpec(){
+        initRelationshipTypes()
+        defaultCatalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
+        catalogueXmlLoader = new CatalogueXmlLoader(defaultCatalogueBuilder)
 
-      catalogueXmlLoader.load(getClass().getResourceAsStream('TestDataModelV1.xml'))
-      catalogueXmlLoader.load(getClass().getResourceAsStream('TestDataModelV2.xml'))
-      sourceDataModel = DataModel.findByNameAndSemanticVersion('TestDataModel', '2')
-  }
+        catalogueXmlLoader.load(getClass().getResourceAsStream('TestDataModelV1.xml'))
+        catalogueXmlLoader.load(getClass().getResourceAsStream('TestDataModelV2.xml'))
+        sourceDataModel = DataModel.findByNameAndSemanticVersion('TestDataModel', '2')
+    }
 
     def setup() {
         XMLUnit.ignoreWhitespace = true
