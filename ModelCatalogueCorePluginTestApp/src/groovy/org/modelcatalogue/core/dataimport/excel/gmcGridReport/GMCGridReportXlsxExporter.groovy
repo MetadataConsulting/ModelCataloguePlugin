@@ -63,6 +63,9 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
     }
     // export will do as it normally does, with new headers, and a different printDataElement, and then do sheetsAfterMainSheetExport at the end.
 
+    static String noSourceMessage = 'No source identified'
+    static String multipleSourcesMessage = 'Multiple sources identified, please see entries in the online catalogue'
+
     @Override
     void printDataElement(RowDefinition rowDefinition, Relationship dataElementRelationship, List outline = []) {
         DataElement dataElement = dataElementRelationship.destination
@@ -120,7 +123,7 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
                     }
             }
             cell { // Related To
-                value "${(relatedTo) ? ((relatedTo.size()==1) ? relatedTo[0]?.name : "Multiple sources identified, please see catalogue") : "No source identified"}"
+                value "${(relatedTo) ? ((relatedTo.size()==1) ? relatedTo[0]?.name : multipleSourcesMessage) : noSourceMessage}"
                 if (relatedTo && relatedTo.size()==1) link to url "${ getLoadURL(relatedTo[0]) }"
                 style standardCellStyle
             }
@@ -354,9 +357,9 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
                     score.put("completed", completed + 1)
                 }
             }
-            return "Multiple sources identified, please see entries in the online catalogue"
+            return multipleSourcesMessage
         }else{
-            return "No source identified"
+            return noSourceMessage
         }
 
 
@@ -373,9 +376,9 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
                 systemsMap.put(dmname, elements)
             }
         }else{
-            List elements =  (systemsMap.get("No source identified"))?:[]
+            List elements =  (systemsMap.get(noSourceMessage))?:[]
             elements.add(sourceElement)
-            systemsMap.put("No source identified", elements)
+            systemsMap.put(noSourceMessage, elements)
         }
 
     }
@@ -384,9 +387,9 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
         if(relatedTo.size()==1){
             "${relatedTo[0].dataModel.name}"
         }else if(relatedTo.size()>1){
-            "Multiple sources identified, please see entries in the online catalogue"
+            multipleSourcesMessage
         }else{
-            "No source identified"
+            noSourceMessage
         }
     }
 

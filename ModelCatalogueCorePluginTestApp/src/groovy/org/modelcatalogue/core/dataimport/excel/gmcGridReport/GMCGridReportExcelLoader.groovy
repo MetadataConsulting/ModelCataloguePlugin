@@ -74,20 +74,25 @@ class GMCGridReportExcelLoader extends ExcelLoader {
         Patch patch = getPatchFromWorkbook(workbook, index)
         patch.applyInstructionsAndMoves()
     }
-
+    List<String> ignoreRelatedTo = [GMCGridReportXlsxExporter.noSourceMessage,
+                                    GMCGridReportXlsxExporter.multipleSourcesMessage]
     Patch getPatchFromWorkbook(Workbook workbook, int index=0) {
         Sheet sheet = workbook.getSheetAt(index)
         List<Map<String, String>> rowMaps = getRowMaps(sheet)
-        Map<String, List<Map<String, String>>> modelMaps = rowMaps.groupBy{it.get('Source System')}
+        Map<String, List<Map<String, String>>> modelMaps = rowMaps.groupBy{it.get(Headers.sourceSystem)}
         Closure instructions = {
             modelMaps.each {String modelName, modelRowMaps ->
                 dataModel('name': modelName){
                     // ext 'http://www.modelcatalogue.org/metadata/#organization', 'UCL' // do we need this here? does metadata get carried forward in an update?
                     modelRowMaps.each {Map<String, String> rowMap ->
-                        dataElement(name: rowMap.get('Data Element')){
-                            GMCGridReportXlsxExporter.ntElementMetadataHeaders.each { header ->             ext header, (rowMap[header]) // we could have some strange defaults
+                        String placeholderName = rowMap.get(Headers.relatedTo)
+                        if (!ignoreRelatedTo.contains(placeholderName)) {
+                            dataElement(name: placeholderName){
+                                GMCGridReportXlsxExporter.ntElementMetadataHeaders.each {
+                                    header -> ext header, (rowMap[header])
+                                }
+                                // ext 'represents' "${getMCIdFromSpreadsheet(rowMap)}" // do we need this here?
                             }
-                            // ext 'represents' "${getMCIdFromSpreadsheet(rowMap)}" // do we need this here?
                         }
                     }
                 }
