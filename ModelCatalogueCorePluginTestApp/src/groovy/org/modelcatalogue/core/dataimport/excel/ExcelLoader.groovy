@@ -19,7 +19,7 @@ class ExcelLoader {
             firstcapture
         }.toUpperCase()
     }
-    protected Map<String, String> createRowMap(Row row, List<String> headers) {
+    static protected Map<String, String> createRowMap(Row row, List<String> headers) {
         Map<String, String> rowMap = [:]
         for (Cell cell : row) {
             rowMap = updateRowMap(rowMap, cell, headers)
@@ -45,6 +45,23 @@ class ExcelLoader {
 		}
 		data
 	}
+
+    static List<Map<String,String>> getRowMaps(Sheet sheet) {
+
+        Iterator<Row> rowIt = sheet.rowIterator()
+        Row row = rowIt.next()
+        List<String> headers = getRowData(row)
+
+        List<Map<String, String>> rowMaps = []
+        while (rowIt.hasNext()) {
+            row = rowIt.next()
+            Map<String, String> rowMap = createRowMap(row, headers)
+
+
+            rowMaps << rowMap
+        }
+        return rowMaps
+    }
 
 	static void getValue(Cell cell, List<String> data) {
 		def colIndex = cell.getColumnIndex()
@@ -75,7 +92,6 @@ class ExcelLoader {
      * @param catalogueBuilder
      * @param index
      */
-
     Pair<String, List<String>> buildXmlFromWorkbookSheet(Workbook workbook, int index=0, String owner='') {}
 
     /**

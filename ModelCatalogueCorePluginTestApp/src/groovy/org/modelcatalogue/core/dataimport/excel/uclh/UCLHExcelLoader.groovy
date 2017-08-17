@@ -63,8 +63,14 @@ class UCLHExcelLoader extends ExcelLoader{
         return tokens[0].trim()
 
     }
+    static Map<String, String> metadataHeaders = ['Semantic Matching',	'Known issue',	'Immediate solution', 'Immediate solution Owner',
+                                               'Long term solution',	'Long term solution owner',	'Data Item', 'Unique Code',
+                                               'Related To',	'Part of standard data set',
+                                               'Data Completeness','Estimated quality',
+                                               'Timely?', 'Comments'].collectEntries {
+            header -> [(header), WordUtils.capitalizeFully(header).replaceAll(/\?/,'')]}  // map from header keys to their capitalized forms used as metadata keys
 
-
+    static String defaultGMCMetadataValue = ''
     @Override
     Pair<String, List<String>> buildXmlFromWorkbookSheet(Workbook workbook, int index=0, String owner='') {
 
@@ -84,31 +90,11 @@ class UCLHExcelLoader extends ExcelLoader{
         }
         Sheet sheet = workbook.getSheetAt(index);
 
-        Iterator<Row> rowIt = sheet.rowIterator()
-        Row row = rowIt.next()
-        List<String> headers = getRowData(row)
-
-        List<Map<String, String>> rowMaps = []
-        while (rowIt.hasNext()) {
-            row = rowIt.next()
-            Map<String, String> rowMap = createRowMap(row, headers)
-
-
-            rowMaps << rowMap
-        }
+        List<Map<String, String>> rowMaps = getRowMaps(sheet)
 
         String modelName = rowMaps[0]['Current Paper Document  or system name']+getOwnerSuffixWithRandom() // at the moment we are dealing with just one            UCLH data source, so there will be just one model
 
         List<String> modelNames = [modelName]
-
-        Map<String, String> metadataHeaders = ['Semantic Matching',	'Known issue',	'Immediate solution', 'Immediate solution Owner',
-                                               'Long term solution',	'Long term solution owner',	'Data Item', 'Unique Code',
-                                               'Related To',	'Part of standard data set',
-                                               'Data Completeness','Estimated quality',
-                                               'Timely?', 'Comments'].collectEntries {
-            header -> [(header), WordUtils.capitalizeFully(header).replaceAll(/\?/,'')]
-        } // map from header keys to their capitalized forms used as metadata keys
-        String defaultMetadataValue = ''
 
         catalogueBuilder.build {
             dataModel('name': modelName) {
@@ -116,7 +102,7 @@ class UCLHExcelLoader extends ExcelLoader{
                 rowMaps.each { Map<String, String> rowMap ->
                     dataElement(name: getNTElementName(rowMap)) {
                         metadataHeaders.each {k, v ->
-                            ext v, (rowMap[k] ?: defaultMetadataValue)
+                            ext v, (rowMap[k] ?: defaultGMCMetadataValue)
                         }
                         ext 'represents', "${getMCIdFromSpreadSheet(rowMap)}"
                         //id('mcID1000')
