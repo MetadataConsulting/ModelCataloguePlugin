@@ -10,10 +10,10 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.dataimport.excel.ExcelLoaderSpec
+import org.modelcatalogue.core.dataimport.excel.gmcGrid.GMCGridReportXlsxExporter
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.FileOpener
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
-import org.modelcatalogue.nt.export.NTGridReportXlsxExporter
 import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
 import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
 import spock.lang.Shared
@@ -85,7 +85,7 @@ class UCLHExcelLoaderSpec extends ExcelLoaderSpec {
         excelLoader.addRelationshipsToModels(sourceDataModel, xmlAndDataModelNames.right)
 
 
-        NTGridReportXlsxExporter.create(sourceDataModel, dataClassService, grailsApplication, 5).export(tempFile.newOutputStream())
+        GMCGridReportXlsxExporter.create(sourceDataModel, dataClassService, grailsApplication, 5).export(tempFile.newOutputStream())
         FileOpener.open(tempFile)
 
         SpreadsheetCriteria query = PoiSpreadsheetQuery.FACTORY.forFile(tempFile)
