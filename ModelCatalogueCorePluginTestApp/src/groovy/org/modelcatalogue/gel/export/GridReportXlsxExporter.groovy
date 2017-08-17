@@ -92,8 +92,8 @@ class GridReportXlsxExporter  {
                 }
 
             }
-            sheetsAfterMainSheetExport().each{name, closure ->
-                sheet(name, closure)
+            sheetsAfterMainSheetExport().each{name, instructions ->
+                sheet(name, instructions)
             }
         }
 
