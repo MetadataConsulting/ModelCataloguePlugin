@@ -1074,7 +1074,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
     }
 
 
-    def "data models in paramters will create new data models"() {
+    def "data models in parameters will create new data models"() {
         final String parentDataClassName = 'Parent DMIP'
         final String childDataClassName = 'Child DMIP'
         final String modelOneName = 'Model #001'
@@ -1214,7 +1214,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
             grandChild.dataModel == dataModel
     }
 
-    def "when creating refrence data type don't create hierarchy"() {
+    def "when creating reference data type don't create hierarchy"() {
         given:
             build {
                 dataModel(name: DATA_MODEL_NO_HIERARCHY) {
