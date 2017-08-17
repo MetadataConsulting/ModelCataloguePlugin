@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.norththames
 
 import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.dataimport.excel.uclh.UCLHGridReportXlsxExporter
+import org.modelcatalogue.core.dataimport.excel.gmcGrid.GMCGridReportXlsxExporter
 import org.springframework.http.HttpStatus
 
 /**
@@ -31,7 +31,7 @@ class NorthThamesController {
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream outputStream ->
             // reload domain class as this is called in separate thread
-            UCLHGridReportXlsxExporter.create(DataModel.get(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
+            GMCGridReportXlsxExporter.create(DataModel.get(dataModelId), dataClassService, grailsApplication, depth).export(outputStream)
         }
 
         response.setHeader("X-Asset-ID", assetId.toString())
