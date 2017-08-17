@@ -57,10 +57,8 @@ import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportHeade
  * It does not delete anything.
  *
  * We will need to specify in the spreadsheet that this data element was previously found in this source system,
- * but now it is in this source system, so that we can delete the data element from where it was previously,
+ * but now it is in that source system, so that we can delete the data element from where it was previously,
  * and also create a new linking relationship to the new element in the new (draft) model.
- *
- * However, can we truly trust others to do things properly? They might forget to specify it.
  *
  * Created by james on 15/08/2017.
  */
@@ -71,6 +69,10 @@ class GMCGridReportExcelLoader extends ExcelLoader {
     GMCGridReportExcelLoader(ElementService elementService, DataModelService dataModelService) {
         this.elementService = elementService
         this.dataModelService = dataModelService
+    }
+    void updateFromWorkbook(Workbook workbook, int index=0) {
+        Patch patch = getPatchFromWorkbook(workbook, index)
+        patch.applyInstructionsAndMoves()
     }
 
     Patch getPatchFromWorkbook(Workbook workbook, int index=0) {
@@ -94,11 +96,12 @@ class GMCGridReportExcelLoader extends ExcelLoader {
         }
         List<Move> moves = []
         for (Map<String, String> rowMap: rowMaps) {
-            if (rowMap.get(Headers.previouslyInSourceSystem) !=
-                rowMap.get(Headers.previouslyInSourceSystem)) {
+            if (rowMap.get(Headers.sourceSystem) !=
+                rowMap.get(Headers.previouslyInSourceSystem)) { // if no change, these would be the same
                 moves << new Move(
                     gelDataElementMCID: rowMap.get(Headers.id) as Long,
                     // this may not be the MCID! It tries to be at first but it could also be latestVersionId...
+                    gelDataElementName: rowMap.get(Headers.dataElement),
                     placeholderName: rowMap.get(Headers.relatedTo),
                     movedFrom: getDraftModelFromName(rowMap.get(Headers.previouslyInSourceSystem)),
                     movedTo: getDraftModelFromName(rowMap.get(Headers.sourceSystem)))
@@ -109,10 +112,7 @@ class GMCGridReportExcelLoader extends ExcelLoader {
             moves: moves)
 
     }
-    void updateFromWorkbook(Workbook workbook, int index=0) {
-        Patch patch = getPatchFromWorkbook(workbook, index)
-        patch.applyInstructionsAndMoves()
-    }
+
 
     DataModel getDraftModelFromName(String name) {
         return DataModel.executeQuery(
@@ -138,13 +138,14 @@ class GMCGridReportExcelLoader extends ExcelLoader {
     @Immutable
     class Move {
         Long gelDataElementMCID
+        String gelDataElementName
         String placeholderName
         DataModel movedFrom
         DataModel movedTo
         void changeRelationshipsAndDeleteOld() {
             DataElement gelDataElement = DataElement.executeQuery(
-                'from DataElement d where d.modelCatalogueId=:mcID',
-                [mcID: gelDataElementMCID]
+                'from DataElement d where d.modelCatalogueId=:mcID and d.name=:name',
+                [mcID: gelDataElementMCID, name: gelDataElementName]
             )[0]
             //    DataElement.findByModelCatalogueId(gelDataElementMCID)
 
