@@ -98,11 +98,15 @@ class GMCGridReportExcelLoader extends ExcelLoader {
                 rowMap.get(Headers.previouslyInSourceSystem)) {
                 moves << new Move(
                     gelDataElementMCID: rowMap.get(Headers.id) as Long,
+                    // this may not be the MCID! It tries to be at first but it could also be latestVersionId...
                     placeholderName: rowMap.get(Headers.relatedTo),
                     movedFrom: getDraftModelFromName(rowMap.get(Headers.previouslyInSourceSystem)),
                     movedTo: getDraftModelFromName(rowMap.get(Headers.sourceSystem)))
             }
         }
+        return new Patch(
+            instructions: instructions,
+            moves: moves)
 
     }
     void updateFromWorkbook(Workbook workbook, int index=0) {
