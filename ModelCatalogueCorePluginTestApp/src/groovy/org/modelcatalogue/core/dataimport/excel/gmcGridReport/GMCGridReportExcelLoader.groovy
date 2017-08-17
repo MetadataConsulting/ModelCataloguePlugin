@@ -76,15 +76,23 @@ class GMCGridReportExcelLoader extends ExcelLoader {
     }
     List<String> ignoreRelatedTo = [GMCGridReportXlsxExporter.noSourceMessage,
                                     GMCGridReportXlsxExporter.multipleSourcesMessage]
+
     Patch getPatchFromWorkbook(Workbook workbook, int index=0) {
         Sheet sheet = workbook.getSheetAt(index)
         List<Map<String, String>> rowMaps = getRowMaps(sheet)
-        Map<String, List<Map<String, String>>> modelMaps = rowMaps.groupBy{it.get(Headers.sourceSystem)}
+        Map<String, List<Map<String, String>>> modelMap = rowMaps.groupBy{it.get(Headers.sourceSystem)}
         Closure instructions = {
-            modelMaps.each {String modelName, modelRowMaps ->
+            /**
+             * create models
+             */
+            modelMap.each {String modelName,
+                           List<Map<String,String>> rowMapsForModel ->
                 dataModel('name': modelName){
                     // ext 'http://www.modelcatalogue.org/metadata/#organization', 'UCL' // do we need this here? does metadata get carried forward in an update?
-                    modelRowMaps.each {Map<String, String> rowMap ->
+                    /**
+                     * create data elements within models
+                     */
+                    rowMapsForModel.each {Map<String, String> rowMap ->
                         String placeholderName = rowMap.get(Headers.relatedTo)
                         if (!ignoreRelatedTo.contains(placeholderName)) {
                             dataElement(name: placeholderName){
@@ -99,6 +107,32 @@ class GMCGridReportExcelLoader extends ExcelLoader {
 
             }
         }
+
+        return new Patch(
+            instructions: instructions,
+            rowMaps: rowMaps)
+
+    }
+
+
+
+    @Immutable
+    class Patch {
+        Closure instructions // instructions to DefaultCatalogueBuilder
+        List<Map<String, String>> rowMaps
+
+        void applyInstructionsAndMoves() {
+            DefaultCatalogueBuilder defaultCatalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
+            defaultCatalogueBuilder.build instructions
+            /** MUST create moves AFTER build instructions have been carried out
+             * to find the right draft models */
+            List<Move> moves = movesFromRowMaps(rowMaps)
+            for (Move move: moves) {
+                move.changeRelationshipsAndDeleteOld()
+            }
+        }
+    }
+    List<Move> movesFromRowMaps(List<Map<String, String>> rowMaps) {
         List<Move> moves = []
         for (Map<String, String> rowMap: rowMaps) {
             if (rowMap.get(Headers.sourceSystem) !=
@@ -112,13 +146,8 @@ class GMCGridReportExcelLoader extends ExcelLoader {
                     movedTo: getDraftModelFromName(rowMap.get(Headers.sourceSystem)))
             }
         }
-        return new Patch(
-            instructions: instructions,
-            moves: moves)
-
+        return moves
     }
-
-
     DataModel getDraftModelFromName(String name) {
         return DataModel.executeQuery(
             'from DataModel dm where dm.name=:name and status=:status',
@@ -126,19 +155,6 @@ class GMCGridReportExcelLoader extends ExcelLoader {
         )[0]
     }
 
-    @Immutable(copyWith=true)
-    class Patch {
-        Closure instructions // instructions to DefaultCatalogueBuilder
-        List<Move> moves
-        void applyInstructionsAndMoves() {
-            DefaultCatalogueBuilder defaultCatalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
-            defaultCatalogueBuilder.build instructions
-
-            for (Move move: moves) {
-                move.changeRelationshipsAndDeleteOld()
-            }
-        }
-    }
 
     @Immutable
     class Move {
