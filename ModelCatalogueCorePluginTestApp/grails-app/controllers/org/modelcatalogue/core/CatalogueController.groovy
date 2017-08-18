@@ -12,6 +12,8 @@ import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 import org.springframework.http.HttpStatus
 
+import javax.servlet.http.HttpServletResponse
+
 import static org.springframework.http.HttpStatus.UNAUTHORIZED
 
 
@@ -25,9 +27,6 @@ class CatalogueController {
     def executorService
 
 
-
-
-
     def xref() {
         CatalogueElement element = elementService.findByModelCatalogueId(CatalogueElement, request.forwardURI.replace('/export', ''))
 
@@ -36,7 +35,30 @@ class CatalogueController {
             return
         }
 
-        redirect controller: params.resource, action: 'show', id: element.id
+        if (params.format == 'xml') {
+
+            if(!modelCatalogueSecurityService.isSubscribed(getDataModel(element))){
+                response.sendError HttpServletResponse.SC_UNAUTHORIZED
+                return false
+            }
+
+            response.contentType = 'application/xml'
+            response.setHeader("Content-disposition", "attachment; filename=\"${element.name.replaceAll(/\s+/, '_')}.mc.xml\"")
+            CatalogueXmlPrinter printer = new CatalogueXmlPrinter(dataModelService, dataClassService)
+            printer.bind(element){
+                idIncludeVersion = true
+                if (params.full != 'true') {
+                    keepInside = element.instanceOf(DataModel) ? element : element.dataModel
+                }
+                if (params.repetitive == 'true') {
+                    repetitive = true
+                }
+            }.writeTo(response.writer)
+            return
+        }
+
+        redirect controller: params.resource, action: 'show', id: element.id, params: params
+
         return
     }
 

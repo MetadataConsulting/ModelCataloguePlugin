@@ -139,7 +139,6 @@ class UserAdminController extends grails.plugin.springsecurity.ui.UserController
         //only add if this is a general role i.e. it isn't specific to a data model
         //specific roles come later
         for (role in roles) {
-            String authority = role
             generalRoles[(role)] = false
             UserRole.findAllByUserAndRole(user, role).each{ UserRole userRole ->
                 if(!userRole.dataModel){
@@ -148,6 +147,8 @@ class UserAdminController extends grails.plugin.springsecurity.ui.UserController
             }
 
         }
+
+        def specificRoles = [Role.findByAuthority("ROLE_METADATA_CURATOR"), Role.findByAuthority("ROLE_USER")]
 
         //TODO: need to put this into the security service method
         //TODO: could create a groovy class to store this instead of HASHMAPS
@@ -164,7 +165,7 @@ class UserAdminController extends grails.plugin.springsecurity.ui.UserController
 
         //create a default list of roles that are applicable to each model,
         Map defaultRoleListForDataModel = [:]
-        roles.each{ role ->
+        specificRoles.each{ role ->
             // set as false i.e. the user doesn't have a role assigned to a model by default
             defaultRoleListForDataModel.put(role, false)
         }
@@ -222,7 +223,7 @@ class UserAdminController extends grails.plugin.springsecurity.ui.UserController
             }
         }
 
-        return [user: user, roleMap: generalRoles, userRoles: userRolesMap]
+        return [user: user, generalRoles: generalRoles, specificRoles: specificRoles, userRoles: userRolesMap]
 
     }
 

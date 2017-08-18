@@ -234,8 +234,6 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         //if this is a data model add this data model, otherwise add the data model of the class.
         if(this.instanceOf(DataModel) && currentUser) {
             modelCatalogueSecurityService.removeAllUserRoleModel(currentUser, this)
-        }else if(this.dataModel && currentUser){
-            modelCatalogueSecurityService.removeAllUserRoleModel(currentUser, this.dataModel)
         }
         auditService.logElementDeleted(this)
     }

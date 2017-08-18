@@ -8,7 +8,7 @@ import org.modelcatalogue.core.DataClassService
 class PrintContext {
 
     DataModelService dataModelService
-    DataClassService modelService
+    DataClassService dataClassService
 
     boolean idIncludeVersion
     boolean noHref
@@ -23,7 +23,7 @@ class PrintContext {
 
     PrintContext(DataModelService dataModelService, DataClassService modelService) {
         this.dataModelService = dataModelService
-        this.modelService = modelService
+        this.dataClassService = modelService
     }
 
     void markAsPrinted(CatalogueElement element) {

@@ -27,9 +27,6 @@ import static org.springframework.http.HttpStatus.OK
 
 class DataModelController<T extends CatalogueElement> extends AbstractCatalogueElementController<DataModel> {
 
-    DataClassService dataClassService
-    DataElementService dataElementService
-    DataTypeService dataTypeService
     SessionFactory sessionFactory
 
 	DataModelController() {
