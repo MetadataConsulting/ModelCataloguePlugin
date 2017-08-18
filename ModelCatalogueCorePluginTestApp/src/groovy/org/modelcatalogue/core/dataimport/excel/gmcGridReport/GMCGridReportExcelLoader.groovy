@@ -18,46 +18,17 @@ import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportXlsxE
  * Class for loading GMC (Genomic Medical Centre) Grid Reports.
  *
  * Should load excel files of the format exported by what is now called GMCGridReportXlsxExporter.
- * This format should eventually become the one format used by all 13 GMCs.
- * The UCLHGridReport links a source data model such as the Cancer Model with GMC models representing data sources.
- * Loading such a file consists of creating or updating the GMC models, and changing the link relationships appropriately.
+ * Loading such a file consists of updating the GMC models, and changing the link relationships appropriately.
  * Updating would involve finding the differences between what is said on file
  * (placeholder metadata may change;
  * a placeholder may move from one GMC model to another)
  * and the current GMC models.
  *
- * These GMC models should have draft status, such that they can be easily updated. But if they are finalized,
- * updating would involve creating a new version.
+ * The DefaultCatalogueBuilder will update changed metadata automatically if the data element stays in place.
+ * But it will create a new version of a model (with copies of the data elements) if a new data element appears there (as it would if we moved a data element).
+ * It also does not delete anything.
  *
- * TODO: step 1: load excel into an in-memory programmatic/object representation Rep.
- * TODO: step 1.5: determine if the GMC models are to be created or updated
- *
- * TODO: step 2C(reate): create GMC models from Rep.
- *
- * TODO: step 2U(pdate): find differences between the representation and the GMC models.
- * TODO: step 3U: create new versions if necessary
- * TODO: step 4U: apply changes to placeholder metadata
- * TODO: step 5U: move placeholders
- *
- * Obviously the best representation of models is the domain class... of Data Models.
- * This could be created by DefaultCatalogueBuilder. The thing is
- * we don't want to save them.
- *
- * External bits we will need:
- * A loader that returns DataModels (not saved)
- * Diff function,
- * Status checking,
- * New version creating,
- * updating methods.
- *
- * Or maybe the DefaultCatalogueBuilder just updates things automatically!? Wouldn't that be great.
- *
- * Well, the DefaultCatalogueBuilder will update changed metadata automatically if the data element stays in place.
- * But it will create a new version of a model if a new data element appears there (as it would if we moved a data element).
- * It does not delete anything.
- *
- * We will need to specify in the spreadsheet that this data element was previously found in this source system,
- * but now it is in that source system, so that we can delete the data element from where it was previously,
+ * If a data element moves from one source system to another, we will need to specify the previous system in the spreadsheet so that we can delete the data element from where it was previously,
  * and also create a new linking relationship to the new element in the new (draft) model.
  *
  * Created by james on 15/08/2017.

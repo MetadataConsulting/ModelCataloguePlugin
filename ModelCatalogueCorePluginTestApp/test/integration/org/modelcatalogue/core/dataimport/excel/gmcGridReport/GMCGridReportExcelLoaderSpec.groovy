@@ -110,9 +110,15 @@ class GMCGridReportExcelLoaderSpec extends ExcelLoaderSpec {
         then:
             noExceptionThrown()
 
+        when: "metadata changed"
+            new GMCGridReportExcelLoader(dataModelService, elementService).updateFromWorkbook(new HSSFWorkbook(getClass().getResourceAsStream('gmcGridReportTestUpdate2.xls')))
+            doGridReport(gelModel, 'tempGMCGridReportAfterLoadingUpdatedSpreadsheet2')
+        then:
+            noExceptionThrown()
+
     }
     void doGridReport(DataModel gelModel, String fileName) {
-        File tempFile = temporaryFolder.newFile("${fileName}${System.currentTimeMillis()}.xlsx")
+        File tempFile = temporaryFolder.newFile("${fileName}_${System.currentTimeMillis()}.xlsx")
 
         GMCGridReportXlsxExporter.create(gelModel,dataClassService, grailsApplication, 5, organization).export(tempFile.newOutputStream())
         FileOpener.open(tempFile)
