@@ -104,8 +104,7 @@ class GMCGridReportExcelLoaderSpec extends ExcelLoaderSpec {
         then:
             noExceptionThrown()
 
-        when: "data element placeholder moved"
-            GMCGridReportExcelLoader
+
 
     }
     void relateNamedElements(String el1, String el2) {
