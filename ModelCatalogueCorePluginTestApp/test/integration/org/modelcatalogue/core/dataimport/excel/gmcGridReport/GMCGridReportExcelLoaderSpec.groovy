@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.dataimport.excel.gmcGridReport
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.codehaus.groovy.grails.commons.GrailsApplication
@@ -96,17 +97,27 @@ class GMCGridReportExcelLoaderSpec extends ExcelLoaderSpec {
             relateNamedElements(de2Name, de2phName)
 
             DataModel gelModel = DataModel.findByName(gelModelName)
+            doGridReport(gelModel, 'tempGMCGridReportAfterInitialImport')
 
-            File tempFile = temporaryFolder.newFile("tempFile${System.currentTimeMillis()}.xlsx")
-
-            GMCGridReportXlsxExporter.create(gelModel,dataClassService, grailsApplication, 5, organization).export(tempFile.newOutputStream())
-            FileOpener.open(tempFile)
         then:
             noExceptionThrown()
 
+        when: "data element placeholder moved"
 
+            new GMCGridReportExcelLoader(dataModelService, elementService).updateFromWorkbook(new HSSFWorkbook(getClass().getResourceAsStream('gmcGridReportTestUpdate1.xls')))
+
+            doGridReport(gelModel, 'tempGMCGridReportAfterLoadingUpdatedSpreadsheet1')
+        then:
+            noExceptionThrown()
 
     }
+    void doGridReport(DataModel gelModel, String fileName) {
+        File tempFile = temporaryFolder.newFile("${fileName}${System.currentTimeMillis()}.xlsx")
+
+        GMCGridReportXlsxExporter.create(gelModel,dataClassService, grailsApplication, 5, organization).export(tempFile.newOutputStream())
+        FileOpener.open(tempFile)
+    }
+
     void relateNamedElements(String el1, String el2) {
         DataElement.findByName(el1).addToRelatedTo(DataElement.findByName(el2))
 

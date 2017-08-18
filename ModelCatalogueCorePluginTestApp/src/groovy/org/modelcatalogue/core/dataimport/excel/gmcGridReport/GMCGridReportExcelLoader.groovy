@@ -7,7 +7,6 @@ import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
-import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
@@ -134,9 +133,12 @@ class GMCGridReportExcelLoader extends ExcelLoader {
              * to find the right draft models */
             List<Move> moves = movesFromRowMaps(rowMaps)
             for (Move move: moves) {
-                move.changeRelationshipsAndDeleteOld()
+                move.deleteOldAndRelateToNew()
             }
         }
+    }
+    String beforeDot(String s) {
+        s.find(/(.*)\./){match, firstSection -> firstSection}
     }
     List<Move> movesFromRowMaps(List<Map<String, String>> rowMaps) {
         List<Move> moves = []
@@ -144,7 +146,7 @@ class GMCGridReportExcelLoader extends ExcelLoader {
             if (rowMap.get(Headers.sourceSystem) !=
                 rowMap.get(Headers.previouslyInSourceSystem)) { // if no change, these would be the same
                 moves << new Move(
-                    gelDataElementMCID: rowMap.get(Headers.id) as Long,
+                    gelDataElementMCID: (beforeDot(rowMap.get(Headers.id))),
                     // this may not be the MCID! It tries to be at first but it could also be latestVersionId...
                     gelDataElementName: rowMap.get(Headers.dataElement),
                     placeholderName: rowMap.get(Headers.relatedTo),
@@ -162,12 +164,12 @@ class GMCGridReportExcelLoader extends ExcelLoader {
     }
 
     class Move {
-        Long gelDataElementMCID
+        String gelDataElementMCID
         String gelDataElementName
         String placeholderName
         DataModel movedFrom
         DataModel movedTo
-        void changeRelationshipsAndDeleteOld() {
+        void deleteOldAndRelateToNew() {
             DataElement gelDataElement = DataElement.executeQuery(
                 'from DataElement d where d.modelCatalogueId=:mcID and d.name=:name',
                 [mcID: gelDataElementMCID, name: gelDataElementName]
@@ -178,18 +180,15 @@ class GMCGridReportExcelLoader extends ExcelLoader {
                 'from DataElement d where d.name=:name and d.dataModel=:dataModel',
                 [name: placeholderName, dataModel: movedFrom]
             )[0]
-            Relationship oldRelationship = Relationship.executeQuery(
-                'from Relationship r where r.source=:source and r.destination=:destination',
-                [source: gelDataElement, destination: oldPlaceholder]
-            )[0]
+            oldPlaceholder.deleteRelationships()
+            oldPlaceholder.delete(flush:true)
 
             DataElement newPlaceholder = DataElement.executeQuery(
                 'from DataElement d where d.name=:name and d.dataModel=:dataModel',
                 [name: placeholderName, dataModel: movedTo]
             )[0]
-            oldRelationship.setDestination(newPlaceholder)
-            oldRelationship.save(flush:true)
-            oldPlaceholder.delete(flush:true)
+            gelDataElement.addToRelatedTo(newPlaceholder)
+
 
 
         }
