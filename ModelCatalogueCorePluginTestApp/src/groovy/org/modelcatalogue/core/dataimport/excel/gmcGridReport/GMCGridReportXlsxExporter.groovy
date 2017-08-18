@@ -26,16 +26,16 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
      */
     Map systemsMap = [:]
     Map metadataCompletion = [:]
-    String hospital = ''
+    String organization = ''
 
-    static GMCGridReportXlsxExporter create(DataModel element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3, String hospital = 'UCL') {
-        return new GMCGridReportXlsxExporter(element, dataClassService, grailsApplication, depth, hospital)
+    static GMCGridReportXlsxExporter create(DataModel element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3, String organization = 'UCL') {
+        return new GMCGridReportXlsxExporter(element, dataClassService, grailsApplication, depth, organization)
     }
 
 
-    GMCGridReportXlsxExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3, String hospital = 'UCL') {
+    GMCGridReportXlsxExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3, String organization = 'UCL') {
         super(element, dataClassService, grailsApplication, depth)
-        this.hospital = hospital
+        this.organization = organization
 
     }
 
@@ -65,12 +65,13 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
 
     static String noSourceMessage = 'No source identified'
     static String multipleSourcesMessage = 'Multiple sources identified, please see entries in the online catalogue'
+    static String oneSourceNoMetadataMessage = 'Source identified, metadata not recorded'
 
     @Override
     void printDataElement(RowDefinition rowDefinition, Relationship dataElementRelationship, List outline = []) {
         DataElement dataElement = dataElementRelationship.destination
         List relatedTo  = []
-        relatedTo = dataElement.relatedTo.findAll{ it.dataModel.ext.get('http://www.modelcatalogue.org/metadata/#organization') == "UCL" }
+        relatedTo = dataElement.relatedTo.findAll{ it.dataModel.ext.get('http://www.modelcatalogue.org/metadata/#organization') == organization }
         addToSystemsMap(relatedTo, dataElement)
 
         rowDefinition.with {
@@ -345,7 +346,7 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
             }else{
                 score.put("total", total + 1)
                 metadataCompletion.put(metadata, score)
-                return 'Source identified, metadata not recorded'
+                return oneSourceNoMetadataMessage
             }
         }else if(relatedTo.size()>1){
 

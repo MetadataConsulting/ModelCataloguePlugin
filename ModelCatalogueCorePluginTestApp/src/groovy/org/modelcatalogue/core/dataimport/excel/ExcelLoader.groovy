@@ -32,7 +32,7 @@ class ExcelLoader {
      * @param List rowData
      * @return CatalogueElementDto
      */
-    protected Map<String, String> updateRowMap(Map<String,String> rowMap, Cell cell,  List<String> headers) {
+    static protected Map<String, String> updateRowMap(Map<String,String> rowMap, Cell cell,  List<String> headers) {
         def colIndex = cell.getColumnIndex()
         rowMap[headers[colIndex]] = valueHelper(cell)
         rowMap

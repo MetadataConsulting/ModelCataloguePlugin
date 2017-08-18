@@ -13,6 +13,7 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.apache.commons.lang.WordUtils
 import org.apache.commons.lang3.tuple.Pair
+import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportExcelLoader
 
 /**
  * Created by david on 04/08/2017.
@@ -70,7 +71,7 @@ class UCLHExcelLoader extends ExcelLoader{
                                                'Timely?', 'Comments'].collectEntries {
             header -> [(header), WordUtils.capitalizeFully(header).replaceAll(/\?/,'')]}  // map from header keys to their capitalized forms used as metadata keys
 
-    static String defaultGMCMetadataValue = ''
+    String defaultGMCMetadataValue = GMCGridReportExcelLoader.defaultGMCMetadataValue
     @Override
     Pair<String, List<String>> buildXmlFromWorkbookSheet(Workbook workbook, int index=0, String owner='') {
 
@@ -125,6 +126,4 @@ class UCLHExcelLoader extends ExcelLoader{
             }
         }
     }
-
-
 }

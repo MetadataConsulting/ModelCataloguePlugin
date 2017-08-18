@@ -12,6 +12,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportHeaders as Headers
+import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportXlsxExporter as Exporter
 
 
 /**
@@ -63,19 +64,20 @@ import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportHeade
  * Created by james on 15/08/2017.
  */
 class GMCGridReportExcelLoader extends ExcelLoader {
-    ElementService elementService = null
     DataModelService dataModelService = null
+    ElementService elementService = null
 
-    GMCGridReportExcelLoader(ElementService elementService, DataModelService dataModelService) {
-        this.elementService = elementService
+    GMCGridReportExcelLoader(DataModelService dataModelService, ElementService elementService) {
         this.dataModelService = dataModelService
+        this.elementService = elementService
     }
+    static String defaultGMCMetadataValue = ''
     void updateFromWorkbook(Workbook workbook, int index=0) {
         Patch patch = getPatchFromWorkbook(workbook, index)
         patch.applyInstructionsAndMoves()
     }
-    List<String> ignoreRelatedTo = [GMCGridReportXlsxExporter.noSourceMessage,
-                                    GMCGridReportXlsxExporter.multipleSourcesMessage]
+    List<String> ignoreRelatedTo = [Exporter.noSourceMessage,
+                                    Exporter.multipleSourcesMessage]
 
     Patch getPatchFromWorkbook(Workbook workbook, int index=0) {
         Sheet sheet = workbook.getSheetAt(index)
@@ -94,10 +96,14 @@ class GMCGridReportExcelLoader extends ExcelLoader {
                      */
                     rowMapsForModel.each {Map<String, String> rowMap ->
                         String placeholderName = rowMap.get(Headers.relatedTo)
-                        if (!ignoreRelatedTo.contains(placeholderName)) {
+                        if (!ignoreRelatedTo.contains(placeholderName)) { //only write the related to placeholder if the value is not one of the messages saying either no source or multiple sources
                             dataElement(name: placeholderName){
-                                GMCGridReportXlsxExporter.ntElementMetadataHeaders.each {
-                                    header -> ext header, (rowMap[header])
+                                Headers.ntElementMetadataHeaders.each {
+                                    header ->
+                                        String entry = rowMap[header]
+                                        ext header, (entry == Exporter.oneSourceNoMetadataMessage) ?
+                                            defaultGMCMetadataValue :
+                                            entry
                                 }
                                 // ext 'represents' "${getMCIdFromSpreadsheet(rowMap)}" // do we need this here?
                             }
@@ -155,8 +161,6 @@ class GMCGridReportExcelLoader extends ExcelLoader {
         )[0]
     }
 
-
-    @Immutable
     class Move {
         Long gelDataElementMCID
         String gelDataElementName
