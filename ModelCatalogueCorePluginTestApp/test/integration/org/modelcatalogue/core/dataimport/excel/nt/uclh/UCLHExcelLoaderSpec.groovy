@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.dataimport.excel.nt.uclh
 
 import org.apache.commons.lang3.tuple.Pair
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.custommonkey.xmlunit.XMLUnit
 import org.junit.Rule
@@ -9,6 +10,7 @@ import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
+import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.modelcatalogue.core.dataimport.excel.ExcelLoaderSpec
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.FileOpener
@@ -61,8 +63,10 @@ class UCLHExcelLoaderSpec extends ExcelLoaderSpec {
      * There are two relatedTo columns!!!
      */
     def "test expected output for UCLH #file"() {
+        setup:
+        Closure instructions = excelLoaderInstructionsAndModelNames(file).left
         expect:
-        similar excelLoaderXmlResult(file).left, getClass().getResourceAsStream('UCLHAriaTestExpected.xml').text
+        similar excelLoader.buildXmlFromInstructions(instructions), getClass().getResourceAsStream('UCLHAriaTestExpected.xml').text
         where:
         file << testFiles
 
@@ -80,9 +84,13 @@ class UCLHExcelLoaderSpec extends ExcelLoaderSpec {
         File tempFile = temporaryFolder.newFile("ntSummaryReport${System.currentTimeMillis()}.xlsx")
 
         when:
-        Pair<String, List<String>> xmlAndDataModelNames = excelLoaderXmlResult(file)
+        /*
+        Pair<String, List<String>> xmlAndDataModelNames = excelLoaderXmlResult(file, 0)
         catalogueXmlLoader.load(new ByteArrayInputStream(xmlAndDataModelNames.left.getBytes(StandardCharsets.UTF_8))) // load XML from Excel into catalogue
-        excelLoader.addRelationshipsToModels(sourceDataModel, xmlAndDataModelNames.right)
+        */
+        Pair<Closure, List<String>> instructionsAndDataModelNames = excelLoaderInstructionsAndModelNames(file)
+        excelLoader.buildModelFromInstructions(defaultCatalogueBuilder, instructionsAndDataModelNames.left)
+        excelLoader.addRelationshipsToModels(sourceDataModel, instructionsAndDataModelNames.right)
 
 
         NTGridReportXlsxExporter.create(sourceDataModel, dataClassService, grailsApplication, 5).export(tempFile.newOutputStream())
@@ -95,6 +103,7 @@ class UCLHExcelLoaderSpec extends ExcelLoaderSpec {
         where:
         file << testFiles
     }
+
 
 
 

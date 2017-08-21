@@ -22,7 +22,7 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
         XMLUnit.ignoreComments = true
         XMLUnit.ignoreAttributeOrder = true
         stringWriter = new StringWriter()
-        //builder = new XmlCatalogueBuilder(stringWriter, true)
+        builder = new XmlCatalogueBuilder(stringWriter, true)
         excelLoader = new ExcelLoader()
     }
 
@@ -49,12 +49,12 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
     }
 
 
-    Pair<String, List<String>> excelLoaderXmlResult(String sampleFile, int index=0) {
-        excelLoader.buildXmlFromWorkbookSheet(
+    Pair<Closure, List<String>> excelLoaderInstructionsAndModelNames(String sampleFile, String sheetName = 'Data items') {
+        excelLoader.buildInstructionsAndModelNamesFromWorkbookSheet(
              new XSSFWorkbook(
             getClass().getResourceAsStream(sampleFile)),
-            builder,
-            index,
+            //builder,
+            sheetName,
             ExcelLoader.getOwnerFromFileName(sampleFile, '_nt_rawimport')
             )
     }

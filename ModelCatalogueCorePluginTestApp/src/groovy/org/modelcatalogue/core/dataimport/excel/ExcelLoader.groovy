@@ -6,6 +6,7 @@ import org.apache.poi.ss.usermodel.Row
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
 import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 
 /**
  * This used to be a class for one purpose ("importData", now called "buildXmlFromStandardWorkbookSheet"), but now we have made it a parent class of
@@ -33,18 +34,27 @@ class ExcelLoader {
      * @return CatalogueElementDto
      */
     protected Map<String, String> updateRowMap(Map<String,String> rowMap, Cell cell,  List<String> headers) {
-        def colIndex = cell.getColumnIndex()
+        int colIndex = cell.getColumnIndex()
         rowMap[headers[colIndex]] = valueHelper(cell)
         rowMap
     }
 
 	static List<String> getRowData(Row row) {
-		def data = []
-		for (Cell cell : row) {
-			getValue(cell, data)
-		}
+        List<String> data = []
+            for (Cell cell : row) {
+                getValue(cell, data)
+            }
 		data
 	}
+
+    static boolean isRowEmpty(Row row) {
+        for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
+            Cell cell = row.getCell(c)
+            if (cell != null && cell.getCellType() != Cell.CELL_TYPE_BLANK)
+                return false
+        }
+        return true
+    }
 
 	static void getValue(Cell cell, List<String> data) {
 		def colIndex = cell.getColumnIndex()
@@ -68,6 +78,12 @@ class ExcelLoader {
         return ""
     }
 	private static final QUOTED_CHARS = ["\\": "&#92;", ":" : "&#58;", "|" : "&#124;", "%" : "&#37;"]
+
+    /**
+     *
+     *
+     */
+    Pair<Closure, List<String>> buildInstructionsAndModelNamesFromWorkbookSheet(Workbook workbook, String sheetName, String owner='') {}
     /**
      * In the future other ExcelLoaders which inherit from this one will override this method and not the "standard" one.
      * @param headers
@@ -75,9 +91,13 @@ class ExcelLoader {
      * @param catalogueBuilder
      * @param index
      */
-
-    Pair<String, List<String>> buildXmlFromWorkbookSheet(Workbook workbook, CatalogueBuilder catalogueBuilder, int index=0, String owner='') {}
-
+    String buildXmlFromInstructions(Closure buildInstructions= {}) {}
+    /**
+     *
+     * @param defaultCatalogueBuilder
+     * @param buildInstructions
+     */
+    void buildModelFromInstructions(DefaultCatalogueBuilder defaultCatalogueBuilder, Closure buildInstructions = {}) {}
     /**
      * Add relationships from sourceDataModel to models with destinationModelNames
      * via some metadata in the destination model elements that indicates which source element to relate
@@ -105,17 +125,16 @@ class ExcelLoader {
 		Sheet sheet = workbook.getSheetAt(index);
 
 		Iterator<Row> rowIt = sheet.rowIterator()
+        //isRowEmpty(Row row)
 		List<String> headers = getRowData(rowIt.next())
 
 		List<List<String>> rowDataLists = []
 		while(rowIt.hasNext()) {
-			List<String> rowDataList =getRowData(rowIt.next())
-
-			/*boolean canBeInserted = rowDataList.inject(true) {acc, entry ->
-                acc && (entry != null) && (entry != '')
+            Row row = rowIt.next()
+            if(!isRowEmpty(row)){
+                List<String> rowDataList =getRowData(rowIt.next())
+                rowDataLists << rowDataList
             }
-			if(canBeInserted)*/
-            rowDataLists << rowDataList
 		}
 		//get indexes of the appropriate sections
 		def dataItemNameIndex = headers.indexOf(headersMap.get('dataElementName'))
