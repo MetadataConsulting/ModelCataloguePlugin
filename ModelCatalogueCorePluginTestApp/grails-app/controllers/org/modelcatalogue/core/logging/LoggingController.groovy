@@ -12,7 +12,7 @@ class LoggingController {
     LoggingService loggingService
 
     def logsToAssets() {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
+        if (!modelCatalogueSecurityService.hasRole('SUPERVISOR')) {
             render status: HttpStatus.UNAUTHORIZED
             return
         }

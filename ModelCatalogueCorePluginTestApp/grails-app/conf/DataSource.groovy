@@ -28,7 +28,6 @@ environments {
                 jdbcInterceptors="ConnectionState"
             }
         }
-
     }
     test {
         if (System.getenv('DOCKERIZED_TESTS') && System.properties["grails.test.phase"] == 'functional') {

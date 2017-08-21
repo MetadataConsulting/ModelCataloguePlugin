@@ -8,6 +8,8 @@ import org.hibernate.StaleStateException
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.policy.VerificationPhase
 import org.modelcatalogue.core.publishing.DraftContext
+import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.security.UserRole
 import org.modelcatalogue.core.util.lists.ListWithTotalAndType
 import org.modelcatalogue.core.util.lists.Lists
 import org.springframework.dao.ConcurrencyFailureException
@@ -223,7 +225,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
-        if (!modelCatalogueSecurityService.hasRole('SUPERVISOR')) {
+        if (!modelCatalogueSecurityService.hasRole('SUPERVISOR', getDataModel())) {
             // only drafts can be deleted
             def error = "Only elements with status of DRAFT can be deleted."
             if (instance instanceof DataModel) {
@@ -306,7 +308,10 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
      * @return Returns true if user role is CURATOR, false otherwise.
      */
     protected boolean allowSaveAndEdit() {
-        modelCatalogueSecurityService.hasRole('CURATOR')
+        //if the user is a "general" curator they can create data models
+//        if(resource == DataModel) return modelCatalogueSecurityService.hasRole('CURATOR')
+        //but if they are trying to create something within the context of a data model they must have curator access to the specific model (not just general curator access)
+        modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())
     }
 
     /**
@@ -314,7 +319,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
      * @return Returns true if user role is ADMIN, false otherwise.
      */
     protected boolean allowDelete() {
-        modelCatalogueSecurityService.hasRole('CURATOR')
+        modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())
     }
 
     protected boolean isFavoriteAfterUpdate() {
@@ -430,4 +435,21 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     protected void methodNotAllowed() { render status: METHOD_NOT_ALLOWED }
 
     protected void notAcceptable() { render status: NOT_ACCEPTABLE }
+
+//TODO: REMOVE PUT INTO SERVICE AND CLASSES
+    protected DataModel getDataModel(){
+        DataModel dataModel
+        if(resource!=DataModel && resource && params?.id){
+            dataModel = (resource.get(params.id)?.dataModel)
+        }else if(resource == DataModel && params?.id){
+            dataModel = (resource.get(params.id))
+        }else if(getObjectToBind()?.dataModels){
+            dataModel = DataModel.get(getObjectToBind().dataModels.first()?.id)
+        }else if(params?.dataModel){
+            dataModel = DataModel.get(params.dataModel)
+        }
+        dataModel
+    }
+
+
 }

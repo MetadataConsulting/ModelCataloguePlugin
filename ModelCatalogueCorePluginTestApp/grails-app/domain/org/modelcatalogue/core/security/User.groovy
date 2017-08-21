@@ -8,8 +8,6 @@ import org.modelcatalogue.core.publishing.PublishingContext
 
 class User extends CatalogueElement {
 
-    transient modelCatalogueSecurityService
-
     String username
     String password
     String email

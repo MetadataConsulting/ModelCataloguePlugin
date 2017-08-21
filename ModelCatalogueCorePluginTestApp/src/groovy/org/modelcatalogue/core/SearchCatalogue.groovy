@@ -15,6 +15,7 @@ public interface SearchCatalogue {
     Observable<Boolean> unindex(Object object)
     Observable<Boolean> unindex(Collection<Object> object)
     Observable<Boolean> reindex(boolean soft)
+    void deleteIndexes()
 
     boolean isIndexingManually()
 

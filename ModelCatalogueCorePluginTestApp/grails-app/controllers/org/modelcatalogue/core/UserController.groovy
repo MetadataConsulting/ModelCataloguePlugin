@@ -16,12 +16,19 @@ class UserController extends AbstractCatalogueElementController<User> {
         super(User, false)
     }
 
+
     /**
      * Shows a single resource
      * @param id The id of the resource
      * @return The rendered resource or a 404 if it doesn't exist
      */
     def show() {
+
+        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
+            notFound()
+            return
+        }
+
         User element = queryForResource(params.id)
 
         if (!element) {
@@ -34,7 +41,7 @@ class UserController extends AbstractCatalogueElementController<User> {
 
     @Override
     protected boolean allowSaveAndEdit() {
-        modelCatalogueSecurityService.hasRole('ADMIN')
+        modelCatalogueSecurityService.hasRole('SUPERVISOR')
     }
 
     def classifications() {
@@ -59,7 +66,7 @@ class UserController extends AbstractCatalogueElementController<User> {
         render([
                 success: true,
                 username: modelCatalogueSecurityService.currentUser.username,
-                roles: modelCatalogueSecurityService.currentUser.authorities*.authority,
+                roles: modelCatalogueSecurityService.getRoles(params?.dataModelId),
                 id: modelCatalogueSecurityService.currentUser.hasProperty('id') ? modelCatalogueSecurityService.currentUser.id : null,
                 dataModels: filter.toMap()
         ] as JSON)
@@ -74,11 +81,11 @@ class UserController extends AbstractCatalogueElementController<User> {
     }
 
     def addFavourite(Long id) {
-        addRelation(id, 'favourite', true, null)
+        addRelation(id, 'favourite', true)
     }
 
     def removeFavourite(Long id) {
-        removeRelation(id, 'favourite', true, null)
+        removeRelation(id, 'favourite', true)
     }
 
     def enable() {
@@ -113,6 +120,7 @@ class UserController extends AbstractCatalogueElementController<User> {
         respond user
     }
 
+
     def apiKey(Boolean regenerate) {
         if (!modelCatalogueSecurityService.isUserLoggedIn()) {
             notFound()
@@ -123,7 +131,7 @@ class UserController extends AbstractCatalogueElementController<User> {
     }
 
     private switchEnabled(boolean enabled) {
-        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
+        if (!modelCatalogueSecurityService.hasRole('SUPERVISOR')) {
             notFound()
             return
         }

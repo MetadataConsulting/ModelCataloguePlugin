@@ -18,6 +18,7 @@ import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.publishing.PublishingContext
+import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.util.ElasticMatchResult
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.HibernateHelper
@@ -43,26 +44,23 @@ class ElementService implements Publisher<CatalogueElement> {
     def sessionFactory
     def elasticSearchService
 
-    public static Long MATCH_SCORE_LEVEL_75 = 75
-    public static Long MATCH_SCORE_LEVEL_CLOSE = 95
-    public static Long MATCH_SCORE_LEVEL_EXACT = 100
 
-
-    List<CatalogueElement> list(Map params = [:]) {
-        CatalogueElement.findAllByStatusInList(getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')), params)
-    }
-
-    public <E extends CatalogueElement> List<E> list(params = [:], Class<E> resource) {
-        resource.findAllByStatusInList(getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')), params)
-    }
-
-    Long count(params = [:]) {
-        CatalogueElement.countByStatusInList(getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')))
-    }
-
-    public <E extends CatalogueElement> Long count(params = [:], Class<E> resource) {
-        resource.countByStatusInList(getStatusFromParams(params, modelCatalogueSecurityService.hasRole('VIEWER')))
-    }
+//    NONE OF THESE ARE USED OR IMPLEMENTED - Commenting them out - will remove
+//    List<CatalogueElement> list(Map params = [:]) {
+//        CatalogueElement.findAllByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/), params)
+//    }
+//
+//    public <E extends CatalogueElement> List<E> list(params = [:], Class<E> resource) {
+//        resource.findAllByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/), params)
+//    }
+//
+//    Long count(params = [:]) {
+//        CatalogueElement.countByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/))
+//    }
+//
+//    public <E extends CatalogueElement> Long count(params = [:], Class<E> resource) {
+//        resource.countByStatusInList(getStatusFromParams(params, false /*modelCatalogueSecurityService.hasRole('VIEWER')*/))
+//    }
 
     public DataModel createDraftVersion(DataModel dataModel, String newSemanticVersion, DraftContext context) {
         dataModel.checkNewSemanticVersion(newSemanticVersion)
@@ -84,6 +82,9 @@ class ElementService implements Publisher<CatalogueElement> {
 
                 // TODO: better target the changes
                 CacheService.VERSION_COUNT_CACHE.invalidateAll()
+
+                //add all the userRoles from the old version to the new version
+                modelCatalogueSecurityService.copyUserRoles(dataModel, draft)
 
                 return draft
             }

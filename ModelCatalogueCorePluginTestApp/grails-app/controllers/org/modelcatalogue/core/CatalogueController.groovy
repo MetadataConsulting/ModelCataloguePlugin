@@ -2,16 +2,18 @@ package org.modelcatalogue.core
 
 import grails.converters.JSON
 import grails.gorm.DetachedCriteria
-import grails.util.Environment
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.cache.CacheService
-import org.modelcatalogue.core.security.UserService
+import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.HibernateHelper
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.core.util.builder.ProgressMonitor
 import org.modelcatalogue.core.util.lists.Lists
 import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 import org.springframework.http.HttpStatus
+
+import static org.springframework.http.HttpStatus.UNAUTHORIZED
+
 
 class CatalogueController {
 
@@ -22,6 +24,10 @@ class CatalogueController {
     def modelCatalogueSecurityService
     def executorService
 
+
+
+
+
     def xref() {
         CatalogueElement element = elementService.findByModelCatalogueId(CatalogueElement, request.forwardURI.replace('/export', ''))
 
@@ -30,23 +36,8 @@ class CatalogueController {
             return
         }
 
-        if (params.format == 'xml') {
-            response.contentType = 'application/xml'
-            response.setHeader("Content-disposition", "attachment; filename=\"${element.name.replaceAll(/\s+/, '_')}.mc.xml\"")
-            CatalogueXmlPrinter printer = new CatalogueXmlPrinter(dataModelService, dataClassService)
-            printer.bind(element){
-                idIncludeVersion = true
-                if (params.full != 'true') {
-                    keepInside = element.instanceOf(DataModel) ? element : element.dataModel
-                }
-                if (params.repetitive == 'true') {
-                    repetitive = true
-                }
-            }.writeTo(response.writer)
-            return
-        }
-
         redirect controller: params.resource, action: 'show', id: element.id
+        return
     }
 
     def ext() {
@@ -88,6 +79,7 @@ class CatalogueController {
         }
 
         redirect url: "${grailsApplication.config.grails.serverURL}/catalogue/${GrailsNameUtils.getPropertyName(HibernateHelper.getEntityClass(element))}/${element.id}"
+        return
     }
 
 
@@ -104,11 +96,13 @@ class CatalogueController {
         }, {
             CacheService.MONITORS_CACHE.size()
         }) as JSON)
+
     }
 
+    //TODO: Remove/find out why this is needed
     def dataModelsForPreload() {
         // only render data models for preload if there is no data model in the catalogue (very likely the first run)
-        if (DataModel.findByNameNotEqual('Clinical Tags') || !modelCatalogueSecurityService.hasRole(UserService.ROLE_ADMIN)) {
+        if (DataModel.findByNameNotEqual('Clinical Tags') /*|| !modelCatalogueSecurityService.hasRole(UserService.ROLE_ADMIN)*/) {
             render([] as JSON)
             return
 
@@ -139,5 +133,13 @@ class CatalogueController {
 
         render([id: logId] as JSON)
     }
+
+
+
+    protected DataModel getDataModel(CatalogueElement ce){
+        if(ce instanceof DataModel) return ce
+        return ce.dataModel
+    }
+
 
 }

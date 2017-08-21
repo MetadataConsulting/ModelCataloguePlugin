@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.security
 
 import org.apache.commons.lang.builder.HashCodeBuilder
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.util.FriendlyErrors
 
 class UserRole implements Serializable {
@@ -9,6 +10,11 @@ class UserRole implements Serializable {
 
     User user
     Role role
+    DataModel dataModel
+
+    static constraints = {
+        dataModel nullable: true
+    }
 
     boolean equals(other) {
         if (!(other instanceof UserRole)) {
@@ -50,6 +56,25 @@ class UserRole implements Serializable {
         new UserRole(user: user, role: role).save(flush: flush, insert: true)
     }
 
+    static UserRole create(User user, Role role, DataModel dataModel, boolean flush = false) {
+        if (!user.readyForQueries) {
+            if (!user.name) {
+                user.name = user.username
+            }
+            FriendlyErrors.failFriendlySave(user)
+        }
+        for (OAuthID authID in user.oAuthIDs) {
+            if (!authID.getId()) {
+                FriendlyErrors.failFriendlySave(authID)
+            }
+        }
+        UserRole existing = findByUserAndRoleAndDataModel(user, role, dataModel)
+        if (existing) {
+            return existing
+        }
+        new UserRole(user: user, role: role, dataModel: dataModel).save(flush: flush, insert: true)
+    }
+
     static boolean remove(User user, Role role, boolean flush = false) {
         UserRole instance = findByUserAndRole(user, role)
         if (!instance) {
@@ -60,6 +85,17 @@ class UserRole implements Serializable {
         true
     }
 
+    static boolean remove(User user, Role role, DataModel dataModel, boolean flush = false) {
+        UserRole instance = findByUserAndRoleAndDataModel(user, role, dataModel)
+        if (!instance) {
+            return false
+        }
+
+        instance.delete(flush: flush)
+        true
+    }
+
+
     static void removeAll(User user) {
         executeUpdate 'DELETE FROM UserRole WHERE user=:user', [user: user]
     }
@@ -69,7 +105,6 @@ class UserRole implements Serializable {
     }
 
     static mapping = {
-        id composite: ['role', 'user']
         version false
     }
 }

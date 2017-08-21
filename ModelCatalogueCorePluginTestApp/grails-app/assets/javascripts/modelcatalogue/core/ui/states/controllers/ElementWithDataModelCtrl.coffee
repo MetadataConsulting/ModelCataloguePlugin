@@ -7,5 +7,5 @@ angular.module('mc.core.ui.states.controllers.ElementWithDataModelCtrl', ['ui.ro
   '$scope', 'element', 'currentDataModel',
   ($scope ,  element ,  currentDataModel) ->
     $scope.element = element
-    $scope.currentDataModel = currentDataModel
+
 ])

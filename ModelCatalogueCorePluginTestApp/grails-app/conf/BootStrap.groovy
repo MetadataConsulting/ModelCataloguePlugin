@@ -63,9 +63,11 @@ class BootStrap {
             initPoliciesAndTags()
             initSecurity(!System.getenv('MC_BLANK_DEV'))
         }
+
         println 'completed:initCatalogueService'
         log.info "completed:initCatalogueService"
         //modelCatalogueSearchService.reindex(true)
+
 
         initCatalogueService.setupStoredProcedures()
         println 'completed:setupStoredProcedures'
@@ -430,9 +432,9 @@ class BootStrap {
         createRequestmapIfMissing('/api/modelCatalogue/core/user/*/favourite', 'isAuthenticated()',HttpMethod.POST) // favourite item
         createRequestmapIfMissing('/api/modelCatalogue/core/user/apikey',    'isAuthenticated()',HttpMethod.POST) // get or create new api key
         createRequestmapIfMissing('/api/modelCatalogue/core/user/*/favourite', 'isAuthenticated()',HttpMethod.DELETE) // unfavourite item
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'ROLE_METADATA_CURATOR',         HttpMethod.POST)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'ROLE_METADATA_CURATOR',         HttpMethod.PUT)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'ROLE_METADATA_CURATOR',         HttpMethod.DELETE)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',         HttpMethod.POST)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',         HttpMethod.PUT)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/**',          'isAuthenticated()',         HttpMethod.DELETE)
         createRequestmapIfMissing('/api/modelCatalogue/core/asset/*/validateXML',  'isAuthenticated()',   HttpMethod.POST) // validate xml
 
         createRequestmapIfMissing('/sso/*/**',                              'isAuthenticated()',   HttpMethod.GET)
@@ -456,7 +458,9 @@ class BootStrap {
 
    //create some test models etc. for dev
    //TODO: remove this and replace with a functional test
+
         final def var1 = log.info("completed:initSecurity")
+
 
 
     }

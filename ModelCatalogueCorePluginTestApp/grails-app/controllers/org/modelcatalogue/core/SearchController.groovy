@@ -34,7 +34,7 @@ class SearchController extends AbstractRestfulController<CatalogueElement> {
      * @return
      */
     def reindex() {
-        if (!modelCatalogueSecurityService.hasRole("ADMIN")) {
+        if (!modelCatalogueSecurityService.hasRole("ADMIN", getDataModel())) {
             unauthorized()
             return
         }

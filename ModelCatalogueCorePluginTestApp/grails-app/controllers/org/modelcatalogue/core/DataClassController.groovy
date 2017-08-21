@@ -86,6 +86,15 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
     }
 
     def inventoryDoc(String name, Integer depth) {
+
+        if (!allowSaveAndEdit()) {
+            unauthorized()
+            return
+        }
+        if (handleReadOnly()) {
+            return
+        }
+
         DataClass dataClass = DataClass.get(params.id)
         def assetId =  assetService.storeReportAsAsset(
                 dataClass.dataModel,
@@ -101,6 +110,15 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
     }
 
     def inventorySpreadsheet(String name, Integer depth) {
+
+        if (!allowSaveAndEdit()) {
+            unauthorized()
+            return
+        }
+        if (handleReadOnly()) {
+            return
+        }
+
         DataClass dataClass = DataClass.get(params.id)
 
         Long dataClassId = dataClass.id
@@ -118,6 +136,15 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
     }
 
     def changelogDoc(String name, Integer depth, Boolean includeMetadata) {
+
+        if (!allowSaveAndEdit()) {
+            unauthorized()
+            return
+        }
+        if (handleReadOnly()) {
+            return
+        }
+
         DataClass dataClass = DataClass.get(params.id)
 
         Long dataClassId = dataClass.id

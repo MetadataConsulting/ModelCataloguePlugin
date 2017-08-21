@@ -52,7 +52,7 @@ class DataImportController  {
     }
 
     def upload() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+        if (!modelCatalogueSecurityService.hasRole('SUPERVISOR')) {
             render status: HttpStatus.UNAUTHORIZED
             return
         }
@@ -294,6 +294,7 @@ class DataImportController  {
             auditService.logExternalChange(Asset.get(assetId), userId, message, code)
         }
     }
+
 
     protected String getOwnerFromFileName(String sampleFile){
         sampleFile.find(/(.*)_nt_rawimport.*/){match,firstcapture ->

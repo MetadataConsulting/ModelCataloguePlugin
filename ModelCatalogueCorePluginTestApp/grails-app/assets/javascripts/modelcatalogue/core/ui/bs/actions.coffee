@@ -61,6 +61,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
 
       return undefined if not elementPresent
       return undefined if not security.getCurrentUser()?.id
+      return undefined if $scope.element.classifiedName=="Not authorised to view details"
 
       action =
         position: -20000
@@ -304,6 +305,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config (actionsP
       if $scope.element
         return undefined if not angular.isFunction $scope.element.isInstanceOf
         return undefined if $scope.element.isInstanceOf('asset')
+        return undefined if $scope.element.classifiedName=="Not authorised to view details"
       {
         position: 100000
         label: 'Export'
