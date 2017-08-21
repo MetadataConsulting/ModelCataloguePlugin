@@ -282,7 +282,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             return
         }
 
-        DataModelFilter filter = DataModelFilter.includes(dataModel).withImports()
+        DataModelFilter filter = DataModelFilter.includes(dataModel).withImports(modelCatalogueSecurityService.getSubscribed())
 
 
         if (filter.isIncluding(other.dataModel)) {
