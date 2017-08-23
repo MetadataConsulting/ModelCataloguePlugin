@@ -38,10 +38,12 @@ class GMCGridReportExcelLoaderSpec extends ExcelLoaderSpec {
 
     @Shared DefaultCatalogueBuilder defaultCatalogueBuilder
     @Rule TemporaryFolder temporaryFolder = new TemporaryFolder()
+    @Shared GMCGridReportExcelLoader gmcGridReportExcelLoader
 
     def setupSpec() {
         initRelationshipTypes()
         defaultCatalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
+        gmcGridReportExcelLoader = new GMCGridReportExcelLoader(dataModelService, elementService)
     }
 
     static String gelModelName = 'GELModel'
@@ -53,7 +55,7 @@ class GMCGridReportExcelLoaderSpec extends ExcelLoaderSpec {
     static String de1phName = 'DE1_ph'
     static String de2phName = 'DE2_ph'
     static Closure testUpdateInitialModelsInstructions = {
-        dataModel(name:gelModelName) {
+        dataModel(name:gelModelName) { // gelModel must have at least two data sources
             dataClass(name:'DC1'){
                 dataClass(name: 'DC2'){
                     dataElement(name:de1Name, id:1)
@@ -69,30 +71,16 @@ class GMCGridReportExcelLoaderSpec extends ExcelLoaderSpec {
         }
         dataModel(name:dataSource2Name) {
             ext 'http://www.modelcatalogue.org/metadata/#organization', organization
-            dataElement(name:de2phName)
-        }
-    } as Closure
-
-    static Closure testUpdateModelsUpdate1Instructions = {
-        dataModel(name:dataSource2Name) {
-            dataElement(name:de1phName) {
-                ext 'EXT1', 'EXTVAL1'
+            dataElement(name:de2phName) {
+                ext Headers.semanticMatching, 'yes' // initial data element placeholders MUST have metadata.
             }
         }
     } as Closure
 
-    static Closure testUpdateModelsUpdate2Instructions = {
-        dataModel(name:dataSource1Name){
-            dataElement(name:de1phName){
-                ext 'EXT1', 'EXTVAL2'
-                ext 'EXT2', 'EXTVAL3'
-            }
-        }
-    } as Closure
 
     def "test update"() {
         when: "initial models in"
-            defaultCatalogueBuilder.build testUpdateInitialModelsInstructions
+            gmcGridReportExcelLoader.defaultCatalogueBuilder.build testUpdateInitialModelsInstructions
             relateNamedElements(de1Name, de1phName)
             relateNamedElements(de2Name, de2phName)
 
@@ -104,15 +92,18 @@ class GMCGridReportExcelLoaderSpec extends ExcelLoaderSpec {
 
         when: "data element placeholder moved"
 
-            new GMCGridReportExcelLoader(dataModelService, elementService).updateFromWorkbook(new HSSFWorkbook(getClass().getResourceAsStream('gmcGridReportTestUpdate1.xls')))
+            gmcGridReportExcelLoader.updateFromWorkbook(new HSSFWorkbook(getClass().getResourceAsStream('gmcGridReportTestUpdate1.xls')))
 
             doGridReport(gelModel, 'tempGMCGridReportAfterLoadingUpdatedSpreadsheet1')
         then:
             noExceptionThrown()
 
         when: "metadata changed"
-            new GMCGridReportExcelLoader(dataModelService, elementService).updateFromWorkbook(new HSSFWorkbook(getClass().getResourceAsStream('gmcGridReportTestUpdate2.xls')))
+            gmcGridReportExcelLoader.updateFromWorkbook(new HSSFWorkbook(getClass().getResourceAsStream('gmcGridReportTestUpdate2.xls')))
             doGridReport(gelModel, 'tempGMCGridReportAfterLoadingUpdatedSpreadsheet2')
+        /**
+         * OK so this is not really working. TestUpdate2 would change the metadata on DE2 placeholder but it does not relink things properly.
+         */
         then:
             noExceptionThrown()
 

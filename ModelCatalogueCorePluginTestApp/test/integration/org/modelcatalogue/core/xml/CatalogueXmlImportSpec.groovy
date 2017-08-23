@@ -59,7 +59,38 @@ class CatalogueXmlImportSpec extends AbstractIntegrationSpec {
         grandChild
         grandChild.dataModel == dataModel
     }
+    def "test update an initial model/data element with no metadata"() {
+        when:
+            catalogueXmlLoader.load(inputStreamFromString(xmlFromInstructions {
+                dataModel(name:'DM3'){
+                    dataElement(name:'DE3') {
+                        ext 'EXT1', 'EXTVAL1' //test passed with this!
+                    }
+                }
+            }
+            ))
+            catalogueXmlLoader.load(inputStreamFromString(xmlFromInstructions {
+                dataModel(name:'DM3'){
+                    dataElement(name:'DE3') {
+                        ext 'EXT1', 'EXTVAL2'
+                    }
+                }
+            }
+            ))
+        then:
+            /**
+             * After update, a new DM3 was created, with a new DE3 which has metadata, whereas the first had none at all.
+             */
+            List<DataModel> dataModelDM3s = DataModel.findAllByName('DM3')
+            assert dataModelDM3s.size() == 2
+            assert dataModelDM3s[0].status == ElementStatus.DEPRECATED
 
+            DataModel dataModelDM3Current = dataModelDM3s[1]
+            assert dataModelDM3Current.status == ElementStatus.DRAFT
+
+            dataElementFromDataModel('DE3', dataModelDM3Current).ext.get('EXT1') == 'EXTVAL2'
+
+    }
     static Closure testUpdateInitialModelsInstructions = {
         dataModel(name:'DM1'){
             dataElement(name:'DE1'){
@@ -88,6 +119,14 @@ class CatalogueXmlImportSpec extends AbstractIntegrationSpec {
                 ext 'EXT2', 'EXTVAL3'
             }
         }
+
+/*
+        dataModel(name:'DM2') {
+            dataElement(name:'DE1') {
+                ext 'EXT1', 'EXTVAL2'
+            }
+            //dataElement(name: 'DE2')
+        }*/
     } as Closure
 
     void afterTestUpdateInitialModels() {
@@ -105,9 +144,7 @@ class CatalogueXmlImportSpec extends AbstractIntegrationSpec {
          *  'DE1' data element– update does not delete.
          */
         assert dataModelsDM1.size() == 1
-        assert dataModelsDM1[0].dataElements.findAll {dataElement ->
-            dataElement.name == 'DE1'
-        }.size() == 1
+        assert dataElementFromDataModel('DE1', dataModelsDM1[0])
 
         /**
          * There are now two DM2: the previous, now deprecated, and the current, a draft.
@@ -118,36 +155,42 @@ class CatalogueXmlImportSpec extends AbstractIntegrationSpec {
         assert dataModelDM2s[0].status == ElementStatus.DEPRECATED
 
         DataModel dataModelDM2Current = dataModelDM2s[1]
+        assert dataModelDM2Current.status == ElementStatus.DRAFT
 
         assert dataModelDM2Current.ext.get('DM2EXT') == 'EXT'
 
-        DataElement dm2de1 =
-            dataModelDM2Current.dataElements.find {dataElement ->
-                dataElement.name == 'DE1'
-            }
-
+        DataElement dm2de1 = dataElementFromDataModel('DE1', dataModelDM2Current)
         assert dm2de1.ext.get('EXT1') == 'EXTVAL1'
 
-        DataElement dm2de2 =
-            dataModelDM2Current.dataElements.find {dataElement ->
-                dataElement.name == 'DE2'
-            }
-
+        DataElement dm2de2 = dataElementFromDataModel('DE2', dataModelDM2Current)
         assert dm2de2
     }
 
     void afterTestUpdateModelsUpdate2() {
-        List<DataModel> dataModelsDM1U2 = DataModel.findAllByName('DM1')
+        List<DataModel> dataModelsDM1 = DataModel.findAllByName('DM1')
         /**
          *  after update, there is still only one 'DM1' data model, with
          *  'DE1' data element, but the extensions changed.
          */
-        dataModelsDM1U2.size() == 1
-        List<DataElement> dm1de1s =  dataModelsDM1U2[0].dataElements.findAll {dataElement ->
+        assert dataModelsDM1.size() == 1
+        List<DataElement> dm1de1s =  dataModelsDM1[0].dataElements.findAll {dataElement ->
             dataElement.name == 'DE1'
         }
-        dm1de1s.size() == 1
-        dm1de1s[0].ext.get('EXT1') == 'EXTVAL2'
+        assert dm1de1s.size() == 1
+        assert dm1de1s[0].ext.get('EXT1') == 'EXTVAL2'
+
+        /*List<DataModel> dataModelDM2s = DataModel.findAllByName('DM2')
+        assert dataModelDM2s.size() == 2
+        assert dataModelDM2s[1].dataElements.findAll {dataElement ->
+            dataElement.name == 'DE1'
+        }[0].ext.get('EXT1') == 'EXTVAL2'*/
+
+    }
+
+    DataElement dataElementFromDataModel(String dataElementName, DataModel dataModel) {
+        return dataModel.dataElements.find {
+            dataElement -> dataElement.name == dataElementName
+        }
     }
 
     def "test updating a data model"() {
@@ -167,7 +210,7 @@ class CatalogueXmlImportSpec extends AbstractIntegrationSpec {
             afterTestUpdateModelsUpdate2()
 
     }
-    @Ignore // should be the same effect as above.
+   //@Ignore // should be the same effect as above.
     def "test updating a data model using defaultCatalogueBuilder"() {
         when: "initial models loaded"
         defaultCatalogueBuilder.build(testUpdateInitialModelsInstructions)
