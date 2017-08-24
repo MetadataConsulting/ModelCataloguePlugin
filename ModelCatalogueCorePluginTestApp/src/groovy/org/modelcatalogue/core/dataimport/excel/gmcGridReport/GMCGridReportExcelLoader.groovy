@@ -17,6 +17,11 @@ import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportHeade
  * a placeholder may move from one GMC model to another)
  * and the current GMC models.
  *
+ * Assumes that the placeholder data elements and the data sources already exist with exactly
+ * the names in the columns 'Related To' (placeholder), 'Source System' (data source).
+ *
+ * If file x is loaded in, the exporter should produce the same x except with Previously In Source System column set to the new Source System column.
+ *
  * Created by james on 24/08/2017.
  */
 abstract class GMCGridReportExcelLoader extends ExcelLoader {

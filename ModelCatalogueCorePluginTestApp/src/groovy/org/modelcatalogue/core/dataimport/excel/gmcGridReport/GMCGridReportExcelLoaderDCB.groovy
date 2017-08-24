@@ -18,7 +18,7 @@ import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportExcel
 
 /**
 
- *  Implementation using DefaultCatalogueBuilder.
+ *  Implementation using DefaultCatalogueBuilder. (Doesn't really work.)
  *
  * The DefaultCatalogueBuilder will update changed metadata automatically if the data element stays in place.
  * But it will create a new version of a model (with copies of the data elements) if a new data element appears there (as it would if we moved a data element).

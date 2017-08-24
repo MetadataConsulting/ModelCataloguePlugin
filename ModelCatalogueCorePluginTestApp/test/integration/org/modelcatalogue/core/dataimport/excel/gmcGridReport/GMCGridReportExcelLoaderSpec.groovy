@@ -47,6 +47,7 @@ class GMCGridReportExcelLoaderSpec extends ExcelLoaderSpec {
     }
 
     static String gelModelName = 'GELModel'
+    static String gelModelImportedName = 'GELModelImported'
     static String organization = 'testOrganization'
     static String de1Name = 'DE1'
     static String de2Name = 'DE2'
@@ -54,37 +55,64 @@ class GMCGridReportExcelLoaderSpec extends ExcelLoaderSpec {
     static String dataSource2Name = 'DS2'
     static String de1phName = 'DE1_ph'
     static String de2phName = 'DE2_ph'
-    static Closure testUpdateInitialModelsInstructions = {
-        dataModel(name:gelModelName) { // gelModel must have at least two data sources
-            dataClass(name:'DC1'){
-                dataClass(name: 'DC2'){
-                    dataElement(name:de1Name, id:1)
-                    dataElement(name:de2Name, id:2)
+    static Closure testUpdateInitialModelsInstructions(boolean withImports) {
+        return {
+            if (withImports) {
+                dataModel(name:gelModelName) { // gelModel must have at least two data sources
+                    dataClass(name:'DC1'){
+                        dataClass(name: 'DC2'){
+                            dataElement(name:de1Name, id:1)
+                        }
+                    }
+                }
+                dataModel(name:gelModelImportedName) { // gelModel must have at least two data sources
+                    dataClass(name:'DCImp1'){
+                        dataClass(name: 'DCImp2'){
+                            dataElement(name:de2Name, id:2)
+                        }
+                    }
+                }
+
+            }
+            else {
+                dataModel(name:gelModelName) { // gelModel must have at least two data sources
+                    dataClass(name:'DC1'){
+                        dataClass(name: 'DC2'){
+                            dataElement(name:de1Name, id:1)
+                            dataElement(name:de2Name, id:2)
+                        }
+                    }
                 }
             }
-        }
-        dataModel(name:dataSource1Name){
-            ext 'http://www.modelcatalogue.org/metadata/#organization', organization
-            dataElement(name:de1phName){
-                ext Headers.semanticMatching, 'yes'
+            dataModel(name:dataSource1Name){
+                ext 'http://www.modelcatalogue.org/metadata/#organization', organization
+                dataElement(name:de1phName){
+                    ext Headers.semanticMatching, 'yes'
+                }
             }
-        }
-        dataModel(name:dataSource2Name) {
-            ext 'http://www.modelcatalogue.org/metadata/#organization', organization
-            dataElement(name:de2phName) {
+            dataModel(name:dataSource2Name) {
+                ext 'http://www.modelcatalogue.org/metadata/#organization', organization
+                dataElement(name:de2phName) {
+                }
             }
-        }
-    } as Closure
+        } as Closure
+    }
 
 
     def "test update"() {
         log.info("Using ${gmcGridReportExcelLoader.getClass().name}")
         when: "initial models in"
-            defaultCatalogueBuilder.build testUpdateInitialModelsInstructions
+            defaultCatalogueBuilder.build testUpdateInitialModelsInstructions(withImports)
+            DataModel gelModel = DataModel.findByName(gelModelName)
+            if (withImports) {
+                DataModel gelModelImported = DataModel.findByName(gelModelImportedName)
+                gelModel.addToImports(gelModelImported)
+                gelModelImported.addToImportedBy(gelModel)
+            }
             relateNamedElements(de1Name, de1phName)
             relateNamedElements(de2Name, de2phName)
 
-            DataModel gelModel = DataModel.findByName(gelModelName)
+
             doGridReport(gelModel, 'tempGMCGridReportAfterInitialImport')
 
         then:
@@ -112,7 +140,15 @@ class GMCGridReportExcelLoaderSpec extends ExcelLoaderSpec {
         then: "DE1_ph should be back to DS1 and Known Issue should be Not recorded"
         noExceptionThrown()
         where:
+        /**
+         * gmcGridReportExcelLoaderDCB doesn't really work.
+         */
         gmcGridReportExcelLoader << [gmcGridReportExcelLoaderDirect]
+        /**
+         * The exporter doesn't seem to display stuff from an imported
+         * data model
+         */
+        withImports << [false]
 
     }
     void doGridReport(DataModel gelModel, String fileName) {
