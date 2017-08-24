@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.dataimport.excel.uclh
 
-import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.modelcatalogue.builder.api.CatalogueBuilder

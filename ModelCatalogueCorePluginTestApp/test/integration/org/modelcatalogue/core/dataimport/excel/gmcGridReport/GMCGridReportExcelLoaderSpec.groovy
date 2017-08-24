@@ -1,8 +1,7 @@
 package org.modelcatalogue.core.dataimport.excel.gmcGridReport
 
+import groovy.util.logging.Log4j
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.apache.poi.ss.usermodel.Workbook
-import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -11,11 +10,9 @@ import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
-import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.dataimport.excel.ExcelLoaderSpec
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.FileOpener
-import org.modelcatalogue.core.xml.CatalogueXmlImportSpec
 import spock.lang.Shared
 import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportHeaders as Headers
 
@@ -29,6 +26,7 @@ import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportHeade
  * Check changes;
  * Created by james on 17/08/2017.
  */
+@Log4j
 class GMCGridReportExcelLoaderSpec extends ExcelLoaderSpec {
     @Shared DataModelService dataModelService
     @Shared ElementService elementService
@@ -38,12 +36,14 @@ class GMCGridReportExcelLoaderSpec extends ExcelLoaderSpec {
 
     @Shared DefaultCatalogueBuilder defaultCatalogueBuilder
     @Rule TemporaryFolder temporaryFolder = new TemporaryFolder()
-    @Shared GMCGridReportExcelLoader gmcGridReportExcelLoader
+    @Shared GMCGridReportExcelLoader gmcGridReportExcelLoaderDCB
+    @Shared GMCGridReportExcelLoader gmcGridReportExcelLoaderDirect
 
     def setupSpec() {
         initRelationshipTypes()
         defaultCatalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
-        gmcGridReportExcelLoader = new GMCGridReportExcelLoader(dataModelService, elementService)
+        gmcGridReportExcelLoaderDCB = new GMCGridReportExcelLoaderDCB(dataModelService, elementService)
+        gmcGridReportExcelLoaderDirect = new GMCGridReportExcelLoaderDirect()
     }
 
     static String gelModelName = 'GELModel'
@@ -79,8 +79,9 @@ class GMCGridReportExcelLoaderSpec extends ExcelLoaderSpec {
 
 
     def "test update"() {
+        log.info("Using ${gmcGridReportExcelLoader.getClass().name}")
         when: "initial models in"
-            gmcGridReportExcelLoader.defaultCatalogueBuilder.build testUpdateInitialModelsInstructions
+            defaultCatalogueBuilder.build testUpdateInitialModelsInstructions
             relateNamedElements(de1Name, de1phName)
             relateNamedElements(de2Name, de2phName)
 
@@ -92,20 +93,22 @@ class GMCGridReportExcelLoaderSpec extends ExcelLoaderSpec {
 
         when: "data element placeholder moved"
 
-            gmcGridReportExcelLoader.updateFromWorkbook(new HSSFWorkbook(getClass().getResourceAsStream('gmcGridReportTestUpdate1.xls')))
+            gmcGridReportExcelLoader.updateFromWorkbookSheet(new HSSFWorkbook(getClass().getResourceAsStream('gmcGridReportTestUpdate1.xls')))
 
             doGridReport(gelModel, 'tempGMCGridReportAfterLoadingUpdatedSpreadsheet1')
         then:
             noExceptionThrown()
 
         when: "metadata changed"
-            gmcGridReportExcelLoader.updateFromWorkbook(new HSSFWorkbook(getClass().getResourceAsStream('gmcGridReportTestUpdate2.xls')))
+            gmcGridReportExcelLoader.updateFromWorkbookSheet(new HSSFWorkbook(getClass().getResourceAsStream('gmcGridReportTestUpdate2.xls')))
             doGridReport(gelModel, 'tempGMCGridReportAfterLoadingUpdatedSpreadsheet2')
         /**
          * OK so this is not really working. TestUpdate2 would change the metadata on DE2 placeholder but it does not relink things properly.
          */
         then:
             noExceptionThrown()
+        where:
+        gmcGridReportExcelLoader << [gmcGridReportExcelLoaderDirect]
 
     }
     void doGridReport(DataModel gelModel, String fileName) {
@@ -115,7 +118,7 @@ class GMCGridReportExcelLoaderSpec extends ExcelLoaderSpec {
         FileOpener.open(tempFile)
     }
 
-    void relateNamedElements(String el1, String el2) {
+    static void relateNamedElements(String el1, String el2) {
         DataElement.findByName(el1).addToRelatedTo(DataElement.findByName(el2))
 
     }
