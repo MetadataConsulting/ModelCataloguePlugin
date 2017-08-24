@@ -72,7 +72,6 @@ class GMCGridReportExcelLoaderSpec extends ExcelLoaderSpec {
         dataModel(name:dataSource2Name) {
             ext 'http://www.modelcatalogue.org/metadata/#organization', organization
             dataElement(name:de2phName) {
-                ext Headers.semanticMatching, 'yes' // initial data element placeholders MUST have metadata.
             }
         }
     } as Closure
@@ -93,20 +92,25 @@ class GMCGridReportExcelLoaderSpec extends ExcelLoaderSpec {
 
         when: "data element placeholder moved"
 
-            gmcGridReportExcelLoader.updateFromWorkbookSheet(new HSSFWorkbook(getClass().getResourceAsStream('gmcGridReportTestUpdate1.xls')))
+            gmcGridReportExcelLoader.updateFromWorkbookSheet(new HSSFWorkbook(getClass().getResourceAsStream('gmcGridReportTestUpdateMove.xls')))
 
-            doGridReport(gelModel, 'tempGMCGridReportAfterLoadingUpdatedSpreadsheet1')
-        then:
+            doGridReport(gelModel, 'tempGMCGridReportAfterLoadingUpdateMove')
+        then: "should have DE1_ph in DS2"
             noExceptionThrown()
 
         when: "metadata changed"
-            gmcGridReportExcelLoader.updateFromWorkbookSheet(new HSSFWorkbook(getClass().getResourceAsStream('gmcGridReportTestUpdate2.xls')))
-            doGridReport(gelModel, 'tempGMCGridReportAfterLoadingUpdatedSpreadsheet2')
-        /**
-         * OK so this is not really working. TestUpdate2 would change the metadata on DE2 placeholder but it does not relink things properly.
-         */
-        then:
+            gmcGridReportExcelLoader.updateFromWorkbookSheet(new HSSFWorkbook(getClass().getResourceAsStream('gmcGridReportTestUpdateMetadataChange.xls')))
+            doGridReport(gelModel, 'tempGMCGridReportAfterLoadingUpdateMetadataChange')
+
+        then: "DE2_ph Semantic Matching should be no"
             noExceptionThrown()
+
+        when: "simultaneous change"
+        gmcGridReportExcelLoader.updateFromWorkbookSheet(new HSSFWorkbook(getClass().getResourceAsStream('gmcGridReportTestUpdateSimultaneous.xls')))
+        doGridReport(gelModel, 'tempGMCGridReportAfterLoadingUpdateSimultaneous')
+
+        then: "DE1_ph should be back to DS1 and Known Issue should be Not recorded"
+        noExceptionThrown()
         where:
         gmcGridReportExcelLoader << [gmcGridReportExcelLoaderDirect]
 
