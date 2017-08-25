@@ -23,8 +23,6 @@ import java.util.zip.ZipInputStream
 class DataImportController  {
 
     def initCatalogueService
-    def umljService
-    def loincImportService
     def modelCatalogueSecurityService
     def executorService
     def elementService
@@ -83,10 +81,12 @@ class DataImportController  {
             Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
             def id = asset.id
             InputStream inputStream = file.inputStream
+            String filename = file.originalFilename
+            Workbook wb = WorkbookFactory.create(inputStream)
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
-            executeInBackground(id, "Imported from Excel") {
-                loadSpreadsheet( file, defaultCatalogueBuilder, suffix, id, userId)
-            }
+            //executeInBackground(id, "Imported from Excel") {
+                loadSpreadsheet( wb, filename, defaultCatalogueBuilder, suffix, id, userId)
+            //}
             redirectToAsset(id)
             return
         }
@@ -96,10 +96,12 @@ class DataImportController  {
             Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
             def id = asset.id
             InputStream inputStream = file.inputStream
+            String filename = file.originalFilename
+            Workbook wb = WorkbookFactory.create(inputStream)
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
-            executeInBackground(id, "Imported from Excel") {
-                loadSpreadsheet( file, defaultCatalogueBuilder, suffix, id, userId)
-            }
+            //executeInBackground(id, "Imported from Excel") {
+                loadSpreadsheet( wb, filename,defaultCatalogueBuilder, suffix, id, userId)
+            //}
             redirectToAsset(id)
             return
         }
@@ -209,36 +211,36 @@ class DataImportController  {
             return
         }
 
-        if (checkFileNameEndsWith('.umlj')) {
-            Asset asset = assetService.storeAsset(params, file, 'text/umlj')
-            def id = asset.id
-            defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
-            InputStream inputStream = file.inputStream
-            String name = params?.name
-            executeInBackground(id, "Imported from Style UML")  {
-                try {
-                    DataModel dataModel = DataModel.findByName(name)
-                    if(!dataModel) dataModel =  new DataModel(name: name).save(flush:true, failOnError:true)
-                    umljService.importUmlDiagram(defaultCatalogueBuilder, inputStream, name, dataModel)
-                    Asset updated = Asset.get(id)
-                    updated.dataModel = dataModel
-                    updated.status = ElementStatus.FINALIZED
-                    updated.description = "Your import has finished."
-                    updated.dataModel = dataModel
-                    updated.save(flush: true, failOnError: true)
-                } catch (Exception e) {
-                    Asset updated = Asset.get(id)
-                    updated.refresh()
-                    updated.status = ElementStatus.FINALIZED
-                    updated.name = updated.name + " - Error during upload"
-                    updated.description = "Error importing umlj file: ${e}"
-                    updated.save(flush: true, failOnError: true)
-                }
-            }
-
-            redirectToAsset(id)
-            return
-        }
+//        if (checkFileNameEndsWith('.umlj')) {
+//            Asset asset = assetService.storeAsset(params, file, 'text/umlj')
+//            def id = asset.id
+//            defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
+//            InputStream inputStream = file.inputStream
+//            String name = params?.name
+//            executeInBackground(id, "Imported from Style UML")  {
+//                try {
+//                    DataModel dataModel = DataModel.findByName(name)
+//                    if(!dataModel) dataModel =  new DataModel(name: name).save(flush:true, failOnError:true)
+//                    umljService.importUmlDiagram(defaultCatalogueBuilder, inputStream, name, dataModel)
+//                    Asset updated = Asset.get(id)
+//                    updated.dataModel = dataModel
+//                    updated.status = ElementStatus.FINALIZED
+//                    updated.description = "Your import has finished."
+//                    updated.dataModel = dataModel
+//                    updated.save(flush: true, failOnError: true)
+//                } catch (Exception e) {
+//                    Asset updated = Asset.get(id)
+//                    updated.refresh()
+//                    updated.status = ElementStatus.FINALIZED
+//                    updated.name = updated.name + " - Error during upload"
+//                    updated.description = "Error importing umlj file: ${e}"
+//                    updated.save(flush: true, failOnError: true)
+//                }
+//            }
+//
+//            redirectToAsset(id)
+//            return
+//        }
 
         if (!CONTENT_TYPES.contains(confType)) errors.add("input should be an Excel, XML, MC, OBO, UML or LOINC file but uploaded content is ${confType}")
         respond "errors": errors
@@ -302,14 +304,13 @@ class DataImportController  {
         }
     }
 
-    protected void loadSpreadsheet(MultipartFile file, DefaultCatalogueBuilder defaultCatalogueBuilder, String suffix, Long id, Long userId){
+    protected void loadSpreadsheet(Workbook wb, String filename,DefaultCatalogueBuilder defaultCatalogueBuilder, String suffix, Long id, Long userId){
         Pair<String,String> modelDetails = getModelDetails(suffix)
-        InputStream inputStream = file.inputStream
-
+        //InputStream inputStream = file.getInputStream()
         try{
             UCLHExcelLoader loader = new UCLHExcelLoader(false)
-            String dataOwner = ExcelLoader.getOwnerFromFileName(file.originalFilename, '_nt_rawimport')
-            Workbook wb = WorkbookFactory.create(inputStream)
+            String dataOwner = ExcelLoader.getOwnerFromFileName(filename, '_nt_rawimport')
+            //Workbook wb = WorkbookFactory.create(inputStream)
             Pair<Closure, List<String>> instructionsAndDataModelNames = loader.buildInstructionsAndModelNamesFromWorkbookSheet(wb, modelDetails.right, dataOwner)
             loader.buildModelFromInstructions(defaultCatalogueBuilder, instructionsAndDataModelNames.left)
             DataModel cancerModel = DataModel.findByName(modelDetails.left)
