@@ -117,6 +117,31 @@ class BootStrap {
 
         reportsRegistry.register {
             creates asset
+            title { "Grid Report Spreadsheet" }
+            defaultName { "${it.name} report as MS Excel Document Grid" }
+            depth 3
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.countDeclares() > 0
+            }
+            link controller: 'dataModel', action: 'gridSpreadsheet', id: true
+        }
+
+
+        reportsRegistry.register {
+            creates asset
+            title { "North Thames Summary Report" }
+            defaultName { "${it.name} report as MS Excel Document Grid" }
+            depth 3
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.countDeclares() > 0
+            }
+            link controller: 'northThames', action: 'northThamesSummaryReport', id: true
+        }
+
+        reportsRegistry.register {
+            creates asset
             title { "Inventory Report Document" }
             defaultName { "${it.name} report as MS Word Document" }
             depth 3
@@ -238,6 +263,17 @@ class BootStrap {
             link controller: 'genomics', action: 'exportRareDiseasePhenotypesAndClinicalTestsDoc', id: true
         }
 
+
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases Eligibility Phenotypes Split Docs" }
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseaseSplitDocs', id: true
+        }
+
         reportsRegistry.register {
             creates link
             title { "Rare Diseases HPO And Clinical Tests (JSON)" }
@@ -289,6 +325,16 @@ class BootStrap {
                 dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
             }
             link controller: 'genomics', action: 'exportRareDiseaseEligibilityCsv', id: true
+        }
+
+        reportsRegistry.register {
+            creates link
+            title { "Rare Diseases Static Website" }
+            type DataModel
+            when { DataModel dataModel ->
+                dataModel.ext.get('Rare Disease Report Available') == 'true' || dataModel.ext.get("All Rare Disease Conditions Reports") == 'true' || dataModel.ext.get(Metadata.ALL_RD_REPORTS) == 'true' || dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
+            }
+            link controller: 'genomics', action: 'exportRareDiseasesWebsite', id: true
         }
 
 
@@ -417,6 +463,7 @@ class BootStrap {
                 '/login', '/login.*', '/login/*',
                 '/logout', '/logout.*', '/logout/*',
                 '/register/*', '/errors', '/errors/*',
+                '/load',
                 '/index.gsp'
         ]) {
             createRequestmapIfMissing(url, 'permitAll', null)
