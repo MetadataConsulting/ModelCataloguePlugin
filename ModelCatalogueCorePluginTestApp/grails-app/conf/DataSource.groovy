@@ -12,9 +12,10 @@ environments {
         dataSource {
             driverClassName = "com.mysql.jdbc.Driver"
             dialect='org.hibernate.dialect.MySQL5InnoDBDialect'
-            url = "jdbc:mysql://mdxtest.cluster-ch0cnxwamolr.eu-west-1.rds.amazonaws.com:3306/ntroletest"
+
+            url = "jdbc:mysql://localhost:3306/exceltest3"
             username = 'mdradmin'
-            password = 'mdr4dm1n2017'
+            password = 'mdradmin123'
             dbCreate = "update"
             properties {
                 maxActive = -1

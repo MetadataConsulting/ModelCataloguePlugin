@@ -449,9 +449,11 @@ import static org.modelcatalogue.core.util.HibernateHelper.getEntityClass
             }
             if (value instanceof String) {
                 element.setProperty(key, value.toString().trim())
+                return
             }
             element.setProperty(key, value)
         }
+        return [:]
     }
 
     private <T extends CatalogueElement> void updateExtensions(T element) {

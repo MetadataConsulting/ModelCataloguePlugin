@@ -1,37 +1,41 @@
-package org.modelcatalogue.nt.export
+package org.modelcatalogue.core.dataimport.excel.gmcGridReport
 
-import com.google.common.collect.ImmutableMap
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.core.*
-import org.modelcatalogue.core.export.inventory.ModelCatalogueStyles
-import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.gel.export.GridReportXlsxExporter
 import org.modelcatalogue.spreadsheet.builder.api.RowDefinition
 import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
-import org.modelcatalogue.spreadsheet.builder.api.SpreadsheetBuilder
-import org.modelcatalogue.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
 
 /**
  * GridReportXlsxExporter.groovy
- * Purpose: Generate an excel report from a data model, including metadata using the required format
+ * Generates a report from a source data model which, as in GridReportXlsxExporter, shows its data classes in a hierarchy and
+ * lists its data elements; furthermore, some of the data elements are linked to a representative placeholder in GMC data models
+ * which represent data sources of particular hospitals in a GMC; and the placeholders have associated metadata;
+ * the placeholders and their metadata are listed with the data elements.
  *
+ * Excel headers format v0.2. At the moment based on UCL data
  * @author Adam Milward
  * @version 31/03/2017
  */
-class NTGridReportXlsxExporter extends GridReportXlsxExporter {
+class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
 
+    /**
+     * Map of data source systems
+     */
     Map systemsMap = [:]
     Map metadataCompletion = [:]
+    String organization = ''
 
-    static NTGridReportXlsxExporter create(DataModel element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3) {
-        return new NTGridReportXlsxExporter(element, dataClassService, grailsApplication, depth)
+    static GMCGridReportXlsxExporter create(DataModel element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3, String organization = 'UCL') {
+        return new GMCGridReportXlsxExporter(element, dataClassService, grailsApplication, depth, organization)
     }
 
 
-    NTGridReportXlsxExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3) {
+    GMCGridReportXlsxExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3, String organization = 'UCL') {
         super(element, dataClassService, grailsApplication, depth)
+        this.organization = organization
 
     }
 
@@ -43,35 +47,36 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
             color black
         }
     }
-
-    private List<String> ntElementMetadataHeaders = ['Semantic Matching', 'Known Issue', 'Immediate Solution', 'Immediate Solution Owner', 'Long Term Solution', 'Long Term Solution Owner', 'Data Item Unique Code', 'Related To Metadata', 'Part Of Standard Data Set', 'Data Completeness', 'Estimated Quality', 'Timely', 'Comments']
-    private List<String> ntElementMetadataKeys = ntElementMetadataHeaders.collect{
-        it.replace(/Related To Metadata/, 'Related To')}
-    protected List<String> excelHeaders = ['ID', 'Data Element', 'Multiplicity', 'Data Type', 'Validation Rule', 'Business Rule', 'Related To', 'Source System'] + ntElementMetadataHeaders
-
+    static List<String> ntElementMetadataHeaders = GMCGridReportHeaders.ntElementMetadataHeaders
+    static List<String> ntElementMetadataKeys = GMCGridReportHeaders.ntElementMetadataKeys
+    static List<String> excelHeaders = GMCGridReportHeaders.excelHeaders
 
     @Override
     Map<String, Closure> sheetsAfterMainSheetExport() {
         Map<String, Closure> sheets =
-            ['Analysis': {SheetDefinition sheet -> buildAnalysis(sheet)} as Closure] +
+            ['Analysis': {SheetDefinition sheet -> writeAnalysis(sheet)} as Closure] +
             systemsMap.collectEntries {name, v ->
-                [(name), {SheetDefinition sheet -> buildCompletionTab(sheet, name)} as Closure]
+                [(name), {SheetDefinition sheet -> writeSystemSheet(sheet, name)} as Closure]
             }
         println "Sheets: ${sheets}"
         return sheets
     }
     // export will do as it normally does, with new headers, and a different printDataElement, and then do sheetsAfterMainSheetExport at the end.
 
+    static String noSourceMessage = 'No source identified'
+    static String multipleSourcesMessage = 'Multiple sources identified, please see entries in the online catalogue'
+    static String oneSourceNoMetadataMessage = 'Source identified, metadata not recorded'
+
     @Override
     void printDataElement(RowDefinition rowDefinition, Relationship dataElementRelationship, List outline = []) {
         DataElement dataElement = dataElementRelationship.destination
         List relatedTo  = []
-        relatedTo = dataElement.relatedTo.findAll{ it.dataModel.ext.get('http://www.modelcatalogue.org/metadata/#organization') == "UCL" }
+        relatedTo = dataElement.relatedTo.findAll{ it.dataModel.ext.get('http://www.modelcatalogue.org/metadata/#organization') == organization }
         addToSystemsMap(relatedTo, dataElement)
 
         rowDefinition.with {
 
-            outline.each{
+            outline.each{ // Class Hierarchy
 
                 cell(it){
                     style {
@@ -85,7 +90,7 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
 
             }
 
-            cell(depth + 1) {
+            cell(depth + 1) { //ID
                 value "${(dataElement.modelCatalogueId)?:(dataElement.getLatestVersionId()) ?: dataElement.getId()}.${dataElement.getVersionNumber()}"
                 style {
                     wrap text
@@ -96,7 +101,7 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
                 }
             }
 
-            cell() {
+            cell() { // Data Element
                 value dataElement.name
                 link to url "${getLoadURL(dataElement)}"
                 style {
@@ -107,6 +112,7 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
                     }
                 }
             }
+            // Multiplicity -> BusinessRule
             [ "${getMultiplicity(dataElementRelationship)}",
               "${(dataElement?.dataType) ? printDataType(dataElement?.dataType) : ""}",
               "${(dataElement?.dataType?.rule) ?: ""}",
@@ -117,17 +123,20 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
                         style standardCellStyle
                     }
             }
-            cell {
-                value "${(relatedTo) ? ((relatedTo.size()==1) ? relatedTo[0]?.name : "Multiple sources identified, please see catalogue") : "No source identified"}"
+            cell { // Related To
+                value "${(relatedTo) ? ((relatedTo.size()==1) ? relatedTo[0]?.name : multipleSourcesMessage) : noSourceMessage}"
                 if (relatedTo && relatedTo.size()==1) link to url "${ getLoadURL(relatedTo[0]) }"
                 style standardCellStyle
             }
 
-
-            cell {
+            Closure sourceSystem = {
                 value "${getRelatedToModel(relatedTo)}"
                 style standardCellStyle
-            }
+            } as Closure
+
+            cell sourceSystem // Source System
+
+            cell sourceSystem // Previously In Source System -- same as Source System
 
             ntElementMetadataKeys.each{metadataKey ->
                 cell {
@@ -140,13 +149,11 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
 
 
     /**
-     * Renders analysis
+     * Write a sheet detailing a particular data source system.
      * @param sheet the current sheet
      * @param systems - the systems that are referenced in the report
      */
-
-
-    private void buildCompletionTab(SheetDefinition sheet, String system) {
+    private void writeSystemSheet(SheetDefinition sheet, String system) {
 
 
         sheet.with { SheetDefinition sheetDefinition ->
@@ -172,7 +179,11 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
         }
 
     }
-
+    /**
+     * Helper for #writeSystemSheet
+     * @param rowDefinition
+     * @param dataElement
+     */
     private void printSystemDataElement(RowDefinition rowDefinition, DataElement dataElement){
         rowDefinition.with {
 
@@ -227,17 +238,12 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
 
 
     /**
-     * Renders analysis
+     * Renders analysis of what data comes from where, and how much metadata is filled in.
      * @param sheet the current sheet
      * @param systems - the systems that are referenced in the report
      */
-
-
-
-    private void buildAnalysis(SheetDefinition sheet){
+    private void writeAnalysis(SheetDefinition sheet){
         sheet.with { SheetDefinition sheetDefinition ->
-
-
             //source system breakdown
             row {
                 cell {
@@ -261,7 +267,6 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
             }
 
             systemsMap.each{ k, v ->
-
                 row {
                     cell {
                         value "$k"
@@ -275,9 +280,6 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
             }
 
             //metadata completion breakdown
-
-//source system breakdown
-
             row {
                 cell {
                     value " "
@@ -318,17 +320,18 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
                         width auto
                     }
                 }
-
-
-
             }
 
         }
     }
 
-
-
-    String printSystemMetadata(List relatedTo, String metadata){
+    /**
+     * Helper for writeAnalysis
+     * @param relatedTo
+     * @param metadata
+     * @return
+     */
+    private String printSystemMetadata(List relatedTo, String metadata){
 
         Map score = metadataCompletion.get(metadata) ?: [:]
         Integer completed = score.get("completed")?:0
@@ -343,7 +346,7 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
             }else{
                 score.put("total", total + 1)
                 metadataCompletion.put(metadata, score)
-                return 'Source identified, metadata not recorded'
+                return oneSourceNoMetadataMessage
             }
         }else if(relatedTo.size()>1){
 
@@ -355,16 +358,16 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
                     score.put("completed", completed + 1)
                 }
             }
-            return "Multiple sources identified, please see entries in the online catalogue"
+            return multipleSourcesMessage
         }else{
-            return "No source identified"
+            return noSourceMessage
         }
 
 
 
     }
 
-    void addToSystemsMap(List relatedTo, DataElement sourceElement){
+    private void addToSystemsMap(List relatedTo, DataElement sourceElement){
 
         if(relatedTo.size()>0){
             relatedTo.each{ de ->
@@ -374,9 +377,9 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
                 systemsMap.put(dmname, elements)
             }
         }else{
-            List elements =  (systemsMap.get("No source identified"))?:[]
+            List elements =  (systemsMap.get(noSourceMessage))?:[]
             elements.add(sourceElement)
-            systemsMap.put("No source identified", elements)
+            systemsMap.put(noSourceMessage, elements)
         }
 
     }
@@ -385,9 +388,9 @@ class NTGridReportXlsxExporter extends GridReportXlsxExporter {
         if(relatedTo.size()==1){
             "${relatedTo[0].dataModel.name}"
         }else if(relatedTo.size()>1){
-            "Multiple sources identified, please see entries in the online catalogue"
+            multipleSourcesMessage
         }else{
-            "No source identified"
+            noSourceMessage
         }
     }
 

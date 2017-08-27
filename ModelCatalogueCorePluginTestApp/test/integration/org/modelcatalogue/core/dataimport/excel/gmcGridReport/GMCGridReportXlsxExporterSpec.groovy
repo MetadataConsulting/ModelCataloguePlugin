@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.dataimport.excel.nt.uclh
+package org.modelcatalogue.core.dataimport.excel.gmcGridReport
 
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.junit.Rule
@@ -12,7 +12,7 @@ import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
 import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
 
-class UCLHGridReportXlsxExporterSpec extends AbstractIntegrationSpec {
+class GMCGridReportXlsxExporterSpec extends AbstractIntegrationSpec {
 
     public static final String ROOT_DATA_MODEL_NAME = 'Grid Report Data Model'
     ElementService elementService
@@ -293,7 +293,7 @@ class UCLHGridReportXlsxExporterSpec extends AbstractIntegrationSpec {
         def file = temporaryFolder.newFile("${System.currentTimeMillis()}.xlsx")
 
         when:
-        UCLHGridReportXlsxExporter.create(dataModel, dataClassService, grailsApplication, 5).export(file.newOutputStream())
+        GMCGridReportXlsxExporter.create(dataModel, dataClassService, grailsApplication, 5).export(file.newOutputStream())
         FileOpener.open(file)
 
         SpreadsheetCriteria query = PoiSpreadsheetQuery.FACTORY.forFile(file)

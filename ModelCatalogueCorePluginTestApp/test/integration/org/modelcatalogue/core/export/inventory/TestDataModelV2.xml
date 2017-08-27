@@ -205,59 +205,6 @@ Record the date where TESTcer recurrence was confirmed or diagnosis of recurrenc
                 </dataElement>
               </dataClass>
               <dataClass name="REFERRALS">
-                <dataElement name="External Beam Type" id="14978" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/3685@3.2.0">
-                  <metadata>
-                    <extension key="Min Occurs">1</extension>
-                    <extension key="Max Occurs">1</extension>
-                  </metadata>
-                  <description>Type of external beam, if applicable. The prescribed type of beam for a Teletherapy Treatment/ Exposure</description>
-                  <relatedTo ref="68847" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/68847@0.0.1" />
-                  <relatedTo ref="68847" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/68847@0.0.1" />
-                  <extensions>
-                    <extension key="http://www.modelcatalogue.org/metadata/genomics/#gel-id">14978</extension>
-                  </extensions>
-                  <dataType name="externalBeamType" id="14980" href="https://nt.metadataexchange.org.uk/catalogue/dataType/3684@3.2.0">
-                    <description>External Beam Type</description>
-                    <extensions>
-                      <extension key="http://www.modelcatalogue.org/metadata/genomics/#gel-id">14980</extension>
-                    </extensions>
-                    <enumerations>
-                      <enumeration value="imrt" id="1">IMRT</enumeration>
-                      <enumeration value="stereotactic" id="2">Stereotactic</enumeration>
-                      <enumeration value="2dxrt" id="3">2DXRT</enumeration>
-                      <enumeration value="3dxrt" id="4">3DXRT</enumeration>
-                      <enumeration value="4dxrt" id="5">4DXRT</enumeration>
-                      <enumeration value="electrons" id="6">Electrons</enumeration>
-                      <enumeration value="protons" id="7">Protons</enumeration>
-                    </enumerations>
-                  </dataType>
-                </dataElement>
-                <dataElement name="Prescription" id="14976" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/3680@3.2.0">
-                  <metadata>
-                    <extension key="Min Occurs">0</extension>
-                    <extension key="Max Occurs">1</extension>
-                  </metadata>
-                  <description>Reference to uploaded copy of prescription document</description>
-                  <relatedTo ref="68843" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/68843@0.0.1" />
-                  <relatedTo ref="68843" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/68843@0.0.1" />
-                  <extensions>
-                    <extension key="http://www.modelcatalogue.org/metadata/genomics/#gel-id">14976</extension>
-                  </extensions>
-                  <dataType ref="http://www.w3.org/2001/XMLSchema#string" href="https://nt.metadataexchange.org.uk/catalogue/dataType/38@0.0.1" />
-                </dataElement>
-                <dataElement name="Plan" id="14975" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/3681@3.2.0">
-                  <metadata>
-                    <extension key="Min Occurs">0</extension>
-                    <extension key="Max Occurs">1</extension>
-                  </metadata>
-                  <description>Reference to uploaded copy of radiotherapy plan</description>
-                  <relatedTo ref="68844" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/68844@0.0.1" />
-                  <relatedTo ref="68844" href="https://nt.metadataexchange.org.uk/catalogue/dataElement/68844@0.0.1" />
-                  <extensions>
-                    <extension key="http://www.modelcatalogue.org/metadata/genomics/#gel-id">14975</extension>
-                  </extensions>
-                  <dataType ref="http://www.w3.org/2001/XMLSchema#string" href="https://nt.metadataexchange.org.uk/catalogue/dataType/38@0.0.1" />
-                </dataElement>
                 <dataElement name="sourceOfReferralForOutPatients">
                 <metadata>
                     <extension key="Min Occurs">2</extension>

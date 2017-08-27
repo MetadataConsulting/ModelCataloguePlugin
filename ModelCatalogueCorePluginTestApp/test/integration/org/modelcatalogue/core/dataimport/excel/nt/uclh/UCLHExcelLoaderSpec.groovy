@@ -1,7 +1,6 @@
-package org.modelcatalogue.core.dataimport.excel.nt.uclh
+package org.modelcatalogue.core.dataimport.excel.uclh
 
 import org.apache.commons.lang3.tuple.Pair
-import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.custommonkey.xmlunit.XMLUnit
 import org.junit.Rule
@@ -10,14 +9,14 @@ import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
-import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.modelcatalogue.core.dataimport.excel.ExcelLoaderSpec
+import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportXlsxExporter
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.FileOpener
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
-import org.modelcatalogue.nt.export.NTGridReportXlsxExporter
 import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
 import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
+import org.modelcatalogue.core.dataimport.excel.uclh.UCLHExcelLoader
 import spock.lang.Shared
 
 import java.nio.charset.StandardCharsets
@@ -39,15 +38,15 @@ class UCLHExcelLoaderSpec extends ExcelLoaderSpec {
 
     @Shared CatalogueXmlLoader catalogueXmlLoader
     @Shared DataModel sourceDataModel
-  def setupSpec(){
-      initRelationshipTypes()
-      defaultCatalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
-      catalogueXmlLoader = new CatalogueXmlLoader(defaultCatalogueBuilder)
+    def setupSpec(){
+        initRelationshipTypes()
+        defaultCatalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
+        catalogueXmlLoader = new CatalogueXmlLoader(defaultCatalogueBuilder)
 
-      catalogueXmlLoader.load(getClass().getResourceAsStream('TestDataModelV1.xml'))
-      catalogueXmlLoader.load(getClass().getResourceAsStream('TestDataModelV2.xml'))
-      sourceDataModel = DataModel.findByNameAndSemanticVersion('TestDataModel', '2')
-  }
+        catalogueXmlLoader.load(getClass().getResourceAsStream('TestDataModelV1.xml'))
+        catalogueXmlLoader.load(getClass().getResourceAsStream('TestDataModelV2.xml'))
+        sourceDataModel = DataModel.findByNameAndSemanticVersion('TestDataModel', '2')
+    }
 
     def setup() {
         XMLUnit.ignoreWhitespace = true
@@ -55,7 +54,7 @@ class UCLHExcelLoaderSpec extends ExcelLoaderSpec {
         XMLUnit.ignoreAttributeOrder = true
         stringWriter = new StringWriter()
         //builder = new XmlCatalogueBuilder(stringWriter, true)
-        excelLoader = new UCLHExcelLoader()
+        excelLoader = new org.modelcatalogue.core.dataimport.excel.uclh.UCLHExcelLoader()
     }
     List<String> uclhHeaders = ['L2',	'L3',	'L4',	'L5',	'Lowest level ID',	'Idno',	'Name',	'Description',	'Multiplicity',	'Value Domain / Data Type',	'Related To',	'Current Paper Document  or system name',	'Semantic Matching',	'Known issue',	'Immediate solution', 'Immediate solution Owner',	'Long term solution',	'Long term solution owner',	'Data Item', 'Unique Code',	'Related To',	'Part of standard data set',	'Data Completeness',	'Estimated quality',	'Timely?', 'Comments']
 
@@ -63,10 +62,8 @@ class UCLHExcelLoaderSpec extends ExcelLoaderSpec {
      * There are two relatedTo columns!!!
      */
     def "test expected output for UCLH #file"() {
-        setup:
-        Closure instructions = excelLoaderInstructionsAndModelNames(file).left
         expect:
-        similar excelLoader.buildXmlFromInstructions(instructions), getClass().getResourceAsStream('UCLHAriaTestExpected.xml').text
+        similar excelLoaderXmlResult(file).left, getClass().getResourceAsStream('UCLHAriaTestExpected.xml').text
         where:
         file << testFiles
 
@@ -84,16 +81,12 @@ class UCLHExcelLoaderSpec extends ExcelLoaderSpec {
         File tempFile = temporaryFolder.newFile("ntSummaryReport${System.currentTimeMillis()}.xlsx")
 
         when:
-        /*
-        Pair<String, List<String>> xmlAndDataModelNames = excelLoaderXmlResult(file, 0)
+        Pair<String, List<String>> xmlAndDataModelNames = excelLoaderXmlResult(file)
         catalogueXmlLoader.load(new ByteArrayInputStream(xmlAndDataModelNames.left.getBytes(StandardCharsets.UTF_8))) // load XML from Excel into catalogue
-        */
-        Pair<Closure, List<String>> instructionsAndDataModelNames = excelLoaderInstructionsAndModelNames(file)
-        excelLoader.buildModelFromInstructions(defaultCatalogueBuilder, instructionsAndDataModelNames.left)
-        excelLoader.addRelationshipsToModels(sourceDataModel, instructionsAndDataModelNames.right)
+        excelLoader.addRelationshipsToModels(sourceDataModel, xmlAndDataModelNames.right)
 
 
-        NTGridReportXlsxExporter.create(sourceDataModel, dataClassService, grailsApplication, 5).export(tempFile.newOutputStream())
+        GMCGridReportXlsxExporter.create(sourceDataModel, dataClassService, grailsApplication, 5).export(tempFile.newOutputStream())
         FileOpener.open(tempFile)
 
         SpreadsheetCriteria query = PoiSpreadsheetQuery.FACTORY.forFile(tempFile)
@@ -103,7 +96,6 @@ class UCLHExcelLoaderSpec extends ExcelLoaderSpec {
         where:
         file << testFiles
     }
-
 
 
 

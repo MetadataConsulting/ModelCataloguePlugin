@@ -5,15 +5,16 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportExcelLoaderDirect
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.core.dataimport.excel.ExcelLoader
-import org.modelcatalogue.core.dataimport.excel.HeadersMap
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
-import org.modelcatalogue.core.dataimport.excel.nt.uclh.UCLHExcelLoader
+import org.modelcatalogue.core.dataimport.excel.uclh.UCLHExcelLoader
 import org.modelcatalogue.integration.obo.OboLoader
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 import org.springframework.http.HttpStatus
+import org.springframework.scheduling.annotation.Async
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
@@ -75,7 +76,7 @@ class DataImportController  {
 
         Long userId = modelCatalogueSecurityService.currentUser?.id
 
-
+        //North Thames GMC specific import type for cancer data
         String suffix = "ca_nt_rawimport.xls"
         if (checkFileNameContainsAndType(file,suffix)) {
             Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
@@ -84,13 +85,12 @@ class DataImportController  {
             String filename = file.originalFilename
             Workbook wb = WorkbookFactory.create(inputStream)
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
-            //executeInBackground(id, "Imported from Excel") {
-                loadSpreadsheet( wb, filename, defaultCatalogueBuilder, suffix, id, userId)
-            //}
+            loadSpreadsheet( wb, filename, defaultCatalogueBuilder, suffix, id, userId)
             redirectToAsset(id)
             return
         }
 
+        //North Thames GMC specific import type for rare disease data
         suffix = "rd_nt_rawimport.xls"
         if (checkFileNameContainsAndType(file,suffix)) {
             Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
@@ -99,12 +99,26 @@ class DataImportController  {
             String filename = file.originalFilename
             Workbook wb = WorkbookFactory.create(inputStream)
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
-            //executeInBackground(id, "Imported from Excel") {
-                loadSpreadsheet( wb, filename,defaultCatalogueBuilder, suffix, id, userId)
-            //}
+            loadSpreadsheet( wb, filename,defaultCatalogueBuilder, suffix, id, userId)
             redirectToAsset(id)
             return
         }
+
+        //Default excel import - which assumes data is in the 'Grid data' format
+        suffix = "xls"
+        if (checkFileNameContainsAndType(file,suffix)) {
+            Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
+            def id = asset.id
+            InputStream inputStream = file.inputStream
+            String filename = file.originalFilename
+            Workbook wb = WorkbookFactory.create(inputStream)
+            defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
+            Pair<String,String> modelDetails = getModelDetails(suffix)
+            loadGridSpreadsheet(wb)
+            redirectToAsset(id)
+            return
+        }
+
 
 
 
@@ -289,7 +303,7 @@ class DataImportController  {
         updated.save(flush: true, failOnError: true)
     }
 
-
+    //simply halts if the closure includes a file stream object
     protected executeInBackground(Long assetId, String message, Closure code) {
         Long userId = modelCatalogueSecurityService.currentUser?.id
         executorService.submit {
@@ -304,21 +318,31 @@ class DataImportController  {
         }
     }
 
+    @Async
+    protected void loadGridSpreadsheet(Workbook wb){
+    //Pair<String,String> modelDetails = getModelDetails(suffix)
+    try{
+        GMCGridReportExcelLoaderDirect loader = new GMCGridReportExcelLoaderDirect()
+        loader.updateFromWorkbookSheet(wb, 0)
+        } catch (Exception e) {
+          logError(e)
+     }
+    }
+
+    @Async
     protected void loadSpreadsheet(Workbook wb, String filename,DefaultCatalogueBuilder defaultCatalogueBuilder, String suffix, Long id, Long userId){
         Pair<String,String> modelDetails = getModelDetails(suffix)
-        //InputStream inputStream = file.getInputStream()
         try{
             UCLHExcelLoader loader = new UCLHExcelLoader(false)
             String dataOwner = ExcelLoader.getOwnerFromFileName(filename, '_nt_rawimport')
-            //Workbook wb = WorkbookFactory.create(inputStream)
-            Pair<Closure, List<String>> instructionsAndDataModelNames = loader.buildInstructionsAndModelNamesFromWorkbookSheet(wb, modelDetails.right, dataOwner)
-            loader.buildModelFromInstructions(defaultCatalogueBuilder, instructionsAndDataModelNames.left)
-            DataModel cancerModel = DataModel.findByName(modelDetails.left)
-            loader.addRelationshipsToModels(cancerModel, instructionsAndDataModelNames.right)
+            List<String> modelNames = loader.loadModel(wb,modelDetails.right,dataOwner)
+            DataModel referenceModel = DataModel.findByNameAndStatus(modelDetails.left, ElementStatus.FINALIZED)
+            //DataModel.findByName()
+            loader.addRelationshipsToModels(referenceModel, modelNames)
             finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
-            } catch (Exception e) {
-                logError(id, e)
-            }
+        } catch (Exception e) {
+            logError(id, e)
+        }
     }
     /*
     *       getModelDetails

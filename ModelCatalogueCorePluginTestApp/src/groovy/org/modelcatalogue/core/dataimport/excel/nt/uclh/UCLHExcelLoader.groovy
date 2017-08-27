@@ -1,17 +1,22 @@
-package org.modelcatalogue.core.dataimport.excel.nt.uclh
+package org.modelcatalogue.core.dataimport.excel.uclh
 
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
+
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.apache.commons.lang.WordUtils
 import org.apache.commons.lang3.tuple.Pair
+import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportExcelLoader
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 
 /**
@@ -37,9 +42,11 @@ class UCLHExcelLoader extends ExcelLoader{
     Long getMCIdFromSpreadSheet(Map<String,String> rowMap) {
         Long id = 0
         try{
-            String sId = rowMap['Idno']?:(rowMap['DE ID']?:'UNAVAILABLE')
-            def identity = sId.split("\\.")
-            id = identity[0] as Long
+            String sId = rowMap['DE ID']?:rowMap['Idno']
+            if(sId){
+                def identity = sId.split("\\.")
+                id = identity[0] as Long
+            }
         }catch(NumberFormatException ne){//
             //exception catches the case where the row has been
             //filled with data that is not in the expected format
@@ -58,12 +65,27 @@ class UCLHExcelLoader extends ExcelLoader{
 
     String getElementFromGelName(Map<String,String> rowMap){
 
-        String sName = rowMap['Name']?:(rowMap['Data Element Name']?:'blankcell')//we need to put this into a form to use on the db
+        String sName = rowMap['Name']?:rowMap['Data Element Name'] //we need to put this into a form to use on the db
         List<String> tokens = sName.tokenize('(') //grab bit before the bracket - Event Reference (14858.3)
         return tokens[0].trim()
 
     }
-    @Override
+    static Map<String, String> metadataHeaders = ['Semantic Matching',	'Known issue',	'Immediate solution', 'Immediate solution Owner',
+                                                  'Long term solution',	'Long term solution owner',	'Data Item', 'Unique Code',
+                                                  'Related To',	'Part of standard data set',
+                                                  'Data Completeness','Estimated quality',
+                                                  'Timely?', 'Comments'].collectEntries {
+        header -> [(header), WordUtils.capitalizeFully(header).replaceAll(/\?/,'')]
+    }  // map from header keys to their capitalized forms used as metadata keys
+
+
+    void buildModelFromInstructions(DefaultCatalogueBuilder defaultCatalogueBuilder, Closure buildInstructions = {}) {
+
+        defaultCatalogueBuilder.build buildInstructions
+    }
+
+
+
     Pair<Closure, List<String>> buildInstructionsAndModelNamesFromWorkbookSheet(Workbook workbook, String sheetName, String owner='') {
 
         if (owner == '') {
@@ -108,41 +130,148 @@ class UCLHExcelLoader extends ExcelLoader{
         } // map from header keys to their capitalized forms used as metadata keys
         String defaultMetadataValue = ''
         Closure resultClosure =    {
-                modelMaps.each{ String modelName, List<Map<String,String>> modelRowMaps ->
-                    dataModel('name': modelName) {
-                        ext 'http://www.modelcatalogue.org/metadata/#organization', 'UCL'
-                        modelRowMaps.each { Map<String, String> rowMap ->
-                            String dename = getNTElementName(rowMap)
-                            if(!dename.equalsIgnoreCase('blankcell_ph')) {
-                                dataElement(name: dename) {
-                                    metadataHeaders.each { k, v ->
-                                        ext v, (rowMap[k] ?: defaultMetadataValue)
-                                    }
-                                    ext 'represents', "${getMCIdFromSpreadSheet(rowMap)}"
+            modelMaps.each{ String modelName, List<Map<String,String>> modelRowMaps ->
+                dataModel('name': modelName) {
+                    ext 'http://www.modelcatalogue.org/metadata/#organization', 'UCL'
+                    modelRowMaps.each { Map<String, String> rowMap ->
+                        String dename = getNTElementName(rowMap)
+                        if(!dename.equalsIgnoreCase('blankcell_ph')) {
+                            dataElement(name: dename) {
+                                metadataHeaders.each { k, v ->
+                                    ext v, (rowMap[k] ?: defaultMetadataValue)
                                 }
+                                ext 'represents', "${getMCIdFromSpreadSheet(rowMap)}"
                             }
                         }
                     }
                 }
-            } as Closure
+            }
+        } as Closure
         return Pair.of(resultClosure, modelNames)
     }
 
+
+    List<String>  loadModel(Workbook workbook, String sheetName, String owner='') {
+
+        if (owner == '') {
+            ownerSuffix = ''
+        }
+        else {
+            ownerSuffix = '_' + owner
+        }
+
+        if (!workbook) {
+            throw new IllegalArgumentException("Excel file contains no worksheet!")
+        }
+        //Sheet sheet = workbook.getSheetAt(index);
+        Sheet sheet = workbook.getSheet(sheetName)
+        Iterator<Row> rowIt = sheet.rowIterator()
+        Row row = rowIt.next()
+        List<String> headers = getRowData(row)
+        List<Map<String, String>> rowMaps = []
+
+        while (rowIt.hasNext()) {
+            row = rowIt.next()
+            if(!isRowEmpty(row)){
+                Map<String, String> rowMap = createRowMap(row, headers)
+                rowMaps << rowMap
+            }
+        }
+        //Set up a Map of new Models in the spreadsheet
+        Map<String, List<Map<String, String>>> modelMaps = rowMaps.groupBy{
+            String modelName = it.get('Collected from')
+            if(modelName){
+                it.get('Collected from')+getOwnerSuffixWithRandom()
+            }
+        }
+        //Store the list of model names for future usage
+        List<String> modelNames = modelMaps.keySet() as List<String>
+        Map<String, String> metadataHeaders = ['Semantic Matching',	'Known issue',	'Immediate solution', 'Immediate solution Owner',
+                                               'Long term solution',	'Long term solution owner',	'Data Item', 'Unique Code',
+                                               'Related To',	'Part of standard data set',
+                                               'Data Completeness','Estimated quality',
+                                               'Timely?', 'Comments'].collectEntries {
+            header -> [(header), WordUtils.capitalizeFully(header).replaceAll(/\?/,'')]
+        } // map from header keys to their capitalized forms used as metadata keys
+
+        //Iterate through the modelMaps to build new DataModel
+        modelMaps.each { String name, List<Map<String, String>> rowMapsForModel ->
+
+            DataModel newModel = getDataModel(name)
+            //Iterate through each row to build an new DataElement
+            rowMapsForModel.each{ Map<String, String> rowMap ->
+                String ntname = getNTElementName(rowMap)
+                String ntdescription = rowMap['Description']
+                DataElement newElement = new DataElement(name: ntname, description:  ntdescription , DataModel: newModel ).save(flush:true, failOnError: true)
+                newElement.setDataModel(newModel)
+                //Add in metadata
+                metadataHeaders.each { k, v ->
+                    newElement.addExtension(v, rowMap[k])
+                }
+                Long ref = getMCIdFromSpreadSheet(rowMap)
+                //Add metadata for adding in relationship to reference model
+                newElement.addExtension("represents", ref as String)
+            }
+
+        }
+        return modelNames
+    }
+
+    private DataModel getDataModel(String dmName){
+        DataModel newModel = DataModel.executeQuery(
+            'from DataModel dm where dm.name=:name and status=:status',
+            [name:dmName, status: ElementStatus.DRAFT]
+        )[0]
+        if((newModel == null )||( newModel.name == null)){
+            newModel = new DataModel(name: dmName).save(flush:true, failOnError: true)
+        }
+        return newModel
+    }
+
+
+
+    String defaultGMCMetadataValue = GMCGridReportExcelLoader.defaultGMCMetadataValue
     @Override
-    String buildXmlFromInstructions(Closure buildInstructions = {}) {
+    Pair<String, List<String>> buildXmlFromWorkbookSheet(Workbook workbook, int index=0, String owner='') {
+
+        if (owner == '') {
+            ownerSuffix = ''
+        }
+        else {
+            ownerSuffix = '_' + owner
+        }
+
+
         Writer stringWriter = new StringWriter()
         CatalogueBuilder catalogueBuilder = new XmlCatalogueBuilder(stringWriter, true)
-        catalogueBuilder.build buildInstructions
-        return stringWriter.toString()
+
+        if (!workbook) {
+            throw new IllegalArgumentException("Excel file contains no worksheet!")
+        }
+        Sheet sheet = workbook.getSheetAt(index);
+
+        List<Map<String, String>> rowMaps = getRowMaps(sheet)
+
+        String modelName = rowMaps[0]['Current Paper Document  or system name']+getOwnerSuffixWithRandom() // at the moment we are dealing with just one            UCLH data source, so there will be just one model
+
+        List<String> modelNames = [modelName]
+
+        catalogueBuilder.build {
+            dataModel('name': modelName) {
+                ext 'http://www.modelcatalogue.org/metadata/#organization', 'UCL'
+                rowMaps.each { Map<String, String> rowMap ->
+                    dataElement(name: getNTElementName(rowMap)) {
+                        metadataHeaders.each {k, v ->
+                            ext v, (rowMap[k] ?: defaultGMCMetadataValue)
+                        }
+                        ext 'represents', "${getMCIdFromSpreadSheet(rowMap)}"
+                        //id('mcID1000')
+                    }
+                }
+            }
+        }
+        return Pair.of(stringWriter.toString(), modelNames)
     }
-
-    @Override
-    void buildModelFromInstructions(DefaultCatalogueBuilder defaultCatalogueBuilder, Closure buildInstructions = {}) {
-
-        defaultCatalogueBuilder.build buildInstructions
-    }
-
-
 
     @Override
     void addRelationshipsToModels(DataModel sourceDataModel, List<String> destinationModelNames){
@@ -151,20 +280,15 @@ class UCLHExcelLoader extends ExcelLoader{
             List<DataElement> importedUCLHelements = dataModel.getDataElements()
             for (DataElement destinationDataElement: importedUCLHelements) {
                 String mcID = destinationDataElement.ext.get('represents')
-                if(mcID){
-                    DataElement sourceDataElement = DataElement.findByModelCatalogueIdAndDataModel(mcID, sourceDataModel) // and sourceDataModel?
-
-                    if(sourceDataElement) {
-                        sourceDataElement.addToRelatedTo(destinationDataElement)
-                        println  "MC id from spreadsheet=" + mcID + ",Related to source=" + sourceDataElement.name + ",dest=" + destinationDataElement.id
-                    }else{
-                        println  "MC id from spreadsheet=" + mcID + "Unable to locate source element to pair with dest=" + destinationDataElement.id
-                    }
+                //DataElement sourceDataElement = DataElement.findByModelCatalogueIdAndSourceModel(mcID) // and sourceDataModel?
+                DataElement sourceDataElement = DataElement.findAllByModelCatalogueIdAndStatus(mcID, ElementStatus.FINALIZED)[0]
+                if(sourceDataElement) {
+                    Relationship rs1 = sourceDataElement.createLinkTo(destinationDataElement, RelationshipType.relatedToType, ignoreRules: true, skipUniqueChecking: true)
+                   // Relationship rs2 = destinationDataElement.createLinkTo(sourceDataElement, RelationshipType.relatedToType, ignoreRules: true, skipUniqueChecking: true)
+                   // println rs1.id + " connected to " + rs2.id
+                    //sourceDataElement.addToRelatedTo(destinationDataElement)
                 }
-
             }
         }
     }
-
-
 }

@@ -22,7 +22,7 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
         XMLUnit.ignoreComments = true
         XMLUnit.ignoreAttributeOrder = true
         stringWriter = new StringWriter()
-        builder = new XmlCatalogueBuilder(stringWriter, true)
+        //builder = new XmlCatalogueBuilder(stringWriter, true)
         excelLoader = new ExcelLoader()
     }
 
@@ -34,7 +34,7 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
         similar standardExcelLoaderXmlResult(file,
             HeadersMap.createForStandardExcelLoader()),
             (new FileInputStream (new File (resourcePath + '/test.catalogue.xml'))).text
-            //getClass().getResourceAsStream('test.catalogue.xml').text
+        //getClass().getResourceAsStream('test.catalogue.xml').text
 
         where:
         file << ['test.xlsx', 'legacy.xlsx']
@@ -44,19 +44,18 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
         return excelLoader.buildXmlFromStandardWorkbookSheet(headersMap,
             WorkbookFactory.create(
                 (new FileInputStream(resourcePath + '/' + sampleFile))),
-                //getClass().getResourceAsStream(sampleFile)),
+            //getClass().getResourceAsStream(sampleFile)),
             index)
     }
 
 
-    Pair<Closure, List<String>> excelLoaderInstructionsAndModelNames(String sampleFile, String sheetName = 'Data items') {
-        excelLoader.buildInstructionsAndModelNamesFromWorkbookSheet(
-             new XSSFWorkbook(
-            getClass().getResourceAsStream(sampleFile)),
-            //builder,
-            sheetName,
+    Pair<String, List<String>> excelLoaderXmlResult(String sampleFile, int index=0) {
+        excelLoader.buildXmlFromWorkbookSheet(
+            new XSSFWorkbook(
+                getClass().getResourceAsStream(sampleFile)),
+            index,
             ExcelLoader.getOwnerFromFileName(sampleFile, '_nt_rawimport')
-            )
+        )
     }
 
 
