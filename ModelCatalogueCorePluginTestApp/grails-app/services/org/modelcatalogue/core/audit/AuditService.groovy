@@ -46,7 +46,7 @@ class AuditService {
        auditorFactory =  { return CompoundAuditor.from(new DefaultAuditor(executorService), new EventNotifier(brokerMessagingTemplate, executorService)) }
        if (modelCatalogueSearchService.indexingManually) {
         Callable<Auditor> oldFactory = auditorFactory
-        auditorFactory = { CompoundAuditor.from(oldFactory(), new SearchNotifier(modelCatalogueSearchService), new EventNotifier(brokerMessagingTemplate, executorService))}
+        auditorFactory = { CompoundAuditor.from(oldFactory(), new SearchNotifier(modelCatalogueSearchService))}
        }
    }
 
