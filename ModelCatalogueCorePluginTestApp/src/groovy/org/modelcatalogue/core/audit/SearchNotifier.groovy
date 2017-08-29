@@ -31,7 +31,7 @@ class SearchNotifier extends AbstractAuditor {
     }
 
     private void indexInternal(Object object) {
-        buffer.onNext(object)
+        if (!getSystem()) {buffer.onNext(object)}
     }
 
     @Override
