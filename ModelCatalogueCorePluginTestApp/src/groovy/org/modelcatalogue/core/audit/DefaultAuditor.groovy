@@ -28,40 +28,42 @@ class DefaultAuditor extends LoggingAuditor {
 
     Observable<Long> logChange(Map <String, Object> changeProps, CatalogueElement element, boolean async) {
         AsyncSubject<Long> subject = AsyncSubject.create()
+        if (!getSystem()) {
 
-        boolean currentSystem = system
+            boolean currentSystem = system
 
-        Closure code = {
+            Closure code = {
 
-            try {
-                Change change = new Change(changeProps)
-                change.system = change.system || currentSystem
-                change.validate()
+                try {
+                    Change change = new Change(changeProps)
+                    change.system = change.system || currentSystem
+                    change.validate()
 
-                if (change.hasErrors()) {
-                    log.warn FriendlyErrors.printErrors("Error logging ${changeProps.type} of $element", change.errors)
+                    if (change.hasErrors()) {
+                        log.warn FriendlyErrors.printErrors("Error logging ${changeProps.type} of $element", change.errors)
 
-                    subject.onNext(0)
-                    subject.onCompleted()
-                    return
+                        subject.onNext(0)
+                        subject.onCompleted()
+                        return
+                    }
+
+                    change.save()
+                    subject.onNext(change.id)
+                } catch (Exception e) {
+                    log.error "Exception writing audit log for $element", e
+                    subject.onError(e)
                 }
 
-                change.save()
-                subject.onNext(change.id)
-            } catch (Exception e) {
-                log.error "Exception writing audit log for $element", e
-                subject.onError(e)
+                subject.onCompleted()
             }
 
-            subject.onCompleted()
-        }
+            if (async) {
+                executorService.submit code
+            } else {
+                code()
+            }
 
-        if (async) {
-            executorService.submit code
-        } else {
-            code()
         }
-
         return subject
     }
 
