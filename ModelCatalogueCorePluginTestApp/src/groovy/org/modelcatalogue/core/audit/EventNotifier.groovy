@@ -30,28 +30,31 @@ class EventNotifier extends LoggingAuditor {
     @Override
     protected Observable<Long> logChange(Map<String, Object> changeProps, CatalogueElement element, boolean async) {
         // this is always async
-        String change = changeProps.type?.toString()
-        String elementAsJSON = render(element)
-        String key = "${GrailsNameUtils.getPropertyName(HibernateHelper.getEntityClass(element))}/${element.getId()}"
-        Subject<Map<String, Object>,Map<String, Object>> debounceQueue = CacheService.DEBOUNCE_CACHE.getIfPresent(key)
-        if (!debounceQueue) {
-            debounceQueue = PublishSubject.create()
+        if (!getSystem()) {
 
-            debounceQueue.debounce(1, TimeUnit.SECONDS).subscribe({
-                brokerMessagingTemplate.convertAndSend("/topic/changes/$key".toString(), it)
-            } , {
-                throw new RuntimeException("Problems sending element: ${element} with change props: $changeProps to /topic/changes/$key", it)
-            })
+            String change = changeProps.type?.toString()
+            String elementAsJSON = render(element)
+            String key = "${GrailsNameUtils.getPropertyName(HibernateHelper.getEntityClass(element))}/${element.getId()}"
+            Subject<Map<String, Object>,Map<String, Object>> debounceQueue = CacheService.DEBOUNCE_CACHE.getIfPresent(key)
+            if (!debounceQueue) {
+                debounceQueue = PublishSubject.create()
 
-            CacheService.DEBOUNCE_CACHE.put(key, debounceQueue)
-        }
-        executorService.execute {
-            debounceQueue.onNext([element: elementAsJSON, change: change])
-        }
+                debounceQueue.debounce(1, TimeUnit.SECONDS).subscribe({
+                    brokerMessagingTemplate.convertAndSend("/topic/changes/$key".toString(), it)
+                } , {
+                    throw new RuntimeException("Problems sending element: ${element} with change props: $changeProps to /topic/changes/$key", it)
+                })
 
-        // notify the data model that some nested element has been changed
-        if (element.dataModel) {
-            logChange(element.dataModel, type: ChangeType.DATA_MODEL_CHANGED, async)
+                CacheService.DEBOUNCE_CACHE.put(key, debounceQueue)
+            }
+            executorService.execute {
+                debounceQueue.onNext([element: elementAsJSON, change: change])
+            }
+
+            // notify the data model that some nested element has been changed
+            if (element.dataModel) {
+                logChange(element.dataModel, type: ChangeType.DATA_MODEL_CHANGED, async)
+            }
         }
 
         // does not create any entity so it does not emit any id
