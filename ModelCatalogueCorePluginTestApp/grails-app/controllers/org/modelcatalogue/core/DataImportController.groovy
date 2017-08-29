@@ -6,6 +6,7 @@ import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportExcelLoaderDirect
+import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportXlsxExporter
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.core.dataimport.excel.ExcelLoader
@@ -30,6 +31,7 @@ class DataImportController  {
     def dataModelService
     def assetService
     def auditService
+    def dataClassService
 
 
     private static final List<String> CONTENT_TYPES = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream', 'application/xml', 'text/xml', 'application/zip']
@@ -110,11 +112,12 @@ class DataImportController  {
             Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
             def id = asset.id
             InputStream inputStream = file.inputStream
-            String filename = file.originalFilename
+            //String filename = file.originalFilename
             Workbook wb = WorkbookFactory.create(inputStream)
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
-            Pair<String,String> modelDetails = getModelDetails(suffix)
+            //Pair<String,String> modelDetails = getModelDetails(suffix)
             loadGridSpreadsheet(wb)
+            finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
             redirectToAsset(id)
             return
         }
@@ -324,6 +327,7 @@ class DataImportController  {
     try{
         GMCGridReportExcelLoaderDirect loader = new GMCGridReportExcelLoaderDirect()
         loader.updateFromWorkbookSheet(wb, 0)
+
         } catch (Exception e) {
           logError(e)
      }
@@ -337,9 +341,9 @@ class DataImportController  {
             String dataOwner = ExcelLoader.getOwnerFromFileName(filename, '_nt_rawimport')
             List<String> modelNames = loader.loadModel(wb,modelDetails.right,dataOwner)
             DataModel referenceModel = DataModel.findByNameAndStatus(modelDetails.left, ElementStatus.FINALIZED)
-            //DataModel.findByName()
             loader.addRelationshipsToModels(referenceModel, modelNames)
             finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
+
         } catch (Exception e) {
             logError(id, e)
         }
