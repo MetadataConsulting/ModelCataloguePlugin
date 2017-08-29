@@ -51,6 +51,7 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
     static List<String> ntElementMetadataKeys = GMCGridReportHeaders.ntElementMetadataKeys
     static List<String> excelHeaders = GMCGridReportHeaders.excelHeaders
 
+
     @Override
     Map<String, Closure> sheetsAfterMainSheetExport() {
         Map<String, Closure> sheets =

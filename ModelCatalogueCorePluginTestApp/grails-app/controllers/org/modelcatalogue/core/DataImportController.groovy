@@ -228,36 +228,6 @@ class DataImportController  {
             return
         }
 
-//        if (checkFileNameEndsWith('.umlj')) {
-//            Asset asset = assetService.storeAsset(params, file, 'text/umlj')
-//            def id = asset.id
-//            defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
-//            InputStream inputStream = file.inputStream
-//            String name = params?.name
-//            executeInBackground(id, "Imported from Style UML")  {
-//                try {
-//                    DataModel dataModel = DataModel.findByName(name)
-//                    if(!dataModel) dataModel =  new DataModel(name: name).save(flush:true, failOnError:true)
-//                    umljService.importUmlDiagram(defaultCatalogueBuilder, inputStream, name, dataModel)
-//                    Asset updated = Asset.get(id)
-//                    updated.dataModel = dataModel
-//                    updated.status = ElementStatus.FINALIZED
-//                    updated.description = "Your import has finished."
-//                    updated.dataModel = dataModel
-//                    updated.save(flush: true, failOnError: true)
-//                } catch (Exception e) {
-//                    Asset updated = Asset.get(id)
-//                    updated.refresh()
-//                    updated.status = ElementStatus.FINALIZED
-//                    updated.name = updated.name + " - Error during upload"
-//                    updated.description = "Error importing umlj file: ${e}"
-//                    updated.save(flush: true, failOnError: true)
-//                }
-//            }
-//
-//            redirectToAsset(id)
-//            return
-//        }
 
         if (!CONTENT_TYPES.contains(confType)) errors.add("input should be an Excel, XML, MC, OBO, UML or LOINC file but uploaded content is ${confType}")
         respond "errors": errors
