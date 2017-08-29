@@ -12,8 +12,6 @@ import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.ValidationRule
-import org.modelcatalogue.core.diff.CatalogueElementDiffs
-import org.modelcatalogue.core.export.inventory.CatalogueElementToXlsxExporter
 import org.modelcatalogue.core.export.inventory.ModelCatalogueStyles
 import org.modelcatalogue.core.util.DataModelFilter
 
@@ -23,9 +21,6 @@ import org.modelcatalogue.spreadsheet.builder.api.SpreadsheetBuilder
 import org.modelcatalogue.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
-import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHANGE_NEW
-import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.CHANGE_REMOVAL
-
 
 /**
  * GridReportXlsxExporter.groovy
@@ -60,6 +55,12 @@ class GridReportXlsxExporter  {
             style medium
         }
     }
+    List<DataClass> getDataClasses() {
+        return getDataClassesFromModel(element as DataModel)
+    }
+    List<DataClass> getDataClassesFromModel(DataModel dataModel) {
+        return dataClassService.getTopLevelDataClasses(DataModelFilter.includes(dataModel), ImmutableMap.of('status', 'active'), true).items
+    }
     protected List<String> excelHeaders = ['Data Element', 'Multiplicity', 'Data Type', 'Validation Rule', 'Business Rule', 'Labkey Field Name', 'Labkey View', 'Additional review', 'Additional Rule']
 
     Map<String, Closure> sheetsAfterMainSheetExport() {}
@@ -67,7 +68,7 @@ class GridReportXlsxExporter  {
     void export(OutputStream outputStream) {
         SpreadsheetBuilder builder = new PoiSpreadsheetBuilder()
         List<DataClass> dataClasses = Collections.emptyList()
-        dataClasses = dataClassService.getTopLevelDataClasses(DataModelFilter.includes(element as DataModel), ImmutableMap.of('status', 'active'), true).items
+        dataClasses = getDataClasses()
 
         builder.build(outputStream) {
             apply ModelCatalogueStyles
