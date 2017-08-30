@@ -179,9 +179,9 @@ class UCLHExcelLoader extends ExcelLoader{
         }
         //Set up a Map of new Models in the spreadsheet
         Map<String, List<Map<String, String>>> modelMaps = rowMaps.groupBy{
-            String modelName = it.get('Collected from')
+            String modelName = it.get('Collected from') ?: it.get('Primary source') ?: it.get('Secondary source')
             if(modelName){
-                it.get('Collected from')+getOwnerSuffixWithRandom()
+                modelName+getOwnerSuffixWithRandom()
             }
         }
         //Store the list of model names for future usage
@@ -201,7 +201,7 @@ class UCLHExcelLoader extends ExcelLoader{
             //Iterate through each row to build an new DataElement
             rowMapsForModel.each{ Map<String, String> rowMap ->
                 String ntname = getNTElementName(rowMap)
-                String ntdescription = rowMap['Description']
+                String ntdescription = rowMap['Description'] ?: rowMap['DE Description']
                 DataElement newElement = new DataElement(name: ntname, description:  ntdescription , DataModel: newModel ).save(flush:true, failOnError: true)
                 newElement.setDataModel(newModel)
                 //Add in metadata
