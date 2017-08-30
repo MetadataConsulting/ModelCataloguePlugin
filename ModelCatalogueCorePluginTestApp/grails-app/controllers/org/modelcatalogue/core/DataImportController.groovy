@@ -87,7 +87,9 @@ class DataImportController  {
             String filename = file.originalFilename
             Workbook wb = WorkbookFactory.create(inputStream)
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
-            loadSpreadsheet( wb, filename, defaultCatalogueBuilder, suffix, id, userId)
+            executeInBackground(id, "Imported from XML ZIP") {
+                loadSpreadsheet( wb, filename,defaultCatalogueBuilder, suffix, id, userId)
+            }
             redirectToAsset(id)
             return
         }
@@ -101,7 +103,9 @@ class DataImportController  {
             String filename = file.originalFilename
             Workbook wb = WorkbookFactory.create(inputStream)
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
-            loadSpreadsheet( wb, filename,defaultCatalogueBuilder, suffix, id, userId)
+            executeInBackground(id, "Imported from XML ZIP") {
+                loadSpreadsheet( wb, filename,defaultCatalogueBuilder, suffix, id, userId)
+            }
             redirectToAsset(id)
             return
         }
@@ -112,17 +116,15 @@ class DataImportController  {
             Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
             def id = asset.id
             InputStream inputStream = file.inputStream
-            //String filename = file.originalFilename
             Workbook wb = WorkbookFactory.create(inputStream)
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
-            //Pair<String,String> modelDetails = getModelDetails(suffix)
-            loadGridSpreadsheet(wb)
+            executeInBackground(id, "Imported from XML ZIP") {
+                loadGridSpreadsheet(wb)
+            }
             finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
             redirectToAsset(id)
             return
         }
-
-
 
 
         if (checkFileNameContainsAndType(file, '.zip')) {
@@ -293,29 +295,32 @@ class DataImportController  {
 
     @Async
     protected void loadGridSpreadsheet(Workbook wb){
-    //Pair<String,String> modelDetails = getModelDetails(suffix)
-    try{
-        GMCGridReportExcelLoaderDirect loader = new GMCGridReportExcelLoaderDirect()
-        loader.updateFromWorkbookSheet(wb, 0)
+        auditService.mute {
+            try {
+                GMCGridReportExcelLoaderDirect loader = new GMCGridReportExcelLoaderDirect()
+                loader.updateFromWorkbookSheet(wb, 0)
 
-        } catch (Exception e) {
-          logError(e)
-     }
+            } catch (Exception e) {
+                logError(e)
+            }
+        }
     }
 
     @Async
     protected void loadSpreadsheet(Workbook wb, String filename,DefaultCatalogueBuilder defaultCatalogueBuilder, String suffix, Long id, Long userId){
         Pair<String,String> modelDetails = getModelDetails(suffix)
-        try{
-            UCLHExcelLoader loader = new UCLHExcelLoader(false)
-            String dataOwner = ExcelLoader.getOwnerFromFileName(filename, '_nt_rawimport')
-            List<String> modelNames = loader.loadModel(wb,modelDetails.right,dataOwner)
-            DataModel referenceModel = DataModel.findByNameAndStatus(modelDetails.left, ElementStatus.FINALIZED)
-            loader.addRelationshipsToModels(referenceModel, modelNames)
-            finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
+        auditService.mute {
+            try{
+                UCLHExcelLoader loader = new UCLHExcelLoader(false)
+                String dataOwner = ExcelLoader.getOwnerFromFileName(filename, '_nt_rawimport')
+                List<String> modelNames = loader.loadModel(wb,modelDetails.right,dataOwner)
+                DataModel referenceModel = DataModel.findByNameAndStatus(modelDetails.left, ElementStatus.FINALIZED)
+                loader.addRelationshipsToModels(referenceModel, modelNames)
+                finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
 
-        } catch (Exception e) {
-            logError(id, e)
+            } catch (Exception e) {
+                logError(id, e)
+            }
         }
     }
     /*
