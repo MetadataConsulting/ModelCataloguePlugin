@@ -75,7 +75,7 @@ class UCLHExcelLoader extends ExcelLoader{
 
     }
     static Map<String, String> metadataHeaders = ['Semantic Matching',	'Known issue',	'Immediate solution', 'Immediate solution Owner',
-                                                  'Long term solution',	'Long term solution owner',	'Data Item', 'Unique Code',
+                                                  'Long term solution',	'Long term solution owner',	'Data Item Unique Code',
                                                   'Related To',	'Part of standard data set',
                                                   'Data Completeness','Estimated quality',
                                                   'Timely?', 'Comments'].collectEntries {
@@ -125,13 +125,7 @@ class UCLHExcelLoader extends ExcelLoader{
 //        }
 //
 //        List<String> modelNames = modelMaps.keySet() as List<String>
-//        Map<String, String> metadataHeaders = ['Semantic Matching',	'Known issue',	'Immediate solution', 'Immediate solution Owner',
-//                                               'Long term solution',	'Long term solution owner',	'Data Item', 'Unique Code',
-//                                               'Related To',	'Part of standard data set',
-//                                               'Data Completeness','Estimated quality',
-//                                               'Timely?', 'Comments'].collectEntries {
-//            header -> [(header), WordUtils.capitalizeFully(header).replaceAll(/\?/,'')]
-//        } // map from header keys to their capitalized forms used as metadata keys
+
 //        String defaultMetadataValue = ''
 //        Closure resultClosure =    {
 //            modelMaps.each{ String modelName, List<Map<String,String>> modelRowMaps ->
@@ -190,29 +184,26 @@ class UCLHExcelLoader extends ExcelLoader{
         }
         //Store the list of model names for future usage
         List<String> modelNames = modelMaps.keySet() as List<String>
-        Map<String, String> metadataHeaders = ['Semantic Matching',	'Known issue',	'Immediate solution', 'Immediate solution Owner',
-                                               'Long term solution',	'Long term solution owner',	'Data Item', 'Unique Code',
-                                               'Related To',	'Part of standard data set',
-                                               'Data Completeness','Estimated quality',
-                                               'Timely?', 'Comments'].collectEntries {
-            header -> [(header), WordUtils.capitalizeFully(header).replaceAll(/\?/,'')]
-        } // map from header keys to their capitalized forms used as metadata keys
 
 
         Date start = new Date()
         log.info("Start import to mc" + ownerSuffix )
+        timed("Start import to mc for $ownerSuffix", {
         //Iterate through the modelMaps to build new DataModel
         modelMaps.each { String name, List<Map<String, String>> rowMapsForModel ->
 
+            timed(
+            "Start import of model $name",
+            {
             DataModel newModel = getDataModel(name)
-            Date startModelImport = new Date()
-            log.info("Start import of model" + name )
             //Iterate through each row to build an new DataElement
             rowMapsForModel.each{ Map<String, String> rowMap ->
                 String ntname = getNTElementName(rowMap)
                 String ntdescription = rowMap['Description'] ?: rowMap['DE Description']
-                Date startElementInport = new Date()
-                log.info("Start import of model" + name )
+
+                timed(
+                "Start import of element $ntname",
+                {
                 DataElement newElement = new DataElement(name: ntname, description:  ntdescription , DataModel: newModel ).save(flush:true, failOnError: true)
 
                 newElement.setDataModel(newModel)
@@ -223,19 +214,35 @@ class UCLHExcelLoader extends ExcelLoader{
                 Long ref = getMCIdFromSpreadSheet(rowMap)
                 //Add metadata for adding in relationship to reference model
                 newElement.addExtension("represents", ref as String)
-                Date stopElementImport = new Date()
-                TimeDuration tdElementImport = TimeCategory.minus( stopElementImport, startElementInport )
-                log.info("Complete element import, element= " + newElement.name + "duration:" + tdElementImport )
+                return newElement.name
+                },
+                {String newElementName ->
+                    "Complete element import, element = $newElementName"
+                })
+
             }
-            Date stopModelImport = new Date()
-            TimeDuration tdModelImport = TimeCategory.minus( stopModelImport, startModelImport )
-            log.info("Complete model import, model= " + newModel.name + "duration:" + tdModelImport )
+            return newModel.name
+            },
+            {String newModelName ->
+                "Complete model import, model = $newModelName"
+            })
+
 
         }
-        Date stop = new Date()
-        TimeDuration td = TimeCategory.minus( stop, start )
-        log.info("Complete import, " + ownerSuffix  +  "duration:" + td )
+        return ''
+        },
+        {String unused ->
+            "Completed import to mc for $ownerSuffix"
+        })
         return modelNames
+    }
+    void timed(String startMessage, Closure<String> block, Closure<String> endMessageFromResultOfBlock) {
+        Date start = new Date()
+        log.info(startMessage)
+        String resultString = block.call()
+        Date stop = new Date()
+        TimeDuration duration = TimeCategory.minus(stop, start)
+        log.info(endMessageFromClosure(resultString) + " duration: $duration")
     }
 
     private DataModel getDataModel(String dmName){
