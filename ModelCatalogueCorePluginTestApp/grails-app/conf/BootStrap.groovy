@@ -139,7 +139,7 @@ class BootStrap {
                 when { DataModel dataModel ->
                     (dataModel.countDeclares() > 0) && (gelSourceModelNames.contains(dataModel.name))
                 }
-                link controller: 'northThames', action: 'northThamesSummaryReport', id: true, params: [organization: name]
+                link {[controller: 'northThames', action: 'northThamesSummaryReport', id: true, params: [organization: name]]}
             }
         }
 
