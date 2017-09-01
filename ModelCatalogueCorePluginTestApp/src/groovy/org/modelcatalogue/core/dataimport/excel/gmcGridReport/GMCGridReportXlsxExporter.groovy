@@ -28,6 +28,16 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
     Map metadataCompletion = [:]
     String organization = ''
 
+    /**
+     * The report is triggered from a DataModel (element), and is on the
+     * location of data elements specified by that DataModel in the given 'organization'.
+     * @param element
+     * @param dataClassService
+     * @param grailsApplication
+     * @param depth
+     * @param organization
+     * @return
+     */
     static GMCGridReportXlsxExporter create(DataModel element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3, String organization = 'UCL') {
         return new GMCGridReportXlsxExporter(element, dataClassService, grailsApplication, depth, organization)
     }
