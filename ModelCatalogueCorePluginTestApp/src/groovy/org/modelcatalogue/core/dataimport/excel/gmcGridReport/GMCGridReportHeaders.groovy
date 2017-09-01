@@ -10,7 +10,7 @@ class GMCGridReportHeaders {
     static String dataType = 'Data Type'
     static String validationRule = 'Validation Rule'
     static String businessRule = 'Business Rule'
-    static String relatedTo = 'Related To'
+    static String placeholder = 'Placeholder'
     static String sourceSystem = 'Source System'
     static String previouslyInSourceSystem = 'Previously In Source System'
 
@@ -21,7 +21,7 @@ class GMCGridReportHeaders {
     static String longTermSolution = 'Long Term Solution'
     static String longTermSolutionOwner = 'Long Term Solution Owner'
     static String dataItemUniqueCode = 'Data Item Unique Code'
-    static String relatedToMetadata = 'Related To Metadata'
+    static String relatedTo = 'Related To'
     static String partOfStandardDataSet = 'Part Of Standard Data Set'
     static String dataCompleteness = 'Data Completeness'
     static String estimatedQuality = 'Estimated Quality'
@@ -31,10 +31,9 @@ class GMCGridReportHeaders {
 
 
     static List<String> ntElementMetadataHeaders =
-        [semanticMatching, knownIssue, immediateSolution, immediateSolutionOwner, longTermSolution, longTermSolutionOwner, dataItemUniqueCode, relatedToMetadata, partOfStandardDataSet, dataCompleteness, estimatedQuality, timely, comments]
-    static List<String> ntElementMetadataKeys = ntElementMetadataHeaders.collect{
-        it.replace(/Related To Metadata/, 'Related To')}
+        [semanticMatching, knownIssue, immediateSolution, immediateSolutionOwner, longTermSolution, longTermSolutionOwner, dataItemUniqueCode, relatedTo, partOfStandardDataSet, dataCompleteness, estimatedQuality, timely, comments]
+    static List<String> ntElementMetadataKeys = ntElementMetadataHeaders //ntElementMetadataHeaders.collect{ it.replace(/Related To Metadata/, 'Related To')}
     static List<String> excelHeaders = // v0.2
-        [id, dataElement, multiplicity, dataType, validationRule, businessRule, relatedTo, sourceSystem, previouslyInSourceSystem] + ntElementMetadataHeaders
+        [id, dataElement, multiplicity, dataType, validationRule, businessRule, placeholder, sourceSystem, previouslyInSourceSystem] + ntElementMetadataHeaders
 
 }
