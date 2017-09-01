@@ -242,7 +242,7 @@ class UCLHExcelLoader extends ExcelLoader{
         String resultString = block.call()
         Date stop = new Date()
         TimeDuration duration = TimeCategory.minus(stop, start)
-        log.info(endMessageFromClosure(resultString) + " duration: $duration")
+        log.info(endMessageFromResultOfBlock(resultString) + " duration: $duration")
     }
 
     private DataModel getDataModel(String dmName){
