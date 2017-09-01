@@ -127,8 +127,8 @@ class BootStrap {
             link controller: 'dataModel', action: 'gridSpreadsheet', id: true
         }
 
-        List<String> northThamesHospitalNames = ['GOSH', "LNWH", "MEH", "UCLH"] // not sure if this should be defined here. Maybe it would be better in a source file, or perhaps a config file.
-        List<String> gelSourceModelNames = ["Cancer Model", "Rare Diseases"]
+        List<String> northThamesHospitalNames = ['GOSH', 'LNWH', 'MEH', 'UCLH'] // not sure if this should be defined here. Maybe it would be better in a source file, or perhaps a config file.
+        List<String> gelSourceModelNames = ['Cancer Model', 'Rare Diseases']
         northThamesHospitalNames.each{ name ->
             reportsRegistry.register {
                 creates asset
