@@ -86,7 +86,7 @@ class CopyAssociationsAndRelationships {
             }
 
             //don't copy inherited relationships - if they are inherited the based on relationships will be copied and they will get handled by that function
-            
+
             if (r.inherited) {
                 return
             }
