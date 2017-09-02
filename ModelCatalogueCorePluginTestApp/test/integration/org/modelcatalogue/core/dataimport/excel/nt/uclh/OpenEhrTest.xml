@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/2.2/metadataregistry.xsd">
+    <dataModel name="null_GEL">
+        <dataElement name="Name not provided_ph">
+            <extensions>
+                <extension key="Archetype Path Query Statement">unavailable</extension>
+                <extension key="Gel Dataset Identifier">unavailable</extension>
+                <extension key="represents">0</extension>
+            </extensions>
+        </dataElement>
+        <dataElement name="Name not provided_ph">
+            <extensions>
+                <extension key="Archetype Path Query Statement">unavailable</extension>
+                <extension key="Gel Dataset Identifier">unavailable</extension>
+                <extension key="represents">0</extension>
+            </extensions>
+        </dataElement>
+        <dataElement name="Name not provided_ph">
+            <extensions>
+                <extension key="Archetype Path Query Statement">unavailable</extension>
+                <extension key="Gel Dataset Identifier">unavailable</extension>
+                <extension key="represents">0</extension>
+            </extensions>
+        </dataElement>
+        <dataElement name="Name not provided_ph">
+            <extensions>
+                <extension key="Archetype Path Query Statement">unavailable</extension>
+                <extension key="Gel Dataset Identifier">unavailable</extension>
+                <extension key="represents">0</extension>
+            </extensions>
+        </dataElement>
+        <dataElement name="Name not provided_ph">
+            <extensions>
+                <extension key="Archetype Path Query Statement">unavailable</extension>
+                <extension key="Gel Dataset Identifier">unavailable</extension>
+                <extension key="represents">0</extension>
+            </extensions>
+        </dataElement>
+        <dataElement name="Name not provided_ph">
+            <extensions>
+                <extension key="Archetype Path Query Statement">unavailable</extension>
+                <extension key="Gel Dataset Identifier">unavailable</extension>
+                <extension key="represents">0</extension>
+            </extensions>
+        </dataElement>
+        <dataElement name="Name not provided_ph">
+            <extensions>
+                <extension key="Archetype Path Query Statement">unavailable</extension>
+                <extension key="Gel Dataset Identifier">unavailable</extension>
+                <extension key="represents">0</extension>
+            </extensions>
+        </dataElement>
+        <dataElement name="Name not provided_ph">
+            <extensions>
+                <extension key="Archetype Path Query Statement">unavailable</extension>
+                <extension key="Gel Dataset Identifier">unavailable</extension>
+                <extension key="represents">0</extension>
+            </extensions>
+        </dataElement>
+        <dataElement name="Name not provided_ph">
+            <extensions>
+                <extension key="Archetype Path Query Statement">unavailable</extension>
+                <extension key="Gel Dataset Identifier">unavailable</extension>
+                <extension key="represents">0</extension>
+            </extensions>
+        </dataElement>
+        <dataElement name="Name not provided_ph">
+            <extensions>
+                <extension key="Archetype Path Query Statement">unavailable</extension>
+                <extension key="Gel Dataset Identifier">unavailable</extension>
+                <extension key="represents">0</extension>
+            </extensions>
+        </dataElement>
+        <dataElement name="Name not provided_ph">
+            <extensions>
+                <extension key="Archetype Path Query Statement">unavailable</extension>
+                <extension key="Gel Dataset Identifier">unavailable</extension>
+                <extension key="represents">0</extension>
+            </extensions>
+        </dataElement>
+        <dataElement name="Name not provided_ph">
+            <extensions>
+                <extension key="Archetype Path Query Statement">unavailable</extension>
+                <extension key="Gel Dataset Identifier">unavailable</extension>
+                <extension key="represents">0</extension>
+            </extensions>
+        </dataElement>
+        <dataElement name="Name not provided_ph">
+            <extensions>
+                <extension key="Archetype Path Query Statement">unavailable</extension>
+                <extension key="Gel Dataset Identifier">unavailable</extension>
+                <extension key="represents">0</extension>
+            </extensions>
+        </dataElement>
+        <extensions>
+            <extension key="http://www.modelcatalogue.org/metadata/#organization">UCL</extension>
+        </extensions>
+    </dataModel>
+</catalogue>

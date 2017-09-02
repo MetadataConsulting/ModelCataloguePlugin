@@ -57,6 +57,14 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
             ExcelLoader.getOwnerFromFileName(sampleFile, '_nt_rawimport')
         )
     }
+    Pair<String, List<String>> excelLoaderXmlResult(String sampleFile, String bitInBetween, int index=0) {
+        excelLoader.buildXmlFromWorkbookSheet(
+            new XSSFWorkbook(
+                getClass().getResourceAsStream(sampleFile)),
+            index,
+            ExcelLoader.getOwnerFromFileName(sampleFile, bitInBetween)
+        )
+    }
 
 
     boolean similar(String sampleXml, String expectedXml) {
