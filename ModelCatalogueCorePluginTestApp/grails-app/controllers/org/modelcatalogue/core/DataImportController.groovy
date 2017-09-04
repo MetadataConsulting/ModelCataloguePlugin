@@ -7,6 +7,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportExcelLoaderDirect
 import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportXlsxExporter
+import org.modelcatalogue.core.dataimport.excel.nt.uclh.OpenEhrExcelLoader
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.builder.BuildProgressMonitor
 import org.modelcatalogue.core.dataimport.excel.ExcelLoader
@@ -106,6 +107,23 @@ class DataImportController  {
             executeInBackground(id, "Imported from XML ZIP") {
                 loadSpreadsheet( wb, filename,defaultCatalogueBuilder, suffix, id, userId)
             }
+            redirectToAsset(id)
+            return
+        }
+
+        //Default excel import - which assumes data is in the 'Grid data' format
+        suffix = "openEHR.xls"
+        if (checkFileNameContainsAndType(file,suffix)) {
+            Asset asset = assetService.storeAsset(params, file, 'application/vnd.ms-excel')
+            def id = asset.id
+            InputStream inputStream = file.inputStream
+            String filename = file.originalFilename
+            Workbook wb = WorkbookFactory.create(inputStream)
+            defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
+            executeInBackground(id, "Imported from XML ZIP") {
+                loadOpenEhrSpreadsheet( wb, filename,defaultCatalogueBuilder, suffix, id, userId)
+            }
+            finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
             redirectToAsset(id)
             return
         }
@@ -314,6 +332,25 @@ class DataImportController  {
                 UCLHExcelLoader loader = new UCLHExcelLoader(false)
                 String dataOwner = ExcelLoader.getOwnerFromFileName(filename, '_nt_rawimport')
                 List<String> modelNames = loader.loadModel(wb,modelDetails.right,dataOwner)
+                DataModel referenceModel = DataModel.findByNameAndStatus(modelDetails.left, ElementStatus.FINALIZED)
+                loader.addRelationshipsToModels(referenceModel, modelNames)
+                finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
+
+            } catch (Exception e) {
+                logError(id, e)
+            }
+        }
+    }
+
+
+    @Async
+    protected void loadOpenEhrSpreadsheet(Workbook wb, String filename,DefaultCatalogueBuilder defaultCatalogueBuilder, String suffix, Long id, Long userId){
+        Pair<String,String> modelDetails = getModelDetails(suffix)
+        auditService.mute {
+            try{
+                OpenEhrExcelLoader loader = new OpenEhrExcelLoader(false)
+                String dataOwner = ExcelLoader.getOwnerFromFileName(filename, '_openEHR')
+                List<String> modelNames = loader.loadModel(wb,dataOwner)
                 DataModel referenceModel = DataModel.findByNameAndStatus(modelDetails.left, ElementStatus.FINALIZED)
                 loader.addRelationshipsToModels(referenceModel, modelNames)
                 finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
