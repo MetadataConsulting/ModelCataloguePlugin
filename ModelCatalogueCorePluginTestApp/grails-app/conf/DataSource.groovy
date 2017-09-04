@@ -13,7 +13,7 @@ environments {
             driverClassName = "com.mysql.jdbc.Driver"
             dialect='org.hibernate.dialect.MySQL5InnoDBDialect'
 
-            url = "jdbc:mysql://localhost:3306/exceltest3"
+            url = "jdbc:mysql://localhost:3306/exceltest"
             username = 'mdradmin'
             password = 'mdradmin123'
             dbCreate = "update"
@@ -63,6 +63,25 @@ environments {
         }
     }
     production {
-        // from external config
+        dataSource {
+            driverClassName = "com.mysql.jdbc.Driver"
+            dialect='org.hibernate.dialect.MySQL5InnoDBDialect'
+
+            url = System.getenv('mdx_db_url')//"jdbc:mysql://localhost:3306/exceltest"
+            username = System.getenv('mdx_db_username')//'mdradmin'
+            password = System.getenv('mdx_db_passwprd')//'mdradmin123'
+            dbCreate = "update"
+            properties {
+                maxActive = -1
+                minEvictableIdleTimeMillis=1800000
+                timeBetweenEvictionRunsMillis=1800000
+                numTestsPerEvictionRun=3
+                testOnBorrow=true
+                testWhileIdle=true
+                testOnReturn=false
+                validationQuery="SELECT 1"
+                jdbcInterceptors="ConnectionState"
+            }
+        }
     }
 }

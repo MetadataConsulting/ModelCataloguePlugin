@@ -7,6 +7,8 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.Tag
 import org.modelcatalogue.core.ValidationRule
 import org.modelcatalogue.core.security.User
+import groovy.json.JsonSlurper
+
 
 // locations to search for config files that get merged into the main config;
 // config files can be ConfigSlurper scripts, Java properties files, or classes
@@ -189,14 +191,66 @@ environments {
     production {
         grails.logging.jul.usebridge = false
 
-        // ---
-        // you can overrides in your mc-config.groovy
         mc.sync.relationshipTypes=true
         grails.assets.minifyJs = true
         // configure the default storage
         mc.storage.directory = "/tmp/mc/storage"
         mc.storage.maxSize = 50 * 1024 * 1024
         // ---
+        grails.logging.jul.usebridge = false
+        grails.serverURL = System.getProperty('mdx_server_url')//"https://localhost:8899/mc"
+
+        grails.plugin.springsecurity.auth.loginFormUrl = "${grails.serverURL}/login/auth"
+        grails.plugin.springsecurity.successHandler.ajaxSuccessUrl = "${grails.serverURL}/login/ajaxSuccess"
+        grails.plugin.springsecurity.failureHandler.ajaxAuthFailUrl = "${grails.serverURL}/login/authfail"
+        grails.plugin.springsecurity.logout.afterLogoutUrl = grails.serverURL
+        grails.plugin.springsecurity.successHandler.defaultTargetUrl = grails.serverURL
+
+
+        mc.search.elasticsearch.host=System.getenv("mdx_elastic_host")//"127.0.0.1"
+        mc.ssearch.elasticsearch.port=System.getenv("mdx_elastic_host")//'9300'
+
+        grails.plugin.console.enabled=true
+        mc.legacy.dataModels=true
+        grails.mail.default.from = System.getenv("MC_MAIL_FROM")//"admin@datalink.org.uk"//System.getenv("MC_MAIL_FROM")
+        grails.plugin.springsecurity.ui.register.emailFrom = System.getenv("MC_MAIL_FROM")//"david@metadataconsulting.co.uk"//System.getenv("MC_MAIL_FROM")
+        grails.plugin.springsecurity.ui.forgotPassword.emailFrom = System.getenv("MC_MAIL_FROM")//"david@metadataconsulting.co.uk"//System.getenv("MC_MAIL_FROM")
+
+        grails {
+            mail {
+                host = System.getenv('mdx_mail_host')//"vps.beenleigh.com"
+                port = System.getenv('mdx_mail_port')//"25" as Integer
+                username = System.getenv('mdx_mail_username')//"testadmin@datalink.org.uk"//System.getenv("MC_MAIL_USERNAME")
+                password = System.getenv('mdx_mail_password')//"adm1nAtB33nl31gh"//System.getenv("MC_MAIL_PASSWORD")
+                if (System.getenv("MC_MAIL_PROPS")) {
+                    props = new JsonSlurper().parseText(System.getenv("MC_MAIL_PROPS"))
+                }
+            }
+        }
+
+
+
+        mc.name = System.getenv('mdx_name')//"Metadata Exchange"
+        mc.welcome.jumbo = System.getenv('mdx_welcome')//"The Metadata Exchange is loaded with some test data"
+        mc.welcome.info = System.getenv('mdx_info')//"Welcome to the Metadata Exchange"
+        mc.allow.signup = System.getenv('mdx_allow_signup')//true
+
+
+
+        if (System.getenv("MC_CSS_CUSTOM")) {
+            mc.css.custom = System.getenv("MC_CSS_CUSTOM")
+        }
+
+        if (System.getenv('MC_MAX_ACTIVE_USERS')) {
+            mc.max.active.users = System.getenv('MC_MAX_ACTIVE_USERS')
+        }
+
+        if (System.getenv('MC_PRELOAD')) {
+            try {
+                mc.preload = new JsonSlurper().parseText(System.getenv('MC_PRELOAD'))
+            } catch (ignored) {}
+        }
+
 
         grails.assets.minifyOptions = [
                 strictSemicolons: false,
@@ -205,22 +259,22 @@ environments {
         ]
 
 
-        if (System.properties["mc.config.location"]) {
-            // for running
-            // grails prod run-war -Dmc.config.location=my-conf.groovy
-            grails.config.locations = ["file:" + System.properties["mc.config.location"]]
-        } else {
-            grails.config.locations = [ "classpath:mc-config.properties",
-                                        "classpath:mc-config.groovy",
-                                        "file:${userHome}/.grails/mc-config.properties",
-                                        "file:${userHome}/.grails/mc-config.groovy"]
-        }
-        if (System.properties['catalina.base']) {
-            def tomcatConfDir = new File("${System.properties['catalina.base']}/conf")
-            if (tomcatConfDir.isDirectory()) {
-                grails.config.locations = ["file:${tomcatConfDir.canonicalPath}/mc-config.groovy"]
-            }
-        }
+//        if (System.properties["mc.config.location"]) {
+//            // for running
+//            // grails prod run-war -Dmc.config.location=my-conf.groovy
+//            grails.config.locations = ["file:" + System.properties["mc.config.location"]]
+//        } else {
+//            grails.config.locations = [ "classpath:mc-config.properties",
+//                                        "classpath:mc-config.groovy",
+//                                        "file:${userHome}/.grails/mc-config.properties",
+//                                        "file:${userHome}/.grails/mc-config.groovy"]
+//        }
+//        if (System.properties['catalina.base']) {
+//            def tomcatConfDir = new File("${System.properties['catalina.base']}/conf")
+//            if (tomcatConfDir.isDirectory()) {
+//                grails.config.locations = ["file:${tomcatConfDir.canonicalPath}/mc-config.groovy"]
+//            }
+//        }
 
     }
 }
