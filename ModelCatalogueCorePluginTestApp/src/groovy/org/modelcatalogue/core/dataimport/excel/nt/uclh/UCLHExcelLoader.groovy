@@ -169,7 +169,7 @@ class UCLHExcelLoader extends ExcelLoader{
         return modelNames
     }
 
-    private DataModel getDataModel(String dmName){
+    protected DataModel getDataModel(String dmName){
         DataModel newModel = DataModel.executeQuery(
             'from DataModel dm where dm.name=:name and status=:status',
             [name:dmName, status: ElementStatus.DRAFT]

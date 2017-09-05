@@ -69,7 +69,7 @@ environments {
 
             url = System.getenv('mdx_db_url')//"jdbc:mysql://localhost:3306/exceltest"
             username = System.getenv('mdx_db_username')//'mdradmin'
-            password = System.getenv('mdx_db_passwprd')//'mdradmin123'
+            password = System.getenv('mdx_db_password')//'mdradmin123'
             dbCreate = "update"
             properties {
                 maxActive = -1

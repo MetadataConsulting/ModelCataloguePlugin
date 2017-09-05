@@ -198,14 +198,30 @@ environments {
         mc.storage.maxSize = 50 * 1024 * 1024
         // ---
         grails.logging.jul.usebridge = false
-        grails.serverURL = System.getProperty('mdx_server_url')//"https://localhost:8899/mc"
+        grails.serverURL = System.getProperty('MDX_SERVER_URL')//"https://localhost:8899/mc"
+        println "ServerURL:" + grails.serverURL
+        println "mdx_db_url:" + System.getProperty('mdx_db_url')
+        println "mdx_db_username:" + System.getProperty('mdx_db_username')
+        println "mdx_db_password:" + System.getProperty('mdx_db_password')
+        println "mdx_server_url:" + System.getProperty('mdx_server_url')
+        println "mdx_elastic_host:" + System.getProperty('mdx_elastic_host')
+        println "mdx_elastic_port:" + System.getProperty('mdx_elastic_port')
+        println "MC_MAIL_FROM:" + System.getProperty('MC_MAIL_FROM')
+        println "mdx_mail_host:" + System.getProperty('mdx_mail_host')
+        println "mdx_mail_port:" + System.getProperty('mdx_mail_port')
+        println "mdx_mail_username:" + System.getProperty('mdx_mail_username')
+        println "mdx_mail_password:" + System.getProperty('mdx_mail_password')
+        println "mdx_name:" + System.getProperty('mdx_name')
+        println "mdx_welcome:" + System.getProperty('mdx_welcome')
+        println "mdx_info:" + System.getProperty('mdx_info')
+        println "mdx_allow_signup:" + System.getProperty('mdx_allow_signup')
 
         grails.plugin.springsecurity.auth.loginFormUrl = "${grails.serverURL}/login/auth"
         grails.plugin.springsecurity.successHandler.ajaxSuccessUrl = "${grails.serverURL}/login/ajaxSuccess"
         grails.plugin.springsecurity.failureHandler.ajaxAuthFailUrl = "${grails.serverURL}/login/authfail"
         grails.plugin.springsecurity.logout.afterLogoutUrl = grails.serverURL
         grails.plugin.springsecurity.successHandler.defaultTargetUrl = grails.serverURL
-
+        //println "ServerURL" + grails.serverURL
 
         mc.search.elasticsearch.host=System.getenv("mdx_elastic_host")//"127.0.0.1"
         mc.ssearch.elasticsearch.port=System.getenv("mdx_elastic_host")//'9300'

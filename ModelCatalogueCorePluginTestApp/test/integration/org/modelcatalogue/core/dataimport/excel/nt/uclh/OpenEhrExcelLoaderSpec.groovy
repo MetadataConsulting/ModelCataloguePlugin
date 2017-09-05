@@ -56,7 +56,7 @@ class OpenEhrExcelLoaderSpec extends ExcelLoaderSpec{
         XMLUnit.ignoreComments = true
         XMLUnit.ignoreAttributeOrder = true
         stringWriter = new StringWriter()
-        excelLoader = new org.modelcatalogue.core.dataimport.excel.nt.uclh.OpenEhrExcelLoader()
+        excelLoader = new org.modelcatalogue.core.dataimport.excel.nt.uclh.OpenEhrExcelLoader(true)
         List<String> openEHRHeaders = ['GEL Dataset Identifier', 'GEL Dataset Name', 'Archetype Path Query Statement']
     }
 

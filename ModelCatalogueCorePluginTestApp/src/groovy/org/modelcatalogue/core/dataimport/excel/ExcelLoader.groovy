@@ -90,7 +90,7 @@ class ExcelLoader {
         }
         return ""
     }
-    private static final QUOTED_CHARS = ["\\": "&#92;", ":" : "&#58;", "|" : "&#124;", "%" : "&#37;"]
+    static final QUOTED_CHARS = ["\\": "&#92;", ":" : "&#58;", "|" : "&#124;", "%" : "&#37;"]
     /**
      * In the future other ExcelLoaders which inherit from this one will override this method and not the "standard" one.
      * @param headers

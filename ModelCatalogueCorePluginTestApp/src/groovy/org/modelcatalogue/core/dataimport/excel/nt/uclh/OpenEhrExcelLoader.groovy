@@ -1,11 +1,16 @@
 package org.modelcatalogue.core.dataimport.excel.nt.uclh
 
+import groovy.time.TimeCategory
+import groovy.time.TimeDuration
 import org.apache.commons.lang.WordUtils
 import org.apache.commons.lang3.tuple.Pair
+import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
+import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.dataimport.excel.uclh.UCLHExcelLoader
 
 /**
@@ -13,6 +18,9 @@ import org.modelcatalogue.core.dataimport.excel.uclh.UCLHExcelLoader
  */
 class OpenEhrExcelLoader extends UCLHExcelLoader {
 
+    OpenEhrExcelLoader(boolean test = false){
+        super(test)
+    }
 
     @Override
     Pair<String, List<String>> buildXmlFromWorkbookSheet(Workbook workbook, int index=0, String owner='') {
@@ -59,7 +67,7 @@ class OpenEhrExcelLoader extends UCLHExcelLoader {
     @Override
     String getNTElementName(Map<String,String> rowMap){
         String alias = getElementFromGelName(rowMap) + "_ph"
-        String name = rowMap['Data Item Unique Code']?:alias
+        String name = alias?:rowMap['GEL Dataset Identifier']
         return name
     }
 
@@ -93,7 +101,78 @@ class OpenEhrExcelLoader extends UCLHExcelLoader {
         header -> [(header), WordUtils.capitalizeFully(header).replaceAll(/\?/,'')]
     }  // map from header keys to their capitalized forms used as metadata keys
 
+    List<String>  loadModel(Workbook workbook,  String owner='') {
+        List<String> modelNames = []
+        if (owner == '') {
+            ownerSuffix = ''
+        }
+        else {
+            ownerSuffix = '_openEHR_' + owner
+        }
 
+        if (!workbook) {
+            throw new IllegalArgumentException("Excel file contains no worksheet!")
+        }
+        //We convert the data in the spreadsheet to the workLists format
+        Map<String,List<Map<String, String>>> workbookMap = [:]
+        int sheetno = workbook.size()
+        for (int i = 1; i < sheetno ; i++){
+            Sheet sheet = workbook.getSheetAt(i)
+            String sheetName = sheet.getSheetName()
+            List<Map<String, String>> rowMapList =importSheet(sheet)
+            workbookMap[sheetName] = rowMapList
+        }
+
+        //Iterate through the modelMaps to build new DataModel
+        workbookMap.each { String name, List<Map<String, String>> rowMapsForModel ->
+
+            DataModel newModel = getDataModel(name + ownerSuffix)
+            modelNames << name
+
+            //Iterate through each row to build an new DataElement
+            rowMapsForModel.each{ Map<String, String> rowMap ->
+                String ntname = getNTElementName(rowMap)
+                String ntdescription = 'OpenEhr Element Description'
+                DataElement newElement = new DataElement(name: ntname, description:  ntdescription , DataModel: newModel ).save(flush:true, failOnError: true)
+                newElement.setDataModel(newModel)
+                //Add in metadata
+                openEhrHeaders.each { k, v ->
+                    newElement.addExtension(v, rowMap[k])
+                }
+                Long ref = getMCIdFromSpreadSheet(rowMap)
+                //Add metadata for adding in relationship to reference model
+                newElement.addExtension("represents", ref as String)
+            }
+        }
+
+        return modelNames
+    }
+    /**
+     * importSheet
+     * For each sheet we iterate through the rows one at a time
+     * For each row we store the information in a map
+     * The map relates the header (for each column) with the data (for each column)
+     * So for each row we get a map of (column-name -> row-value) - this is rowMap
+     * The maps are then stored in a list of rowmaps -> rowMapList
+     *
+     * @param sheet
+     */
+    List<Map<String, String>> importSheet(Sheet sheet){
+
+        Iterator<Row> rowIt = sheet.rowIterator()
+        Row row = rowIt.next()
+        List<String> headers = getRowData(row)
+        List<Map<String, String>> rowMapList = []
+
+        while (rowIt.hasNext()) {
+            row = rowIt.next()
+            if(!isRowEmpty(row)){
+                Map<String, String> rowMap = createRowMap(row, headers)
+                rowMapList << rowMap
+            }
+        }
+        return rowMapList
+    }
 
 
 
