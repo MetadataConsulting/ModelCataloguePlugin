@@ -28,6 +28,9 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
     Map systemsMap = [:]
     Map metadataCompletion = [:]
     String organization = ''
+    static String defaultOrganization = 'UCLH'
+    static String organizationMetadataKey = 'http://www.modelcatalogue.org/metadata/#organization'
+    protected List<String> excelHeaders = Headers.excelHeaders
 
     /**
      * The report is triggered from a DataModel (element), and is on the
@@ -39,12 +42,12 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
      * @param organization
      * @return
      */
-    static GMCGridReportXlsxExporter create(DataModel element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3, String organization = 'UCL') {
+    static GMCGridReportXlsxExporter create(DataModel element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3, String organization = defaultOrganization) {
         return new GMCGridReportXlsxExporter(element, dataClassService, grailsApplication, depth, organization)
     }
 
 
-    GMCGridReportXlsxExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3, String organization = 'UCL') {
+    GMCGridReportXlsxExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3, String organization = defaultOrganization) {
         super(element, dataClassService, grailsApplication, depth)
         this.organization = organization
 
@@ -79,7 +82,7 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
     void printDataElement(RowDefinition rowDefinition, Relationship dataElementRelationship, List outline = []) {
         DataElement dataElement = dataElementRelationship.destination
         List placeholders  = []
-        placeholders = dataElement.relatedTo.findAll{ it.dataModel.ext.get('http://www.modelcatalogue.org/metadata/#organization') == organization }
+        placeholders = dataElement.relatedTo.findAll{ it.dataModel.ext.get(organizationMetadataKey) == organization }
         addToSystemsMap(placeholders, dataElement)
 
         rowDefinition.with {
@@ -167,7 +170,7 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
         sheet.with { SheetDefinition sheetDefinition ->
 
             row{
-                Headers.excelHeaders.minus(['Multiplicity', 'Related To', 'Source System']).each {
+                excelHeaders.minus(['Multiplicity', 'Related To', 'Source System']).each {
                     cellValue ->
                         cell {
                             value cellValue
