@@ -19,9 +19,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.apache.commons.lang.WordUtils
 import org.apache.commons.lang3.tuple.Pair
-import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportExcelLoader
 import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportXlsxExporter
-import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 
 /**
  * Created by david on 04/08/2017.
@@ -31,7 +29,7 @@ class UCLHExcelLoader extends ExcelLoader{
     ElementService elementService
     DataModelService dataModelService
 
-    String ownerSuffix = ''
+    String ownerAndGELModelSuffix = ''
     String randomSuffix = ''
     UCLHExcelLoader(boolean test = false) {
         if (test) {
@@ -40,7 +38,7 @@ class UCLHExcelLoader extends ExcelLoader{
     }
 
     String getOwnerSuffixWithRandom(){
-        return ownerSuffix+randomSuffix
+        return ownerAndGELModelSuffix+randomSuffix
     }
 
 
@@ -150,13 +148,14 @@ class UCLHExcelLoader extends ExcelLoader{
     }*/
 
 
-    List<String>  loadModel(Workbook workbook, String sheetName, String owner='') {
-
-        if (owner == '') {
-            ownerSuffix = ''
+    List<String>  loadModel(Workbook workbook, String sheetName, String ownerAndGELModel ='') {
+        String organization = ''
+        if (ownerAndGELModel == '') {
+            ownerAndGELModelSuffix = ''
         }
         else {
-            ownerSuffix = '_' + owner
+            ownerAndGELModelSuffix = '_' + ownerAndGELModel
+            organization = ownerAndGELModel.split(/_/)[0]
         }
 
         if (!workbook) {
@@ -188,8 +187,8 @@ class UCLHExcelLoader extends ExcelLoader{
 
 
         Date start = new Date()
-        log.info("Start import to mc" + ownerSuffix )
-        timed("Start import to mc for $ownerSuffix", {
+        log.info("Start import to mc" + ownerAndGELModelSuffix )
+        timed("Start import to mc for $ownerAndGELModelSuffix", {
         //Iterate through the modelMaps to build new DataModel
         modelMaps.each { String name, List<Map<String, String>> rowMapsForModel ->
 
@@ -197,7 +196,7 @@ class UCLHExcelLoader extends ExcelLoader{
             "Start import of model $name",
             {
             DataModel newModel = getDataModel(name)
-            newModel.addExtension(GMCGridReportXlsxExporter.organizationMetadataKey, owner)
+            newModel.addExtension(GMCGridReportXlsxExporter.organizationMetadataKey, organization)
             //Iterate through each row to build an new DataElement
             rowMapsForModel.each{ Map<String, String> rowMap ->
                 String ntname = getNTElementName(rowMap)
@@ -234,7 +233,7 @@ class UCLHExcelLoader extends ExcelLoader{
         return ''
         },
         {String unused ->
-            "Completed import to mc for $ownerSuffix"
+            "Completed import to mc for $ownerAndGELModelSuffix"
         })
         return modelNames
     }
@@ -268,10 +267,10 @@ class UCLHExcelLoader extends ExcelLoader{
     Pair<String, List<String>> buildXmlFromWorkbookSheet(Workbook workbook, int index=0, String owner='') {
 
         if (owner == '') {
-            ownerSuffix = ''
+            ownerAndGELModelSuffix = ''
         }
         else {
-            ownerSuffix = '_' + owner
+            ownerAndGELModelSuffix = '_' + owner
         }
 
 
