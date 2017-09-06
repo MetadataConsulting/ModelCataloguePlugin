@@ -11,7 +11,7 @@ import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.dataimport.excel.uclh.UCLHExcelLoader
+import org.modelcatalogue.core.dataimport.excel.nt.uclh.UCLHExcelLoader
 
 /**
  * Created by davidmilward on 31/08/2017.
