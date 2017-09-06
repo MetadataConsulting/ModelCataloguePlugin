@@ -13,7 +13,7 @@ class NorthThamesController {
 
     def dataClassService, assetService
 
-    //produce a grid report spreadsheet where the whole data set is diaplyed as a grid with metadata and relationships (rather then tabs)
+    //produce a grid report spreadsheet where the whole data set is displayed as a grid with metadata and relationships (rather then tabs)
 
     def northThamesSummaryReport(String name, Integer depth) {
         DataModel dataModel = DataModel.get(params.id)
@@ -27,8 +27,8 @@ class NorthThamesController {
 
         def assetId = assetService.storeReportAsAsset(
                 dataModel,
-                name: name ? name : "${dataModel.name} report as MS Excel Document",
-                originalFileName: "${dataModel.name}-${dataModel.status}-${dataModel.version}.xlsx",
+                name: name ? name : "${dataModel.name} report as MS Excel Document-for-${organization}",
+                originalFileName: "${organization}-${dataModel.name}-${dataModel.status}-${dataModel.version}.xlsx",
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         ) { OutputStream outputStream ->
             // reload domain class as this is called in separate thread
