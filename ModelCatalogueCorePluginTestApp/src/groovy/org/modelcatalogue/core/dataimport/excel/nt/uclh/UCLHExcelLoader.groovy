@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.dataimport.excel.uclh
+package org.modelcatalogue.core.dataimport.excel.nt.uclh
 
 import groovy.util.logging.Log
 import groovy.time.TimeCategory
@@ -85,63 +85,63 @@ class UCLHExcelLoader extends ExcelLoader{
 
 
 
-    List<String>  loadModel(Workbook workbook, String sheetName, String owner='') {
-
-        if (owner == '') {
-            ownerSuffix = ''
-        }
-        else {
-            ownerSuffix = '_' + owner
-        }
-
-        if (!workbook) {
-            throw new IllegalArgumentException("Excel file contains no worksheet!")
-        }
-        //Sheet sheet = workbook.getSheetAt(index);
-        Sheet sheet = workbook.getSheet(sheetName)
-        Iterator<Row> rowIt = sheet.rowIterator()
-        Row row = rowIt.next()
-        List<String> headers = getRowData(row)
-        List<Map<String, String>> rowMaps = []
-
-        while (rowIt.hasNext()) {
-            row = rowIt.next()
-            if(!isRowEmpty(row)){
-                Map<String, String> rowMap = createRowMap(row, headers)
-                rowMaps << rowMap
-            }
-        }
-
-        Map<String, List<Map<String, String>>> modelMaps = rowMaps.groupBy{
-            String modelName = it.get('Collected from')
-            if(modelName){
-                it.get('Collected from')+getOwnerSuffixWithRandom()
-            }
-        }
-
-        List<String> modelNames = modelMaps.keySet() as List<String>
-
-        String defaultMetadataValue = ''
-        Closure resultClosure =    {
-            modelMaps.each{ String modelName, List<Map<String,String>> modelRowMaps ->
-                dataModel('name': modelName) {
-                    ext 'http://www.modelcatalogue.org/metadata/#organization', 'UCL'
-                    modelRowMaps.each { Map<String, String> rowMap ->
-                        String dename = getNTElementName(rowMap)
-                        if(!dename.equalsIgnoreCase('blankcell_ph')) {
-                            dataElement(name: dename) {
-                                metadataHeaders.each { k, v ->
-                                    ext v, (rowMap[k] ?: defaultMetadataValue)
-                                }
-                                ext 'represents', "${getMCIdFromSpreadSheet(rowMap)}"
-                            }
-                        }
-                    }
-                }
-            }
-        } as Closure
-        return Pair.of(resultClosure, modelNames)
-    }*/
+//    List<String>  loadModel(Workbook workbook, String sheetName, String owner='') {
+//
+//        if (owner == '') {
+//            ownerSuffix = ''
+//        }
+//        else {
+//            ownerSuffix = '_' + owner
+//        }
+//
+//        if (!workbook) {
+//            throw new IllegalArgumentException("Excel file contains no worksheet!")
+//        }
+//        //Sheet sheet = workbook.getSheetAt(index);
+//        Sheet sheet = workbook.getSheet(sheetName)
+//        Iterator<Row> rowIt = sheet.rowIterator()
+//        Row row = rowIt.next()
+//        List<String> headers = getRowData(row)
+//        List<Map<String, String>> rowMaps = []
+//
+//        while (rowIt.hasNext()) {
+//            row = rowIt.next()
+//            if(!isRowEmpty(row)){
+//                Map<String, String> rowMap = createRowMap(row, headers)
+//                rowMaps << rowMap
+//            }
+//        }
+//
+//        Map<String, List<Map<String, String>>> modelMaps = rowMaps.groupBy{
+//            String modelName = it.get('Collected from')
+//            if(modelName){
+//                it.get('Collected from')+getOwnerSuffixWithRandom()
+//            }
+//        }
+//
+//        List<String> modelNames = modelMaps.keySet() as List<String>
+//
+//        String defaultMetadataValue = ''
+//        Closure resultClosure =    {
+//            modelMaps.each{ String modelName, List<Map<String,String>> modelRowMaps ->
+//                dataModel('name': modelName) {
+//                    ext 'http://www.modelcatalogue.org/metadata/#organization', 'UCL'
+//                    modelRowMaps.each { Map<String, String> rowMap ->
+//                        String dename = getNTElementName(rowMap)
+//                        if(!dename.equalsIgnoreCase('blankcell_ph')) {
+//                            dataElement(name: dename) {
+//                                metadataHeaders.each { k, v ->
+//                                    ext v, (rowMap[k] ?: defaultMetadataValue)
+//                                }
+//                                ext 'represents', "${getMCIdFromSpreadSheet(rowMap)}"
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        } as Closure
+//        return Pair.of(resultClosure, modelNames)
+//    }
 
 
     List<String>  loadModel(Workbook workbook, String sheetName, String ownerAndGELModel ='') {
@@ -195,9 +195,9 @@ class UCLHExcelLoader extends ExcelLoader{
         //Iterate through the modelMaps to build new DataModel
         modelMaps.each { String name, List<Map<String, String>> rowMapsForModel ->
 
-            timed(
-            "Start import of model $name",
-            {
+           // timed(
+           // "Start import of model $name",
+           // {
             DataModel newModel = getDataModel(name)
             newModel.addExtension(GMCGridReportXlsxExporter.organizationMetadataKey, organization)
             //Iterate through each row to build an new DataElement
@@ -205,9 +205,9 @@ class UCLHExcelLoader extends ExcelLoader{
                 String ntname = getNTElementName(rowMap)
                 String ntdescription = rowMap['Description'] ?: rowMap['DE Description']
 
-                timed(
-                "Start import of element $ntname",
-                {
+               // timed(
+               // "Start import of element $ntname",
+               // {
                 DataElement newElement = new DataElement(name: ntname, description:  ntdescription , DataModel: newModel ).save(flush:true, failOnError: true)
 
                 newElement.setDataModel(newModel)
@@ -219,17 +219,17 @@ class UCLHExcelLoader extends ExcelLoader{
                 //Add metadata for adding in relationship to reference model
                 newElement.addExtension("represents", ref as String)
                 return newElement.name
-                },
-                {String newElementName ->
-                    "Complete element import, element = $newElementName"
-                })
+                //},
+               // {String newElementName ->
+               //     "Complete element import, element = $newElementName"
+               // })
 
             }
             return newModel.name
-            },
-            {String newModelName ->
-                "Complete model import, model = $newModelName"
-            })
+           // },
+          //  {String newModelName ->
+          //      "Complete model import, model = $newModelName"
+          //  })
 
 
         }
