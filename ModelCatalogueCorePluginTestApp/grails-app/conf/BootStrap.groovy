@@ -127,17 +127,20 @@ class BootStrap {
             link controller: 'dataModel', action: 'gridSpreadsheet', id: true
         }
 
-
-        reportsRegistry.register {
-            creates asset
-            title { "North Thames Summary Report" }
-            defaultName { "${it.name} report as MS Excel Document Grid" }
-            depth 3
-            type DataModel
-            when { DataModel dataModel ->
-                dataModel.countDeclares() > 0
+        List<String> northThamesHospitalNames = ['GOSH', 'LNWH', 'MEH', 'UCLH'] // not sure if this should be defined here. Maybe it would be better in a source file, or perhaps a config file.
+        List<String> gelSourceModelNames = ['Cancer Model', 'Rare Diseases']
+        northThamesHospitalNames.each{ name ->
+            reportsRegistry.register {
+                creates asset
+                title { "GMC Grid Report – North Thames – ${name}" }
+                defaultName { "${it.name} report as MS Excel Document Grid" }
+                depth 7 // for Rare Diseases
+                type DataModel
+                when { DataModel dataModel ->
+                    (dataModel.countDeclares() > 0) && (gelSourceModelNames.contains(dataModel.name))
+                }
+                link controller: 'northThames', action: 'northThamesSummaryReport', id: true, params: [organization: name]
             }
-            link controller: 'northThames', action: 'northThamesSummaryReport', id: true
         }
 
         reportsRegistry.register {

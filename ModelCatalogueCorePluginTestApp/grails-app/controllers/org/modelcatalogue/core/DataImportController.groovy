@@ -330,8 +330,8 @@ class DataImportController  {
         auditService.mute {
             try{
                 UCLHExcelLoader loader = new UCLHExcelLoader(false)
-                String dataOwner = ExcelLoader.getOwnerFromFileName(filename, '_nt_rawimport')
-                List<String> modelNames = loader.loadModel(wb,modelDetails.right,dataOwner)
+                String dataOwnerAndGelModel = ExcelLoader.getOwnerAndGelModelFromFileName(filename, '_nt_rawimport')
+                List<String> modelNames = loader.loadModel(wb,modelDetails.right,dataOwnerAndGelModel)
                 DataModel referenceModel = DataModel.findByNameAndStatus(modelDetails.left, ElementStatus.FINALIZED)
                 loader.addRelationshipsToModels(referenceModel, modelNames)
                 finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)

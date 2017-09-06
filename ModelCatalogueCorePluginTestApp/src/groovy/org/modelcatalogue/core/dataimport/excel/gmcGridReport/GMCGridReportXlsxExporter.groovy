@@ -5,6 +5,7 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.gel.export.GridReportXlsxExporter
 import org.modelcatalogue.spreadsheet.builder.api.RowDefinition
 import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
+import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportHeaders as Headers
 
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
 
@@ -27,13 +28,26 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
     Map systemsMap = [:]
     Map metadataCompletion = [:]
     String organization = ''
+    static String defaultOrganization = 'UCLH'
+    static String organizationMetadataKey = 'http://www.modelcatalogue.org/metadata/#organization'
+    protected List<String> excelHeaders = Headers.excelHeaders
 
-    static GMCGridReportXlsxExporter create(DataModel element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3, String organization = 'UCL') {
+    /**
+     * The report is triggered from a DataModel (element), and is on the
+     * location of data elements specified by that DataModel in the given 'organization'.
+     * @param element
+     * @param dataClassService
+     * @param grailsApplication
+     * @param depth
+     * @param organization
+     * @return
+     */
+    static GMCGridReportXlsxExporter create(DataModel element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3, String organization = defaultOrganization) {
         return new GMCGridReportXlsxExporter(element, dataClassService, grailsApplication, depth, organization)
     }
 
 
-    GMCGridReportXlsxExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3, String organization = 'UCL') {
+    GMCGridReportXlsxExporter(CatalogueElement element, DataClassService dataClassService, GrailsApplication grailsApplication, Integer depth = 3, String organization = defaultOrganization) {
         super(element, dataClassService, grailsApplication, depth)
         this.organization = organization
 
@@ -47,10 +61,6 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
             color black
         }
     }
-    static List<String> ntElementMetadataHeaders = GMCGridReportHeaders.ntElementMetadataHeaders
-    static List<String> ntElementMetadataKeys = GMCGridReportHeaders.ntElementMetadataKeys
-    static List<String> excelHeaders = GMCGridReportHeaders.excelHeaders
-
 
     @Override
     Map<String, Closure> sheetsAfterMainSheetExport() {
@@ -71,9 +81,9 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
     @Override
     void printDataElement(RowDefinition rowDefinition, Relationship dataElementRelationship, List outline = []) {
         DataElement dataElement = dataElementRelationship.destination
-        List relatedTo  = []
-        relatedTo = dataElement.relatedTo.findAll{ it.dataModel.ext.get('http://www.modelcatalogue.org/metadata/#organization') == organization }
-        addToSystemsMap(relatedTo, dataElement)
+        List placeholders  = []
+        placeholders = dataElement.relatedTo.findAll{ it.dataModel.ext.get(organizationMetadataKey) == organization }
+        addToSystemsMap(placeholders, dataElement)
 
         rowDefinition.with {
 
@@ -125,13 +135,13 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
                     }
             }
             cell { // Related To
-                value "${(relatedTo) ? ((relatedTo.size()==1) ? relatedTo[0]?.name : multipleSourcesMessage) : noSourceMessage}"
-                if (relatedTo && relatedTo.size()==1) link to url "${ getLoadURL(relatedTo[0]) }"
+                value "${(placeholders) ? ((placeholders.size()==1) ? placeholders[0]?.name : multipleSourcesMessage) : noSourceMessage}"
+                if (placeholders && placeholders.size()==1) link to url "${ getLoadURL(placeholders[0]) }"
                 style standardCellStyle
             }
 
             Closure sourceSystem = {
-                value "${getRelatedToModel(relatedTo)}"
+                value "${getRelatedToModel(placeholders)}"
                 style standardCellStyle
             } as Closure
 
@@ -139,9 +149,9 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
 
             cell sourceSystem // Previously In Source System -- same as Source System
 
-            ntElementMetadataKeys.each{metadataKey ->
+            Headers.ntElementMetadataKeys.each{metadataKey ->
                 cell {
-                    value "${printSystemMetadata(relatedTo, metadataKey)}"
+                    value "${printSystemMetadata(placeholders, metadataKey)}"
                     style standardCellStyle
                 }
             }
@@ -220,7 +230,7 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
                         style standardCellStyle
                     }
             }
-            ntElementMetadataKeys.each{metadataKey ->
+            Headers.ntElementMetadataKeys.each{metadataKey ->
                 cell {
                     value "${printSystemMetadata([dataElement], metadataKey)}"
                     style {

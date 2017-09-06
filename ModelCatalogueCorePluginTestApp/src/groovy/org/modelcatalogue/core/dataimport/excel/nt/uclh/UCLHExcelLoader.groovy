@@ -19,8 +19,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataimport.excel.ExcelLoader
 import org.apache.commons.lang.WordUtils
 import org.apache.commons.lang3.tuple.Pair
-import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportExcelLoader
-import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
+import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportXlsxExporter
 
 /**
  * Created by david on 04/08/2017.
@@ -30,7 +29,7 @@ class UCLHExcelLoader extends ExcelLoader{
     ElementService elementService
     DataModelService dataModelService
 
-    String ownerSuffix = ''
+    String ownerAndGELModelSuffix = ''
     String randomSuffix = ''
     UCLHExcelLoader(boolean test = false) {
         if (test) {
@@ -39,7 +38,7 @@ class UCLHExcelLoader extends ExcelLoader{
     }
 
     String getOwnerSuffixWithRandom(){
-        return ownerSuffix+randomSuffix
+        return ownerAndGELModelSuffix+randomSuffix
     }
 
 
@@ -75,7 +74,7 @@ class UCLHExcelLoader extends ExcelLoader{
 
     }
     static Map<String, String> metadataHeaders = ['Semantic Matching',	'Known issue',	'Immediate solution', 'Immediate solution Owner',
-                                                  'Long term solution',	'Long term solution owner',	'Data Item', 'Unique Code',
+                                                  'Long term solution',	'Long term solution owner',	'Data Item Unique Code',
                                                   'Related To',	'Part of standard data set',
                                                   'Data Completeness','Estimated quality',
                                                   'Timely?', 'Comments'].collectEntries {
@@ -93,6 +92,66 @@ class UCLHExcelLoader extends ExcelLoader{
         }
         else {
             ownerSuffix = '_' + owner
+        }
+
+        if (!workbook) {
+            throw new IllegalArgumentException("Excel file contains no worksheet!")
+        }
+        //Sheet sheet = workbook.getSheetAt(index);
+        Sheet sheet = workbook.getSheet(sheetName)
+        Iterator<Row> rowIt = sheet.rowIterator()
+        Row row = rowIt.next()
+        List<String> headers = getRowData(row)
+        List<Map<String, String>> rowMaps = []
+
+        while (rowIt.hasNext()) {
+            row = rowIt.next()
+            if(!isRowEmpty(row)){
+                Map<String, String> rowMap = createRowMap(row, headers)
+                rowMaps << rowMap
+            }
+        }
+
+        Map<String, List<Map<String, String>>> modelMaps = rowMaps.groupBy{
+            String modelName = it.get('Collected from')
+            if(modelName){
+                it.get('Collected from')+getOwnerSuffixWithRandom()
+            }
+        }
+
+        List<String> modelNames = modelMaps.keySet() as List<String>
+
+        String defaultMetadataValue = ''
+        Closure resultClosure =    {
+            modelMaps.each{ String modelName, List<Map<String,String>> modelRowMaps ->
+                dataModel('name': modelName) {
+                    ext 'http://www.modelcatalogue.org/metadata/#organization', 'UCL'
+                    modelRowMaps.each { Map<String, String> rowMap ->
+                        String dename = getNTElementName(rowMap)
+                        if(!dename.equalsIgnoreCase('blankcell_ph')) {
+                            dataElement(name: dename) {
+                                metadataHeaders.each { k, v ->
+                                    ext v, (rowMap[k] ?: defaultMetadataValue)
+                                }
+                                ext 'represents', "${getMCIdFromSpreadSheet(rowMap)}"
+                            }
+                        }
+                    }
+                }
+            }
+        } as Closure
+        return Pair.of(resultClosure, modelNames)
+    }*/
+
+
+    List<String>  loadModel(Workbook workbook, String sheetName, String ownerAndGELModel ='') {
+        String organization = ''
+        if (ownerAndGELModel == '') {
+            ownerAndGELModelSuffix = ''
+        }
+        else {
+            ownerAndGELModelSuffix = '_' + ownerAndGELModel
+            organization = ownerAndGELModel.split(/_/)[0]
         }
 
         if (!workbook) {
@@ -131,19 +190,24 @@ class UCLHExcelLoader extends ExcelLoader{
 
 
         Date start = new Date()
-        log.info("Start import to mc" + ownerSuffix )
+        log.info("Start import to mc" + ownerAndGELModelSuffix )
+        timed("Start import to mc for $ownerAndGELModelSuffix", {
         //Iterate through the modelMaps to build new DataModel
         modelMaps.each { String name, List<Map<String, String>> rowMapsForModel ->
 
+            timed(
+            "Start import of model $name",
+            {
             DataModel newModel = getDataModel(name)
-            Date startModelImport = new Date()
-            log.info("Start import of model" + name )
+            newModel.addExtension(GMCGridReportXlsxExporter.organizationMetadataKey, organization)
             //Iterate through each row to build an new DataElement
             rowMapsForModel.each{ Map<String, String> rowMap ->
                 String ntname = getNTElementName(rowMap)
                 String ntdescription = rowMap['Description'] ?: rowMap['DE Description']
-                Date startElementInport = new Date()
-                log.info("Start import of model" + name )
+
+                timed(
+                "Start import of element $ntname",
+                {
                 DataElement newElement = new DataElement(name: ntname, description:  ntdescription , DataModel: newModel ).save(flush:true, failOnError: true)
 
                 newElement.setDataModel(newModel)
@@ -154,19 +218,35 @@ class UCLHExcelLoader extends ExcelLoader{
                 Long ref = getMCIdFromSpreadSheet(rowMap)
                 //Add metadata for adding in relationship to reference model
                 newElement.addExtension("represents", ref as String)
-                Date stopElementImport = new Date()
-                TimeDuration tdElementImport = TimeCategory.minus( stopElementImport, startElementInport )
-                log.info("Complete element import, element= " + newElement.name + "duration:" + tdElementImport )
+                return newElement.name
+                },
+                {String newElementName ->
+                    "Complete element import, element = $newElementName"
+                })
+
             }
-            Date stopModelImport = new Date()
-            TimeDuration tdModelImport = TimeCategory.minus( stopModelImport, startModelImport )
-            log.info("Complete model import, model= " + newModel.name + "duration:" + tdModelImport )
+            return newModel.name
+            },
+            {String newModelName ->
+                "Complete model import, model = $newModelName"
+            })
+
 
         }
-        Date stop = new Date()
-        TimeDuration td = TimeCategory.minus( stop, start )
-        log.info("Complete import, " + ownerSuffix  +  "duration:" + td )
+        return ''
+        },
+        {String unused ->
+            "Completed import to mc for $ownerAndGELModelSuffix"
+        })
         return modelNames
+    }
+    void timed(String startMessage, Closure<String> block, Closure<String> endMessageFromResultOfBlock) {
+        Date start = new Date()
+        log.info(startMessage)
+        String resultString = block.call()
+        Date stop = new Date()
+        TimeDuration duration = TimeCategory.minus(stop, start)
+        log.info(endMessageFromResultOfBlock(resultString) + " duration: $duration")
     }
 
     protected DataModel getDataModel(String dmName){
@@ -190,10 +270,10 @@ class UCLHExcelLoader extends ExcelLoader{
     Pair<String, List<String>> buildXmlFromWorkbookSheet(Workbook workbook, int index=0, String owner='') {
 
         if (owner == '') {
-            ownerSuffix = ''
+            ownerAndGELModelSuffix = ''
         }
         else {
-            ownerSuffix = '_' + owner
+            ownerAndGELModelSuffix = '_' + owner
         }
 
 

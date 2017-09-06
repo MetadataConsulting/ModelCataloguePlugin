@@ -14,7 +14,7 @@ import org.modelcatalogue.core.DataModel
  */
 class ExcelLoader {
 
-    static String getOwnerFromFileName(String sampleFile, String bitInBetween) {
+    static String getOwnerAndGelModelFromFileName(String sampleFile, String bitInBetween) {
         sampleFile.find(/(.*)$bitInBetween.*/){ match, firstcapture ->
             firstcapture
         }.toUpperCase()

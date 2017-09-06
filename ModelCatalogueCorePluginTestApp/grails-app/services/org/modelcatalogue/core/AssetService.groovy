@@ -237,7 +237,7 @@ class AssetService {
                     updated.refresh()
                     updated.status = ElementStatus.FINALIZED
                     updated.name = updated.name + " - Error during generation"
-                    updated.description = "Error generating report" +":$e"
+                    updated.description = "Error generating report: $e"
                     updated.save(flush: true, failOnError: true)
                 }
             }
