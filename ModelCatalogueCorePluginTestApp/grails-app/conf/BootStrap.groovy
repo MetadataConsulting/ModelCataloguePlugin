@@ -143,6 +143,7 @@ class BootStrap {
             }
         }
 
+
         reportsRegistry.register {
             creates asset
             title { "Inventory Report Document" }
@@ -213,28 +214,6 @@ class BootStrap {
             link controller: 'genomics', action: 'exportAllRareDiseaseReports', id: true
         }
 
-// needs more work
-//        reportsRegistry.register {
-//            creates asset
-//            title { "GEL Changelog (Word Doc)" }
-//            defaultName { "${it.name} changelog as MS Word Document" }
-//            depth 3
-//            includeMetadata true
-//            type DataModel
-//            when { DataModel dataModel ->
-//                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
-//            }
-//            link controller: 'genomics', action: 'exportChangeLogDocument', id: true
-//        }
-
-//        reportsRegistry.register {
-//            creates asset
-//            title { "GEL Data Specification Report (Word Doc)" }
-//            defaultName { "${it.name} report as MS Word Document" }
-//            depth 3
-//            type DataModel
-//            link controller: 'genomics', action: 'exportGelSpecification', id: true
-//        }
 
         reportsRegistry.register {
             creates link
@@ -341,53 +320,6 @@ class BootStrap {
         }
 
 
-// needs work before we can release
-//        reportsRegistry.register {
-//            creates link
-//            title { "Cancer Types (JSON)" }
-//            type DataModel
-//            when { DataModel dataModel ->
-//                dataModel.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
-//            }
-//            link controller: 'genomics', action: 'exportCancerTypesAsJson', id: true
-//        }
-//
-//        reportsRegistry.register {
-//            creates link
-//            title { "Cancer Types (CSV)" }
-//            type DataModel
-//            when { DataModel dataModel ->
-//                dataModel.ext.get(Metadata.CANCER_TYPES_AVAILABLE) == 'true'
-//            }
-//            link controller: 'genomics', action: 'exportCancerTypesAsCsv', id: true
-//        }
-// needs work before we can release
-//        reportsRegistry.register {
-//            creates link
-//            title { "Change Log for RD Phenotypes And Clinical Tests (Excel)" }
-//            type DataModel
-//            when { DataModel dataModel ->
-//                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
-//            }
-//            link controller: 'genomics', action: 'exportRareDiseaseHPOAndClinicalTestsAsXls', id: true
-//        }
-// needs work before we can release
-//        reportsRegistry.register {
-//            creates link
-//            title { "Change Log for RD Eligibility (Excel)" }
-//            type DataModel
-//            when { DataModel dataModel ->
-//                dataModel.ext.get(Metadata.HPO_REPORT_AVAILABLE) == 'true'
-//            }
-//            link controller: 'genomics', action: 'exportRareDiseaseEligibilityChangeLogAsXls', id: true
-//        }
-// needs work before we can release
-//        reportsRegistry.register {
-//            creates link
-//            title { "GEL Data Specification Change Log (Excel)" }
-//            type DataModel
-//            link controller: 'genomics', action: 'exportDataSpecChangeLogAsXls', id: true
-//        }
 
         reportsRegistry.register {
             creates link
