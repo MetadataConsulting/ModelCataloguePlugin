@@ -36,6 +36,24 @@ class CatalogueController {
             return
         }
 
+
+        if (params.format == 'xml') {
+            response.contentType = 'application/xml'
+            response.setHeader("Content-disposition", "attachment; filename=\"${element.name.replaceAll(/\s+/, '_')}.mc.xml\"")
+            CatalogueXmlPrinter printer = new CatalogueXmlPrinter(dataModelService, dataClassService)
+            printer.bind(element){
+                idIncludeVersion = true
+                if (params.full == 'false') {
+                    keepInside = element.instanceOf(DataModel) ? element : element.dataModel
+                }
+                if (params.repetitive != 'false') {
+                    repetitive = true
+                }
+            }.writeTo(response.writer)
+            return
+        }
+
+
         redirect controller: params.resource, action: 'show', id: element.id
         return
     }
