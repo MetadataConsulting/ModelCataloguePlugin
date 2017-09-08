@@ -70,7 +70,8 @@ class UCLHExcelLoader extends ExcelLoader{
 
         String sName = rowMap['Name']?:rowMap['Data Element Name']?:"Name not provided" //we need to put this into a form to use on the db
         List<String> tokens = sName.tokenize('(') //grab bit before the bracket - Event Reference (14858.3)
-        return tokens[0].trim()
+        sName = tokens[0]?:sName
+        return sName
 
     }
     static Map<String, String> metadataHeaders = ['Semantic Matching',	'Known issue',	'Immediate solution', 'Immediate solution Owner',
