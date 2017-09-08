@@ -16,7 +16,7 @@ import org.modelcatalogue.core.util.test.FileOpener
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
 import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
-import org.modelcatalogue.core.dataimport.excel.uclh.UCLHExcelLoader
+import org.modelcatalogue.core.dataimport.excel.nt.uclh.UCLHExcelLoader
 import spock.lang.Shared
 
 import java.nio.charset.StandardCharsets
@@ -54,7 +54,7 @@ class UCLHExcelLoaderSpec extends ExcelLoaderSpec {
         XMLUnit.ignoreAttributeOrder = true
         stringWriter = new StringWriter()
         //builder = new XmlCatalogueBuilder(stringWriter, true)
-        excelLoader = new org.modelcatalogue.core.dataimport.excel.uclh.UCLHExcelLoader()
+        excelLoader = new org.modelcatalogue.core.dataimport.excel.nt.uclh.UCLHExcelLoader()
     }
     List<String> uclhHeaders = ['L2',	'L3',	'L4',	'L5',	'Lowest level ID',	'Idno',	'Name',	'Description',	'Multiplicity',	'Value Domain / Data Type',	'Related To',	'Current Paper Document  or system name',	'Semantic Matching',	'Known issue',	'Immediate solution', 'Immediate solution Owner',	'Long term solution',	'Long term solution owner',	'Data Item', 'Unique Code',	'Related To',	'Part of standard data set',	'Data Completeness',	'Estimated quality',	'Timely?', 'Comments']
 
