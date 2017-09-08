@@ -13,7 +13,6 @@ import org.modelcatalogue.core.util.lists.Relationships
 
 class DataClassController extends AbstractCatalogueElementController<DataClass> {
 
-    def dataClassService
     PerformanceUtilService performanceUtilService
 
     DataClassController() {

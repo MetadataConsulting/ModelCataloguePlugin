@@ -272,7 +272,7 @@ class ElasticSearchService implements SearchCatalogue {
         if (CatalogueElement.isAssignableFrom(resource)) {
             indicies = resource == DataModel ? [getGlobalIndexName(DataModel)] : collectDataModelIndicies(params, elementService.collectSubclasses(resource))
 
-            BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
+            QueryBuilder boolQuery = QueryBuilders.boolQuery()
 
             if (search != '*') {
                 boolQuery.minimumNumberShouldMatch(1)
@@ -286,12 +286,24 @@ class ElasticSearchService implements SearchCatalogue {
                 boolQuery.must(QueryBuilders.termsQuery('content_type', params.contentType))
             }
 
-            CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
-                boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
-            }
+            if(!search.contains("*")) {
 
-            boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
-            boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.termQuery('ext.value', search)).boost(10))
+                CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
+                    boolQuery.should(QueryBuilders.matchQuery(property, search).boost(boost))
+                }
+
+                boolQuery.should(QueryBuilders.prefixQuery('name', search.toLowerCase()).boost(200))
+                boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.termQuery('ext.value', search)).boost(10))
+            }else{
+
+                CATALOGUE_ELEMENT_BOOSTS.each { String property, int boost ->
+                    boolQuery.should(QueryBuilders.wildcardQuery(property, search).boost(boost))
+                }
+
+                boolQuery.should(QueryBuilders.wildcardQuery('name', search.toLowerCase()).boost(200))
+                boolQuery.should(QueryBuilders.nestedQuery('ext', QueryBuilders.wildcardQuery('ext.value', search)).boost(10))
+
+            }
 
             qb = boolQuery
         } else if (RelationshipType.isAssignableFrom(resource)) {
@@ -910,13 +922,20 @@ class ElasticSearchService implements SearchCatalogue {
                     dataModelId = params.long('dataModel')
                 }
 
+                //check that there is a data model is
+                // and check that you should include the results for the imports as well in search results
                 if (dataModelId) {
-                    if(subscribedModels.findResults{it.id}.contains(dataModelId)){
-                        DataModel dataModel = DataModel.get(dataModelId)
-                        if (dataModel) {
-                            return DataModelFilter.includes(dataModel).withImports(subscribedModels)
+                        if (subscribedModels.findResults { it.id }.contains(dataModelId)) {
+                            DataModel dataModel = DataModel.get(dataModelId)
+                            if (dataModel) {
+                                if(params.get('searchImports')!="false") {
+                                    return DataModelFilter.includes(dataModel).withImports(subscribedModels)
+                                }else{
+                                    return DataModelFilter.includes(dataModel)
+                                }
+                            }
                         }
-                    }
+
                 }
         }else{
             return DataModelFilter.includes(subscribedModels)

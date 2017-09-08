@@ -17,15 +17,15 @@ class CatalogueXmlPrinter {
     static final String ASSETS_NAMESPACE_URL = 'http://www.metadataregistry.org.uk/assets/schema/2.0/metadataregistry_asset.xsd'
 
     DataModelService dataModelService
-    DataClassService modelService
+    DataClassService dataClassService
 
-    CatalogueXmlPrinter(DataModelService dataModelService, DataClassService modelService) {
+    CatalogueXmlPrinter(DataModelService dataModelService, DataClassService dataClassService) {
         this.dataModelService = dataModelService
-        this.modelService = modelService
+        this.dataClassService = dataClassService
     }
 
     Writable bind(CatalogueElement element, @DelegatesTo(PrintContext) Closure contextConfigurer = {}) {
-        PrintContext context = new PrintContext(dataModelService, modelService)
+        PrintContext context = new PrintContext(dataModelService, dataClassService)
         context.with contextConfigurer
 
         Map<String, String> ns = [xmlns : NAMESPACE_URL]
@@ -49,7 +49,7 @@ class CatalogueXmlPrinter {
     }
 
     public <CE extends CatalogueElement> Writable bind(Iterable<CE> elements, @DelegatesTo(PrintContext) Closure contextConfigurer = {}) {
-        PrintContext context = new PrintContext(dataModelService, modelService)
+        PrintContext context = new PrintContext(dataModelService, dataClassService)
         context.with contextConfigurer
 
         return { Writer writer ->

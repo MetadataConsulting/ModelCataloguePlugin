@@ -52,7 +52,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      */
 
     def beforeInterceptor = {
-        println "Tracing action ${actionUri}, tracing resource ${resource}"
+//        println "Tracing action ${actionUri}, tracing resource ${resource}"
        if(resource!=User && getDataModel()) {
             if(!modelCatalogueSecurityService.isSubscribed(getDataModel())){
                 response.sendError HttpServletResponse.SC_UNAUTHORIZED
@@ -238,9 +238,13 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
+        ListWithTotalAndType<T> items
 
-        ListWithTotalAndType<T> items = getAllEffectiveItems(max)
-        //TODO - review usage - is this used? and when?
+        //use elasticsearch for anything that isn't a data model or a user list
+        // allows you to filter imports etc quickly and easilt
+
+        items = getAllEffectiveItems(max)
+
 
         if (params.boolean('minimal') && items instanceof ListWithTotalAndTypeWrapper) {
             ListWithTotalAndTypeWrapper<T> listWrapper = items as ListWithTotalAndTypeWrapper<T>
@@ -253,7 +257,9 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             }
         }
 
+
         respond items
+
     }
 
 
@@ -271,27 +277,11 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-
-        if (params.format == 'xml') {
-
-            response.contentType = 'application/xml'
-            response.setHeader("Content-disposition", "attachment; filename=\"${element.name.replaceAll(/\s+/, '_')}.mc.xml\"")
-            CatalogueXmlPrinter printer = new CatalogueXmlPrinter(dataModelService, dataClassService)
-            printer.bind(element){
-                idIncludeVersion = true
-                if (params.full != 'true') {
-                    keepInside = element.instanceOf(DataModel) ? element : element.dataModel
-                }
-                if (params.repetitive == 'true') {
-                    repetitive = true
-                }
-            }.writeTo(response.writer)
-            return
-        }
-
-
         respond element
     }
+
+
+
 
     /**
      * Updates a resource for the given id
@@ -414,6 +404,12 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
+        if (!modelCatalogueSecurityService.hasRole('CURATOR', destination.dataModel) ) {
+            unauthorized()
+            return
+        }
+
+
         T merged = elementService.merge(source, destination)
 
         if (merged.hasErrors()) {
@@ -432,10 +428,11 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
      */
     @Transactional
     def cloneElement() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR', getDataModel()) ) {
+        if (!modelCatalogueSecurityService.hasRole('VIEWER', getDataModel()) ) {
             unauthorized()
             return
         }
+
 
         if (handleReadOnly()) {
             return
@@ -448,6 +445,13 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
 
         DataModel destinationDataModel = DataModel.get(params.destinationDataModelId)
+
+        if (!modelCatalogueSecurityService.hasRole('CURATOR', destinationDataModel)) {
+            unauthorized()
+            return
+        }
+
+
         if (destinationDataModel == null) {
             notFound()
             return
@@ -957,11 +961,12 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
 
     /**
-     * returns all effective items for a user is a list of data models based on the specific data model role
+     * returns all effective items for a user as a list of data models based on the specific data model role
      * i.e. we can view the basic info of data models that we aren't subscribed to
      * @param id of catalogue element - if there is one
      */
     protected ListWrapper<T> getAllEffectiveItems(Integer max) {
+
         if (params.status?.toLowerCase() == 'active') {
             if (modelCatalogueSecurityService.hasRole('VIEWER', getDataModel())){
                 return dataModelService.classified(withAdditionalIndexCriteria(Lists.fromCriteria(params, resource, "/${resourceName}/") {
