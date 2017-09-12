@@ -28,10 +28,12 @@ import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportXlsxE
 class UCLHExcelLoader extends ExcelLoader{
     ElementService elementService
     DataModelService dataModelService
+    boolean bTest = false
 
     String ownerAndGELModelSuffix = ''
     String randomSuffix = ''
     UCLHExcelLoader(boolean test = false) {
+        bTest = test
         if (test) {
             randomSuffix = '_' + ((new Random()).nextInt(200) + 1) as String
         }
@@ -39,6 +41,10 @@ class UCLHExcelLoader extends ExcelLoader{
 
     String getOwnerSuffixWithRandom(){
         return ownerAndGELModelSuffix+randomSuffix
+    }
+
+    String getOwnerSuffix(){
+        return ownerAndGELModelSuffix
     }
 
 

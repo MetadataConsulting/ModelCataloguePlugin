@@ -62,7 +62,7 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
             new XSSFWorkbook(
                 getClass().getResourceAsStream(sampleFile)),
             index,
-            ExcelLoader.getOwnerFromFileName(sampleFile, bitInBetween)
+            ExcelLoader.getOwnerAndGelModelFromFileName(sampleFile, bitInBetween)
         )
     }
 
