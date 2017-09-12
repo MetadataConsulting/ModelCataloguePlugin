@@ -50,7 +50,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             context.typesUsed << 'declaration'
         }
 
-        if (context.printOnlyReference(element)) {
+        if (context.printOnlyReference(element) && !context.repetitive) {
             theMkp."${elementName}"(ref(element, context, true)) {
                 processRelationshipMetadata(theMkp, context, rel)
             }
@@ -82,8 +82,10 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
 
         if (element.hasModelCatalogueId()) {
             attrs.id = element.modelCatalogueId
-        } else {
-            attrs.id = element.getDefaultModelCatalogueId(!context.idIncludeVersion)
+        } else if(element.latestVersionId) {
+            attrs.id = element.latestVersionId
+        } else{
+            attrs.id = element.id
         }
 
         if (!context.noHref) {
