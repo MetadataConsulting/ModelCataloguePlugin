@@ -31,7 +31,7 @@ class DataModelPrintHelper extends CatalogueElementPrintHelper<DataModel> {
             theMkp.policy(policy.name)
             context.policiesUsed << policy.name
         }
-        for (CatalogueElement other in context.modelService.getTopLevelDataClasses(DataModelFilter.includes(element), [:]).items) {
+        for (CatalogueElement other in context.dataClassService.getTopLevelDataClasses(DataModelFilter.includes(element), [:]).items) {
                 printElement(theMkp, other, context, null)
         }
 

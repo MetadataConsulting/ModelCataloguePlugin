@@ -68,7 +68,7 @@ if (isOpenId) {
 		<h2>General Roles</h2>
 		<p>These roles determine general access, such as whether you can view a list of all the draft models in the application or administer users.</p>
 
-		<g:each var="entry" in="${roleMap}">
+		<g:each var="entry" in="${generalRoles}">
 		<div>
 			<g:checkBox name="${entry.key.authority}" value="${entry.value}"/>
 			<g:link controller='role' action='edit' id='${entry.key.id}'>${entry.key.authority.encodeAsHTML()}</g:link>
@@ -83,8 +83,8 @@ if (isOpenId) {
 		<table>
 			<tr>
 				<th>&nbsp;</th>
-				<g:each var="roles" in="${roleMap}">
-					<th>${roles.key.authority}</th>
+				<g:each var="roles" in="${specificRoles}">
+					<th>${roles.authority}</th>
 				</g:each>
 			</tr>
 

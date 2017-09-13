@@ -27,9 +27,6 @@ import static org.springframework.http.HttpStatus.OK
 
 class DataModelController<T extends CatalogueElement> extends AbstractCatalogueElementController<DataModel> {
 
-    DataClassService dataClassService
-    DataElementService dataElementService
-    DataTypeService dataTypeService
     SessionFactory sessionFactory
 
 	DataModelController() {
@@ -285,7 +282,7 @@ class DataModelController<T extends CatalogueElement> extends AbstractCatalogueE
             return
         }
 
-        DataModelFilter filter = DataModelFilter.includes(dataModel).withImports()
+        DataModelFilter filter = DataModelFilter.includes(dataModel).withImports(modelCatalogueSecurityService.getSubscribed())
 
 
         if (filter.isIncluding(other.dataModel)) {

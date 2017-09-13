@@ -83,4 +83,14 @@ class DataElementController extends AbstractCatalogueElementController<DataEleme
         }
     }
 
+
+    protected boolean allowSaveAndEdit() {
+        DataType dataType = DataType.get(getObjectToBind()?.dataType?.id)
+        if(dataType && !modelCatalogueSecurityService.isSubscribed(dataType)) return false
+        //if the user is a "general" curator they can create data models
+//        if(resource == DataModel) return modelCatalogueSecurityService.hasRole('CURATOR')
+        //but if they are trying to create something within the context of a data model they must have curator access to the specific model (not just general curator access)
+        modelCatalogueSecurityService.hasRole('CURATOR', getDataModel())
+    }
+
 }

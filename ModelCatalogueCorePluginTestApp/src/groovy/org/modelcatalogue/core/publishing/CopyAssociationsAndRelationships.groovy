@@ -67,7 +67,6 @@ class CopyAssociationsAndRelationships {
     }
 
     void copyRelationshipsInternal(DataModel dataModel, RelationshipDirection direction, Set<String> createdRelationshipHashes) {
-        List<Relationship> toRemove = []
 
         relationshipService.eachRelationshipPartitioned(direction, element) { Relationship r ->
             if (r.relationshipType.system) {
@@ -85,6 +84,13 @@ class CopyAssociationsAndRelationships {
             if (r.archived) {
                 return
             }
+
+            //don't copy inherited relationships - if they are inherited the based on relationships will be copied and they will get handled by that function
+
+            if (r.inherited) {
+                return
+            }
+
 
             CatalogueElement otherSide
             String hash
@@ -122,20 +128,11 @@ class CopyAssociationsAndRelationships {
                 throw new IllegalStateException(FriendlyErrors.printErrors("Migrated relationship ${created} contains errors", created.errors))
             }
 
-            if (isOverriding(created, r)) {
-                toRemove << r
-            }
 
             createdRelationshipHashes << hash
         }
 
-        for (Relationship r in toRemove) {
-            if (direction == RelationshipDirection.INCOMING) {
-                element.removeLinkFrom(r.source, r.relationshipType)
-            } else {
-                element.removeLinkTo(r.destination, r.relationshipType)
-            }
-        }
+
     }
 
     static boolean isOverriding(Relationship created, Relationship old) {

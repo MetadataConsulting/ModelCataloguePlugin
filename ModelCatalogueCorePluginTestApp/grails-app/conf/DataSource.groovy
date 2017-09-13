@@ -13,7 +13,7 @@ environments {
             driverClassName = "com.mysql.jdbc.Driver"
             dialect='org.hibernate.dialect.MySQL5InnoDBDialect'
 
-            url = "jdbc:mysql://localhost:3306/exceltest2"
+            url = ""
             username = 'mdradmin'
             password = 'mdradmin123'
             dbCreate = "update"
