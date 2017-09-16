@@ -95,7 +95,7 @@ class CatalogueElementToXlsxExporter {
     }
 
     protected static String getModelCatalogueIdToPrint(CatalogueElement element) {
-        element.hasModelCatalogueId() && !element.modelCatalogueId.startsWith('http') ? element.modelCatalogueId : element.combinedVersion
+        element.hasModelCatalogueId() && !element.modelCatalogueId.startsWith('http') ? element.modelCatalogueId : (element.getLatestVersionId()) ?: element.getId()
     }
 
     protected static void buildIntroduction(SheetDefinition sheet, CatalogueElement dataModel) {

@@ -119,8 +119,9 @@ class GridReportXlsxExporter  {
                     }
                 }
 
+                def rowDepth = 2
                 dataClasses.each{ dataClass->
-                    buildRows(sheetDefinition, dataClass.getOutgoingRelationshipsByType(RelationshipType.hierarchyType), 1, 2)
+                    rowDepth = printClass(dataClass, sheetDefinition, 1, rowDepth, 0, [])
                 }
 
             }
@@ -181,6 +182,7 @@ class GridReportXlsxExporter  {
                 }
                 if (dataElements) {
                     printDataElement(rowDefinition, dataElements.head(), outline)
+                    rowDepth++
                 }else{
                     outline.each {
                             cell(it) {
@@ -197,13 +199,13 @@ class GridReportXlsxExporter  {
             }
             if (dataElements.size() > 1) {
                 for (Relationship dataElementRelationship in dataElements.tail()) {
-                    rowDepth++
                     row(rowDepth) { RowDefinition rowDefinition ->
                         printDataElement(rowDefinition, dataElementRelationship, outline)
                     }
+                    rowDepth++
                 }
             }
-            rowDepth = buildRows(sheetDefinition, child.getOutgoingRelationshipsByType(RelationshipType.hierarchyType), columnDepth + 1, (dataElements.size() > 1)?(rowDepth + 1):rowDepth, outline)
+            rowDepth = buildRows(sheetDefinition, child.getOutgoingRelationshipsByType(RelationshipType.hierarchyType), columnDepth + 1, rowDepth, outline)
             rowDepth
         }
     }
