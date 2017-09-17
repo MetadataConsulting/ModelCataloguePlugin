@@ -13,7 +13,7 @@ environments {
             driverClassName = "com.mysql.jdbc.Driver"
             dialect='org.hibernate.dialect.MySQL5InnoDBDialect'
 
-            url = ""
+            url = "jdbc:mysql://localhost:3306/exceltest"
             username = 'mdradmin'
             password = 'mdradmin123'
             dbCreate = "update"
@@ -67,9 +67,9 @@ environments {
             driverClassName = "com.mysql.jdbc.Driver"
             dialect='org.hibernate.dialect.MySQL5InnoDBDialect'
 
-            url = System.getenv('mdx_db_url')//"jdbc:mysql://localhost:3306/exceltest"
-            username = System.getenv('mdx_db_username')//'mdradmin'
-            password = System.getenv('mdx_db_password')//'mdradmin123'
+            url = System.getenv('MDX_DB_URL')//"jdbc:mysql://localhost:3306/exceltest"
+            username = System.getenv('MDX_DB_USERNAME')//'mdradmin'
+            password = System.getenv('MDX_DB_PASSWORD')//'mdradmin123'
             dbCreate = "update"
             properties {
                 maxActive = -1

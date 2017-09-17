@@ -439,6 +439,13 @@ class BootStrap {
 //        createRequestmapIfMissing('/api/modelCatalogue/core/relationshipTypes/**', 'ROLE_ADMIN')
 
 
+   //create some test models etc. for dev
+   //TODO: remove this and replace with a functional test
+
+        final def var1 = log.info("completed:initSecurity")
+
+
+
     }
 
     def initPoliciesAndTags() {

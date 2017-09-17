@@ -46,16 +46,16 @@ class CatalogueController {
             CatalogueXmlPrinter printer = new CatalogueXmlPrinter(dataModelService, dataClassService)
             printer.bind(element){
                 idIncludeVersion = true
+
                 if (params.full == 'false') {
                     keepInside = element.instanceOf(DataModel) ? element : element.dataModel
                 }
-                if (params.repetitive != 'false') {
 
-                    repetitive = true
-                }
             }.writeTo(response.writer)
             return
         }
+
+
 
         redirect controller: params.resource, action: 'show', id: element.id, params: params
 

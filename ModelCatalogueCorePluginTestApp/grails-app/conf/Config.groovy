@@ -189,6 +189,7 @@ environments {
         }
     }
     production {
+        //Pickup setting from environment variables
         grails.logging.jul.usebridge = false
 
         mc.sync.relationshipTypes=true
@@ -198,33 +199,36 @@ environments {
         mc.storage.maxSize = 50 * 1024 * 1024
         // ---
         grails.logging.jul.usebridge = false
-        grails.serverURL = System.getProperty('MDX_SERVER_URL')//"https://localhost:8899/mc"
         println "ServerURL:" + grails.serverURL
-        println "mdx_db_url:" + System.getProperty('mdx_db_url')
-        println "mdx_db_username:" + System.getProperty('mdx_db_username')
-        println "mdx_db_password:" + System.getProperty('mdx_db_password')
-        println "mdx_server_url:" + System.getProperty('mdx_server_url')
-        println "mdx_elastic_host:" + System.getProperty('mdx_elastic_host')
-        println "mdx_elastic_port:" + System.getProperty('mdx_elastic_port')
-        println "MC_MAIL_FROM:" + System.getProperty('MC_MAIL_FROM')
-        println "mdx_mail_host:" + System.getProperty('mdx_mail_host')
-        println "mdx_mail_port:" + System.getProperty('mdx_mail_port')
-        println "mdx_mail_username:" + System.getProperty('mdx_mail_username')
-        println "mdx_mail_password:" + System.getProperty('mdx_mail_password')
-        println "mdx_name:" + System.getProperty('mdx_name')
-        println "mdx_welcome:" + System.getProperty('mdx_welcome')
-        println "mdx_info:" + System.getProperty('mdx_info')
-        println "mdx_allow_signup:" + System.getProperty('mdx_allow_signup')
+        println "MDX_SERVER_URL:" + System.getenv('MDX_SERVER_URL')
+        grails.serverURL = System.getenv('MDX_SERVER_URL')//"https://localhost:8899/mc"
+        //println "ServerURL:" + grails.serverURL
+        println "ServerURL:${grails.serverURL} END"
+        println "MDX_DB_URL:" + System.getenv('MDX_DB_URL')
+        println "MDX_DB_USERNAME:" + System.getenv('MDX_DB_USERNAME')
+        println "MDX_DB_PASSWORD:" + System.getenv('MDX_DB_PASSWORD')
+        println "MDX_ELASTIC_HOST:" + System.getenv('MDX_ELASTIC_HOST')
+        println "MDX_ELASTIC_PORT:" + System.getenv('MDX_ELASTIC_PORT')
+        println "MC_MAIL_FROM:" + System.getenv('MC_MAIL_FROM')
+        println "MDX_MAIL_HOST:" + System.getenv('MDX_MAIL_HOST')
+        println "MDX_MAIL_PORT:" + System.getenv('MDX_MAIL_PORT')
+        println "MDX_MAIL_USERNAME:" + System.getenv('MDX_MAIL_USERNAME')
+        println "MDX_MAIL_PASSWORD:" + System.getenv('MDX_MAIL_PASSWORD')
+        println "MDX_NAME:" + System.getenv('MDX_NAME')
+        println "MDX_WELCOME:" + System.getenv('MDX_WELCOME')
+        println "MDX_INFO:" + System.getenv('MDX_INFO')
+        println "MDX_ALLOW_SIGNUP:" + System.getenv('MDX_ALLOW_SIGNUP')
 
-        grails.plugin.springsecurity.auth.loginFormUrl = "${grails.serverURL}/login/auth"
-        grails.plugin.springsecurity.successHandler.ajaxSuccessUrl = "${grails.serverURL}/login/ajaxSuccess"
-        grails.plugin.springsecurity.failureHandler.ajaxAuthFailUrl = "${grails.serverURL}/login/authfail"
+        grails.plugin.springsecurity.auth.loginFormUrl = grails.serverURL + "/login/auth"
+        println grails.serverURL + "/login/ajaxSuccess"
+        grails.plugin.springsecurity.successHandler.ajaxSuccessUrl = grails.serverURL + "/login/ajaxSuccess"
+        grails.plugin.springsecurity.failureHandler.ajaxAuthFailUrl = grails.serverURL + "/login/authfail"
         grails.plugin.springsecurity.logout.afterLogoutUrl = grails.serverURL
         grails.plugin.springsecurity.successHandler.defaultTargetUrl = grails.serverURL
         //println "ServerURL" + grails.serverURL
 
-        mc.search.elasticsearch.host=System.getenv("mdx_elastic_host")//"127.0.0.1"
-        mc.ssearch.elasticsearch.port=System.getenv("mdx_elastic_host")//'9300'
+        mc.search.elasticsearch.host=System.getenv('MDX_ELASTIC_HOST')
+        mc.ssearch.elasticsearch.port=System.getenv('MDX_ELASTIC_PORT')
 
         grails.plugin.console.enabled=true
         mc.legacy.dataModels=true
@@ -234,10 +238,10 @@ environments {
 
         grails {
             mail {
-                host = System.getenv('mdx_mail_host')//"vps.beenleigh.com"
-                port = System.getenv('mdx_mail_port')//"25" as Integer
-                username = System.getenv('mdx_mail_username')//"testadmin@datalink.org.uk"//System.getenv("MC_MAIL_USERNAME")
-                password = System.getenv('mdx_mail_password')//"adm1nAtB33nl31gh"//System.getenv("MC_MAIL_PASSWORD")
+                host = System.getenv('MDX_MAIL_HOST')//"vps.beenleigh.com"
+                port = System.getenv('MDX_MAIL_PORT')//"25" as Integer
+                username = System.getenv('MDX_MAIL_USERNAME')//"testadmin@datalink.org.uk"//System.getenv("MC_MAIL_USERNAME")
+                password = System.getenv('MDX_MAIL_PASSWORD')//"adm1nAtB33nl31gh"//System.getenv("MC_MAIL_PASSWORD")
                 if (System.getenv("MC_MAIL_PROPS")) {
                     props = new JsonSlurper().parseText(System.getenv("MC_MAIL_PROPS"))
                 }
@@ -246,10 +250,10 @@ environments {
 
 
 
-        mc.name = System.getenv('mdx_name')//"Metadata Exchange"
-        mc.welcome.jumbo = System.getenv('mdx_welcome')//"The Metadata Exchange is loaded with some test data"
-        mc.welcome.info = System.getenv('mdx_info')//"Welcome to the Metadata Exchange"
-        mc.allow.signup = System.getenv('mdx_allow_signup')//true
+        mc.name = System.getenv('MDX_NAME')//"Metadata Exchange"
+        mc.welcome.jumbo = System.getenv('MDX_WELCOME')//"The Metadata Exchange is loaded with some test data"
+        mc.welcome.info = System.getenv('MDX_INFO')//"Welcome to the Metadata Exchange"
+        mc.allow.signup = System.getenv('MDX_ALLOW_SIGNUP')//true
 
 
 

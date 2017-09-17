@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.dataimport.excel.nt.uclh
 
-import org.apache.commons.lang3.tuple.Pair
+
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.custommonkey.xmlunit.XMLUnit
 import org.junit.Rule
@@ -10,16 +10,9 @@ import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.dataimport.excel.ExcelLoaderSpec
-import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportXlsxExporter
-import org.modelcatalogue.core.dataimport.excel.uclh.UCLHExcelLoaderSpec
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
-import org.modelcatalogue.core.util.test.FileOpener
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
-import org.modelcatalogue.spreadsheet.query.api.SpreadsheetCriteria
-import org.modelcatalogue.spreadsheet.query.poi.PoiSpreadsheetQuery
 import spock.lang.Shared
-
-import java.nio.charset.StandardCharsets
 
 /**
  * Created by davidmilward on 31/08/2017.

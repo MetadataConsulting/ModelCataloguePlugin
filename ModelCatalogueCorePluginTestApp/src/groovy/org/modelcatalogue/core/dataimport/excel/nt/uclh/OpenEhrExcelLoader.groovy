@@ -1,7 +1,5 @@
 package org.modelcatalogue.core.dataimport.excel.nt.uclh
 
-import groovy.time.TimeCategory
-import groovy.time.TimeDuration
 import org.apache.commons.lang.WordUtils
 import org.apache.commons.lang3.tuple.Pair
 import org.apache.poi.ss.usermodel.Row
@@ -11,7 +9,6 @@ import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.dataimport.excel.nt.uclh.UCLHExcelLoader
 
 /**
  * Created by davidmilward on 31/08/2017.
@@ -26,10 +23,10 @@ class OpenEhrExcelLoader extends UCLHExcelLoader {
     Pair<String, List<String>> buildXmlFromWorkbookSheet(Workbook workbook, int index=0, String owner='') {
 
         if (owner == '') {
-            ownerSuffix = ''
+            ownerAndGELModelSuffix = ''
         }
         else {
-            ownerSuffix = '_' + owner
+            ownerAndGELModelSuffix = '_' + owner
         }
 
 
@@ -42,8 +39,12 @@ class OpenEhrExcelLoader extends UCLHExcelLoader {
         Sheet sheet = workbook.getSheetAt(index);
 
         List<Map<String, String>> rowMaps = getRowMaps(sheet)
+        String suffix = getOwnerSuffixWithRandom()
+        if(bTest){
+            suffix = getOwnerSuffix()
+        }
 
-        String modelName = rowMaps[0]['Current Paper Document  or system name']+getOwnerSuffixWithRandom() // at the moment we are dealing with just one            UCLH data source, so there will be just one model
+        String modelName = rowMaps[0]['Current Paper Document  or system name']+  suffix // at the moment we are dealing with just one            UCLH data source, so there will be just one model
 
         List<String> modelNames = [modelName]
 
@@ -104,10 +105,10 @@ class OpenEhrExcelLoader extends UCLHExcelLoader {
     List<String>  loadModel(Workbook workbook,  String owner='') {
         List<String> modelNames = []
         if (owner == '') {
-            ownerSuffix = ''
+            ownerAndGELModelSuffix = ''
         }
         else {
-            ownerSuffix = '_openEHR_' + owner
+            ownerAndGELModelSuffix = '_openEHR_' + owner
         }
 
         if (!workbook) {
@@ -126,7 +127,7 @@ class OpenEhrExcelLoader extends UCLHExcelLoader {
         //Iterate through the modelMaps to build new DataModel
         workbookMap.each { String name, List<Map<String, String>> rowMapsForModel ->
 
-            DataModel newModel = getDataModel(name + ownerSuffix)
+            DataModel newModel = getDataModel(name + ownerAndGELModelSuffix)
             modelNames << name
 
             //Iterate through each row to build an new DataElement
