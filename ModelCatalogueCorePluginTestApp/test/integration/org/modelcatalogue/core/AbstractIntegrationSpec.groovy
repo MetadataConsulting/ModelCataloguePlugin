@@ -52,7 +52,7 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
             TestData.createTestData()
         }
         cacheService.clearCache()
-        Role adminRole = Role.findOrCreateWhere(authority: 'ROLE_ADMIN').save(failOnError: true)
+        Role adminRole = Role.findOrCreateWhere(authority: 'ROLE_SUPERVISOR').save(failOnError: true)
         User user = User.list(max: 1).first()
         UserRole.create(user, adminRole, true)
         user.save(failOnError: true)
