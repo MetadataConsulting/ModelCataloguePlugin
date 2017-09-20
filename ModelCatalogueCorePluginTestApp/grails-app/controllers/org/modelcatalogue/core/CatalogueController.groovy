@@ -36,10 +36,10 @@ class CatalogueController {
             CatalogueXmlPrinter printer = new CatalogueXmlPrinter(dataModelService, dataClassService)
             printer.bind(element){
                 idIncludeVersion = true
-                if (params.full != 'true') {
+                if (params.full == 'false') {
                     keepInside = element.instanceOf(DataModel) ? element : element.dataModel
                 }
-                if (params.repetitive == 'true') {
+                if (params.repetitive != 'false') {
                     repetitive = true
                 }
             }.writeTo(response.writer)
