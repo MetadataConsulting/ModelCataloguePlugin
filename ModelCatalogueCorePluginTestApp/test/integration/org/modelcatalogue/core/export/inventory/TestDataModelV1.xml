@@ -642,5 +642,6 @@ DATE (including year, month and day) - CCYY-MM-DD
         </dataClass>
       </dataClass>
     </dataClass>
+    <dataClass name="NHIC Datasets Test for Delete"></dataClass>
   </dataModel>
 </catalogue>

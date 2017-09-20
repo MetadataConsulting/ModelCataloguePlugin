@@ -3,8 +3,10 @@ package org.modelcatalogue.core.diff
 import grails.util.GrailsNameUtils
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.enumeration.Enumeration
+import org.modelcatalogue.core.util.HibernateHelper
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -19,13 +21,15 @@ class Diff {
     final Relationship relationship
     final Object selfValue
     final Object otherValue
+    final DataClass parentClass
 
-    private Diff(String key, CatalogueElement element, Relationship relationship, Object selfValue, Object otherValue) {
+    private Diff(String key, CatalogueElement element, Relationship relationship, Object selfValue, Object otherValue, DataClass parentClass) {
         this.key = key
         this.element = element
         this.selfValue = selfValue
         this.otherValue = otherValue
         this.relationship = relationship
+        this.parentClass = parentClass
     }
 
     static String keyForProperty(String propertyName) {
@@ -64,33 +68,33 @@ class Diff {
         return "entity:$entityId"
     }
 
-    static Diff createEntityChange(CatalogueElement self, CatalogueElement other) {
-        return new Diff(keyForSelf(self.latestVersionId ?: self.id), self, null, self, other)
+    static Diff createEntityChange(CatalogueElement self, CatalogueElement other, DataClass parentClass) {
+        return new Diff(keyForSelf(self?.latestVersionId ?: self?.id), self, null, self, other, parentClass)
     }
 
-    static Diff createPropertyChange(String propertyKey, CatalogueElement source,  Object selfValue, Object otherValue) {
-        return new Diff(propertyKey, source, null, selfValue, otherValue)
+    static Diff createPropertyChange(String propertyKey, CatalogueElement source,  Object selfValue, Object otherValue, DataClass parentClass) {
+        return new Diff(propertyKey, source, null, selfValue, otherValue, parentClass)
     }
 
 
-    static Diff createExtensionChange(String extensionKey, CatalogueElement source ,String selfValue, String otherValue) {
-        return new Diff(keyForExtension(extensionKey), source, null, selfValue, otherValue)
+    static Diff createExtensionChange(String extensionKey, CatalogueElement source ,String selfValue, String otherValue, DataClass parentClass) {
+        return new Diff(keyForExtension(extensionKey), source, null, selfValue, otherValue, parentClass)
     }
 
-    static Diff createMissingRelationship(CatalogueElement source, Relationship relationship) {
-        return new Diff(keyForRelationship(relationship), source, relationship, relationship, null)
+    static Diff createMissingRelationship(CatalogueElement source, Relationship relationship, DataClass parentClass) {
+        return new Diff(keyForRelationship(relationship), source, relationship, relationship, null, parentClass)
     }
 
-    static Diff createRelationshipMetadataChange(Relationship relationship, String metadataKey, CatalogueElement source, String selfValue, String otherValue) {
-        return new Diff(keyForRelationshipExtension(relationship, metadataKey), source, relationship, selfValue, otherValue)
+    static Diff createRelationshipMetadataChange(Relationship relationship, String metadataKey, CatalogueElement source, String selfValue, String otherValue, DataClass parentClass) {
+        return new Diff(keyForRelationshipExtension(relationship, metadataKey), source, relationship, selfValue, otherValue, parentClass)
     }
 
-    static Diff createNewRelationship(CatalogueElement source, Relationship relationship) {
-        return new Diff(keyForRelationship(relationship), source, relationship, null, relationship)
+    static Diff createNewRelationship(CatalogueElement source, Relationship relationship, DataClass parentClass) {
+        return new Diff(keyForRelationship(relationship), source, relationship, null, relationship, parentClass)
     }
 
-    static Diff createEnumerationChange(CatalogueElement source, Long id, Enumeration selfEnumeration, Enumeration otherEnumeration) {
-        return new Diff(keyForEnumeration(id), source, null, selfEnumeration, otherEnumeration)
+    static Diff createEnumerationChange(CatalogueElement source, Long id, Enumeration selfEnumeration, Enumeration otherEnumeration, DataClass parentClass) {
+        return new Diff(keyForEnumeration(id), source, null, selfEnumeration, otherEnumeration, parentClass)
     }
 
     @Override
@@ -148,12 +152,18 @@ class Diff {
     String getChangeDescription() {
         StringBuilder builder = new StringBuilder()
 
+        //set description if removed "from", if added "to" i.e. removed x FROM y, or added x TO y
+        String toFromIn = " to "
+
         if (isSelfMissing()) {
             builder << 'Removed '
+            toFromIn = " from "
         } else if (isOtherMissing()) {
             builder << 'Added '
+            toFromIn = " to "
         } else {
             builder  << 'Updated '
+            toFromIn = " in "
         }
 
         if (isEnumerationChange()) {
@@ -170,27 +180,27 @@ class Diff {
 
             builder << 'Enumeration ' << (selfEnumeration?.key ?: otherEnumeration?.key)
 
-            return builder.toString()
         }
 
 
         if (isExtensionChange()) {
-            builder << 'Metadata ' << key.substring(4)
-            return builder.toString()
+            builder << 'Metadata ' << key.substring(4) << toFromIn << element?.name
+
         }
 
         if (isRelationshipChange()) {
             switch (relationship.relationshipType.name) {
                 case 'hierarchy':
-                    builder << 'Data Class'
+                    builder << 'Data Class ' << relationship.destination.name << toFromIn << relationship.source.name
+
                     break;
                 case 'containment':
-                    builder << 'Data Element'
+                    builder << 'Data Element ' << relationship.destination.name << toFromIn << relationship.source.name
+
                     break;
                 default:
                     builder << 'Relationship ' << GrailsNameUtils.getNaturalName(relationship.relationshipType.name)
             }
-            return builder.toString()
         }
 
         if (isRelationshipExtensionChange()) {
@@ -204,21 +214,31 @@ class Diff {
                 default:
                     builder << 'Relationship ' << GrailsNameUtils.getNaturalName(relationship.relationshipType.name)
             }
-            builder << ' Metadata ' << relationshipExtensionKey
-            return builder.toString()
+            builder << ' Metadata ' << relationshipExtensionKey << ' from ' << relationship.destination.name << ' to ' << relationship.source.name
         }
 
         if (isEntityChange()) {
-            builder << " Entity"
-            return builder.toString();
+
+            String type = "${(this?.element)? GrailsNameUtils.getNaturalName(HibernateHelper.getEntityClass(this.element).simpleName):GrailsNameUtils.getNaturalName(HibernateHelper.getEntityClass(this.otherValue).simpleName)}"
+
+            builder << type
+
+            if(this.parentClass && this.element /*&& type!="Data Class"*/){
+                builder << "${this.element.name}${toFromIn}${this?.parentClass?.name}"
+            }else if(this.element && !this.parentClass){
+                builder << "${toFromIn}top level"
+            }
+//            else if(this.element){
+//                builder << "${toFromIn}${this.element.name}"
+//            }
+
         }
 
         if (isPropertyChange()) {
-            builder << GrailsNameUtils.getNaturalName(key)
-            return builder.toString()
+            builder << "${GrailsNameUtils.getNaturalName(key)}"
         }
 
-        // should never happen
-        return key
+
+        return builder.toString()
     }
 }
