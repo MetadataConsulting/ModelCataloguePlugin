@@ -1,11 +1,10 @@
-package org.modelcatalogue.core.dataimport.excel.gmcGridReport
+package org.modelcatalogue.core.dataexport.excel.gmcgridreport
 
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.core.*
 import org.modelcatalogue.gel.export.GridReportXlsxExporter
 import org.modelcatalogue.spreadsheet.builder.api.RowDefinition
 import org.modelcatalogue.spreadsheet.builder.api.SheetDefinition
-import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportHeaders as Headers
 
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
 
@@ -30,7 +29,7 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
     String organization = ''
     static String defaultOrganization = 'UCLH'
     static String organizationMetadataKey = 'http://www.modelcatalogue.org/metadata/#organization'
-    protected List<String> excelHeaders = Headers.excelHeaders
+    protected List<String> excelHeaders = GMCGridReportHeaders.excelHeaders
 
     /**
      * The report is triggered from a DataModel (element), and is on the
@@ -149,7 +148,7 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
 
             cell sourceSystem // Previously In Source System -- same as Source System
 
-            Headers.ntElementMetadataKeys.each{metadataKey ->
+            GMCGridReportHeaders.ntElementMetadataKeys.each{ metadataKey ->
                 cell {
                     value "${printSystemMetadata(placeholders, metadataKey)}"
                     style standardCellStyle
@@ -230,7 +229,7 @@ class GMCGridReportXlsxExporter extends GridReportXlsxExporter {
                         style standardCellStyle
                     }
             }
-            Headers.ntElementMetadataKeys.each{metadataKey ->
+            GMCGridReportHeaders.ntElementMetadataKeys.each{ metadataKey ->
                 cell {
                     value "${printSystemMetadata([dataElement], metadataKey)}"
                     style {

@@ -11,9 +11,8 @@ import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
-import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportHeaders as Headers
-import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportXlsxExporter as Exporter
-import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportExcelLoader.Move as Move
+import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportHeaders as Headers
+import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxExporter as Exporter
 
 
 /**
@@ -83,6 +82,40 @@ class GMCGridReportExcelLoaderDCB extends GMCGridReportExcelLoader {
             instructions: instructions,
             rowMaps: rowMaps)
 
+    }
+
+    static class Move {
+        String gelDataElementMCID
+        String gelDataElementName
+        String placeholderName
+        DataModel movedFrom
+        DataModel movedTo
+        void deleteOldAndRelateToNew() {
+            DataElement gelDataElement = DataElement.executeQuery(
+                'from DataElement d where d.modelCatalogueId=:mcID and d.name=:name',
+                [mcID: gelDataElementMCID, name: gelDataElementName]
+            )[0]
+            //    DataElement.findByModelCatalogueId(gelDataElementMCID)
+
+            DataElement oldPlaceholder = DataElement.executeQuery(
+                'from DataElement d where d.name=:name and d.dataModel=:dataModel',
+                [name: placeholderName, dataModel: movedFrom]
+            )[0]
+            oldPlaceholder.deleteRelationships()
+            oldPlaceholder.delete(flush:true)
+
+            DataElement newPlaceholder = DataElement.executeQuery(
+                'from DataElement d where d.name=:name and d.dataModel=:dataModel',
+                [name: placeholderName, dataModel: movedTo]
+            )[0]
+            gelDataElement.addToRelatedTo(newPlaceholder)
+        }
+
+        void justMove() {
+            DataElement placeholder = DataElement.findByNameAndDataModel(placeholderName, movedFrom)
+            placeholder.dataModel = movedTo
+            placeholder.save(flush:true)
+        }
     }
 
 

@@ -4,8 +4,9 @@ import org.apache.poi.ss.usermodel.Workbook
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxExporter
 import org.modelcatalogue.core.dataimport.excel.ExcelLoader
-import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportHeaders as Headers
+import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportHeaders as Headers
 
 /**
  * Class for loading GMC (Genomic Medical Centre) Grid Reports.

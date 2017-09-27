@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.dataimport.excel.gmcGridReport
+package org.modelcatalogue.core.dataexport.excel.gmcgridreport
 
 /**
  * Created by james on 17/08/2017.

@@ -5,7 +5,8 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.dataimport.excel.gmcGridReport.GMCGridReportHeaders as Headers
+import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportHeaders as Headers
+import org.modelcatalogue.core.dataexport.excel.gmcgridreport.GMCGridReportXlsxExporter
 
 /**
  * The GMCGridReportExcelLoaderDCB using the defaultCatalogueBuilder has been
