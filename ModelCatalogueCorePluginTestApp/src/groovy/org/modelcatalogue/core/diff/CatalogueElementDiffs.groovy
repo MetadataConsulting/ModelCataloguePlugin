@@ -9,6 +9,7 @@ import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
+import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
@@ -42,14 +43,18 @@ class CatalogueElementDiffs {
     }
 
     ImmutableMultimap<String, Diff> differentiate(CatalogueElement self, CatalogueElement other) {
-        differentiate(self, other, null)
+        differentiate(self, other, null, null)
     }
 
-    ImmutableMultimap<String, Diff> differentiate(CatalogueElement self, CatalogueElement other, CatalogueElement parentClass) {
+    ImmutableMultimap<String, Diff> differentiate(CatalogueElement self, CatalogueElement other, DataClass parentClass) {
+        differentiate(self, other, parentClass, null, null)
+    }
+
+    ImmutableMultimap<String, Diff> differentiate(CatalogueElement self, CatalogueElement other, DataClass parentClass, DataElement parentElement) {
 
         //if there isn't another catalogue element or isn't a self of they are the same - return no change
         if (!other || !self || self == other) {
-            return ImmutableMultimap.of(Diff.keyForSelf(self?.latestVersionId ?: self?.id ?: other?.latestVersionId ?: other?.id), Diff.createEntityChange(self, other, parentClass))
+            return ImmutableMultimap.of(Diff.keyForSelf(self?.latestVersionId ?: self?.id ?: other?.latestVersionId ?: other?.id), Diff.createEntityChange(self, other, parentClass, parentElement))
         }
 
         //instantiate the multimpa builder
@@ -87,14 +92,14 @@ class CatalogueElementDiffs {
                     //compare the reference types, if they are different return a diff
 
                     if ((selfElement?.latestVersionId ?: selfElement?.id) != (otherElement?.latestVersionId ?: otherElement?.id)) {
-                        builder.put(Diff.keyForProperty(property.name), Diff.createPropertyChange(property.name, self, selfValue, otherValue, parentClass))
+                        builder.put(Diff.keyForProperty(property.name), Diff.createPropertyChange(property.name, self, selfValue, otherValue, parentClass, parentElement))
                     }
                 } else {
 
                     //else if the properties are simple properties and are different then return the dif
 
                     if (selfValue != otherValue) {
-                        builder.put(Diff.keyForProperty(property.name), Diff.createPropertyChange(property.name, self, selfValue, otherValue, parentClass))
+                        builder.put(Diff.keyForProperty(property.name), Diff.createPropertyChange(property.name, self, selfValue, otherValue, parentClass, parentElement))
                     }
                 }
 
@@ -110,14 +115,14 @@ class CatalogueElementDiffs {
                 for (Enumeration enumeration in selfEnumerations) {
                     Enumeration otherEnumeration = otherEnumerations.getEnumerationById(enumeration.id)
                     if (enumeration.key != otherEnumeration?.key || enumeration.value != otherEnumeration?.value || enumeration.deprecated != otherEnumeration?.deprecated) {
-                        builder.put(Diff.keyForEnumeration(enumeration.id), Diff.createEnumerationChange(self, enumeration.id, enumeration, otherEnumeration, parentClass))
+                        builder.put(Diff.keyForEnumeration(enumeration.id), Diff.createEnumerationChange(self, enumeration.id, enumeration, otherEnumeration, parentClass, parentElement))
                     }
                 }
 
                 Set<Long> missingEnumerations = Sets.difference(otherEnumerations.iterator().collect { it.id }.toSet(), selfEnumerations.iterator().collect { it.id }.toSet())
 
                 for (Long id in missingEnumerations) {
-                    builder.put(Diff.keyForEnumeration(id), Diff.createEnumerationChange(self, id, null, otherEnumerations.getEnumerationById(id), parentClass))
+                    builder.put(Diff.keyForEnumeration(id), Diff.createEnumerationChange(self, id, null, otherEnumerations.getEnumerationById(id), parentClass, parentElement))
                 }
             }
         }
@@ -129,14 +134,14 @@ class CatalogueElementDiffs {
             String otherValue = other.ext[extension.key]
 
             if (selfValue != otherValue) {
-                builder.put(Diff.keyForExtension(extension.key), Diff.createExtensionChange(extension.key, self, selfValue, otherValue, parentClass))
+                builder.put(Diff.keyForExtension(extension.key), Diff.createExtensionChange(extension.key, self, selfValue, otherValue, parentClass, parentElement))
             }
         }
 
         Set<String> missingExtensions = Sets.difference(other.ext.keySet(), self.ext.keySet())
 
         for(String key in missingExtensions) {
-            builder.put(Diff.keyForExtension(key), Diff.createExtensionChange(key, self, null, other.ext[key], parentClass))
+            builder.put(Diff.keyForExtension(key), Diff.createExtensionChange(key, self, null, other.ext[key], parentClass, parentElement))
         }
 
 
@@ -157,7 +162,7 @@ class CatalogueElementDiffs {
             //if there isn't an 'other' relationships create a diff
 
             if (!otherRelationship) {
-                builder.put(rel.key, Diff.createMissingRelationship(self, rel.value, parentClass))
+                builder.put(rel.key, Diff.createMissingRelationship(self, rel.value, parentClass, parentElement))
                 continue
             }
 
@@ -169,21 +174,21 @@ class CatalogueElementDiffs {
 
                 if (selfValue != otherValue) {
                     String changeKey = Diff.keyForRelationshipExtension(selfRelationship, extension.key)
-                    builder.put(changeKey, Diff.createRelationshipMetadataChange(selfRelationship, extension.key, self, selfValue, otherValue, parentClass))
+                    builder.put(changeKey, Diff.createRelationshipMetadataChange(selfRelationship, extension.key, self, selfValue, otherValue, parentClass, parentElement))
                 }
             }
 
             Set<String> missingRelationshipExtensions = Sets.difference(otherRelationship.ext.keySet(), selfRelationship.ext.keySet())
 
             for(String key in missingRelationshipExtensions) {
-                builder.put(Diff.keyForRelationshipExtension(otherRelationship, key), Diff.createRelationshipMetadataChange(otherRelationship, key, self, null, otherRelationship.ext[key], parentClass))
+                builder.put(Diff.keyForRelationshipExtension(otherRelationship, key), Diff.createRelationshipMetadataChange(otherRelationship, key, self, null, otherRelationship.ext[key], parentClass, parentElement))
             }
         }
 
         Set<String> missingRelationships = Sets.difference(otherRelationships.keySet(), selfRelationships.keySet())
 
         for(String key in missingRelationships) {
-            builder.put(key, Diff.createNewRelationship(self, otherRelationships[key], parentClass))
+            builder.put(key, Diff.createNewRelationship(self, otherRelationships[key], parentClass, parentElement))
         }
 
         return builder.build()
@@ -194,7 +199,7 @@ class CatalogueElementDiffs {
 
         //if there isn't another catalogue element or isn't a self of they are the same - return
         if (!other || !self || self == other) {
-            return ImmutableMultimap.of(Diff.keyForSelf(self?.latestVersionId ?: self?.id ?: other?.latestVersionId ?: other?.id), Diff.createEntityChange(self, other, null))
+            return ImmutableMultimap.of(Diff.keyForSelf(self?.latestVersionId ?: self?.id ?: other?.latestVersionId ?: other?.id), Diff.createEntityChange(self, other, null, null))
         }
 
         //instantiate the multimpa builder
@@ -232,7 +237,7 @@ class CatalogueElementDiffs {
         //been deleted
 
         for(String key in missingRelationships) {
-            builder.put(key, Diff.createMissingRelationship(self, otherRelationships[key], null))
+            builder.put(key, Diff.createMissingRelationship(self, otherRelationships[key], null, null))
         }
 
         return builder.build()

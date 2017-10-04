@@ -251,110 +251,175 @@ class CatalogueElementToXlsxExporter {
             log.info "Printing all changes summary."
 
             //fill changes sheet
-            sheet('Changes') {
+            sheet('Changes') { SheetDefinition sheet ->
                 row {
                     cell {
                         style H1
                         value 'Changes Summary'
                         colspan 6
-                }   }
-                row {
-                    cell {
-                        value 'Parent ID'
-                        width 10
-                        styles ModelCatalogueStyles.INNER_TABLE_HEADER
-                    }
-                    cell {
-                        value 'Parent Name'
-                        width 15
-                        styles ModelCatalogueStyles.INNER_TABLE_HEADER
-                    }
-                    cell {
-                        value 'ID'
-                        width 10
-                        styles ModelCatalogueStyles.INNER_TABLE_HEADER
-                    }
-                    cell {
-                        value 'Type'
-                        width 15
-                        styles ModelCatalogueStyles.INNER_TABLE_HEADER
-                    }
-                    cell {
-                        value 'Name'
-                        width 25
-                        styles ModelCatalogueStyles.INNER_TABLE_HEADER
-                    }
-                    cell {
-                        value 'Description'
-                        width 35
-                        styles ModelCatalogueStyles.INNER_TABLE_HEADER
-                    }
-                    cell {
-                        value 'Old Value'
-                        width 35
-                        styles ModelCatalogueStyles.INNER_TABLE_HEADER
-                    }
-                    cell {
-                        value 'New Value'
-                        width 35
-                        styles ModelCatalogueStyles.INNER_TABLE_HEADER
-                    }
                 }
+                }
+
+
                 log.info "Sorting changes"
-                Iterable<Diff> allDiffs = Iterables.concat(computedDiffs.values().collect { it.values() }).sort { a, b ->
+                Iterable<Diff> allDiffs = Iterables.concat(computedDiffs.values().collect { it.values() })
 
-                    //first try sorting by the parent class name
-                    if(a?.parentClass && b?.parentClass) {
-                        a?.parentClass.name <=> b?.parentClass.name
-                    }else{
-                       -1
-                    }
+                //load diffs by class
+                //key is the class id
+                //if a data element diff is included - it's included with the class id
 
+                Map diffsByClass = getDiffsMapByClass(allDiffs)
+
+                diffsByClass.each{ key, val ->
+                    printClassDetails(key, val, sheet)
                 }
 
-                log.info "Printing ${allDiffs.size()} changes"
-                for (Diff diff in allDiffs) {
-                    row {
-                        cell {
-                            value "${(diff?.parentClass)?getModelCatalogueIdToPrint(diff?.parentClass):"Top level class, no parent"}"
-                            styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
-                        }
-                        cell {
-                            value "${(diff?.parentClass)? diff?.parentClass?.name :"Top level class, no parent"}"
-                            styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
-                        }
-                        cell {
-                            value  "${(diff?.element)? getModelCatalogueIdToPrint(diff?.element):getModelCatalogueIdToPrint(diff.otherValue)}"
-                            styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
-                        }
-                        cell {
-                            value  "${(diff?.element)? GrailsNameUtils.getNaturalName(HibernateHelper.getEntityClass(diff.element).simpleName):GrailsNameUtils.getNaturalName(HibernateHelper.getEntityClass(diff.otherValue).simpleName)}"
-                            styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
-                        }
-                        cell {
-                            value  "${(diff?.element)? diff.element.name : diff.otherValue?.name}"
-                            styles withDiffStyles(diff, ModelCatalogueStyles.DESCRIPTION, ModelCatalogueStyles.CENTER_LEFT)
-                        }
-                        cell {
-                            value diff.changeDescription
-                            styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
-                        }
-                        cell {
-                            value humanReadableValue(diff.otherValue)
-                            styles withDiffStyles(diff, ModelCatalogueStyles.DESCRIPTION)
-                        }
-                        cell {
-                            value humanReadableValue(diff.selfValue)
-                            styles withDiffStyles(diff, ModelCatalogueStyles.DESCRIPTION)
-                        }
-                    }
-                }
+
+
             }
 
         }
 
         log.info "Exported ${GrailsNameUtils.getNaturalName(HibernateHelper.getEntityClass(element).simpleName)} ${element.name} (${element.combinedVersion}) to inventory spreadsheet."
 
+    }
+
+    protected Map getDiffsMapByClass(allDiffs){
+        Map diffsByClass = [:]
+
+        allDiffs.each{ Diff diff ->
+            if(diff!=null) {
+                Set classDiffs = []
+                classDiffs.add(diff)
+                //if this is a class use it's id as the key
+                // and add these diffs to those already recorded
+                if (diff?.element && diff.element.instanceOf(DataClass)) {
+                    //get the diffs that have already been collected
+                    if(diffsByClass.get(diff.element.name)) {
+                        classDiffs.addAll(diffsByClass.get(diff.element.name))
+                    }
+                    diffsByClass.put(diff.element.name, classDiffs)
+                } else {
+
+                    if (diff.parentClass) {
+                        //get the diffs that have already been collected using the parent id
+                        if(diffsByClass.get(diff.parentClass.name)) {
+                            classDiffs.addAll(diffsByClass.get(diff.parentClass.name))
+                        }
+                        diffsByClass.put(diff.parentClass.name, classDiffs)
+                    } else {
+                        //they are top level deleted diffs - so look in the otherValue
+                        if(diffsByClass.get(diff.otherValue.name)) {
+                            classDiffs.addAll(diffsByClass.get(diff.otherValue.name))
+                        }
+                        diffsByClass.put(diff.otherValue.name, classDiffs)
+                    }
+                }
+            }
+        }
+
+        diffsByClass
+    }
+
+
+    protected void printClassDetails(String key, Set val,  SheetDefinition sheet){
+
+        sheet.with {
+            row {
+                cell {
+                    style H1
+                    value key
+                    colspan 6
+                }
+            }
+            row {
+                cell {
+                    value 'Parent ID'
+                    width 10
+                    styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                }
+                cell {
+                    value 'Parent Name'
+                    width 15
+                    styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                }
+                cell {
+                    value 'ID'
+                    width 10
+                    styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                }
+                cell {
+                    value 'Type'
+                    width 15
+                    styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                }
+                cell {
+                    value 'Name'
+                    width 25
+                    styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                }
+                cell {
+                    value 'Description'
+                    width 35
+                    styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                }
+                cell {
+                    value 'Old Value'
+                    width 35
+                    styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                }
+                cell {
+                    value 'New Value'
+                    width 35
+                    styles ModelCatalogueStyles.INNER_TABLE_HEADER
+                }
+            }
+            val.each { Diff diff ->
+                printChanges(diff, sheet)
+            }
+      }
+
+
+    }
+
+    protected void printChanges(Diff diff, SheetDefinition sheet){
+
+        sheet.with {
+            row {
+                cell {
+                    value "${(diff?.parentClass) ? getModelCatalogueIdToPrint(diff?.parentClass) : "Top level class, no parent"}"
+                    styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
+                }
+                cell {
+                    value "${(diff?.parentClass) ? diff?.parentClass?.name : "Top level class, no parent"}"
+                    styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
+                }
+                cell {
+                    value "${(diff?.element) ? getModelCatalogueIdToPrint(diff?.element) : getModelCatalogueIdToPrint(diff.otherValue)}"
+                    styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
+                }
+                cell {
+                    value "${(diff?.element) ? GrailsNameUtils.getNaturalName(HibernateHelper.getEntityClass(diff.element).simpleName) : GrailsNameUtils.getNaturalName(HibernateHelper.getEntityClass(diff.otherValue).simpleName)}"
+                    styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
+                }
+                cell {
+                    value "${(diff?.element) ? diff.element.name : diff.otherValue?.name}"
+                    styles withDiffStyles(diff, ModelCatalogueStyles.DESCRIPTION, ModelCatalogueStyles.CENTER_LEFT)
+                }
+                cell {
+                    value diff.changeDescription
+                    styles withDiffStyles(diff, ModelCatalogueStyles.CENTER_LEFT)
+                }
+                cell {
+                    value humanReadableValue(diff.otherValue)
+                    styles withDiffStyles(diff, ModelCatalogueStyles.DESCRIPTION)
+                }
+                cell {
+                    value humanReadableValue(diff.selfValue)
+                    styles withDiffStyles(diff, ModelCatalogueStyles.DESCRIPTION)
+                }
+            }
+        }
     }
 
     protected void buildDataClassesDetails(Iterable<DataClass> dataClasses, CatalogueElement previousVersionElementForDiff, WorkbookDefinition workbook, SheetDefinition sheet, int level = 0, Set<Long> processed = new HashSet<Long>()) {
@@ -526,7 +591,7 @@ class CatalogueElementToXlsxExporter {
     }
 
     protected static boolean isSkipExport(DataClass dataClassForDetail) {
-        dataClassForDetail.ext[Metadata.SKIP_EXPORT]
+        dataClassForDetail.ext.get(Metadata.SKIP_EXPORT)=="true"
     }
 
     protected static String normalizeDataClassName(DataClass dataClassForDetail) {
@@ -640,7 +705,7 @@ class CatalogueElementToXlsxExporter {
                     cell {
                         value "${dataClass.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataClass.defaultModelCatalogueId}"
                         style 'description'
-                        link to url "${dataClass.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataClass.defaultModelCatalogueId}"
+                       // link to url "${dataClass.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataClass.defaultModelCatalogueId}"
                     }
 
 
@@ -679,7 +744,11 @@ class CatalogueElementToXlsxExporter {
 
     private Map<String,ImmutableMultimap<String, Diff>> computedDiffs = [:]
 
-    private ImmutableMultimap<String, Diff> collectDiffs(CatalogueElement element, CatalogueElement previousVersionElementForDiff, DataClass parentClass) {
+    private ImmutableMultimap<String, Diff> collectDiffs(CatalogueElement element, CatalogueElement previousVersionElementForDiff, DataClass parentClass){
+        collectDiffs( element,  previousVersionElementForDiff,  parentClass, null)
+    }
+
+    private ImmutableMultimap<String, Diff> collectDiffs(CatalogueElement element, CatalogueElement previousVersionElementForDiff, DataClass parentClass, DataElement parentElement) {
 
 
         if (!element || !previousVersionElementForDiff) {
@@ -696,7 +765,7 @@ class CatalogueElementToXlsxExporter {
         CatalogueElement other = findOther(element, previousVersionElementForDiff)
 
         if (previousVersionElementForDiff) {
-            diffs = catalogueElementDiffs.differentiate(element, other, parentClass)
+            diffs = catalogueElementDiffs.differentiate(element, other, parentClass, parentElement)
         }
 
         computedDiffs[key] = diffs
@@ -787,7 +856,7 @@ class CatalogueElementToXlsxExporter {
         DataType dataType = element.dataType
 
         ImmutableMultimap<String, Diff> dataElementDiffs = collectDiffs(element, previousVersionElementForDiff, dataClass)
-        ImmutableMultimap<String, Diff> dataTypeDiffs = collectDiffs(element.dataType, previousVersionElementForDiff, dataClass)
+        ImmutableMultimap<String, Diff> dataTypeDiffs = collectDiffs(element.dataType, previousVersionElementForDiff, dataClass, element)
         Collection<Diff> missingEnums = dataTypeDiffs.values().findAll { it.enumerationChange && it.selfMissing }
 
         ListWithTotalAndType<DataType> typeHierarchy = dataType ? ElementService.getTypeHierarchy([:], dataType) : Lists.emptyListWithTotalAndType(DataType)

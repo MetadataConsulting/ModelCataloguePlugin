@@ -613,7 +613,7 @@ The side of the body that is the subject of an Imaging or Radiodiagnostic Event.
                     </enumerations>
                   </dataType>
                 </dataElement>
-                <dataElement name="gender2">
+                <dataElement name="gender2 element">
                   <description>gender test stuff</description>
                   <extensions>
                     <extension key="NHIC_Identifier:">TEST_GENDER</extension>

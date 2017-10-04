@@ -4,6 +4,7 @@ import grails.util.GrailsNameUtils
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
+import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.enumeration.Enumeration
 import org.modelcatalogue.core.util.HibernateHelper
@@ -22,14 +23,16 @@ class Diff {
     final Object selfValue
     final Object otherValue
     final DataClass parentClass
+    final DataElement parentElement
 
-    private Diff(String key, CatalogueElement element, Relationship relationship, Object selfValue, Object otherValue, DataClass parentClass) {
+    private Diff(String key, CatalogueElement element, Relationship relationship, Object selfValue, Object otherValue, DataClass parentClass, DataElement parentElement) {
         this.key = key
         this.element = element
         this.selfValue = selfValue
         this.otherValue = otherValue
         this.relationship = relationship
         this.parentClass = parentClass
+        this.parentElement = parentElement
     }
 
     static String keyForProperty(String propertyName) {
@@ -68,33 +71,33 @@ class Diff {
         return "entity:$entityId"
     }
 
-    static Diff createEntityChange(CatalogueElement self, CatalogueElement other, DataClass parentClass) {
-        return new Diff(keyForSelf(self?.latestVersionId ?: self?.id), self, null, self, other, parentClass)
+    static Diff createEntityChange(CatalogueElement self, CatalogueElement other, DataClass parentClass, DataElement parentElement) {
+        return new Diff(keyForSelf(self?.latestVersionId ?: self?.id), self, null, self, other, parentClass, parentElement)
     }
 
-    static Diff createPropertyChange(String propertyKey, CatalogueElement source,  Object selfValue, Object otherValue, DataClass parentClass) {
-        return new Diff(propertyKey, source, null, selfValue, otherValue, parentClass)
+    static Diff createPropertyChange(String propertyKey, CatalogueElement source,  Object selfValue, Object otherValue, DataClass parentClass, DataElement parentElement) {
+        return new Diff(propertyKey, source, null, selfValue, otherValue, parentClass, parentElement)
     }
 
 
-    static Diff createExtensionChange(String extensionKey, CatalogueElement source ,String selfValue, String otherValue, DataClass parentClass) {
-        return new Diff(keyForExtension(extensionKey), source, null, selfValue, otherValue, parentClass)
+    static Diff createExtensionChange(String extensionKey, CatalogueElement source ,String selfValue, String otherValue, DataClass parentClass, DataElement parentElement) {
+        return new Diff(keyForExtension(extensionKey), source, null, selfValue, otherValue, parentClass, parentElement)
     }
 
-    static Diff createMissingRelationship(CatalogueElement source, Relationship relationship, DataClass parentClass) {
-        return new Diff(keyForRelationship(relationship), source, relationship, relationship, null, parentClass)
+    static Diff createMissingRelationship(CatalogueElement source, Relationship relationship, DataClass parentClass, DataElement parentElement) {
+        return new Diff(keyForRelationship(relationship), source, relationship, relationship, null, parentClass, parentElement)
     }
 
-    static Diff createRelationshipMetadataChange(Relationship relationship, String metadataKey, CatalogueElement source, String selfValue, String otherValue, DataClass parentClass) {
-        return new Diff(keyForRelationshipExtension(relationship, metadataKey), source, relationship, selfValue, otherValue, parentClass)
+    static Diff createRelationshipMetadataChange(Relationship relationship, String metadataKey, CatalogueElement source, String selfValue, String otherValue, DataClass parentClass, DataElement parentElement) {
+        return new Diff(keyForRelationshipExtension(relationship, metadataKey), source, relationship, selfValue, otherValue, parentClass, parentElement)
     }
 
-    static Diff createNewRelationship(CatalogueElement source, Relationship relationship, DataClass parentClass) {
-        return new Diff(keyForRelationship(relationship), source, relationship, null, relationship, parentClass)
+    static Diff createNewRelationship(CatalogueElement source, Relationship relationship, DataClass parentClass, DataElement parentElement) {
+        return new Diff(keyForRelationship(relationship), source, relationship, null, relationship, parentClass, parentElement)
     }
 
-    static Diff createEnumerationChange(CatalogueElement source, Long id, Enumeration selfEnumeration, Enumeration otherEnumeration, DataClass parentClass) {
-        return new Diff(keyForEnumeration(id), source, null, selfEnumeration, otherEnumeration, parentClass)
+    static Diff createEnumerationChange(CatalogueElement source, Long id, Enumeration selfEnumeration, Enumeration otherEnumeration, DataClass parentClass, DataElement parentElement) {
+        return new Diff(keyForEnumeration(id), source, null, selfEnumeration, otherEnumeration, parentClass, parentElement)
     }
 
     @Override
@@ -223,14 +226,13 @@ class Diff {
 
             builder << type
 
-            if(this.parentClass && this.element /*&& type!="Data Class"*/){
-                builder << "${this.element.name}${toFromIn}${this?.parentClass?.name}"
-            }else if(this.element && !this.parentClass){
-                builder << "${toFromIn}top level"
+            if(this.parentClass && this.element && (type=="Data Class" || type=="Data Element")){
+                builder << " ${this.element.name}${toFromIn}${this?.parentClass?.name}"
+            }else if(this.element && !this.parentClass && type=="Data Class"){
+                builder << " ${toFromIn}top level"
+            }else if(this.element && this.parentElement){
+                builder << " ${this.element.name}${toFromIn}${this.parentElement.name}"
             }
-//            else if(this.element){
-//                builder << "${toFromIn}${this.element.name}"
-//            }
 
         }
 
