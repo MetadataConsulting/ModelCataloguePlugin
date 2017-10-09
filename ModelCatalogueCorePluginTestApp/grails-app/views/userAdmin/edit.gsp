@@ -67,12 +67,16 @@ if (isOpenId) {
 
 		<h2>General Roles</h2>
 		<p>These roles determine general access, such as whether you can view a list of all the draft models in the application or administer users.</p>
-
-		<g:each var="entry" in="${generalRoles}">
-		<div>
-			<g:checkBox name="${entry.key.authority}" value="${entry.value}"/>
-			<g:link controller='role' action='edit' id='${entry.key.id}'>${entry.key.authority.encodeAsHTML()}</g:link>
-		</div>
+		<g:each var="role" in="${roleList}">
+			<div>
+			<g:if test="${userRoleOverview.generalAuthorities.contains(role.authority)}">
+				<g:checkBox name="roles" value="${role.authority}" checked="true" />
+			</g:if>
+			<g:else>
+				<g:checkBox name="roles" value="${role.authority}" checked="false" />
+			</g:else>
+			<g:link controller='role' action='edit' id='${role.id}'>${role.authority.encodeAsHTML()}</g:link>
+			</div>
 		</g:each>
 
 		</br>
@@ -81,25 +85,30 @@ if (isOpenId) {
 		<p>These roles are specific to a model - a user could be a curator on one model but not have access to view the elements of another model</p>
 		<p>NOTE: by aware of imports - if a model imports another model you should give the users ROLE_USER access, otherwise they may not be able to view some elements</p>
 		<table>
-			<tr>
-				<th>&nbsp;</th>
-				<g:each var="roles" in="${specificRoles}">
-					<th>${roles.authority}</th>
-				</g:each>
-			</tr>
-
-			<g:each var="model" in="${userRoles}">
+			<thead>
 				<tr>
-					<th>${model?.value?.name}</th>
-
-					<g:each var="role" in="${model.value?.roleList}">
-						<td>
-							<g:checkBox name="${model?.key}-${role.key?.authority}" value="${role.value}"/>
-						</td>
+					<th>&nbsp;</th>
+					<g:each var="role" in="${specificRolesList}">
+						<th>${role.authority}</th>
 					</g:each>
 				</tr>
+			</thead>
+			<g:each var="dataModel" in="${dataModelList}">
+				<tbody>
+				    <th>${dataModel.name}${dataModel.defaultModelCatalogueId ? ' (' + dataModel.defaultModelCatalogueId + ')' : ''}</th>
+				    <g:each var="role" in="${specificRolesList}">
+					    <td>
+							<g:set var="dataModelAuthorities" value="${userRoleOverview.dataModelAuthorities.find { it.id == dataModel.id }}"/>
+						    <g:if test="${dataModelAuthorities != null && dataModelAuthorities.authorities?.contains(role.authority)}">
+							    <g:checkBox name="roles" value="${dataModel.id}-${role.authority}" checked="true"/>
+						    </g:if>
+						    <g:else>
+							    <g:checkBox name="roles" value="${dataModel.id}-${role.authority}" checked="false"/>
+						    </g:else>
+					    </td>
+				    </g:each>
+				</tbody>
 			</g:each>
-
 		</table>
 	</s2ui:tab>
 
