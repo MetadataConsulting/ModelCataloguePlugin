@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.converters.JSON
+import groovy.transform.CompileStatic
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
@@ -120,14 +121,21 @@ class UserController extends AbstractCatalogueElementController<User> {
         respond user
     }
 
-
     def apiKey(Boolean regenerate) {
         if (!modelCatalogueSecurityService.isUserLoggedIn()) {
             notFound()
             return
         }
-
-        render([apiKey: userService.getApiKey(modelCatalogueSecurityService.currentUser, regenerate)] as JSON)
+        String username = modelCatalogueSecurityService.currentUsername()
+        if ( !username ) {
+            notFound()
+            return
+        }
+        if ( regenerate ) {
+            userService.resetApiKey(username)
+        }
+        String apiKey = userService.findApiKeyByUsername(username)
+        render([apiKey: apiKey] as JSON)
     }
 
     private switchEnabled(boolean enabled) {
