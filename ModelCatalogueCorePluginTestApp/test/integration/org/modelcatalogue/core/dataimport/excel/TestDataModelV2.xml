@@ -180,6 +180,7 @@ Record the date  where TESTcer was confirmed or diagnosis agreed (This will norm
                 <dataElement name="WEIGHT">
                   <dataType name="Grams">
                       <measurementUnit name="Grams"></measurementUnit>
+                      <rule>x.isNumber()</rule>
                   </dataType>
                 </dataElement>
                 <dataElement name="DATE OF RECURRENCE (CLINICALLY AGREED)*">
