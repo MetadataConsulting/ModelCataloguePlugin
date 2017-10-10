@@ -124,14 +124,14 @@ class ExcelExporter {
             rowDepth
             }
         }
-
+    String blank = ''
     void printDataElement(DataClass parent, DataClass child, RowDefinition rowDefinition, Relationship dataElementRelationship, List outline = []) {
         DataElement dataElement = dataElementRelationship.destination
         Collection<Relationship> relatedTo = dataElement.getRelationshipsByType(RelationshipType.relatedToType)
         if(relatedTo.empty && dataElement?.dataType) {
             relatedTo = dataElement?.dataType.getRelationshipsByType(RelationshipType.relatedToType)}
 
-        String blank = ''
+
 
         rowDefinition.with {
             //'Parent Data Class ID','Parent Data Class Name',
@@ -255,7 +255,7 @@ class ExcelExporter {
             return enumerated.prettyPrint()
         }
 
-        return " "
+        return blank
 
     }
 
@@ -266,7 +266,7 @@ class ExcelExporter {
             String max = ext.get("Max Occurs") ?: '*'
             return "$min..$max"
         }
-        else return ""
+        else return blank
     }
 
     String printBusRule(List<ValidationRule> rules){
