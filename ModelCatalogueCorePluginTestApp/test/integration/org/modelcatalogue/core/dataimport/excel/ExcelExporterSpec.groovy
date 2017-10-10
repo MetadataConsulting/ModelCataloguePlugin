@@ -29,8 +29,8 @@ class ExcelExporterSpec extends AbstractIntegrationSpec {
         DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
 
         CatalogueXmlLoader loader = new CatalogueXmlLoader(builder)
-        loader.load(DataModelToXlsxExporterSpec.getResourceAsStream('TestDataModelV1.xml'))
-        loader.load(DataModelToXlsxExporterSpec.getResourceAsStream('TestDataModelV2.xml'))
+        loader.load(getClass().getResourceAsStream('TestDataModelV1.xml'))
+        loader.load(getClass().getResourceAsStream('TestDataModelV2.xml'))
         dataModel = DataModel.findByNameAndSemanticVersion('TestDataModel', '2')
 
     }

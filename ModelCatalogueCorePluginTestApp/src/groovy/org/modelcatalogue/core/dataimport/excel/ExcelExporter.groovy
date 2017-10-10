@@ -13,8 +13,9 @@ import org.modelcatalogue.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 import static org.modelcatalogue.core.export.inventory.ModelCatalogueStyles.H1
 
 /**
- * Excel.groovy
- * Purpose: Generate an excel report from a data model, including metadata using the required format
+ * ExcelExporter.groovy
+ * Purpose: Generate an excel report from a data model, including metadata using the required format.
+ * We'll try to make this round-trip with ExcelLoader, changing ExcelLoader to match the format defined here.
  *
  * @author Adam Milward
  * @version 31/03/2017
