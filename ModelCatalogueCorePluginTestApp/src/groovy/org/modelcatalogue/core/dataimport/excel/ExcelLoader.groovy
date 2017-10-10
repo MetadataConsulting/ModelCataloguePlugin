@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.dataimport.excel
 
+import groovy.util.logging.Log
 import org.apache.commons.lang3.tuple.Pair
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.ss.usermodel.Row
@@ -13,6 +14,7 @@ import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
  * future NT Excel Loaders, so that they can access similar methods.
  * This may not be the best way
  */
+@Log
 class ExcelLoader {
 
 
@@ -25,7 +27,8 @@ class ExcelLoader {
         }.toUpperCase()
     }
     static protected Map<String, String> createRowMap(Row row, List<String> headers) {
-        Map<String, String> rowMap = [:]
+        Map<String, String> rowMap = new LinkedHashMap<>()
+        // Important that it's LinkedHashMap, for order to be kept, to get the last section which is metadata!
         for (Cell cell : row) {
             rowMap = updateRowMap(rowMap, cell, headers)
         }
@@ -56,6 +59,7 @@ class ExcelLoader {
         Iterator<Row> rowIt = sheet.rowIterator()
         Row row = rowIt.next()
         List<String> headers = getRowData(row)
+        log.info("Headers are ${headers as String}")
         List<Map<String, String>> rowMaps = []
         while (rowIt.hasNext()) {
             row = rowIt.next()
@@ -164,11 +168,13 @@ class ExcelLoader {
 
     String buildModelFromWorkbookSheet(Map<String, String> headersMap, Workbook workbook, int index = 0, CatalogueBuilder catalogueBuilder){
 
+        log.info("Using headersMap ${headersMap as String}")
+        // headersMap maps internal names of headers to what are hopefully the headers used in the actual spreadsheet.
         if(!workbook) {
             throw new IllegalArgumentException("Excel file contains no worksheet!")
         }
         Sheet sheet = workbook.getSheetAt(index);
-
+/*
         Iterator<Row> rowIt = sheet.rowIterator()
         List<String> headers = getRowData(rowIt.next())
 
@@ -176,8 +182,10 @@ class ExcelLoader {
         while(rowIt.hasNext()) {
             List<String> rowDataList =getRowData(rowIt.next())
             rowDataLists << rowDataList
-        }
-        //get indexes of the appropriate sections
+        }*/
+        List<Map<String,String>> rowMaps = getRowMaps(sheet)
+/*
+            //get indexes of the appropriate sections
         def dataItemNameIndex = headers.indexOf(headersMap.get('dataElementName'))
         def dataItemCodeIndex = headers.indexOf(headersMap.get('dataElementCode'))
         def dataItemDescriptionIndex = headers.indexOf(headersMap.get('dataElementDescription'))
@@ -248,9 +256,75 @@ class ExcelLoader {
 
                 }
             }
+        }*/
+        catalogueBuilder.build {
+            copy relationships
+            rowMaps.each { Map<String, String> rowMap ->
+                dataModel(name: tryHeader(HeadersMap.classification, headersMap, rowMap) ?: tryHeader(HeadersMap.dataModel, headersMap, rowMap)) {
+                    globalSearchFor dataType
+
+                    def createChildModel = {
+                        def createDataElement = {
+                            if(tryHeader(HeadersMap.dataElementName, headersMap, rowMap)) {
+                                dataElement(name: tryHeader(HeadersMap.dataElementName, headersMap, rowMap),
+                                        description: tryHeader(HeadersMap.dataElementDescription, headersMap, rowMap),
+                                        id: tryHeader(HeadersMap.dataElementCode, headersMap, rowMap)) {
+                                    if (tryHeader(HeadersMap.measurementUnitName, headersMap, rowMap) ||
+                                            tryHeader(HeadersMap.dataTypeName, headersMap, rowMap)) {
+                                            importDataTypes(catalogueBuilder,
+                                                    tryHeader(HeadersMap.dataElementName, headersMap, rowMap),
+                                                    tryHeader(HeadersMap.dataTypeName, headersMap, rowMap),
+                                                    tryHeader(HeadersMap.dataTypeCode, headersMap, rowMap),
+                                                    tryHeader(HeadersMap.dataTypeClassification, headersMap, rowMap) ?: tryHeader(HeadersMap.dataTypeDataModel, headersMap, rowMap),
+                                                    tryHeader(HeadersMap.measurementUnitName, headersMap, rowMap),
+                                                    tryHeader(HeadersMap.measurementSymbol, headersMap, rowMap))
+                                    }
+                                    List<String> metadataKeys = rowMap.keySet().toList().dropWhile({header ->
+                                        header != headersMap.get(HeadersMap.metadata)
+                                    })
+                                    for (String key: metadataKeys) {
+                                        if (key != "" && key != "null") {
+                                            ext(key, rowMap.get(key).take(2000).toString())
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+
+                        def modelName = tryHeader(HeadersMap.containingModelName, headersMap, rowMap) ?: tryHeader(HeadersMap.containingDataClassName, headersMap, rowMap)
+                        def modelId = tryHeader(HeadersMap.containingModelCode, headersMap, rowMap) ?: tryHeader(HeadersMap.containingDataClassCode, headersMap, rowMap)
+
+                        if (modelName || modelId) {
+                            dataClass(name: modelName, id: modelId, createDataElement)
+                        } else {
+                            catalogueBuilder.with createDataElement
+                        }
+                    }
+
+                    def parentModelName = tryHeader(HeadersMap.parentModelName, headersMap, rowMap) ?: tryHeader(HeadersMap.parentDataClassName, headersMap, rowMap)
+                    def parentModelCode = tryHeader(HeadersMap.parentModelCode, headersMap, rowMap) ?: tryHeader(HeadersMap.parentDataClassCode, headersMap, rowMap)
+
+                    if (parentModelName || parentModelCode) {
+                        dataClass(name: parentModelName, id: parentModelCode, createChildModel)
+                    } else {
+                        catalogueBuilder.with createChildModel
+                    }
+
+                }
+            }
         }
 
 
+    }
+    String tryHeader(String internalHeaderName, Map<String,String> headersMap, Map<String, String> rowMap) {
+        // headersMap maps internal names of headers to what are hopefully the headers used in the actual spreadsheet.
+        String entry = rowMap.get(headersMap.get(internalHeaderName))
+        if (entry) return entry
+        else {
+            log.info("Trying to use internalHeaderName '$internalHeaderName' which headersMap corresponds to" +
+                "header ${headersMap.get(internalHeaderName)} from rowMap ${rowMap as String}, nothing found.")
+            return null}
     }
 
     static String getRowValue(List<String> rowDataList, index){
