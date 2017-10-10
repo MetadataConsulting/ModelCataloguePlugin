@@ -40,7 +40,7 @@ class ExcelExporter {
 
     protected Closure standardCellStyle = {
         wrap text
-        border top, {
+        border top, left, {
             color black
             style medium
         }
@@ -52,10 +52,13 @@ class ExcelExporter {
         return dataClassService.getTopLevelDataClasses(DataModelFilter.includes(dataModel), ImmutableMap.of('status', 'active'), true).items
     }
     protected List<String> excelHeaders = [
-            'Parent Data Class ID','Parent Data Class Name','Data Class ID', 'Data Class Name',
-            'Data Element ID', 'Data Element Name', 'Multiplicity', 'Data Element Description',
+            'Parent Data Class ID','Parent Data Class Name',
+            'Data Class ID', 'Data Class Name',
+            'Data Element ID', 'Data Element Name',
+            'Multiplicity', 'Data Element Description',
             'Data Type ID', 'Data Type Name', 'Data Type Enumerations', 'Data Type Rule',
-            'Measurement Unit ID', 'Measurement Unit Name', 'Metadata']
+            'Measurement Unit ID', 'Measurement Unit Name',
+            'Metadata']
 
     Map<String, Closure> sheetsAfterMainSheetExport() {}
 
@@ -126,63 +129,37 @@ class ExcelExporter {
         DataElement dataElement = dataElementRelationship.destination
         Collection<Relationship> relatedTo = dataElement.getRelationshipsByType(RelationshipType.relatedToType)
         if(relatedTo.empty && dataElement?.dataType) relatedTo = dataElement?.dataType.getRelationshipsByType(RelationshipType.relatedToType)
+
         rowDefinition.with {
+            //'Parent Data Class ID','Parent Data Class Name',
             cell {
                 value getModelCatalogueIdToPrint(parent)
-                link to url "${parent.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + parent.defaultModelCatalogueId}"
-                style {
-                    wrap text
-                    border top, left, {
-                        color black
-                        style medium
-                    }
-                }
+                link to url "${urlFromModelCatalogueId(parent.defaultModelCatalogueId)}"
+                style standardCellStyle
             }
             cell {
                 value parent.name
-                style {
-                    wrap text
-                    border top, left, {
-                        color black
-                        style medium
-                    }
-                }
+                style standardCellStyle
             }
+
+            //'Data Class ID', 'Data Class Name',
             cell {
                 value getModelCatalogueIdToPrint(child)
-                link to url "${child.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + child.defaultModelCatalogueId}"
-                style {
-                    wrap text
-                    border top, left, {
-                        color black
-                        style medium
-                    }
-                }
+                link to url "${urlFromModelCatalogueId(child.defaultModelCatalogueId)}"
+                style standardCellStyle
             }
             cell {
                 value child.name
-                style {
-                    wrap text
-                    border top, left, {
-                        color black
-                        style medium
-                    }
-                }
+                style standardCellStyle
             }
 
+            //'Data Element ID', 'Data Element Name',
             cell() {
                 value getModelCatalogueIdToPrint(dataElement)
-                link to url "${dataElement.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + dataElement.defaultModelCatalogueId}"
+                link to url "${urlFromModelCatalogueId(dataElement.defaultModelCatalogueId)}"
 
-                style {
-                    wrap text
-                    border top, left, {
-                        color black
-                        style medium
-                    }
-                }
+                style standardCellStyle
             }
-
             cell() {
                     value dataElement.name
                     link to url "${getLoadURL(dataElement)}"
@@ -194,75 +171,42 @@ class ExcelExporter {
                         }
                     }
                 }
+
+            //'Multiplicity', 'Data Element Description',
             cell{
                 value "${getMultiplicity(dataElementRelationship)}"
-                style {
-                    wrap text
-                    border top, left, {
-                        color black
-                        style medium
-                    }
-                }
+                style standardCellStyle
             }
             cell{
                 value "${dataElement.description}"
-                style {
-                    wrap text
-                    border top, left, {
-                        color black
-                        style medium
-                    }
-                }
+                style standardCellStyle
             }
+            /*
+[
+
+
+
+
+
+
+'Measurement Unit ID', 'Measurement Unit Name',
+'Metadata']
+ */         // 'Data Type ID', 'Data Type Name', 'Data Type Enumerations', 'Data Type Rule',
             cell{
-                value dataElement?.dataType.id
-                style {
-                    wrap text
-                    border top, left, {
-                        color black
-                        style medium
-                    }
-                }
-            }
-            cell{
-                value "${(dataElement?.dataType) ? getModelCatalogueIdToPrint(dataElement?.dataType.name) : ''}"
-                style {
-                    wrap text
-                    border top, left, {
-                        color black
-                        style medium
-                    }
-                }
+                value "${(dataElement?.dataType) ? getModelCatalogueIdToPrint(dataElement?.dataType) : ''}"
+                style standardCellStyle
             }
             cell{
                 value "${dataElement?.dataType.name}"
-                style {
-                    wrap text
-                    border top, left, {
-                        color black
-                        style medium
-                    }
-                }
+                style standardCellStyle
             }
             cell{
                 value "${(dataElement?.dataType) ? printEnumeratedType(dataElement?.dataType) : ""}"
-                style {
-                    wrap text
-                    border top, left, {
-                        color black
-                        style medium
-                    }
-                }
+                style standardCellStyle
             }
             cell{
                 value "${(dataElement?.dataType?.rule) ? dataElement?.dataType?.rule : ""}"
-                style {
-                    wrap text
-                    border top, left, {
-                        color black
-                        style medium
-                    }
-                }
+                style standardCellStyle
             }
 //                [ ,
 //                  ,
@@ -325,7 +269,9 @@ class ExcelExporter {
         ce?.defaultModelCatalogueId.split("/catalogue")[0] + "/load?" + ce.defaultModelCatalogueId
     }
 
-
+    String urlFromModelCatalogueId(String modelCatalogueId) {
+        return modelCatalogueId.split("/catalogue")[0] + "/load?" + modelCatalogueId
+    }
     protected static String getModelCatalogueIdToPrint(CatalogueElement element) {
         element.hasModelCatalogueId() && !element.modelCatalogueId.startsWith('http') ? element.modelCatalogueId : element.combinedVersion
     }
