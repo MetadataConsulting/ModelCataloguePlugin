@@ -329,6 +329,7 @@ class ExcelLoader {
 
         return stringWriter.toString()
     }
+    // Based on buildModelFromWorkbookSheet
     String buildModelFromSpreadsheetFromExcelExporter(Map<String, String> headersMap = HeadersMap.createForSpreadsheetFromExcelExporter(), Workbook workbook, int index = 0, CatalogueBuilder catalogueBuilder, String modelName = ''){
 
         log.info("Using headersMap ${headersMap as String}")
@@ -345,49 +346,37 @@ class ExcelLoader {
         // for the spreadsheet exported by ExcelExporter
         catalogueBuilder.build {
             copy relationships
+            // data model name provided rather than gotten from sheet
             dataModel(name: modelName) {
                 rowMaps.each { Map<String, String> rowMap ->
                     globalSearchFor dataType
 
                     // TODO: IDs might need some processing to be usable? Like stripping off the first bit?
-
-                    // TODO: ++ code to use Multiplicity,
-                    loadMultiplicityCode = {
-                        String unparsedMultiplicity = tryHeader(HeadersMap.multiplicity, headersMap, rowMap)
-                    }
-
-
-
-                    def createChildModel = {
+                    Closure createChildDataClass = {
                         def createDataElement = {
                             if(tryHeader(HeadersMap.dataElementName, headersMap, rowMap)) {
                                 dataElement(name: tryHeader(HeadersMap.dataElementName, headersMap, rowMap),
                                         description: tryHeader(HeadersMap.dataElementDescription, headersMap, rowMap),
                                         id: tryHeader(HeadersMap.dataElementCode, headersMap, rowMap)) {
-                                    // TODO: Data Type: add in code to use
-                                    // ++ Data Type Enumerations,
-                                    // ++ Data Type Rule,
-                                    // ++ Measurement Unit ID
-                                    // see the following:
-                                    loadDataTypeStuffCode = {
-                                        String unparsedEnumerationsString = tryHeader(HeadersMap.dataTypeEnumerations, headersMap, rowMap)
-                                        String rule = tryHeader(HeadersMap.dataTypeRule, headersMap, rowMap)
-                                        String measurementUnitID = tryHeader(HeadersMap.measurementUnitCode, headersMap, rowMap)
+                                    // Relationship metadata: Multiplicity
+                                    String[] multiplicity = tryHeader(HeadersMap.multiplicity, headersMap, rowMap).split(/\.\./)
+                                    relationship {
+                                        ext "Min Occurs", outOfBoundsWith({multiplicity[0]})
+                                        ext "Max Occurs", outOfBoundsWith({multiplicity[1]})
                                     }
-                                    // TODO: the following code needs to be modified since ExcelExporter spreadsheet doesn't have
-                                    // measurementSymbol/dataTypeDataModel.
-                                    // a method similar to importDataTypes may need to be written.
-                                    /*
+                                    // Data Type
                                     if (tryHeader(HeadersMap.measurementUnitName, headersMap, rowMap) ||
                                             tryHeader(HeadersMap.dataTypeName, headersMap, rowMap)) {
-                                        importDataTypes(catalogueBuilder,
-                                                tryHeader(HeadersMap.dataElementName, headersMap, rowMap),
+                                        importDataTypesFromExcelExporterFormat(
+                                                catalogueBuilder,
                                                 tryHeader(HeadersMap.dataTypeName, headersMap, rowMap),
                                                 tryHeader(HeadersMap.dataTypeCode, headersMap, rowMap),
-                                                tryHeader(HeadersMap.dataTypeClassification, headersMap, rowMap) ?: tryHeader(HeadersMap.dataTypeDataModel, headersMap, rowMap), // -- will not be in ExcelExporter spreadsheet
+                                                tryHeader(HeadersMap.dataTypeEnumerations, headersMap, rowMap),
+                                                tryHeader(HeadersMap.dataTypeRule, headersMap, rowMap),
                                                 tryHeader(HeadersMap.measurementUnitName, headersMap, rowMap),
-                                                tryHeader(HeadersMap.measurementSymbol, headersMap, rowMap)) // -- will not be in...
-                                    }*/
+                                                tryHeader(HeadersMap.measurementUnitCode, headersMap, rowMap)
+                                        )
+                                    }
                                     List<String> metadataKeys = rowMap.keySet().toList().dropWhile({header ->
                                         header != headersMap.get(HeadersMap.metadata)
                                     })
@@ -415,9 +404,9 @@ class ExcelLoader {
                     def parentDataClassID = tryHeader(HeadersMap.parentModelCode, headersMap, rowMap) ?: tryHeader(HeadersMap.parentDataClassCode, headersMap, rowMap)
 
                     if (parentDataClassName || parentDataClassID) {
-                        dataClass(name: parentDataClassName, id: parentDataClassID, createChildModel)
+                        dataClass(name: parentDataClassName, id: parentDataClassID, createChildDataClass)
                     } else {
-                        catalogueBuilder.with createChildModel
+                        catalogueBuilder.with createChildDataClass
                     }
 
 
@@ -425,6 +414,14 @@ class ExcelLoader {
             }
         }
 
+    }
+    String outOfBoundsWith(Closure<String> c, String s = '') {
+        try {
+            return c()
+        }
+        catch (ArrayIndexOutOfBoundsException a) {
+            return s
+        }
     }
     String tryHeader(String internalHeaderName, Map<String,String> headersMap, Map<String, String> rowMap) {
         // headersMap maps internal names of headers to what are hopefully the headers used in the actual spreadsheet.
@@ -441,6 +438,23 @@ class ExcelLoader {
         (index!=-1)?rowDataList[index]:null
     }
 
+    static void importDataTypesFromExcelExporterFormat(CatalogueBuilder catalogueBuilder,
+            String dataTypeName, String dataTypeCode, String dataTypeEnumerations, String dataTypeRule, String measurementUnitName, String measurementUnitCode){
+        String[] lines = dataTypeEnumerations?.split("\\r?\\n");
+        Map<String,String> enumerations = dataTypeEnumerations ? parseEnumeration(lines) : [:]
+        if (enumerations) {
+            catalogueBuilder.dataType(name: dataTypeName, enumerations: enumerations, rule: dataTypeRule, id: dataTypeCode) //TODO: get dataModel, which used to be dataTypeClassification, from data type code.
+        }
+
+        else if (measurementUnitName) {
+            catalogueBuilder.dataType(name: dataTypeName, rule: dataTypeRule, id: dataTypeCode) {
+                measurementUnit(name: measurementUnitName, id: measurementUnitCode)
+            }
+        }
+        else {
+            catalogueBuilder.dataType(name: dataTypeName, rule: dataTypeRule, id: dataTypeCode)
+        }
+    }
 
     /**
      *
@@ -487,11 +501,11 @@ class ExcelLoader {
 
         lines.each { enumeratedValues ->
 
-            def EV = enumeratedValues.split(":")
+            String[] EV = enumeratedValues.split(":")
 
-            if (EV != null && EV.size() > 1 && EV[0] != null && EV[1] != null) {
-                def key = EV[0]
-                def value = EV[1]
+            if (EV?.size() == 2) {
+                String key = EV[0]
+                String value = EV[1]
 
                 if (value.size() > 244) {
                     value = value[0..244]

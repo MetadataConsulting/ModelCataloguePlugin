@@ -182,7 +182,7 @@ class ExcelExporter {
                 style standardCellStyle
             }
             cell{
-                value "${dataElement.description}"
+                value "${dataElement?.description ?: blank}"
                 style standardCellStyle
             }
             // 'Data Type ID', 'Data Type Name',
@@ -191,7 +191,7 @@ class ExcelExporter {
                 style standardCellStyle
             }
             cell{
-                value "${dataElement?.dataType.name}"
+                value "${dataElement?.dataType?.name ?: blank}"
                 style standardCellStyle
             }
 
@@ -201,19 +201,19 @@ class ExcelExporter {
                 style standardCellStyle
             }
             cell{
-                value "${(dataElement?.dataType?.rule) ?: blank}"
+                value "${dataElement?.dataType?.rule ?: blank}"
                 style standardCellStyle
             }
 
             //'Measurement Unit ID', 'Measurement Unit Name',
             if (dataElement?.dataType?.instanceOf(PrimitiveType)) {
-                PrimitiveType prim = dataElement?.dataType
+                PrimitiveType prim = (PrimitiveType) dataElement.dataType
                 cell {
                     value "${getModelCatalogueIdToPrint(prim?.measurementUnit)}"
                     style standardCellStyle
                 }
                 cell {
-                    value "${prim?.measurementUnit.name}"
+                    value "${prim.measurementUnit.name}"
                     style standardCellStyle
                 }
             }
@@ -225,7 +225,7 @@ class ExcelExporter {
             // 'Metadata'
 
             cell {
-                value "${dataElement?.ext.collect { key, value -> "$key: $value"}.join('\n')}"
+                value "${dataElement?.ext.sort().collect { key, value -> "$key: $value"}.join('\n')}"
                 style standardCellStyle
             }
 
