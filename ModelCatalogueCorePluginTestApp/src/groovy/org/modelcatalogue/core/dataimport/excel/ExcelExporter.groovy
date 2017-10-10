@@ -260,28 +260,13 @@ class ExcelExporter {
     }
 
     String getMultiplicity(Relationship dataElementRelationship){
-        String multiplicityText = " "
-
-        if(dataElementRelationship?.ext.get("Min Occurs")=="0"){
-            multiplicityText += "Optional "
-        }else if(dataElementRelationship?.ext.get("Min Occurs")=="1"){
-            multiplicityText += "Mandatory "
+        if (dataElementRelationship) {
+            Map<String, String> ext = dataElementRelationship.ext
+            String min = ext.get("Min Occurs") ?: '0'
+            String max = ext.get("Max Occurs") ?: '*'
+            return "$min..$max"
         }
-
-        if(dataElementRelationship?.ext.get("Max Occurs")=="*"){
-            multiplicityText += "Multiple "
-        }
-
-        if(dataElementRelationship.source.ext.get("http://xsd.modelcatalogue.org/section#type")=="choice"){
-            multiplicityText += " CHOICE "
-        }
-
-        if(dataElementRelationship?.ext.get("Max Occurs") && dataElementRelationship?.ext.get("Min Occurs")){
-         multiplicityText += "(" + dataElementRelationship?.ext.get("Min Occurs") + ".." + dataElementRelationship?.ext.get("Max Occurs") + ")"
-        }
-
-
-        multiplicityText
+        else return ""
     }
 
     String printBusRule(List<ValidationRule> rules){
