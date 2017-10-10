@@ -349,14 +349,14 @@ class ExcelLoader {
                 rowMaps.each { Map<String, String> rowMap ->
                     globalSearchFor dataType
 
-                    // IDs might need some processing to be usable?
+                    // TODO: IDs might need some processing to be usable? Like stripping off the first bit?
 
-                    // ++ code to load Multiplicity,
+                    // TODO: ++ code to use Multiplicity,
+                    loadMultiplicityCode = {
+                        String unparsedMultiplicity = tryHeader(HeadersMap.multiplicity, headersMap, rowMap)
+                    }
 
-                    // Data Type: add in code to load
-                    // ++ Data Type Enumerations,
-                    // ++ Data Type Rule,
-                    // ++ Measurement Unit ID
+
 
                     def createChildModel = {
                         def createDataElement = {
@@ -364,7 +364,21 @@ class ExcelLoader {
                                 dataElement(name: tryHeader(HeadersMap.dataElementName, headersMap, rowMap),
                                         description: tryHeader(HeadersMap.dataElementDescription, headersMap, rowMap),
                                         id: tryHeader(HeadersMap.dataElementCode, headersMap, rowMap)) {
-                                    /*if (tryHeader(HeadersMap.measurementUnitName, headersMap, rowMap) ||
+                                    // TODO: Data Type: add in code to use
+                                    // ++ Data Type Enumerations,
+                                    // ++ Data Type Rule,
+                                    // ++ Measurement Unit ID
+                                    // see the following:
+                                    loadDataTypeStuffCode = {
+                                        String unparsedEnumerationsString = tryHeader(HeadersMap.dataTypeEnumerations, headersMap, rowMap)
+                                        String rule = tryHeader(HeadersMap.dataTypeRule, headersMap, rowMap)
+                                        String measurementUnitID = tryHeader(HeadersMap.measurementUnitCode, headersMap, rowMap)
+                                    }
+                                    // TODO: the following code needs to be modified since ExcelExporter spreadsheet doesn't have
+                                    // measurementSymbol/dataTypeDataModel.
+                                    // a method similar to importDataTypes may need to be written.
+                                    /*
+                                    if (tryHeader(HeadersMap.measurementUnitName, headersMap, rowMap) ||
                                             tryHeader(HeadersMap.dataTypeName, headersMap, rowMap)) {
                                         importDataTypes(catalogueBuilder,
                                                 tryHeader(HeadersMap.dataElementName, headersMap, rowMap),
