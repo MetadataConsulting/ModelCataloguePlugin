@@ -128,7 +128,10 @@ class ExcelExporter {
     void printDataElement(DataClass parent, DataClass child, RowDefinition rowDefinition, Relationship dataElementRelationship, List outline = []) {
         DataElement dataElement = dataElementRelationship.destination
         Collection<Relationship> relatedTo = dataElement.getRelationshipsByType(RelationshipType.relatedToType)
-        if(relatedTo.empty && dataElement?.dataType) relatedTo = dataElement?.dataType.getRelationshipsByType(RelationshipType.relatedToType)
+        if(relatedTo.empty && dataElement?.dataType) {
+            relatedTo = dataElement?.dataType.getRelationshipsByType(RelationshipType.relatedToType)}
+
+        String blank = ''
 
         rowDefinition.with {
             //'Parent Data Class ID','Parent Data Class Name',
@@ -154,13 +157,13 @@ class ExcelExporter {
             }
 
             //'Data Element ID', 'Data Element Name',
-            cell() {
+            cell {
                 value getModelCatalogueIdToPrint(dataElement)
                 link to url "${urlFromModelCatalogueId(dataElement.defaultModelCatalogueId)}"
 
                 style standardCellStyle
             }
-            cell() {
+            cell {
                     value dataElement.name
                     link to url "${getLoadURL(dataElement)}"
                     style {
@@ -181,41 +184,59 @@ class ExcelExporter {
                 value "${dataElement.description}"
                 style standardCellStyle
             }
-            /*
-[
-
-
-
-
-
-
-'Measurement Unit ID', 'Measurement Unit Name',
-'Metadata']
- */         // 'Data Type ID', 'Data Type Name', 'Data Type Enumerations', 'Data Type Rule',
+            // 'Data Type ID', 'Data Type Name',
             cell{
-                value "${(dataElement?.dataType) ? getModelCatalogueIdToPrint(dataElement?.dataType) : ''}"
+                value "${(dataElement?.dataType) ? getModelCatalogueIdToPrint(dataElement?.dataType) : blank}"
                 style standardCellStyle
             }
             cell{
                 value "${dataElement?.dataType.name}"
                 style standardCellStyle
             }
+
+            //'Data Type Enumerations', 'Data Type Rule',
             cell{
-                value "${(dataElement?.dataType) ? printEnumeratedType(dataElement?.dataType) : ""}"
+                value "${(dataElement?.dataType) ? printEnumeratedType(dataElement?.dataType) : blank}"
                 style standardCellStyle
             }
             cell{
-                value "${(dataElement?.dataType?.rule) ? dataElement?.dataType?.rule : ""}"
+                value "${(dataElement?.dataType?.rule) ?: blank}"
                 style standardCellStyle
             }
+
+            //'Measurement Unit ID', 'Measurement Unit Name',
+            if (dataElement?.dataType?.instanceOf(PrimitiveType)) {
+                PrimitiveType prim = dataElement?.dataType
+                cell {
+                    value "${getModelCatalogueIdToPrint(prim?.measurementUnit)}"
+                    style standardCellStyle
+                }
+                cell {
+                    value "${prim?.measurementUnit.name}"
+                    style standardCellStyle
+                }
+            }
+            else {
+                // leave blank
+                cell {style standardCellStyle}
+                cell {style standardCellStyle}
+            }
+            // 'Metadata'
+
+            cell {
+                value "${dataElement?.ext.collect { key, value -> "$key: $value"}.join('\n')}"
+                style standardCellStyle
+            }
+
+
 //                [ ,
 //                  ,
 //                  ,
-//                  "${(dataElement?.involvedIn) ? printBusRule(dataElement?.involvedIn) : ""}",
-//                  "${(dataElement?.ext.get("LabKey Field Name")) ?: ""}",
-//                  "${(dataElement?.ext.get("Additional Review")) ?: ""}",
-//                  "${(dataElement?.ext.get("Additional Rule")) ?: ""}",
-//                  "${(dataElement?.ext.get("Additional Rule Dependency")) ?: ""}"].
+//                  "${(dataElement?.involvedIn) ? printBusRule(dataElement?.involvedIn) : blank}",
+//                  "${(dataElement?.ext.get("LabKey Field Name")) ?: blank}",
+//                  "${(dataElement?.ext.get("Additional Review")) ?: blank}",
+//                  "${(dataElement?.ext.get("Additional Rule")) ?: blank}",
+//                  "${(dataElement?.ext.get("Additional Rule Dependency")) ?: blank}"].
 //                    each{cellValue ->
 //                        cell {
 //                            value cellValue
@@ -230,7 +251,8 @@ class ExcelExporter {
     String printEnumeratedType(DataType dataType){
 
         if(dataType.instanceOf(EnumeratedType)){
-            return dataType.prettyPrint()
+            EnumeratedType enumerated = (EnumeratedType) dataType
+            return enumerated.prettyPrint()
         }
 
         return " "
