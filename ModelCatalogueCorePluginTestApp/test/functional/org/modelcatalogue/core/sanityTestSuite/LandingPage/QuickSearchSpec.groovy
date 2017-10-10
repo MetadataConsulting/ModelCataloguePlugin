@@ -43,12 +43,12 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
         check modalDialog displayed
 
         when:
-        fill 'name' with 'TESTING Validation Rule'
+        fill 'name' with 'Demo Model Validation'
 
         click save
 
         then:
-        check { infTableCell(1, 1) } contains 'TESTING Validation Rule'
+        check { infTableCell(1, 1) } contains 'Demo Model Validation'
     }
 
 
@@ -126,6 +126,7 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
         click quickSearch
 
         and:
+        Thread.sleep(3000L)
         fill search with "xs:string" and pick first item
 
         then:
@@ -156,11 +157,12 @@ class QuickSearchSpec extends AbstractModelCatalogueGebSpec{
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
         and:
-        fill search with "TESTING Validation Rule" and pick first item
+        Thread.sleep(3000L)
+        fill search with "Demo Model Validation" and pick first item
 
         then:
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-        check rightSideTitle contains "TESTING Validation Rule"
+        check rightSideTitle contains "Demo Model Validation"
 
     }
 

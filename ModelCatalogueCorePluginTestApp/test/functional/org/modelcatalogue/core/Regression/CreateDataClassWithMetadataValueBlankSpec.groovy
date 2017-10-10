@@ -24,7 +24,7 @@ import static org.modelcatalogue.core.geb.Common.rightSideTitle
 class CreateDataClassWithMetadataValueBlankSpec extends AbstractModelCatalogueGebSpec {
 
     private static final String createButton = "a#role_data-models_create-data-modelBtn"
-    private static final String finishStep = "button#step-finish"
+    private static final String finishStep = "#step-finish > span"
     private static final String closeStep = "div.modal-footer>button:nth-child(2)"
     private static final String  exitButton = "button#exit-wizard"
     private static final String   createdDataClass = "td.col-md-4>span>span>a"

@@ -1,15 +1,18 @@
 package org.modelcatalogue.core.Regression
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
+import org.openqa.selenium.By
+import org.openqa.selenium.interactions.Actions
 import spock.lang.Stepwise
-import spock.lang.Unroll
-
 import static org.modelcatalogue.core.geb.Common.create
+import static org.modelcatalogue.core.geb.Common.delete
 import static org.modelcatalogue.core.geb.Common.getDescription
-import static org.modelcatalogue.core.geb.Common.getModalHeader
 import static org.modelcatalogue.core.geb.Common.getModelCatalogueId
 import static org.modelcatalogue.core.geb.Common.getNameLabel
+import static org.modelcatalogue.core.geb.Common.item
+import static org.modelcatalogue.core.geb.Common.modalHeader
 import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
+import static org.modelcatalogue.core.geb.Common.pick
 import static org.modelcatalogue.core.geb.Common.rightSideTitle
 
 @Stepwise
@@ -21,7 +24,6 @@ class CreateNewVersionFromFinalisedToDraftSpec extends AbstractModelCatalogueGeb
     private static final String  versionsTreeViews='ul.catalogue-element-treeview-list-root>li>ul>li:nth-child(10)>div>span>span'
     private static final String  closeButton='div.modal-footer>button:nth-child(2)'
     private static final String  finishButton='button#step-finish'
-    private static final String   search='input#element'
     private static final String   dataClasses='ul.catalogue-element-treeview-list-root>li>ul>li:nth-child(1)>div>span>span'
     private static final String   createdVersion='tr.warning>td:nth-child(2)>a'
     private static final String   createdDataClass='td.col-md-4>span>span>a'
@@ -36,12 +38,12 @@ class CreateNewVersionFromFinalisedToDraftSpec extends AbstractModelCatalogueGeb
     private static final String   dataModelMenuButton='a#role_item_catalogue-element-menu-item-link>span:nth-child(3)'
     private static final String  dataWizard ='div.alert'
     private static final String exitButton= 'button#exit-wizard'
-    private static final String  dataClassCreated='tbody.ng-scope>tr:nth-child(2)>td:nth-child(1)>span>span>a'
     private static final String modelInTree = 'ul.catalogue-element-treeview-list-root>li>div>span>span'
     private static final String elementStep="button#step-elements"
     private static final String plusButton = "span.input-group-btn>button"
     private static final String  dataElement="input#data-element"
-    private static final String  raw ="ul.nav-pills>li:nth-child(4)>a"
+
+    private static  Actions action = null
 
     private static final int TIME_TO_REFRESH_SEARCH_RESULTS = 3000
 
@@ -87,9 +89,9 @@ class CreateNewVersionFromFinalisedToDraftSpec extends AbstractModelCatalogueGeb
     }
 
 
-    def"finalized the data model and create new version"(){
+    def"create data class and add data element from imported data model"() {
 
-        when:'refresh the page and select data model'
+        when: 'refresh the page and select data model'
 
         click modelCatalogue
 
@@ -110,11 +112,11 @@ class CreateNewVersionFromFinalisedToDraftSpec extends AbstractModelCatalogueGeb
         when:
         click create
 
-        then:'check the title of the page'
+        then: 'check the title of the page'
         check modalHeader is 'Data Class Wizard'
 
         when: 'fill the data class form'
-        fill nameLabel with'TESTING_CLASS'
+        fill nameLabel with 'TESTING_CLASS'
         fill modelCatalogueId with 'ME-34567'
         fill description with 'THIS IS MY TESTING DATA CLASS'
         click elementStep
@@ -122,6 +124,9 @@ class CreateNewVersionFromFinalisedToDraftSpec extends AbstractModelCatalogueGeb
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
         click plusButton
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
+        fill dataElement with 'MET-523.M1.DE1' and pick first item
+        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
+        fill dataElement with 'MET-523.M2.DE1' and pick first item
 
         and:
         click finishButton
@@ -130,9 +135,15 @@ class CreateNewVersionFromFinalisedToDraftSpec extends AbstractModelCatalogueGeb
         then:
         check dataWizard contains 'TESTING_CLASS'
 
-        when:'navigate to the top menu and select finalized'
+        expect: 'navigate to the top menu and select finalized'
         click exitButton
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
+
+    }
+
+    def"finalized the data model and create new version"() {
+
+        when:
         click modelInTree
         click dataModelMenuButton
         click finalize
@@ -148,53 +159,100 @@ class CreateNewVersionFromFinalisedToDraftSpec extends AbstractModelCatalogueGeb
         check table contains 'TESTING_DATA_MODEL_NEW_VERSION (0.0.1) finalized'
 
 
-        when:'navigate to the top menu and click on the new version'
+        when: 'navigate to the top menu and click on the new version'
         click dataModelMenuButton
         click newVersion
 
-        and:'fill the version form'
+        and: 'fill the version form'
 
         fill semanticVersion with '0.0.2'
         click createNewVersion
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
         click modalPrimaryButton
 
-        and:'navigate to the tree view and select versions'
+        and: 'navigate to the tree view and select versions'
         click versionsTreeViews
         click createdVersion
 
         then:
-        check rightSideTitle  contains 'TESTING_DATA_MODEL_NEW_VERSION'
+        check rightSideTitle contains 'TESTING_DATA_MODEL_NEW_VERSION'
 
+    }
 
-        when:
+    def"verify that data elements are createed"(int location,String dataElement){
+
         click dataClasses
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
         click createdDataClass
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
-        then:
-        check rightSideTitle contains'TESTING_CLASS'
-
-
-    }
-      @Unroll
-    def" verify that data are not duplicated"(int location,String dataElement){
-
-          //add a refresh
         expect:
-
         $("#data-elements-changes > div.inf-table-body > table > tbody > tr:nth-child($location) > td:nth-child(1) > a.preserve-new-lines.ng-binding.ng-scope").text().contains( dataElement)
-          Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
-
         where:
         location || dataElement
-        1        || 'MET-523.M3.DE'
-        2        || 'MET-523.M3.DE'
-        3        || 'MET-523.M3.DE'
+        1        || 'TEST_ELEMENT'
+        2        || 'MET-523.M1.DE1'
+        3        || 'MET-523.M2.DE1'
 
 
     }
+
+    def"finalized the draft data model and create a new version"(){
+
+        when:
+        selectInTree 'TESTING_DATA_MODEL_NEW_VERSION'
+
+        then:
+        check rightSideTitle contains 'TESTING_DATA_MODEL_NEW_VERSION MET-00263@0.0.2'
+
+        when:
+        click dataModelMenuButton
+        click finalize
+        then:
+        check modalHeader is 'Finalize Data Model'
+
+        when:
+        fill versionNote with 'TESTING VERSION'
+        click finalizeButton
+
+        and:
+        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
+        click modalPrimaryButton
+
+        then:
+        check table contains 'TESTING_DATA_MODEL_NEW_VERSION (0.0.2) finalized'
+
+        when:
+        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
+        click dataModelMenuButton
+        click newVersion
+
+
+        then:
+        check modalHeader is 'New Version of Data Model'
+
+        when:
+        fill semanticVersion with '0.0.3'
+        click createNewVersion
+        Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
+        click modalPrimaryButton
+        Thread.sleep(2000L)
+
+        and: 'navigate to the tree view and select versions'
+
+        Thread.sleep(4000l)
+        selectInTree 'Versions'
+        Thread.sleep(2000l)
+
+
+        then:
+        check { infTableCell(1, 1) } is '0.0.3'
+        check { infTableCell(2, 1) } is '0.0.2'
+        check { infTableCell(3, 1) } is '0.0.1'
+
+
+    }
+
 
 
 }

@@ -28,8 +28,8 @@ class EditDataElementSpec extends AbstractModelCatalogueGebSpec {
     private static final String  dataElement="tbody.ng-scope>tr:nth-child(1)>td:nth-child(1)>span>span>a"
     static final String  metadataLink = 'form.ng-pristine>div:nth-child(7)>p>span>span:nth-child(1)'
     private static final String submit="span.fa-check"
-    static final CatalogueContent metadataReviewed = CatalogueContent.create('*[name=metadataStep-reviewed]')
-    static final CatalogueContent metadataApproved = CatalogueContent.create('*[name=metadataStep-approved]')
+    static final CatalogueContent metadataReviewed = CatalogueContent.create('*[name=metadata-reviewed]')
+    static final CatalogueContent metadataApproved = CatalogueContent.create('*[name=metadata-approved]')
 
     def" login to model catalogue and select a draft model"(){
 
@@ -50,13 +50,13 @@ class EditDataElementSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         click inlineEdit
-        fill 'metadataStep-authors' with 'Neville Chamberlain'
-        fill 'metadataStep-reviewers' with 'Édouard Daladier'
-        fill 'metadataStep-owner' with 'Jan Hus'
+        fill 'metadata-authors' with 'Neville Chamberlain'
+        fill 'metadata-reviewers' with 'Édouard Daladier'
+        fill 'metadata-owner' with 'Jan Hus'
         fill metadataReviewed with '03/04/2017'
         fill metadataApproved with '03/05/2017'
-        fill 'metadataStep-namespace' with 'Namespace'
-        fill 'metadataStep-organization' with 'Organization'
+        fill 'metadata-namespace' with 'Namespace'
+        fill 'metadata-organization' with 'Organization'
         3.times { scroll up }
         click inlineEditSubmit
 
@@ -66,8 +66,8 @@ class EditDataElementSpec extends AbstractModelCatalogueGebSpec {
         when:
         click editButton
         Thread.sleep(3000l)
-        fill 'metadataStep-organization' with 'MetaData Consulting Limited'
-        fill 'metadataStep-namespace' with 'xString'
+        fill 'metadata-organization' with 'MetaData Consulting Limited'
+        fill 'metadata-namespace' with 'xString'
         and:'save '
         click submit
         Thread.sleep(3000)

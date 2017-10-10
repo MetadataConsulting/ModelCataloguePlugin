@@ -44,6 +44,8 @@ class CreateNewDraftAndAddDataTypeFromAnotherModelSpec  extends AbstractModelCat
     private static final String deleteButton = "a#delete-menu-item-link>span:nth-child(3)"
 
 
+
+
     def "login to model catalogue and create a data model"(){
 
         when:
@@ -163,6 +165,7 @@ class CreateNewDraftAndAddDataTypeFromAnotherModelSpec  extends AbstractModelCat
 
         when:
         fill semanticVersion with '2.0.1'
+        Thread.sleep(2000l)
 
         then:
         $("body > div.modal.fade.ng-isolate-scope.in > div > div > div.modal-body.ng-scope > form > div.checkbox.ng-scope > label > input").value(true)
@@ -223,6 +226,7 @@ class CreateNewDraftAndAddDataTypeFromAnotherModelSpec  extends AbstractModelCat
         check modalHeader is 'Do you really want to delete Data Model Draft Data Model?'
         and:
         click modalPrimaryButton
+
 
     }
 

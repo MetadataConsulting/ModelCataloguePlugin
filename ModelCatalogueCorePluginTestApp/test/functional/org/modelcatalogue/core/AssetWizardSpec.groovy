@@ -141,6 +141,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         check rightSideTitle contains 'MET-522'
 
         when:
+        Thread.sleep(2000)
         select 'MET-522' open 'Data Classes' select 'MET-522.M1'
 
         then:

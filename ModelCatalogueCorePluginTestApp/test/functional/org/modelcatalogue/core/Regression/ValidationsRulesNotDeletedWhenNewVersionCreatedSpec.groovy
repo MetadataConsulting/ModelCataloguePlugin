@@ -129,6 +129,7 @@ class ValidationsRulesNotDeletedWhenNewVersionCreatedSpec extends AbstractModelC
         when:
         fill semanticVersion with '1.0.0'
         fill revisionNotes with 'TESTING VALIDATION RULES'
+        Thread.sleep(4000l)
         click finalizedButton
         Thread.sleep(3000l)
         click modalPrimaryButton

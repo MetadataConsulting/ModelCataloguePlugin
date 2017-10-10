@@ -74,14 +74,11 @@ class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
     def " create a data element"() {
 
         when:
-        click modelCatalogue
-
-        and:
-        select 'Test 3' open 'Data Elements'
+        selectInTree 'Data Elements'
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
         then:
-        check rightSideTitle contains ' Active Data Elements'
+        check rightSideTitle contains 'Active Data Elements'
 
         when:
         click create
@@ -127,7 +124,7 @@ class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
         select 'Test 3' open 'Data Elements' select 'No tags'
 
         then:
-        check rightSideTitle contains ' Active Data Elements'
+        check rightSideTitle contains 'Active Data Elements'
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
         click createdTag
 
@@ -142,10 +139,6 @@ class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
     def " delete the created tag"() {
 
         when:
-        click modelCatalogue
-
-        and:
-        select 'Test 3'
         selectInTree 'Data Elements'
 
         then:
@@ -175,9 +168,10 @@ class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
         check table isGone()
 
         when:
-        click Tags
-        then:
-        check rightSideTitle is 'Active Tags'
+
+         selectInTree 'Tags'
+         then:
+         check rightSideTitle is 'Active Tags'
          and:
          check { infTableCell(1, 2) } contains 'TESTING_TAG'
 
@@ -200,8 +194,8 @@ class VerifyUserCanTagUsingTreeViewSpec extends AbstractModelCatalogueGebSpec{
         click modalPrimaryButton
 
         and:
-        select 'Test 3'
         selectInTree  'Deprecated Items'
+
         Thread.sleep(TIME_TO_REFRESH_SEARCH_RESULTS)
 
         then:

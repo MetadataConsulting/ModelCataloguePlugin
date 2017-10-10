@@ -2,8 +2,11 @@ package org.modelcatalogue.core.sanityTestSuite.CreateDataModels
 
 import org.modelcatalogue.core.geb.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.geb.CatalogueContent
+import org.openqa.selenium.By
+import org.openqa.selenium.interactions.Actions
 import spock.lang.Stepwise
 
+import static org.modelcatalogue.core.geb.Common.delete
 import static org.modelcatalogue.core.geb.Common.description
 import static org.modelcatalogue.core.geb.Common.getBackdrop
 import static org.modelcatalogue.core.geb.Common.getCreate
@@ -20,6 +23,8 @@ import static org.modelcatalogue.core.geb.Common.getSave
 import static org.modelcatalogue.core.geb.Common.item
 import static org.modelcatalogue.core.geb.Common.messages
 import static org.modelcatalogue.core.geb.Common.modalDialog
+import static org.modelcatalogue.core.geb.Common.modalHeader
+import static org.modelcatalogue.core.geb.Common.modalPrimaryButton
 import static org.modelcatalogue.core.geb.Common.modelCatalogueId
 import static org.modelcatalogue.core.geb.Common.nameLabel
 import static org.modelcatalogue.core.geb.Common.pick
@@ -35,7 +40,8 @@ class CreateDataTypeAndSelectSubsetSpec extends AbstractModelCatalogueGebSpec {
     private static final String pickEnumeratedType = '#pickEnumeratedType'
     private static final String  Rule = 'form.ng-valid>div:nth-child(4)>label'
     private static final String  regularExpression = 'p.help-block>a:nth-child(5)'
-    private static final String  ruleCreated = '#metadataCurator > div.container-fluid.container-main > div > div > div.ng-scope > div > div.split-view-right.data-model-detail-pane > ui-view > ui-view > div > div > div > div > form > div:nth-child(6) > div > ng-include > div > pre'
+    private static final String  dataModelMenuBar = 'a#role_item_catalogue-element-menu-item-link>span:nth-child(3)'
+    private static  Actions action = null
 
 
 
@@ -144,7 +150,7 @@ class CreateDataTypeAndSelectSubsetSpec extends AbstractModelCatalogueGebSpec {
 
         check enumeratedTypeBase displayed
 
-        fill enumeratedTypeBase with 'Enumeration 2' and pick first item
+        fill enumeratedTypeBase with 'Enumeration 1' and pick first item
 
         click '#subtype-enum-1'
 
@@ -161,8 +167,26 @@ class CreateDataTypeAndSelectSubsetSpec extends AbstractModelCatalogueGebSpec {
         select 'Test 3' open'Data Types' select'Enumeration 3'
 
         then:
-        check rightSideTitle contains 'Enumeration 3 319@0.0.1'
+        check rightSideTitle contains 'Enumeration 3'
 
+
+        expect:
+        check { infTableCell(1, 1) } contains "Enumeration 1"
+
+    }
+
+    def"delete the created enumeration"(){
+
+        when:
+        action = new Actions(driver)
+        action = action.clickAndHold(driver.findElement(By.cssSelector(dataModelMenuBar)))
+        click delete
+
+        then:
+        check modalHeader is 'Do you really want to delete Enumerated Type Enumeration 3?'
+
+        and:
+        click modalPrimaryButton
 
 
     }

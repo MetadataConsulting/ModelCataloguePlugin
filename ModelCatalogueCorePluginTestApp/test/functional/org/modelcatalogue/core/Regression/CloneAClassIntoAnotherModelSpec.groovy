@@ -13,7 +13,7 @@ import static org.modelcatalogue.core.geb.Common.pick
 import static org.modelcatalogue.core.geb.Common.rightSideTitle
 
 @Stepwise
-class CloneAanClassIntoAnotherModelSpec extends AbstractModelCatalogueGebSpec{
+class CloneAClassIntoAnotherModelSpec extends AbstractModelCatalogueGebSpec{
 
     private static final String  createButton='a#role_data-models_create-data-modelBtn'
     private static final String  cloneButton='a#clone-menu-item-link>span:nth-child(3)'

@@ -169,6 +169,7 @@ class DeprecateItemsAndCreateNewVersionSpec extends  AbstractModelCatalogueGebSp
         fill nameLabel with 'PRIMITIVE TYPE'
         fill modelCatalogueId with 'BD -001'
         fill description with 'TESTING DEPRECATED MODEL AND CREATE NEW VERSION'
+        Thread.sleep(3000l)
         click primitiveType
 
         then:
@@ -186,6 +187,7 @@ class DeprecateItemsAndCreateNewVersionSpec extends  AbstractModelCatalogueGebSp
         fill nameLabel with 'ENUMERATION TYPE'
         fill modelCatalogueId with 'BD -002'
         fill description with 'TESTING DEPRECATED MODEL AND CREATE NEW VERSION'
+        Thread.sleep(3000l)
         click enumerationType
 
         then:
@@ -282,6 +284,7 @@ class DeprecateItemsAndCreateNewVersionSpec extends  AbstractModelCatalogueGebSp
     def"create a new version of the data model"(){
 
         when:
+        Thread.sleep(3000L)
         selectInTree('Restore Version Model')
         Thread.sleep(3000L)
         click dataModelMenuBar

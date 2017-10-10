@@ -34,6 +34,7 @@ class DataElementAndDataTypeViewShowDepreciatedElementSpec extends AbstractModel
     private static final String dataElements= "ul.catalogue-element-treeview-list-root>li>ul>li:nth-child(2)>div>span>span"
     private static final String dataModel= "ul.catalogue-element-treeview-list-root>li>div>span>span"
     private static final String deleteButton= "a#delete-menu-item-link>span:nth-child(3)"
+    private static final String deprecatedButton= "button.btn-primary"
 
     def"login to model catalogue and create data model"(){
 
@@ -178,12 +179,7 @@ class DataElementAndDataTypeViewShowDepreciatedElementSpec extends AbstractModel
       when:
       click dataMenuBarButton
       click deprecated
-
-      then:
-      check modalHeader is 'Do you want to mark Data Type SIMPLE TYPE1 as deprecatedAndRestore?'
-
-      when:
-      click modalPrimaryButton
+      click deprecatedButton
 
       then:
       check rightSideTitle contains 'SIMPLE TYPE1 MD-0054@0.0.1'
@@ -207,11 +203,6 @@ class DataElementAndDataTypeViewShowDepreciatedElementSpec extends AbstractModel
       when:
       click dataMenuBarButton
       click deprecated
-
-      then:
-      check modalHeader is 'Do you want to mark Data Element ELEMENT1 as deprecatedAndRestore?'
-
-      when:
       click modalPrimaryButton
 
       then:
@@ -222,8 +213,6 @@ class DataElementAndDataTypeViewShowDepreciatedElementSpec extends AbstractModel
     def"check that data type and element are deprecated"(){
 
         when:
-        click modelCatalogueButton
-        select 'ElementAndType Model'
         selectInTree 'Deprecated Items'
 
         then:
@@ -237,7 +226,7 @@ class DataElementAndDataTypeViewShowDepreciatedElementSpec extends AbstractModel
 
     }
 
-    def"check that deprecated data type doe not  figure out on the list of data types"(){
+    def"check that deprecated data type does not figure out on the list of data types"(){
 
         when:
         Thread.sleep(2000l)

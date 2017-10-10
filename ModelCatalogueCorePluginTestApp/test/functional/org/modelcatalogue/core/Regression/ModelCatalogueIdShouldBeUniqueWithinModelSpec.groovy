@@ -220,7 +220,9 @@ class ModelCatalogueIdShouldBeUniqueWithinModelSpec extends AbstractModelCatalog
 
 
         when:
+        Thread.sleep(3000)
         fill nameLabel with 'Kilogram'
+        Thread.sleep(3000)
         fill 'input#symbol' with 'KG'
         fill modelCatalogueId with 'MET-13'
         fill description with'TESTING ELEMENT'
@@ -233,7 +235,9 @@ class ModelCatalogueIdShouldBeUniqueWithinModelSpec extends AbstractModelCatalog
 
 
         when:
+        Thread.sleep(3000)
         fill nameLabel with 'Little'
+        Thread.sleep(3000)
         fill 'input#symbol' with 'L'
         fill modelCatalogueId with 'MET-13'
         fill description with 'TESTING ELEMENT'

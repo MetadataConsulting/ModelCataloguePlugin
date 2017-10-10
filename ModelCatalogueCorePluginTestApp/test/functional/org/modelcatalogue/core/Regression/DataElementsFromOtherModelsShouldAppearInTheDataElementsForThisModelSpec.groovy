@@ -30,12 +30,9 @@ class DataElementsFromOtherModelsShouldAppearInTheDataElementsForThisModelSpec e
     private static final String closeStep ="div.modal-footer>button:nth-child(2)"
     private static final String dataMenuBarButton ="a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
     private static final String  createNewDataElement ="a#catalogue-element-create-dataElement-menu-item-link>span:nth-child(3)"
-    private static final String  modelCatalogueButton ="span.mc-name"
     private static final String  createDataTypes ="a#catalogue-element-create-dataType-menu-item-link>span:nth-child(3)"
     private static final String  createDataClass ="a#catalogue-element-create-dataClass-menu-item-link>span:nth-child(3)"
     private static final String  newDataClass ="td.col-md-4>span>span>a"
-    private static final String  importedDataTYPE="#data-elements-changes > div.inf-table-body > table > tbody > tr > td.inf-table-item-cell.ng-scope.col-md-3 > span > span"
-    private static final String  importedDataElement="#data-elements-changes > div.inf-table-body > table > tbody > tr > td:nth-child(1) > a.preserve-new-lines.ng-binding.ng-scope"
     private static final String  importedDataElementFromTreeView="ul.catalogue-element-treeview-list-root>li>ul>li:nth-child(1)>ul>li>ul>li>div>span>span"
 
 
@@ -109,8 +106,8 @@ class DataElementsFromOtherModelsShouldAppearInTheDataElementsForThisModelSpec e
     def" create a simple data type"(){
 
         when:
-        click modelCatalogueButton
-        select 'Data Element From'
+
+        selectInTree  'Data Element From'
 
         then:
         check rightSideTitle  contains 'Data Element From MET-2299@0.0.'
@@ -137,8 +134,8 @@ class DataElementsFromOtherModelsShouldAppearInTheDataElementsForThisModelSpec e
   def" create a data class and add data element from imported data model"(){
 
       when:
-      click modelCatalogueButton
-      select 'Data Element From'
+
+      selectInTree  'Data Element From'
 
       then:
       check rightSideTitle contains 'Data Element From MET-2299@0.0.1'
@@ -185,8 +182,6 @@ class DataElementsFromOtherModelsShouldAppearInTheDataElementsForThisModelSpec e
     def" verify that the new data class contains data element from imported data model"(){
 
         when:
-        click modelCatalogueButton
-        select 'Data Element From'
         selectInTree  'Data Classes'
         click newDataClass
 
@@ -195,29 +190,27 @@ class DataElementsFromOtherModelsShouldAppearInTheDataElementsForThisModelSpec e
 
 
         expect:
-        check importedDataElement contains 'MET-523.M1.DE1'
-        check importedDataTYPE  contains 'MET-523.M1.VD1'
+        check { infTableCell(1, 1) } contains 'MET-523.M1.DE1'
+        check { infTableCell(1, 3) } contains 'MET-523.M1.VD1'
 
 
         when:
         Thread.sleep(2000L)
-        click modelCatalogueButton
-        select 'Data Element From'
         selectInTree  'Data Classes'
         click newDataClass
         Thread.sleep(2000l)
         click importedDataElementFromTreeView
 
         then:
-        check rightSideTitle contains 'MET-523.M1.DE1 185@0.0.1'
+        check rightSideTitle contains 'MET-523.M1.DE1'
 
     }
 
     def"delete the created data model"(){
 
         when:
-        click modelCatalogueButton
-        select 'Data Element From'
+
+        selectInTree  'Data Element From'
 
         then:
         check rightSideTitle contains 'Data Element From MET-2299@0.0.1'
@@ -229,7 +222,7 @@ class DataElementsFromOtherModelsShouldAppearInTheDataElementsForThisModelSpec e
 
 
         then:
-        check modalHeader contains 'Do you really want to delete Data Model Data Element From?'
+        check modalHeader contains 'Do you really want to delete Data'
         and:
         click modalPrimaryButton
 

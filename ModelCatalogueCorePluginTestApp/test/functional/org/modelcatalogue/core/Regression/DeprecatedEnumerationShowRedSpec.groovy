@@ -20,6 +20,7 @@ import static org.modelcatalogue.core.geb.Common.rightSideTitle
 import static org.modelcatalogue.core.geb.Common.save
 
 @Stepwise @Title("https://metadataStep.atlassian.net/browse/MET-1245?filter=11400")
+
 class DeprecatedEnumerationShowRedSpec extends AbstractModelCatalogueGebSpec {
 
     private static final String createButton = "a#role_data-models_create-data-modelBtn"
@@ -31,7 +32,7 @@ class DeprecatedEnumerationShowRedSpec extends AbstractModelCatalogueGebSpec {
     private static final String enumeratedType = "a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
     private static final String deprecated = "a#archive-menu-item-link>span:nth-child(3)"
     private static final String dataModelMenuBar = "a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
-    public static final String pickEnumeratedType = '#pickEnumeratedType'
+    public static final String pickEnumeratedType = 'input#pickEnumeratedType'
     public static final CatalogueContent enumerationsTableEditor = CatalogueContent.create('table', title: 'Enumerations')
     private static  Actions action = null
 
@@ -119,7 +120,7 @@ class DeprecatedEnumerationShowRedSpec extends AbstractModelCatalogueGebSpec {
         click deprecated
 
         then:
-        check modalHeader is 'Do you want to mark Enumerated Type Enumeration 2 as deprecatedAndRestore?'
+        check modalHeader is 'Do you want to mark Enumerated Type Enumeration 2 as deprecated?'
         and:
         click modalPrimaryButton
 
@@ -137,7 +138,7 @@ class DeprecatedEnumerationShowRedSpec extends AbstractModelCatalogueGebSpec {
         click deprecated
 
         then:
-        check modalHeader is 'Do you want to mark Enumerated Type Enumeration 1 as deprecatedAndRestore?'
+        check modalHeader is 'Do you want to mark Enumerated Type Enumeration 1 as deprecated?'
         and:
         click modalPrimaryButton
 

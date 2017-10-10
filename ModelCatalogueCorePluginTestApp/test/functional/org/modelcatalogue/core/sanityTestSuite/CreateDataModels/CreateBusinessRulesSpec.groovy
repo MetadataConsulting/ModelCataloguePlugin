@@ -23,8 +23,8 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
     private static final String businessRule ="td.col-md-4>span>span>a"
     private static final String validationRuleButton ="a#role_item_catalogue-element-menu-item-link>span:nth-child(3)"
     private static final String deleteButton ="a#delete-menu-item-link>span:nth-child(3)"
-    private static final String stepMetadata = "#step-metadataStep"
-    private static final String stepChildren = "#step-children"
+    private static final String stepMetadata = "button#step-metadata"
+    private static final String stepChildren = "button#step-children"
     private static final String dataElements = "ul.catalogue-element-treeview-list-root>li>ul>li:nth-child(2)>div>span>span"
     private static final String stepFinish = "#step-finish"
     private static final String exitButton = "#exit-wizard"
@@ -42,7 +42,7 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
         select'Test 3' select 'Data Classes'
 
         then:
-        check rightSideTitle  contains ' Active Data Classes'
+        check rightSideTitle  contains 'Active Data Classes'
     }
 
     def"create a data Class"(){
@@ -95,7 +95,7 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
     def"create a data element "(){
 
         when:
-        click dataElements
+        selectInTree 'Data Elements'
         click create
 
         and:
@@ -121,7 +121,7 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
      def" Navigate to business rules page"(){
 
          when:
-         click businessRules
+         selectInTree 'Business Rules'
          click create
          then:
          check modalHeader is "New Validation Rule"
@@ -157,7 +157,6 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         click modelCatalogue
-
         and:
         select'Test 3' select 'Business Rules'
         selectInTree "Business Rules"
@@ -167,6 +166,10 @@ class CreateBusinessRulesSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         click businessRule
+
+        then:
+        check { infTableCell(1, 1) } contains "New Data Class"
+
 
         and:'navigate to the top menu and click on the validation button'
         click validationRuleButton
