@@ -9,8 +9,8 @@ stewardship = angular.module('mc.core.stewardship',
     #,'ui.bootstrap'
   ])
 
-# List of levels to be selected for sensitivity
-stewardship.controller 'SelectSensitivity', ($scope) ->
+
+stewardship.controller 'SelectStewardshipInfo', ($scope) ->
   $scope.sensitivityLevels = [
     "Anonymous"
     "Personal"
@@ -18,6 +18,11 @@ stewardship.controller 'SelectSensitivity', ($scope) ->
     "Pseudonymous"
     "Sensitive"
   ]
+  $scope.effectiveFrom = new Date($scope.element.ext.get('http://stewardship.modelcatalogue.org/stewardship#effectiveFrom'))
+  $scope.effectiveTo = new Date($scope.element.ext.get('http://stewardship.modelcatalogue.org/stewardship#effectiveTo'))
+  $scope.lastAudit = new Date($scope.element.ext.get('http://stewardship.modelcatalogue.org/stewardship#lastAudit'))
+
+
 
 stewardship.config ['detailSectionsProvider', (detailSectionsProvider)->
   detailSectionsProvider.register {

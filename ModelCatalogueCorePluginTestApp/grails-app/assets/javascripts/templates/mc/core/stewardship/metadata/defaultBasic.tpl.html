@@ -18,7 +18,7 @@
       "http://stewardship.modelcatalogue.org/stewardship#databaseAdministrator" # name
 
       -->
-    <table class="table table-condensed table-striped table-borderless table-no-margin small">
+    <table ng-controller="SelectStewardshipInfo"  class="table table-condensed table-striped table-borderless table-no-margin small">
         <tr ng-if="view.handlesKey('http://stewardship.modelcatalogue.org/stewardship#registrationAuthority')">
           <th class="col-md-3">
             Registration Authority
@@ -73,8 +73,8 @@
           </th>
           <td class="full-width-editable">
 
-              <span editable-date="extAsMap['http://stewardship.modelcatalogue.org/stewardship#effectiveFrom']" class = "small">
-                        {{element.ext.get('http://stewardship.modelcatalogue.org/stewardship#effectiveFrom')
+              <span editable-date="effectiveFrom" class = "small">
+                        {{effectiveFrom
                           | date: "dd/MM/yyyy"}}
                     </span>
           </td>
@@ -89,8 +89,8 @@
           </th>
           <td class="full-width-editable">
 
-              <span editable-date="extAsMap['http://stewardship.modelcatalogue.org/stewardship#effectiveTo']" class = "small">
-                        {{element.ext.get('http://stewardship.modelcatalogue.org/stewardship#effectiveTo')
+              <span editable-date="effectiveTo" class = "small">
+                        {{effectiveTo
                             | date: "dd/MM/yyyy"}}
                     </span>
           </td>
@@ -105,13 +105,12 @@
             </th>
             <td class="full-width-editable">
                 <!-- this editable date is an HTML5 feature -->
-                    <span editable-date="extAsMap['http://stewardship.modelcatalogue.org/stewardship#lastAudit']"
-
+                    <span editable-date="lastAudit"
                           class = "small">
                       <!--e-is-open="opened.$data"
                           e-ng-click="open($event,'$data')"
                           e-datepicker-popup="dd-MMMM-yyyy"-->
-                        {{element.ext.get('http://stewardship.modelcatalogue.org/stewardship#lastAudit')
+                        {{lastAudit
                             | date: "dd/MM/yyyy"
                             }}<!--want to format with| date:"dd/MM/yyyy"-->
                     </span>
@@ -126,7 +125,7 @@
                    popover-trigger="mouseenter"></i>
             </th>
             <td class="full-width-editable">
-                <div  ng-controller="SelectSensitivity">
+                <div >
                     <span editable-select="extAsMap['http://stewardship.modelcatalogue.org/stewardship#sensitivity']"
                           e-ng-options="s for s in sensitivityLevels"
                           class = "small">

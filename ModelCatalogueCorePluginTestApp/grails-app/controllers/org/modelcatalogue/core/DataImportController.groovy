@@ -141,7 +141,7 @@ class DataImportController  {
             executeInBackground(id, "Imported from XML ZIP") {
                 try {
                     ExcelLoader parser = new ExcelLoader()
-                    parser.buildModelFromStandardWorkbookSheet(HeadersMap.createForStandardExcelLoader(), wb, defaultCatalogueBuilder)
+                    parser.buildModelFromStandardWorkbookSheet(HeadersMap.createForStandardExcelLoader(), inputStream, )
                     finalizeAsset(id, (DataModel) (defaultCatalogueBuilder.created.find {it.instanceOf(DataModel)} ?: defaultCatalogueBuilder.created.find{it.dataModel}?.dataModel), userId)
                 } catch (Exception e) {
                     logError(id, e)
@@ -197,7 +197,7 @@ class DataImportController  {
             return
         }
 
-        if (checkFileNameEndsWith('.obo')) {
+        if (checkFileNameEndsWith(file, '.obo')) {
             Asset asset = assetService.storeAsset(params, file, 'text/obo')
             def id = asset.id
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
@@ -217,7 +217,7 @@ class DataImportController  {
             return
         }
 
-        if (checkFileNameEndsWith('c.csv')) {
+        if (checkFileNameEndsWith(file, '.csv')) {
             Asset asset = assetService.storeAsset(params, file, 'application/model-catalogue')
             def id = asset.id
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)
@@ -236,7 +236,7 @@ class DataImportController  {
             return
         }
 
-        if (checkFileNameEndsWith('.mc')) {
+        if (checkFileNameEndsWith(file, '.mc')) {
             Asset asset = assetService.storeAsset(params, file, 'application/model-catalogue')
             def id = asset.id
             defaultCatalogueBuilder.monitor = BuildProgressMonitor.create("Importing $file.originalFilename", id)

@@ -252,7 +252,7 @@ class DataArchitectService {
         suggestions[label] = suggestionGenerator
     }
 
-    def generateSuggestions(String suggestion = null, String dataModel1ID, String dataModel2ID, String minScore = 10) {
+    def generateSuggestions(String suggestion = null, String dataModel1ID, String dataModel2ID, String minScore = 10, modelCatalogueSecurityService = modelCatalogueSecurityService) {
 
         def execute = { String label, Runnable cl ->
             log.info "Creating suggestions '$label'"
