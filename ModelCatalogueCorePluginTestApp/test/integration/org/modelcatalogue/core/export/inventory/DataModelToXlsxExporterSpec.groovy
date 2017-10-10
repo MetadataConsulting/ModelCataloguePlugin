@@ -24,11 +24,65 @@ class DataModelToXlsxExporterSpec extends AbstractIntegrationSpec {
     @Rule TemporaryFolder temporaryFolder = new TemporaryFolder()
 
     def setup() {
+
         initRelationshipTypes()
         CatalogueXmlLoader loader = new CatalogueXmlLoader(catalogueBuilder)
         loader.load(DataModelToXlsxExporterSpec.getResourceAsStream('TestDataModelV1.xml'))
         loader.load(DataModelToXlsxExporterSpec.getResourceAsStream('TestDataModelV2.xml'))
         dataModel = DataModel.findByNameAndSemanticVersion('TestDataModel', '2')
+        dataModel.save(flush:true, failOnError:true)
+        DataClass toDelete = DataClass.findByNameAndDataModel("NHIC Datasets Test for Delete", dataModel)
+        toDelete.deleteRelationships()
+        toDelete.delete(flush:true, failOnError:true)
+
+        /*
+        *  Differences between test data model v1 and test model v2
+        *
+        * CLASSES
+        *
+        * NHIC Datasets Test for Delete Class should be deleted i.e. only appear no the front page in red
+        *
+        * NHIC Datasets Class
+        * v2 - Additional metadata - skip export true
+        *
+        * Ovarian Cancer Class
+        * v2 - Additional metadata - subsection true
+        *
+        * CUH Class
+        * v2 - Additional metadata - skip export  true
+        *
+        * Round 1 Class
+        * v2 - Additional metadata - skip export  true
+        *
+        * Main Class
+        * v2 - Additional metadata - skip export  true
+        * v2 - Added Imaging
+        * v2 - Moved Demographics to top level - SHOULD BE HIGHLIGHTED
+        *
+        * Patient Identity Details Class
+        * v2 - Added Min Max Constraints (could be displayed as a main class change as well)
+        * *  NHS Number Data Element
+        * * * * v2 - changed data type to Number from String
+        * *  nhsNumberStatusIndicatorCode Data Element
+        * * * * v2 - data type changed
+        * * * * * nhsNumberStatusIndicatorCode Type
+        * * * * * deprecated  enumerations 6, modified enumeration 8, removed enumeration 01,07, added enumeration 4,5,10
+        * *  Person Birth Data Data Element removed
+        * *  ORGANISATION CODE (CODE OF PROVIDER) Data Element added
+        *
+        * Referrals Class
+        * * sourceOfReferralForOutPatients Data Element
+        * v2 - multiplicity added - min occurs 2, max occurs 5
+        * v2 - metadata removed - E, F, G, H, E2
+        * v2 type changed
+        * * * * sourceOfReferralForOutPatients Type
+        * * * * 07, 92 - deleted, 06, 10 deprecated, 99 new, 05 changed
+        *
+        *
+        * */
+
+
+
     }
 
     def "export model to excel"() {
