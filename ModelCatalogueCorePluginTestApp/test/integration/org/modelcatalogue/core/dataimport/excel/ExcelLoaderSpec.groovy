@@ -46,6 +46,17 @@ class ExcelLoaderSpec extends AbstractIntegrationSpec {
 
     }
 
+    def "test expected output loading spreadsheet produced by ExcelExporter"() {
+        expect: similar excelLoader.buildXmlFromSpreadsheetFromExcelExporter(
+                HeadersMap.createForSpreadsheetFromExcelExporter(),
+                WorkbookFactory.create(
+                        (new FileInputStream(resourcePath + '/' + 'excel_exporter_rule_measurement_unit.xls'))),
+                0,
+                'Fresh Model Imported From ExcelExporter Spreadsheet'),
+
+                (new FileInputStream(new File(resourcePath + '/test_expected_xml_from_load_spreadsheet_from_excel_exporter.xml'))).text
+    }
+
     def "test default catalogue builder imports dataset"(){
 
         when: "I load the Excel file"
